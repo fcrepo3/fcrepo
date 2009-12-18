@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" title="Export {pid}" showCloseButton="true" close="closeDialog(event)">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.TextArea;
+			import mx.managers.PopUpManager;
+			import mx.events.CloseEvent;
+			import script.Alerts;
+			import script.ErrorHandler;
+         	
+         	[Bindable]
+         	public var pid:String;
+         	
+			public var url:String;
+			
+            /**
+             * Used for exporting object content. At the class level because 
+             * it must stay in scope while the file is being downloaded.
+             */
+            private var exportFile:FileReference = new FileReference();
+            
+            /**
+             * Sets the export content url
+             */ 
+            public function setup(pid:String, url:String):void {
+                this.pid = pid;
+                this.url = url;
+            }
+         	
+            /**
+             * Exports an object.
+             */ 
+            private function exportObject():void {
+                var formatURI:String = "info:fedora/fedora-system:" + 
+                                       format.selectedValue.toString();
+                var contextType:String = context.selection.id;
+                if(contextType == "publicaccess") { 
+                    contextType = "public"; 
+                }                  
+                var request:URLRequest = new URLRequest(url + 
+                                                        "?format=" + formatURI + 
+                                                        "&context=" + contextType);
+                request.method = URLRequestMethod.GET;              
+                var fileName:String = pid.replace(":", "_") + ".xml";
+                              
+                exportFile.addEventListener(IOErrorEvent.IO_ERROR, 
+                                            ErrorHandler.handleFault);              
+                exportFile.download(request, fileName);
+                closeDialog(null);
+            }
+         
+            /**
+             * Closes the login dialog
+             */
+            private function closeDialog(event : CloseEvent):void {
+                PopUpManager.removePopUp(this);
+            }
+		]]>
+	</mx:Script>
+   
+	<mx:Form defaultButton="{ok}">
+	    <mx:HBox>
+    		<mx:FormItem width="180">
+    		    <mx:Label text="Format" styleName="header" />
+    			<mx:RadioButtonGroup id="format"/>
+                <mx:RadioButton groupName="format" id="foxml11" selected="true"
+                                label="FOXML-1.1"/>
+                <mx:RadioButton groupName="format" id="foxml10"
+                                label="FOXML-1.0"/>
+                <mx:RadioButton groupName="format" id="mets11"
+                                label="METSFedoraExt-1.1"/>
+                <mx:RadioButton groupName="format" id="mets10"
+                                label="METSFedoraExt-1.0"/>
+                <mx:RadioButton groupName="format" id="atom"
+                                label="ATOM-1.1"/>
+                <mx:RadioButton groupName="format" id="atomzip"
+                                label="ATOMZip-1.1"/>                                                                
+    		</mx:FormItem>
+    		<mx:FormItem width="150">
+    		    <mx:Label text="Context" styleName="header" />
+                <mx:RadioButtonGroup id="context"/>
+                <mx:RadioButton groupName="context" id="migrate" selected="true"
+                                label="Migrate"/>
+                <mx:RadioButton groupName="context" id="publicaccess"
+                                label="Public Access"/>
+                <mx:RadioButton groupName="context" id="archive"
+                                label="Archive"/>
+    		</mx:FormItem>
+		</mx:HBox>				    	  
+	</mx:Form>
+
+	<mx:HBox>
+		<mx:Button label="Ok" id="ok" click="exportObject()"/>
+		<mx:Button label="Cancel" click="closeDialog(null)"/>
+	</mx:HBox>
+
+</mx:TitleWindow>

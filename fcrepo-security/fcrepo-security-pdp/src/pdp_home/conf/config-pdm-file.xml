@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<pdm-file>
+	<directory name="/policy-db" />
+	<schemaConfig validation="false">
+			<schema
+				namespace="urn:oasis:names:tc:xacml:2.0:context:schema:os"
+				location="http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-context-schema-os.xsd"/>
+			<schema
+				namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+				location="http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd"/>
+	</schemaConfig>
+	<indexMap>
+		<subjectAttributes>
+			<attribute name="urn:oasis:names:tc:xacml:1.0:subject:subject-id" type="http://www.w3.org/2001/XMLSchema#string"/>
+			<attribute name="urn:fedora:names:fedora:2.1:subject:loginId" type="http://www.w3.org/2001/XMLSchema#string"/>
+			<attribute name="urn:fedora:names:fedora:2.1:subject:role" type="http://www.w3.org/2001/XMLSchema#string"/>
+		</subjectAttributes>
+		<resourceAttributes>
+			<attribute name="urn:oasis:names:tc:xacml:1.0:resource:resource-id" type="http://www.w3.org/2001/XMLSchema#anyURI"/>
+			<attribute name="urn:fedora:names:fedora:2.1:resource:object:pid" type="http://www.w3.org/2001/XMLSchema#string"/>
+			<attribute name="urn:fedora:names:fedora:2.1:resource:datastream:id" type="http://www.w3.org/2001/XMLSchema#string"/>
+		</resourceAttributes>
+		<actionAttributes/>
+		<environmentAttributes/>
+	</indexMap>
+</pdm-file>

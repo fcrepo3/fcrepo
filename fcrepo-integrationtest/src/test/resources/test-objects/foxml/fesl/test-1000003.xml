@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject FEDORA_URI="info:fedora/test:1000003"
+  PID="test:1000003" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+  xmlns:tv="http://nish.person.org/tv#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Chuck Versus the Helicopter"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X"
+    FEDORA_URI="info:fedora/test:1000003/RELS-EXT" ID="RELS-EXT"
+    STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion
+      FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0"
+      ID="RELS-EXT.0" LABEL="RDF Metadata" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <rdf:RDF
+          xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
+          <rdf:Description rdf:about="info:fedora/test:1000003">
+            <rel:isMemberOf rdf:resource="info:fedora/test:1000001"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X"
+    FEDORA_URI="info:fedora/test:1000003/DC" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.0"
+      LABEL="Dublin Core" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:identifier>test:1000003</dc:identifier>
+          <dc:title>Chuck Versus the Helicopter</dc:title>
+          <dc:format>video/x-msvideo</dc:format>
+          <dc:type>video</dc:type>
+          <dc:description>The Government wants to verify the secrets are inside Chuck's head. So they send a doctor who programmed the Intersect system to examine Chuck. When the doctor's car explodes. There's evidence one of the agencies was involved, leaving Chuck unsure whom to trust.</dc:description>
+          <dc:source>http://www.imdb.com/title/tt1035917/</dc:source>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X"
+    FEDORA_URI="info:fedora/test:1000003/TV" ID="TV" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="TV.0" LABEL="TV Data" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <episode id="1035917" xmlns="http://nish.person.org/tv#">
+          <title>Chuck Versus the Helicopter</title>
+          <synopsis>The Government wants to verify the secrets are inside Chuck's head. So they send a doctor who programmed the Intersect system to examine Chuck. When the doctor's car explodes. There's evidence one of the agencies was involved, leaving Chuck unsure whom to trust.</synopsis>
+          <season>01</season>
+          <episode>02</episode>
+          <year>2007</year>
+          <aired>1 October 2007</aired>
+          <imdbUrl>http://www.imdb.com/title/tt1035917/</imdbUrl>
+        </episode>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapping>
+	<actionAttributes>
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-addDatastream" to="create" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-addDisseminator" to="create" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-adminPing" to="admin" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-export" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getDatastream" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getDatastreamHistory" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getDatastreams" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getDisseminator" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getDisseminators" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getDisseminatorHistory" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getNextPid" to="create" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getObjectProperties" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getObjectXML" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-ingest" to="create" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-modifyDatastreamByReference" to="update" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-modifyDatastreamByValue" to="update" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-modifyDisseminator" to="update" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-modifyObject" to="update" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-purgeObject" to="delete" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-purgeDatastream" to="delete" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-purgeDisseminator" to="delete" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-setDatastreamState" to="update" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-setDisseminatorState" to="update" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-describeRepository" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-findObjects" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-riFindObjects" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getDatastreamDissemination" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getDissemination" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getObjectHistory" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getObjectProfile" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-listDatastreams" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-listMethods" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-listObjectInFieldSearchResults" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-listObjectInResourceIndexResults" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-actAsSurrogateFor" to="admin" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-serverShutdown" to="admin" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-serverStatus" to="admin" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-oai" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-upload" to="create" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-dsstate" to="update" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-resolveDatastream" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-reloadPolicies" to="admin" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getRelationships" to="read" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-addRelationship" to="create" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-purgeRelationship" to="delete" />
+	</actionAttributes>
+</mapping>

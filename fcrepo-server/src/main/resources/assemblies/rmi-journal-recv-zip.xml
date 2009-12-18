@@ -1,0 +1,27 @@
+<assembly>
+  <id>rmi-journal-recv</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+
+  <fileSets>
+
+    <fileSet>
+      <directory>../resources/inc/journal</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+
+  </fileSets>
+
+  <dependencySets>
+
+    <dependencySet>
+      <includes>
+        <include>org.fcrepo:fcrepo-server:jar:rmi-journal-recv:${project.version}</include>
+      </includes>
+      <useProjectAttachments>true</useProjectAttachments>
+    </dependencySet>
+
+  </dependencySets>
+
+</assembly>

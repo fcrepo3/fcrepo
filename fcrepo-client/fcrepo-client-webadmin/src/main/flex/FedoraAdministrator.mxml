@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+				xmlns:flexlib="http://code.google.com/p/flexlib/"
+				pageTitle="Fedora Web Administrator"
+	            layout="vertical"
+	            backgroundColor="#FFFFFF"
+	            creationComplete="login()">
+         
+	<mx:Style source="styles.css" />
+
+	<mx:Script>
+		<![CDATA[
+		    import mx.rpc.events.ResultEvent;
+			import mx.managers.PopUpManager;
+			import mx.utils.URLUtil;
+			import mx.controls.Alert;
+			import script.Alerts;			
+			import script.ErrorHandler;
+			import script.Util;
+			
+            [Bindable]
+            public var title:String = "Fedora Web Administrator - Beta";
+			
+			[Bindable]
+			public var baseUrl:String = null;
+
+            public var cookie:SharedObject;
+                       
+            /**
+             * Creates a dialog to allow a user to enter the information necessary
+             * to log in to a repository.
+             */ 						
+			private function login():void {
+			    var protocol:String;
+			    var host:String;
+			    var port:String;
+			    var context:String;
+			    
+			    cookie = SharedObject.getLocal("fedora");
+			    if (cookie.size > 0) { // See if there is an available cookie
+                    protocol = cookie.data.protocol;
+                    host = cookie.data.host;
+                    port = cookie.data.port;
+                    context = cookie.data.context;
+                } else { // Use the url on which this SWF file was loaded for defaults
+    			    var url:String = this.url;
+    			    var loadedProtocol:String = URLUtil.getProtocol(url);
+    				var loadedHost:String = URLUtil.getServerName(url);
+    				var loadedPort:uint = URLUtil.getPort(url);
+    				if(loadedProtocol != null && loadedProtocol != "") {
+    				    protocol = loadedProtocol;
+    				}
+    				if(loadedHost != null && loadedHost != "") {
+    				    host = loadedHost;
+    				}
+    				if(loadedPort > 0) {
+    				    port = new String(loadedPort);
+    				}
+                }
+				
+				// Backup defaults
+				if(protocol == null || protocol == "") {
+				    protocol = "http";
+				}				
+				if(host == null || host == "") {
+				    host = "localhost";
+				}
+				if(port == null || port == "") {
+				    port = "8080";
+				}
+				if(context == null || context == "") {			
+				    context = "fedora";
+				}
+
+                var initialized:Boolean = false;
+                if(baseUrl != null) {
+                    initialized = true;
+                }
+
+                // Let the user set the connection parameters
+                var loginDialog:LoginDialog = new LoginDialog();				
+				loginDialog.setup(protocol, host, port, context, initialized);
+				PopUpManager.addPopUp(loginDialog, this, true);
+				PopUpManager.centerPopUp(loginDialog);				
+			}
+
+            /**
+             * Collects the information necessary to connect to a repository.
+             */
+           public function setRepo(protocol:String, host:String, port:String, context:String) : void {           	
+            	this.baseUrl = protocol+"://"+host+":"+port+"/"+context;
+            	
+            	ErrorHandler.baseUrl = baseUrl;            	
+            	
+            	cookie.data.protocol = protocol;
+                cookie.data.host = host;
+                cookie.data.port = port;
+                cookie.data.context = context;
+                cookie.flush();
+            	
+                repository.send();                
+            }
+
+            /**
+             * Updates the datastream list on an existing object tab given the
+             * object's PID. This should be used when the contents of the list
+             * changes (add/modify/purge datastream) to keep the list in sync 
+             * with the object in the repository.
+             */
+            public function updateObjectDSList(pid:String) : void {
+                var objTabIndex:int = findObjectTab(pid);
+                                
+                if(objTabIndex > -1) {
+                    (tabs.getChildAt(objTabIndex) as ObjectTab).updateDatastreamList();
+                }
+            }
+
+            /**
+             * Finds the tab on which an object with a given pid is displayed. 
+             * Returns the index of the tab or -1 if no tab is found.
+             */
+            private function findObjectTab(pid:String) : int {
+                for(var i:int=0; i<tabs.numChildren; i++) {
+                    var tab:DisplayObject = tabs.getChildAt(i);                    
+                    if(tab is ObjectTab) {
+                        var objectTab:ObjectTab = tab as ObjectTab;
+                        if(objectTab.label == pid) {
+                            return i;                   
+                        }
+                    }
+                }
+                return -1;
+            }
+            
+            /**
+             * Attempts to retrieve an object. If the object is already displayed
+             * in a tab, that tab is selected, otherwise an existance check is
+             * performed prior to opening a new object tab.
+             */
+            public function openObject(pid:String):void {
+                var objTabIndex:int = findObjectTab(pid);
+                
+                if(objTabIndex > -1) {
+                    tabs.selectedIndex = objTabIndex;
+                } else {
+                    var objectLoader:URLLoader = new URLLoader();
+                    objectLoader.addEventListener(IOErrorEvent.IO_ERROR, 
+                                                  openObjectFaultHandler);
+                    objectLoader.addEventListener(Event.COMPLETE, 
+                                                  function():void{addObjectTab(pid);});            
+                    var objectRequest:URLRequest =
+                        new URLRequest(baseUrl+"/objects/"+pid+"?format=xml");           
+                    objectLoader.load(objectRequest);
+                }
+            }                     
+            
+            /**
+             * Adds a tab to display a digital object.
+             */
+		    private function addObjectTab(pid:String):void {
+                var newTab:ObjectTab = new ObjectTab();
+                newTab.setup(baseUrl, pid);
+                tabs.addChild(newTab);                              
+                tabs.selectedIndex = tabs.numChildren - 1;                    
+      		}
+
+            /**
+             * Adds a tab to display search results.
+             */      		
+		    private function addSearchTab(terms:String, fields:Array):void {
+		        if(terms.indexOf("'") >= 0 || terms.indexOf("\"") >= 0) {
+		            Alerts.showInfo("The search term may not contain quotes");
+		        } else {
+           			var newTab:SearchTab = new SearchTab();   				
+       				tabs.addChild(newTab);
+       				tabs.selectedIndex = tabs.numChildren - 1;       			  
+       				newTab.setup(baseUrl, terms, fields);
+		        }
+      		}
+      		
+      		/**
+      		 * Creates a new digital object in the repository
+      		 */ 
+      		private function createNewObject(pid:String, label:String):void {      						
+				if(pid != null && pid != "" && pid.indexOf(":") <= 0) {
+                    Alerts.showInfo("PID must be of the form 'namespace:alphaNumericName'");  
+				} else {
+				    label = Util.replaceAll(label, "&", "<>amp;");
+                    label = Util.replaceAll(label, "<>amp;", "&amp;");
+				    label = Util.replaceAll(label, "\"", "&quot;");
+				    label = Util.replaceAll(label, "<", "&lt;");
+				    label = Util.replaceAll(label, ">", "&gt;");				    
+				    
+				    createObject.contentType = "text/xml";
+                    createObject.send(createObjectXml(pid, label));
+				}
+      		}
+      		
+      		/**
+      		 * Handles the result of an object creation request.
+      		 */
+      		private function objectCreationComplete(event:ResultEvent):void {
+      		    var error:String = ErrorHandler.getError(event.result);
+                if(error != null) {
+                    Alerts.showError("Could not create object " + 
+                                     "due to: " + error);
+                    return;
+                }
+      		    			
+      			var pid:String = event.result.toString();
+      			if(pid != null && pid != "") {
+      				openObject(pid);
+      			} else {
+      				Alerts.showInfo("No pid is available to open a viewer.");
+      			}
+      		}
+      		
+      		/**
+      		 * Constructs a FOXML document for an empty digital object.
+      		 */
+      		private function createObjectXml(pid:String, label:String):String {
+				var xml:String = 
+				  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+        		  "<foxml:digitalObject VERSION=\"1.1\"" +
+        		  " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" + 
+        		  " xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\"" +
+        		  " xsi:schemaLocation=\"info:fedora/fedora-system:def/foxml#" + 
+        		  " http://www.fedora.info/definitions/1/0/foxml1-1.xsd\"";
+       			if(pid != null && pid != "") {
+				  xml += " PID=\"" + pid + "\"";
+      			}
+      			xml += "><foxml:objectProperties>" +
+        		  "<foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>" +
+        		  "<foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\"" + label + "\"/>" +
+        		  "</foxml:objectProperties>" +
+        		  "</foxml:digitalObject>";
+        		return xml;
+      		}
+      		
+      		/**
+      		 * Provides a browse and select dialog for choosing an XML file for object ingest
+      		 */
+      		private function ingestObject(format:String):void {
+      		    var ingestUrl:String = baseUrl+"/objects/new?format=info:fedora/fedora-system:"+
+      		                           format+"&flash=true";
+                if(flash.system.Capabilities.playerType == "ActiveX")
+                { // If IE, do flex upload
+                    var fileUploadDialog:FileUploadDialog = new FileUploadDialog();
+                    fileUploadDialog.setup(ingestUrl + "&ignoreMime=true", "text/xml");
+                    PopUpManager.addPopUp(fileUploadDialog, this, true);
+                    PopUpManager.centerPopUp(fileUploadDialog);
+                }
+                else
+                { // Otherwise do javascript upload   
+                  if (ExternalInterface.available) {
+                      ExternalInterface.addCallback("jsUploadComplete", jsUploadComplete);                  
+                      ExternalInterface.call("upload",ingestUrl);
+                  }
+                }			
+      		}
+      		
+      		/**
+      		 * Handles the response from a JavaScript file upload
+      		 */
+      		private function jsUploadComplete(response:String):void {
+      		    var error:String = ErrorHandler.getError(response);
+                if(error != null) {
+                    Alerts.showError("Object ingest failed due to: " + error);
+                    return;
+                }
+                
+                // Determine the type of file upload
+                // If object ingest, response should contain a PID
+                // If datastream upload, response should be empty
+                if(response.indexOf(":") > 0) {
+                    if(response.indexOf("<") < 0 && response.indexOf(">") < 0) {
+                        openObject(response);
+                    }
+                } else if(response == "" || response == "<pre></pre>") {
+                    Alerts.showInfo("Content uploaded successfully");
+                    try {
+                        (tabs.selectedChild as ObjectTab).updateDatastreamList();
+                    } catch(error:Object) {}
+                } else {
+                    Alerts.showWarning("Unexpected response to upload request: " + 
+                                       response);
+                }
+      		}
+      		
+            /**
+             * Handles errors that occur when attempting to open an object.
+             */
+            private function openObjectFaultHandler(event:Event):void {
+                Alerts.showError("Could not retrieve object '" + openObjectPid.text + "' from the repository. " + 
+                                 "Either the object does not exist, or you do not have permission to view it.");            
+            }            
+            
+            /**
+             * Handles errors that occur when attempting to connect to a repository.
+             */
+            private function loginFaultHandler(event:Event):void {
+                login();
+                Alerts.showError("Could not connect to repository at " + baseUrl);
+            }      		
+		]]>
+	</mx:Script>
+	
+	<mx:HTTPService id="repository" url="{baseUrl}/describe?xml=true"
+					fault="loginFaultHandler(event)" showBusyCursor="true" />
+	<mx:HTTPService id="createObject" method="POST" url="{baseUrl}/objects/new?flash=true" 
+					result="objectCreationComplete(event)" fault="ErrorHandler.handleFault(event)" 
+					showBusyCursor="true" />
+	
+	<mx:Canvas width="100%" height="100%">		
+		<mx:TitleWindow id="mainWindow" width="100%" height="90%" layout="horizontal" title="{title}" 
+		                showCloseButton="false" styleName="top">
+			<mx:Accordion x="0" y="0" width="241" height="100%" selectedIndex="1">
+				<mx:Form label="Search" defaultButton="{searchButton}">
+					<mx:Label text="Search Term" styleName="header" />
+					<mx:FormItem>
+						<mx:TextInput id="searchTerm"  width="200"/>
+						<mx:Button id="searchButton" label="Search" click="addSearchTab(searchTerm.text, searchFields.selectedItems)" />
+					</mx:FormItem>
+					<mx:Label text="Fields to include in results" styleName="header" />
+					<mx:FormItem>
+						<mx:List id="searchFields" width="98" height="356" allowMultipleSelection="true" selectedIndices="[0]">
+							<mx:Array >
+								<mx:String>label</mx:String><mx:String>state</mx:String><mx:String>ownerId</mx:String>
+								<mx:String>cDate</mx:String><mx:String>mDate</mx:String><mx:String>dcmDate</mx:String>
+								<mx:String>title</mx:String><mx:String>creator</mx:String><mx:String>subject</mx:String>
+								<mx:String>description</mx:String><mx:String>publisher</mx:String><mx:String>contributor</mx:String>
+								<mx:String>date</mx:String><mx:String>type</mx:String><mx:String>format</mx:String>
+								<mx:String>identifier</mx:String><mx:String>source</mx:String><mx:String>language</mx:String>
+								<mx:String>relation</mx:String><mx:String>coverage</mx:String><mx:String>rights</mx:String>                        
+							</mx:Array>
+						</mx:List>
+					</mx:FormItem>					
+				</mx:Form>
+				<mx:VBox label="Object">				
+					<mx:Form defaultButton="{openButton}">
+					  	<mx:Label text="Open Object" styleName="header" />
+					  	<mx:FormItem label="PID">
+					  		<mx:TextInput id="openObjectPid"/>			  		
+					  	</mx:FormItem>
+					  	<mx:FormItem>								
+					  		<mx:Button id="openButton" label="Open" click="openObject(openObjectPid.text)"/>
+					  	</mx:FormItem>				
+					</mx:Form>				  																		
+					<mx:Form defaultButton="{createObjectButton}">
+						<mx:HRule width="210" height="2"/>
+						<mx:Label text="Create Object" styleName="header" />
+						<mx:FormItem label="PID">
+							<mx:TextInput id="createObjectPid" />
+						</mx:FormItem>
+						<mx:FormItem label="Label">
+							<mx:TextInput id="createObjectLabel" />
+						</mx:FormItem>
+						<mx:FormItem>					
+							<mx:Button id="createObjectButton" label="Create New Object" 
+								click="createNewObject(createObjectPid.text, createObjectLabel.text)" />
+						</mx:FormItem>	
+					</mx:Form>				  																		
+					<mx:Form>			
+						<mx:HRule width="210" height="2"/>			
+						<mx:Label text="Ingest Object" styleName="header" />
+                        <mx:FormItem label="Format" width="222">
+                            <mx:ComboBox id="ingestFormat" width="152" rowCount="6">
+                                <mx:Array>
+                                    <mx:String>FOXML-1.1</mx:String>
+                                    <mx:String>FOXML-1.0</mx:String>
+                                    <mx:String>METSFedoraExt-1.1</mx:String>
+                                    <mx:String>METSFedoraExt-1.0</mx:String>                                    
+                                    <mx:String>ATOM-1.1</mx:String>
+                                    <mx:String>ATOMZip-1.1</mx:String>                                                                                                                            
+                                </mx:Array>
+                            </mx:ComboBox>
+                        </mx:FormItem>			
+						<mx:FormItem>
+							<mx:Button label="Ingest Object" click="ingestObject(ingestFormat.selectedItem as String)"  />
+						</mx:FormItem>								
+					</mx:Form>
+				</mx:VBox>	
+			</mx:Accordion>
+			<flexlib:SuperTabNavigator id="tabs" width="100%" height="100%">
+			    <mx:VBox label="Repository">
+		            <mx:Label text="Welcome to the Fedora Repository Web Administrator" textAlign="center" width="100%" />
+	            	<mx:Form label="Repository Information">
+	            	    <mx:Label text="You are connected to the following repository:" />
+						<mx:FormItem label="Repository Name:">
+							<mx:Label text="{repository.lastResult.fedoraRepository.repositoryName}" styleName="repoLabel" />
+						</mx:FormItem>
+						<mx:FormItem label="Repository Version:">
+							<mx:Label text="{repository.lastResult.fedoraRepository.repositoryVersion}" styleName="repoLabel" />
+						</mx:FormItem>
+						<mx:FormItem label="Repository Base URL:">
+							<mx:Label text="{repository.lastResult.fedoraRepository.repositoryBaseURL}" styleName="repoLabel" />
+						</mx:FormItem>
+					</mx:Form>
+			    </mx:VBox>			    
+			</flexlib:SuperTabNavigator>
+		</mx:TitleWindow>
+		<mx:Button label="{baseUrl}" y="8" right="10" alpha="0.9" styleName="login" click="login()" />
+	</mx:Canvas>
+	
+</mx:Application>

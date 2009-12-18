@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" PolicyId="permit-apim-by-ldap-group" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:1.0:policy
+http://www.fedora.info/definitions/1/0/api/cs-xacml-schema-policy-01.xsd">
+	<Description> </Description>
+	<!-- Scope of Policy:  This policy applies only to the Fedora API-M Interface -->
+	<Target>
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<Resources>
+			<AnyResource/>
+		</Resources>
+		<Actions>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:api-m</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:api"/>
+				</ActionMatch>
+			</Action>
+		</Actions>
+	</Target>
+	<!-- Rule for how API-M can be accessed. -->
+	<Rule RuleId="1" Effect="Permit">
+		<!-- Permit access if the requestor is a member of one of the specified groups (defined by the LDAP 'ou' attribute). -->
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+			<SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="ou"/>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Lb-Info Technology</AttributeValue>
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Lb-Univ Librarian-General</AttributeValue>
+			</Apply>
+		</Condition>
+	</Rule>
+</Policy>

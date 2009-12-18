@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+	<globalConfiguration>
+		<parameter name="adminPassword" value="admin" />
+		<parameter name="enableNamespacePrefixOptimization" value="false" />
+		<parameter name="dotNetSoapEncFix" value="true" />
+		<parameter name="disablePrettyXML" value="true" />
+		<parameter name="attachments.implementation" value="org.apache.axis.attachments.AttachmentsImpl" />
+		<parameter name="sendXsiTypes" value="true" />
+		<parameter name="sendMultiRefs" value="true" />
+		<parameter name="sendXMLDeclaration" value="true" />
+		<requestFlow>
+			<handler type="java:org.apache.axis.handlers.JWSHandler">
+				<parameter name="scope" value="session" />
+			</handler>
+			<handler type="java:org.apache.axis.handlers.JWSHandler">
+				<parameter name="scope" value="request" />
+				<parameter name="extension" value=".jwr" />
+			</handler>
+		</requestFlow>
+	</globalConfiguration>
+	<handler name="URLMapper" type="java:org.apache.axis.handlers.http.URLMapper" />
+	<handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder" />
+	<handler name="Authenticate" type="java:org.apache.axis.handlers.SimpleAuthenticationHandler" />
+	<handler name="PEP" type="java:melcoe.fedora.pep.ws.PEP">
+		<parameter name="scope" value="application" />
+	</handler>
+	<service name="managementS" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="PEP" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="PEP" />
+		</responseFlow>
+		<parameter name="wsdlServicePort" value="managementS" />
+		<parameter name="className" value="fedora.server.management.FedoraAPIMBindingSOAPHTTPSkeleton" />
+		<parameter name="typeMappingVersion" value="1.2" />
+		<parameter name="allowedMethods" value="*" />
+		<parameter name="wsdlServiceElement" value="Fedora-API-M-Service" />
+		<parameter name="wsdlTargetNamespace" value="http://www.fedora.info/definitions/1/0/api/" />
+		<parameter name="wsdlPortType" value="Fedora-API-M" />
+		<parameter name="scope" value="application" />
+		<parameter name="schemaUnqualified" value="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns1:RelationshipTuple"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.RelationshipTuple" xmlns:ns1="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns2:Datastream"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.Datastream" xmlns:ns2="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle=""
+			qname="ns3:DatastreamControlGroup" serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.DatastreamControlGroup"
+			xmlns:ns3="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns4:ArrayOfString"
+			xmlns:ns4="http://www.fedora.info/definitions/1/0/types/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+	</service>
+	<service name="AdminService" provider="java:MSG">
+		<parameter name="allowedMethods" value="AdminService" />
+		<parameter name="enableRemoteAdmin" value="false" />
+		<parameter name="className" value="org.apache.axis.utils.Admin" />
+		<namespace>http://xml.apache.org/axis/wsdd/</namespace>
+	</service>
+	<service name="access" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="PEP" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="PEP" />
+		</responseFlow>
+		<parameter name="wsdlServicePort" value="access" />
+		<parameter name="className" value="fedora.server.access.FedoraAPIABindingSOAPHTTPSkeleton" />
+		<parameter name="typeMappingVersion" value="1.2" />
+		<parameter name="allowedMethods" value="*" />
+		<parameter name="wsdlServiceElement" value="Fedora-API-A-Service" />
+		<parameter name="wsdlTargetNamespace" value="http://www.fedora.info/definitions/1/0/api/" />
+		<parameter name="wsdlPortType" value="Fedora-API-A" />
+		<parameter name="scope" value="application" />
+		<parameter name="schemaUnqualified" value="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns5:FieldSearchQuery"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.FieldSearchQuery" xmlns:ns5="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle=""
+			qname="ns6:ComparisonOperator" serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.ComparisonOperator"
+			xmlns:ns6="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle="" qname="ns7:defaultInputType"
+			serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.DefaultInputType" xmlns:ns7="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle="" qname="ns8:passByValue"
+			serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.PassByValue" xmlns:ns8="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns9:Condition"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.Condition" xmlns:ns9="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns10:Property"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.Property" xmlns:ns10="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns11:ObjectProfile"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.ObjectProfile" xmlns:ns11="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns12:ObjectMethodsDef"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.ObjectMethodsDef" xmlns:ns12="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle="" qname="ns13:userInputType"
+			serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.UserInputType" xmlns:ns13="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns14:RepositoryInfo"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.RepositoryInfo" xmlns:ns14="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""
+			qname="ns15:FieldSearchResult" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.FieldSearchResult"
+			xmlns:ns15="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle="" qname="ns16:passByRef"
+			serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.PassByRef" xmlns:ns16="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle=""
+			qname="ns17:datastreamInputType" serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.DatastreamInputType"
+			xmlns:ns17="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns18:ObjectFields"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.ObjectFields" xmlns:ns18="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns19:ListSession"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.ListSession" xmlns:ns19="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns20:MIMETypedStream"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.MIMETypedStream" xmlns:ns20="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns21:MethodParmDef"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.MethodParmDef" xmlns:ns21="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns22:DatastreamDef"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.DatastreamDef" xmlns:ns22="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="ns23:MethodParmDef" languageSpecificType="java:fedora.server.types.gen.MethodParmDef[]"
+			qname="ns23:methodParmDefs" xmlns:ns23="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns24:objModels"
+			xmlns:ns24="http://www.fedora.info/definitions/1/0/types/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+		<arrayMapping innerType="ns25:ObjectFields" languageSpecificType="java:fedora.server.types.gen.ObjectFields[]" qname="ns25:resultList"
+			xmlns:ns25="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="ns26:Property" languageSpecificType="java:fedora.server.types.gen.Property[]" qname="ns26:header"
+			xmlns:ns26="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="ns27:Condition" languageSpecificType="java:fedora.server.types.gen.Condition[]" qname="ns27:conditions"
+			xmlns:ns27="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="ns28:Property" languageSpecificType="java:fedora.server.types.gen.Property[]" qname="ns28:parameters"
+			xmlns:ns28="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns29:ArrayOfString"
+			xmlns:ns29="http://www.fedora.info/definitions/1/0/types/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+	</service>
+	<service name="Version" provider="java:RPC">
+		<parameter name="allowedMethods" value="getVersion" />
+		<parameter name="className" value="org.apache.axis.Version" />
+	</service>
+	<service name="accessS" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="PEP" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="PEP" />
+		</responseFlow>
+		<parameter name="wsdlServicePort" value="accessS" />
+		<parameter name="className" value="fedora.server.access.FedoraAPIABindingSOAPHTTPSkeleton" />
+		<parameter name="typeMappingVersion" value="1.2" />
+		<parameter name="allowedMethods" value="*" />
+		<parameter name="wsdlServiceElement" value="Fedora-API-A-Service" />
+		<parameter name="wsdlTargetNamespace" value="http://www.fedora.info/definitions/1/0/api/" />
+		<parameter name="wsdlPortType" value="Fedora-API-A" />
+		<parameter name="scope" value="application" />
+		<parameter name="schemaUnqualified" value="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns30:FieldSearchQuery"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.FieldSearchQuery" xmlns:ns30="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle=""
+			qname="ns31:ComparisonOperator" serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.ComparisonOperator"
+			xmlns:ns31="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle="" qname="ns32:defaultInputType"
+			serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.DefaultInputType" xmlns:ns32="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle="" qname="ns33:passByValue"
+			serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.PassByValue" xmlns:ns33="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns34:Condition"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.Condition" xmlns:ns34="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns35:Property"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.Property" xmlns:ns35="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns36:ObjectProfile"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.ObjectProfile" xmlns:ns36="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns37:ObjectMethodsDef"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.ObjectMethodsDef" xmlns:ns37="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle="" qname="ns38:userInputType"
+			serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.UserInputType" xmlns:ns38="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns39:RepositoryInfo"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.RepositoryInfo" xmlns:ns39="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""
+			qname="ns40:FieldSearchResult" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.FieldSearchResult"
+			xmlns:ns40="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle="" qname="ns41:passByRef"
+			serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.PassByRef" xmlns:ns41="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle=""
+			qname="ns42:datastreamInputType" serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.DatastreamInputType"
+			xmlns:ns42="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns43:ObjectFields"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.ObjectFields" xmlns:ns43="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns44:ListSession"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.ListSession" xmlns:ns44="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns45:MIMETypedStream"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.MIMETypedStream" xmlns:ns45="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns46:MethodParmDef"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.MethodParmDef" xmlns:ns46="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns47:DatastreamDef"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.DatastreamDef" xmlns:ns47="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="ns48:MethodParmDef" languageSpecificType="java:fedora.server.types.gen.MethodParmDef[]"
+			qname="ns48:methodParmDefs" xmlns:ns48="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns49:objModels"
+			xmlns:ns49="http://www.fedora.info/definitions/1/0/types/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+		<arrayMapping innerType="ns50:ObjectFields" languageSpecificType="java:fedora.server.types.gen.ObjectFields[]" qname="ns50:resultList"
+			xmlns:ns50="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="ns51:Property" languageSpecificType="java:fedora.server.types.gen.Property[]" qname="ns51:header"
+			xmlns:ns51="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="ns52:Condition" languageSpecificType="java:fedora.server.types.gen.Condition[]" qname="ns52:conditions"
+			xmlns:ns52="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="ns53:Property" languageSpecificType="java:fedora.server.types.gen.Property[]" qname="ns53:parameters"
+			xmlns:ns53="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns54:ArrayOfString"
+			xmlns:ns54="http://www.fedora.info/definitions/1/0/types/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+	</service>
+	<service name="management" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="PEP" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="PEP" />
+		</responseFlow>
+		<parameter name="wsdlServicePort" value="management" />
+		<parameter name="className" value="fedora.server.management.FedoraAPIMBindingSOAPHTTPSkeleton" />
+		<parameter name="typeMappingVersion" value="1.2" />
+		<parameter name="allowedMethods" value="*" />
+		<parameter name="wsdlServiceElement" value="Fedora-API-M-Service" />
+		<parameter name="wsdlTargetNamespace" value="http://www.fedora.info/definitions/1/0/api/" />
+		<parameter name="wsdlPortType" value="Fedora-API-M" />
+		<parameter name="scope" value="application" />
+		<parameter name="schemaUnqualified" value="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""
+			qname="ns55:RelationshipTuple" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.RelationshipTuple"
+			xmlns:ns55="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns56:Datastream"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:fedora.server.types.gen.Datastream" xmlns:ns56="http://www.fedora.info/definitions/1/0/types/" />
+		<typeMapping deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory" encodingStyle=""
+			qname="ns57:DatastreamControlGroup" serializer="org.apache.axis.encoding.ser.EnumSerializerFactory" type="java:fedora.server.types.gen.DatastreamControlGroup"
+			xmlns:ns57="http://www.fedora.info/definitions/1/0/types/" />
+		<arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns58:ArrayOfString"
+			xmlns:ns58="http://www.fedora.info/definitions/1/0/types/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+	</service>
+	<transport name="http">
+		<requestFlow>
+			<handler type="URLMapper" />
+			<handler type="java:org.apache.axis.handlers.http.HTTPAuthHandler" />
+		</requestFlow>
+		<parameter name="qs:list" value="org.apache.axis.transport.http.QSListHandler" />
+		<parameter name="qs:wsdl" value="org.apache.axis.transport.http.QSWSDLHandler" />
+		<parameter name="qs:method" value="org.apache.axis.transport.http.QSMethodHandler" />
+	</transport>
+	<transport name="local">
+		<responseFlow>
+			<handler type="LocalResponder" />
+		</responseFlow>
+	</transport>
+</deployment>

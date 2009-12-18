@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" PolicyId="deny-apia-dissem-demo1-getMedium-to-ldap-group" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:1.0:policy
+http://www.fedora.info/definitions/1/0/api/cs-xacml-schema-policy-01.xsd">
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  This policy will DENY access to the 'demo:1/getMedium' dissemination (defined on a disseminator that subscibes to the demo:1 -->
+	<!--  behavior definition).   Specificallly, it will DENY access to users of particular LDAP-defined GROUPS who are making -->
+	<!--  getDissemination requests on API-A  for the 'demo:1/getMedium' dissemination.  -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description> This policy will DENY access to the 'demo:1/getMedium' dissemination (defined on a disseminator that subscibes to the demo:1 behavior definition).   Specifically, it will DENY access to users of particular LDAP-defined GROUPS who are making getDissemination requests on API-A  for the 'demo:1/getMedium' dissemination.</Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.  However, the scope of the Subject is narrowed down in the Rule Condition (below).  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- This policy is applicable to resources that are disseminations, specifically 'demo:1/getMedium' disseminations.  The incoming -->
+		<!-- dissemination request must contain the 'demo:1' behavior definition AND the 'getMedium' method for this policy to be applicable.  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- The ResourceMatch elements enables the XACML enforcement engine to determine whether this policy is applicable based -->
+		<!-- on whether an incoming Fedora request pertains to the kind of a Resource entity (in this case a dissemination) that is specified -->
+		<!-- in the ResourceMatch. At runtime, the XACML engine does a comparison of attribute names/values in the incoming request -->
+		<!-- against attribute names/values in the ResourceMatch specification.  An attribute name is found in a ResourceAttributeDesignator -->
+		<!-- element and  an attribute value in the AttributeValue element.  Note that the XACML-based function "string-equal" on the -->
+		<!-- ResourceMatch element indicates that the matching will be string-based.  Multiple ResourceMatch elements are logically -->
+		<!-- AND-ed together by the XACML enforcement engine. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- In this example, the ResourceMatch elements say that that this policy is applicable for resources (disseminations) where : -->
+		<!--         attribute named 'resource:sdef:pid" has a value of 'demo:1'  -->
+		<!--           AND -->
+		<!--         attribute named 'resource:disseminator:method' has a value of 'getMedium.' =-->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<Resource>
+				<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:1</AttributeValue>
+					<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:sdef:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</ResourceMatch>
+				<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">getMedium</AttributeValue>
+					<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:disseminator:method" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</ResourceMatch>
+			</Resource>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to ONLY to the getDissemination action (operation) in the Fedora Access Service (i.e., API-A).  -->
+		<!--  Note that the ActionAttributeDesignator element specifies the concept of a fedora-based action via the identifier -->
+		<!--  urn:fedora:names:fedora:2.1:action:id.  The particular action (API-A operation) that is the target for this policy -->
+		<!--  is specified by the AttributeValue identifier of urn:fedora:names:fedora:2.1:action:id-getDissemination. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDissemination</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:id"/>
+				</ActionMatch>
+			</Action>
+		</Actions>
+	</Target>
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Rule 1: This Rule will DENY access to users who are members of a certain group.  The rule sets up a condition under which -->
+	<!-- denial should occur.  A Condition element wraps the specification of the SubjectAttributeDesignator, which is where an -->
+	<!-- LDAP subject attribute (ou) for this rule is specified.  The Condition element specifies the URN of an XACML-defined function -->
+	<!-- (string-at-least-one-member-of)  that wraps the SubjectAttributeDesignator to indicate the that there are -->
+	<!-- multiple string values for the LDAP attribute that will result in denial.   -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- BOTTOM LINE:  -->
+	<!-- DENY access to API-A to users whose LDAP attribute (ou) has the value of 'Lb-Info Technology' or 'Lb-Univ Librarian-General. ' -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Rule RuleId="1" Effect="Deny">
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+			<SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="ou"/>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Lb-Info Technology</AttributeValue>
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Lb-Univ Librarian-General</AttributeValue>
+			</Apply>
+		</Condition>
+	</Rule>
+</Policy>

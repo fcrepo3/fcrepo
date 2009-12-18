@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" title="Replace Datastream Content" showCloseButton="true" close="closeDialog(event)">
+
+	<mx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			import mx.events.CloseEvent;
+            import script.Alerts;
+            import mx.rpc.events.ResultEvent;
+            import script.ErrorHandler;
+            import script.Util;
+
+         	[Bindable]
+         	private var url:String;
+         	
+         	[Bindable]
+         	private var mimeType:String;
+
+            /**
+             * Sets up a dialog to replace datastream content.
+             */ 
+         	public function setup(url:String, mimeType:String):void {
+                this.url = url;
+                this.mimeType = mimeType;
+         	}
+
+            /**
+             * Closes the replace content dialog.
+             */ 
+            private function closeDialog(event : CloseEvent):void {
+                PopUpManager.removePopUp(this);
+            }
+
+            /**
+             * Updates an datastream's content based on a URL.
+             */ 
+            private function sendImport():void {
+                if(importType.selection == importUrl) {
+                    // Flex doesn't know how to generate an HTTP PUT
+                    // Fortunately, the REST API will interpret an HTTP POST with
+                    // an X-HTTP-Method-Override header set to 'PUT' as a PUT.
+                    importUrlService.headers['X-HTTP-Method-Override'] = 'PUT';                    
+                    
+                    // Flex will turn an HTTP POST into an HTTP GET if there
+                    // is no posted content, unless the content type is set
+                    // to something other than application/x-www-form-urlencoded
+                    importUrlService.contentType=mimeType;
+                    
+                    importUrlService.url = url + "?dsLocation=" + location.text + 
+                                           "&ignoreContent=true&flash=true";
+                    importUrlService.send();
+                } else if(importType.selection == importFile) {
+                    importDatastreamFile();
+                }
+            }
+
+            /**
+             * Shuts down after a successful content replacement
+             */ 
+            private function importComplete(event:ResultEvent):void {
+                var error:String = ErrorHandler.getError(event.result);
+                if(error != null) {
+                    Alerts.showError("Could not update datastream" + 
+                                     " due to: " + error);
+                    return;
+                }
+                
+                Alerts.showInfo("Import from URL completed successfully");
+                closeDialog(null);
+            }
+
+            /**
+             * Facilitates updating a datastream's content based on a file.
+             */  
+            private function importDatastreamFile():void {
+                var uploadUrl:String = 
+                    url + "?mimeType=" + Util.urlEncode(mimeType) + "&flash=true";
+                if(flash.system.Capabilities.playerType == "ActiveX")
+                { // If IE, do flex upload
+                    var fileUploadDialog:FileUploadDialog = new FileUploadDialog();
+                    fileUploadDialog.setup(uploadUrl, mimeType);
+                    PopUpManager.addPopUp(fileUploadDialog, this, true);
+                    PopUpManager.centerPopUp(fileUploadDialog);                     
+                }
+                else
+                { // Otherwise do javascript upload
+                    ExternalInterface.call("upload",uploadUrl);
+                }
+                closeDialog(null);  
+            } 
+
+            /**
+             * Sets the UI to allow entering a URL.
+             */ 
+            private function useUrl():void {
+                urlLocation.visible = true;
+                urlLocation.includeInLayout = true;
+                fileLabel.visible = false;
+                fileLabel.includeInLayout = false;
+            }
+            
+            /**
+             * Sets the UI to indicate the use of a file.
+             */
+            private function useFile():void {
+                urlLocation.visible = false;
+                urlLocation.includeInLayout = false;
+                fileLabel.visible = true;
+                fileLabel.includeInLayout = true;                
+            }
+		]]>
+	</mx:Script>
+
+	<mx:HTTPService id="importUrlService" method="POST" resultFormat="text" 
+	                result="importComplete(event)" showBusyCursor="true"
+	                fault="ErrorHandler.handleFault(event)" />
+
+    <mx:Form width="400">
+        <mx:RadioButtonGroup id="importType"/>
+        <mx:RadioButton groupName="importType" id="importUrl" label="Content from a URL" 
+                        selected="true" click="useUrl()"/>
+            <mx:FormItem label="Location:" id="urlLocation">
+                <mx:TextInput id="location" width="300" />
+            </mx:FormItem>                
+        <mx:RadioButton groupName="importType" id="importFile" label="Content from a File" 
+                        click="useFile()"/>
+            <mx:Label id="fileLabel" text="Click Ok to select a file" 
+                      visible="false" includeInLayout="false"/>
+    </mx:Form>
+
+	<mx:HBox>
+	    <mx:Button label="Ok" click="sendImport()"/>
+		<mx:Button label="Cancel" click="closeDialog(null)"/>
+	</mx:HBox>
+
+</mx:TitleWindow>

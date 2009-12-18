@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" title="File Upload" showCloseButton="true" close="closeDialog(event)">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.TextArea;
+			import mx.managers.PopUpManager;
+			import mx.events.CloseEvent;
+            import script.Alerts;
+            import mx.rpc.events.ResultEvent;
+            import script.ErrorHandler;
+         	
+         	[Bindable]
+         	private var url:String;
+         	
+         	[Bindable]
+            private var mimetype:String;
+         	
+            /**
+             * Used to allow file ingests. At the class level because it must
+             * stay in scope during the upload.
+             */
+            private var fileToUpload:FileReference = new FileReference();         	
+        	
+        	/**
+        	 * Sets up for the file upload.
+        	 */	                  	
+         	public function setup(url:String, mimetype:String):void {
+                this.url = url;
+                this.mimetype = mimetype;
+         	}
+         
+            /**
+             * Closes this dialog after the upload is complete.
+             */
+			private function closeDialog(event : CloseEvent):void {
+				PopUpManager.removePopUp(this);
+			}
+			
+			/**
+			 * Allows the user to browse for a file to upload.
+			 */
+            private function fileBrowse():void {
+                fileToUpload.addEventListener(Event.SELECT, fileSelectHandler);
+                fileToUpload.addEventListener(Event.COMPLETE, uploadCompleteHandler);
+                fileToUpload.addEventListener(IOErrorEvent.IO_ERROR, ErrorHandler.handleFault);
+                
+                fileToUpload.browse();
+            }			
+
+            /**
+             * Called when the user has selected the file to upload.
+             */ 
+            private function fileSelectHandler(event:Event):void {                
+                fileUploadLocation.text = fileToUpload.name;
+            }
+			
+			/**
+			 * Performs the file upload.
+			 */
+            private function uploadFile():void {
+                var request:URLRequest = new URLRequest(url);
+                request.method = URLRequestMethod.POST;
+                // Note: Content-Type for FileReference uploads is always set to 
+                // application/octet-stream due to a flex bug. The type is being
+                // set here in the hopes that this bug will one day be fixed.
+                request.contentType = mimetype;
+                fileToUpload.upload(request, fileToUpload.name);
+                closeDialog(null);             
+            }
+            
+            /**
+             * Handles the upload response.
+             */ 
+            private function uploadCompleteHandler(event:ResultEvent):void {
+                var error:String = ErrorHandler.getError(event.result);
+                if(error != null) {
+                    Alerts.showError("File upload failed due to: " + error);
+                    return;
+                }                
+                
+                Alerts.showInfo("File upload completed successfully");
+            }			
+		]]>
+	</mx:Script>
+   
+    <mx:Form width="300">         
+        <mx:FormItem>
+            <mx:HBox>                           
+                <mx:TextInput id="fileUploadLocation" editable="false" width="180" />
+                <mx:Button label="Browse" click="fileBrowse()" />
+            </mx:HBox>
+        </mx:FormItem>            
+        <mx:FormItem>
+            <mx:Button label="Upload" click="uploadFile()"  />
+        </mx:FormItem>                              
+    </mx:Form>
+
+	<mx:HBox>
+		<mx:Button label="Cancel" click="closeDialog(null)"/>
+	</mx:HBox>
+
+</mx:TitleWindow>

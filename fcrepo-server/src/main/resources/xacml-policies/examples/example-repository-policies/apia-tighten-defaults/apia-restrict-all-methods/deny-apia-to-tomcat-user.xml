@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" PolicyId="deny-apia-to-tomcat-user" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:1.0:policy
+http://www.fedora.info/definitions/1/0/api/cs-xacml-schema-policy-01.xsd">
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  This policy will deny access to all API-A methods to a particular user based on login id  (as registered in the tomcat-users.xml file). -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description>This policy will deny access to all API-A methods to a particular user based on login id  (as registered in the tomcat-users.xml file).</Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.  However, the scope of the Subject is narrowed down in the Rule element(s), below.  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Resource (i.e., any digital object)  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<AnyResource/>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable ONLY to actions (operations) in the Fedora Access Service (i.e., API-A)  -->
+		<!--  Note that the ActionAttributeDesignator element specifies the concept of a service interface in Fedora -->
+		<!--  via the action identifier of urn:fedora:names:fedora:2.1:action:api.  The API-A service interface (as target for this policy) -->
+		<!--  is specified by the AttributeValue of urn:fedora:names:fedora:2.1:action:api-a. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:api-a</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:api"/>
+				</ActionMatch>
+			</Action>
+		</Actions>
+	</Target>
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Rule 1: This Rule will deny access to a specific user.  -->
+	<!-- See the Fedora system documentation on Tomcat Authentication for details of how register users in the tomcat-users.xml file. -->
+	<!-- A Condition element wraps the specification of the SubjectAttributeDesignator, which contains the attribute identifier for -->
+	<!-- Fedora loginId (urn:fedora:names:fedora:2.1:subject:loginId).  This rule says that denial will occur when the value of this -->
+	<!-- attribute is 'sdp.' -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Rule RuleId="1" Effect="Deny">
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">sdp</AttributeValue>
+			<SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:subject:loginId"/>
+		</Condition>
+	</Rule>
+</Policy>

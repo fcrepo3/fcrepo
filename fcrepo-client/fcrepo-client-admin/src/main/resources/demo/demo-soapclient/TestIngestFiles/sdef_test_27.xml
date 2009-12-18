@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject VERSION="1.1" PID="test:27" xmlns:foxml="info:fedora/fedora-system:def/foxml#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+	<foxml:objectProperties>
+		<foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
+		<foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Behavior Definition Object for Image Manipulation Servlet"/>
+		<foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2004-12-10T00:21:52Z"/>
+		<foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+	</foxml:objectProperties>
+	<foxml:datastream ID="DC" CONTROL_GROUP="X" STATE="A">
+		<foxml:datastreamVersion FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0" MIMETYPE="text/xml" LABEL="Dublin Core Record for this object">
+			<foxml:xmlContent>
+				<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+					<dc:title>Behavior Definition Object for Image Manipulation Servlet</dc:title>
+					<dc:identifier>test:27</dc:identifier>
+				</oai_dc:dc>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT1.0" LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
+			<foxml:xmlContent>
+				<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:fedora-model="info:fedora/fedora-system:def/model#">
+					<rdf:Description rdf:about="info:fedora/test:27">
+						<fedora-model:hasModel rdf:resource="info:fedora/fedora-system:ServiceDefinition-3.0"/>
+					</rdf:Description>
+				</rdf:RDF>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>	
+	<foxml:datastream ID="METHODMAP" CONTROL_GROUP="X" STATE="A">
+		<foxml:datastreamVersion FORMAT_URI="info:fedora/fedora-system:FedoraSDefMethodMap-1.0" ID="METHODMAP1.0" MIMETYPE="text/xml" LABEL="Abstract Method Map">
+			<foxml:xmlContent>
+				<fmm:MethodMap 
+				    name="Fedora MethodMap for Image Manipulation Servlet" xmlns:fmm="http://fedora.comm.nsdlib.org/service/methodmap">
+					<fmm:Method operationName="resizeImage">
+						<fmm:UserInputParm defaultValue="150" parmName="width" passBy="VALUE" required="true"/>
+					</fmm:Method>
+					<fmm:Method operationName="zoomImage">
+						<fmm:UserInputParm defaultValue="3" parmName="zoom" passBy="VALUE" required="true"/>
+					</fmm:Method>
+					<fmm:Method operationName="brightImage">
+						<fmm:UserInputParm defaultValue="3.5" parmName="bright" passBy="VALUE" required="true"/>
+					</fmm:Method>
+					<fmm:Method operationName="watermarkImage">
+						<fmm:UserInputParm defaultValue="Watermarked 2003" parmName="watermark" passBy="VALUE" required="true"/>
+					</fmm:Method>
+					<fmm:Method operationName="grayscaleImage"/>
+					<fmm:Method operationName="cropImage">
+						<fmm:UserInputParm defaultValue="30" parmName="x" passBy="VALUE" required="true"/>
+						<fmm:UserInputParm defaultValue="100" parmName="y" passBy="VALUE" required="true"/>
+						<fmm:UserInputParm defaultValue="" parmName="width" passBy="VALUE" required="false"/>
+						<fmm:UserInputParm defaultValue="" parmName="height" passBy="VALUE" required="false"/>
+					</fmm:Method>
+					<fmm:Method operationName="convertImage">
+						<fmm:UserInputParm defaultValue="gif" parmName="convertTo" passBy="VALUE" required="true">
+							<fmm:ValidParmValues>
+								<fmm:ValidParm value="jpg"/>
+								<fmm:ValidParm value="gif"/>
+								<fmm:ValidParm value="tiff"/>
+								<fmm:ValidParm value="png"/>
+								<fmm:ValidParm value="bmp"/>
+							</fmm:ValidParmValues>
+						</fmm:UserInputParm>
+					</fmm:Method>
+				</fmm:MethodMap>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+</foxml:digitalObject>

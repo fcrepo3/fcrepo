@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PolicyId="demo-7" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+	<Description>This is an object-specific policy.  It could be stored inside the demo:7 digital object in the POLICY datastream OR in the directory for object-specific policies. (The directory location is set in the Authorization module configuration in the Fedora server configuration file (fedora.fcfg). By using multiple policy Rules, this policy shows how to deny access to all raw datastreams in the object except to particular users (e.g., the object owners).  It also shows how to deny access to a particular disseminations to selected user roles.</Description>
+	<Target>
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<Resources>
+			<Resource>
+				<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:31</AttributeValue>
+					<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</ResourceMatch>
+			</Resource>
+		</Resources>
+		<Actions>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:api-a</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:api"/>
+				</ActionMatch>
+			</Action>
+		</Actions>
+	</Target>
+	<Rule RuleId="1" Effect="Deny">
+		<!-- ***************************************************************************************************************************************** -->
+		<!-- Denial is conditional upon the user login Id NOT being the same as the owner of the object.  -->
+		<!-- ***************************************************************************************************************************************** -->
+		<!-- NOTE!!  Be careful with this kind of rule if you don't want to shut access off to the Fedora administrator.  The use -->
+		<!-- of the NOT function can easily cut out the administrator even in light of the repository-wide policy that says that -->
+		<!-- the administrator can do everything.   This is because the policy combining algorithm for the Fedora authorization -->
+		<!-- module is set for DENY to override permit.   So, in this example, we add the administrator's userid to the list of users -->
+		<!-- who are not to be denied. -->
+		<!-- ***************************************************************************************************************************************** -->
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:or">
+				<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+           			<SubjectAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:subject:loginId" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string" />
+           			<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:owner" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string" />
+           		</Apply> 
+		    		<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">administrator</AttributeValue>
+					<SubjectAttributeDesignator AttributeId="fedoraRole" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</Apply> 
+				<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">fedoraInternalCall-1</AttributeValue>
+					<SubjectAttributeDesignator AttributeId="fedoraRole" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</Apply>
+			</Apply>
+		</Condition>
+	</Rule>
+</Policy>
+

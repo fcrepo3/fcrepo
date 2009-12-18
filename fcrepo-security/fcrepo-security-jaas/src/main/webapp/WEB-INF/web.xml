@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4"
+	xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee	http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+	<servlet>
+		<servlet-name>UserServlet</servlet-name>
+		<servlet-class>fedora.server.jaas.UserServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>UserServlet</servlet-name>
+		<url-pattern>/user</url-pattern>
+	</servlet-mapping>
+	
+	<filter>
+		<filter-name>AuthFilterJAAS</filter-name>
+		<filter-class>fedora.server.jaas.AuthFilterJAAS</filter-class>
+		<!--
+		<init-param>
+			<description>OPTIONAL. Points to the location of the JAAS configuration file.
+			Defaults to $FEDORA_HOME/server/config/jaas.conf</description>
+			<param-name>jaas.config.location</param-name>
+			<param-value>C:/Apps/Fedora/server/config/jaas.conf</param-value>
+		</init-param>
+		<init-param>
+			<description>OPTIONAL. Specifies the JAAS authentication configuration to use</description>
+			<param-name>jaas.config.name</param-name>
+			<param-value>fedora-auth</param-value>
+		</init-param>
+		<init-param>
+			<description>OPTIONAL. A comma separated list of class names for role principals</description>
+			<param-name>roleClassNames</param-name>
+			<param-value>fedora-auth</param-value>
+		</init-param>
+		-->
+		<init-param>
+			<description>OPTIONAL. A comma separated list of class names for user principals. First
+			one that is found is effective only.</description>
+			<param-name>userClassNames</param-name>
+			<param-value>fedora.server.jaas.auth.UserPrincipal</param-value>
+		</init-param>
+		<init-param>
+			<description>OPTIONAL. A comma separated list of attribute names that can be attached to the
+			user which represent roles to Fedora. These attributes get added to the fedoraRole
+			attribute. The attributes 'role' and 'fedoraRole' are always assumed. 
+			</description>
+			<param-name>roleAttributeNames</param-name>
+			<param-value>eduPersonEntitlement</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>AuthFilterJAAS</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+</web-app>

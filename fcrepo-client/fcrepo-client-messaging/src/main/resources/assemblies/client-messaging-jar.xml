@@ -1,0 +1,188 @@
+<assembly>
+  <id>fedora-messaging-jar</id>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <formats>
+    <format>jar</format>
+  </formats>
+  
+  <fileSets>
+
+    <fileSet>
+      <directory>target/classes</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+
+    <fileSet>
+      <directory>../../fcrepo-common/target/classes/fedora/common</directory>
+      <outputDirectory>/fedora/common</outputDirectory>
+      <includes>
+        <include>Constants*.class</include>
+        <include>FaultException.class</include>
+        <include>MalformedPIDException.class</include>
+        <include>Models.class</include> 
+        <include>PID.class</include>       
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>../../fcrepo-common/target/classes/fedora/common/policy</directory>
+      <outputDirectory>/fedora/common/policy</outputDirectory>
+    </fileSet>
+
+    <fileSet>
+      <directory>../../fcrepo-common/target/classes/fedora/common/rdf</directory>
+      <outputDirectory>/fedora/common/rdf</outputDirectory>
+    </fileSet>
+
+    <fileSet>
+      <directory>../../fcrepo-server/target/classes/fedora/server</directory>
+      <outputDirectory>/fedora/server</outputDirectory>
+      <includes>
+        <include>Server.class</include>
+        <include>Pluggable.class</include>
+        <include>Parameterized.class</include>
+        <include>MultiValueMap.class</include> 
+        <include>Module.class</include>
+        <include>DatastoreConfig.class</include>
+        <include>Context.class</include>
+      </includes>
+    </fileSet>
+  
+    <fileSet>
+      <directory>../../fcrepo-server/target/classes/fedora/server/config</directory>
+      <outputDirectory>/fedora/server/config</outputDirectory>
+      <includes>
+        <include>ServerConfigurationParser.class</include>
+        <include>ServerConfiguration.class</include>
+        <include>Parameter.class</include>
+        <include>ModuleConfiguration.class</include> 
+        <include>DatastoreConfiguration.class</include>
+        <include>Configuration.class</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>../../fcrepo-server/target/classes/fedora/server/errors</directory>
+      <outputDirectory>/fedora/server/errors</outputDirectory>
+      <includes>
+        <include>ShutdownException.class</include>
+        <include>ServerShutdownException.class</include>
+        <include>ServerInitializationException.class</include>
+        <include>ServerException.class</include> 
+        <include>ModuleShutdownException.class</include>
+        <include>ModuleInitializationException.class</include>
+        <include>MessagingException.class</include>
+        <include>MalformedPidExceptionException.class</include>
+        <include>InitializationException.class</include>
+        <include>GeneralException.class</include>
+        <include>authorization/AuthzException.class</include>       
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>../../fcrepo-server/target/classes/fedora/server/messaging</directory>
+      <outputDirectory>/fedora/server/messaging</outputDirectory>
+      <includes>
+        <include>PName.class</include>
+        <include>JMSManager*.class</include>
+        <include>FedoraTypes.class</include>
+        <include>FedoraMethod.class</include> 
+        <include>FedoraMessage.class</include>
+        <include>AtomAPIMMessage.class</include>
+        <include>APIMMessage.class</include>       
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>../../fcrepo-server/target/classes/fedora/server/resources</directory>
+      <outputDirectory>/fedora/server/resources</outputDirectory>
+      <includes>
+        <include>MIMETypes.properties</include>
+        <include>Server.properties</include>
+      </includes>
+    </fileSet>
+    
+    <fileSet>
+      <directory>../../fcrepo-server/target/classes/fedora/server/security</directory>
+      <outputDirectory>/fedora/server/security</outputDirectory>
+      <includes>
+        <include>Authorization.class</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>../../fcrepo-server/target/classes/fedora/server/storage/types</directory>
+      <outputDirectory>/fedora/server/storage/types</outputDirectory>
+      <includes>
+        <include>RelationshipTuple.class</include>
+        <include>TupleArrayTripleIterator.class</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>../../fcrepo-server/target/classes/fedora/server/utilities</directory>
+      <outputDirectory>/fedora/server/storage/utilities</outputDirectory>
+      <includes>
+        <include>DateUtility.class</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>../../fcrepo-server/target/classes/fedora/server/utilities/status</directory>
+      <outputDirectory>/fedora/server/storage/utilities/status</outputDirectory>
+      <includes>
+        <include>ServerState.class</include>
+        <include>ServerStatusFile.class</include>
+        <include>ServerStatusMessage.class</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>../../fcrepo-server/target/classes/fedora/utilities</directory>
+      <outputDirectory>/fedora/utilities</outputDirectory>
+      <includes>
+        <include>XMLDocument.class</include>
+        <include>Log4J.class</include>
+        <include>Log4J*.class</include>
+      </includes>
+    </fileSet>
+
+  </fileSets>
+  
+  <dependencySets>
+  
+    <dependencySet>
+      <includes>
+
+        <!-- <include>org.duraspace.fedora:common:jar</include> -->
+        <!-- <include>org.duraspace.fedora:server:jar</include> -->
+        <include>com.sun.xml.stream:sjsxp:jar:*</include>
+        <include>dom4j:dom4j:jar:*</include>
+        <include>javax.activation:activation:jar:*</include>
+        <include>javax.xml:jsr173:jar:*</include>
+        <include>jaxen:jaxen:jar:*</include>
+        <include>log4j:log4j:jar:*</include>
+        <include>org.apache.abdera:abdera-core:jar:*</include>
+        <include>org.apache.abdera:abdera-i18n:jar:*</include>
+        <include>org.apache.abdera:abdera-parser:jar:*</include>
+        <include>org.apache.activemq:activemq-all:jar:*</include>
+        <include>org.apache.ws.commons.axiom:axiom-api:jar:*</include>
+        <include>org.apache.ws.commons.axiom:axiom-impl:jar:*</include>
+
+      </includes>
+      <!-- <useProjectAttachments>true</useProjectAttachments> -->
+      <outputDirectory>/lib</outputDirectory>
+    </dependencySet>
+    
+    <!--
+    <dependencySet>
+      <includes>
+      
+        <include>org.duraspace.fedora:fedora-messaging-client:jar</include>
+        
+      </includes>
+    </dependencySet>
+    -->
+    
+  </dependencySets>
+</assembly>

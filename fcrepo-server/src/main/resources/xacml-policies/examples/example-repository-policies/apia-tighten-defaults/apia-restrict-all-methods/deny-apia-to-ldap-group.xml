@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" PolicyId="deny-apia-to-ldap-group" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:1.0:policy
+http://www.fedora.info/definitions/1/0/api/cs-xacml-schema-policy-01.xsd">
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  This policy will deny access to all API-A methods to users who are Librarians or Information Technologists -->
+	<!--  (as indicated by their LDAP attributes). -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description> Deny access to all API-A methods to users who are Librarians or Info Technologists (as indicated by their LDAP attributes).</Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.  However, the scope of the Subject is narrowed down in the Rule Condition (below).  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Resource (i.e., any digital object)  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<AnyResource/>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable ONLY to actions (operations) in the Fedora Access Service (i.e., API-A)  -->
+		<!--  Note that the ActionAttributeDesignator element specifies the concept of a service interface in Fedora -->
+		<!--  via the action identifier of urn:fedora:names:fedora:2.1:action:api.  The API-A service interface (as target for this policy) -->
+		<!--  is specified by the AttributeValue of urn:fedora:names:fedora:2.1:action:api-a. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:api-a</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:api"/>
+				</ActionMatch>
+			</Action>
+		</Actions>
+	</Target>
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Rule 1: This Rule will DENY access to users who are members of a certain group.  The rule sets up a condition under which -->
+	<!-- denial should occur.  A Condition element wraps the specification of the SubjectAttributeDesignator, which is where an -->
+	<!-- LDAP subject attribute (ou) for this rule is specified.  The Condition element specifies the URN of an XACML-defined function -->
+	<!-- (string-at-least-one-member-of)  that wraps the SubjectAttributeDesignator to indicate the that there are -->
+	<!-- multiple string values for the LDAP attribute that will result in denial.   -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- BOTTOM LINE:  -->
+	<!-- DENY access to API-A to users whose LDAP attribute (ou) has the value of 'Lb-Info Technology' or 'Lb-Univ Librarian-General. ' -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Rule RuleId="1" Effect="Deny">
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+			<SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="ou"/>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Lb-Info Technology</AttributeValue>
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Lb-Univ Librarian-General</AttributeValue>
+			</Apply>
+		</Condition>
+	</Rule>
+</Policy>

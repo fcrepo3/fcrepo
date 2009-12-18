@@ -1,0 +1,15 @@
+body {
+  background-color: SteelBlue;
+  font-family: helvetica, arial, sans-serif;
+  font-size: 12pt;
+}
+
+.heading {
+  font-family: courier;
+  font-size: 16pt;
+  color: LightSteelBlue;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 8px;
+  margin-bottom: 12px;
+}

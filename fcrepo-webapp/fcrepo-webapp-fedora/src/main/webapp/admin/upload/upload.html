@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <title>Upload</title>
+    <script type="text/javascript">
+    <!--
+      var submitted = false;
+
+      function init() {
+        var form = document.getElementById("upload_form");
+        var url = opener.url;
+        form.action = url;
+      }
+
+      function upload() {
+        submitted = true;
+        document.getElementById("submit").disabled=true;
+        document.getElementById("uploading").style.visibility="visible";
+        document.getElementById("upload_form").submit();
+      }
+
+      function complete() {
+        if(submitted == true) {
+          var response = "";
+          try {
+            // Due to browser security constraints, this fails when
+            // the target domain for the upload differs from the
+            // domain on which the adminstrator was loaded.
+            var iframe = document.getElementById("upload_target");
+            response = iframe.contentWindow.document.body.innerHTML;
+          } finally {
+            opener.uploadComplete(response);
+            window.close();
+          }
+        }
+      }
+    //-->
+    </script>
+  </head>
+  <body bgcolor='#686B8D' onload="init()">
+    <form id="upload_form"
+          method='POST'
+          enctype='multipart/form-data'
+          target='upload_target'
+          onsubmit='upload()'>
+      <input id='file' type='file' name='file'>
+      <input id='submit' type='submit' value='Upload'>
+    </form>
+    <center><img id="uploading" src="loading.gif" style="visibility:hidden" /></center>
+    <iframe id='upload_target'
+            name='upload_target' src='#'
+            style='width:0;height:0;border:0px solid #fff;'
+            onload='complete()'>
+    </iframe>
+  </body>
+</html>

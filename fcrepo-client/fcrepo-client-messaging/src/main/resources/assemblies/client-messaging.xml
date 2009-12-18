@@ -1,0 +1,41 @@
+<assembly>
+  <id>fedora-messaging</id>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <dependencySets>
+  
+    <dependencySet>
+      <includes>
+
+        <include>org.fcrepo:fcrepo-common:jar</include>
+        <include>org.fcrepo:fcrepo-server:jar</include>
+        <include>com.sun.xml.stream:sjsxp:jar:*</include>
+        <include>dom4j:dom4j:jar:*</include>
+        <include>javax.activation:activation:jar:*</include>
+        <include>javax.xml:jsr173:jar:*</include>
+        <include>jaxen:jaxen:jar:*</include>
+        <include>log4j:log4j:jar:*</include>
+        <include>org.apache.abdera:abdera-core:jar:*</include>
+        <include>org.apache.abdera:abdera-i18n:jar:*</include>
+        <include>org.apache.abdera:abdera-parser:jar:*</include>
+        <include>org.apache.activemq:activemq-all:jar:*</include>
+        <include>org.apache.ws.commons.axiom:axiom-api:jar:*</include>
+        <include>org.apache.ws.commons.axiom:axiom-impl:jar:*</include>
+
+      </includes>
+      <!-- <useProjectAttachments>true</useProjectAttachments> -->
+      <outputDirectory>/lib</outputDirectory>
+    </dependencySet>
+    
+    <dependencySet>
+      <includes>
+       
+        <include>org.fcrepo:fcrepo-client-messaging:jar:${project.version}</include>
+        
+      </includes>
+    </dependencySet>
+    
+  </dependencySets>
+</assembly>

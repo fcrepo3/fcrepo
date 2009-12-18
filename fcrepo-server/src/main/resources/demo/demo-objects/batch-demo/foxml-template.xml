@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject VERSION="1.1" PID="template:objectPid" xmlns:foxml="info:fedora/fedora-system:def/foxml#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+	<foxml:objectProperties>
+		<foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+		<foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="template:Object Label"/>
+		<foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+		<!-- Note: The value for createdDate is assigned dynamically by the Fedora server at ingest time if the createdDate property is not      -->
+		<!-- present in the object being ingested. Therefore, it is recommended that this property be omitted from the object template so this   -->
+		<!-- date will be assigned dynamically by the Fedora server. If included in the template file, this value will be carried through to the        -->
+		<!-- built objects and will result in the specified static date being used at ingest time by the Fedora server rather than dynamically         -->
+		<!-- assigning createdDate at ingest time. The same is true for object components like datastreams and disseminators. The                -->
+		<!-- datastreamVersion and disseminatorVersion elements contain an optional CREATED attribute that defines a createdDate for     -->
+		<!-- these components. If the CREATED attribute is omitted, a createdDate is assinged dynamically at ingest time. If included in the   -->
+		<!-- template object, the specified values will be carried through to all built objects resulting in the specified static dates being used     -->
+		<!-- rather than than the Fedora server assigning component createdDates.                                                                                                   -->
+		<!--                                                                                                                                                                                                                              -->
+		<!-- Uncomment the next line only if you want all objects built with this template to retain the specified creation date after ingest.            -->
+		<!-- <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2005-03-15T12:57:07.241Z"/>                   -->
+		<foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2005-03-15T12:57:07.702Z"/>
+	</foxml:objectProperties>
+	<foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
+		<!-- Note: The value for createdDate is assigned dynamically by the Fedora server at ingest time if the CREATED attribute is not        -->
+		<!-- present on the component in the object being ingested. Therefore, it is recommended that this attribute be omitted from the          -->
+		<!-- object template so this date will be assigned dynamically by the Fedora server. If included in the template file, this value will be    -->
+		<!-- carried through to the built objects and will result in the specified static date being used at ingest time by the Fedora server          -->
+		<!-- rather than dynamically assigning createdDate at ingest time.                                                                                                                   -->
+		<!--                                                                                                                                                                                                                             -->
+		<!-- Uncomment the the following line if you want the DC datastream for all abjects built with this template to retain the specified         -->
+		<!-- createdDate after ingest.                                                                                                                                                                                -->
+		<!-- <foxml:datastreamVersion CREATED="2005-03-15T12:57:07.241Z" ID="DC.0" LABEL="template: Dublin Core Record for this object" MIMETYPE="text/xml"> -->
+		<foxml:datastreamVersion FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.0" LABEL="template: Dublin Core Record for this object" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="DESC" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="DESC.0" LABEL="template: UVA descriptive metadata" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="E" ID="DS1" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="DS1.0" LABEL="template: THUMBNAIL jpg image" MIMETYPE="image/jpeg" SIZE="0">
+			<foxml:contentLocation REF="url of THUMBNAIL image" TYPE="URL"/>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="DIGIPROV1" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="DIGIPROV1.0" LABEL="template: UVA digiprov metadata for THUMBNAIL res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="SOURCE1" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="SOURCE1.0" LABEL="template: UVA source metadata for THUMBNAIL res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="TECH1" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="TECH1.0" LABEL="template: UVA technical metadata for THUMBNAIL image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="RIGHTS1" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="RIGHTS1.0" LABEL="template: UVA access rights/policy metadata for THUMBNAIL res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="E" ID="DS2" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="DS2.0" LABEL="template: MEDIUM res jpg image" MIMETYPE="image/jpeg">
+			<foxml:contentLocation REF="template: url of MEDIUM res jpg image" TYPE="URL"/>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="DIGIPROV2" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="DIGIPROV2.0" LABEL="template: UVA digiprov metadata for MEDRES res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="SOURCE2" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="SOURCE2.0" LABEL="template: UVA source metadata for MEDIUM res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="TECH2" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="TECH2.0" LABEL="template: UVA technical metadata for MED res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="RIGHTS2" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="RIGHTS2.0" LABEL="template: UVA access rights/policy metadata for MEDRES res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="E" ID="DS3" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="DS3.0" LABEL="template: HIGH res jpg image" MIMETYPE="image/jpeg">
+			<foxml:contentLocation REF="template: url of HIGH res jpg image" TYPE="URL"/>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="DIGIPROV3" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="DIGIPROV3.0" LABEL="template: UVA digiprov metadata for HIGH res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="SOURCE3" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="SOURCE3.0" LABEL="template: UVA source metadata for HIGH res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="TECH3" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="TECH3.0" LABEL="template: UVA technical metadata for HIGH res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="RIGHTS3" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="RIGHTS3.0" LABEL="template: UVA access rights/policy metadata for HIGHRES res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="E" ID="DS4" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="DS4.0" LABEL="template: VERYHIGH jpg image" MIMETYPE="image/jpeg" SIZE="0">
+			<foxml:contentLocation REF="template: url of VERYHIGH jpg image" TYPE="URL"/>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="DIGIPROV4" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="DIGIPROV4.0" LABEL="template: UVA digiprov metadata for VERYHIGH res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="SOURCE4" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="SOURCE4.0" LABEL="template: UVA source metadata for VERYHIGH res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="TECH4" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="TECH4.0" LABEL="template: UVA technical metadata for VERYHIGH res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="RIGHTS4" STATE="A" VERSIONABLE="true">
+		<foxml:datastreamVersion ID="RIGHTS4.0" LABEL="template: UVA access rights/policy metadata for VERYHIGH res image" MIMETYPE="text/xml">
+			<foxml:xmlContent>
+				<dummy/>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+</foxml:digitalObject>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="info:fedora/fedora-system:def/listDatastreams#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="info:fedora/fedora-system:def/listDatastreams#" elementFormDefault="qualified">
+	<!-- root element declaration -->
+	<xsd:element name="objectDatastreams">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="objectDatastreamsType"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- complex type declarations -->
+	<xsd:complexType name="objectDatastreamsType">
+		<xsd:sequence>
+			<xsd:element name="datastream" type="datastreamType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="pid" type="xsd:string" use="required"/>
+		<xsd:attribute name="asOfDateTime" type="xsd:string" use="optional"/>
+		<xsd:attribute name="baseURL" type="xsd:string" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="datastreamType">
+		<xsd:attribute name="dsid" type="xsd:string" use="required"/>
+		<xsd:attribute name="label" type="xsd:string" use="required"/>
+		<xsd:attribute name="mimeType" type="xsd:string" use="required"/>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,408 @@
+Mulgara Semantic Store Legal Statements
+
+This project includes source code and/or binary distributions from other
+projects and companies. It is our intent to list each of them here. If
+we forgot to give credit where credit is due, please send electronic
+mail to legal@pisoftware.com.
+
+This file lists code requirements of this project (in no particular
+order), and provides their licenses and other information to fulfill
+legal requirements. We have attempted to err on the side of providing
+more information than is required by any particular license.
+
+
+I.  Open Source Components
+
+    Source code for Open Source components may be obtained from
+    the URL provided for each project.
+
+    Kowari Metastore (Modified)
+    Source:   src/jar/* (roughly).  Mulgara is a fork of Kowari and
+              so includes modifications to most of Kowari.  Package
+              names have been changed globally in this release.  For
+              detailed changes, see the file KOWARI-MODIFICATIONS.txt
+              in this directory.
+    URL:      http://kowari.org/
+    LICENSE:  Mozilla Public License, v1.1
+              http://kowari.org/mpl1.1.html
+    
+    Kowari Metastore Documentation (Modified)
+    Source:   docs/*
+    URL:      http://kowari.org/oldsite/index.htm
+    LICENSE:  GNU Free Documentation License, Version 1.2
+              http://www.gnu.org/copyleft/fdl.html
+    NB:       Modified documentation retains licensing under the same
+              terms.  See the file DOC_LICENSE.txt.
+
+    ANTLR
+    JARs:     antlr.jar
+    URL:      http://www.antlr.org/
+    LICENSE:  BSD
+              http://www.antlr.org/license.html
+    
+    Apache Derby
+    JARs:     derby.jar
+    URL:      http://db.apache.org/derby/
+    LICENSE:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+
+    Apache SOAP
+    JARs:     apache-soap-2.2.jar
+    URL:      http://archive.apache.org/dist/ws/soap/version-2.2/
+    LICENSE:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+    
+    AspectJ
+    JARs:     aspectjrt-1.2.jar
+    URL:      http://www.eclipse.org/aspectj/
+    LICENSE:  Common Public License v1.0
+              http://www.eclipse.org/legal/cpl-v10.html
+
+    AXIS
+    JARs:     axis-1.1.jar
+              axis-ant-1.1.jar
+              saaj-1.1
+              jaxrpc-1.1.jar
+    URL:      http://ws.apache.org/axis/index.html
+    LICENSE:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+    
+    Barracuda
+    JARs:     barracuda-ant-1.2.6.jar
+              barracuda-1.2.6.jar
+              plankton-1.2.6.jar
+    URL:      http://barracudamvc.org/Barracuda/docs/index.html
+    LICENSE:  GNU Lesser General Public License
+              http://opensource.org/licenses/lgpl-license.php
+    
+    Bean Scripting Framework
+    JARs:     bsf-2.3.0.jar
+    URL:      http://jakarta.apache.org/bsf/
+    LICENSE:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+    
+    BeanShell
+    JARs:     bsh-2.0b1.jar
+    URL:      http://www.beanshell.org/
+    LICENSE:  Dual License: Sun Public License or LGPL
+              LGPL chosen
+              http://www.gnu.org/copyleft/lesser.html
+
+    BEEPCORE 
+    JARs:     beepcore-0.9.08.jar
+    URL:      http://sourceforge.net/projects/beepcore-java
+    LICENSE:  The BSD License
+              http://opensource.org/licenses/bsd-license.php
+    
+    Castor
+    JARs:     castor-0.9.3.9-xml.jar
+    URL:      http://castor.org
+    LICENSE:  The Intalio License (BSD-style)
+              http://www.castor.org/license.html
+    
+    Commons Discovery
+    JARs:     commons-discovery-1.2.jar
+    URL:      http://jakarta.apache.org/commons/discovery/
+    LICENSE:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+    
+    Commons HTTP Client
+    JARs:     commons-httpclient-2.0.2.jar
+    URL:      http://jakarta.apache.org/commons/httpclient/
+    LICENSE:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+    
+    Commons Logging
+    JARs:     commons-logging-1.0.3.jar
+    URL:      http://jakarta.apache.org/commons/logging/
+    LICENSE:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+    
+    Concurrent
+    JARs:     concurrent-1.3.4.jar
+    URL:      http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html
+    LICENSE:  Public Domain with the exception of two classes used by
+              consent of Sun under a BSD-style license:
+              http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/sun-u.c.license.pdf
+
+    Date Utils
+    JARs:     DateUtils1.jar
+    URL:      http://mulgara.org/files/misc/DateUtils/
+    LICENSE:  BSD Variant
+              http://mulgara.org/files/misc/DateUtils/licence.txt
+
+    GNU Regexp
+    JARs:     gnu-regexp-1.1.4.jar
+    URL:      http://savannah.gnu.org/projects/gnu-regexp/
+    LICENSE:  LGPL
+              http://www.gnu.org/copyleft/lesser.html
+
+    ICU4J
+    JARs:     icu4j.jar
+    URL:      http://icu.sourceforge.net/
+    LICENSE:  BSD Variant
+              http://source.icu-project.org/repos/icu/icu/trunk/license.html
+    
+    Jakarta ORO
+    JARs:     jakarta-oro-2.0.5.jar
+    URL:      http://jakarta.apache.org/oro/
+    LICENSE:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+
+    JArgs
+    JARs:     jargs-0.2.jar
+    URL:      http://jargs.sourceforge.net/
+    LICENSE:  BSD License
+              http://www.opensource.org/licenses/bsd-license.php
+    
+    Jasper
+    JARs:     jasper-compiler-4.2.29.jar
+              jasper-runtime-4.2.29.jar
+    URL:      http://tomcat.apache.org/tomcat-4.1-doc/index.html
+    LICENSE:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+
+    Java CC 3.2
+    JARs:     javacc.jar
+    URL:      https://javacc.dev.java.net/
+    LICENSE:  BSD
+              http://www.opensource.org/licenses/bsd-license.php
+
+    JBoss
+    JARs:     jboss-j2ee.jar
+    URL:      http://jboss.org
+    License:  GNU LGPL
+              http://www.opensource.org/licenses/lgpl-license.php
+    
+    Jena Semantic web toolkit
+    JARs:     jena-2.1.jar
+    URL:      http://jena.sourceforge.net/
+    LICENSE:  BSD License
+              http://www.opensource.org/licenses/bsd-license.php
+    
+    Jetty
+    JARs:     org.mortbay.jetty-4.2.19.jar
+              org.mortbay.jetty.plus-4.2.19.jar
+    URL:      http://jetty.mortbay.org
+    LICENSE:  Apache Software License, v2.0
+              http://jetty.mortbay.org/LICENSE.TXT
+    NOTE:     Source modifications made, for more information see:
+              http://groups.yahoo.com/group/jetty-discuss/message/2686
+
+    Java ID3 Library
+    JARs:     jid3-0.34.jar
+    URL:      http://jid3.blinkenlights.org/
+    LICENSE:  LGPL
+              http://www.opensource.org/licenses/lgpl-license.php
+
+    JLayer
+    JARs:     jl1.0.jar
+    URL:      http://www.javazoom.net/javalayer/javalayer.html
+    LICENSE:  LGPL
+              http://www.gnu.org/copyleft/lesser.html
+    
+    JOTM (Java Open Transaction Manager)
+    JARs:     jotm-1.5.3.jar (locally patched)
+              jotm_carol-1.5.3.jar
+              jotm_iiop_stubs-1.5.3.jar
+              connector-1_5.jar (J2EE spec from Sun)
+              jta-spec1_0_1.jar (J2EE spec from Sun)
+    URL:      http://jotm.objectweb.org/ 
+    LICENSE:  BSD-style
+              http://jotm.objectweb.org/bsd_license.html
+
+    JRDF
+    JARs:     jrdf-0.3.4.3.jar
+    URL:      http://mulgara.org/files/jrdf/
+    LICENSE:  Dual license: Apache or GNU LGPL
+              LGPL chosen
+              http://opensource.org/licenses/lgpl-license.php
+    
+    JSR-173 (Streaming API for XML "StAX")
+    JARs:     jsr173_07_api.jar
+              jsr173_07_ri.jar
+    URL:      http://jcp.org/aboutJava/communityprocess/final/jsr173/index.html
+    LICENSE:  BEA Systems Specification License (BSD-like)
+              (accessible via the above URL)
+    
+    JTidy
+    JARs:     jtidy-r7-xmlc-2.2.jar
+    URL:      http://sourceforge.net/projects/jtidy
+    LICENSE:  JTidy License
+              http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/jtidy/jtidy/LICENSE.
+    
+    Log4J
+    JARs:     log4j-1.2.8.jar
+    URL:      http://jakarta.apache.org
+    LICENSE:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+    
+    Lucene 2.0
+    JARs:     lucene-2.0.0.jar
+    URL:      http://jakarta.apache.org/lucene/docs/index.html
+    LICENSE:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+    
+    Mozilla Rhino
+    JARs:     js-1.5r3.jar
+    URL:      http://www.mozilla.org/rhino/
+    LICENSE:  Netscape Public License
+              http://www.mozilla.org/MPL/NPL-1.1.html
+    
+    Sable CC
+    JARs:     sablecc-2.18.2.jar
+    URL:      http://www.sablecc.org
+    LICENSE:  GNU LGPL
+              http://www.opensource.org/licenses/lgpl-license.php
+ 
+    SOFA
+    JARs:     sofa-1.0-alpha.jar
+    URL:      http://sofa.projects.semwebcentral.org/
+    License   GNU LGPL
+              http://www.opensource.org/licenses/lgpl-license.php
+
+    Trove4j
+    JARs:     trove-1.0.2.jar
+    URL:      http://trove4j.sf.net/
+    License   GNU LGPL
+              http://www.opensource.org/licenses/lgpl-license.php
+    
+    WSDL4J
+    JARs:     wsdl4j-1.4.jar
+    URL:      http://sourceforge.net/projects/wsdl4j
+    LICENSE:  Common Public License
+              http://oss.software.ibm.com/developerworks/opensource/CPLv1.0.htm
+    
+    Xerces
+    JARs:     xercesImpl.jar
+              xmlParserAPIs.jar
+    URL:      http://xml.apache.org/xerces-j/index.html
+    LICENSE:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+    
+    Xalan
+    JARs:    xalan-2.7.0.jar
+    URL:     http://xml.apache.org/xalan-j/
+    LICENSE:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+    
+    XMLC
+    JARs:     xmlc-all-runtime-2.2.jar
+              xmlc-taskdef-2.2.jar
+              xmlc-xerces.jar
+    URL:      http://www.enhydra.org/tech/xmlc/index.html
+    LICENSE:  LGPL
+              http://opensource.org/licenses/lgpl-license.php
+
+    EMORY UTILs
+    JARs:     emory-util.jar
+    URL:      http://dcl.mathcs.emory.edu/util/
+    LICENSE:  Public domain
+              http://creativecommons.org/licenses/publicdomain
+              
+    XOM 1.0
+    JARs:     xom-1.0d21.jar
+    URL:      http://www.xom.nu/
+    License   GNU LGPL
+              http://www.opensource.org/licenses/lgpl-license.php
+
+    JavaBeans Activation Framework 1.0.2
+    JARs:     activation-1.0.2.jar
+    URL:      http://java.sun.com/products/javabeans/glasgow/jaf.html
+    License:  Common Development and Distribution License (CDDL) v1.0
+              https://glassfish.dev.java.net/public/CDDLv1.0.html
+
+    Java Servlet API
+    JARs:     javax.servlet-2.3.jar
+    URL:      http://java.sun.com/products/servlet/download.html
+    License:  Common Development and Distribution License (CDDL) v1.0
+              https://glassfish.dev.java.net/public/CDDLv1.0.html
+
+    JavaMail
+    JARs:     mail-1.3.jar
+    URL:      http://java.sun.com/products/javamail/
+    License:  Common Development and Distribution License (CDDL) v1.0
+              https://glassfish.dev.java.net/public/CDDLv1.0.html
+
+
+II. Supporting Optional Packages
+
+    Those wishing to build the Mulgara Semantic Store from source will
+    require Ant.  Those wishing to run the unit tests included in the
+    distribution will require the other packages listed here:
+
+    Ant
+    JARs:     ant-1.7.0.jar
+              ant-apache-bsf-1.7.0.jar
+              ant-junit-1.7.0.jar
+              ant-launcher-1.7.0.jar
+              ant-nodeps-1.7.0.jar
+              ant-trax-1.7.0.jar
+    URL:      http://jakarta.apache.org/ant
+    License:  Apache Software License, v2.0
+              http://www.apache.org/licenses/LICENSE-2.0
+
+// Source for this version no longer available.
+    JUnit
+    JARs:     junit-3.8.1.jar
+    URL:      http://www.junit.org,
+              http://JUnit.sourceforge.net/
+    License:  Common Public License v1.0
+              http://junit.sourceforge.net/cpl-v10.html
+
+    JXUnit
+    JARs:     jxunit3.jar
+    URL:      http://jxunit.sourceforge.net/
+    License:  Modified BSD
+              http://jxquick.sourceforge.net/quick3/License.txt
+
+    JXQuick Runtime
+    JARs:     Quick4rt.jar
+              Quick4util.jar
+    URL:      http://jxquick.sourceforge.net/quick3/
+    License:  Modified BSD
+              http://jxquick.sourceforge.net/quick3/License.txt
+
+
+Please note:
+
+  Tucana, Tucana Technologies, Tucana Knowledge Server, TKS, TKS Viewer,
+  Tucana Designer, Kowari Metastore, Kowari, Kowari Viewer, Interactive
+  Tucana Query Language, iTQL, Tucana Management Console, TMC, Tucana
+  Metadata Extraction Framework and TMex are trademarks or registered
+  trademarks of Northrop Grumman Corporation in the United States and
+  other countries.
+
+  AMD and AMD Opteron are trademarks of Advanced Micro Devices, Inc.
+
+  Mac OS is a registered trademark of Apple Computer, Inc.
+
+  IBM, VisualAge, WebSphere and Lotus Notes are registered trademarks of
+  International Business Machines Corporation in the United States,
+  other countries, or both.
+
+  Intel is a registered trademark of Intel Corporation or its
+  subsidiaries in the United States and other countries.
+
+  JBoss is a registered trademark and servicemark of JBoss Inc.
+
+  AeroText is a trademark of Lockheed Martin Corporation or its
+  subsidiaries in the United States and other countries.
+
+  Microsoft, Windows, Windows NT, Visual Studio, Active Directory and
+  Visual Basic are registered trademarks of Microsoft Corporation in the
+  United States and other countries.
+
+  Sun, Sun Microsystems, Java, JavaBean, JavaServer Pages, Java Virtual
+  Machine, J2SE, JVM, JDBC, Solaris and SPARC are trademarks of Sun
+  Microsystems, Inc. in the United States and other countries.
+
+  SUSE is a registered trademark of SUSE AG.
+
+  UNIX is a registered trademark of The Open Group.
+
+  Linux is a registered trademark of Linus Torvalds.
+
+  All other products or services mentioned herein are the trademarks or
+  service marks of their respective companies or organizations.
+

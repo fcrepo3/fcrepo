@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" PolicyId="demo-11">
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  OBJECT-SPECIFIC POLICY:  This is an object-specific policy.  It could be stored inside the demo:26 digital object in the POLICY -->
+	<!-- datastream OR in the directory for object-specific policies. (The directory location is set in the Authorization module -->
+	<!-- configuration in the Fedora server configuration file (fedora.fcfg).  -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  By using multiple policy Rules, this policy shows how to deny access to particular datastreams in the object. -->
+	<!--  1) The policy will DENY everyone except professors and researchers access to -particular- source datastreams of the -->
+	<!--  demo:11 object by  controlling access to the getDatastreamDissemination method of the Fedora Access Service (API-A).  -->
+	<!--  2) The policy will DENY everyone except students, professors, and researchers, access to all disseminations of demo:11. -->
+	<!--  3) This policy will also DENY ALL access to the demo:11 object to a SPECIFIC USER based on the user's login id  -->
+	<!--  (as registered in the tomcat-users.xml file). -->
+	<!--  NOTE:  The net effect of the policy PERMITS open access to the descriptive metadata datastreams of demo:11. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  TEST CASE:  This policy can be tested on the object demo:26 -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description>By using multiple policy Rules, this policy shows how to deny access to particular datastreams in the object. 1) The policy will DENY everyone except professors and researchers access to -particular- source datastreams of the demo:11 object by  controlling access to the getDatastreamDissemination method of the Fedora Access Service (API-A).  2) The policy will DENY everyone except students, professors, and researchers, access to all disseminations of demo:11.  3) This policy will also DENY ALL access to the demo:11 object to a SPECIFIC USER based on login id  (as registered in the tomcat-users.xml file).  NOTE:  The net effect of the policy permits open access to the descriptive metadata datastream of demo:11.</Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.  However, the scope of the Subject is narrowed down in the Rule Condition (below). -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to the object demo:11  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<Resource>
+				<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:11</AttributeValue>
+					<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</ResourceMatch>
+			</Resource>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any action. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<AnyAction/>
+		</Actions>
+	</Target>
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Rule 1: This Rule will deny access to specific datastreams.   The datastream restrictions will deny access to everyone except -->
+	<!-- those users who are in the role of professors and researchers.  -->
+	<!-- The rule Target narrows the Resource matching down to a particular source content datastream (DS1) for the demo:11 and to -->
+	<!-- a particular metadata datastream (RIGHTS). -->
+	<!-- The rule Target narrows the Action matching down to the getDatastreamDissemination operation. -->
+	<!-- The Condition element wraps the specification of the SubjectAttributeDesignator, which contains the attribute identifier for fedoraRole -->
+	<!-- and values for that role of researcher and professor.  The condition is wrapped with a NOT function, meaning that denial will occur -->
+	<!-- for any user that is NOT one of the specified roles.  -->
+	<!-- See the Fedora system documentation on Tomcat Authentication for details of how register users and fedoraRoles in the tomcat-users.xml file. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Rule RuleId="1" Effect="Deny">
+		<Target>
+			<Subjects>
+				<AnySubject/>
+			</Subjects>
+			<Resources>
+				<Resource>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:11</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">DS1</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:datastream:id" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+				</Resource>
+				<Resource>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:11</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">RIGHTS1</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:datastream:id" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+				</Resource>
+			</Resources>
+			<Actions>
+				<Action>
+					<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDatastreamDissemination</AttributeValue>
+						<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:id"/>
+					</ActionMatch>
+				</Action>
+			</Actions>
+		</Target>
+		<!-- ***************************************************************************************************************************************** -->
+		<!-- The Condition:  this rule will deny access (scoped by the rule Target) when the requester is in NOT in particular roles. -->
+		<!-- ***************************************************************************************************************************************** -->
+		<!-- NOTE!!  Be careful with this kind of rule if you don't want to shut access off to the Fedora administrator.  The use -->
+		<!-- of the NOT function can easily cut out the administrator even in light of the repository-wide policy that says that -->
+		<!-- the administrator can do everything.   This is because the policy combining algorithm for the Fedora authorization -->
+		<!-- module is set for DENY to override permit.   So, in this example, we add the administrator role to the list of  -->
+		<!-- who is not to be denied. -->
+		<!-- ***************************************************************************************************************************************** -->
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+				<SubjectAttributeDesignator AttributeId="fedoraRole" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">researcher</AttributeValue>
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">professor</AttributeValue>
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">administrator</AttributeValue>
+				</Apply>
+			</Apply>
+		</Condition>
+	</Rule>
+	<!-- ***************************************************************************************************************************************************************** -->
+	<!-- Rule 2:  DENY a particular user ALL access to the demo:11 object.-->
+	<!-- **************************************************************************************************************************************************************** -->
+	<Rule RuleId="2" Effect="Deny">
+		<!-- The Conditio for this denial rule is a particular person (i.e., who has login id of "testuser4").  All all access to this object will be denied. -->
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">testuser4</AttributeValue>
+			<SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:subject:loginId"/>
+		</Condition>
+	</Rule>
+	<!-- ***************************************************************************************************************************************************************** -->
+	<!-- Rule 3:  Permit all other access to this object.  In conjunction with the other rules, the net effect should be that everything is permitted-->
+	<!-- except those things expressly denied in the other rules.  -->
+	<!-- **************************************************************************************************************************************************************** -->
+	<Rule RuleId="3" Effect="Permit"/>
+</Policy>

@@ -1,0 +1,134 @@
+global {
+	color: #FFFFFF;
+}
+
+Application {
+	theme-color: #01015B;
+	color: #FFFFFF; 
+	backgroundGradientAlphas: 0.8, 0.86; 
+	backgroundGradientColors: #2F365B, #686B8D;
+}
+
+TitleWindow {
+	borderColor: #262B49;
+	controlBarStyleName: titleWindowControlBar;
+	borderAlpha: 1.0;
+	font-size: 14;
+}
+
+Form {
+	backgroundColor: #E1E1E5;
+}
+
+Accordion {
+	themeColor: #000000;
+	backgroundColor: #E1E1E5;
+	headerStyleName: "myaccordionHeader";
+}
+
+.myaccordionHeader {
+	color: #000000;
+	font-size: 12;
+}
+
+Label {
+	color: #000000;
+}
+
+List {
+	color: #000000;	
+	rollOverColor: #B8BAD5;
+	selectionColor: #7B7D9F;
+	fontFamily: Verdana;
+	fontSize: 10;
+	fontWeight: normal;
+}
+
+Label.header {
+	fontSize: 12;
+	fontWeight: bold;
+}
+
+Button {
+	color: #010101;
+	font-size: 10;
+}
+
+Button.login {
+	color: #FFFFFF;
+	textRollOverColor: #FFFFFF;
+	textSelectedColor: #DFDFDF;
+}
+
+HRule {
+	strokeColor: #6F7575;
+}
+
+Form {
+	paddingLeft: 10;
+	paddingRight: 0;
+}
+
+VBox.welcome {
+	backgroundColor: #FFFFFF;
+}
+
+SuperTabNavigator {
+	backgroundColor: #E1E1E5;
+	horizontal-gap: 4;
+    tabStyleName: "myTabs";
+}
+
+.myTabs {
+   fontSize: 14;
+
+}
+
+Label.repoLabel {
+    fontWeight: bold;
+}
+
+TextInput, TextArea, Label.formLabel {
+	color: #000000;
+	font-size: 10;
+}
+
+DataGrid
+{
+	color: #000000;
+	fontSize: 10;
+	headerStyleName: "mydataGridHeaderStyle";
+}
+
+.mydataGridHeaderStyle {
+	fontSize: 11;
+}
+
+.tabContents {
+	padding-top: 20;
+	padding-left: 40;
+}
+
+.objectButtons {
+    right: 0;
+}
+
+ComboBox {
+    fontFamily: Verdana;
+    fontSize: 10;
+    fontWeight: bold;
+}
+
+Alert {
+	color: #000000;
+	backgroundColor: #FFFFFF;
+	border-color: #262B49;
+}
+
+Alert.warning {
+    border-color: #FFF15F;
+}
+
+Alert.error {
+    border-color: #CF2626;
+}

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        PolicyId="deny-if-not-authenticated"
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+  <Description>deny any access if client hasn't authenticated.  this really applies only to urls not protected
+    by container security, but requiring authentication, as specified in web.xml, as container-protected access 
+    would prevent a failed authentication from reaching xacml authorization evaluation</Description>
+  <Target>
+    <Subjects>
+      <Subject><!-- require attribute to be present -->
+        <SubjectMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string"/>        
+          <SubjectAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:subject:login-id" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+        </SubjectMatch>
+      </Subject>
+    </Subjects>
+    <Resources>
+      <AnyResource/>
+    </Resources>    
+    <Actions>
+      <AnyAction/>
+    </Actions>  
+  </Target>
+  <Rule RuleId="1" Effect="Deny"/>
+</Policy>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        PolicyId="deny-if-modified-after"
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+  <Description> </Description>
+  <Target>
+    <Subjects>
+      <AnySubject/> 
+    </Subjects>
+    <Resources>
+      <Resource>
+        <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:dateTime-less-than">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#dateTime">2006-01-01T00:00:00.000Z</AttributeValue>
+          <ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:lastModifiedDate" 
+            DataType="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        </ResourceMatch>
+      </Resource>
+    </Resources>
+    <Actions>
+      <AnyAction/>
+    </Actions>    
+  </Target>
+  <Rule RuleId="1" Effect="Deny"/>
+</Policy>

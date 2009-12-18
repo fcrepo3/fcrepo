@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" title="Add New Datastream" showCloseButton="true" close="closeDialog(event)">
+    <mx:Script>
+        <![CDATA[
+            import mx.controls.TextArea;
+            import mx.managers.PopUpManager;
+            import mx.events.CloseEvent;
+            import mx.core.Container;
+            import script.Alerts;
+            import mx.rpc.events.ResultEvent;
+            import script.ErrorHandler;
+            import script.Util;
+
+            private var pid:String;
+            private var url:String;
+            
+            /**
+             * Sets up the new datastream dialog.
+             */ 
+            public function setup(pid:String, url:String):void {
+                this.pid = pid;
+                this.url = url;
+            }
+         
+            /**
+             * Close the new datastream dialog.
+             */ 
+            private function closeDialog(event:CloseEvent):void {
+                PopUpManager.removePopUp(this);
+            }
+
+            /**
+             * Provides a way to hide unneeded portions of the UI.
+             */ 
+            private function hide(item:Container):void {
+                item.visible = false;
+                item.includeInLayout = false;
+            }
+
+            /**
+             * Provides a way to show hidden portions of the UI.
+             */ 
+            private function show(item:Container):void {
+                item.includeInLayout = true;
+                item.visible = true;
+            }
+
+            /**
+             * Update the datastream type.
+             */
+            private function changeControlGroup():void {
+                if(dsControlGroup.selectedIndex == 0) {// X
+                    show(contentXML);
+                    hide(contentLocation);
+                    hide(managedContent);
+                } else if(dsControlGroup.selectedIndex == 1) {// M
+                    hide(contentXML);
+                    hide(contentLocation);
+                    show(managedContent);
+                } else if(dsControlGroup.selectedIndex == 2) {// R
+                    hide(contentXML);
+                    show(contentLocation);
+                    hide(managedContent);
+                } else if(dsControlGroup.selectedIndex == 3) {// E
+                    hide(contentXML);
+                    show(contentLocation);
+                    hide(managedContent);
+                } 
+            }
+
+            /**
+             * Add a new datastream based on user inputs.
+             */         
+            private function addDatastream():void {
+                if(dsID.text == null || dsID.text == "") {
+                    Alerts.showInfo("You must provide a Datastream ID");
+                } else if(dsMIME.text == null || dsMIME.text == "") {
+                    Alerts.showInfo("You must provide a MIME type");
+                } else if((dsControlGroup.selectedIndex == 2 || dsControlGroup.selectedIndex == 3) && 
+                          (dsLocation.text == null || dsLocation.text == "")) {
+                    Alerts.showInfo("You must provide a location");
+                } else if(dsControlGroup.selectedIndex == 0 && 
+                          xmlIncludeType.selection == xmlContent && 
+                          (dsXML.text == null || dsXML.text == "")) {                          
+                    Alerts.showInfo("You must provide XML content");
+                } else if(dsControlGroup.selectedIndex == 0 && 
+                          xmlIncludeType.selection == xmlUrl && 
+                          (xmlLocation.text == null || xmlLocation.text == "")) {                          
+                    Alerts.showInfo("You must provide a URL");                    
+                } else {                
+                    // It is necessary to include a content type to keep flex from
+                    // converting the request to a GET (since there is no content)          
+                    datastreamAdd.contentType=dsMIME.text;
+                    
+                    var addURL:String = url + "/" + Util.urlEncode(dsID.text) + 
+                                        "?dsLabel=" + Util.urlEncode(dsLabel.text) +
+                                        "&formatURI=" + Util.urlEncode(dsFormatURI.text) +
+                                        "&checksumType=" + Util.urlEncode(dsChecksumType.text) +
+                                        "&altIDs=" + Util.urlEncode(dsAltID.text) +
+                                        "&mimeType=" + Util.urlEncode(dsMIME.text);
+                    
+                    var requestContent:Object = null;                    
+                    if(dsControlGroup.selectedIndex == 0) { // X
+                        addURL += "&controlGroup=X";
+                        if(xmlIncludeType.selection == xmlContent) {
+                            requestContent = dsXML.text;
+                        } else if(xmlIncludeType.selection == xmlUrl) {
+                            addURL += "&dsLocation=" + xmlLocation.text;
+                        }
+                    } else if(dsControlGroup.selectedIndex == 1) { // M
+                        addURL += "&controlGroup=M";
+                        if(managedIncludeType.selection == managedUrl) {
+                            addURL += "&dsLocation=" + managedLocation.text;
+                        }
+                    } else if(dsControlGroup.selectedIndex == 2) { // R
+                        addURL += "&controlGroup=R";
+                        addURL += "&dsLocation=" + dsLocation.text;
+                    } else if(dsControlGroup.selectedIndex == 3) { // E
+                        addURL += "&controlGroup=E";
+                        addURL += "&dsLocation=" + dsLocation.text;
+                    }                                                         
+                                      
+                    if(dsVersionable.selectedIndex == 0) {
+                        addURL += "&versionable=true";
+                    } else if(dsVersionable.selectedIndex == 1) {
+                        addURL += "&versionable=false";
+                    }                 
+
+                    if(dsState.selectedIndex == 0) {
+                        addURL += "&dsState=A";
+                    } else if(dsState.selectedIndex == 1) {
+                        addURL += "&dsState=I";
+                    }
+                    
+                    addURL = addURL + "&flash=true";
+
+                    // For M or X (with file option selected) types, provide a file upload dialog
+                    if((dsControlGroup.selectedIndex == 1 && managedIncludeType.selection == managedFile) || 
+                       (dsControlGroup.selectedIndex == 0 && xmlIncludeType.selection == xmlFile)) {
+                        uploadManagedContent(addURL);
+                        finalizeAddDatastream();
+                    } else {
+                        datastreamAdd.url = addURL;
+                        datastreamAdd.send(requestContent);
+                    }                    
+                }
+            }
+            
+            /**
+             * Provide a way to upload a file as the contents of a datastream.
+             */ 
+            private function uploadManagedContent(uploadUrl:String):void {
+                if(flash.system.Capabilities.playerType == "ActiveX")
+                { // If IE, do flex upload
+                    var fileUploadDialog:FileUploadDialog = new FileUploadDialog();
+                    fileUploadDialog.setup(uploadUrl, Util.urlEncode(dsMIME.text));
+                    PopUpManager.addPopUp(fileUploadDialog, this, true);
+                    PopUpManager.centerPopUp(fileUploadDialog);                     
+                }
+                else
+                { // Otherwise do javascript upload
+                    ExternalInterface.call("upload",uploadUrl);
+                }                
+            }            
+             
+            /**
+             * Check the result of the add datastream call
+             */
+            private function addDatastreamComplete(event:ResultEvent):void {
+                var error:String = ErrorHandler.getError(event.result);
+                if(error != null) {
+                    Alerts.showError("Attempt to add a datastream failed " + 
+                                     " due to: " + error);
+                    return;
+                }
+                
+                finalizeAddDatastream();
+            }
+            
+            /**
+             * Close down after the datastream has been added.
+             */
+            private function finalizeAddDatastream():void {    
+                closeDialog(null);
+                parentApplication.updateObjectDSList(pid);
+            }
+
+            /**
+             * Set the UI to allow for text content in an X type datastream.
+             */ 
+            private function useXmlContent():void {
+                dsXML.visible = true;
+                dsXML.includeInLayout = true;
+                fileXML.visible = false;
+                fileXML.includeInLayout = false;
+                urlXML.visible = false;
+                urlXML.includeInLayout = false;
+            }
+            
+            /**
+             * Set the UI to allow for file content in an X type datastream.
+             */ 
+            private function useXmlFile():void {
+                dsXML.visible = false;
+                dsXML.includeInLayout = false;
+                fileXML.visible = true;
+                fileXML.includeInLayout = true;
+                urlXML.visible = false;
+                urlXML.includeInLayout = false;               
+            }
+            
+            /**
+             * Set the UI to allow for content from a URL in an X type datastream.
+             */            
+            private function useXmlUrl():void {
+                dsXML.visible = false;
+                dsXML.includeInLayout = false;
+                fileXML.visible = false;
+                fileXML.includeInLayout = false;
+                urlXML.visible = true;
+                urlXML.includeInLayout = true;                
+            }
+
+            /**
+             * Set the UI to allow for file content in an M type datastream.
+             */
+            private function useManagedFile():void {
+                fileManaged.visible = true;
+                fileManaged.includeInLayout = true;
+                urlManaged.visible = false;
+                urlManaged.includeInLayout = false;                
+            }
+
+            /**
+             * Set the UI to allow for content from a URL in an M type datastream.
+             */
+            private function useManagedUrl():void {
+                fileManaged.visible = false;
+                fileManaged.includeInLayout = false;
+                urlManaged.visible = true;
+                urlManaged.includeInLayout = true;                
+            }            
+        ]]>
+    </mx:Script>
+   
+    <mx:HTTPService id="datastreamAdd" method="POST" resultFormat="text" 
+                    result="addDatastreamComplete(event)" showBusyCursor="true"
+                    fault="ErrorHandler.handleFault(event)" />  
+    
+    <mx:Form width="450">
+        <mx:FormItem label="Datastream ID:">
+            <mx:TextInput id="dsID" width="300" />            
+        </mx:FormItem> 
+        <mx:FormItem label="Label:">
+            <mx:TextInput id="dsLabel" width="300" />            
+        </mx:FormItem>
+        <mx:FormItem label="Control Group:">
+            <mx:ComboBox id="dsControlGroup" change="changeControlGroup()">
+                <mx:Array >
+                    <mx:String>Inline XML (X)</mx:String>
+                    <mx:String>Managed Content (M)</mx:String>
+                    <mx:String>Redirect (R)</mx:String>
+                    <mx:String>External Reference (E)</mx:String>
+                </mx:Array>
+            </mx:ComboBox> 
+        </mx:FormItem>               
+        <mx:FormItem label="MIME Type:">
+            <mx:TextInput id="dsMIME" width="300" text="text/xml" />
+        </mx:FormItem>
+        <mx:FormItem label="State:">
+            <mx:ComboBox id="dsState">
+                <mx:Array >
+                    <mx:String>Active (A)</mx:String>
+                    <mx:String>Inactive (I)</mx:String>
+                </mx:Array>
+            </mx:ComboBox>
+        </mx:FormItem> 
+        <mx:FormItem label="Versionable:">
+            <mx:ComboBox id="dsVersionable">
+                <mx:Array >
+                    <mx:String>Updates will create a new version</mx:String>
+                    <mx:String>Updates will replace most recent version</mx:String>
+                </mx:Array>
+            </mx:ComboBox>
+        </mx:FormItem>
+        <mx:FormItem label="Format URI:">
+            <mx:TextInput id="dsFormatURI" width="300" />
+        </mx:FormItem>
+        <mx:FormItem label="Alternate IDs:">
+            <mx:TextInput id="dsAltID" width="300" />
+        </mx:FormItem>
+        <mx:FormItem label="Checksum:">
+            <mx:HBox>
+                <mx:ComboBox id="dsChecksumType">
+                    <mx:Array >
+                        <mx:String>Default</mx:String>
+                        <mx:String>Disabled</mx:String>
+                        <mx:String>MD5</mx:String>
+                        <mx:String>SHA-1</mx:String>
+                        <mx:String>SHA-256</mx:String>
+                        <mx:String>SHA-512</mx:String>
+                    </mx:Array>
+                </mx:ComboBox>                
+            </mx:HBox>                     
+        </mx:FormItem>
+        <mx:FormItem label="Checksum:">
+            <mx:TextInput id="dsChecksum" width="300" />
+        </mx:FormItem>
+        <mx:HRule width="430" height="2"/>
+        <mx:VBox visible="true" id="contentXML">
+            <mx:RadioButtonGroup id="xmlIncludeType"/>
+            <mx:RadioButton groupName="xmlIncludeType" id="xmlContent" label="XML from text" 
+                            selected="true" click="useXmlContent()"/>
+                <mx:TextArea id="dsXML" width="430" height="200" />
+            <mx:RadioButton groupName="xmlIncludeType" id="xmlUrl" label="XML from a URL" click="useXmlUrl()"/>
+                <mx:FormItem label="Location:" id="urlXML" visible="false" includeInLayout="false">
+                    <mx:TextInput id="xmlLocation" width="300" />
+                </mx:FormItem>                
+            <mx:RadioButton groupName="xmlIncludeType" id="xmlFile" label="XML from a File" click="useXmlFile()"/>
+                <mx:Label id="fileXML" text="Fill out the above information, then click Ok to select a file" 
+                          visible="false" includeInLayout="false"/>                     
+        </mx:VBox>        
+        <mx:FormItem label="Location:" visible="false" includeInLayout="false" id="contentLocation">
+            <mx:TextInput id="dsLocation" width="300" />
+        </mx:FormItem>
+        <mx:VBox visible="false" includeInLayout="false" id="managedContent">
+            <mx:RadioButtonGroup id="managedIncludeType"/>
+            <mx:RadioButton groupName="managedIncludeType" id="managedUrl" label="Content from a URL" selected="true"
+                            click="useManagedUrl()"/>
+                <mx:FormItem label="Location:" id="urlManaged">
+                    <mx:TextInput id="managedLocation" width="300" />
+                </mx:FormItem>                
+            <mx:RadioButton groupName="managedIncludeType" id="managedFile" label="Content from a File" click="useManagedFile()"/>
+                <mx:Label id="fileManaged" text="Fill out the above information, then click Ok to select a file" 
+                      visible="false" includeInLayout="false"/>             
+        </mx:VBox>               
+    </mx:Form>
+
+    <mx:HBox>
+        <mx:Button label="Ok" click="addDatastream()"/>
+        <mx:Button label="Cancel" click="closeDialog(null)"/>        
+    </mx:HBox>
+
+</mx:TitleWindow>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PolicyId="demo-5" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  OBJECT-SPECIFIC POLICY:  This is an object-specific policy.  It could be stored inside the demo:5 digital object in the POLICY -->
+	<!-- datastream OR in the directory for object-specific policies. (The directory location is set in the Authorization module -->
+	<!-- configuration in the Fedora server configuration file (fedora.fcfg).  -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  By using multiple policy Rules, this policy shows how to deny access to all raw datastreams in the object except to particular -->
+	<!--  users (e.g., the object owners).  It also shows how to deny access to a particular disseminations to selected user roles. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  TEST CASE:  This policy can be tested on the object demo:5 -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description>This is an object-specific policy.  It could be stored inside the demo:5 digital object in the POLICY datastream OR in the directory for object-specific policies. (The directory location is set in the Authorization module configuration in the Fedora server configuration file (fedora.fcfg). By using multiple policy Rules, this policy shows how to deny access to all raw datastreams in the object except to particular users (e.g., the object owners).  It also shows how to deny access to a particular disseminations to selected user roles.</Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.  However, the scope of the Subject is narrowed down in the Rule Condition (below). -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to the object demo:5.  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<Resource>
+				<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:5</AttributeValue>
+					<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</ResourceMatch>
+			</Resource>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any action. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<AnyAction/>
+		</Actions>
+	</Target>
+	<!-- ***************************************************************************************************************************************** -->
+	<!-- Rule 1:  Deny access to raw datastreams to everyone EXCEPT particular users (e.g., who are the object owners) -->
+	<!-- and also the Fedora repository administrator.   -->
+	<!-- ***************************************************************************************************************************************** -->
+	<Rule RuleId="1" Effect="Deny">
+		<Target>
+			<Subjects>
+				<AnySubject/>
+			</Subjects>
+			<Resources>
+				<AnyResource/>
+			</Resources>
+			<Actions>
+				<Action>
+					<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDatastreamDissemination</AttributeValue>
+						<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:id"/>
+					</ActionMatch>
+				</Action>
+			</Actions>
+		</Target>
+		<!-- ***************************************************************************************************************************************** -->
+		<!-- Denial is conditional upon the user login Id NOT being one of the users identified in the set below.  -->
+		<!-- ***************************************************************************************************************************************** -->
+		<!-- NOTE!!  Be careful with this kind of rule if you don't want to shut access off to the Fedora administrator.  The use -->
+		<!-- of the NOT function can easily cut out the administrator even in light of the repository-wide policy that says that -->
+		<!-- the administrator can do everything.   This is because the policy combining algorithm for the Fedora authorization -->
+		<!-- module is set for DENY to override permit.   So, in this example, we add the administrator's userid to the list of users -->
+		<!-- who are not to be denied. -->
+		<!-- ***************************************************************************************************************************************** -->
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+				<SubjectAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:subject:loginId" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">testuser1</AttributeValue>
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">testuser2</AttributeValue>
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">fedoraAdmin</AttributeValue>
+				</Apply>
+			</Apply>
+		</Condition>
+	</Rule>
+	<!-- ***************************************************************************************************************************************************************** -->
+	<!-- Rule 2:  Deny access to high-quality image disseminations of the demo:5 object if the user's Fedora role is NOT professor or student. -->
+	<!-- Note that low-quality and medium-quality image disseminations are not restricted by this rule, so as long as another rule does not restrict -->
+	<!-- them, they will be available to everyone. -->
+	<!-- **************************************************************************************************************************************************************** -->
+	<Rule RuleId="2" Effect="Deny">
+		<Target>
+			<Subjects>
+				<AnySubject/>
+			</Subjects>
+			<Resources>
+				<Resource>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:5</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">getHigh</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:disseminator:method" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+				</Resource>
+				<Resource>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:5</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">getVeryHigh</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:disseminator:method" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+				</Resource>
+			</Resources>
+			<Actions>
+				<Action>
+					<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDissemination</AttributeValue>
+						<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:id"/>
+					</ActionMatch>
+				</Action>
+			</Actions>
+		</Target>
+		<!-- ***************************************************************************************************************************************** -->
+		<!-- The Condition indicates that the Resources/Actions specified in the target will be denied to users who are -->
+		<!-- NOT of one of the roles listed below. -->
+		<!-- ***************************************************************************************************************************************** -->
+		<!-- NOTE!!  Be careful with this kind of rule if you don't want to shut access off to the Fedora administrator.  The use -->
+		<!-- of the NOT function can easily cut out the administrator even in light of the repository-wide policy that says that -->
+		<!-- the administrator can do everything.   This is because the policy combining algorithm for the Fedora authorization -->
+		<!-- module is set for DENY to override permit.   So, in this example, we add the administrator role to the list of  -->
+		<!-- who is not to be denied. -->
+		<!-- ***************************************************************************************************************************************** -->
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+				<SubjectAttributeDesignator AttributeId="fedoraRole" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">student</AttributeValue>
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">professor</AttributeValue>
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">administrator</AttributeValue>
+				</Apply>
+			</Apply>
+		</Condition>
+	</Rule>
+	<!-- ***************************************************************************************************************************************************************** -->
+	<!-- Rule 3:  Permit all other access to this object.  In conjunction with the other rules, the net effect should be that everything is permitted-->
+	<!-- except those things expressly denied in the other rules.  -->
+	<!-- **************************************************************************************************************************************************************** -->
+	<Rule RuleId="3" Effect="Permit"/>
+</Policy>

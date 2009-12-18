@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" PolicyId="deny-objects-by-cmodel-to-ldap-group" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:1.0:policy
+http://www.fedora.info/definitions/1/0/api/cs-xacml-schema-policy-01.xsd">
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- This policy will DENY all APIA access to digital objects that are EAD Finding AIDS.  This is based on the object content model -->
+	<!-- attribute having a value of "UVA_EAD_FINDING_AID.  Specifically, the policy will DENY access to users that belong to a -->
+	<!-- particular LDAP-defined GROUP. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description>This policy will DENY all APIA access to digital objects that are EAD Finding AIDS.  This is based on the object content model  attribute having a value of "UVA_EAD_FINDING_AID.  Specifically, the policy will DENY access to users that belong to a particular LDAP-defined GROUP.</Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.  However, the scope of the Subject is narrowed down in the Rule Condition (below).  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- This policy is applicable ONLY to objects that belong the the content model grouping of "UVA_EAD_FINDING_AID" -->
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- The ResourceMatch elements enables the XACML enforcement engine to determine whether this policy is applicable based -->
+		<!-- on whether an incoming Fedora request pertains to the kind of a Resource entity (in this case a dissemination) that is specified -->
+		<!-- in the ResourceMatch. At runtime, the XACML engine does a comparison of attribute names/values in the incoming request -->
+		<!-- against attribute names/values in the ResourceMatch specification.  An attribute name is found in a ResourceAttributeDesignator -->
+		<!-- element and  an attribute value in the AttributeValue element.  Note that the XACML-based function "string-equal" on the -->
+		<!-- ResourceMatch element indicates that the matching will be string-based.  Multiple ResourceMatch elements are logically -->
+		<!-- AND-ed together by the XACML enforcement engine. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- In this example, the ResourceMatch elements say that that this policy is applicable for resources (objects) where : -->
+		<!--         attribute named 'resource:object:contentModel" has a value of 'UVA_EAD_FINDING_AID'  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<Resource>
+				<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">UVA_EAD_FINDING_AID</AttributeValue>
+					<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:contentModel" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</ResourceMatch>
+			</Resource>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable ONLY to actions (operations) of the Fedora Access Service (i.e., API-A). -->
+		<!--  The ActionAttributeDesignator element is used to specify the action identifier.  -->
+		<!--  The action identifier (urn:fedora:names:fedora:2.1:action:api) indicates that the policy will apply broadly to an entire Fedora API -->
+		<!--  (a sort of composite action consisting of all methods in a particular API).  -->
+		<!-- The AttributeValue names the specific Fedora API  that is the target of this policy, namely API-A, as indicated by the  -->
+		<!-- identifier urn:fedora:names:fedora:2.1:action:api-a. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:api-a</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:api"/>
+				</ActionMatch>
+			</Action>
+		</Actions>
+	</Target>
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Rule 1: This Rule will DENY access to users who are members of a certain group.  The rule sets up a condition under which -->
+	<!-- denial should occur.  A Condition element wraps the specification of the SubjectAttributeDesignator, which is where an -->
+	<!-- LDAP subject attribute (ou) for this rule is specified.  The Condition element specifies the URN of an XACML-defined function -->
+	<!-- (string-at-least-one-member-of)  that wraps the SubjectAttributeDesignator to indicate the that there are -->
+	<!-- multiple string values for the LDAP attribute that will result in denial.   -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- BOTTOM LINE:  -->
+	<!-- DENY access to API-A to users whose LDAP attribute (ou) has the value of 'Lb-Info Technology' or 'Lb-Univ Librarian-General. ' -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Rule RuleId="1" Effect="Deny">
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+			<SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="ou"/>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Lb-Info Technology</AttributeValue>
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Lb-Univ Librarian-General</AttributeValue>
+			</Apply>
+		</Condition>
+	</Rule>
+</Policy>

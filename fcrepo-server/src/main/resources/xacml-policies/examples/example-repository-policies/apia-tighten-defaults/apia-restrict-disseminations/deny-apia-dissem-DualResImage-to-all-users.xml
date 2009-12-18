@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" PolicyId="deny-apia-dissem-DualResImage-to-all-users" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:1.0:policy
+http://www.fedora.info/definitions/1/0/api/cs-xacml-schema-policy-01.xsd">
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  This policy will DENY access to disseminations that are available on objects via a disseminator subscribing to -->
+	<!--   a particular behavior definition (demo:DualResImage).  Specificallly,  it will DENY access to ALL users making getDissemination -->
+	<!--   requests upon that disseminator. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description>This policy will DENY access to disseminations that are available on objects via a disseminator subscribing to a particular behavior definition (demo:DualResImage).  Specifically,  it will DENY access to ALL users making these getDissemination requests upon that disseminator.</Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- This policy is applicable to resources that are disseminations based on the 'demo:2' behavior definition.    -->
+		<!-- Given that an object has a disseminator that uses this behavior definition, any dissemination requests based on this -->
+		<!-- disseminator will be covered by this policy. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- The ResourceMatch elements enables the XACML enforcement engine to determine whether this policy is applicable based -->
+		<!-- on whether an incoming Fedora request pertains to the kind of a Resource entity (in this case a dissemination) that is specified -->
+		<!-- in the ResourceMatch. At runtime, the XACML engine does a comparison of attribute names/values in the incoming request -->
+		<!-- against attribute names/values in the ResourceMatch specification.  An attribute name is found in a ResourceAttributeDesignator -->
+		<!-- element and  an attribute value in the AttributeValue element.  Note that the XACML-based function "string-equal" on the -->
+		<!-- ResourceMatch element indicates that the matching will be string-based.  Multiple ResourceMatch elements can be logically -->
+		<!-- AND-ed together by the XACML enforcement engine. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- In this example, the ResourceMatch elements say that that this policy is applicable for resources (disseminations) where : -->
+		<!--         attribute named 'resource:sdef:pid" has a value of ' the 'demo:DualResImage'  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<Resource>
+				<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:DualResolution</AttributeValue>
+					<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:sdef:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</ResourceMatch>
+			</Resource>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to ONLY to the getDissemination action (operation) in the Fedora Access Service (i.e., API-A).  -->
+		<!--  Note that the ActionAttributeDesignator element specifies the concept of a fedora-based action via the identifier -->
+		<!--  urn:fedora:names:fedora:2.1:action:id.  The particular action (API-A operation) that is the target for this policy -->
+		<!--  is specified by the AttributeValue identifier of urn:fedora:names:fedora:2.1:action:id-getDissemination. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDissemination</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:id"/>
+				</ActionMatch>
+			</Action>
+		</Actions>
+	</Target>
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Rule 1:  The Rule is completely undiscriminating in that it has no refining conditions.  It will DENY access to to ANY USER issuing -->
+	<!-- a request for actions named in the Policy Target above.  This essentially turns off access to the Subject/Resource/Action -->
+	<!-- combinations  specified in the Policy Target because this Rule does not have its own local Target or any constraining -->
+	<!-- Condition to narrow down the scope of the denial. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Rule RuleId="1" Effect="Deny"/>
+</Policy>

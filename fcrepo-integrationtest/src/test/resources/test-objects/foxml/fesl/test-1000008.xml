@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject FEDORA_URI="info:fedora/test:1000008"
+  PID="test:1000008" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+  xmlns:tv="http://nish.person.org/tv#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Crocodile"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X"
+    FEDORA_URI="info:fedora/test:1000008/RELS-EXT" ID="RELS-EXT"
+    STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion
+      FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0"
+      ID="RELS-EXT.0" LABEL="RDF Metadata" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <rdf:RDF
+          xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
+          <rdf:Description rdf:about="info:fedora/test:1000008">
+            <rel:isMemberOf rdf:resource="info:fedora/test:1000006"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X"
+    FEDORA_URI="info:fedora/test:1000008/DC" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.0"
+      LABEL="Dublin Core" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:identifier>test:1000008</dc:identifier>
+          <dc:title>Crocodile</dc:title>
+          <dc:format>video/x-msvideo</dc:format>
+          <dc:type>video</dc:type>
+          <dc:description>Dexter's world of police analyst by day, and serial killer by night, is rocked when he's privately contacted by another serial killer, whom the department is investigating, who claims that the killer knows about Dexter's double life. Meanwhile, Dexter's sister, Debra begins investigating the mysterious killings with Dexter's help, but who lets her take the credit. She then finds a stolen refrigerated truck which contains a gruesome message. Dexter also begins stalking his next victim, a wealthy businessman who gets acquitted of a drunk driving charge. Elsewhere, Sgt. Doakes investigates the murder of an undercover vice cop whom was investigating a powerful drug cartel leader, named Carlos Guerrero, while Lt. Laguerta also learns that Doakes was secretly involved with the murder victim's wife. Also, an unsure Rita tries to try out intimacy with Dexter after they have a get together with Debra and her blind date.&lt;br/&gt;&lt;h5&gt;Next US airings:&lt;/h5&gt;&lt;table border="0" cellpadding="5" cellspacing="0"&gt;&lt;tr class="odd"&gt;&lt;td nowrap="1"&gt;&lt;a href="/tvgrid/2009-05-31/2100#SHOW"&gt;Sun. May 31&lt;/a&gt;</dc:description>
+          <dc:source>http://www.imdb.com/title/tt0757186/</dc:source>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X"
+    FEDORA_URI="info:fedora/test:1000008/TV" ID="TV" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="TV.0" LABEL="TV Data" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <episode id="0757186" xmlns="http://nish.person.org/tv#">
+          <title>Crocodile</title>
+          <synopsis>Dexter's world of police analyst by day, and serial killer by night, is rocked when he's privately contacted by another serial killer, whom the department is investigating, who claims that the killer knows about Dexter's double life. Meanwhile, Dexter's sister, Debra begins investigating the mysterious killings with Dexter's help, but who lets her take the credit. She then finds a stolen refrigerated truck which contains a gruesome message. Dexter also begins stalking his next victim, a wealthy businessman who gets acquitted of a drunk driving charge. Elsewhere, Sgt. Doakes investigates the murder of an undercover vice cop whom was investigating a powerful drug cartel leader, named Carlos Guerrero, while Lt. Laguerta also learns that Doakes was secretly involved with the murder victim's wife. Also, an unsure Rita tries to try out intimacy with Dexter after they have a get together with Debra and her blind date.&lt;br/&gt;&lt;h5&gt;Next US airings:&lt;/h5&gt;&lt;table border="0" cellpadding="5" cellspacing="0"&gt;&lt;tr class="odd"&gt;&lt;td nowrap="1"&gt;&lt;a href="/tvgrid/2009-05-31/2100#SHOW"&gt;Sun. May 31&lt;/a&gt;</synopsis>
+          <season>01</season>
+          <episode>02</episode>
+          <year>2006</year>
+          <aired>8 October 2006</aired>
+          <imdbUrl>http://www.imdb.com/title/tt0757186/</imdbUrl>
+        </episode>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

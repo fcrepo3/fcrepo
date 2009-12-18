@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<TITLE></TITLE>
+<meta name="collection" content="exclude">
+
+	<META NAME="GENERATOR" CONTENT="StarOffice 6.0  (Solaris Sparc)">
+	<META NAME="CREATED" CONTENT="20020108;10172900">
+	<META NAME="CHANGED" CONTENT="20030925;14325200">
+	<STYLE>
+	<!--
+		@page { margin: 0.84cm }
+		P { margin-bottom: 0cm }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US">
+<P STYLE="margin-top: 0.25cm"><B>J2EE<SUP>TM</SUP> Connector
+Architecture Specification (&quot;Specification&quot;)</B> <BR><B>Version:
+1.5</B><BR><B>Status: FCS</B> <BR><B>Release: November 24, 2003</B></P>
+<P STYLE="margin-top: 0.25cm"><B>Copyright 2003 Sun Microsystems,
+Inc.</B> 
+</P>
+<P STYLE="margin-bottom: 0.51cm"><B>4150 Network Circle, Santa Clara,
+California 95054, U.S.A</B> <BR><B>All rights reserved.</B> 
+</P>
+<P STYLE="margin-top: 0.25cm"><B>NOTICE; LIMITED LICENSE GRANTS</B> 
+</P>
+<P STYLE="margin-bottom: 0.13cm">Sun Microsystems, Inc. (&quot;Sun&quot;)
+hereby grants you a fully-paid, non-exclusive, non-transferable,
+worldwide, limited license (without the right to sublicense), under
+the Sun's applicable intellectual property rights to view, download,
+use and reproduce the Specification only for the purpose of internal
+evaluation, which shall be understood to include developing
+applications intended to run on an implementation of the
+Specification provided that such applications do not themselves
+implement any portion(s) of the Specification. 
+</P>
+<P STYLE="margin-bottom: 0.13cm">Sun also grants you a perpetual,
+non-exclusive, worldwide, fully paid-up, royalty free, limited
+license (without the right to sublicense) under any applicable
+copyrights or patent rights it may have in the Specification to
+create and/or distribute an Independent Implementation of the
+Specification that: (i) fully implements the Spec(s) including all
+its required interfaces and functionality; (ii) does not modify,
+subset, superset or otherwise extend the Licensor Name Space, or
+include any public or protected packages, classes, Java interfaces,
+fields or methods within the Licensor Name Space other than those
+required/authorized by the Specification or Specifications being
+implemented; and (iii) passes the TCK (including satisfying the
+requirements of the applicable TCK Users Guide) for such
+Specification. The foregoing license is expressly conditioned on your
+not acting outside its scope. No license is granted hereunder for any
+other purpose. 
+</P>
+<P STYLE="margin-bottom: 0.13cm">You need not include limitations
+(i)-(iii) from the previous paragraph or any other particular &quot;pass
+through&quot; requirements in any license You grant concerning the
+use of your Independent Implementation or products derived from it.
+However, except with respect to implementations of the Specification
+(and products derived from them) that satisfy limitations (i)-(iii)
+from the previous paragraph, You may neither: (a) grant or otherwise
+pass through to your licensees any licenses under Sun's applicable
+intellectual property rights; nor (b) authorize your licensees to
+make any claims concerning their implementation's compliance with the
+Spec in question. 
+</P>
+<P STYLE="margin-bottom: 0.51cm">For the purposes of this Agreement:
+&quot;<I>Independent Implementation</I>&quot; shall mean an
+implementation of the Specification that neither derives from any of
+Sun's source code or binary code materials nor, except with an
+appropriate and separate license from Sun, includes any of Sun's
+source code or binary code materials; and &quot;<I>Licensor Name
+Space</I>&quot; shall mean the public class or interface declarations
+whose names begin with &quot;java&quot;, &quot;javax&quot;, &quot;com.sun&quot;
+or their equivalents in any subsequent naming convention adopted by
+Sun through the Java Community Process, or any recognized successors
+or replacements thereof. 
+</P>
+<P STYLE="margin-bottom: 0.51cm">This Agreement will terminate
+immediately without notice from Sun if you fail to comply with any
+material provision of or act outside the scope of the licenses
+granted above. 
+</P>
+<P STYLE="margin-top: 0.25cm"><B>TRADEMARKS</B> 
+</P>
+<P STYLE="margin-bottom: 0.51cm">No right, title, or interest in or
+to any trademarks, service marks, or trade names of Sun or Sun's
+licensors is granted hereunder.&nbsp; Sun, Sun Microsystems, the Sun
+logo, Java, the Java Coffee Cup logo, and J2EE are trademarks or
+registered trademarks of Sun Microsystems, Inc. in the U.S. and other
+countries. 
+</P>
+<P STYLE="margin-top: 0.25cm"><B>DISCLAIMER OF WARRANTIES</B> 
+</P>
+<P STYLE="margin-bottom: 0.51cm">THE SPECIFICATION IS PROVIDED &quot;AS
+IS&quot;.&nbsp; SUN MAKES NO REPRESENTATIONS OR WARRANTIES, EITHER
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR
+NON-INFRINGEMENT, THAT THE CONTENTS OF THE SPECIFICATION ARE SUITABLE
+FOR ANY PURPOSE OR THAT ANY PRACTICE OR IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADE
+SECRETS OR OTHER RIGHTS.&nbsp; This document does not represent any
+commitment to release or implement any portion of the Specification
+in any product. 
+</P>
+<P STYLE="margin-bottom: 0.51cm">THE SPECIFICATION COULD INCLUDE
+TECHNICAL INACCURACIES OR TYPOGRAPHICAL ERRORS.&nbsp; CHANGES ARE
+PERIODICALLY ADDED TO THE INFORMATION THEREIN; THESE CHANGES WILL BE
+INCORPORATED INTO NEW VERSIONS OF THE SPECIFICATION, IF ANY.&nbsp;
+SUN MAY MAKE IMPROVEMENTS AND/OR CHANGES TO THE PRODUCT(S) AND/OR THE
+PROGRAM(S) DESCRIBED IN THE SPECIFICATION AT ANY TIME.&nbsp; Any use
+of such changes in the Specification will be governed by the
+then-current license for the applicable version of the Specification.
+</P>
+<P STYLE="margin-top: 0.25cm"><B>LIMITATION OF LIABILITY</B> 
+</P>
+<P STYLE="margin-bottom: 0.51cm">TO THE EXTENT NOT PROHIBITED BY LAW,
+IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY DAMAGES,
+INCLUDING WITHOUT LIMITATION, LOST REVENUE, PROFITS OR DATA, OR FOR
+SPECIAL, INDIRECT, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE DAMAGES,
+HOWEVER CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY, ARISING OUT
+OF OR RELATED TO ANY FURNISHING, PRACTICING, MODIFYING OR ANY USE OF
+THE SPECIFICATION, EVEN IF SUN AND/OR ITS LICENSORS HAVE BEEN ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGES. 
+</P>
+<P STYLE="margin-bottom: 0.51cm">You will indemnify, hold harmless,
+and defend Sun and its licensors from any claims arising or resulting
+from: (i) your use of the Specification; (ii) the use or distribution
+of your Java application, applet and/or clean room implementation;
+and/or (iii) any claims that later versions or releases of any
+Specification furnished to you are incompatible with the
+Specification provided to you under this license. 
+</P>
+<P STYLE="margin-top: 0.25cm"><B>RESTRICTED RIGHTS LEGEND</B> 
+</P>
+<P STYLE="margin-bottom: 0.51cm">U.S. Government: If this
+Specification is being acquired by or on behalf of the U.S.
+Government or by a U.S. Government prime contractor or subcontractor
+(at any tier), then the Government's rights in the Specification and
+accompanying documentation shall be only as set forth in this
+license; this is in accordance with 48 C.F.R. 227.7201 through
+227.7202-4 (for Department of Defense (DoD) acquisitions) and with 48
+C.F.R. 2.101 and 12.212 (for non-DoD acquisitions). 
+</P>
+<P STYLE="margin-top: 0.25cm"><B>REPORT</B> 
+</P>
+<P STYLE="margin-bottom: 0.51cm">You may wish to report any
+ambiguities, inconsistencies or inaccuracies you may find in
+connection with your use of the Specification (&quot;Feedback&quot;).
+To the extent that you provide Sun with any Feedback, you hereby: (i)
+agree that such Feedback is provided on a non-proprietary and
+non-confidential basis, and (ii) grant Sun a perpetual,
+non-exclusive, worldwide, fully paid-up, irrevocable license, with
+the right to sublicense through multiple levels of sublicensees, to
+incorporate, disclose, and use without limitation the Feedback for
+any purpose related to the Specification and future versions,
+implementations, and test suites thereof. 
+</P>
+<P STYLE="margin-bottom: 0.51cm"><I><FONT COLOR="#000000">(LFI#136187/Form
+ID#011801)</FONT></I> 
+</P>
+</BODY>
+<script language="JavaScript" src="/js/omi/jsc/s_code_remote.js"></script></HTML>

@@ -1,0 +1,54 @@
+<html>
+<head><title>ImageManipulation webapp</title></head>
+<body bgcolor="#DADADA">
+<h3>Welcome to the ImageManipulation Local Service</h3>
+<p>ImageManipulation is a Java servlet that takes a URL of an image as a param and based on other given parameters, can perform a variety of image related manipulations on the object. After the image is manipulated, it is then sent back as an image/type object to the calling parent, most often a browser or an HTML img tag.</p>
+<p><b>http://<font color="#008040">&lt;hostname&gt;</font>:<font color="#008040">&lt;port-number&gt;</font>/imagemanip/ImageManipulation?url=<font color="#008040">&lt;url-of-image&gt;</font>&amp;<font color="#FF0000">&lt;parameters&gt;</font></b></p>
+<p><font color="#000000">where:</font></p>
+<ul>
+  <li><font color="#008040">&lt;hostname&gt;</font><font color="#000000"> The 
+    hostname of the Fedora server.</font></li>
+  <li><font color="#008040">&lt;port-number&gt;</font><font color="#000000"> The 
+    port number on which the Fedora server is running.</font></li>
+  <li><font color="#008040">&lt;url-of-image&gt;</font><font color="#000000"> The URL of the image to open. Supported formats currently are gif, jpg, tiff, png, and bmp</font></li>
+  <li><font color="#008040">&lt;parameters&gt;</font><font color="#000000"> 
+    Optional parameters that can be used to manipulate the image:
+			<ul>
+				<li><b>Resize:</b>&nbsp;&nbsp;&nbsp;
+				<b>op=resize&newWidth=&lt;width-in-pixels&gt;</b><br />
+				This resizes an image to a specified width in pixels, automatically scaling the height in proportion to the width.
+				</li>
+				<li><b>Zoom:</b>&nbsp;&nbsp;&nbsp;
+				<b>op=zoom&zoomAmt=&lt;zoom-value&gt;</b><br />
+				This zooms an image, depending on the zoom-value. 0 &lt; zoom-value &lt; 1 : zoom out, zoom-value=1 : original, 1 &lt; zoom-value : zoom in
+				</li>
+				<li><b>Adjust Brightness:</b>&nbsp;&nbsp;&nbsp;
+				<b>op=brightness&brightAmt=&lt;bright-value&gt;</b><br />
+				This adjusts the brightness of an image, depending on the bright-value. 0 &lt;= bright-value &lt; 1 : darkens, bright-value=1 : original, 1 &lt; bright-value : lightens
+				</li>
+				<li><b>Watermark:</b>&nbsp;&nbsp;&nbsp;
+				<b>op=watermark&wmText=&lt;watermark-text&gt;</b><br />
+				Watermarks an image, with the supplied text.
+				</li>
+				<li><b>Grayscale:</b>&nbsp;&nbsp;&nbsp;
+				<b>op=grayscale</b><br />
+				Converts an image to grayscale.
+				</li>
+				<li><b>Crop:</b>&nbsp;&nbsp;&nbsp;
+				<b>op=crop&cropX=&lt;crop-x&gt;&cropY=&lt;crop-y&gt;&<font color="#FF0000">cropWidth=&lt;crop-width&gt;</font>&<font color="#FF0000">cropHeight=&lt;crop-height&gt;</font></b><br />
+				Crops an image, starting from (crop-x,crop-y) coordinate, and crops to the optional (crop-width,crop-height) coordinate if supplied, or just to the lower-right corner of the image. All values are measured in pixels.
+				</li>
+				<li><b>Convert:</b>&nbsp;&nbsp;&nbsp;
+				<b>op=convert&amp;convertTo=&lt;format&gt;</b><br />
+				Converts an image to another format. Currently supported formats are: gif, jpg, tiff, png, and bmp.</li>
+			</ul>
+		</font></li>
+</ul>
+<p><font color="#000000">Examples:</font></p>
+<p><font color="#000000"><a href="/imagemanip/ImageManipulation?url=http://www.explore.cornell.edu/tour_landmarks/img/frosty_tower02.jpg&op=zoom&zoomAmt=2.5">/imagemanip/ImageManipulation?url=http://www.explore.cornell.edu/tour_landmarks/img/frosty_tower02.jpg&op=zoom&zoomAmt=2.5</a></font></p>
+<p><font color="#000000"><a href="/imagemanip/ImageManipulation?url=http://www.explore.cornell.edu/tour_landmarks/img/frosty_tower02.jpg&op=convert&convertTo=gif">/imagemanip/ImageManipulation?url=http://www.explore.cornell.edu/tour_landmarks/img/frosty_tower02.jpg&op=convert&convertTo=gif</a></font></p>
+<p>&nbsp;</p>
+<p><cite>* This service uses the ImageJ API from Wayne Rasband which is free to use in the public domain. For additonal information regarding the ImageJ API, please refer to 
+  the ImageJ project web site at: <a href="http://rsb.info.nih.gov/ij/">http://rsb.info.nih.gov/ij</a>.</cite></p>
+</html>
+

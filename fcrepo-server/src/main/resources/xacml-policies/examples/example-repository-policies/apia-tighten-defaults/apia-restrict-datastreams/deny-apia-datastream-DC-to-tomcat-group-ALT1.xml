@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" PolicyId="deny-apia-datastream-DC-to-tomcat-group-ALT1">
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  This policy will deny access to Dublin Core datastreams.  Specificallly, it will deny access to USER GROUPS making -->
+	<!--  getDatastreamDissemination requests on API-A for datastreams with a datastream identifier of 'DC.'  User groups are -->
+	<!-- defined using custom roles in the tomcat-users.xml file. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- NOTE:  This policy constrains things to the Dublin Core datastream in the Policy Target.   See an alternative approach in -->
+	<!-- the policy named deny-apia-datastream-dc-to-tomcat-group-ALT2 (which contrains things in a Rule Target). -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  NOTE:  User GROUPS are defined using custom Fedora attributes in the tomcat-users.xml file. -->
+	<!--  See the Fedora system documentation on Tomcat Authentication for details of how to specify custom attributes -->
+	<!--  (such as 'fedoraRole') in the tomcat-users.xml file. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description>This policy will deny access to Dublin Core datastreams.  Specifically, it will deny access to USER GROUPS making getDatastreamDissemination requests on API-A for datastreams with a datastream identifier of 'DC.'  User groups are defined using custom roles in the tomcat-users.xml file.</Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.  However, the scope of the Subject is narrowed down in the Rule Condition (below). -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- This policy is applicable to resources that are Dubin Core (DC) datastreams.  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- The ResourceMatch element enables the XACML enforcement engine to determine whether this policy is applicable based -->
+		<!-- on whether an incoming Fedora request pertains to the kind of a Resource entity specified in the ResourceMatch.  -->
+		<!-- This is done by the XACML engine doing a comparison of attribute names/values in the incoming request against attribute -->
+		<!-- names/values in the ResourceMatch specification.  Notice the XACML-based function "string-equal" on the ResourceMatch -->
+		<!-- element which indicates that the matching will be string-based.   -->
+		<!-- The ResourceAttributeDesignator element specifies a match criterion as the attribute name datastream:id  -->
+		<!-- (identified by urn:fedora:names:fedora:2.1:resource:datastream:id).  The AttributeValue  element indicates that the value -->
+		<!-- of the datastream:id must be 'DC' for this policy to be applicable.  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<Resource>
+				<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">DC</AttributeValue>
+					<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:datastream:id" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</ResourceMatch>
+			</Resource>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to ONLY to the getDatastreamDissemination action (operation) in the Fedora Access Service (i.e., API-A).  -->
+		<!--  Note that the ActionAttributeDesignator element specifies the concept of a fedora-based action via the identifier -->
+		<!--  urn:fedora:names:fedora:2.1:action:id.  The particular action (API-A operation) that is the target for this policy -->
+		<!--  is specified by the AttributeValue identifier of urn:fedora:names:fedora:2.1:action:id-getDatastreamDissemination. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDatastreamDissemination</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:id"/>
+				</ActionMatch>
+			</Action>
+		</Actions>
+	</Target>
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Rule 1: This Rule will deny access to users who are of a particular group  (i.e., based on the Fedora 'group' attribute). -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Rule RuleId="1" Effect="Deny">
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- Rule Condition:  -->
+		<!-- The rule sets up a condition under which denial should occur.  A Condition element wraps the specification of the -->
+		<!-- SubjectAttributeDesignator, which is the Fedora 'group'' attribute.   The Condition element specifies the URN of an -->
+		<!-- XACML-defined function (string-is-in)  that wraps the SubjectAttributeDesignator to indicate the that there is -->
+		<!-- ONE string value for user group that will result in denial.   The Condition says that denial will occur -->
+		<!-- if the user group has the value of 'mygroup. ' -->
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- Note that in Fedora you can use the tomcat-users.xml file to register different kinds of roles for users.  -->
+		<!-- See the Fedora system documentation on Tomcat Authentication for details of how custom roles -->
+		<!--  (such as 'group') can be specified in the tomcat-users.xml file. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">mygroup</AttributeValue>
+			<SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="group"/>
+		</Condition>
+	</Rule>
+</Policy>

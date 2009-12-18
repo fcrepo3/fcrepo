@@ -1,0 +1,169 @@
+<wsdl:definitions xmlns:axis2="http://pdp.xacml.melcoe" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:ns0="http://pdp.xacml.melcoe/xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://pdp.xacml.melcoe">
+	<wsdl:documentation>Melcoe PDP Service</wsdl:documentation>
+	<wsdl:types>
+		<xs:schema xmlns:ns="http://pdp.xacml.melcoe/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://pdp.xacml.melcoe/xsd">
+			<xs:element name="evaluateFault">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="evaluateFault" type="xs:anyType" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="evaluate">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="param0" nillable="true" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="evaluateResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="return" nillable="true" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="evaluateBatchFault">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="evaluateBatchFault" type="xs:anyType" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="evaluateBatch">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element maxOccurs="unbounded" name="param0" nillable="true" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="evaluateBatchResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="return" nillable="true" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="evaluateBatchMessage">
+		<wsdl:part name="part1" element="ns0:evaluateBatch" />
+	</wsdl:message>
+	<wsdl:message name="evaluateBatchResponse">
+		<wsdl:part name="part1" element="ns0:evaluateBatchResponse" />
+	</wsdl:message>
+	<wsdl:message name="evaluateBatchFault">
+		<wsdl:part name="part1" element="ns0:evaluateBatchFault" />
+	</wsdl:message>
+	<wsdl:message name="evaluateMessage">
+		<wsdl:part name="part1" element="ns0:evaluate" />
+	</wsdl:message>
+	<wsdl:message name="evaluateResponse">
+		<wsdl:part name="part1" element="ns0:evaluateResponse" />
+	</wsdl:message>
+	<wsdl:message name="evaluateFault">
+		<wsdl:part name="part1" element="ns0:evaluateFault" />
+	</wsdl:message>
+	<wsdl:portType name="MelcoePDPPortType">
+		<wsdl:operation name="evaluateBatch">
+			<wsdl:input xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" message="axis2:evaluateBatchMessage" wsaw:Action="urn:evaluateBatch" />
+			<wsdl:output message="axis2:evaluateBatchResponse" />
+			<wsdl:fault message="axis2:evaluateBatchFault" name="evaluateBatchFault" />
+		</wsdl:operation>
+		<wsdl:operation name="evaluate">
+			<wsdl:input xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" message="axis2:evaluateMessage" wsaw:Action="urn:evaluate" />
+			<wsdl:output message="axis2:evaluateResponse" />
+			<wsdl:fault message="axis2:evaluateFault" name="evaluateFault" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="MelcoePDPSOAP11Binding" type="axis2:MelcoePDPPortType">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+		<wsdl:operation name="evaluateBatch">
+			<soap:operation soapAction="urn:evaluateBatch" style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="evaluateBatchFault">
+				<soap:fault name="evaluateBatchFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="evaluate">
+			<soap:operation soapAction="urn:evaluate" style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="evaluateFault">
+				<soap:fault name="evaluateFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<!--
+	<wsdl:binding name="MelcoePDPSOAP12Binding" type="axis2:MelcoePDPPortType">
+		<soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+		<wsdl:operation name="evaluateBatch">
+			<soap12:operation soapAction="urn:evaluateBatch" style="document" />
+			<wsdl:input>
+				<soap12:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="evaluateBatchFault">
+				<soap12:fault use="literal" name="evaluateBatchFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="evaluate">
+			<soap12:operation soapAction="urn:evaluate" style="document" />
+			<wsdl:input>
+				<soap12:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="evaluateFault">
+				<soap12:fault use="literal" name="evaluateFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:binding name="MelcoePDPHttpBinding" type="axis2:MelcoePDPPortType">
+		<http:binding verb="POST" />
+		<wsdl:operation name="evaluateBatch">
+			<http:operation location="evaluateBatch" />
+			<wsdl:input>
+				<mime:content type="text/xml" />
+			</wsdl:input>
+			<wsdl:output>
+				<mime:content type="text/xml" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="evaluate">
+			<http:operation location="evaluate" />
+			<wsdl:input>
+				<mime:content type="text/xml" />
+			</wsdl:input>
+			<wsdl:output>
+				<mime:content type="text/xml" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	-->
+	<wsdl:service name="MelcoePDP">
+		<wsdl:port name="MelcoePDPSOAP11port_http" binding="axis2:MelcoePDPSOAP11Binding">
+			<soap:address location="http://localhost:8080/axis2/services/MelcoePDP" />
+		</wsdl:port>
+		<!--
+		<wsdl:port name="MelcoePDPSOAP12port_http" binding="axis2:MelcoePDPSOAP12Binding">
+			<soap12:address location="http://localhost:8080/axis2/services/MelcoePDP" />
+		</wsdl:port>
+		<wsdl:port name="MelcoePDPHttpport1" binding="axis2:MelcoePDPHttpBinding">
+			<http:address location="http://localhost:8080/axis2/rest/MelcoePDP" />
+		</wsdl:port>
+		-->
+	</wsdl:service>
+</wsdl:definitions>

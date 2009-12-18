@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+About this Schema:
+  This schema describes the "Datastream Composite Model" format,
+  a format for specifying the datastream requirements of a Fedora content
+  model.  Example instances of this format can be found within the
+  demo content model objects.  These datastreams have ID "DS_COMPOSITE_MODEL"
+  and FORMAT_URI "info:fedora/fedora-system:FedoraDSCompositeModel-1.0".
+
+Syntax:
+  The root element, [dsCompositeModel], may contain any number of [dsTypeModel]
+  child elements.  Each [dsTypeModel] element must have an ID attribute,
+  and may contain any number of [form] child elements.  Each [form] element
+  may have a FORMAT_URI attribute and/or a MIME attribute.
+
+Semantics:
+  A [dsCompositeModel] specifies a minimal set of datastream requirements that
+  must be met by conforming objects.  If the set of requirements is met,
+  an object can be said to conform to the model.  Note that conforming objects
+  may contain additional datastreams that are not required by the model.
+
+  A [dsTypeModel] specifies the ID of a datastream that must exist in
+  conforming objects, and optionally, a set of format requirements, via
+  the [form] element.
+
+  For a given [dsTypeModel]:
+  - If no [form] child elements are present, the model does not constrain
+    the format of conforming datastreams.
+  - If one or more [form] child elements are present, conforming datastreams
+    must match at least one.
+    
+  For a given [form]:
+  - A candidate datastream matches if the datastream's MIME type matches
+    that given in the MIME attribute (if any), AND the datastream's
+    FORMAT_URI matches that given in the FORMAT_URI attribute (if any).
+  - If the MIME attribute is not present, the candidate datastream's MIME type
+    is not constrained by that format requirement.
+  - If the FORMAT_URI attribute is not present, the candidate datastream's
+    FORMAT_URI is not constrained by that format requirement.
+-->
+<xsd:schema
+    targetNamespace="info:fedora/fedora-system:def/dsCompositeModel#"
+    xmlns="info:fedora/fedora-system:def/dsCompositeModel#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+  <xsd:element name="dsCompositeModel">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element minOccurs="0" maxOccurs="unbounded" ref="dsTypeModel"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="dsTypeModel">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element minOccurs="0" maxOccurs="unbounded" ref="form"/>
+      </xsd:sequence>
+      <xsd:attribute name="ID" use="required" type="xsd:NCName"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="form">
+    <xsd:complexType>
+      <xsd:attribute name="FORMAT_URI" use="optional" type="xsd:anyURI"/>
+      <xsd:attribute name="MIME" use="optional"/>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

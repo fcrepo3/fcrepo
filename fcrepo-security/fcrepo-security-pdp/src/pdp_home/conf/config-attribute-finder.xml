@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<AttributeFinders>
+	<AttributeFinder name="melcoe.xacml.pdp.finder.attribute.FedoraRIAttributeFinder">
+		<resolver url="http://localhost:5743/fedora/melcoerisearch" username="" password="" />
+		<!--  designator: subject, action, resource, environment -->
+		<attribute designator="resource" name="info:fedora/fedora-system:def/view#mimeType" />
+		<attribute designator="resource" name="info:fedora/fedora-system:def/model#ownerId" />
+		<attribute designator="resource" name="info:fedora/fedora-system:def/model#state" />
+		<attribute designator="resource" name="info:fedora/fedora-system:def/model#createdDate" />
+		<attribute designator="resource" name="info:fedora/fedora-system:def/model#label" />
+		<attribute designator="resource" name="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" />
+		<attribute designator="resource" name="http://muradora.ramp.org.au/sf#isSmartFolder" />
+	</AttributeFinder>
+	<!--
+	<AttributeFinder name="melcoe.xacml.pdp.finder.attribute.LDAPAttributeFinder">
+		<option name="java.naming.factory.initial" value="com.sun.jndi.ldap.LdapCtxFactory" />
+		<option name="java.naming.provider.url" value="ldap://nish.ramp.org.au:389/" />
+		<option name="java.naming.security.authentication" value="simple" />
+		<option name="java.naming.referral" value="follow" />
+		<option name="java.naming.security.principal" value="cn=admin,dc=arcs,dc=org,dc=au" />
+		<option name="java.naming.security.credentials" value="arcs" />
+		<option name="id-attribute" value="uid" />
+		<option name="searchbase" value="dc=arcs,dc=org,dc=au" />
+		<attribute designator="subject" name="memberOf" />
+	</AttributeFinder>
+	-->
+</AttributeFinders>

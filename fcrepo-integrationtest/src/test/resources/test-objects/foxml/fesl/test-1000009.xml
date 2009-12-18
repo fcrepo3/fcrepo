@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject FEDORA_URI="info:fedora/test:1000009"
+  PID="test:1000009" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+  xmlns:tv="http://nish.person.org/tv#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="It&amp;#x27;s Alive!"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X"
+    FEDORA_URI="info:fedora/test:1000009/RELS-EXT" ID="RELS-EXT"
+    STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion
+      FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0"
+      ID="RELS-EXT.0" LABEL="RDF Metadata" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <rdf:RDF
+          xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
+          <rdf:Description rdf:about="info:fedora/test:1000009">
+            <rel:isMemberOf rdf:resource="info:fedora/test:1000006"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X"
+    FEDORA_URI="info:fedora/test:1000009/DC" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.0"
+      LABEL="Dublin Core" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:identifier>test:1000009</dc:identifier>
+          <dc:title>It&amp;#x27;s Alive!</dc:title>
+          <dc:format>video/x-msvideo</dc:format>
+          <dc:type>video</dc:type>
+          <dc:description>It is now 38 days since Dexter saved his sister and executed the Ice Truck Killer. Since that time however, Sgt. Doakes has spent all of his free time following Dexter sure in his belief that something about him is wrong. Dexter very much wants to kill someone and when the opportunity finally arrives, finds that he is unable to follow through. His sister Debra, apparently recovered from her ordeal, returns to work but Lt. Laguerta isn't so sure. Rita is happy with her relationship with Dexter, but her husband keeps pressuring her to help him with his defense. The police discover Dexter's burial ground.</dc:description>
+          <dc:source>http://www.imdb.com/title/tt1013977/</dc:source>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X"
+    FEDORA_URI="info:fedora/test:1000009/TV" ID="TV" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="TV.0" LABEL="TV Data" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <episode id="1013977" xmlns="http://nish.person.org/tv#">
+          <title>It&amp;#x27;s Alive!</title>
+          <synopsis>It is now 38 days since Dexter saved his sister and executed the Ice Truck Killer. Since that time however, Sgt. Doakes has spent all of his free time following Dexter sure in his belief that something about him is wrong. Dexter very much wants to kill someone and when the opportunity finally arrives, finds that he is unable to follow through. His sister Debra, apparently recovered from her ordeal, returns to work but Lt. Laguerta isn't so sure. Rita is happy with her relationship with Dexter, but her husband keeps pressuring her to help him with his defense. The police discover Dexter's burial ground.</synopsis>
+          <season>02</season>
+          <episode>01</episode>
+          <year>2007</year>
+          <aired>30 September 2007</aired>
+          <imdbUrl>http://www.imdb.com/title/tt1013977/</imdbUrl>
+        </episode>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

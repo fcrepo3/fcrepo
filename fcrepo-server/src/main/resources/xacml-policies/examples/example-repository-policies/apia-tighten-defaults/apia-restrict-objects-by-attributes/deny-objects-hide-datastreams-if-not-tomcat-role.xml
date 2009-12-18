@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v5 rel. 4 U (http://www.xmlspy.com) by Sandy Payette (Cornell University) -->
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" PolicyId="deny-objects-hide-datastreams-if-not-tomcat-role" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:1.0:policy
+C:\eclipse\workspace\fedora\dist\server\xsd\cs-xacml-schema-policy-01.xsd">
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- The overall intent of this policy is datastream hiding,  meaning that raw datastreams must not be accessible to anyone except -->
+	<!-- very privileged users, but service-mediated disseminations are accessible by a broader audience.  The key point is that students -->
+	<!-- can access disseminations of the object,  but not the raw datastreams.  This is might typically be done in cases where lesser -->
+	<!-- privleged users are given a derivation of the main datastream, or a lesser quality view, or a less complete view of the raw -->
+	<!-- datastream content.  Given that an object is of a certain content model  (in this case UVA_STD_IMAGE), this policy will DENY -->
+	<!-- datastream access  to users who do NOT have the ROLE of 'administrator' or 'professor.'  It will also DENY dissemination -->
+	<!-- access to  to users who do NOT have the ROLE of  'student,' 'administrator,'  or 'professor.'   -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  NOTE:  User ROLES are defined using custom Fedora attributes in the tomcat-users.xml file. -->
+	<!--  See the Fedora system documentation on Tomcat Authentication for details of how to specify custom attributes -->
+	<!--  (such as 'fedoraRole') in the tomcat-users.xml file. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description>The overall intent of this policy is datastream hiding,  meaning that raw datastreams must not be accessible to anyone except very privileged users, but service-mediated disseminations are accessible by a broader audience.  The key point is that students can access disseminations of the object,  but not the raw datastreams.  This is might typically be done in cases where lesser privleged users are given a derivation of the main datastream, or a lesser quality view, or a less complete view of the raw datastream content.  Given that an object is of a certain content model  (in this case UVA_STD_IMAGE), this policy will DENY datastream access  to users who do NOT have the ROLE of 'administrator' or 'professor.'  It will also DENY dissemination access to users who do NOT have the ROLE of  'student,' 'administrator,'  or 'professor.' </Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.  However, the scope of the Subject is narrowed down in the Rules below.  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- This policy is applicable ONLY to objects that belong the the content model grouping of "UVA_STD_IMAGE" -->
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- The ResourceMatch elements enables the XACML enforcement engine to determine whether this policy is applicable based -->
+		<!-- on whether an incoming Fedora request pertains to the kind of a Resource entity (in this case a dissemination) that is specified -->
+		<!-- in the ResourceMatch. At runtime, the XACML engine does a comparison of attribute names/values in the incoming request -->
+		<!-- against attribute names/values in the ResourceMatch specification.  An attribute name is found in a ResourceAttributeDesignator -->
+		<!-- element and  an attribute value in the AttributeValue element.  Note that the XACML-based function "string-equal" on the -->
+		<!-- ResourceMatch element indicates that the matching will be string-based.  Multiple ResourceMatch elements are logically -->
+		<!-- AND-ed together by the XACML enforcement engine. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- In this example, the ResourceMatch elements say that that this policy is applicable for resources (objects) where : -->
+		<!--         attribute named 'resource:object:contentModel" has a value of 'UVA_STD_IMAGE'  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<Resource>
+				<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">UVA_STD_IMAGE</AttributeValue>
+					<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:contentModel" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</ResourceMatch>
+			</Resource>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to either the getDatasteramDissemination or the getDissemination actions (operations) in the Fedora -->
+		<!--  Access Service (i.e., API-A).  -->
+		<!--  Note that the ActionAttributeDesignator element specifies the concept of a fedora-based action via the identifier -->
+		<!--  urn:fedora:names:fedora:2.1:action:id.  The particular action (API-A operation) that are the target for this policy -->
+		<!--  is specified by the AttributeValue identifiers of: -->
+		<!--       urn:fedora:names:fedora:2.1:action:id-getDissemination. -->
+		<!--       urn:fedora:names:fedora:2.1:action:id-getDatastreamDissemination. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDatastreamDissemination</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:id"/>
+				</ActionMatch>
+			</Action>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDissemination</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:id"/>
+				</ActionMatch>
+			</Action>
+		</Actions>
+	</Target>
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Rule 1:  Datastream Hiding Rule. -->
+	<!-- Deny direct access to datastreams if the user role is NOT in an acceptable list of users. -->
+	<!-- This form of datastream hiding is used when the intent is for users to gain access to object content only via dissemination methods. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Rule RuleId="1" Effect="Deny">
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- First, the rule target narrows the action down to just apply to the getDatastreamDissemination request of API-A -->
+		<!-- The intent of this rule is to only allow adminstrators and professors direct access to the datastreams. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Target>
+			<Subjects>
+				<AnySubject/>
+			</Subjects>
+			<Resources>
+				<Resource>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">UVA_STD_IMAGE</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:contentModel" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+				</Resource>
+			</Resources>
+			<!-- *********************************************************************************************************************************************************-->
+			<!-- Here, the Action element overrides what was in the policy-level target.   We narrow down to just datastream requests. -->
+			<!-- *********************************************************************************************************************************************************-->
+			<Actions>
+				<Action>
+					<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDatastreamDissemination</AttributeValue>
+						<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:id"/>
+					</ActionMatch>
+				</Action>
+			</Actions>
+		</Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- Next, the condition says that denial will occur if the subject (requester)  does NOT have a valid user role.  -->
+		<!-- Notice that the condion defines a group of privileged user roles for accessing raw datastreams. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+				<SubjectAttributeDesignator AttributeId="fedoraRole" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">administrator</AttributeValue>
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">professor</AttributeValue>
+				</Apply>
+			</Apply>
+		</Condition>
+	</Rule>
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Rule 2:  Dissemination Rule. -->
+	<!-- Deny access to disseminations if the user role is NOT in an acceptable list of users. -->
+	<!-- The intent of this rule is to let students access disseminations of the object (where in the Datastream Hiding rule) students were excluded. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Rule RuleId="2" Effect="Deny">
+		<!-- *********************************************************************************************************************************************************-->
+		<!-- First, the rule target narrows the action down to just apply to the getDissemination request of API-A -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Target>
+			<Subjects>
+				<AnySubject/>
+			</Subjects>
+			<Resources>
+				<Resource>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">UVA_STD_IMAGE</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:contentModel" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+				</Resource>
+			</Resources>
+			<!-- *********************************************************************************************************************************************************-->
+			<!-- Here, the Action element overrides what was in the policy-level target.   We narrow down to just dissemination requests. -->
+			<!-- *********************************************************************************************************************************************************-->
+			<Actions>
+				<Action>
+					<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDissemination</AttributeValue>
+						<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:id"/>
+					</ActionMatch>
+				</Action>
+			</Actions>
+		</Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--Notice that the condition for the dissemination rule allows wider access than the datastream rule.  Students can get disseminations. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+				<SubjectAttributeDesignator AttributeId="fedoraRole" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">student</AttributeValue>
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">administrator</AttributeValue>
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">professor</AttributeValue>
+				</Apply>
+			</Apply>
+		</Condition>
+	</Rule>
+</Policy>

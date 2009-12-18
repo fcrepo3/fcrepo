@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Melcoe Fedora PEP" default="compile" basedir=".">
+
+	<property environment="env" />
+	<property name="src" value="src" />
+	<property name="lib" value="lib" />
+	<property name="doc" value="doc" />
+	<property name="base" value="base" />
+	<property name="build" value="build" />
+	<property name="dist" value="dist" />
+	<property name="jarfile" value="melcoe-pep-fedora.jar" />
+
+	<property name="fedora-client" value="${env.FEDORA_HOME}/client/fedora-client.jar" />
+
+	<path id="libs">
+		<pathelement location="${fedora-client}" />
+		<pathelement location="${env.CATALINA_HOME}/lib/servlet-api.jar" />
+		<pathelement location="${env.CATALINA_HOME}/common/lib/servlet-api.jar" />
+		<pathelement location="${env.FEDORA_HOME}/client/fedora-client.jar" />
+		<pathelement location="${webapp.location}/WEB-INF/classes" />
+		<fileset dir="${webapp.location}/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="clean" description="remove necessary directories">
+		<delete dir="${build}" />
+		<delete dir="${dist}" />
+		<delete dir="${doc}" />
+	</target>
+
+	<target name="check.environment" description="checks that various environment variables are set">
+		<fail unless="webapp.location" message="please run ant with -Dwebapp.location=[location to directory where the Fedora web application is installed" />
+
+		<!--
+		<fail message="Could not locate file: ${fedora-client}">
+			<condition>
+				<not>
+					<available file="${fedora-client}" />
+				</not>
+			</condition>
+		</fail>
+		-->
+
+		<fail message="Could not locate web services config file: ${webapp.location}/WEB-INF/server-config.wsdd">
+			<condition>
+				<not>
+					<available file="${webapp.location}/WEB-INF/server-config.wsdd" />
+				</not>
+			</condition>
+		</fail>
+
+		<fail message="Could not locate web application config file: ${webapp.location}/WEB-INF/web.xml">
+			<condition>
+				<not>
+					<available file="${webapp.location}/WEB-INF/web.xml" />
+				</not>
+			</condition>
+		</fail>
+
+		<condition property="uninstall.ok">
+			<and>
+				<available file="${webapp.location}/WEB-INF/server-config.wsdd.backup.original" />
+				<available file="${webapp.location}/WEB-INF/web.xml.backup.original" />
+			</and>
+		</condition>
+
+		<condition property="install.ok.not">
+			<or>
+				<available file="${webapp.location}/WEB-INF/server-config.wsdd.backup.original" />
+				<available file="${webapp.location}/WEB-INF/web.xml.backup.original" />
+			</or>
+		</condition>
+	</target>
+
+	<target name="init" description="create necessary directories">
+		<mkdir dir="${build}" />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${doc}" />
+	</target>
+
+	<target name="compile" depends="init,check.environment" description="compile source">
+		<javac srcdir="${src}" destdir="${build}" classpathref="libs" debug="true">
+			<!--
+			<compilerarg value="-Xlint:deprecation"/>
+			<compilerarg value="-Xlint:unchecked"/>
+		-->
+		</javac>
+		<copy todir="${build}">
+			<fileset dir="${src}" excludes="**/*.java" />
+		</copy>
+	</target>
+
+	<target name="dist" depends="compile" description="creates a jar file">
+		<jar destfile="${dist}/${jarfile}" basedir="${build}" />
+	</target>
+
+	<target name="dist.doc" depends="init">
+		<javadoc packagenames="melcoe.*" sourcepath="${src}" destdir="${doc}" author="true" classpathref="libs" version="true" use="true" windowtitle="MELCOE PDP">
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/" />
+		</javadoc>
+	</target>
+
+	<target name="install" depends="check.environment,dist" description="installs the MelcoePEP">
+		<fail if="install.ok.not" message="Backup configuration files exist in the Fedora WEB-INF folder. Back these up or remove them before install can proceed." />
+
+		<move file="${webapp.location}/WEB-INF/web.xml" tofile="${webapp.location}/WEB-INF/web.xml.backup.original" />
+		<move file="${webapp.location}/WEB-INF/server-config.wsdd" tofile="${webapp.location}/WEB-INF/server-config.wsdd.backup.original" />
+		<copy file="${base}/melcoe-pep-server-config.wsdd" tofile="${webapp.location}/WEB-INF/server-config.wsdd" />
+		<copy file="${base}/melcoe-pep-web.xml" tofile="${webapp.location}/WEB-INF/web.xml" />
+		<copy file="${base}/properties/melcoe-pep.log4j.properties" tofile="${webapp.location}/WEB-INF/classes/melcoe-pep.log4j.properties" />
+		<copy file="${base}/properties/config-melcoe-pep.xml" tofile="${webapp.location}/WEB-INF/classes/config-melcoe-pep.xml" />
+		<copy file="${base}/properties/config-melcoe-pep-mapping.xml" tofile="${webapp.location}/WEB-INF/classes/config-melcoe-pep-mapping.xml" />
+		<copy file="${dist}/${jarfile}" tofile="${webapp.location}/WEB-INF/lib/${jarfile}" />
+		<echo />
+		<echo />
+		<echo>You should restart your application server.</echo>
+		<echo />
+		<echo />
+		<echo>Do not delete the *.backup.original files in the WEB-INF folder.</echo>
+		<echo />
+		<echo />
+	</target>
+
+	<target name="uninstall" depends="check.environment" description="removes the installation" if="uninstall.ok">
+		<delete file="${webapp.location}/WEB-INF/server-config.wsdd" />
+		<delete file="${webapp.location}/WEB-INF/web.xml" />
+		<delete file="${webapp.location}/WEB-INF/lib/${jarfile}" />
+		<delete file="${webapp.location}/WEB-INF/classes/melcoe-pep.log4j.properties" />
+		<delete file="${webapp.location}/WEB-INF/classes/config-melcoe-pep.xml" />
+		<delete file="${webapp.location}/WEB-INF/classes/config-melcoe-pep-mapping.xml" />
+		<move file="${webapp.location}/WEB-INF/server-config.wsdd.backup.original" tofile="${webapp.location}/WEB-INF/server-config.wsdd" />
+		<move file="${webapp.location}/WEB-INF/web.xml.backup.original" tofile="${webapp.location}/WEB-INF/web.xml" />
+	</target>
+
+</project>

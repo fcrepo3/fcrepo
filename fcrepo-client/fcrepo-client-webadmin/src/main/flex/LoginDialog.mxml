@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" title="Connect to a Repository" 
+                showCloseButton="true" creationComplete="setValues()" close="closeDialog(event)">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.TextArea;
+			import mx.managers.PopUpManager;
+			import mx.events.CloseEvent;
+         	
+         	private var protocol:String;
+			private var host:String;			
+			private var port:String;
+			private var context:String;
+			
+			[Bindable]
+			private var clientInitialized:Boolean;
+            
+            /**
+             * Sets the default login values
+             */ 
+         	public function setup(protocol:String, 
+         	                      host:String, 
+         	                      port:String, 
+         	                      context:String, 
+         	                      initialized:Boolean):void {
+                this.protocol = protocol;
+				this.host = host;
+				this.port = port;
+				this.context = context;
+                this.clientInitialized = initialized;
+         	}
+         	
+            private function setValues():void {
+                if(protocol == "https") {
+                    protocolInput.selectedIndex = 1;
+                } else {
+                    protocolInput.selectedIndex = 0;
+                }
+                
+                hostInput.text = host;
+                portInput.text = port; 
+                contextInput.text = context;
+            }         	
+         	
+         	/**
+         	 * Returns the login information to the main application.
+         	 */
+         	private function passBack():void {
+                parentApplication.setRepo(protocolInput.selectedItem.toString(), 
+                                          hostInput.text, 
+                                          portInput.text, 
+                                          contextInput.text);
+         		closeDialog(null);	
+         	}
+         
+            /**
+             * Closes the login dialog
+             */
+			private function closeDialog(event : CloseEvent):void {
+				PopUpManager.removePopUp(this);
+			}
+		]]>
+	</mx:Script>
+   
+    <mx:Form label="Connection" width="100%">
+        <mx:Label text="{protocolInput.selectedItem.toString()}://{hostInput.text}:{portInput.text}/{contextInput.text}" 
+                  width="100%" textAlign="center" />        
+    </mx:Form>   
+   
+	<mx:Form label="Connection" width="100%" defaultButton="{ok}">
+        <mx:FormItem label="Protocol:">
+            <mx:ComboBox id="protocolInput">
+                <mx:Array >
+                    <mx:String>http</mx:String>
+                    <mx:String>https</mx:String>
+                </mx:Array>
+            </mx:ComboBox>
+        </mx:FormItem> 	
+		<mx:FormItem label="Host:">
+			<mx:TextInput id="hostInput" width="180" />
+		</mx:FormItem>
+		<mx:FormItem label="Port:">
+			<mx:TextInput id="portInput" width="180" />
+		</mx:FormItem>
+        <mx:FormItem label="Context:">
+            <mx:TextInput id="contextInput" width="180" />
+        </mx:FormItem>        
+	</mx:Form>
+	   
+	<mx:HBox>
+		<mx:Button label="Ok" id="ok" click="passBack()"/>
+		<mx:Button label="Cancel" id="cancel" visible="{clientInitialized}" click="closeDialog(null)"/>
+	</mx:HBox>
+
+</mx:TitleWindow>

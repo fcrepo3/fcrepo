@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!-- much of this assembly descriptor  has been taken from the standardized apache source-release assembly descriptor 
+http://maven.apache.org/apache-resource-bundles/apache-source-release-assembly-descriptor/
+--> 
+<assembly>
+  <id>src</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <!-- main project directory structure -->
+    <fileSet>
+      <directory>.</directory>
+      <outputDirectory>/</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <excludes>
+        <!-- build output -->
+        <exclude>%regex[(?!((?!${project.build.directory}/)[^/]+/)*src/).*${project.build.directory}.*]</exclude>
+
+        <!-- IDEs -->
+        <exclude>**/maven-eclipse.xml</exclude>
+        <exclude>**/.project</exclude>
+        <exclude>**/.classpath</exclude>
+        <exclude>**/*.iws</exclude>
+        <exclude>**/*.ipr</exclude>
+        <exclude>**/*.iml</exclude>
+        <exclude>**/.settings</exclude>
+        <exclude>**/.settings/**</exclude>
+        <exclude>**/.externalToolBuilders</exclude>
+        <exclude>**/.externalToolBuilders/**</exclude>
+        <exclude>**/.deployables</exclude>
+        <exclude>**/.deployables/**</exclude>
+        <exclude>**/.wtpmodules</exclude>
+        <exclude>**/.wtpmodules/**</exclude>
+        <exclude>**/*.swp</exclude>
+        <exclude>**/*.swo</exclude>
+
+        <!-- fedora related leftovers that should not be included -->
+        <!-- server -->
+        <exclude>fcrepo-server/activemq-data</exclude>
+        <exclude>fcrepo-server/activemq-data/**</exclude>
+        <exclude>fcrepo-server/test</exclude>
+        <exclude>fcrepo-server/test/**</exclude>
+        <exclude>fcrepo-server/*.log</exclude>
+        
+        <!-- client stubwrappers -->
+        <exclude>fcrepo-client/stubwrappers</exclude>
+        <exclude>fcrepo-client/stubwrappers/**</exclude>
+        
+
+        <!-- release-plugin temp files -->
+        <exclude>**/pom.xml.releaseBackup</exclude>
+        <exclude>**/release.properties</exclude>
+      </excludes>
+    </fileSet>
+  </fileSets>
+</assembly> 

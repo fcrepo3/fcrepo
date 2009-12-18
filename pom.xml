@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.fcrepo</groupId>
+  <artifactId>fcrepo</artifactId>
+  <packaging>pom</packaging>
+  <version>3.3</version>
+  <name>Fedora Repository Project</name>
+  <url>http://fedora-commons.org/</url>
+
+  <organization>
+    <name>DuraSpace</name>
+    <url>http://www.duraspace.org/</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <comments>Copyright (c) 2009 DuraSpace</comments>
+    </license>
+  </licenses>
+
+  <issueManagement>
+    <system>jira</system>
+    <url>https://fedora-commons.org/jira/browse/FCREPO</url>
+  </issueManagement>
+
+  <ciManagement>
+    <system>bamboo</system>
+    <url>https://fedora-commons.org/bamboo/browse/FCREPO</url>
+  </ciManagement>
+
+  <developers>
+    <developer>
+      <name>Armintor, Benjamin</name>
+      <email>armintor@gmail.com</email>
+    </developer>
+
+    <developer>
+      <name>Bayliss, Steve</name>
+      <email>stephen.bayliss@acuityunlimited.co.uk</email>
+    </developer>
+
+    <developer>
+      <name>Birkland, Aaron</name>
+      <email>birkland@cs.cornell.edu</email>
+    </developer>
+
+    <developer>
+      <name>Blekinge, Asger Askov</name>
+      <email>abr@statsbiblioteket.dk</email>
+    </developer>
+
+    <developer>
+      <name>Branan, Bill</name>
+      <email>bbranan@duraspace.org</email>
+    </developer>
+
+    <developer>
+      <name>Davis, Daniel</name>
+      <email>ddavis@fedora-commons.org</email>
+    </developer>
+
+    <developer>
+      <name>Pedersen, Gert</name>
+      <email>gsp@dtic.dtu.dk</email>
+    </developer>
+
+    <developer>
+      <name>Shin, Edwin</name>
+      <email>edwin.shin@yourmediashelf.com</email>
+    </developer>
+
+    <developer>
+      <name>Strnad, Kai</name>
+      <email>kai.strnad@googlemail.com</email>
+    </developer>
+
+    <developer>
+      <name>Wilper, Chris</name>
+      <email>cwilper@duraspace.org</email>
+    </developer>
+
+    <developer>
+      <name>Woods, Andrew</name>
+      <email>awoods@duraspace.org</email>
+    </developer>
+
+  </developers>
+
+  <modules>
+    <module>fcrepo-generate</module>
+    <module>fcrepo-common</module>
+    <module>fcrepo-server</module>
+    <module>fcrepo-client</module>
+    <module>fcrepo-integrationtest</module>
+    <module>fcrepo-installer</module>
+    <module>fcrepo-security</module>
+    <module>fcrepo-webapp</module>
+  </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <unitTests>**/*Test.class</unitTests>
+    <integrationTests>**/*Integration*.class</integrationTests>
+    <instrumentedTests>**/*Test*__*.class</instrumentedTests>
+    <nestedClassTests>**/*Test*$*.class</nestedClassTests>
+    <integration.test.skip>false</integration.test.skip>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>commons-httpclient</groupId>
+        <artifactId>commons-httpclient</artifactId>
+        <version>3.1</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>2.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.abdera</groupId>
+        <artifactId>abdera-core</artifactId>
+        <version>0.4.0-incubating</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.abdera</groupId>
+        <artifactId>abdera-i18n</artifactId>
+        <version>0.4.0-incubating</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.abdera</groupId>
+        <artifactId>abdera-parser</artifactId>
+        <version>0.4.0-incubating</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derby</artifactId>
+        <version>10.5.3.0_1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derbyclient</artifactId>
+        <version>10.5.3.0_1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.ws.commons.axiom</groupId>
+        <artifactId>axiom-api</artifactId>
+        <version>1.2.8</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.ws.commons.axiom</groupId>
+        <artifactId>axiom-impl</artifactId>
+        <version>1.2.8</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>1.0.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.fcrepo</groupId>
+        <artifactId>mulgara-core</artifactId>
+        <version>2.1.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.fcrepo</groupId>
+        <artifactId>trippi-core</artifactId>
+        <version>1.4.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.fcrepo</groupId>
+        <artifactId>persistence-api</artifactId>
+        <version>1.0.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.fcrepo</groupId>
+        <artifactId>sunxacml</artifactId>
+        <version>1.2</version>
+        <classifier>melcoe</classifier>
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.15</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.sun.jdmk</groupId>
+            <artifactId>jmxtools</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.jmx</groupId>
+            <artifactId>jmxri</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.jms</groupId>
+            <artifactId>jms</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>servlet-api</artifactId>
+        <version>2.4</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet.jsp</groupId>
+        <artifactId>jsp-api</artifactId>
+        <version>2.0</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
+        <version>2.9.1</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Central Maven Repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>duraspace-releases</id>
+      <name>DuraSpace Releases Maven Repository</name>
+      <url>https://fedora-commons.org/m2/content/repositories/releases</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>duraspace-thirdparty</id>
+      <name>Duraspace Thirdparty Maven Repository</name>
+      <url>https://fedora-commons.org/m2/content/repositories/thirdparty</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>duraspace-snapshots</id>
+      <name>DuraSpace Snapshots Maven Repository</name>
+      <url>https://fedora-commons.org/m2/content/repositories/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>maven2-repository.dev.java.net</id>
+      <name>Java.net Repository for Maven</name>
+      <url>http://download.java.net/maven/2/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>apache-incubating</id>
+      <name>Apache Incubating Repository</name>
+      <url>http://people.apache.org/repo/m2-incubating-repository/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>jboss</id>
+      <url>http://repository.jboss.com/maven2/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>aduna</id>
+      <name>Aduna Releases Maven Repository</name>
+      <url>http://repo.aduna-software.org/maven2/releases/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <!-- disabled bad repo: maven-repository.dev.java.net -->
+    <!-- see http://jira.codehaus.org/browse/MEV-649      -->
+    <repository>
+      <id>java.net</id>
+      <url>https://maven-repository.dev.java.net/nonav/repository</url>
+      <releases><enabled>false</enabled></releases>
+      <snapshots><enabled>false</enabled></snapshots>
+    </repository>
+
+  </repositories>
+
+  <scm>
+    <connection>scm:svn:https://fedora-commons.svn.sourceforge.net/svnroot/fedora-commons/fedora/trunk</connection>
+    <developerConnection>scm:svn:https://fedora-commons.svn.sourceforge.net/svnroot/fedora-commons/fedora/trunk</developerConnection>
+    <url>http://fedora-commons.svn.sourceforge.net/viewvc/fedora-commons/fedora/trunk</url>
+  </scm>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>2.1-beta-1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.3</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <debug>true</debug>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.4.2</version>
+
+        <configuration>
+          <excludes>
+            <exclude>${integrationTests}</exclude>
+            <exclude>${instrumentedTests}</exclude>
+            <exclude>${nestedClassTests}</exclude>
+          </excludes>
+          <includes>
+            <include>${unitTests}</include>
+          </includes>
+        </configuration>
+
+        <executions>
+          <execution>
+            <id>int-test</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <configuration>
+              <skip>${integration.test.skip}</skip>
+              <systemProperties>
+              </systemProperties>
+              <excludes>
+                <exclude>${unitTests}</exclude>
+                <exclude>${instrumentedTests}</exclude>
+              </excludes>
+              <includes>
+                <include>${integrationTests}</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>1.0-beta-3</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>create</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <revisionOnScmFailure>${version}</revisionOnScmFailure>
+          <timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss 'UTC'Z}</timestampFormat>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>fedora-release</id>
+      <build>
+        <plugins>
+          <!-- create the buildable source distribution -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.2-beta-4</version>
+            <dependencies>
+              <dependency>
+                <!--
+                  NOTE: The fix for PLXUTILS-120 is crucial for the
+                  assembly descriptor regex, therefore we have to insist
+                  on plexus utils >= 2.0.1 for the time being
+                -->
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-utils</artifactId>
+                <version>2.0.1</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <phase>package</phase>
+                <configuration>
+                  <appendAssemblyId>true</appendAssemblyId>
+                  <finalName>fcrepo-src-${project.version}</finalName>
+                  <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
+                  <descriptors>
+                    <descriptor>src/main/resources/assemblies/fedora-source-release.xml
+                    </descriptor>
+                  </descriptors>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- sign each artifact with a pgp key -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- build checksums for each artifact -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-install-plugin</artifactId>
+            <configuration>
+              <createChecksum>true</createChecksum>
+            </configuration>
+          </plugin>
+
+          <!-- generate aggregate javadoc -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.6.1</version>
+            <configuration>
+              <maxmemory>128m</maxmemory>
+            </configuration>
+            <executions>
+              <execution>
+                <id>aggregate</id>
+                <goals>
+                  <goal>aggregate</goal>
+                </goals>
+                <phase>install</phase>
+              </execution>
+            </executions>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <!-- <scope>test</scope> -->
+    </dependency>
+
+  </dependencies>
+
+</project>

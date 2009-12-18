@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" PolicyId="deny-apia-datastream-all-to-all-users">
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  This policy will DENY access to ALL datastreams.  -->
+	<!--  Specifically, it will DENY access to ALL USERS making requests to the getDatastreamDissemination method of API-A. -->
+	<!--  This policy is not fine-grained to target specific types of datastreams. -->
+	<!--  Instead, it does a blanket denial of access to the getDatastreamDissemination service method. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description> This policy will DENY access to ALL datastreams.  Specifically, it will DENY access to ALL USERS making requests to the getDatastreamDissemination method of API-A.</Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.   -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Resource (i.e., any datastream)  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<AnyResource/>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to ONLY to the getDatastreamDissemination action (operation) in the Fedora Access Service (i.e., API-A).  -->
+		<!--  Note that the ActionAttributeDesignator element specifies the concept of a fedora-based action via the identifier -->
+		<!--  urn:fedora:names:fedora:2.1:action:id.  The particular action (API-A operation) that is the target for this policy -->
+		<!--  is specified by the AttributeValue identifier of urn:fedora:names:fedora:2.1:action:id-getDatastreamDissemination. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDatastreamDissemination</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:id"/>
+				</ActionMatch>
+			</Action>
+		</Actions>
+	</Target>
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Rule 1:  The Rule is completely undiscriminating in that it has no refining conditions.  It will DENY access to to ANY USER issuing -->
+	<!-- a request for actions named in the Policy Target above.  This essentially turns off access to the Subject/Resource/Action -->
+	<!-- combinations  specified in the Policy Target because this Rule does not have its own local Target or any constraining -->
+	<!-- Condition to narrow down the scope of the denial. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Rule RuleId="1" Effect="Deny"/>
+</Policy>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PolicyId="deny-apia-except-by-owner" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  This policy will DENY access to ALL API-A methods to users who are NOT the owner of the object being accessed (except for the administrator). -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  NOTE:  User ROLES are defined using custom Fedora attributes in the tomcat-users.xml file. -->
+	<!--  See the Fedora system documentation on Tomcat Authentication for details of how to specify custom attributes -->
+	<!--  (such as 'fedoraRole') in the tomcat-users.xml file. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description> This policy will DENY access to ALL API-A methods to users who are NOT the owner of the object being accessed (except for the administrator). </Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.  However, the scope of the Subject is narrowed down in the Rule Condition (below).  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Resource (i.e., any digital object)  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<AnyResource/>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable ONLY to actions (operations) of the Fedora Access Service (i.e., API-A). -->
+		<!--  The ActionAttributeDesignator element is used to specify the action identifier.  -->
+		<!--  The action identifier (urn:fedora:names:fedora:2.1:action:api) indicates that the policy will apply broadly to an entire Fedora API -->
+		<!--  (a sort of composite action consisting of all methods in a particular API).  -->
+		<!-- The AttributeValue names the specific Fedora API  that is the target of this policy, namely API-A, as indicated by the  -->
+		<!-- identifier urn:fedora:names:fedora:2.1:action:api-a. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:api-a</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:api"/>
+				</ActionMatch>
+			</Action>
+		</Actions>
+	</Target>
+	<Rule RuleId="1" Effect="Deny">
+		<!-- ***************************************************************************************************************************************** -->
+		<!-- Denial is conditional upon the user login Id NOT being the same as the owner of the object.  -->
+		<!-- ***************************************************************************************************************************************** -->
+		<!-- NOTE!!  Be careful with this kind of rule if you don't want to shut access off to the Fedora administrator.  The use -->
+		<!-- of the NOT function can easily cut out the administrator even in light of the repository-wide policy that says that -->
+		<!-- the administrator can do everything.   This is because the policy combining algorithm for the Fedora authorization -->
+		<!-- module is set for DENY to override permit.   So, in this example, we add the administrator's userid to the list of users -->
+		<!-- who are not to be denied. -->
+		<!-- ***************************************************************************************************************************************** -->
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:or">
+				<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+           			<SubjectAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:subject:loginId" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string" />
+           			<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:owner" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string" />
+           		</Apply> 
+		    		<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">administrator</AttributeValue>
+					<SubjectAttributeDesignator AttributeId="fedoraRole" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</Apply> 
+				<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">fedoraInternalCall-1</AttributeValue>
+					<SubjectAttributeDesignator AttributeId="fedoraRole" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</Apply>
+			</Apply>
+		</Condition>
+	</Rule>
+</Policy>
+

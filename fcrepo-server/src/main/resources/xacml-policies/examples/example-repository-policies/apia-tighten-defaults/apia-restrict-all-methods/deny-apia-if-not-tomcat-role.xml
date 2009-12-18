@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" PolicyId="deny-apia-if-not-tomcat-role" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:1.0:policy
+http://www.fedora.info/definitions/1/0/api/cs-xacml-schema-policy-01.xsd">
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  This policy will DENY access to ALL API-A methods to users who are NOT in the administrator or professor ROLES. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  NOTE:  User ROLES are defined using custom Fedora attributes in the tomcat-users.xml file. -->
+	<!--  See the Fedora system documentation on Tomcat Authentication for details of how to specify custom attributes -->
+	<!--  (such as 'fedoraRole') in the tomcat-users.xml file. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description> This policy will DENY access to ALL API-A methods  to users who are NOT in the administrator or professor ROLES. </Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.  However, the scope of the Subject is narrowed down in the Rule Condition (below).  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Resource (i.e., any digital object)  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<AnyResource/>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable ONLY to actions (operations) of the Fedora Access Service (i.e., API-A). -->
+		<!--  The ActionAttributeDesignator element is used to specify the action identifier.  -->
+		<!--  The action identifier (urn:fedora:names:fedora:2.1:action:api) indicates that the policy will apply broadly to an entire Fedora API -->
+		<!--  (a sort of composite action consisting of all methods in a particular API).  -->
+		<!-- The AttributeValue names the specific Fedora API  that is the target of this policy, namely API-A, as indicated by the  -->
+		<!-- identifier urn:fedora:names:fedora:2.1:action:api-a. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:api-a</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:api"/>
+				</ActionMatch>
+			</Action>
+		</Actions>
+	</Target>
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Rule 1: This Rule will DENY access to users who are NOT of a particular role  (i.e., based on the 'fedoraRole' attribute. -->
+	<!-- See the Fedora system documentation on Tomcat Authentication for details of how to specify custom roles -->
+	<!--  (such as 'fedoraRole') in the tomcat-users.xml file. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Rule RuleId="1" Effect="Deny">
+		<!-- ****************************************************************************************************************************************************-->
+		<!-- This sets up a Condition under which denial should occur.  The Condition element sets up a NOT condition using the -->
+		<!-- XACML-defined negation function (urn:oasis:names:tc:xacml:1.0:function:not). -->
+		<!-- Within the Condition, the Apply element indicates what the negation applies to.  In this case, the negation applies to a set -->
+		<!-- of user ROLES.   Notice that the Apply element defines the notion of a set via an XACML-defined function -->
+		<!-- (string-at-least-one-member-of).  This function applies to the 'fedoraRole' attribute (see the SubjectAttributeDesignator) -->
+		<!-- that is used to specify Fedora user roles.  Any string value that matches one of the strings in the set will be denied access. -->
+		<!-- ****************************************************************************************************************************************************-->
+		<!-- BOTTOM LINE:  If the user's role is NOT 'administrator' and NOT 'professor, the user is DENIED access.  In other words, -->
+		<!-- everyone EXCEPT professors and administrators is DENIED.   Incidentally, professors and administrators are not explicitly permitted  -->
+		<!-- access, they are just NOT DENIED.  This is relevant, because there could be another policy in scope for the repository that -->
+		<!-- explicitly denies access to administrators and professors.  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+				<SubjectAttributeDesignator AttributeId="fedoraRole" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">administrator</AttributeValue>
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">professor</AttributeValue>
+				</Apply>
+			</Apply>
+		</Condition>
+	</Rule>
+</Policy>

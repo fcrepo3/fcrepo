@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!---******************************************************************-->
+<!-- FOXML TEST OBJECT:  Use this to test all variants of datastreams. -->
+<!---******************************************************************-->
+<foxml:digitalObject xmlns:foxml="info:fedora/fedora-system:def/foxml#" VERSION="1.1" PID="test:100" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+  <!---********************************************************************-->
+  <!-- OBJECT PROPERTIES : non-versionable properties of the digital object-->
+  <!---********************************************************************-->
+  <foxml:objectProperties>
+    <!-- OBJECT PROPERTIES DEFINED IN FOXML SCHEMA -->
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Sandy's Test Object"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+  </foxml:objectProperties>
+  <!---************************************************************-->
+  <!-- FEDORA RESERVED DATASTREAM: DUBLIN CORE METADATA FOR OBJECT -->
+  <!---************************************************************-->
+  <foxml:datastream ID="DC" STATE="A"  CONTROL_GROUP="X" VERSIONABLE="true">
+    <foxml:datastreamVersion FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.0" MIMETYPE="text/xml" LABEL="Dublin Core Record for this object" CREATED="2004-08-18T06:32:00">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+          <dc:title>Sandy's Reference Object</dc:title>
+          <dc:creator>Sandy Payette</dc:creator>
+          <dc:subject>FOXML Testing</dc:subject>
+          <dc:description>Object depicts all types of datastreams</dc:description>
+          <dc:publisher>Cornell CIS</dc:publisher>
+          <dc:identifier>test:100</dc:identifier>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <!---***********************************************************-->
+  <!-- FEDORA RESERVED DATASTREAM: OBJECT-TO-OBJECT RELATIONSHIPS -->
+  <!-- The RELS-EXT datastream is validated by Fedora.            -->
+  <!---***********************************************************-->
+  <foxml:datastream ID="RELS-EXT" CONTROL_GROUP="X">
+    <foxml:datastreamVersion FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT.0" MIMETYPE="application/rdf+xml" LABEL="RDF Statements about this object">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:fedora="info:fedora/fedora-system:def/relations-external#" xmlns:myns="http://www.nsdl.org/ontologies/relationships#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:fedora-model="info:fedora/fedora-system:def/model#">
+          <rdf:Description rdf:about="info:fedora/test:100">
+            <fedora:isMemberOfCollection rdf:resource="info:fedora/something:49"/>
+            <fedora:isMemberOfCollection rdf:resource="info:fedora/something:48"/>
+            <myns:isPartOf rdf:resource="info:fedora/mystuff:100"/>
+            <fedora-model:hasModel rdf:resource="info:fedora/test:UVA_STD_IMAGE"/>
+            <fedora-model:hasModel rdf:resource="info:fedora/demo:UVA_MRSID_IMAGE_1"/>
+            <fedora-model:hasModel rdf:resource="info:fedora/demo:UVA_STD_IMAGE_1"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <!--**************************-->
+  <!-- USER-DEFINED DATASTREAMS -->
+  <!--**************************-->
+  <foxml:datastream CONTROL_GROUP="M" ID="THUMBRES_IMG" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="THUMBRES_IMG1.0" MIMETYPE="image/jpeg" LABEL="Architectural Drawing Pavilion III (low res)">
+      <foxml:contentLocation REF="http://icarus.lib.virginia.edu/images/iva/archerd05small.jpg" TYPE="URL"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="M" ID="MEDRES_IMG" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="MEDRES_IMG1.0" MIMETYPE="image/jpeg" LABEL="Architectural Drawing Pavilion III (med res)">
+      <foxml:contentLocation REF="http://icarus.lib.virginia.edu/images/iva/archerd05medium1.jpg" TYPE="URL"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="E" ID="HIGHRES_IMG" STATE="A">
+    <foxml:datastreamVersion ID="HIGHRES_IMG1.0" MIMETYPE="image/jpeg" LABEL="Architectural Drawing Pavilion III (high res)">
+      <foxml:contentLocation REF="http://icarus.lib.virginia.edu/images/iva/archerd05medium2.jpg" TYPE="URL"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="R" ID="VERYHIGHRES_IMG" STATE="A" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="VERYHIGHRES_IMG1.0" MIMETYPE="image/jpeg" LABEL="Architectural Drawing Pavilion III (veryhigh res)">
+      <foxml:contentLocation REF="http://icarus.lib.virginia.edu/images/iva/archerd05high.jpg" TYPE="URL"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="E" ID="MRSID" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="DS5.0" MIMETYPE="image/x-mrsid-image" LABEL="Pavilion III, University of Virginia">
+      <foxml:contentLocation REF="http://iris.lib.virginia.edu/mrsid/mrsid_images/iva/archerp01.sid" TYPE="URL"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="E" ID="url" STATE="A">
+    <foxml:datastreamVersion ID="ur1.0" MIMETYPE="image/jpeg" LABEL="Architectural Drawing Pavilion III (high res)">
+      <foxml:contentLocation REF="http://icarus.lib.virginia.edu/images/iva/archerd05medium2.jpg" TYPE="URL"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>  
+  <foxml:datastream ID="UVATECH" STATE="A"  CONTROL_GROUP="X" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="UVATECH.0" MIMETYPE="text/xml" FORMAT_URI="info:fedora/format:xml:mets:techMD:OTHER:uvalibadmin" LABEL="UVA Technical Metadata Record">
+      <foxml:xmlContent>
+        <uvalibadmin:admin xmlns:uvalibadmin="http://virginia.lib.edu/uvalibadmin:tech">
+          <uvalibadmin:technical>
+            <uvalibadmin:format>image/jpeg</uvalibadmin:format>
+            <uvalibadmin:compression>LZW</uvalibadmin:compression>
+            <uvalibadmin:bitDepth BITS=""/>
+            <uvalibadmin:colorSpace/>
+            <uvalibadmin:colorProfile CPLOCAT="" CPFILE=""/>
+            <uvalibadmin:resolution>600</uvalibadmin:resolution>
+          </uvalibadmin:technical>
+        </uvalibadmin:admin>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

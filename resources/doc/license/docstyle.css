@@ -1,0 +1,221 @@
+/* RESET */ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-weight:inherit;font-style:inherit;font-family:inherit;vertical-align:baseline}:focus{ outline:0}body{ line-height:1; color:black; background:white}ol,ul{ list-style:none}table{ border-collapse:separate; border-spacing:0}caption,th,td{ text-align:left; font-weight:normal}blockquote:before,blockquote:after,q:before,q:after{ content:""}blockquote,q{ quotes:""""}h1,h2,h3,h4,h5,h6{font-weight:normal}
+
+html{
+  font-size: 62.5%;
+}
+a{
+  color: #2e6174;
+}
+a:hover, a:focus{
+  background-color: #fffe8c;
+}
+body{
+  font-size: 1.4em; /* 14 */
+  font-family: verdana, corbel, helvetica, arial, sans-serif;
+  line-height: 1.286em; /* 18 */
+  margin: 0;
+}
+body #content li.square{
+  list-style: square inside;
+  margin-bottom: 1.286em;
+  margin-top: 1.286em;
+}
+
+body #content ul li,
+body #content ol li,
+body #content span.plaintext{
+  font-size: .583em;
+  font-weight: normal;
+  line-height: 1.286em;
+  margin: 0;
+}
+body #content span.plaintext{
+  margin: 1.286em;
+}
+body #content ul ul li,
+body #content ul ol li,
+body #content ol ul li,
+body #content ol ol li,
+body #content ol.alpha li{
+  font-size: 1em;
+  margin: 0 0 0 1em;
+}
+body #content ol.alpha li ul{
+  font-size: .75em;
+}
+body #content ol.alpha ul li span.plaintext{
+  font-size: .75em;
+}
+ol#content ol.alpha ul li{
+   font-size: .75em;
+}
+ol#content ol.alpha ul li ul li{
+   font-size: 1.4em;
+}
+ol#content ol.alpha ul li ul li ul li{
+   font-size: 1.2em;
+}
+ol#content ol.alpha ul li ul li ul li ul li{
+   font-size: 1.3em;
+}
+code.block{
+  display: block;
+  margin: 1.286em;
+}
+#content li ol li h3{
+  font-size: 1em;
+  line-height: 1em;
+}
+div#content{
+  margin-left: .75em;
+}
+div#content, ol#content li{
+  font-size: 1.715em;
+  font-weight: bold;
+  line-height: 1.5em;
+  margin-bottom: 1.5em;
+  margin-top: 1.5em;
+}
+div#content h2{
+  margin: 1.5em 0;
+}
+div#content h3{
+  font-size: 22px;
+}
+div#content p{
+  font-size: .583em;
+  font-weight: normal;
+  line-height: 1.286em;
+  margin: 1.286em;
+}
+div#content ul{
+  margin-left: 2.25em;
+}
+em{
+  font-style: italic;
+}
+#footer{
+  font-size: .714em;
+  line-height: 1.8em;
+  margin: 1.286em 0 0;
+  text-align: center;
+}
+h1{
+  font-size: 2.143em;
+  font-weight: bold;
+  line-height: 1.2em;
+  padding-top: 1.2em;
+}
+h2{
+  font-size: 1em;
+  font-weight: bold;
+  line-height: 1em;
+}
+h3{
+  display: inline;
+  font-size: 1.286em;
+  font-weight: bold;
+  line-height: 1.636em;
+}
+h3.newstar{
+  background: url('images/new.png') no-repeat right center;
+  line-height: 2em;
+  padding: .5em 4em .5em 0;
+}
+h4{
+  display: inline;
+}
+#header{
+  background: url('images/docs.png') no-repeat 1.286em 0;
+  border-bottom: solid .071em #999;
+  height: 8em;
+  text-align: center;
+}
+#header a{
+  color: #000;
+}
+#header h2{
+  font-size: 1.429em;
+  font-weight: normal;
+  line-height: 1.8em;
+  margin: 0;
+}
+img{
+  vertical-align: middle;
+}
+#lastModified{
+  display: none;
+}
+li{
+  margin: 0 1.286em;
+}
+li.nostyle{
+  list-style: none;
+}
+ol, ul{
+  list-style: disc inside;
+  margin-left: 1em;
+}
+ol{
+  list-style: decimal outside;
+}
+ol h2{
+  display: inline;
+}
+ol ol{
+  list-style: decimal inside;
+  margin-left: 1em;
+}
+ol#content{
+  margin-left: 1.285em;
+}
+ol.alpha li{
+  list-style: inside upper-alpha;
+}
+ol.alpha ul li{
+  list-style-type: disc;
+}
+pre, table, td, th{
+  font-size: 16px;
+  background: #f1f1f1;
+  border: solid 1px #999;
+  padding: 5px;
+}
+table{
+  border-collapse: collapse;
+}
+span.plaintext{
+  display: block;
+}
+strong{
+  font-weight: bold;
+}
+div.notice{
+  background: #f1f1f1;
+  border: solid .143em #999;
+  margin: 1.286em;
+  padding: 0.5em;
+}
+#toc{
+  background: #f1f1f1;
+  border: solid .143em #999;
+  margin: 1.286em;
+  padding: 1.143em;
+  width: 30em;
+}
+#toc h2{
+  font-size: 1.426em;
+  line-height: 1.8em;
+  margin: 0;
+}
+#toc li{
+  margin: 0;
+  text-indent: 0;
+}
+#toc ol, #toc ul{
+  list-style: decimal inside;
+  margin: 0 0 0 1.286em;
+}
+#toc ul{
+  list-style-type: square;
+}

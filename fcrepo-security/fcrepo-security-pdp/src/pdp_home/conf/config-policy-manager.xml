@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<PolicyManager>
+	<PolicyDataManager>melcoe.xacml.pdp.data.DbXmlPolicyDataManager</PolicyDataManager>
+	<PolicyCombiningAlgorithm>melcoe.xacml.pdp.HierarchicalLowestChildDenyOverridesPolicyAlg</PolicyCombiningAlgorithm>
+</PolicyManager>

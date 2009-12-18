@@ -1,0 +1,39 @@
+<assembly>
+  <id>rmi-journal-recv</id>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <formats>
+    <format>jar</format>
+  </formats>
+
+  <dependencySets>
+
+    <dependencySet>
+      <includes>
+        <include>org.fcrepo:fcrepo-server:jar:rmi-journal-recv-main:${project.version}</include>
+      </includes>
+      <outputDirectory>/main</outputDirectory>
+      <outputFileNameMapping>main.jar</outputFileNameMapping>
+      <useProjectAttachments>true</useProjectAttachments>
+    </dependencySet>
+
+   <dependencySet>
+      <includes>
+        <!-- 
+          Note: The include statement below will need to be rewritten to
+                catch properly defined (i.e. maven-central) dependencies.
+        -->
+        <include>log4j:log4j:jar:1.2.15</include>
+      </includes>
+      <outputDirectory>/lib</outputDirectory>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
+        <include>org.fcrepo:one-jar-boot:jar:0.96</include>
+      </includes>
+      <unpack>true</unpack>
+    </dependencySet>
+
+  </dependencySets>
+
+</assembly>

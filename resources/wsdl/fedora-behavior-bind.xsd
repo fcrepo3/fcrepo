@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://fedora.comm.nsdlib.org/" xmlns:fedora="http://fedora.comm.nsdlib.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:complexType name="datastreamInputType">
+			<xsd:sequence>
+				<xsd:element name="MIME" type="xsd:string" minOccurs="0"/>
+				<xsd:choice>
+					<xsd:element name="contentURL" type="xsd:string"/>
+					<xsd:element name="content" type="xsd:base64Binary"/>
+				</xsd:choice>
+			</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="userInputType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="defaultInputType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:complexType name="MIMEStreamReturnType">
+		<xsd:sequence>
+			<xsd:element name="MIME" type="xsd:string"/>
+			<xsd:element name="stream" type="xsd:base64Binary" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

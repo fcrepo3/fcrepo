@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject FEDORA_URI="info:fedora/test:1000006"
+  PID="test:1000006" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+  xmlns:tv="http://nish.person.org/tv#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Dexter"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X"
+    FEDORA_URI="info:fedora/test:1000006/RELS-EXT" ID="RELS-EXT"
+    STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion
+      FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0"
+      ID="RELS-EXT.0" LABEL="RDF Metadata" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <rdf:RDF
+          xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
+          <rdf:Description rdf:about="info:fedora/test:1000006">
+            <rel:isCollection>true</rel:isCollection>
+            <rel:isMemberOf rdf:resource="info:fedora/test:1000000"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X"
+    FEDORA_URI="info:fedora/test:1000006/DC" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.0"
+      LABEL="Dublin Core" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:identifier>test:1000006</dc:identifier>
+          <dc:title>Dexter</dc:title>
+          <dc:format>video/x-msvideo</dc:format>
+          <dc:type>video</dc:type>
+          <dc:description>During the day, Dexter Morgan is a jovial employee in the Miami Metropolitan Police Department's crime lab, but his meticulously crafted life masks his true nature. In reality Dexter is a disciplined and murderous psychopath (a self-admitted "monster"), and he slakes his blood lust at night by carefully killing the serial killers he tracks down during the day. Based on the novels (Darkly Dreaming Dexter, Dearly Devoted Dexter and Dexter in the Dark) by Jeff Lindsay.</dc:description>
+          <dc:source>http://www.imdb.com/title/tt0773262</dc:source>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X"
+    FEDORA_URI="info:fedora/test:1000006/TV" ID="TV" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="TV.0" LABEL="TV Data" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <series id="0773262" xmlns="http://nish.person.org/tv#">
+          <title>Dexter</title>
+          <synopsis>During the day, Dexter Morgan is a jovial employee in the Miami Metropolitan Police Department's crime lab, but his meticulously crafted life masks his true nature. In reality Dexter is a disciplined and murderous psychopath (a self-admitted "monster"), and he slakes his blood lust at night by carefully killing the serial killers he tracks down during the day. Based on the novels (Darkly Dreaming Dexter, Dearly Devoted Dexter and Dexter in the Dark) by Jeff Lindsay.</synopsis>
+          <imdbUrl>http://www.imdb.com/title/tt0773262</imdbUrl>
+        </series>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

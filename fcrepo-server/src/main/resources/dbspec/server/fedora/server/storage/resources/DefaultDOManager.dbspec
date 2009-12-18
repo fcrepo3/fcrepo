@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+	<table name="objectPaths" primaryKey="tokenDbID">
+		<column name="tokenDbID" type="int(11)" notNull="true" autoIncrement="true"/>
+		<column name="token" type="varchar(64)" notNull="true" default="" unique="true"/>
+		<column name="path" type="varchar(255)" notNull="true" default=""/>
+	</table>
+	<table name="datastreamPaths" primaryKey="tokenDbID">
+		<column name="tokenDbID" type="int(11)" notNull="true" autoIncrement="true"/>
+		<column name="token" type="varchar(199)" notNull="true" default="" unique="true"/>
+		<column name="path" type="varchar(255)" notNull="true" default=""/>
+	</table>
+	<table name="pidGen">
+        <comment>For each namespace the DBPIDGenerator keeps track of, 
+        the highestID is the highest known id ever used from that namespace.
+        The PID generation algorithm simply increments this value to get
+        the next id within the namespace.
+        </comment>
+        <column name="namespace" type="varchar(255)" notNull="true" binary="true"/>
+        <column name="highestID" type="int(11)" notNull="true"/>
+    </table>
+	<table name="doRegistry" primaryKey="doPID">
+		<comment>This is used internally to keep track of objects in the definitive
+             store.  When an object is ingested or newly created, a PID
+             has been assigned, and the object is written to the definitive
+             store, an entry is created here.
+            </comment>
+		<column name="doPID" type="varchar(64)" notNull="true" binary="true">
+			<comment>The PID of the object</comment>
+		</column>
+		<column name="systemVersion" type="smallint(6)" notNull="true" default="0">
+			<comment>The system version of the object.  This starts at zero on
+               initial creation or import, and is subsequently incremented by
+               one each time a change is committed to the definitive store.
+      </comment>
+		</column>
+		<column name="ownerId" type="varchar(64)" notNull="false">
+			<comment>The userId of the user who owns the object.</comment>
+		</column>
+		<column name="objectState" type="varchar(1)" notNull="true" default="A">
+			<comment>The state of the object (currently unused)</comment>
+		</column>
+		<column name="label" type="varchar(255)" notNull="false" default="">
+			<comment>The label of the object.</comment>
+		</column>
+	</table>
+	
+	
+	<table name="modelDeploymentMap">
+	    <column name="cModel" type="varchar(64)" notNull="true" binary="true" />
+	    <column name="sDef" type="varchar(64)" notNull="true" binary="true" />
+	    <column name="sDep" type="varchar(64)" notNull="true" binary="true" />
+	</table>
+	
+    <table name="doFields">
+		<comment>Used for searching key object metadata, including repository
+                 fields and dublin core fields.  There is one row per digital
+                 object in this table.  Dublin core fields contain all characters
+                 from all corresponding elements in the most recent DC
+                 datastream for the object, if any.  Otherwise, they are null.
+                 All dublin core fields start and end with a space, and are
+                 in a normalized form (all lowercase letters) so that case
+                 insensitive searching may be done.</comment>
+		<column name="pid" type="varchar(64)" notNull="true" index="pid" binary="true">
+			<comment>The PID of the object</comment>
+		</column>
+		<column name="label" type="varchar(255)" notNull="false">
+			<comment>The label of the object</comment>
+		</column>
+		<column name="state" type="varchar(1)" notNull="true" default="A">
+			<comment>The state of the object.</comment>
+		</column>
+		<column name="ownerId" type="varchar(64)" notNull="false">
+			<comment>The userId of the user who owns the object.</comment>
+		</column>
+		<column name="cDate" type="bigint" notNull="true">
+			<comment>The date the object was first ingested or created in the repository.</comment>
+		</column>
+		<column name="mDate" type="bigint" notNull="true">
+			<comment>The date the object was last modified.</comment>
+		</column>
+		<column name="dcmDate" type="bigint" notNull="false">
+			<comment>The date the primary dublin core record was last modified.</comment>
+		</column>
+		<column name="dcTitle" type="text" notNull="false">
+			<comment>All dc:title values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcCreator" type="text" notNull="false">
+			<comment>All dc:creator values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcSubject" type="text" notNull="false">
+			<comment>All dc:subject values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcDescription" type="text" notNull="false">
+			<comment>All dc:description values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcPublisher" type="text" notNull="false">
+			<comment>All dc:publisher values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcContributor" type="text" notNull="false">
+			<comment>All dc:contributor values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcDate" type="text" notNull="false">
+			<comment>All dc:date values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcType" type="text" notNull="false">
+			<comment>All dc:type values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcFormat" type="text" notNull="false">
+			<comment>All dc:format values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcIdentifier" type="text" notNull="false">
+			<comment>All dc:identifier values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcSource" type="text" notNull="false">
+			<comment>All dc:source values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcLanguage" type="text" notNull="false">
+			<comment>All dc:language values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcRelation" type="text" notNull="false">
+			<comment>All dc:relation values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcCoverage" type="text" notNull="false">
+			<comment>All dc:coverage values, lowercase and delimited by space.</comment>
+		</column>
+		<column name="dcRights" type="text" notNull="false">
+			<comment>All dc:rights values, lowercase and delimited by space.</comment>
+		</column>
+    </table>
+	<table name="dcDates">
+	    <comment>When a dc:date of a DC datastream can be parsed as a java Date, 
+		    it is added in this table as well as the objectFields table.
+			When greater-than, greater-than or equal, less-than, less-than or equal,
+			or equals operators are used when querying of the dc:date, the values
+			here are checked.</comment>
+		<column name="pid" type="varchar(64)" notNull="true" index="pid" binary="true">
+			<comment>The PID of the object</comment>
+		</column>
+		<column name="dcDate" type="bigint" notNull="true">
+			<comment>A dc:date that was successfully parsed as a date.</comment>
+		</column>
+	</table>
+</database>
+
+

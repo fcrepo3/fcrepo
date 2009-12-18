@@ -1,0 +1,760 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+      <!--
+				
+				Generated at 2007-11-03T21:19:52.595Z-->
+      <title>Saxonica: XSLT and XQuery Processing: Third Party Source Components</title>
+      <meta name="coverage" content="Worldwide">
+      <meta name="copyright" content="Copyright Saxonica Ltd">
+      <meta name="title" content="Saxonica: XSLT and XQuery Processing: Third Party Source Components">
+      <meta name="robots" content="noindex,nofollow">
+      <link rel="stylesheet" href="../saxondocs.css" type="text/css">
+   </head>
+   <body class="main">
+      <div id="rhDkBlueArea" style="position:absolute; width:123px; height:2933px; z-index:2; right: 0px; top: 0px; border: 1px none #000000; background-color: #C1CEDE; layer-background-color: #C1CEDE; visibility: visible;"></div>
+      <div id="rhMdBlueArea" style="position:absolute; width:217px; height:2933px; z-index:2; right: 340px; top: 0px; border: 1px none #000000; background-color: #E4EEF0; layer-background-color: #E4EEF0; visibility: visible;"></div>
+      <div id="lhLightArea" style="position:absolute; width:34px; height:2933px; z-index:2; left: 66px; top: 0px; border: 1px none #000000; background-color: #f6fffb; layer-background-color: #E4EEF0; visibility: visible;"></div>
+      <div id="lhDkBlueArea" style="position:absolute; width:66px; height:2933px; z-index:2; left: 0px; top: 0px; border: 1px none #000000; background-color: #C1CEDE; layer-background-color: #C1CEDE; visibility: visible;"></div>
+      <div id="LogoArea" style="position:absolute; width:340px; height:72px; z-index:3; right: 0px; top: 0px; border: 1px none #000000; visibility: visible;"><a href="../index/intro.html"><img src="../img/saxonica_logo.gif" width="340" height="72" border="0" alt="Saxonica.com"></a></div>
+      <div id="MenuArea" style="position:absolute; width:157px; z-index:4; right: 33px; top: 114px; visibility: visible; background-color: #f6fffb; layer-background-color: #f6fffb; border: 1px solid #3D5B96; padding-top:9px; padding-left:15px;padding-right:11px; padding-bottom:9px;">
+         <table width="164" border="0" bgcolor="#3D5B96" cellspacing="1" cellpadding="1">
+            <tr bgcolor="#f6fffb">
+               <td style="padding-left:5px"><a href="http://www.saxonica.com/">SAXONICA</a></td>
+            </tr>
+         </table><br><table border="0" cellspacing="0" cellpadding="1">
+            <tr>
+               <td class="title" colspan="2">Saxon Documentation</td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/spacer.gif" width="120" height="10" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../contents.html">Full Contents</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../index/intro.html">About Saxon</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../changes/intro.html">Changes in this Release</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../conditions/intro.html">Notices</a></td>
+            </tr>
+            <tr>
+               <td><img src="../img/spacer.gif" width="10" height="5" border="0" alt="blank space"></td>
+               <td><a href="intro.html">Introduction</a></td>
+            </tr>
+            <tr>
+               <td><img src="../img/spacer.gif" width="10" height="5" border="0" alt="blank space"></td>
+               <td><a href="contributors.html">Contributors</a></td>
+            </tr>
+            <tr>
+               <td>»&nbsp;</td>
+               <td><a href="third-party-components.html">Third Party Source Components</a></td>
+            </tr>
+            <tr>
+               <td><img src="../img/spacer.gif" width="10" height="5" border="0" alt="blank space"></td>
+               <td><a href="redistributed.html">Redistributed Components</a></td>
+            </tr>
+            <tr>
+               <td><img src="../img/spacer.gif" width="10" height="5" border="0" alt="blank space"></td>
+               <td><a href="algorithms.html">Published Algorithms and Specifications</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../using-xsl/intro.html">Using XSLT 2.0</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../using-xquery/intro.html">Using XQuery</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../sourcedocs/intro.html">Handling Source Documents</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../schema-processing/intro.html">XML Schema Processing</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../xpath-api/intro.html">XPath API for Java</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../dotnet/intro.html">Saxon on .NET</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../extensibility/intro.html">Extensibility</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../extensions/intro.html">Saxon Extensions</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../samples/intro.html">Sample Saxon Applications</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../sql-extension/intro.html">The Saxon SQL Extension</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../xsl-elements/intro.html">XSLT Elements</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../expressions/intro.html">XPath 2.0 Expression Syntax</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../functions/intro.html">Function Library</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+            <tr>
+               <td colspan="2"><a href="../conformance/intro.html">Standards Conformance</a></td>
+            </tr>
+            <tr>
+               <td colspan="2"><img src="../img/text_blue_dot.gif" width="164" height="1" border="0" alt=""></td>
+            </tr>
+         </table>
+      </div>
+      <div id="MainTextArea" style="position:absolute; height:100%; z-index:5; left: 130px; right: 260px; top: 110px; border: 1px none #000000; visibility: visible;">
+         <h1>Third Party Source Components</h1>
+         <p>These tables lists components in category B as described above. (Category B is open
+            source code that has been integrated at source level)
+         </p>
+         <p>Unlike contributed code, this code was typically not written expressly for inclusion in Saxon, but
+            was originally published under some other license.
+         </p>
+         <p class="subhead">A2 Base64 Encoder/Decoder</p>
+         <table border="1">
+            <tr>
+               <td valign="top">
+                  <p>Origin</p>
+               </td>
+               <td valign="top">
+                  <p>Netscape Communications Corp</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Description</p>
+               </td>
+               <td valign="top">
+                  <p>Encoder and decoder for Base 64</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Approximate LOC</p>
+               </td>
+               <td valign="top">
+                  <p>400</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Saxon packages / modules</p>
+               </td>
+               <td valign="top">
+                  <p>Two inner classes within
+                     net.sf.saxon.value.Base64Value
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Modifications</p>
+               </td>
+               <td valign="top">
+                  <p>Minor modifications needed to meet the
+                     W3C XML Schema specification for Base64 lexical representation
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Availability of source</p>
+               </td>
+               <td valign="top">
+                  <p>Current URL unknown. Originally part of
+                     Netscape Directory Server, package netscape.ldap.util, modules
+                     MimeBase64Encoder and MimeBase64Decoder. 
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Source version used</p>
+               </td>
+               <td valign="top">
+                  <p>Unknown. Snapshot taken in 2004.</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>License</p>
+               </td>
+               <td valign="top">
+                  <p>Netscape 1.1: see <a href="http://www.mozilla.org/MPL/NPL-1.1.html" target="_blank" class="bodylink">http://www.mozilla.org/MPL/NPL-1.1.html</a></p>
+               </td>
+            </tr>
+         </table>
+         <p class="subhead">A3 Generic Sorter</p>
+         <table border="1">
+            <tr>
+               <td valign="top">
+                  <p>Origin</p>
+               </td>
+               <td valign="top">
+                  <p>CERN (author Wolfgang Hoschek)</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Description</p>
+               </td>
+               <td valign="top">
+                  <p>Generic sort routines based on published
+                     algorithms
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Approximate LOC</p>
+               </td>
+               <td valign="top">
+                  <p>500</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Saxon packages / modules</p>
+               </td>
+               <td valign="top">
+                  <p>net.sf.saxon.sort.GenericSorter</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Modifications</p>
+               </td>
+               <td valign="top">
+                  <p>Minimal modifications needed to integrate
+                     the code
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Availability of source</p>
+               </td>
+               <td valign="top">
+                  <p>Currently available as part of Colt
+                     project, http://dsd.lbl.gov/~hoschek/colt/, module cern.colt.GenericSorting
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Source version used</p>
+               </td>
+               <td valign="top">
+                  <p>Unknown. Snapshot taken in&nbsp; 2004?</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>License</p>
+               </td>
+               <td valign="top">
+                  <p>CERN License: see below</p>
+               </td>
+            </tr>
+         </table>
+         <div class="boxed" style="border: solid thin; background-color: #B1CCC7; padding: 2px">Copyright © 1999 CERN - European Organization for Nuclear Research.<br><br>
+            
+            Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose
+            is hereby granted without fee, provided that the above copyright notice appear in all copies and
+            that both that copyright notice and this permission notice appear in supporting documentation.
+            CERN makes no representations about the suitability of this software for any purpose.
+            It is provided "as is" without expressed or implied warranty.
+            
+         </div>
+         <p class="subhead">A4 Unicode Normalization</p>
+         <table border="1">
+            <tr>
+               <td valign="top">
+                  <p>Origin</p>
+               </td>
+               <td valign="top">
+                  <p>Unicode Consortium (author Mark Davis)</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Description</p>
+               </td>
+               <td valign="top">
+                  <p>Routines for Unicode character
+                     normalization
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Approximate LOC</p>
+               </td>
+               <td valign="top">
+                  <p>3500 (including data sets)</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Saxon packages / modules</p>
+               </td>
+               <td valign="top">
+                  <p>net.sf.saxon.sort.codenorm.*</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Modifications</p>
+               </td>
+               <td valign="top">
+                  <p>Core functionality unchanged; rewrote the
+                     module that loads the data tables from the Unicode character database; removed
+                     dependencies on ICU; fixed a few bugs
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Availability of source</p>
+               </td>
+               <td valign="top">
+                  <p>Specification of algorithm at http://unicode.org/reports/tr15/,
+                     code available via http://www.unicode.org/reports/tr15/Normalizer.html
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Source version used</p>
+               </td>
+               <td valign="top">
+                  <p>No version number. Snapshot taken in June
+                     2005
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>License 
+                     
+                  </p>
+               </td>
+               <td valign="top">
+                  <p>Unicode license: see below:</p>
+               </td>
+            </tr>
+         </table>
+         <div class="boxed" style="border: solid thin; background-color: #B1CCC7; padding: 2px">COPYRIGHT AND PERMISSION NOTICE<br>
+            Copyright © 1991-2007 Unicode, Inc. All rights reserved. 
+            Distributed under the Terms of Use in http://www.unicode.org/copyright.html.<br><br>
+            
+            Permission is hereby granted, free of charge, to any person obtaining 
+            a copy of the Unicode data files and any associated documentation 
+            (the "Data Files") or Unicode software and any associated documentation 
+            (the "Software") to deal in the Data Files or Software without restriction, 
+            including without limitation the rights to use, copy, modify, merge, publish, 
+            distribute, and/or sell copies of the Data Files or Software, and to permit 
+            persons to whom the Data Files or Software are furnished to do so, provided 
+            that (a) the above copyright notice(s) and this permission notice appear 
+            with all copies of the Data Files or Software, (b) both the above copyright 
+            notice(s) and this permission notice appear in associated documentation, 
+            and (c) there is clear notice in each modified Data File or in the 
+            Software as well as in the documentation associated with the Data File(s) 
+            or Software that the data or software has been modified.<br><br>
+            
+            THE DATA FILES AND SOFTWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF 
+            ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
+            OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT 
+            OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS 
+            INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT
+            OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
+            OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE 
+            OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE
+            OR PERFORMANCE OF THE DATA FILES OR SOFTWARE.<br><br>
+            
+            Except as contained in this notice, the name of a copyright holder shall
+            not be used in advertising or otherwise to promote the sale, use 
+            or other dealings in these Data Files or Software without prior 
+            written authorization of the copyright holder.
+            
+         </div>
+         <p class="subhead">A5 XPath Parser</p>
+         <table border="1">
+            <tr>
+               <td valign="top">
+                  <p>Origin</p>
+               </td>
+               <td valign="top">
+                  <p>James Clark (www.jclark.com)</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Description</p>
+               </td>
+               <td valign="top">
+                  <p>Top-down parser and lexical tokenizer for
+                     XPath
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Approximate LOC</p>
+               </td>
+               <td valign="top">
+                  <p>1000 (including data sets)</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Saxon packages / modules</p>
+               </td>
+               <td valign="top">
+                  <p>net.sf.saxon.expr.*, modules
+                     ExpressionParser, Tokenizer, Token
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Modifications</p>
+               </td>
+               <td valign="top">
+                  <p>Substantially rewritten with enhancements
+                     to handle XPath 2.0 and XQuery 1.0 syntax, improved error reporting, etc.
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Availability of source</p>
+               </td>
+               <td valign="top">
+                  <p>Derives from James Clark's xt product,
+                     which in its original form is at http://www.jclark.com/xml/xt-old.html.
+                     Package com.jclark.xsl.expr, modules ExprParser and ExprTokenizer
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Source version used</p>
+               </td>
+               <td valign="top">
+                  <p>Unknown. Snapshot taken in 1999.</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>License</p>
+               </td>
+               <td valign="top">
+                  <p>James Clark (see below). Apparently copyright has
+                     since been transferred to the Thai Open Source Center Ltd.
+                  </p>
+               </td>
+            </tr>
+         </table>
+         <div class="boxed" style="border: solid thin; background-color: #B1CCC7; padding: 2px">
+            Copyright (c) 1998, 1999 James Clark<br><br>
+            
+            Permission is hereby granted, free of charge, to any person obtaining
+            a copy of this software and associated documentation files (the
+            "Software"), to deal in the Software without restriction, including
+            without limitation the rights to use, copy, modify, merge, publish,
+            distribute, sublicense, and/or sell copies of the Software, and to
+            permit persons to whom the Software is furnished to do so, subject to
+            the following conditions:<br><br>
+            
+            The above copyright notice and this permission notice shall be included
+            in all copies or substantial portions of the Software.<br><br>
+            
+            THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+            OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+            MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+            IN NO EVENT SHALL JAMES CLARK BE LIABLE FOR ANY CLAIM, DAMAGES OR
+            OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+            ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+            OTHER DEALINGS IN THE SOFTWARE.<br><br>
+            
+            Except as contained in this notice, the name of James Clark shall
+            not be used in advertising or otherwise to promote the sale, use or
+            other dealings in this Software without prior written authorization
+            from James Clark.<br><br>
+            
+            
+         </div>
+         <p class="subhead">A6 Regex Translator</p>
+         <table border="1">
+            <tr>
+               <td valign="top">
+                  <p>Origin</p>
+               </td>
+               <td valign="top">
+                  <p>James Clark (www.jclark.com)</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Description</p>
+               </td>
+               <td valign="top">
+                  <p>Translator from XML Schema regular
+                     expressions to JDK 1.4 regular expressions
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Approximate LOC</p>
+               </td>
+               <td valign="top">
+                  <p>1000</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Saxon packages / modules</p>
+               </td>
+               <td valign="top">
+                  <p>net.sf.saxon.java, modules
+                     JDK14RegexTranslator and JDK15RegexTranslator, and net.sf.saxon.dotnet,
+                     module DotNetRegexTranslator
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Modifications</p>
+               </td>
+               <td valign="top">
+                  <p>Enhancements to handle XPath 2.0 regular
+                     expressions as input and to produce JDK 1.5 and .NET regular expressions as
+                     output
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Availability of source</p>
+               </td>
+               <td valign="top">
+                  <p>Available at 
+                     http://www.thaiopensource.com/download/xsdregex-20020430.zip
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Source version used</p>
+               </td>
+               <td valign="top">
+                  <p>20020430</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>License</p>
+               </td>
+               <td valign="top">
+                  <p>Thai Open Source Center Ltd.</p>
+               </td>
+            </tr>
+         </table>
+         <div class="boxed" style="border: solid thin; background-color: #B1CCC7; padding: 2px">
+            Copyright (c) 2001-2003 Thai Open Source Software Center Ltd
+            All rights reserved.<br><br>
+            
+            Redistribution and use in source and binary forms, with or without
+            modification, are permitted provided that the following conditions are
+            met:<br><br>
+            
+            * Redistributions of source code must retain the above copyright
+            notice, this list of conditions and the following disclaimer.<br><br>
+            
+            * Redistributions in binary form must reproduce the above copyright
+            notice, this list of conditions and the following disclaimer in
+            the documentation and/or other materials provided with the
+            distribution.<br><br>
+            
+            * Neither the name of the Thai Open Source Software Center Ltd nor
+            the names of its contributors may be used to endorse or promote
+            products derived from this software without specific prior written
+            permission.<br><br>
+            
+            THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+            "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+            LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+            A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR
+            CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+            EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+            PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+            PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+            LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+            NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+            SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+            
+            
+            
+         </div>
+         <p> </p>
+         <p class="subhead">A7 Ant Saxon Task</p>
+         <table border="1">
+            <tr>
+               <td valign="top">
+                  <p>Origin</p>
+               </td>
+               <td valign="top">
+                  <p>Apache</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Description</p>
+               </td>
+               <td valign="top">
+                  <p>Ant task to run schema-aware Saxon
+                     transformations
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Approximate LOC</p>
+               </td>
+               <td valign="top">
+                  <p>1000</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Saxon packages / modules</p>
+               </td>
+               <td valign="top">
+                  <p>net.sf.saxon.ant.AntTransform</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Modifications</p>
+               </td>
+               <td valign="top">
+                  <p>Derived from the standard XSLT task in
+                     the Apache Ant product, with enhancements to provide properties to control
+                     schema-aware transformations. 50% rewrite.
+                  </p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Availability of source</p>
+               </td>
+               <td valign="top">
+                  <p>http://ant.apache.org/</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>Source version used</p>
+               </td>
+               <td valign="top">
+                  <p>Ant 1.7.0</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top">
+                  <p>License</p>
+               </td>
+               <td valign="top">
+                  <p>Apache: see http://www.apache.org/licenses/LICENSE-2.0. This license requires
+                     a notice to be displayed; the relevant notice is copied below
+                  </p>
+               </td>
+            </tr>
+         </table>
+         <div class="boxed" style="border: solid thin; background-color: #B1CCC7; padding: 2px">
+            Apache Ant<br>
+            Copyright 1999-2006 The Apache Software Foundation<br><br>
+            
+            This product includes software developed by
+            The Apache Software Foundation (http://www.apache.org/).<br><br>
+            
+            This product includes also software developed by :<br>
+            - the W3C consortium (http://www.w3c.org) ,<br>
+            - the SAX project (http://www.saxproject.org)<br><br>
+            
+            The &lt;sync&gt; task is based on code Copyright (c) 2002, Landmark
+            Graphics Corp that has been kindly donated to the Apache Software
+            Foundation.
+            
+         </div>
+         <table width="100%">
+            <tr>
+               <td>
+                  <p align="right"><a class="nav" href="redistributed.html">Next</a></p>
+               </td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

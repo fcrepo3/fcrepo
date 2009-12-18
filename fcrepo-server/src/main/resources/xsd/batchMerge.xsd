@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This schema was changed for Fedora 3.0 to use the official            -->
+<!-- xlink namespace URI.                                                  -->
+<xsd:schema targetNamespace="http://www.fedora.info/definitions/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.fedora.info/definitions/" xmlns:xlink="http://www.w3.org/1999/xlink" elementFormDefault="qualified">
+	<xsd:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink-1999.xsd"/>
+	<xsd:annotation>
+		<xsd:documentation>Prior to Fedora 2.1, there was no formal batchMerge schema and the schema was implied based
+			on the example object-specific files. This schema provides a more formal definition that conforms to the pre-Fedora 2.1
+			object-specific examples and also provides some new extensions.
+		</xsd:documentation>
+	</xsd:annotation>
+	<xsd:element name="input">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="comment" minOccurs="0"/>
+				<xsd:element ref="metadata" minOccurs="0"/>
+				<xsd:element ref="datastreams" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="OBJID" type="xsd:string" use="required"/>
+			<xsd:attribute name="LABEL" type="xsd:string" use="optional"/>
+			<xsd:attribute name="OWNERID" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="metadata">
+		<xsd:annotation>
+			<xsd:documentation>This element is for backward compatibility with pre-Fedora 2.1 object-specific file formats where
+				inline XML metadata was treated separately from other types of datastreams. It is recommended that users use the
+				new extended datastream element for all types of datastreams. This feature may be deprecated in a future release.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="metadata" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:any namespace="##any" processContents="skip" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="ID" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="datastreams">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="datastream" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="ID" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="datastream">
+		<xsd:annotation>
+			<xsd:documentation>This element has been extended from the examples in pre-Fedora2.1 object-specific files.
+				It now includes the ability to include inline XML within the datastream element and also includes several new
+				datastream attributes that were introduced with FOXML 1.0.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="xmlContent" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="ID" type="xsd:string" use="optional"/>
+			<xsd:attribute name="LABEL" type="xsd:string" use="optional"/>
+			<xsd:attribute name="FORMAT_URI" type="xsd:string" use="optional"/>
+			<xsd:attribute name="MIMETYPE" type="xsd:string" use="optional"/>
+			<xsd:attribute name="ALT_IDS" type="uriListType" use="optional"/>
+			<xsd:attributeGroup ref="xlink:simpleLink"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="xmlContent">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:any namespace="##any" processContents="skip" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="uriListType">
+		<xsd:list itemType="xsd:anyURI"/>
+	</xsd:simpleType>
+</xsd:schema>

@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" title="Datastream Profile" 
+                layout="vertical" showCloseButton="true" resize="true" close="closeDialog(event)">
+	<mx:Script>	
+		<![CDATA[
+		    import mx.rpc.events.ResultEvent;
+			import mx.managers.PopUpManager;
+			import mx.events.CloseEvent;
+			import flash.external.ExternalInterface;
+			import mx.controls.Alert;
+			import script.Alerts;
+			import script.ErrorHandler;
+			import script.Util;
+
+            [Bindable]
+            private var pid:String;
+
+            [Bindable]
+            private var dsID:String;
+        
+            [Bindable]
+            private var url:String;        
+    
+            [Bindable]
+            private var dsProfile:Object;
+
+            /**
+             * Used for exporting datastream content. At the class level because 
+             * it must stay in scope while the file is being downloaded.
+             */
+            private var exportFile:FileReference = new FileReference();
+                      
+            /**
+             * Sets up the datastream dialog, loads datastream data
+             */ 
+			public function setup(pid:String, dsID:String, url:String):void {
+				this.title = dsID;
+				
+				this.pid = pid;
+				this.dsID = dsID;
+				this.url = url;
+				      	  
+    		    datastreamProfile.url = url + "?format=xml&flash=true";
+			    datastreamProfile.send();
+			}
+          
+            /**
+             * Closes the datastream dialog
+             */ 
+			private function closeDialog(event : CloseEvent):void {
+				PopUpManager.removePopUp(this); // close this dialog
+			}
+			
+			/**
+			 * Loads the datastream profile information into the UI
+			 */
+			private function setDatastreamProfile(event:ResultEvent):void {
+                var error:String = ErrorHandler.getError(event.result);
+                if(error != null) {                
+                    Alerts.showError("Could not get datastream " + dsID + 
+                                     " due to: " + error);
+                    return;
+                }
+                
+			    dsProfile = event.result.datastreamProfile;
+
+                if(dsProfile.dsControlGroup == "X") {
+                    dsControlGroup.text = "Inline XML (X)";
+                    contentLocation.visible=false;
+                    contentLocation.includeInLayout=false;
+                } else if(dsProfile.dsControlGroup == "M") {
+                    dsControlGroup.text = "Managed Content (M)";
+                    contentLocation.visible=false;
+                    contentLocation.includeInLayout=false;
+                    if(dsProfile.dsMIME.indexOf("text")>=0) {                        
+                    } else if(dsProfile.dsMIME.indexOf("image")>=0) {
+                        showContentButton.label = "View Content";   
+                    } else {
+                        showContentButton.visible = false;
+                        showContentButton.includeInLayout = false;
+                    }                                   
+                } else if(dsProfile.dsControlGroup == "R") {
+                    dsControlGroup.text = "Redirect (R)";
+                    showContentButton.label = "View Content";
+                    textDS.editable = false;
+                    replaceContent.visible=false;
+                    replaceContent.includeInLayout=false;                    
+                } else if(dsProfile.dsControlGroup == "E") {
+                    dsControlGroup.text = "External Reference (E)";
+                    showContentButton.label = "View Content";
+                    textDS.editable = false;
+                    replaceContent.visible=false;
+                    replaceContent.includeInLayout=false;
+                }
+
+                if(dsProfile.dsState == "I") {
+                    dsState.selectedIndex = 1;
+                } else if(dsProfile.dsState == "D") {
+                    dsState.selectedIndex = 2;
+                } else {
+                    dsState.selectedIndex = 0;
+                }
+                
+                if(dsProfile.dsVersionable == true) {
+                    dsVersionable.selectedIndex = 0;
+                } else {
+                    dsVersionable.selectedIndex = 1;
+                }
+                             
+                if(dsProfile.dsChecksumType == "DEFAULT") {
+                    dsChecksumType.selectedIndex = 0;                    
+                } else if(dsProfile.dsChecksumType == "DISABLED") {
+                    dsChecksumType.selectedIndex = 1;                    
+                } else if(dsProfile.dsChecksumType == "MD5") {
+                    dsChecksumType.selectedIndex = 2;
+                } else if(dsProfile.dsChecksumType == "SHA-1") {
+                    dsChecksumType.selectedIndex = 3;
+                } else if(dsProfile.dsChecksumType == "SHA-256") {
+                    dsChecksumType.selectedIndex = 4;
+                } else if(dsProfile.dsChecksumType == "SHA-385") {
+                    dsChecksumType.selectedIndex = 5;
+                } else if(dsProfile.dsChecksumType == "SHA-512") {
+                    dsChecksumType.selectedIndex = 6;
+                } else if(dsProfile.dsChecksumType == "HAVAL") {
+                    dsChecksumType.selectedIndex = 7;
+                } else if(dsProfile.dsChecksumType == "TIGER") {
+                    dsChecksumType.selectedIndex = 8;
+                } else if(dsProfile.dsChecksumType == "WHIRLPOOL") {
+                    dsChecksumType.selectedIndex = 9;
+                }
+                
+                if(dsChecksumType.selectedIndex > 1) {
+                    dsChecksum.visible = true;
+                } else {
+                    dsChecksum.visible = false;
+                }
+                
+                PopUpManager.centerPopUp(this);
+			}
+			
+			/**
+			 * Displays the contents of a datastream.
+			 */
+            private function showDatastream():void {               
+                if(dsProfile.dsMIME.indexOf("text")>=0 || 
+                   dsProfile.dsMIME.indexOf("xml")>=0) {
+                    // Do not mask http codes on redirects
+                    if(dsProfile.dsControlGroup == "R") {
+                        datastream.url = url + "/content";
+                    } else {
+                        datastream.url = url + "/content?flash=true";
+                    }
+                    datastream.send();
+                    textDS.visible = true;
+                    textDS.includeInLayout = true;
+                } else if(dsProfile.dsMIME.indexOf("image")>=0) {
+                    imageDS.source = url + "/content";
+                    imageDSPanel.visible = true;
+                    imageDSPanel.includeInLayout = true;
+                }
+                showContentButton.visible = false;
+                showContentButton.includeInLayout = false;
+                hideContentButton.visible = true;
+                hideContentButton.includeInLayout = true;
+                
+                PopUpManager.centerPopUp(this);
+            }
+
+            /**
+             * Hides the contents of a datastream.
+             */
+            private function hideDatastream():void {               
+                textDS.visible = false;
+                textDS.includeInLayout = false;
+                imageDSPanel.visible = false;
+                imageDSPanel.includeInLayout = false;
+
+                if(hideContentButton.visible == true) {
+                    hideContentButton.visible = false;
+                    hideContentButton.includeInLayout = false;                
+                    showContentButton.visible = true;
+                    showContentButton.includeInLayout = true;
+                }
+                   
+                PopUpManager.centerPopUp(this);                
+            }            
+
+            /**
+             * Handles get datastream responses
+             */
+            private function retrieveDatastreamComplete(event:ResultEvent):void {
+                var error:String = ErrorHandler.getError(event.result);
+                if(error != null) {
+                    Alerts.showError("Could not retrieve datastream " + 
+                                     " due to: " + error);
+                    return;
+                }
+            }
+
+            /**
+             * Provides the option to replace the contents of a datastream.
+             */ 
+            private function replaceDatastreamContent():void {
+                hideDatastream();
+                var replaceDialog:ReplaceContentDialog = new ReplaceContentDialog();
+                replaceDialog.setup(url, dsMIME.text);
+                PopUpManager.addPopUp(replaceDialog, this, true);
+                PopUpManager.centerPopUp(replaceDialog);                
+            }
+            
+            /**
+             * Exports datastream contents.
+             */ 
+            private function exportDatastream():void {           
+                var request:URLRequest = new URLRequest(url + "/content");
+                request.method = URLRequestMethod.GET;              
+                var fileName:String = pid.replace(":", "_") + "-" + dsID;
+                exportFile.download(request, fileName);
+            }            
+            
+            /**
+             * Modifies a datastream.
+             */ 
+            private function modifyDatastream():void {
+                if(dsMIME.text == null || dsMIME.text == ""){
+                    Alerts.showInfo("MIME Type is required");
+                    return;
+                }
+                             
+                var modifyURL:String = 
+                    url + "?dsLabel=" + Util.urlEncode(dsLabel.text) +
+                    "&formatURI=" + Util.urlEncode(dsFormatURI.text) +
+                    "&checksumType=" + Util.urlEncode(dsChecksumType.text) +
+                    "&altIDs=" + Util.urlEncode(dsAltID.text) +
+                    "&mimeType=" + Util.urlEncode(dsMIME.text);
+
+                if(dsProfile.dsControlGroup == "R" ||
+                   dsProfile.dsControlGroup == "E") {
+                    modifyURL += "&dsLocation=" + Util.urlEncode(dsLocation.text) 
+                }
+
+                if(dsVersionable.selectedIndex == 0) {
+                    modifyURL += "&versionable=true";
+                } else if(dsVersionable.selectedIndex == 1) {
+                    modifyURL += "&versionable=false";
+                }                 
+
+                if(dsState.selectedIndex == 0) {
+                    modifyURL += "&dsState=A";
+                } else if(dsState.selectedIndex == 1) {
+                    modifyURL += "&dsState=I";
+                } else if(dsState.selectedIndex == 2) {
+                    modifyURL += "&dsState=D";
+                }                    
+
+                modifyURL += "&flash=true";
+
+                // Flex doesn't know how to generate an HTTP PUT
+                // Fortunately, the REST API will interpret an HTTP POST with
+                // an X-HTTP-Method-Override header set to 'PUT' as a PUT.
+                datastreamModify.headers['X-HTTP-Method-Override'] = 'PUT';
+                    
+                // Flex will turn an HTTP POST into an HTTP GET if there
+                // is no posted content, unless the content type is set
+                // to something other than application/x-www-form-urlencoded
+                datastreamModify.contentType=dsProfile.dsMIME;
+                
+                if(textDS.visible == true) {
+                    datastreamModify.url = modifyURL;
+                    datastreamModify.send(textDS.text);
+                } else {
+                    datastreamModify.url = modifyURL + "&ignoreContent=true";                    
+                    datastreamModify.send();
+                }           
+            }
+            
+            /**
+             * Handles reloading the UI after a datastream has been modified.
+             */ 
+            private function modifyDatastreamComplete(event:ResultEvent):void {
+                var error:String = ErrorHandler.getError(event.result);
+                if(error != null){
+                    if(dsState.selectedIndex == 2) {
+                        error = "Could not modify datastream. Deleted datastreams cannot be " + 
+                                "modified without first transitioning them to another state.";
+                    } else {                    
+                        error = "Could not modify datastream " + dsID + " due to: " + error;
+                    }
+                    Alerts.showError(error);
+                    return;
+                }
+                
+                Alerts.showInfo("Your changes to " + dsID + " in object " + pid + " have been saved");
+                datastreamProfile.send();
+                parentApplication.updateObjectDSList(pid);
+            }
+
+            /**
+             * Verifies that the datastream should be purged
+             */
+            private function verifyPurgeDatastream():void {
+                Alerts.showVerification("Are you sure you want to delete " + dsID + 
+                                        "? This action cannot be undone.",
+                                        "Verify Purge Datastream",
+                                        this, 
+                                        verifyPurgeHandler);
+            }
+            
+            private function verifyPurgeHandler(event:CloseEvent):void {
+                if (event.detail==Alert.YES) {
+                    purgeDatastream();
+                }
+            }
+            
+            /**
+             * Purges a datastream.
+             */ 
+            private function purgeDatastream():void {
+                datastreamPurge.url = url + "?flash=true";
+
+                // Flex doesn't know how to generate an HTTP DELETE.
+                // Fortunately, the REST API will interpret an HTTP POST with
+                // an X-HTTP-Method-Override header set to 'DELETE' as a DELETE.
+                datastreamPurge.headers['X-HTTP-Method-Override'] = 'DELETE';
+                
+                // Flex will turn an HTTP POST into an HTTP GET if there
+                // is no posted content, unless the content type is set
+                // to something other than application/x-www-form-urlencoded
+                datastreamPurge.contentType="application/fedora";
+                
+                datastreamPurge.send();                               
+            }
+            
+            /**
+             * Closes down this dialog after a datastream has been purged.
+             */ 
+            private function purgeDatastreamComplete(event:ResultEvent):void {
+                var error:String = ErrorHandler.getError(event.result);
+                if(error != null) {
+                    Alerts.showError("Could not purge datastream " + 
+                                     dsID + " due to: " + error);
+                    return;
+                }
+                
+                closeDialog(null);
+                parentApplication.updateObjectDSList(pid);
+            }            
+       ]]>
+	</mx:Script>
+   
+    <mx:HTTPService id="datastream" resultFormat="text" showBusyCursor="true"
+                    result="retrieveDatastreamComplete(event)"
+                    fault="ErrorHandler.handleFault(event)" />
+	<mx:HTTPService id="datastreamProfile" showBusyCursor="true" 
+	                result="setDatastreamProfile(event)" 
+                    fault="ErrorHandler.handleFault(event)" />
+    <mx:HTTPService id="datastreamModify" method="POST" resultFormat="text" 
+                    showBusyCursor="true" 
+                    result="modifyDatastreamComplete(event)" 
+                    fault="ErrorHandler.handleFault(event)" />
+	<mx:HTTPService id="datastreamPurge" method="POST" showBusyCursor="true"
+	                result="purgeDatastreamComplete(event)" 
+	                fault="ErrorHandler.handleFault(event)" />
+	
+    <mx:Form width="100%">
+        <mx:FormItem label="Label:">
+            <mx:TextInput id="dsLabel" text="{dsProfile.dsLabel}" width="300" />
+        </mx:FormItem>
+        <mx:FormItem label="Control Group:">
+            <mx:Label styleName="formLabel" id="dsControlGroup" selectable="true" />
+        </mx:FormItem>
+        <mx:FormItem label="MIME Type:">
+            <mx:TextInput id="dsMIME" text="{dsProfile.dsMIME}" width="300" />
+        </mx:FormItem>
+        <mx:FormItem label="State:">
+            <mx:ComboBox id="dsState">
+                <mx:Array >
+                    <mx:String>Active (A)</mx:String>
+                    <mx:String>Inactive (I)</mx:String>
+                    <mx:String>Deleted (D)</mx:String>
+                </mx:Array>
+            </mx:ComboBox>
+        </mx:FormItem>
+        <mx:FormItem label="Created:">
+            <mx:Label styleName="formLabel" text="{dsProfile.dsCreateDate}" selectable="true" />
+        </mx:FormItem>
+        <mx:FormItem label="Versionable:">
+            <mx:ComboBox id="dsVersionable">
+                <mx:Array >
+                    <mx:String>Updates will create a new version</mx:String>
+                    <mx:String>Updates will replace most recent version</mx:String>
+                </mx:Array>
+            </mx:ComboBox>
+        </mx:FormItem>
+        <mx:FormItem label="Format URI:">
+            <mx:TextInput id="dsFormatURI" text="{dsProfile.dsFormatURI}" width="300" />
+        </mx:FormItem>
+        <mx:FormItem label="Alternate IDs:">
+            <mx:TextInput id="dsAltID" text="{dsProfile.dsAltID}" width="300" />
+        </mx:FormItem>
+        <mx:FormItem label="Location:" id="contentLocation">
+            <mx:TextInput id="dsLocation" text="{dsProfile.dsLocation}" width="300" />
+        </mx:FormItem>
+        <mx:FormItem label="Access URL:">
+            <mx:Label styleName="formLabel" text="{url}/content" selectable="true" />
+        </mx:FormItem>
+        <mx:FormItem label="Checksum:">
+            <mx:HBox>
+                <mx:ComboBox id="dsChecksumType">
+                    <mx:Array>
+                        <mx:String>Default</mx:String>
+                        <mx:String>Disabled</mx:String>
+                        <mx:String>MD5</mx:String>
+                        <mx:String>SHA-1</mx:String>
+                        <mx:String>SHA-256</mx:String>
+                        <mx:String>SHA-512</mx:String>
+                    </mx:Array>
+                </mx:ComboBox>
+                <mx:Label styleName="formLabel" id="dsChecksum" text="{dsProfile.dsChecksum}" selectable="true" />
+            </mx:HBox>                     
+        </mx:FormItem>   
+    </mx:Form>
+    
+    <mx:TextArea id="textDS" width="100%" height="250" text="{datastream.lastResult}" visible="false" includeInLayout="false" />
+    <mx:Panel id="imageDSPanel" width="100%" height="250" visible="false" includeInLayout="false">
+        <mx:Image id="imageDS"/>
+    </mx:Panel>
+    
+    <mx:HBox>
+        <mx:Button label="Edit Content" id="showContentButton" click="showDatastream()" />
+        <mx:Button label="Hide Content" id="hideContentButton" click="hideDatastream()" visible="false" includeInLayout="false" />
+        <mx:Button label="Replace Content" id="replaceContent" click="replaceDatastreamContent()" />
+        <mx:Button label="Export Content" click="exportDatastream()" />
+        <mx:Button label="Save Changes" click="modifyDatastream()" />
+        <mx:Button label="Purge Datastream" click="verifyPurgeDatastream()" />
+        <mx:Button label="Close" click="closeDialog(null)" />        
+    </mx:HBox>    
+    
+</mx:TitleWindow>

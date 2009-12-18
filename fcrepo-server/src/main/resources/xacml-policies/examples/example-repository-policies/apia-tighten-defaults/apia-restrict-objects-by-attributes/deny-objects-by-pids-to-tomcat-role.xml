@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v5 rel. 4 U (http://www.xmlspy.com) by Sandy Payette (Cornell University) -->
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" PolicyId="deny-objects-by-pids-to-tomcat-role" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:1.0:policy
+C:\eclipse\workspace\fedora\dist\server\xsd\cs-xacml-schema-policy-01.xsd">
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Overall, this policy will identify a set of objects by their PIDs and it will DENY all  APIA access to users of particular ROLES.-->
+	<!-- NOTE:  As a repository-wide policy, this policy demonstrates how to control access to specific objects (identified by PID).  -->
+	<!-- As an alternative, it is possible to create ‘object-specific’ policies that either resides in the digital object’s POLICY datastream, -->
+	<!-- or that is stored in the object-specific policy directory.  (See the Fedora system documentation on XACML policies -->
+	<!-- for more information.)-->
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  NOTE:  User ROLES are defined using custom Fedora attributes in the tomcat-users.xml file. -->
+	<!--  See the Fedora system documentation on Tomcat Authentication for details of how to specify custom attributes -->
+	<!--  (such as 'fedoraRole') in the tomcat-users.xml file. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description>Overall, this policy will identify a set of objects by their PIDs and it will DENY ALL APIA access to users of particular ROLES. NOTE:  As a repository-wide policy, this policy demonstrates how to control access to specific objects (identified by PID).  As an alternative, it is possible to create ‘object-specific’ policies that either resides in the digital object’s POLICY datastream, or that is stored in the object-specific policy directory.  (See the Fedora system documentation on XACML policies for more information.)</Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.  However, the scope of the Subject is narrowed down in the Rules below.  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to a specific set of objects, identified by their PIDs.  The object PIDs are specified in the -->
+		<!--  ResourceMatch elements, where the PID is a attribute of the object (urn:fedora:names:fedora:2.1:resource:object:pid)   -->
+		<!--  the AttributeValue specifies the actual PID value. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<Resource>
+				<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:7</AttributeValue>
+					<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</ResourceMatch>
+			</Resource>
+			<Resource>
+				<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:11</AttributeValue>
+					<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</ResourceMatch>
+			</Resource>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable ONLY to actions (operations) of the Fedora Access Service (i.e., API-A). -->
+		<!--  The ActionAttributeDesignator element is used to specify the action identifier.  -->
+		<!--  The action identifier (urn:fedora:names:fedora:2.1:action:api) indicates that the policy will apply broadly to an entire Fedora API -->
+		<!--  (a sort of composite action consisting of all methods in a particular API).  -->
+		<!-- The AttributeValue names the specific Fedora API  that is the target of this policy, namely API-A, as indicated by the  -->
+		<!-- identifier urn:fedora:names:fedora:2.1:action:api-a. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<Action>
+				<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:api-a</AttributeValue>
+					<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:api"/>
+				</ActionMatch>
+			</Action>
+		</Actions>
+	</Target>
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Rule 1:  Access will be denied to users in the ROLE of either student or goofball -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Rule RuleId="1" Effect="Deny">
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+			<SubjectAttributeDesignator AttributeId="fedoraRole" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">student</AttributeValue>
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">goofball</AttributeValue>
+			</Apply>
+		</Condition>
+	</Rule>
+</Policy>

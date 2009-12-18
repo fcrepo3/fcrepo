@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" title="Object XML" layout="vertical" showCloseButton="true" resize="true" close="closeDialog(event)" width="800" height="600">
+    <mx:Script>
+        <![CDATA[
+            import mx.managers.PopUpManager;
+            import mx.events.CloseEvent;
+            import script.Alerts;
+            import mx.rpc.events.ResultEvent;
+            import script.ErrorHandler;
+          
+            /**
+             * Sets up an object XML dialog.
+             */ 
+            public function setup(pid:String, url:String):void {
+                this.title = "Object XML for " + pid;             
+                objectXML.url = url;
+                objectXML.send();
+            }
+          
+            /**
+             * Closes and removes an object XML dialog.
+             */ 
+            private function closeDialog(event : CloseEvent):void {
+                PopUpManager.removePopUp(this); // close this dialog
+            }
+            
+            private function objectXmlComplete(event:ResultEvent):void {
+                var error:String = ErrorHandler.getError(event.result);
+                if(error != null) {
+                    Alerts.showError("Could not get object XML" + 
+                                     " due to: " + error);
+                    return;
+                }                
+            }
+       ]]>
+    </mx:Script>
+   
+    <mx:HTTPService id="objectXML" resultFormat="text" showBusyCursor="true" 
+                    result="objectXmlComplete(event)" 
+                    fault="ErrorHandler.handleFault(event)"/>
+   
+    <mx:TextArea id="xmlDisplay" width="100%" height="100%" text="{objectXML.lastResult}" />
+    <mx:Button label="Close" click="closeDialog(null)"/>    
+   
+</mx:TitleWindow>

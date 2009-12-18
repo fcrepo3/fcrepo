@@ -1,0 +1,58 @@
+.tabContent {
+  background-color: LightSteelBlue;
+  padding-top: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.inputForm {
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-bottom: 6px;
+}
+
+.formTitle {
+  font-size: 14pt;
+  border-bottom: thin dashed #aaaaaa;
+  margin-bottom: 8px;
+}
+
+.tab-container {
+  background-color: LightSteelBlue;
+  border:1px solid #6D99B6;
+}
+
+.tabs { 
+  position:relative; 
+  height: 27px; 
+  margin: 0; 
+  padding: 0; 
+  background-color: SteelBlue;
+  overflow:hidden
+}
+
+.tabs li {
+  display:inline;
+}
+
+.tabs a:hover {
+  background-color: #ddddff;
+}
+
+.tabs a.tab-active {
+  background-color: LightSteelBlue;
+  border-right: 1px solid #6D99B6;
+}
+
+.tabs a  {
+  height: 27px; 
+  font:14px verdana, helvetica, sans-serif;font-weight:bold;
+  position:relative; 
+  padding:6px 10px 10px 10px; 
+  margin: 0px -4px 0px 0px; 
+  color:#000000;
+  text-decoration:none;
+  border-right:1px solid #6D99B6;
+}
+
+

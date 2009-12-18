@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://data.pdp.xacml.melcoe/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax21="http://util.xacml.melcoe/xsd" xmlns:ax22="http://util.java/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://data.pdp.xacml.melcoe/xsd">
+    <wsdl:documentation>PolicyDataManagerService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://util.java/xsd">
+            <xs:complexType name="Set">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="empty" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax24="http://util.xacml.melcoe/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://data.pdp.xacml.melcoe/xsd">
+            <xs:import namespace="http://util.xacml.melcoe/xsd"/>
+            <xs:complexType name="Exception">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Exception" nillable="true" type="xs:anyType"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="PolicyDataManagerException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="PolicyDataManagerException" nillable="true" type="ns:PolicyDataManagerException"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="PolicyDataManagerException">
+                <xs:complexContent>
+                    <xs:extension base="ns:Exception">
+                        <xs:sequence/>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="deletePolicy">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deletePolicyResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updatePolicy">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="newDocument" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updatePolicyResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addPolicy">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="document" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addPolicyResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listPoliciesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="lastUpdateResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPolicy">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPolicyResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ns:DocumentInfo"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="DocumentInfo">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="content" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="findPolicies">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="attributes" nillable="true" type="ax21:AttributeBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="findPoliciesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ns:DocumentInfo"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema xmlns:ax23="http://util.java/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://util.xacml.melcoe/xsd">
+            <xs:import namespace="http://util.java/xsd"/>
+            <xs:complexType name="AttributeBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="id" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="values" nillable="true" type="ax22:Set"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="listPoliciesRequest"/>
+    <wsdl:message name="listPoliciesResponse">
+        <wsdl:part name="parameters" element="ns:listPoliciesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="PolicyDataManagerException">
+        <wsdl:part name="parameters" element="ns:PolicyDataManagerException"/>
+    </wsdl:message>
+    <wsdl:message name="updatePolicyRequest">
+        <wsdl:part name="parameters" element="ns:updatePolicy"/>
+    </wsdl:message>
+    <wsdl:message name="updatePolicyResponse">
+        <wsdl:part name="parameters" element="ns:updatePolicyResponse"/>
+    </wsdl:message>
+    <wsdl:message name="deletePolicyRequest">
+        <wsdl:part name="parameters" element="ns:deletePolicy"/>
+    </wsdl:message>
+    <wsdl:message name="deletePolicyResponse">
+        <wsdl:part name="parameters" element="ns:deletePolicyResponse"/>
+    </wsdl:message>
+    <wsdl:message name="lastUpdateRequest"/>
+    <wsdl:message name="lastUpdateResponse">
+        <wsdl:part name="parameters" element="ns:lastUpdateResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addPolicyRequest">
+        <wsdl:part name="parameters" element="ns:addPolicy"/>
+    </wsdl:message>
+    <wsdl:message name="addPolicyResponse">
+        <wsdl:part name="parameters" element="ns:addPolicyResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getPolicyRequest">
+        <wsdl:part name="parameters" element="ns:getPolicy"/>
+    </wsdl:message>
+    <wsdl:message name="getPolicyResponse">
+        <wsdl:part name="parameters" element="ns:getPolicyResponse"/>
+    </wsdl:message>
+    <wsdl:message name="findPoliciesRequest">
+        <wsdl:part name="parameters" element="ns:findPolicies"/>
+    </wsdl:message>
+    <wsdl:message name="findPoliciesResponse">
+        <wsdl:part name="parameters" element="ns:findPoliciesResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="PolicyDataManagerServicePortType">
+        <wsdl:operation name="listPolicies">
+            <wsdl:input message="ns:listPoliciesRequest" wsaw:Action="urn:listPolicies"/>
+            <wsdl:output message="ns:listPoliciesResponse" wsaw:Action="urn:listPoliciesResponse"/>
+            <wsdl:fault message="ns:PolicyDataManagerException" name="PolicyDataManagerException" wsaw:Action="urn:listPoliciesPolicyDataManagerException"/>
+        </wsdl:operation>
+        <wsdl:operation name="updatePolicy">
+            <wsdl:input message="ns:updatePolicyRequest" wsaw:Action="urn:updatePolicy"/>
+            <wsdl:output message="ns:updatePolicyResponse" wsaw:Action="urn:updatePolicyResponse"/>
+            <wsdl:fault message="ns:PolicyDataManagerException" name="PolicyDataManagerException" wsaw:Action="urn:updatePolicyPolicyDataManagerException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deletePolicy">
+            <wsdl:input message="ns:deletePolicyRequest" wsaw:Action="urn:deletePolicy"/>
+            <wsdl:output message="ns:deletePolicyResponse" wsaw:Action="urn:deletePolicyResponse"/>
+            <wsdl:fault message="ns:PolicyDataManagerException" name="PolicyDataManagerException" wsaw:Action="urn:deletePolicyPolicyDataManagerException"/>
+        </wsdl:operation>
+        <wsdl:operation name="lastUpdate">
+            <wsdl:input message="ns:lastUpdateRequest" wsaw:Action="urn:lastUpdate"/>
+            <wsdl:output message="ns:lastUpdateResponse" wsaw:Action="urn:lastUpdateResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="addPolicy">
+            <wsdl:input message="ns:addPolicyRequest" wsaw:Action="urn:addPolicy"/>
+            <wsdl:output message="ns:addPolicyResponse" wsaw:Action="urn:addPolicyResponse"/>
+            <wsdl:fault message="ns:PolicyDataManagerException" name="PolicyDataManagerException" wsaw:Action="urn:addPolicyPolicyDataManagerException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getPolicy">
+            <wsdl:input message="ns:getPolicyRequest" wsaw:Action="urn:getPolicy"/>
+            <wsdl:output message="ns:getPolicyResponse" wsaw:Action="urn:getPolicyResponse"/>
+            <wsdl:fault message="ns:PolicyDataManagerException" name="PolicyDataManagerException" wsaw:Action="urn:getPolicyPolicyDataManagerException"/>
+        </wsdl:operation>
+        <wsdl:operation name="findPolicies">
+            <wsdl:input message="ns:findPoliciesRequest" wsaw:Action="urn:findPolicies"/>
+            <wsdl:output message="ns:findPoliciesResponse" wsaw:Action="urn:findPoliciesResponse"/>
+            <wsdl:fault message="ns:PolicyDataManagerException" name="PolicyDataManagerException" wsaw:Action="urn:findPoliciesPolicyDataManagerException"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="PolicyDataManagerServiceSoap11Binding" type="ns:PolicyDataManagerServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="listPolicies">
+            <soap:operation soapAction="urn:listPolicies" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PolicyDataManagerException">
+                <soap:fault use="literal" name="PolicyDataManagerException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updatePolicy">
+            <soap:operation soapAction="urn:updatePolicy" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PolicyDataManagerException">
+                <soap:fault use="literal" name="PolicyDataManagerException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deletePolicy">
+            <soap:operation soapAction="urn:deletePolicy" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PolicyDataManagerException">
+                <soap:fault use="literal" name="PolicyDataManagerException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addPolicy">
+            <soap:operation soapAction="urn:addPolicy" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PolicyDataManagerException">
+                <soap:fault use="literal" name="PolicyDataManagerException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="lastUpdate">
+            <soap:operation soapAction="urn:lastUpdate" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getPolicy">
+            <soap:operation soapAction="urn:getPolicy" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PolicyDataManagerException">
+                <soap:fault use="literal" name="PolicyDataManagerException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="findPolicies">
+            <soap:operation soapAction="urn:findPolicies" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PolicyDataManagerException">
+                <soap:fault use="literal" name="PolicyDataManagerException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="PolicyDataManagerServiceSoap12Binding" type="ns:PolicyDataManagerServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="listPolicies">
+            <soap12:operation soapAction="urn:listPolicies" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PolicyDataManagerException">
+                <soap12:fault use="literal" name="PolicyDataManagerException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updatePolicy">
+            <soap12:operation soapAction="urn:updatePolicy" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PolicyDataManagerException">
+                <soap12:fault use="literal" name="PolicyDataManagerException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deletePolicy">
+            <soap12:operation soapAction="urn:deletePolicy" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PolicyDataManagerException">
+                <soap12:fault use="literal" name="PolicyDataManagerException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addPolicy">
+            <soap12:operation soapAction="urn:addPolicy" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PolicyDataManagerException">
+                <soap12:fault use="literal" name="PolicyDataManagerException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="lastUpdate">
+            <soap12:operation soapAction="urn:lastUpdate" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getPolicy">
+            <soap12:operation soapAction="urn:getPolicy" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PolicyDataManagerException">
+                <soap12:fault use="literal" name="PolicyDataManagerException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="findPolicies">
+            <soap12:operation soapAction="urn:findPolicies" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PolicyDataManagerException">
+                <soap12:fault use="literal" name="PolicyDataManagerException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="PolicyDataManagerServiceHttpBinding" type="ns:PolicyDataManagerServicePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="listPolicies">
+            <http:operation location="PolicyDataManagerService/listPolicies"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="listPolicies"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="listPolicies"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updatePolicy">
+            <http:operation location="PolicyDataManagerService/updatePolicy"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="updatePolicy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="updatePolicy"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deletePolicy">
+            <http:operation location="PolicyDataManagerService/deletePolicy"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="deletePolicy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="deletePolicy"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addPolicy">
+            <http:operation location="PolicyDataManagerService/addPolicy"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="addPolicy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="addPolicy"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="lastUpdate">
+            <http:operation location="PolicyDataManagerService/lastUpdate"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="lastUpdate"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="lastUpdate"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getPolicy">
+            <http:operation location="PolicyDataManagerService/getPolicy"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getPolicy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getPolicy"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="findPolicies">
+            <http:operation location="PolicyDataManagerService/findPolicies"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="findPolicies"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="findPolicies"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="PolicyDataManagerService">
+        <wsdl:port name="PolicyDataManagerServiceHttpSoap11Endpoint" binding="ns:PolicyDataManagerServiceSoap11Binding">
+            <soap:address location="http://137.111.246.199:8080/axis2/services/PolicyDataManagerService.PolicyDataManagerServiceHttpSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="PolicyDataManagerServiceHttpSoap12Endpoint" binding="ns:PolicyDataManagerServiceSoap12Binding">
+            <soap12:address location="http://137.111.246.199:8080/axis2/services/PolicyDataManagerService.PolicyDataManagerServiceHttpSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="PolicyDataManagerServiceHttpEndpoint" binding="ns:PolicyDataManagerServiceHttpBinding">
+            <http:address location="http://137.111.246.199:8080/axis2/services/PolicyDataManagerService.PolicyDataManagerServiceHttpEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

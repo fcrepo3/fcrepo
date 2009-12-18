@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" PolicyId="demo-26">
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  OBJECT-SPECIFIC POLICY:  This is an object-specific policy.  It could be stored inside the demo:26 digital object in the POLICY -->
+	<!-- datastream OR in the directory for object-specific policies. (The directory location is set in the Authorization module -->
+	<!-- configuration in the Fedora server configuration file (fedora.fcfg).  -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  By using multiple policy Rules, this policy shows how to deny access to particular datastreams in the object. -->
+	<!--  The policy will DENY visitors access to the TEI and FOP source datastreams of the demo:26 object by controlling access to the -->
+	<!--  getDatastreamDissemination method of the Fedora Access Service (API-A).  These datastreams are open to all other kinds -->
+	<!--  of users, and Disseminations are open to all users. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<!--  TEST CASE:  This policy can be tested on the object demo:26 -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Description>By using multiple policy Rules, this policy shows how to deny access to particular datastreams in the object.  The policy will DENY visitors access to the TEI and FOP source datastreams of the demo:26 object by controlling access to the getDatastreamDissemination method of the Fedora Access Service (API-A).  These datastreams are open to all other kinds of users, and Disseminations are open to all users. This is an object-specific policy.  It could be stored inside the demo:26 digital object in the POLICY datastream OR in the directory for object-specific policies. (The directory location is set in the Authorization module configuration in the Fedora server configuration file (fedora.fcfg).</Description>
+	<Target>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any Subject.  However, the scope of the Subject is narrowed down in the Rule Condition (below). -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Subjects>
+			<AnySubject/>
+		</Subjects>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to the object demo:26  -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Resources>
+			<Resource>
+				<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:26</AttributeValue>
+					<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</ResourceMatch>
+			</Resource>
+		</Resources>
+		<!-- *********************************************************************************************************************************************************-->
+		<!--  This policy is applicable to any action. -->
+		<!-- *********************************************************************************************************************************************************-->
+		<Actions>
+			<AnyAction/>
+		</Actions>
+	</Target>
+	<!-- *********************************************************************************************************************************************************-->
+	<!-- Rule 1: This Rule will deny access a specific datastream.   Access will be denied to students.  -->
+	<!-- The Target narrows the Resource matching down to the particular TEISOURCE and FOPDISSEM datastreams for the demo:26 object. -->
+	<!-- and narrows the Action matching down to the getDatastreamDissemination operation. -->
+	<!-- The Condition element wraps the specification of the SubjectAttributeDesignator, which contains the attribute identifier for fedoraRole -->
+	<!-- and a value for that role of visitor. -->
+	<!-- See the Fedora system documentation on Tomcat Authentication for details of how register users in the tomcat-users.xml file. -->
+	<!-- *********************************************************************************************************************************************************-->
+	<Rule RuleId="1" Effect="Deny">
+		<Target>
+			<Subjects>
+				<AnySubject/>
+			</Subjects>
+			<!-- Notice that within a <Resource>, the <ResourceMatch elements are OR'd together  (e.g., pid is demo:26 AND datastream id is TEISOURCE). -->
+			<!-- Notice that multiple <Resource> elements create an OR condition (TEISOURCE -OR- FOPDISSEM are applicable).  -->
+			<Resources>
+				<Resource>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:26</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">TEISOURCE</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:datastream:id" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+				</Resource>
+				<Resource>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">demo:26</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:pid" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+					<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">FOPDISSEM</AttributeValue>
+						<ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:datastream:id" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ResourceMatch>
+				</Resource>
+			</Resources>
+			<Actions>
+				<Action>
+					<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDatastreamDissemination</AttributeValue>
+						<ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:id"/>
+					</ActionMatch>
+				</Action>
+			</Actions>
+		</Target>
+		<!-- The Condition:  The Rule will deny access (scoped by the rule Target) when the requester is in the role of visitor. -->
+		<Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+			<SubjectAttributeDesignator AttributeId="fedoraRole" MustBePresent="false" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">visitor</AttributeValue>
+			</Apply>
+		</Condition>
+	</Rule>
+	<!-- ***************************************************************************************************************************************************************** -->
+	<!-- Rule 2:  Permit all other access to this object.  In conjunction with the other rules, the net effect should be that everything is permitted-->
+	<!-- except those things expressly denied in the other rules.  -->
+	<!-- **************************************************************************************************************************************************************** -->
+	<Rule RuleId="2" Effect="Permit"/>
+</Policy>

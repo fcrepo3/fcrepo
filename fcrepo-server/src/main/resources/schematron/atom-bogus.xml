@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- **********************************************************************************************************-->
+<!-- BOGUS Atom Schematron for DOValidator to use until we upgrade to ISO Schemtron -->
+<!-- *********************************************************************************************************-->
+<sch:schema xmlns:sch="http://www.ascc.net/xml/schematron">
+	<!-- FIGURE OUT: how to best deal with validation and namespace prefix declaration-->
+	<sch:ns prefix="atom" uri="http://www.w3.org/2005/Atom"/>
+	<sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
+	<!-- VALIDATION FOR OBJECT INGEST PHASE:  These rules apply to a digital object in its "submission" format for ingest into the repository-->
+	<!-- These rules are to be applied upon initial receipt of the object by the repository, before the repository has done any processing of the input.-->
+	<sch:phase id="ingest">
+		<sch:active pattern="preliminary"/>
+	</sch:phase>
+	<!-- VALIDATION FOR OBJECT STORAGE PHASE: Rules to ensure that digital object is FULLY valid before being accepted for final storage in the repository-->
+	<!-- These rules are to be applied after all processing has been done by the repository, and before it is submitted to low level storage.-->
+	<sch:phase id="store">
+		<sch:active pattern="preliminary"/>
+		<sch:active pattern="completed"/>
+	</sch:phase>
+	<!-- PRELIMINARY INGEST RULES PATTERN: -->
+	<!-- These rules are to be applied to objects no matter what phase of the object lifecycle they are in.-->
+	<sch:pattern name="Preliminary Object Checks" id="preliminary">
+		<sch:rule context="atom:feed">
+            <sch:assert test="count(atom:id) = 1">An atom feed must have one and only one atom:id
+                element. (RFC 4287, sec.4.1.1)</sch:assert>
+        </sch:rule>
+	</sch:pattern>
+	<!-- COMPLETED RULES PATTERN: -->
+	<!-- These rules are to be applied to objects when they are considered completed and ready to be stored persistently in the repository.-->
+	<!-- These are attributes that are optional in the FOXML XML Schema (i.e., to support ingest files), but that ultimately must be assigned by the system. -->
+	<!-- This validation may be unnecessary if we accept that the Fedora server will ensure this programmatically. -->
+	<sch:pattern name="Completed Object Checks" id="completed">
+		<sch:rule context="atom:entry">
+			<sch:assert test="count(atom:id) = 1">An atom entry must have one and only one atom:id
+                element. (RFC 4287, sec.4.1.2)</sch:assert>
+		</sch:rule>
+	</sch:pattern>
+</sch:schema>

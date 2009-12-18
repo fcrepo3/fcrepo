@@ -1,0 +1,24 @@
+<html>
+<head><title>FOP webapp</title></head>
+<body bgcolor="#DADADA">
+<h3>Welcome to the FOP*<cite></cite> Local Service</h3>
+<p>This local service provides transformations from <a href="http://www.zvon.org/xxl/xslfoReference/Output/">XSL-FO format</a> to PDF. 
+  The service functions as a java servlet and can be invoked using the following syntax:</p>
+<p><b>http://<font color="#008040">&lt;hostname&gt;</font>:<font color="#008040">&lt;port-number&gt;</font>/fop/FOPServlet?source=<font color="#008040">&lt;xml-fo-source&gt;</font></b></p>
+<p><font color="#000000">where:</font></p>
+<ul>
+  <li><font color="#008040">&lt;hostname&gt;</font><font color="#000000"> The 
+    hostname of the Fedora server; default is localhost.</font></li>
+  <li><font color="#008040">&lt;port-number&gt;</font><font color="#000000"> The 
+    port number on which the Fedora server is running; default 8080.</font></li>
+  <li><font color="#008040">&lt;xml-fo-source&gt;</font><font color="#000000"> The 
+    URL of the XML source file.</font></li>
+</ul>
+<p><font color="#000000">Example:</font></p>
+<p><font color="#000000"><a href="http://localhost:8080/fop/FOPServlet?source=http://www.fedora.info/services/fop/sample_fo.xml">http://localhost:8080/fop/FOPServlet?source=http://www.fedora.info/services/fop/sample_fo.xml</a></font></p>
+<p>&nbsp;</p>
+<p><cite>* This service uses the FOP formatter from Apache which is 
+  licensed under the Apache Software License v1.1 <a href="http://xml.apache.org/fop/license.html">(ASL)</a>. 
+  For additonal information regarding FOP formatter, please refer to 
+  the FOP project web site at: <a href="http://xml.apache.org/fop/">http://xml.apache.org/fop/</a>.</cite></p>
+</html>

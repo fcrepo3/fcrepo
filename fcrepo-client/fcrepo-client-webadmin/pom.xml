@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.fcrepo</groupId>
+  <artifactId>fcrepo-client-webadmin</artifactId>
+  <packaging>swf</packaging>
+  <version>3.3</version>
+  <name>Fedora Web Admin Client (Flash)</name>
+
+  <!--
+    TEMPORARY Instructions:
+      To build: mvn package
+      To test: a) make sure test instance of Fedora is started
+               b) copy crossdomain.xml to that instance's ROOT webapp
+               c) point browser to target/index.html
+      To integrate: a) examine existing files and dirs in
+                       fcrepo-webapp-fedora/src/main/webapp/admin
+                    b) for each one that already exists there,
+                       copy the corresponding one from target/ 
+                       after a successful build
+                    c) check built changes in to fcrepo-webapp-fedora
+                       as indicated above anytime source in this
+                       module changes
+    TODO: Integrate this as a module of the parent fcrepo project,
+          and have its relevant target/ artifacts pulled in automatically
+          by the fcrepo-webapp-fedora project.
+  -->
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <build>
+    <sourceDirectory>src/main/flex</sourceDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.flexmojos</groupId>
+        <artifactId>flexmojos-maven-plugin</artifactId>
+        <version>3.4.2</version>
+        <extensions>true</extensions>
+        <configuration>
+          <headlessServer>true</headlessServer>
+          <sourceFile>FedoraAdministrator.mxml</sourceFile>
+          <templateURI>folder:src/main/html-template</templateURI>
+          <parameters>
+            <bgcolor>#ffffff</bgcolor>
+          </parameters>
+          <htmlName>index</htmlName>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>wrapper</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.adobe.flex.framework</groupId>
+      <artifactId>flex-framework</artifactId>
+      <version>3.2.0.3958</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>flexlib</groupId>
+      <artifactId>flexlib-bin</artifactId>
+      <version>2.4</version>
+      <type>swc</type>
+    </dependency>
+
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>flexmojos</id>
+      <url>http://repository.sonatype.org/content/groups/flexgroup/</url>
+    </repository>
+    <repository>
+      <id>ow2</id>
+      <url>http://maven.ow2.org/maven2</url>
+    </repository>
+  </repositories>
+
+</project>

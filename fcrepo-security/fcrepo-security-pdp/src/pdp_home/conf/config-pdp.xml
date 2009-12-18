@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config defaultPDP="melcoePDP" defaultAttributeFactory="attr" defaultCombiningAlgFactory="comb" defaultFunctionFactory="func">
+	<pdp name="melcoePDP">
+		<policyFinderModule class="melcoe.xacml.pdp.finder.policy.GenericPolicyFinderModule"/>
+		<attributeFinderModule class="com.sun.xacml.finder.impl.CurrentEnvModule" />
+		<attributeFinderModule class="com.sun.xacml.finder.impl.SelectorModule" />
+		<attributeFinderModule class="melcoe.xacml.pdp.finder.attribute.FedoraRIAttributeFinder" />
+	</pdp>
+	<attributeFactory name="attr" useStandardDatatypes="true" />
+	<combiningAlgFactory name="comb" useStandardAlgorithms="true" />
+	<functionFactory name="func" useStandardFunctions="true" />
+</config>
