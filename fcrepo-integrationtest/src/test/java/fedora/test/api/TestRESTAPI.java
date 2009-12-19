@@ -577,7 +577,7 @@ public class TestRESTAPI
         HttpResponse response = post("", true);
         assertEquals(SC_CREATED, response.getStatusCode());
 
-        String emptyObjectPid = extractPid(response.responseHeaders[1].toString());
+        String emptyObjectPid = extractPid(response.getResponseHeader("Location").getValue());
         assertNotNull(emptyObjectPid);
         emptyObjectPid = emptyObjectPid.replaceAll("\n", "").replaceAll("\r", "").replaceAll("%3A", ":");
         // PID should be returned as a header and as the response body
@@ -598,7 +598,7 @@ public class TestRESTAPI
         response = post("", true);
         assertEquals(SC_CREATED, response.getStatusCode());
 
-        emptyObjectPid = extractPid(response.responseHeaders[1].toString());
+        emptyObjectPid = extractPid(response.getResponseHeader("Location").getValue());
         assertTrue(emptyObjectPid.startsWith("test"));
 
         // Delete empty "test" object
@@ -630,7 +630,7 @@ public class TestRESTAPI
 
         // Delete minimal object
         String minimalObjectPid =
-            extractPid(response.responseHeaders[1].toString());
+            extractPid(response.getResponseHeader("Location").getValue());
         url = String.format("/objects/%s", minimalObjectPid);
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
         assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
