@@ -8,12 +8,17 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.StringWriter;
+import java.io.Writer;
 
+import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * Test the generation of Fedora's web.xml based on install options.
+ *
  * @author Edwin Shin
  */
 public class TestFedoraWebXML {
@@ -42,15 +47,27 @@ public class TestFedoraWebXML {
         // TODO this is just the stub for a proper test
 
         FedoraWebXML webXML;
+        Writer writer;
 
         // TestConfigA
         webXML =
                 new FedoraWebXML(webXMLFilePath, getOptions(false,
-                                                            true,
+                                                            false,
                                                             true,
                                                             false,
-                                                            ""));
+                                                            "/foo/bar"));
         assertNotNull(webXML);
+        writer = new StringWriter();
+        webXML.write(writer);
+        String configA = writer.toString();
+        XMLAssert.assertXpathExists("//web-app/filter-mapping[filter-name='EnforceAuthnFilter']", configA);
+        XMLAssert.assertXpathExists("//web-app/filter-mapping[filter-name='RestApiAuthnFilter']", configA);
+        XMLAssert.assertXpathExists("//web-app/filter-mapping[filter-name='SetupFilter']", configA);
+        XMLAssert.assertXpathExists("//web-app/filter-mapping[filter-name='XmlUserfileFilter']", configA);
+        XMLAssert.assertXpathExists("//web-app/filter-mapping[filter-name='FinalizeFilter']", configA);
+        XMLAssert.assertXpathNotExists("//web-app/filter-mapping[filter-name='AuthFilterJAAS']", configA);
+        XMLAssert.assertXpathNotExists("//web-app/filter-mapping[filter-name='PEPFilter']", configA);
+        XMLAssert.assertXpathEvaluatesTo("/foo/bar", "//web-app/servlet[servlet-name='ControlServlet']/init-param[param-name='fedora.home']/param-value", configA);
 
         // TestConfigB
         webXML =
@@ -59,25 +76,58 @@ public class TestFedoraWebXML {
                                                             true,
                                                             false,
                                                             ""));
-        
+        assertNotNull(webXML);
+        writer = new StringWriter();
+        webXML.write(writer);
+        String configB = writer.toString();
+        XMLAssert.assertXpathExists("//web-app/filter-mapping[filter-name='EnforceAuthnFilter']", configB);
+        XMLAssert.assertXpathExists("//web-app/filter-mapping[filter-name='SetupFilter']", configB);
+        XMLAssert.assertXpathExists("//web-app/filter-mapping[filter-name='XmlUserfileFilter']", configB);
+        XMLAssert.assertXpathExists("//web-app/filter-mapping[filter-name='FinalizeFilter']", configB);
+        XMLAssert.assertXpathNotExists("//web-app/filter-mapping[filter-name='RestApiAuthnFilter']", configB);
+        XMLAssert.assertXpathNotExists("//web-app/filter-mapping[filter-name='AuthFilterJAAS']", configB);
+        XMLAssert.assertXpathNotExists("//web-app/filter-mapping[filter-name='PEPFilter']", configB);
+
         // TestConfigC
         webXML =
-            new FedoraWebXML(webXMLFilePath, getOptions(true,
+            new FedoraWebXML(webXMLFilePath, getOptions(false,
                                                         false,
                                                         true,
                                                         true,
                                                         ""));
+        assertNotNull(webXML);
+        writer = new StringWriter();
+        webXML.write(writer);
+        String configC = writer.toString();
+        XMLAssert.assertXpathExists("//web-app/filter-mapping[filter-name='AuthFilterJAAS']", configC);
+        XMLAssert.assertXpathExists("//web-app/filter-mapping[filter-name='PEPFilter']", configC);
+        XMLAssert.assertXpathNotExists("//web-app/filter-mapping[filter-name='EnforceAuthnFilter']", configC);
+        XMLAssert.assertXpathNotExists("//web-app/filter-mapping[filter-name='RestApiAuthnFilter']", configC);
+        XMLAssert.assertXpathNotExists("//web-app/filter-mapping[filter-name='SetupFilter']", configC);
+        XMLAssert.assertXpathNotExists("//web-app/filter-mapping[filter-name='XmlUserfileFilter']", configC);
+        XMLAssert.assertXpathNotExists("//web-app/filter-mapping[filter-name='FinalizeFilter']", configC);
+        XMLAssert.assertXpathEvaluatesTo("false", "//web-app/filter[filter-name='AuthFilterJAAS']/init-param[param-name='authnAPIA']/param-value", configC);
 
         // TestConfigQ
-        webXML = 
-        	new FedoraWebXML(webXMLFilePath, getOptions(false, 
-        												false, 
-        												false, 
-        												false, 
+        webXML =
+        	new FedoraWebXML(webXMLFilePath, getOptions(false,
+        												false,
+        												false,
+        												false,
         												""));
-        
+
     }
 
+    /**
+     * Set Fedora installer options for web.xml
+     *
+     * @param apiaA require AuthN for APIA
+     * @param apiaS require SSL for APIA
+     * @param apimS require SSL for APIM
+     * @param fesl require FeSL
+     * @param fedoraHome path to FEDORA_HOME
+     * @return
+     */
     private WebXMLOptions getOptions(boolean apiaA,
                                      boolean apiaS,
                                      boolean apimS,

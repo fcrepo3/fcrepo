@@ -7,6 +7,7 @@ package fedora.utilities.install.container;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,10 +32,10 @@ import fedora.server.config.webxml.WebXML;
 import fedora.utilities.install.InstallOptions;
 
 /**
- * Configures the web.xml for Fedora. This class does not create a complete 
+ * Configures the web.xml for Fedora. This class does not create a complete
  * web.xml document from scratch. It assumes that the constructor-provided
  * webXML file has already defined the base set of servlets, servlet-mapping,
- * etc. Specifically, we expect the web.xml located in 
+ * etc. Specifically, we expect the web.xml located in
  * fcrepo-webapp-fedora/main/webapp/WEB-INF/web.xml.
  *
  * @author Edwin Shin
@@ -46,7 +47,8 @@ public class FedoraWebXML {
 
     private final String CONFIDENTIAL = "CONFIDENTIAL";
 
-    private final String FILTER_AUTHN = "EnforceAuthnFilter";
+    private final String FILTER_AUTHN;
+    private final String FILTER_ENFORCE_AUTHN = "EnforceAuthnFilter";
     private final String FILTER_RESTAPI = "RestApiAuthnFilter";
     private final String FILTER_PEP = "PEPFilter";
     private final String FILTER_PEP_CLASS = "melcoe.fedora.pep.rest.PEP";
@@ -55,43 +57,42 @@ public class FedoraWebXML {
     private final String FILTER_FINALIZE = "FinalizeFilter";
     private final String FILTER_JAAS = "AuthFilterJAAS";
 
-    private final String[] FILTER_APIA_SERVLET_NAMES =
-            new String[] {"AccessServlet", "DescribeRepositoryServlet",
-                    "FieldSearchServlet", "GetObjectHistoryServlet",
-                    "ListDatastreamsServlet", "ListMethodsServlet",
-                    "MethodParameterResolverServlet", "OAIProviderServlet",
-                    "ReportServlet", "RISearchServlet"};
 
-    private final String[] FILTER_APIA_URL_PATTERNS =
-            new String[] {"/services/access"};
+    private final Collection<String> FILTER_APIA_SERVLET_NAMES =
+        Arrays.asList("AccessServlet", "DescribeRepositoryServlet",
+                      "FieldSearchServlet", "GetObjectHistoryServlet",
+                      "ListDatastreamsServlet", "ListMethodsServlet",
+                      "MethodParameterResolverServlet", "OAIProviderServlet",
+                      "ReportServlet", "RISearchServlet");
 
-    private final String[] FILTER_APIM_SERVLET_NAMES =
-            new String[] {"AxisServlet", "ControlServlet", "GetNextPIDServlet",
-                    "UploadServlet"};
+    private final Collection<String> FILTER_APIA_URL_PATTERNS =
+        Arrays.asList("/services/access");
 
-    private final String[] FILTER_APIM_URL_PATTERNS =
-            new String[] {"/getDSAuthenticated", "/index.html",
-                    "/services/management"};
+    private final Collection<String> FILTER_APIM_SERVLET_NAMES =
+        Arrays.asList("AxisServlet", "ControlServlet", "GetNextPIDServlet",
+                      "UploadServlet", "UserServlet");
 
-    private final String[] SC_APIA_URL_PATTERNS =
-            new String[] {"/", "/describe", "/get/*", "/getAccessParmResolver",
-                    "/getObjectHistory/*", "/listDatastreams/*",
-                    "/listMethods/*", "/oai", "/report", "/risearch",
-                    "/search", "/services/access", "/wsdl", "*.jsp"};
+    private final Collection<String> FILTER_APIM_URL_PATTERNS =
+        Arrays.asList("/getDSAuthenticated", "/index.html",
+                      "/services/management", "/user");
 
-    private final String[] SC_APIM_URL_PATTERNS =
-            new String[] {"/index.html", "/getDSAuthenticated",
-                    "/management/getNextPID", "/management/upload",
-                    "/services/management", "*.jws"};
-    
-    private final Map<String,String> FESL_SERVLET_MAPPINGS = 
+    private final Collection<String> SC_APIA_URL_PATTERNS =
+        Arrays.asList("/", "/describe", "/get/*", "/getAccessParmResolver",
+                      "/getObjectHistory/*", "/listDatastreams/*",
+                      "/listMethods/*", "/oai", "/report", "/risearch",
+                      "/search", "/services/access", "/wsdl", "*.jsp");
+
+    private final Collection<String> SC_APIM_URL_PATTERNS =
+        Arrays.asList("/index.html", "/getDSAuthenticated",
+                      "/management/getNextPID", "/management/upload",
+                      "/services/management", "*.jws");
+
+    private final Map<String,String> FESL_SERVLET_MAPPINGS =
     	new HashMap<String,String>() {
 			private static final long serialVersionUID = 1L;
 			{put("UserServlet", "/user");
 			}
     	};
-    	
-    //FIXME for FeSL, what about UserServlet and /user url-pattern?
 
     private final WebXMLOptions options;
 
@@ -102,13 +103,18 @@ public class FedoraWebXML {
     }
 
     /**
-     * 
+     *
      * @param webXML path to the webXML file
      * @param options
      */
     public FedoraWebXML(String webXML, WebXMLOptions options) {
         this.options = options;
         fedoraWebXML = fedora.server.config.webxml.WebXML.getInstance(webXML);
+        if (options.requireFesl()) {
+            FILTER_AUTHN = FILTER_JAAS;
+        } else {
+            FILTER_AUTHN = FILTER_ENFORCE_AUTHN;
+        }
 
         setFedoraHome();
         setFilters();
@@ -118,7 +124,12 @@ public class FedoraWebXML {
                          new FilterMappingComparator());
         setSecurityConstraints();
     }
-    
+
+    /**
+     * Add or remove servlet filters based on configuration.
+     * At the moment, this only adds or removes the FILTER_PEP servlet filter
+     * depending on whether or not FeSL was enabled.
+     */
     private void setFilters() {
     	Filter f = new Filter();
 		f.setFilterName(FILTER_PEP);
@@ -127,6 +138,14 @@ public class FedoraWebXML {
     		fedoraWebXML.addFilter(f);
     	} else {
     		fedoraWebXML.removeFilter(f);
+    	}
+
+    	for (Filter filter : fedoraWebXML.getFilters()) {
+    	    for (InitParam param : filter.getInitParams()) {
+                if (param.getParamName().equals("authnAPIA")) {
+                    param.setParamValue(Boolean.toString(options.requireApiaAuth()));
+                }
+            }
     	}
     }
 
@@ -144,36 +163,71 @@ public class FedoraWebXML {
     		}
     	}
     }
-    
+
     /**
      * Set the filter-mappings. The filter-mappings for APIM are always set.
      */
     private void setFilterMappings() {
-        addFilterMappings(FILTER_APIM_SERVLET_NAMES, FILTER_APIM_URL_PATTERNS);
-
-        // AuthN filter for all REST API methods
-        FilterMapping fmAll = new FilterMapping();
-        fmAll.setFilterName(FILTER_AUTHN);
-        fmAll.addServletName("RestServlet");
-
-        // AuthN filter for REST API methods corresponding to API-M
-        FilterMapping fmAPIM = new FilterMapping();
-        fmAPIM.setFilterName(FILTER_RESTAPI);
-        fmAPIM.addServletName("RestServlet");
-
-        if (options.requireApiaAuth()) {
-            addFilterMappings(FILTER_APIA_SERVLET_NAMES,
-                              FILTER_APIA_URL_PATTERNS);
-            fedoraWebXML.addFilterMapping(fmAll);
-        } else {
-            removeFilterMappings(FILTER_APIA_SERVLET_NAMES,
-                                 FILTER_APIA_URL_PATTERNS);
-            fedoraWebXML.addFilterMapping(fmAPIM);
-        }
-        
-        // FeSL
+        Set<String> filterNames = new HashSet<String>();
+        filterNames.add(FILTER_AUTHN);
         if (options.requireFesl()) {
-        	setFeslFilterMappings();
+            filterNames.add(FILTER_PEP);
+        }
+
+        // Explicitly remove all APIM authentication filter mappings before
+        // adding, in the event that the web.xml is mixing legacy & FeSL
+        // authn filter-mappings
+        removeFilterMappings(Arrays.asList(FILTER_ENFORCE_AUTHN, FILTER_JAAS), FILTER_APIM_SERVLET_NAMES, FILTER_APIM_URL_PATTERNS);
+
+        // Add the APIM filter-mappings
+        addFilterMappings(filterNames, FILTER_APIM_SERVLET_NAMES, FILTER_APIM_URL_PATTERNS);
+
+        // APIA filter-mappings
+        if (options.requireApiaAuth()) {
+            addFilterMappings(filterNames, FILTER_APIA_SERVLET_NAMES,
+                              FILTER_APIA_URL_PATTERNS);
+        } else {
+            removeFilterMappings(filterNames, FILTER_APIA_SERVLET_NAMES,
+                                 FILTER_APIA_URL_PATTERNS);
+        }
+
+        // REST-API
+        removeFilterMappings(Arrays.asList(FILTER_RESTAPI, FILTER_ENFORCE_AUTHN, FILTER_JAAS),
+                             Arrays.asList("RestServlet"), null);
+        Set<String> restFilters = new HashSet<String>();
+        if (options.requireFesl()) {
+            restFilters.add(FILTER_AUTHN);
+            restFilters.add(FILTER_PEP);
+        } else {
+            if (options.requireApiaAuth()) {
+                restFilters.add(FILTER_AUTHN);
+            } else {
+                restFilters.add(FILTER_RESTAPI);
+            }
+        }
+        for (String fn : restFilters) {
+            FilterMapping restFM = new FilterMapping();
+            restFM.setFilterName(fn);
+            restFM.addServletName("RestServlet");
+            fedoraWebXML.addFilterMapping(restFM);
+        }
+
+        // If FeSL is enabled, remove legacy filter-mappings
+        if (options.requireFesl()) {
+            Collection<String> toDelete = Arrays.asList(FILTER_SETUP,
+                                                        FILTER_XMLUSERFILE,
+                                                        FILTER_FINALIZE);
+            String filterName;
+            FilterMapping fMap;
+            Iterator<FilterMapping> filterMappings =
+                    fedoraWebXML.getFilterMappings().iterator();
+            while (filterMappings.hasNext()) {
+                fMap = filterMappings.next();
+                filterName = fMap.getFilterName();
+                if (toDelete.contains(filterName)) {
+                    filterMappings.remove();
+                }
+            }
         }
     }
 
@@ -242,8 +296,8 @@ public class FedoraWebXML {
      *
      * @param urlPatterns
      */
-    private void addUserDataConstraint(String[] urlPatterns) {
-        Set<String> targetSet = new HashSet<String>(Arrays.asList(urlPatterns));
+    private void addUserDataConstraint(Collection<String> urlPatterns) {
+        Set<String> targetSet = new HashSet<String>(urlPatterns);
         Set<String> candidateSet;
         boolean hasUserDataConstraint = false;
         Set<SecurityConstraint> removalSet = new HashSet<SecurityConstraint>();
@@ -304,8 +358,8 @@ public class FedoraWebXML {
      * @param urlPatterns
      *        The array of url-patterns to match.
      */
-    private void removeUserDataConstraint(String[] urlPatterns) {
-        List<String> up = Arrays.asList(urlPatterns);
+    private void removeUserDataConstraint(Collection<String> urlPatterns) {
+        List<String> up = new ArrayList<String>(urlPatterns);
 
         scLoop: for (SecurityConstraint sc : fedoraWebXML
                 .getSecurityConstraints()) {
@@ -318,102 +372,109 @@ public class FedoraWebXML {
         }
     }
 
-    private void addFilterMappings(String[] servletNames, String[] urlPatterns) {
-        Set<String> servlets = new HashSet<String>(Arrays.asList(servletNames));
-        Set<String> urls = new HashSet<String>(Arrays.asList(urlPatterns));
+    /**
+     * For each specified servlet-name and url-pattern, add a filter-mapping
+     * with each specified filter-name.
+     *
+     * @param filterNames
+     * @param servletNames
+     * @param urlPatterns
+     */
+    private void addFilterMappings(Collection<String> filterNames,
+                                   Collection<String> servletNames,
+                                   Collection<String> urlPatterns) {
+        if (filterNames == null || filterNames.size() == 0) {
+            return;
+        }
+        if (servletNames == null) {
+            servletNames = Collections.emptySet();
+        }
+        if (urlPatterns == null) {
+            urlPatterns = Collections.emptySet();
+        }
 
+        // If filter-mappings already exist for a specified servlet-name or
+        // url-pattern, don't duplicate it
         for (FilterMapping fMap : fedoraWebXML.getFilterMappings()) {
-            if (fMap.getFilterName().equals(FILTER_AUTHN)) {
+            String fn = fMap.getFilterName();
+            if (filterNames.contains(fn)) {
                 for (String servletName : fMap.getServletNames()) {
-                    servlets.remove(servletName);
+                    servletNames.remove(servletName);
                 }
                 for (String urlPattern : fMap.getUrlPatterns()) {
-                    urls.remove(urlPattern);
+                    urlPatterns.remove(urlPattern);
                 }
             }
         }
-        
-        for (String servletName : servlets) {
-            FilterMapping fm = new FilterMapping();
-            fm.setFilterName(FILTER_AUTHN);
-            fm.addServletName(servletName);
-            fedoraWebXML.addFilterMapping(fm);
+
+        for (String servletName : servletNames) {
+            for (String filterName : filterNames) {
+                FilterMapping fm = new FilterMapping();
+                fm.setFilterName(filterName);
+                fm.addServletName(servletName);
+                fedoraWebXML.addFilterMapping(fm);
+            }
         }
 
-        for (String urlPattern : urls) {
-            FilterMapping fm = new FilterMapping();
-            fm.setFilterName(FILTER_AUTHN);
-            fm.addUrlPattern(urlPattern);
-            fedoraWebXML.addFilterMapping(fm);
-        }
-    }
-
-    private void removeFilterMappings(String[] servletNames,
-                                      String[] urlPatterns) {
-        Set<String> servlets = new HashSet<String>(Arrays.asList(servletNames));
-        Set<String> urls = new HashSet<String>(Arrays.asList(urlPatterns));
-
-        fedora.server.config.webxml.WebXML fedoraWebXML =
-                fedora.server.config.webxml.WebXML.getInstance();
-        for (FilterMapping fMap : fedoraWebXML.getFilterMappings()) {
-            if (fMap.getFilterName().equals(FILTER_AUTHN)) {
-                for (String servletName : fMap.getServletNames()) {
-                    if (servlets.contains(servletName)) {
-                        fMap.removeServletName(servletName);
-                    }
-                }
-                for (String urlPattern : fMap.getUrlPatterns()) {
-                    if (urls.contains(urlPattern)) {
-                        fMap.removeUrlPattern(urlPattern);
-                    }
-                }
-                if (fMap.getServletNames().size() == 0
-                        && fMap.getUrlPatterns().size() == 0) {
-                    fedoraWebXML.removeFilterMapping(fMap);
-                }
+        for (String urlPattern : urlPatterns) {
+            for (String filterName : filterNames) {
+                FilterMapping fm = new FilterMapping();
+                fm.setFilterName(filterName);
+                fm.addUrlPattern(urlPattern);
+                fedoraWebXML.addFilterMapping(fm);
             }
         }
     }
 
     /**
-     * Set the filter mappings required by FeSL.
-     * This involves replacing the legacy policy enforcement filter, FILTER_AUTHN,
-     * with PEP_FILTER as well as removing some unneeded filters and adding the
-     * FILTER_JAAS filter.
-     * It is assumed that the actual servlets or url-patterns that need filter
-     * mapping have already been declared previously, with the exception of 
-     * FILTER_JAAS.
+     * Removes filter-mappings with the specified parameters.
+     *
+     * @param filterNames
+     * @param servletNames
+     * @param urlPatterns
      */
-    private void setFeslFilterMappings() {
-    	Collection<String> toDelete = new HashSet<String>();
-    	toDelete.add(FILTER_SETUP);
-    	toDelete.add(FILTER_XMLUSERFILE);
-    	toDelete.add(FILTER_FINALIZE);
-    	
-    	Collection<String> toReplace = new HashSet<String>();
-    	toReplace.add(FILTER_AUTHN);
-    	toReplace.add(FILTER_RESTAPI);
-    	
-    	String filterName;    	
-    	FilterMapping fMap;
-        Iterator<FilterMapping> filterMappings =
-                fedoraWebXML.getFilterMappings().iterator();
+    private void removeFilterMappings(Collection<String> filterNames,
+                                      Collection<String> servletNames,
+                                      Collection<String> urlPatterns) {
+        if (filterNames == null || filterNames.size() == 0) {
+            return;
+        }
+        if (servletNames == null) {
+            servletNames = Collections.emptySet();
+        }
+        if (urlPatterns == null) {
+            urlPatterns = Collections.emptySet();
+        }
+
+        FilterMapping fMap;
+        Iterator<FilterMapping> filterMappings = fedoraWebXML.getFilterMappings().iterator();
         while (filterMappings.hasNext()) {
-        	fMap = filterMappings.next();
-        	filterName = fMap.getFilterName();
-        	if (toReplace.contains(filterName)) {
-            	fMap.setFilterName(FILTER_PEP);
-            } else if (toDelete.contains(filterName)) {
-            	filterMappings.remove();
+            fMap = filterMappings.next();
+            String fn = fMap.getFilterName();
+            if (filterNames.contains(fn)) {
+                Iterator<String>sNames = fMap.getServletNames().iterator();
+                while(sNames.hasNext()) {
+                    String servletName = sNames.next();
+                    if (servletNames.contains(servletName)) {
+                        sNames.remove();
+                    }
+                }
+
+                Iterator<String>uPatterns = fMap.getUrlPatterns().iterator();
+                while(uPatterns.hasNext()) {
+                    String urlPattern = uPatterns.next();
+                    if (urlPatterns.contains(urlPattern)) {
+                        uPatterns.remove();
+                    }
+                }
+                if (fMap.getServletNames().size() == 0
+                        && fMap.getUrlPatterns().size() == 0) {
+                    filterMappings.remove();
+                }
             }
         }
-        
-        fMap = new FilterMapping();
-        fMap.setFilterName(FILTER_JAAS);
-        fMap.addUrlPattern("/*");
-        fedoraWebXML.addFilterMapping(fMap);
     }
-    
+
     /**
      * Sets all context-param/param-value and init-param/param-value elements
      * where param-name=fedora.home
@@ -451,13 +512,13 @@ public class FedoraWebXML {
 
         private static final long serialVersionUID = 1L;
 
-        private static final String SETUP_FILTER = "SetupFilter";
+        private final String SETUP_FILTER = "SetupFilter";
 
-        private static final String XMLUSERFILE_FILTER = "XmlUserfileFilter";
+        private final String XMLUSERFILE_FILTER = "XmlUserfileFilter";
 
-        private static final String FINALIZE_FILTER = "FinalizeFilter";
+        private final String FINALIZE_FILTER = "FinalizeFilter";
 
-        private static final String WILDCARD_URL_PATTERN = "/*";
+        private final String WILDCARD_URL_PATTERN = "/*";
 
         public int compare(FilterMapping fm1, FilterMapping fm2) {
             String fn1 = fm1.getFilterName();
@@ -500,6 +561,15 @@ public class FedoraWebXML {
             if (fn2.equals(FINALIZE_FILTER) && !up2.isEmpty()
                     && up2.get(0).equals(WILDCARD_URL_PATTERN)) {
                 return -1;
+            }
+
+            // FILTER_JAAS mappings always precede FILTER_PEP
+            if (fn1.equals(FILTER_JAAS) && fn2.equals(FILTER_PEP)) {
+                return -1;
+            }
+
+            if (fn2.equals(FILTER_JAAS) && fn1.equals(FILTER_PEP)) {
+                return 1;
             }
 
             // Other WILDCARD_URL_PATTERN filter-mappings start at 3rd place

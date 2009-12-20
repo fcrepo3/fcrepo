@@ -279,9 +279,10 @@
       <param-value>org.fcrepo.server.jaas.auth.UserPrincipal</param-value>
     </init-param>
     <init-param>
-      <description>OPTIONAL. A comma separated list of url-patterns to ignore</description>
-      <param-name>excludeUris</param-name>
-      <param-value>/getDS</param-value>
+      <description>True iff API-A requests via the REST API require authentication. 
+      If not specified, defaults to true.</description>
+      <param-name>authnAPIA</param-name>
+      <param-value>false</param-value>
     </init-param>
   </filter>
 
