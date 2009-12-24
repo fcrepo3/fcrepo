@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package fedora.server.config.webxml;
@@ -32,12 +32,18 @@ public class WebXML
 
     private String version;
 
+    private String xmlns;
+
+    private String xmlns_xsi;
+
+    private String xsi_schemaLocation;
+
     private String displayName;
 
     private final List<Listener> listeners;
-    
+
     private final List<ContextParam> contextParams;
-    
+
     private final List<Servlet> servlets;
 
     private final List<ServletMapping> servletMappings;
@@ -74,7 +80,7 @@ public class WebXML
 
     /**
      * Create an instance of WebXML from the specified file.
-     * 
+     *
      * @param webxml
      *        Path to web.xml file.
      * @return instance of WebXML
@@ -125,23 +131,47 @@ public class WebXML
     public void setVersion(String version) {
         this.version = version;
     }
-    
+
+    public String getXmlns() {
+        return xmlns;
+    }
+
+    public void setXmlns(String xmlns) {
+        this.xmlns = xmlns;
+    }
+
+    public String getXmlns_xsi() {
+        return xmlns_xsi;
+    }
+
+    public void setXmlns_xsi(String xmlns_xsi) {
+        this.xmlns_xsi = xmlns_xsi;
+    }
+
+    public String getXsi_schemaLocation() {
+        return xsi_schemaLocation;
+    }
+
+    public void setXsi_schemaLocation(String xsi_schemaLocation) {
+        this.xsi_schemaLocation = xsi_schemaLocation;
+    }
+
     public List<Listener> getListeners() {
         return listeners;
     }
-    
+
     public void addListener(Listener listener) {
         listeners.add(listener);
     }
-    
+
     public List<ContextParam> getContextParams() {
         return contextParams;
     }
-    
+
     public void addContextParam(ContextParam contextParam) {
         contextParams.add(contextParam);
     }
-    
+
     public List<Servlet> getServlets() {
         return servlets;
     }
@@ -181,7 +211,7 @@ public class WebXML
     public void addFilterMapping(FilterMapping filterMapping) {
         filterMappings.add(filterMapping);
     }
-    
+
     public void removeFilter(Filter filter) {
     	filters.remove(filter);
     }
