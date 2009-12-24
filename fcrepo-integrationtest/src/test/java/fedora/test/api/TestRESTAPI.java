@@ -4,20 +4,26 @@
  */
 package fedora.test.api;
 
+import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
+import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
+import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
+import static org.apache.commons.httpclient.HttpStatus.SC_NO_CONTENT;
+import static org.apache.commons.httpclient.HttpStatus.SC_OK;
+import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
+
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
 import java.net.URL;
 import java.net.URLEncoder;
-
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import junit.framework.TestSuite;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -34,27 +40,15 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
-
 import org.junit.Test;
 
-import junit.framework.TestSuite;
-
 import fedora.common.PID;
-
 import fedora.server.access.FedoraAPIA;
 import fedora.server.management.FedoraAPIM;
 import fedora.server.types.gen.Datastream;
 import fedora.server.types.gen.MIMETypedStream;
-
 import fedora.test.DemoObjectTestSetup;
 import fedora.test.FedoraServerTestCase;
-
-import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
-import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
-import static org.apache.commons.httpclient.HttpStatus.SC_NO_CONTENT;
-import static org.apache.commons.httpclient.HttpStatus.SC_OK;
-import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
 
 /**
  * Tests of the REST API. Tests assume a running instance of Fedora with the
@@ -1012,7 +1006,7 @@ public class TestRESTAPI
         String contentDisposition = "";
         Header[] headers = response.responseHeaders;
         for (Header header : headers) {
-            if (header.getName().equals("content-disposition")) {
+            if (header.getName().equalsIgnoreCase("content-disposition")) {
                 contentDisposition = header.getValue();
             }
         }
