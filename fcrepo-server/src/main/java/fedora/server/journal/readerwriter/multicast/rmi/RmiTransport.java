@@ -6,6 +6,7 @@
 package fedora.server.journal.readerwriter.multicast.rmi;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -89,6 +90,17 @@ public class RmiTransport
             throw new JournalException("'" + serviceName
                     + "' not registered at '" + serverName + "'", e);
         }
+    }
+
+    /* For testing purposes */
+    protected RmiTransport(Map<String, String> parameters,
+                           boolean crucial,
+                           TransportParent parent,
+                           RmiJournalReceiverInterface rx)
+            throws JournalException {
+        super(parameters, crucial, parent);
+        bufferSize = parseBufferSize(parameters);
+        receiver = rx;
     }
 
     private String parseHost(Map<String, String> parameters)
@@ -196,6 +208,16 @@ public class RmiTransport
             super.testStateChange(State.FILE_CLOSED);
             parent.writeDocumentTrailer(xmlWriter);
             xmlWriter.close();
+
+            /*
+             * SOME implementations of XMLWriter do not close all resources, so
+             * we need to close the rmi manually just in case.
+             */
+            try {
+                writer.close();
+            } catch (IOException e) {
+                throw new JournalException(e);
+            }
             super.setState(State.FILE_CLOSED);
         } catch (XMLStreamException e) {
             throw new JournalException(e);

@@ -12,6 +12,8 @@ import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import java.rmi.RemoteException;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -115,6 +117,20 @@ public class TestRmiTransport {
     @Test(expected = JournalException.class)
     public void testNoRegistry() throws JournalException {
         new RmiTransport(parameters, CRUCIAL, parent);
+    }
+
+    @Test
+    public void testOpenCloseSequenceCalls() throws JournalException,
+            RemoteException {
+        MockRmiJournalReceiver receiver = new MockRmiJournalReceiver();
+        RmiTransport transport =
+                new RmiTransport(parameters, CRUCIAL, parent, receiver);
+
+        transport.openFile("someHash", "aFileName", new Date());
+        assertEquals(1, receiver.howManyCallsToOpenFile());
+
+        transport.closeFile();
+        assertEquals(1, receiver.howManyCallsToClosefile());
     }
 
     @Ignore
