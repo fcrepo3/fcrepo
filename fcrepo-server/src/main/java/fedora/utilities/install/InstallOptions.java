@@ -70,9 +70,9 @@ public class InstallOptions {
     public static final String DATABASE_PASSWORD = "database.password";
 
     public static final String XACML_ENABLED = "xacml.enabled";
-    
+
     public static final String FESL_ENABLED = "fesl.enabled";
-    
+
     public static final String FESL_DBXML_HOME = "fesl.dbxml.home";
 
     public static final String RI_ENABLED = "ri.enabled";
@@ -265,20 +265,14 @@ public class InstallOptions {
         } else {
         	inputOption(XACML_ENABLED);
         }
-        
+
         inputOption(RI_ENABLED);
         inputOption(MESSAGING_ENABLED);
         if (getValue(MESSAGING_ENABLED).equals(Boolean.toString(true))) {
             inputOption(MESSAGING_URI);
         }
 
-        // If using an "other" servlet container, we can't automatically deploy
-        // the local services, so don't even bother to ask.
-        if (getValue(SERVLET_ENGINE).equals(OTHER)) {
-            _map.put(DEPLOY_LOCAL_SERVICES, "false");
-        } else {
-            inputOption(DEPLOY_LOCAL_SERVICES);
-        }
+        inputOption(DEPLOY_LOCAL_SERVICES);
     }
 
     private String dashes(int len) {
@@ -433,7 +427,7 @@ public class InstallOptions {
     public Collection<String> getOptionNames() {
     	return _map.keySet();
     }
-    
+
     /**
      * Apply defaults to the options, where possible.
      */
@@ -451,7 +445,7 @@ public class InstallOptions {
      * Validate the options, assuming defaults have already been applied.
      * Validation for a given option might entail more than a syntax check. It
      * might check whether a given directory exists, for example.
-     * 
+     *
      */
     private void validateAll() throws OptionValidationException {
         boolean unattended = getBooleanValue(UNATTENDED, false);

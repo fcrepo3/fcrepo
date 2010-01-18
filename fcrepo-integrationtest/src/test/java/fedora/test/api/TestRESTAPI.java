@@ -4,20 +4,26 @@
  */
 package fedora.test.api;
 
+import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
+import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
+import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
+import static org.apache.commons.httpclient.HttpStatus.SC_NO_CONTENT;
+import static org.apache.commons.httpclient.HttpStatus.SC_OK;
+import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
+
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
 import java.net.URL;
 import java.net.URLEncoder;
-
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import junit.framework.TestSuite;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -34,27 +40,15 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
-
 import org.junit.Test;
 
-import junit.framework.TestSuite;
-
 import fedora.common.PID;
-
 import fedora.server.access.FedoraAPIA;
 import fedora.server.management.FedoraAPIM;
 import fedora.server.types.gen.Datastream;
 import fedora.server.types.gen.MIMETypedStream;
-
 import fedora.test.DemoObjectTestSetup;
 import fedora.test.FedoraServerTestCase;
-
-import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
-import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
-import static org.apache.commons.httpclient.HttpStatus.SC_NO_CONTENT;
-import static org.apache.commons.httpclient.HttpStatus.SC_OK;
-import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
 
 /**
  * Tests of the REST API. Tests assume a running instance of Fedora with the
@@ -577,7 +571,7 @@ public class TestRESTAPI
         HttpResponse response = post("", true);
         assertEquals(SC_CREATED, response.getStatusCode());
 
-        String emptyObjectPid = extractPid(response.responseHeaders[1].toString());
+        String emptyObjectPid = extractPid(response.getResponseHeader("Location").getValue());
         assertNotNull(emptyObjectPid);
         emptyObjectPid = emptyObjectPid.replaceAll("\n", "").replaceAll("\r", "").replaceAll("%3A", ":");
         // PID should be returned as a header and as the response body
@@ -598,7 +592,7 @@ public class TestRESTAPI
         response = post("", true);
         assertEquals(SC_CREATED, response.getStatusCode());
 
-        emptyObjectPid = extractPid(response.responseHeaders[1].toString());
+        emptyObjectPid = extractPid(response.getResponseHeader("Location").getValue());
         assertTrue(emptyObjectPid.startsWith("test"));
 
         // Delete empty "test" object
@@ -630,7 +624,7 @@ public class TestRESTAPI
 
         // Delete minimal object
         String minimalObjectPid =
-            extractPid(response.responseHeaders[1].toString());
+            extractPid(response.getResponseHeader("Location").getValue());
         url = String.format("/objects/%s", minimalObjectPid);
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
         assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
@@ -1012,7 +1006,7 @@ public class TestRESTAPI
         String contentDisposition = "";
         Header[] headers = response.responseHeaders;
         for (Header header : headers) {
-            if (header.getName().equals("content-disposition")) {
+            if (header.getName().equalsIgnoreCase("content-disposition")) {
                 contentDisposition = header.getValue();
             }
         }
