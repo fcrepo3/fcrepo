@@ -174,4 +174,29 @@ public class BaseRestResource {
         }
         return date;
     }
+	
+	public static Date parseMementoDatetime(String acceptDatetime) throws IllegalArgumentException {
+		Date date = null;
+		
+		if(acceptDatetime != null) {
+			date = parseDate(acceptDatetime.trim().substring(acceptDatetime.indexOf("{") + 1, acceptDatetime.indexOf("}")));
+		}
+		
+		return date;
+	}
+	
+	public Date getAsOfDateTime(String dTime) {
+		Date date = null;
+		
+		if(dTime != null) {
+			date = parseDate(dTime);	
+		} 
+		
+		String acceptDatetime = headers.getRequestHeaders().getFirst("x-accept-datetime");
+		if(date == null && acceptDatetime != null) {
+			date = parseMementoDatetime(acceptDatetime);
+		}
+		
+		return date;
+	}
 }

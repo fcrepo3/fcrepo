@@ -160,7 +160,7 @@ public class FedoraObjectResource extends BaseRestResource {
             String format) {
 
         try {
-            Date asOfDateTime = parseDate(dateTime);
+            Date asOfDateTime = getAsOfDateTime(dateTime);
             Context context = getContext();
             ObjectProfile objProfile = apiAService.getObjectProfile(context, pid, asOfDateTime);
             String xml = getSerializer(context).objectProfileToXML(objProfile, asOfDateTime);

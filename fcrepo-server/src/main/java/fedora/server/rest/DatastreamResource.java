@@ -59,7 +59,6 @@ import fedora.server.utilities.DateUtility;
  */
 @Path("/{pid}/datastreams")
 public class DatastreamResource extends BaseRestResource {
-
     /**
      * Inquires upon all object Datastreams to obtain datastreams contained by a
      * digital object. This returns a set of datastream locations that represent
@@ -82,7 +81,7 @@ public class DatastreamResource extends BaseRestResource {
             String format) {
 
         try {
-            Date asOfDateTime = parseDate(dateTime);
+            Date asOfDateTime = getAsOfDateTime(dateTime);
             Context context = getContext();
             MediaType mime = RestHelper.getContentType(format);
             DatastreamDef[] dsDefs = apiAService.listDatastreams(context, pid, asOfDateTime);
@@ -100,7 +99,7 @@ public class DatastreamResource extends BaseRestResource {
             return handleException(ex);
         }
     }
-
+	
     /**
      * Invoke API-M.getDatastream(context, pid, dsID, asOfDateTime)
      *
@@ -122,7 +121,7 @@ public class DatastreamResource extends BaseRestResource {
                      @DefaultValue("false")
                      boolean validateChecksum) {
         try {
-            Date asOfDateTime = parseDate(dateTime);
+            Date asOfDateTime = getAsOfDateTime(dateTime);
             Context context = getContext();
             Datastream dsProfile = apiMService.getDatastream(context, pid, dsID, asOfDateTime);
 
@@ -131,7 +130,7 @@ public class DatastreamResource extends BaseRestResource {
                   "No datastream could be found. Either there is no datastream for " +
                   "the digital object \""+pid+"\" with datastream ID of \""+dsID+
                   "\"  OR  there are no datastreams that match the specified " +
-                  "date/time value of \""+dateTime+"\".").build();
+                  "date/time value of \""+asOfDateTime.toString()+"\".").build();
             }
 
             String xml = getSerializer(context).
@@ -175,9 +174,9 @@ public class DatastreamResource extends BaseRestResource {
                                                                         context,
                                                                         pid,
                                                                         dsID,
-                                                                        parseDate(dateTime));
+                                                                        getAsOfDateTime(dateTime));
             if (datastreamFilenameHelper != null) {
-                datastreamFilenameHelper.addContentDispositionHeader(context, pid, dsID, download, parseDate(dateTime), stream);
+                datastreamFilenameHelper.addContentDispositionHeader(context, pid, dsID, download, getAsOfDateTime(dateTime), stream);
 
             }
 
