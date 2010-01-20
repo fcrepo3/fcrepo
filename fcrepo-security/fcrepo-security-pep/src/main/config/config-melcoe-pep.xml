@@ -4,7 +4,7 @@
 		The pdp-client class is responsible for the PEP communicating with a PDP. By substituting
 		in different classes for the client you can communicate with virtually any PDP.
 	-->
-	<pdp-client class="melcoe.fedora.pep.DirectPDPClient" />
+	<pdp-client class="org.fcrepo.server.security.xacml.pep.DirectPDPClient" />
 	
 	<!--
 		The response cache, as its name suggests, caches XACML responses based on a hash of an
@@ -20,7 +20,7 @@
 		If an item is found in the cache, then a request is not	sent to the PDP. Instead the previously
 		calculated value is used.
 	-->
-	<response-cache class="melcoe.fedora.pep.ResponseCacheImpl" active="true">
+	<response-cache class="org.fcrepo.server.security.xacml.pep.ResponseCacheImpl" active="true">
 		<cache-size>1000</cache-size>
 		<cache-item-ttl>60000</cache-item-ttl>
 	</response-cache>
@@ -29,7 +29,7 @@
 		This class handles the identification of relationships between objects. It currently
 		just resolves parents. It makes use of the ResourceIndexModule of Fedora.
 	-->
-	<relationship-resolver class="melcoe.xacml.util.RelationshipResolverImpl">
+	<relationship-resolver class="org.fcrepo.server.security.xacml.util.RelationshipResolverImpl">
 		<option name="parent-child-relationship-1">info:fedora/fedora-system:def/relations-external#isMemberOf</option>
 		<option name="parent-child-relationship-2">info:fedora/fedora-system:def/relations-external#isMemberOfCollection</option>
 		<option name="parent-child-relationship-3">info:fedora/fedora-system:def/relations-external#isPartOf</option>
@@ -37,7 +37,7 @@
 
 	<!-- Relationship module that works via HTTP... sloooowwwer -->
 	<!--
-	<relationship-resolver class="melcoe.fedora.pep.RelationshipResolverHttpImpl">
+	<relationship-resolver class="org.fcrepo.server.security.xacml.pep.RelationshipResolverHttpImpl">
 		<option name="url">http://localhost:8080/fedora/risearch</option>
 		<option name="username">admin</option>
 		<option name="password">test</option>
@@ -55,7 +55,7 @@
 		found then it checks the parents of the parents until there are no more ancestors or a
 		permit is found.
 	-->
-	<evaluation-engine class="melcoe.fedora.pep.EvaluationEngineImpl" />
+	<evaluation-engine class="org.fcrepo.server.security.xacml.pep.EvaluationEngineImpl" />
 	
 	<!--
 		This section maps handlers for REST operations. When an operation is executed the appropriate
@@ -63,18 +63,18 @@
 		in the case of 'search'.
 	-->
 	<handlers-rest>
-		<handler operation="/describe" class="melcoe.fedora.pep.rest.filters.DescribeFilter" />
-		<handler operation="/get" class="melcoe.fedora.pep.rest.filters.GetFilter" />
-		<handler operation="/getObjectHistory" class="melcoe.fedora.pep.rest.filters.GetObjectHistoryFilter" />
-		<handler operation="/listDatastreams" class="melcoe.fedora.pep.rest.filters.ListDatastreamsFilter" />
-		<handler operation="/listMethods" class="melcoe.fedora.pep.rest.filters.ListMethodsFilter" />
-		<handler operation="/search" class="melcoe.fedora.pep.rest.filters.SearchFilter" />
-		<handler operation="/management/getNextPID" class="melcoe.fedora.pep.rest.filters.GetNextPIDFilter" />
+		<handler operation="/describe" class="org.fcrepo.server.security.xacml.pep.rest.filters.DescribeFilter" />
+		<handler operation="/get" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetFilter" />
+		<handler operation="/getObjectHistory" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetObjectHistoryFilter" />
+		<handler operation="/listDatastreams" class="org.fcrepo.server.security.xacml.pep.rest.filters.ListDatastreamsFilter" />
+		<handler operation="/listMethods" class="org.fcrepo.server.security.xacml.pep.rest.filters.ListMethodsFilter" />
+		<handler operation="/search" class="org.fcrepo.server.security.xacml.pep.rest.filters.SearchFilter" />
+		<handler operation="/management/getNextPID" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetNextPIDFilter" />
 		<!-- 
         Filters risearch results, but with a significant performance penalty. 
-        <handler operation="risearch" class="melcoe.fedora.pep.rest.filters.RISearchFilter" />
+        <handler operation="risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.RISearchFilter" />
 		-->
-        <handler operation="/objects" class="melcoe.fedora.pep.rest.filters.ObjectsFilter" />
+        <handler operation="/objects" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsFilter" />
 	</handlers-rest>
 	
 	<!--
@@ -82,25 +82,25 @@
 		sections ObjectsFilter and these handlers are loaded through that interface.
 	-->
 	<handlers-objects>
-		<handler operation="findObjects" class="melcoe.fedora.pep.rest.objectshandlers.FindObjects" />
-		<handler operation="resumeFindObjects" class="melcoe.fedora.pep.rest.objectshandlers.FindObjects" />
-		<handler operation="getDatastreamDissemination" class="melcoe.fedora.pep.rest.objectshandlers.GetDatastreamDissemination" />
-		<handler operation="getObjectHistory" class="melcoe.fedora.pep.rest.objectshandlers.GetObjectHistory" />
-		<handler operation="getObjectProfile" class="melcoe.fedora.pep.rest.objectshandlers.GetObjectProfile" />
-		<handler operation="listDatastreams" class="melcoe.fedora.pep.rest.objectshandlers.ListDatastreams" />
-		<handler operation="listMethods" class="melcoe.fedora.pep.rest.objectshandlers.ListMethods" />
-		<handler operation="addDatastream" class="melcoe.fedora.pep.rest.objectshandlers.AddDatastream" />
-		<handler operation="export" class="melcoe.fedora.pep.rest.objectshandlers.Export" />
-		<handler operation="getDatastream" class="melcoe.fedora.pep.rest.objectshandlers.GetDatastream" />
-		<handler operation="getNextPID" class="melcoe.fedora.pep.rest.objectshandlers.GetNextPID" />
-		<handler operation="getObjectXML" class="melcoe.fedora.pep.rest.objectshandlers.GetObjectXML" />
-		<handler operation="ingest" class="melcoe.fedora.pep.rest.objectshandlers.Ingest" />
-		<handler operation="modifyDatastream" class="melcoe.fedora.pep.rest.objectshandlers.ModifyDatastream" />
-		<handler operation="modifyObject" class="melcoe.fedora.pep.rest.objectshandlers.ModifyObject" />
-		<handler operation="purgeDatastream" class="melcoe.fedora.pep.rest.objectshandlers.PurgeDatastream" />
-		<handler operation="purgeObject" class="melcoe.fedora.pep.rest.objectshandlers.PurgeObject" />
-		<handler operation="setDatastreamState" class="melcoe.fedora.pep.rest.objectshandlers.SetDatastreamState" />
-		<handler operation="setDatastreamVersionable" class="melcoe.fedora.pep.rest.objectshandlers.SetDatastreamVersionable" />
+		<handler operation="findObjects" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects" />
+		<handler operation="resumeFindObjects" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects" />
+		<handler operation="getDatastreamDissemination" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastreamDissemination" />
+		<handler operation="getObjectHistory" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectHistory" />
+		<handler operation="getObjectProfile" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectProfile" />
+		<handler operation="listDatastreams" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ListDatastreams" />
+		<handler operation="listMethods" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ListMethods" />
+		<handler operation="addDatastream" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.AddDatastream" />
+		<handler operation="export" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Export" />
+		<handler operation="getDatastream" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastream" />
+		<handler operation="getNextPID" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetNextPID" />
+		<handler operation="getObjectXML" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectXML" />
+		<handler operation="ingest" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Ingest" />
+		<handler operation="modifyDatastream" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ModifyDatastream" />
+		<handler operation="modifyObject" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ModifyObject" />
+		<handler operation="purgeDatastream" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeDatastream" />
+		<handler operation="purgeObject" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeObject" />
+		<handler operation="setDatastreamState" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.SetDatastreamState" />
+		<handler operation="setDatastreamVersionable" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.SetDatastreamVersionable" />
 	</handlers-objects>
 	
 	<!--
@@ -109,67 +109,67 @@
 		tasks such as filtering for searches.
 	-->
 	<handlers-ws service="access">
-		<handler operation="describeRepository" class="melcoe.fedora.pep.ws.operations.DescribeRepositoryHandler" />
-		<handler operation="getObjectProfile" class="melcoe.fedora.pep.ws.operations.GetObjectProfileHandler" />
-		<handler operation="listDatastreams" class="melcoe.fedora.pep.ws.operations.ListDatastreamsHandler" />
-		<handler operation="listMethods" class="melcoe.fedora.pep.ws.operations.ListMethodsHandler" />
-		<handler operation="getDatastreamDissemination" class="melcoe.fedora.pep.ws.operations.GetDatastreamDisseminationHandler" />
-		<handler operation="getDissemination" class="melcoe.fedora.pep.ws.operations.GetDisseminationHandler" />
-		<handler operation="findObjects" class="melcoe.fedora.pep.ws.operations.FindObjectsHandler" />
-		<handler operation="resumeFindObjects" class="melcoe.fedora.pep.ws.operations.ResumeFindObjectsHandler" />
-		<handler operation="getObjectHistory" class="melcoe.fedora.pep.ws.operations.GetObjectHistoryHandler" />
+		<handler operation="describeRepository" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeRepositoryHandler" />
+		<handler operation="getObjectProfile" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectProfileHandler" />
+		<handler operation="listDatastreams" class="org.fcrepo.server.security.xacml.pep.ws.operations.ListDatastreamsHandler" />
+		<handler operation="listMethods" class="org.fcrepo.server.security.xacml.pep.ws.operations.ListMethodsHandler" />
+		<handler operation="getDatastreamDissemination" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamDisseminationHandler" />
+		<handler operation="getDissemination" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDisseminationHandler" />
+		<handler operation="findObjects" class="org.fcrepo.server.security.xacml.pep.ws.operations.FindObjectsHandler" />
+		<handler operation="resumeFindObjects" class="org.fcrepo.server.security.xacml.pep.ws.operations.ResumeFindObjectsHandler" />
+		<handler operation="getObjectHistory" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectHistoryHandler" />
 	</handlers-ws>
 	<handlers-ws service="accessS">
-		<handler operation="describeRepository" class="melcoe.fedora.pep.ws.operations.DescribeRepositoryHandler" />
-		<handler operation="getObjectProfile" class="melcoe.fedora.pep.ws.operations.GetObjectProfileHandler" />
-		<handler operation="listDatastreams" class="melcoe.fedora.pep.ws.operations.ListDatastreamsHandler" />
-		<handler operation="listMethods" class="melcoe.fedora.pep.ws.operations.ListMethodsHandler" />
-		<handler operation="getDatastreamDissemination" class="melcoe.fedora.pep.ws.operations.GetDatastreamDisseminationHandler" />
-		<handler operation="getDissemination" class="melcoe.fedora.pep.ws.operations.GetDisseminationHandler" />
-		<handler operation="findObjects" class="melcoe.fedora.pep.ws.operations.FindObjectsHandler" />
-		<handler operation="resumeFindObjects" class="melcoe.fedora.pep.ws.operations.ResumeFindObjectsHandler" />
-		<handler operation="getObjectHistory" class="melcoe.fedora.pep.ws.operations.GetObjectHistoryHandler" />
+		<handler operation="describeRepository" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeRepositoryHandler" />
+		<handler operation="getObjectProfile" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectProfileHandler" />
+		<handler operation="listDatastreams" class="org.fcrepo.server.security.xacml.pep.ws.operations.ListDatastreamsHandler" />
+		<handler operation="listMethods" class="org.fcrepo.server.security.xacml.pep.ws.operations.ListMethodsHandler" />
+		<handler operation="getDatastreamDissemination" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamDisseminationHandler" />
+		<handler operation="getDissemination" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDisseminationHandler" />
+		<handler operation="findObjects" class="org.fcrepo.server.security.xacml.pep.ws.operations.FindObjectsHandler" />
+		<handler operation="resumeFindObjects" class="org.fcrepo.server.security.xacml.pep.ws.operations.ResumeFindObjectsHandler" />
+		<handler operation="getObjectHistory" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectHistoryHandler" />
 	</handlers-ws>
 	<handlers-ws service="management">
-		<handler operation="addDatastream" class="melcoe.fedora.pep.ws.operations.AddDatastreamHandler" />
-		<handler operation="describeUser" class="melcoe.fedora.pep.ws.operations.DescribeUserHandler" />
-		<handler operation="export" class="melcoe.fedora.pep.ws.operations.ExportHandler" />
-		<handler operation="getDatastream" class="melcoe.fedora.pep.ws.operations.GetDatastreamHandler" />
-		<handler operation="getDatastreamHistory" class="melcoe.fedora.pep.ws.operations.GetDatastreamHistoryHandler" />
-		<handler operation="getDatastreams" class="melcoe.fedora.pep.ws.operations.GetDatastreamsHandler" />
-		<handler operation="getNextPID" class="melcoe.fedora.pep.ws.operations.GetNextPIDHandler" />
-		<handler operation="getObjectXML" class="melcoe.fedora.pep.ws.operations.GetObjectXMLHandler" />
-		<handler operation="ingest" class="melcoe.fedora.pep.ws.operations.IngestHandler" />
-		<handler operation="modifyDatastreamByReference" class="melcoe.fedora.pep.ws.operations.ModifyDatastreamByReferenceHandler" />
-		<handler operation="modifyDatastreamByValue" class="melcoe.fedora.pep.ws.operations.ModifyDatastreamByValueHandler" />
-		<handler operation="modifyObject" class="melcoe.fedora.pep.ws.operations.ModifyObjectHandler" />
-		<handler operation="purgeDatastream" class="melcoe.fedora.pep.ws.operations.PurgeDatastreamHandler" />
-		<handler operation="purgeObject" class="melcoe.fedora.pep.ws.operations.PurgeObjectHandler" />
-		<handler operation="setDatastreamState" class="melcoe.fedora.pep.ws.operations.SetDatastreamStateHandler" />
-		<handler operation="setDatastreamVersionable" class="melcoe.fedora.pep.ws.operations.SetDatastreamVersionableHandler" />
-		<handler operation="addRelationship" class="melcoe.fedora.pep.ws.operations.AddRelationshipHandler" />
-		<handler operation="getRelationships" class="melcoe.fedora.pep.ws.operations.GetRelationshipsHandler" />
-		<handler operation="purgeRelationship" class="melcoe.fedora.pep.ws.operations.PurgeRelationshipHandler" />
+		<handler operation="addDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddDatastreamHandler" />
+		<handler operation="describeUser" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeUserHandler" />
+		<handler operation="export" class="org.fcrepo.server.security.xacml.pep.ws.operations.ExportHandler" />
+		<handler operation="getDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHandler" />
+		<handler operation="getDatastreamHistory" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHistoryHandler" />
+		<handler operation="getDatastreams" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamsHandler" />
+		<handler operation="getNextPID" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetNextPIDHandler" />
+		<handler operation="getObjectXML" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectXMLHandler" />
+		<handler operation="ingest" class="org.fcrepo.server.security.xacml.pep.ws.operations.IngestHandler" />
+		<handler operation="modifyDatastreamByReference" class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyDatastreamByReferenceHandler" />
+		<handler operation="modifyDatastreamByValue" class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyDatastreamByValueHandler" />
+		<handler operation="modifyObject" class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyObjectHandler" />
+		<handler operation="purgeDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeDatastreamHandler" />
+		<handler operation="purgeObject" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeObjectHandler" />
+		<handler operation="setDatastreamState" class="org.fcrepo.server.security.xacml.pep.ws.operations.SetDatastreamStateHandler" />
+		<handler operation="setDatastreamVersionable" class="org.fcrepo.server.security.xacml.pep.ws.operations.SetDatastreamVersionableHandler" />
+		<handler operation="addRelationship" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddRelationshipHandler" />
+		<handler operation="getRelationships" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetRelationshipsHandler" />
+		<handler operation="purgeRelationship" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeRelationshipHandler" />
 	</handlers-ws>
 	<handlers-ws service="managementS">
-		<handler operation="addDatastream" class="melcoe.fedora.pep.ws.operations.AddDatastreamHandler" />
-		<handler operation="describeUser" class="melcoe.fedora.pep.ws.operations.DescribeUserHandler" />
-		<handler operation="export" class="melcoe.fedora.pep.ws.operations.ExportHandler" />
-		<handler operation="getDatastream" class="melcoe.fedora.pep.ws.operations.GetDatastreamHandler" />
-		<handler operation="getDatastreamHistory" class="melcoe.fedora.pep.ws.operations.GetDatastreamHistoryHandler" />
-		<handler operation="getDatastreams" class="melcoe.fedora.pep.ws.operations.GetDatastreamsHandler" />
-		<handler operation="getNextPID" class="melcoe.fedora.pep.ws.operations.GetNextPIDHandler" />
-		<handler operation="getObjectXML" class="melcoe.fedora.pep.ws.operations.GetObjectXMLHandler" />
-		<handler operation="ingest" class="melcoe.fedora.pep.ws.operations.IngestHandler" />
-		<handler operation="modifyDatastreamByReference" class="melcoe.fedora.pep.ws.operations.ModifyDatastreamByReferenceHandler" />
-		<handler operation="modifyDatastreamByValue" class="melcoe.fedora.pep.ws.operations.ModifyDatastreamByValueHandler" />
-		<handler operation="modifyObject" class="melcoe.fedora.pep.ws.operations.ModifyObjectHandler" />
-		<handler operation="purgeDatastream" class="melcoe.fedora.pep.ws.operations.PurgeDatastreamHandler" />
-		<handler operation="purgeObject" class="melcoe.fedora.pep.ws.operations.PurgeObjectHandler" />
-		<handler operation="setDatastreamState" class="melcoe.fedora.pep.ws.operations.SetDatastreamStateHandler" />
-		<handler operation="setDatastreamVersionable" class="melcoe.fedora.pep.ws.operations.SetDatastreamVersionableHandler" />
-		<handler operation="addRelationship" class="melcoe.fedora.pep.ws.operations.AddRelationshipHandler" />
-		<handler operation="getRelationships" class="melcoe.fedora.pep.ws.operations.GetRelationshipsHandler" />
-		<handler operation="purgeRelationship" class="melcoe.fedora.pep.ws.operations.PurgeRelationshipHandler" />
+		<handler operation="addDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddDatastreamHandler" />
+		<handler operation="describeUser" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeUserHandler" />
+		<handler operation="export" class="org.fcrepo.server.security.xacml.pep.ws.operations.ExportHandler" />
+		<handler operation="getDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHandler" />
+		<handler operation="getDatastreamHistory" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHistoryHandler" />
+		<handler operation="getDatastreams" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamsHandler" />
+		<handler operation="getNextPID" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetNextPIDHandler" />
+		<handler operation="getObjectXML" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectXMLHandler" />
+		<handler operation="ingest" class="org.fcrepo.server.security.xacml.pep.ws.operations.IngestHandler" />
+		<handler operation="modifyDatastreamByReference" class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyDatastreamByReferenceHandler" />
+		<handler operation="modifyDatastreamByValue" class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyDatastreamByValueHandler" />
+		<handler operation="modifyObject" class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyObjectHandler" />
+		<handler operation="purgeDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeDatastreamHandler" />
+		<handler operation="purgeObject" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeObjectHandler" />
+		<handler operation="setDatastreamState" class="org.fcrepo.server.security.xacml.pep.ws.operations.SetDatastreamStateHandler" />
+		<handler operation="setDatastreamVersionable" class="org.fcrepo.server.security.xacml.pep.ws.operations.SetDatastreamVersionableHandler" />
+		<handler operation="addRelationship" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddRelationshipHandler" />
+		<handler operation="getRelationships" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetRelationshipsHandler" />
+		<handler operation="purgeRelationship" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeRelationshipHandler" />
 	</handlers-ws>
 </config>

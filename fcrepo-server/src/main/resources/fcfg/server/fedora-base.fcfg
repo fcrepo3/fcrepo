@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <server xmlns="http://www.fedora.info/definitions/1/0/config/" 
-		class="fedora.server.BasicServer">
+		class="org.fcrepo.server.BasicServer">
 	<param name="repositoryName" value="Fedora Repository">
 		<comment>Defines a human readable name for the Fedora server; default is 
 		Fedora Repository.</comment>
@@ -96,8 +96,8 @@
 		<comment>Source of mappings from MIMETYPE to file extension</comment>
 	</param>
 
-	<module role="fedora.server.storage.lowlevel.ILowlevelStorage" 
-			class="fedora.server.storage.lowlevel.DefaultLowlevelStorageModule">
+	<module role="org.fcrepo.server.storage.lowlevel.ILowlevelStorage" 
+			class="org.fcrepo.server.storage.lowlevel.DefaultLowlevelStorageModule">
 		<param name="object_store_base" value="data/objects" isFilePath="true">
 			<comment>The root directory for the internal storage of Fedora 
 			objects. This value should be adjusted based on your installation 
@@ -110,18 +110,18 @@
 			installation environment. This value should not point to the same 
 			location as object_store_base.</comment>
 		</param>
-		<param name="path_registry" value="fedora.server.storage.lowlevel.DBPathRegistry">
+		<param name="path_registry" value="org.fcrepo.server.storage.lowlevel.DBPathRegistry">
 			<comment>The java class used to determine the path registry; default 
-			is fedora.server.storage.lowlevel.DBPathRegistry.</comment>
+			is org.fcrepo.server.storage.lowlevel.DBPathRegistry.</comment>
 		</param>
-		<param name="path_algorithm" value="fedora.server.storage.lowlevel.TimestampPathAlgorithm">
+		<param name="path_algorithm" value="org.fcrepo.server.storage.lowlevel.TimestampPathAlgorithm">
 			<comment>The java class used to determine the path algorithm; 
-			default is fedora.server.storage.lowlevel.TimestampPathAlgorithm.
+			default is org.fcrepo.server.storage.lowlevel.TimestampPathAlgorithm.
 			</comment>
 		   </param>
-		<param name="file_system" value="fedora.server.storage.lowlevel.GenericFileSystem">
+		<param name="file_system" value="org.fcrepo.server.storage.lowlevel.GenericFileSystem">
 			<comment>The java class that determines the implementation class; 
-			default is fedora.server.storage.lowlevel.GenericFileSystem.</comment>
+			default is org.fcrepo.server.storage.lowlevel.GenericFileSystem.</comment>
 		</param>
 		<param name="backslash_is_escape" value="false">
 			<comment>Whether the escape character (i.e. (the token beginning an 
@@ -132,7 +132,7 @@
 			Postgresql, false for Derby, Oracle and McKoi.</comment>
 		</param>
 	</module>
-	<module role="fedora.server.security.Authorization" class="fedora.server.security.DefaultAuthorization">
+	<module role="org.fcrepo.server.security.Authorization" class="org.fcrepo.server.security.DefaultAuthorization">
 		<comment>Builds and manages Fedora's authorization structure.</comment>
 		<param name="REPOSITORY-POLICIES-DIRECTORY" value="data/fedora-xacml-policies/repository-policies" isFilePath="true"/>
 		<param name="REPOSITORY-POLICY-GUITOOL-POLICIES-DIRECTORY" value="data/fedora-xacml-policies/repository-policies-generated-by-policyguitool" isFilePath="true">
@@ -145,7 +145,7 @@
 		<param name="VALIDATE-OBJECT-POLICIES-FROM-FILE" value="false"/>
 		<param name="VALIDATE-OBJECT-POLICIES-FROM-DATASTREAM" value="false"/>
 	</module>
-	<module role="fedora.server.security.BackendSecurity" class="fedora.server.security.DefaultBackendSecurity">
+	<module role="org.fcrepo.server.security.BackendSecurity" class="org.fcrepo.server.security.DefaultBackendSecurity">
 		<comment>Description: Interface to the backend service security 
 		configuration. This module initializes backend service security 
 		information in the server by parsing the beSecurity configuration file. 
@@ -165,7 +165,7 @@
 			beSecurity configuration file.</comment>
 		</param>
 	</module>
-	<module role="fedora.server.storage.DOManager" class="fedora.server.storage.DefaultDOManager">
+	<module role="org.fcrepo.server.storage.DOManager" class="org.fcrepo.server.storage.DefaultDOManager">
     	<comment>The interface to the storage subsystem.  This provides 
     	context-appropriate DOReaders and DOWriters for reflecting on and 
     	writing to the objects stored in the repository. It also provides 
@@ -206,13 +206,13 @@
             authentication.</comment>
         </param>
 	</module>
-	<module role="fedora.server.management.Management" class="fedora.server.management.ManagementModule">
+	<module role="org.fcrepo.server.management.Management" class="org.fcrepo.server.management.ManagementModule">
 		<comment>The management subsystem. This implements the methods necessary 
 		to fulfill API-M requests without regard to:
                  - how the service is exposed
                  - how bytestreams and java types might be marshalled/demarshalled over the wire
                  - how the storage subsystem is implemented.</comment>
-        <param name="decorator1" value="fedora.server.messaging.NotificationInvocationHandler" />
+        <param name="decorator1" value="org.fcrepo.server.messaging.NotificationInvocationHandler" />
 		<param name="autoChecksum" value="false">
 			<comment>Controls whether a checksum is automatically computed for 
 			every datastream as the datastream is added to the repository. This 
@@ -240,7 +240,7 @@
             </comment>
         </param>
 	</module>
-	<module role="fedora.server.access.Access" class="fedora.server.access.DefaultAccess">
+	<module role="org.fcrepo.server.access.Access" class="org.fcrepo.server.access.DefaultAccess">
     	<comment>Description: The access subsystem. This implements the methods 
     	necessary to fulfill API-A requests without regard to:
 			- how the service is exposed
@@ -278,7 +278,7 @@
 			doMediateDatastreams is false.</comment>
 		</param>
 	</module>
-	<module role="fedora.server.access.DynamicAccess" class="fedora.server.access.DynamicAccessModule">
+	<module role="org.fcrepo.server.access.DynamicAccess" class="org.fcrepo.server.access.DynamicAccessModule">
 		<comment>The dynamic behavior module for the access subsystem. This 
 		implements the methods necessary to fulfill API-A requests without 
 		regard to:
@@ -286,13 +286,13 @@
 	        - (Future) dynamically associating other behavior definitions and mechanisms
 	          with objects
 	        - running disseminations of dynamic behaviors</comment>
-		<param name="fedora-system:1" value="fedora.server.access.internalservices.Bootstrap">
+		<param name="fedora-system:1" value="org.fcrepo.server.access.internalservices.Bootstrap">
 			<comment>The interface that defines the methods of the bootstrap 
 			disseminator. These methods are "built-in" to the Fedora system, and 
 			are dynamically associated with every behavior definition and 
 			behavior mechanism object.</comment>
 		</param>
-		<param name="fedora-system:2" value="fedora.server.access.internalservices.BootstrapImpl">
+		<param name="fedora-system:2" value="org.fcrepo.server.access.internalservices.BootstrapImpl">
 			<comment>The class that implements the methods of the bootstrap 
 			disseminator. These method implementations are "built-in" to the 
 			Fedora system, and are dynamically associated with every behavior 
@@ -300,12 +300,12 @@
 			of as implementing an "internal service" whereas other disseminators 
 			use external services (described by WSDL) to do their work.</comment>
 		</param>
-		<param name="fedora-system:3" value="fedora.server.access.defaultdisseminator.DefaultDisseminator">
+		<param name="fedora-system:3" value="org.fcrepo.server.access.defaultdisseminator.DefaultDisseminator">
 			<comment>The interface that defines the methods of the default 
 			disseminator. These methods are "built-in" to the Fedora system, and 
 			are dynamically associated with every object.</comment>
 		</param>
-		<param name="fedora-system:4" value="fedora.server.access.defaultdisseminator.DefaultDisseminatorImpl">
+		<param name="fedora-system:4" value="org.fcrepo.server.access.defaultdisseminator.DefaultDisseminatorImpl">
 			<comment>The class that implements the methods of the default 
 			disseminator. These method implementations are "built-in" to the
             Fedora system, and are dynamically associated with every object.
@@ -314,7 +314,7 @@
             WSDL) to do their work.</comment>
 		</param>
 	</module>
-	<module role="fedora.server.search.FieldSearch" class="fedora.server.search.FieldSearchSQLModule">
+	<module role="org.fcrepo.server.search.FieldSearch" class="org.fcrepo.server.search.FieldSearchSQLModule">
 		<comment>Supports the API-A simpleSearch and advancedSearch methods.
 		</comment>
 	    <param name="maxResults" value="100">
@@ -359,7 +359,7 @@
 	        been ingested.</comment>
 		</param>
 	</module>
-	<module role="fedora.server.resourceIndex.ResourceIndex" class="fedora.server.resourceIndex.ResourceIndexModule">
+	<module role="org.fcrepo.server.resourceIndex.ResourceIndex" class="org.fcrepo.server.resourceIndex.ResourceIndexModule">
 		<comment>Supports the ResourceIndex.</comment>
 		<param name="level" value="0">
 			<comment>(required) 
@@ -393,7 +393,7 @@
 			test:apple instead of http://example.org/terms#apple</comment>
 		</param>
 	</module>
-	<module role="fedora.oai.OAIProvider" class="fedora.server.oai.FedoraOAIProviderModule">
+	<module role="org.fcrepo.oai.OAIProvider" class="org.fcrepo.server.oai.FedoraOAIProviderModule">
 		<comment>Description: Exposes the repository for OAI harvesters.</comment>
 		<param name="repositoryName" value="Your Fedora Repository Name Here"/>
 		<param name="repositoryDomainName" value="example.org"/>
@@ -402,29 +402,29 @@
 		<param name="maxRecords" value="100"/>
 		<param name="maxHeaders" value="100"/>
 	</module>
-	<module role="fedora.server.storage.translation.DOTranslator" class="fedora.server.storage.translation.DOTranslatorModule">
+	<module role="org.fcrepo.server.storage.translation.DOTranslator" class="org.fcrepo.server.storage.translation.DOTranslatorModule">
 		<comment>Supports translation from DigitalObject to a stream of some
 		         format, and vice-versa. The parameters below specify
 		         serializer/deserializer classes to be used for a given format. Those
 		         classes must implement the DOSerializer/DODeserializer interfaces.</comment>
-		<param name="serializer_info:fedora/fedora-system:METSFedoraExt-1.1" value="fedora.server.storage.translation.METSFedoraExt1_1DOSerializer"/>
-		<param name="deserializer_info:fedora/fedora-system:METSFedoraExt-1.1" value="fedora.server.storage.translation.METSFedoraExt1_1DODeserializer"/>
-		<param name="serializer_info:fedora/fedora-system:METSFedoraExt-1.0" value="fedora.server.storage.translation.METSFedoraExt1_0DOSerializer"/>
-		<param name="deserializer_info:fedora/fedora-system:METSFedoraExt-1.0" value="fedora.server.storage.translation.METSFedoraExt1_0DODeserializer"/>
-		<param name="serializer_info:fedora/fedora-system:FOXML-1.1" value="fedora.server.storage.translation.FOXML1_1DOSerializer"/>
-		<param name="deserializer_info:fedora/fedora-system:FOXML-1.1" value="fedora.server.storage.translation.FOXML1_1DODeserializer"/>
-		<param name="serializer_info:fedora/fedora-system:FOXML-1.0" value="fedora.server.storage.translation.FOXML1_0DOSerializer"/>
-		<param name="deserializer_info:fedora/fedora-system:FOXML-1.0" value="fedora.server.storage.translation.FOXML1_0DODeserializer"/>
-	    <param name="serializer_info:fedora/fedora-system:ATOM-1.1" value="fedora.server.storage.translation.Atom1_1DOSerializer"/>
-        <param name="deserializer_info:fedora/fedora-system:ATOM-1.1" value="fedora.server.storage.translation.Atom1_1DODeserializer"/>
-	    <param name="serializer_info:fedora/fedora-system:ATOMZip-1.1" value="fedora.server.storage.translation.AtomZip1_1DOSerializer"/>
-	    <param name="deserializer_info:fedora/fedora-system:ATOMZip-1.1" value="fedora.server.storage.translation.AtomZip1_1DODeserializer"/>
+		<param name="serializer_info:fedora/fedora-system:METSFedoraExt-1.1" value="org.fcrepo.server.storage.translation.METSFedoraExt1_1DOSerializer"/>
+		<param name="deserializer_info:fedora/fedora-system:METSFedoraExt-1.1" value="org.fcrepo.server.storage.translation.METSFedoraExt1_1DODeserializer"/>
+		<param name="serializer_info:fedora/fedora-system:METSFedoraExt-1.0" value="org.fcrepo.server.storage.translation.METSFedoraExt1_0DOSerializer"/>
+		<param name="deserializer_info:fedora/fedora-system:METSFedoraExt-1.0" value="org.fcrepo.server.storage.translation.METSFedoraExt1_0DODeserializer"/>
+		<param name="serializer_info:fedora/fedora-system:FOXML-1.1" value="org.fcrepo.server.storage.translation.FOXML1_1DOSerializer"/>
+		<param name="deserializer_info:fedora/fedora-system:FOXML-1.1" value="org.fcrepo.server.storage.translation.FOXML1_1DODeserializer"/>
+		<param name="serializer_info:fedora/fedora-system:FOXML-1.0" value="org.fcrepo.server.storage.translation.FOXML1_0DOSerializer"/>
+		<param name="deserializer_info:fedora/fedora-system:FOXML-1.0" value="org.fcrepo.server.storage.translation.FOXML1_0DODeserializer"/>
+	    <param name="serializer_info:fedora/fedora-system:ATOM-1.1" value="org.fcrepo.server.storage.translation.Atom1_1DOSerializer"/>
+        <param name="deserializer_info:fedora/fedora-system:ATOM-1.1" value="org.fcrepo.server.storage.translation.Atom1_1DODeserializer"/>
+	    <param name="serializer_info:fedora/fedora-system:ATOMZip-1.1" value="org.fcrepo.server.storage.translation.AtomZip1_1DOSerializer"/>
+	    <param name="deserializer_info:fedora/fedora-system:ATOMZip-1.1" value="org.fcrepo.server.storage.translation.AtomZip1_1DODeserializer"/>
 	</module>
-	<module role="fedora.server.management.PIDGenerator" class="fedora.server.management.BasicPIDGenerator">
+	<module role="org.fcrepo.server.management.PIDGenerator" class="org.fcrepo.server.management.BasicPIDGenerator">
 		<comment>The pid generator.</comment>
 		<param name="pidgen_log_dir" value="pidgen"/>
 	</module>
-	<module role="fedora.server.messaging.Messaging" class="fedora.server.messaging.MessagingModule">
+	<module role="org.fcrepo.server.messaging.Messaging" class="org.fcrepo.server.messaging.MessagingModule">
 		<comment>Fedora's Java Messaging Service (JMS) Module</comment>
 		<param name="enabled" value="false" />
 		<param name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory" />
@@ -436,12 +436,12 @@
 			<comment>A datastore representing a JMS Destination for APIM events which do not update the repository</comment>
 		</param>
 	</module>
-	<module role="fedora.server.storage.ConnectionPoolManager" class="fedora.server.storage.ConnectionPoolManagerImpl">
+	<module role="org.fcrepo.server.storage.ConnectionPoolManager" class="org.fcrepo.server.storage.ConnectionPoolManagerImpl">
 		<comment>This module facilitates obtaining ConnectionPools</comment>
 		<param name="defaultPoolName" value="localDerbyPool" />
 		<param name="poolNames" value="localDerbyPool" />
 	</module>
-	<module role="fedora.server.validation.DOValidator" class="fedora.server.validation.DOValidatorModule">
+	<module role="org.fcrepo.server.validation.DOValidator" class="org.fcrepo.server.validation.DOValidatorModule">
 		<comment>Description: Supports validation of digital objects, including
              XML Schema validation, Schematron validation (to Fedora Rules schema
              written in Schematron language), and other programatic validation
@@ -506,10 +506,10 @@
             when it must write a temporary file.</comment>
 		</param>
 	</module>
-	<module role="fedora.server.storage.ExternalContentManager" class="fedora.server.storage.DefaultExternalContentManager">
+	<module role="org.fcrepo.server.storage.ExternalContentManager" class="org.fcrepo.server.storage.DefaultExternalContentManager">
 		<comment>This module facilitates obtaining external content via HTTP</comment>
 	</module>
-	<module role="fedora.server.utilities.ThreadMonitor" class="fedora.server.utilities.ThreadMonitorModule">
+	<module role="org.fcrepo.server.utilities.ThreadMonitor" class="org.fcrepo.server.utilities.ThreadMonitorModule">
 		<comment>Prints basic information about the system memory and running
              threads to the log periodically for diagnostic purposes.</comment>
 		<param name="active" value="false">
@@ -550,7 +550,7 @@
 		<param name="jdbcDriverClass" value="com.mysql.jdbc.Driver">
 			<comment>The JDBC driver class name.</comment>
 		</param>
-		<param name="ddlConverter" value="fedora.server.utilities.MySQLDDLConverter"/>
+		<param name="ddlConverter" value="org.fcrepo.server.utilities.MySQLDDLConverter"/>
 		<param name="maxActive" value="100">
 			<comment>The maximum number of active instances in pool.</comment>
 		</param>
@@ -631,7 +631,7 @@
 		<param name="jdbcDriverClass" value="com.mckoi.JDBCDriver">
 			<comment>The JDBC driver class name.</comment>
 		</param>
-		<param name="ddlConverter" value="fedora.server.utilities.McKoiDDLConverter"/>
+		<param name="ddlConverter" value="org.fcrepo.server.utilities.McKoiDDLConverter"/>
 		<param name="maxActive" value="100">
 			<comment>The maximum number of active instances in pool.</comment>
 		</param>
@@ -705,7 +705,7 @@
         <param name="jdbcDriverClass" value="org.apache.derby.jdbc.EmbeddedDriver">
             <comment>The JDBC driver class name.</comment>
         </param>
-        <param name="ddlConverter" value="fedora.server.utilities.DerbyDDLConverter"/>
+        <param name="ddlConverter" value="org.fcrepo.server.utilities.DerbyDDLConverter"/>
         <param name="maxActive" value="100">
             <comment>The maximum number of active instances in pool.</comment>
         </param>
@@ -783,7 +783,7 @@
 		<param name="jdbcDriverClass" value="oracle.jdbc.OracleDriver">
 			<comment>The JDBC driver class name.</comment>
 		</param>
-		<param name="ddlConverter" value="fedora.server.utilities.OracleDDLConverter"/>
+		<param name="ddlConverter" value="org.fcrepo.server.utilities.OracleDDLConverter"/>
 		<param name="maxActive" value="100">
 			<comment>The maximum number of active instances in pool.</comment>
 		</param>
@@ -865,7 +865,7 @@
 		<param name="jdbcDriverClass" value="org.postgresql.Driver">
 			<comment>The JDBC driver class name.</comment>
 		</param>
-		<param name="ddlConverter" value="fedora.server.utilities.PostgresDDLConverter"/>
+		<param name="ddlConverter" value="org.fcrepo.server.utilities.PostgresDDLConverter"/>
 		<param name="maxActive" value="100">
 			<comment>The maximum number of active instances in pool.</comment>
 		</param>

@@ -24,19 +24,19 @@ import org.w3c.dom.Document;
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
-import fedora.client.FedoraClient;
+import org.fcrepo.client.FedoraClient;
 
-import fedora.common.Constants;
+import org.fcrepo.common.Constants;
 
-import fedora.server.management.FedoraAPIM;
-import fedora.server.access.FedoraAPIA;
-import fedora.server.types.gen.DatastreamDef;
-import fedora.server.types.gen.MethodParmDef;
-import fedora.server.types.gen.MIMETypedStream;
-import fedora.server.types.gen.ObjectMethodsDef;
-import fedora.server.types.gen.ObjectProfile;
-import fedora.server.types.gen.RepositoryInfo;
-import fedora.server.types.gen.Property;
+import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.access.FedoraAPIA;
+import org.fcrepo.server.types.gen.DatastreamDef;
+import org.fcrepo.server.types.gen.MethodParmDef;
+import org.fcrepo.server.types.gen.MIMETypedStream;
+import org.fcrepo.server.types.gen.ObjectMethodsDef;
+import org.fcrepo.server.types.gen.ObjectProfile;
+import org.fcrepo.server.types.gen.RepositoryInfo;
+import org.fcrepo.server.types.gen.Property;
 
 /**
  * A simple example of a SOAP client that makes calls to the Fedora SOAP 

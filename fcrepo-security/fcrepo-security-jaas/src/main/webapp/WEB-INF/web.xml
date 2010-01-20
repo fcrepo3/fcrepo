@@ -6,7 +6,7 @@
 
 	<servlet>
 		<servlet-name>UserServlet</servlet-name>
-		<servlet-class>fedora.server.jaas.UserServlet</servlet-class>
+		<servlet-class>org.fcrepo.server.security.jaas.UserServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -16,7 +16,7 @@
 	
 	<filter>
 		<filter-name>AuthFilterJAAS</filter-name>
-		<filter-class>fedora.server.jaas.AuthFilterJAAS</filter-class>
+		<filter-class>org.fcrepo.server.security.jaas.AuthFilterJAAS</filter-class>
 		<!--
 		<init-param>
 			<description>OPTIONAL. Points to the location of the JAAS configuration file.
@@ -39,7 +39,7 @@
 			<description>OPTIONAL. A comma separated list of class names for user principals. First
 			one that is found is effective only.</description>
 			<param-name>userClassNames</param-name>
-			<param-value>fedora.server.jaas.auth.UserPrincipal</param-value>
+			<param-value>org.fcrepo.server.security.jaas.auth.UserPrincipal</param-value>
 		</init-param>
 		<init-param>
 			<description>OPTIONAL. A comma separated list of attribute names that can be attached to the

@@ -17,7 +17,7 @@
     </fileSet>
 
     <fileSet>
-      <directory>../fcrepo-server/src/main/resources/dbspec/server/fedora/server/storage/resources
+      <directory>../fcrepo-server/src/main/resources/dbspec/server/org/fcrepo/server/storage/resources
       </directory>
       <outputDirectory>/resources</outputDirectory>
       <includes>

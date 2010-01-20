@@ -6,7 +6,7 @@
     <servlet>
         <servlet-name>FOPServlet</servlet-name>
         <display-name>FOP Servlet</display-name>
-        <servlet-class> fedora.localservices.fop.FOPServlet </servlet-class>
+        <servlet-class> org.fcrepo.localservices.fop.FOPServlet </servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>FOPServlet</servlet-name>

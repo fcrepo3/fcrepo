@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<betwixt-config>	
+	<class name="org.fcrepo.server.config.webxml.WebXML">
+		<element name="web-app">
+			<attribute name="id" property="id" />
+			<attribute name="version" property="version" />
+            <attribute name="xmlns" property="xmlns" />
+            <attribute name="xmlns:xsi" property="xmlns_xsi" />
+            <attribute name="xsi:schemaLocation" property="xsi_schemaLocation" />
+            
+			<element name="display-name" property="displayName" />
+			
+			<element name="listener" property="listeners" />
+			<element name="context-param" property="contextParams" />
+			
+			<element name="servlet" property="servlets" />
+			<element name="servlet-mapping" property="servletMappings" />
+			<element name="filter" property="filters" />
+			<element name="filter-mapping" property="filterMappings" />
+			<element name="security-constraint" property="securityConstraints" />
+			<element name="welcome-file-list" property="welcomeFileList" />
+			<element name="error-page" property="errorPages" />
+			<element name="login-config" property="loginConfig" />
+			<element name="security-role" property="securityRoles" />
+			<addDefaults />
+		</element>
+	</class>
+	
+	<class name="org.fcrepo.server.config.webxml.Listener">
+        <element name="listener">
+            <element name="listener-class" property="listenerClass" />
+            <addDefaults/>
+        </element>
+    </class>
+	
+	<class name="org.fcrepo.server.config.webxml.ContextParam">
+        <element name="context-param">
+            <element name="description" property="descriptions" />
+            <element name="param-name" property="paramName" />
+            <element name="param-value" property="paramValue" />
+            <addDefaults/>
+        </element>
+    </class>
+	
+	<class name="org.fcrepo.server.config.webxml.Servlet">
+		<element name="servlet">
+			<element name="description" property="descriptions" />
+			<element name="display-name" property="displayName" />
+			<element name="servlet-name" property="servletName" />
+			<element name="servlet-class" property="servletClass" />
+			<element name="init-param" property="initParams" />
+			<element name="load-on-startup" property="loadOnStartup" />
+			<addDefaults/>
+		</element>
+	</class>
+	
+	<class name="org.fcrepo.server.config.webxml.InitParam">
+		<element name="init-param">
+			<element name="description" property="descriptions" />
+			<element name="param-name" property="paramName" />
+			<element name="param-value" property="paramValue" />
+			<addDefaults/>
+		</element>
+	</class>
+	
+	<class name="org.fcrepo.server.config.webxml.ServletMapping">
+		<element name="servlet-mapping">
+			<element name="servlet-name" property="servletName" />
+			<element name="url-pattern" property="urlPatterns" />
+			<addDefaults/>
+		</element>
+	</class>
+	
+	<class name="org.fcrepo.server.config.webxml.Filter">
+		<element name="filter">
+            <element name="description" property="descriptions" />
+			<element name="filter-name" property="filterName" />
+			<element name="filter-class" property="filterClass" />
+            <element name="init-param" property="initParams" />
+			<addDefaults/>
+		</element>
+	</class>
+	
+	<class name="org.fcrepo.server.config.webxml.FilterMapping">
+		<element name="filter-mapping">
+			<element name="filter-name" property="filterName" />
+			<element name="servlet-name" property="servletNames" />
+			<element name="url-pattern" property="urlPatterns" />
+			<addDefaults/>
+		</element>
+	</class>
+	
+	<class name="org.fcrepo.server.config.webxml.SecurityConstraint">
+		<element name="security-constraint">
+			<element name="web-resource-collection" property="webResourceCollections" />
+			<element name="auth-constraint" property="authConstraint" />
+			<element name="user-data-constraint" property="userDataConstraint" />
+			<addDefaults/>
+		</element>
+	</class>
+	
+	<class name="org.fcrepo.server.config.webxml.WebResourceCollection">
+		<element name="web-resource-collection">
+			<element name="web-resource-name" property="webResourceName" />
+			<element name="description" property="descriptions" />
+			<element name="url-pattern" property="urlPatterns" />
+			<element name="http-method" property="httpMethods" />
+			<addDefaults/>
+		</element>
+	</class>
+	
+	<class name="org.fcrepo.server.config.webxml.AuthConstraint">
+		<element name="auth-constraint">
+			<element name="description" property="descriptions" />
+			<element name="role-name" property="roleName" />
+			<addDefaults/>
+		</element>
+	</class>
+	
+	<class name="org.fcrepo.server.config.webxml.UserDataConstraint">
+		<element name="user-data-constraint">
+			<element name="description" property="descriptions" />
+			<element name="transport-guarantee" property="transportGuarantee" />
+			<addDefaults/>
+		</element>
+	</class>
+
+	<class name="org.fcrepo.server.config.webxml.WelcomeFileList">
+		<element name="welcome-file-list">
+			<element name="welcome-file" property="welcomeFiles" />
+			<addDefaults/>
+		</element>
+	</class>
+	
+	<class name="org.fcrepo.server.config.webxml.ErrorPage">
+		<element name="error-page">
+			<element name="error-code" property="errorCode" />
+			<element name="exception-type" property="exceptionType" />
+			<element name="location" property="location" />
+			<addDefaults/>
+		</element>
+	</class>
+
+	<class name="org.fcrepo.server.config.webxml.LoginConfig">
+		<element name="login-config">
+			<element name="auth-method" property="authMethod" />
+			<element name="realm-name" property="realmName" />
+			<addDefaults/>
+		</element>
+	</class>
+	
+	<class name="org.fcrepo.server.config.webxml.SecurityRole">
+		<element name="security-role">
+			<element name="role-name" property="roleName" />
+			<addDefaults/>
+		</element>
+	</class>
+</betwixt-config>

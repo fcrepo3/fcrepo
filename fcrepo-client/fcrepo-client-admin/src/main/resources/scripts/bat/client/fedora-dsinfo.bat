@@ -8,4 +8,4 @@ exit /B 1
 
 set LAUNCHER="%FEDORA_HOME%\client\bin\env-client.bat"
 
-call %LAUNCHER% fedora.client.datastream.DatastreamConduit %*
+call %LAUNCHER% org.fcrepo.client.datastream.DatastreamConduit %*

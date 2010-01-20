@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-  <bean name="fedora.server.storage.lowlevel.ILowlevelStorage"
-        class="fedora.server.storage.lowlevel.akubra.AkubraLowlevelStorage"
+  <bean name="org.fcrepo.server.storage.lowlevel.ILowlevelStorage"
+        class="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorage"
         singleton="true">
     <constructor-arg>
       <description>The store of serialized Fedora objects</description>
@@ -39,7 +39,7 @@
   </bean>
 
   <bean name="fsObjectStoreMapper"
-        class="fedora.server.storage.lowlevel.akubra.HashPathIdMapper"
+        class="org.fcrepo.server.storage.lowlevel.akubra.HashPathIdMapper"
         singleton="true">
     <constructor-arg value="##"/>
   </bean>
@@ -60,7 +60,7 @@
   </bean>
 
   <bean name="fsDatastreamStoreMapper"
-        class="fedora.server.storage.lowlevel.akubra.HashPathIdMapper"
+        class="org.fcrepo.server.storage.lowlevel.akubra.HashPathIdMapper"
         singleton="true">
     <constructor-arg value="##"/>
   </bean>

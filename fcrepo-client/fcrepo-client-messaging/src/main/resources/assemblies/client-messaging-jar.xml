@@ -13,8 +13,8 @@
     </fileSet>
 
     <fileSet>
-      <directory>../../fcrepo-common/target/classes/fedora/common</directory>
-      <outputDirectory>/fedora/common</outputDirectory>
+      <directory>../../fcrepo-common/target/classes/org/fcrepo/common</directory>
+      <outputDirectory>/org/fcrepo/common</outputDirectory>
       <includes>
         <include>Constants*.class</include>
         <include>FaultException.class</include>
@@ -25,18 +25,18 @@
     </fileSet>
 
     <fileSet>
-      <directory>../../fcrepo-common/target/classes/fedora/common/policy</directory>
-      <outputDirectory>/fedora/common/policy</outputDirectory>
+      <directory>../../fcrepo-common/target/classes/org/fcrepo/common/policy</directory>
+      <outputDirectory>/org/fcrepo/common/policy</outputDirectory>
     </fileSet>
 
     <fileSet>
-      <directory>../../fcrepo-common/target/classes/fedora/common/rdf</directory>
-      <outputDirectory>/fedora/common/rdf</outputDirectory>
+      <directory>../../fcrepo-common/target/classes/org/fcrepo/common/rdf</directory>
+      <outputDirectory>/org/fcrepo/common/rdf</outputDirectory>
     </fileSet>
 
     <fileSet>
-      <directory>../../fcrepo-server/target/classes/fedora/server</directory>
-      <outputDirectory>/fedora/server</outputDirectory>
+      <directory>../../fcrepo-server/target/classes/org/fcrepo/server</directory>
+      <outputDirectory>/org/fcrepo/server</outputDirectory>
       <includes>
         <include>Server.class</include>
         <include>Pluggable.class</include>
@@ -49,8 +49,8 @@
     </fileSet>
   
     <fileSet>
-      <directory>../../fcrepo-server/target/classes/fedora/server/config</directory>
-      <outputDirectory>/fedora/server/config</outputDirectory>
+      <directory>../../fcrepo-server/target/classes/org/fcrepo/server/config</directory>
+      <outputDirectory>/org/fcrepo/server/config</outputDirectory>
       <includes>
         <include>ServerConfigurationParser.class</include>
         <include>ServerConfiguration.class</include>
@@ -62,8 +62,8 @@
     </fileSet>
 
     <fileSet>
-      <directory>../../fcrepo-server/target/classes/fedora/server/errors</directory>
-      <outputDirectory>/fedora/server/errors</outputDirectory>
+      <directory>../../fcrepo-server/target/classes/org/fcrepo/server/errors</directory>
+      <outputDirectory>/org/fcrepo/server/errors</outputDirectory>
       <includes>
         <include>ShutdownException.class</include>
         <include>ServerShutdownException.class</include>
@@ -80,8 +80,8 @@
     </fileSet>
 
     <fileSet>
-      <directory>../../fcrepo-server/target/classes/fedora/server/messaging</directory>
-      <outputDirectory>/fedora/server/messaging</outputDirectory>
+      <directory>../../fcrepo-server/target/classes/org/fcrepo/server/messaging</directory>
+      <outputDirectory>/org/fcrepo/server/messaging</outputDirectory>
       <includes>
         <include>PName.class</include>
         <include>JMSManager*.class</include>
@@ -94,8 +94,8 @@
     </fileSet>
 
     <fileSet>
-      <directory>../../fcrepo-server/target/classes/fedora/server/resources</directory>
-      <outputDirectory>/fedora/server/resources</outputDirectory>
+      <directory>../../fcrepo-server/target/classes/org/fcrepo/server/resources</directory>
+      <outputDirectory>/org/fcrepo/server/resources</outputDirectory>
       <includes>
         <include>MIMETypes.properties</include>
         <include>Server.properties</include>
@@ -103,16 +103,16 @@
     </fileSet>
     
     <fileSet>
-      <directory>../../fcrepo-server/target/classes/fedora/server/security</directory>
-      <outputDirectory>/fedora/server/security</outputDirectory>
+      <directory>../../fcrepo-server/target/classes/org/fcrepo/server/security</directory>
+      <outputDirectory>/org/fcrepo/server/security</outputDirectory>
       <includes>
         <include>Authorization.class</include>
       </includes>
     </fileSet>
 
     <fileSet>
-      <directory>../../fcrepo-server/target/classes/fedora/server/storage/types</directory>
-      <outputDirectory>/fedora/server/storage/types</outputDirectory>
+      <directory>../../fcrepo-server/target/classes/org/fcrepo/server/storage/types</directory>
+      <outputDirectory>/org/fcrepo/server/storage/types</outputDirectory>
       <includes>
         <include>RelationshipTuple.class</include>
         <include>TupleArrayTripleIterator.class</include>
@@ -120,16 +120,16 @@
     </fileSet>
 
     <fileSet>
-      <directory>../../fcrepo-server/target/classes/fedora/server/utilities</directory>
-      <outputDirectory>/fedora/server/storage/utilities</outputDirectory>
+      <directory>../../fcrepo-server/target/classes/org/fcrepo/server/utilities</directory>
+      <outputDirectory>/org/fcrepo/server/storage/utilities</outputDirectory>
       <includes>
         <include>DateUtility.class</include>
       </includes>
     </fileSet>
 
     <fileSet>
-      <directory>../../fcrepo-server/target/classes/fedora/server/utilities/status</directory>
-      <outputDirectory>/fedora/server/storage/utilities/status</outputDirectory>
+      <directory>../../fcrepo-server/target/classes/org/fcrepo/server/utilities/status</directory>
+      <outputDirectory>/org/fcrepo/server/storage/utilities/status</outputDirectory>
       <includes>
         <include>ServerState.class</include>
         <include>ServerStatusFile.class</include>
@@ -138,8 +138,8 @@
     </fileSet>
 
     <fileSet>
-      <directory>../../fcrepo-server/target/classes/fedora/utilities</directory>
-      <outputDirectory>/fedora/utilities</outputDirectory>
+      <directory>../../fcrepo-server/target/classes/org/fcrepo/utilities</directory>
+      <outputDirectory>/org/fcrepo/utilities</outputDirectory>
       <includes>
         <include>XMLDocument.class</include>
         <include>Log4J.class</include>

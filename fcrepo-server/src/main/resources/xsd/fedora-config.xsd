@@ -18,24 +18,24 @@
     <admin email="root@localhost" public="true">
       <comment>This is Bob Smith.  He's real nice.</comment>
     </admin>
-    <module role="fedora.server.modules.Logging" 
-            class="fedora.server.modules.Logger">
+    <module role="org.fcrepo.server.modules.Logging" 
+            class="org.fcrepo.server.modules.Logger">
       <comment>We're using the basic logging module.</comment>
       <param name="dbtable" value="mysql1#test1log">
           <comment>Bob administers this, too.</comment>
       </param>
     </module>
-    <module role="fedora.server.storage.DOManager"
-            class="fedora.server.storage.DefaultDOManager">
+    <module role="org.fcrepo.server.storage.DOManager"
+            class="org.fcrepo.server.storage.DefaultDOManager">
       <comment>This one comes with Fedora.  It's best not to change
           these values unless you know what you're doing.</comment>
-      <param name="reader_fast" value="fedora.server.storage.FastDOReader"/>
-      <param name="writer_fast" value="fedora.server.storage.FastDOWriter"/>
+      <param name="reader_fast" value="org.fcrepo.server.storage.FastDOReader"/>
+      <param name="writer_fast" value="org.fcrepo.server.storage.FastDOWriter"/>
       <param name="fast_db" value="mysql1#test1fast"/>
       <param name="fast_fallback_reader" value="definitive"/>
-      <param name="reader_definitive" value="fedora.server.storage.DefinitiveDOReader"/>
-      <param name="writer_definitive" value="fedora.server.storage.DefinitiveDOWriter"/>
-      <param name="definitive_registry_class" value="fedora.server.storage.DBRegistry"/>
+      <param name="reader_definitive" value="org.fcrepo.server.storage.DefinitiveDOReader"/>
+      <param name="writer_definitive" value="org.fcrepo.server.storage.DefinitiveDOWriter"/>
+      <param name="definitive_registry_class" value="org.fcrepo.server.storage.DBRegistry"/>
       <param name="definitive_registry_dbtable" value="mysql1#test1dreg"/>
     </module>
     <database id="mysql1">

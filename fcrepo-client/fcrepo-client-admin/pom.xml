@@ -86,7 +86,7 @@
               -->
               <archive>
                 <manifest>
-                  <mainClass>fedora.client.Administrator</mainClass>
+                  <mainClass>org.fcrepo.client.Administrator</mainClass>
                   <addClasspath>true</addClasspath>
                   <classpathPrefix>lib/</classpathPrefix>
                   <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>

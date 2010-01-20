@@ -58,4 +58,4 @@ set OPTS=%OPTS% -Dcom.sun.xacml.PolicySchema="%FEDORA_HOME%\server\xsd\cs-xacml-
 set OPTS=%OPTS% -Dfedora.home="%FEDORA_HOME%"
 set OPTS=%OPTS% -Dfedora.web.inf.lib="%WEBINF%\lib%"
 
-%JAVA% -server -Xmn64m -Xms256m -Xmx256m -cp %CP% %OPTS% fedora.server.utilities.rebuild.cli.CLILoader %*
+%JAVA% -server -Xmn64m -Xms256m -Xmx256m -cp %CP% %OPTS% org.fcrepo.server.utilities.rebuild.cli.CLILoader %*

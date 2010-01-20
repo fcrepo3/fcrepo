@@ -9,7 +9,7 @@
 	<!--
 	<listener>
         <listener-class>
-            fedora.server.utilities.Log4jConfigListener
+            org.fcrepo.server.utilities.Log4jConfigListener
 		</listener-class>
     </listener>
 	
@@ -38,14 +38,14 @@
 	<servlet>
 		<display-name>Fedora Access Servlet</display-name>
 		<servlet-name>AccessServlet</servlet-name>
-		<servlet-class>fedora.server.access.FedoraAccessServlet</servlet-class>
+		<servlet-class>org.fcrepo.server.access.FedoraAccessServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<display-name>
 			Fedora Controller Servlet (start, stop, get server status)
 		</display-name>
 		<servlet-name>ControlServlet</servlet-name>
-		<servlet-class>fedora.server.ServerController</servlet-class>
+		<servlet-class>org.fcrepo.server.ServerController</servlet-class>
 		<init-param>
 			<param-name>fedora.home</param-name>
 			<param-value/>
@@ -56,62 +56,62 @@
 		<display-name>Fedora Datastream Resolver Servlet</display-name>
 		<servlet-name>DatastreamResolverServlet</servlet-name>
 		<servlet-class>
-			fedora.server.access.dissemination.DatastreamResolverServlet
+			org.fcrepo.server.access.dissemination.DatastreamResolverServlet
 		</servlet-class>
 	</servlet>
 	<servlet>
 		<display-name>Fedora Repository Description Servlet</display-name>
 		<servlet-name>DescribeRepositoryServlet</servlet-name>
 		<servlet-class>
-			fedora.server.access.DescribeRepositoryServlet
+			org.fcrepo.server.access.DescribeRepositoryServlet
 		</servlet-class>
 	</servlet>
 	<servlet>
 		<display-name>Fedora Search Servlet</display-name>
 		<servlet-name>FieldSearchServlet</servlet-name>
 		<servlet-class>
-			fedora.server.access.FieldSearchServlet
+			org.fcrepo.server.access.FieldSearchServlet
 		</servlet-class>
 	</servlet>
 	<servlet>
 		<display-name>Fedora PID Generator Servlet</display-name>
 		<servlet-name>GetNextPIDServlet</servlet-name>
-		<servlet-class>fedora.server.management.GetNextPIDServlet</servlet-class>
+		<servlet-class>org.fcrepo.server.management.GetNextPIDServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<display-name>Fedora Object History Servlet</display-name>
 		<servlet-name>GetObjectHistoryServlet</servlet-name>
-		<servlet-class>fedora.server.access.GetObjectHistoryServlet</servlet-class>
+		<servlet-class>org.fcrepo.server.access.GetObjectHistoryServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<display-name>Fedora List Datastreams Servlet</display-name>
 		<servlet-name>ListDatastreamsServlet</servlet-name>
-		<servlet-class>fedora.server.access.ListDatastreamsServlet</servlet-class>
+		<servlet-class>org.fcrepo.server.access.ListDatastreamsServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<display-name>Fedora List Methods Servlet</display-name>
 		<servlet-name>ListMethodsServlet</servlet-name>
-		<servlet-class>fedora.server.access.ListMethodsServlet</servlet-class>
+		<servlet-class>org.fcrepo.server.access.ListMethodsServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<display-name>Fedora Method Parm Resolver Servlet</display-name>
 		<servlet-name>MethodParameterResolverServlet</servlet-name>
-		<servlet-class>fedora.server.access.MethodParameterResolverServlet</servlet-class>
+		<servlet-class>org.fcrepo.server.access.MethodParameterResolverServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<display-name>Fedora OAI Provider Servlet</display-name>
 		<servlet-name>OAIProviderServlet</servlet-name>
-		<servlet-class>fedora.server.oai.FedoraOAIProviderServlet</servlet-class>
+		<servlet-class>org.fcrepo.server.oai.FedoraOAIProviderServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<display-name>Fedora Report Servlet</display-name>
 		<servlet-name>ReportServlet</servlet-name>
-		<servlet-class>fedora.server.access.ReportServlet</servlet-class>
+		<servlet-class>org.fcrepo.server.access.ReportServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<display-name>Fedora Resource Index Search Servlet</display-name>
 		<servlet-name>RISearchServlet</servlet-name>
-		<servlet-class>fedora.server.access.RISearchServlet</servlet-class>
+		<servlet-class>org.fcrepo.server.access.RISearchServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<display-name>
@@ -119,12 +119,12 @@
 			and sends back an identifier)
 		</display-name>
 		<servlet-name>UploadServlet</servlet-name>
-		<servlet-class>fedora.server.management.UploadServlet</servlet-class>
+		<servlet-class>org.fcrepo.server.management.UploadServlet</servlet-class>
 	</servlet>
     <servlet>
         <display-name>WSDL Servlet</display-name>
         <servlet-name>WSDLServlet</servlet-name>
-        <servlet-class>fedora.server.access.WSDLServlet</servlet-class>
+        <servlet-class>org.fcrepo.server.access.WSDLServlet</servlet-class>
     </servlet>
 	<servlet>
 		<display-name>Fedora REST API Servlet</display-name>
@@ -132,7 +132,7 @@
 	    <servlet-class>com.sun.ws.rest.impl.container.servlet.ServletAdaptor</servlet-class>
 	    <init-param>
 	      <param-name>webresourceclass</param-name>
-	      <param-value>fedora.server.rest.WebResources</param-value>
+	      <param-value>org.fcrepo.server.rest.WebResources</param-value>
 	    </init-param>
     </servlet>
 
@@ -230,23 +230,23 @@
 	<!-- refactoring after fedora 2.2 might eliminate the need for this "setup" filter.  map it first. -->
 	<filter>
 		<filter-name>SetupFilter</filter-name>
-		<filter-class>fedora.server.security.servletfilters.FilterSetup</filter-class>
+		<filter-class>org.fcrepo.server.security.servletfilters.FilterSetup</filter-class>
 	</filter>
 	<filter>
 		<filter-name>XmlUserfileFilter</filter-name>
-		<filter-class>fedora.server.security.servletfilters.xmluserfile.FilterXmlUserfile</filter-class>
+		<filter-class>org.fcrepo.server.security.servletfilters.xmluserfile.FilterXmlUserfile</filter-class>
 	</filter>
     <filter>
         <filter-name>RestApiAuthnFilter</filter-name>
-        <filter-class>fedora.server.security.servletfilters.FilterRestApiAuthn</filter-class>
+        <filter-class>org.fcrepo.server.security.servletfilters.FilterRestApiAuthn</filter-class>
     </filter>
 	<filter>
 		<filter-name>EnforceAuthnFilter</filter-name>
-		<filter-class>fedora.server.security.servletfilters.FilterEnforceAuthn</filter-class>
+		<filter-class>org.fcrepo.server.security.servletfilters.FilterEnforceAuthn</filter-class>
 	</filter>
 	<filter>
 		<filter-name>FinalizeFilter</filter-name>
-		<filter-class>fedora.server.security.servletfilters.FilterFinalize</filter-class>
+		<filter-class>org.fcrepo.server.security.servletfilters.FilterFinalize</filter-class>
 	</filter>
 
   <!-- among security filters, map this one first. -->
@@ -403,19 +403,19 @@
 	</error-page>
 	<error-page>
 		<exception-type>
-			fedora.server.errors.servletExceptionExtensions.Continue100Exception
+			org.fcrepo.server.errors.servletExceptionExtensions.Continue100Exception
 		</exception-type>
 		<location>/jsp/continue-100.jsp</location>
 	</error-page>
 	<error-page>
 		<exception-type>
-			fedora.server.errors.servletExceptionExtensions.Ok200Exception
+			org.fcrepo.server.errors.servletExceptionExtensions.Ok200Exception
 		</exception-type>
 		<location>/jsp/ok-200.jsp</location>
 	</error-page>
 	<error-page>
 		<exception-type>
-			fedora.server.errors.servletExceptionExtensions.BadRequest400Exception
+			org.fcrepo.server.errors.servletExceptionExtensions.BadRequest400Exception
 		</exception-type>
 		<location>/jsp/bad-request-400.jsp</location>
 	</error-page>
@@ -425,7 +425,7 @@
 	</error-page>
 	<error-page>
 		<exception-type>
-			fedora.server.errors.servletExceptionExtensions.Unauthorized401Exception
+			org.fcrepo.server.errors.servletExceptionExtensions.Unauthorized401Exception
 		</exception-type>
 		<location>/jsp/unauthorized-401.jsp</location>
 	</error-page>
@@ -435,7 +435,7 @@
 	</error-page>
 	<error-page>
 		<exception-type>
-			fedora.server.errors.servletExceptionExtensions.Forbidden403Exception
+			org.fcrepo.server.errors.servletExceptionExtensions.Forbidden403Exception
 		</exception-type>
 		<location>/jsp/forbidden-403.jsp</location>
 	</error-page>
@@ -445,13 +445,13 @@
 	</error-page>
 	<error-page>
 		<exception-type>
-			fedora.server.errors.servletExceptionExtensions.NotFound404Exception
+			org.fcrepo.server.errors.servletExceptionExtensions.NotFound404Exception
 		</exception-type>
 		<location>/jsp/notfound-404.jsp</location>
 	</error-page>
 	<error-page>
 		<exception-type>
-			fedora.server.errors.servletExceptionExtensions.InternalError500Exception
+			org.fcrepo.server.errors.servletExceptionExtensions.InternalError500Exception
 		</exception-type>
 		<location>/jsp/internal-error-500.jsp</location>
 	</error-page>
@@ -465,7 +465,7 @@
 	</error-page>
 	<error-page>
 		<exception-type>
-			fedora.server.errors.servletExceptionExtensions.Unavailable503Exception
+			org.fcrepo.server.errors.servletExceptionExtensions.Unavailable503Exception
 		</exception-type>
 		<location>/jsp/unavailable-503.jsp</location>
 	</error-page>

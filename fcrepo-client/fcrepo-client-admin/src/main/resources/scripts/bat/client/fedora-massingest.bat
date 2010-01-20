@@ -8,5 +8,5 @@ exit /B 1
 
 set LAUNCHER="%FEDORA_HOME%\client\bin\env-client.bat"
 
-call %LAUNCHER% fedora.client.test.MassIngest %*
+call %LAUNCHER% org.fcrepo.client.test.MassIngest %*
 

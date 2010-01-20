@@ -61,12 +61,12 @@
               <goal>java</goal>
             </goals>
             <configuration>
-              <mainClass>fedora.server.storage.translation.ConvertObjectSerialization</mainClass>
+              <mainClass>org.fcrepo.server.storage.translation.ConvertObjectSerialization</mainClass>
               <arguments>
                 <argument>${basedir}/src/main/resources/demo/demo-objects/foxml</argument>
                 <argument>${project.build.directory}/client/demo/mets</argument>
-                <argument>fedora.server.storage.translation.FOXML1_1DODeserializer</argument>
-                <argument>fedora.server.storage.translation.METSFedoraExt1_1DOSerializer</argument>
+                <argument>org.fcrepo.server.storage.translation.FOXML1_1DODeserializer</argument>
+                <argument>org.fcrepo.server.storage.translation.METSFedoraExt1_1DOSerializer</argument>
                 <argument>true</argument>
                 <argument>xml</argument>
                 <argument>xml</argument>
@@ -80,12 +80,12 @@
               <goal>java</goal>
             </goals>
             <configuration>
-              <mainClass>fedora.server.storage.translation.ConvertObjectSerialization</mainClass>
+              <mainClass>org.fcrepo.server.storage.translation.ConvertObjectSerialization</mainClass>
               <arguments>
                 <argument>${basedir}/src/main/resources/demo/demo-objects/foxml</argument>
                 <argument>${project.build.directory}/client/demo/atom</argument>
-                <argument>fedora.server.storage.translation.FOXML1_1DODeserializer</argument>
-                <argument>fedora.server.storage.translation.Atom1_1DOSerializer</argument>
+                <argument>org.fcrepo.server.storage.translation.FOXML1_1DODeserializer</argument>
+                <argument>org.fcrepo.server.storage.translation.Atom1_1DOSerializer</argument>
                 <argument>true</argument>
                 <argument>xml</argument>
                 <argument>xml</argument>
@@ -99,12 +99,12 @@
               <goal>java</goal>
             </goals>
             <configuration>
-              <mainClass>fedora.server.storage.translation.ConvertObjectSerialization</mainClass>
+              <mainClass>org.fcrepo.server.storage.translation.ConvertObjectSerialization</mainClass>
               <arguments>
                 <argument>${basedir}/src/main/resources/demo/demo-objects/foxml</argument>
                 <argument>${project.build.directory}/client/demo/atom-zip</argument>
-                <argument>fedora.server.storage.translation.FOXML1_1DODeserializer</argument>
-                <argument>fedora.server.storage.translation.AtomZip1_1DOSerializer</argument>
+                <argument>org.fcrepo.server.storage.translation.FOXML1_1DODeserializer</argument>
+                <argument>org.fcrepo.server.storage.translation.AtomZip1_1DOSerializer</argument>
                 <argument>false</argument>
                 <argument>xml</argument>
                 <argument>zip</argument>
@@ -213,13 +213,13 @@
               
               <archive>
                 <manifest>
-                  <mainClass>fedora.server.journal.readerwriter.multicast.rmi.RmiJournalReceiver</mainClass>
+                  <mainClass>org.fcrepo.server.journal.readerwriter.multicast.rmi.RmiJournalReceiver</mainClass>
                 </manifest>
               </archive>
 
               <includes>
-                <include>fedora/server/journal/readerwriter/multicast/**</include>
-                <include>fedora/server/journal/JournalException.class</include>
+                <include>org/fcrepo/server/journal/readerwriter/multicast/**</include>
+                <include>org/fcrepo/server/journal/JournalException.class</include>
               </includes>
             </configuration> 
           </execution>
@@ -236,7 +236,7 @@
               
               <archive>
                 <manifest>
-                  <mainClass>fedora.server.utilities.rebuild.cli.CLILoader</mainClass>
+                  <mainClass>org.fcrepo.server.utilities.rebuild.cli.CLILoader</mainClass>
                   <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                 </manifest>
 
@@ -246,7 +246,7 @@
                 </manifestEntries>
               </archive>
               <includes>
-                <include>fedora/server/utilities/rebuild/cli/**</include>
+                <include>org/fcrepo/server/utilities/rebuild/cli/**</include>
               </includes>
             </configuration> 
           </execution> 
@@ -411,7 +411,7 @@
                   <goal>java</goal>
                 </goals>
                 <configuration>
-                  <mainClass>fedora.common.policy.Release2_1Namespace</mainClass>
+                  <mainClass>org.fcrepo.common.policy.Release2_1Namespace</mainClass>
                   <arguments>
                     <argument>${project.build.directory}/vocabulary.txt</argument>
                   </arguments>
@@ -443,13 +443,13 @@
                   <classifier>utilities-main</classifier>
                   <archive>
                     <manifest>
-                      <mainClass>fedora.utilities.install.Installer</mainClass>
+                      <mainClass>org.fcrepo.utilities.install.Installer</mainClass>
                     </manifest>
                   </archive>
 
                   <includes>
-                    <include>fedora/utilities/**</include>
-                    <include>fedora/server/**</include>
+                    <include>org/fcrepo/utilities/**</include>
+                    <include>org/fcrepo/server/**</include>
                     <include>**/fedorausers-mapping.xml</include>
                     <include>**/webxml-mapping.xml</include>
                   </includes>

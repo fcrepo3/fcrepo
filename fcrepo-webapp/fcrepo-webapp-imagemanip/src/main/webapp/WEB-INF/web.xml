@@ -8,7 +8,7 @@
     <servlet>
         <display-name>Image Manipulation Servlet</display-name>
         <servlet-name>ImageManipulation</servlet-name>
-        <servlet-class> fedora.localservices.imagemanip.ImageManipulation </servlet-class>
+        <servlet-class> org.fcrepo.localservices.imagemanip.ImageManipulation </servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ImageManipulation</servlet-name>

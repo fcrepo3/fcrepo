@@ -17,6 +17,6 @@ demo_format=info:fedora/fedora-system:FOXML-1.1
 
 args="\"d\" \"$demo_path\" \"$demo_format\" \"$1:$2\" \"$3\" \"$4\" \"$5\" \"\" \"$6\""
 
-execWithTheseArgs fedora.client.utility.ingest.Ingest "$args"
+execWithTheseArgs org.fcrepo.client.utility.ingest.Ingest "$args"
 
 exit $?

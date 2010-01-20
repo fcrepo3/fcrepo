@@ -8,7 +8,7 @@
     <servlet>
         <display-name>Saxon Servlet</display-name>
         <servlet-name>SaxonServlet</servlet-name>
-        <servlet-class>fedora.localservices.saxon.SaxonServlet</servlet-class>
+        <servlet-class>org.fcrepo.localservices.saxon.SaxonServlet</servlet-class>
         <init-param>
             <param-name>credentials for localhost:8080/fedora/getDS</param-name>
             <param-value>backendUser:backendPass</param-value>

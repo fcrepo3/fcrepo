@@ -25,4 +25,4 @@ set ARGS=%ARGS% %DEMO_PATH%
 set ARGS=%ARGS% %DEMO_FORMAT%
 set ARGS=%ARGS% "%1:%2" %3 %4 %5 "" %6
 
-call %LAUNCHER% fedora.client.utility.ingest.Ingest %ARGS%
+call %LAUNCHER% org.fcrepo.client.utility.ingest.Ingest %ARGS%

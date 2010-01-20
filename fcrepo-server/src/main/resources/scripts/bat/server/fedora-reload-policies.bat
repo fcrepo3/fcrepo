@@ -8,4 +8,4 @@ exit /B 1
 
 set LAUNCHER="%FEDORA_HOME%\server\bin\env-server.bat"
 
-call %LAUNCHER% fedora.server.utilities.ServerUtility %*
+call %LAUNCHER% org.fcrepo.server.utilities.ServerUtility %*

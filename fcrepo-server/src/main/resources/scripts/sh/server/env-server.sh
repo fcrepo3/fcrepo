@@ -67,7 +67,7 @@ execWithTheseArgs() {
             -Dcom.sun.xacml.PolicySchema=\"$FEDORA_HOME\"/server/xsd/cs-xacml-schema-policy-01.xsd \
             -Dfedora.home=\"$FEDORA_HOME\" \
             -Dfedora.web.inf.lib=\"$webinf\"/lib \
-            fedora.server.utilities.rebuild.cli.CLILoader $1 $2"
+            org.fcrepo.server.utilities.rebuild.cli.CLILoader $1 $2"
     eval $exec_cmd
     return $?
 }

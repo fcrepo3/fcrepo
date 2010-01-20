@@ -34,9 +34,9 @@
                   classpathref="maven.compile.classpath" dir="${project.build.outputDirectory}">
                   <arg value="server" />
                   <arg
-                    value="${basedir}/../../fcrepo-common/target/generated-sources/axistools/wsdl2java/fedora/server/management/deploy.wsdd" />
+                    value="${basedir}/../../fcrepo-common/target/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/deploy.wsdd" />
                   <arg
-                    value="${basedir}/../../fcrepo-common/target/generated-sources/axistools/wsdl2java/fedora/server/access/deploy.wsdd" />
+                    value="${basedir}/../../fcrepo-common/target/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/deploy.wsdd" />
                 </java>
               </tasks>
             </configuration>

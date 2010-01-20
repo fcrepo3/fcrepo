@@ -3,6 +3,6 @@
 scriptdir=`dirname "$0"`
 . "$scriptdir"/env-client.sh
 
-execWithCmdlineArgs fedora.client.Administrator
+execWithCmdlineArgs org.fcrepo.client.Administrator
 
 exit $?

@@ -3,6 +3,6 @@
 scriptdir=`dirname "$0"`
 . "$scriptdir"/env-client.sh
 
-execWithCmdlineArgs fedora.client.utility.AutoFinder
+execWithCmdlineArgs org.fcrepo.client.utility.AutoFinder
 
 exit $?
