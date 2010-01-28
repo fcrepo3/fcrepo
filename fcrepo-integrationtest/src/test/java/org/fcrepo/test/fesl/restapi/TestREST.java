@@ -2,24 +2,28 @@
 package org.fcrepo.test.fesl.restapi;
 
 import java.io.File;
+
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import junit.framework.JUnit4TestAdapter;
+import org.apache.log4j.Logger;
 
 import org.apache.http.client.ClientProtocolException;
-import org.apache.log4j.Logger;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.fcrepo.test.fesl.util.DataUtils;
+import org.fcrepo.test.fesl.util.FedoraUtil;
 import org.fcrepo.test.fesl.util.HttpUtils;
 import org.fcrepo.test.fesl.util.LoadDataset;
 import org.fcrepo.test.fesl.util.RemoveDataset;
+
+import junit.framework.JUnit4TestAdapter;
 
 
 public class TestREST {
@@ -43,7 +47,8 @@ public class TestREST {
                 (PropertyResourceBundle) ResourceBundle.getBundle(PROPERTIES);
         String username = prop.getString("fedora.admin.username");
         String password = prop.getString("fedora.admin.password");
-        String fedoraUrl = prop.getString("fedora.url");
+        //String fedoraUrl = prop.getString("fedora.url");
+        String fedoraUrl = FedoraUtil.getBaseURL();
 
         try {
             if (log.isDebugEnabled()) {

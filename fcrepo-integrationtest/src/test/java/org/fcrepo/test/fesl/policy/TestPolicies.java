@@ -4,22 +4,25 @@ package org.fcrepo.test.fesl.policy;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-import junit.framework.JUnit4TestAdapter;
-
 import org.apache.log4j.Logger;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import org.w3c.dom.Document;
 
 import org.fcrepo.server.security.xacml.pdp.data.DbXmlPolicyDataManager;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManager;
 import org.fcrepo.test.fesl.util.AuthorizationDeniedException;
 import org.fcrepo.test.fesl.util.DataUtils;
+import org.fcrepo.test.fesl.util.FedoraUtil;
 import org.fcrepo.test.fesl.util.HttpUtils;
 import org.fcrepo.test.fesl.util.LoadDataset;
 import org.fcrepo.test.fesl.util.RemoveDataset;
+
+import junit.framework.JUnit4TestAdapter;
 
 
 public class TestPolicies {
@@ -45,7 +48,8 @@ public class TestPolicies {
                 (PropertyResourceBundle) ResourceBundle.getBundle(PROPERTIES);
         String username = prop.getString("fedora.admin.username");
         String password = prop.getString("fedora.admin.password");
-        String fedoraUrl = prop.getString("fedora.url");
+        //String fedoraUrl = prop.getString("fedora.url");
+        String fedoraUrl = FedoraUtil.getBaseURL();
 
         try {
             if (log.isDebugEnabled()) {
