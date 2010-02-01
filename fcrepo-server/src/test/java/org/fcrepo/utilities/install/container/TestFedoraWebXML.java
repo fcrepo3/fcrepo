@@ -4,12 +4,10 @@
  */
 package org.fcrepo.utilities.install.container;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.StringWriter;
 import java.io.Writer;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,14 +15,15 @@ import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import org.fcrepo.utilities.install.container.FedoraWebXML;
-import org.fcrepo.utilities.install.container.WebXMLOptions;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test the generation of Fedora's web.xml based on install options.
@@ -109,7 +108,7 @@ public class TestFedoraWebXML {
         XMLAssert.assertXpathExists("//w:web-app/w:filter-mapping[w:filter-name='FinalizeFilter']", configA);
         XMLAssert.assertXpathNotExists("//w:web-app/w:filter-mapping[w:filter-name='AuthFilterJAAS']", configA);
         XMLAssert.assertXpathNotExists("//w:web-app/w:filter-mapping[w:filter-name='PEPFilter']", configA);
-        XMLAssert.assertXpathEvaluatesTo("/foo/bar", "//w:web-app/w:servlet[w:servlet-name='ControlServlet']/w:init-param[w:param-name='fedora.home']/w:param-value", configA);
+        XMLAssert.assertXpathEvaluatesTo((new File("/foo/bar")).getAbsolutePath(), "//w:web-app/w:servlet[w:servlet-name='ControlServlet']/w:init-param[w:param-name='fedora.home']/w:param-value", configA);
 
         // TestConfigB
         webXML =
