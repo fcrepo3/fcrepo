@@ -150,10 +150,7 @@ public class ConnectionPool {
                             .createDataSource(props);
             dataSource.setDriverClassName(driver);
         } catch (Exception e) {
-            SQLException se =
-                    new SQLException("Error initializing connection pool");
-            se.initCause(se);
-            throw se;
+            throw new SQLException("Error initializing connection pool", e);
         }
     }
 

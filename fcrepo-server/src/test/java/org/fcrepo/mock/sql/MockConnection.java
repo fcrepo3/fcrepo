@@ -5,7 +5,6 @@
 
 package org.fcrepo.mock.sql;
 
-/* JDBC_4_ANT_TOKEN_BEGIN -
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -14,7 +13,6 @@ import java.sql.SQLClientInfoException;
 import java.sql.SQLXML;
 import java.sql.Struct;
 import java.util.Properties;
-- JDBC_4_ANT_TOKEN_END */
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -241,7 +239,6 @@ public class MockConnection
         throw new RuntimeException("MockConnection.setTypeMap not implemented");
     }
 
-    /* JDBC_4_ANT_TOKEN_BEGIN -
     @Override
     public Array createArrayOf(String arg0, Object[] arg1) throws SQLException {
         throw new UnsupportedOperationException(
@@ -320,5 +317,4 @@ public class MockConnection
         throw new UnsupportedOperationException(
         "Java 1.6 JDBC methods are not supported");
     }
-    - JDBC_4_ANT_TOKEN_END */
 }

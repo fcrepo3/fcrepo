@@ -32,17 +32,15 @@ export CATALINA_HOME
 echo "[Script Options]"
 echo "Arguments     = $*"
 
-# First arg should always specify java5 or java6
+# First arg should always specify java6
 if [ $# -lt 1 ]; then
-  echo "ERROR: Expected first argument: java5 or java6"
+  echo "ERROR: Expected first argument: java6"
   exit 1
 else
-  if [ "$1" == "java5" ]; then
-    JAVA_HOME=$JAVA5_HOME
-  elif [ "$1" == "java6" ]; then
+  if [ "$1" == "java6" ]; then
     JAVA_HOME=$JAVA6_HOME
   else
-    echo "ERROR: First argument must be java5 or java6"
+    echo "ERROR: First argument must be java6"
     exit 1
   fi
 fi

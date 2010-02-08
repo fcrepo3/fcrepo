@@ -4,14 +4,12 @@
  */
 package org.fcrepo.server.utilities;
 
-/* JDBC_4_ANT_TOKEN_BEGIN -
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.NClob;
 import java.sql.SQLXML;
 import java.sql.Struct;
-- JDBC_4_ANT_TOKEN_END */
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -38,8 +36,6 @@ public abstract class ConnectionWrapper
         m_wrappedConnection = wrapped;
     }
     
-    /* JDBC_4_ANT_TOKEN_BEGIN -
-
     public boolean isWrapperFor(Class<?> iface) {
         throw new UnsupportedOperationException(
                 "Java 1.6 Connection methods are not supported");
@@ -104,8 +100,6 @@ public abstract class ConnectionWrapper
         throw new UnsupportedOperationException(
                 "Java 1.6 Connection methods are not supported");
     }
-
-    - JDBC_4_ANT_TOKEN_END */
 
     public Statement createStatement() throws SQLException {
         return m_wrappedConnection.createStatement();

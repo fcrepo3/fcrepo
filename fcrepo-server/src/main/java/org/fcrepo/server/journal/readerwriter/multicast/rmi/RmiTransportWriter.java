@@ -68,9 +68,7 @@ public class RmiTransportWriter
             receiver.writeText(indexedHash, new String(cbuf, off, len));
             itemIndex++;
         } catch (JournalException e) {
-            IOException wrapper = new IOException();
-            wrapper.initCause(e);
-            throw wrapper;
+            throw new IOException(e);
         }
     }
 
@@ -85,9 +83,7 @@ public class RmiTransportWriter
                 m_closed= true;
             }
         } catch (JournalException e) {
-            IOException wrapper = new IOException();
-            wrapper.initCause(e);
-            throw wrapper;
+            throw new IOException(e);
         }
     }
 

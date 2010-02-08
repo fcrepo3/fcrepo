@@ -80,9 +80,7 @@ public class JournalEntryContext
         try {
             map.set(key, values);
         } catch (Exception e) {
-            IllegalArgumentException iae = new IllegalArgumentException();
-            iae.initCause(e);
-            throw iae;
+            throw new IllegalArgumentException(e);
         }
     }
 

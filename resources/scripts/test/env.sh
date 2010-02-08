@@ -6,9 +6,6 @@
 #       in the Config*.properties files
 #
 
-# Where is JDK 1.5 installed?
-JAVA5_HOME=/usr/java/jdk1.5.0_16
-
 # Where is JDK 1.6 installed?
 JAVA6_HOME=/usr/local/jdk1.6.0_11
 

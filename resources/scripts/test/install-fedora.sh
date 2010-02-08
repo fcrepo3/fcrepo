@@ -11,7 +11,7 @@ SCRIPTDIR=`dirname "$SCRIPTPATH"`
 
 # Basic check of arguments
 if [ $# -ne 2 ]; then
-  echo "ERROR: Expected 2 args; java5|java6 installprops"
+  echo "ERROR: Expected 2 args; java6 installprops"
   exit 1
 fi
 

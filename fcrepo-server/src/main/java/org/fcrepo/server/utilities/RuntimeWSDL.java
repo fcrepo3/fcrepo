@@ -97,9 +97,7 @@ public class RuntimeWSDL {
             if (e instanceof IOException) {
                 throw (IOException) e;
             } else {
-                IOException ioe = new IOException("Error getting RuntimeWSDL");
-                ioe.initCause(e);
-                throw ioe;
+                throw new IOException("Error getting RuntimeWSDL", e);
             }
         }
     }

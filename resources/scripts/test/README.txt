@@ -32,11 +32,11 @@ Scripts:
 
     on-commit.sh       The entry point for our "on commit" builds.
                        As of this writing, this simply runs the sanity.sh
-                       script with "java5" as a parameter.  This script
+                       script with "java6" as a parameter.  This script
                        does not accept any arguments.
 
     sanity.sh          Runs a series of "sanity" tests using the given
-                       version of java (java5 or java6) as a parameter.
+                       version of java (e.g. java6) as a parameter.
                        As of this writing, this includes all unit tests
                        and the following integration tests:
 
@@ -50,13 +50,13 @@ Scripts:
                        when the tests complete (whether successful or not).
 
                        Example Usage:
-                         sanity.sh java5
+                         sanity.sh java6
 
     install-fedora.sh  Assuming a "release" build has been run, this installs
                        a fresh instance of Fedora with the given install.properties
                        file (the second argument).  The installer is executed
                        with the version of java given in the first argument
-                       (java5 or java6).
+                       (e.g. java6).
 
                        Example Usage:
-                         install-fedora.sh java5 ConfigB.properties
+                         install-fedora.sh java6 ConfigB.properties

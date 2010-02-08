@@ -267,9 +267,7 @@ class JournalOutputFile
                  * console? If we throw it, where will it be recorded?
                  */
                 e.printStackTrace();
-                IllegalStateException ise = new IllegalStateException();
-                ise.initCause(e);
-                throw ise;
+                throw new IllegalStateException(e);
             }
         }
     }

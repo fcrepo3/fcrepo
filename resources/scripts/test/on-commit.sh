@@ -8,7 +8,7 @@ echo ""
 SCRIPTPATH=$(cd ${0%/*} && echo $PWD/${0##*/})
 SCRIPTDIR=`dirname "$SCRIPTPATH"`
 
-$SCRIPTDIR/sanity.sh java5
+$SCRIPTDIR/sanity.sh java6
 
 if [ $? -ne 0 ]; then
   echo ""

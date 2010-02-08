@@ -70,8 +70,7 @@ public class HierarchicalLowestChildPermitOverridesPolicyAlg
         try {
             identifierURI = new URI(algId);
         } catch (URISyntaxException se) {
-            earlyException = new IllegalArgumentException();
-            earlyException.initCause(se);
+            earlyException = new IllegalArgumentException(se);
         }
     }
 
