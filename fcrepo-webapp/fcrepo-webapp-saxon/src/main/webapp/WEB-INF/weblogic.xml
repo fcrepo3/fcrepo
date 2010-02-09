@@ -1,0 +1,12 @@
+<weblogic-web-app xmlns="http://www.bea.com/ns/weblogic/weblogic-web-app"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.bea.com/ns/weblogic/weblogic-web-app/1.0/weblogic-web-app.xsd">
+  <!-- See: http://download-llnw.oracle.com/docs/cd/E12840_01/wls/docs103/webapp/weblogic_xml.html -->
+  <description>This is the WebLogic deployment descriptor for the Fedora webapp.
+  See http://download-llnw.oracle.com/docs/cd/E12840_01/wls/docs103/webapp/weblogic_xml.html 
+  for a complete reference of the various elements.</description>
+  <weblogic-version>10.3.1</weblogic-version>
+  <container-descriptor>
+    <prefer-web-inf-classes>true</prefer-web-inf-classes>
+  </container-descriptor>
+</weblogic-web-app>
