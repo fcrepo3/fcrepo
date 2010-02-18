@@ -3,7 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         PolicyId="deny-apim-if-not-localhost"
         RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
-  <Description>deny apim access if client ip address is not 127.0.0.1 or ::1</Description>
+  <Description>deny apim access if client ip address is not 127.0.0.1 (or IPv6 equivalent)</Description>
   <Target>
     <Subjects>
       <AnySubject/>
@@ -29,6 +29,8 @@
           <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
             <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">127.0.0.1</AttributeValue>
             <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">::1</AttributeValue>
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">0:0:0:0:0:0:0:1</AttributeValue>
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">0:0:0:0:0:0:0:1%0</AttributeValue>
           </Apply>
         </Apply>
         <!--uncomment(+replicate) for (multiple) ip regexes Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:regexp-string-match">
