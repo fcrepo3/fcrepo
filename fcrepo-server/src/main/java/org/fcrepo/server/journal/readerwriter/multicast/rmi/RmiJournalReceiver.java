@@ -16,29 +16,18 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
-import org.apache.log4j.lf5.LogLevel;
 
 import org.fcrepo.server.journal.JournalException;
 import org.fcrepo.server.journal.readerwriter.multicast.TransportOutputFile;
 
 
 /**
- * <p>
- * <b>Title:</b> RmiJournalReceiver.java
- * </p>
- * <p>
- * <b>Description:</b> A free-standing RMI server that receives journal
- * messages from an RmiTransport and writes them to files in a specified
- * directory.
- * </p>
+ * A free-standing RMI server that receives journal messages from an
+ * RmiTransport and writes them to files in a specified directory.
  * <p>
  * Note: command-line arguments are specified in
  * {@link RmiJournalReceiverArguments}.
- * </p>
  *
  * @author jblake
  * @version $Id: RmiJournalReceiver.java,v 1.4 2007/06/21 15:59:53 jblake Exp $
@@ -82,22 +71,6 @@ public class RmiJournalReceiver
         super(arguments.getServerPortNumber());
         this.arguments = arguments;
         directory = arguments.getDirectoryPath();
-        initializeLog4J(arguments.getLogLevel());
-    }
-
-    /**
-     * Set the logger to write to the console, at whatever level the user
-     * specified in the command line argumements.
-     */
-    private void initializeLog4J(LogLevel logLevel) {
-        ConsoleAppender appender =
-                new ConsoleAppender(new SimpleLayout(), "System.out");
-        appender.setName("Console");
-        appender.activateOptions();
-
-        Logger root = Logger.getRootLogger();
-        root.addAppender(appender);
-        root.setLevel(Level.toLevel(logLevel.getLabel()));
     }
 
     /**

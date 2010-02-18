@@ -22,13 +22,6 @@ and the Javadocs at
 http://sunxacml.sourceforge.net/javadoc/index.html  
 The project's homepage is at http://sunxacml.sourceforge.net/
 
-To quiet sunxacml INFO messages, a logging.properties file is included with the Fedora distribution,
-edited to print only SEVERE messages to the console.  Fedora then starts Java using that logging.properties file.
-The original file, as distributed with JDK 1.4.2.8, prints INFO (and more severe) messages, making the console a bit
-chatty.  To revert to the original logging behavior, edit fedora-start.bat (Windows) or fedora.sh (Unix), and remove
--D... ; or edit the Fedora version of logging.properties.
-
-
 XACML QUICKSTART / GOTCHAS
 xacml provides attribute values for <Target> evaluation as single values, 
 but provides them for <Condition> evaluation as "bags" (sets), doing so even 

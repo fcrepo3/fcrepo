@@ -37,6 +37,8 @@
                     value="${basedir}/../../fcrepo-common/target/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/deploy.wsdd" />
                   <arg
                     value="${basedir}/../../fcrepo-common/target/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/deploy.wsdd" />
+                  <sysproperty key="logback.configurationFile"
+                    value="${basedir}/src/test/resources/logback.xml"/>
                 </java>
               </tasks>
             </configuration>
@@ -142,7 +144,6 @@
               org.apache.taglibs.standard.tag.rt.core,
               org.apache.taglibs.standard.tei,
               org.apache.taglibs.standard.tlv,
-              org.apache.log4j,
               javax.management;resolution:=optional,
               javax.xml.parsers;resolution:=optional,
               javax.xml.transform;resolution:=optional,

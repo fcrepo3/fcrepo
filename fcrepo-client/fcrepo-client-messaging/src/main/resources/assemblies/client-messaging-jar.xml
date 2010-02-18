@@ -154,14 +154,15 @@
     <dependencySet>
       <includes>
 
-        <!-- <include>org.duraspace.fedora:common:jar</include> -->
-        <!-- <include>org.duraspace.fedora:server:jar</include> -->
         <include>com.sun.xml.stream:sjsxp:jar:*</include>
         <include>dom4j:dom4j:jar:*</include>
         <include>javax.activation:activation:jar:*</include>
         <include>javax.xml:jsr173:jar:*</include>
         <include>jaxen:jaxen:jar:*</include>
-        <include>log4j:log4j:jar:*</include>
+        <include>org.slf4j:slf4j-api:jar:*</include>                                         
+        <include>org.slf4j:log4j-over-slf4j:jar:*</include>                                         
+        <include>ch.qos.logback:logback-core:jar:*</include>
+        <include>ch.qos.logback:logback-classic:jar:*</include>
         <include>org.apache.abdera:abdera-core:jar:*</include>
         <include>org.apache.abdera:abdera-i18n:jar:*</include>
         <include>org.apache.abdera:abdera-parser:jar:*</include>
@@ -170,19 +171,8 @@
         <include>org.apache.ws.commons.axiom:axiom-impl:jar:*</include>
 
       </includes>
-      <!-- <useProjectAttachments>true</useProjectAttachments> -->
       <outputDirectory>/lib</outputDirectory>
     </dependencySet>
-    
-    <!--
-    <dependencySet>
-      <includes>
-      
-        <include>org.duraspace.fedora:fedora-messaging-client:jar</include>
-        
-      </includes>
-    </dependencySet>
-    -->
     
   </dependencySets>
 </assembly>

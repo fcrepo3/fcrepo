@@ -701,7 +701,7 @@ public interface Constants {
          */
         public static final String getValue() {
             if (value == null) {
-                if (System.getProperty("servlet.fedora.home") != null) {                    
+                if (System.getProperty("servlet.fedora.home") != null) {
                     value = System.getProperty("servlet.fedora.home");
                 } else if (System.getProperty("fedora.home") != null) {
                     value = System.getProperty("fedora.home");

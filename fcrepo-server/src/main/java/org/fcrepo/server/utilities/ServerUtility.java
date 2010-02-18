@@ -10,12 +10,9 @@ import java.io.IOException;
 
 import java.net.URI;
 
-import java.util.Properties;
-
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.http.WebClient;
@@ -170,33 +167,10 @@ public class ServerUtility {
     }
 
     /**
-     * Initializes logging to use Log4J and to send WARN messages to STDOUT for
-     * command-line use.
-     */
-    private static void initLogging() {
-        // send all log4j output to STDOUT and configure levels
-        Properties props = new Properties();
-        props.setProperty("log4j.appender.STDOUT",
-                          "org.apache.log4j.ConsoleAppender");
-        props.setProperty("log4j.appender.STDOUT.layout",
-                          "org.apache.log4j.PatternLayout");
-        props.setProperty("log4j.appender.STDOUT.layout.ConversionPattern",
-                          "%p: %m%n");
-        props.setProperty("log4j.rootLogger", "WARN, STDOUT");
-        PropertyConfigurator.configure(props);
-
-        // tell commons-logging to use Log4J
-        final String pfx = "org.apache.commons.logging.";
-        System.setProperty(pfx + "LogFactory", pfx + "impl.Log4jFactory");
-        System.setProperty(pfx + "Log", pfx + "impl.Log4JLogger");
-    }
-
-    /**
      * Command-line entry point to reload policies. Takes 3 args: protocol user
      * pass
      */
     public static void main(String[] args) {
-        initLogging();
         if (args.length == 3) {
             try {
                 reloadPolicies(args[0], args[1], args[2]);

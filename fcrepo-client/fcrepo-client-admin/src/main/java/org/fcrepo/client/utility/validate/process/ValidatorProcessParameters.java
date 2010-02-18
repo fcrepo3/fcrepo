@@ -1,13 +1,11 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 
 package org.fcrepo.client.utility.validate.process;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,7 +15,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.fcrepo.client.utility.validate.remote.ServiceInfo;
@@ -25,11 +22,9 @@ import org.fcrepo.server.errors.QueryParseException;
 import org.fcrepo.server.search.Condition;
 import org.fcrepo.server.search.FieldSearchQuery;
 
-
-
 /**
  * Parse and store the command-line arguments for the {@link ValidatorProcess}.
- * 
+ *
  * @author Jim Blake
  */
 public class ValidatorProcessParameters {
@@ -41,7 +36,7 @@ public class ValidatorProcessParameters {
             "usage: ValidatorProcess -serverurl <url> -username <username> "
                     + "-password <password> "
                     + "{-terms <terms> | -query <query> | -pidfile <path>} "
-                    + "[-logConfig <filename>]";
+                    + "[-verbose]";
 
     /**
      * Required parameter: the base url of the Fedora repository server. E.g.
@@ -85,12 +80,11 @@ public class ValidatorProcessParameters {
     public static final String PARAMETER_PIDFILE = "-pidfile";
 
     /**
-     * Optional parameter: the name of a Log4J properties-style configuration
-     * file that will be used to restrict or format the output of the validator.
-     * If this is not provided, output will be written to System.out. E.g.
-     * <code>/usr/local/validator.config.properties</code>
+     * Optional parameter: whether to print all messages during validation.
+     * Normally, only messages that are relevant to an object's being marked
+     * invalid or indeterminate are printed.
      */
-    public static final String PARAMETER_LOG_CONFIG = "-logConfig";
+    public static final String PARAMETER_VERBOSE = "-verbose";
 
     public enum IteratorType {
         FS_QUERY, PIDFILE
@@ -104,19 +98,13 @@ public class ValidatorProcessParameters {
                             PARAMETER_TERMS,
                             PARAMETER_QUERY,
                             PARAMETER_PIDFILE,
-                            PARAMETER_LOG_CONFIG)));
+                            PARAMETER_VERBOSE)));
 
     /**
      * The URL, username and password of the repository we are operating
      * against.
      */
     private final ServiceInfo serviceInfo;
-
-    /**
-     * The Log4J configuration properties obtained from the -logConfig file, or
-     * an empty set of properties if no filename was provided.
-     */
-    private final Properties logConfigProperties;
 
     /**
      * If the command-line arguments contain -terms or -query, this is set to
@@ -134,6 +122,11 @@ public class ValidatorProcessParameters {
      * A pidfile, from the -pidfile parameter.
      */
     private final File pidfile;
+
+    /**
+     * Whether to print verbose messages, from the -verbose parameter.
+     */
+    private final boolean verbose;
 
     /**
      * Parse the command line arguments and check for validity.
@@ -159,9 +152,11 @@ public class ValidatorProcessParameters {
             pidfile = assemblePidfile(pidfileParm);
         }
 
-        String logConfigFile =
-                getOptionalParameter(PARAMETER_LOG_CONFIG, parms);
-        logConfigProperties = readLogConfigFile(logConfigFile);
+        if (parms.containsKey(PARAMETER_VERBOSE)) {
+            verbose = true;
+        } else {
+            verbose = false;
+        }
     }
 
     /**
@@ -316,49 +311,8 @@ public class ValidatorProcessParameters {
         return pidfile;
     }
 
-    /**
-     * Try to read the log configuration properties from the supplied file. If
-     * no file was specified, return an empty {@link Properties} object.
-     */
-    private Properties readLogConfigFile(String logConfigFilename) {
-        Properties props = new Properties();
-
-        if (logConfigFilename != null) {
-            File propertiesFile = new File(logConfigFilename);
-
-            if (!propertiesFile.exists()) {
-                throw new ValidatorProcessUsageException(PARAMETER_LOG_CONFIG
-                        + " file '" + logConfigFilename + "' does not exist.");
-            }
-            if (!propertiesFile.isFile() || !propertiesFile.canRead()) {
-                throw new ValidatorProcessUsageException(PARAMETER_LOG_CONFIG
-                        + " file '" + logConfigFilename
-                        + "' is not a readable file.");
-            }
-
-            try {
-                props.load(new FileInputStream(propertiesFile));
-            } catch (IOException e) {
-                throw new ValidatorProcessUsageException("Failed to load "
-                        + "properties from " + PARAMETER_LOG_CONFIG + " file '"
-                        + logConfigFilename + "'");
-            }
-        }
-        return props;
-    }
-
     public ServiceInfo getServiceInfo() {
         return serviceInfo;
-    }
-
-    /**
-     * Create a fresh {@link Properties} object to distribute, so this object
-     * remains immutable.
-     */
-    public Properties getLogConfigProperties() {
-        Properties props = new Properties();
-        props.putAll(logConfigProperties);
-        return props;
     }
 
     public IteratorType getIteratorType() {
@@ -371,5 +325,9 @@ public class ValidatorProcessParameters {
 
     public File getPidfile() {
         return pidfile;
+    }
+
+    public boolean getVerbose() {
+        return verbose;
     }
 }

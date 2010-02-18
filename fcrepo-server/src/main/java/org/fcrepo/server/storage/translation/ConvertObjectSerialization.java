@@ -28,6 +28,7 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
+import org.fcrepo.utilities.LogConfig;
 
 
 
@@ -197,6 +198,7 @@ public class ConvertObjectSerialization {
      * @param args command-line args.
      */
     public static void main(String[] args) {
+        LogConfig.initMinimal();
         if (args.length < 4 || args.length > 7) {
             die("Expected 4 to 7 arguments", true);
         }

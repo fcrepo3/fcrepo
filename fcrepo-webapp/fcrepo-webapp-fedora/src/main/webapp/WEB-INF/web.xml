@@ -5,19 +5,15 @@
 
   <display-name>Fedora Repository Server</display-name>
 
-  <!--  Cleanup listener for general resource handling -->
+  <!-- Cleanup listener for general resource handling -->
   <listener>
     <listener-class>org.fcrepo.server.utilities.CleanupContextListener</listener-class>
   </listener>
-  <!--
-    <listener>
-      <listener-class>org.fcrepo.server.utilities.Log4jConfigListener</listener-class>
-    </listener>
-    <context-param>
-      <param-name>log4j-configLocation</param-name>
-      <param-value>${fedora.home}/server/config/log4j.properties</param-value>
-    </context-param>
-  -->
+
+  <!-- Listener for initializing logging configuration -->
+  <listener>
+    <listener-class>org.fcrepo.server.utilities.LogSetupContextListener</listener-class>
+  </listener>
 
   <context-param>
     <param-name>fedora.home</param-name>

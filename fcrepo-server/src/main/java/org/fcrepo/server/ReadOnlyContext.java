@@ -453,11 +453,13 @@ public class ReadOnlyContext
                                    request.getContentType());
             }
             if (request.getLocalAddr() != null) {
+                LOG.debug("Request Server IP Address is '" + request.getLocalAddr() + "'");
                 environmentMap
                         .set(Constants.HTTP_REQUEST.SERVER_IP_ADDRESS.uri,
                              request.getLocalAddr());
             }
             if (request.getRemoteAddr() != null) {
+                LOG.debug("Request Client IP Address is '" + request.getRemoteAddr() + "'");
                 environmentMap
                         .set(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.uri,
                              request.getRemoteAddr());

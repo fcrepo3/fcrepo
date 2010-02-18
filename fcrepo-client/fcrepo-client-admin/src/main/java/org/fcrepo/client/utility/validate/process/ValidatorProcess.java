@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 
@@ -23,7 +23,7 @@ import org.fcrepo.client.utility.validate.remote.ServiceInfo;
  * A command-line utility that validates objects in a remote repository,
  * selected by criteria. See the javadoc for {@link ValidatorProcessParameters}
  * for the usage details.
- * 
+ *
  * @author Jim Blake
  */
 public class ValidatorProcess {
@@ -68,7 +68,7 @@ public class ValidatorProcess {
             RemoteObjectSource objectSource =
                     openObjectSource(parms.getServiceInfo());
             ValidationResults results =
-                    new Log4jValidationResults(parms.getLogConfigProperties());
+                    new SimpleValidationResults(parms.getVerbose());
 
             // Get the list of PIDs.
             Iterator<String> pids = getPidIterator(parms, objectSource);

@@ -35,7 +35,6 @@ import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.authorization.AuthzOperationalException;
 import org.fcrepo.server.errors.authorization.AuthzPermittedException;
 import org.fcrepo.server.storage.DOManager;
-import org.fcrepo.utilities.Log4JRedirectFilter;
 
 
 
@@ -92,11 +91,6 @@ public class PolicyEnforcementPoint {
     private final URI RESOURCE_ID_URI;
 
     private final URI RESOURCE_NAMESPACE_URI;
-
-    static {
-        // force com.sun.xacml logging to use Log4J
-        Log4JRedirectFilter.apply("com.sun.xacml.finder.AttributeFinder");
-    }
 
     private PolicyEnforcementPoint() {
 

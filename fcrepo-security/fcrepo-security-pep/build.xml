@@ -108,7 +108,6 @@
 		<move file="${webapp.location}/WEB-INF/server-config.wsdd" tofile="${webapp.location}/WEB-INF/server-config.wsdd.backup.original" />
 		<copy file="${base}/melcoe-pep-server-config.wsdd" tofile="${webapp.location}/WEB-INF/server-config.wsdd" />
 		<copy file="${base}/melcoe-pep-web.xml" tofile="${webapp.location}/WEB-INF/web.xml" />
-		<copy file="${base}/properties/melcoe-pep.log4j.properties" tofile="${webapp.location}/WEB-INF/classes/melcoe-pep.log4j.properties" />
 		<copy file="${base}/properties/config-melcoe-pep.xml" tofile="${webapp.location}/WEB-INF/classes/config-melcoe-pep.xml" />
 		<copy file="${base}/properties/config-melcoe-pep-mapping.xml" tofile="${webapp.location}/WEB-INF/classes/config-melcoe-pep-mapping.xml" />
 		<copy file="${dist}/${jarfile}" tofile="${webapp.location}/WEB-INF/lib/${jarfile}" />
@@ -126,7 +125,6 @@
 		<delete file="${webapp.location}/WEB-INF/server-config.wsdd" />
 		<delete file="${webapp.location}/WEB-INF/web.xml" />
 		<delete file="${webapp.location}/WEB-INF/lib/${jarfile}" />
-		<delete file="${webapp.location}/WEB-INF/classes/melcoe-pep.log4j.properties" />
 		<delete file="${webapp.location}/WEB-INF/classes/config-melcoe-pep.xml" />
 		<delete file="${webapp.location}/WEB-INF/classes/config-melcoe-pep-mapping.xml" />
 		<move file="${webapp.location}/WEB-INF/server-config.wsdd.backup.original" tofile="${webapp.location}/WEB-INF/server-config.wsdd" />

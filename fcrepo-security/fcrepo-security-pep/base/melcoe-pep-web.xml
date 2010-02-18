@@ -3,14 +3,6 @@
     xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     <display-name>Fedora Repository Server</display-name>
-    <!--
-        <listener><listener-class>
-        org.fcrepo.server.utilities.Log4jConfigListener </listener-class>
-        </listener> <context-param>
-        <param-name>log4j-configLocation</param-name>
-        <param-value>${fedora.home}/server/config/log4j.properties</param-value>
-        </context-param>
-    -->
 
     <context-param>
         <param-name>fedora.home</param-name>

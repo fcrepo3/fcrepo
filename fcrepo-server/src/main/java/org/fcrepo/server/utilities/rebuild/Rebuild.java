@@ -24,7 +24,6 @@ import org.fcrepo.server.config.Parameter;
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.config.ServerConfigurationParser;
 import org.fcrepo.server.errors.InitializationException;
-import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.storage.lowlevel.FileSystem;
 import org.fcrepo.server.storage.lowlevel.IListable;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
@@ -34,10 +33,8 @@ import org.fcrepo.server.storage.translation.FOXML1_1DODeserializer;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.utilities.ServerUtility;
-import org.fcrepo.utilities.FileComparator;
-
-
-
+import org.fcrepo.utilities.LogConfig;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * Entry-point for rebuilding various aspects of the repository.
@@ -50,9 +47,6 @@ public class Rebuild
     private static Server server;
 
     private FileSystem fs;
-
-    private static FileComparator _REVERSE_FILE_COMPARATOR =
-            new FileComparator(true);
 
     /**
      * Rebuilders that the rebuild utility knows about.
@@ -260,41 +254,6 @@ public class Rebuild
         return choiceIndex;
     }
 
-    private InputStream getFile(File f, String searchString)
-            throws IOException, LowlevelStorageException {
-
-        /*
-         * If we don't care about the existence of a search string, don't bother
-         * looking
-         */
-        if (searchString == null) {
-            return fs.read(f);
-        }
-
-        BufferedReader reader = null;
-
-        try {
-            reader = new BufferedReader(new InputStreamReader(fs.read(f)));
-            String line = reader.readLine();
-            while (line != null) {
-                if (line.indexOf(searchString) != -1) {
-                    return fs.read(f);
-                } else {
-                    line = reader.readLine();
-                }
-            }
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (Exception e) {
-                }
-            }
-        }
-
-        return null;
-    }
-
     private static ServerConfiguration getServerConfig(File serverDir,
                                                        String profile)
             throws IOException {
@@ -332,7 +291,8 @@ public class Rebuild
         return c;
     }
 
-    private static int setValuesForProfile(List configs, String profile) {
+    private static int setValuesForProfile(List configs,
+                                           String profile) {
         Iterator iter = configs.iterator();
         int c = 0;
         while (iter.hasNext()) {
@@ -377,14 +337,6 @@ public class Rebuild
     }
 
     public static void main(String[] args) {
-        // tell commons-logging to use log4j
-        System.setProperty("org.apache.commons.logging.LogFactory",
-                           "org.apache.commons.logging.impl.Log4jFactory");
-        System.setProperty("org.apache.commons.logging.Log",
-                           "org.apache.commons.logging.impl.Log4JLogger");
-        // log4j
-        // File log4jConfig = new File(new File(homeDir), "config/log4j.xml");
-        // DOMConfigurator.configure(log4jConfig.getPath());
         String profile = null;
         if (args.length > 0) {
             profile = args[0];
@@ -393,8 +345,16 @@ public class Rebuild
             fail("Too many arguments", true, true);
         }
         try {
-            File serverDir =
-                    new File(new File(Constants.FEDORA_HOME), "server");
+            File fedoraHomeDir = new File(Constants.FEDORA_HOME);
+
+            // Configure logging from file & redirect java.util.logging to slf4j
+            System.setProperty("fedora.home", Constants.FEDORA_HOME);
+            System.setProperty("logfile.extension", "-rebuild.log");
+            LogConfig.initFromFile(new File(fedoraHomeDir,
+                                            "server/config/logback.xml"));
+            SLF4JBridgeHandler.install();
+
+            File serverDir = new File(fedoraHomeDir, "server");
             ServerConfiguration serverConfig =
                     getServerConfig(serverDir, profile);
             System.err.println();

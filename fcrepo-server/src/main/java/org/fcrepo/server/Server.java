@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server;
@@ -52,16 +52,12 @@ import org.fcrepo.server.security.Authorization;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.status.ServerState;
 import org.fcrepo.server.utilities.status.ServerStatusFile;
-import org.fcrepo.utilities.Log4J;
-
-
-
 
 /**
  * The starting point for working with a Fedora repository. This class handles
  * loading, starting, and stopping modules (the module lifecycle), and provides
  * access to core constants.
- * 
+ *
  * @author Chris Wilper
  */
 public abstract class Server
@@ -74,7 +70,7 @@ public abstract class Server
     public static final boolean GLOBAL_CHOICE = false;
 
     /** Logger for this class. */
-    private static Logger LOG;
+    private static final Logger LOG = Logger.getLogger(Server.class);
 
     /**
      * The ResourceBundle that provides access to constants from
@@ -450,7 +446,7 @@ public abstract class Server
      * the <code>Server</code>, then initializes each module, validating its
      * required params, then verifies that the server's required module roles
      * have been met.
-     * 
+     *
      * @param rootConfigElement
      *        The root <code>Element</code> of configuration.
      * @param homeDir
@@ -555,7 +551,7 @@ public abstract class Server
                             (Module) moduleConstructor
                                     .newInstance(new Object[] {
                                             moduleParams.get(role),
-                                            (Server) this, role});
+                                            this, role});
                     m_loadedModules.put(role, inst);
                 } catch (ClassNotFoundException cnfe) {
                     throw new ModuleInitializationException(MessageFormat
@@ -674,33 +670,6 @@ public abstract class Server
     }
 
     /**
-     * Configures Log4J using FEDORA_HOME/config/log4j.properties.
-     */
-    protected static void configureLog4J(String extension)
-            throws ServerInitializationException {
-
-        File fedoraHome = new File(Constants.FEDORA_HOME);
-        File serverDir = new File(fedoraHome, "server");
-        File logDir = new File(serverDir, "logs");
-        logDir.mkdirs();
-        
-        Map<String, String> options = new HashMap<String, String>();
-        options.put("logDir", logDir.getPath());
-        options.put("extension", extension);
-
-        File propFile = new File(serverDir, "config/log4j.properties");
-        
-        try {
-            Log4J.initFromPropFile(propFile, options);
-        } catch (Exception e) {
-            throw new ServerInitializationException("Error initializing from "
-                    + "log4j configuration file: " + propFile.getPath(), e);
-        }
-
-        LOG = Logger.getLogger(Server.class.getName());
-    }
-
-    /**
      * Builds and returns a <code>Map</code> of parameter name-value pairs
      * defined as children of the given <code>Element</code>, according to
      * the server configuration schema.
@@ -716,7 +685,7 @@ public abstract class Server
      * will contain the the name-value pair <code>HashMaps</code> of each of
      * the CONFIG_ELEMENT_DATASTORE elements found (keyed by
      * CONFIG_ATTRIBUTE_ID).
-     * 
+     *
      * @param element
      *        The element containing the name-value pair defintions.
      * @param dAttribute
@@ -907,7 +876,7 @@ public abstract class Server
      * </p>
      * This is useful for threaded <code>Modules</code> that need to wait
      * until all initialization has occurred before doing something.
-     * 
+     *
      * @return whether initialization has completed.
      */
     public final boolean hasInitialized() {
@@ -937,7 +906,7 @@ public abstract class Server
         if (okToStart) {
             return getInstance(homeDir);
         } else {
-            Server instance = (Server) s_instances.get(homeDir);
+            Server instance = s_instances.get(homeDir);
             if (instance == null) {
                 throw new ServerInitializationException("The Fedora server is not yet running.");
             } else {
@@ -950,7 +919,7 @@ public abstract class Server
     /**
      * Provides an instance of the server specified in the configuration file at
      * homeDir/CONFIG_DIR/CONFIG_FILE, or DEFAULT_SERVER_CLASS if unspecified.
-     * 
+     *
      * @param homeDir
      *        The base directory for the server.
      * @return The instance.
@@ -962,12 +931,11 @@ public abstract class Server
     public final static synchronized Server getInstance(File homeDir)
             throws ServerInitializationException, ModuleInitializationException {
         // return an instance if already in memory
-        Server instance = (Server) s_instances.get(homeDir);
+        Server instance = s_instances.get(homeDir);
         if (instance != null) {
             return instance;
         }
 
-        configureLog4J(".log");
         LOG.info("Starting up server");
 
         // else instantiate a new one given the class provided in the
@@ -1084,7 +1052,7 @@ public abstract class Server
 
     /**
      * Gets the server's home directory.
-     * 
+     *
      * @return The directory.
      */
     public final File getHomeDir() {
@@ -1093,25 +1061,25 @@ public abstract class Server
 
     /**
      * Gets a loaded <code>Module</code>.
-     * 
+     *
      * @param role
      *        The role of the <code>Module</code> to get.
      * @return The <code>Module</code>, <code>null</code> if not found.
      */
     public final Module getModule(String role) {
-        return (Module) m_loadedModules.get(role);
+        return m_loadedModules.get(role);
     }
 
     /**
      * Gets a <code>DatastoreConfig</code>.
-     * 
+     *
      * @param id
      *        The id as given in the server configuration.
      * @return The <code>DatastoreConfig</code>, <code>null</code> if not
      *         found.
      */
     public final DatastoreConfig getDatastoreConfig(String id) {
-        return (DatastoreConfig) m_datastoreConfigs.get(id);
+        return m_datastoreConfigs.get(id);
     }
 
     public Iterator<String> datastoreConfigIds() {
@@ -1120,7 +1088,7 @@ public abstract class Server
 
     /**
      * Gets an <code>Iterator</code> over the roles that have been loaded.
-     * 
+     *
      * @return (<code>String</code>s) The roles.
      */
     public final Iterator<String> loadedModuleRoles() {
@@ -1133,7 +1101,7 @@ public abstract class Server
      * </p>
      * This is guaranteed to be run before any modules are loaded. The default
      * implementation does nothing.
-     * 
+     *
      * @throws ServerInitializationException
      *         If a severe server startup-related error occurred.
      */
@@ -1150,7 +1118,7 @@ public abstract class Server
      * This is guaranteed to be run after all Modules have been loaded and all
      * module initialization (initModule() and postInitModule()) has taken
      * place. The default implementation does nothing.
-     * 
+     *
      * @throws ServerInitializationException
      *         If a severe server startup-related error occurred.
      */
@@ -1185,7 +1153,7 @@ public abstract class Server
      * </p>
      * Right before this is finished, the instance is removed from the server
      * instances map.
-     * 
+     *
      * @throws ServerShutdownException
      *         If a severe server shutdown-related error occurred.
      *         USER_REPRESENTED = addName(new XacmlName(this,
@@ -1223,7 +1191,7 @@ public abstract class Server
      * error. If an error occurs, it should be thrown as a
      * <code>ServerShutdownException</code> after attempts to free every
      * resource have been made.
-     * 
+     *
      * @throws ServerShutdownException
      *         If a severe server shutdown-related error occurred.
      */
@@ -1235,12 +1203,13 @@ public abstract class Server
 
     /**
      * Calls <code>shutdown()</code> when finalization occurs.
-     * 
+     *
      * @throws ServerShutdownException
      *         If a severe server shutdown-related error occurred.
      * @throws ModuleShutdownException
      *         If a severe module shutdown-related error occurred.
      */
+    @Override
     public final void finalize() throws ServerShutdownException,
             ModuleShutdownException {
         shutdownServer();
@@ -1336,11 +1305,11 @@ public abstract class Server
             padding = "                ";
             i = 0;
             Iterator iter2 =
-                    ((DatastoreConfig) getDatastoreConfig(id)).parameterNames();
+                    (getDatastoreConfig(id)).parameterNames();
             while (iter2.hasNext()) {
                 String name = (String) iter2.next();
                 String value =
-                        ((DatastoreConfig) getDatastoreConfig(id))
+                        (getDatastoreConfig(id))
                                 .getParameter(name);
                 if (i > 0) {
                     out.append(padding);
@@ -1397,10 +1366,10 @@ public abstract class Server
             return currentDate;
         }
     }
-   
+
     /**
      * Gets the server configuration.
-     * 
+     *
      * @return the server configuration.
      */
     public static ServerConfiguration getConfig() {
@@ -1410,7 +1379,7 @@ public abstract class Server
                              "server/config/fedora.fcfg"));
             ServerConfigurationParser parser =
                 new ServerConfigurationParser(fcfg);
-            return parser.parse(); 
+            return parser.parse();
         } catch (IOException e) {
             throw new FaultException("Error loading server configuration",
                                      e);

@@ -95,13 +95,11 @@
         <dependency>
           <groupId>commons-beanutils</groupId>
           <artifactId>commons-beanutils</artifactId>
-          <version>1.6</version>
         </dependency>
 
         <dependency>
           <groupId>commons-betwixt</groupId>
           <artifactId>commons-betwixt</artifactId>
-          <version>0.7</version>
         </dependency>
 
         <dependency>
@@ -157,19 +155,34 @@
       <groupId>commons-digester</groupId>
       <artifactId>commons-digester</artifactId>
       <version>1.7</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.0.4</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
+
+    <dependency>                                                                                    
+      <groupId>ch.qos.logback</groupId>                                                           
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
@@ -295,21 +308,6 @@
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
     </dependency>
-
-    <!-- dependencies needed by the actual installer.jar 
-            fedora-common.jar
-            lib.dom4j
-            lib.jaxen
-            lib.mulgara
-            lib.log4j
-            lib.commons-beanutils
-            lib.commons-betwixt
-            lib.commons-collections
-            lib.commons-digester
-            lib.commons-logging
-            lib.openrdf-model
-            lib.one-jar
-      -->
 
   </dependencies>
 </project>

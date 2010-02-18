@@ -73,17 +73,6 @@ public class FedoraClient
 
     public static final String FEDORA_URI_PREFIX = "info:fedora/";
 
-    /**
-     * Should FedoraClient take over log4j configuration?
-     * <h2>Deprecated as of Fedora 2.2</h2>
-     * FedoraClient no longer takes over Log4J configuration, and setting this
-     * value has no effect. Applications that use this class should configure
-     * Log4J themselves, or make a log4j.xml or log4j.properties file available
-     * from the runtime CLASSPATH.
-     */
-    @Deprecated
-    public static boolean FORCE_LOG4J_CONFIGURATION = false;
-
     /** Seconds to wait before a connection is established. */
     public int TIMEOUT_SECONDS = 20;
 

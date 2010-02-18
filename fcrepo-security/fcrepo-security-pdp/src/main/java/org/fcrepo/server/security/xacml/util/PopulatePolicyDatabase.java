@@ -20,12 +20,11 @@ package org.fcrepo.server.security.xacml.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
@@ -57,7 +56,6 @@ public class PopulatePolicyDatabase {
 
     public static void main(String[] args) throws PolicyDataManagerException,
             FileNotFoundException {
-        BasicConfigurator.configure();
         dbXmlPolicyDataManager = new DbXmlPolicyDataManager();
         log.info("Adding");
         add();

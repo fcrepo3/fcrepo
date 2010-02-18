@@ -67,7 +67,6 @@ import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.swing.mdi.MDIDesktopPane;
 import org.fcrepo.swing.mdi.WindowMenu;
-import org.fcrepo.utilities.Log4J;
 
 
 
@@ -867,7 +866,6 @@ public class Administrator
     }
 
     public static void main(String[] args) {
-        Log4J.force();
         if (args.length == 1) {
             int socketTimeoutSeconds = 120;
             try {

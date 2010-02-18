@@ -13,12 +13,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.util.Map;
-import java.util.Properties;
 
-import org.apache.log4j.PropertyConfigurator;
+import java.util.Map;
 
 import org.fcrepo.utilities.FileUtils;
+import org.fcrepo.utilities.LogConfig;
 import org.fcrepo.utilities.Zip;
 import org.fcrepo.utilities.install.container.Container;
 import org.fcrepo.utilities.install.container.ContainerFactory;
@@ -26,26 +25,6 @@ import org.fcrepo.utilities.install.container.FedoraWebXML;
 
 
 public class Installer {
-
-    static {
-        //send all log4j (WARN only) output to STDOUT
-        Properties props = new Properties();
-        props.setProperty("log4j.appender.STDOUT",
-                          "org.apache.log4j.ConsoleAppender");
-        props.setProperty("log4j.appender.STDOUT.layout",
-                          "org.apache.log4j.PatternLayout");
-        props.setProperty("log4j.appender.STDOUT.layout.ConversionPattern",
-                          "%p (%c{1}) %m%n");
-        props.setProperty("log4j.rootLogger", "WARN, STDOUT");
-        PropertyConfigurator.configure(props);
-
-        //tell commons-logging to use log4j
-        final String pfx = "org.apache.commons.logging.";
-        if (System.getProperty(pfx + "LogFactory") == null) {
-            System.setProperty(pfx + "LogFactory", pfx + "impl.Log4jFactory");
-            System.setProperty(pfx + "Log", pfx + "impl.Log4JLogger");
-        }
-    }
 
     private final Distribution _dist;
 
@@ -169,22 +148,15 @@ public class Installer {
                 installJDBCDriver(_dist, _opts, webinfLib);
             }
 
-            // Remove log4j if using JBoss Application Server
-            if (container.equals(InstallOptions.OTHER)
-                    && _opts.getValue(InstallOptions.USING_JBOSS)
-                            .equals("true")) {
-                new File(webinfLib, Distribution.LOG4J).delete();
-            }
-            
             // FeSL configuration
             if (_opts.getBooleanValue(InstallOptions.FESL_ENABLED, false)) {
             	File originalWsdd = new File(warStage, "WEB-INF/server-config.wsdd");
             	originalWsdd.renameTo(new File(warStage, "WEB-INF/server-config.wsdd.backup.original"));
-            	
+
             	File feslWsdd = new File(warStage, "WEB-INF/melcoe-pep-server-config.wsdd");
             	feslWsdd.renameTo(new File(warStage, "WEB-INF/server-config.wsdd"));
             }
-            
+
             File fedoraWar = new File(installDir, fedoraWarName + ".war");
             Zip.zip(fedoraWar, warStage.listFiles());
             return fedoraWar;
@@ -262,6 +234,7 @@ public class Installer {
      * Command-line entry point.
      */
     public static void main(String[] args) {
+        LogConfig.initMinimal();
         try {
             Distribution dist = new ClassLoaderDistribution();
             InstallOptions opts = null;

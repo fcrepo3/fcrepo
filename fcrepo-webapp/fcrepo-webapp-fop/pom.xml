@@ -26,25 +26,40 @@
   </build>
 
   <dependencies>
+
+    <dependency>                                                                                    
+      <groupId>ch.qos.logback</groupId>                                                           
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
       <version>2.4</version>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>fop</artifactId>
       <version>0.95-1</version>
     </dependency>
+
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>fop-hyph</artifactId>
       <version>1.2</version>
     </dependency>
+
   </dependencies>
 </project>
