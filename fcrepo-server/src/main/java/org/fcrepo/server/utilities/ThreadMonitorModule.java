@@ -1,30 +1,29 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.utilities;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ModuleInitializationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Module wrapper for ThreadMonitorImpl.
- * 
+ *
  * @author Chris Wilper
  */
 public class ThreadMonitorModule
         extends Module
         implements ThreadMonitor {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(ThreadMonitorModule.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ThreadMonitorModule.class);
 
     private ThreadMonitorImpl m_wrappedMonitor;
 
@@ -45,9 +44,8 @@ public class ThreadMonitorModule
                         .equals("true"))) {
             m_active = true;
             if (pollInterval == null) {
-                LOG
-                        .info("pollInterval unspecified, defaulting to 10,000 milliseconds.");
                 pollInterval = "10000";
+                logger.info("pollInterval unspecified, defaulting to {}ms", pollInterval);
             }
             try {
                 int pi = Integer.parseInt(pollInterval);

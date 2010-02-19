@@ -56,14 +56,12 @@ execWithCmdlineArgs() {
 execWithTheseArgs() {
     common="$CATALINA_HOME"/common
     exec_cmd="exec \"$java\" -server -Xmn64m -Xms256m -Xmx256m \
-            -cp \"$webinf\"/classes:\"$FEDORA_HOME\"/server/bin/${fedora-cli-loader-jar} \
+            -cp \"$webinf\"/classes:\"$FEDORA_HOME\"/server/bin:\"$FEDORA_HOME\"/server/bin/${fedora-cli-loader-jar} \
             -Djava.endorsed.dirs=\"$common\"/endorsed:\"$common\"/lib \
             -Djavax.net.ssl.trustStore=\"$FEDORA_HOME\"/server/truststore \
             -Djavax.net.ssl.trustStorePassword=tomcat \
             -Djavax.xml.parsers.DocumentBuilderFactory=org.apache.xerces.jaxp.DocumentBuilderFactoryImpl \
             -Djavax.xml.parsers.SAXParserFactory=org.apache.xerces.jaxp.SAXParserFactoryImpl \
-            -Dorg.apache.commons.logging.LogFactory=org.apache.commons.logging.impl.Log4jFactory \
-            -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4jLogger \
             -Dcom.sun.xacml.PolicySchema=\"$FEDORA_HOME\"/server/xsd/cs-xacml-schema-policy-01.xsd \
             -Dfedora.home=\"$FEDORA_HOME\" \
             -Dfedora.web.inf.lib=\"$webinf\"/lib \

@@ -24,9 +24,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+
 import java.lang.reflect.Constructor;
+
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,16 +40,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 
 import com.sun.xacml.Indenter;
 import com.sun.xacml.ParsingException;
@@ -59,6 +52,16 @@ import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Subject;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Utility class that provides various methods for creating/converting contexts.
@@ -66,13 +69,14 @@ import com.sun.xacml.ctx.Subject;
  * representations to their object representations and vice versa as well as a
  * few utility methods for getting information from the contexts. It also
  * contains methods for constructing requests.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 
 public class ContextUtil {
 
-    private static Logger log = Logger.getLogger(ContextUtil.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ContextUtil.class);
 
     private static final URI XACML_RESOURCE_ID =
             URI.create("urn:oasis:names:tc:xacml:1.0:resource:resource-id");
@@ -120,12 +124,11 @@ public class ContextUtil {
         try {
             is = new FileInputStream(configPEPFile);
         } catch (FileNotFoundException e) {
-            log.info("Mapping file, config-melcoe-pep-mapping.xml, not found.");
+            logger.info("Mapping file, config-melcoe-pep-mapping.xml, not found.");
         }
 
         if (is != null) {
-            log
-                    .info("Mapping file found (config-melcoe-pep-mapping.xml). Loading maps");
+            logger.info("Mapping file found (config-melcoe-pep-mapping.xml). Loading maps");
             try {
                 DocumentBuilderFactory factory =
                         DocumentBuilderFactory.newInstance();
@@ -150,7 +153,7 @@ public class ContextUtil {
                                 URI value = new URI(to);
                                 actionMap.put(key, value);
                             } catch (URISyntaxException mue) {
-                                log.warn("Mapping contained invalid URI: ["
+                                logger.warn("Mapping contained invalid URI: ["
                                         + from + "] / [" + to + "]");
                             }
                         }
@@ -174,7 +177,7 @@ public class ContextUtil {
                     }
                 }
             } catch (Exception e) {
-                log.warn("Error occurred loading the mapping file. "
+                logger.warn("Error occurred loading the mapping file. "
                         + "Mappings will not be used.", e);
             }
         }
@@ -218,8 +221,8 @@ public class ContextUtil {
                     relationshipResolverElement.getElementsByTagName("option");
 
             if (optionList == null || optionList.getLength() == 0) {
-                if (log.isDebugEnabled()) {
-                    log.debug("creating relationship resolver WITHOUT options");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("creating relationship resolver WITHOUT options");
                 }
 
                 rr =
@@ -227,8 +230,8 @@ public class ContextUtil {
                                 .newInstance();
 
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("creating relationship resolver WITH options");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("creating relationship resolver WITH options");
                 }
 
                 options = new HashMap<String, String>();
@@ -239,8 +242,8 @@ public class ContextUtil {
                                     .getNodeValue();
                     String value = n.getFirstChild().getNodeValue();
                     options.put(key, value);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Node [name]: " + key + ": " + value);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Node [name]: " + key + ": " + value);
                     }
                 }
                 c =
@@ -251,9 +254,9 @@ public class ContextUtil {
                                 .newInstance(new Object[] {options});
             }
         } catch (Exception e) {
-            log.info("Failed to get configured RelationshipResolver, will try "
+            logger.info("Failed to get configured RelationshipResolver, will try "
                     + "fallback.");
-            log.debug(e.getMessage());
+            logger.debug(e.getMessage());
             rr = new RelationshipResolverImpl();
         }
         DEFAULT_RELATIONSHIP_RESOLVER = rr;
@@ -267,7 +270,7 @@ public class ContextUtil {
      * Sets up the Subject section of the request. Takes a list of Maps of
      * URI/AttributeValue pairs. Each list element represents one subject which
      * contains a map of URI/AttributeValues.
-     * 
+     *
      * @return a Set of Subject instances for inclusion in a Request
      */
     public Set<Subject> setupSubjects(List<Map<URI, List<AttributeValue>>> subjs) {
@@ -303,7 +306,7 @@ public class ContextUtil {
 
     /**
      * Creates a Resource specifying the resource-id, a required attribute.
-     * 
+     *
      * @return a Set of Attributes for inclusion in a Request
      */
     public Set<Attribute> setupResources(Map<URI, AttributeValue> res)
@@ -334,7 +337,7 @@ public class ContextUtil {
                 res.put(XACML_RESOURCE_ID, new AnyURIAttribute(new URI(pid)));
             }
         } catch (Exception e) {
-            log.error("Error finding parents.", e);
+            logger.error("Error finding parents.", e);
             throw new MelcoeXacmlException("Error finding parents.", e);
         }
 
@@ -347,7 +350,7 @@ public class ContextUtil {
 
     /**
      * Creates an Action specifying the action-id, an optional attribute.
-     * 
+     *
      * @return a Set of Attributes for inclusion in a Request
      */
     public Set<Attribute> setupAction(Map<URI, AttributeValue> a) {
@@ -388,7 +391,7 @@ public class ContextUtil {
 
     /**
      * Creates the Environment attributes.
-     * 
+     *
      * @return a Set of Attributes for inclusion in a Request
      */
     public Set<Attribute> setupEnvironment(Map<URI, AttributeValue> e) {
@@ -407,7 +410,7 @@ public class ContextUtil {
 
     /**
      * Constructs a RequestCtx object.
-     * 
+     *
      * @param subjects
      *        list of Subjects
      * @param actions
@@ -424,8 +427,8 @@ public class ContextUtil {
                                    Map<URI, AttributeValue> resources,
                                    Map<URI, AttributeValue> environment)
             throws MelcoeXacmlException {
-        if (log.isDebugEnabled()) {
-            log.debug("Building request!");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Building request!");
         }
 
         if (relationshipResolver == null) {
@@ -444,7 +447,7 @@ public class ContextUtil {
                                    setupAction(actions),
                                    setupEnvironment(environment));
         } catch (Exception e) {
-            log.error("Error creating request.", e);
+            logger.error("Error creating request.", e);
             throw new MelcoeXacmlException("Error creating request", e);
         }
 
@@ -453,7 +456,7 @@ public class ContextUtil {
 
     /**
      * Converts a string based response to a ResponseCtx obejct.
-     * 
+     *
      * @param response
      *        the string response
      * @return the ResponseCtx object
@@ -478,7 +481,7 @@ public class ContextUtil {
 
     /**
      * Converts a string based request to a RequestCtx obejct.
-     * 
+     *
      * @param request
      *        the string request
      * @return the RequestCtx object
@@ -499,7 +502,7 @@ public class ContextUtil {
 
     /**
      * Converts a RequestCtx object to its string representation.
-     * 
+     *
      * @param reqCtx
      *        the RequestCtx object
      * @return the String representation of the RequestCtx object
@@ -512,7 +515,7 @@ public class ContextUtil {
 
     /**
      * Converst a ResponseCtx object to its string representation.
-     * 
+     *
      * @param resCtx
      *        the ResponseCtx object
      * @return the String representation of the ResponseCtx object
@@ -525,7 +528,7 @@ public class ContextUtil {
 
     /**
      * Returns a map of resource-id, result based on an XACML response.
-     * 
+     *
      * @param resCtx
      *        the XACML response
      * @return the Map of resource-id and result

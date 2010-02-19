@@ -2,18 +2,10 @@
 package org.fcrepo.server.security.xacml.pdp.finder.attribute;
 
 import java.net.URI;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-
-import org.apache.log4j.Logger;
-
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderConfigUtil;
-import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderException;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
-import org.fcrepo.server.security.xacml.util.RelationshipResolver;
 
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.attr.AttributeFactory;
@@ -23,11 +15,19 @@ import com.sun.xacml.attr.StandardAttributeFactory;
 import com.sun.xacml.cond.EvaluationResult;
 import com.sun.xacml.finder.AttributeFinderModule;
 
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderConfigUtil;
+import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderException;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.fcrepo.server.security.xacml.util.RelationshipResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FedoraRIAttributeFinder
         extends AttributeFinderModule {
 
-    private static final Logger log =
-            Logger.getLogger(FedoraRIAttributeFinder.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(FedoraRIAttributeFinder.class);
 
     private AttributeFactory attributeFactory = null;
 
@@ -40,15 +40,14 @@ public class FedoraRIAttributeFinder
             attributes =
                     AttributeFinderConfigUtil.getAttributeFinderConfig(this
                             .getClass().getName());
-            log
-                    .info("Initialised AttributeFinder:"
+            logger.info("Initialised AttributeFinder:"
                             + this.getClass().getName());
 
-            if (log.isDebugEnabled()) {
-                log.debug("registering the following attributes: ");
+            if (logger.isDebugEnabled()) {
+                logger.debug("registering the following attributes: ");
                 for (Integer k : attributes.keySet()) {
                     for (String l : attributes.get(k)) {
-                        log.debug(k + ": " + l);
+                        logger.debug(k + ": " + l);
                     }
                 }
             }
@@ -56,9 +55,9 @@ public class FedoraRIAttributeFinder
             Map<String, String> resolverConfig =
                     AttributeFinderConfigUtil.getResolverConfig(this.getClass()
                             .getName());
-            if (log.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 for (String s : resolverConfig.keySet()) {
-                    log.debug(s + ": " + resolverConfig.get(s));
+                    logger.debug(s + ": " + resolverConfig.get(s));
                 }
             }
 
@@ -67,14 +66,14 @@ public class FedoraRIAttributeFinder
 
             attributeFactory = StandardAttributeFactory.getFactory();
         } catch (AttributeFinderException afe) {
-            log.fatal("Attribute finder not initialised:"
-                    + this.getClass().getName());
+            logger.error("Attribute finder not initialised:"
+                    + this.getClass().getName(), afe);
         }
     }
 
     /**
      * Returns true always because this module supports designators.
-     * 
+     *
      * @return true always
      */
     @Override
@@ -85,7 +84,7 @@ public class FedoraRIAttributeFinder
     /**
      * Returns a <code>Set</code> with a single <code>Integer</code> specifying
      * that environment attributes are supported by this module.
-     * 
+     *
      * @return a <code>Set</code> with
      *         <code>AttributeDesignator.ENVIRONMENT_TARGET</code> included
      */
@@ -97,7 +96,7 @@ public class FedoraRIAttributeFinder
     /**
      * Used to get an attribute. If one of those values isn't being asked for,
      * or if the types are wrong, then an empty bag is returned.
-     * 
+     *
      * @param attributeType
      *        the datatype of the attributes to find, which must be time, date,
      *        or dateTime for this module to resolve a value
@@ -125,8 +124,8 @@ public class FedoraRIAttributeFinder
                                           EvaluationCtx context,
                                           int designatorType) {
         String resourceId = context.getResourceId().encode();
-        if (log.isDebugEnabled()) {
-            log.debug("RIAttributeFinder: [" + attributeType.toString() + "] "
+        if (logger.isDebugEnabled()) {
+            logger.debug("RIAttributeFinder: [" + attributeType.toString() + "] "
                     + attributeId + ", rid=" + resourceId);
         }
 
@@ -140,8 +139,8 @@ public class FedoraRIAttributeFinder
 
         // we only know about registered attributes from config file
         if (!attributes.keySet().contains(new Integer(designatorType))) {
-            if (log.isDebugEnabled()) {
-                log.debug("Does not know about designatorType: "
+            if (logger.isDebugEnabled()) {
+                logger.debug("Does not know about designatorType: "
                         + designatorType);
             }
             return new EvaluationResult(BagAttribute
@@ -151,8 +150,8 @@ public class FedoraRIAttributeFinder
         Set<String> allowedAttributes =
                 attributes.get(new Integer(designatorType));
         if (!allowedAttributes.contains(attrName)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Does not know about attribute: " + attrName);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Does not know about attribute: " + attrName);
             }
             return new EvaluationResult(BagAttribute
                     .createEmptyBag(attributeType));
@@ -162,7 +161,7 @@ public class FedoraRIAttributeFinder
         try {
             result = getEvaluationResult(resourceId, attrName, attributeType);
         } catch (Exception e) {
-            log.error("Error finding attribute: " + e.getMessage(), e);
+            logger.error("Error finding attribute: " + e.getMessage(), e);
             return new EvaluationResult(BagAttribute
                     .createEmptyBag(attributeType));
         }
@@ -191,14 +190,14 @@ public class FedoraRIAttributeFinder
             try {
                 attributeValue = attributeFactory.createValue(type, s);
             } catch (Exception e) {
-                log.error("Error creating attribute: " + e.getMessage(), e);
+                logger.error("Error creating attribute: " + e.getMessage(), e);
                 continue;
             }
 
             bagValues.add(attributeValue);
 
-            if (log.isDebugEnabled()) {
-                log.debug("AttributeValue found: [" + type.toASCIIString()
+            if (logger.isDebugEnabled()) {
+                logger.debug("AttributeValue found: [" + type.toASCIIString()
                         + "] " + s);
             }
         }

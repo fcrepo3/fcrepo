@@ -8,8 +8,6 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
-
 import org.apache.http.client.ClientProtocolException;
 
 import org.junit.AfterClass;
@@ -22,13 +20,16 @@ import org.fcrepo.test.fesl.util.FedoraUtil;
 import org.fcrepo.test.fesl.util.HttpUtils;
 import org.fcrepo.test.fesl.util.LoadDataset;
 import org.fcrepo.test.fesl.util.RemoveDataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import junit.framework.JUnit4TestAdapter;
 
 
 public class TestREST {
 
-    private static final Logger log = Logger.getLogger(TestREST.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(TestREST.class);
 
     private static final String PROPERTIES = "fedora";
 
@@ -51,15 +52,13 @@ public class TestREST {
         String fedoraUrl = FedoraUtil.getBaseURL();
 
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Setting up...");
-            }
+            logger.debug("Setting up...");
 
             httpUtils = new HttpUtils(fedoraUrl, username, password);
 
             LoadDataset.main(null);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
             Assert.fail(e.getMessage());
         }
     }
@@ -67,26 +66,26 @@ public class TestREST {
     @AfterClass
     public static void teardown() {
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Tearing down...");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Tearing down...");
             }
 
             RemoveDataset.main(null);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
             Assert.fail(e.getMessage());
         }
     }
 
     @Test
     public void testFindObjects01() {
-        log.info("[ testFindObjects01 ]");
+        logger.info("[ testFindObjects01 ]");
 
         try {
             String url = "/fedora/objects?terms=*Helicopter";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check =
@@ -100,15 +99,15 @@ public class TestREST {
 
     @Test
     public void testFindObjects02() {
-        log.info("[ testFindObjects02 ]");
+        logger.info("[ testFindObjects02 ]");
 
         try {
             String url =
                     "/fedora/objects?terms=*Helicopter&"
                             + "pid=true&label=true&state=true&ownerId=true&title=true";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check =
@@ -122,13 +121,13 @@ public class TestREST {
 
     @Test
     public void testFindObjectsXML01() {
-        log.info("[ testFindObjectsXML01 ]");
+        logger.info("[ testFindObjectsXML01 ]");
 
         try {
             String url = "/fedora/objects?terms=*Helicopter&resultFormat=xml";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check = response.contains("<pid>test:1000003</pid>");
@@ -140,15 +139,15 @@ public class TestREST {
 
     @Test
     public void testFindObjectsXML02() {
-        log.info("[ testFindObjectsXML02 ]");
+        logger.info("[ testFindObjectsXML02 ]");
 
         try {
             String url =
                     "/fedora/objects?terms=*Helicopter&resultFormat=xml&pid=true"
                             + "&state=true&ownerId=true&title=true&label=true";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check = response.contains("<pid>test:1000003</pid>");
@@ -160,13 +159,13 @@ public class TestREST {
 
     @Test
     public void testGetDatastreamDissemination() {
-        log.info("[ testGetDatastreamDissemination ]");
+        logger.info("[ testGetDatastreamDissemination ]");
 
         try {
             String url = "/fedora/objects/test:1000003/datastreams/TV/content";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check = response.contains("tt1035917");
@@ -178,13 +177,13 @@ public class TestREST {
 
     @Test
     public void testGetObjectHistory() {
-        log.info("[ testGetObjectHistory ]");
+        logger.info("[ testGetObjectHistory ]");
 
         try {
             String url = "/fedora/objects/test:1000003/versions";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check = response.contains("test:1000003");
@@ -196,13 +195,13 @@ public class TestREST {
 
     @Test
     public void testGetObjectHistoryXML() {
-        log.info("[ testGetObjectHistoryXML ]");
+        logger.info("[ testGetObjectHistoryXML ]");
 
         try {
             String url = "/fedora/objects/test:1000003/versions?format=xml";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check = response.contains("pid=\"test:1000003\"");
@@ -214,13 +213,13 @@ public class TestREST {
 
     @Test
     public void testGetObjectProfile() {
-        log.info("[ testGetObjectProfile ]");
+        logger.info("[ testGetObjectProfile ]");
 
         try {
             String url = "/fedora/objects/test:1000001";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check = response.contains("<td align=\"left\">Chuck</td>");
@@ -232,13 +231,13 @@ public class TestREST {
 
     @Test
     public void testGetObjectProfileXML() {
-        log.info("[ testGetObjectProfileXML ]");
+        logger.info("[ testGetObjectProfileXML ]");
 
         try {
             String url = "/fedora/objects/test:1000001?format=xml";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check = response.contains("<objLabel>Chuck</objLabel>");
@@ -250,13 +249,13 @@ public class TestREST {
 
     @Test
     public void testListDatastreams() {
-        log.info("[ testListDatastreams ]");
+        logger.info("[ testListDatastreams ]");
 
         try {
             String url = "/fedora/objects/test:1000003/datastreams";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check =
@@ -271,13 +270,13 @@ public class TestREST {
 
     @Test
     public void testListDatastreamsXML() {
-        log.info("[ testListDatastreamsXML ]");
+        logger.info("[ testListDatastreamsXML ]");
 
         try {
             String url = "/fedora/objects/test:1000003/datastreams?format=xml";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check =
@@ -292,13 +291,13 @@ public class TestREST {
 
     @Test
     public void testListMethods() {
-        log.info("[ testListMethods ]");
+        logger.info("[ testListMethods ]");
 
         try {
             String url = "/fedora/objects/test:1000003/methods";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check =
@@ -314,13 +313,13 @@ public class TestREST {
 
     @Test
     public void testListMethodsXML() {
-        log.info("[ testListMethodsXML ]");
+        logger.info("[ testListMethodsXML ]");
 
         try {
             String url = "/fedora/objects/test:1000003/methods?format=xml";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check =
@@ -336,7 +335,7 @@ public class TestREST {
 
     @Test
     public void testAddDatastream() {
-        log.info("[ testAddDatastream ]");
+        logger.info("[ testAddDatastream ]");
 
         try {
             File f =
@@ -346,14 +345,14 @@ public class TestREST {
             String url =
                     "/fedora/objects/test:1000001/datastreams/TESTAD?dsLabel=TESTAD";
             String response = httpUtils.post(url, null, data);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             url = "/fedora/objects/test:1000001/datastreams?format=xml";
             response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
             boolean check = response.contains("TESTAD");
             Assert.assertTrue("Expected object data not found", check);
@@ -367,13 +366,13 @@ public class TestREST {
 
     @Test
     public void testExport() {
-        log.info("[ testExport ]");
+        logger.info("[ testExport ]");
 
         try {
             String url = "/fedora/objects/test:1000001/export";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check =
@@ -387,13 +386,13 @@ public class TestREST {
 
     @Test
     public void testGetDatastream() {
-        log.info("[ testGetDatastream ]");
+        logger.info("[ testGetDatastream ]");
 
         try {
             String url = "/fedora/objects/test:1000001/datastreams/TV";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check =
@@ -407,14 +406,14 @@ public class TestREST {
 
     @Test
     public void testGetDatastreamXML() {
-        log.info("[ testGetDatastreamXML ]");
+        logger.info("[ testGetDatastreamXML ]");
 
         try {
             String url =
                     "/fedora/objects/test:1000001/datastreams/TV?format=xml";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check = response.contains("<dsLabel>TV Data</dsLabel>");
@@ -427,13 +426,13 @@ public class TestREST {
 
     @Test
     public void testGetNextPID() {
-        log.info("[ testGetNextPID ]");
+        logger.info("[ testGetNextPID ]");
 
         try {
             String url = "/fedora/objects/nextPID";
             String response = httpUtils.post(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             String regex = ".*<td align=\"left\">.+\\:.+</td>.*";
@@ -448,13 +447,13 @@ public class TestREST {
 
     @Test
     public void testGetNextPIDXML() {
-        log.info("[ testGetNextPIDXML ]");
+        logger.info("[ testGetNextPIDXML ]");
 
         try {
             String url = "/fedora/objects/nextPID?format=xml";
             String response = httpUtils.post(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             String regex = ".*<pid>.+\\:.+</pid>.*";
@@ -469,13 +468,13 @@ public class TestREST {
 
     @Test
     public void testGetObjectXML() {
-        log.info("[ testGetObjectXML ]");
+        logger.info("[ testGetObjectXML ]");
 
         try {
             String url = "/fedora/objects/test:1000003/objectXML";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check =
@@ -490,7 +489,7 @@ public class TestREST {
 
     @Test
     public void testIngest() {
-        log.info("[ testIngest ]");
+        logger.info("[ testIngest ]");
 
         try {
             try {
@@ -508,8 +507,8 @@ public class TestREST {
                     DataUtils.loadFile(RESOURCEBASE + "/fesl/test-1000003.xml");
             String url = "/fedora/objects/new";
             String response = httpUtils.post(url, null, data);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             // ensure it exists
@@ -525,7 +524,7 @@ public class TestREST {
 
     @Test
     public void testModifyDatastream() {
-        log.info("[ testModifyDatastream ]");
+        logger.info("[ testModifyDatastream ]");
 
         try {
             File f =
@@ -536,15 +535,15 @@ public class TestREST {
             String url =
                     "/fedora/objects/test:1000000/datastreams/TESTAD?dsLabel=TESTAD";
             String response = httpUtils.post(url, null, data);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             // ensure it was added
             url = "/fedora/objects/test:1000000/datastreams?format=xml";
             response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
             boolean check = response.contains("TESTAD");
             Assert.assertTrue("Expected object data not found", check);
@@ -554,15 +553,15 @@ public class TestREST {
             data = DataUtils.loadFile(f);
             url = "/fedora/objects/test:1000000/datastreams/TESTAD";
             response = httpUtils.put(url, null, data);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             // get the new datastream and check it...
             url = "/fedora/objects/test:1000000/datastreams/TESTAD/content";
             response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
             check = response.contains("Modified datastream: 123998134");
             Assert.assertTrue("Expected object data not found", check);
@@ -577,22 +576,22 @@ public class TestREST {
 
     @Test
     public void testModifyObject() {
-        log.info("[ testModifyObject ]");
+        logger.info("[ testModifyObject ]");
 
         try {
             // modify the object.
             String url =
                     "/fedora/objects/test:1000000?label=This+is+a+New+Label&state=I";
             String response = httpUtils.put(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             // ensure modifications were successful
             url = "/fedora/objects/test:1000000?format=xml";
             response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check =
@@ -610,8 +609,8 @@ public class TestREST {
                     DataUtils.loadFile(RESOURCEBASE + "/fesl/test-1000000.xml");
             url = "/fedora/objects/new";
             response = httpUtils.post(url, null, data);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
         } catch (Exception re) {
             Assert.fail(re.getMessage());
@@ -621,7 +620,7 @@ public class TestREST {
 
     @Test
     public void testPurgeDatastream() {
-        log.info("[ testPurgeDatastream ]");
+        logger.info("[ testPurgeDatastream ]");
 
         try {
             File f =
@@ -632,15 +631,15 @@ public class TestREST {
             String url =
                     "/fedora/objects/test:1000001/datastreams/TESTAD?dsLabel=TESTAD";
             String response = httpUtils.post(url, null, data);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             // ensure it exists
             url = "/fedora/objects/test:1000001/datastreams?format=xml";
             response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
             boolean check = response.contains("TESTAD");
             Assert.assertTrue("Expected object data not found [add]", check);
@@ -652,8 +651,8 @@ public class TestREST {
             // ensure it is gone
             url = "/fedora/objects/test:1000001/datastreams?format=xml";
             response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
             check = !response.contains("TESTAD");
             Assert.assertTrue("Expected object data not found", check);
@@ -665,48 +664,48 @@ public class TestREST {
 
     @Test
     public void testPurgeObject() {
-        log.info("[ testPurgeDatastream ]");
+        logger.info("[ testPurgeDatastream ]");
 
         try {
             // ensure it exists
-            if (log.isDebugEnabled()) {
-                log.debug("checking if object exists");
+            if (logger.isDebugEnabled()) {
+                logger.debug("checking if object exists");
             }
             String url = "/fedora/objects/test:1000000?format=xml";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
             boolean check = response.contains("<objLabel>TV Series</objLabel>");
             Assert.assertTrue("Expected object data not found", check);
 
             // delete datastream
-            if (log.isDebugEnabled()) {
-                log.debug("deleting object");
+            if (logger.isDebugEnabled()) {
+                logger.debug("deleting object");
             }
             url = "/fedora/objects/test:1000000";
             httpUtils.delete(url, null);
 
             // ingest object to reset state.
-            if (log.isDebugEnabled()) {
-                log.debug("ingesting object");
+            if (logger.isDebugEnabled()) {
+                logger.debug("ingesting object");
             }
             byte[] data =
                     DataUtils.loadFile(RESOURCEBASE + "/fesl/test-1000000.xml");
             url = "/fedora/objects/new";
             response = httpUtils.post(url, null, data);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             // ensure it exists
-            if (log.isDebugEnabled()) {
-                log.debug("checking that object now exists");
+            if (logger.isDebugEnabled()) {
+                logger.debug("checking that object now exists");
             }
             url = "/fedora/objects/test:1000000?format=xml";
             response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             check = response.contains("<objLabel>TV Series</objLabel>");
@@ -719,7 +718,7 @@ public class TestREST {
 
     @Test
     public void testSetDatastreamState() {
-        log.info("[ testSetDatastreamState ]");
+        logger.info("[ testSetDatastreamState ]");
 
         try {
             File f =
@@ -730,15 +729,15 @@ public class TestREST {
             String url =
                     "/fedora/objects/test:1000000/datastreams/TESTDS?dsLabel=TESTDS";
             String response = httpUtils.post(url, null, data);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             // ensure it was added
             url = "/fedora/objects/test:1000000/datastreams?format=xml";
             response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
             boolean check = response.contains("TESTDS");
             Assert.assertTrue("Expected object data not found", check);
@@ -746,15 +745,15 @@ public class TestREST {
             // set the test datastream state
             url = "/fedora/objects/test:1000000/datastreams/TESTDS?dsState=I";
             response = httpUtils.put(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             // get the new datastream and check it...
             url = "/fedora/objects/test:1000000/datastreams/TESTDS?format=xml";
             response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
             check = response.contains("<dsState>I</dsState>");
             Assert.assertTrue("Expected object data not found", check);
@@ -769,7 +768,7 @@ public class TestREST {
 
     @Test
     public void testSetDatastreamVersion() {
-        log.info("[ testSetDatastreamVersion ]");
+        logger.info("[ testSetDatastreamVersion ]");
 
         try {
             File f =
@@ -780,15 +779,15 @@ public class TestREST {
             String url =
                     "/fedora/objects/test:1000000/datastreams/TESTDS?dsLabel=TESTDS";
             String response = httpUtils.post(url, null, data);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             // ensure it was added
             url = "/fedora/objects/test:1000000/datastreams?format=xml";
             response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
             boolean check = response.contains("TESTDS");
             Assert.assertTrue("Expected object data not found", check);
@@ -797,15 +796,15 @@ public class TestREST {
             url =
                     "/fedora/objects/test:1000000/datastreams/TESTDS?versionable=false";
             response = httpUtils.put(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             // get the new datastream and check it...
             url = "/fedora/objects/test:1000000/datastreams/TESTDS?format=xml";
             response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
             check = response.contains("<dsVersionable>false</dsVersionable>");
             Assert.assertTrue("Expected object data not found", check);

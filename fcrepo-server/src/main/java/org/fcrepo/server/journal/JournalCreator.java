@@ -9,8 +9,6 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ModuleInitializationException;
@@ -20,6 +18,8 @@ import org.fcrepo.server.journal.entry.CreatorJournalEntry;
 import org.fcrepo.server.management.ManagementDelegate;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -35,9 +35,8 @@ import org.fcrepo.server.storage.types.RelationshipTuple;
 public class JournalCreator
         implements JournalWorker, JournalConstants {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(JournalCreator.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(JournalCreator.class);
 
     private final JournalWriter writer;
 
@@ -58,7 +57,7 @@ public class JournalCreator
             writer = JournalWriter.getInstance(parameters, role, server);
         } catch (JournalException e) {
             String msg = "Problem creating the JournalWriter";
-            LOG.error(msg, e);
+            logger.error(msg, e);
             throw new ModuleInitializationException(msg, role, e);
         }
     }

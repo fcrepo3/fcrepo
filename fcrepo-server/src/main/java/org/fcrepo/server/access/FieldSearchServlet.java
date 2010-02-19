@@ -21,8 +21,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
@@ -38,6 +36,8 @@ import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.search.ObjectFields;
 import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -52,9 +52,8 @@ public class FieldSearchServlet
 
     private static final long serialVersionUID = 1L;
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(FieldSearchServlet.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(FieldSearchServlet.class);
 
     /** Instance of the Server */
     private static Server s_server = null;
@@ -192,7 +191,7 @@ public class FieldSearchServlet
                                     .parseInt(request
                                             .getParameter("maxResults"));
                 } catch (NumberFormatException nfe) {
-                    LOG.error("Bad request (maxResults not an integer)", nfe);
+                    logger.error("Bad request (maxResults not an integer)", nfe);
                     throw new BadRequest400Exception(request,
                                                      ACTION_LABEL,
                                                      "",

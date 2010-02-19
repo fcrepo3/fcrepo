@@ -11,9 +11,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.FaultException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -23,9 +23,8 @@ import org.fcrepo.common.FaultException;
  */
 public abstract class StreamUtility {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(StreamUtility.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(StreamUtility.class);
 
     /**
      * Returns an XML-appropriate encoding of the given String.
@@ -129,7 +128,7 @@ public abstract class StreamUtility {
                 in.close();
                 out.close();
             } catch (IOException e) {
-                LOG.warn("Unable to close stream", e);
+                logger.warn("Unable to close stream", e);
             }
         }
     }

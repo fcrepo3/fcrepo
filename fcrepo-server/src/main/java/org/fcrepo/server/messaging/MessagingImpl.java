@@ -11,14 +11,12 @@ import java.util.Properties;
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.MessagingException;
 import org.fcrepo.server.management.Management;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The default, JMS implementation of Messaging.
@@ -28,9 +26,9 @@ import org.fcrepo.server.management.Management;
  * @version $Id$
  */
 public class MessagingImpl implements Messaging {
-    /** Logger for this class. */
-    private static Logger LOG =
-            Logger.getLogger(MessagingImpl.class.getName());
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(MessagingImpl.class);
 
     private final Map<String, List<String>> mdMap;
     private final JMSManager jmsMgr;
@@ -111,8 +109,8 @@ public class MessagingImpl implements Messaging {
                 }
             }
         } else {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Silently dropping non-Management method: " + method.getName());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Silently dropping non-Management method: " + method.getName());
             }
         }
     }

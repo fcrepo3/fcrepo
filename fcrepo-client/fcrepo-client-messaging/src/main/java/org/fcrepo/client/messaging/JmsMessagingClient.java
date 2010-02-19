@@ -15,12 +15,11 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Topic;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.errors.MessagingException;
 import org.fcrepo.server.messaging.JMSManager;
 import org.fcrepo.server.messaging.JMSManager.DestinationType;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A messaging client which listens for messages via JMS.
@@ -32,16 +31,17 @@ public class JmsMessagingClient implements MessagingClient, MessageListener {
     private static final int MAX_RETRIES = 5;
     private static final int RETRY_INTERVAL = 20000;
 
-    private String m_clientId;
-    private MessagingListener m_listener;
-    private Properties m_connectionProperties;
-    private String m_messageSelector;
-    private boolean m_durable;
+    private static final Logger logger =
+            LoggerFactory.getLogger(JmsMessagingClient.class);
+
+    private final String m_clientId;
+    private final MessagingListener m_listener;
+    private final Properties m_connectionProperties;
+    private final String m_messageSelector;
+    private final boolean m_durable;
 
     private JMSManager m_jmsManager = null;
     private boolean m_connected = false;
-
-    private Logger LOG = Logger.getLogger(JmsMessagingClient.class.getName());
 
     /**
      * Creates a messaging client
@@ -292,7 +292,7 @@ public class JmsMessagingClient implements MessagingClient, MessageListener {
                 }
             }
         } catch (MessagingException me) {
-            LOG.error("MessagingException encountered attempting to start "
+            logger.error("MessagingException encountered attempting to start "
                     + "Messaging Client: " + m_clientId
                     + ". Exception message: " + me.getMessage(), me);
             throw me;
@@ -314,7 +314,7 @@ public class JmsMessagingClient implements MessagingClient, MessageListener {
             m_jmsManager = null;
             m_connected = false;
         } catch (MessagingException me) {
-            LOG.error("Messaging Exception encountered attempting to stop "
+            logger.error("Messaging Exception encountered attempting to stop "
                     + "Messaging Client: " + m_clientId
                     + ". Exception message: " + me.getMessage(), me);
             throw me;
@@ -336,6 +336,7 @@ public class JmsMessagingClient implements MessagingClient, MessageListener {
      */
     private class JMSBrokerConnector extends Thread {
 
+        @Override
         public void run() {
             try {
                 connect();

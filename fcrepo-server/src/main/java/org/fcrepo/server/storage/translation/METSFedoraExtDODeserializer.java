@@ -24,8 +24,6 @@ import java.util.List;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.log4j.Logger;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -49,6 +47,8 @@ import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.utilities.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -71,9 +71,8 @@ public class METSFedoraExtDODeserializer
      */
     public static final XMLFormat DEFAULT_FORMAT = METS_EXT1_1;
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(METSFedoraExtDODeserializer.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(METSFedoraExtDODeserializer.class);
 
     /** The format this deserializer reads. */
     private final XMLFormat m_format;
@@ -260,7 +259,7 @@ public class METSFedoraExtDODeserializer
                             String encoding,
                             int transContext) throws ObjectIntegrityException,
             StreamIOException, UnsupportedEncodingException {
-        LOG.debug("Deserializing " + m_format.uri + " for transContext: "
+        logger.debug("Deserializing " + m_format.uri + " for transContext: "
                 + transContext);
 
         // initialize sax for this parse
@@ -922,14 +921,14 @@ public class METSFedoraExtDODeserializer
         ds.DSInfoType = m_dsInfoType;
 
         ds.DSChecksumType = m_dsChecksumType;
-        LOG.debug("instantiate datastream: dsid = " + m_dsId
+        logger.debug("instantiate datastream: dsid = " + m_dsId
                 + "checksumType = " + m_dsChecksumType + "checksum = "
                 + m_dsChecksum);
         if (m_obj.isNew()) {
             if (m_dsChecksum != null && !m_dsChecksum.equals("")
                     && !m_dsChecksum.equals(Datastream.CHECKSUM_NONE)) {
                 String tmpChecksum = ds.getChecksum();
-                LOG.debug("checksum = " + tmpChecksum);
+                logger.debug("checksum = " + tmpChecksum);
                 if (!m_dsChecksum.equals(tmpChecksum)) {
                     throw new SAXException(new ValidationException("Checksum Mismatch: "
                             + tmpChecksum));
@@ -982,18 +981,18 @@ public class METSFedoraExtDODeserializer
             //LOOK! this sets bytes, not characters.  Do we want to set this?
             ds.DSSize = ds.xmlContent.length;
         } catch (Exception uee) {
-            LOG.debug("Error processing inline xml content in SAX parse: "
+            logger.debug("Error processing inline xml content in SAX parse: "
                     + uee.getMessage());
         }
 
-        LOG.debug("instantiate datastream: dsid = " + m_dsId
+        logger.debug("instantiate datastream: dsid = " + m_dsId
                 + "checksumType = " + m_dsChecksumType + "checksum = "
                 + m_dsChecksum);
         if (m_obj.isNew()) {
             if (m_dsChecksum != null && !m_dsChecksum.equals("")
                     && !m_dsChecksum.equals(Datastream.CHECKSUM_NONE)) {
                 String tmpChecksum = ds.getChecksum();
-                LOG.debug("checksum = " + tmpChecksum);
+                logger.debug("checksum = " + tmpChecksum);
                 if (!m_dsChecksum.equals(tmpChecksum)) {
                     throw new SAXException(new ValidationException("Checksum Mismatch: "
                             + tmpChecksum));
@@ -1196,7 +1195,7 @@ public class METSFedoraExtDODeserializer
             ds.xmlContent = buf.toString().getBytes(m_characterEncoding);
             ds.DSSize = ds.xmlContent.length;
         } catch (UnsupportedEncodingException uee) {
-            LOG.error("Encoding error when creating RELS-INT datastream", uee);
+            logger.error("Encoding error when creating RELS-INT datastream", uee);
         }
         // FINALLY! add the RDF and an inline xml datastream in the digital object
         m_obj.addDatastreamVersion(ds, true);

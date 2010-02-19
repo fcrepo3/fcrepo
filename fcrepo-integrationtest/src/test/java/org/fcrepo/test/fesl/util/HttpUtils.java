@@ -4,7 +4,9 @@ package org.fcrepo.test.fesl.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.URL;
+
 import java.util.Map;
 
 import org.apache.http.HttpException;
@@ -30,11 +32,14 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpUtils {
 
-    private static final Logger log = Logger.getLogger(HttpUtils.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(HttpUtils.class);
 
     private DefaultHttpClient client = null;
 
@@ -71,7 +76,7 @@ public class HttpUtils {
                                                                credentials);
             }
         } catch (Exception e) {
-            log.error("Failed to instantiate HttpUtils.");
+            logger.error("Failed to instantiate HttpUtils.", e);
             throw e;
         }
     }
@@ -87,8 +92,8 @@ public class HttpUtils {
         // create request
         HttpGet request = new HttpGet(url);
 
-        if (log.isDebugEnabled()) {
-            log.debug("getting url: " + url);
+        if (logger.isDebugEnabled()) {
+            logger.debug("getting url: " + url);
         }
 
         // add headers to request
@@ -97,8 +102,8 @@ public class HttpUtils {
                 String value = headers.get(header);
                 request.addHeader(header, value);
 
-                if (log.isDebugEnabled()) {
-                    log.debug("adding header: " + header + " = " + value);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("adding header: " + header + " = " + value);
                 }
             }
         }
@@ -131,8 +136,8 @@ public class HttpUtils {
             request.setEntity(entity);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("getting url: " + url);
+        if (logger.isDebugEnabled()) {
+            logger.debug("getting url: " + url);
         }
 
         // add headers to request if necessary
@@ -141,8 +146,8 @@ public class HttpUtils {
                 String value = headers.get(header);
                 request.addHeader(header, value);
 
-                if (log.isDebugEnabled()) {
-                    log.debug("adding header: " + header + " = " + value);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("adding header: " + header + " = " + value);
                 }
             }
         }
@@ -175,8 +180,8 @@ public class HttpUtils {
             request.setEntity(entity);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("getting url: " + url);
+        if (logger.isDebugEnabled()) {
+            logger.debug("getting url: " + url);
         }
 
         // add headers to request if necessary
@@ -185,8 +190,8 @@ public class HttpUtils {
                 String value = headers.get(header);
                 request.addHeader(header, value);
 
-                if (log.isDebugEnabled()) {
-                    log.debug("adding header: " + header + " = " + value);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("adding header: " + header + " = " + value);
                 }
             }
         }
@@ -200,8 +205,8 @@ public class HttpUtils {
         // create request
         HttpDelete request = new HttpDelete(url);
 
-        if (log.isDebugEnabled()) {
-            log.debug("getting url: " + url);
+        if (logger.isDebugEnabled()) {
+            logger.debug("getting url: " + url);
         }
 
         // add headers to request
@@ -210,8 +215,8 @@ public class HttpUtils {
                 String value = headers.get(header);
                 request.addHeader(header, value);
 
-                if (log.isDebugEnabled()) {
-                    log.debug("adding header: " + header + " = " + value);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("adding header: " + header + " = " + value);
                 }
             }
         }
@@ -221,8 +226,8 @@ public class HttpUtils {
 
     private String process(HttpRequest request) throws IOException,
             AuthorizationDeniedException, ClientProtocolException {
-        if (log.isDebugEnabled()) {
-            log.debug("request line: " + request.getRequestLine());
+        if (logger.isDebugEnabled()) {
+            logger.debug("request line: " + request.getRequestLine());
         }
 
         HttpResponse response = client.execute(httpHost, request, httpContext);

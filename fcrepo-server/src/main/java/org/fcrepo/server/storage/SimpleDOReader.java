@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
-
 import org.jrdf.graph.ObjectNode;
 import org.jrdf.graph.PredicateNode;
 import org.jrdf.graph.SubjectNode;
@@ -43,6 +41,8 @@ import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.utilities.DateUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.fcrepo.common.Constants.MODEL;
 
@@ -57,9 +57,8 @@ import static org.fcrepo.common.Constants.MODEL;
 public class SimpleDOReader
         implements DOReader {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(SimpleDOReader.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(SimpleDOReader.class);
 
     protected final DigitalObject m_obj;
 
@@ -174,7 +173,7 @@ public class SimpleDOReader
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         int transContext;
         // first, set the translation context...
-        LOG.debug("Export context: " + exportContext);
+        logger.debug("Export context: " + exportContext);
 
         if (exportContext == null || exportContext.equals("")
             || exportContext.equalsIgnoreCase("default")) {
@@ -193,14 +192,14 @@ public class SimpleDOReader
         // now serialize for export in the proper XML format...
         if (format == null || format.equals("")
             || format.equalsIgnoreCase("default")) {
-            LOG.debug("Export in default format: " + m_exportFormat);
+            logger.debug("Export in default format: " + m_exportFormat);
             m_translator.serialize(m_obj,
                                    bytes,
                                    m_exportFormat,
                                    "UTF-8",
                                    transContext);
         } else {
-            LOG.debug("Export in format: " + format);
+            logger.debug("Export in format: " + format);
             m_translator.serialize(m_obj, bytes, format, "UTF-8", transContext);
         }
 

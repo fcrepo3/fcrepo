@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.storage;
@@ -16,8 +16,6 @@ import java.util.Map;
 
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.http.HttpInputStream;
 import org.fcrepo.common.http.WebClient;
 import org.fcrepo.server.Context;
@@ -25,6 +23,8 @@ import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.types.DigitalObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -49,15 +49,14 @@ import org.fcrepo.server.storage.types.DigitalObject;
  * <li> &lt;param name="gSearchPassword" value="examplePassword"/&gt;</li>
  * </ul>
  * </p>
- * 
+ *
  * @author Chris Wilper
  */
 public class GSearchDOManager
         extends DefaultDOManager {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(GSearchDOManager.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(GSearchDOManager.class);
 
     /** Required param: URL of GSearch REST interface. */
     public static final String GSEARCH_REST_URL = "gSearchRESTURL";
@@ -106,7 +105,7 @@ public class GSearchDOManager
         } else {
             try {
                 new URL(_gSearchRESTURL);
-                LOG.debug("Configured GSearch REST URL: " + _gSearchRESTURL);
+                logger.debug("Configured GSearch REST URL: " + _gSearchRESTURL);
             } catch (MalformedURLException e) {
                 throw new ModuleInitializationException("Malformed URL given "
                         + "for " + GSEARCH_REST_URL + " parameter: "
@@ -118,7 +117,7 @@ public class GSearchDOManager
         // should also be.
         String user = getParameter(GSEARCH_USERNAME);
         if (user != null) {
-            LOG.debug("Will authenticate to GSearch service as user: " + user);
+            logger.debug("Will authenticate to GSearch service as user: " + user);
             String pass = getParameter(GSEARCH_PASSWORD);
             if (pass != null) {
                 _gSearchCredentials =
@@ -129,7 +128,7 @@ public class GSearchDOManager
                         + " was specified", getRole());
             }
         } else {
-            LOG.debug(GSEARCH_USERNAME + " unspecified; will not attempt "
+            logger.debug(GSEARCH_USERNAME + " unspecified; will not attempt "
                     + "to authenticate to GSearch service");
         }
 
@@ -156,14 +155,14 @@ public class GSearchDOManager
         String pid = obj.getPid();
         url.append("&value=" + urlEncode(pid));
         if (remove) {
-            LOG.info("Signaling removal of " + pid + " to GSearch");
+            logger.info("Signaling removal of " + pid + " to GSearch");
             url.append("&action=deletePid");
         } else {
-            if (LOG.isInfoEnabled()) {
+            if (logger.isInfoEnabled()) {
                 if (obj.isNew()) {
-                    LOG.info("Signaling add of " + pid + " to GSearch");
+                    logger.info("Signaling add of " + pid + " to GSearch");
                 } else {
-                    LOG.info("Signaling mod of " + pid + " to GSearch");
+                    logger.info("Signaling mod of " + pid + " to GSearch");
                 }
             }
             url.append("&action=fromPid");
@@ -184,24 +183,24 @@ public class GSearchDOManager
     private void sendRESTMessage(String url) {
         HttpInputStream response = null;
         try {
-            LOG.debug("Getting " + url);
+            logger.debug("Getting " + url);
             response = _webClient.get(url, false, _gSearchCredentials);
             int code = response.getStatusCode();
             if (code != 200) {
-                LOG.warn("Error sending update to GSearch service (url=" + url
+                logger.warn("Error sending update to GSearch service (url=" + url
                         + ").  HTTP response code was " + code + ". "
                         + "Body of response from GSearch follows:\n"
                         + getString(response));
             }
         } catch (Exception e) {
-            LOG.warn("Error sending update to GSearch service via URL: " + url,
+            logger.warn("Error sending update to GSearch service via URL: " + url,
                      e);
         } finally {
             if (response != null) {
                 try {
                     response.close();
                 } catch (Exception e) {
-                    LOG.warn("Error closing GSearch response", e);
+                    logger.warn("Error closing GSearch response", e);
                 }
             }
         }
@@ -235,7 +234,7 @@ public class GSearchDOManager
         try {
             return URLEncoder.encode(s, "UTF-8");
         } catch (Exception e) {
-            LOG.warn("Failed to encode '" + s + "'", e);
+            logger.warn("Failed to encode '" + s + "'", e);
             return s;
         }
     }

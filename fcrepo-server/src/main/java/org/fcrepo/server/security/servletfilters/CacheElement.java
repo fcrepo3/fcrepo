@@ -10,15 +10,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
  */
 public class CacheElement {
 
-    private static final Log LOG = LogFactory.getLog(CacheElement.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(CacheElement.class);
+
     private static final Calendar EARLIER;
     private static final boolean s_expired_default = true; // safest
     private static final long MILLIS_IN_SECOND = 1000;
@@ -79,14 +81,14 @@ public class CacheElement {
                                Map namedValues,
                                String errorMessage) {
         String m = m_cacheabbrev + " populate() ";
-        LOG.debug(m + ">");
+        logger.debug(m + ">");
         try {
             if (predicates != null) {
-                LOG.warn(m + " predicates are deprecated; will be ignored");
+                logger.warn(m + " predicates are deprecated; will be ignored");
             }
             assertInvalid();
             if (errorMessage != null) {
-                LOG.error(m + "errorMessage==" + errorMessage);
+                logger.error(m + "errorMessage==" + errorMessage);
                 throw new Exception(errorMessage);
             } else {
                 validate(authenticated, namedValues);
@@ -94,10 +96,10 @@ public class CacheElement {
                 // can't set pwd here, don't have it
             }
         } catch (Throwable t) {
-            LOG.error(m + "invalidating to be sure");
+            logger.error(m + "invalidating to be sure");
             this.invalidate(errorMessage);
         } finally {
-            LOG.debug(m + "<");
+            logger.debug(m + "<");
         }
     }
 
@@ -118,30 +120,30 @@ public class CacheElement {
         // non-interlaced.  This protects against overlapping calls resulting in
         // redundant authenticator calls.
         String m = m_cacheabbrev + " authenticate() ";
-        LOG.debug(m + ">");
+        logger.debug(m + ">");
         Boolean rc = null;
         try {
-            LOG.debug(m + "m_valid==" + m_valid);
+            logger.debug(m + "m_valid==" + m_valid);
             if (m_valid && !CacheElement.isExpired(m_expiration)) {
-                LOG.debug(m + "valid and not expired, so use");
+                logger.debug(m + "valid and not expired, so use");
                 if (!isAuthenticated()) {
-                    LOG.debug(m + "auth==" + m_authenticated);
+                    logger.debug(m + "auth==" + m_authenticated);
                     rc = m_authenticated;
                 } else {
-                    LOG.debug(m + "already authd, request password==" + pwd);
+                    logger.debug(m + "already authd, request password==" + pwd);
                     if (pwd == null) {
-                        LOG.debug(m + "null request password");
+                        logger.debug(m + "null request password");
                         rc = Boolean.FALSE;
                     } else if ("".equals(pwd)) {
-                        LOG.debug(m + "zero-length request password");
+                        logger.debug(m + "zero-length request password");
                         rc = Boolean.FALSE;
                     } else {
-                        LOG.debug(m + "stored password==" + m_password);
+                        logger.debug(m + "stored password==" + m_password);
                         rc = pwd.equals(m_password);
                     }
                 }
             } else { // expired or invalid
-                LOG.debug(m + "expired or invalid, so try to repopulate");
+                logger.debug(m + "expired or invalid, so try to repopulate");
                 this.invalidate();
                 CacheElementPopulator cePop = cache.getCacheElementPopulator();
                 cePop.populateCacheElement(this, pwd);
@@ -151,18 +153,18 @@ public class CacheElement {
                 if (m_authenticated == null || !m_valid) {
                     duration = cache.getAuthExceptionTimeoutDuration();
                     unit = cache.getAuthExceptionTimeoutUnit();
-                    LOG.debug(m + "couldn't complete population");
+                    logger.debug(m + "couldn't complete population");
                 } else {
-                    LOG.debug(m + "populate completed");
+                    logger.debug(m + "populate completed");
                     if (isAuthenticated()) {
                         m_password = pwd;
                         duration = cache.getAuthSuccessTimeoutDuration();
                         unit = cache.getAuthSuccessTimeoutUnit();
-                        LOG.debug(m + "populate succeeded");
+                        logger.debug(m + "populate succeeded");
                     } else {
                         duration = cache.getAuthFailureTimeoutDuration();
                         unit = cache.getAuthFailureTimeoutUnit();
-                        LOG.debug(m + "populate failed");
+                        logger.debug(m + "populate failed");
                     }
                 }
                 m_expiration = CacheElement.calcExpiration(duration, unit);
@@ -171,10 +173,10 @@ public class CacheElement {
         } catch (Throwable th) {
             this.invalidate();
             rc = m_authenticated;
-            LOG.error(m + "invalidating to be sure");
+            logger.error(m + "invalidating to be sure");
         } finally {
             audit();
-            LOG.debug(m + "< " + rc);
+            logger.debug(m + "< " + rc);
         }
         return rc;
     }
@@ -186,14 +188,14 @@ public class CacheElement {
         // redundant (authenticator?) calls.
         // TODO: refactor method name so that it doesn't look like "getter"
         String m = m_cacheabbrev + " namedValues ";
-        LOG.debug(m + ">");
+        logger.debug(m + ">");
         Map rc = null;
         try {
-            LOG.debug(m + "valid==" + m_valid);
+            logger.debug(m + "valid==" + m_valid);
             if (m_valid && !CacheElement.isExpired(m_expiration)) {
-                LOG.debug(m + "valid and not expired, so use");
+                logger.debug(m + "valid and not expired, so use");
             } else {
-                LOG.debug(m + "expired or invalid, so try to repopulate");
+                logger.debug(m + "expired or invalid, so try to repopulate");
                 this.invalidate();
                 CacheElementPopulator cePop = cache.getCacheElementPopulator();
                 cePop.populateCacheElement(this, pwd);
@@ -202,18 +204,18 @@ public class CacheElement {
                 if (m_namedValues == null || !m_valid) {
                     duration = cache.getAuthExceptionTimeoutDuration();
                     unit = cache.getAuthExceptionTimeoutUnit();
-                    LOG.debug(m + "couldn't complete population");
+                    logger.debug(m + "couldn't complete population");
                 } else {
-                    LOG.debug(m + "populate completed");
+                    logger.debug(m + "populate completed");
                     if (m_namedValues == null) {
                         duration = cache.getAuthFailureTimeoutDuration();
                         unit = cache.getAuthFailureTimeoutUnit();
-                        LOG.debug(m + "populate failed");
+                        logger.debug(m + "populate failed");
                     } else {
                         m_password = pwd;
                         duration = cache.getAuthSuccessTimeoutDuration();
                         unit = cache.getAuthSuccessTimeoutUnit();
-                        LOG.debug(m + "populate succeeded");
+                        logger.debug(m + "populate succeeded");
                     }
                 }
                 m_expiration = CacheElement.calcExpiration(duration, unit);
@@ -221,14 +223,14 @@ public class CacheElement {
         } catch (Throwable th) {
             String msg = m + "invalidating to be sure";
             this.invalidate(msg);
-            LOG.error(msg);
+            logger.error(msg);
         } finally {
             audit();
             rc = m_namedValues;
             if (rc == null) {
                 rc = new Hashtable();
             }
-            LOG.debug(m + "< " + rc);
+            logger.debug(m + "< " + rc);
         }
         return rc;
     }
@@ -248,25 +250,25 @@ public class CacheElement {
 
     public final void audit() {
         String m = m_cacheabbrev + " audit() ";
-        if (LOG.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             try {
                 Calendar now = Calendar.getInstance();
-                LOG.debug(m + "> " + m_cacheid + " " + getInstanceId()
+                logger.debug(m + "> " + m_cacheid + " " + getInstanceId()
                         + " @ " + format(now));
-                LOG.debug(m + "valid==" + m_valid);
-                LOG.debug(m + "userid==" + getUserid());
-                LOG.debug(m + "password==" + m_password);
-                LOG.debug(m + "authenticated==" + m_authenticated);
-                LOG.debug(m + "errorMessage==" + m_errorMessage);
-                LOG.debug(m + "expiration==" + format(m_expiration));
-                LOG.debug(m + compareForExpiration(now, m_expiration));
+                logger.debug(m + "valid==" + m_valid);
+                logger.debug(m + "userid==" + getUserid());
+                logger.debug(m + "password==" + m_password);
+                logger.debug(m + "authenticated==" + m_authenticated);
+                logger.debug(m + "errorMessage==" + m_errorMessage);
+                logger.debug(m + "expiration==" + format(m_expiration));
+                logger.debug(m + compareForExpiration(now, m_expiration));
                 if (m_namedValues == null) {
-                    LOG.debug(m + "(no named attributes");
+                    logger.debug(m + "(no named attributes");
                 } else {
                     CacheElement.auditNamedValues(m, m_namedValues);
                 }
             } finally {
-                LOG.debug(m + "<");
+                logger.debug(m + "<");
             }
         }
     }
@@ -293,7 +295,7 @@ public class CacheElement {
         m_expiration = EARLIER;
         m_password = null;
         if (m_errorMessage != null) {
-            LOG.debug(m + m_errorMessage);
+            logger.debug(m + m_errorMessage);
         }
     }
 
@@ -334,7 +336,7 @@ public class CacheElement {
     ///////////////////////////////////////////////////////////////////////////
 
     private static final void auditNamedValues(String m, Map namedValues) {
-        if (LOG.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             assert namedValues != null;
             for (Iterator outer = namedValues.keySet().iterator(); outer
                     .hasNext();) {
@@ -353,7 +355,7 @@ public class CacheElement {
                     for (Iterator it = values.iterator(); it.hasNext();) {
                         temp = it.next();
                         if (!(temp instanceof String)) {
-                            LOG.error(m + "set member not string, ==" + temp);
+                            logger.error(m + "set member not string, ==" + temp);
                         } else {
                             String value = (String) temp;
                             sb.append(punct + value);
@@ -362,7 +364,7 @@ public class CacheElement {
                     }
                     sb.append("}");
                 }
-                LOG.debug(sb.toString());
+                logger.debug(sb.toString());
             }
         }
     }
@@ -467,20 +469,20 @@ public class CacheElement {
 
     private static final Calendar calcExpiration(int duration, int unit) {
         String m = "- calcExpiration(int,int) ";
-        LOG.debug(m + ">");
+        logger.debug(m + ">");
         Calendar now = Calendar.getInstance();
         Calendar rc = Calendar.getInstance();
         try {
             CacheElement.checkCalcExpiration(duration, unit);
             if (duration > 0) {
                 rc.add(unit, duration);
-                LOG.debug(m + CacheElement.compareForExpiration(now, rc));
+                logger.debug(m + CacheElement.compareForExpiration(now, rc));
             } else {
-                LOG.debug(m + "timeout set to now (effectively, no caching)");
+                logger.debug(m + "timeout set to now (effectively, no caching)");
             }
         } finally {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(m + "< " + format(rc));
+            if (logger.isDebugEnabled()) {
+                logger.debug(m + "< " + format(rc));
             }
         }
         return rc;
@@ -502,7 +504,7 @@ public class CacheElement {
             rc = Calendar.HOUR;
         } else {
             String msg = "illegal Calendar unit: " + unit;
-            LOG.error(m + "(" + msg + ")");
+            logger.error(m + "(" + msg + ")");
             throw new IllegalArgumentException(msg);
         }
         return rc;
@@ -516,8 +518,8 @@ public class CacheElement {
             calendarUnit = calcCalendarUnit(unit);
         } catch (Throwable t) {
             duration = 0;
-            LOG.error(m + "using duration==" + duration);
-            LOG.error(m + "using calendarUnit==" + calendarUnit);
+            logger.error(m + "using duration==" + duration);
+            logger.error(m + "using calendarUnit==" + calendarUnit);
         } finally {
             rc = CacheElement.calcExpiration(duration, calendarUnit);
         }
@@ -529,32 +531,32 @@ public class CacheElement {
                                           boolean verbose) {
         String m = "- isExpired() ";
         if (verbose) {
-            LOG.debug(m + ">");
+            logger.debug(m + ">");
         }
         boolean rc = CacheElement.s_expired_default;
         try {
             if (now == null) {
                 String msg = "illegal parm now==" + now;
-                LOG.error(m + "(" + msg + ")");
+                logger.error(m + "(" + msg + ")");
                 throw new IllegalArgumentException(msg);
             }
             if (expiration == null) {
                 String msg = "illegal parm expiration==" + expiration;
-                LOG.error(m + "(" + msg + ")");
+                logger.error(m + "(" + msg + ")");
                 throw new IllegalArgumentException(msg);
             }
             if (verbose) {
-                LOG.debug(m + "now==" + format(now));
-                LOG.debug(m + "exp==" + format(expiration));
+                logger.debug(m + "now==" + format(now));
+                logger.debug(m + "exp==" + format(expiration));
             }
             rc = !now.before(expiration);
         } catch (Throwable th) {
-            LOG.error(m + "failed comparison");
+            logger.error(m + "failed comparison");
             rc = CacheElement.s_expired_default;
         } finally {
             if (verbose) {
-                LOG.debug(m + compareForExpiration(now, expiration));
-                LOG.debug(m + "< " + rc);
+                logger.debug(m + compareForExpiration(now, expiration));
+                logger.debug(m + "< " + rc);
             }
         }
         return rc;
@@ -566,13 +568,13 @@ public class CacheElement {
         try {
             if (expiration == null) {
                 String msg = "illegal parm expiration==" + expiration;
-                LOG.error(m + "(" + msg + ")");
+                logger.error(m + "(" + msg + ")");
                 throw new IllegalArgumentException(msg);
             }
             Calendar now = Calendar.getInstance();
             rc = CacheElement.isExpired(now, expiration, verbose);
         } catch (Throwable th) {
-            LOG.error(m + "failed comparison");
+            logger.error(m + "failed comparison");
             rc = CacheElement.s_expired_default;
         }
         return rc;

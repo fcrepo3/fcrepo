@@ -7,15 +7,16 @@ package org.fcrepo.server.security.servletfilters;
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
  */
 public class Cache {
 
-    private static final Log LOG = LogFactory.getLog(Cache.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(Cache.class);
 
     static boolean firstCall = true;
 
@@ -107,7 +108,7 @@ public class Cache {
         String key = getKey(userid/* , password, getCacheKeySeparator() */);
         CacheElement cacheElement = getCacheElement(userid);
         if (cacheElement == null) {
-            LOG.debug(m + "cache element is null for " + userid);
+            logger.debug(m + "cache element is null for " + userid);
         } else {
             cacheElement.audit();
         }
@@ -136,21 +137,21 @@ public class Cache {
         CacheElement cacheElement = null;
         String keytemp = getKey(userid/* ,password,CACHE_KEY_SEPARATOR */);
         Integer key = new Integer(keytemp.hashCode());
-        LOG.debug(m + "keytemp==" + keytemp);
-        LOG.debug(m + "key==" + key);
+        logger.debug(m + "keytemp==" + keytemp);
+        logger.debug(m + "key==" + key);
         if (cache.containsKey(key)) {
-            LOG.debug(m + "cache already has element");
+            logger.debug(m + "cache already has element");
         } else {
-            LOG.debug(m + "cache does not have element; create and put");
+            logger.debug(m + "cache does not have element; create and put");
             CacheElement itemtemp =
                     new CacheElement(userid, getCacheId(), getCacheAbbrev());
             cache.put(key, itemtemp);
         }
         cacheElement = (CacheElement) cache.get(key);
         if (cacheElement == null) {
-            LOG.error(m + "cache does not contain element");
+            logger.error(m + "cache does not contain element");
         } else {
-            LOG.debug(m + "element retrieved from cache successfully");
+            logger.debug(m + "element retrieved from cache successfully");
         }
         return cacheElement;
     }
@@ -158,9 +159,9 @@ public class Cache {
     public static final void testAssert() {
         try {
             assert false;
-            LOG.debug("asserts are not turned on");
+            logger.debug("asserts are not turned on");
         } catch (Throwable t) {
-            LOG.debug("asserts are turned on");
+            logger.debug("asserts are turned on");
         }
     }
 
@@ -173,28 +174,25 @@ public class Cache {
         }
         String m = getCacheAbbrev() + " authenticate() ";
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(m + "----------------------------------------------");
-            LOG.debug(m + "> " + getCacheId() + " [" + userid + "] ["
+        if (logger.isDebugEnabled()) {
+            logger.debug(m + "----------------------------------------------");
+            logger.debug(m + "> " + getCacheId() + " [" + userid + "] ["
                     + password + "]");
         } else {
-            LOG.info("Authenticating user [" + userid + "]");
+            logger.info("Authenticating user [" + userid + "]");
         }
 
         CacheElement cacheElement = getCacheElement(userid /* , password */);
-        LOG.debug(m + "cacheElement==" + cacheElement.getInstanceId());
+        logger.debug(m + "cacheElement==" + cacheElement.getInstanceId());
 
         Boolean authenticated = null;
         try {
             authenticated = cacheElement.authenticate(this, password);
         } catch (Throwable t) {
-            LOG.fatal(m + ".authenticate() catch");
-            LOG.fatal(m + t.getMessage());
-            LOG.fatal(m
-                    + (t.getCause() == null ? "" : t.getCause().getMessage()));
+            logger.error("Error authenticating", t);
             throw t;
         }
-        LOG.debug(m + "< " + authenticated);
+        logger.debug(m + "< " + authenticated);
 
         return authenticated;
     }
@@ -208,26 +206,22 @@ public class Cache {
         }
         String m = getCacheAbbrev() + " getNamedValues() ";
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(m + "----------------------------------------------");
-            LOG.debug(m + "> " + getCacheId() + " [" + userid + "] ["
+        if (logger.isDebugEnabled()) {
+            logger.debug(m + "----------------------------------------------");
+            logger.debug(m + "> " + getCacheId() + " [" + userid + "] ["
                     + password + "]");
         }
 
         CacheElement cacheElement = getCacheElement(userid /* , password */);
-        LOG.debug(m + "cacheElement==" + cacheElement.getInstanceId());
+        logger.debug(m + "cacheElement==" + cacheElement.getInstanceId());
         Map namedValues = null;
         try {
             namedValues = cacheElement.getNamedValues(this, password);
         } catch (Throwable t) {
-            LOG.fatal(m + ".authenticate");
-            LOG.fatal(m + t.getMessage());
-            LOG.fatal(m
-                    + (t.getCause() == null ? "" : t.getCause().getMessage()));
-
+            logger.error("Error getting named values", t);
             throw t;
         }
-        LOG.debug(m + "< " + namedValues);
+        logger.debug(m + "< " + namedValues);
 
         return namedValues;
     }

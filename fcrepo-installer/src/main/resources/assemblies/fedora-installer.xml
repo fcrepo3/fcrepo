@@ -34,7 +34,6 @@
         <include>keystore</include>
       </includes>
     </fileSet>
-
   </fileSets>
 
   <dependencySets>
@@ -150,17 +149,16 @@
         <include>commons-betwixt:commons-betwixt:*</include>
         <include>commons-collections:commons-collections:jar:*</include>
         <include>commons-digester:commons-digester:jar:*</include>
-        <include>commons-logging:commons-logging:jar:*</include>
         <include>dom4j:dom4j:jar:*</include>
         <include>org.fcrepo:mulgara-core:jar:*</include>
         <include>org.fcrepo:openrdf-sesame-onejar:jar:*</include>
         <include>jaxen:jaxen:jar:*</include>
-        <include>log4j:log4j:jar:*</include>
-
+        <include>org.slf4j:slf4j-api:jar:*</include>                                         
+        <include>org.slf4j:jcl-over-slf4j:jar:*</include>                                         
+        <include>org.slf4j:log4j-over-slf4j:jar:*</include>                                         
+        <include>ch.qos.logback:logback-core:jar:*</include>
+        <include>ch.qos.logback:logback-classic:jar:*</include>
       </includes>
-      <excludes>
-        <!-- <exclude>org.fcrepo:one-jar-boot:jar:0.96</exclude> -->
-      </excludes>
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>/lib</outputDirectory>
     </dependencySet>

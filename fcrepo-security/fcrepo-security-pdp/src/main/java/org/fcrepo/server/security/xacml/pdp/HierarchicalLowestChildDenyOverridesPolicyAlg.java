@@ -20,8 +20,10 @@ package org.fcrepo.server.security.xacml.pdp;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -30,11 +32,6 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
@@ -46,13 +43,18 @@ import com.sun.xacml.combine.PolicyCombiningAlgorithm;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Status;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class HierarchicalLowestChildDenyOverridesPolicyAlg
         extends PolicyCombiningAlgorithm {
 
-    private static final Logger log =
-            Logger
-                    .getLogger(HierarchicalLowestChildDenyOverridesPolicyAlg.class
-                            .getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(HierarchicalLowestChildDenyOverridesPolicyAlg.class);
 
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
@@ -89,7 +91,7 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
 
     /**
      * Protected constructor used by the ordered version of this algorithm.
-     * 
+     *
      * @param identifier
      *        the algorithm's identifier
      */
@@ -100,7 +102,7 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
     /**
      * Applies the combining rule to the set of policies based on the evaluation
      * context.
-     * 
+     *
      * @param context
      *        the context from the request
      * @param parameters
@@ -115,7 +117,7 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
     public Result combine(EvaluationCtx context,
                           List parameters,
                           List policyElements) {
-        log.info("Combining using: " + getIdentifier());
+        logger.info("Combining using: " + getIdentifier());
 
         boolean atLeastOneError = false;
         boolean atLeastOnePermit = false;
@@ -206,13 +208,13 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
                 resourceId = extractResourceId(t);
 
                 if (resourceId == null) {
-                    log.warn("Policy did not contain resourceId: "
+                    logger.warn("Policy did not contain resourceId: "
                             + policy.getId());
                     continue;
                 }
 
-                if (log.isDebugEnabled()) {
-                    log.debug("ResourceID: " + resourceId);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("ResourceID: " + resourceId);
                 }
             }
 
@@ -234,10 +236,10 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
             }
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Applicable policies:");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Applicable policies:");
             for (AbstractPolicy p : applicablePolicies) {
-                log.debug("\t" + p.getId());
+                logger.debug("\t" + p.getId());
             }
         }
 
@@ -253,7 +255,7 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
         try {
             docBuilder = factory.newDocumentBuilder();
         } catch (ParserConfigurationException pe) {
-            log.error("Error obtaining an XML parser: " + pe.getMessage(), pe);
+            logger.error("Error obtaining an XML parser: " + pe.getMessage(), pe);
             return null;
         }
 
@@ -263,7 +265,7 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
                     docBuilder.parse(new ByteArrayInputStream(output
                             .toByteArray()));
         } catch (Exception e) {
-            log.error("Problem parsing TargetMatchGroup to obtain id");
+            logger.error("Problem parsing TargetMatchGroup to obtain id");
             return null;
         }
 
@@ -301,8 +303,8 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
 
     private int getLength(String resourceId) {
         if (resourceId == null || "".equals(resourceId)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Length: " + resourceId + " " + 0);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Length: " + resourceId + " " + 0);
             }
 
             return 0;
@@ -312,8 +314,8 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
 
         for (int x = 0; x < components.length; x++) {
             if (components[x].matches(".*[^\\w\\-\\&\\:\\+\\~\\$]+.*")) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Length: " + resourceId + " " + (x - 1)
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Length: " + resourceId + " " + (x - 1)
                             + "\tComponent: " + components[x]);
                 }
 
@@ -321,8 +323,8 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
             }
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Length [return]: " + resourceId + " "
+        if (logger.isDebugEnabled()) {
+            logger.debug("Length [return]: " + resourceId + " "
                     + (components.length - 1));
         }
 

@@ -43,8 +43,6 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 
-import org.apache.log4j.Logger;
-
 import org.jrdf.graph.Literal;
 import org.jrdf.graph.Node;
 
@@ -56,8 +54,8 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.utilities.DateUtility;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * General-purpose utility class for Fedora clients. Provides methods to get
@@ -72,17 +70,6 @@ public class FedoraClient
         implements Constants {
 
     public static final String FEDORA_URI_PREFIX = "info:fedora/";
-
-    /**
-     * Should FedoraClient take over log4j configuration?
-     * <h2>Deprecated as of Fedora 2.2</h2>
-     * FedoraClient no longer takes over Log4J configuration, and setting this
-     * value has no effect. Applications that use this class should configure
-     * Log4J themselves, or make a log4j.xml or log4j.properties file available
-     * from the runtime CLASSPATH.
-     */
-    @Deprecated
-    public static boolean FORCE_LOG4J_CONFIGURATION = false;
 
     /** Seconds to wait before a connection is established. */
     public int TIMEOUT_SECONDS = 20;
@@ -99,9 +86,8 @@ public class FedoraClient
     /** Whether to automatically follow HTTP redirects. */
     public boolean FOLLOW_REDIRECTS = true;
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(FedoraClient.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(FedoraClient.class);
 
     private final SOAPEndpoint m_accessEndpoint = new SOAPEndpoint("access");
 
@@ -186,7 +172,7 @@ public class FedoraClient
             try {
                 body = post.getResponseBodyAsString();
             } catch (Exception e) {
-                LOG.warn("Error reading response body", e);
+                logger.warn("Error reading response body", e);
             }
             if (body == null) {
                 body = "[empty response body]";
@@ -328,7 +314,7 @@ public class FedoraClient
                                boolean followRedirects) throws IOException {
 
         String urlString = url.toString();
-        LOG.debug("FedoraClient is getting " + urlString);
+        logger.debug("FedoraClient is getting " + urlString);
         HttpClient client = getHttpClient();
         GetMethod getMethod = new GetMethod(urlString);
         getMethod.setDoAuthentication(true);
@@ -339,12 +325,12 @@ public class FedoraClient
             if (status != 200) {
                 if (followRedirects && 300 <= status && status <= 399) {
                     // Handle the redirect here !
-                    LOG
+                    logger
                             .debug("FedoraClient is handling redirect for HTTP STATUS="
                                     + status);
                     Header hLoc = in.getResponseHeader("location");
                     if (hLoc != null) {
-                        LOG.debug("FedoraClient is trying redirect location: "
+                        logger.debug("FedoraClient is trying redirect location: "
                                 + hLoc.getValue());
                         // Try the redirect location, but don't try to handle another level of redirection.
                         return get(hLoc.getValue(), true, false);
@@ -356,7 +342,7 @@ public class FedoraClient
                             try {
                                 in.close();
                             } catch (Exception e) {
-                                LOG.error("Can't close InputStream: "
+                                logger.error("Can't close InputStream: "
                                         + e.getMessage());
                             }
                         }
@@ -370,7 +356,7 @@ public class FedoraClient
                         try {
                             in.close();
                         } catch (Exception e) {
-                            LOG.error("Can't close InputStream: "
+                            logger.error("Can't close InputStream: "
                                     + e.getMessage());
                         }
                     }
@@ -420,7 +406,7 @@ public class FedoraClient
             try {
                 in.close();
             } catch (Exception e) {
-                LOG.error("Can't close InputStream: " + e.getMessage());
+                logger.error("Can't close InputStream: " + e.getMessage());
             }
         }
     }
@@ -545,7 +531,7 @@ public class FedoraClient
             // Make the APIA call for describe repository
             // and make sure that HTTP 302 status is handled.
             String desc = getResponseAsString("/describe?xml=true", true, true);
-            LOG.debug("describeRepository response:\n" + desc);
+            logger.debug("describeRepository response:\n" + desc);
             String[] parts = desc.split("<repositoryVersion>");
             if (parts.length < 2) {
                 throw new IOException("Could not find repositoryVersion element in content of /describe?xml=true");
@@ -555,7 +541,7 @@ public class FedoraClient
                 throw new IOException("Could not find end of repositoryVersion element in content of /describe?xml=true");
             }
             m_serverVersion = parts[1].substring(0, i).trim();
-            LOG.debug("Server version is " + m_serverVersion);
+            logger.debug("Server version is " + m_serverVersion);
         }
         return m_serverVersion;
     }
@@ -661,7 +647,7 @@ public class FedoraClient
             try {
                 in.close();
             } catch (Exception e) {
-                LOG.error("Can't close InputStream: " + e.getMessage());
+                logger.error("Can't close InputStream: " + e.getMessage());
             }
         }
     }

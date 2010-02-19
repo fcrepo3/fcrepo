@@ -12,8 +12,6 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.log4j.Logger;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -28,6 +26,8 @@ import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -39,7 +39,9 @@ import org.fcrepo.server.storage.types.RelationshipTuple;
  * @version $Id$
  */
 public class DatastreamFilenameHelper {
-    private static final Logger LOG = Logger.getLogger(DatastreamFilenameHelper.class.getName());
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(DatastreamFilenameHelper.class);
 
     // configures behaviour from fedora.fcfg
     protected static String m_datastreamContentDispositionInlineEnabled;
@@ -149,10 +151,10 @@ public class DatastreamFilenameHelper {
                     if (!extensionMappings.containsKey(mimeType)) {
                         extensionMappings.put(mimeType, extension);
                     } else {
-                        LOG.warn("Duplicate extension " + extension + " found for mime-type " + mimeType + " in " + mappingFile);
+                        logger.warn("Duplicate extension " + extension + " found for mime-type " + mimeType + " in " + mappingFile);
                     }
                 } else {
-                    LOG.warn("Element mime-mapping is missing child elements mime-type and/or extension in " + mappingFile);
+                    logger.warn("Element mime-mapping is missing child elements mime-type and/or extension in " + mappingFile);
                 }
             }
         }
@@ -242,7 +244,7 @@ public class DatastreamFilenameHelper {
                         if (!filename.equals(""))
                             extension = getExtension(filename, m_datastreamExtensionMappingLabel, MIMETYPE);
                     } else {
-                        LOG.warn("Unknown datastream filename source specified in datastreamFilenameSource in fedora.fcfg: " + source + ". Please specify zero or more of: rels id label");
+                        logger.warn("Unknown datastream filename source specified in datastreamFilenameSource in fedora.fcfg: " + source + ". Please specify zero or more of: rels id label");
                     }
                 }
             }
@@ -285,12 +287,12 @@ public class DatastreamFilenameHelper {
             if (filenameRels[0].isLiteral) {
                 filename = filenameRels[0].object;
             } else {
-                LOG.warn("Object " + pid + " datastream " + dsid + " specifies a filename which is not a literal in RELS-INT");
+                logger.warn("Object " + pid + " datastream " + dsid + " specifies a filename which is not a literal in RELS-INT");
                 filename = "";
             }
         } else {
             if (filenameRels.length > 1) {
-                LOG.warn("Object " + pid + " datastream " + dsid + " specifies more than one filename in RELS-INT");
+                logger.warn("Object " + pid + " datastream " + dsid + " specifies more than one filename in RELS-INT");
             }
             filename = "";
         }
@@ -353,7 +355,7 @@ public class DatastreamFilenameHelper {
                         extension = m_datastreamDefaultExtension;
                 } else {
                     // unknown mapping type
-                    LOG.warn("Unknown extension mapping type specified in fedora.fcfg");
+                    logger.warn("Unknown extension mapping type specified in fedora.fcfg");
                     extension = m_datastreamDefaultExtension;
                 }
             }

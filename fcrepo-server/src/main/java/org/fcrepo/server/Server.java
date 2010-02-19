@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server;
@@ -27,8 +27,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -52,16 +50,14 @@ import org.fcrepo.server.security.Authorization;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.status.ServerState;
 import org.fcrepo.server.utilities.status.ServerStatusFile;
-import org.fcrepo.utilities.Log4J;
-
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The starting point for working with a Fedora repository. This class handles
  * loading, starting, and stopping modules (the module lifecycle), and provides
  * access to core constants.
- * 
+ *
  * @author Chris Wilper
  */
 public abstract class Server
@@ -73,8 +69,8 @@ public abstract class Server
 
     public static final boolean GLOBAL_CHOICE = false;
 
-    /** Logger for this class. */
-    private static Logger LOG;
+    private static final Logger logger =
+            LoggerFactory.getLogger(Server.class);
 
     /**
      * The ResourceBundle that provides access to constants from
@@ -450,7 +446,7 @@ public abstract class Server
      * the <code>Server</code>, then initializes each module, validating its
      * required params, then verifies that the server's required module roles
      * have been met.
-     * 
+     *
      * @param rootConfigElement
      *        The root <code>Element</code> of configuration.
      * @param homeDir
@@ -477,19 +473,18 @@ public abstract class Server
             File configFile =
                     new File(m_homeDir + File.separator + CONFIG_DIR
                             + File.separator + CONFIG_FILE);
-            LOG.info("Server home is " + m_homeDir.toString());
+            logger.info("Server home is " + m_homeDir.toString());
             if (s_serverProfile == null) {
-                LOG
-                        .debug("fedora.serverProfile property not set... will always "
-                                + "use param 'value' attributes from configuration for param values.");
+                logger.debug("fedora.serverProfile property not set... will always "
+                        + "use param 'value' attributes from configuration for param values.");
             } else {
-                LOG.debug("fedora.serverProfile property was '"
+                logger.debug("fedora.serverProfile property was '"
                         + s_serverProfile + "'... will use param '"
                         + s_serverProfile + "value' attributes from "
                         + "configuration for param values, falling back to "
                         + "'value' attributes where unspecified.");
             }
-            LOG.debug("Loading and validating configuration file \""
+            logger.debug("Loading and validating configuration file \""
                     + configFile + "\"");
 
             // do the parsing and validation of configuration
@@ -535,7 +530,7 @@ public abstract class Server
             while (mRoles.hasNext()) {
                 String role = (String) mRoles.next();
                 String className = (String) moduleClassNames.get(role);
-                LOG.info("Initializing " + className);
+                logger.info("Initializing " + className);
                 try {
                     Class moduleClass = Class.forName(className);
                     Class param1Class =
@@ -544,7 +539,7 @@ public abstract class Server
                             Class.forName(MODULE_CONSTRUCTOR_PARAM2_CLASS);
                     Class param3Class =
                             Class.forName(MODULE_CONSTRUCTOR_PARAM3_CLASS);
-                    LOG.debug("Getting constructor " + className + "("
+                    logger.debug("Getting constructor " + className + "("
                             + MODULE_CONSTRUCTOR_PARAM1_CLASS + ","
                             + MODULE_CONSTRUCTOR_PARAM2_CLASS + ","
                             + MODULE_CONSTRUCTOR_PARAM3_CLASS + ")");
@@ -555,7 +550,7 @@ public abstract class Server
                             (Module) moduleConstructor
                                     .newInstance(new Object[] {
                                             moduleParams.get(role),
-                                            (Server) this, role});
+                                            this, role});
                     m_loadedModules.put(role, inst);
                 } catch (ClassNotFoundException cnfe) {
                     throw new ModuleInitializationException(MessageFormat
@@ -609,9 +604,9 @@ public abstract class Server
             while (mRoles.hasNext()) {
                 String r = (String) mRoles.next();
                 Module m = getModule(r);
-                LOG.info("Post-Initializing " + m.getClass().getName());
+                logger.info("Post-Initializing " + m.getClass().getName());
                 reqRoles = m.getRequiredModuleRoles();
-                LOG.debug("verifying dependencies have been loaded...");
+                logger.debug("verifying dependencies have been loaded...");
                 for (String element : reqRoles) {
                     if (getModule(element) == null) {
                         throw new ModuleInitializationException(MessageFormat
@@ -619,46 +614,45 @@ public abstract class Server
                                         new Object[] {element}), r);
                     }
                 }
-                LOG.debug(reqRoles.length + " dependencies, all loaded, ok.");
+                logger.debug(reqRoles.length + " dependencies, all loaded, ok.");
                 m.postInitModule();
             }
 
             // Do postInitServer for the Server instance
-            LOG.debug("Post-initializing server");
+            logger.debug("Post-initializing server");
             postInitServer();
 
             // flag that we're done initting
-            LOG.info("Server startup complete");
+            logger.info("Server startup complete");
             m_initialized = true;
         } catch (ServerInitializationException sie) {
             // these are caught and rethrown for two reasons:
             // 1) so they can be logged in the startup log, and
             // 2) so an attempt can be made to free resources tied up thus far
             //    via shutdown()
-            LOG.fatal("Server failed to initialize", sie);
+            logger.error("Server failed to initialize", sie);
             try {
                 shutdown(null);
             } catch (Throwable th) {
-                LOG.warn("Error shutting down server after failed startup", th);
+                logger.warn("Error shutting down server after failed startup", th);
             }
             throw sie;
         } catch (ModuleInitializationException mie) {
-            LOG.fatal("Module (" + mie.getRole() + ") failed to initialize",
+            logger.error("Module (" + mie.getRole() + ") failed to initialize",
                       mie);
             try {
                 shutdown(null);
             } catch (Throwable th) {
-                LOG.warn("Error shutting down server after failed startup", th);
+                logger.warn("Error shutting down server after failed startup", th);
             }
             throw mie;
         } catch (Throwable th) {
             String msg = "Fatal error while starting server";
-            LOG.fatal(msg, th);
+            logger.error(msg, th);
             try {
                 shutdown(null);
             } catch (Throwable oth) {
-                LOG
-                        .warn("Error shutting down server after failed startup",
+                logger.warn("Error shutting down server after failed startup",
                               oth);
             }
             throw new RuntimeException(msg, th);
@@ -671,33 +665,6 @@ public abstract class Server
 
     protected String overrideModuleClass(String moduleClass) {
         return null;
-    }
-
-    /**
-     * Configures Log4J using FEDORA_HOME/config/log4j.properties.
-     */
-    protected static void configureLog4J(String extension)
-            throws ServerInitializationException {
-
-        File fedoraHome = new File(Constants.FEDORA_HOME);
-        File serverDir = new File(fedoraHome, "server");
-        File logDir = new File(serverDir, "logs");
-        logDir.mkdirs();
-        
-        Map<String, String> options = new HashMap<String, String>();
-        options.put("logDir", logDir.getPath());
-        options.put("extension", extension);
-
-        File propFile = new File(serverDir, "config/log4j.properties");
-        
-        try {
-            Log4J.initFromPropFile(propFile, options);
-        } catch (Exception e) {
-            throw new ServerInitializationException("Error initializing from "
-                    + "log4j configuration file: " + propFile.getPath(), e);
-        }
-
-        LOG = Logger.getLogger(Server.class.getName());
     }
 
     /**
@@ -716,7 +683,7 @@ public abstract class Server
      * will contain the the name-value pair <code>HashMaps</code> of each of
      * the CONFIG_ELEMENT_DATASTORE elements found (keyed by
      * CONFIG_ATTRIBUTE_ID).
-     * 
+     *
      * @param element
      *        The element containing the name-value pair defintions.
      * @param dAttribute
@@ -735,7 +702,7 @@ public abstract class Server
             moduleAndDatastreamInfo.add(new HashMap());
             params.put(null, moduleAndDatastreamInfo);
         }
-        LOG.debug(MessageFormat.format(INIT_CONFIG_CONFIG_EXAMININGELEMENT,
+        logger.debug(MessageFormat.format(INIT_CONFIG_CONFIG_EXAMININGELEMENT,
                                        new Object[] {element.getLocalName(),
                                                dAttribute}));
         for (int i = 0; i < element.getChildNodes().getLength(); i++) {
@@ -790,7 +757,7 @@ public abstract class Server
                     }
                     params.put(nameNode.getNodeValue(), valueNode
                             .getNodeValue());
-                    LOG.debug(MessageFormat
+                    logger.debug(MessageFormat
                             .format(INIT_CONFIG_CONFIG_PARAMETERIS,
                                     new Object[] {nameNode.getNodeValue(),
                                             valueNode.getNodeValue()}));
@@ -907,7 +874,7 @@ public abstract class Server
      * </p>
      * This is useful for threaded <code>Modules</code> that need to wait
      * until all initialization has occurred before doing something.
-     * 
+     *
      * @return whether initialization has completed.
      */
     public final boolean hasInitialized() {
@@ -937,7 +904,7 @@ public abstract class Server
         if (okToStart) {
             return getInstance(homeDir);
         } else {
-            Server instance = (Server) s_instances.get(homeDir);
+            Server instance = s_instances.get(homeDir);
             if (instance == null) {
                 throw new ServerInitializationException("The Fedora server is not yet running.");
             } else {
@@ -950,7 +917,7 @@ public abstract class Server
     /**
      * Provides an instance of the server specified in the configuration file at
      * homeDir/CONFIG_DIR/CONFIG_FILE, or DEFAULT_SERVER_CLASS if unspecified.
-     * 
+     *
      * @param homeDir
      *        The base directory for the server.
      * @return The instance.
@@ -962,13 +929,12 @@ public abstract class Server
     public final static synchronized Server getInstance(File homeDir)
             throws ServerInitializationException, ModuleInitializationException {
         // return an instance if already in memory
-        Server instance = (Server) s_instances.get(homeDir);
+        Server instance = s_instances.get(homeDir);
         if (instance != null) {
             return instance;
         }
 
-        configureLog4J(".log");
-        LOG.info("Starting up server");
+        logger.info("Starting up server");
 
         // else instantiate a new one given the class provided in the
         // root element in the config file and return it
@@ -1084,7 +1050,7 @@ public abstract class Server
 
     /**
      * Gets the server's home directory.
-     * 
+     *
      * @return The directory.
      */
     public final File getHomeDir() {
@@ -1093,25 +1059,25 @@ public abstract class Server
 
     /**
      * Gets a loaded <code>Module</code>.
-     * 
+     *
      * @param role
      *        The role of the <code>Module</code> to get.
      * @return The <code>Module</code>, <code>null</code> if not found.
      */
     public final Module getModule(String role) {
-        return (Module) m_loadedModules.get(role);
+        return m_loadedModules.get(role);
     }
 
     /**
      * Gets a <code>DatastoreConfig</code>.
-     * 
+     *
      * @param id
      *        The id as given in the server configuration.
      * @return The <code>DatastoreConfig</code>, <code>null</code> if not
      *         found.
      */
     public final DatastoreConfig getDatastoreConfig(String id) {
-        return (DatastoreConfig) m_datastoreConfigs.get(id);
+        return m_datastoreConfigs.get(id);
     }
 
     public Iterator<String> datastoreConfigIds() {
@@ -1120,7 +1086,7 @@ public abstract class Server
 
     /**
      * Gets an <code>Iterator</code> over the roles that have been loaded.
-     * 
+     *
      * @return (<code>String</code>s) The roles.
      */
     public final Iterator<String> loadedModuleRoles() {
@@ -1133,7 +1099,7 @@ public abstract class Server
      * </p>
      * This is guaranteed to be run before any modules are loaded. The default
      * implementation does nothing.
-     * 
+     *
      * @throws ServerInitializationException
      *         If a severe server startup-related error occurred.
      */
@@ -1150,7 +1116,7 @@ public abstract class Server
      * This is guaranteed to be run after all Modules have been loaded and all
      * module initialization (initModule() and postInitModule()) has taken
      * place. The default implementation does nothing.
-     * 
+     *
      * @throws ServerInitializationException
      *         If a severe server startup-related error occurred.
      */
@@ -1185,7 +1151,7 @@ public abstract class Server
      * </p>
      * Right before this is finished, the instance is removed from the server
      * instances map.
-     * 
+     *
      * @throws ServerShutdownException
      *         If a severe server shutdown-related error occurred.
      *         USER_REPRESENTED = addName(new XacmlName(this,
@@ -1196,21 +1162,21 @@ public abstract class Server
     public final void shutdown(Context context) throws ServerShutdownException,
             ModuleShutdownException, AuthzException {
         Iterator roleIterator = loadedModuleRoles();
-        LOG.info("Shutting down server");
+        logger.info("Shutting down server");
         ModuleShutdownException mse = null;
         while (roleIterator.hasNext()) {
             Module m = getModule((String) roleIterator.next());
             String mName = m.getClass().getName();
             try {
-                LOG.info("Shutting down " + mName);
+                logger.info("Shutting down " + mName);
                 m.shutdownModule();
             } catch (ModuleShutdownException e) {
-                LOG.warn("Error shutting down module " + mName, e);
+                logger.warn("Error shutting down module " + mName, e);
                 mse = e;
             }
         }
         shutdownServer();
-        LOG.info("Server shutdown complete");
+        logger.info("Server shutdown complete");
         s_instances.remove(getHomeDir());
         if (mse != null) {
             throw mse;
@@ -1223,7 +1189,7 @@ public abstract class Server
      * error. If an error occurs, it should be thrown as a
      * <code>ServerShutdownException</code> after attempts to free every
      * resource have been made.
-     * 
+     *
      * @throws ServerShutdownException
      *         If a severe server shutdown-related error occurred.
      */
@@ -1235,12 +1201,13 @@ public abstract class Server
 
     /**
      * Calls <code>shutdown()</code> when finalization occurs.
-     * 
+     *
      * @throws ServerShutdownException
      *         If a severe server shutdown-related error occurred.
      * @throws ModuleShutdownException
      *         If a severe module shutdown-related error occurred.
      */
+    @Override
     public final void finalize() throws ServerShutdownException,
             ModuleShutdownException {
         shutdownServer();
@@ -1336,11 +1303,11 @@ public abstract class Server
             padding = "                ";
             i = 0;
             Iterator iter2 =
-                    ((DatastoreConfig) getDatastoreConfig(id)).parameterNames();
+                    (getDatastoreConfig(id)).parameterNames();
             while (iter2.hasNext()) {
                 String name = (String) iter2.next();
                 String value =
-                        ((DatastoreConfig) getDatastoreConfig(id))
+                        (getDatastoreConfig(id))
                                 .getParameter(name);
                 if (i > 0) {
                     out.append(padding);
@@ -1397,10 +1364,10 @@ public abstract class Server
             return currentDate;
         }
     }
-   
+
     /**
      * Gets the server configuration.
-     * 
+     *
      * @return the server configuration.
      */
     public static ServerConfiguration getConfig() {
@@ -1410,7 +1377,7 @@ public abstract class Server
                              "server/config/fedora.fcfg"));
             ServerConfigurationParser parser =
                 new ServerConfigurationParser(fcfg);
-            return parser.parse(); 
+            return parser.parse();
         } catch (IOException e) {
             throw new FaultException("Error loading server configuration",
                                      e);

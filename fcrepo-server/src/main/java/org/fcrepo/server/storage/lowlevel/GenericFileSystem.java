@@ -18,12 +18,10 @@ import java.io.InputStream;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.utilities.FileUtils;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -32,9 +30,8 @@ import org.fcrepo.utilities.FileUtils;
 public class GenericFileSystem
         extends FileSystem {
 
-    /** Logger for this class. */
-    private static Logger LOG =
-            Logger.getLogger(GenericFileSystem.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(GenericFileSystem.class);
 
     public GenericFileSystem(Map<String, ?> configuration) {
         super(configuration);
@@ -98,7 +95,7 @@ public class GenericFileSystem
         }
         try {
             boolean fileCopySuccessful = FileUtils.copy(content, fileOutputStream);
-            
+
             if(!fileCopySuccessful) {
                 throw new LowlevelStorageException(true, "couldn't write new file "
                         + getPath(file));
@@ -150,14 +147,14 @@ public class GenericFileSystem
                 try {
                     out.close();
                 } catch (IOException e) {
-                    LOG.warn("Could not close file for writing "
+                    logger.warn("Could not close file for writing "
                             + file.getPath(), e);
                 }
             }
             try {
                 content.close();
             } catch (IOException e) {
-                LOG.warn("Could not close content stream for reading", e);
+                logger.warn("Could not close content stream for reading", e);
             }
         }
 
@@ -170,9 +167,8 @@ public class GenericFileSystem
             throw new LowlevelStorageException(true, err);
         } else {
             if (!backupFile.delete()) {
-                LOG
-                        .warn("Could not delete backup file "
-                                + backupFile.getPath());
+                logger.warn("Could not delete backup file {}",
+                        backupFile.getPath());
             }
         }
 

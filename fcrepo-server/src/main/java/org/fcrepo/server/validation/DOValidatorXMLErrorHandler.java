@@ -1,14 +1,15 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.validation;
 
-import org.apache.log4j.Logger;
-
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Sandy Payette
@@ -16,24 +17,23 @@ import org.xml.sax.SAXParseException;
 public class DOValidatorXMLErrorHandler
         implements ErrorHandler {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DOValidatorXMLErrorHandler.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DOValidatorXMLErrorHandler.class);
 
     public DOValidatorXMLErrorHandler() {
     }
 
     public void warning(SAXParseException e) throws SAXException {
-        LOG.warn("SAX WARNING (publicId=" + e.getPublicId() + ")", e);
+        logger.warn("SAX WARNING (publicId=" + e.getPublicId() + ")", e);
     }
 
     public void error(SAXParseException e) throws SAXException {
-        LOG.error("SAX ERROR (publicId=" + e.getPublicId() + ")", e);
+        logger.error("SAX ERROR (publicId=" + e.getPublicId() + ")", e);
         throw new SAXException(formatParseExceptionMsg(e));
     }
 
     public void fatalError(SAXParseException e) throws SAXException {
-        LOG.error("SAX FATAL ERROR (publicId=" + e.getPublicId() + ")", e);
+        logger.error("SAX FATAL ERROR (publicId=" + e.getPublicId() + ")", e);
         throw new SAXException(formatParseExceptionMsg(e));
     }
 

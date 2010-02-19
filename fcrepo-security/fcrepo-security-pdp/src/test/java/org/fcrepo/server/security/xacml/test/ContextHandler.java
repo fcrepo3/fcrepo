@@ -19,7 +19,8 @@
 package org.fcrepo.server.security.xacml.test;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 import org.fcrepo.server.security.xacml.pdp.MelcoePDPImpl;
@@ -35,8 +36,8 @@ import com.sun.xacml.ctx.ResponseCtx;
  */
 public class ContextHandler {
 
-    private static Logger log =
-            Logger.getLogger(ContextHandler.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ContextHandler.class);
 
     private static final ContextHandler contextHandler;
 
@@ -51,7 +52,7 @@ public class ContextHandler {
     private ContextHandler() {
         try {
             melcoePDPImpl = new MelcoePDPImpl();
-            log.debug("created new PDP");
+            logger.debug("created new PDP");
         } catch (Exception e) {
             // test code...
         }
@@ -68,7 +69,7 @@ public class ContextHandler {
      *         context.
      */
     public ResponseCtx evaluate(RequestCtx reqCtx) throws Exception {
-        log.debug("Resolving RequestCtx request!");
+        logger.debug("Resolving RequestCtx request!");
 
         String request = contextUtil.makeRequestCtx(reqCtx);
         String response = evaluate(request);

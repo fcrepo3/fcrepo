@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.validation;
@@ -9,17 +9,18 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import org.apache.log4j.Logger;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ObjectValidityException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.utilities.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -28,36 +29,35 @@ import org.fcrepo.utilities.FileUtils;
  * digital object XML files encoded in one of the Fedora-supported encoding
  * formats (i.e., FOXML, Fedora METS, and possibly others in the future). The
  * following types of validation can be run:
- * 
+ *
  * <pre>
  *   0=VALDIATE_ALL : All validation will be done.
- *   1=VALIDATE_XML_SCHEMA : the digital object will be validated against 
- *                 the the appropriate XML Schema. An ObjectValidityException 
+ *   1=VALIDATE_XML_SCHEMA : the digital object will be validated against
+ *                 the the appropriate XML Schema. An ObjectValidityException
  *                 will be thrown if the object fails the schema test.
- *   2=VALIDATE_SCHEMATRON : the digital object will be validated 
- *                 against a set of rules expressed by a Schematron schema.  
- *                 These rules are beyond what can be expressed in XML Schema.  
+ *   2=VALIDATE_SCHEMATRON : the digital object will be validated
+ *                 against a set of rules expressed by a Schematron schema.
+ *                 These rules are beyond what can be expressed in XML Schema.
  *                 The Schematron schema expresses rules for different phases
- *                 of the object. There are rules appropriate to a digital 
- *                 object when it is first ingested into the repository 
- *                 (ingest phase). There are additional rules that must be met 
- *                 before a digital object is considered valid for permanent 
- *                 storage in the repository (completed phase). These rules 
+ *                 of the object. There are rules appropriate to a digital
+ *                 object when it is first ingested into the repository
+ *                 (ingest phase). There are additional rules that must be met
+ *                 before a digital object is considered valid for permanent
+ *                 storage in the repository (completed phase). These rules
  *                 pertain to aspects of the object that are system assigned,
  *                 such as created dates and state codes.
- *                 An ObjectValidityException will be thrown if the object fails 
+ *                 An ObjectValidityException will be thrown if the object fails
  *                 the Fedora rules test.
  * </pre>
- * 
+ *
  * @author Sandy Payette
  * @version $Id$
  */
 public class DOValidatorImpl
         implements DOValidator {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DOValidatorImpl.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DOValidatorImpl.class);
 
     protected static boolean debug = true;
 
@@ -110,7 +110,7 @@ public class DOValidatorImpl
      * Any parameter may be given as null, in which case the default value is
      * assumed.
      * </p>
-     * 
+     *
      * @param tempDir
      *        Working area for validation, default is <i>temp/</i>
      * @param xmlSchemaMap
@@ -133,7 +133,7 @@ public class DOValidatorImpl
                            String schematronPreprocessorPath,
                            Map<String, String> ruleSchemaMap)
             throws ServerException {
-        LOG.debug("VALIDATE: Initializing object validation...");
+        logger.debug("VALIDATE: Initializing object validation...");
         m_xmlSchemaMap = xmlSchemaMap;
         m_ruleSchemaMap = ruleSchemaMap;
         if (tempDir == null) {
@@ -152,10 +152,10 @@ public class DOValidatorImpl
      * <p>
      * Validates a digital object.
      * </p>
-     * 
+     *
      * @param objectAsStream
      *        The digital object provided as a stream.
-     * @param format 
+     * @param format
      *           The format URI of the object serialization.
      * @param validationType
      *        The level of validation to perform on the digital object. This is
@@ -199,7 +199,7 @@ public class DOValidatorImpl
      * <p>
      * Validates a digital object.
      * </p>
-     * 
+     *
      * @param objectAsFile
      *        The digital object provided as a file.
      * @param validationType
@@ -223,11 +223,11 @@ public class DOValidatorImpl
                          int validationType,
                          String phase) throws ObjectValidityException,
             GeneralException {
-        LOG.debug("Validation phase=" + phase + " format=" + format);
-        LOG.debug("VALIDATE: Initiating validation: " + " phase=" + phase
+        logger.debug("Validation phase=" + phase + " format=" + format);
+        logger.debug("VALIDATE: Initiating validation: " + " phase=" + phase
                 + " format=" + format);
         checkFormat(format);
-        
+
         if (format.equals(Constants.ATOM_ZIP1_1.uri)) {
             // If the object serialization is a Zip file with an atom
             // manifest, extract the manifest for validation.
@@ -247,7 +247,7 @@ public class DOValidatorImpl
                 throw new GeneralException(e.getMessage(), e);
             }
         }
-        
+
         if (validationType == VALIDATE_ALL) {
             validateByRules(objectAsFile,
                             m_ruleSchemaMap.get(format),
@@ -263,7 +263,7 @@ public class DOValidatorImpl
                             phase);
         } else {
             String msg = "VALIDATE: ERROR - missing or invalid validationType";
-            LOG.error(msg);
+            logger.error(msg);
             cleanUp(objectAsFile);
             throw new GeneralException("[DOValidatorImpl] " + msg + ":"
                     + validationType);
@@ -279,7 +279,7 @@ public class DOValidatorImpl
 
     /**
      * Do XML Schema validation on the Fedora object.
-     * 
+     *
      * @param objectAsFile
      *        The digital object provided as a file.
      * @throws ObjectValidityException
@@ -294,16 +294,16 @@ public class DOValidatorImpl
             DOValidatorXMLSchema xsv = new DOValidatorXMLSchema(xmlSchemaPath);
             xsv.validate(objectAsFile);
         } catch (ObjectValidityException e) {
-            LOG.error("VALIDATE: ERROR - failed XML Schema validation.", e);
+            logger.error("VALIDATE: ERROR - failed XML Schema validation.", e);
             cleanUp(objectAsFile);
             throw e;
         } catch (Exception e) {
-            LOG.error("VALIDATE: ERROR - failed XML Schema validation.", e);
+            logger.error("VALIDATE: ERROR - failed XML Schema validation.", e);
             cleanUp(objectAsFile);
             throw new ObjectValidityException("[DOValidatorImpl]: validateXMLSchema. "
                     + e.getMessage());
         }
-        LOG.debug("VALIDATE: SUCCESS - passed XML Schema validation.");
+        logger.debug("VALIDATE: SUCCESS - passed XML Schema validation.");
     }
 
     /**
@@ -311,7 +311,7 @@ public class DOValidatorImpl
      * validation tests the object against a set of rules expressed using XPATH
      * in a Schematron schema. These test for things that are beyond what can be
      * expressed using XML Schema.
-     * 
+     *
      * @param objectAsFile
      *        The digital object provided as a file.
      * @param schemaPath
@@ -338,18 +338,18 @@ public class DOValidatorImpl
                                               phase);
             schtron.validate(objectAsFile);
         } catch (ObjectValidityException e) {
-            LOG.error("VALIDATE: ERROR - failed Schematron rules validation.",
+            logger.error("VALIDATE: ERROR - failed Schematron rules validation.",
                       e);
             cleanUp(objectAsFile);
             throw e;
         } catch (Exception e) {
-            LOG.error("VALIDATE: ERROR - failed Schematron rules validation.",
+            logger.error("VALIDATE: ERROR - failed Schematron rules validation.",
                       e);
             cleanUp(objectAsFile);
             throw new ObjectValidityException("[DOValidatorImpl]: "
                     + "failed Schematron rules validation. " + e.getMessage());
         }
-        LOG.debug("VALIDATE: SUCCESS - passed Schematron rules validation.");
+        logger.debug("VALIDATE: SUCCESS - passed Schematron rules validation.");
     }
 
     private File streamtoFile(String dirname, InputStream objectAsStream)
@@ -376,8 +376,8 @@ public class DOValidatorImpl
         return objectAsFile;
     }
 
-    // Distinguish temporary object files from real object files 
-    // that were passed in for validation.  This is a bit ugly as it stands, 
+    // Distinguish temporary object files from real object files
+    // that were passed in for validation.  This is a bit ugly as it stands,
     // but it should only blow away files in the temp directory.
     private void cleanUp(File f) {
         if (f.getParentFile() != null) {

@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.storage;
@@ -12,8 +12,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.ObjectNotFoundException;
@@ -22,6 +20,8 @@ import org.fcrepo.server.errors.StorageDeviceException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.errors.UnsupportedTranslationException;
 import org.fcrepo.server.storage.translation.DOTranslator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -36,15 +36,14 @@ import org.fcrepo.server.storage.translation.DOTranslator;
  * directory. What is in the directory at construction-time is what is assumed
  * to be the extent of the repository for the life of the object.
  * </p>
- * 
+ *
  * @author Chris Wilper
  */
 public class DirectoryBasedRepositoryReader
         implements RepositoryReader {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DirectoryBasedRepositoryReader.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DirectoryBasedRepositoryReader.class);
 
     private final DOTranslator m_translator;
 
@@ -60,7 +59,7 @@ public class DirectoryBasedRepositoryReader
      * Initializes the RepositoryReader by looking at all files in the provided
      * directory and ensuring that they're all serialized digital objects and
      * that there are no PID conflicts.
-     * 
+     *
      * @param directory
      *        the directory where this repository is based.
      * @param translator
@@ -101,12 +100,12 @@ public class DirectoryBasedRepositoryReader
                                                in);
                     String pid = reader.GetObjectPID();
                     if (reader.GetObjectPID().length() == 0) {
-                        LOG.warn("File " + thisFile + " has no pid...skipping");
+                        logger.warn("File " + thisFile + " has no pid...skipping");
                     } else {
                         m_files.put(pid, thisFile);
                     }
                 } catch (NullPointerException npe) {
-                    LOG.warn("Error in " + thisFile.getName() + "...skipping");
+                    logger.warn("Error in " + thisFile.getName() + "...skipping");
                 }
             }
         } catch (FileNotFoundException fnfe) {

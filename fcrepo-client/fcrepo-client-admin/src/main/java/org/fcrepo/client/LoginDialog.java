@@ -38,13 +38,11 @@ import javax.swing.JPasswordField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Launch a dialog for logging into a Fedora repository.
@@ -54,9 +52,8 @@ import org.fcrepo.server.management.FedoraAPIM;
 public class LoginDialog
         extends JDialog {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(LoginDialog.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(LoginDialog.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -262,7 +259,7 @@ public class LoginDialog
                   + "NOTE: The web-based Fedora Admin GUI will completely\n"
                   + "replace this one in future releases of Fedora.",
                     "Try the *New* Fedora Admin GUI!",
-                    JOptionPane.INFORMATION_MESSAGE);  
+                    JOptionPane.INFORMATION_MESSAGE);
         }
         // finally, populate them
         m_serverComboBox.addItem(m_lastServer);
@@ -352,7 +349,7 @@ public class LoginDialog
                          String pass) throws Exception {
 
         try {
-            LOG.info("Logging in...");
+            logger.info("Logging in...");
             // get a FedoraClient
             String baseURL = protocol + "://" + host + ":" + port + "/" + context;
             FedoraClient fc = new FedoraClient(baseURL, user, pass);

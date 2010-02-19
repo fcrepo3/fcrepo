@@ -10,7 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -30,8 +31,8 @@ import org.apache.log4j.Logger;
  */
 public class TransportOutputFile {
 
-    private static final Logger LOG =
-            Logger.getLogger(TransportOutputFile.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(TransportOutputFile.class);
 
     private enum State {
         READY, OPEN, CLOSED
@@ -53,7 +54,7 @@ public class TransportOutputFile {
      */
     public TransportOutputFile(File directory, String name)
             throws IOException {
-        LOG.debug("creating TransportOutputFile: '" + directory + "', '" + name
+        logger.debug("creating TransportOutputFile: '" + directory + "', '" + name
                 + "'");
 
         file = new File(directory, name);

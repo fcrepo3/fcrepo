@@ -29,7 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 
 
 import org.apache.axis.AxisFault;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -49,8 +50,8 @@ import com.sun.xacml.ctx.RequestCtx;
 public class GetNextPIDFilter
         extends AbstractFilter {
 
-    private static Logger log =
-            Logger.getLogger(GetNextPIDFilter.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(GetNextPIDFilter.class);
 
     /**
      * Default constructor.
@@ -110,7 +111,7 @@ public class GetNextPIDFilter
                             pid,
                             null);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw AxisFault.makeFault(e);
         }
 

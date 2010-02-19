@@ -71,6 +71,7 @@
                 <argument>xml</argument>
                 <argument>xml</argument>
               </arguments>
+              <classpathScope>runtime</classpathScope>
             </configuration>
           </execution>
           <execution>
@@ -90,6 +91,7 @@
                 <argument>xml</argument>
                 <argument>xml</argument>
               </arguments>
+              <classpathScope>runtime</classpathScope>
             </configuration>
           </execution>
           <execution>
@@ -109,6 +111,7 @@
                 <argument>xml</argument>
                 <argument>zip</argument>
               </arguments>
+              <classpathScope>runtime</classpathScope>
             </configuration>
           </execution>
         </executions>
@@ -437,13 +440,11 @@
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
-      <version>1.6</version>
     </dependency>
 
     <dependency>
       <groupId>commons-betwixt</groupId>
       <artifactId>commons-betwixt</artifactId>
-      <version>0.8</version>
     </dependency>
 
     <dependency>
@@ -467,7 +468,6 @@
     <dependency>
       <groupId>commons-discovery</groupId>
       <artifactId>commons-discovery</artifactId>
-      <version>0.2</version>
     </dependency>
     
     <dependency>
@@ -487,12 +487,6 @@
       <version>1.4</version>
     </dependency>
 
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.0.4</version>
-    </dependency>
-    
     <dependency>
       <groupId>dom4j</groupId>
       <artifactId>dom4j</artifactId>
@@ -584,58 +578,24 @@
       <version>1.0</version>
     </dependency>
 
-    <!--
-    <dependency>
-      <groupId>mckoi</groupId>
-      <artifactId>mckoi</artifactId>
-      <version>1.0.2</version>
-      <scope>runtime</scope>
-    </dependency>
-    -->
-
-    <!--
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.6</version>
-      <scope>runtime</scope>
-    </dependency>
-    -->
-
     <dependency>
       <groupId>org.apache.abdera</groupId>
       <artifactId>abdera-core</artifactId>
-      <version>0.4.0-incubating</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.abdera</groupId>
       <artifactId>abdera-extensions-main</artifactId>
-      <version>0.4.0-incubating</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.abdera</groupId>
-          <artifactId>abdera-client</artifactId>
-        </exclusion>
-      </exclusions> 
     </dependency>
 
     <dependency>
       <groupId>org.apache.abdera</groupId>
       <artifactId>abdera-i18n</artifactId>
-      <version>0.4.0-incubating</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.abdera</groupId>
       <artifactId>abdera-parser</artifactId>
-      <version>0.4.0-incubating</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.woodstox</groupId>
-          <artifactId>wstx-asl</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -649,13 +609,11 @@
       <artifactId>derby</artifactId>
     </dependency>
 
-    <!-- Note: Used by messaging. DWD 9/9/2009 -->
     <dependency>
       <groupId>org.apache.ws.commons.axiom</groupId>
       <artifactId>axiom-api</artifactId>
     </dependency>
 
-    <!-- Note: Used by messaging. DWD 9/9/2009 -->
     <dependency>
       <groupId>org.apache.ws.commons.axiom</groupId>
       <artifactId>axiom-impl</artifactId>
@@ -671,30 +629,53 @@
       <groupId>org.akubraproject</groupId>
       <artifactId>akubra-core</artifactId>
       <version>0.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.akubraproject</groupId>
       <artifactId>akubra-fs</artifactId>
       <version>0.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.akubraproject</groupId>
       <artifactId>akubra-map</artifactId>
       <version>0.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.akubraproject</groupId>
       <artifactId>akubra-mem</artifactId>
       <version>0.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>axis</artifactId>
-      <version>1.3-PATCHED</version>
     </dependency>
 
     <dependency>
@@ -734,7 +715,6 @@
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>trippi-core</artifactId>
-      <version>1.4.3</version>
     </dependency>
     
     <dependency>
@@ -750,12 +730,6 @@
     </dependency>
     
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.5.2</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>fcrepo-common</artifactId>
       <version>${project.version}</version>
@@ -769,25 +743,28 @@
       <scope>test</scope>
     </dependency>
 
-    <!--
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>8.3-603.jdbc3</version>
-      <scope>runtime</scope>
-    </dependency>
-    -->
-    
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
       <version>2.5.6</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
       <version>2.5.6</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     
     <dependency>
@@ -827,13 +804,30 @@
       <version>1.0</version>
     </dependency>
 
-    <!--
     <dependency>
-      <groupId>wsdl4j</groupId>
-      <artifactId>wsdl4j</artifactId>
-      <version>1.5.1</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
-    -->
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>                                                           
+      <artifactId>logback-classic</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>xerces</groupId>

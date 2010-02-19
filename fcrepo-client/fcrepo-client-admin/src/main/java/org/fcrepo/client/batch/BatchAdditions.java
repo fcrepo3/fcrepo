@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.client.batch;
@@ -72,26 +72,19 @@ class BatchAdditions
         try {
             File file = new File(filePrefix);
             FileInputStream fileInputStream = null;
-            if (!file.exists()) {
-                //LOG THIS
-                throw new Exception("x");
-            }
             if (!file.canRead()) {
-                //LOG THIS
-                throw new Exception("x");
+                throw new Exception("Missing or unreadable file: " + getPath(file));
             }
-            {
-                long lFileLength;
-                try {
-                    lFileLength = file.length();
-                } catch (Exception eCaughtStatFile) { //<== make specific
-                    throw new Exception("file " + getPath(file)
-                            + "couldn't be statted for reading");
-                }
-                if (lFileLength > Integer.MAX_VALUE) {
-                    throw new Exception("file " + getPath(file)
-                            + "too large for reading");
-                }
+            long lFileLength;
+            try {
+                lFileLength = file.length();
+            } catch (Exception eCaughtStatFile) { //<== make specific
+                throw new Exception("file " + getPath(file)
+                        + "couldn't be statted for reading");
+            }
+            if (lFileLength > Integer.MAX_VALUE) {
+                throw new Exception("file " + getPath(file)
+                        + "too large for reading");
             }
             fileInputStream = new FileInputStream(file);
             byte[] buffer = new byte[BUFFERLENGTH];

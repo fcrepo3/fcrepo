@@ -27,8 +27,6 @@ import com.sun.xacml.ctx.Status;
 import com.sun.xacml.finder.PolicyFinder;
 import com.sun.xacml.finder.PolicyFinderResult;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.FaultException;
 import org.fcrepo.server.ReadOnlyContext;
@@ -40,8 +38,8 @@ import org.fcrepo.server.errors.ValidationException;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.Datastream;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * XACML PolicyFinder for Fedora.
@@ -52,9 +50,8 @@ import org.fcrepo.server.storage.types.Datastream;
 public class PolicyFinderModule
         extends com.sun.xacml.finder.PolicyFinderModule {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(PolicyFinderModule.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(PolicyFinderModule.class);
 
     private static final List<String> ERROR_CODE_LIST = new ArrayList<String>(1);
 
@@ -90,7 +87,7 @@ public class PolicyFinderModule
         m_validateObjectPoliciesFromDatastream = validateObjectPoliciesFromDatastream;
         m_policyParser = policyParser;
 
-        LOG.info("Loading repository policies...");
+        logger.info("Loading repository policies...");
         m_repositoryPolicies = new ArrayList<AbstractPolicy>();
         try {
             m_repositoryPolicies.addAll(
@@ -166,7 +163,7 @@ public class PolicyFinderModule
                                                      pid);
             Datastream ds = reader.GetDatastream("POLICY", null);
             if (ds != null) {
-                LOG.debug("Using POLICY for " + pid);
+                logger.debug("Using POLICY for " + pid);
                 return m_policyParser
                         .copy().parse(ds.getContentStream(),
                                       m_validateObjectPoliciesFromDatastream);
@@ -194,13 +191,13 @@ public class PolicyFinderModule
                                                null);
         Object element = getAttributeFromEvaluationResult(attribute);
         if (element == null) {
-            LOG.debug("PolicyFinderModule:getPid exit on "
+            logger.debug("PolicyFinderModule:getPid exit on "
                     + "can't get contextId on request callback");
             return null;
         }
 
         if (!(element instanceof StringAttribute)) {
-            LOG.debug("PolicyFinderModule:getPid exit on "
+            logger.debug("PolicyFinderModule:getPid exit on "
                     + "couldn't get contextId from xacml request "
                     + "non-string returned");
             return null;
@@ -244,7 +241,7 @@ public class PolicyFinderModule
                 policies.addAll(loadPolicies(parser, validate, file));
             } else {
                 if (file.getName().endsWith(".xml")) {
-                    LOG.info("Loading policy: " + file.getPath());
+                    logger.info("Loading policy: " + file.getPath());
                     InputStream policyStream = new FileInputStream(file);
                     policies.add(parser.parse(policyStream, validate));
                 }

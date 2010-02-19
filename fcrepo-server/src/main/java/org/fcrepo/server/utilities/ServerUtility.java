@@ -10,25 +10,21 @@ import java.io.IOException;
 
 import java.net.URI;
 
-import java.util.Properties;
-
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.http.WebClient;
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.config.ServerConfigurationParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 public class ServerUtility {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(ServerUtility.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ServerUtility.class);
 
     public static final String HTTP = "http";
 
@@ -47,7 +43,7 @@ public class ServerUtility {
     static {
         String fedoraHome = Constants.FEDORA_HOME;
         if (fedoraHome == null) {
-            LOG.warn("FEDORA_HOME not set; unable to initialize");
+            logger.warn("FEDORA_HOME not set; unable to initialize");
         } else {
             File fcfgFile = new File(fedoraHome, "server/config/fedora.fcfg");
             try {
@@ -55,7 +51,7 @@ public class ServerUtility {
                         new ServerConfigurationParser(new FileInputStream(fcfgFile))
                                 .parse();
             } catch (IOException e) {
-                LOG.warn("Unable to read server configuration from "
+                logger.warn("Unable to read server configuration from "
                         + fcfgFile.getPath(), e);
             }
         }
@@ -69,7 +65,7 @@ public class ServerUtility {
             getServerResponse(protocol, user, pass, "/describe");
             return true;
         } catch (Exception e) {
-            LOG.debug("Assuming the server isn't running because "
+            logger.debug("Assuming the server isn't running because "
                     + "describe request failed", e);
             return false;
         }
@@ -113,7 +109,7 @@ public class ServerUtility {
                                             String pass,
                                             String path) throws IOException {
         String url = getBaseURL(protocol) + path;
-        LOG.info("Getting URL: " + url);
+        logger.info("Getting URL: " + url);
         UsernamePasswordCredentials creds =
                 new UsernamePasswordCredentials(user, pass);
         return new WebClient().getResponseAsString(url, true, creds);
@@ -170,33 +166,10 @@ public class ServerUtility {
     }
 
     /**
-     * Initializes logging to use Log4J and to send WARN messages to STDOUT for
-     * command-line use.
-     */
-    private static void initLogging() {
-        // send all log4j output to STDOUT and configure levels
-        Properties props = new Properties();
-        props.setProperty("log4j.appender.STDOUT",
-                          "org.apache.log4j.ConsoleAppender");
-        props.setProperty("log4j.appender.STDOUT.layout",
-                          "org.apache.log4j.PatternLayout");
-        props.setProperty("log4j.appender.STDOUT.layout.ConversionPattern",
-                          "%p: %m%n");
-        props.setProperty("log4j.rootLogger", "WARN, STDOUT");
-        PropertyConfigurator.configure(props);
-
-        // tell commons-logging to use Log4J
-        final String pfx = "org.apache.commons.logging.";
-        System.setProperty(pfx + "LogFactory", pfx + "impl.Log4jFactory");
-        System.setProperty(pfx + "Log", pfx + "impl.Log4JLogger");
-    }
-
-    /**
      * Command-line entry point to reload policies. Takes 3 args: protocol user
      * pass
      */
     public static void main(String[] args) {
-        initLogging();
         if (args.length == 3) {
             try {
                 reloadPolicies(args[0], args[1], args[2]);

@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.storage.lowlevel;
@@ -10,20 +10,18 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.LowlevelStorageInconsistencyException;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
  */
 public abstract class PathRegistry {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(PathRegistry.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(PathRegistry.class);
 
     protected static final int NO_REPORT = 0; //<=========????????
 
@@ -58,7 +56,7 @@ public abstract class PathRegistry {
     public abstract void auditFiles() throws LowlevelStorageException;
 
     public void auditRegistry() throws LowlevelStorageException {
-        LOG.info("begin audit:  registry-against-files");
+        logger.info("begin audit:  registry-against-files");
         Enumeration<String> keys = keys();
         while (keys.hasMoreElements()) {
             String pid = keys.nextElement();
@@ -66,14 +64,14 @@ public abstract class PathRegistry {
                 String path = get(pid);
                 File file = new File(path);
                 boolean fileExists = file.exists();
-                LOG.info((fileExists ? "" : "ERROR: ") + "registry has [" + pid
+                logger.info((fileExists ? "" : "ERROR: ") + "registry has [" + pid
                         + "] => [" + path + "] " + (fileExists ? "and" : "BUT")
                         + " file does " + (fileExists ? "" : "NOT") + "exist");
             } catch (LowlevelStorageException e) {
-                LOG.error("ERROR: registry has [" + pid + "] => []", e);
+                logger.error("ERROR: registry has [" + pid + "] => []", e);
             }
         }
-        LOG.info("end audit:  registry-against-files (ending normally)");
+        logger.info("end audit:  registry-against-files (ending normally)");
     }
 
     protected final String getRegistryName() {
@@ -103,7 +101,7 @@ public abstract class PathRegistry {
                         path = element.getCanonicalPath();
                     } catch (IOException e) {
                         if (report != NO_REPORT) {
-                            LOG.error("couldn't get File path", e);
+                            logger.error("couldn't get File path", e);
                         }
                         if (stopOnError) {
                             throw new LowlevelStorageException(true,
@@ -115,7 +113,7 @@ public abstract class PathRegistry {
                         String pid = PathAlgorithm.decode(filename);
                         if (pid == null) {
                             if (report != NO_REPORT) {
-                                LOG.error("unexpected file at [" + path + "]");
+                                logger.error("unexpected file at [" + path + "]");
                             }
                             if (stopOnError) {
                                 throw new LowlevelStorageException(true,
@@ -127,7 +125,7 @@ public abstract class PathRegistry {
                             switch (operation) {
                                 case REPORT_FILES: {
                                     if (report == FULL_REPORT) {
-                                        LOG.info("file [" + path
+                                        logger.info("file [" + path
                                                 + "] would have pid [" + pid
                                                 + "]");
                                     }
@@ -136,7 +134,7 @@ public abstract class PathRegistry {
                                 case REBUILD: {
                                     put(pid, path);
                                     if (report == FULL_REPORT) {
-                                        LOG.info("added to registry: [" + pid
+                                        logger.info("added to registry: [" + pid
                                                 + "] ==> [" + path + "]");
                                     }
                                     break;
@@ -149,21 +147,15 @@ public abstract class PathRegistry {
                                     }
                                     boolean matches = rpath.equals(path);
                                     if (report == FULL_REPORT || !matches) {
-                                        LOG
-                                                .info((matches ? "" : "ERROR: ")
-                                                        + "["
-                                                        + path
-                                                        + "] "
-                                                        + (matches ? ""
-                                                                : "NOT ")
-                                                        + "in registry"
-                                                        + (matches ? ""
-                                                                : "; pid ["
-                                                                        + pid
-                                                                        + "] instead registered as ["
-                                                                        + (rpath == null ? "[OBJECT NOT IN STORE]"
-                                                                                : rpath)
-                                                                        + "]"));
+                                        logger.info((matches ? "" : "ERROR: ")
+                                                + "[" + path + "] "
+                                                + (matches ? "" : "NOT ")
+                                                + "in registry" + (matches ? ""
+                                                : "; pid [" + pid
+                                                + "] instead registered as ["
+                                                + (rpath == null
+                                                ? "[OBJECT NOT IN STORE]"
+                                                : rpath) + "]"));
                                     }
                                 }
                             }

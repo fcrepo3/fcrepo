@@ -1,14 +1,14 @@
 /*
  * File: ObjectsFilter.java
- * 
+ *
  * Copyright 2009 2DC
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -22,17 +22,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.sun.xacml.ctx.RequestCtx;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -40,25 +42,25 @@ import org.w3c.dom.NodeList;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Handlers;
-
-import com.sun.xacml.ctx.RequestCtx;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handles the get operations.
- * 
+ *
  * @author nish.naidoo@gmail.com
  */
 public class ObjectsFilter
         extends AbstractFilter {
 
-    private static Logger log = Logger.getLogger(ObjectsFilter.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ObjectsFilter.class);
 
     private Map<String, RESTFilter> objectsHandlers = null;
 
     /**
      * Default constructor.
-     * 
+     *
      * @throws PEPException
      */
     public ObjectsFilter()
@@ -118,8 +120,8 @@ public class ObjectsFilter
             path = "";
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("objectsHandler path: " + path);
+        if (logger.isDebugEnabled()) {
+            logger.debug("objectsHandler path: " + path);
         }
 
         // The method override header. Takes precedence over the HTTP method
@@ -134,19 +136,19 @@ public class ObjectsFilter
 
         method = method.toUpperCase();
 
-        if (log.isDebugEnabled()) {
-            log.debug("objectsHandler method: " + method);
+        if (logger.isDebugEnabled()) {
+            logger.debug("objectsHandler method: " + method);
         }
 
         String[] parts = path.split("/");
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             for (String p : parts) {
-                log.debug("objectsHandler part: " + p);
+                logger.debug("objectsHandler part: " + p);
             }
         }
 
         if (parts.length < 1) {
-            log.info("Not enough components on the URI.");
+            logger.info("Not enough components on the URI.");
             throw new ServletException("Not enough components on the URI.");
         }
 
@@ -207,8 +209,8 @@ public class ObjectsFilter
             handlerName = Handlers.GETDATASTREAMDISSEMINATION;
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("activating handler: " + handlerName);
+        if (logger.isDebugEnabled()) {
+            logger.debug("activating handler: " + handlerName);
         }
 
         return objectsHandlers.get(handlerName);
@@ -258,26 +260,25 @@ public class ObjectsFilter
                         RESTFilter filter =
                                 (RESTFilter) filterClass.newInstance();
                         objectsHandlers.put(opn, filter);
-                        if (log.isDebugEnabled()) {
-                            log.debug("objects handler added to map: " + opn
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("objects handler added to map: " + opn
                                     + "/" + cls);
                         }
                     } catch (ClassNotFoundException e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("filterClass not found for: " + cls);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("filterClass not found for: " + cls);
                         }
                     } catch (InstantiationException ie) {
-                        log.error("Could not instantiate filter: " + cls);
+                        logger.error("Could not instantiate filter: " + cls);
                         throw new ServletException(ie.getMessage(), ie);
                     } catch (IllegalAccessException iae) {
-                        log.error("Could not instantiate filter: " + cls);
+                        logger.error("Could not instantiate filter: " + cls);
                         throw new ServletException(iae.getMessage(), iae);
                     }
                 }
             }
         } catch (Exception e) {
-            log.fatal("Failed to initialse the PEP for REST");
-            log.fatal(e.getMessage(), e);
+            logger.error("Failed to initialse the PEP for REST", e);
             throw new ServletException(e.getMessage(), e);
         }
     }

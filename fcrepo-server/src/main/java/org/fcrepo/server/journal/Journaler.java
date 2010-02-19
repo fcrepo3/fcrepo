@@ -10,8 +10,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -22,7 +20,8 @@ import org.fcrepo.server.management.Management;
 import org.fcrepo.server.management.ManagementDelegate;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Management module that decorates a ManagementDelegate module with code that
@@ -35,9 +34,8 @@ public class Journaler
         extends Module
         implements Management, JournalConstants {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(Journaler.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(Journaler.class);
 
     private JournalWorker worker;
 
@@ -62,7 +60,7 @@ public class Journaler
         Map<String, String> parameters = getParameters();
         copyPropertiesOverParameters(parameters);
         serverInterface = new ServerWrapper(getServer());
-        LOG.info("Journaling parameters: " + parameters);
+        logger.info("Journaling parameters: " + parameters);
         parseParameters(parameters);
 
         if (inRecoveryMode) {
@@ -71,7 +69,7 @@ public class Journaler
         } else {
             worker = new JournalCreator(parameters, getRole(), serverInterface);
         }
-        LOG.info("Journal worker module is: " + worker.toString());
+        logger.info("Journal worker module is: " + worker.toString());
     }
 
     /**
@@ -118,7 +116,7 @@ public class Journaler
      */
     private void parseParameters(Map<String, String> parameters)
             throws ModuleInitializationException {
-        LOG.info("Parameters: " + parameters);
+        logger.info("Parameters: " + parameters);
 
         String mode = parameters.get(PARAMETER_JOURNAL_MODE);
         if (mode == null) {

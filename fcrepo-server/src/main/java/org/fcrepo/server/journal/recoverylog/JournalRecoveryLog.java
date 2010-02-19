@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.journal.recoverylog;
@@ -11,8 +11,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.MultiValueMap;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.journal.JournalConstants;
@@ -21,19 +19,19 @@ import org.fcrepo.server.journal.ServerInterface;
 import org.fcrepo.server.journal.entry.ConsumerJournalEntry;
 import org.fcrepo.server.journal.entry.JournalEntryContext;
 import org.fcrepo.server.journal.helpers.JournalHelper;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The abstract base for all JournalRecoveryLog classes.
- * 
+ *
  * @author Jim Blake
  */
 public abstract class JournalRecoveryLog
         implements JournalConstants {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(JournalRecoveryLog.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(JournalRecoveryLog.class);
 
     private static final int LEVEL_LOW = 0;
 
@@ -67,7 +65,7 @@ public abstract class JournalRecoveryLog
                                                                         role,
                                                                         server},
                                                                 parameters);
-            LOG.info("JournalRecoveryLog is " + recoveryLog.toString());
+            logger.info("JournalRecoveryLog is " + recoveryLog.toString());
             return (JournalRecoveryLog) recoveryLog;
         } catch (JournalException e) {
             throw new ModuleInitializationException("Can't create JournalRecoveryLog",
@@ -140,7 +138,7 @@ public abstract class JournalRecoveryLog
     }
 
     /**
-     * Format a journal entry for writing to the log. Take logging level into
+     * Format a journal entry for writing to the logger. Take logging level into
      * account.
      */
     public void log(ConsumerJournalEntry journalEntry) {
@@ -229,7 +227,7 @@ public abstract class JournalRecoveryLog
             writer.write(JournalHelper.formatDate(new Date()) + ": " + message
                     + "\n");
         } catch (IOException e) {
-            LOG.error("Error writing journal log entry", e);
+            logger.error("Error writing journal log entry", e);
         }
     }
 

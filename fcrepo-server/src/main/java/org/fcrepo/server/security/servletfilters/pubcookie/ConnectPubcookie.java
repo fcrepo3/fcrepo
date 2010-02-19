@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security.servletfilters.pubcookie;
@@ -23,21 +23,20 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.w3c.dom.Node;
 
 import org.w3c.tidy.Tidy;
 
-//import org.fcrepo.server.security.servletfilters.HttpTidyConnect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
  */
 public class ConnectPubcookie {
 
-    private final Log log = LogFactory.getLog(ConnectPubcookie.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(ConnectPubcookie.class);
 
     private boolean completedFully = false;
 
@@ -56,10 +55,10 @@ public class ConnectPubcookie {
     }
 
     public final Cookie[] getResponseCookies() {
-        log.debug(this.getClass().getName() + ".getResponseCookies() "
+        logger.debug(this.getClass().getName() + ".getResponseCookies() "
                 + "cookies are:");
         for (Cookie element : responseCookies) {
-            log.debug(this.getClass().getName() + ".getResponseCookies() "
+            logger.debug(this.getClass().getName() + ".getResponseCookies() "
                     + "cookie==" + element);
         }
         return responseCookies;
@@ -69,46 +68,14 @@ public class ConnectPubcookie {
                                               URL url,
                                               Map requestParameters,
                                               Cookie[] requestCookies) {
-        LogFactory.getLog(ConnectPubcookie.class).debug(ConnectPubcookie.class
-                .getName()
-                + ".setup()");
+        logger.debug("Entered setup()");
         HttpMethodBase method = null;
         if (requestParameters == null) {
-            LogFactory.getLog(ConnectPubcookie.class)
-                    .debug(ConnectPubcookie.class.getName() + ".setup()"
-                            + " requestParameters == null");
+            logger.debug("Using GetMethod; requestParameters == null");
             method = new GetMethod(url.toExternalForm());
-            //GetMethod is superclass to ExpectContinueMethod, so we don't require method.setUseExpectHeader(false);
-            LogFactory.getLog(ConnectPubcookie.class)
-                    .debug(ConnectPubcookie.class.getName() + ".setup()"
-                            + " after getting method");
         } else {
-            LogFactory.getLog(ConnectPubcookie.class)
-                    .debug(ConnectPubcookie.class.getName() + ".setup()"
-                            + " requestParameters != null");
+            logger.debug("Using PostMethod; requestParameters specified");
             method = new PostMethod(url.toExternalForm()); // "http://localhost:8080/"
-            LogFactory.getLog(ConnectPubcookie.class)
-                    .debug(ConnectPubcookie.class.getName() + ".setup()"
-                            + " after getting method");
-
-            //XXX method.getParams().setBooleanParameter(HttpMethodParams.USE_EXPECT_CONTINUE, false); //new way
-            //XXX method.getParams().setIntParameter(HttpMethodParams.SO_TIMEOUT, 10000);            
-            //XXX method.getParams().setVersion(HttpVersion.HTTP_0_9); //or HttpVersion.HTTP_1_0 HttpVersion.HTTP_1_1
-
-            LogFactory.getLog(ConnectPubcookie.class)
-                    .debug(ConnectPubcookie.class.getName() + ".setup()"
-                            + " after setting USE_EXPECT_CONTINUE");
-
-            //PostMethod is subclass of ExpectContinueMethod, so we require here:            
-            //((PostMethod)method).setUseExpectHeader(false);
-            //client.setTimeout(30000); // increased from 10000 as temp fix; 2005-03-17 wdn5e
-            //HttpClientParams httpClientParams = new HttpClientParams();
-            //httpClientParams.setBooleanParameter(HttpMethodParams.USE_EXPECT_CONTINUE, true); //old way
-            //httpClientParams.setIntParameter(HttpMethodParams.SO_TIMEOUT, 30000);
-
-            LogFactory
-                    .getLog(ConnectPubcookie.class)
-                    .debug(ConnectPubcookie.class.getName() + ".setup()" + " A");
 
             Part[] parts = new Part[requestParameters.size()];
             Iterator iterator = requestParameters.keySet().iterator();
@@ -117,37 +84,14 @@ public class ConnectPubcookie {
                 String fieldValue = (String) requestParameters.get(fieldName);
                 StringPart stringPart = new StringPart(fieldName, fieldValue);
                 parts[i] = stringPart;
-                LogFactory.getLog(ConnectPubcookie.class)
-                        .debug(ConnectPubcookie.class.getName() + ".setup()"
-                                + " part[" + i + "]==" + fieldName + "="
-                                + fieldValue);
-
+                logger.debug("Adding Post parameter {} = {}", fieldName, fieldValue);
                 ((PostMethod) method).addParameter(fieldName, fieldValue); //old way
             }
-
-            LogFactory
-                    .getLog(ConnectPubcookie.class)
-                    .debug(ConnectPubcookie.class.getName() + ".setup()" + " B");
-
-            //XXX MultipartRequestEntity multipartRequestEntity = new MultipartRequestEntity(parts, method.getParams());
-            // ((PostMethod)method).setRequestEntity(multipartRequestEntity); //new way            
         }
-        //method.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
         HttpState state = client.getState();
         for (Cookie cookie : requestCookies) {
             state.addCookie(cookie);
         }
-        //method.setFollowRedirects(true); this is disallowed at runtime, so redirect won't be honored
-
-        LogFactory.getLog(ConnectPubcookie.class).debug(ConnectPubcookie.class
-                .getName()
-                + ".setup()" + " C");
-        LogFactory.getLog(ConnectPubcookie.class).debug(ConnectPubcookie.class
-                .getName()
-                + ".setup()" + " method==" + method);
-        LogFactory.getLog(ConnectPubcookie.class).debug(ConnectPubcookie.class
-                .getName()
-                + ".setup()" + " method==" + method.toString());
         return method;
     }
 
@@ -156,35 +100,36 @@ public class ConnectPubcookie {
                               Cookie[] requestCookies,
                               String truststoreLocation,
                               String truststorePassword) {
-        log.debug(this.getClass().getName() + ".connect() " + " url=="
-                + urlString + " requestParameters==" + requestParameters
-                + " requestCookies==" + requestCookies);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Entered .connect() " + " url=="
+                    + urlString + " requestParameters==" + requestParameters
+                    + " requestCookies==" + requestCookies);
+        }
         responseCookies2 = null;
         URL url = null;
         try {
             url = new URL(urlString);
         } catch (MalformedURLException mue) {
-            log.error(this.getClass().getName() + ".connect() "
-                    + "bad configured url==" + urlString);
+            logger.error("Malformed url: " + urlString, mue);
         }
 
         if (urlString.startsWith("https:") && null != truststoreLocation
                 && !"".equals(truststoreLocation) && null != truststorePassword
                 && !"".equals(truststorePassword)) {
-            log.debug("setting " + FilterPubcookie.TRUSTSTORE_LOCATION_KEY
+            logger.debug("setting " + FilterPubcookie.TRUSTSTORE_LOCATION_KEY
                     + " to " + truststoreLocation);
             System.setProperty(FilterPubcookie.TRUSTSTORE_LOCATION_KEY,
                                truststoreLocation);
-            log.debug("setting " + FilterPubcookie.TRUSTSTORE_PASSWORD_KEY
+            logger.debug("setting " + FilterPubcookie.TRUSTSTORE_PASSWORD_KEY
                     + " to " + truststorePassword);
             System.setProperty(FilterPubcookie.TRUSTSTORE_PASSWORD_KEY,
                                truststorePassword);
 
-            log.debug("setting " + FilterPubcookie.KEYSTORE_LOCATION_KEY
+            logger.debug("setting " + FilterPubcookie.KEYSTORE_LOCATION_KEY
                     + " to " + truststoreLocation);
             System.setProperty(FilterPubcookie.KEYSTORE_LOCATION_KEY,
                                truststoreLocation);
-            log.debug("setting " + FilterPubcookie.KEYSTORE_PASSWORD_KEY
+            logger.debug("setting " + FilterPubcookie.KEYSTORE_PASSWORD_KEY
                     + " to " + truststorePassword);
             System.setProperty(FilterPubcookie.KEYSTORE_PASSWORD_KEY,
                                truststorePassword);
@@ -193,54 +138,26 @@ public class ConnectPubcookie {
                                "ssl,handshake,data,trustmanager");
 
         } else {
-            log.debug("DIAGNOSTIC urlString==" + urlString);
-            log.debug("didn't set " + FilterPubcookie.TRUSTSTORE_LOCATION_KEY
+            logger.debug("DIAGNOSTIC urlString==" + urlString);
+            logger.debug("didn't set " + FilterPubcookie.TRUSTSTORE_LOCATION_KEY
                     + " to " + truststoreLocation);
-            log.debug("didn't set " + FilterPubcookie.TRUSTSTORE_PASSWORD_KEY
+            logger.debug("didn't set " + FilterPubcookie.TRUSTSTORE_PASSWORD_KEY
                     + " to " + truststorePassword);
         }
 
-        /*
-         * log.debug("\n-a-"); Protocol easyhttps = null; try { easyhttps = new
-         * Protocol("https", (ProtocolSocketFactory) new
-         * EasySSLProtocolSocketFactory(), 443); } catch (Throwable t) {
-         * log.debug(t); log.debug(t.getMessage()); if (t.getCause() != null)
-         * log.debug(t.getCause().getMessage()); } log.debug("\n-b-");
-         * Protocol.registerProtocol("https", easyhttps); log.debug("\n-c-");
-         */
-
         HttpClient client = new HttpClient();
-        log.debug(this.getClass().getName() + ".connect() "
-                + " b4 calling setup");
-        log.debug(this.getClass().getName() + ".connect() requestCookies=="
-                + requestCookies);
+        logger.debug(".connect() requestCookies==" + requestCookies);
         HttpMethodBase method =
                 setup(client, url, requestParameters, requestCookies);
-        log.debug(this.getClass().getName() + ".connect() "
-                + " after calling setup");
         int statusCode = 0;
         try {
-            log.debug(this.getClass().getName() + ".connect() "
-                    + " b4 calling executeMethod");
             client.executeMethod(method);
-            log.debug(this.getClass().getName() + ".connect() "
-                    + " after calling executeMethod");
             statusCode = method.getStatusCode();
-            log.debug(this.getClass().getName() + ".connect() "
-                    + "(with configured url) statusCode==" + statusCode);
         } catch (Exception e) {
-            log.error(this.getClass().getName() + ".connect() "
-                    + "failed original connect, url==" + urlString);
-            log.error(e);
-            log.error(e.getMessage());
-            if (e.getCause() != null) {
-                log.error(e.getCause().getMessage());
-            }
-            e.printStackTrace();
+            logger.error("failed original connect, url==" + urlString, e);
         }
 
-        log.debug(this.getClass().getName() + ".connect() " + " status code=="
-                + statusCode);
+        logger.debug("status code==" + statusCode);
 
         if (302 == statusCode) {
             Header redirectHeader = method.getResponseHeader("Location");
@@ -256,90 +173,64 @@ public class ConnectPubcookie {
                                       requestParameters,
                                       requestCookies);
                     } catch (MalformedURLException mue) {
-                        log.error(this.getClass().getName() + ".connect() "
-                                + "bad redirect, url==" + urlString);
+                        logger.error(".connect() malformed redirect url: " + urlString);
                     }
                     statusCode = 0;
                     try {
                         client.executeMethod(method);
                         statusCode = method.getStatusCode();
-                        log.debug(this.getClass().getName() + ".connect() "
-                                + "(on redirect) statusCode==" + statusCode);
+                        logger.debug(".connect() (on redirect) statusCode==" + statusCode);
                     } catch (Exception e) {
-                        log.error(this.getClass().getName() + ".connect() "
+                        logger.error(".connect() "
                                 + "failed redirect connect");
                     }
                 }
             }
         }
         if (statusCode == 200) { // this is either the original, non-302, status code or the status code after redirect
-            log.debug(this.getClass().getName() + ".connect() "
-                    + "status code 200");
             String content = null;
             try {
-                log.debug(this.getClass().getName() + ".connect() "
-                        + "b4 gRBAS()");
                 content = method.getResponseBodyAsString();
-                log.debug(this.getClass().getName() + ".connect() "
-                        + "after gRBAS() content==" + content);
             } catch (IOException e) {
-                log.error(this.getClass().getName() + ".connect() "
-                        + "couldn't get content");
+                logger.error("Error getting content", e);
                 return;
             }
             if (content == null) {
-                log.error(this.getClass().getName()
-                        + ".connect() content==null");
+                logger.error("Content is null");
                 return;
             } else {
-                log.debug(this.getClass().getName()
-                        + ".connect() content != null, about to new Tidy");
                 Tidy tidy = null;
                 try {
                     tidy = new Tidy();
                 } catch (Throwable t) {
-                    log.debug("new Tidy didn't");
-                    log.debug(t);
-                    log.debug(t.getMessage());
-                    if (t != null) {
-                        log.debug(t.getCause().getMessage());
-                    }
+                    logger.error("Error creating Tidy instance?!", t);
                 }
-                log.debug(this.getClass().getName()
-                        + ".connect() after newing Tidy, tidy==" + tidy);
                 byte[] inputBytes = content.getBytes();
-                log.debug(this.getClass().getName() + ".connect() A1");
                 ByteArrayInputStream inputStream =
                         new ByteArrayInputStream(inputBytes);
-                log.debug(this.getClass().getName() + ".connect() A2");
                 responseDocument = tidy.parseDOM(inputStream, null); //use returned root node as only output
-                log.debug(this.getClass().getName() + ".connect() A3");
             }
-            log.debug(this.getClass().getName() + ".connect() "
-                    + "b4 getState()");
             HttpState state = client.getState();
-            log.debug(this.getClass().getName() + ".connect() state==" + state);
             try {
                 responseCookies2 = method.getRequestHeaders();
-                log.debug(this.getClass().getName()
-                        + ".connect() just got headers");
-                for (Header element : responseCookies2) {
-                    log.debug(this.getClass().getName() + ".connect() header=="
-                            + element);
+                if (logger.isDebugEnabled()) {
+                    for (Header element : responseCookies2) {
+                        logger.debug("Header: {}={}", element.getName(), element.getValue());
+                    }
                 }
                 responseCookies = state.getCookies();
-                log.debug(this.getClass().getName()
+                logger.debug(this.getClass().getName()
                         + ".connect() responseCookies==" + responseCookies);
             } catch (Throwable t) {
-                log.error(this.getClass().getName() + ".connect() exception=="
+                logger.error(this.getClass().getName() + ".connect() exception=="
                         + t.getMessage());
                 if (t.getCause() != null) {
-                    log.error(this.getClass().getName() + ".connect() cause=="
+                    logger.error(this.getClass().getName() + ".connect() cause=="
                             + t.getCause().getMessage());
                 }
             }
             completedFully = true;
-            log.debug(this.getClass().getName() + ".connect() completedFully=="
+            logger.debug(this.getClass().getName() + ".connect() completedFully=="
                     + completedFully);
         }
     }

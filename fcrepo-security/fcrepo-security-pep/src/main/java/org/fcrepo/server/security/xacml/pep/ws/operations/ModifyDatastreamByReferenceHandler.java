@@ -19,24 +19,24 @@
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 import java.net.URI;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
-import org.apache.axis.AxisFault;
-import org.apache.axis.MessageContext;
-import org.apache.log4j.Logger;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.LogUtil;
 
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
 
+import org.apache.axis.AxisFault;
+import org.apache.axis.MessageContext;
+
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -44,10 +44,8 @@ import com.sun.xacml.ctx.RequestCtx;
 public class ModifyDatastreamByReferenceHandler
         extends AbstractOperationHandler {
 
-    private static Logger log =
-            Logger
-                    .getLogger(ModifyDatastreamByReferenceHandler.class
-                            .getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ModifyDatastreamByReferenceHandler.class);
 
     public ModifyDatastreamByReferenceHandler()
             throws PEPException {
@@ -61,7 +59,7 @@ public class ModifyDatastreamByReferenceHandler
 
     public RequestCtx handleRequest(MessageContext context)
             throws OperationHandlerException {
-        log.debug("ModifyDatastreamByReferenceHandler/handleRequest!");
+        logger.debug("ModifyDatastreamByReferenceHandler/handleRequest!");
 
         RequestCtx req = null;
         List<Object> oMap = null;
@@ -80,9 +78,9 @@ public class ModifyDatastreamByReferenceHandler
 
         try {
             oMap = getSOAPRequestObjects(context);
-            log.debug("Retrieved SOAP Request Objects");
+            logger.debug("Retrieved SOAP Request Objects");
         } catch (AxisFault af) {
-            log.error("Error obtaining SOAP Request Objects", af);
+            logger.error("Error obtaining SOAP Request Objects", af);
             throw new OperationHandlerException("Error obtaining SOAP Request Objects",
                                                 af);
         }
@@ -100,12 +98,12 @@ public class ModifyDatastreamByReferenceHandler
             // logMessage = (String) oMap.get(9);
             // force = (Boolean) oMap.get(10);
         } catch (Exception e) {
-            log.error("Error obtaining parameters", e);
+            logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",
                                                 e);
         }
 
-        log.debug("Extracted SOAP Request Objects");
+        logger.debug("Extracted SOAP Request Objects");
 
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
@@ -164,7 +162,7 @@ public class ModifyDatastreamByReferenceHandler
                             pid,
                             dsID);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw new OperationHandlerException(e.getMessage(), e);
         }
 

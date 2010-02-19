@@ -17,8 +17,6 @@ import java.util.Date;
 
 import org.apache.axis.types.NonNegativeInteger;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
@@ -28,8 +26,8 @@ import org.fcrepo.server.errors.StorageDeviceException;
 import org.fcrepo.server.utilities.AxisUtility;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.TypeUtility;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements the Fedora management SOAP service.
@@ -39,9 +37,8 @@ import org.fcrepo.server.utilities.TypeUtility;
 public class FedoraAPIMBindingSOAPHTTPImpl
         implements Constants, FedoraAPIM {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(FedoraAPIMBindingSOAPHTTPImpl.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(FedoraAPIMBindingSOAPHTTPImpl.class);
 
     /** The Fedora Server instance */
     private static Server s_server;
@@ -73,7 +70,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                 .getModule("org.fcrepo.server.management.Management");
             }
         } catch (InitializationException ie) {
-            LOG.error("Error getting server", ie);
+            logger.error("Error getting server", ie);
             s_initialized = false;
             s_initException = ie;
         }
@@ -81,7 +78,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
 
     public String ingest(byte[] XML, String format, String logMessage)
             throws java.rmi.RemoteException {
-        LOG.debug("start: ingest");
+        logger.debug("start: ingest");
         assertInitialized();
         try {
             // always gens pid, unless pid in stream starts with "test:" "demo:"
@@ -94,10 +91,10 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                        "UTF-8",
                                        true);
         } catch (Throwable th) {
-            LOG.error("Error ingesting", th);
+            logger.error("Error ingesting", th);
             throw AxisUtility.getFault(th);
         } finally {
-            LOG.debug("end: ingest");
+            logger.debug("end: ingest");
         }
     }
 
@@ -106,7 +103,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                String label,
                                String ownerId,
                                String logMessage) throws RemoteException {
-        LOG.debug("start: modifyObject, " + PID);
+        logger.debug("start: modifyObject, " + PID);
         assertInitialized();
         try {
             return DateUtility.convertDateToString(s_management
@@ -117,10 +114,10 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                   ownerId,
                                   logMessage));
         } catch (Throwable th) {
-            LOG.error("Error modifying object", th);
+            logger.error("Error modifying object", th);
             throw AxisUtility.getFault(th);
         } finally {
-            LOG.debug("end: modifyObject, " + PID);
+            logger.debug("end: modifyObject, " + PID);
         }
     }
 
@@ -135,7 +132,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
             pipeStream(in, out);
             return out.toByteArray();
         } catch (Throwable th) {
-            LOG.error("Error getting object XML", th);
+            logger.error("Error getting object XML", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -154,7 +151,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
             pipeStream(in, out);
             return out.toByteArray();
         } catch (Throwable th) {
-            LOG.error("Error exporting object", th);
+            logger.error("Error exporting object", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -182,7 +179,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
 
     public String purgeObject(String PID, String logMessage, boolean force)
             throws java.rmi.RemoteException {
-        LOG.debug("start: purgeObject, " + PID);
+        logger.debug("start: purgeObject, " + PID);
         assertInitialized();
         try {
             return DateUtility.convertDateToString(s_management
@@ -191,10 +188,10 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                  logMessage,
                                  force));
         } catch (Throwable th) {
-            LOG.error("Error purging object", th);
+            logger.error("Error purging object", th);
             throw AxisUtility.getFault(th);
         } finally {
-            LOG.debug("end: purgeObject, " + PID);
+            logger.debug("end: purgeObject, " + PID);
         }
     }
 
@@ -211,7 +208,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                 String checksumType,
                                 String checksum,
                                 String logMessage) throws RemoteException {
-        LOG.debug("start: addDatastream, " + pid + ", " + dsID);
+        logger.debug("start: addDatastream, " + pid + ", " + dsID);
         assertInitialized();
         try {
             return s_management.addDatastream(ReadOnlyContext.getSoapContext(),
@@ -229,10 +226,10 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                               checksum,
                                               logMessage);
         } catch (Throwable th) {
-            LOG.error("Error adding datastream", th);
+            logger.error("Error adding datastream", th);
             throw AxisUtility.getFault(th);
         } finally {
-            LOG.debug("end: addDatastream, " + pid + ", " + dsID);
+            logger.debug("end: addDatastream, " + pid + ", " + dsID);
         }
     }
 
@@ -248,7 +245,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                               String logMessage,
                                               boolean force)
             throws java.rmi.RemoteException {
-        LOG.debug("start: modifyDatastreamByReference, " + PID + ", "
+        logger.debug("start: modifyDatastreamByReference, " + PID + ", "
                 + datastreamID);
         assertInitialized();
         try {
@@ -267,10 +264,10 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                                  logMessage,
                                                  force));
         } catch (Throwable th) {
-            LOG.error("Error modifying datastream by reference", th);
+            logger.error("Error modifying datastream by reference", th);
             throw AxisUtility.getFault(th);
         } finally {
-            LOG.debug("end: modifyDatastreamByReference, " + PID + ", "
+            logger.debug("end: modifyDatastreamByReference, " + PID + ", "
                     + datastreamID);
         }
     }
@@ -287,7 +284,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                           String logMessage,
                                           boolean force)
             throws java.rmi.RemoteException {
-        LOG.debug("start: modifyDatastreamByValue, " + PID + ", "
+        logger.debug("start: modifyDatastreamByValue, " + PID + ", "
                 + datastreamID);
         assertInitialized();
         try {
@@ -309,10 +306,10 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                              logMessage,
                                              force));
         } catch (Throwable th) {
-            LOG.error("Error modifying datastream by value", th);
+            logger.error("Error modifying datastream by value", th);
             throw AxisUtility.getFault(th);
         } finally {
-            LOG.debug("end: modifyDatastreamByValue, " + PID + ", "
+            logger.debug("end: modifyDatastreamByValue, " + PID + ", "
                     + datastreamID);
         }
     }
@@ -331,7 +328,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                         dsState,
                                         logMessage));
         } catch (Throwable th) {
-            LOG.error("Error setting datastream state", th);
+            logger.error("Error setting datastream state", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -350,7 +347,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                               versionable,
                                               logMessage));
         } catch (Throwable th) {
-            LOG.error("Error setting datastream versionable", th);
+            logger.error("Error setting datastream versionable", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -365,7 +362,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                     .getSoapContext(), PID, datastreamID, DateUtility
                     .convertStringToDate(versionDate));
         } catch (Throwable th) {
-            LOG.error("Error comparing datastream checksum", th);
+            logger.error("Error comparing datastream checksum", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -377,7 +374,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                     String logMessage,
                                     boolean force)
             throws java.rmi.RemoteException {
-        LOG.debug("start: purgeDatastream, " + PID + ", " + datastreamID);
+        logger.debug("start: purgeDatastream, " + PID + ", " + datastreamID);
         assertInitialized();
         try {
             return toStringArray(s_management.purgeDatastream(ReadOnlyContext
@@ -385,10 +382,10 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                     .convertStringToDate(startDT), DateUtility
                     .convertStringToDate(endDT), logMessage, force));
         } catch (Throwable th) {
-            LOG.error("Error purging datastream", th);
+            logger.error("Error purging datastream", th);
             throw AxisUtility.getFault(th);
         } finally {
-            LOG.debug("end: purgeDatastream, " + PID + ", " + datastreamID);
+            logger.debug("end: purgeDatastream, " + PID + ", " + datastreamID);
         }
     }
 
@@ -415,7 +412,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                                    .convertStringToDate(asOfDateTime));
             return TypeUtility.convertDatastreamToGenDatastream(ds);
         } catch (Throwable th) {
-            LOG.error("Error getting datastream", th);
+            logger.error("Error getting datastream", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -432,7 +429,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                             .convertStringToDate(asOfDateTime), state);
             return getGenDatastreams(intDatastreams);
         } catch (Throwable th) {
-            LOG.error("Error getting datastreams", th);
+            logger.error("Error getting datastreams", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -469,7 +466,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                             .getSoapContext(), PID, datastreamID);
             return getGenDatastreams(intDatastreams);
         } catch (Throwable th) {
-            LOG.error("Error getting datastream history", th);
+            logger.error("Error getting datastream history", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -477,7 +474,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
     public java.lang.String[] getNextPID(NonNegativeInteger numPIDs,
                                          String namespace)
             throws java.rmi.RemoteException {
-        LOG.debug("start: getNextPID");
+        logger.debug("start: getNextPID");
         assertInitialized();
         try {
             if (numPIDs == null) {
@@ -487,10 +484,10 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                            numPIDs.intValue(),
                                            namespace);
         } catch (Throwable th) {
-            LOG.error("Error getting next PID", th);
+            logger.error("Error getting next PID", th);
             throw AxisUtility.getFault(th);
         } finally {
-            LOG.debug("end: getNextPID");
+            logger.debug("end: getNextPID");
         }
     }
 
@@ -503,7 +500,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
     public org.fcrepo.server.types.gen.RelationshipTuple[] getRelationships(String subject,
                                                                         String relationship)
             throws java.rmi.RemoteException {
-        LOG.debug("start: getRelationships");
+        logger.debug("start: getRelationships");
         assertInitialized();
         try {
             org.fcrepo.server.storage.types.RelationshipTuple[] intRelationshipTuples = null;
@@ -512,10 +509,10 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                     .getSoapContext(), subject, relationship);
             return getGenRelsTuples(intRelationshipTuples);
         } catch (Throwable th) {
-            LOG.error("Error getting relationships", th);
+            logger.error("Error getting relationships", th);
             throw AxisUtility.getFault(th);
         } finally {
-            LOG.debug("end: getRelationships");
+            logger.debug("end: getRelationships");
         }
     }
 
@@ -525,7 +522,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                    boolean isLiteral,
                                    String datatype)
             throws java.rmi.RemoteException {
-        LOG.debug("start: addRelationship");
+        logger.debug("start: addRelationship");
         assertInitialized();
         try {
             return s_management.addRelationship(ReadOnlyContext
@@ -536,10 +533,10 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                                 isLiteral,
                                                 datatype);
         } catch (Throwable th) {
-            LOG.error("Error adding relationships", th);
+            logger.error("Error adding relationships", th);
             throw AxisUtility.getFault(th);
         } finally {
-            LOG.debug("end: addRelationship");
+            logger.debug("end: addRelationship");
         }
     }
 
@@ -549,7 +546,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                      boolean isLiteral,
                                      String datatype)
             throws java.rmi.RemoteException {
-        LOG.debug("start: purgeRelationship");
+        logger.debug("start: purgeRelationship");
         assertInitialized();
         try {
             return s_management.purgeRelationship(ReadOnlyContext
@@ -560,10 +557,10 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                           isLiteral,
                                           datatype);
         } catch (Throwable th) {
-            LOG.error("Error purging relationships", th);
+            logger.error("Error purging relationships", th);
             throw AxisUtility.getFault(th);
         } finally {
-            LOG.debug("end: purgeRelationship");
+            logger.debug("end: purgeRelationship");
         }
     }
 

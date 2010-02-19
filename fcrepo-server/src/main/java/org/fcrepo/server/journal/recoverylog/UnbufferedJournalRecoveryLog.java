@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.journal.recoverylog;
@@ -10,10 +10,10 @@ import java.io.IOException;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.journal.ServerInterface;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -21,15 +21,14 @@ import org.fcrepo.server.journal.ServerInterface;
  * <p>
  * All entries are written to a log, which is flushed after each entry so the
  * log will be up to date even if the server crashes.
- * 
+ *
  * @author Jim Blake
  */
 public class UnbufferedJournalRecoveryLog
         extends JournalRecoveryLog {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(UnbufferedJournalRecoveryLog.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(UnbufferedJournalRecoveryLog.class);
 
     private final File logFile;
 
@@ -78,7 +77,7 @@ public class UnbufferedJournalRecoveryLog
                 writer.flush();
             }
         } catch (IOException e) {
-            LOG.error("Error writing journal log entry", e);
+            logger.error("Error writing journal log entry", e);
         }
     }
 
@@ -94,7 +93,7 @@ public class UnbufferedJournalRecoveryLog
                 writer.close();
             }
         } catch (IOException e) {
-            LOG.error("Error shutting down journal log", e);
+            logger.error("Error shutting down journal log", e);
         }
     }
 

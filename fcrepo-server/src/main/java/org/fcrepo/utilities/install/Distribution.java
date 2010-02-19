@@ -55,8 +55,6 @@ public abstract class Distribution {
 
     public static final String COMMONS_POOL;
 
-    public static final String LOG4J;
-
     private static Properties PROPS;
     static {
         // an up to date install.properties should be provided by the buildfile
@@ -82,14 +80,12 @@ public abstract class Distribution {
         COMMONS_COLLECTIONS = PROPS.getProperty("install.commons.collections");
         COMMONS_DBCP = PROPS.getProperty("install.commons.dbcp");
         COMMONS_POOL = PROPS.getProperty("install.commons.pool");
-
-        LOG4J = PROPS.getProperty("install.log4j");
     }
 
     /**
      * Tests whether the distribution contains the resource identified by
      * the provided path.
-     * 
+     *
      * @param path The path to the resource (e.g. /foo/bar)
      * @return true iff the distribution contains the resource
      */
@@ -97,7 +93,7 @@ public abstract class Distribution {
 
     /**
      * Get the requested resource.
-     * 
+     *
      * @param path path of the requested resource
      * @return the requested resource as an InputStream
      * @throws IOException
@@ -106,7 +102,7 @@ public abstract class Distribution {
 
     /**
      * Get the URL of the resource identified by the provided path.
-     * 
+     *
      * @param path the path for the requested resource
      * @return a URL for the requested resource or null if not found
      */

@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.util.AttributeComparator;
@@ -44,8 +44,8 @@ import com.sun.xacml.ctx.Subject;
 public class ResponseCacheImpl
         implements ResponseCache {
 
-    private static final Logger log =
-            Logger.getLogger(ResponseCacheImpl.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ResponseCacheImpl.class);
 
     private final ContextUtil contextUtil = new ContextUtil();
 
@@ -90,7 +90,7 @@ public class ResponseCacheImpl
         String noCache = System.getenv("PEP_NOCACHE");
         if (noCache != null && noCache.toLowerCase().startsWith("t")) {
             TTL = 0;
-            log.info("PEP_NOCACHE: TTL on responseCache set to 0");
+            logger.info("PEP_NOCACHE: TTL on responseCache set to 0");
         } else {
             TTL = ttl.longValue();
         }
@@ -123,8 +123,8 @@ public class ResponseCacheImpl
             if (requestCache.size() >= CACHE_SIZE) {
                 String key = requestCacheUsageTracker.remove(0);
                 requestCache.remove(key);
-                if (log.isDebugEnabled()) {
-                    log.debug("Purging cache element");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Purging cache element");
                 }
             }
 
@@ -133,13 +133,13 @@ public class ResponseCacheImpl
             requestCacheTimeTracker.put(hash, new Long(System
                     .currentTimeMillis()));
 
-            if (log.isDebugEnabled()) {
-                log.debug("Adding Cache Item (" + requestCache.size() + "/"
+            if (logger.isDebugEnabled()) {
+                logger.debug("Adding Cache Item (" + requestCache.size() + "/"
                         + requestCacheUsageTracker.size() + "/"
                         + requestCacheTimeTracker.size() + "): " + hash);
             }
         } catch (Exception e) {
-            log.warn("Error adding cache item: " + e.getMessage(), e);
+            logger.warn("Error adding cache item: " + e.getMessage(), e);
         }
     }
 
@@ -154,8 +154,8 @@ public class ResponseCacheImpl
         try {
             hash = makeHash(request);
 
-            if (log.isDebugEnabled()) {
-                log.debug("Getting Cache Item (" + requestCache.size() + "/"
+            if (logger.isDebugEnabled()) {
+                logger.debug("Getting Cache Item (" + requestCache.size() + "/"
                         + requestCacheUsageTracker.size() + "/"
                         + requestCacheTimeTracker.size() + "): " + hash);
             }
@@ -175,8 +175,8 @@ public class ResponseCacheImpl
                 requestCacheUsageTracker.remove(hash);
                 requestCacheTimeTracker.remove(hash);
 
-                if (log.isDebugEnabled()) {
-                    log.debug("CACHE_ITEM_TTL exceeded: " + hash);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("CACHE_ITEM_TTL exceeded: " + hash);
                 }
 
                 return null;
@@ -187,7 +187,7 @@ public class ResponseCacheImpl
             requestCacheUsageTracker.add(requestCacheUsageTracker
                     .remove(requestCacheUsageTracker.indexOf(hash)));
         } catch (Exception e) {
-            log.warn("Error getting cache item: " + e.getMessage(), e);
+            logger.warn("Error getting cache item: " + e.getMessage(), e);
             response = null;
         }
 

@@ -10,21 +10,25 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
+import org.w3c.dom.Document;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DataFileUtils {
 
-    public static final Logger log = Logger.getLogger(DataFileUtils.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(DataFileUtils.class);
 
     public static Document getDocumentFromFile(File file) throws Exception {
         byte[] document = loadFile(file);
@@ -114,7 +118,7 @@ public class DataFileUtils {
             serializer.serialize(doc);
             result = new String(out.toByteArray(), "UTF-8");
         } catch (Exception e) {
-            log.error("Failed to format document.", e);
+            logger.error("Failed to format document.", e);
         }
 
         return result;
@@ -171,7 +175,7 @@ public class DataFileUtils {
 
     /**
      * Converts a hash into its hexadecimal string representation.
-     * 
+     *
      * @param bytes
      *        the byte array to convert
      * @return the hexadecimal string representation

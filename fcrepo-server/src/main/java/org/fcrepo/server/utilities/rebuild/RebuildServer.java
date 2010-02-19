@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.utilities.rebuild;
@@ -66,7 +66,7 @@ public class RebuildServer
     /**
      * Provides an instance of the server specified in the configuration file at
      * homeDir/CONFIG_DIR/CONFIG_FILE, or DEFAULT_SERVER_CLASS if unspecified.
-     * 
+     *
      * @param homeDir
      *        The base directory for the server.
      * @return The instance.
@@ -77,8 +77,7 @@ public class RebuildServer
      */
     public final static Server getRebuildInstance(File homeDir)
             throws ServerInitializationException, ModuleInitializationException {
-        configureLog4J("-rebuild.log");
-        // instantiate a new special purpose server for rebuilding 
+        // instantiate a new special purpose server for rebuilding
         // SQL databases given the class provided in the root element
         // in the config file and return it
         File configFile = null;

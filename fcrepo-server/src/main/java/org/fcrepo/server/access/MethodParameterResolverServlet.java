@@ -17,11 +17,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.InitializationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -41,9 +41,8 @@ import org.fcrepo.server.errors.InitializationException;
 public class MethodParameterResolverServlet
         extends HttpServlet {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(MethodParameterResolverServlet.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(MethodParameterResolverServlet.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -142,7 +141,7 @@ public class MethodParameterResolverServlet
                             + " -- sDefPID: " + sDefPID + " -- methodName: "
                             + methodName + " -- methodParms: "
                             + methodParms.toString() + "\".  ";
-            LOG.error(message);
+            logger.error(message);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                                message);

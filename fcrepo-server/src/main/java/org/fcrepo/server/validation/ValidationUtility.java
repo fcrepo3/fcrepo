@@ -10,8 +10,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.FaultException;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.errors.ServerException;
@@ -20,6 +18,8 @@ import org.fcrepo.server.security.PolicyParser;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamManagedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -32,7 +32,8 @@ import org.fcrepo.server.storage.types.DatastreamManagedContent;
  */
 public abstract class ValidationUtility {
 
-    private static final Logger LOG = Logger.getLogger(ValidationUtility.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(ValidationUtility.class);
 
     private static PolicyParser policyParser;
 
@@ -116,16 +117,16 @@ public abstract class ValidationUtility {
             try {
                 content.close();
             } catch (IOException e) {
-                LOG.warn("Error closing stream", e);
+                logger.warn("Error closing stream", e);
             }
         }
     }
 
     private static void validatePOLICY(InputStream content)
             throws ValidationException {
-        LOG.debug("Validating POLICY datastream");
+        logger.debug("Validating POLICY datastream");
         policyParser.copy().parse(content, true);
-        LOG.debug("POLICY datastream is valid");
+        logger.debug("POLICY datastream is valid");
     }
 
     /**
@@ -137,9 +138,9 @@ public abstract class ValidationUtility {
      */
     private static void validateRELS(PID pid, String dsId, InputStream content)
             throws ValidationException {
-        LOG.debug("Validating " + dsId + " datastream");
+        logger.debug("Validating " + dsId + " datastream");
         new RelsValidator().validate(pid, dsId, content);
-        LOG.debug(dsId + " datastream is valid");
+        logger.debug(dsId + " datastream is valid");
     }
 
 }

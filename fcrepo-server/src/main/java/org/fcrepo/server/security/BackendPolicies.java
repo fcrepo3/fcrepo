@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security;
@@ -12,19 +12,17 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.PID;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
  */
 public class BackendPolicies {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(BackendPolicies.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(BackendPolicies.class);
 
     public static final String FEDORA_INTERNAL_CALL = "fedoraInternalCall-1";
 
@@ -47,17 +45,17 @@ public class BackendPolicies {
     }
 
     public Hashtable generateBackendPolicies() throws Exception {
-        LOG.debug("in BackendPolicies.generateBackendPolicies() 1");
+        logger.debug("in BackendPolicies.generateBackendPolicies() 1");
         Hashtable tempfiles = null;
         if (inFilePath.endsWith(".xml")) { // replacing code for .properties
-            LOG.debug("in BackendPolicies.generateBackendPolicies() .xml 1");
+            logger.debug("in BackendPolicies.generateBackendPolicies() .xml 1");
             BackendSecurityDeserializer bds =
                     new BackendSecurityDeserializer("UTF-8", false);
-            LOG.debug("in BackendPolicies.generateBackendPolicies() .xml 2");
+            logger.debug("in BackendPolicies.generateBackendPolicies() .xml 2");
             backendSecuritySpec = bds.deserialize(inFilePath);
-            LOG.debug("in BackendPolicies.generateBackendPolicies() .xml 3");
+            logger.debug("in BackendPolicies.generateBackendPolicies() .xml 3");
             tempfiles = writePolicies();
-            LOG.debug("in BackendPolicies.generateBackendPolicies() .xml 4");
+            logger.debug("in BackendPolicies.generateBackendPolicies() .xml 4");
         }
         return tempfiles;
     }
@@ -87,13 +85,12 @@ public class BackendPolicies {
             excludedRolesText.append("\t\t<ExcludedRoles>\n");
             Iterator excludedRoleIterator = roles.iterator();
             while (excludedRoleIterator.hasNext()) {
-                LOG
-                        .debug("in BackendPolicies.newWritePolicies() another inner it");
+                logger.debug("in BackendPolicies.newWritePolicies() another inner it");
                 String excludedRole = (String) excludedRoleIterator.next();
                 if ("default".equals(excludedRole)) {
                     continue;
                 }
-                LOG.debug("in BackendPolicies.newWritePolicies() excludedRole="
+                logger.debug("in BackendPolicies.newWritePolicies() excludedRole="
                         + excludedRole);
                 excludedRolesText.append("\t\t\t<ExcludedRole>");
                 excludedRolesText.append(excludedRole);
@@ -118,7 +115,7 @@ public class BackendPolicies {
         if ("true".equals(callbackSsl)) {
             temp.append("\t\t<SslRequired/>\n");
         }
-        LOG.debug("DEBUGGING IPREGEX0 [" + iplist + "]");
+        logger.debug("DEBUGGING IPREGEX0 [" + iplist + "]");
         String[] ipRegexes = new String[0];
         if (iplist != null && !"".equals(iplist.trim())) {
             ipRegexes = iplist.trim().split("\\s");
@@ -127,11 +124,11 @@ public class BackendPolicies {
          * if (ipRegexes.length == 1) { //fixup ipRegexes[0] =
          * ipRegexes[0].trim(); }
          */
-        LOG.debug("DEBUGGING IPREGEX1 [" + iplist.trim() + "]");
+        logger.debug("DEBUGGING IPREGEX1 [" + iplist.trim() + "]");
         if (ipRegexes.length != 0) {
             temp.append("\t\t<IpRegexes>\n");
             for (String element : ipRegexes) {
-                LOG.debug("DEBUGGING IPREGEX2 " + element);
+                logger.debug("DEBUGGING IPREGEX2 " + element);
                 temp.append("\t\t\t<IpRegex>");
                 temp.append(element);
                 temp.append("</IpRegex>\n");
@@ -150,7 +147,7 @@ public class BackendPolicies {
     }
 
     private Hashtable writePolicies() throws Exception {
-        LOG.debug("in BackendPolicies.newWritePolicies() 1");
+        logger.debug("in BackendPolicies.newWritePolicies() 1");
         StringBuffer sb = null;
         Hashtable<String, String> tempfiles = new Hashtable<String, String>();
         Iterator coarseIterator = backendSecuritySpec.listRoleKeys().iterator();
@@ -181,15 +178,11 @@ public class BackendPolicies {
                             + "didn't correctly parse key " + key);
             }
             sb = new StringBuffer();
-            LOG
-                    .debug("in BackendPolicies.newWritePolicies() another outer it, key="
-                            + key);
+            logger.debug("in BackendPolicies.newWritePolicies() another outer it, key={}", key);
             Hashtable properties = backendSecuritySpec.getSecuritySpec(key);
-            LOG
-                    .debug("in BackendPolicies.newWritePolicies() properties.size()="
+            logger.debug("in BackendPolicies.newWritePolicies() properties.size()="
                             + properties.size());
-            LOG
-                    .debug("in BackendPolicies.newWritePolicies() properties.get(BackendSecurityDeserializer.ROLE)="
+            logger.debug("in BackendPolicies.newWritePolicies() properties.get(BackendSecurityDeserializer.ROLE)="
                             + properties.get(BackendSecurityDeserializer.ROLE));
             String callbackBasicAuth =
                     (String) properties
@@ -197,8 +190,7 @@ public class BackendPolicies {
             if (callbackBasicAuth == null) {
                 callbackBasicAuth = "false";
             }
-            LOG
-                    .debug("in BackendPolicies.newWritePolicies() CallbackBasicAuth="
+            logger.debug("in BackendPolicies.newWritePolicies() CallbackBasicAuth="
                             + callbackBasicAuth);
             String callbackSsl =
                     (String) properties
@@ -211,19 +203,19 @@ public class BackendPolicies {
             if (iplist == null) {
                 iplist = "";
             }
-            LOG.debug("in BackendPolicies.newWritePolicies() coarseIplist="
+            logger.debug("in BackendPolicies.newWritePolicies() coarseIplist="
                     + iplist);
             String id = "generated_for_" + key.replace(':', '-');
-            LOG.debug("in BackendPolicies.newWritePolicies() id=" + id);
-            LOG.debug("in BackendPolicies.newWritePolicies() " + filename1
+            logger.debug("in BackendPolicies.newWritePolicies() id=" + id);
+            logger.debug("in BackendPolicies.newWritePolicies() " + filename1
                     + " " + filename2);
             String filename = filename1 + filename2; //was id.replace(':','-');
-            LOG.debug("in BackendPolicies.newWritePolicies() " + filename);
+            logger.debug("in BackendPolicies.newWritePolicies() " + filename);
             PID tempPid = new PID(filename);
-            LOG.debug("in BackendPolicies.newWritePolicies() got PID "
+            logger.debug("in BackendPolicies.newWritePolicies() got PID "
                     + tempPid);
             filename = tempPid.toFilename();
-            LOG.debug("in BackendPolicies.newWritePolicies() filename="
+            logger.debug("in BackendPolicies.newWritePolicies() filename="
                     + filename);
             sb
                     .append("<Policy xmlns=\"urn:oasis:names:tc:xacml:1.0:policy\" PolicyId=\""
@@ -254,7 +246,7 @@ public class BackendPolicies {
             sb.append(temp);
 
             sb.append("</Policy>\n");
-            LOG.debug("\ndumping policy\n" + sb + "\n");
+            logger.debug("\ndumping policy\n" + sb + "\n");
             File outfile = null;
             if (outFilePath == null) {
                 outfile = File.createTempFile(filename, ".xml");
@@ -268,7 +260,7 @@ public class BackendPolicies {
             pos.println(sb);
             pos.close();
         }
-        LOG.debug("finished writing temp files");
+        logger.debug("finished writing temp files");
         return tempfiles;
     }
 

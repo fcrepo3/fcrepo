@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ObjectIntegrityException;
@@ -30,6 +28,8 @@ import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.MD5Utility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -45,9 +45,8 @@ import org.fcrepo.server.utilities.MD5Utility;
 public class FieldSearchResultSQLImpl
         implements FieldSearchResult {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(FieldSearchResultSQLImpl.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(FieldSearchResultSQLImpl.class);
 
     /* fields supporting public accessors */
     private ArrayList m_objectFields;
@@ -179,7 +178,7 @@ public class FieldSearchResultSQLImpl
 
         }
         String qt = queryText.toString();
-        LOG.debug(qt);
+        logger.debug(qt);
         return qt;
     }
 
@@ -341,7 +340,7 @@ public class FieldSearchResultSQLImpl
         long passedSeconds =
                 (System.currentTimeMillis() - m_startMillis) / 1000;
         m_expired = passedSeconds > m_maxSeconds;
-        LOG.debug("has fieldSearchResultSQL expired? "+m_expired +
+        logger.debug("has fieldSearchResultSQL expired? "+m_expired +
                   ", passed: "+passedSeconds);
         if (m_expired) {
             // clean up

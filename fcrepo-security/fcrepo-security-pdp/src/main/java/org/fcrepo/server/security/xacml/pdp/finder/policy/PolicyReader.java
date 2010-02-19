@@ -8,7 +8,7 @@
  *
  *   1. Redistribution of source code must retain the above copyright notice,
  *      this list of conditions and the following disclaimer.
- * 
+ *
  *   2. Redistribution in binary form must reproduce the above copyright
  *      notice, this list of conditions and the following disclaimer in the
  *      documentation and/or other materials provided with the distribution.
@@ -16,7 +16,7 @@
  * Neither the name of Sun Microsystems, Inc. or the names of contributors may
  * be used to endorse or promote products derived from this software without
  * specific prior written permission.
- * 
+ *
  * This software is provided "AS IS," without a warranty of any kind. ALL
  * EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
  * ANY IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
@@ -38,25 +38,28 @@ package org.fcrepo.server.security.xacml.pdp.finder.policy;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.ParsingException;
 import com.sun.xacml.Policy;
 import com.sun.xacml.PolicySet;
 import com.sun.xacml.finder.PolicyFinder;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is provided as a utility for reading policies from common, simple
@@ -67,12 +70,15 @@ import com.sun.xacml.finder.PolicyFinder;
  * <code>com.sun.xacml.finder.impl.FilePolicyModule</code>, but as of the 2.0
  * release, that class has been removed. This new <code>PolicyReader</code>
  * class provides much better functionality for loading policies.
- * 
+ *
  * @since 2.0
  * @author Seth Proctor
  */
 public class PolicyReader
         implements ErrorHandler {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(PolicyReader.class);
 
     /**
      * The property which is used to specify the schema file to validate against
@@ -100,37 +106,29 @@ public class PolicyReader
     // the builder used to create DOM documents
     private DocumentBuilder builder;
 
-    // the optional logger used for error reporting
-    private final Logger logger;
-
     /**
      * Creates a <code>PolicyReader</code> that does not schema-validate
      * policies.
-     * 
+     *
      * @param finder
      *        a <code>PolicyFinder</code> that is used by policy sets, which may
      *        be null only if no references are used
-     * @param logger
-     *        a <code>Logger</code> used to report parsing errors
      */
-    public PolicyReader(PolicyFinder finder, Logger logger) {
-        this(finder, logger, null);
+    public PolicyReader(PolicyFinder finder) {
+        this(finder, null);
     }
 
     /**
      * Creates a <code>PolicyReader</code> that may schema-validate policies.
-     * 
+     *
      * @param finder
      *        a <code>PolicyFinder</code> that is used by policy sets, which may
      *        be null only if no references are used
-     * @param logger
-     *        a <code>Logger</code> used to report parsing errors
      * @param schemaFile
      *        the schema file used to validate policies, or null if schema
      *        validation is not desired
      */
-    public PolicyReader(PolicyFinder finder, Logger logger, File schemaFile) {
-        this.logger = logger;
+    public PolicyReader(PolicyFinder finder, File schemaFile) {
         this.finder = finder;
 
         // create the factory
@@ -159,7 +157,7 @@ public class PolicyReader
 
     /**
      * Tries to read an XACML policy or policy set from the given file.
-     * 
+     *
      * @param file
      *        the file containing the policy to read
      * @return a (potentially schema-validated) policy loaded from the given
@@ -180,7 +178,7 @@ public class PolicyReader
 
     /**
      * Tries to read an XACML policy or policy set from the given stream.
-     * 
+     *
      * @param input
      *        the stream containing the policy to read
      * @return a (potentially schema-validated) policy loaded from the given
@@ -202,7 +200,7 @@ public class PolicyReader
     /**
      * Tries to read an XACML policy or policy set based on the given URL. This
      * may be any resolvable URL, like a file or http pointer.
-     * 
+     *
      * @param url
      *        a URL pointing to the policy to read
      * @return a (potentially schema-validated) policy loaded from the given
@@ -243,49 +241,43 @@ public class PolicyReader
 
     /**
      * Standard handler routine for the XML parsing.
-     * 
+     *
      * @param exception
      *        information on what caused the problem
      */
     public void warning(SAXParseException exception) throws SAXException {
-        if (logger.isLoggable(Level.WARNING)) {
-            logger.warning("Warning on line " + exception.getLineNumber()
-                    + ": " + exception.getMessage());
-        }
+        logger.warn("Warning on line " + exception.getLineNumber()
+                + ": " + exception.getMessage());
     }
 
     /**
      * Standard handler routine for the XML parsing.
-     * 
+     *
      * @param exception
      *        information on what caused the problem
      * @throws SAXException
      *         always to halt parsing on errors
      */
     public void error(SAXParseException exception) throws SAXException {
-        if (logger.isLoggable(Level.WARNING)) {
-            logger.warning("Error on line " + exception.getLineNumber() + ": "
-                    + exception.getMessage() + " ... "
-                    + "Policy will not be available");
-        }
+        logger.warn("Error on line " + exception.getLineNumber() + ": "
+                + exception.getMessage() + " ... "
+                + "Policy will not be available");
 
         throw new SAXException("error parsing policy");
     }
 
     /**
      * Standard handler routine for the XML parsing.
-     * 
+     *
      * @param exception
      *        information on what caused the problem
      * @throws SAXException
      *         always to halt parsing on errors
      */
     public void fatalError(SAXParseException exception) throws SAXException {
-        if (logger.isLoggable(Level.WARNING)) {
-            logger.warning("Fatal error on line " + exception.getLineNumber()
-                    + ": " + exception.getMessage() + " ... "
-                    + "Policy will not be available");
-        }
+        logger.warn("Fatal error on line " + exception.getLineNumber()
+                + ": " + exception.getMessage() + " ... "
+                + "Policy will not be available");
 
         throw new SAXException("fatal error parsing policy");
     }

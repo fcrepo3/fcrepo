@@ -41,14 +41,12 @@ execWithCmdlineArgs() {
 
 execWithTheseArgs() {
     exec_cmd="exec \"$java\" -Xms64m -Xmx96m \
-            -cp \"$FEDORA_HOME\"/client:\"$FEDORA_HOME\"/client/${fedora-client-jar} \
+            -cp \"$FEDORA_HOME\"/client/bin:\"$FEDORA_HOME\"/client/${fedora-client-jar} \
             -Djava.endorsed.dirs=\"$FEDORA_HOME\"/client/lib \
             -Djavax.net.ssl.trustStore=\"$FEDORA_HOME\"/client/truststore \
             -Djavax.net.ssl.trustStorePassword=tomcat \
             -Djavax.xml.parsers.DocumentBuilderFactory=org.apache.xerces.jaxp.DocumentBuilderFactoryImpl \
             -Djavax.xml.parsers.SAXParserFactory=org.apache.xerces.jaxp.SAXParserFactoryImpl \
-            -Dorg.apache.commons.logging.LogFactory=org.apache.commons.logging.impl.Log4jFactory \
-            -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4jLogger \
             -Dfedora.home=\"$FEDORA_HOME\" \
             $1 $2"
     eval $exec_cmd

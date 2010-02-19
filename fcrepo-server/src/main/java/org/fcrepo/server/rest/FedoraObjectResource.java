@@ -27,13 +27,13 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.access.ObjectProfile;
 import org.fcrepo.server.rest.RestUtil.RequestContent;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -47,8 +47,8 @@ import org.fcrepo.server.utilities.StreamUtility;
 public class FedoraObjectResource extends BaseRestResource {
     private final String FOXML1_1 = "info:fedora/fedora-system:FOXML-1.1";
 
-    private static Logger LOG =
-            Logger.getLogger(FedoraObjectResource.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(FedoraObjectResource.class);
 
     /**
      * Exports the entire digital object in the specified XML format
@@ -274,7 +274,7 @@ public class FedoraObjectResource extends BaseRestResource {
                 }
 
                 if(namespace != null && !namespace.equals("")) {
-                    LOG.warn("The namespace parameter is only applicable when object " +
+                    logger.warn("The namespace parameter is only applicable when object " +
                              "content is not provided, thus the namespace provided '" +
                              namespace + "' has been ignored.");
                 }

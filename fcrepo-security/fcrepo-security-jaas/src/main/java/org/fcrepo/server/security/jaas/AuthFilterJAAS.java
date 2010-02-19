@@ -21,17 +21,15 @@ package org.fcrepo.server.security.jaas;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+
 import java.security.Principal;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.security.auth.Subject;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -41,13 +39,18 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.jaas.auth.AuthHttpServletRequestWrapper;
 import org.fcrepo.server.security.jaas.auth.handler.UsernamePasswordCallbackHandler;
 import org.fcrepo.server.security.jaas.util.Base64;
 import org.fcrepo.server.security.jaas.util.SubjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -80,7 +83,8 @@ import org.fcrepo.server.security.jaas.util.SubjectUtils;
 public class AuthFilterJAAS
         implements Filter {
 
-    private static Logger log = Logger.getLogger(AuthFilterJAAS.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(AuthFilterJAAS.class);
 
     private static final String SESSION_SUBJECT_KEY =
             "javax.security.auth.subject";
@@ -119,10 +123,10 @@ public class AuthFilterJAAS
 
         this.filterConfig = filterConfig;
         if (this.filterConfig == null) {
-            log.info("No configuration for: " + this.getClass().getName());
+            logger.info("No configuration for: " + this.getClass().getName());
         }
 
-        log.info("using FEDORA_HOME: " + fedoraHome);
+        logger.info("using FEDORA_HOME: " + fedoraHome);
 
         // Get the jaas.conf file to use and the config to use from the
         // jaas.conf file. This defaults to $FEDORA_HOME/server/config/jaas.conf
@@ -135,8 +139,8 @@ public class AuthFilterJAAS
         tmp = filterConfig.getInitParameter("jaas.config.location");
         if (tmp != null && !"".equals(tmp)) {
             jaasConfigLocation = tmp;
-            if (log.isDebugEnabled()) {
-                log.debug("using location from init file: "
+            if (logger.isDebugEnabled()) {
+                logger.debug("using location from init file: "
                         + jaasConfigLocation);
             }
         }
@@ -144,8 +148,8 @@ public class AuthFilterJAAS
         tmp = filterConfig.getInitParameter("jaas.config.name");
         if (tmp != null && !"".equals(tmp)) {
             jaasConfigName = tmp;
-            if (log.isDebugEnabled()) {
-                log.debug("using name from init file: " + jaasConfigName);
+            if (logger.isDebugEnabled()) {
+                logger.debug("using name from init file: " + jaasConfigName);
             }
         }
 
@@ -191,13 +195,13 @@ public class AuthFilterJAAS
         if (!jaasConfig.exists()) {
             String msg =
                     "JAAS config file not at: " + jaasConfig.getAbsolutePath();
-            log.error(msg);
+            logger.error(msg);
             throw new ServletException(msg);
         }
 
         System.setProperty(JAAS_CONFIG_KEY, jaasConfig.getAbsolutePath());
 
-        log.info("initialised servlet filter: " + this.getClass().getName());
+        logger.info("initialised servlet filter: " + this.getClass().getName());
     }
 
     /*
@@ -237,9 +241,9 @@ public class AuthFilterJAAS
             }
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("incoming filter: " + this.getClass().getName());
-            log.debug("session-id: " + req.getSession().getId());
+        if (logger.isDebugEnabled()) {
+            logger.debug("incoming filter: " + this.getClass().getName());
+            logger.debug("session-id: " + req.getSession().getId());
         }
 
         Subject subject = authenticate(req);
@@ -270,13 +274,13 @@ public class AuthFilterJAAS
 
         chain.doFilter(authRequest, response);
 
-        if (log.isDebugEnabled()) {
-            log.debug("outgoing filter: " + this.getClass().getName());
+        if (logger.isDebugEnabled()) {
+            logger.debug("outgoing filter: " + this.getClass().getName());
         }
     }
 
     public void destroy() {
-        log.info("destroying servlet filter: " + this.getClass().getName());
+        logger.info("destroying servlet filter: " + this.getClass().getName());
         filterConfig = null;
     }
 
@@ -326,15 +330,15 @@ public class AuthFilterJAAS
             byte[] data = Base64.decode(authorization.substring(6));
             auth = new String(data);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
             return null;
         }
 
         String username = auth.substring(0, auth.indexOf(':'));
         String password = auth.substring(auth.indexOf(':') + 1);
 
-        if (log.isDebugEnabled()) {
-            log.debug("auth username: " + username);
+        if (logger.isDebugEnabled()) {
+            logger.debug("auth username: " + username);
         }
 
         LoginContext loginContext = null;
@@ -344,7 +348,7 @@ public class AuthFilterJAAS
             loginContext = new LoginContext(jaasConfigName, handler);
             loginContext.login();
         } catch (LoginException le) {
-            log.error(le.getMessage());
+            logger.error(le.getMessage());
             return null;
         }
 
@@ -395,8 +399,8 @@ public class AuthFilterJAAS
             }
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("found userPrincipal ["
+        if (logger.isDebugEnabled()) {
+            logger.debug("found userPrincipal ["
                     + userPrincipal.getClass().getName() + "]: "
                     + userPrincipal.getName());
         }
@@ -436,9 +440,9 @@ public class AuthFilterJAAS
             }
         }
 
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             for (String r : userRoles) {
-                log.debug("found role: " + r);
+                logger.debug("found role: " + r);
             }
         }
 
@@ -469,8 +473,8 @@ public class AuthFilterJAAS
 
         for (String role : userRoles) {
             roles.add(role);
-            if (log.isDebugEnabled()) {
-                log.debug("added role: " + role);
+            if (logger.isDebugEnabled()) {
+                logger.debug("added role: " + role);
             }
         }
     }

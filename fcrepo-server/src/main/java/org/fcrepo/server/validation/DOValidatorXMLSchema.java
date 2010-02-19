@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.validation;
@@ -15,8 +15,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.log4j.Logger;
-
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -25,20 +23,21 @@ import org.xml.sax.XMLReader;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ObjectValidityException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 /**
  * XML Schema validation for Digital Objects.
- * 
+ *
  * @author Sandy Payette
  */
 public class DOValidatorXMLSchema
         implements Constants, EntityResolver {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DOValidatorXMLSchema.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DOValidatorXMLSchema.class);
 
     /** Constants used for JAXP 1.2 */
     private static final String JAXP_SCHEMA_LANGUAGE =
@@ -51,7 +50,7 @@ public class DOValidatorXMLSchema
         try {
             schemaURI = (new File(schemaPath)).toURI();
         } catch (Exception e) {
-            LOG.error("Error constructing validator", e);
+            logger.error("Error constructing validator", e);
             throw new GeneralException(e.getMessage());
         }
     }

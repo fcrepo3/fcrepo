@@ -1,31 +1,30 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.journal;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.journal.entry.ConsumerJournalEntry;
 import org.fcrepo.server.journal.helpers.JournalHelper;
 import org.fcrepo.server.journal.recoverylog.JournalRecoveryLog;
 import org.fcrepo.server.management.ManagementDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Process the journal entries as a separate Thread, while the JournalConsumer
  * is blocking all calls from outside.
- * 
+ *
  * @author Jim Blake
  */
 public class JournalConsumerThread
         extends Thread {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(JournalConsumerThread.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(JournalConsumerThread.class);
 
     private final ServerInterface server;
 
@@ -96,7 +95,7 @@ public class JournalConsumerThread
              * Of course, if we catch an OutOfMemoryError or a
              * VirtualMachineError, all bets are off.
              */
-            LOG.fatal("Error during Journal recovery", e);
+            logger.error("Error during Journal recovery", e);
             String stackTrace = JournalHelper.captureStackTrace(e);
             recoveryLog.log("PROBLEM: " + stackTrace);
             recoveryLog.log("Recovery terminated prematurely.");
@@ -118,10 +117,10 @@ public class JournalConsumerThread
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                LOG.warn("Thread was interrupted");
+                logger.warn("Thread was interrupted");
             }
         }
-        LOG.fatal("Can't recover from the Journal - "
+        logger.error("Can't recover from the Journal - "
                 + "the server hasn't initialized after " + i + " seconds.");
         shutdown = true;
     }

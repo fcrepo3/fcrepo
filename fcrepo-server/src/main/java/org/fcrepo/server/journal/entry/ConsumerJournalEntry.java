@@ -13,7 +13,7 @@ import org.fcrepo.server.management.ManagementDelegate;
 /**
  * The JournalEntry to use when consuming a journal file.
  * <p>
- * Before invoking a method, write the entry to the recovery log. After invoking
+ * Before invoking a method, write the entry to the recovery logger. After invoking
  * the method, log a completion message.
  * 
  * @author Jim Blake

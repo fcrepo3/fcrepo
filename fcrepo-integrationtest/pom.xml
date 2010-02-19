@@ -92,6 +92,10 @@
 
                   <systemProperties>
                     <property>
+                      <name>logback.configurationFile</name>
+                      <value>src/test/resources/logback.xml</value>
+                    </property>
+                    <property>
                       <name>fedora.home</name>
                       <value>${fedora.home}</value>
                     </property>
@@ -208,6 +212,10 @@
 
                   <systemProperties>
                     <property>
+                      <name>logback.configurationFile</name>
+                      <value>src/test/resources/logback.xml</value>
+                    </property>
+                    <property>
                       <name>fedora.home</name>
                       <value>${fedora.home}</value>
                     </property>
@@ -323,6 +331,10 @@
                   <skip>${integration.test.skip}</skip>
 
                   <systemProperties>
+                    <property>
+                      <name>logback.configurationFile</name>
+                      <value>src/test/resources/logback.xml</value>
+                    </property>
                     <property>
                       <name>fedora.home</name>
                       <value>${fedora.home}</value>
@@ -443,6 +455,10 @@
                   <skip>${integration.test.skip}</skip>
 
                   <systemProperties>
+                    <property>
+                      <name>logback.configurationFile</name>
+                      <value>src/test/resources/logback.xml</value>
+                    </property>
                     <property>
                       <name>fedora.home</name>
                       <value>${fedora.home}</value>

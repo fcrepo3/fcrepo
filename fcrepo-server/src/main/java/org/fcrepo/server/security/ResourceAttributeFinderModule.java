@@ -16,8 +16,6 @@ import com.sun.xacml.attr.AttributeDesignator;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.cond.EvaluationResult;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
@@ -26,8 +24,8 @@ import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.utilities.DateUtility;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -35,9 +33,8 @@ import org.fcrepo.server.utilities.DateUtility;
 class ResourceAttributeFinderModule
         extends AttributeFinderModule {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(ResourceAttributeFinderModule.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ResourceAttributeFinderModule.class);
 
     @Override
     protected boolean canHandleAdhoc() {
@@ -106,7 +103,7 @@ class ResourceAttributeFinderModule
 
     public void setOwnerIdSeparator(String ownerIdSeparator) {
         this.ownerIdSeparator = ownerIdSeparator;
-        LOG.debug("resourceAttributeFinder just set ownerIdSeparator ==["
+        logger.debug("resourceAttributeFinder just set ownerIdSeparator ==["
                 + this.ownerIdSeparator + "]");
     }
 
@@ -124,13 +121,13 @@ class ResourceAttributeFinderModule
 
         Object element = getAttributeFromEvaluationResult(attribute);
         if (element == null) {
-            LOG.debug("getDatastreamId: " + " exit on "
+            logger.debug("getDatastreamId: " + " exit on "
                     + "can't get resource-id on request callback");
             return null;
         }
 
         if (!(element instanceof StringAttribute)) {
-            LOG.debug("getDatastreamId: " + " exit on "
+            logger.debug("getDatastreamId: " + " exit on "
                     + "couldn't get resource-id from xacml request "
                     + "non-string returned");
             return null;
@@ -139,14 +136,12 @@ class ResourceAttributeFinderModule
         String datastreamId = ((StringAttribute) element).getValue();
 
         if (datastreamId == null) {
-            LOG.debug("getDatastreamId: " + " exit on " + "null resource-id");
+            logger.debug("getDatastreamId: " + " exit on " + "null resource-id");
             return null;
         }
 
         if (!validDatastreamId(datastreamId)) {
-            LOG
-                    .debug("getDatastreamId: " + " exit on "
-                            + "invalid resource-id");
+            logger.debug("invalid resource-id: datastreamId is not valid");
             return null;
         }
 
@@ -175,19 +170,19 @@ class ResourceAttributeFinderModule
         try {
             String pid = getPid(context);
             if ("".equals(pid)) {
-                LOG.debug("no pid");
+                logger.debug("no pid");
                 return null;
             }
-            LOG.debug("getResourceAttribute, pid=" + pid);
+            logger.debug("getResourceAttribute, pid=" + pid);
             DOReader reader = null;
             try {
-                LOG.debug("pid=" + pid);
+                logger.debug("pid=" + pid);
                 reader =
                         doManager.getReader(Server.USE_DEFINITIVE_STORE,
                                             ReadOnlyContext.EMPTY,
                                             pid);
             } catch (ServerException e) {
-                LOG.debug("couldn't get object reader");
+                logger.debug("couldn't get object reader");
                 return null;
             }
             String[] values = null;
@@ -195,17 +190,16 @@ class ResourceAttributeFinderModule
                 try {
                     values = new String[1];
                     values[0] = reader.GetObjectState();
-                    LOG.debug("got " + Constants.OBJECT.STATE.uri + "="
+                    logger.debug("got " + Constants.OBJECT.STATE.uri + "="
                             + values[0]);
                 } catch (ServerException e) {
-                    LOG.debug("failed getting " + Constants.OBJECT.STATE.uri);
+                    logger.debug("failed getting " + Constants.OBJECT.STATE.uri);
                     return null;
                 }
             }
             else if (Constants.OBJECT.OWNER.uri.equals(attributeId)) {
                 try {
-                    LOG
-                            .debug("ResourceAttributeFinder.getAttributeLocally using ownerIdSeparator==["
+                    logger.debug("ResourceAttributeFinder.getAttributeLocally using ownerIdSeparator==["
                                     + ownerIdSeparator + "]");
                     String ownerId = reader.getOwnerId();
                     if (ownerId == null) {
@@ -217,9 +211,9 @@ class ResourceAttributeFinderModule
                     for (int i = 0; i < values.length; i++) {
                         temp += (" [" + values[i] + "]");
                     }
-                    LOG.debug(temp);
+                    logger.debug(temp);
                 } catch (ServerException e) {
-                    LOG.debug("failed getting " + Constants.OBJECT.OWNER.uri);
+                    logger.debug("failed getting " + Constants.OBJECT.OWNER.uri);
                     return null;
                 }
             } else if (Constants.MODEL.HAS_MODEL.uri.equals(attributeId)) {
@@ -227,7 +221,7 @@ class ResourceAttributeFinderModule
                 try {
                     models.addAll(reader.getContentModels());
                 } catch (ServerException e) {
-                    LOG.debug("failed getting " + Constants.MODEL.HAS_MODEL.uri);
+                    logger.debug("failed getting " + Constants.MODEL.HAS_MODEL.uri);
                     return null;
                 }
                 values = models.toArray(new String[0]);
@@ -237,10 +231,10 @@ class ResourceAttributeFinderModule
                     values[0] =
                             DateUtility.convertDateToString(reader
                                     .getCreateDate());
-                    LOG.debug("got " + Constants.OBJECT.CREATED_DATETIME.uri
+                    logger.debug("got " + Constants.OBJECT.CREATED_DATETIME.uri
                             + "=" + values[0]);
                 } catch (ServerException e) {
-                    LOG.debug("failed getting "
+                    logger.debug("failed getting "
                             + Constants.OBJECT.CREATED_DATETIME.uri);
                     return null;
                 }
@@ -251,11 +245,11 @@ class ResourceAttributeFinderModule
                     values[0] =
                             DateUtility.convertDateToString(reader
                                     .getLastModDate());
-                    LOG.debug("got "
+                    logger.debug("got "
                             + Constants.OBJECT.LAST_MODIFIED_DATETIME.uri + "="
                             + values[0]);
                 } catch (ServerException e) {
-                    LOG.debug("failed getting "
+                    logger.debug("failed getting "
                             + Constants.OBJECT.LAST_MODIFIED_DATETIME.uri);
                     return null;
                 }
@@ -274,19 +268,19 @@ class ResourceAttributeFinderModule
                             .equals(attributeId)) {
                 String datastreamId = getDatastreamId(context);
                 if ("".equals(datastreamId)) {
-                    LOG.debug("no datastreamId");
+                    logger.debug("no datastreamId");
                     return null;
                 }
-                LOG.debug("datastreamId=" + datastreamId);
+                logger.debug("datastreamId=" + datastreamId);
                 Datastream datastream;
                 try {
                     datastream = reader.GetDatastream(datastreamId, new Date()); //right import (above)?
                 } catch (ServerException e) {
-                    LOG.debug("couldn't get datastream");
+                    logger.debug("couldn't get datastream");
                     return null;
                 }
                 if (datastream == null) {
-                    LOG.debug("got null datastream");
+                    logger.debug("got null datastream");
                     return null;
                 }
 
@@ -328,17 +322,17 @@ class ResourceAttributeFinderModule
                     values = new String[1];
                     values[0] = Long.toString(datastream.DSSize);
                 } else {
-                    LOG.debug("looking for unknown resource attribute="
+                    logger.debug("looking for unknown resource attribute="
                             + attributeId);
                 }
             } else {
-                LOG.debug("looking for unknown resource attribute="
+                logger.debug("looking for unknown resource attribute="
                         + attributeId);
             }
             return values;
         } finally {
             long dur = System.currentTimeMillis() - getAttributeStartTime;
-            LOG.debug("Locally getting the '" + attributeId
+            logger.debug("Locally getting the '" + attributeId
                     + "' attribute for this resource took " + dur + "ms.");
         }
     }
@@ -359,13 +353,13 @@ class ResourceAttributeFinderModule
                                               null);
         Object element = getAttributeFromEvaluationResult(attribute);
         if (element == null) {
-            LOG.debug("PolicyFinderModule:getPid" + " exit on "
+            logger.debug("PolicyFinderModule:getPid" + " exit on "
                     + "can't get contextId on request callback");
             return null;
         }
 
         if (!(element instanceof StringAttribute)) {
-            LOG.debug("PolicyFinderModule:getPid" + " exit on "
+            logger.debug("PolicyFinderModule:getPid" + " exit on "
                     + "couldn't get contextId from xacml request "
                     + "non-string returned");
             return null;
@@ -374,7 +368,7 @@ class ResourceAttributeFinderModule
         String pid = ((StringAttribute) element).getValue();
 
         if (pid == null) {
-            LOG.debug("PolicyFinderModule:getPid" + " exit on "
+            logger.debug("PolicyFinderModule:getPid" + " exit on "
                     + "null contextId");
             return null;
         }

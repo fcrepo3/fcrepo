@@ -45,8 +45,6 @@ import javax.swing.KeyStroke;
 
 import org.apache.axis.AxisFault;
 
-import org.apache.log4j.Logger;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -67,12 +65,8 @@ import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.swing.mdi.MDIDesktopPane;
 import org.fcrepo.swing.mdi.WindowMenu;
-import org.fcrepo.utilities.Log4J;
-
-
-
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fedora Administrator GUI.
@@ -82,9 +76,8 @@ import org.fcrepo.utilities.Log4J;
 public class Administrator
         extends JFrame {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(Administrator.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(Administrator.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -867,7 +860,6 @@ public class Administrator
     }
 
     public static void main(String[] args) {
-        Log4J.force();
         if (args.length == 1) {
             int socketTimeoutSeconds = 120;
             try {
@@ -875,7 +867,7 @@ public class Administrator
             } catch (Exception e) {
             }
             APIAStubFactory.SOCKET_TIMEOUT_SECONDS = socketTimeoutSeconds;
-            LOG.info("Socket timeout set to " + socketTimeoutSeconds
+            logger.info("Socket timeout set to " + socketTimeoutSeconds
                     + " seconds");
         }
         String protocol = null;

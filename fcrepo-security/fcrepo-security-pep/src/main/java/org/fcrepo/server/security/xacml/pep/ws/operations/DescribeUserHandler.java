@@ -26,7 +26,8 @@ import javax.xml.soap.SOAPHeaderElement;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.security.xacml.pep.PEPException;
 
@@ -38,8 +39,8 @@ import com.sun.xacml.ctx.RequestCtx;
 public class DescribeUserHandler
         extends AbstractOperationHandler {
 
-    private static Logger log =
-            Logger.getLogger(DescribeUserHandler.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DescribeUserHandler.class);
 
     public DescribeUserHandler()
             throws PEPException {
@@ -72,7 +73,7 @@ public class DescribeUserHandler
                 role.addTextNode(fedoraRole);
             }
         } catch (Exception e) {
-            log.error("Error setting roles for user: " + e.getMessage(), e);
+            logger.error("Error setting roles for user: " + e.getMessage(), e);
         }
 
         return null;

@@ -20,13 +20,13 @@ package org.fcrepo.server.security.xacml.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 import org.fcrepo.server.security.xacml.pdp.data.DbXmlPolicyDataManager;
@@ -37,8 +37,8 @@ import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManagerException;
  */
 public class PopulatePolicyDatabase {
 
-    private static final Logger log =
-            Logger.getLogger(PopulatePolicyDatabase.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(PopulatePolicyDatabase.class);
 
     private static final String POLICY_HOME =
             MelcoePDP.PDP_HOME.getAbsolutePath() + "/policies";
@@ -57,22 +57,21 @@ public class PopulatePolicyDatabase {
 
     public static void main(String[] args) throws PolicyDataManagerException,
             FileNotFoundException {
-        BasicConfigurator.configure();
         dbXmlPolicyDataManager = new DbXmlPolicyDataManager();
-        log.info("Adding");
+        logger.info("Adding");
         add();
-        log.info("Listing");
+        logger.info("Listing");
         list();
     }
 
     public static void add() throws PolicyDataManagerException,
             FileNotFoundException {
-        log.info("Starting clock!");
+        logger.info("Starting clock!");
         long time1 = System.nanoTime();
         addDocuments();
         long time2 = System.nanoTime();
-        log.info("Stopping clock!");
-        log.info("Time taken: " + (time2 - time1));
+        logger.info("Stopping clock!");
+        logger.info("Time taken: " + (time2 - time1));
     }
 
     public static void addDocuments() throws PolicyDataManagerException,
@@ -84,8 +83,8 @@ public class PopulatePolicyDatabase {
 
         for (File f : files) {
             if (dbXmlPolicyDataManager.contains(f)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Policy database already contains " + f.getName()
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Policy database already contains " + f.getName()
                             + ". Skipping.");
                 }
             } else {
@@ -97,7 +96,7 @@ public class PopulatePolicyDatabase {
     public static void list() throws PolicyDataManagerException {
         List<String> docNames = dbXmlPolicyDataManager.listPolicies();
         for (String s : docNames) {
-            log.info("doc: " + s);
+            logger.info("doc: " + s);
         }
     }
 

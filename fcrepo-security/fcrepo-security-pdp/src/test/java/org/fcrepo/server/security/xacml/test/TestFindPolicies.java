@@ -5,15 +5,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.security.xacml.pdp.data.DbXmlPolicyDataManager;
 import org.fcrepo.server.security.xacml.util.AttributeBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestFindPolicies {
 
-    private static final Logger log = Logger.getLogger(TestFindPolicies.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(TestFindPolicies.class);
 
     private static DbXmlPolicyDataManager dbXmlPolicyDataManager;
 
@@ -39,17 +39,17 @@ public class TestFindPolicies {
 
         results = dbXmlPolicyDataManager.findPolicies(attributes);
         for (String name : results.keySet()) {
-            log.info("Name: " + name);
+            logger.info("Name: " + name);
         }
 
         results = dbXmlPolicyDataManager.findPolicies(attributes);
         for (String name : results.keySet()) {
-            log.info("Name: " + name);
+            logger.info("Name: " + name);
         }
 
         results = dbXmlPolicyDataManager.findPolicies(attributes);
         for (String name : results.keySet()) {
-            log.info("Name: " + name);
+            logger.info("Name: " + name);
         }
     }
 }

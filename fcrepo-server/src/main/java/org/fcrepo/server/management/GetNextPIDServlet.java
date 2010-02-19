@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.management;
@@ -25,8 +25,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
@@ -39,9 +37,8 @@ import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.servletExceptionExtensions.InternalError500Exception;
 import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
 import org.fcrepo.utilities.XmlTransformUtility;
-
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements the "getNextPID" functionality of the Fedora Management LITE
@@ -76,16 +73,15 @@ import org.fcrepo.utilities.XmlTransformUtility;
  * value of "true" indicates a return type of text/xml; the absence of the xml
  * parameter or a value of "false" indicates format is to be text/html.</li>
  * </ul>
- * 
+ *
  * @author Ross Wayland
  */
 public class GetNextPIDServlet
         extends HttpServlet
         implements Constants {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(GetNextPIDServlet.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(GetNextPIDServlet.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -109,7 +105,7 @@ public class GetNextPIDServlet
      * available PIDs. Parse and validate the servlet input parameters and then
      * execute the specified request.
      * </p>
-     * 
+     *
      * @param request
      *        The servlet request.
      * @param response
@@ -154,7 +150,7 @@ public class GetNextPIDServlet
                                                     new String[0]);
         } catch (Throwable th) {
             final String msg = "Unexpected error getting next PID";
-            LOG.error(msg, th);
+            logger.error(msg, th);
             throw new InternalError500Exception(msg,
                                                 th,
                                                 request,
@@ -169,7 +165,7 @@ public class GetNextPIDServlet
      * Get the requested list of next Available PIDs by invoking the approriate
      * method from the Management subsystem.
      * </p>
-     * 
+     *
      * @param context
      *        The context of this request.
      * @param numPIDs
@@ -243,7 +239,7 @@ public class GetNextPIDServlet
             } else {
                 // GetNextPID request returned no PIDs.
                 String message = "[GetNextPIDServlet] No PIDs returned.";
-                LOG.error(message);
+                logger.error(message);
             }
         } catch (ServerException e) {
             throw e;
@@ -284,7 +280,7 @@ public class GetNextPIDServlet
          * <p>
          * Constructor for GetNextPIDSerializerThread.
          * </p>
-         * 
+         *
          * @param pidList
          *        An array of the requested next available PIDs.
          * @param pw
@@ -325,14 +321,14 @@ public class GetNextPIDServlet
                     pw.flush();
                     pw.close();
                 } catch (IOException ioe) {
-                    LOG.error("WriteThread error", ioe);
+                    logger.error("WriteThread error", ioe);
                 } finally {
                     try {
                         if (pw != null) {
                             pw.close();
                         }
                     } catch (IOException ioe) {
-                        LOG.warn("WriteThread error", ioe);
+                        logger.warn("WriteThread error", ioe);
                     }
                 }
             }
@@ -343,7 +339,7 @@ public class GetNextPIDServlet
      * <p>
      * For now, treat a HTTP POST request just like a GET request.
      * </p>
-     * 
+     *
      * @param request
      *        The servet request.
      * @param response
@@ -363,7 +359,7 @@ public class GetNextPIDServlet
      * <p>
      * Initialize servlet.
      * </p>
-     * 
+     *
      * @throws ServletException
      *         If the servet cannot be initialized.
      */

@@ -27,7 +27,8 @@ import java.util.Map;
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.types.NonNegativeInteger;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -46,8 +47,8 @@ import com.sun.xacml.ctx.RequestCtx;
 public class GetNextPIDHandler
         extends AbstractOperationHandler {
 
-    private static Logger log =
-            Logger.getLogger(GetNextPIDHandler.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(GetNextPIDHandler.class);
 
     public GetNextPIDHandler()
             throws PEPException {
@@ -61,7 +62,7 @@ public class GetNextPIDHandler
 
     public RequestCtx handleRequest(MessageContext context)
             throws OperationHandlerException {
-        log.debug("GetNextPIDHandler/handleRequest!");
+        logger.debug("GetNextPIDHandler/handleRequest!");
 
         RequestCtx req = null;
         List<Object> oMap = null;
@@ -71,9 +72,9 @@ public class GetNextPIDHandler
 
         try {
             oMap = getSOAPRequestObjects(context);
-            log.debug("Retrieved SOAP Request Objects");
+            logger.debug("Retrieved SOAP Request Objects");
         } catch (AxisFault af) {
-            log.error("Error obtaining SOAP Request Objects", af);
+            logger.error("Error obtaining SOAP Request Objects", af);
             throw new OperationHandlerException("Error obtaining SOAP Request Objects",
                                                 af);
         }
@@ -82,12 +83,12 @@ public class GetNextPIDHandler
             numPids = (NonNegativeInteger) oMap.get(0);
             pidNamespace = (String) oMap.get(1);
         } catch (Exception e) {
-            log.error("Error obtaining parameters", e);
+            logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",
                                                 e);
         }
 
-        log.debug("Extracted SOAP Request Objects");
+        logger.debug("Extracted SOAP Request Objects");
 
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
@@ -125,7 +126,7 @@ public class GetNextPIDHandler
                             "FedoraRepository",
                             null);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw new OperationHandlerException(e.getMessage(), e);
         }
 

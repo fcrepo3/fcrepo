@@ -19,8 +19,6 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.axis.types.NCName;
 
-import org.apache.log4j.Logger;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -29,6 +27,8 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.common.FaultException;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.errors.ValidationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -112,9 +112,8 @@ public class RelsValidator
         extends DefaultHandler
         implements Constants {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(RelsValidator.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(RelsValidator.class);
 
     // state variables
     private String m_doURI;
@@ -538,7 +537,7 @@ public class RelsValidator
             } else if (length == 24) {
                 format.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             } else {
-                LOG.warn("Not a valid dateTime: " + lex);
+                logger.warn("Not a valid dateTime: " + lex);
                 return false;
             }
         } else {
@@ -551,18 +550,18 @@ public class RelsValidator
             } else if (length == 23) {
                 format.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
             } else {
-                LOG.warn("Not a valid dateTime: " + lex);
+                logger.warn("Not a valid dateTime: " + lex);
                 return false;
             }
         }
         try {
             format.parse(lex);
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Validated dateTime: " + lex);
+            if (logger.isTraceEnabled()) {
+                logger.trace("Validated dateTime: " + lex);
             }
             return true;
         } catch (ParseException e) {
-            LOG.warn("Not a valid dateTime: " + lex);
+            logger.warn("Not a valid dateTime: " + lex);
             return false;
         }
     }

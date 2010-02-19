@@ -71,11 +71,20 @@
       <outputDirectory>/server/bin</outputDirectory>
       <filtered>true</filtered>
     </fileSet>  
+
     <fileSet>
       <directory>../fcrepo-server/src/main/resources/scripts/sh/server</directory>
       <outputDirectory>/server/bin</outputDirectory>
       <fileMode>0755</fileMode>
       <filtered>true</filtered>
+    </fileSet>
+
+    <fileSet>
+      <directory>../fcrepo-server/src/main/resources/scripts</directory>
+      <outputDirectory>/server/bin</outputDirectory>
+      <includes>
+        <include>logback.xml</include>
+      </includes>
     </fileSet>  
 
     <fileSet>
@@ -156,8 +165,6 @@
       <includes>
         <include>fedora-base.fcfg</include>
         <include>fedora-*.properties</include>
-        <include>logging.properties</include>
-        <include>log4j.properties</include>
         <include>*.xml</include>
       </includes>
       <excludes>
@@ -169,7 +176,7 @@
       <directory>../fcrepo-server/src/main/resources/fcfg/server</directory>
       <outputDirectory>/server/config</outputDirectory>
       <includes>
-        <include>log4j.properties</include>
+        <include>logback.xml</include>
         <include>akubra-llstore.xml</include>
         <include>mime-to-extensions.xml</include>
       </includes>
@@ -243,6 +250,14 @@
     </fileSet>  
 
     <fileSet>
+      <directory>../fcrepo-client/fcrepo-client-admin/src/main/resources/scripts</directory>
+      <outputDirectory>/client/bin</outputDirectory>
+      <includes>
+        <include>logback.xml</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
       <directory>../fcrepo-client/fcrepo-client-admin/src/main/resources/demo/demo-soapclient</directory>
       <outputDirectory>/client/demo/soapclient</outputDirectory>
       <filtered>true</filtered>
@@ -280,12 +295,6 @@
       <destName>undeployAPI-A.wsdd</destName>
     </file>
 
-    <file>
-      <source>../fcrepo-server/src/main/resources/xml/client-log4j.xml</source>
-      <outputDirectory>/client</outputDirectory>
-      <destName>log4j.xml</destName>
-    </file>  
-
   </files>
 
   <dependencySets>
@@ -304,7 +313,6 @@
         <include>commons-codec:commons-codec:jar:*</include>
         <include>commons-discovery:commons-discovery:jar:*</include>
         <include>commons-httpclient:commons-httpclient:jar:*</include>
-        <include>commons-logging:commons-logging:jar:*</include>
         <include>commons-pool:commons-pool:jar:*</include>
         <include>gnu.getopt:java-getopt:jar:*</include>
         <include>javax.activation:activation:jar:*</include>
@@ -312,7 +320,6 @@
         <include>javax.xml:jaxrpc-api:jar:*</include>
         <include>com.sun.woodstock.dependlibs:jhbasic:jar:*</include>
         <include>javax.xml.soap:saaj-api:jar:*</include>
-        <include>log4j:log4j:jar:*</include>
         <include>org.fcrepo:axis:jar:*</include>
         <include>org.fcrepo:jai_codec:jar:*</include>        
         <include>org.fcrepo:jai_core:jar:*</include>
@@ -322,7 +329,10 @@
         <include>org.fcrepo:sunxacml:jar:*</include>
         <include>org.fcrepo:trippi-core:jar:*</include>
         <include>org.slf4j:slf4j-api:jar:*</include>
-        <include>org.slf4j:slf4j-log4j12:jar:*</include>
+        <include>org.slf4j:jcl-over-slf4j:jar:*</include>                                         
+        <include>org.slf4j:log4j-over-slf4j:jar:*</include>                                         
+        <include>ch.qos.logback:logback-core:jar:*</include>
+        <include>ch.qos.logback:logback-classic:jar:*</include>
         <include>wsdl4j:wsdl4j:jar:*</include>
         <include>xerces:xercesImpl:jar:*</include>
         <include>xmlpull:xmlpull:jar:*</include>

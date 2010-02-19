@@ -3,6 +3,7 @@ package org.fcrepo.server.security.xacml.pdp.finder.attribute;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -16,11 +17,6 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-
-import org.apache.log4j.Logger;
-
-import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderConfigUtil;
-
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.attr.AttributeFactory;
 import com.sun.xacml.attr.AttributeValue;
@@ -29,11 +25,15 @@ import com.sun.xacml.attr.StandardAttributeFactory;
 import com.sun.xacml.cond.EvaluationResult;
 import com.sun.xacml.finder.AttributeFinderModule;
 
+import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderConfigUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class LDAPAttributeFinder
         extends AttributeFinderModule {
 
-    private static final Logger log =
-            Logger.getLogger(LDAPAttributeFinder.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(LDAPAttributeFinder.class);
 
     private AttributeFactory attributeFactory = null;
 
@@ -50,15 +50,14 @@ public class LDAPAttributeFinder
             attributes =
                     AttributeFinderConfigUtil.getAttributeFinderConfig(this
                             .getClass().getName());
-            log
-                    .info("Initialised AttributeFinder:"
+            logger.info("Initialised AttributeFinder:"
                             + this.getClass().getName());
 
-            if (log.isDebugEnabled()) {
-                log.debug("registering the following attributes: ");
+            if (logger.isDebugEnabled()) {
+                logger.debug("registering the following attributes: ");
                 for (Integer k : attributes.keySet()) {
                     for (String l : attributes.get(k)) {
-                        log.debug(k + ": " + l);
+                        logger.debug(k + ": " + l);
                     }
                 }
             }
@@ -71,14 +70,14 @@ public class LDAPAttributeFinder
 
             ctx = new InitialDirContext(dirEnv);
         } catch (Exception e) {
-            log.fatal("Attribute finder not initialised:"
-                    + this.getClass().getName());
+            logger.error("Attribute finder not initialised:"
+                    + this.getClass().getName(), e);
         }
     }
 
     /**
      * Returns true always because this module supports designators.
-     * 
+     *
      * @return true always
      */
     @Override
@@ -89,7 +88,7 @@ public class LDAPAttributeFinder
     /**
      * Returns a <code>Set</code> with a single <code>Integer</code> specifying
      * that environment attributes are supported by this module.
-     * 
+     *
      * @return a <code>Set</code> with
      *         <code>AttributeDesignator.ENVIRONMENT_TARGET</code> included
      */
@@ -101,7 +100,7 @@ public class LDAPAttributeFinder
     /**
      * Used to get an attribute. If one of those values isn't being asked for,
      * or if the types are wrong, then an empty bag is returned.
-     * 
+     *
      * @param attributeType
      *        the datatype of the attributes to find, which must be time, date,
      *        or dateTime for this module to resolve a value
@@ -149,11 +148,11 @@ public class LDAPAttributeFinder
             }
 
             user = userAV.encode();
-            if (log.isDebugEnabled()) {
-                log.debug("LDAPAttributeFinder: Getting info for " + user);
+            if (logger.isDebugEnabled()) {
+                logger.debug("LDAPAttributeFinder: Getting info for " + user);
             }
         } catch (URISyntaxException use) {
-            log.error(use.getMessage());
+            logger.error(use.getMessage());
             return new EvaluationResult(BagAttribute
                     .createEmptyBag(attributeType));
         }
@@ -163,8 +162,8 @@ public class LDAPAttributeFinder
 
         // we only know about registered attributes from config file
         if (!attributes.keySet().contains(new Integer(designatorType))) {
-            if (log.isDebugEnabled()) {
-                log.debug("Does not know about designatorType: "
+            if (logger.isDebugEnabled()) {
+                logger.debug("Does not know about designatorType: "
                         + designatorType);
             }
             return new EvaluationResult(BagAttribute
@@ -174,8 +173,8 @@ public class LDAPAttributeFinder
         Set<String> allowedAttributes =
                 attributes.get(new Integer(designatorType));
         if (!allowedAttributes.contains(attrName)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Does not know about attribute: " + attrName);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Does not know about attribute: " + attrName);
             }
             return new EvaluationResult(BagAttribute
                     .createEmptyBag(attributeType));
@@ -185,7 +184,7 @@ public class LDAPAttributeFinder
         try {
             result = getEvaluationResult(user, attrName, attributeType);
         } catch (Exception e) {
-            log.error("Error finding attribute: " + e.getMessage(), e);
+            logger.error("Error finding attribute: " + e.getMessage(), e);
             return new EvaluationResult(BagAttribute
                     .createEmptyBag(attributeType));
         }
@@ -224,8 +223,8 @@ public class LDAPAttributeFinder
                     NamingEnumeration nea = attr.getAll();
                     while (nea.hasMoreElements()) {
                         String value = (String) nea.nextElement();
-                        if (log.isDebugEnabled()) {
-                            log.debug(attr.getID() + ": " + value);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(attr.getID() + ": " + value);
                         }
 
                         AttributeValue attributeValue = null;
@@ -233,22 +232,22 @@ public class LDAPAttributeFinder
                             attributeValue =
                                     attributeFactory.createValue(type, value);
                         } catch (Exception e) {
-                            log.error("Error creating attribute: "
+                            logger.error("Error creating attribute: "
                                     + e.getMessage(), e);
                             continue;
                         }
 
                         bagValues.add(attributeValue);
 
-                        if (log.isDebugEnabled()) {
-                            log.debug("AttributeValue found: ["
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("AttributeValue found: ["
                                     + type.toASCIIString() + "] " + value);
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            log.error(e);
+            logger.error("Error getting evaluation result", e);
             return new EvaluationResult(BagAttribute.createEmptyBag(type));
         }
 
@@ -270,7 +269,7 @@ public class LDAPAttributeFinder
         Iterator i = bag.iterator();
         while (i.hasNext()) {
             AttributeValue a = (AttributeValue) i.next();
-            log.info("value: " + a.encode());
+            logger.info("value: " + a.encode());
         }
     }
 }

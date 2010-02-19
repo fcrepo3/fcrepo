@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -35,11 +36,14 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.sun.xacml.ctx.RequestCtx;
+import com.sun.xacml.ctx.ResponseCtx;
+import com.sun.xacml.ctx.Result;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -52,21 +56,20 @@ import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.rest.filters.DataResponseWrapper;
 import org.fcrepo.server.security.xacml.pep.rest.filters.ParameterRequestWrapper;
 import org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter;
-
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * This is the PEP for the REST interface.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public final class PEP
         implements Filter {
 
-    private static Logger log = Logger.getLogger(PEP.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(PEP.class);
 
     private FilterConfig filterConfig = null;
 
@@ -85,9 +88,8 @@ public final class PEP
             ServletException {
         // if a response has already been committed, bypass this filter...
         if (response.isCommitted()) {
-            if (log.isDebugEnabled()) {
-                log
-                        .debug("Response has already been committed. Bypassing PEP.");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Response has already been committed. Bypassing PEP.");
             }
             // continuing the chain once auth has failed causes errors. Short
             // circuiting the path here.
@@ -99,7 +101,7 @@ public final class PEP
         // Need to make sure we are dealing with HttpServlets
         if (!(request instanceof HttpServletRequest)
                 || !(response instanceof HttpServletResponse)) {
-            log.error("Servlets are not HttpServlets!");
+            logger.error("Servlets are not HttpServlets!");
             throw new ServletException("Servlets are not HttpServlets!");
         }
 
@@ -113,9 +115,9 @@ public final class PEP
 
         String uri = ((HttpServletRequest) request).getRequestURI();
         String servletPath = ((HttpServletRequest) request).getServletPath();
-        if (log.isDebugEnabled()) {
-            log.debug("Incoming URI: " + uri);
-            log.debug("Incoming servletPath: " + servletPath);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Incoming URI: " + uri);
+            logger.debug("Incoming servletPath: " + servletPath);
         }
 
         // get the filter (or null if no filter)
@@ -137,8 +139,8 @@ public final class PEP
                 // substitute our own response object that captures the data
                 res = new DataResponseWrapper(((HttpServletResponse) response));
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Filtering URI: [" + req.getRequestURI()
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Filtering URI: [" + req.getRequestURI()
                             + "] with: [" + filter.getClass().getName() + "]");
                 }
 
@@ -188,16 +190,16 @@ public final class PEP
         try {
             ctxHandler = ContextHandlerImpl.getInstance();
         } catch (PEPException pe) {
-            log.error("Error obtaining ContextHandler", pe);
+            logger.error("Error obtaining ContextHandler", pe);
             throw new ServletException("Error obtaining ContextHandler", pe);
         }
 
-        log.info("Initialising Servlet Filter: " + PEP.class.getName());
+        logger.info("Initialising Servlet Filter: " + PEP.class);
         filterConfig = filterCfg;
 
         // exit if no config. Should always have a config.
         if (filterConfig == null) {
-            log.error("No config found!");
+            logger.error("No config found!");
             throw new ServletException("No config found for filter (filterConfig)");
         }
 
@@ -209,7 +211,7 @@ public final class PEP
      * @see javax.servlet.Filter#destroy()
      */
     public void destroy() {
-        log.info("Destroying Servlet Filter: " + PEP.class.getName());
+        logger.info("Destroying Servlet Filter: " + PEP.class);
         filterConfig = null;
         filters = null;
         ctxHandler = null;
@@ -259,26 +261,25 @@ public final class PEP
                         RESTFilter filter =
                                 (RESTFilter) filterClass.newInstance();
                         filters.put(opn, filter);
-                        if (log.isDebugEnabled()) {
-                            log.debug("filter added to filter map: " + opn
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("filter added to filter map: " + opn
                                     + "/" + cls);
                         }
                     } catch (ClassNotFoundException e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("filterClass not found for: " + cls);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("filterClass not found for: " + cls);
                         }
                     } catch (InstantiationException ie) {
-                        log.error("Could not instantiate filter: " + cls);
+                        logger.error("Could not instantiate filter: " + cls);
                         throw new ServletException(ie.getMessage(), ie);
                     } catch (IllegalAccessException iae) {
-                        log.error("Could not instantiate filter: " + cls);
+                        logger.error("Could not instantiate filter: " + cls);
                         throw new ServletException(iae.getMessage(), iae);
                     }
                 }
             }
         } catch (Exception e) {
-            log.fatal("Failed to initialse the PEP for REST");
-            log.fatal(e.getMessage(), e);
+            logger.error("Failed to initialse the PEP for REST", e);
             throw new ServletException(e.getMessage(), e);
         }
     }
@@ -287,7 +288,7 @@ public final class PEP
      * Obtains a filter from the filter map. If the filter does not exist in the
      * filter map, then an attempt to create the required filter is made and if
      * successful it is added to the filter map.
-     * 
+     *
      * @param servletPath
      *        the servletPath of incoming servlet request
      * @return the filter to use
@@ -296,15 +297,15 @@ public final class PEP
     private RESTFilter getFilter(String servletPath) throws ServletException {
         RESTFilter filter = filters.get(servletPath);
 
-        if (filter != null && log.isDebugEnabled())
-        	log.debug("obtaining filter: " + filter.getClass().getName());
+        if (filter != null && logger.isDebugEnabled())
+        	logger.debug("obtaining filter: " + filter.getClass().getName());
 
         return filter;
     }
 
     /**
      * Enforces a decision returned from the PDP.
-     * 
+     *
      * @param res
      *        the XACML response
      * @throws AuthzDeniedException
@@ -314,7 +315,7 @@ public final class PEP
         Set<Result> results = res.getResults();
         for (Result r : results) {
             if (r.getDecision() != Result.DECISION_PERMIT) {
-                log.debug("Denying access: " + r.getDecision());
+                logger.debug("Denying access: " + r.getDecision());
                 switch (r.getDecision()) {
                     case Result.DECISION_DENY:
                         throw new AuthzDeniedException("Deny");
@@ -326,12 +327,12 @@ public final class PEP
                 }
             }
         }
-        log.debug("Permitting access!");
+        logger.debug("Permitting access!");
     }
 
     /**
      * Outputs an access denied message.
-     * 
+     *
      * @param out
      *        the output stream to send the message to
      * @param message
@@ -355,7 +356,7 @@ public final class PEP
     /**
      * Sends a 401 error to the browser. This forces a login screen to be
      * displayed allowing the user to login.
-     * 
+     *
      * @param response
      *        the response to set the headers and status
      */

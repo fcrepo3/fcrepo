@@ -24,13 +24,13 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.Constants;
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.RPCParam;
 import org.apache.axis.types.NonNegativeInteger;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.LogUtil;
@@ -38,15 +38,14 @@ import org.fcrepo.server.types.gen.FieldSearchQuery;
 
 import com.sun.xacml.ctx.RequestCtx;
 
-
 /**
  * @author nishen@melcoe.mq.edu.au
  */
 public class FindObjectsHandler
         extends AbstractOperationHandler {
 
-    private static Logger log =
-            Logger.getLogger(FindObjectsHandler.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(FindObjectsHandler.class);
 
     private FieldSearchResultHandler resultHandler = null;
 
@@ -58,17 +57,13 @@ public class FindObjectsHandler
 
     public RequestCtx handleResponse(MessageContext context)
             throws OperationHandlerException {
-        if (log.isDebugEnabled()) {
-            log.debug("FindObjectsHandler/handleResponse!");
-        }
+        logger.debug("FindObjectsHandler/handleResponse!");
         return resultHandler.handleResponse(context);
     }
 
     public RequestCtx handleRequest(MessageContext context)
             throws OperationHandlerException {
-        if (log.isDebugEnabled()) {
-            log.debug("FindObjectsHandler/handleRequest!");
-        }
+        logger.debug("FindObjectsHandler/handleRequest!");
 
         // Ensuring that there is always a PID present in a request.
         List<Object> oMap = null;

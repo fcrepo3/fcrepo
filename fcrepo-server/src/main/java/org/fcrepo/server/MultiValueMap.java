@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server;
@@ -9,13 +9,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MultiValueMap {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(MultiValueMap.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(MultiValueMap.class);
 
     private boolean locked = false;
 
@@ -38,12 +38,12 @@ public class MultiValueMap {
     public void set(String name, Object value) throws Exception {
         if (name == null) {
             String msg = here + ": set() has null name, value=" + value;
-            LOG.debug(msg);
+            logger.debug(msg);
             throw new Exception(msg);
         }
         if (locked) {
             String msg = here + ": set() has object locked";
-            LOG.debug(msg);
+            logger.debug(msg);
             throw new Exception(msg);
         }
         if (value instanceof String) {
@@ -55,7 +55,7 @@ public class MultiValueMap {
             value = "";
         } else {
             String msg = here + ": set() has unhandled type";
-            LOG.debug(msg);
+            logger.debug(msg);
             throw new Exception(msg);
         }
         attributes.put(name, value);

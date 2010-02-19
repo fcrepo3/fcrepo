@@ -23,14 +23,13 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.LowlevelStorageInconsistencyException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.storage.ConnectionPool;
 import org.fcrepo.server.utilities.SQLUtility;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -38,9 +37,8 @@ import org.fcrepo.server.utilities.SQLUtility;
 public class DBPathRegistry
         extends PathRegistry {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DBPathRegistry.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DBPathRegistry.class);
 
     private ConnectionPool connectionPool = null;
 
@@ -207,12 +205,12 @@ public class DBPathRegistry
         } catch (LowlevelStorageInconsistencyException e2) {
         }
         try {
-            LOG.info("begin rebuilding registry from files");
+            logger.info("begin rebuilding registry from files");
             traverseFiles(storeBases, REBUILD, false, report); // continues, ignoring bad files
-            LOG.info("end rebuilding registry from files (ending normally)");
+            logger.info("end rebuilding registry from files (ending normally)");
         } catch (Exception e) {
             if (report != NO_REPORT) {
-                LOG.error("ending rebuild unsuccessfully", e);
+                logger.error("ending rebuild unsuccessfully", e);
             }
             throw new LowlevelStorageException(true,
                                                "ending rebuild unsuccessfully",
@@ -222,9 +220,9 @@ public class DBPathRegistry
 
     @Override
     public void auditFiles() throws LowlevelStorageException {
-        LOG.info("begin audit: files-against-registry");
+        logger.info("begin audit: files-against-registry");
         traverseFiles(storeBases, AUDIT_FILES, false, FULL_REPORT);
-        LOG.info("end audit: files-against-registry (ending normally)");
+        logger.info("end audit: files-against-registry (ending normally)");
     }
 
     @Override

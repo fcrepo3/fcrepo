@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.DatastoreConfig;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -19,6 +17,8 @@ import org.fcrepo.server.errors.ConnectionPoolNotFoundException;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.ModuleShutdownException;
 import org.fcrepo.server.utilities.DDLConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -34,9 +34,8 @@ public class ConnectionPoolManagerImpl
         extends Module
         implements ConnectionPoolManager {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(ConnectionPoolManagerImpl.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ConnectionPoolManagerImpl.class);
 
     private static Hashtable<String, ConnectionPool> h_ConnectionPools =
             new Hashtable<String, ConnectionPool>();
@@ -117,7 +116,7 @@ public class ConnectionPoolManagerImpl
                                                                 + "Name Not Specified",
                                                         getRole());
             }
-            LOG.debug("DefaultPoolName: " + defaultPoolName);
+            logger.debug("DefaultPoolName: " + defaultPoolName);
             String poolList = this.getParameter("poolNames");
 
             // Pool names should be comma delimited
@@ -167,39 +166,35 @@ public class ConnectionPoolManagerImpl
                                 .byteValue();
                 if (whenExhaustedAction != 0 && whenExhaustedAction != 1
                         && whenExhaustedAction != 2) {
-                    LOG
-                            .debug("Valid values for whenExhaustedAction are: 0 - (fail), 1 - (block), or 2 - (grow)");
+                    logger.debug("Valid values for whenExhaustedAction are: 0 - (fail), 1 - (block), or 2 - (grow)");
                     throw new ModuleInitializationException("A connection pool could "
-                                                                    + "not be instantiated. The underlying error was an "
-                                                                    + "invalid value for the whenExhaustedAction parameter."
-                                                                    + "Valid values are 0 - (fail), 1 - (block), or 2 - (grow). Value specified"
-                                                                    + "was \""
-                                                                    + whenExhaustedAction
-                                                                    + "\".",
-                                                            getRole());
+                            + "not be instantiated. The underlying error was an "
+                            + "invalid value for the whenExhaustedAction parameter."
+                            + "Valid values are 0 - (fail), 1 - (block), or 2 - (grow). Value specified"
+                            + "was \"" + whenExhaustedAction + "\".", getRole());
                 }
 
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("poolName[" + i + "] = " + poolNames[i]);
-                    LOG.debug("JDBC driver: " + jdbcDriverClass);
-                    LOG.debug("Database username: " + dbUsername);
-                    LOG.debug("Database password: " + dbPassword);
-                    LOG.debug("JDBC connection URL: " + jdbcURL);
-                    LOG.debug("Maximum active connections: " + maxActive);
-                    LOG.debug("Maximum idle connections: " + maxIdle);
-                    LOG.debug("Maximum wait time: " + maxWait);
-                    LOG.debug("Minimum idle time: " + minIdle);
-                    LOG.debug("Number of tests per eviction run: "
+                if (logger.isDebugEnabled()) {
+                    logger.debug("poolName[" + i + "] = " + poolNames[i]);
+                    logger.debug("JDBC driver: " + jdbcDriverClass);
+                    logger.debug("Database username: " + dbUsername);
+                    logger.debug("Database password: " + dbPassword);
+                    logger.debug("JDBC connection URL: " + jdbcURL);
+                    logger.debug("Maximum active connections: " + maxActive);
+                    logger.debug("Maximum idle connections: " + maxIdle);
+                    logger.debug("Maximum wait time: " + maxWait);
+                    logger.debug("Minimum idle time: " + minIdle);
+                    logger.debug("Number of tests per eviction run: "
                             + numTestsPerEvictionRun);
-                    LOG.debug("Minimum Evictable Idle time: "
+                    logger.debug("Minimum Evictable Idle time: "
                             + minEvictableIdleTimeMillis);
-                    LOG.debug("Minimum Evictable Idle time: "
+                    logger.debug("Minimum Evictable Idle time: "
                             + timeBetweenEvictionRunsMillis);
-                    LOG.debug("Validation query: " + validationQuery);
-                    LOG.debug("Test on borrow: " + testOnBorrow);
-                    LOG.debug("Test on return: " + testOnReturn);
-                    LOG.debug("Test while idle: " + testWhileIdle);
-                    LOG.debug("whenExhaustedAction: " + whenExhaustedAction);
+                    logger.debug("Validation query: " + validationQuery);
+                    logger.debug("Test on borrow: " + testOnBorrow);
+                    logger.debug("Test on return: " + testOnReturn);
+                    logger.debug("Test while idle: " + testWhileIdle);
+                    logger.debug("whenExhaustedAction: " + whenExhaustedAction);
                 }
 
                 // Treat any parameters whose names start with "connection."
@@ -208,7 +203,7 @@ public class ConnectionPoolManagerImpl
                 for (String name : config.getParameters().keySet()) {
                     if (name.startsWith("connection.")) {
                         String realName = name.substring(11);
-                        LOG.debug("Connection property " + realName + " = "
+                        logger.debug("Connection property " + realName + " = "
                                 + config.getParameter(name));
                         cProps.put(realName, config.getParameter(name));
                     }
@@ -261,11 +256,11 @@ public class ConnectionPoolManagerImpl
                                                testWhileIdle,
                                                whenExhaustedAction);
                     connectionPool.setConnectionProperties(cProps);
-                    LOG.debug("Initialized Pool: " + connectionPool);
+                    logger.debug("Initialized Pool: " + connectionPool);
                     h_ConnectionPools.put(poolNames[i], connectionPool);
-                    LOG.debug("putPoolInHash: " + h_ConnectionPools.size());
+                    logger.debug("putPoolInHash: " + h_ConnectionPools.size());
                 } catch (SQLException sqle) {
-                    LOG.error("Unable to initialize connection pool: "
+                    logger.error("Unable to initialize connection pool: "
                             + poolNames[i] + ": " + sqle.getMessage());
                 }
             }

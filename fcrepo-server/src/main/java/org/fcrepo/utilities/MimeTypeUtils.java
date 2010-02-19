@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.utilities;
@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -16,10 +17,11 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * <tt>MimeTypeUtils</tt> provides the 
+ * <tt>MimeTypeUtils</tt> provides the
  * {@link #fileExtensionForMIMEType fileExtensionForMIMEType()} method, which
  * converts a MIME type to a file extension. That method uses a traditional
  * <tt>mime.types</tt> files, similar to the file shipped with with web
@@ -36,10 +38,10 @@ import org.apache.log4j.Logger;
  * MIME type is the one that is used. The files are only loaded once within a
  * given running Java VM.
  * </p>
- * 
- * <p>This class is derived from org.clapper.util.misc.MIMETypeUtil, originally 
+ *
+ * <p>This class is derived from org.clapper.util.misc.MIMETypeUtil, originally
  * authored by Brian M. Clapper and made available under a BSD-style license.</p>
- * 
+ *
  * @author Brian M. Clapper
  * @author Edwin Shin *
  * @version $Id$
@@ -49,14 +51,14 @@ public class MimeTypeUtils {
     /**
      * Default MIME type, when a MIME type cannot be determined from a file's
      * extension.
-     * 
+     *
      * @see #MIMETypeForFile
      * @see #MIMETypeForFileName
      */
     public static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 
-    /** Logger for this class. */
-    private static final Logger LOG = Logger.getLogger(MimeTypeUtils.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(MimeTypeUtils.class);
 
     /**
      * Table for converting MIME type strings to file extensions. The table is
@@ -76,7 +78,7 @@ public class MimeTypeUtils {
 
     /**
      * Get an appropriate extension for a MIME type.
-     * 
+     *
      * @param mimeType
      *        the String MIME type
      * @return the appropriate file name extension, or a default extension if
@@ -85,7 +87,7 @@ public class MimeTypeUtils {
     public static String fileExtensionForMIMEType(String mimeType) {
         loadMappings();
 
-        String ext = (String) mimeTypeToExtensionMap.get(mimeType);
+        String ext = mimeTypeToExtensionMap.get(mimeType);
 
         if (ext == null) ext = "dat";
 
@@ -135,14 +137,14 @@ public class MimeTypeUtils {
                 String[] extensions = bundle.getString(type).split(" ");
 
                 if (mimeTypeToExtensionMap.get(type) == null) {
-                    LOG.debug("Internal: " + type + " -> \"" + extensions[0]
+                    logger.debug("Internal: " + type + " -> \"" + extensions[0]
                             + "\"");
                     mimeTypeToExtensionMap.put(type, extensions[0]);
                 }
             }
 
             catch (MissingResourceException ex) {
-                LOG.error("While reading internal bundle \""
+                logger.error("While reading internal bundle \""
                                   + MIME_MAPPINGS_BUNDLE
                                   + "\", got unexpected error on key \"" + type
                                   + "\"",
@@ -153,7 +155,7 @@ public class MimeTypeUtils {
 
     /**
      * Attempt to load a MIME types file. Throws no exceptions.
-     * 
+     *
      * @param path
      *        path to the file
      * @param map
@@ -163,9 +165,9 @@ public class MimeTypeUtils {
         try {
             File f = new File(path);
 
-            LOG.debug("Attempting to load MIME types file \"" + path + "\"");
+            logger.debug("Attempting to load MIME types file \"" + path + "\"");
             if (!(f.exists() && f.isFile()))
-                LOG.debug("Regular file \"" + path + "\" does not exist.");
+                logger.debug("Regular file \"" + path + "\" does not exist.");
 
             else {
                 LineNumberReader r = new LineNumberReader(new FileReader(f));
@@ -221,8 +223,8 @@ public class MimeTypeUtils {
                     // existing mapping for the MIME type.
 
                     if (mimeTypeToExtensionMap.get(mimeType) == null) {
-                        extension = (String) extensions.get(0);
-                        LOG.debug("File \"" + path + "\": " + mimeType
+                        extension = extensions.get(0);
+                        logger.debug("File \"" + path + "\": " + mimeType
                                 + " -> \"" + extension + "\"");
 
                         mimeTypeToExtensionMap.put(mimeType, extension);
@@ -232,7 +234,7 @@ public class MimeTypeUtils {
                 r.close();
             }
         } catch (IOException ex) {
-            LOG.debug("Error reading \"" + path + "\"", ex);
+            logger.debug("Error reading \"" + path + "\"", ex);
         }
     }
 

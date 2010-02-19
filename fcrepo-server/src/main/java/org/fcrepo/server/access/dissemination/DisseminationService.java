@@ -19,8 +19,6 @@ import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Server;
@@ -45,6 +43,8 @@ import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.ServerUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -54,9 +54,8 @@ import org.fcrepo.server.utilities.ServerUtility;
  */
 public class DisseminationService {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DisseminationService.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DisseminationService.class);
 
     /** The Fedora Server instance */
     private static Server s_server;
@@ -121,22 +120,20 @@ public class DisseminationService {
                 String expireLimit =
                         s_server.getParameter("datastreamExpirationLimit");
                 if (expireLimit == null || expireLimit.equalsIgnoreCase("")) {
-                    LOG
-                            .info("datastreamExpirationLimit unspecified; defaulting to "
+                    logger.info("datastreamExpirationLimit unspecified; defaulting to "
                                     + "300 seconds");
                     datastreamExpirationLimit = 300;
                 } else {
                     datastreamExpirationLimit =
                             new Integer(expireLimit).intValue();
-                    LOG.info("datastreamExpirationLimit="
+                    logger.info("datastreamExpirationLimit="
                             + datastreamExpirationLimit);
                 }
                 String dsMediation =
                         s_server.getModule("org.fcrepo.server.access.Access")
                                 .getParameter("doMediateDatastreams");
                 if (dsMediation == null || dsMediation.equalsIgnoreCase("")) {
-                    LOG
-                            .info("doMediateDatastreams unspecified; defaulting to false");
+                    logger.info("doMediateDatastreams unspecified; defaulting to false");
                 } else {
                     doDatastreamMediation =
                             new Boolean(dsMediation).booleanValue();
@@ -147,7 +144,7 @@ public class DisseminationService {
             s_server.getModule("org.fcrepo.server.storage.ExternalContentManager");
 
         } catch (InitializationException ie) {
-            LOG.error("Initialization error", ie);
+            logger.error("Initialization error", ie);
         }
     }
 
@@ -212,7 +209,7 @@ public class DisseminationService {
                                                  String methodName)
             throws ServerException {
 
-        LOG.debug("Started assembling dissemination");
+        logger.debug("Started assembling dissemination");
 
         String dissURL = null;
         String protocolType = null;
@@ -220,7 +217,7 @@ public class DisseminationService {
         MIMETypedStream dissemination = null;
         boolean isRedirect = false;
 
-        if (LOG.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             printBindingInfo(dissBindInfoArray);
         }
 
@@ -369,25 +366,13 @@ public class DisseminationService {
                 }
                 String datastreamResolverServletURL =
                         dsMediatedCallbackHost + dsMediatedServletPath;
-                if (LOG.isDebugEnabled()) {
-                    LOG
-                            .debug("******************Checking backend service dsLocation: "
-                                    + dissBindInfo.dsLocation);
-                    LOG
-                            .debug("******************Checking backend service dsControlGroupType: "
-                                    + dissBindInfo.dsControlGroupType);
-                    LOG
-                            .debug("******************Checking backend service callbackBasicAuth: "
-                                    + callbackBasicAuth);
-                    LOG
-                            .debug("******************Checking backend service callbackSSL: "
-                                    + callbackSSL);
-                    LOG
-                            .debug("******************Checking backend service callbackRole: "
-                                    + callbackRole);
-                    LOG
-                            .debug("******************DatastreamResolverServletURL: "
-                                    + datastreamResolverServletURL);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("******************Checking backend service dsLocation: {}", dissBindInfo.dsLocation);
+                    logger.debug("******************Checking backend service dsControlGroupType: {}", dissBindInfo.dsControlGroupType);
+                    logger.debug("******************Checking backend service callbackBasicAuth: {}", callbackBasicAuth);
+                    logger.debug("******************Checking backend service callbackSSL: {}", callbackSSL);
+                    logger.debug("******************Checking backend service callbackRole: {}", callbackRole);
+                    logger.debug("******************DatastreamResolverServletURL: {}", datastreamResolverServletURL);
                 }
 
                 String currentKey = dissBindInfo.DSBindKey;
@@ -397,7 +382,7 @@ public class DisseminationService {
                     // to compare with the value of the current binding key.
                     nextKey = dissBindInfoArray[i + 1].DSBindKey;
                 }
-                LOG.debug("currentKey: '" + currentKey + "', nextKey: '"
+                logger.debug("currentKey: '" + currentKey + "', nextKey: '"
                         + nextKey + "'");
                 // In most cases, there is only a single datastream that matches a
                 // given DSBindingKey so the substitution process is to just replace
@@ -534,10 +519,10 @@ public class DisseminationService {
                                     + "\"  . The Reason was \""
                                     + uee.getMessage() + "\"  . String value: "
                                     + replaceString + "  . ";
-                    LOG.error(message);
+                    logger.error(message);
                     throw new GeneralException(message);
                 }
-                LOG.debug("Replaced dissURL: " + dissURL.toString()
+                logger.debug("Replaced dissURL: " + dissURL.toString()
                         + " DissBindingInfo index: " + i);
             }
 
@@ -570,12 +555,12 @@ public class DisseminationService {
                                     + uee.getMessage()
                                     + "\"  . Parameter name: " + name + "  . "
                                     + "Parameter value: " + value + "  .";
-                    LOG.error(message);
+                    logger.error(message);
                     throw new GeneralException(message);
                 }
                 String pattern = "\\(" + name + "\\)";
                 dissURL = substituteString(dissURL, pattern, value);
-                LOG.debug("User parm substituted in URL: " + dissURL);
+                logger.debug("User parm substituted in URL: " + dissURL);
             }
 
             // FIXME Need a more elegant means of handling optional userInputParm
@@ -591,7 +576,7 @@ public class DisseminationService {
             // are not supplied by the client.
             if (dissURL.indexOf("(") != -1) {
                 dissURL = stripParms(dissURL);
-                LOG.debug("Non-supplied optional userInputParm values removed "
+                logger.debug("Non-supplied optional userInputParm values removed "
                         + "from URL: " + dissURL);
             }
 
@@ -610,7 +595,7 @@ public class DisseminationService {
             }
 
             // Resolve content referenced by dissemination result.
-            LOG.debug("ProtocolType: " + protocolType);
+            logger.debug("ProtocolType: " + protocolType);
             if (protocolType.equalsIgnoreCase("http")) {
 
                 if (isRedirect) {
@@ -638,10 +623,10 @@ public class DisseminationService {
                                         + uee.getMessage()
                                         + "\"  . String value: " + dissURL
                                         + "  . ";
-                        LOG.error(message);
+                        logger.error(message);
                         throw new GeneralException(message);
                     }
-                    LOG.debug("Finished assembling dissemination");
+                    logger.debug("Finished assembling dissemination");
                     dissemination =
                             new MIMETypedStream("application/fedora-redirect",
                                                 is,
@@ -649,10 +634,7 @@ public class DisseminationService {
                 } else {
                     // For all non-redirected disseminations, Fedora captures and returns
                     // the MIMETypedStream resulting from the dissemination request.
-                    //ExternalContentManager externalContentManager = (ExternalContentManager)
-                    //    s_server.getModule("org.fcrepo.server.storage.ExternalContentManager");
-                    LOG.debug("Finished assembling dissemination");
-                    LOG.debug("URL: " + dissURL);
+                    logger.debug("Finished assembling dissemination, URL={}", dissURL);
 
                     // See if backend service reference is to fedora server itself or an external location.
                     // We must examine URL to see if this is referencing a remote backend service or is
@@ -684,47 +666,13 @@ public class DisseminationService {
                         beServiceCallPassword = beHash.get("callPassword");
                     }
 
-                    /*
-                     * //fixup: if
-                     * (BackendPolicies.FEDORA_INTERNAL_CALL.equals(beServiceRole)) {
-                     * if (beServiceCallSSL) { if (dissURL.startsWith("http:")) {
-                     * dissURL = dissURL.replaceFirst("http:", "https:"); } if
-                     * (dissURL.indexOf(":"+fedoraServerPort+"/") >= 0) {
-                     * dissURL = dissURL.replaceFirst(":"+fedoraServerPort+"/",
-                     * ":"+fedoraServerRedirectPort+"/"); } } else { if
-                     * (dissURL.startsWith("https:")) { dissURL =
-                     * dissURL.replaceFirst("https:", "http:"); } if
-                     * (dissURL.indexOf(":"+fedoraServerRedirectPort+"/") >= 0) {
-                     * dissURL =
-                     * dissURL.replaceFirst(":"+fedoraServerRedirectPort+"/",
-                     * ":"+fedoraServerPort+"/"); } } if
-                     * (beServiceCallBasicAuth) { if (dissURL.indexOf("getDS?") >=
-                     * 0) { dissURL = dissURL.replaceFirst("getDS\\?",
-                     * "getDSAuthenticated\\?"); } } else { if
-                     * (dissURL.indexOf("getDSAuthenticated?") >= 0) { dissURL =
-                     * dissURL.replaceFirst("getDSAuthenticated\\?",
-                     * "getDS\\?"); } } }
-                     */
-
-                    if (LOG.isDebugEnabled()) {
-                        LOG
-                                .debug("******************getDisseminationContent beServiceRole: "
-                                        + beServiceRole);
-                        LOG
-                                .debug("******************getDisseminationContent beServiceCallBasicAuth: "
-                                        + beServiceCallBasicAuth);
-                        LOG
-                                .debug("******************getDisseminationContent beServiceCallSSL: "
-                                        + beServiceCallSSL);
-                        LOG
-                                .debug("******************getDisseminationContent beServiceCallUsername: "
-                                        + beServiceCallUsername);
-                        LOG
-                                .debug("******************getDisseminationContent beServiceCallPassword: "
-                                        + beServiceCallPassword);
-                        LOG
-                                .debug("******************getDisseminationContent dissURL: "
-                                        + dissURL);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("******************getDisseminationContent beServiceRole: {}", beServiceRole);
+                        logger.debug("******************getDisseminationContent beServiceCallBasicAuth: {}", beServiceCallBasicAuth);
+                        logger.debug("******************getDisseminationContent beServiceCallSSL: {}", beServiceCallSSL);
+                        logger.debug("******************getDisseminationContent beServiceCallUsername: {}", beServiceCallUsername);
+                        logger.debug("******************getDisseminationContent beServiceCallPassword: {}", beServiceCallPassword);
+                        logger.debug("******************getDisseminationContent dissURL: {}", dissURL);
                     }
 
                     // Dispatch backend service URL request authenticating as necessary based on beSecurity configuration
@@ -741,7 +689,7 @@ public class DisseminationService {
                 String message =
                         "[DisseminationService] Protocol type: " + protocolType
                                 + "NOT yet implemented";
-                LOG.error(message);
+                logger.error(message);
                 throw new DisseminationException(message);
 
             } else if (protocolType.equalsIgnoreCase("file")) {
@@ -753,7 +701,7 @@ public class DisseminationService {
                 String message =
                         "[DisseminationService] Protocol type: " + protocolType
                                 + "NOT supported.";
-                LOG.error(message);
+                logger.error(message);
                 throw new DisseminationException(message);
             }
 
@@ -763,7 +711,7 @@ public class DisseminationService {
             String message =
                     "[DisseminationService] Dissemination Binding "
                             + "Info contained no data";
-            LOG.error(message);
+            logger.error(message);
             throw new DisseminationBindingInfoNotFoundException(message);
         }
         return dissemination;
@@ -836,7 +784,7 @@ public class DisseminationService {
                 timeStamp = Timestamp.valueOf(extractTimestamp(key));
                 if (expireLimit > timeStamp.getTime()) {
                     dsRegistry.remove(key);
-                    LOG.debug("DatastreamMediationKey removed from Hash: "
+                    logger.debug("DatastreamMediationKey removed from Hash: "
                             + key);
                 }
             }
@@ -886,34 +834,16 @@ public class DisseminationService {
                         beHash.get("callUsername");
                 String beServiceCallPassword =
                         beHash.get("callPassword");
-                if (LOG.isDebugEnabled()) {
-                    LOG
-                            .debug("******************Registering datastream dsLocation: "
-                                    + dsLocation);
-                    LOG
-                            .debug("******************Registering datastream dsControlGroupType: "
-                                    + dsControlGroupType);
-                    LOG
-                            .debug("******************Registering datastream beServiceRole: "
-                                    + beServiceRole);
-                    LOG
-                            .debug("******************Registering datastream beServiceCallbackBasicAuth: "
-                                    + beServiceCallbackBasicAuth);
-                    LOG
-                            .debug("******************Registering datastream beServiceCallBasicAuth: "
-                                    + beServiceCallBasicAuth);
-                    LOG
-                            .debug("******************Registering datastream beServiceCallbackSSL: "
-                                    + beServiceCallbackSSL);
-                    LOG
-                            .debug("******************Registering datastream beServiceCallSSL: "
-                                    + beServiceCallSSL);
-                    LOG
-                            .debug("******************Registering datastream beServiceCallUsername: "
-                                    + beServiceCallUsername);
-                    LOG
-                            .debug("******************Registering datastream beServiceCallPassword: "
-                                    + beServiceCallPassword);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("******************Registering datastream dsLocation: {}", dsLocation);
+                    logger.debug("******************Registering datastream dsControlGroupType: {}", dsControlGroupType);
+                    logger.debug("******************Registering datastream beServiceRole: {}", beServiceRole);
+                    logger.debug("******************Registering datastream beServiceCallbackBasicAuth: {}", beServiceCallbackBasicAuth);
+                    logger.debug("******************Registering datastream beServiceCallBasicAuth: {}", beServiceCallBasicAuth);
+                    logger.debug("******************Registering datastream beServiceCallbackSSL: {}", beServiceCallbackSSL);
+                    logger.debug("******************Registering datastream beServiceCallSSL: {}", beServiceCallSSL);
+                    logger.debug("******************Registering datastream beServiceCallUsername: {}", beServiceCallUsername);
+                    logger.debug("******************Registering datastream beServiceCallPassword: {}", beServiceCallPassword);
                 }
                 dm.callbackRole = beServiceRole;
                 dm.callUsername = beServiceCallUsername;
@@ -923,7 +853,7 @@ public class DisseminationService {
                 dm.callbackSSL = beServiceCallbackSSL;
                 dm.callSSL = beServiceCallSSL;
                 dsRegistry.put(tempID, dm);
-                LOG.debug("DatastreammediationKey added to Hash: " + tempID);
+                logger.debug("DatastreammediationKey added to Hash: " + tempID);
             }
 
         } catch (Throwable th) {
@@ -1060,37 +990,37 @@ public class DisseminationService {
                             + internalDSLocation + "\" is "
                             + "not in the required format of: "
                             + "\"doPID+DSID+DSVERSIONID\" .";
-            LOG.error(message);
+            logger.error(message);
             throw new GeneralException(message);
         }
-        LOG.debug("********** Resolving Internal Datastream dsLocation: "
+        logger.debug("********** Resolving Internal Datastream dsLocation: "
                 + dsLocation);
         return dsLocation;
     }
 
     public static void printBindingInfo(DisseminationBindingInfo[] info) {
         for (int i = 0; i < info.length; i++) {
-            LOG.debug("DisseminationBindingInfo[" + i + "]:");
-            LOG.debug("  DSBindKey          : " + info[i].DSBindKey);
-            LOG.debug("  dsLocation         : " + info[i].dsLocation);
-            LOG.debug("  dsControlGroupType : " + info[i].dsControlGroupType);
-            LOG.debug("  dsID               : " + info[i].dsID);
-            LOG.debug("  dsVersionID        : " + info[i].dsVersionID);
-            LOG.debug("  AddressLocation    : " + info[i].AddressLocation);
-            LOG.debug("  OperationLocation  : " + info[i].OperationLocation);
-            LOG.debug("  ProtocolType       : " + info[i].ProtocolType);
-            LOG.debug("  dsState            : " + info[i].dsState);
-            LOG.debug("  dsCreateDT         : " + info[i].dsCreateDT);
+            logger.debug("DisseminationBindingInfo[" + i + "]:");
+            logger.debug("  DSBindKey          : " + info[i].DSBindKey);
+            logger.debug("  dsLocation         : " + info[i].dsLocation);
+            logger.debug("  dsControlGroupType : " + info[i].dsControlGroupType);
+            logger.debug("  dsID               : " + info[i].dsID);
+            logger.debug("  dsVersionID        : " + info[i].dsVersionID);
+            logger.debug("  AddressLocation    : " + info[i].AddressLocation);
+            logger.debug("  OperationLocation  : " + info[i].OperationLocation);
+            logger.debug("  ProtocolType       : " + info[i].ProtocolType);
+            logger.debug("  dsState            : " + info[i].dsState);
+            logger.debug("  dsCreateDT         : " + info[i].dsCreateDT);
             for (int j = 0; j < info[i].methodParms.length; j++) {
                 MethodParmDef def = info[i].methodParms[j];
-                LOG.debug("  MethodParamDef[" + j + "]:");
-                LOG.debug("    parmName         : " + def.parmName);
-                LOG.debug("    parmDefaultValue : " + def.parmDefaultValue);
-                LOG.debug("    parmRequired     : " + def.parmRequired);
-                LOG.debug("    parmLabel        : " + def.parmLabel);
-                LOG.debug("    parmPassBy       : " + def.parmPassBy);
+                logger.debug("  MethodParamDef[" + j + "]:");
+                logger.debug("    parmName         : " + def.parmName);
+                logger.debug("    parmDefaultValue : " + def.parmDefaultValue);
+                logger.debug("    parmRequired     : " + def.parmRequired);
+                logger.debug("    parmLabel        : " + def.parmLabel);
+                logger.debug("    parmPassBy       : " + def.parmPassBy);
                 for (String element : def.parmDomainValues) {
-                    LOG.debug("    parmDomainValue  : " + element);
+                    logger.debug("    parmDomainValue  : " + element);
                 }
             }
         }

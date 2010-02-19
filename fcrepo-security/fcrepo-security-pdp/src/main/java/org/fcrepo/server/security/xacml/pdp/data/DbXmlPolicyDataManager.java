@@ -24,9 +24,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,14 +45,11 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
-import org.fcrepo.server.security.xacml.util.AttributeBean;
+import com.sun.xacml.EvaluationCtx;
+import com.sun.xacml.attr.AttributeDesignator;
+import com.sun.xacml.attr.AttributeValue;
+import com.sun.xacml.attr.BagAttribute;
+import com.sun.xacml.cond.EvaluationResult;
 
 import com.sleepycat.db.Environment;
 import com.sleepycat.db.EnvironmentConfig;
@@ -68,11 +67,15 @@ import com.sleepycat.dbxml.XmlResults;
 import com.sleepycat.dbxml.XmlTransaction;
 import com.sleepycat.dbxml.XmlUpdateContext;
 import com.sleepycat.dbxml.XmlValue;
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeDesignator;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.BagAttribute;
-import com.sun.xacml.cond.EvaluationResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
+import org.fcrepo.server.security.xacml.util.AttributeBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -104,14 +107,14 @@ import com.sun.xacml.cond.EvaluationResult;
  * <li>The config-dbxml.xml configuration file located in $FEDORA_HOME/pdp/conf</li>
  * </ul>
  * </p>
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public class DbXmlPolicyDataManager
         implements PolicyDataManager {
 
-    private static final Logger log =
-            Logger.getLogger(DbXmlPolicyDataManager.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DbXmlPolicyDataManager.class);
 
     private static final String XACML20_POLICY_NS =
             "urn:oasis:names:tc:xacml:2.0:policy:schema:os";
@@ -148,7 +151,7 @@ public class DbXmlPolicyDataManager
      * reads the configuration file, 'config-dbxml.xml' and initialises/creates
      * the database as required based on that configuration. Any required
      * indexes are automatically created.
-     * 
+     *
      * @throws PolicyDataManagerException
      */
     public DbXmlPolicyDataManager()
@@ -160,10 +163,10 @@ public class DbXmlPolicyDataManager
         try {
             try {
                 EnvironmentConfig envCfg = new EnvironmentConfig();
-                if (log.isDebugEnabled()) {
-                    log.debug("Lockers: " + envCfg.getMaxLockers());
-                    log.debug("LockObjects: " + envCfg.getMaxLockObjects());
-                    log.debug("Locks: " + envCfg.getMaxLocks());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Lockers: " + envCfg.getMaxLockers());
+                    logger.debug("LockObjects: " + envCfg.getMaxLockObjects());
+                    logger.debug("Locks: " + envCfg.getMaxLocks());
                 }
 
                 // envCfg.setRunRecovery(true);
@@ -231,7 +234,7 @@ public class DbXmlPolicyDataManager
                 }
 
                 txn.commit();
-                log.info("Opened Container: " + CONTAINER);
+                logger.info("Opened Container: " + CONTAINER);
 
                 queries = new HashMap<String, XmlQueryExpression>();
 
@@ -239,7 +242,7 @@ public class DbXmlPolicyDataManager
 
                 setLastUpdate(System.currentTimeMillis());
             } catch (Exception e) {
-                log.fatal("Could not start database subsystem.", e);
+                logger.error("Could not start database subsystem.", e);
                 txn.abort();
                 close();
                 throw new PolicyDataManagerException(e.getMessage(), e);
@@ -300,8 +303,8 @@ public class DbXmlPolicyDataManager
             throws PolicyDataManagerException {
         try {
             if (validator != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("validating document: " + name);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("validating document: " + name);
                 }
                 validator
                         .validate(new StreamSource(new ByteArrayInputStream(document
@@ -376,8 +379,8 @@ public class DbXmlPolicyDataManager
             throws PolicyDataManagerException {
         try {
             if (validator != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("validating document: " + name);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("validating document: " + name);
                 }
                 validator
                         .validate(new StreamSource(new ByteArrayInputStream(newDocument
@@ -471,9 +474,8 @@ public class DbXmlPolicyDataManager
                                     .setVariableValue("XacmlResourceIdValue"
                                             + c, component);
 
-                            if (log.isDebugEnabled()) {
-                                log
-                                        .debug("XacmlResourceIdValue"
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("XacmlResourceIdValue"
                                                 + resourceComponentCount + ": "
                                                 + value);
                             }
@@ -485,8 +487,8 @@ public class DbXmlPolicyDataManager
                         context.setVariableValue(t + "Id" + count,
                                                  new XmlValue(bean.getId()));
 
-                        if (log.isDebugEnabled()) {
-                            log.debug(t + "Id" + count + " = '" + bean.getId()
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(t + "Id" + count + " = '" + bean.getId()
                                     + "'");
                         }
 
@@ -496,8 +498,8 @@ public class DbXmlPolicyDataManager
                                                              + "-Value"
                                                              + valueCount,
                                                      new XmlValue(value));
-                            if (log.isDebugEnabled()) {
-                                log.debug(t + "Id" + count + "-Value"
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(t + "Id" + count + "-Value"
                                         + valueCount + " = '" + value + "'");
                             }
 
@@ -514,8 +516,8 @@ public class DbXmlPolicyDataManager
 
             b = System.nanoTime();
             total += b - a;
-            if (log.isDebugEnabled()) {
-                log.debug("Query prep. time: " + (b - a) + "ns");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Query prep. time: " + (b - a) + "ns");
             }
 
             // execute the query
@@ -523,15 +525,15 @@ public class DbXmlPolicyDataManager
             XmlResults results = qe.execute(context);
             b = System.nanoTime();
             total += b - a;
-            if (log.isDebugEnabled()) {
-                log.debug("Query exec. time: " + (b - a) + "ns");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Query exec. time: " + (b - a) + "ns");
             }
 
             // process results
             while (results.hasNext()) {
                 XmlValue value = results.next();
-                if (log.isDebugEnabled()) {
-                    log.debug("Retrieved Document: "
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Retrieved Document: "
                             + value.asDocument().getName());
                 }
                 documents.put(value.asDocument().getName(), value.asDocument()
@@ -539,8 +541,8 @@ public class DbXmlPolicyDataManager
             }
             results.delete();
 
-            if (log.isDebugEnabled()) {
-                log.debug("Total exec. time: " + total + "ns");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Total exec. time: " + total + "ns");
             }
         } catch (XmlException xe) {
             throw new PolicyDataManagerException("Error getting policies from PolicyDataManager.",
@@ -554,7 +556,7 @@ public class DbXmlPolicyDataManager
 
     /**
      * Check if the policy identified by policyName exists.
-     * 
+     *
      * @param policyName
      * @return true iff the policy store contains a policy identified as
      *         policyName
@@ -577,7 +579,7 @@ public class DbXmlPolicyDataManager
 
     /**
      * Check if the policy identified by policyName exists.
-     * 
+     *
      * @param policy
      * @return true iff the policy store contains a policy with the same
      *         PolicyId
@@ -636,22 +638,22 @@ public class DbXmlPolicyDataManager
             if (container != null) {
                 container.close();
                 container = null;
-                log.info("Closed container");
+                logger.info("Closed container");
             }
 
             if (manager != null) {
                 manager.close();
                 manager = null;
-                log.info("Closed manager");
+                logger.info("Closed manager");
             }
         } catch (Exception de) {
-            log.warn(de.getMessage());
+            logger.warn(de.getMessage());
         }
     }
 
     /**
      * Obtains the metadata for the given document.
-     * 
+     *
      * @param docIS
      *        the document as an InputStream
      * @return the document metadata as a Map
@@ -693,7 +695,7 @@ public class DbXmlPolicyDataManager
                 metadata.put("anyEnvironment", "T");
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
         }
 
         return metadata;
@@ -701,7 +703,7 @@ public class DbXmlPolicyDataManager
 
     /**
      * Creates an instance of an XmlDocument for storage in the database.
-     * 
+     *
      * @param name
      *        the name of the document (policy)
      * @param document
@@ -766,7 +768,7 @@ public class DbXmlPolicyDataManager
     /**
      * Either returns a query that has previously been generated, or generates a
      * new one if it has not.
-     * 
+     *
      * @param attributeMap
      *        the Map of attributes, type and values upon which this query is
      *        based
@@ -797,8 +799,8 @@ public class DbXmlPolicyDataManager
         // We do not have a query of those dimensions. We must make one.
         String query = createQuery(attributeMap, r);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Query [" + hash + "]:\n" + query);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Query [" + hash + "]:\n" + query);
         }
 
         // Once we have created a query, we can parse it and store the
@@ -813,7 +815,7 @@ public class DbXmlPolicyDataManager
     /**
      * Given a set of attributes this method generates a DBXML XPath query based
      * on those attributes to extract a subset of policies from the database.
-     * 
+     *
      * @param attributeMap
      *        the Map of Attributes from which to generate the query
      * @param r
@@ -911,7 +913,7 @@ public class DbXmlPolicyDataManager
     /**
      * This method extracts the attributes listed in the indexMap from the given
      * evaluation context.
-     * 
+     *
      * @param eval
      *        the Evaluation Context from which to extract Attributes
      * @return a Map of Attributes for each category (Subject, Resource, Action,
@@ -1084,15 +1086,15 @@ public class DbXmlPolicyDataManager
     /**
      * Reads a configuration file and initialises the instance based on that
      * information.
-     * 
+     *
      * @throws PolicyDataManagerException
      */
     private void initConfig() throws PolicyDataManagerException {
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             Runtime runtime = Runtime.getRuntime();
-            log.debug("Total memory: " + runtime.totalMemory() / 1024);
-            log.debug("Free memory: " + runtime.freeMemory() / 1024);
-            log.debug("Max memory: " + runtime.maxMemory() / 1024);
+            logger.debug("Total memory: " + runtime.totalMemory() / 1024);
+            logger.debug("Free memory: " + runtime.freeMemory() / 1024);
+            logger.debug("Max memory: " + runtime.maxMemory() / 1024);
         }
 
         try {
@@ -1105,7 +1107,7 @@ public class DbXmlPolicyDataManager
                         + f.getAbsolutePath());
             }
 
-            log.info("Loading config file: " + f.getAbsolutePath());
+            logger.info("Loading config file: " + f.getAbsolutePath());
 
             DocumentBuilderFactory factory =
                     DocumentBuilderFactory.newInstance();
@@ -1135,8 +1137,8 @@ public class DbXmlPolicyDataManager
                         }
                     }
 
-                    if (log.isDebugEnabled()) {
-                        log.debug("[config] " + node.getNodeName() + ": "
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("[config] " + node.getNodeName() + ": "
                                 + db_home.getAbsolutePath());
                     }
                 }
@@ -1145,8 +1147,8 @@ public class DbXmlPolicyDataManager
                             node.getAttributes().getNamedItem("name")
                                     .getNodeValue();
                     File conFile = new File(DB_HOME + "/" + CONTAINER);
-                    if (log.isDebugEnabled()) {
-                        log.debug("[config] " + node.getNodeName() + ": "
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("[config] " + node.getNodeName() + ": "
                                 + conFile.getAbsolutePath());
                     }
                 }
@@ -1168,8 +1170,8 @@ public class DbXmlPolicyDataManager
             for (int x = 0; x < nodes.getLength(); x++) {
                 Node node = nodes.item(x);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Node name: " + node.getNodeName());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Node name: " + node.getNodeName());
                     }
 
                     NodeList attrs = node.getChildNodes();
@@ -1194,17 +1196,14 @@ public class DbXmlPolicyDataManager
             nodes = schemaConfig.getChildNodes();
             if ("true".equals(schemaConfig.getAttributes()
                     .getNamedItem("validation").getNodeValue())) {
-                log.info("Initialising validation");
+                logger.info("Initialising validation");
 
                 for (int x = 0; x < nodes.getLength(); x++) {
                     Node schemaNode = nodes.item(x);
                     if (schemaNode.getNodeType() == Node.ELEMENT_NODE) {
                         if (XACML20_POLICY_NS.equals(schemaNode.getAttributes()
                                 .getNamedItem("namespace").getNodeValue())) {
-                            if (log.isDebugEnabled()) {
-                                log
-                                        .debug("found valid schema. Creating validator");
-                            }
+                            logger.debug("found valid schema. Creating validator");
                             String loc =
                                     schemaNode.getAttributes()
                                             .getNamedItem("location")
@@ -1220,9 +1219,8 @@ public class DbXmlPolicyDataManager
                 }
             }
         } catch (Exception e) {
-            log.fatal("Could not initialise DBXML: " + e.getMessage(), e);
-            throw new PolicyDataManagerException("Could not initialise DBXML: "
-                    + e.getMessage(), e);
+            logger.error("Could not initialise DBXML", e);
+            throw new PolicyDataManagerException("Could not initialise DBXML", e);
         }
     }
 
@@ -1293,8 +1291,8 @@ public class DbXmlPolicyDataManager
 
             b = System.nanoTime();
             total += b - a;
-            if (log.isDebugEnabled()) {
-                log.debug("Query prep. time: " + (b - a) + "ns");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Query prep. time: " + (b - a) + "ns");
             }
 
             a = System.nanoTime();
@@ -1302,16 +1300,16 @@ public class DbXmlPolicyDataManager
                     searchQueries[attributes.length].execute(context);
             b = System.nanoTime();
             total += b - a;
-            if (log.isDebugEnabled()) {
-                log.debug("Search exec. time: " + (b - a) + "ns");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Search exec. time: " + (b - a) + "ns");
             }
 
             a = System.nanoTime();
 
             while (results.hasNext()) {
                 XmlValue value = results.next();
-                if (log.isDebugEnabled()) {
-                    log.debug("Found search result: "
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Found search result: "
                             + value.asDocument().getName());
                 }
                 documents.put(value.asDocument().getName(), value.asDocument()
@@ -1321,13 +1319,13 @@ public class DbXmlPolicyDataManager
 
             b = System.nanoTime();
             total += b - a;
-            if (log.isDebugEnabled()) {
-                log.debug("Result proc. time: " + (b - a) + "ns");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Result proc. time: " + (b - a) + "ns");
             }
 
-            log.info("Total time: " + total + "ns");
+            logger.info("Total time: " + total + "ns");
         } catch (XmlException xe) {
-            log.error("Exception during findPolicies: " + xe.getMessage(), xe);
+            logger.error("Exception during findPolicies: " + xe.getMessage(), xe);
             throw new PolicyDataManagerException("Exception during findPolicies: "
                                                          + xe.getMessage(),
                                                  xe);

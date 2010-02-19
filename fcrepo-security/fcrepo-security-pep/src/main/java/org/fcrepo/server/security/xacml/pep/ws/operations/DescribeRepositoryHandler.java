@@ -24,7 +24,8 @@ import java.util.Map;
 
 
 import org.apache.axis.MessageContext;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -35,15 +36,14 @@ import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
 
-
 /**
  * @author nishen@melcoe.mq.edu.au
  */
 public class DescribeRepositoryHandler
         extends AbstractOperationHandler {
 
-    private static Logger log =
-            Logger.getLogger(DescribeRepositoryHandler.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DescribeRepositoryHandler.class);
 
     public DescribeRepositoryHandler()
             throws PEPException {
@@ -57,7 +57,7 @@ public class DescribeRepositoryHandler
 
     public RequestCtx handleRequest(MessageContext context)
             throws OperationHandlerException {
-        log.debug("DescribeRepositoryHandler/handleRequest!");
+        logger.debug("DescribeRepositoryHandler/handleRequest!");
 
         RequestCtx req = null;
 
@@ -90,7 +90,7 @@ public class DescribeRepositoryHandler
                             "FedoraRepository",
                             null);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw new OperationHandlerException(e.getMessage(), e);
         }
 

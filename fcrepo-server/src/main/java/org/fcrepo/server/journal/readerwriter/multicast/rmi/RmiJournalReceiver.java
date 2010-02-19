@@ -16,29 +16,18 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
-import org.apache.log4j.lf5.LogLevel;
-
 import org.fcrepo.server.journal.JournalException;
 import org.fcrepo.server.journal.readerwriter.multicast.TransportOutputFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
- * <p>
- * <b>Title:</b> RmiJournalReceiver.java
- * </p>
- * <p>
- * <b>Description:</b> A free-standing RMI server that receives journal
- * messages from an RmiTransport and writes them to files in a specified
- * directory.
- * </p>
+ * A free-standing RMI server that receives journal messages from an
+ * RmiTransport and writes them to files in a specified directory.
  * <p>
  * Note: command-line arguments are specified in
  * {@link RmiJournalReceiverArguments}.
- * </p>
  *
  * @author jblake
  * @version $Id: RmiJournalReceiver.java,v 1.4 2007/06/21 15:59:53 jblake Exp $
@@ -48,8 +37,8 @@ public class RmiJournalReceiver
         extends UnicastRemoteObject
         implements RmiJournalReceiverInterface {
 
-    private static final Logger LOG =
-            Logger.getLogger(RmiJournalReceiver.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(RmiJournalReceiver.class);
 
     /** The parsed arguments from the command line. */
     private final RmiJournalReceiverArguments arguments;
@@ -74,30 +63,13 @@ public class RmiJournalReceiver
     private String currentRepositoryHash;
 
     /**
-     * On creation, parse the arguments and initialize Log4J for the
-     * application.
+     * On creation, parse the arguments.
      */
     public RmiJournalReceiver(RmiJournalReceiverArguments arguments)
             throws RemoteException {
         super(arguments.getServerPortNumber());
         this.arguments = arguments;
         directory = arguments.getDirectoryPath();
-        initializeLog4J(arguments.getLogLevel());
-    }
-
-    /**
-     * Set the logger to write to the console, at whatever level the user
-     * specified in the command line argumements.
-     */
-    private void initializeLog4J(LogLevel logLevel) {
-        ConsoleAppender appender =
-                new ConsoleAppender(new SimpleLayout(), "System.out");
-        appender.setName("Console");
-        appender.activateOptions();
-
-        Logger root = Logger.getRootLogger();
-        root.addAppender(appender);
-        root.setLevel(Level.toLevel(logLevel.getLabel()));
     }
 
     /**
@@ -110,7 +82,7 @@ public class RmiJournalReceiver
                         .createRegistry(arguments.getRegistryPortNumber());
         registry.rebind(RMI_BINDING_NAME, this);
         Thread.sleep(2000);
-        LOG.info("RmiJournalReceiver is ready - journal directory is '"
+        logger.info("RmiJournalReceiver is ready - journal directory is '"
                 + arguments.getDirectoryPath().getAbsolutePath() + "'");
     }
 
@@ -139,7 +111,7 @@ public class RmiJournalReceiver
 
         currentRepositoryHash = repositoryHash;
         itemIndex = 0;
-        LOG.debug("opened file '" + filename + "', hash is '" + repositoryHash
+        logger.debug("opened file '" + filename + "', hash is '" + repositoryHash
                 + "'");
     }
 
@@ -163,7 +135,7 @@ public class RmiJournalReceiver
                 RmiJournalReceiverHelper
                         .figureIndexedHash(currentRepositoryHash, itemIndex);
         if (!calculatedHash.equals(indexedHash)) {
-            LOG.debug("calculatedHash='" + calculatedHash + "', providedHash='"
+            logger.debug("calculatedHash='" + calculatedHash + "', providedHash='"
                     + indexedHash + "'");
             throw logAndGetException("indexed hash is incorrect.");
         }
@@ -176,7 +148,7 @@ public class RmiJournalReceiver
                     + journalFile.getName() + "'", e);
         }
 
-        LOG.debug("Wrote item #" + itemIndex + " to file '"
+        logger.debug("Wrote item #" + itemIndex + " to file '"
                 + journalFile.getName() + "'");
         itemIndex++;
     }
@@ -202,17 +174,17 @@ public class RmiJournalReceiver
                     + journalFile.getName() + "'", e);
         }
 
-        LOG.debug("closing file: '" + journalFile.getName() + "'");
+        logger.debug("closing file: '" + journalFile.getName() + "'");
         journalFile = null;
     }
 
     private JournalException logAndGetException(String message) {
-        LOG.error(message);
+        logger.error(message);
         return new JournalException(message);
     }
 
     private JournalException logAndGetException(String message, Throwable e) {
-        LOG.error(message, e);
+        logger.error(message, e);
         return new JournalException(message + ": " + e.toString());
     }
 

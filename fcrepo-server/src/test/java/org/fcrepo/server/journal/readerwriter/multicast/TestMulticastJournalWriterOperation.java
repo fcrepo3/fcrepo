@@ -14,10 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
-import org.apache.log4j.WriterAppender;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,7 +24,6 @@ import org.fcrepo.server.journal.JournalWriter;
 import org.fcrepo.server.journal.MockServerForJournalTesting;
 import org.fcrepo.server.journal.ServerInterface;
 import org.fcrepo.server.management.MockManagementDelegate;
-
 
 import static org.fcrepo.server.journal.readerwriter.multicast.MulticastJournalWriter.TRANSPORT_PARAMETER_PREFIX;
 import static org.junit.Assert.assertEquals;
@@ -80,24 +75,6 @@ public class TestMulticastJournalWriterOperation {
     @Before
     public void initializeJournalOperatingMode() {
         JournalOperatingMode.setMode(JournalOperatingMode.NORMAL);
-    }
-
-    @Before
-    public void initializeLog4j() {
-        logWriter = new StringWriter();
-        SimpleLayout myLayout = new SimpleLayout() {
-
-            // Just eat the Throwable object in the LogEvent
-            @Override
-            public boolean ignoresThrowable() {
-                return false;
-            }
-
-        };
-        WriterAppender myAppender = new WriterAppender(myLayout, logWriter);
-        myAppender.setImmediateFlush(true);
-        Logger root = Logger.getRootLogger();
-        root.addAppender(myAppender);
     }
 
     @Test

@@ -4,8 +4,6 @@ package org.fcrepo.test.fesl.policy;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-import org.apache.log4j.Logger;
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -21,13 +19,16 @@ import org.fcrepo.test.fesl.util.FedoraUtil;
 import org.fcrepo.test.fesl.util.HttpUtils;
 import org.fcrepo.test.fesl.util.LoadDataset;
 import org.fcrepo.test.fesl.util.RemoveDataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import junit.framework.JUnit4TestAdapter;
 
 
 public class TestPolicies {
 
-    private static final Logger log = Logger.getLogger(TestPolicies.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(TestPolicies.class);
 
     private static final String PROPERTIES = "fedora";
 
@@ -52,8 +53,8 @@ public class TestPolicies {
         String fedoraUrl = FedoraUtil.getBaseURL();
 
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Setting up...");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Setting up...");
             }
 
             polMan = new DbXmlPolicyDataManager();
@@ -69,7 +70,7 @@ public class TestPolicies {
             // Now that objects are loaded, remove the policy
             delPolicy(policyId);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             Assert.fail(e.getMessage());
         }
     }
@@ -77,8 +78,8 @@ public class TestPolicies {
     @AfterClass
     public static void teardown() {
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Tearing down...");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Tearing down...");
             }
 
             polMan = new DbXmlPolicyDataManager();
@@ -91,7 +92,7 @@ public class TestPolicies {
             // Now that objects are loaded, remove the policy
             delPolicy(policyId);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             Assert.fail(e.getMessage());
         }
     }
@@ -106,8 +107,8 @@ public class TestPolicies {
         try {
             String url = "/fedora/objects/test:1000007?format=xml";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             // If we get here, we fail... should have thrown exception
@@ -129,8 +130,8 @@ public class TestPolicies {
         try {
             String url = "/fedora/objects/test:1000007?format=xml";
             String response = httpUtils.get(url);
-            if (log.isDebugEnabled()) {
-                log.debug("http response:\n" + response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("http response:\n" + response);
             }
 
             boolean check = response.contains("<objLabel>Dexter</objLabel>");

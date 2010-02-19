@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security;
@@ -25,7 +25,8 @@ import com.sun.xacml.attr.TimeAttribute;
 import com.sun.xacml.cond.EvaluationResult;
 import com.sun.xacml.ctx.Status;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -33,9 +34,8 @@ import org.apache.log4j.Logger;
 abstract class AttributeFinderModule
         extends com.sun.xacml.finder.AttributeFinderModule {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(AttributeFinderModule.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(AttributeFinderModule.class);
 
     private ServletContext servletContext = null;
 
@@ -62,7 +62,7 @@ abstract class AttributeFinderModule
     private Boolean instantiatedOk = null;
 
     protected final void setInstantiatedOk(boolean value) {
-        LOG.debug("setInstantiatedOk() " + value);
+        logger.debug("setInstantiatedOk() " + value);
         if (instantiatedOk == null) {
             instantiatedOk = new Boolean(value);
         }
@@ -70,7 +70,7 @@ abstract class AttributeFinderModule
 
     @Override
     public boolean isDesignatorSupported() {
-        LOG.debug("isDesignatorSupported() will return " + iAm() + " "
+        logger.debug("isDesignatorSupported() will return " + iAm() + " "
                 + (instantiatedOk != null && instantiatedOk.booleanValue()));
         return instantiatedOk != null && instantiatedOk.booleanValue();
     }
@@ -78,45 +78,45 @@ abstract class AttributeFinderModule
     private final boolean parmsOk(URI attributeType,
                                   URI attributeId,
                                   int designatorType) {
-        LOG.debug("in parmsOk " + iAm());
+        logger.debug("in parmsOk " + iAm());
         if (!getSupportedDesignatorTypes()
                 .contains(new Integer(designatorType))) {
-            LOG.debug("AttributeFinder:parmsOk" + iAm() + " exit on "
+            logger.debug("AttributeFinder:parmsOk" + iAm() + " exit on "
                     + "target not supported");
             return false;
         }
 
         if (attributeType == null) {
-            LOG.debug("AttributeFinder:parmsOk" + iAm() + " exit on "
+            logger.debug("AttributeFinder:parmsOk" + iAm() + " exit on "
                     + "null attributeType");
             return false;
         }
 
         if (attributeId == null) {
-            LOG.debug("AttributeFinder:parmsOk" + iAm() + " exit on "
+            logger.debug("AttributeFinder:parmsOk" + iAm() + " exit on "
                     + "null attributeId");
             return false;
         }
 
-        LOG.debug("AttributeFinder:parmsOk" + iAm() + " looking for "
+        logger.debug("AttributeFinder:parmsOk" + iAm() + " looking for "
                 + attributeId.toString());
         showRegisteredAttributes();
 
         if (hasAttribute(attributeId.toString())) {
             if (!getAttributeType(attributeId.toString()).equals(attributeType
                     .toString())) {
-                LOG.debug("AttributeFinder:parmsOk" + iAm() + " exit on "
+                logger.debug("AttributeFinder:parmsOk" + iAm() + " exit on "
                         + "attributeType incorrect for attributeId");
                 return false;
             }
         } else {
             if (!StringAttribute.identifier.equals(attributeType.toString())) {
-                LOG.debug("AttributeFinder:parmsOk" + iAm() + " exit on "
+                logger.debug("AttributeFinder:parmsOk" + iAm() + " exit on "
                         + "attributeType incorrect for attributeId");
                 return false;
             }
         }
-        LOG.debug("exiting parmsOk normally " + iAm());
+        logger.debug("exiting parmsOk normally " + iAm());
         return true;
     }
 
@@ -135,7 +135,7 @@ abstract class AttributeFinderModule
      * context
      */) {
         if (attribute.indeterminate()) {
-            LOG.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
+            logger.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
                     + " exit on "
                     + "couldn't get resource attribute from xacml request "
                     + "indeterminate");
@@ -144,7 +144,7 @@ abstract class AttributeFinderModule
 
         if (attribute.getStatus() != null
                 && !Status.STATUS_OK.equals(attribute.getStatus())) {
-            LOG.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
+            logger.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
                     + " exit on "
                     + "couldn't get resource attribute from xacml request "
                     + "bad status");
@@ -153,7 +153,7 @@ abstract class AttributeFinderModule
 
         AttributeValue attributeValue = attribute.getAttributeValue();
         if (!(attributeValue instanceof BagAttribute)) {
-            LOG.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
+            logger.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
                     + " exit on "
                     + "couldn't get resource attribute from xacml request "
                     + "no bag");
@@ -162,7 +162,7 @@ abstract class AttributeFinderModule
 
         BagAttribute bag = (BagAttribute) attributeValue;
         if (1 != bag.size()) {
-            LOG.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
+            logger.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
                     + " exit on "
                     + "couldn't get resource attribute from xacml request "
                     + "wrong bag n=" + bag.size());
@@ -173,7 +173,7 @@ abstract class AttributeFinderModule
         Object element = it.next();
 
         if (element == null) {
-            LOG.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
+            logger.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
                     + " exit on "
                     + "couldn't get resource attribute from xacml request "
                     + "null returned");
@@ -181,18 +181,18 @@ abstract class AttributeFinderModule
         }
 
         if (it.hasNext()) {
-            LOG.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
+            logger.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
                     + " exit on "
                     + "couldn't get resource attribute from xacml request "
                     + "too many returned");
-            LOG.debug(element.toString());
+            logger.debug(element.toString());
             while (it.hasNext()) {
-                LOG.debug(it.next().toString());
+                logger.debug(it.next().toString());
             }
             return null;
         }
 
-        LOG.debug("AttributeFinder:getAttributeFromEvaluationCtx " + iAm()
+        logger.debug("AttributeFinder:getAttributeFromEvaluationCtx " + iAm()
                 + " returning " + element.toString());
         return element;
     }
@@ -210,7 +210,7 @@ abstract class AttributeFinderModule
 
     protected final void registerAttribute(String id, String type)
             throws URISyntaxException {
-        LOG.debug("registering attribute " + iAm() + " " + id);
+        logger.debug("registering attribute " + iAm() + " " + id);
         attributeIdUris.put(id, new URI(id));
         attributeTypeUris.put(id, new URI(type));
         attributeTypes.put(id, type);
@@ -228,7 +228,7 @@ abstract class AttributeFinderModule
         Iterator it = attributeIdUris.keySet().iterator();
         while (it.hasNext()) {
             String key = (String) it.next();
-            LOG.debug("another registered attribute  = " + iAm() + " " + key);
+            logger.debug("another registered attribute  = " + iAm() + " " + key);
         }
     }
 
@@ -246,18 +246,18 @@ abstract class AttributeFinderModule
             new HashSet<Integer>();
 
     protected final void registerSupportedDesignatorType(int designatorType) {
-        LOG.debug("registerSupportedDesignatorType() " + iAm());
+        logger.debug("registerSupportedDesignatorType() " + iAm());
         supportedDesignatorTypes.add(designatorType);
     }
 
     @Override
     public Set getSupportedDesignatorTypes() {
         if (instantiatedOk != null && instantiatedOk.booleanValue()) {
-            LOG.debug("getSupportedDesignatorTypes() will return " + iAm()
+            logger.debug("getSupportedDesignatorTypes() will return " + iAm()
                     + " set of elements, n=" + supportedDesignatorTypes.size());
             return supportedDesignatorTypes;
         }
-        LOG.debug("getSupportedDesignatorTypes() will return " + iAm()
+        logger.debug("getSupportedDesignatorTypes() will return " + iAm()
                 + "NULLSET");
         return NULLSET;
     }
@@ -267,23 +267,23 @@ abstract class AttributeFinderModule
     private final boolean willService(URI attributeId) {
         String temp = attributeId.toString();
         if (hasAttribute(temp)) {
-            LOG.debug("willService() " + iAm()
+            logger.debug("willService() " + iAm()
                     + " accept this known serviced attribute "
                     + attributeId.toString());
             return true;
         }
         if (!canHandleAdhoc()) {
-            LOG.debug("willService() " + iAm() + " deny any adhoc attribute "
+            logger.debug("willService() " + iAm() + " deny any adhoc attribute "
                     + attributeId.toString());
             return false;
         }
         if (attributesDenied.contains(temp)) {
-            LOG.debug("willService() " + iAm()
+            logger.debug("willService() " + iAm()
                     + " deny this known adhoc attribute "
                     + attributeId.toString());
             return false;
         }
-        LOG.debug("willService() " + iAm()
+        logger.debug("willService() " + iAm()
                 + " allow this unknown adhoc attribute "
                 + attributeId.toString());
         return true;
@@ -296,12 +296,12 @@ abstract class AttributeFinderModule
                                           URI category,
                                           EvaluationCtx context,
                                           int designatorType) {
-        LOG.debug("AttributeFinder:findAttribute " + iAm());
-        LOG.debug("attributeType=[" + attributeType + "], attributeId=["
+        logger.debug("AttributeFinder:findAttribute " + iAm());
+        logger.debug("attributeType=[" + attributeType + "], attributeId=["
                 + attributeId + "]" + iAm());
 
         if (!parmsOk(attributeType, attributeId, designatorType)) {
-            LOG.debug("AttributeFinder:findAttribute" + " exit on "
+            logger.debug("AttributeFinder:findAttribute" + " exit on "
                     + "parms not ok" + iAm());
             if (attributeType == null) {
                 try {
@@ -315,29 +315,29 @@ abstract class AttributeFinderModule
         }
 
         if (!willService(attributeId)) {
-            LOG.debug("AttributeFinder:willService() " + iAm()
+            logger.debug("AttributeFinder:willService() " + iAm()
                     + " returns false" + iAm());
             return new EvaluationResult(BagAttribute
                     .createEmptyBag(attributeType));
         }
 
         if (category != null) {
-            LOG.debug("++++++++++ AttributeFinder:findAttribute " + iAm()
+            logger.debug("++++++++++ AttributeFinder:findAttribute " + iAm()
                     + " category=" + category.toString());
         }
-        LOG.debug("++++++++++ AttributeFinder:findAttribute " + iAm()
+        logger.debug("++++++++++ AttributeFinder:findAttribute " + iAm()
                 + " designatorType=" + designatorType);
 
-        LOG.debug("about to get temp " + iAm());
+        logger.debug("about to get temp " + iAm());
         Object temp =
                 getAttributeLocally(designatorType,
                                     attributeId.toASCIIString(),
                                     category,
                                     context);
-        LOG.debug(iAm() + " got temp=" + temp);
+        logger.debug(iAm() + " got temp=" + temp);
 
         if (temp == null) {
-            LOG.debug("AttributeFinder:findAttribute" + " exit on "
+            logger.debug("AttributeFinder:findAttribute" + " exit on "
                     + "attribute value not found" + iAm());
             return new EvaluationResult(BagAttribute
                     .createEmptyBag(attributeType));
@@ -345,7 +345,7 @@ abstract class AttributeFinderModule
 
         Set<AttributeValue> set = new HashSet<AttributeValue>();
         if (temp instanceof String) {
-            LOG.debug("AttributeFinder:findAttribute" + " will return a "
+            logger.debug("AttributeFinder:findAttribute" + " will return a "
                     + "String " + iAm());
             if (attributeType.toString().equals(StringAttribute.identifier)) {
                 set.add(new StringAttribute((String) temp));
@@ -386,9 +386,9 @@ abstract class AttributeFinderModule
                 } catch (Throwable t) {
                 }
             } //xacml fixup
-            //was set.add(new StringAttribute((String)temp));            
+            //was set.add(new StringAttribute((String)temp));
         } else if (temp instanceof String[]) {
-            LOG.debug("AttributeFinder:findAttribute" + " will return a "
+            logger.debug("AttributeFinder:findAttribute" + " will return a "
                     + "String[] " + iAm());
             for (int i = 0; i < ((String[]) temp).length; i++) {
                 if (((String[]) temp)[i] == null) {
@@ -398,7 +398,7 @@ abstract class AttributeFinderModule
                     set.add(new StringAttribute(((String[]) temp)[i]));
                 } else if (attributeType.toString()
                         .equals(DateTimeAttribute.identifier)) {
-                    LOG.debug("USING AS DATETIME:" + ((String[]) temp)[i]);
+                    logger.debug("USING AS DATETIME:" + ((String[]) temp)[i]);
                     DateTimeAttribute tempDateTimeAttribute;
                     try {
                         tempDateTimeAttribute =
@@ -409,7 +409,7 @@ abstract class AttributeFinderModule
                     }
                 } else if (attributeType.toString()
                         .equals(DateAttribute.identifier)) {
-                    LOG.debug("USING AS DATE:" + ((String[]) temp)[i]);
+                    logger.debug("USING AS DATE:" + ((String[]) temp)[i]);
                     DateAttribute tempDateAttribute;
                     try {
                         tempDateAttribute =
@@ -419,7 +419,7 @@ abstract class AttributeFinderModule
                     }
                 } else if (attributeType.toString()
                         .equals(TimeAttribute.identifier)) {
-                    LOG.debug("USING AS TIME:" + ((String[]) temp)[i]);
+                    logger.debug("USING AS TIME:" + ((String[]) temp)[i]);
                     TimeAttribute tempTimeAttribute;
                     try {
                         tempTimeAttribute =
@@ -429,7 +429,7 @@ abstract class AttributeFinderModule
                     }
                 } else if (attributeType.toString()
                         .equals(IntegerAttribute.identifier)) {
-                    LOG.debug("USING AS INTEGER:" + ((String[]) temp)[i]);
+                    logger.debug("USING AS INTEGER:" + ((String[]) temp)[i]);
                     IntegerAttribute tempIntegerAttribute;
                     try {
                         tempIntegerAttribute =

@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.messaging;
@@ -10,9 +10,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -24,8 +26,9 @@ import org.apache.abdera.model.Category;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.parser.Parser;
-import org.apache.log4j.Logger;
+
 import org.dom4j.DocumentException;
+
 import org.trippi.RDFFormat;
 import org.trippi.TrippiException;
 
@@ -34,6 +37,8 @@ import org.fcrepo.server.errors.MessagingException;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.storage.types.TupleArrayTripleIterator;
 import org.fcrepo.server.utilities.DateUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -67,9 +72,9 @@ import org.fcrepo.server.utilities.DateUtility;
  * repository, e.g. http://localhost:8080/fedora.</li>
  * <li>atom:summary corresponds to the PID of the method, if applicable.</li>
  * </ul>
- * 
+ *
  * @see <a href="http://atomenabled.org/developers/syndication/atom-format-spec.php">The Atom Syndication Format</a>
- * 
+ *
  * @author Edwin Shin
  * @since 3.0
  * @version $Id$
@@ -77,33 +82,32 @@ import org.fcrepo.server.utilities.DateUtility;
 public class AtomAPIMMessage
         implements APIMMessage {
 
-    /** Logger for this class. */
-    private static Logger LOG =
-            Logger.getLogger(AtomAPIMMessage.class.getName());
-    
-    private Abdera abdera = Abdera.getInstance();
+    private static final Logger logger =
+            LoggerFactory.getLogger(AtomAPIMMessage.class);
+
+    private final Abdera abdera = Abdera.getInstance();
 
     private final static String TYPES_NS = Constants.TYPES.uri;
 
     private final static String TYPES_PREFIX = "fedora-types";
-    
+
     private final static String versionPredicate = Constants.VIEW.VERSION.uri;
-    
+
     private final static String formatPredicate = "http://www.fedora.info/definitions/1/0/types/formatURI";
-    
+
     private static FedoraTypes fedoraTypes;
-    
-    private String fedoraBaseUrl;
-    
-    private String serverVersion;
 
-    private String format;
+    private final String fedoraBaseUrl;
 
-    private String methodName;
+    private final String serverVersion;
 
-    private String pid;
+    private final String format;
 
-    private Date date;
+    private final String methodName;
+
+    private final String pid;
+
+    private final Date date;
 
     private String author;
 
@@ -111,9 +115,9 @@ public class AtomAPIMMessage
 
     private Object[] args;
 
-    private Object returnVal;
+    private final Object returnVal;
 
-    private Entry entry;
+    private final Entry entry;
 
     public AtomAPIMMessage(FedoraMethod method, String fedoraBaseUrl, String serverVersion, String format)
             throws MessagingException {
@@ -132,7 +136,7 @@ public class AtomAPIMMessage
         this.fedoraBaseUrl = fedoraBaseUrl;
         this.serverVersion = serverVersion;
         this.format = format;
-        methodName = method.getName();        
+        methodName = method.getName();
         pid = method.getPID() == null ? "" : method.getPID().toString();
         date = method.getDate() == null ? new Date() : method.getDate();
 
@@ -157,7 +161,7 @@ public class AtomAPIMMessage
             entry.setSummary(pid);
         }
         setReturnValue();
-        
+
         if (serverVersion != null && !serverVersion.equals(""))
             entry.addCategory(versionPredicate, serverVersion, null);
         if (format != null && !format.equals(""))
@@ -175,7 +179,7 @@ public class AtomAPIMMessage
 
         pid = entry.getSummary();
         returnVal = entry.getContent();
-        
+
         serverVersion = getCategoryTerm(versionPredicate);
         format = getCategoryTerm(formatPredicate);
     }
@@ -183,7 +187,7 @@ public class AtomAPIMMessage
     private void setEntryId() {
         entry.setId("urn:uuid:" + UUID.randomUUID().toString());
     }
-    
+
     /**
      * Set the entry's atom:author element using author from the Context
      * if it was available. Set the author:uri to fedoraBaseUrl.
@@ -210,8 +214,8 @@ public class AtomAPIMMessage
                 entry.addCategory(scheme, objectToString(args[i], datatype), datatype);
             } else {
                 // parameters not defined in the WSDL are silently dropped (e.g. Context)
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Silently dropping parameter not defined in the WSDL: " + parameter);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Silently dropping parameter not defined in the WSDL: " + parameter);
                 }
             }
         }
@@ -224,11 +228,11 @@ public class AtomAPIMMessage
         String term = objectToString(returnVal, datatype);
         entry.setContent(term);
     }
-    
+
     /**
-     * Get the String value of an object based on its class or 
+     * Get the String value of an object based on its class or
      * XML Schema Datatype.
-     * 
+     *
      * @param obj
      * @param xsdType
      * @return
@@ -236,7 +240,7 @@ public class AtomAPIMMessage
     private String objectToString(Object obj, String xsdType) {
         if (obj == null) {
             return "null";
-        }      
+        }
         String javaType = obj.getClass().getCanonicalName();
         String term;
         if (javaType.equals("java.util.Date")) {
@@ -271,19 +275,20 @@ public class AtomAPIMMessage
     /**
      * Serialization of the API-M message as an Atom entry. {@inheritDoc}
      */
+    @Override
     public String toString() {
         Writer sWriter = new StringWriter();
 
         try {
             entry.writeTo("prettyxml", sWriter);
         } catch (IOException e) {
-            LOG.error(e.getMessage());
+            logger.error(e.getMessage());
         }
         return sWriter.toString();
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     public String getBaseUrl() {
@@ -291,7 +296,7 @@ public class AtomAPIMMessage
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     public Date getDate() {
@@ -299,15 +304,15 @@ public class AtomAPIMMessage
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     public String getMethodName() {
         return methodName;
     }
-    
+
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     public String getPID() {
@@ -317,23 +322,23 @@ public class AtomAPIMMessage
     public String getAuthor() {
         return author;
     }
-    
+
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     public String getFormat() {
         return format;
     }
-    
+
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     public String getServerVersion() {
         return serverVersion;
     }
-    
+
     private static <A extends Annotation> A getParameterAnnotation(Method m,
                                                                    int paramIndex,
                                                                    Class<A> annot) {
@@ -342,11 +347,11 @@ public class AtomAPIMMessage
         }
         return null;
     }
-    
+
     /**
      * Get the name of a method parameter via its <code>PName</code> annotation.
-     * 
-     * @param m 
+     *
+     * @param m
      * @param paramIndex the index of the parameter array.
      * @return the parameter name or an empty string if not available.
      */
@@ -383,10 +388,10 @@ public class AtomAPIMMessage
         }
         return sb.toString();
     }
-    
+
     /**
      * Get the first atom:category term that matches the provided scheme.
-     * 
+     *
      * @param scheme
      * @return the term or null if no match.
      */

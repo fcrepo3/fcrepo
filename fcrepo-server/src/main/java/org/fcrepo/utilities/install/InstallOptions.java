@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,8 +35,6 @@ public class InstallOptions {
     public static final String APIM_SSL_REQUIRED = "apim.ssl.required";
 
     public static final String SERVLET_ENGINE = "servlet.engine";
-
-    public static final String USING_JBOSS = "jboss";
 
     public static final String TOMCAT_HOME = "tomcat.home";
 
@@ -187,7 +186,6 @@ public class InstallOptions {
             _map.put(RI_ENABLED, null); // false
             _map.put(MESSAGING_ENABLED, null); // false
             _map.put(DEPLOY_LOCAL_SERVICES, null); // true
-            _map.put(USING_JBOSS, null); // included
             applyDefaults();
             return;
         }
@@ -203,9 +201,7 @@ public class InstallOptions {
             inputOption(APIM_SSL_REQUIRED);
         }
         inputOption(SERVLET_ENGINE);
-        if (getValue(SERVLET_ENGINE).equals(OTHER)) {
-            inputOption(USING_JBOSS);
-        } else {
+        if (!getValue(SERVLET_ENGINE).equals(OTHER)) {
             inputOption(TOMCAT_HOME);
             inputOption(TOMCAT_HTTP_PORT);
             inputOption(TOMCAT_SHUTDOWN_PORT);

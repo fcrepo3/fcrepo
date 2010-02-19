@@ -7,9 +7,6 @@ package org.fcrepo.server.journal.readerwriter.multicast.rmi;
 
 import java.io.File;
 
-import org.apache.log4j.lf5.LogLevel;
-import org.apache.log4j.lf5.LogLevelFormatException;
-
 /**
  * <p>
  * RmiJournalReceiverArguments.java
@@ -35,16 +32,13 @@ public class RmiJournalReceiverArguments {
 
     private final int serverPortNumber;
 
-    private final LogLevel logLevel;
-
     public RmiJournalReceiverArguments(String[] args) {
         if (args.length < 1) {
-            throw new IllegalArgumentException("usage: RmiJournalReceiver [fullDirectoryPath] {registryPort} {serverPort} {logLevel}");
+            throw new IllegalArgumentException("usage: RmiJournalReceiver [fullDirectoryPath] {registryPort} {serverPort}");
         }
         directoryPath = parseDirectoryPath(args);
         registryPortNumber = parseRegistryPortNumber(args);
         serverPortNumber = parseServerPortNumber(args);
-        logLevel = parseLogLevel(args);
     }
 
     private File parseDirectoryPath(String[] args) {
@@ -90,19 +84,6 @@ public class RmiJournalReceiverArguments {
         }
     }
 
-    private LogLevel parseLogLevel(String[] args) {
-        if (args.length < 4) {
-            return LogLevel.WARN;
-        } else {
-            try {
-                return LogLevel.valueOf(args[3]);
-            } catch (LogLevelFormatException e) {
-                throw new IllegalArgumentException("'" + args[3]
-                        + "' is not a valid log level.");
-            }
-        }
-    }
-
     public File getDirectoryPath() {
         return directoryPath;
     }
@@ -113,10 +94,6 @@ public class RmiJournalReceiverArguments {
 
     public int getServerPortNumber() {
         return serverPortNumber;
-    }
-
-    public LogLevel getLogLevel() {
-        return logLevel;
     }
 
 }

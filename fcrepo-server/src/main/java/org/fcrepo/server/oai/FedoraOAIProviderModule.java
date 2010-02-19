@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.oai.BadResumptionTokenException;
 import org.fcrepo.oai.CannotDisseminateFormatException;
 import org.fcrepo.oai.DateGranularitySupport;
@@ -27,8 +25,8 @@ import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.search.FieldSearch;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An OAIProvider that acts as a server module and wraps FedoraOAIProvider.
@@ -40,9 +38,8 @@ public class FedoraOAIProviderModule
         extends Module
         implements OAIProvider {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(FedoraOAIProviderModule.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(FedoraOAIProviderModule.class);
 
     private FedoraOAIProvider m_wrappedOAIProvider;
 
@@ -148,8 +145,7 @@ public class FedoraOAIProviderModule
             try {
                 maxRecords = Long.parseLong(maxRecordsString);
                 if (maxRecords > maxResults) {
-                    LOG
-                            .warn("maxRecords was over the limit given by the FieldSearch module, using highest possible value: "
+                    logger.warn("maxRecords was over the limit given by the FieldSearch module, using highest possible value: "
                                     + maxResults);
                     maxRecords = maxResults;
                 }
@@ -163,8 +159,7 @@ public class FedoraOAIProviderModule
             try {
                 maxHeaders = Long.parseLong(maxHeadersString);
                 if (maxHeaders > maxResults) {
-                    LOG
-                            .warn("maxHeaders was over the limit given by the FieldSearch module, using highest possible value: "
+                    logger.warn("maxHeaders was over the limit given by the FieldSearch module, using highest possible value: "
                                     + maxResults);
                     maxHeaders = maxResults;
                 }

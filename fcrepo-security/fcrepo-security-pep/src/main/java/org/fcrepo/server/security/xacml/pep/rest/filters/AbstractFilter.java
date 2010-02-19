@@ -20,6 +20,7 @@ package org.fcrepo.server.security.xacml.pep.rest.filters;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,29 +30,28 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-
-import org.apache.log4j.Logger;
+import com.sun.xacml.attr.AttributeValue;
+import com.sun.xacml.attr.StringAttribute;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
 import org.fcrepo.server.security.xacml.pep.PEPException;
-
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * This is the AbstractFilter class which provides generic functionality for all
  * REST filters. All REST filters should extend this class.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public abstract class AbstractFilter
         implements RESTFilter {
 
-    private static Logger log =
-            Logger.getLogger(AbstractFilter.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(AbstractFilter.class);
 
     private static ContextHandler contextHandlerImpl;
 
@@ -66,7 +66,7 @@ public abstract class AbstractFilter
 
     /**
      * Default constructor obtains an instance of the Context Handler.
-     * 
+     *
      * @throws PEPException
      */
     public AbstractFilter()
@@ -84,7 +84,7 @@ public abstract class AbstractFilter
     /**
      * Creates a list of Subjects from a servlet request. If no subject is found
      * a subject called 'anonymous' is created.
-     * 
+     *
      * @param request
      *        the servlet request
      * @return a list of Subjects
@@ -157,7 +157,7 @@ public abstract class AbstractFilter
             }
             subjects.add(subAttr);
         } catch (URISyntaxException use) {
-            log.error(use.getMessage(), use);
+            logger.error(use.getMessage(), use);
             throw new ServletException(use);
         }
 
@@ -166,7 +166,7 @@ public abstract class AbstractFilter
 
     /**
      * Returns a list of environment attributes.
-     * 
+     *
      * @param request
      *        the servlet request from which to obtain the attributes
      * @return a list of environment attributes
@@ -185,7 +185,7 @@ public abstract class AbstractFilter
 
     /**
      * Function to determine whether a parameter is a PID.
-     * 
+     *
      * @param item
      *        the uri parameter
      */
@@ -202,7 +202,7 @@ public abstract class AbstractFilter
     /**
      * Function to determine whether a parameter is a datastream or a
      * dissemination.
-     * 
+     *
      * @param item
      *        the uri parameter
      */
@@ -218,7 +218,7 @@ public abstract class AbstractFilter
 
     /**
      * Checks whether a parameter fits the date pattern.
-     * 
+     *
      * @param item
      *        the date
      * @return returns true if the string is a date or else false

@@ -12,17 +12,14 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.XPath;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.utilities.XMLDocument;
-
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for retrieving the XML Schema Datatypes associated with
@@ -34,9 +31,9 @@ import org.fcrepo.utilities.XMLDocument;
  */
 public class FedoraTypes
         extends XMLDocument {
-    /** Logger for this class. */
-    private static Logger LOG =
-            Logger.getLogger(FedoraTypes.class.getName());
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(FedoraTypes.class);
 
     private final Map<String, String> method2datatype = new HashMap<String, String>();
     private final Map<String, String> response2parameter = new HashMap<String, String>();
@@ -101,7 +98,7 @@ public class FedoraTypes
             xsd = new FileInputStream(new File(new File(fedoraHome),
                                                "server/xsd/fedora-types.xsd"));
         } catch (FileNotFoundException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
             xsd = new FileInputStream("server/src/main/resources/xsd/fedora-types.xsd");
         }
         return xsd;

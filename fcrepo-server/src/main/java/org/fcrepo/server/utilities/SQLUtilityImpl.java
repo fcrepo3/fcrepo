@@ -21,11 +21,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.config.DatastoreConfiguration;
 import org.fcrepo.server.errors.InconsistentTableSpecException;
 import org.fcrepo.server.storage.ConnectionPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -38,7 +38,8 @@ import org.fcrepo.server.storage.ConnectionPool;
 class SQLUtilityImpl
         extends SQLUtility {
 
-    private static final Logger LOG = Logger.getLogger(SQLUtilityImpl.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(SQLUtilityImpl.class);
 
     @Override
     protected ConnectionPool i_getConnectionPool(DatastoreConfiguration cpDC)
@@ -180,7 +181,7 @@ class SQLUtilityImpl
             }
         }
         sql.append(" WHERE " + uniqueColumn + " = ?");
-        LOG.debug("About to execute: " + sql.toString());
+        logger.debug("About to execute: " + sql.toString());
         PreparedStatement stmt = conn.prepareStatement(sql.toString());
 
         try {
@@ -244,7 +245,7 @@ class SQLUtilityImpl
             }
         }
         sql.append(")");
-        LOG.debug("About to execute: " + sql.toString());
+        logger.debug("About to execute: " + sql.toString());
         PreparedStatement stmt = conn.prepareStatement(sql.toString());
 
         try {
@@ -350,7 +351,7 @@ class SQLUtilityImpl
         Iterator<TableSpec> nii = tSpecs.iterator();
         while (nii.hasNext()) {
             TableSpec spec = nii.next();
-            if (LOG.isInfoEnabled()) {
+            if (logger.isInfoEnabled()) {
                 StringBuffer sqlCmds = new StringBuffer();
                 Iterator<String> iter =
                         tcConn.getDDLConverter().getDDL(spec).iterator();
@@ -359,7 +360,7 @@ class SQLUtilityImpl
                     sqlCmds.append(iter.next());
                     sqlCmds.append(";");
                 }
-                LOG.info("Creating new " + "table '" + spec.getName()
+                logger.info("Creating new " + "table '" + spec.getName()
                         + "' with command(s): " + sqlCmds.toString());
             }
             tcConn.createTable(spec);
@@ -371,7 +372,7 @@ class SQLUtilityImpl
             try {
                 stmt.close();
             } catch (SQLException e) {
-                LOG.warn("Unable to close statement", e);
+                logger.warn("Unable to close statement", e);
             }
         }
     }

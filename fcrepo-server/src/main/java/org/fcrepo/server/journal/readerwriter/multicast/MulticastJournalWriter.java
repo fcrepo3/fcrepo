@@ -14,8 +14,6 @@ import java.util.TimerTask;
 
 import javax.xml.stream.XMLEventWriter;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.journal.JournalException;
 import org.fcrepo.server.journal.JournalOperatingMode;
@@ -29,7 +27,8 @@ import org.fcrepo.server.journal.readerwriter.multicast.request.OpenFileRequest;
 import org.fcrepo.server.journal.readerwriter.multicast.request.ShutdownRequest;
 import org.fcrepo.server.journal.readerwriter.multicast.request.TransportRequest;
 import org.fcrepo.server.journal.readerwriter.multicast.request.WriteEntryRequest;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.fcrepo.server.journal.readerwriter.multicast.Transport.State.FILE_CLOSED;
 import static org.fcrepo.server.journal.readerwriter.multicast.Transport.State.FILE_OPEN;
@@ -48,8 +47,8 @@ public class MulticastJournalWriter
         extends JournalWriter
         implements TransportParent {
 
-    private static final Logger LOG =
-            Logger.getLogger(MulticastJournalWriter.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(MulticastJournalWriter.class);
 
     /**
      * prefix that indicates a transport parameter - must include the separator
@@ -180,7 +179,7 @@ public class MulticastJournalWriter
         checkAllTransportsHaveClassnames();
         checkAllTransportsHaveCrucialFlags();
         checkAtLeastOneCrucialTransport();
-        LOG.info("Journal transport parameters validated.");
+        logger.info("Journal transport parameters validated.");
     }
 
     private void checkAtLeastOneTransport() throws JournalException {
@@ -244,7 +243,7 @@ public class MulticastJournalWriter
                                                                  thisTransportMap,
                                                                  crucialFlag,
                                                                  this});
-            LOG.info("Transport '" + transportName + "' is " + transport);
+            logger.info("Transport '" + transportName + "' is " + transport);
             result.put(transportName, (Transport) transport);
         }
         return result;
@@ -273,7 +272,7 @@ public class MulticastJournalWriter
                 return;
             }
 
-            LOG.debug("Preparing to write journal entry.");
+            logger.debug("Preparing to write journal entry.");
 
             if (state == FILE_OPEN) {
                 closeFileIfAppropriate();
@@ -304,7 +303,7 @@ public class MulticastJournalWriter
             if (state == SHUTDOWN) {
                 return;
             }
-            LOG.debug("Writing journal entry.");
+            logger.debug("Writing journal entry.");
             sendRequestToAllTransports(new WriteEntryRequest(this, journalEntry));
             currentSize += sizeEstimator.estimateSize(journalEntry);
 
@@ -335,7 +334,7 @@ public class MulticastJournalWriter
                 closeFile();
             }
 
-            LOG.debug("Shutting down.");
+            logger.debug("Shutting down.");
             sendRequestToAllTransports(new ShutdownRequest());
             state = SHUTDOWN;
         }
@@ -388,7 +387,7 @@ public class MulticastJournalWriter
         @Override
         public void run() {
             try {
-                LOG.debug("Timer task requests file close.");
+                logger.debug("Timer task requests file close.");
                 closeFile();
             } catch (JournalException e) {
                 /*
@@ -493,7 +492,7 @@ public class MulticastJournalWriter
         for (String transportName : transports.keySet()) {
             Transport transport = transports.get(transportName);
             try {
-                LOG.debug("Sending " + request.getClass().getSimpleName()
+                logger.debug("Sending " + request.getClass().getSimpleName()
                         + " to transport '" + transportName + "'");
                 request.performRequest(transport);
             } catch (JournalException e) {
@@ -519,7 +518,7 @@ public class MulticastJournalWriter
         }
         for (String transportName : nonCrucialExceptions.keySet()) {
             JournalException e = nonCrucialExceptions.get(transportName);
-            LOG.error("Exception thrown from non-crucial Journal Transport: '"
+            logger.error("Exception thrown from non-crucial Journal Transport: '"
                     + transportName + "'", e);
         }
     }
@@ -531,7 +530,7 @@ public class MulticastJournalWriter
         }
         for (String transportName : crucialExceptions.keySet()) {
             JournalException e = crucialExceptions.get(transportName);
-            LOG.fatal("Exception thrown from crucial Journal Transport: '"
+            logger.error("Exception thrown from crucial Journal Transport: '"
                     + transportName + "'", e);
         }
     }

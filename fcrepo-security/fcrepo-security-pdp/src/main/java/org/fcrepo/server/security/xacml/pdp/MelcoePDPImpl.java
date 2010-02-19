@@ -21,13 +21,9 @@ package org.fcrepo.server.security.xacml.pdp;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+
 import java.util.HashSet;
 import java.util.Set;
-
-
-import org.apache.log4j.Logger;
-
-import org.fcrepo.server.security.xacml.util.PopulatePolicyDatabase;
 
 import com.sun.xacml.ConfigurationStore;
 import com.sun.xacml.Indenter;
@@ -37,24 +33,28 @@ import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 
+import org.fcrepo.server.security.xacml.util.PopulatePolicyDatabase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This is an implementation of the MelcoePDP interface. It provides for the
  * evaluation of requests. It uses
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public class MelcoePDPImpl
         implements MelcoePDP {
 
-    private static final Logger log =
-            Logger.getLogger(MelcoePDPImpl.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(MelcoePDPImpl.class);
 
     private PDP pdp;
 
     /**
      * The default constructor. This reads in the configuration file and
      * instantiates a PDP based on it.
-     * 
+     *
      * @throws MelcoePDPException
      */
     public MelcoePDPImpl()
@@ -66,7 +66,7 @@ public class MelcoePDPImpl
             String filename = null;
 
             // Loads the policies in PDP_HOME/policies
-            // Does not monitor the directory for changes, nor will 
+            // Does not monitor the directory for changes, nor will
             // subsequently deleted policies be removed from the policy store
             PopulatePolicyDatabase.addDocuments();
             //
@@ -79,14 +79,14 @@ public class MelcoePDPImpl
                         + f.getAbsolutePath());
             }
 
-            log.info("Loading config file: " + f.getAbsolutePath());
+            logger.info("Loading config file: " + f.getAbsolutePath());
 
             config = new ConfigurationStore(f);
             pdp = new PDP(config.getDefaultPDPConfig());
 
-            log.info("PDP Instantiated and initialised!");
+            logger.info("PDP Instantiated and initialised!");
         } catch (Exception e) {
-            log.fatal("Could not initialise PDP: " + e.getMessage(), e);
+            logger.error("Could not initialise PDP: " + e.getMessage(), e);
             throw new MelcoePDPException("Could not initialise PDP: "
                     + e.getMessage(), e);
         }
@@ -97,9 +97,7 @@ public class MelcoePDPImpl
      * @see org.fcrepo.server.security.xacml.pdp.MelcoePDP#evaluate(java.lang.String)
      */
     public String evaluate(String request) throws EvaluationException {
-        if (log.isDebugEnabled()) {
-            log.debug("evaluating request");
-        }
+        logger.debug("evaluating request");
 
         RequestCtx req = null;
         ByteArrayInputStream is = new ByteArrayInputStream(request.getBytes());
@@ -107,7 +105,7 @@ public class MelcoePDPImpl
         try {
             req = RequestCtx.getInstance(is);
         } catch (ParsingException pe) {
-            log.error("Error parsing request:\n" + request, pe);
+            logger.error("Error parsing request:\n" + request, pe);
             throw new EvaluationException("Error parsing request:\n" + request);
         }
 
@@ -123,8 +121,8 @@ public class MelcoePDPImpl
      * @see org.fcrepo.server.security.xacml.pdp.MelcoePDP#evaluateBatch(java.lang.String[])
      */
     public String evaluateBatch(String[] requests) throws EvaluationException {
-        if (log.isDebugEnabled()) {
-            log.debug("evaluating request batch");
+        if (logger.isDebugEnabled()) {
+            logger.debug("evaluating request batch");
         }
 
         Set<Result> results = new HashSet<Result>();
@@ -137,7 +135,7 @@ public class MelcoePDPImpl
             try {
                 resCtx = ResponseCtx.getInstance(is);
             } catch (ParsingException pe) {
-                log.error("Error parsing response:\n" + response, pe);
+                logger.error("Error parsing response:\n" + response, pe);
                 throw new EvaluationException("Error parsing response:\n"
                         + response);
             }

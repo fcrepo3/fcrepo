@@ -21,6 +21,7 @@ package org.fcrepo.server.security.xacml.pep.ws;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,13 +30,16 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.sun.xacml.ctx.RequestCtx;
+import com.sun.xacml.ctx.ResponseCtx;
+import com.sun.xacml.ctx.Result;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.description.OperationDesc;
 import org.apache.axis.description.ServiceDesc;
 import org.apache.axis.handlers.BasicHandler;
-import org.apache.log4j.Logger;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,17 +51,15 @@ import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandler;
 import org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandlerException;
-
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * This class is an Apache Axis handler. It is used as a handler on both the
  * request and response. The handler examines the operation for the request and
  * retrieves an appropriate handler to manage the request.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public class PEP
@@ -65,7 +67,8 @@ public class PEP
 
     private static final long serialVersionUID = -3435060948149239989L;
 
-    private static Logger log = Logger.getLogger(PEP.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(PEP.class);
 
     /**
      * A list of instantiated handlers. As operations are invoked, handlers for
@@ -86,7 +89,7 @@ public class PEP
     /**
      * Default constructor that initialises the handlers map and the
      * contextHandler.
-     * 
+     *
      * @throws PEPException
      */
     public PEP()
@@ -102,8 +105,8 @@ public class PEP
      * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
      */
     public void invoke(MessageContext context) throws AxisFault {
-        if (log.isDebugEnabled()) {
-            log.debug("AuthHandler executed: " + context.getTargetService()
+        if (logger.isDebugEnabled()) {
+            logger.debug("AuthHandler executed: " + context.getTargetService()
                     + "/" + context.getOperation().getName() + " [" + ts + "]");
         }
 
@@ -131,7 +134,7 @@ public class PEP
                 reqCtx = operationHandler.handleRequest(context);
             }
         } catch (OperationHandlerException ohe) {
-            log.error("Error handling operation: " + operation.getName(), ohe);
+            logger.error("Error handling operation: " + operation.getName(), ohe);
             throw AxisFault
                     .makeFault(new PEPException("Error handling operation: "
                             + operation.getName(), ohe));
@@ -150,7 +153,7 @@ public class PEP
         try {
             resCtx = ctxHandler.evaluate(reqCtx);
         } catch (PEPException pe) {
-            log.error("Error evaluating request", pe);
+            logger.error("Error evaluating request", pe);
             throw AxisFault
                     .makeFault(new PEPException("Error evaluating request (operation: "
                                                         + operation.getName()
@@ -175,7 +178,7 @@ public class PEP
     /**
      * Reads the configuration file and loads up all the handlers listed within.
      * This method creates handlers for each of the services listed.
-     * 
+     *
      * @throws PEPException
      */
     private void loadHandlers() throws PEPException {
@@ -245,13 +248,13 @@ public class PEP
                                                 .newInstance();
                                 handlerMap.put(cls, handler);
                             } catch (ClassNotFoundException e) {
-                                log.debug("handlerClass not found: " + cls);
+                                logger.debug("handlerClass not found: " + cls);
                             } catch (InstantiationException ie) {
-                                log.error("Could not instantiate handler: "
+                                logger.error("Could not instantiate handler: "
                                         + cls);
                                 throw new PEPException(ie);
                             } catch (IllegalAccessException iae) {
-                                log.error("Could not instantiate handler: "
+                                logger.error("Could not instantiate handler: "
                                         + cls);
                                 throw new PEPException(iae);
                             }
@@ -259,16 +262,15 @@ public class PEP
 
                         handlers.put(opn, handler);
 
-                        if (log.isDebugEnabled()) {
-                            log.debug("handler added to handler map: "
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("handler added to handler map: "
                                     + service + "/" + opn + "/" + cls);
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            log.fatal("Failed to initialse the PEP for WS");
-            log.fatal(e.getMessage(), e);
+            logger.error("Failed to initialse the PEP for WS", e);
             throw new PEPException(e.getMessage(), e);
         }
     }
@@ -276,7 +278,7 @@ public class PEP
     /**
      * Function to try and obtain a handler using the name of the current SOAP
      * service and operation.
-     * 
+     *
      * @param opName
      *        the name of the operation
      * @return OperationHandler to handle the operation
@@ -284,16 +286,16 @@ public class PEP
      */
     private OperationHandler getHandler(String serviceName, String operationName) {
         if (serviceName == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Service Name was null!");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Service Name was null!");
             }
 
             return null;
         }
 
         if (operationName == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Operation Name was null!");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Operation Name was null!");
             }
 
             return null;
@@ -302,8 +304,8 @@ public class PEP
         Map<String, OperationHandler> handlers =
                 serviceHandlers.get(serviceName);
         if (handlers == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("No Service Handlers found for: " + serviceName);
+            if (logger.isDebugEnabled()) {
+                logger.debug("No Service Handlers found for: " + serviceName);
             }
 
             return null;
@@ -311,8 +313,8 @@ public class PEP
 
         OperationHandler handler = handlers.get(operationName);
         if (handler == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Handler not found for: " + serviceName + "/"
+            if (logger.isDebugEnabled()) {
+                logger.debug("Handler not found for: " + serviceName + "/"
                         + operationName);
             }
         }
@@ -323,7 +325,7 @@ public class PEP
     /**
      * Method to check a response and enforce any denial. This is achieved by
      * throwing an AxisFault.
-     * 
+     *
      * @param res
      *        the ResponseCtx
      * @throws AxisFault
@@ -333,8 +335,8 @@ public class PEP
         Set<Result> results = res.getResults();
         for (Result r : results) {
             if (r.getDecision() != Result.DECISION_PERMIT) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Denying access: " + r.getDecision());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Denying access: " + r.getDecision());
                 }
                 switch (r.getDecision()) {
                     case Result.DECISION_DENY:
@@ -350,8 +352,8 @@ public class PEP
                 }
             }
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Permitting access!");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Permitting access!");
         }
     }
 }

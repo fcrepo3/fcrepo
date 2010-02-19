@@ -24,18 +24,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
+
 import java.net.URL;
+
 import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -46,8 +44,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import com.sun.xacml.EvaluationCtx;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -55,12 +53,8 @@ import org.w3c.dom.NodeList;
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 import org.fcrepo.server.security.xacml.util.AttributeBean;
 import org.fcrepo.server.security.xacml.util.DataFileUtils;
-
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeDesignator;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.BagAttribute;
-import com.sun.xacml.cond.EvaluationResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -68,8 +62,8 @@ import com.sun.xacml.cond.EvaluationResult;
 public class FilePolicyDataManager
         implements PolicyDataManager {
 
-    private static final Logger log =
-            Logger.getLogger(FilePolicyDataManager.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(FilePolicyDataManager.class);
 
     private static final String XACML20_POLICY_NS =
             "urn:oasis:names:tc:xacml:2.0:policy:schema:os";
@@ -97,7 +91,7 @@ public class FilePolicyDataManager
      * reads the configuration file, 'config-dbxml.xml' and initialises/creates
      * the database as required based on that configuration. Any required
      * indexes are automatically created.
-     * 
+     *
      * @throws PolicyDataManagerException
      */
     public FilePolicyDataManager()
@@ -159,8 +153,8 @@ public class FilePolicyDataManager
             throws PolicyDataManagerException {
         InputStream dis = new ByteArrayInputStream(document.getBytes());
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("validating document: " + name);
+            if (logger.isDebugEnabled()) {
+                logger.debug("validating document: " + name);
             }
             Validator validator = validatorSchema.newValidator();
             validator.validate(new StreamSource(dis));
@@ -268,34 +262,34 @@ public class FilePolicyDataManager
          * resourceComponents; c++, resourceComponentCount++) { XmlValue
          * component = new XmlValue(components[c]);
          * context.setVariableValue("XacmlResourceIdValue" +
-         * resourceComponentCount, component); if (log.isDebugEnabled())
-         * log.debug("XacmlResourceIdValue" + resourceComponentCount + ": " +
+         * resourceComponentCount, component); if (logger.isDebugEnabled())
+         * logger.debug("XacmlResourceIdValue" + resourceComponentCount + ": " +
          * components[c]); } } else {
          * context.setVariableValue("XacmlResourceIdValue" +
          * resourceComponentCount, new XmlValue(value));
-         * resourceComponentCount++; if (log.isDebugEnabled())
-         * log.debug("XacmlResourceIdValue" + resourceComponentCount + ": " +
+         * resourceComponentCount++; if (logger.isDebugEnabled())
+         * logger.debug("XacmlResourceIdValue" + resourceComponentCount + ": " +
          * value); } } } else { context.setVariableValue(t + "Id" + count, new
          * XmlValue(bean.getId())); // removed type to reduce query parsing time
          * // context.setVariableValue(t + "Type" + count, new
-         * XmlValue(bean.getType())); if (log.isDebugEnabled()) log.debug(t +
+         * XmlValue(bean.getType())); if (logger.isDebugEnabled()) logger.debug(t +
          * "Id" + count + " = '" + bean.getId() + "'"); int valueCount = 0; for
          * (String value : bean.getValues()) { context.setVariableValue(t + "Id"
          * + count + "-Value" + valueCount, new XmlValue(value)); if
-         * (log.isDebugEnabled()) log.debug(t + "Id" + count + "-Value" +
+         * (logger.isDebugEnabled()) logger.debug(t + "Id" + count + "-Value" +
          * valueCount + " = '" + value + "'"); valueCount++; } count++; } } }
          * XmlQueryExpression qe = getQuery(attributeMap, context,
          * resourceComponentCount); b = System.nanoTime(); total += (b - a); if
-         * (log.isDebugEnabled()) log.debug("Query prep. time: " + (b - a) +
+         * (logger.isDebugEnabled()) logger.debug("Query prep. time: " + (b - a) +
          * "ns"); // execute the query a = System.nanoTime(); XmlResults results
          * = qe.execute(context); b = System.nanoTime(); total += (b - a); if
-         * (log.isDebugEnabled()) log.debug("Query exec. time: " + (b - a) +
+         * (logger.isDebugEnabled()) logger.debug("Query exec. time: " + (b - a) +
          * "ns"); // process results while (results.hasNext()) { XmlValue value
-         * = results.next(); if (log.isDebugEnabled())
-         * log.debug("Retrieved Document: " + value.asDocument().getName());
+         * = results.next(); if (logger.isDebugEnabled())
+         * logger.debug("Retrieved Document: " + value.asDocument().getName());
          * documents.put(value.asDocument().getName(),
          * value.asDocument().getContent()); } results.delete(); if
-         * (log.isDebugEnabled()) log.debug("Total exec. time: " + total +
+         * (logger.isDebugEnabled()) logger.debug("Total exec. time: " + total +
          * "ns"); } catch (XmlException xe) { throw new
          * PolicyDataManagerException
          * ("Error getting policies from PolicyDataManager.", xe); } catch
@@ -327,46 +321,6 @@ public class FilePolicyDataManager
         }
 
         Map<String, byte[]> documents = new TreeMap<String, byte[]>();
-        /*
-         * try { a = System.nanoTime(); XmlQueryContext context =
-         * manager.createQueryContext();
-         * context.setDefaultCollection(CONTAINER); context.setNamespace("p",
-         * XACML20_POLICY_NS); context.setNamespace("m", METADATA_POLICY_NS);
-         * for (int x = 0; attributes.length < 0; x++) {
-         * context.setVariableValue("id" + x, new
-         * XmlValue(attributes[x].getId())); // context.setVariableValue("type"
-         * + x, new // XmlValue(attributes[x].getType()));
-         * //context.setVariableValue("value" + x, new
-         * XmlValue(attributes[x].getValue())); } if
-         * (searchQueries[attributes.length] == null) { StringBuilder sb = new
-         * StringBuilder(); sb.append("for $doc in "); sb.append("collection('"
-         * + CONTAINER + "') ");
-         * sb.append("let $value := $doc//p:AttributeValue ");
-         * sb.append("let $id := $value/..//@AttributeId ");
-         * sb.append("where 1 = 1 "); for (int x = 0; x < attributes.length;
-         * x++) { sb.append("and $value = $value" + x + " ");
-         * sb.append("and $id = $id" + x + " "); } sb.append("return $doc");
-         * searchQueries[attributes.length] = manager.prepare(sb.toString(),
-         * context); } b = System.nanoTime(); total += (b - a); if
-         * (log.isDebugEnabled()) log.debug("Query prep. time: " + (b - a) +
-         * "ns"); a = System.nanoTime(); XmlResults results =
-         * searchQueries[attributes.length].execute(context); b =
-         * System.nanoTime(); total += (b - a); if (log.isDebugEnabled())
-         * log.debug("Search exec. time: " + (b - a) + "ns"); a =
-         * System.nanoTime(); while (results.hasNext()) { XmlValue value =
-         * results.next(); if (log.isDebugEnabled())
-         * log.debug("Found search result: " + value.asDocument().getName());
-         * documents.put(value.asDocument().getName(),
-         * value.asDocument().getContent()); } results.delete(); b =
-         * System.nanoTime(); total += (b - a); if (log.isDebugEnabled())
-         * log.debug("Result proc. time: " + (b - a) + "ns");
-         * log.info("Total time: " + total + "ns"); } catch (XmlException xe) {
-         * log.error("Exception during findPolicies: " + xe.getMessage(), xe);
-         * throw new
-         * PolicyDataManagerException("Exception during findPolicies: " +
-         * xe.getMessage(), xe); }
-         */
-
         return documents;
     }
 
@@ -390,7 +344,7 @@ public class FilePolicyDataManager
 
     /**
      * Obtains the metadata for the given document.
-     * 
+     *
      * @param docIS
      *        the document as an InputStream
      * @return the document metadata as a Map
@@ -428,213 +382,24 @@ public class FilePolicyDataManager
                 metadata.put("anyEnvironment", "T");
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
         }
 
         return metadata;
     }
 
     /**
-     * This method extracts the attributes listed in the indexMap from the given
-     * evaluation context.
-     * 
-     * @param eval
-     *        the Evaluation Context from which to extract Attributes
-     * @return a Map of Attributes for each category (Subject, Resource, Action,
-     *         Environment)
-     * @throws URISyntaxException
-     */
-    @SuppressWarnings("unchecked")
-    private Map<String, Set<AttributeBean>> getAttributeMap(EvaluationCtx eval)
-            throws URISyntaxException {
-        URI defaultCategoryURI =
-                new URI(AttributeDesignator.SUBJECT_CATEGORY_DEFAULT);
-
-        Map<String, String> im = null;
-        Map<String, Set<AttributeBean>> attributeMap =
-                new HashMap<String, Set<AttributeBean>>();
-        Map<String, AttributeBean> attributeBeans = null;
-
-        im = indexMap.get("subjectAttributes");
-        attributeBeans = new HashMap<String, AttributeBean>();
-        for (String attributeId : im.keySet()) {
-            EvaluationResult result =
-                    eval.getSubjectAttribute(new URI(im.get(attributeId)),
-                                             new URI(attributeId),
-                                             defaultCategoryURI);
-            if (result.getStatus() == null && !result.indeterminate()) {
-                AttributeValue attr = result.getAttributeValue();
-                if (attr.returnsBag()) {
-                    Iterator<AttributeValue> i =
-                            ((BagAttribute) attr).iterator();
-                    if (i.hasNext()) {
-                        while (i.hasNext()) {
-                            AttributeValue value = i.next();
-                            String attributeType = im.get(attributeId);
-
-                            AttributeBean ab = attributeBeans.get(attributeId);
-                            if (ab == null) {
-                                ab = new AttributeBean();
-                                ab.setId(attributeId);
-                                ab.setType(attributeType);
-                                attributeBeans.put(attributeId, ab);
-                            }
-
-                            ab.addValue(value.encode());
-                        }
-                    }
-                }
-            }
-        }
-        attributeMap.put("subjectAttributes", new HashSet(attributeBeans
-                .values()));
-
-        im = indexMap.get("resourceAttributes");
-        attributeBeans = new HashMap<String, AttributeBean>();
-        for (String attributeId : im.keySet()) {
-            EvaluationResult result =
-                    eval.getResourceAttribute(new URI(im.get(attributeId)),
-                                              new URI(attributeId),
-                                              null);
-            if (result.getStatus() == null && !result.indeterminate()) {
-                AttributeValue attr = result.getAttributeValue();
-                if (attr.returnsBag()) {
-                    Iterator<AttributeValue> i =
-                            ((BagAttribute) attr).iterator();
-                    if (i.hasNext()) {
-                        while (i.hasNext()) {
-                            AttributeValue value = i.next();
-                            String attributeType = im.get(attributeId);
-
-                            AttributeBean ab = attributeBeans.get(attributeId);
-                            if (ab == null) {
-                                ab = new AttributeBean();
-                                ab.setId(attributeId);
-                                ab.setType(attributeType);
-                                attributeBeans.put(attributeId, ab);
-                            }
-
-                            ab.addValue(value.encode());
-                        }
-                    }
-                }
-            }
-        }
-        attributeMap.put("resourceAttributes", new HashSet(attributeBeans
-                .values()));
-
-        im = indexMap.get("actionAttributes");
-        attributeBeans = new HashMap<String, AttributeBean>();
-        for (String attributeId : im.keySet()) {
-            EvaluationResult result =
-                    eval.getActionAttribute(new URI(im.get(attributeId)),
-                                            new URI(attributeId),
-                                            null);
-            if (result.getStatus() == null && !result.indeterminate()) {
-                AttributeValue attr = result.getAttributeValue();
-                if (attr.returnsBag()) {
-                    Iterator<AttributeValue> i =
-                            ((BagAttribute) attr).iterator();
-                    if (i.hasNext()) {
-                        while (i.hasNext()) {
-                            AttributeValue value = i.next();
-                            String attributeType = im.get(attributeId);
-
-                            AttributeBean ab = attributeBeans.get(attributeId);
-                            if (ab == null) {
-                                ab = new AttributeBean();
-                                ab.setId(attributeId);
-                                ab.setType(attributeType);
-                                attributeBeans.put(attributeId, ab);
-                            }
-
-                            ab.addValue(value.encode());
-                        }
-                    }
-                }
-            }
-        }
-        attributeMap.put("actionAttributes", new HashSet(attributeBeans
-                .values()));
-
-        im = indexMap.get("environmentAttributes");
-        attributeBeans = new HashMap<String, AttributeBean>();
-        for (String attributeId : im.keySet()) {
-            URI imAttrId = new URI(im.get(attributeId));
-            URI attrId = new URI(attributeId);
-            EvaluationResult result =
-                    eval.getEnvironmentAttribute(imAttrId, attrId, null);
-            if (result.getStatus() == null && !result.indeterminate()) {
-                AttributeValue attr = result.getAttributeValue();
-                if (attr.returnsBag()) {
-                    Iterator<AttributeValue> i =
-                            ((BagAttribute) attr).iterator();
-                    if (i.hasNext()) {
-                        while (i.hasNext()) {
-                            AttributeValue value = i.next();
-                            String attributeType = im.get(attributeId);
-
-                            AttributeBean ab = attributeBeans.get(attributeId);
-                            if (ab == null) {
-                                ab = new AttributeBean();
-                                ab.setId(attributeId);
-                                ab.setType(attributeType);
-                                attributeBeans.put(attributeId, ab);
-                            }
-
-                            ab.addValue(value.encode());
-                        }
-                    }
-                }
-            }
-        }
-        attributeMap.put("environmentAttributes", new HashSet(attributeBeans
-                .values()));
-
-        return attributeMap;
-    }
-
-    private String[] makeComponents(String resourceId) {
-        if (resourceId == null || resourceId.equals("")
-                || !resourceId.startsWith("/")) {
-            return null;
-        }
-
-        List<String> components = new ArrayList<String>();
-
-        String[] parts = resourceId.split("\\/");
-
-        for (int x = 1; x < parts.length; x++) {
-            StringBuilder sb = new StringBuilder();
-            for (int y = 0; y < x; y++) {
-                sb.append("/");
-                sb.append(parts[y + 1]);
-            }
-
-            components.add(sb.toString());
-
-            if (x != parts.length - 1) {
-                components.add(sb.toString() + "/.*");
-            } else {
-                components.add(sb.toString() + "$");
-            }
-        }
-
-        return components.toArray(new String[components.size()]);
-    }
-
-    /**
      * Reads a configuration file and initialises the instance based on that
      * information.
-     * 
+     *
      * @throws PolicyDataManagerException
      */
     private void initConfig() throws PolicyDataManagerException {
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             Runtime runtime = Runtime.getRuntime();
-            log.debug("Total memory: " + runtime.totalMemory() / 1024);
-            log.debug("Free memory: " + runtime.freeMemory() / 1024);
-            log.debug("Max memory: " + runtime.maxMemory() / 1024);
+            logger.debug("Total memory: " + runtime.totalMemory() / 1024);
+            logger.debug("Free memory: " + runtime.freeMemory() / 1024);
+            logger.debug("Max memory: " + runtime.maxMemory() / 1024);
         }
 
         try {
@@ -647,7 +412,7 @@ public class FilePolicyDataManager
                         + f.getAbsolutePath());
             }
 
-            log.info("Loading config file: " + f.getAbsolutePath());
+            logger.info("Loading config file: " + f.getAbsolutePath());
 
             DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
             Document doc = docBuilder.parse(new FileInputStream(f));
@@ -684,10 +449,10 @@ public class FilePolicyDataManager
                         }
                     }
 
-                    if (log.isDebugEnabled()) {
-                        log.debug("[config] " + node.getNodeName() + ": "
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("[config] " + node.getNodeName() + ": "
                                 + db_home.getAbsolutePath());
-                        log.debug("[config] " + node.getNodeName() + ": "
+                        logger.debug("[config] " + node.getNodeName() + ": "
                                 + db_rcyl.getAbsolutePath());
                     }
                 }
@@ -709,8 +474,8 @@ public class FilePolicyDataManager
             for (int x = 0; x < nodes.getLength(); x++) {
                 Node node = nodes.item(x);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Node name: " + node.getNodeName());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Node name: " + node.getNodeName());
                     }
 
                     NodeList attrs = node.getChildNodes();
@@ -735,7 +500,7 @@ public class FilePolicyDataManager
             nodes = schemaConfig.getChildNodes();
             if ("true".equals(schemaConfig.getAttributes()
                     .getNamedItem("validation").getNodeValue())) {
-                log.info("Initialising validation");
+                logger.info("Initialising validation");
 
                 for (int x = 0; x < nodes.getLength(); x++) {
                     Node schemaNode = nodes.item(x);
@@ -745,10 +510,7 @@ public class FilePolicyDataManager
                                         .getNamedItem("namespace")
                                         .getNodeValue();
                         if (XACML20_POLICY_NS.equals(namespace)) {
-                            if (log.isDebugEnabled()) {
-                                log
-                                        .debug("found valid schema. Creating validator");
-                            }
+                            logger.debug("found valid schema. Creating validator");
 
                             SchemaFactory schemaFactory =
                                     SchemaFactory
@@ -791,7 +553,7 @@ public class FilePolicyDataManager
 
             timestampFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         } catch (Exception e) {
-            log.fatal("Could not initialise DBXML: " + e.getMessage(), e);
+            logger.error("Could not initialise DBXML: " + e.getMessage(), e);
             throw new PolicyDataManagerException("Could not initialise DBXML: "
                     + e.getMessage(), e);
         }
@@ -825,11 +587,7 @@ public class FilePolicyDataManager
                 policiesTmp.put(dm.get("PolicyId"), doc);
                 policyFiles.put(dm.get("PolicyId"), f.getName());
             } catch (Exception e) {
-                log.error("Error loading document: " + f.getName());
-                log.error(e.getMessage());
-                if (log.isDebugEnabled()) {
-                    log.debug(e);
-                }
+                logger.error("Error loading document: " + f.getName(), e);
             }
         }
 
@@ -838,20 +596,4 @@ public class FilePolicyDataManager
         }
     }
 
-    private Map<String, Map<String, String>> indexPolicy(byte[] policy) {
-        Map<String, Map<String, String>> indexes =
-                new HashMap<String, Map<String, String>>();
-
-        InputStream docIS = new ByteArrayInputStream(policy);
-        try {
-            DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
-            Document doc = docBuilder.parse(docIS);
-
-            NodeList nodes = doc.getElementsByTagNameNS(XACML20_POLICY_NS, "");
-
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return null;
-    }
 }

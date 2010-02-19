@@ -26,8 +26,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
@@ -44,6 +42,8 @@ import org.fcrepo.server.errors.servletExceptionExtensions.InternalError500Excep
 import org.fcrepo.server.errors.servletExceptionExtensions.NotFound404Exception;
 import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -80,9 +80,8 @@ public class GetObjectHistoryServlet
         extends HttpServlet
         implements Constants {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(GetObjectHistoryServlet.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(GetObjectHistoryServlet.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -131,7 +130,7 @@ public class GetObjectHistoryServlet
         }
 
         PID = URIArray[5];
-        LOG.debug("Servicing getObjectHistory request (PID=" + PID + ")");
+        logger.debug("Servicing getObjectHistory request (PID=" + PID + ")");
 
         // Check for xml encoding parameter; ignore any other parameters
         Hashtable<String, String> h_userParms = new Hashtable<String, String>();
@@ -150,7 +149,7 @@ public class GetObjectHistoryServlet
         try {
             getObjectHistory(context, PID, xml, response);
         } catch (ObjectNotFoundException e) {
-            LOG.error("Object not found for request: "
+            logger.error("Object not found for request: "
                     + request.getRequestURI() + " (actionLabel=" + ACTION_LABEL
                     + ")", e);
             throw new NotFound404Exception(request,
@@ -158,7 +157,7 @@ public class GetObjectHistoryServlet
                                            "",
                                            new String[0]);
         } catch (ObjectNotInLowlevelStorageException e) {
-            LOG.error("Object not found for request: "
+            logger.error("Object not found for request: "
                     + request.getRequestURI() + " (actionLabel=" + ACTION_LABEL
                     + ")", e);
             throw new NotFound404Exception(request,
@@ -171,7 +170,7 @@ public class GetObjectHistoryServlet
                                                     ACTION_LABEL,
                                                     new String[0]);
         } catch (Throwable th) {
-            LOG.error("Unexpected error servicing API-A request", th);
+            logger.error("Unexpected error servicing API-A request", th);
             throw new InternalError500Exception("",
                                                 th,
                                                 request,
@@ -332,14 +331,14 @@ public class GetObjectHistoryServlet
                     pw.flush();
                     pw.close();
                 } catch (IOException ioe) {
-                    LOG.error("WriteThread error", ioe);
+                    logger.error("WriteThread error", ioe);
                 } finally {
                     try {
                         if (pw != null) {
                             pw.close();
                         }
                     } catch (IOException ioe) {
-                        LOG.error("WriteThread error", ioe);
+                        logger.error("WriteThread error", ioe);
                     }
                 }
             }

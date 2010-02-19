@@ -21,7 +21,8 @@ package org.fcrepo.server.security.xacml.pep;
 import java.util.Map;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 import org.fcrepo.server.security.xacml.pdp.MelcoePDPImpl;
@@ -35,8 +36,8 @@ import org.fcrepo.server.security.xacml.pdp.MelcoePDPImpl;
 public class DirectPDPClient
         implements PDPClient {
 
-    private static Logger log =
-            Logger.getLogger(DirectPDPClient.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DirectPDPClient.class);
 
     private MelcoePDP client = null;
 
@@ -52,7 +53,7 @@ public class DirectPDPClient
         try {
             client = new MelcoePDPImpl();
         } catch (Exception e) {
-            log.error("Could not initialise the PEP Client.");
+            logger.error("Could not initialise the PEP Client.");
             throw new PEPException("Could not initialise the PEP Client.", e);
         }
     }
@@ -62,15 +63,15 @@ public class DirectPDPClient
      * @see org.fcrepo.server.security.xacml.pep.PEPClient#evaluate(java.lang.String)
      */
     public String evaluate(String request) throws PEPException {
-        if (log.isDebugEnabled()) {
-            log.debug("Resolving String request:\n" + request);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Resolving String request:\n" + request);
         }
 
         String response = null;
         try {
             response = client.evaluate(request);
         } catch (Exception e) {
-            log.error("Error evaluating request.", e);
+            logger.error("Error evaluating request.", e);
             throw new PEPException("Error evaluating request", e);
         }
 
@@ -82,8 +83,8 @@ public class DirectPDPClient
      * @see org.fcrepo.server.security.xacml.pep.PEPClient#evaluateBatch(java.lang.String[])
      */
     public String evaluateBatch(String[] request) throws PEPException {
-        if (log.isDebugEnabled()) {
-            log.debug("Resolving request batch (" + request.length
+        if (logger.isDebugEnabled()) {
+            logger.debug("Resolving request batch (" + request.length
                     + " requests)");
         }
 
@@ -91,7 +92,7 @@ public class DirectPDPClient
         try {
             response = client.evaluateBatch(request);
         } catch (Exception e) {
-            log.error("Error evaluating request.", e);
+            logger.error("Error evaluating request.", e);
             throw new PEPException("Error evaluating request", e);
         }
 

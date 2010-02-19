@@ -28,7 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -49,7 +50,8 @@ import com.sun.xacml.ctx.RequestCtx;
 public class GetFilter
         extends AbstractFilter {
 
-    private static Logger log = Logger.getLogger(GetFilter.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(GetFilter.class);
 
     /**
      * Default constructor.
@@ -72,14 +74,14 @@ public class GetFilter
                                     HttpServletResponse response)
             throws IOException, ServletException {
         if (request.getPathInfo() == null) {
-            log.error("Bad request: " + request.getRequestURI());
+            logger.error("Bad request: " + request.getRequestURI());
             throw new ServletException("Bad request: "
                     + request.getRequestURI());
         }
 
         String[] parts = request.getPathInfo().split("/");
         if (parts.length < 2) {
-            log.warn("Not enough path components on the URI.");
+            logger.warn("Not enough path components on the URI.");
             return null;
             // throw new ServletException("Not enough path components on the
             // URI.");
@@ -93,9 +95,9 @@ public class GetFilter
         String methodName = null;
         String dateTime = null;
 
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             for (String p : parts) {
-                log.debug("Parts: " + p);
+                logger.debug("Parts: " + p);
             }
         }
 
@@ -195,7 +197,7 @@ public class GetFilter
 
             LogUtil.statLog(request.getRemoteUser(), logAction, pid, dsID);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw new ServletException(e);
         }
 

@@ -45,7 +45,7 @@ public class JournalConsumer
     /**
      * Get the appropriate JournalReader and JournalRecoveryLog, based on the
      * server parameters, and create a JournalConsumerThread that will process
-     * the journal entries, using that reader and that log.
+     * the journal entries, using that reader and that logger.
      */
     public JournalConsumer(Map<String, String> parameters,
                            String role,

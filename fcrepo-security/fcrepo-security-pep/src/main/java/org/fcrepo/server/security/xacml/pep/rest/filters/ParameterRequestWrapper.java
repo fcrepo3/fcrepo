@@ -28,10 +28,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.security.servletfilters.ExtendedHttpServletRequestWrapper;
-
 
 /**
  * Request wrapper that forces the addition of specified parameters.
@@ -42,8 +42,8 @@ import org.fcrepo.server.security.servletfilters.ExtendedHttpServletRequestWrapp
 public class ParameterRequestWrapper
         extends ExtendedHttpServletRequestWrapper {
 
-    private static Logger log =
-            Logger.getLogger(ParameterRequestWrapper.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ParameterRequestWrapper.class);
 
     private Map<String, String[]> params = null;
 
@@ -78,23 +78,23 @@ public class ParameterRequestWrapper
             }
         } else if (request.getRequestURI() != null
                 && request.getRequestURI().endsWith("/risearch")) {
-            if (log.isDebugEnabled()) {
-                log.debug("Entered format check");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Entered format check");
             }
 
             format = params.get("format");
 
-            if (log.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 if (format != null) {
                     for (String f : format) {
-                        log.debug("Format: " + f);
+                        logger.debug("Format: " + f);
                     }
                 }
             }
 
             if (format != null && !Arrays.asList(format).contains("RDF/XML")) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Setting format to: RDF/XML");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Setting format to: RDF/XML");
                 }
 
                 params.put("format", new String[] {"RDF/XML"});

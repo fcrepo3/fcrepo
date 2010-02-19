@@ -6,30 +6,32 @@ package org.fcrepo.common.http;
 
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configures the proxy settings of the web client. Can either be created using
  * the system settings or with a custom configuration.
- * 
+ *
  * @version $Id$
  */
 public class ProxyConfiguration {
 
-    private String proxyHost;
+    private static final Logger logger =
+        LoggerFactory.getLogger(ProxyConfiguration.class);
 
-    private int proxyPort;
+    private final String proxyHost;
 
-    private String proxyUser;
+    private final int proxyPort;
 
-    private String proxyPassword;
+    private final String proxyUser;
 
-    private Pattern nonProxyPattern;
+    private final String proxyPassword;
 
-    private final Logger log = Logger.getLogger(this.getClass());
+    private final Pattern nonProxyPattern;
 
     /**
-     * Default constructor. 
+     * Default constructor.
      * Takes the system provided proxy settings.
      */
     public ProxyConfiguration() {
@@ -44,7 +46,7 @@ public class ProxyConfiguration {
     /**
      * Enables the creation of a proxy configuration using
      * custom values.
-     * 
+     *
      * @param proxyHost the host name of the proxy
      * @param proxyPort the port of the proxy
      * @param proxyUser the username for the proxy
@@ -69,7 +71,7 @@ public class ProxyConfiguration {
      * the java nonproxyhost syntax</a> and turns the nonproxyhost expression
      * into a regex pattern. Basic idea taken from the HttpImpl class of the
      * Liferay Portal software.
-     * 
+     *
      * @param nonProxyHosts
      *        the String that contains the http.nonProxyHosts value. If this
      *        value is empty or invalid, null is returned. If the value is
@@ -79,7 +81,7 @@ public class ProxyConfiguration {
     protected Pattern createNonProxyPattern(String nonProxyHosts) {
         if (nonProxyHosts == null || nonProxyHosts.equals("")) return null;
 
-        // "*.fedora-commons.org" -> ".*?\.fedora-commons\.org" 
+        // "*.fedora-commons.org" -> ".*?\.fedora-commons\.org"
         nonProxyHosts = nonProxyHosts.replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*?");
 
         // a|b|*.c -> (a)|(b)|(.*?\.c)
@@ -91,11 +93,8 @@ public class ProxyConfiguration {
             //we don't want to bring down the whole server by misusing the nonProxy pattern
             //therefore the error is logged and the web client moves on.
         } catch (Exception e) {
-            log
-                    .error("Creating the nonProxyHosts pattern failed for http.nonProxyHosts="
-                            + nonProxyHosts
-                            + " with the following exception: "
-                            + e);
+            logger.error("Creating the nonProxyHosts pattern failed for http.nonProxyHosts="
+                            + nonProxyHosts, e);
             return null;
         }
     }
@@ -116,7 +115,7 @@ public class ProxyConfiguration {
         return proxyPort;
     }
 
-    /** 
+    /**
      * Returns the proxy user.
      * @return the proxy user
      */
@@ -135,7 +134,7 @@ public class ProxyConfiguration {
     /**
      * Checks whether a proxy has been configured and the given host is not in
      * the nonProxyHost list or the nonProxyList is empty.
-     * 
+     *
      * @param host
      *        the host to be matched
      * @return true if the host satifies the above stated condition, otherwise
@@ -149,9 +148,9 @@ public class ProxyConfiguration {
     }
 
     /**
-     * Checks whether the proxy credentials are valid. 
+     * Checks whether the proxy credentials are valid.
      * Username and password must be non-null and non-empty to qualify.
-     * 
+     *
      * @return true if the credentials are valid, false otherwise
      */
     public boolean hasValidCredentials() {

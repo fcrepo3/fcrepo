@@ -7,7 +7,8 @@ package org.fcrepo.server.storage.types;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Data structure for holding a MIME-typed stream.
@@ -17,7 +18,8 @@ import org.apache.log4j.Logger;
  */
 public class MIMETypedStream {
 
-    private static final Logger LOG = Logger.getLogger(MIMETypedStream.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(MIMETypedStream.class);
 
     public String MIMEType;
 
@@ -25,7 +27,7 @@ public class MIMETypedStream {
 
     public Property[] header;
 
-    private boolean gotStream = false;
+    private final boolean gotStream = false;
 
     /**
      * Constructs a MIMETypedStream.
@@ -70,11 +72,11 @@ public class MIMETypedStream {
                 this.stream.close();
                 this.stream = null;
             } catch (IOException e) {
-                LOG.warn("Error closing stream", e);
+                logger.warn("Error closing stream", e);
             }
         }
     }
-    
+
     /**
      * Ensures the underlying stream is closed at garbage-collection time
      * if the stream has not been retrieved. If getStream() has been called

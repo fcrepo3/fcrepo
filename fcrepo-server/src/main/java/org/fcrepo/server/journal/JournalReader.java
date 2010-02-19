@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.journal;
@@ -19,8 +19,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.journal.entry.ConsumerJournalEntry;
@@ -30,6 +28,8 @@ import org.fcrepo.server.journal.helpers.JournalHelper;
 import org.fcrepo.server.journal.recoverylog.JournalRecoveryLog;
 import org.fcrepo.server.journal.xmlhelpers.AbstractXmlReader;
 import org.fcrepo.server.journal.xmlhelpers.ContextXmlReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -39,16 +39,15 @@ import org.fcrepo.server.journal.xmlhelpers.ContextXmlReader;
  * positioned at the beginning of a JournalEntry tag. This class will read the
  * entry and leave the XMLEventReader positioned after the corresponding closing
  * tag.
- * 
+ *
  * @author Jim Blake
  */
 public abstract class JournalReader
         extends AbstractXmlReader
         implements JournalConstants {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(JournalReader.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(JournalReader.class);
 
     protected final Map<String, String> parameters;
 
@@ -85,11 +84,11 @@ public abstract class JournalReader
                                                                         recoveryLog,
                                                                         server},
                                                                 parameters);
-            LOG.info("JournalReader is " + journalReader.toString());
+            logger.info("JournalReader is " + journalReader.toString());
             return (JournalReader) journalReader;
         } catch (JournalException e) {
             String msg = "Can't create JournalReader";
-            LOG.error(msg, e);
+            logger.error(msg, e);
             throw new ModuleInitializationException(msg, role, e);
         }
     }

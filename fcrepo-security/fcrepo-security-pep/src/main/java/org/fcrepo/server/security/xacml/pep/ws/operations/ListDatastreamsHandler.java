@@ -19,24 +19,12 @@
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 import java.net.URI;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-
-import org.apache.axis.AxisFault;
-import org.apache.axis.MessageContext;
-import org.apache.axis.message.RPCParam;
-import org.apache.log4j.Logger;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
-import org.fcrepo.server.security.xacml.util.LogUtil;
-import org.fcrepo.server.types.gen.DatastreamDef;
 
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
@@ -47,6 +35,19 @@ import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Status;
 
+import org.apache.axis.AxisFault;
+import org.apache.axis.MessageContext;
+import org.apache.axis.message.RPCParam;
+
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.fcrepo.server.types.gen.DatastreamDef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -54,8 +55,8 @@ import com.sun.xacml.ctx.Status;
 public class ListDatastreamsHandler
         extends AbstractOperationHandler {
 
-    private static Logger log =
-            Logger.getLogger(ListDatastreamsHandler.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ListDatastreamsHandler.class);
 
     private final ContextUtil contextUtil = new ContextUtil();
 
@@ -66,8 +67,8 @@ public class ListDatastreamsHandler
 
     public RequestCtx handleResponse(MessageContext context)
             throws OperationHandlerException {
-        if (log.isDebugEnabled()) {
-            log.debug("ListDatastreamsHandler/handleResponse!");
+        if (logger.isDebugEnabled()) {
+            logger.debug("ListDatastreamsHandler/handleResponse!");
         }
 
         try {
@@ -79,7 +80,7 @@ public class ListDatastreamsHandler
 
             List<Object> oMap = getSOAPRequestObjects(context);
             if (oMap == null || oMap.size() == 0) {
-                log.error("No request objects!");
+                logger.error("No request objects!");
                 throw new OperationHandlerException("ListDatastream had no pid");
             }
             String pid = (String) oMap.get(0);
@@ -95,7 +96,7 @@ public class ListDatastreamsHandler
 
             setSOAPResponseObject(context, params);
         } catch (Exception e) {
-            log.error("Error filtering datastreams", e);
+            logger.error("Error filtering datastreams", e);
             throw new OperationHandlerException("Error filtering datastreams");
         }
 
@@ -104,8 +105,8 @@ public class ListDatastreamsHandler
 
     public RequestCtx handleRequest(MessageContext context)
             throws OperationHandlerException {
-        if (log.isDebugEnabled()) {
-            log.debug("ListDatastreamsHandler/handleRequest!");
+        if (logger.isDebugEnabled()) {
+            logger.debug("ListDatastreamsHandler/handleRequest!");
         }
 
         RequestCtx req = null;
@@ -116,9 +117,9 @@ public class ListDatastreamsHandler
 
         try {
             oMap = getSOAPRequestObjects(context);
-            log.debug("Retrieved SOAP Request Objects");
+            logger.debug("Retrieved SOAP Request Objects");
         } catch (AxisFault af) {
-            log.error("Error obtaining SOAP Request Objects", af);
+            logger.error("Error obtaining SOAP Request Objects", af);
             throw new OperationHandlerException("Error obtaining SOAP Request Objects",
                                                 af);
         }
@@ -127,12 +128,12 @@ public class ListDatastreamsHandler
             pid = (String) oMap.get(0);
             asOfDateTime = (String) oMap.get(1);
         } catch (Exception e) {
-            log.error("Error obtaining parameters", e);
+            logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",
                                                 e);
         }
 
-        log.debug("Extracted SOAP Request Objects");
+        logger.debug("Extracted SOAP Request Objects");
 
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
@@ -170,7 +171,7 @@ public class ListDatastreamsHandler
                             pid,
                             null);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw new OperationHandlerException(e.getMessage(), e);
         }
 
@@ -186,8 +187,8 @@ public class ListDatastreamsHandler
                 new HashMap<String, DatastreamDef>();
 
         for (DatastreamDef dsDef : dsDefs) {
-            if (log.isDebugEnabled()) {
-                log.debug("Checking: " + dsDef.getID());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Checking: " + dsDef.getID());
             }
 
             objects.put(dsDef.getID(), dsDef);
@@ -218,7 +219,7 @@ public class ListDatastreamsHandler
 
                 requests.add(contextUtil.makeRequestCtx(req));
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                logger.error(e.getMessage(), e);
                 throw new OperationHandlerException(e.getMessage(), e);
             }
         }
@@ -239,10 +240,9 @@ public class ListDatastreamsHandler
         List<DatastreamDef> resultObjects = new ArrayList<DatastreamDef>();
         for (Result r : results) {
             if (r.getResource() == null || "".equals(r.getResource())) {
-                log
-                        .warn("This resource has no resource identifier in the xacml response results!");
-            } else if (log.isDebugEnabled()) {
-                log.debug("Checking: " + r.getResource());
+                logger.warn("This resource has no resource identifier in the xacml response results!");
+            } else if (logger.isDebugEnabled()) {
+                logger.debug("Checking: " + r.getResource());
             }
 
             String[] ridComponents = r.getResource().split("\\/");
@@ -253,13 +253,12 @@ public class ListDatastreamsHandler
                 DatastreamDef tmp = objects.get(rid);
                 if (tmp != null) {
                     resultObjects.add(tmp);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Adding: " + r.getResource() + "[" + rid
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Adding: " + r.getResource() + "[" + rid
                                 + "]");
                     }
                 } else {
-                    log
-                            .warn("Not adding this object as no object found for this key: "
+                    logger.warn("Not adding this object as no object found for this key: "
                                     + r.getResource() + "[" + rid + "]");
                 }
             }

@@ -26,7 +26,8 @@ import java.util.Map;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -45,8 +46,8 @@ import com.sun.xacml.ctx.RequestCtx;
 public class GetDisseminationHandler
         extends AbstractOperationHandler {
 
-    private static Logger log =
-            Logger.getLogger(GetDisseminationHandler.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(GetDisseminationHandler.class);
 
     public GetDisseminationHandler()
             throws PEPException {
@@ -61,7 +62,7 @@ public class GetDisseminationHandler
     @SuppressWarnings("deprecation")
     public RequestCtx handleRequest(MessageContext context)
             throws OperationHandlerException {
-        log.debug("GetDisseminationHandler/handleRequest!");
+        logger.debug("GetDisseminationHandler/handleRequest!");
 
         RequestCtx req = null;
         List<Object> oMap = null;
@@ -74,9 +75,9 @@ public class GetDisseminationHandler
 
         try {
             oMap = getSOAPRequestObjects(context);
-            log.debug("Retrieved SOAP Request Objects");
+            logger.debug("Retrieved SOAP Request Objects");
         } catch (AxisFault af) {
-            log.error("Error obtaining SOAP Request Objects", af);
+            logger.error("Error obtaining SOAP Request Objects", af);
             throw new OperationHandlerException("Error obtaining SOAP Request Objects",
                                                 af);
         }
@@ -88,12 +89,12 @@ public class GetDisseminationHandler
             // properties = (Property[]) oMap.get(3);
             asOfDateTime = (String) oMap.get(4);
         } catch (Exception e) {
-            log.error("Error obtaining parameters", e);
+            logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",
                                                 e);
         }
 
-        log.debug("Extracted SOAP Request Objects");
+        logger.debug("Extracted SOAP Request Objects");
 
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
@@ -139,7 +140,7 @@ public class GetDisseminationHandler
                             pid,
                             null);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw new OperationHandlerException(e.getMessage(), e);
         }
 

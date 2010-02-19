@@ -1,14 +1,14 @@
 /*
  * File: LdapModule.java
- * 
+ *
  * Copyright 2009 Muradora
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -19,9 +19,12 @@
 package org.fcrepo.server.security.jaas.auth.module;
 
 import java.io.IOException;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 import java.text.MessageFormat;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,6 +43,7 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -49,15 +53,16 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.security.jaas.auth.UserPrincipal;
 import org.fcrepo.server.security.jaas.util.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LdapModule
         implements LoginModule {
 
-    private static final Logger log = Logger.getLogger(LdapModule.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(LdapModule.class);
 
     private Subject subject = null;
 
@@ -93,13 +98,13 @@ public class LdapModule
         attributes = new HashMap<String, Set<String>>();
 
         if (debug) {
-            log.debug("login module initialised: " + this.getClass().getName());
+            logger.debug("login module initialised: " + this.getClass().getName());
         }
     }
 
     public boolean login() throws LoginException {
         if (debug) {
-            log.debug(this.getClass().getName() + " login called.");
+            logger.debug(this.getClass().getName() + " login called.");
         }
 
         // The only 2 callback types that are supported.
@@ -138,7 +143,7 @@ public class LdapModule
             subject.getPrincipals().add(principal);
             subject.getPublicCredentials().add(attributes);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return false;
         }
 
@@ -149,7 +154,7 @@ public class LdapModule
         try {
             clear();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return false;
         }
 
@@ -160,7 +165,7 @@ public class LdapModule
         try {
             clear();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return false;
         }
 
@@ -199,27 +204,27 @@ public class LdapModule
 
             if ("bind".equals(bindMode)) {
                 if (debug) {
-                    log.debug("authenticating with mode: " + bindMode);
+                    logger.debug("authenticating with mode: " + bindMode);
                 }
 
                 return bind(username, password, env, attrList);
             } else if ("bind-search-compare".equals(bindMode)) {
                 if (debug) {
-                    log.debug("authenticating with mode: " + bindMode);
+                    logger.debug("authenticating with mode: " + bindMode);
                 }
 
                 return bindSearchX(username, password, env, attrList, false);
             } else if ("bind-search-bind".equals(bindMode)) {
                 if (debug) {
-                    log.debug("authenticating with mode: " + bindMode);
+                    logger.debug("authenticating with mode: " + bindMode);
                 }
 
                 return bindSearchX(username, password, env, attrList, true);
             }
         } catch (NamingException ne) {
-            log.error(ne.getMessage());
+            logger.error(ne.getMessage());
         } catch (Exception e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
         }
 
         return false;
@@ -232,7 +237,7 @@ public class LdapModule
         String bindFilter = getOption("bind.filter", true);
         String dn = MessageFormat.format(bindFilter, username);
         if (debug) {
-            log.debug("authenticating user: " + dn);
+            logger.debug("authenticating user: " + dn);
         }
 
         env.put(Context.SECURITY_PRINCIPAL, dn);
@@ -265,7 +270,7 @@ public class LdapModule
         try {
             ctx = new InitialDirContext(env);
         } catch (NamingException ne) {
-            log.error("Failed to bind as bindUser: " + bindUser);
+            logger.error("Failed to bind as bindUser: " + bindUser);
             throw ne;
         }
 
@@ -292,13 +297,13 @@ public class LdapModule
         NamingEnumeration<SearchResult> results =
                 ctx.search(searchBase, filter, sc);
         if (!results.hasMore()) {
-            log.warn("no valid user found.");
+            logger.warn("no valid user found.");
             return false;
         }
 
         SearchResult result = results.next();
         if (debug) {
-            log.debug("authenticating user: " + result.getNameInNamespace());
+            logger.debug("authenticating user: " + result.getNameInNamespace());
         }
 
         if (bind) {
@@ -317,7 +322,7 @@ public class LdapModule
             try {
                 new InitialDirContext(userEnv);
             } catch (NamingException ne) {
-                log.error("failed to authenticate user: "
+                logger.error("failed to authenticate user: "
                         + result.getNameInNamespace());
                 throw ne;
             }
@@ -325,7 +330,7 @@ public class LdapModule
             // get userPassword attribute
             Attribute up = result.getAttributes().get("userPassword");
             if (up == null) {
-                log.error("unable to read userPassword attribute for: "
+                logger.error("unable to read userPassword attribute for: "
                         + result.getNameInNamespace());
                 return false;
             }
@@ -364,7 +369,7 @@ public class LdapModule
                     aValues.add((String) value);
 
                     if (debug) {
-                        log.debug("added to principal: " + attribute.getID()
+                        logger.debug("added to principal: " + attribute.getID()
                                 + "/" + value);
                     }
                 }
@@ -376,7 +381,7 @@ public class LdapModule
      * Method to compare two passwords. The method attempts to encode the user
      * password based on the ldap password encoding extracted from the storage
      * format (e.g. {SHA}g0bbl3d3g00ka12@#19/=).
-     * 
+     *
      * @param userPassword
      *        the password that the user entered
      * @param ldapPassword
@@ -395,16 +400,16 @@ public class LdapModule
             // compare
             String encoding = m.group(1);
             String password = m.group(2);
-            if (log.isDebugEnabled()) {
-                log.debug("Encoding: " + encoding + ", Password: " + password);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Encoding: " + encoding + ", Password: " + password);
             }
 
             MessageDigest digest = null;
             try {
                 digest = MessageDigest.getInstance(encoding.toUpperCase());
             } catch (NoSuchAlgorithmException e) {
-                log.error("Unsupported Algorithm used: " + encoding);
-                log.error(e.getMessage());
+                logger.error("Unsupported Algorithm used: " + encoding);
+                logger.error(e.getMessage());
                 return false;
             }
 

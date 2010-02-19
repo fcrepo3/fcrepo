@@ -23,8 +23,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
@@ -46,6 +44,8 @@ import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -90,9 +90,8 @@ public class ListMethodsServlet
         extends HttpServlet
         implements Constants {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(ListMethodsServlet.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ListMethodsServlet.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -155,7 +154,7 @@ public class ListMethodsServlet
             try {
                 PID = Server.getPID(URIArray[5]).toString(); // normalize PID
             } catch (Throwable th) {
-                LOG.error("Bad pid syntax in request", th);
+                logger.error("Bad pid syntax in request", th);
                 throw new BadRequest400Exception(request,
                                                  ACTION_LABEL,
                                                  "",
@@ -165,7 +164,7 @@ public class ListMethodsServlet
                 // Request is a versioned listMethods request
                 versDateTime = DateUtility.convertStringToDate(URIArray[6]);
                 if (versDateTime == null) {
-                    LOG.error("Bad date format in request");
+                    logger.error("Bad date format in request");
                     throw new BadRequest400Exception(request,
                                                      ACTION_LABEL,
                                                      "",
@@ -174,10 +173,10 @@ public class ListMethodsServlet
                     asOfDateTime = versDateTime;
                 }
             }
-            LOG.debug("Listing methods (PID=" + PID + ", asOfDate="
+            logger.debug("Listing methods (PID=" + PID + ", asOfDate="
                     + versDateTime + ")");
         } else {
-            LOG.error("Bad syntax (expected 6 or 7 parts) in request");
+            logger.error("Bad syntax (expected 6 or 7 parts) in request");
             throw new BadRequest400Exception(request,
                                              ACTION_LABEL,
                                              "",
@@ -192,16 +191,16 @@ public class ListMethodsServlet
             Context context =
                     ReadOnlyContext.getContext(HTTP_REQUEST.REST.uri, request);
             listMethods(context, PID, asOfDateTime, xml, request, response);
-            LOG.debug("Finished listing methods");
+            logger.debug("Finished listing methods");
         } catch (ObjectNotFoundException e) {
-            LOG.error("Object not found for request: " + requestURI
+            logger.error("Object not found for request: " + requestURI
                     + " (actionLabel=" + ACTION_LABEL + ")", e);
             throw new NotFound404Exception(request,
                                            ACTION_LABEL,
                                            "",
                                            new String[0]);
         } catch (DisseminationException e) {
-            LOG.error("Error Listing Methods: " + requestURI + " (actionLabel="
+            logger.error("Error Listing Methods: " + requestURI + " (actionLabel="
                     + ACTION_LABEL + ")", e);
             throw new NotFound404Exception("Error Listing Methods",
                                            e,
@@ -210,20 +209,20 @@ public class ListMethodsServlet
                                            "",
                                            new String[0]);
         } catch (ObjectNotInLowlevelStorageException e) {
-            LOG.error("Object not found for request: " + requestURI
+            logger.error("Object not found for request: " + requestURI
                     + " (actionLabel=" + ACTION_LABEL + ")", e);
             throw new NotFound404Exception(request,
                                            ACTION_LABEL,
                                            "",
                                            new String[0]);
         } catch (AuthzException ae) {
-            LOG.error("Authorization error listing methods", ae);
+            logger.error("Authorization error listing methods", ae);
             throw RootException.getServletException(ae,
                                                     request,
                                                     ACTION_LABEL,
                                                     new String[0]);
         } catch (Throwable th) {
-            LOG.error("Error listing methods", th);
+            logger.error("Error listing methods", th);
             throw new InternalError500Exception("Error listing methods",
                                                 th,
                                                 request,
@@ -300,7 +299,7 @@ public class ListMethodsServlet
             throw e;
         } catch (Throwable th) {
             String message = "Error listing methods";
-            LOG.error(message, th);
+            logger.error(message, th);
             throw new GeneralException(message, th);
         } finally {
             try {
@@ -456,14 +455,14 @@ public class ListMethodsServlet
                     pw.flush();
                     pw.close();
                 } catch (IOException ioe) {
-                    LOG.error("WriteThread error", ioe);
+                    logger.error("WriteThread error", ioe);
                 } finally {
                     try {
                         if (pw != null) {
                             pw.close();
                         }
                     } catch (IOException ioe) {
-                        LOG.error("WriteThread error", ioe);
+                        logger.error("WriteThread error", ioe);
                     }
                 }
             }
