@@ -13,13 +13,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.proxy.AbstractInvocationHandler;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link java.lang.reflect.InvocationHandler InvocationHandler} responsible
@@ -31,9 +29,8 @@ import org.fcrepo.server.proxy.AbstractInvocationHandler;
 public class NotificationInvocationHandler
         extends AbstractInvocationHandler {
 
-    /** Logger for this class. */
-    private static Logger LOG =
-            Logger.getLogger(MessagingModule.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(MessagingModule.class);
 
     private Messaging messaging;
     private boolean attemptedToLoad = false;
@@ -77,7 +74,7 @@ public class NotificationInvocationHandler
             Server server = Server.getInstance(new File(Constants.FEDORA_HOME), false);
             messaging = (MessagingModule)server.getModule("org.fcrepo.server.messaging.Messaging");
             if (messaging == null) {
-                LOG.warn("Unable to load MessagingModule.");
+                logger.warn("Unable to load MessagingModule.");
             }
             attemptedToLoad = true;
         }

@@ -31,8 +31,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
@@ -55,6 +53,8 @@ import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -143,9 +143,8 @@ public class FedoraAccessServlet
         extends HttpServlet
         implements Constants {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(FedoraAccessServlet.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(FedoraAccessServlet.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -201,7 +200,7 @@ public class FedoraAccessServlet
                 request.getRequestURL().toString()
                         + (request.getQueryString() != null ? "?"
                                 + request.getQueryString() : "");
-        LOG.info("Got request: " + requestURI);
+        logger.info("Got request: " + requestURI);
 
         // Parse servlet URL.
         // For the Fedora API-A-LITE "get" syntax, valid entries include:
@@ -256,7 +255,7 @@ public class FedoraAccessServlet
                                         + "/PID[/dateTime] \"  ."
                                         + " <br></br> Submitted request was: \""
                                         + requestURI + "\"  .  ";
-                        LOG.warn(message);
+                        logger.warn(message);
                         throw new ServletException("from FedoraAccessServlet"
                                 + message);
                         /*
@@ -307,7 +306,7 @@ public class FedoraAccessServlet
                                         + "/PID/dsID[/dateTime] \"  "
                                         + " <br></br> Submitted request was: \""
                                         + requestURI + "\"  .  ";
-                        LOG.warn(message);
+                        logger.warn(message);
                         throw new ServletException("from FedoraAccessServlet"
                                 + message);
                         /*
@@ -346,7 +345,7 @@ public class FedoraAccessServlet
                                     + "/PID/sDefPID/methodName[/dateTime][?ParmArray] \"  "
                                     + " <br></br> Submitted request was: \""
                                     + requestURI + "\"  .  ";
-                    LOG.warn(message);
+                    logger.warn(message);
                     throw new ServletException("from FedoraAccessServlet"
                             + message);
                     /*
@@ -375,7 +374,7 @@ public class FedoraAccessServlet
                                 + "/PID/sDefPID/methodName[/dateTime][?ParmArray] \"  "
                                 + " <br></br> Submitted request was: \""
                                 + requestURI + "\"  .  ";
-                LOG.warn(message);
+                logger.warn(message);
                 throw new ServletException("from FedoraAccessServlet" + message);
                 /*
                  * commented out for exception.jsp test
@@ -424,7 +423,7 @@ public class FedoraAccessServlet
 
         try {
             if (isGetObjectProfileRequest) {
-                LOG.debug("Servicing getObjectProfile request " + "(PID=" + PID
+                logger.debug("Servicing getObjectProfile request " + "(PID=" + PID
                         + ", asOfDate=" + versDateTime + ")");
 
                 Context context =
@@ -437,10 +436,10 @@ public class FedoraAccessServlet
                                  request,
                                  response);
 
-                LOG.debug("Finished servicing getObjectProfile request");
+                logger.debug("Finished servicing getObjectProfile request");
             } else if (isGetDisseminationRequest) {
                 sDefPID = URIArray[6];
-                LOG.debug("Servicing getDissemination request (PID=" + PID
+                logger.debug("Servicing getDissemination request (PID=" + PID
                         + ", sDefPID=" + sDefPID + ", methodName=" + methodName
                         + ", asOfDate=" + versDateTime + ")");
 
@@ -456,9 +455,9 @@ public class FedoraAccessServlet
                                  response,
                                  request);
 
-                LOG.debug("Finished servicing getDissemination request");
+                logger.debug("Finished servicing getDissemination request");
             } else if (isGetDatastreamDisseminationRequest) {
-                LOG.debug("Servicing getDatastreamDissemination request "
+                logger.debug("Servicing getDatastreamDissemination request "
                         + "(PID=" + PID + ", dsID=" + dsID + ", asOfDate="
                         + versDateTime + ")");
 
@@ -472,43 +471,43 @@ public class FedoraAccessServlet
                                            response,
                                            request);
 
-                LOG.debug("Finished servicing getDatastreamDissemination "
+                logger.debug("Finished servicing getDatastreamDissemination "
                         + "request");
             }
         } catch (MethodNotFoundException e) {
-            LOG.error("Method not found for request: " + requestURI
+            logger.error("Method not found for request: " + requestURI
                     + " (actionLabel=" + actionLabel + ")", e);
             throw new NotFound404Exception("", e, request, actionLabel, e
                     .getMessage(), new String[0]);
         } catch (DatastreamNotFoundException e) {
-            LOG.error("Datastream not found for request: " + requestURI
+            logger.error("Datastream not found for request: " + requestURI
                     + " (actionLabel=" + actionLabel + ")", e);
             throw new NotFound404Exception("", e, request, actionLabel, e
                     .getMessage(), new String[0]);
         } catch (ObjectNotFoundException e) {
-            LOG.error("Object not found for request: " + requestURI
+            logger.error("Object not found for request: " + requestURI
                     + " (actionLabel=" + actionLabel + ")", e);
             throw new NotFound404Exception("", e, request, actionLabel, e
                     .getMessage(), new String[0]);
         } catch (DisseminationException e) {
-            LOG.error("Dissemination failed: " + requestURI + " (actionLabel="
+            logger.error("Dissemination failed: " + requestURI + " (actionLabel="
                     + actionLabel + ")", e);
             throw new NotFound404Exception("", e, request, actionLabel, e
                     .getMessage(), new String[0]);
         } catch (ObjectNotInLowlevelStorageException e) {
-            LOG.error("Object or datastream not found for request: "
+            logger.error("Object or datastream not found for request: "
                     + requestURI + " (actionLabel=" + actionLabel + ")", e);
             throw new NotFound404Exception("", e, request, actionLabel, e
                     .getMessage(), new String[0]);
         } catch (AuthzException ae) {
-            LOG.error("Authorization failed for request: " + requestURI
+            logger.error("Authorization failed for request: " + requestURI
                     + " (actionLabel=" + actionLabel + ")", ae);
             throw RootException.getServletException(ae,
                                                     request,
                                                     actionLabel,
                                                     new String[0]);
         } catch (Throwable th) {
-            LOG.error("Unexpected error servicing API-A request", th);
+            logger.error("Unexpected error servicing API-A request", th);
             throw new InternalError500Exception("",
                                                 th,
                                                 request,
@@ -588,7 +587,7 @@ public class FedoraAccessServlet
             throw e;
         } catch (Throwable th) {
             String message = "Error getting object profile";
-            LOG.error(message, th);
+            logger.error(message, th);
             throw new GeneralException(message, th);
         } finally {
             try {
@@ -600,7 +599,7 @@ public class FedoraAccessServlet
                 }
             } catch (Throwable th) {
                 String message = "Error closing output";
-                LOG.error(message, th);
+                logger.error(message, th);
                 throw new StreamIOException(message);
             }
         }
@@ -622,7 +621,7 @@ public class FedoraAccessServlet
                                                     asOfDateTime);
         try {
             // testing to see what's in request header that might be of interest
-            if (LOG.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 for (Enumeration<?> e = request.getHeaderNames(); e
                         .hasMoreElements();) {
                     String name = (String) e.nextElement();
@@ -632,7 +631,7 @@ public class FedoraAccessServlet
                         sb.append((String) headerValues.nextElement());
                     }
                     String value = sb.toString();
-                    LOG.debug("FEDORASERVLET REQUEST HEADER CONTAINED: " + name
+                    logger.debug("FEDORASERVLET REQUEST HEADER CONTAINED: " + name
                             + " : " + value);
                 }
             }
@@ -675,7 +674,7 @@ public class FedoraAccessServlet
                                         .equalsIgnoreCase("content-type")) {
                             response.addHeader(headerArray[i].name,
                                                headerArray[i].value);
-                            LOG.debug("THIS WAS ADDED TO FEDORASERVLET "
+                            logger.debug("THIS WAS ADDED TO FEDORASERVLET "
                                     + "RESPONSE HEADER FROM ORIGINATING "
                                     + "PROVIDER " + headerArray[i].name + " : "
                                     + headerArray[i].value);
@@ -684,7 +683,7 @@ public class FedoraAccessServlet
                 }
                 out = response.getOutputStream();
                 int byteStream = 0;
-                LOG.debug("Started reading dissemination stream");
+                logger.debug("Started reading dissemination stream");
                 InputStream dissemResult = dissemination.getStream();
                 byte[] buffer = new byte[BUF];
                 while ((byteStream = dissemResult.read(buffer)) != -1) {
@@ -695,7 +694,7 @@ public class FedoraAccessServlet
                 dissemResult = null;
                 out.flush();
                 out.close();
-                LOG.debug("Finished reading dissemination stream");
+                logger.debug("Finished reading dissemination stream");
             }
         } finally {
             dissemination.close();
@@ -750,7 +749,7 @@ public class FedoraAccessServlet
         out = response.getOutputStream();
         try {
             // testing to see what's in request header that might be of interest
-            if (LOG.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 for (Enumeration<?> e = request.getHeaderNames(); e
                         .hasMoreElements();) {
                     String name = (String) e.nextElement();
@@ -760,7 +759,7 @@ public class FedoraAccessServlet
                         sb.append((String) headerValues.nextElement());
                     }
                     String value = sb.toString();
-                    LOG.debug("FEDORASERVLET REQUEST HEADER CONTAINED: " + name
+                    logger.debug("FEDORASERVLET REQUEST HEADER CONTAINED: " + name
                             + " : " + value);
                 }
             }
@@ -802,7 +801,7 @@ public class FedoraAccessServlet
                                         .equalsIgnoreCase("content-type")) {
                             response.addHeader(headerArray[i].name,
                                                headerArray[i].value);
-                            LOG.debug("THIS WAS ADDED TO FEDORASERVLET "
+                            logger.debug("THIS WAS ADDED TO FEDORASERVLET "
                                     + "RESPONSE HEADER FROM ORIGINATING "
                                     + "PROVIDER " + headerArray[i].name + " : "
                                     + headerArray[i].value);
@@ -810,7 +809,7 @@ public class FedoraAccessServlet
                     }
                 }
                 int byteStream = 0;
-                LOG.debug("Started reading dissemination stream");
+                logger.debug("Started reading dissemination stream");
                 InputStream dissemResult = dissemination.getStream();
                 byte[] buffer = new byte[BUF];
                 while ((byteStream = dissemResult.read(buffer)) != -1) {
@@ -821,7 +820,7 @@ public class FedoraAccessServlet
                 dissemResult = null;
                 out.flush();
                 out.close();
-                LOG.debug("Finished reading dissemination stream");
+                logger.debug("Finished reading dissemination stream");
             }
         } finally {
             dissemination.close();
@@ -925,14 +924,14 @@ public class FedoraAccessServlet
                     pw.flush();
                     pw.close();
                 } catch (IOException ioe) {
-                    LOG.error("WriteThread IOException", ioe);
+                    logger.error("WriteThread IOException", ioe);
                 } finally {
                     try {
                         if (pw != null) {
                             pw.close();
                         }
                     } catch (IOException ioe) {
-                        LOG.error("WriteThread IOException", ioe);
+                        logger.error("WriteThread IOException", ioe);
                     }
                 }
             }

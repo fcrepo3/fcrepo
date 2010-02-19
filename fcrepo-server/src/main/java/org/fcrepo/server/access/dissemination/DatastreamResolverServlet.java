@@ -22,8 +22,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
@@ -42,6 +40,8 @@ import org.fcrepo.server.storage.types.DatastreamMediation;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.server.utilities.ServerUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -68,9 +68,8 @@ import org.fcrepo.server.utilities.ServerUtility;
 public class DatastreamResolverServlet
         extends HttpServlet {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DatastreamResolverServlet.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DatastreamResolverServlet.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -96,6 +95,7 @@ public class DatastreamResolverServlet
      * @throws ServletException
      *         If the servlet cannot be initialized.
      */
+    @Override
     public void init() throws ServletException {
         try {
             s_server =
@@ -110,19 +110,19 @@ public class DatastreamResolverServlet
             String expireLimit =
                     s_server.getParameter("datastreamMediationLimit");
             if (expireLimit == null || expireLimit.equalsIgnoreCase("")) {
-                LOG.info("datastreamMediationLimit unspecified, using default "
+                logger.info("datastreamMediationLimit unspecified, using default "
                         + "of 5 seconds");
                 datastreamMediationLimit = 5000;
             } else {
                 datastreamMediationLimit = new Integer(expireLimit).intValue();
-                LOG.info("datastreamMediationLimit: "
+                logger.info("datastreamMediationLimit: "
                         + datastreamMediationLimit);
             }
         } catch (InitializationException ie) {
             throw new ServletException("Unable to get an instance of Fedora server "
                     + "-- " + ie.getMessage());
         } catch (Throwable th) {
-            LOG.error("Error initializing servlet", th);
+            logger.error("Error initializing servlet", th);
         }
     }
 
@@ -152,6 +152,7 @@ public class DatastreamResolverServlet
      * @throws IOException
      *         If an error occurrs with an input or output operation.
      */
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String id = null;
@@ -170,9 +171,9 @@ public class DatastreamResolverServlet
                         + request.getQueryString();
 
         id = request.getParameter("id").replaceAll("T", " ");
-        LOG.debug("Datastream tempID=" + id);
+        logger.debug("Datastream tempID=" + id);
 
-        LOG.debug("DRS doGet()");
+        logger.debug("DRS doGet()");
 
         try {
             // Check for required id parameter.
@@ -181,7 +182,7 @@ public class DatastreamResolverServlet
                         "[DatastreamResolverServlet] No datastream ID "
                                 + "specified in servlet request: "
                                 + request.getRequestURI();
-                LOG.error(message);
+                logger.error(message);
                 response
                         .setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response
@@ -208,40 +209,18 @@ public class DatastreamResolverServlet
             dsControlGroupType = dm.dsControlGroupType;
             user = dm.callUsername;
             pass = dm.callPassword;
-            if (LOG.isDebugEnabled()) {
-                LOG
-                        .debug("**************************** DatastreamResolverServlet dm.dsLocation: "
-                                + dm.dsLocation);
-                LOG
-                        .debug("**************************** DatastreamResolverServlet dm.dsControlGroupType: "
-                                + dm.dsControlGroupType);
-                LOG
-                        .debug("**************************** DatastreamResolverServlet dm.callUsername: "
-                                + dm.callUsername);
-                LOG
-                        .debug("**************************** DatastreamResolverServlet dm.Password: "
-                                + dm.callPassword);
-                LOG
-                        .debug("**************************** DatastreamResolverServlet dm.callbackRole: "
-                                + dm.callbackRole);
-                LOG
-                        .debug("**************************** DatastreamResolverServlet dm.callbackBasicAuth: "
-                                + dm.callbackBasicAuth);
-                LOG
-                        .debug("**************************** DatastreamResolverServlet dm.callBasicAuth: "
-                                + dm.callBasicAuth);
-                LOG
-                        .debug("**************************** DatastreamResolverServlet dm.callbackSSl: "
-                                + dm.callbackSSL);
-                LOG
-                        .debug("**************************** DatastreamResolverServlet dm.callSSl: "
-                                + dm.callSSL);
-                LOG
-                        .debug("**************************** DatastreamResolverServlet non ssl port: "
-                                + fedoraServerPort);
-                LOG
-                        .debug("**************************** DatastreamResolverServlet ssl port: "
-                                + fedoraServerRedirectPort);
+            if (logger.isDebugEnabled()) {
+                logger.debug("**************************** DatastreamResolverServlet dm.dsLocation: {}", dm.dsLocation);
+                logger.debug("**************************** DatastreamResolverServlet dm.dsControlGroupType: {}", dm.dsControlGroupType);
+                logger.debug("**************************** DatastreamResolverServlet dm.callUsername: {}", dm.callUsername);
+                logger.debug("**************************** DatastreamResolverServlet dm.Password: {}", dm.callPassword);
+                logger.debug("**************************** DatastreamResolverServlet dm.callbackRole: {}", dm.callbackRole);
+                logger.debug("**************************** DatastreamResolverServlet dm.callbackBasicAuth: {}", dm.callbackBasicAuth);
+                logger.debug("**************************** DatastreamResolverServlet dm.callBasicAuth: {}", dm.callBasicAuth);
+                logger.debug("**************************** DatastreamResolverServlet dm.callbackSSl: {}", dm.callbackSSL);
+                logger.debug("**************************** DatastreamResolverServlet dm.callSSl: {}", dm.callSSL);
+                logger.debug("**************************** DatastreamResolverServlet non ssl port: {}", fedoraServerPort);
+                logger.debug("**************************** DatastreamResolverServlet ssl port: {}", fedoraServerRedirectPort);
             }
 
             // DatastreamResolverServlet maps to two distinct servlet mappings
@@ -277,8 +256,8 @@ public class DatastreamResolverServlet
                     && (ServerUtility.isURLFedoraServer(dsPhysicalLocation)
                             || dsControlGroupType.equals("M") || dsControlGroupType
                             .equals("X"))) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("*********************** Changed role from: "
+                if (logger.isDebugEnabled()) {
+                    logger.debug("*********************** Changed role from: "
                             + dm.callbackRole + "  to: "
                             + BackendPolicies.BACKEND_SERVICE_CALL_UNSECURE);
                 }
@@ -304,8 +283,8 @@ public class DatastreamResolverServlet
                             dsPhysicalLocation
                                     .replaceFirst(fedoraServerPort,
                                                   fedoraServerRedirectPort);
-                    if (LOG.isDebugEnabled()) {
-                        LOG
+                    if (logger.isDebugEnabled()) {
+                        logger
                                 .debug("*********************** DatastreamResolverServlet -- Was Fedora-to-Fedora call -- modified dsPhysicalLocation: "
                                         + dsPhysicalLocation);
                     }
@@ -313,7 +292,7 @@ public class DatastreamResolverServlet
             }
             keyTimestamp = Timestamp.valueOf(ds.extractTimestamp(id));
             currentTimestamp = new Timestamp(new Date().getTime());
-            LOG.debug("dsPhysicalLocation=" + dsPhysicalLocation
+            logger.debug("dsPhysicalLocation=" + dsPhysicalLocation
                     + "dsControlGroupType=" + dsControlGroupType);
 
             // Deny mechanism requests that fall outside the specified time
@@ -322,9 +301,9 @@ public class DatastreamResolverServlet
             // parameter
             // named "datastreamMediationLimit" which is in milliseconds.
             long diff = currentTimestamp.getTime() - keyTimestamp.getTime();
-            LOG.debug("Timestamp diff for mechanism's reponse: " + diff
+            logger.debug("Timestamp diff for mechanism's reponse: " + diff
                     + " ms.");
-            if (diff > (long) datastreamMediationLimit) {
+            if (diff > datastreamMediationLimit) {
                 out = response.getWriter();
                 response.setContentType(HTML_CONTENT_TYPE);
                 out
@@ -335,7 +314,7 @@ public class DatastreamResolverServlet
                                 + datastreamMediationLimit
                                 + "\""
                                 + "milliseconds. Datastream access denied.");
-                LOG.error("Deployment failed to respond to "
+                logger.error("Deployment failed to respond to "
                         + "DatastreamResolverServlet within time limit of "
                         + datastreamMediationLimit);
                 out.close();
@@ -354,11 +333,11 @@ public class DatastreamResolverServlet
                                                request); // , targetRoles);
             if (request.getRemoteUser() == null) {
                 // non-authn: must accept target role of ticket
-                LOG.debug("DatastreamResolverServlet: unAuthenticated request");
+                logger.debug("DatastreamResolverServlet: unAuthenticated request");
             } else {
                 // authn: check user roles for target role of ticket
                 /*
-                 * LOG.debug("DatastreamResolverServlet: Authenticated request
+                 * logger.debug("DatastreamResolverServlet: Authenticated request
                  * getting user"); String[] roles = null; Principal principal =
                  * request.getUserPrincipal(); if (principal == null) { // no
                  * principal to grok roles from!! } else { try { roles =
@@ -366,30 +345,30 @@ public class DatastreamResolverServlet
                  * if (roles == null) { roles = new String[0]; }
                  */
                 //XXXXXXXXXXXXXXXXXXXXXXxif (contains(roles, targetRole)) {
-                LOG.debug("DatastreamResolverServlet: user=="
+                logger.debug("DatastreamResolverServlet: user=="
                         + request.getRemoteUser());
                 /*
                  * if
                  * (((ExtendedHttpServletRequest)request).isUserInRole(targetRole)) {
-                 * LOG.debug("DatastreamResolverServlet: user has required
-                 * role"); } else { LOG.debug("DatastreamResolverServlet: authZ
+                 * logger.debug("DatastreamResolverServlet: user has required
+                 * role"); } else { logger.debug("DatastreamResolverServlet: authZ
                  * exception in validating user"); throw new
                  * AuthzDeniedException("wrong user for this ticket"); }
                  */
             }
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("debugging backendService role");
-                LOG.debug("targetRole=" + targetRole);
+            if (logger.isDebugEnabled()) {
+                logger.debug("debugging backendService role");
+                logger.debug("targetRole=" + targetRole);
                 int targetRolesLength = targetRoles.length;
-                LOG.debug("targetRolesLength=" + targetRolesLength);
+                logger.debug("targetRolesLength=" + targetRolesLength);
                 if (targetRolesLength > 0) {
-                    LOG.debug("targetRoles[0]=" + targetRoles[0]);
+                    logger.debug("targetRoles[0]=" + targetRoles[0]);
                 }
                 int nSubjectValues = context.nSubjectValues(targetRole);
-                LOG.debug("nSubjectValues=" + nSubjectValues);
+                logger.debug("nSubjectValues=" + nSubjectValues);
                 if (nSubjectValues > 0) {
-                    LOG.debug("context.getSubjectValue(targetRole)="
+                    logger.debug("context.getSubjectValue(targetRole)="
                             + context.getSubjectValue(targetRole));
                 }
                 Iterator it = context.subjectAttributes();
@@ -398,17 +377,17 @@ public class DatastreamResolverServlet
                     int n = context.nSubjectValues(name);
                     switch (n) {
                         case 0:
-                            LOG.debug("no subject attributes for " + name);
+                            logger.debug("no subject attributes for " + name);
                             break;
                         case 1:
                             String value = context.getSubjectValue(name);
-                            LOG.debug("single subject attributes for " + name
+                            logger.debug("single subject attributes for " + name
                                     + "=" + value);
                             break;
                         default:
                             String[] values = context.getSubjectValues(name);
                             for (String element : values) {
-                                LOG
+                                logger
                                         .debug("another subject attribute from context "
                                                 + name + "=" + element);
                             }
@@ -418,25 +397,25 @@ public class DatastreamResolverServlet
                 while (it.hasNext()) {
                     String name = (String) it.next();
                     String value = context.getEnvironmentValue(name);
-                    LOG.debug("another environment attribute from context "
+                    logger.debug("another environment attribute from context "
                             + name + "=" + value);
                 }
             }
             /*
              * // Enforcement of Backend Security is temporarily disabled
-             * pending refactoring. // LOG.debug("DatastreamResolverServlet:
+             * pending refactoring. // logger.debug("DatastreamResolverServlet:
              * about to do final authZ check"); Authorization authorization =
              * (Authorization) s_server
              * .getModule("org.fcrepo.server.security.Authorization");
              * authorization.enforceResolveDatastream(context, keyTimestamp);
-             * LOG.debug("DatastreamResolverServlet: final authZ check
+             * logger.debug("DatastreamResolverServlet: final authZ check
              * suceeded.....");
              */
 
             if (dsControlGroupType.equalsIgnoreCase("E")) {
                 // testing to see what's in request header that might be of
                 // interest
-                if (LOG.isDebugEnabled()) {
+                if (logger.isDebugEnabled()) {
                     for (Enumeration e = request.getHeaderNames(); e
                             .hasMoreElements();) {
                         String name = (String) e.nextElement();
@@ -446,7 +425,7 @@ public class DatastreamResolverServlet
                             sb.append((String) headerValues.nextElement());
                         }
                         String value = sb.toString();
-                        LOG
+                        logger
                                 .debug("DATASTREAMRESOLVERSERVLET REQUEST HEADER CONTAINED: "
                                         + name + " : " + value);
                     }
@@ -460,7 +439,7 @@ public class DatastreamResolverServlet
                 ContentManagerParams params = new ContentManagerParams(dsPhysicalLocation);
                 params.setContext(context);
                 mimeTypedStream = externalContentManager.getExternalContent(params);
-                
+
                 // had substituted context:
                 // ReadOnlyContext.getContext(Constants.HTTP_REQUEST.REST.uri,
                 // request));
@@ -474,7 +453,7 @@ public class DatastreamResolverServlet
                                         .equalsIgnoreCase("content-type")) {
                             response.addHeader(headerArray[i].name,
                                                headerArray[i].value);
-                            LOG
+                            logger
                                     .debug("THIS WAS ADDED TO DATASTREAMRESOLVERSERVLET RESPONSE HEADER FROM ORIGINATING PROVIDER "
                                             + headerArray[i].name
                                             + " : "
@@ -506,13 +485,13 @@ public class DatastreamResolverServlet
                             "[DatastreamResolverServlet]  The "
                                     + "internal Fedora datastream id:  \""
                                     + dsPhysicalLocation + "\"  is invalid.";
-                    LOG.error(message);
+                    logger.error(message);
                     throw new ServletException(message);
                 }
                 PID = s[0];
                 dsID = s[1];
                 dsVersionID = s[2];
-                LOG.debug("PID=" + PID + ", dsID=" + dsID + ", dsVersionID="
+                logger.debug("PID=" + PID + ", dsID=" + dsID + ", dsVersionID="
                         + dsVersionID);
 
                 DOReader doReader =
@@ -520,8 +499,8 @@ public class DatastreamResolverServlet
                                             context,
                                             PID);
                 Datastream d =
-                        (Datastream) doReader.getDatastream(dsID, dsVersionID);
-                LOG.debug("Got datastream: " + d.DatastreamID);
+                        doReader.getDatastream(dsID, dsVersionID);
+                logger.debug("Got datastream: " + d.DatastreamID);
                 InputStream is = d.getContentStream();
                 int bytestream = 0;
                 response.setContentType(d.DSMIME);
@@ -539,17 +518,17 @@ public class DatastreamResolverServlet
                         .println("<br>[DatastreamResolverServlet] Unknown "
                                 + "dsControlGroupType: " + dsControlGroupType
                                 + "</br>");
-                LOG.error("Unknown dsControlGroupType: " + dsControlGroupType);
+                logger.error("Unknown dsControlGroupType: " + dsControlGroupType);
             }
         } catch (AuthzException ae) {
-            LOG.error("Authorization failure resolving datastream"
+            logger.error("Authorization failure resolving datastream"
                     + " (actionLabel=" + ACTION_LABEL + ")", ae);
             throw RootException.getServletException(ae,
                                                     request,
                                                     ACTION_LABEL,
                                                     new String[0]);
         } catch (Throwable th) {
-            LOG.error("Error resolving datastream", th);
+            logger.error("Error resolving datastream", th);
             String message =
                     "[DatastreamResolverServlet] returned an error. The "
                             + "underlying error was a  \""
@@ -568,6 +547,7 @@ public class DatastreamResolverServlet
     }
 
     // Clean up resources
+    @Override
     public void destroy() {
     }
 

@@ -25,8 +25,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
@@ -39,6 +37,8 @@ import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.servletExceptionExtensions.InternalError500Exception;
 import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -73,9 +73,8 @@ public class DescribeRepositoryServlet
         extends HttpServlet
         implements Constants {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DescribeRepositoryServlet.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DescribeRepositoryServlet.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -115,7 +114,7 @@ public class DescribeRepositoryServlet
             throws ServletException, IOException {
         boolean xml = false;
 
-        LOG.debug("Got request: " + request.getRequestURL().toString() + "?"
+        logger.debug("Got request: " + request.getRequestURL().toString() + "?"
                 + request.getQueryString());
 
         // Check for xml parameter.
@@ -205,13 +204,13 @@ public class DescribeRepositoryServlet
 
             } else {
                 // Describe request returned nothing.
-                LOG.error("No repository info returned");
+                logger.error("No repository info returned");
             }
         } catch (AuthzException ae) {
             throw ae;
         } catch (Throwable th) {
             String msg = "Error describing repository";
-            LOG.error(msg, th);
+            logger.error(msg, th);
             throw new GeneralException(msg, th);
         } finally {
             try {
@@ -327,14 +326,14 @@ public class DescribeRepositoryServlet
                     pw.flush();
                     pw.close();
                 } catch (IOException ioe) {
-                    LOG.error("WriteThread IOException", ioe);
+                    logger.error("WriteThread IOException", ioe);
                 } finally {
                     try {
                         if (pw != null) {
                             pw.close();
                         }
                     } catch (IOException ioe) {
-                        LOG.error("WriteThread IOException", ioe);
+                        logger.error("WriteThread IOException", ioe);
                     }
                 }
             }

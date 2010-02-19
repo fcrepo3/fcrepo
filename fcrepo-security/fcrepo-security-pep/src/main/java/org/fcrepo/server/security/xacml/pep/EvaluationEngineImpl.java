@@ -21,15 +21,14 @@ package org.fcrepo.server.security.xacml.pep;
 import java.util.HashSet;
 import java.util.Set;
 
-
-import org.apache.log4j.Logger;
-
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
-
 import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
+
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -37,8 +36,8 @@ import com.sun.xacml.ctx.Result;
 public class EvaluationEngineImpl
         implements EvaluationEngine {
 
-    private static Logger log =
-            Logger.getLogger(EvaluationEngineImpl.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(EvaluationEngineImpl.class);
 
     private final ContextUtil contextUtil = new ContextUtil();
 
@@ -52,8 +51,8 @@ public class EvaluationEngineImpl
      * org.fcrepo.server.security.xacml.pep.EvaluationEngine#evaluate(com.sun.xacml.ctx.RequestCtx)
      */
     public ResponseCtx evaluate(RequestCtx reqCtx) throws PEPException {
-        if (log.isDebugEnabled()) {
-            log.debug("evaluating RequestCtx request");
+        if (logger.isDebugEnabled()) {
+            logger.debug("evaluating RequestCtx request");
         }
 
         String request = contextUtil.makeRequestCtx(reqCtx);
@@ -72,8 +71,8 @@ public class EvaluationEngineImpl
      * @see org.fcrepo.server.security.xacml.pep.EvaluationEngine#evaluate(java.lang.String)
      */
     public String evaluate(String request) throws PEPException {
-        if (log.isDebugEnabled()) {
-            log.debug("evaluating String request");
+        if (logger.isDebugEnabled()) {
+            logger.debug("evaluating String request");
         }
 
         String[] requests = new String[] {request};
@@ -85,8 +84,8 @@ public class EvaluationEngineImpl
      * @see org.fcrepo.server.security.xacml.pep.EvaluationEngine#evaluate(java.lang.String[])
      */
     public String evaluate(String[] requests) throws PEPException {
-        if (log.isDebugEnabled()) {
-            log.debug("evaluating array of String requests");
+        if (logger.isDebugEnabled()) {
+            logger.debug("evaluating array of String requests");
         }
 
         long a, b;
@@ -103,10 +102,7 @@ public class EvaluationEngineImpl
             }
 
             if (response == null) {
-                if (log.isDebugEnabled()) {
-                    log
-                            .debug("No item found in cache. Sending to PDP for evaluation.");
-                }
+                logger.debug("No item found in cache. Sending to PDP for evaluation.");
 
                 response = client.evaluate(r);
 
@@ -117,8 +113,8 @@ public class EvaluationEngineImpl
             }
 
             b = System.currentTimeMillis();
-            if (log.isDebugEnabled()) {
-                log.debug("Time taken for XACML Evaluation: " + (b - a) + "ms");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Time taken for XACML Evaluation: " + (b - a) + "ms");
             }
 
             ResponseCtx resCtx;

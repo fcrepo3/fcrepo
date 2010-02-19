@@ -21,8 +21,11 @@ package org.fcrepo.server.security.xacml.pep;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+
 import java.lang.reflect.Constructor;
+
 import java.net.URI;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +33,10 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.sun.xacml.attr.AttributeValue;
+import com.sun.xacml.ctx.RequestCtx;
+import com.sun.xacml.ctx.ResponseCtx;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,11 +44,8 @@ import org.w3c.dom.NodeList;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
-
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -52,8 +54,8 @@ import com.sun.xacml.ctx.ResponseCtx;
 public class ContextHandlerImpl
         implements ContextHandler {
 
-    private static Logger log =
-            Logger.getLogger(ContextHandlerImpl.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ContextHandlerImpl.class);
 
     private ContextUtil contextUtil = null;
 
@@ -68,7 +70,7 @@ public class ContextHandlerImpl
     /**
      * The default constructor that initialises a new ContextHandler instance.
      * This is a private constructor as this is a singleton class.
-     * 
+     *
      * @throws PEPException
      */
     private ContextHandlerImpl()
@@ -86,7 +88,7 @@ public class ContextHandlerImpl
             try {
                 contextHandler = new ContextHandlerImpl();
             } catch (Exception e) {
-                log.error("Could not initialise ContextHandler.");
+                logger.error("Could not initialise ContextHandler.");
                 throw new PEPException("Could not initialise ContextHandler.",
                                        e);
             }
@@ -150,7 +152,7 @@ public class ContextHandlerImpl
      * PEP), a relationship resolver (that communicates with the risearch REST
      * service to determine parental relationships) and a response cache (that
      * caches requests/responses for quicker evaluations).
-     * 
+     *
      * @throws PEPException
      */
     private void init() throws PEPException {
@@ -170,8 +172,8 @@ public class ContextHandlerImpl
             Document doc = docBuilder.parse(is);
             NodeList nodes = null;
 
-            if (log.isDebugEnabled()) {
-                log.debug("Obtained the config file: config-melcoe-pep.xml");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Obtained the config file: config-melcoe-pep.xml");
             }
 
             String className = null;
@@ -192,7 +194,7 @@ public class ContextHandlerImpl
             for (int x = 0; x < optionNodes.getLength(); x++) {
                 Node n = optionNodes.item(x);
                 if (optionNodes.item(x).getNodeType() == Node.ELEMENT_NODE) {
-                    log.debug("Node [name]: "
+                    logger.debug("Node [name]: "
                             + n.getAttributes().getNamedItem("name")
                                     .getNodeValue());
                     String key =
@@ -208,8 +210,8 @@ public class ContextHandlerImpl
                             .getConstructor(new Class[] {Map.class});
             client = (PDPClient) c.newInstance(new Object[] {options});
 
-            if (log.isDebugEnabled()) {
-                log.debug("Instantiated PDPClient: " + className);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Instantiated PDPClient: " + className);
             }
 
             // get the Response Cache
@@ -250,8 +252,8 @@ public class ContextHandlerImpl
                         (ResponseCache) c.newInstance(new Object[] {
                                 new Integer(cacheSize), new Long(cacheTTL)});
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Instantiated ResponseCache: " + className);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Instantiated ResponseCache: " + className);
                 }
             }
 
@@ -269,18 +271,17 @@ public class ContextHandlerImpl
             evaluationEngine.setClient(client);
             evaluationEngine.setResponseCache(responseCache);
 
-            if (log.isDebugEnabled()) {
-                log.debug("Instantiated EvaluationEngine: " + className);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Instantiated EvaluationEngine: " + className);
             }
 
             contextUtil = new ContextUtil();
 
-            if (log.isDebugEnabled()) {
-                log.debug("Instantiated ContextUtil.");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Instantiated ContextUtil.");
             }
         } catch (Exception e) {
-            log.fatal("Failed to initialse the PEP ContextHandler");
-            log.fatal(e.getMessage(), e);
+            logger.error("Failed to initialse the PEP ContextHandler", e);
             throw new PEPException(e.getMessage(), e);
         }
     }

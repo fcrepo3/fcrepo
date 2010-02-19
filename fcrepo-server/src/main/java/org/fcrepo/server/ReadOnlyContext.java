@@ -14,11 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.servletfilters.ExtendedHttpServletRequest;
 import org.fcrepo.server.utilities.DateUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -31,9 +31,8 @@ import org.fcrepo.server.utilities.DateUtility;
 public class ReadOnlyContext
         implements Context {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(ReadOnlyContext.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ReadOnlyContext.class);
 
     public static ReadOnlyContext EMPTY =
             new ReadOnlyContext(null, null, null, "", true);
@@ -89,11 +88,11 @@ public class ReadOnlyContext
         m_environmentAttributes.lock();
         m_subjectAttributes = subjectAttributes;
         if (m_subjectAttributes == null) {
-            LOG.debug("subject map parm is null");
+            logger.debug("subject map parm is null");
             m_subjectAttributes = new MultiValueMap();
         }
         m_subjectAttributes.lock();
-        LOG.debug("subject attributes in readonlycontext constructor == "
+        logger.debug("subject attributes in readonlycontext constructor == "
                 + m_subjectAttributes);
         m_actionAttributes = new MultiValueMap();
         m_actionAttributes.lock();
@@ -131,12 +130,12 @@ public class ReadOnlyContext
 
     public int nSubjectValues(String name) {
         int n = m_subjectAttributes.length(name);
-        LOG.debug("N SUBJECT VALUES without == " + n);
+        logger.debug("N SUBJECT VALUES without == " + n);
         if (extendedHttpServletRequest != null
                 && extendedHttpServletRequest.isUserInRole(name)) {
             n++;
         }
-        LOG.debug("N SUBJECT VALUES with == " + n);
+        logger.debug("N SUBJECT VALUES with == " + n);
         return n;
     }
 
@@ -144,11 +143,11 @@ public class ReadOnlyContext
         String value = null;
         if (m_subjectAttributes.length(name) == 1) {
             value = m_subjectAttributes.getString(name);
-            LOG.debug("SINGLE SUBJECT VALUE from map == " + value);
+            logger.debug("SINGLE SUBJECT VALUE from map == " + value);
         } else if (extendedHttpServletRequest != null
                 && extendedHttpServletRequest.isUserInRole(name)) {
             value = "";
-            LOG.debug("SINGLE SUBJECT VALUE from iuir() == " + value);
+            logger.debug("SINGLE SUBJECT VALUE from iuir() == " + value);
         }
         return value;
     }
@@ -169,7 +168,7 @@ public class ReadOnlyContext
             values[n - 1] = "";
         }
         if (values == null) {
-            LOG.debug("INNER RETURNING NO VALUES FOR " + name);
+            logger.debug("INNER RETURNING NO VALUES FOR " + name);
         } else {
             StringBuffer sb = new StringBuffer();
             sb.append("INNER RETURNING " + values.length + " VALUES FOR "
@@ -177,7 +176,7 @@ public class ReadOnlyContext
             for (int i = 0; i < values.length; i++) {
                 sb.append(" " + values[i]);
             }
-            LOG.debug(sb.toString());
+            logger.debug(sb.toString());
         }
         return values;
     }
@@ -303,36 +302,35 @@ public class ReadOnlyContext
              * handle multiple values (ldap) } }
              */
             if (auxSubjectRoles == null) {
-                LOG.debug("IN CONTEXT auxSubjectRoles == null");
+                logger.debug("IN CONTEXT auxSubjectRoles == null");
             } else {
-                LOG.debug("IN CONTEXT processing auxSubjectRoles=="
+                logger.debug("IN CONTEXT processing auxSubjectRoles=="
                         + auxSubjectRoles);
-                LOG.debug("IN CONTEXT processing auxSubjectRoles.keySet()=="
+                logger.debug("IN CONTEXT processing auxSubjectRoles.keySet()=="
                         + auxSubjectRoles.keySet());
-                LOG
-                        .debug("IN CONTEXT processing auxSubjectRoles.keySet().isEmpty()=="
+                logger.debug("IN CONTEXT processing auxSubjectRoles.keySet().isEmpty()=="
                                 + auxSubjectRoles.keySet().isEmpty());
                 Iterator auxSubjectRoleKeys =
                         auxSubjectRoles.keySet().iterator();
-                LOG.debug("IN CONTEXT processing auxSubjectRoleKeys=="
+                logger.debug("IN CONTEXT processing auxSubjectRoleKeys=="
                         + auxSubjectRoleKeys);
                 while (auxSubjectRoleKeys.hasNext()) {
                     Object name = auxSubjectRoleKeys.next();
-                    LOG.debug("IN CONTEXT name==" + name);
+                    logger.debug("IN CONTEXT name==" + name);
                     if (name instanceof String) {
-                        LOG.debug("IN CONTEXT name is string==" + name);
+                        logger.debug("IN CONTEXT name is string==" + name);
                         Object value = auxSubjectRoles.get(name);
                         if (value instanceof String
                                 || value instanceof String[]) {
-                            LOG.debug("IN CONTEXT value is string([])");
+                            logger.debug("IN CONTEXT value is string([])");
                             if (value instanceof String) {
-                                LOG.debug("IN CONTEXT value is string=="
+                                logger.debug("IN CONTEXT value is string=="
                                         + (String) value);
                             }
                             if (value instanceof String[]) {
-                                LOG.debug("IN CONTEXT value is string[]");
+                                logger.debug("IN CONTEXT value is string[]");
                                 for (int z = 0; z < ((String[]) value).length; z++) {
-                                    LOG.debug("IN CONTEXT this value=="
+                                    logger.debug("IN CONTEXT this value=="
                                             + ((String[]) value)[z]);
                                 }
                             }
@@ -345,7 +343,7 @@ public class ReadOnlyContext
                                     .hasNext();) {
                                 String singleValue =
                                         (String) setIterator.next();
-                                LOG.debug("IN CONTEXT singleValue is string=="
+                                logger.debug("IN CONTEXT singleValue is string=="
                                         + singleValue);
                                 temp[i++] = singleValue;
                             }
@@ -353,10 +351,10 @@ public class ReadOnlyContext
                         }
                     }
                 }
-                LOG.debug("IN CONTEXT after while");
+                logger.debug("IN CONTEXT after while");
             }
         } catch (Exception e) {
-            LOG.error("caught exception building subjectMap " + e.getMessage(),
+            logger.error("caught exception building subjectMap " + e.getMessage(),
                       e);
         } finally {
             subjectMap.lock();
@@ -453,13 +451,13 @@ public class ReadOnlyContext
                                    request.getContentType());
             }
             if (request.getLocalAddr() != null) {
-                LOG.debug("Request Server IP Address is '" + request.getLocalAddr() + "'");
+                logger.debug("Request Server IP Address is '" + request.getLocalAddr() + "'");
                 environmentMap
                         .set(Constants.HTTP_REQUEST.SERVER_IP_ADDRESS.uri,
                              request.getLocalAddr());
             }
             if (request.getRemoteAddr() != null) {
-                LOG.debug("Request Client IP Address is '" + request.getRemoteAddr() + "'");
+                logger.debug("Request Client IP Address is '" + request.getRemoteAddr() + "'");
                 environmentMap
                         .set(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.uri,
                              request.getRemoteAddr());
@@ -492,7 +490,7 @@ public class ReadOnlyContext
                 password = ((ExtendedHttpServletRequest) request).getPassword();
             }
         } catch (Throwable th) {
-            LOG.error("in context, can't grok password from extended request "
+            logger.error("in context, can't grok password from extended request "
                     + th.getMessage());
         }
 
@@ -508,13 +506,13 @@ public class ReadOnlyContext
             noOp =
                     (new Boolean(request.getParameter(NOOP_PARAMETER_NAME)))
                             .booleanValue();
-            LOG.debug("NOOP_PARAMETER_NAME=" + NOOP_PARAMETER_NAME);
-            LOG.debug("request.getParameter(NOOP_PARAMETER_NAME)="
+            logger.debug("NOOP_PARAMETER_NAME=" + NOOP_PARAMETER_NAME);
+            logger.debug("request.getParameter(NOOP_PARAMETER_NAME)="
                     + request.getParameter(NOOP_PARAMETER_NAME));
-            LOG.debug("noOp=" + noOp);
+            logger.debug("noOp=" + noOp);
 
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         Map auxSubjectRoles = null;
         Object testFedoraAuxSubjectAttributes =

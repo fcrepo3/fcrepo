@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security.servletfilters;
@@ -15,8 +15,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -25,7 +25,8 @@ public class FilterSetup
         extends Base
         implements Filter {
 
-    protected static Log log = LogFactory.getLog(FilterSetup.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(FilterSetup.class);
 
     protected static final String NOT_SET = "NOT SET";
 
@@ -34,7 +35,7 @@ public class FilterSetup
     protected boolean inited = false;
 
     public static final String getFilterNameAbbrev(String filterName) {
-        LogFactory.getLog(FilterSetup.class).debug(">>>>>>>>>>>>>>>>>>"
+        LoggerFactory.getLogger(FilterSetup.class).debug(">>>>>>>>>>>>>>>>>>"
                 + filterName);
         String rc = filterName;
         if ("XmlUserfileFilter".equals(filterName)) {
@@ -53,20 +54,20 @@ public class FilterSetup
 
     public void init(FilterConfig filterConfig) {
         String method = "init() ";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         inited = false;
         initErrors = false;
         if (filterConfig != null) {
             FILTER_NAME = filterConfig.getFilterName();
             if (FILTER_NAME == null || "".equals(FILTER_NAME)) {
-                if (log.isErrorEnabled()) {
-                    log.error(format(method, "FILTER_NAME not set"));
+                if (logger.isErrorEnabled()) {
+                    logger.error(format(method, "FILTER_NAME not set"));
                 }
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(format(method, null, "FILTER_NAME", FILTER_NAME));
+                if (logger.isDebugEnabled()) {
+                    logger.debug(format(method, null, "FILTER_NAME", FILTER_NAME));
                 }
                 Enumeration enumer = filterConfig.getInitParameterNames();
                 while (enumer.hasMoreElements()) {
@@ -77,44 +78,44 @@ public class FilterSetup
                 inited = true;
             }
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
     public void destroy() {
         String method = "destroy()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
     @Override
     protected void initThisSubclass(String key, String value) {
-        log.debug("AF.iTS");
+        logger.debug("AF.iTS");
         String method = "initThisSubclass() ";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         super.initThisSubclass(key, value);
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
     public ExtendedHttpServletRequest wrap(HttpServletRequest httpServletRequest)
             throws Exception {
         String method = "wrap() ";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         ExtendedHttpServletRequestWrapper wrap =
                 new ExtendedHttpServletRequestWrapper(httpServletRequest);
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
         return wrap;
     }
@@ -123,60 +124,60 @@ public class FilterSetup
                                   HttpServletResponse response)
             throws Throwable {
         String method = "doThisSubclass() ";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         String test = null;
 
         test = "init";
         if (!inited || initErrors) {
-            if (log.isErrorEnabled()) {
-                log.error("inited==" + inited);
+            if (logger.isErrorEnabled()) {
+                logger.error("inited==" + inited);
             }
-            if (log.isErrorEnabled()) {
-                log.error("initErrors==" + initErrors);
+            if (logger.isErrorEnabled()) {
+                logger.error("initErrors==" + initErrors);
             }
             String msg = fail(method, test);
-            if (log.isErrorEnabled()) {
-                log.error(msg);
+            if (logger.isErrorEnabled()) {
+                logger.error(msg);
             }
             throw new Exception(msg);
         }
-        if (log.isDebugEnabled()) {
-            log.debug(pass(method, test));
+        if (logger.isDebugEnabled()) {
+            logger.debug(pass(method, test));
         }
 
         test = "HttpServletRequest";
         if (!(extendedHttpServletRequest instanceof HttpServletRequest)) {
             String msg = fail(method, test);
-            if (log.isErrorEnabled()) {
-                log.error(msg);
+            if (logger.isErrorEnabled()) {
+                logger.error(msg);
             }
             throw new Exception(msg);
         }
-        if (log.isDebugEnabled()) {
-            log.debug(pass(method, test));
+        if (logger.isDebugEnabled()) {
+            logger.debug(pass(method, test));
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
 
-        return false; // i.e., don't signal to terminate servlet filter chain         
+        return false; // i.e., don't signal to terminate servlet filter chain
     }
 
     public void doFilter(ServletRequest servletRequest,
                          ServletResponse response,
                          FilterChain chain) throws ServletException {
         String method = "doFilter() ";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
-        if (log.isDebugEnabled()) {
-            log.debug(format(method, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+        if (logger.isDebugEnabled()) {
+            logger.debug(format(method, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
         }
-        if (log.isDebugEnabled()) {
-            log.debug(format(method, "FILTER_NAME", FILTER_NAME));
+        if (logger.isDebugEnabled()) {
+            logger.debug(format(method, "FILTER_NAME", FILTER_NAME));
         }
         String test = null;
         boolean terminateServletFilterChain = false;
@@ -185,12 +186,12 @@ public class FilterSetup
 
             //only one filter should wrap
             if (servletRequest instanceof ExtendedHttpServletRequest) {
-                log.debug(format(method, "using existing request..."));
+                logger.debug(format(method, "using existing request..."));
                 extendedHttpServletRequest =
                         (ExtendedHttpServletRequest) servletRequest;
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(format(method, "wrapping request..."));
+                if (logger.isDebugEnabled()) {
+                    logger.debug(format(method, "wrapping request..."));
                 }
                 extendedHttpServletRequest =
                         wrap((HttpServletRequest) servletRequest);
@@ -199,13 +200,13 @@ public class FilterSetup
             test = "HttpServletResponse";
             if (!(response instanceof HttpServletResponse)) {
                 String msg = fail(method, test);
-                if (log.isErrorEnabled()) {
-                    log.error(msg);
+                if (logger.isErrorEnabled()) {
+                    logger.error(msg);
                 }
                 throw new Exception(msg);
             }
-            if (log.isDebugEnabled()) {
-                log.debug(pass(method, test));
+            if (logger.isDebugEnabled()) {
+                logger.debug(pass(method, test));
             }
 
             terminateServletFilterChain =
@@ -213,36 +214,36 @@ public class FilterSetup
                                    (HttpServletResponse) response);
 
         } catch (Throwable th) {
-            showThrowable(th, log, "can't process this filter()");
+            logger.error("Error processing filter", th);
             //current filter should not break the filter chain -- go ahead, regardless of internal failure
         }
 
         try {
-            if (log.isDebugEnabled()) {
-                log.debug(format(method, "before next doFilter()"));
-                log.debug(format(method, null, "extendedHttpServletRequest")
+            if (logger.isDebugEnabled()) {
+                logger.debug(format(method, "before next doFilter()"));
+                logger.debug(format(method, null, "extendedHttpServletRequest")
                         + extendedHttpServletRequest);
-                log.debug(format(method,
+                logger.debug(format(method,
                                  "extendedHttpServletRequest",
                                  extendedHttpServletRequest.getClass()
                                          .getName()));
-                log.debug(format(method, null, "response" + response));
+                logger.debug(format(method, null, "response" + response));
             }
             if (terminateServletFilterChain) {
-                log.debug(format(method, "terminating servlet filter chain"));
+                logger.debug(format(method, "terminating servlet filter chain"));
             } else {
                 chain.doFilter(extendedHttpServletRequest, response);
             }
-            if (log.isDebugEnabled()) {
-                log.debug("back from next doFilter()");
+            if (logger.isDebugEnabled()) {
+                logger.debug("back from next doFilter()");
             }
         } catch (ServletException e) {
             throw e;
         } catch (Throwable th) {
-            showThrowable(th, log, "can't do next doFilter()");
+            logger.error("Can't do next doFilter()", th);
         } finally {
-            if (log.isDebugEnabled()) {
-                log.debug(exit(method));
+            if (logger.isDebugEnabled()) {
+                logger.debug(exit(method));
             }
         }
     }

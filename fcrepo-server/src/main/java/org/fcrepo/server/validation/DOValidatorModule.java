@@ -1,10 +1,9 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.validation;
 
-// Fedora imports
 import java.io.File;
 import java.io.InputStream;
 
@@ -12,26 +11,25 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.ServerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Module Wrapper for DOValidatorImpl.
- * 
+ *
  * @author Sandy Payette
  */
 public class DOValidatorModule
         extends Module
         implements DOValidator {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DOValidatorModule.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DOValidatorModule.class);
 
     /**
      * An instance of the core implementation class for DOValidator. The
@@ -43,7 +41,7 @@ public class DOValidatorModule
      * <p>
      * Constructs a new DOValidatorModule
      * </p>
-     * 
+     *
      * @param moduleParameters
      *        The name/value pair map of module parameters.
      * @param server
@@ -77,13 +75,13 @@ public class DOValidatorModule
                                 new File(getServer().getHomeDir(),
                                          getParameter(paramName)).getPath();
                         xmlSchemaMap.put(xmlSchemaName, xmlSchemaPath);
-                        LOG.debug("Initialized XML Schema " + "location: "
+                        logger.debug("Initialized XML Schema " + "location: "
                                 + xmlSchemaPath);
                     } catch (Exception e) {
                         String msg =
                                 "Problem configuring XML Schema for format="
                                         + xmlSchemaName;
-                        LOG.error(msg, e);
+                        logger.error(msg, e);
                         throw new ModuleInitializationException(msg + ": "
                                 + e.getClass().getName() + ": "
                                 + e.getMessage(), getRole());
@@ -95,13 +93,13 @@ public class DOValidatorModule
                                 new File(getServer().getHomeDir(),
                                          getParameter(paramName)).getPath();
                         ruleSchemaMap.put(ruleSchemaName, ruleSchemaPath);
-                        LOG.debug("Initialized Schematron schema "
+                        logger.debug("Initialized Schematron schema "
                                 + "location: " + ruleSchemaPath);
                     } catch (Exception e) {
                         String msg =
                                 "Problem configuring Schematron Schema for format="
                                         + ruleSchemaName;
-                        LOG.error(msg, e);
+                        logger.error(msg, e);
                         throw new ModuleInitializationException(msg + ": "
                                 + e.getClass().getName() + ": "
                                 + e.getMessage(), getRole());
@@ -110,12 +108,12 @@ public class DOValidatorModule
                     tempDir =
                             new File(getServer().getHomeDir(),
                                      getParameter(paramName)).getPath();
-                    LOG.debug("tempDir set to: " + tempDir);
+                    logger.debug("tempDir set to: " + tempDir);
                 } else if (paramName.equals("schtron_preprocessor")) {
                     schematronPreprocessorPath =
                             new File(getServer().getHomeDir(),
                                      getParameter(paramName)).getPath();
-                    LOG.debug("Initialized Schematron "
+                    logger.debug("Initialized Schematron "
                             + "preprocessor location: "
                             + schematronPreprocessorPath);
                 }
@@ -137,7 +135,7 @@ public class DOValidatorModule
      * <p>
      * Validates a digital object.
      * </p>
-     * 
+     *
      * @param objectAsStream
      *        The digital object provided as a bytestream.
      * @param validationType
@@ -165,7 +163,7 @@ public class DOValidatorModule
      * <p>
      * Validates a digital object.
      * </p>
-     * 
+     *
      * @param objectAsFile
      *        The digital object provided as a file.
      * @param validationType

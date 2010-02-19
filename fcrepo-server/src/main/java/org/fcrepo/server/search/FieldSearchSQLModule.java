@@ -1,12 +1,10 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.search;
 
 import java.util.Map;
-
-import org.apache.log4j.Logger;
 
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -17,20 +15,20 @@ import org.fcrepo.server.storage.ConnectionPool;
 import org.fcrepo.server.storage.ConnectionPoolManager;
 import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.DOReader;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Module that wraps FieldSearchSQLImpl.
- * 
+ *
  * @author Chris Wilper
  */
 public class FieldSearchSQLModule
         extends Module
         implements FieldSearch {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(FieldSearchSQLModule.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(FieldSearchSQLModule.class);
 
     private FieldSearchSQLImpl m_wrappedFieldSearch;
 
@@ -109,11 +107,11 @@ public class FieldSearchSQLModule
         ConnectionPool cPool = null;
         try {
             if (cPoolName == null) {
-                LOG.debug("connectionPool unspecified; using default from "
+                logger.debug("connectionPool unspecified; using default from "
                         + "ConnectionPoolManager.");
                 cPool = cpm.getPool();
             } else {
-                LOG.debug("connectionPool specified: " + cPoolName);
+                logger.debug("connectionPool specified: " + cPoolName);
                 cPool = cpm.getPool(cPoolName);
             }
         } catch (ConnectionPoolNotFoundException cpnfe) {

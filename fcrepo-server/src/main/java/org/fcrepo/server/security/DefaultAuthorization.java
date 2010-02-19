@@ -19,8 +19,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
@@ -34,6 +32,8 @@ import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.status.ServerState;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -114,9 +114,8 @@ public class DefaultAuthorization
         extends Module
         implements Authorization {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DefaultAuthorization.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DefaultAuthorization.class);
 
     private static final String XACML_DIST_BASE = "fedora-internal-use";
 
@@ -218,7 +217,7 @@ public class DefaultAuthorization
         if (moduleParameters.containsKey(OWNER_ID_SEPARATOR_KEY)) {
             ownerIdSeparator =
                     (String) moduleParameters.get(OWNER_ID_SEPARATOR_KEY);
-            LOG.debug("ownerIdSeparator is [" + ownerIdSeparator + "]");
+            logger.debug("ownerIdSeparator is [" + ownerIdSeparator + "]");
         }
 
         // Initialize the policy parser given the POLICY_SCHEMA_PATH_KEY
@@ -490,7 +489,7 @@ public class DefaultAuthorization
                                            String checksum)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceAddDatastream");
+            logger.debug("Entered enforceAddDatastream");
             String target = Constants.ACTION.ADD_DATASTREAM.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -536,7 +535,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceAddDatastream");
+            logger.debug("Exiting enforceAddDatastream");
         }
     }
 
@@ -547,7 +546,7 @@ public class DefaultAuthorization
                                     String exportEncoding)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceExport");
+            logger.debug("Entered enforceExport");
             String target = Constants.ACTION.EXPORT.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -575,7 +574,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceExport");
+            logger.debug("Exiting enforceExport");
         }
     }
 
@@ -596,7 +595,7 @@ public class DefaultAuthorization
                                         String namespace,
                                         int nNewPids) throws AuthzException {
         try {
-            LOG.debug("Entered enforceGetNextPid");
+            logger.debug("Entered enforceGetNextPid");
             String target = Constants.ACTION.GET_NEXT_PID.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -620,7 +619,7 @@ public class DefaultAuthorization
                              namespace,
                              context);
         } finally {
-            LOG.debug("Exiting enforceGetNextPid");
+            logger.debug("Exiting enforceGetNextPid");
         }
     }
 
@@ -630,7 +629,7 @@ public class DefaultAuthorization
                                            Date asOfDateTime)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceGetDatastream");
+            logger.debug("Entered enforceGetDatastream");
             String target = Constants.ACTION.GET_DATASTREAM.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -655,7 +654,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceGetDatastream");
+            logger.debug("Exiting enforceGetDatastream");
         }
     }
 
@@ -664,7 +663,7 @@ public class DefaultAuthorization
                                                   String datastreamId)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceGetDatastreamHistory");
+            logger.debug("Entered enforceGetDatastreamHistory");
             String target = Constants.ACTION.GET_DATASTREAM_HISTORY.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -686,7 +685,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceGetDatastreamHistory");
+            logger.debug("Exiting enforceGetDatastreamHistory");
         }
     }
 
@@ -711,7 +710,7 @@ public class DefaultAuthorization
                                             String datastreamState)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceGetDatastreams");
+            logger.debug("Entered enforceGetDatastreams");
             String target = Constants.ACTION.GET_DATASTREAMS.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -738,7 +737,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceGetDatastreams");
+            logger.debug("Exiting enforceGetDatastreams");
         }
     }
 
@@ -747,7 +746,7 @@ public class DefaultAuthorization
                                           String objectXmlEncoding)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceGetObjectXML");
+            logger.debug("Entered enforceGetObjectXML");
             String target = Constants.ACTION.GET_OBJECT_XML.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -769,7 +768,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceGetObjectXML");
+            logger.debug("Exiting enforceGetObjectXML");
         }
     }
 
@@ -779,7 +778,7 @@ public class DefaultAuthorization
                                     String ingestEncoding)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceIngest");
+            logger.debug("Entered enforceIngest");
             String target = Constants.ACTION.INGEST.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -806,7 +805,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceIngest");
+            logger.debug("Exiting enforceIngest");
         }
     }
 
@@ -826,7 +825,7 @@ public class DefaultAuthorization
                                                             String pid)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceListObjectInFieldSearchResults");
+            logger.debug("Entered enforceListObjectInFieldSearchResults");
             String target =
                     Constants.ACTION.LIST_OBJECT_IN_FIELD_SEARCH_RESULTS.uri;
             if (enforceListObjectInFieldSearchResults) {
@@ -842,7 +841,7 @@ public class DefaultAuthorization
                                  context);
             }
         } finally {
-            LOG.debug("Exiting enforceListObjectInFieldSearchResults");
+            logger.debug("Exiting enforceListObjectInFieldSearchResults");
         }
     }
 
@@ -850,7 +849,7 @@ public class DefaultAuthorization
                                                               String pid)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceListObjectInResourceIndexResults");
+            logger.debug("Entered enforceListObjectInResourceIndexResults");
             String target =
                     Constants.ACTION.LIST_OBJECT_IN_RESOURCE_INDEX_RESULTS.uri;
             if (enforceListObjectInResourceIndexResults) {
@@ -864,7 +863,7 @@ public class DefaultAuthorization
                                  context);
             }
         } finally {
-            LOG.debug("Exiting enforceListObjectInResourceIndexResults");
+            logger.debug("Exiting enforceListObjectInResourceIndexResults");
         }
     }
 
@@ -879,7 +878,7 @@ public class DefaultAuthorization
                                                          String datastreamNewChecksum)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceModifyDatastreamByReference");
+            logger.debug("Entered enforceModifyDatastreamByReference");
             String target = Constants.ACTION.MODIFY_DATASTREAM_BY_REFERENCE.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -919,7 +918,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceModifyDatastreamByReference");
+            logger.debug("Exiting enforceModifyDatastreamByReference");
         }
     }
 
@@ -933,7 +932,7 @@ public class DefaultAuthorization
                                                      String newDatastreamChecksum)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceModifyDatastreamByValue");
+            logger.debug("Entered enforceModifyDatastreamByValue");
             String target = Constants.ACTION.MODIFY_DATASTREAM_BY_VALUE.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -970,7 +969,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceModifyDatastreamByValue");
+            logger.debug("Exiting enforceModifyDatastreamByValue");
         }
     }
 
@@ -980,7 +979,7 @@ public class DefaultAuthorization
                                           String objectNewOwnerId)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceModifyObject");
+            logger.debug("Entered enforceModifyObject");
             String target = Constants.ACTION.MODIFY_OBJECT.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -1007,7 +1006,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceModifyObject");
+            logger.debug("Exiting enforceModifyObject");
         }
     }
 
@@ -1016,7 +1015,7 @@ public class DefaultAuthorization
                                              String datastreamId,
                                              Date endDT) throws AuthzException {
         try {
-            LOG.debug("Entered enforcePurgeDatastream");
+            logger.debug("Entered enforcePurgeDatastream");
             String target = Constants.ACTION.PURGE_DATASTREAM.uri;
             String name = "";
             context.setActionAttributes(null);
@@ -1042,14 +1041,14 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforcePurgeDatastream");
+            logger.debug("Exiting enforcePurgeDatastream");
         }
     }
 
     public final void enforcePurgeObject(Context context, String pid)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforcePurgeObject");
+            logger.debug("Entered enforcePurgeObject");
             String target = Constants.ACTION.PURGE_OBJECT.uri;
             context.setActionAttributes(null);
             context.setResourceAttributes(null);
@@ -1060,7 +1059,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforcePurgeObject");
+            logger.debug("Exiting enforcePurgeObject");
         }
     }
 
@@ -1070,7 +1069,7 @@ public class DefaultAuthorization
                                                 String datastreamNewState)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceSetDatastreamState");
+            logger.debug("Entered enforceSetDatastreamState");
             String target = Constants.ACTION.SET_DATASTREAM_STATE.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -1095,7 +1094,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceSetDatastreamState");
+            logger.debug("Exiting enforceSetDatastreamState");
         }
     }
 
@@ -1105,7 +1104,7 @@ public class DefaultAuthorization
                                                       boolean datastreamNewVersionable)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceSetDatastreamVersionable");
+            logger.debug("Entered enforceSetDatastreamVersionable");
             String target = Constants.ACTION.SET_DATASTREAM_VERSIONABLE.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -1131,7 +1130,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceSetDatastreamVersionable");
+            logger.debug("Exiting enforceSetDatastreamVersionable");
         }
     }
 
@@ -1141,7 +1140,7 @@ public class DefaultAuthorization
                                                        Date versionDate)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceCompareDatastreamChecksum");
+            logger.debug("Entered enforceCompareDatastreamChecksum");
             String target = Constants.ACTION.COMPARE_DATASTREAM_CHECKSUM.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -1167,14 +1166,14 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceCompareDatastreamChecksum");
+            logger.debug("Exiting enforceCompareDatastreamChecksum");
         }
     }
 
     public void enforceDescribeRepository(Context context)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceDescribeRepository");
+            logger.debug("Entered enforceDescribeRepository");
             String target = Constants.ACTION.DESCRIBE_REPOSITORY.uri;
             context.setActionAttributes(null);
             context.setResourceAttributes(null);
@@ -1185,13 +1184,13 @@ public class DefaultAuthorization
                              "",
                              context);
         } finally {
-            LOG.debug("Exiting enforceDescribeRepository");
+            logger.debug("Exiting enforceDescribeRepository");
         }
     }
 
     public void enforceFindObjects(Context context) throws AuthzException {
         try {
-            LOG.debug("Entered enforceFindObjects");
+            logger.debug("Entered enforceFindObjects");
             String target = Constants.ACTION.FIND_OBJECTS.uri;
             context.setActionAttributes(null);
             context.setResourceAttributes(null);
@@ -1202,13 +1201,13 @@ public class DefaultAuthorization
                              "",
                              context);
         } finally {
-            LOG.debug("Exiting enforceFindObjects");
+            logger.debug("Exiting enforceFindObjects");
         }
     }
 
     public void enforceRIFindObjects(Context context) throws AuthzException {
         try {
-            LOG.debug("Entered enforceRIFindObjects");
+            logger.debug("Entered enforceRIFindObjects");
             String target = Constants.ACTION.RI_FIND_OBJECTS.uri;
             context.setActionAttributes(null);
             context.setResourceAttributes(null);
@@ -1219,7 +1218,7 @@ public class DefaultAuthorization
                              "",
                              context);
         } finally {
-            LOG.debug("Exiting enforceRIFindObjects");
+            logger.debug("Exiting enforceRIFindObjects");
         }
     }
 
@@ -1229,7 +1228,7 @@ public class DefaultAuthorization
                                                   Date asOfDate)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceGetDatastreamDissemination");
+            logger.debug("Entered enforceGetDatastreamDissemination");
             String target = Constants.ACTION.GET_DATASTREAM_DISSEMINATION.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -1254,7 +1253,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceGetDatastreamDissemination");
+            logger.debug("Exiting enforceGetDatastreamDissemination");
         }
     }
 
@@ -1269,7 +1268,7 @@ public class DefaultAuthorization
                                         String sDepState,
                                         String dissState) throws AuthzException {
         try {
-            LOG.debug("Entered enforceGetDissemination");
+            logger.debug("Entered enforceGetDissemination");
             String target = Constants.ACTION.GET_DISSEMINATION.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -1314,14 +1313,14 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceGetDissemination");
+            logger.debug("Exiting enforceGetDissemination");
         }
     }
 
     public void enforceGetObjectHistory(Context context, String pid)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceGetObjectHistory");
+            logger.debug("Entered enforceGetObjectHistory");
             String target = Constants.ACTION.GET_OBJECT_HISTORY.uri;
             context.setActionAttributes(null);
             context.setResourceAttributes(null);
@@ -1332,7 +1331,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceGetObjectHistory");
+            logger.debug("Exiting enforceGetObjectHistory");
         }
     }
 
@@ -1340,7 +1339,7 @@ public class DefaultAuthorization
                                         String pid,
                                         Date asOfDate) throws AuthzException {
         try {
-            LOG.debug("Entered enforceGetObjectProfile");
+            logger.debug("Entered enforceGetObjectProfile");
             String target = Constants.ACTION.GET_OBJECT_PROFILE.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -1362,7 +1361,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceGetObjectProfile");
+            logger.debug("Exiting enforceGetObjectProfile");
         }
     }
 
@@ -1370,7 +1369,7 @@ public class DefaultAuthorization
                                        String pid,
                                        Date asOfDate) throws AuthzException {
         try {
-            LOG.debug("Entered enforceListDatastreams");
+            logger.debug("Entered enforceListDatastreams");
             String target = Constants.ACTION.LIST_DATASTREAMS.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -1392,14 +1391,14 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceListDatastreams");
+            logger.debug("Exiting enforceListDatastreams");
         }
     }
 
     public void enforceListMethods(Context context, String pid, Date asOfDate)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceListMethods");
+            logger.debug("Entered enforceListMethods");
             String target = Constants.ACTION.LIST_METHODS.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -1421,13 +1420,13 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceListMethods");
+            logger.debug("Exiting enforceListMethods");
         }
     }
 
     public void enforceServerStatus(Context context) throws AuthzException {
         try {
-            LOG.debug("Entered enforceServerStatus");
+            logger.debug("Entered enforceServerStatus");
             String target = Constants.ACTION.SERVER_STATUS.uri;
             context.setActionAttributes(null);
             context.setResourceAttributes(null);
@@ -1438,13 +1437,13 @@ public class DefaultAuthorization
                              "",
                              context);
         } finally {
-            LOG.debug("Exiting enforceServerStatus");
+            logger.debug("Exiting enforceServerStatus");
         }
     }
 
     public void enforceOAIRespond(Context context) throws AuthzException {
         try {
-            LOG.debug("Entered enforceOAIRespond");
+            logger.debug("Entered enforceOAIRespond");
             String target = Constants.ACTION.OAI.uri;
             context.setActionAttributes(null);
             context.setResourceAttributes(null);
@@ -1455,13 +1454,13 @@ public class DefaultAuthorization
                              "",
                              context);
         } finally {
-            LOG.debug("Exiting enforceOAIRespond");
+            logger.debug("Exiting enforceOAIRespond");
         }
     }
 
     public void enforceUpload(Context context) throws AuthzException {
         try {
-            LOG.debug("Entered enforceUpload");
+            logger.debug("Entered enforceUpload");
             String target = Constants.ACTION.UPLOAD.uri;
             context.setActionAttributes(null);
             context.setResourceAttributes(null);
@@ -1472,7 +1471,7 @@ public class DefaultAuthorization
                              "",
                              context);
         } finally {
-            LOG.debug("Exiting enforceUpload");
+            logger.debug("Exiting enforceUpload");
         }
     }
 
@@ -1480,7 +1479,7 @@ public class DefaultAuthorization
                                          String id,
                                          String state) throws AuthzException {
         try {
-            LOG.debug("Entered enforce_Internal_DSState");
+            logger.debug("Entered enforce_Internal_DSState");
             String target = Constants.ACTION.INTERNAL_DSSTATE.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -1504,7 +1503,7 @@ public class DefaultAuthorization
                              "",
                              context);
         } finally {
-            LOG.debug("Exiting enforce_Internal_DSState");
+            logger.debug("Exiting enforce_Internal_DSState");
         }
     }
 
@@ -1512,7 +1511,7 @@ public class DefaultAuthorization
                                          Date ticketIssuedDateTime)
             throws AuthzException {
         try {
-            LOG.debug("Entered enforceResolveDatastream");
+            logger.debug("Entered enforceResolveDatastream");
             String target = Constants.ACTION.RESOLVE_DATASTREAM.uri;
             context.setResourceAttributes(null);
             MultiValueMap actionAttributes = new MultiValueMap();
@@ -1536,13 +1535,13 @@ public class DefaultAuthorization
                              "",
                              context);
         } finally {
-            LOG.debug("Exiting enforceResolveDatastream");
+            logger.debug("Exiting enforceResolveDatastream");
         }
     }
 
     public void enforceReloadPolicies(Context context) throws AuthzException {
         try {
-            LOG.debug("Entered enforceReloadPolicies");
+            logger.debug("Entered enforceReloadPolicies");
             String target = Constants.ACTION.RELOAD_POLICIES.uri;
             context.setResourceAttributes(null);
             context.setActionAttributes(null);
@@ -1553,7 +1552,7 @@ public class DefaultAuthorization
                              "",
                              context);
         } finally {
-            LOG.debug("Exiting enforceReloadPolicies");
+            logger.debug("Exiting enforceReloadPolicies");
         }
     }
 
@@ -1565,7 +1564,7 @@ public class DefaultAuthorization
                                         String pid,
                                         String predicate) throws AuthzException {
         try {
-            LOG.debug("Entered enforceGetRelationships");
+            logger.debug("Entered enforceGetRelationships");
             String target = Constants.ACTION.GET_RELATIONSHIPS.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -1586,7 +1585,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceGetRelationships");
+            logger.debug("Exiting enforceGetRelationships");
         }
     }
 
@@ -1597,7 +1596,7 @@ public class DefaultAuthorization
                                        boolean isLiteral,
                                        String datatype) throws AuthzException {
         try {
-            LOG.debug("Entered enforceAddRelationship");
+            logger.debug("Entered enforceAddRelationship");
             String target = Constants.ACTION.ADD_RELATIONSHIP.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -1618,7 +1617,7 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforceAddRelationship");
+            logger.debug("Exiting enforceAddRelationship");
         }
     }
 
@@ -1629,7 +1628,7 @@ public class DefaultAuthorization
                                          boolean isLiteral,
                                          String datatype) throws AuthzException {
         try {
-            LOG.debug("Entered enforcePurgeRelationship");
+            logger.debug("Entered enforcePurgeRelationship");
             String target = Constants.ACTION.PURGE_RELATIONSHIP.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
@@ -1650,13 +1649,13 @@ public class DefaultAuthorization
                              extractNamespace(pid),
                              context);
         } finally {
-            LOG.debug("Exiting enforcePurgeRelationship");
+            logger.debug("Exiting enforcePurgeRelationship");
         }
     }
 
     public void enforceRetrieveFile(Context context, String fileURI) throws AuthzException {
         try {
-            LOG.debug("Entered enforceRetrieveFile");
+            logger.debug("Entered enforceRetrieveFile");
             String target = Constants.ACTION.RETRIEVE_FILE.uri;
             context.setActionAttributes(null);
             context.setResourceAttributes(null);
@@ -1677,7 +1676,7 @@ public class DefaultAuthorization
                     extractNamespace(fileURI),
                     context);
             } finally {
-                LOG.debug("Exiting enforceRetrieveFile");
+                logger.debug("Exiting enforceRetrieveFile");
             }
     }
 }

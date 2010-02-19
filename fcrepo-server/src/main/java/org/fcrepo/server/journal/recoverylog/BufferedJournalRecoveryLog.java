@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.journal.recoverylog;
@@ -11,10 +11,10 @@ import java.io.StringWriter;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.journal.ServerInterface;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -24,15 +24,14 @@ import org.fcrepo.server.journal.ServerInterface;
  * This is memory-intensive, so it should only be used for System Tests, where
  * the presence of the log file can be treated as a signal that the recovery is
  * complete.
- * 
+ *
  * @author Jim Blake
  */
 public class BufferedJournalRecoveryLog
         extends JournalRecoveryLog {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(BufferedJournalRecoveryLog.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(BufferedJournalRecoveryLog.class);
 
     private final File logFile;
 
@@ -87,7 +86,7 @@ public class BufferedJournalRecoveryLog
                 logWriter.close();
             }
         } catch (IOException e) {
-            LOG.error("Error shutting down", e);
+            logger.error("Error shutting down", e);
         }
     }
 

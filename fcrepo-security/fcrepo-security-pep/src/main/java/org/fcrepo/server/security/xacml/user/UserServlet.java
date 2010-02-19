@@ -16,7 +16,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -27,7 +28,8 @@ public class UserServlet
 
     private static final long serialVersionUID = 8591611806356037463L;
 
-    private static final Logger log = Logger.getLogger(UserServlet.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(UserServlet.class);
 
     private static final String FEDORA_ATTRS_KEY =
             "FEDORA_AUX_SUBJECT_ATTRIBUTES";
@@ -44,7 +46,7 @@ public class UserServlet
             documentBuilderFactory.setNamespaceAware(true);
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException pce) {
-            log.error("Unable to initialise UserServlet: " + pce.getMessage(),
+            logger.error("Unable to initialise UserServlet: " + pce.getMessage(),
                       pce);
         }
     }
@@ -90,7 +92,7 @@ public class UserServlet
         try {
             output = DataUtils.format(doc).getBytes();
         } catch (Exception e) {
-            log.error("Error obtaining user information: " + e.getMessage(), e);
+            logger.error("Error obtaining user information: " + e.getMessage(), e);
         }
 
         response.setContentType("text/xml");

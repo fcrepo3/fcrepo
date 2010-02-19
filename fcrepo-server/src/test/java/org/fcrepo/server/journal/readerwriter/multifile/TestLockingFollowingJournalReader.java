@@ -401,7 +401,7 @@ public class TestLockingFollowingJournalReader
 
     /**
      * Confirm that the last message in the log is a lock message, and return
-     * its position in the log.
+     * its position in the logger.
      */
     private int assertLockMessageInLog() {
         List<String> messages = MockJournalRecoveryLog.getMessages();

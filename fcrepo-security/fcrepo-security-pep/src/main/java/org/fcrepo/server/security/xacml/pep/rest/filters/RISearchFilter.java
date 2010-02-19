@@ -23,7 +23,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.URI;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +36,7 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
@@ -45,19 +48,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.tidy.Tidy;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
-import org.fcrepo.server.security.xacml.util.LogUtil;
-
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
@@ -66,6 +56,20 @@ import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Status;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import org.w3c.tidy.Tidy;
+
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -76,8 +80,8 @@ import com.sun.xacml.ctx.Status;
 public class RISearchFilter
         extends AbstractFilter {
 
-    private static Logger log =
-            Logger.getLogger(RISearchFilter.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(RISearchFilter.class);
 
     private static final String XACML_RESOURCE_ID =
             "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
@@ -113,7 +117,7 @@ public class RISearchFilter
             transformers.put("RDF/XML", transformer);
             mimeType.put("RDF/XML", "text/xml");
         } catch (TransformerConfigurationException tce) {
-            log.warn("Error loading the rdfxml2nTriples.xsl stylesheet", tce);
+            logger.warn("Error loading the rdfxml2nTriples.xsl stylesheet", tce);
             throw new PEPException("Error loading the rdfxml2nTriples.xsl stylesheet",
                                    tce);
         }
@@ -133,11 +137,11 @@ public class RISearchFilter
             transformers.put("N-Triples", transformer);
             mimeType.put("N-Triples", "text/plain");
         } catch (TransformerConfigurationException tce) {
-            log.warn("Error loading the rdfxml2n3.xsl stylesheet", tce);
+            logger.warn("Error loading the rdfxml2n3.xsl stylesheet", tce);
             throw new PEPException("Error loading the rdfxml2n3.xsl stylesheet",
                                    tce);
         } catch (FileNotFoundException fnfe) {
-            log.warn(fnfe.getMessage());
+            logger.warn(fnfe.getMessage());
             throw new PEPException(fnfe.getMessage());
         }
     }
@@ -196,8 +200,8 @@ public class RISearchFilter
             String pid =
                     nodes.item(x).getAttributes().getNamedItem("rdf:about")
                             .getNodeValue();
-            if (log.isDebugEnabled()) {
-                log.debug("RISearchIndexFilter PID: " + pid);
+            if (logger.isDebugEnabled()) {
+                logger.debug("RISearchIndexFilter PID: " + pid);
             }
 
             List<Node> nodeList = nodeMap.get(pid);
@@ -218,10 +222,9 @@ public class RISearchFilter
             for (Result r : results) {
                 String rid = r.getResource();
                 if (rid == null || "".equals(rid)) {
-                    log
-                            .warn("This resource has no resource identifier in the xacml response results!");
-                } else if (log.isDebugEnabled()) {
-                    log.debug("Checking: " + rid);
+                    logger.warn("This resource has no resource identifier in the xacml response results!");
+                } else {
+                    logger.debug("Checking: {}", rid);
                 }
 
                 if (r.getStatus().getCode().contains(Status.STATUS_OK)
@@ -233,12 +236,12 @@ public class RISearchFilter
                         for (Node node : nodeList) {
                             if (node != null && node.getParentNode() != null) {
                                 node.getParentNode().removeChild(node);
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Removing: " + pid + " [" + rid
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("Removing: " + pid + " [" + rid
                                             + "]");
                                 }
                             } else {
-                                log.warn("Could not locate and/or remove: "
+                                logger.warn("Could not locate and/or remove: "
                                         + pid + " [" + rid + "]");
                             }
                         }
@@ -263,7 +266,7 @@ public class RISearchFilter
         new ByteArrayOutputStream();
         javax.xml.transform.Result dst = null;
         new StreamResult(os);
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             os = new ByteArrayOutputStream();
             dst = new StreamResult(os);
 
@@ -271,17 +274,17 @@ public class RISearchFilter
             try {
                 xFormer.transform(src, dst);
             } catch (Exception e) {
-                log.error(e.getMessage());
+                logger.error(e.getMessage());
             }
 
-            log.debug("RDF/XML:\n" + new String(os.toByteArray()));
+            logger.debug("RDF/XML:\n" + new String(os.toByteArray()));
         }
 
         os = new ByteArrayOutputStream();
         dst = new StreamResult(os);
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Transforming format: " + format);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Transforming format: " + format);
             }
             Transformer xFormer = transformers.get(format);
             xFormer.transform(src, dst);
@@ -289,8 +292,8 @@ public class RISearchFilter
             throw new ServletException("error generating output", te);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("RDF/XML:\n" + new String(os.toByteArray()));
+        if (logger.isDebugEnabled()) {
+            logger.debug("RDF/XML:\n" + new String(os.toByteArray()));
         }
 
         res.setData(os.toByteArray());
@@ -320,8 +323,8 @@ public class RISearchFilter
             throws ServletException {
         Set<String> requests = new HashSet<String>();
         for (String pidDN : pids) {
-            if (log.isDebugEnabled()) {
-                log.debug("Checking: " + pidDN);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Checking: " + pidDN);
             }
 
             Map<URI, AttributeValue> actions =
@@ -366,8 +369,8 @@ public class RISearchFilter
 
                 String xacmlResourceId = getXacmlResourceId(req);
                 if (xacmlResourceId != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Extracted XacmlResourceId: "
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Extracted XacmlResourceId: "
                                 + xacmlResourceId);
                     }
 
@@ -380,13 +383,13 @@ public class RISearchFilter
                 }
 
                 String r = contextUtil.makeRequestCtx(req);
-                if (log.isDebugEnabled()) {
-                    log.debug(r);
+                if (logger.isDebugEnabled()) {
+                    logger.debug(r);
                 }
 
                 requests.add(r);
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                logger.error(e.getMessage(), e);
                 throw new ServletException(e.getMessage(), e);
             }
         }
@@ -394,16 +397,16 @@ public class RISearchFilter
         String res = null;
         ResponseCtx resCtx = null;
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Number of requests: " + requests.size());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Number of requests: " + requests.size());
             }
 
             res =
                     getContextHandler().evaluateBatch(requests
                             .toArray(new String[requests.size()]));
 
-            if (log.isDebugEnabled()) {
-                log.debug("Response: " + res);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Response: " + res);
             }
 
             resCtx = contextUtil.makeResponseCtx(res);
@@ -423,8 +426,8 @@ public class RISearchFilter
         Set<Attribute> attributes = req.getResource();
 
         for (Attribute attr : attributes) {
-            if (log.isDebugEnabled()) {
-                log.debug("Attribute: " + attr.getId().toString());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Attribute: " + attr.getId().toString());
             }
             if (attr.getId().toString().equals(XACML_RESOURCE_ID)) {
                 return attr.getValue().encode();

@@ -20,7 +20,8 @@ package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 
 import org.apache.axis.MessageContext;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -35,8 +36,8 @@ import com.sun.xacml.ctx.RequestCtx;
 public class ResumeFindObjectsHandler
         extends AbstractOperationHandler {
 
-    private static Logger log =
-            Logger.getLogger(ResumeFindObjectsHandler.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ResumeFindObjectsHandler.class);
 
     private FieldSearchResultHandler resultHandler = null;
 
@@ -48,16 +49,16 @@ public class ResumeFindObjectsHandler
 
     public RequestCtx handleResponse(MessageContext context)
             throws OperationHandlerException {
-        if (log.isDebugEnabled()) {
-            log.debug("ResumeFindObjectsHandler/handleResponse!");
+        if (logger.isDebugEnabled()) {
+            logger.debug("ResumeFindObjectsHandler/handleResponse!");
         }
         return resultHandler.handleResponse(context);
     }
 
     public RequestCtx handleRequest(MessageContext context)
             throws OperationHandlerException {
-        if (log.isDebugEnabled()) {
-            log.debug("ResumeFindObjectsHandler/handleRequest!");
+        if (logger.isDebugEnabled()) {
+            logger.debug("ResumeFindObjectsHandler/handleRequest!");
         }
 
         LogUtil.statLog(context.getUsername(), Constants.ACTION.FIND_OBJECTS

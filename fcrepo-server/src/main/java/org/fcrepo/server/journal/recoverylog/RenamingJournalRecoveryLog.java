@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.journal.recoverylog;
@@ -11,11 +11,11 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.journal.ServerInterface;
 import org.fcrepo.server.journal.helpers.JournalHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -25,15 +25,14 @@ import org.fcrepo.server.journal.helpers.JournalHelper;
  * won't over-write an existing log file. Also, the name is prefixed with an '_'
  * (underscore) while the recovery is in progress, so we can see when it
  * finishes.
- * 
+ *
  * @author Jim Blake
  */
 public class RenamingJournalRecoveryLog
         extends JournalRecoveryLog {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(RenamingJournalRecoveryLog.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(RenamingJournalRecoveryLog.class);
 
     /** The name of the log file, when it is complete. */
     String fileName;
@@ -105,7 +104,7 @@ public class RenamingJournalRecoveryLog
                 writer.flush();
             }
         } catch (IOException e) {
-            LOG.error("Unable to write journal log message", e);
+            logger.error("Unable to write journal log message", e);
         }
     }
 
@@ -122,7 +121,7 @@ public class RenamingJournalRecoveryLog
                 logFile.renameTo(new File(fileName));
             }
         } catch (IOException e) {
-            LOG.error("Error shutting down", e);
+            logger.error("Error shutting down", e);
         }
     }
 

@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.storage.lowlevel;
@@ -8,10 +8,10 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -20,9 +20,8 @@ import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 class SimplePathRegistry
         extends PathRegistry {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(PathRegistry.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(PathRegistry.class);
 
     private Hashtable<String, String> hashtable = null;
 
@@ -36,7 +35,7 @@ class SimplePathRegistry
     public String get(String pid) throws LowlevelStorageException {
         String result;
         try {
-            result = (String) hashtable.get(pid);
+            result = hashtable.get(pid);
         } catch (Exception e) {
             throw new LowlevelStorageException(true, "SimplePathRegistry.get("
                     + pid + ")", e);
@@ -72,9 +71,9 @@ class SimplePathRegistry
 
     @Override
     public void auditFiles() throws LowlevelStorageException {
-        LOG.info("begin audit:  files-against-registry");
+        logger.info("begin audit:  files-against-registry");
         traverseFiles(storeBases, AUDIT_FILES, false, FULL_REPORT);
-        LOG.info("end audit:  files-against-registry (ending normally)");
+        logger.info("end audit:  files-against-registry (ending normally)");
     }
 
     @Override
@@ -83,13 +82,13 @@ class SimplePathRegistry
         Hashtable<String, String> temp = hashtable;
         hashtable = new Hashtable<String, String>();
         try {
-            LOG.info("begin rebuilding registry from files");
+            logger.info("begin rebuilding registry from files");
             traverseFiles(storeBases, REBUILD, false, report); // allows bad files
-            LOG.info("end rebuilding registry from files (ending normally)");
+            logger.info("end rebuilding registry from files (ending normally)");
         } catch (Exception e) {
             hashtable = temp;
             if (report != NO_REPORT) {
-                LOG.error("ending rebuild unsuccessfully", e);
+                logger.error("ending rebuild unsuccessfully", e);
             }
             throw new LowlevelStorageException(true,
                                                "ending rebuild unsuccessfully",

@@ -28,7 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -50,8 +51,8 @@ import com.sun.xacml.ctx.RequestCtx;
 public class GetDatastreamDissemination
         extends AbstractFilter {
 
-    private static Logger log =
-            Logger.getLogger(GetDatastreamDissemination.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(GetDatastreamDissemination.class);
 
     /**
      * Default constructor.
@@ -72,8 +73,8 @@ public class GetDatastreamDissemination
     public RequestCtx handleRequest(HttpServletRequest request,
                                     HttpServletResponse response)
             throws IOException, ServletException {
-        if (log.isDebugEnabled()) {
-            log.debug(this.getClass().getName() + "/handleRequest!");
+        if (logger.isDebugEnabled()) {
+            logger.debug(this.getClass().getName() + "/handleRequest!");
         }
 
         String path = request.getPathInfo();
@@ -130,7 +131,7 @@ public class GetDatastreamDissemination
                             pid,
                             dsid);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw new ServletException(e.getMessage(), e);
         }
 

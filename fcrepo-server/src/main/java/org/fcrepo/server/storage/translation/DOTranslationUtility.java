@@ -4,12 +4,30 @@
  */
 package org.fcrepo.server.storage.translation;
 
-import static org.fcrepo.common.Models.CONTENT_MODEL_3_0;
-import static org.fcrepo.common.Models.FEDORA_OBJECT_3_0;
-import static org.fcrepo.common.Models.SERVICE_DEFINITION_3_0;
-import static org.fcrepo.common.Models.SERVICE_DEPLOYMENT_3_0;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 
-import org.apache.log4j.Logger;
+import java.nio.charset.Charset;
+
+import java.text.ParseException;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
@@ -26,27 +44,13 @@ import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.Disseminator;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.Characters;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Pattern;
+import static org.fcrepo.common.Models.CONTENT_MODEL_3_0;
+import static org.fcrepo.common.Models.FEDORA_OBJECT_3_0;
+import static org.fcrepo.common.Models.SERVICE_DEFINITION_3_0;
+import static org.fcrepo.common.Models.SERVICE_DEPLOYMENT_3_0;
 
 /**
  * Utility methods for usage by digital object serializers and deserializers.
@@ -75,9 +79,8 @@ import java.util.regex.Pattern;
 public abstract class DOTranslationUtility
         implements Constants {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DOTranslationUtility.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DOTranslationUtility.class);
 
     /**
      * DESERIALIZE_INSTANCE: Deserialize XML into a java object appropriate for
@@ -326,7 +329,7 @@ public abstract class DOTranslationUtility
         // Second pass: convert non-fedora-app-context URLs via variable substitution
         output = s_fedoraLocalPattern.matcher(output).replaceAll(s_hostInfo);
 
-        LOG.debug("makeAbsoluteURLs: input=" + input + ", output=" + output);
+        logger.debug("makeAbsoluteURLs: input=" + input + ", output=" + output);
         return output;
     }
 
@@ -375,7 +378,7 @@ public abstract class DOTranslationUtility
                         .replaceAll(s_fedoraLocalPattern.pattern());
         }
 
-        LOG.debug("makeFedoraLocalURLs: input=" + input + ", output=" + output);
+        logger.debug("makeFedoraLocalURLs: input=" + input + ", output=" + output);
         return output;
     }
 
@@ -396,7 +399,7 @@ public abstract class DOTranslationUtility
         // (i.e., getItem), and replace with new API-A-LITE syntax.
 
         output = s_getItemPattern.matcher(input).replaceAll("/");
-        LOG.debug("convertGetItemURLs: input=" + input + ", output=" + output);
+        logger.debug("convertGetItemURLs: input=" + input + ", output=" + output);
         return output;
     }
 
@@ -740,16 +743,14 @@ public abstract class DOTranslationUtility
                 if (dsid.equals("WSDL") || dsid.equals("SERVICE-PROFILE")) {
                     for (Datastream d : obj.datastreams(dsid)) {
                         if (!(d instanceof DatastreamXMLMetadata)) {
-                            LOG
-                                    .warn(obj.getPid()
-                                            + " : Refusing to normalize URLs in datastream "
-                                            + dsid
-                                            + " because it is not inline XML");
+                            logger.warn(obj.getPid()
+                                    + " : Refusing to normalize URLs in datastream "
+                                    + dsid + " because it is not inline XML");
                             continue;
                         }
 
                         DatastreamXMLMetadata xd = (DatastreamXMLMetadata) d;
-                        LOG.debug(obj.getPid() + " : normalising URLs in "
+                        logger.debug(obj.getPid() + " : normalising URLs in "
                                 + dsid);
                         xd.xmlContent =
                                 DOTranslationUtility

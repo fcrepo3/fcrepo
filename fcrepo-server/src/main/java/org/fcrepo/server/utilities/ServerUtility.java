@@ -12,20 +12,19 @@ import java.net.URI;
 
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.http.WebClient;
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.config.ServerConfigurationParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 public class ServerUtility {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(ServerUtility.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ServerUtility.class);
 
     public static final String HTTP = "http";
 
@@ -44,7 +43,7 @@ public class ServerUtility {
     static {
         String fedoraHome = Constants.FEDORA_HOME;
         if (fedoraHome == null) {
-            LOG.warn("FEDORA_HOME not set; unable to initialize");
+            logger.warn("FEDORA_HOME not set; unable to initialize");
         } else {
             File fcfgFile = new File(fedoraHome, "server/config/fedora.fcfg");
             try {
@@ -52,7 +51,7 @@ public class ServerUtility {
                         new ServerConfigurationParser(new FileInputStream(fcfgFile))
                                 .parse();
             } catch (IOException e) {
-                LOG.warn("Unable to read server configuration from "
+                logger.warn("Unable to read server configuration from "
                         + fcfgFile.getPath(), e);
             }
         }
@@ -66,7 +65,7 @@ public class ServerUtility {
             getServerResponse(protocol, user, pass, "/describe");
             return true;
         } catch (Exception e) {
-            LOG.debug("Assuming the server isn't running because "
+            logger.debug("Assuming the server isn't running because "
                     + "describe request failed", e);
             return false;
         }
@@ -110,7 +109,7 @@ public class ServerUtility {
                                             String pass,
                                             String path) throws IOException {
         String url = getBaseURL(protocol) + path;
-        LOG.info("Getting URL: " + url);
+        logger.info("Getting URL: " + url);
         UsernamePasswordCredentials creds =
                 new UsernamePasswordCredentials(user, pass);
         return new WebClient().getResponseAsString(url, true, creds);

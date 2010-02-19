@@ -20,6 +20,7 @@ package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.sun.xacml.attr.AttributeValue;
+import com.sun.xacml.attr.StringAttribute;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
@@ -37,28 +40,25 @@ import org.apache.axis.message.RPCElement;
 import org.apache.axis.message.RPCParam;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.log4j.Logger;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
 import org.fcrepo.server.security.xacml.pep.PEPException;
-
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the AbstractHandler class which provides generic functionality for
  * all operation handlers. All operation handlers should extend this class.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public abstract class AbstractOperationHandler
         implements OperationHandler {
 
-    private static Logger log =
-            Logger.getLogger(AbstractOperationHandler.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(AbstractOperationHandler.class);
 
     protected static final String XACML_RESOURCE_ID =
             "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
@@ -73,7 +73,7 @@ public abstract class AbstractOperationHandler
 
     /**
      * Default constructor that obtains an instance of the ContextHandler.
-     * 
+     *
      * @throws PEPException
      */
     public AbstractOperationHandler()
@@ -83,7 +83,7 @@ public abstract class AbstractOperationHandler
 
     /**
      * Extracts the request parameters as objects from the context.
-     * 
+     *
      * @param context
      *        the message context.
      * @return list of Objects
@@ -112,21 +112,21 @@ public abstract class AbstractOperationHandler
             List params = null;
             try {
                 params = ((RPCElement) body).getParams();
-                log.debug("Number of params: " + params.size());
+                logger.debug("Number of params: " + params.size());
             } catch (Exception e) {
-                log.error("Problem obtaining params", e);
+                logger.error("Problem obtaining params", e);
                 throw AxisFault.makeFault(e);
             }
 
             if (params.size() > 0) {
-                log.info("Operation returnType: "
+                logger.info("Operation returnType: "
                         + operation.getReturnType().getNamespaceURI() + " "
                         + operation.getReturnType().getLocalPart());
 
                 for (int x = 0; x < params.size(); x++) {
                     RPCParam param = (RPCParam) params.get(x);
                     result.add(param.getObjectValue());
-                    log.info("Obtained object: (" + x + ") "
+                    logger.info("Obtained object: (" + x + ") "
                             + param.getQName().toString());
                 }
             }
@@ -137,7 +137,7 @@ public abstract class AbstractOperationHandler
 
     /**
      * Extracts the return object from the context.
-     * 
+     *
      * @param context
      *        the message context.
      * @return the return object for the message.
@@ -168,23 +168,23 @@ public abstract class AbstractOperationHandler
             List params = null;
             try {
                 params = ((RPCElement) body).getParams();
-                if (log.isDebugEnabled()) {
-                    log.debug("Number of params: " + params.size());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Number of params: " + params.size());
                 }
             } catch (Exception e) {
-                log.error("Problem obtaining params", e);
+                logger.error("Problem obtaining params", e);
                 throw AxisFault.makeFault(e);
             }
 
             if (params != null && params.size() > 0) {
-                log.info("Operation returnType: "
+                logger.info("Operation returnType: "
                         + operation.getReturnType().getNamespaceURI() + " "
                         + operation.getReturnType().getLocalPart());
 
                 for (int x = 0; result == null && x < params.size(); x++) {
                     RPCParam param = (RPCParam) params.get(x);
                     if (param.getQName().equals(operation.getReturnQName())) {
-                        log.info("Obtained object: (" + x + ") "
+                        logger.info("Obtained object: (" + x + ") "
                                 + param.getQName().toString());
                         result = param.getObjectValue();
                     }
@@ -202,7 +202,7 @@ public abstract class AbstractOperationHandler
 
     /**
      * Sets the request parameters for a request.
-     * 
+     *
      * @param context
      *        the message context
      * @param params
@@ -229,14 +229,14 @@ public abstract class AbstractOperationHandler
                 body.addChild(p);
             }
         } catch (Exception e) {
-            log.fatal("Problem changing SOAP message contents", e);
+            logger.error("Problem changing SOAP message contents", e);
             throw AxisFault.makeFault(e);
         }
     }
 
     /**
      * Sets the return object for a response as the param.
-     * 
+     *
      * @param context
      *        the message context
      * @param param
@@ -260,14 +260,14 @@ public abstract class AbstractOperationHandler
             body.removeContents();
             body.addChild(param);
         } catch (Exception e) {
-            log.fatal("Problem changing SOAP message contents", e);
+            logger.error("Problem changing SOAP message contents", e);
             throw AxisFault.makeFault(e);
         }
     }
 
     /**
      * Sets the return object for a response as a sequence of params.
-     * 
+     *
      * @param context
      *        the message context
      * @param param
@@ -295,14 +295,14 @@ public abstract class AbstractOperationHandler
                 }
             }
         } catch (Exception e) {
-            log.fatal("Problem changing SOAP message contents", e);
+            logger.error("Problem changing SOAP message contents", e);
             throw AxisFault.makeFault(e);
         }
     }
 
     /**
      * Extracts the list of Subjects from the given context.
-     * 
+     *
      * @param context
      *        the message context
      * @return a list of Subjects
@@ -363,7 +363,7 @@ public abstract class AbstractOperationHandler
             }
             subjects.add(subAttr);
         } catch (URISyntaxException use) {
-            log.error(use.getMessage(), use);
+            logger.error(use.getMessage(), use);
             throw AxisFault.makeFault(use);
         }
 
@@ -372,7 +372,7 @@ public abstract class AbstractOperationHandler
 
     /**
      * Obtains a list of environment Attributes.
-     * 
+     *
      * @param context
      *        the message context
      * @return list of environment Attributes
@@ -399,7 +399,7 @@ public abstract class AbstractOperationHandler
 
     /**
      * Returns the roles that the user has.
-     * 
+     *
      * @param context
      *        the message context
      * @return a String array of roles

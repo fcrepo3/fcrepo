@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.validation;
@@ -21,11 +21,11 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.errors.ObjectValidityException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -36,15 +36,14 @@ import org.fcrepo.utilities.XmlTransformUtility;
  * in the METS XML schema, or that cannot be expressed with XML Schema language.
  * Generally we will look for things that are requirements of Fedora objects,
  * which are not requirements for METS objects in general.
- * 
+ *
  * @author Sandy Payette
  * @version $Id$
  */
 public class DOValidatorSchematron {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DOValidatorSchematron.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DOValidatorSchematron.class);
 
     private StreamSource rulesSource;
 
@@ -52,7 +51,7 @@ public class DOValidatorSchematron {
 
     private final StreamSource validatingStyleSheet;
 
-    private static Map<String, ByteArrayOutputStream> generatedStyleSheets = 
+    private static Map<String, ByteArrayOutputStream> generatedStyleSheets =
         new HashMap<String, ByteArrayOutputStream>();
 
     /**
@@ -60,7 +59,7 @@ public class DOValidatorSchematron {
      * preprocessor that is provided by the calling class. This will allow the
      * DOValidator module to pass in the preprocessor that is configured with
      * the Fedora repository.
-     * 
+     *
      * @param schemaPath
      *        the URL of the Schematron schema
      * @param preprocessorPath
@@ -79,7 +78,7 @@ public class DOValidatorSchematron {
 
     /**
      * Run the Schematron validation on a Fedora object.
-     * 
+     *
      * @param objectAsFile
      *        the Fedora object as a File
      * @throws ServerException
@@ -90,7 +89,7 @@ public class DOValidatorSchematron {
 
     /**
      * Run the Schematron validation on a Fedora object.
-     * 
+     *
      * @param objectAsStream
      *        the Fedora object as an Inputstream
      * @throws ServerException
@@ -101,7 +100,7 @@ public class DOValidatorSchematron {
 
     /**
      * Run the Schematron validation on a Fedora object.
-     * 
+     *
      * @param objectSource
      *        the Fedora object as an StreamSource
      * @throws ServerException
@@ -119,7 +118,7 @@ public class DOValidatorSchematron {
             vtransformer.transform(objectSource, validationResult);
             result = new DOValidatorSchematronResult(validationResult);
         } catch (Exception e) {
-            LOG.error("Schematron validation failed", e);
+            logger.error("Schematron validation failed", e);
             throw new ObjectValidityException(e.getMessage());
         }
 
@@ -128,9 +127,7 @@ public class DOValidatorSchematron {
             try {
                 msg = result.getXMLResult();
             } catch (Exception e) {
-                LOG
-                        .warn("Error getting XML result of schematron validation failure",
-                              e);
+                logger.warn("Error getting XML result of schematron validation failure", e);
             }
             throw new ObjectValidityException(msg);
         }
@@ -139,7 +136,7 @@ public class DOValidatorSchematron {
     /**
      * Run setup to prepare for Schematron validation. This entails dynamically
      * creating the validating stylesheet using the preprocessor and the schema.
-     * 
+     *
      * @param preprocessorPath
      *        the location of the Schematron preprocessor
      * @param fedoraschemaPath
@@ -155,7 +152,7 @@ public class DOValidatorSchematron {
                                String phase) throws ObjectValidityException {
         String key = fedoraschemaPath + "#" + phase;
         ByteArrayOutputStream out =
-                (ByteArrayOutputStream) generatedStyleSheets.get(key);
+                generatedStyleSheets.get(key);
         if (out == null) {
             rulesSource = fileToStreamSource(fedoraschemaPath);
             preprocessorSource = fileToStreamSource(preprocessorPath);
@@ -178,7 +175,7 @@ public class DOValidatorSchematron {
      * different phases of the object lifecycle. Some rules are applied when an
      * object is first being ingested into the repository. Other rules apply
      * before the object is put into permanent storage.
-     * 
+     *
      * @param rulesSource
      *        the location of the rules
      * @param preprocessorSource
@@ -203,7 +200,7 @@ public class DOValidatorSchematron {
             ptransformer.setParameter("phase", phase);
             ptransformer.transform(rulesSource, new StreamResult(out));
         } catch (TransformerException e) {
-            LOG.error("Schematron validation failed", e);
+            logger.error("Schematron validation failed", e);
             throw new ObjectValidityException(e.getMessage());
         }
         return out;

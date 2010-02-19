@@ -127,7 +127,7 @@ public class JournalHelper
     }
 
     /**
-     * Format a date for the journal or the log.
+     * Format a date for the journal or the logger.
      */
     public static String formatDate(Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat(TIMESTAMP_FORMAT);

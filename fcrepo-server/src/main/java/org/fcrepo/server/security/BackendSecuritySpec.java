@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security;
@@ -7,22 +7,20 @@ package org.fcrepo.server.security;
 import java.util.Hashtable;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.errors.GeneralException;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class that instantiates information parsed from the beSecurity.xml file.
  * Methods are provided to set and get backend security properties by role id.
- * 
+ *
  * @author payette
  */
 public class BackendSecuritySpec {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(BackendSecuritySpec.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(BackendSecuritySpec.class);
 
     /**
      * The Hashtable is as follows: roleKey = the role identifier for the
@@ -51,7 +49,7 @@ public class BackendSecuritySpec {
     /**
      * Set the security properties at the backend service or for a method of
      * that backend service.
-     * 
+     *
      * @param serviceRoleID -
      *        the role identifier for a service. Valid values for this parameter
      *        are: - a sDep PID for a backend service - "default" to indicate
@@ -68,7 +66,7 @@ public class BackendSecuritySpec {
                                 Hashtable<String, String> properties)
             throws GeneralException {
 
-        LOG.debug(">>>>>> setSecuritySpec: " + " serviceRoleID="
+        logger.debug(">>>>>> setSecuritySpec: " + " serviceRoleID="
                 + serviceRoleID + " methodName=" + methodName
                 + " property count=" + properties.size());
         if (serviceRoleID == null || serviceRoleID.equals("")) {
@@ -102,7 +100,7 @@ public class BackendSecuritySpec {
     /**
      * Get security properties for either the a backend service or a method
      * within that backend service.
-     * 
+     *
      * @param serviceRoleID -
      *        role identifier for a backend service. Valid options: - "default"
      *        (the overall default for backend services) -
@@ -153,7 +151,7 @@ public class BackendSecuritySpec {
     /**
      * Get security properties for either the a backend service or a method
      * within that backend service.
-     * 
+     *
      * @param roleKey =
      *        the role identifier for the backend service, for example: -
      *        "default" (the overall default for backend services) -

@@ -4,7 +4,25 @@
  */
 package org.fcrepo.server.access;
 
-import org.apache.log4j.Logger;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+
+import java.net.InetAddress;
+import java.net.URLDecoder;
+import java.net.UnknownHostException;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
@@ -12,7 +30,14 @@ import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.access.dissemination.DisseminationService;
-import org.fcrepo.server.errors.*;
+import org.fcrepo.server.errors.DatastreamNotFoundException;
+import org.fcrepo.server.errors.DisseminationException;
+import org.fcrepo.server.errors.DisseminatorNotFoundException;
+import org.fcrepo.server.errors.GeneralException;
+import org.fcrepo.server.errors.InvalidUserParmException;
+import org.fcrepo.server.errors.MethodNotFoundException;
+import org.fcrepo.server.errors.ModuleInitializationException;
+import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.search.FieldSearchQuery;
 import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.security.Authorization;
@@ -22,18 +47,24 @@ import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.ServiceDefinitionReader;
 import org.fcrepo.server.storage.ServiceDeploymentReader;
-import org.fcrepo.server.storage.types.*;
+import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.server.storage.types.DatastreamDef;
+import org.fcrepo.server.storage.types.DatastreamManagedContent;
+import org.fcrepo.server.storage.types.DatastreamReferencedContent;
+import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
+import org.fcrepo.server.storage.types.DeploymentDSBindRule;
+import org.fcrepo.server.storage.types.DeploymentDSBindSpec;
+import org.fcrepo.server.storage.types.DisseminationBindingInfo;
+import org.fcrepo.server.storage.types.MIMETypedStream;
+import org.fcrepo.server.storage.types.MethodDef;
+import org.fcrepo.server.storage.types.MethodDefOperationBind;
+import org.fcrepo.server.storage.types.MethodParmDef;
+import org.fcrepo.server.storage.types.ObjectMethodsDef;
+import org.fcrepo.server.storage.types.Property;
+import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.utilities.DateUtility;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.URLDecoder;
-import java.net.UnknownHostException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Access Module, providing support for the Fedora Access subsystem.
@@ -45,8 +76,8 @@ public class DefaultAccess
         extends Module
         implements Access {
 
-    /** Logger for this class. */
-    private final static Logger LOG = Logger.getLogger(Access.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DefaultAccess.class);
 
     /** Current DOManager of the Fedora server. */
     private DOManager m_manager;
@@ -219,7 +250,7 @@ public class DefaultAccess
                                                      asOfDateTime);
             stopTime = new Date().getTime();
             interval = stopTime - startTime;
-            LOG.debug("Roundtrip DynamicDisseminator: " + interval
+            logger.debug("Roundtrip DynamicDisseminator: " + interval
                     + " milliseconds.");
             return retVal;
         }
@@ -232,7 +263,7 @@ public class DefaultAccess
         String serviceDeploymentPID = null;
         for (String cModelURI: reader.getContentModels()){
             String cModelPID = cModelURI.substring("info:fedora/".length());
-        
+
 /*
         for (RelationshipTuple rel : reader.getRelationships(MODEL.HAS_MODEL,
                                                              null)) {
@@ -257,7 +288,7 @@ public class DefaultAccess
 
                 serviceDeploymentPID = foundDeploymentPID;
             } else {
-                LOG.debug("No deployment for (" + cModelPID + ", " + sDefPID
+                logger.debug("No deployment for (" + cModelPID + ", " + sDefPID
                         + ")");
             }
         }
@@ -332,7 +363,7 @@ public class DefaultAccess
         }
         stopTime = new Date().getTime();
         interval = stopTime - startTime;
-        LOG.debug("Roundtrip Looping Diss: " + interval + " milliseconds.");
+        logger.debug("Roundtrip Looping Diss: " + interval + " milliseconds.");
 
         // Check deployment object state
         String authzAux_sDepState = deploymentReader.GetObjectState();
@@ -372,7 +403,7 @@ public class DefaultAccess
 
         stopTime = new Date().getTime();
         interval = stopTime - startTime;
-        LOG.debug("Roundtrip Get/Validate User Parms: " + interval
+        logger.debug("Roundtrip Get/Validate User Parms: " + interval
                 + " milliseconds.");
 
         startTime = new Date().getTime();
@@ -385,7 +416,7 @@ public class DefaultAccess
             if (!defaultMethodParms[i].parmType
                     .equals(MethodParmDef.DATASTREAM_INPUT)) {
                 if (!h_userParms.containsKey(defaultMethodParms[i].parmName)) {
-                    LOG.debug("addedDefaultName: "
+                    logger.debug("addedDefaultName: "
                             + defaultMethodParms[i].parmName);
                     String pdv = defaultMethodParms[i].parmDefaultValue;
                     try {
@@ -400,7 +431,7 @@ public class DefaultAccess
                         }
                     } catch (UnsupportedEncodingException uee) {
                     }
-                    LOG.debug("addedDefaultValue: " + pdv);
+                    logger.debug("addedDefaultValue: " + pdv);
                     h_userParms.put(defaultMethodParms[i].parmName, pdv);
                 }
             }
@@ -408,7 +439,7 @@ public class DefaultAccess
 
         stopTime = new Date().getTime();
         interval = stopTime - startTime;
-        LOG.debug("Roundtrip Get Deployment Parms: " + interval
+        logger.debug("Roundtrip Get Deployment Parms: " + interval
                 + " milliseconds.");
 
         startTime = new Date().getTime();
@@ -433,12 +464,12 @@ public class DefaultAccess
 
         stopTime = new Date().getTime();
         interval = stopTime - startTime;
-        LOG.debug("Roundtrip Assemble Dissemination: " + interval
+        logger.debug("Roundtrip Assemble Dissemination: " + interval
                 + " milliseconds.");
 
         stopTime = new Date().getTime();
         interval = stopTime - initStartTime;
-        LOG.debug("Roundtrip GetDissemination: " + interval + " milliseconds.");
+        logger.debug("Roundtrip GetDissemination: " + interval + " milliseconds.");
         return dissemination;
     }
 
@@ -532,7 +563,7 @@ public class DefaultAccess
         ObjectMethodsDef[] methodDefs = reader.listMethods(asOfDateTime);
         long stopTime = new Date().getTime();
         long interval = stopTime - startTime;
-        LOG.debug("Roundtrip listMethods: " + interval + " milliseconds.");
+        logger.debug("Roundtrip listMethods: " + interval + " milliseconds.");
 
         // DYNAMIC!! Grab any dynamic method definitions and merge them with
         // the statically bound method definitions
@@ -572,7 +603,7 @@ public class DefaultAccess
 
         long stopTime = new Date().getTime();
         long interval = stopTime - startTime;
-        LOG.debug("Roundtrip listDatastreams: " + interval + " milliseconds.");
+        logger.debug("Roundtrip listDatastreams: " + interval + " milliseconds.");
         return dsDefs;
     }
 
@@ -866,15 +897,15 @@ public class DefaultAccess
             for (int i = 0; i < methodParms.length; i++) {
                 methodParm = methodParms[i];
                 h_validParms.put(methodParm.parmName, methodParm);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("methodParms[" + i + "]: "
+                if (logger.isDebugEnabled()) {
+                    logger.debug("methodParms[" + i + "]: "
                             + methodParms[i].parmName + "\nlabel: "
                             + methodParms[i].parmLabel + "\ndefault: "
                             + methodParms[i].parmDefaultValue + "\nrequired: "
                             + methodParms[i].parmRequired + "\ntype: "
                             + methodParms[i].parmType);
                     for (String element : methodParms[i].parmDomainValues) {
-                        LOG.debug("domainValue: " + element);
+                        logger.debug("domainValue: " + element);
                     }
                 }
             }
@@ -918,7 +949,7 @@ public class DefaultAccess
                             // for this parameter and the user has supplied no value for
                             // the parameter. The value of the empty string will be used
                             // as the value of the parameter.
-                            LOG.warn("The method parameter \""
+                            logger.warn("The method parameter \""
                                     + methodParm.parmName
                                     + "\" has no default value and no "
                                     + "value was specified by the user.  "
@@ -1042,12 +1073,12 @@ public class DefaultAccess
         String reposBaseURL = null;
         String fedoraServerHost = getServer().getParameter("fedoraServerHost");
         if (fedoraServerHost == null || fedoraServerHost.equals("")) {
-            LOG.warn("Configuration parameter fedoraServerHost is empty.");
+            logger.warn("Configuration parameter fedoraServerHost is empty.");
             try {
                 InetAddress hostIP = InetAddress.getLocalHost();
                 fedoraServerHost = hostIP.getHostName();
             } catch (UnknownHostException e) {
-                LOG.error("Unable to resolve host of Fedora server", e);
+                logger.error("Unable to resolve host of Fedora server", e);
                 fedoraServerHost = "localhost";
             }
         }
@@ -1135,13 +1166,13 @@ public class DefaultAccess
                                 + "Reason was \"" + uee.getMessage()
                                 + "\"  . String value: " + drc.DSLocation
                                 + "  . ";
-                LOG.error(message);
+                logger.error(message);
                 throw new GeneralException(message);
             }
         }
         long stopTime = new Date().getTime();
         long interval = stopTime - startTime;
-        LOG.debug("Roundtrip getDatastreamDissemination: " + interval
+        logger.debug("Roundtrip getDatastreamDissemination: " + interval
                 + " milliseconds.");
         return mimeTypedStream;
     }

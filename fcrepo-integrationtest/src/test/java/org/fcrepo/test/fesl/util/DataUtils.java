@@ -1,14 +1,14 @@
 /*
  * File: DataUtils.java
- * 
+ *
  * Copyright 2007 Macquarie E-Learning Centre Of Excellence
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -22,27 +22,31 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for managing documents.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public class DataUtils {
 
-    private static final Logger log = Logger.getLogger(DataUtils.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(DataUtils.class);
 
     /**
      * Creates an XML document object from a file.
-     * 
+     *
      * @param file
      *        the filename of the file to load.
      * @return the XML document object.
@@ -56,7 +60,7 @@ public class DataUtils {
 
     /**
      * Creates an XML document object from a file.
-     * 
+     *
      * @param file
      *        the file to load.
      * @return the XML document object.
@@ -77,7 +81,7 @@ public class DataUtils {
 
     /**
      * Creates an XML document object from a byte array.
-     * 
+     *
      * @param file
      *        the file to load.
      * @return the XML document object.
@@ -97,7 +101,7 @@ public class DataUtils {
 
     /**
      * Loads a file into a byte array.
-     * 
+     *
      * @param filename
      *        name of file to load.
      * @return byte array containing the data file.
@@ -110,7 +114,7 @@ public class DataUtils {
 
     /**
      * Loads a file into a byte array.
-     * 
+     *
      * @param File
      *        to load.
      * @return byte array containing the data file.
@@ -119,7 +123,7 @@ public class DataUtils {
     public static byte[] loadFile(File file) throws Exception {
         if (!file.exists() || !file.canRead()) {
             String message = "Cannot read file: " + file.getCanonicalPath();
-            log.error(message);
+            logger.error(message);
             throw new Exception(message);
         }
 
@@ -136,7 +140,7 @@ public class DataUtils {
 
     /**
      * Generates an MD5 checksum of a series of bytes.
-     * 
+     *
      * @param data
      *        the byte array on which to compute the hash.
      * @return the MD5 hash.
@@ -153,7 +157,7 @@ public class DataUtils {
 
     /**
      * Converts a hash into its hexadecimal string representation.
-     * 
+     *
      * @param bytes
      *        the byte array to convert
      * @return the hexadecimal string representation

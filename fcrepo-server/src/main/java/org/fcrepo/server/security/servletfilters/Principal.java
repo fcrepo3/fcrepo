@@ -4,8 +4,8 @@
  */
 package org.fcrepo.server.security.servletfilters;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * import java.security.Principal; import java.util.Map; import java.util.Set;
@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 public class Principal
         implements java.security.Principal {
 
-    private final Log log = LogFactory.getLog(Principal.class);
+    private final Logger logger = LoggerFactory.getLogger(Principal.class);
 
     private final String name;
 

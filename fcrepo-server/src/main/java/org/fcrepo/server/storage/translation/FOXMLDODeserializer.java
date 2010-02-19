@@ -25,8 +25,6 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.log4j.Logger;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -50,6 +48,8 @@ import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.utilities.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -71,9 +71,8 @@ public class FOXMLDODeserializer
      */
     public static final XMLFormat DEFAULT_FORMAT = FOXML1_1;
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(FOXMLDODeserializer.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(FOXMLDODeserializer.class);
 
     /** The format this deserializer reads. */
     private final XMLFormat m_format;
@@ -228,7 +227,7 @@ public class FOXMLDODeserializer
                             String encoding,
                             int transContext) throws ObjectIntegrityException,
             StreamIOException, UnsupportedEncodingException {
-        LOG.debug("Deserializing " + m_format.uri + " for transContext: "
+        logger.debug("Deserializing " + m_format.uri + " for transContext: "
                 + transContext);
 
         // initialize sax for this parse
@@ -256,7 +255,7 @@ public class FOXMLDODeserializer
             throw new ObjectIntegrityException("FOXML IO stream was bad : "
                     + se.getMessage(), se);
         }
-        LOG.debug("Just finished parse.");
+        logger.debug("Just finished parse.");
 
         if (!m_rootElementFound) {
             throw new ObjectIntegrityException("FOXMLDODeserializer: Input stream is not valid FOXML."
@@ -799,15 +798,15 @@ public class FOXMLDODeserializer
         ds.DSLocationType = m_dsLocationType;
         ds.DSInfoType = ""; // METS legacy
         ds.DSChecksumType = m_dsChecksumType;
-        LOG.debug("instantiate datastream: dsid = " + m_dsId
+        logger.debug("instantiate datastream: dsid = " + m_dsId
                 + "checksumType = " + m_dsChecksumType + "checksum = "
                 + m_dsChecksum);
         if (m_obj.isNew()) {
-            LOG.debug("New Object: checking supplied checksum");
+            logger.debug("New Object: checking supplied checksum");
             if (m_dsChecksum != null && !m_dsChecksum.equals("")
                     && !m_dsChecksum.equals(Datastream.CHECKSUM_NONE)) {
                 String tmpChecksum = ds.getChecksum();
-                LOG.debug("checksum = " + tmpChecksum);
+                logger.debug("checksum = " + tmpChecksum);
                 if (!m_dsChecksum.equals(tmpChecksum)) {
                     {
                         throw new SAXException(new ValidationException("Checksum Mismatch: "
@@ -878,7 +877,7 @@ public class FOXMLDODeserializer
                     rels.append(Models.SERVICE_DEPLOYMENT_3_0 + "\n");
                 }
 
-                LOG.debug("Not processing WSDL from " + m_obj.getPid()
+                logger.debug("Not processing WSDL from " + m_obj.getPid()
                         + " with models:\n" + rels);
             }
             //LOOK! this sets bytes, not characters.  Do we want to set this?
@@ -887,7 +886,7 @@ public class FOXMLDODeserializer
             throw new RuntimeException("Error processing inline xml content in SAX parse",
                                        uee);
         }
-        LOG.debug("instantiate datastream: dsid = " + m_dsId
+        logger.debug("instantiate datastream: dsid = " + m_dsId
                 + "checksumType = " + m_dsChecksumType + "checksum = "
                 + m_dsChecksum);
         ds.DSChecksumType = m_dsChecksumType;
@@ -895,7 +894,7 @@ public class FOXMLDODeserializer
             if (m_dsChecksum != null && !m_dsChecksum.equals("")
                     && !m_dsChecksum.equals(Datastream.CHECKSUM_NONE)) {
                 String tmpChecksum = ds.getChecksum();
-                LOG.debug("checksum = " + tmpChecksum);
+                logger.debug("checksum = " + tmpChecksum);
                 if (!m_dsChecksum.equals(tmpChecksum)) {
                     throw new SAXException(new ValidationException("Checksum Mismatch: "
                             + tmpChecksum));

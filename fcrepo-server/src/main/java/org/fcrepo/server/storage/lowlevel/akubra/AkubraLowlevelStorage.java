@@ -20,8 +20,6 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 
-import org.apache.log4j.Logger;
-
 import org.akubraproject.Blob;
 import org.akubraproject.BlobStore;
 import org.akubraproject.BlobStoreConnection;
@@ -36,6 +34,8 @@ import org.fcrepo.server.errors.ObjectAlreadyInLowlevelStorageException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.storage.lowlevel.IListable;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -50,8 +50,8 @@ import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
 public class AkubraLowlevelStorage
         implements ILowlevelStorage, IListable {
 
-    private static final Logger log = Logger.getLogger(
-            AkubraLowlevelStorage.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(AkubraLowlevelStorage.class);
 
     private final BlobStore objectStore;
 
@@ -294,7 +294,7 @@ public class AkubraLowlevelStorage
                 try {
                     delete(newBlob);
                 } catch (Throwable th) {
-                    log.error("Failed to delete " + newBlob.getId() + " while"
+                    logger.error("Failed to delete " + newBlob.getId() + " while"
                               + " recovering from rename failure during safe"
                               + " overwrite", th);
                 }
@@ -314,14 +314,14 @@ public class AkubraLowlevelStorage
                 try {
                     rename(oldBlob, origId);
                 } catch (Throwable th) {
-                    log.error("Failed to rename " + oldBlob.getId() + " to "
+                    logger.error("Failed to rename " + oldBlob.getId() + " to "
                               + origId + " while recovering from rename"
                               + " failure during safe overwrite", th);
                 }
                 try {
                     newBlob.delete();
                 } catch (Throwable th) {
-                    log.error("Failed to delete " + newBlob.getId()
+                    logger.error("Failed to delete " + newBlob.getId()
                               + " while recovering from rename"
                               + " failure during safe overwrite", th);
                 }
@@ -334,7 +334,7 @@ public class AkubraLowlevelStorage
         try {
             delete(oldBlob);
         } catch (Throwable th) {
-            log.error("Failed to delete " + oldBlob.getId()
+            logger.error("Failed to delete " + oldBlob.getId()
                     + " while cleaning up after committed"
                     + " safe overwrite", th);
         }
@@ -388,7 +388,7 @@ public class AkubraLowlevelStorage
                 connection.close();
             }
         } catch (Throwable th) {
-            log.warn("Unexpected error closing blob store connection", th);
+            logger.warn("Unexpected error closing blob store connection", th);
         }
     }
 

@@ -23,9 +23,6 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
@@ -52,8 +49,6 @@ public class FOPServlet
     /** Name of the parameter used for the XSLT file */
     protected static final String XSLT_REQUEST_PARAM = "xslt";
 
-    /** Logger to give to FOP */
-    protected Log log = null;
     /** The TransformerFactory used to create Transformer instances */
     protected TransformerFactory transFactory = null;
     /** The FopFactory used to create Fop instances */
@@ -66,7 +61,6 @@ public class FOPServlet
      */
     @Override
 	public void init() throws ServletException {
-        this.log = LogFactory.getLog(FOPServlet.class.getName());
         this.uriResolver = new RepositoryURIResolver();
         this.transFactory = TransformerFactory.newInstance();
         this.transFactory.setURIResolver(this.uriResolver);

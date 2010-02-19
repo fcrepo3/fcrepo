@@ -3,6 +3,7 @@ package org.fcrepo.server.security.xacml.pdp.finder;
 
 import java.io.File;
 import java.io.FileInputStream;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,8 +14,6 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,11 +21,13 @@ import org.w3c.dom.NodeList;
 
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManagerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AttributeFinderConfigUtil {
 
-    private static final Logger log =
-            Logger.getLogger(AttributeFinderConfigUtil.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(AttributeFinderConfigUtil.class);
 
     public static Map<Integer, Set<String>> getAttributeFinderConfig(String className)
             throws AttributeFinderException {
@@ -49,7 +50,7 @@ public class AttributeFinderConfigUtil {
                         + f.getAbsolutePath());
             }
 
-            log.info("Loading attribute finder config file: "
+            logger.info("Loading attribute finder config file: "
                     + f.getAbsolutePath());
 
             DocumentBuilderFactory factory =
@@ -102,7 +103,7 @@ public class AttributeFinderConfigUtil {
                 }
             }
         } catch (Exception e) {
-            log.fatal("Could not initialise AttributeFinder: [" + className
+            logger.error("Could not initialise AttributeFinder: [" + className
                     + "] " + e.getMessage(), e);
             throw new AttributeFinderException("Could not initialise AttributeFinder: ["
                                                        + className
@@ -138,7 +139,7 @@ public class AttributeFinderConfigUtil {
                 }
             }
         } catch (Exception e) {
-            log.fatal("Could not initialise DBXML: " + e.getMessage(), e);
+            logger.error("Could not initialise DBXML: " + e.getMessage(), e);
             throw new AttributeFinderException("Could not initialise AttributeFinder: ["
                                                        + className
                                                        + "] "
@@ -170,15 +171,15 @@ public class AttributeFinderConfigUtil {
                     String value =
                             n.getAttributes().getNamedItem("value")
                                     .getNodeValue();
-                    if (log.isDebugEnabled()) {
-                        log.debug(className + ": " + name + " = " + value);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(className + ": " + name + " = " + value);
                     }
 
                     options.put(name, value);
                 }
             }
         } catch (Exception e) {
-            log.fatal("Could not initialise DBXML: " + e.getMessage(), e);
+            logger.error("Could not initialise DBXML: " + e.getMessage(), e);
             throw new AttributeFinderException("Could not initialise AttributeFinder: ["
                                                        + className
                                                        + "] "
@@ -200,8 +201,7 @@ public class AttributeFinderConfigUtil {
                     + f.getAbsolutePath());
         }
 
-        log
-                .info("Loading attribute finder config file: "
+        logger.info("Loading attribute finder config file: "
                         + f.getAbsolutePath());
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -216,8 +216,8 @@ public class AttributeFinderConfigUtil {
                     nodes.item(x).getAttributes().getNamedItem("name")
                             .getNodeValue();
             if (className.equals(name)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Located AttributeFinder: " + className);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Located AttributeFinder: " + className);
                 }
 
                 return (Element) nodes.item(x);

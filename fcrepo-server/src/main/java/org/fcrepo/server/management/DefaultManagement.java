@@ -33,8 +33,6 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 import org.apache.commons.betwixt.XMLUtils;
 
-import org.apache.log4j.Logger;
-
 import org.jrdf.graph.URIReference;
 
 import org.w3c.dom.Document;
@@ -69,8 +67,8 @@ import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationConstants;
 import org.fcrepo.server.validation.ValidationUtility;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements API-M without regard to the transport/messaging protocol.
@@ -81,9 +79,8 @@ import org.fcrepo.server.validation.ValidationUtility;
 public class DefaultManagement
         implements Constants, Management, ManagementDelegate {
 
-    /** Logger for this class. */
-    private static Logger LOG =
-            Logger.getLogger(DefaultManagement.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DefaultManagement.class);
 
     private final Authorization m_authz;
 
@@ -135,7 +132,7 @@ public class DefaultManagement
                          boolean newPid) throws ServerException {
         DOWriter w = null;
         try {
-            LOG.debug("Entered ingest");
+            logger.debug("Entered ingest");
             w = m_manager.getIngestWriter(Server.USE_DEFINITIVE_STORE,
                                           context,
                                           serialization,
@@ -155,8 +152,8 @@ public class DefaultManagement
             w.commit(logMessage);
             return pid;
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg = new StringBuilder("Completed ingest(");
                 logMsg.append("objectXML");
                 logMsg.append(", format: ").append(format);
@@ -164,7 +161,7 @@ public class DefaultManagement
                 logMsg.append(", newPid: ").append(newPid);
                 logMsg.append(", logMessage: ").append(logMessage);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
             finishModification(w, "ingest");
@@ -176,10 +173,10 @@ public class DefaultManagement
         if (w != null) {
             m_manager.releaseWriter(w);
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Exiting " + method);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Exiting " + method);
             Runtime r = Runtime.getRuntime();
-            LOG.debug("Memory: " + r.freeMemory() + " bytes free of "
+            logger.debug("Memory: " + r.freeMemory() + " bytes free of "
                     + r.totalMemory() + " available.");
         }
     }
@@ -192,7 +189,7 @@ public class DefaultManagement
                              String logMessage) throws ServerException {
         DOWriter w = null;
         try {
-            LOG.debug("Entered modifyObject");
+            logger.debug("Entered modifyObject");
 
             m_authz.enforceModifyObject(context,
                                                     pid,
@@ -227,8 +224,8 @@ public class DefaultManagement
             w.commit(logMessage);
             return w.getLastModDate();
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed modifyObject(");
                 logMsg.append("pid: ").append(pid);
@@ -237,7 +234,7 @@ public class DefaultManagement
                 logMsg.append(", ownderId: ").append(ownerId);
                 logMsg.append(", logMessage: ").append(logMessage);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
             finishModification(w, "modifyObject");
@@ -247,7 +244,7 @@ public class DefaultManagement
     public InputStream getObjectXML(Context context, String pid, String encoding)
             throws ServerException {
         try {
-            LOG.debug("Entered getObjectXML");
+            logger.debug("Entered getObjectXML");
 
             m_authz.enforceGetObjectXML(context, pid, encoding);
 
@@ -258,17 +255,17 @@ public class DefaultManagement
             InputStream instream = reader.GetObjectXML();
             return instream;
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed getObjectXML(");
                 logMsg.append("pid: ").append(pid);
                 logMsg.append(", encoding: ").append(encoding);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
-            LOG.debug("Exiting getObjectXML");
+            logger.debug("Exiting getObjectXML");
         }
     }
 
@@ -278,7 +275,7 @@ public class DefaultManagement
                               String exportContext,
                               String encoding) throws ServerException {
         try {
-            LOG.debug("Entered export");
+            logger.debug("Entered export");
 
             m_authz.enforceExport(context,
                                               pid,
@@ -294,18 +291,18 @@ public class DefaultManagement
 
             return instream;
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg = new StringBuilder("Completed export(");
                 logMsg.append("pid: ").append(pid);
                 logMsg.append(", format: ").append(format);
                 logMsg.append(", exportContext: ").append(exportContext);
                 logMsg.append(", encoding: ").append(encoding);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
-            LOG.debug("Exiting export");
+            logger.debug("Exiting export");
         }
     }
 
@@ -319,7 +316,7 @@ public class DefaultManagement
         }
         DOWriter w = null;
         try {
-            LOG.debug("Entered purgeObject");
+            logger.debug("Entered purgeObject");
 
             m_authz.enforcePurgeObject(context, pid);
 
@@ -329,14 +326,14 @@ public class DefaultManagement
             Date serverDate = Server.getCurrentDate(context);
             return serverDate;
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed purgeObject(");
                 logMsg.append("pid: ").append(pid);
                 logMsg.append(", logMessage: ").append(logMessage);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
             finishModification(w, "purgeObject");
@@ -358,7 +355,7 @@ public class DefaultManagement
                                 String checksum,
                                 String logMessage) throws ServerException {
 
-        LOG.debug("Entered addDatastream");
+        logger.debug("Entered addDatastream");
 
         // empty MIME types are allowed. assume they meant "" if they provide it
         // as null.
@@ -380,7 +377,7 @@ public class DefaultManagement
                     rContext
                             .getRecoveryValue(Constants.RECOVERY.DATASTREAM_ID.uri);
             if (dsID != null) {
-                LOG.debug("Using new dsID from recovery context");
+                logger.debug("Using new dsID from recovery context");
             }
         }
 
@@ -529,8 +526,8 @@ public class DefaultManagement
 
             return ds.DatastreamID;
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed addDatastream(");
                 logMsg.append("pid: ").append(pid);
@@ -547,7 +544,7 @@ public class DefaultManagement
                 logMsg.append(", checksum: ").append(checksum);
                 logMsg.append(", logMessage: ").append(logMessage);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
             finishModification(w, "addDatastream");
@@ -585,7 +582,7 @@ public class DefaultManagement
 
         DOWriter w = null;
         try {
-            LOG.debug("Entered modifyDatastreamByReference");
+            logger.debug("Entered modifyDatastreamByReference");
             m_authz
                     .enforceModifyDatastreamByReference(context,
                                                         pid,
@@ -725,8 +722,8 @@ public class DefaultManagement
 
             return nowUTC;
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed modifyDatastreamByReference(");
                 logMsg.append("pid: ").append(pid);
@@ -741,7 +738,7 @@ public class DefaultManagement
                 logMsg.append(", logMessage: ").append(logMessage);
                 logMsg.append(", force: ").append(force);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
             finishModification(w, "modifyDatastreamByReference");
@@ -777,7 +774,7 @@ public class DefaultManagement
         }
         DOWriter w = null;
         try {
-            LOG.debug("Entered modifyDatastreamByValue");
+            logger.debug("Entered modifyDatastreamByValue");
             m_authz.enforceModifyDatastreamByValue(context,
                                                                pid,
                                                                datastreamId,
@@ -884,8 +881,8 @@ public class DefaultManagement
 
             return nowUTC;
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed modifyDatastreamByValue(");
                 logMsg.append("pid: ").append(pid);
@@ -900,7 +897,7 @@ public class DefaultManagement
                 logMsg.append(", logMessage: ").append(logMessage);
                 logMsg.append(", force: ").append(force);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
             finishModification(w, "modifyDatastreamByValue");
@@ -920,7 +917,7 @@ public class DefaultManagement
         }
         DOWriter w = null;
         try {
-            LOG.debug("Entered purgeDatastream");
+            logger.debug("Entered purgeDatastream");
 
             m_authz.enforcePurgeDatastream(context,
                                                        pid,
@@ -978,8 +975,8 @@ public class DefaultManagement
             // ... then give the response
             return deletedDates;
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed purgeDatastream(");
                 logMsg.append("pid: ").append(pid);
@@ -988,7 +985,7 @@ public class DefaultManagement
                 logMsg.append(", endDT: ").append(endDT);
                 logMsg.append(", logMessage: ").append(logMessage);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
             finishModification(w, "purgeDatastream");
@@ -1038,7 +1035,7 @@ public class DefaultManagement
                                     String datastreamID,
                                     Date asOfDateTime) throws ServerException {
         try {
-            LOG.debug("Entered getDatastream");
+            logger.debug("Entered getDatastream");
 
             m_authz.enforceGetDatastream(context,
                                                      pid,
@@ -1050,18 +1047,18 @@ public class DefaultManagement
 
             return r.GetDatastream(datastreamID, asOfDateTime);
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed getDatastream(");
                 logMsg.append("pid: ").append(pid);
                 logMsg.append(", datastreamID: ").append(datastreamID);
                 logMsg.append(", asOfDateTime: ").append(asOfDateTime);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
-            LOG.debug("Exiting getDatastream");
+            logger.debug("Exiting getDatastream");
         }
     }
 
@@ -1070,7 +1067,7 @@ public class DefaultManagement
                                        Date asOfDateTime,
                                        String state) throws ServerException {
         try {
-            LOG.debug("Entered getDatastreams");
+            logger.debug("Entered getDatastreams");
 
             m_authz.enforceGetDatastreams(context,
                                                       pid,
@@ -1082,18 +1079,18 @@ public class DefaultManagement
 
             return r.GetDatastreams(asOfDateTime, state);
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed getDatastreams(");
                 logMsg.append("pid: ").append(pid);
                 logMsg.append(", asOfDateTime: ").append(asOfDateTime);
                 logMsg.append(", state: ").append(state);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
-            LOG.debug("Exiting getDatastreams");
+            logger.debug("Exiting getDatastreams");
         }
     }
 
@@ -1102,7 +1099,7 @@ public class DefaultManagement
                                              String datastreamID)
             throws ServerException {
         try {
-            LOG.debug("Entered getDatastreamHistory");
+            logger.debug("Entered getDatastreamHistory");
 
             m_authz.enforceGetDatastreamHistory(context,
                                                             pid,
@@ -1125,17 +1122,17 @@ public class DefaultManagement
 
             return out;
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed getDatastreamHistory(");
                 logMsg.append("pid: ").append(pid);
                 logMsg.append(", datastreamID: ").append(datastreamID);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
-            LOG.debug("Exiting getDatastreamHistory");
+            logger.debug("Exiting getDatastreamHistory");
         }
     }
 
@@ -1158,7 +1155,7 @@ public class DefaultManagement
     public String[] getNextPID(Context context, int numPIDs, String namespace)
             throws ServerException {
         try {
-            LOG.debug("Entered getNextPID");
+            logger.debug("Entered getNextPID");
             m_authz.enforceGetNextPid(context, namespace, numPIDs);
 
             String[] pidList = null;
@@ -1171,7 +1168,7 @@ public class DefaultManagement
                         rContext
                                 .getRecoveryValues(Constants.RECOVERY.PID_LIST.uri);
                 if (pidList != null && pidList.length > 0) {
-                    LOG.debug("Reserving and returning PID_LIST "
+                    logger.debug("Reserving and returning PID_LIST "
                             + "from recovery context");
                     m_manager.reservePIDs(pidList);
                 }
@@ -1184,17 +1181,17 @@ public class DefaultManagement
             return pidList;
 
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed getNextPID(");
                 logMsg.append("numPIDs: ").append(numPIDs);
                 logMsg.append(", namespace: ").append(namespace);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
-            LOG.debug("Exiting getNextPID");
+            logger.debug("Exiting getNextPID");
         }
     }
 
@@ -1282,7 +1279,7 @@ public class DefaultManagement
                                    String logMessage) throws ServerException {
         DOWriter w = null;
         try {
-            LOG.debug("Entered setDatastreamState");
+            logger.debug("Entered setDatastreamState");
 
             m_authz.enforceSetDatastreamState(context,
                                                           pid,
@@ -1312,8 +1309,8 @@ public class DefaultManagement
             w.commit(logMessage);
             return nowUTC;
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed setDatastreamState(");
                 logMsg.append("pid: ").append(pid);
@@ -1321,7 +1318,7 @@ public class DefaultManagement
                 logMsg.append(", dsState: ").append(dsState);
                 logMsg.append(", logMessage: ").append(logMessage);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
             finishModification(w, "setDatastreamState");
@@ -1336,7 +1333,7 @@ public class DefaultManagement
             throws ServerException {
         DOWriter w = null;
         try {
-            LOG.debug("Entered setDatastreamVersionable");
+            logger.debug("Entered setDatastreamVersionable");
 
             m_authz.enforceSetDatastreamVersionable(context,
                                                                 pid,
@@ -1359,8 +1356,8 @@ public class DefaultManagement
             w.commit(logMessage);
             return nowUTC;
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed setDatastreamVersionable(");
                 logMsg.append("pid: ").append(pid);
@@ -1368,7 +1365,7 @@ public class DefaultManagement
                 logMsg.append(", versionable: ").append(versionable);
                 logMsg.append(", logMessage: ").append(logMessage);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
             finishModification(w, "setDatastreamVersionable");
@@ -1382,36 +1379,36 @@ public class DefaultManagement
             throws ServerException {
         DOReader r = null;
         try {
-            LOG.debug("Entered compareDatastreamChecksum");
+            logger.debug("Entered compareDatastreamChecksum");
 
             m_authz.enforceCompareDatastreamChecksum(context,
                                                                  pid,
                                                                  datastreamID,
                                                                  versionDate);
 
-            LOG.debug("Getting Reader");
+            logger.debug("Getting Reader");
             r = m_manager.getReader(Server.USE_DEFINITIVE_STORE, context, pid);
-            LOG.debug("Getting datastream:" + datastreamID + "date: "
+            logger.debug("Getting datastream:" + datastreamID + "date: "
                     + versionDate);
             Datastream ds = r.GetDatastream(datastreamID, versionDate);
-            LOG.debug("Got Datastream, comparing checksum");
+            logger.debug("Got Datastream, comparing checksum");
             boolean check = ds.compareChecksum();
-            LOG.debug("compared checksum = " + check);
+            logger.debug("compared checksum = " + check);
 
             return check ? ds.getChecksum() : "Checksum validation error";
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed compareDatastreamChecksum(");
                 logMsg.append("pid: ").append(pid);
                 logMsg.append(", datastreamID: ").append(datastreamID);
                 logMsg.append(", versionDate: ").append(versionDate);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
-            LOG.debug("Exiting compareDatastreamChecksum");
+            logger.debug("Exiting compareDatastreamChecksum");
         }
     }
 
@@ -1511,7 +1508,7 @@ public class DefaultManagement
             if (!isPid(subject))
                 return subject;
             // otherwise return URI from the pid
-            LOG.warn("Relationships API methods:  the 'pid' (" + subject + ") form of a relationship's subject is deprecated.  Please specify the subject using the " + Constants.FEDORA.uri + " uri scheme.");
+            logger.warn("Relationships API methods:  the 'pid' (" + subject + ") form of a relationship's subject is deprecated.  Please specify the subject using the " + Constants.FEDORA.uri + " uri scheme.");
             return PID.toURI(subject);
         }
         static String getSubjectPID(String subject) throws ServerException {
@@ -1540,7 +1537,7 @@ public class DefaultManagement
         DOReader r = null;
         String pid = null;
         try {
-            LOG.debug("Entered getRelationships");
+            logger.debug("Entered getRelationships");
 
             pid = SubjectProcessor.getSubjectPID(subject);
 
@@ -1549,7 +1546,7 @@ public class DefaultManagement
                                                         relationship);
 
             r = m_manager.getReader(Server.USE_DEFINITIVE_STORE, context, pid);
-            LOG.debug("Getting Relationships:  pid = " + pid + " predicate = "
+            logger.debug("Getting Relationships:  pid = " + pid + " predicate = "
                     + relationship);
             try {
                 URIReference pred = null;
@@ -1567,17 +1564,17 @@ public class DefaultManagement
                 throw new GeneralException("Relationship must be a URI", e);
             }
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed getRelationships(");
                 logMsg.append("pid: ").append(pid);
                 logMsg.append(", relationship: ").append(relationship);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
-            LOG.debug("Exiting getRelationships");
+            logger.debug("Exiting getRelationships");
         }
     }
 
@@ -1590,7 +1587,7 @@ public class DefaultManagement
         DOWriter w = null;
         String pid = null;
         try {
-            LOG.debug("Entered addRelationship");
+            logger.debug("Entered addRelationship");
             pid = SubjectProcessor.getSubjectPID(subject);
             m_authz.enforceAddRelationship(context,
                                                        pid,
@@ -1615,8 +1612,8 @@ public class DefaultManagement
 
             return added;
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed addRelationship(");
                 logMsg.append("pid: ").append(pid);
@@ -1625,7 +1622,7 @@ public class DefaultManagement
                 logMsg.append(", isLiteral: ").append(isLiteral);
                 logMsg.append(", datatype: ").append(datatype);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
             finishModification(w, "addRelationship");
@@ -1641,7 +1638,7 @@ public class DefaultManagement
         DOWriter w = null;
         String pid = null;
         try {
-            LOG.debug("Entered purgeRelationship");
+            logger.debug("Entered purgeRelationship");
             pid = SubjectProcessor.getSubjectPID(subject);
             m_authz.enforcePurgeRelationship(context,
                                                          pid,
@@ -1664,8 +1661,8 @@ public class DefaultManagement
             }
             return purged;
         } finally {
-            // Log completion
-            if (LOG.isInfoEnabled()) {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
                 StringBuilder logMsg =
                         new StringBuilder("Completed purgeRelationship(");
                 logMsg.append("pid: ").append(pid);
@@ -1674,7 +1671,7 @@ public class DefaultManagement
                 logMsg.append(", isLiteral: ").append(isLiteral);
                 logMsg.append(", datatype: ").append(datatype);
                 logMsg.append(")");
-                LOG.info(logMsg.toString());
+                logger.info(logMsg.toString());
             }
 
             finishModification(w, "purgeRelationship");
@@ -1764,10 +1761,10 @@ public class DefaultManagement
                 File file = new File(this.m_tempDir, id);
                 if (file.exists()) {
                     if (file.delete()) {
-                        LOG.info("Removed uploaded file '" + id
+                        logger.info("Removed uploaded file '" + id
                             + "' because it expired.");
                     } else {
-                        LOG.warn("Could not remove expired uploaded file '"
+                        logger.warn("Could not remove expired uploaded file '"
                             + id + "'. Check permissions in management/upload/ directory.");
                     }
                 }

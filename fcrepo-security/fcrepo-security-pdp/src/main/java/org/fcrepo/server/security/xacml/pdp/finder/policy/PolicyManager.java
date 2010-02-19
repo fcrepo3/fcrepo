@@ -32,7 +32,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -63,8 +64,8 @@ import com.sun.xacml.finder.PolicyFinder;
  */
 public class PolicyManager {
 
-    private static final Logger log =
-            Logger.getLogger(PolicyManager.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(PolicyManager.class);
 
     private PolicyDataManager policyDataManager = null;
 
@@ -173,10 +174,10 @@ public class PolicyManager {
             throws TopLevelPolicyException, PolicyDataManagerException {
         Map<String, byte[]> potentialPolicies =
                 policyDataManager.getPolicies(eval);
-        log.debug("Obtained policies: " + potentialPolicies.size());
+        logger.debug("Obtained policies: " + potentialPolicies.size());
 
         AbstractPolicy policy = matchPolicies(eval, potentialPolicies);
-        log.debug("Matched policies and created abstract policy.");
+        logger.debug("Matched policies and created abstract policy.");
 
         return policy;
     }
@@ -230,14 +231,14 @@ public class PolicyManager {
                         throw new TopLevelPolicyException(status);
                     }
 
-                    if (log.isDebugEnabled()) {
-                        log.debug("Matched policy: " + policyId);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Matched policy: " + policyId);
                     }
 
                     list.put(policyId, policy);
                 }
             } catch (ParsingException pe) {
-                log.error("Error parsing policy: " + policyId + " ("
+                logger.error("Error parsing policy: " + policyId + " ("
                         + pe.getMessage() + ")");
             }
         }

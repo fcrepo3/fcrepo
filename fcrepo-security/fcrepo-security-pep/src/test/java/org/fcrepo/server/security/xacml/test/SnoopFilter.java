@@ -13,12 +13,14 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class SnoopFilter
         implements Filter {
 
-    private static final Logger log = Logger.getLogger(SnoopFilter.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(SnoopFilter.class);
 
     private FilterConfig filterConfig = null;
 
@@ -34,7 +36,7 @@ public final class SnoopFilter
         // Need to make sure we are dealing with HttpServlets
         if (!(request instanceof HttpServletRequest)
                 || !(response instanceof HttpServletResponse)) {
-            log.error("Servlets are not HttpServlets!");
+            logger.error("Servlets are not HttpServlets!");
             throw new ServletException("Servlets are not HttpServlets!");
         }
 
@@ -43,26 +45,26 @@ public final class SnoopFilter
 
         String uri = req.getRequestURI();
 
-        if (log.isDebugEnabled()) {
-            log.debug("Incoming Request, URI: " + uri);
-            log.debug("Headers: ");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Incoming Request, URI: " + uri);
+            logger.debug("Headers: ");
             Enumeration headerNames = req.getHeaderNames();
             while (headerNames.hasMoreElements()) {
                 String headerName = (String) headerNames.nextElement();
                 Enumeration values = req.getHeaders(headerName);
                 while (values.hasMoreElements()) {
                     String value = (String) values.nextElement();
-                    log.debug(headerName + ": " + value);
+                    logger.debug(headerName + ": " + value);
                 }
             }
-            log.debug("userPrincipal: " + req.getUserPrincipal());
-            log.debug("remoteUser: " + req.getRemoteUser());
+            logger.debug("userPrincipal: " + req.getUserPrincipal());
+            logger.debug("remoteUser: " + req.getRemoteUser());
         }
 
         chain.doFilter(req, res);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Outgoing Response, URI: " + uri);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Outgoing Response, URI: " + uri);
         }
     }
 
@@ -71,12 +73,12 @@ public final class SnoopFilter
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
      */
     public void init(FilterConfig filterCfg) throws ServletException {
-        log.info("Initialising Servlet Filter: " + this.getClass().getName());
+        logger.info("Initialising Servlet Filter: " + this.getClass().getName());
         filterConfig = filterCfg;
 
         // exit if no config. Should always have a config.
         if (filterConfig == null) {
-            log.error("No config found!");
+            logger.error("No config found!");
             throw new ServletException("No config found for filter (filterConfig)");
         }
     }
@@ -86,7 +88,7 @@ public final class SnoopFilter
      * @see javax.servlet.Filter#destroy()
      */
     public void destroy() {
-        log.info("Destroying Servlet Filter: " + this.getClass().getName());
+        logger.info("Destroying Servlet Filter: " + this.getClass().getName());
         filterConfig = null;
     }
 }

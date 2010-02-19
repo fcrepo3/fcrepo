@@ -18,8 +18,6 @@ import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
@@ -27,6 +25,8 @@ import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -44,9 +44,8 @@ import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
 public class UploadServlet
         extends HttpServlet {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(UploadServlet.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(UploadServlet.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -71,7 +70,7 @@ public class UploadServlet
             FileItemIterator iter = upload.getItemIterator(request);
             while (in == null && iter.hasNext()) {
                 FileItemStream item = iter.next();
-                LOG.info("Got next item: isFormField=" + item.isFormField() + " fieldName=" + item.getFieldName());
+                logger.info("Got next item: isFormField=" + item.isFormField() + " fieldName=" + item.getFieldName());
                 if (!item.isFormField() && item.getFieldName().equals("file")) {
                     in = item.openStream();
                 }
@@ -111,16 +110,16 @@ public class UploadServlet
                              HttpServletResponse response) {
         try {
             if (status == HttpServletResponse.SC_CREATED) {
-                LOG.info("Successful upload, id=" + message);
+                logger.info("Successful upload, id=" + message);
             } else {
-                LOG.error("Failed upload: " + message);
+                logger.error("Failed upload: " + message);
             }
             response.setStatus(status);
             response.setContentType("text/plain");
             PrintWriter w = response.getWriter();
             w.println(message);
         } catch (Exception e) {
-            LOG.error("Unable to send response", e);
+            logger.error("Unable to send response", e);
         }
     }
 

@@ -21,11 +21,12 @@ package org.fcrepo.server.security.xacml.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LogUtil {
 
-    private static Logger statLog = Logger.getLogger("statistics");
+    private static final Logger statlogger = LoggerFactory.getLogger(LogUtil.class);
 
     private static SimpleDateFormat dateFormat =
             new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSS");
@@ -53,6 +54,6 @@ public class LogUtil {
         tmp = dsID == null || "".equals(dsID) ? "" : dsID;
         sb.append(tmp);
 
-        statLog.info(sb.toString());
+        statlogger.info(sb.toString());
     }
 }

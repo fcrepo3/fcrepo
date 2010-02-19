@@ -46,7 +46,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.client.Administrator;
 import org.fcrepo.server.types.gen.Datastream;
@@ -66,9 +67,8 @@ public class DatastreamPane
         extends EditingPane
         implements ChangeListener {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DatastreamPane.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DatastreamPane.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -1711,7 +1711,7 @@ public class DatastreamPane
                     File file =
                             new File(new File(dlg.getDirectory()), dlg
                                     .getFile());
-                    LOG.debug("Exporting to " + file.getPath());
+                    logger.debug("Exporting to " + file.getPath());
                     Administrator.setLastDir(file.getParentFile()); // remember the dir for next time
                     Administrator.DOWNLOADER
                             .getDatastreamContent(m_pid,

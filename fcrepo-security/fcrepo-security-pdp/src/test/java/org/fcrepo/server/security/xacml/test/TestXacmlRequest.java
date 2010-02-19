@@ -20,30 +20,32 @@ package org.fcrepo.server.security.xacml.test;
 
 import java.io.File;
 import java.io.FileInputStream;
+
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-
-import org.apache.log4j.Logger;
-
-import org.fcrepo.server.security.xacml.util.ContextUtil;
-
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
+
+import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author nishen@melcoe.mq.edu.au
  */
 public class TestXacmlRequest {
 
-    private static final Logger log = Logger.getLogger(TestXacmlRequest.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(TestXacmlRequest.class);
 
     private static ContextHandler contextHandler = null;
 
@@ -55,8 +57,8 @@ public class TestXacmlRequest {
         StringBuilder request = new StringBuilder();
         if (args.length > 0) {
             File reqFile = new File(args[0]);
-            if (log.isDebugEnabled()) {
-                log.debug("Using request file: " + reqFile.getAbsolutePath());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Using request file: " + reqFile.getAbsolutePath());
             }
 
             Scanner scanner = new Scanner(new FileInputStream(reqFile));

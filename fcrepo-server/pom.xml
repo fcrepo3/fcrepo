@@ -71,6 +71,7 @@
                 <argument>xml</argument>
                 <argument>xml</argument>
               </arguments>
+              <classpathScope>runtime</classpathScope>
             </configuration>
           </execution>
           <execution>
@@ -90,6 +91,7 @@
                 <argument>xml</argument>
                 <argument>xml</argument>
               </arguments>
+              <classpathScope>runtime</classpathScope>
             </configuration>
           </execution>
           <execution>
@@ -109,6 +111,7 @@
                 <argument>xml</argument>
                 <argument>zip</argument>
               </arguments>
+              <classpathScope>runtime</classpathScope>
             </configuration>
           </execution>
         </executions>

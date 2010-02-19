@@ -1,14 +1,14 @@
 /*
  * File: SubjectUtils.java
- * 
+ *
  * Copyright 2009 Muradora
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -25,11 +25,13 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SubjectUtils {
 
-    private static final Logger log = Logger.getLogger(SubjectUtils.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(SubjectUtils.class);
 
     private static final String CLASS_OBJECT = "java.util.HashMap";
 
@@ -50,8 +52,8 @@ public class SubjectUtils {
             Map<String, Set<String>> tmp = null;
             Object o = i.next();
 
-            if (log.isDebugEnabled()) {
-                log.debug("checking for attributes (class name): "
+            if (logger.isDebugEnabled()) {
+                logger.debug("checking for attributes (class name): "
                         + o.getClass().getName());
             }
 
@@ -70,8 +72,8 @@ public class SubjectUtils {
 
             tObject = t.next();
 
-            if (log.isDebugEnabled()) {
-                log.debug("checking for attributes (key object name): "
+            if (logger.isDebugEnabled()) {
+                logger.debug("checking for attributes (key object name): "
                         + tObject.getClass().getName());
             }
 
@@ -86,8 +88,8 @@ public class SubjectUtils {
 
             tObject = t.next();
 
-            if (log.isDebugEnabled()) {
-                log.debug("checking for attributes (value object name): "
+            if (logger.isDebugEnabled()) {
+                logger.debug("checking for attributes (value object name): "
                         + tObject.getClass().getName());
             }
 

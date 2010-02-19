@@ -10,8 +10,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-
 import org.trippi.TriplestoreReader;
 import org.trippi.TriplestoreWriter;
 import org.trippi.server.TrippiServer;
@@ -26,6 +24,8 @@ import org.fcrepo.server.errors.servletExceptionExtensions.InternalError500Excep
 import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
 import org.fcrepo.server.resourceIndex.ResourceIndex;
 import org.fcrepo.server.security.Authorization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -39,13 +39,10 @@ public class RISearchServlet
 
     private static final long serialVersionUID = 1L;
 
-    /** Logger for this class. */
-    private static final Logger LOG = Logger.getLogger(RISearchServlet.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(RISearchServlet.class);
 
     private static final String ACTION_LABEL = "Resource Index Search";
-
-    private static final Logger logger =
-            Logger.getLogger(ResourceIndex.class.getName());
 
     private Authorization m_authorization;
 
@@ -103,7 +100,7 @@ public class RISearchServlet
             m_authorization.enforceRIFindObjects(context);
             super.doGet(server, request, response);
         } catch (AuthzException e) {
-            LOG.error("Authorization failed for request: "
+            logger.error("Authorization failed for request: "
                     + request.getRequestURI() + " (actionLabel=" + ACTION_LABEL
                     + ")", e);
             throw RootException.getServletException(e,
@@ -111,7 +108,7 @@ public class RISearchServlet
                                                     ACTION_LABEL,
                                                     new String[0]);
         } catch (Throwable th) {
-            LOG.error("Unexpected error servicing API-A request", th);
+            logger.error("Unexpected error servicing API-A request", th);
             throw new InternalError500Exception("",
                                                 th,
                                                 request,

@@ -4,7 +4,24 @@
  */
 package org.fcrepo.server.utilities.rebuild;
 
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
@@ -33,23 +50,8 @@ import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.utilities.SQLUtility;
 import org.fcrepo.server.utilities.TableSpec;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Rebuilder for the SQL database.
@@ -57,9 +59,8 @@ import java.util.Set;
 public class SQLRebuilder
         implements Rebuilder {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(Rebuilder.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(Rebuilder.class);
 
     private ServerConfiguration m_serverConfig;
 
@@ -133,7 +134,7 @@ public class SQLRebuilder
             }
 
         } catch (InitializationException ie) {
-            LOG.error("Error initializing", ie);
+            logger.error("Error initializing", ie);
             throw ie;
         }
     }
@@ -279,8 +280,7 @@ public class SQLRebuilder
                         .getModule("org.fcrepo.server.management.PIDGenerator");
 
         // SET OBJECT PROPERTIES:
-        LOG
-                .debug("Rebuild: Setting object/component states and create dates if unset...");
+        logger.debug("Rebuild: Setting object/component states and create dates if unset...");
         // set object state to "A" (Active) if not already set
         if (obj.getState() == null || obj.getState().equals("")) {
             obj.setState("A");
@@ -293,8 +293,7 @@ public class SQLRebuilder
         obj.setLastModDate(nowUTC);
 
         // SET OBJECT PROPERTIES:
-        LOG
-                .debug("Rebuild: Setting object/component states and create dates if unset...");
+        logger.debug("Rebuild: Setting object/component states and create dates if unset...");
         // set object state to "A" (Active) if not already set
         if (obj.getState() == null || obj.getState().equals("")) {
             obj.setState("A");
@@ -323,7 +322,7 @@ public class SQLRebuilder
 
         // GET DIGITAL OBJECT WRITER:
         // get an object writer configured with the DEFAULT export format
-        LOG.debug("INGEST: Instantiating a SimpleDOWriter...");
+        logger.debug("INGEST: Instantiating a SimpleDOWriter...");
         try {
             DOWriter w =
                     manager.getWriter(Server.USE_DEFINITIVE_STORE,
@@ -334,8 +333,7 @@ public class SQLRebuilder
 
         // PID GENERATION:
         // have the system generate a PID if one was not provided
-        LOG
-                .debug("INGEST: Stream contained PID with retainable namespace-id... will use PID from stream.");
+        logger.debug("INGEST: Stream contained PID with retainable namespace-id... will use PID from stream.");
         try {
             pidGenerator.neverGeneratePID(obj.getPid());
         } catch (IOException e) {
@@ -353,12 +351,12 @@ public class SQLRebuilder
         }
 
         try {
-            LOG.info("COMMIT: Attempting replication: " + obj.getPid());
+            logger.info("COMMIT: Attempting replication: " + obj.getPid());
             DOReader reader =
                     manager.getReader(Server.USE_DEFINITIVE_STORE,
                                       m_context,
                                       obj.getPid());
-            LOG.info("COMMIT: Updating FieldSearch indexes...");
+            logger.info("COMMIT: Updating FieldSearch indexes...");
             fieldSearch.update(reader);
 
         } catch (ServerException se) {
@@ -421,7 +419,7 @@ public class SQLRebuilder
         try {
             // REGISTRY:
             // update systemVersion in doRegistry (add one)
-            LOG.debug("COMMIT: Updating registry...");
+            logger.debug("COMMIT: Updating registry...");
             String query =
                     "SELECT systemVersion " + "FROM doRegistry "
                             + "WHERE doPID='" + pid + "'";

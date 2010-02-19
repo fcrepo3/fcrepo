@@ -1,14 +1,14 @@
 /*
  * File: DemoLoginModule.java
- * 
+ *
  * Copyright 2009 Muradora
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -19,6 +19,7 @@
 package org.fcrepo.server.security.jaas.auth.module;
 
 import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,14 +34,15 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.security.jaas.auth.UserPrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DemoLoginModule
         implements LoginModule {
 
-    private static final Logger log = Logger.getLogger(DemoLoginModule.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(DemoLoginModule.class);
 
     private Subject subject = null;
 
@@ -75,16 +77,16 @@ public class DemoLoginModule
         attributes = new HashMap<String, Set<String>>();
 
         if (debug) {
-            log.debug("login module initialised: " + this.getClass().getName());
+            logger.debug("login module initialised: " + this.getClass().getName());
         }
     }
 
     public boolean login() throws LoginException {
         if (debug) {
-            log.debug("DemoLoginModule login called.");
+            logger.debug("DemoLoginModule login called.");
             for (String key : sharedState.keySet()) {
                 String value = sharedState.get(key).toString();
-                log.debug(key + ": " + value);
+                logger.debug(key + ": " + value);
             }
         }
 
@@ -132,7 +134,7 @@ public class DemoLoginModule
             subject.getPrincipals().add(p);
             subject.getPublicCredentials().add(attributes);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return false;
         }
 
@@ -146,7 +148,7 @@ public class DemoLoginModule
             subject.getPrivateCredentials().clear();
             username = null;
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return false;
         }
 
@@ -160,7 +162,7 @@ public class DemoLoginModule
             subject.getPrivateCredentials().clear();
             username = null;
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return false;
         }
 

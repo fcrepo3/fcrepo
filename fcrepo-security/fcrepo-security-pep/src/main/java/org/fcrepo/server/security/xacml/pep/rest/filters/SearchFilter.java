@@ -22,7 +22,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.URI;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,6 +33,7 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
@@ -45,20 +48,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-
-import org.apache.axis.AxisFault;
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.tidy.Tidy;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
-import org.fcrepo.server.security.xacml.util.LogUtil;
-
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
@@ -67,16 +56,33 @@ import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Status;
 
+import org.apache.axis.AxisFault;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import org.w3c.tidy.Tidy;
+
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Filter to handle the search operation.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public class SearchFilter
         extends AbstractFilter {
 
-    private static Logger log = Logger.getLogger(SearchFilter.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(SearchFilter.class);
 
     private ContextUtil contextUtil = null;
 
@@ -86,7 +92,7 @@ public class SearchFilter
 
     /**
      * Default constructor.
-     * 
+     *
      * @throws PEPException
      */
     public SearchFilter()
@@ -147,7 +153,7 @@ public class SearchFilter
                             "FedoraRepository",
                             null);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
             throw AxisFault.makeFault(e);
         }
 
@@ -176,18 +182,18 @@ public class SearchFilter
         String body = new String(data);
 
         if (body.startsWith("<html>")) {
-            if (log.isDebugEnabled()) {
-                log.debug("filtering html");
+            if (logger.isDebugEnabled()) {
+                logger.debug("filtering html");
             }
             result = filterHTML(request, res);
         } else if (body.startsWith("<?xml")) {
-            if (log.isDebugEnabled()) {
-                log.debug("filtering html");
+            if (logger.isDebugEnabled()) {
+                logger.debug("filtering html");
             }
             result = filterXML(request, res);
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("not filtering due to unexpected output: " + body);
+            if (logger.isDebugEnabled()) {
+                logger.debug("not filtering due to unexpected output: " + body);
             }
             result = body;
         }
@@ -200,7 +206,7 @@ public class SearchFilter
     /**
      * Parses an XML based response and removes the items that are not
      * permitted.
-     * 
+     *
      * @param request
      *        the http servlet request
      * @param response
@@ -239,8 +245,8 @@ public class SearchFilter
         }
 
         if (rows.getLength() == 0) {
-            if (log.isDebugEnabled()) {
-                log.debug("No results to filter.");
+            if (logger.isDebugEnabled()) {
+                logger.debug("No results to filter.");
             }
 
             return body;
@@ -262,10 +268,9 @@ public class SearchFilter
 
         for (Result r : results) {
             if (r.getResource() == null || "".equals(r.getResource())) {
-                log
-                        .warn("This resource has no resource identifier in the xacml response results!");
-            } else if (log.isDebugEnabled()) {
-                log.debug("Checking: " + r.getResource());
+                logger.warn("This resource has no resource identifier in the xacml response results!");
+            } else if (logger.isDebugEnabled()) {
+                logger.debug("Checking: " + r.getResource());
             }
 
             String[] ridComponents = r.getResource().split("\\/");
@@ -275,8 +280,8 @@ public class SearchFilter
                     && r.getDecision() != Result.DECISION_PERMIT) {
                 Node node = pids.get(rid);
                 node.getParentNode().removeChild(node);
-                if (log.isDebugEnabled()) {
-                    log.debug("Removing: " + r.getResource() + "[" + rid + "]");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Removing: " + r.getResource() + "[" + rid + "]");
                 }
             }
         }
@@ -296,7 +301,7 @@ public class SearchFilter
     /**
      * Parses an HTML based response and removes the items that are not
      * permitted.
-     * 
+     *
      * @param request
      *        the http servlet request
      * @param response
@@ -327,8 +332,8 @@ public class SearchFilter
 
         // only the header row, no results.
         if (rows.getLength() == 1) {
-            if (log.isDebugEnabled()) {
-                log.debug("No results to filter.");
+            if (logger.isDebugEnabled()) {
+                logger.debug("No results to filter.");
             }
             return body;
         }
@@ -368,10 +373,9 @@ public class SearchFilter
 
         for (Result r : results) {
             if (r.getResource() == null || "".equals(r.getResource())) {
-                log
-                        .warn("This resource has no resource identifier in the xacml response results!");
-            } else if (log.isDebugEnabled()) {
-                log.debug("Checking: " + r.getResource());
+                logger.warn("This resource has no resource identifier in the xacml response results!");
+            } else if (logger.isDebugEnabled()) {
+                logger.debug("Checking: " + r.getResource());
             }
 
             String[] ridComponents = r.getResource().split("\\/");
@@ -382,8 +386,8 @@ public class SearchFilter
                 Node node = pids.get(rid);
                 node.getParentNode().removeChild(node.getNextSibling());
                 node.getParentNode().removeChild(node);
-                if (log.isDebugEnabled()) {
-                    log.debug("Removing: " + r.getResource() + "[" + rid + "]");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Removing: " + r.getResource() + "[" + rid + "]");
                 }
             }
         }
@@ -402,7 +406,7 @@ public class SearchFilter
 
     /**
      * Takes a given list of PID's and evaluates them.
-     * 
+     *
      * @param pids
      *        the list of pids to check
      * @param request
@@ -418,8 +422,8 @@ public class SearchFilter
             throws ServletException {
         Set<String> requests = new HashSet<String>();
         for (String pid : pids) {
-            if (log.isDebugEnabled()) {
-                log.debug("Checking: " + pid);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Checking: " + pid);
             }
 
             Map<URI, AttributeValue> actions =
@@ -450,13 +454,13 @@ public class SearchFilter
                                               getEnvironment(request));
 
                 String r = contextUtil.makeRequestCtx(req);
-                if (log.isDebugEnabled()) {
-                    log.debug(r);
+                if (logger.isDebugEnabled()) {
+                    logger.debug(r);
                 }
 
                 requests.add(r);
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                logger.error(e.getMessage(), e);
                 throw new ServletException(e.getMessage(), e);
             }
         }
@@ -464,16 +468,16 @@ public class SearchFilter
         String res = null;
         ResponseCtx resCtx = null;
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Number of requests: " + requests.size());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Number of requests: " + requests.size());
             }
 
             res =
                     getContextHandler().evaluateBatch(requests
                             .toArray(new String[requests.size()]));
 
-            if (log.isDebugEnabled()) {
-                log.debug("Response: " + res);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Response: " + res);
             }
 
             resCtx = contextUtil.makeResponseCtx(res);

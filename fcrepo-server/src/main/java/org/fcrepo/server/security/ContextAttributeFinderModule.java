@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security;
@@ -14,12 +14,10 @@ import com.sun.xacml.attr.AttributeDesignator;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.cond.EvaluationResult;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -27,9 +25,8 @@ import org.fcrepo.server.Context;
 class ContextAttributeFinderModule
         extends AttributeFinderModule {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(ContextAttributeFinderModule.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ContextAttributeFinderModule.class);
 
     @Override
     protected boolean canHandleAdhoc() {
@@ -109,29 +106,29 @@ class ContextAttributeFinderModule
         try {
             contextIdType = new URI(StringAttribute.identifier);
         } catch (URISyntaxException e) {
-            LOG.debug("ContextAttributeFinder:getContextId" + " exit on "
+            logger.debug("ContextAttributeFinder:getContextId" + " exit on "
                     + "couldn't make URI for contextId type");
         }
         try {
             contextIdId = new URI(Constants.ACTION.CONTEXT_ID.uri);
         } catch (URISyntaxException e) {
-            LOG.debug("ContextAttributeFinder:getContextId" + " exit on "
+            logger.debug("ContextAttributeFinder:getContextId" + " exit on "
                     + "couldn't make URI for contextId itself");
         }
-        LOG.debug("ContextAttributeFinder:findAttribute"
+        logger.debug("ContextAttributeFinder:findAttribute"
                 + " about to call getAttributeFromEvaluationCtx");
 
         EvaluationResult attribute =
                 context.getActionAttribute(contextIdType, contextIdId, null);
         Object element = getAttributeFromEvaluationResult(attribute);
         if (element == null) {
-            LOG.debug("ContextAttributeFinder:getContextId" + " exit on "
+            logger.debug("ContextAttributeFinder:getContextId" + " exit on "
                     + "can't get contextId on request callback");
             return null;
         }
 
         if (!(element instanceof StringAttribute)) {
-            LOG.debug("ContextAttributeFinder:getContextId" + " exit on "
+            logger.debug("ContextAttributeFinder:getContextId" + " exit on "
                     + "couldn't get contextId from xacml request "
                     + "non-string returned");
             return null;
@@ -140,13 +137,13 @@ class ContextAttributeFinderModule
         String contextId = ((StringAttribute) element).getValue();
 
         if (contextId == null) {
-            LOG.debug("ContextAttributeFinder:getContextId" + " exit on "
+            logger.debug("ContextAttributeFinder:getContextId" + " exit on "
                     + "null contextId");
             return null;
         }
 
         if (!validContextId(contextId)) {
-            LOG.debug("ContextAttributeFinder:getContextId" + " exit on "
+            logger.debug("ContextAttributeFinder:getContextId" + " exit on "
                     + "invalid context-id");
             return null;
         }
@@ -172,19 +169,19 @@ class ContextAttributeFinderModule
                                                String attributeId,
                                                URI resourceCategory,
                                                EvaluationCtx ctx) {
-        LOG.debug("getAttributeLocally context");
+        logger.debug("getAttributeLocally context");
         String contextId = getContextId(ctx);
-        LOG.debug("contextId=" + contextId + " attributeId=" + attributeId);
+        logger.debug("contextId=" + contextId + " attributeId=" + attributeId);
         Context context = (Context) contexts.get(contextId);
-        LOG.debug("got context");
+        logger.debug("got context");
         Object values = null;
-        LOG.debug("designatorType" + designatorType);
+        logger.debug("designatorType" + designatorType);
         switch (designatorType) {
             case AttributeDesignator.SUBJECT_TARGET:
                 if (0 > context.nSubjectValues(attributeId)) {
                     values = null;
                 } else {
-                    LOG.debug("getting n values for " + attributeId + "="
+                    logger.debug("getting n values for " + attributeId + "="
                             + context.nSubjectValues(attributeId));
                     switch (context.nSubjectValues(attributeId)) {
                         case 0:
@@ -202,16 +199,18 @@ class ContextAttributeFinderModule
                         default:
                             values = context.getSubjectValues(attributeId);
                     }
-                    if (values == null) {
-                        LOG.debug("RETURNING NO VALUES FOR " + attributeId);
-                    } else {
-                        StringBuffer sb = new StringBuffer();
-                        sb.append("RETURNING " + ((String[]) values).length
-                                + " VALUES FOR " + attributeId + " ==");
-                        for (int i = 0; i < ((String[]) values).length; i++) {
-                            sb.append(" " + ((String[]) values)[i]);
+                    if (logger.isDebugEnabled()) {
+                        if (values == null) {
+                            logger.debug("RETURNING NO VALUES FOR " + attributeId);
+                        } else {
+                            StringBuffer sb = new StringBuffer();
+                            sb.append("RETURNING " + ((String[]) values).length
+                                    + " VALUES FOR " + attributeId + " ==");
+                            for (int i = 0; i < ((String[]) values).length; i++) {
+                                sb.append(" " + ((String[]) values)[i]);
+                            }
+                            logger.debug(sb.toString());
                         }
-                        LOG.debug(sb);
                     }
                 }
                 break;
@@ -284,25 +283,25 @@ class ContextAttributeFinderModule
             default:
         }
         if (values instanceof String) {
-            LOG.debug("getAttributeLocally string value=" + (String) values);
+            logger.debug("getAttributeLocally string value=" + (String) values);
         } else if (values instanceof String[]) {
-            LOG.debug("getAttributeLocally string values=" + values);
+            logger.debug("getAttributeLocally string values=" + values);
             for (int i = 0; i < ((String[]) values).length; i++) {
-                LOG.debug("another string value=" + ((String[]) values)[i]);
+                logger.debug("another string value=" + ((String[]) values)[i]);
             }
         } else {
-            LOG.debug("getAttributeLocally object value=" + values);
+            logger.debug("getAttributeLocally object value=" + values);
         }
         return values;
     }
 
     final void registerContext(Object key, Context value) {
-        LOG.debug("registering " + key);
+        logger.debug("registering " + key);
         contexts.put(key, value);
     }
 
     final void unregisterContext(Object key) {
-        LOG.debug("unregistering " + key);
+        logger.debug("unregistering " + key);
         contexts.remove(key);
     }
 

@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security.servletfilters.pubcookie;
@@ -11,15 +11,14 @@ import java.util.Map;
 
 import org.apache.commons.httpclient.Cookie;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.fcrepo.server.security.servletfilters.BaseCaching;
 import org.fcrepo.server.security.servletfilters.CacheElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -28,7 +27,8 @@ import org.fcrepo.server.security.servletfilters.CacheElement;
 public class FilterPubcookie
         extends BaseCaching {
 
-    protected static Log log = LogFactory.getLog(FilterPubcookie.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(FilterPubcookie.class);
 
     private static final Map NO_REQUEST_PARAMETERS = new HashMap();
 
@@ -76,20 +76,20 @@ public class FilterPubcookie
     @Override
     public void destroy() {
         String method = "destroy()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         super.destroy();
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
     @Override
     protected void initThisSubclass(String key, String value) {
         String method = "initThisSubclass()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         boolean setLocally = false;
         if (PUBCOOKIE_NAME_KEY.equals(key)) {
@@ -114,26 +114,26 @@ public class FilterPubcookie
             TRUSTSTORE_PASSWORD = value;
             setLocally = true;
         } else {
-            if (log.isErrorEnabled()) {
-                log.error(format(method, "deferring to super"));
+            if (logger.isErrorEnabled()) {
+                logger.error(format(method, "deferring to super"));
             }
             super.initThisSubclass(key, value);
         }
         if (setLocally) {
-            if (log.isInfoEnabled()) {
-                log.info(format(method, "known parameter", key, value));
+            if (logger.isInfoEnabled()) {
+                logger.info(format(method, "known parameter", key, value));
             }
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
     private final String getAction(Node parent,
                                    String pubcookieLoginpageFormName) {
         String method = "getAction()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         String action = "";
         NodeList children = parent.getChildNodes();
@@ -156,8 +156,8 @@ public class FilterPubcookie
                 break;
             }
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
         return action;
     }
@@ -165,13 +165,13 @@ public class FilterPubcookie
     //initial, setup call
     private final Map getFormFields(Node parent) {
         String method = "getFormFields(Node parent)";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         Map formfields = new Hashtable();
         getFormFields(parent, formfields);
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
         return formfields;
     }
@@ -179,8 +179,8 @@ public class FilterPubcookie
     //inner, recursive call
     private final void getFormFields(Node parent, Map formfields) {
         String method = "getFormFields(Node parent, Map formfields)";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         NodeList children = parent.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
@@ -198,34 +198,31 @@ public class FilterPubcookie
                     value = valueNode.getNodeValue();
                 }
                 if ("hidden".equalsIgnoreCase(type) && value != null) {
-                    if (log.isDebugEnabled()) {
-                        log
-                                .debug(format("capturing hidden fields",
-                                              name,
-                                              value));
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(format("capturing hidden fields", name, value));
                     }
                     formfields.put(name, value);
                 }
             }
             getFormFields(child, formfields);
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
     @Override
     public void populateCacheElement(CacheElement cacheElement, String password) {
         String method = "populateCacheElement()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         Boolean authenticated = null;
         ConnectPubcookie tidyConnect = new ConnectPubcookie();
-        if (log.isDebugEnabled()) {
-            log.debug(format(method, "b4 first connect()", "tidyConnect"));
-            log.debug(tidyConnect);
-            log.debug(format(method,
+        if (logger.isDebugEnabled()) {
+            logger.debug(format(method, "b4 first connect()", "tidyConnect"));
+            logger.debug(tidyConnect.toString());
+            logger.debug(format(method,
                              null,
                              "PUBCOOKIE_LOGINPAGE_URL",
                              PUBCOOKIE_LOGINPAGE_URL));
@@ -236,25 +233,25 @@ public class FilterPubcookie
                             TRUSTSTORE_LOCATION,
                             TRUSTSTORE_PASSWORD);
         if (!tidyConnect.completedFully()) {
-            if (log.isInfoEnabled()) {
-                log.info(format(method, "form page did not load"));
+            if (logger.isInfoEnabled()) {
+                logger.info(format(method, "form page did not load"));
             }
         } else {
             Cookie[] formpageCookies = tidyConnect.getResponseCookies();
             Node formpageDocument = tidyConnect.getResponseDocument();
             String action =
                     getAction(formpageDocument, PUBCOOKIE_LOGINPAGE_FORM_NAME);
-            if (log.isDebugEnabled()) {
-                log.debug(format(method, "action", action));
+            if (logger.isDebugEnabled()) {
+                logger.debug(format(method, "action", action));
             }
             Map formpageFields = getFormFields(formpageDocument);
             Iterator iter = null;
 
-            if (log.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 iter = formpageFields.keySet().iterator();
                 while (iter.hasNext()) {
                     String key = (String) iter.next();
-                    log.debug(format(method, null, key, (String) formpageFields
+                    logger.debug(format(method, null, key, (String) formpageFields
                             .get(key)));
                 }
             }
@@ -264,11 +261,11 @@ public class FilterPubcookie
             formpageFields.put(PUBCOOKIE_LOGINPAGE_INPUT_NAME_PASSWORD,
                                password);
 
-            if (log.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 iter = formpageFields.keySet().iterator();
                 while (iter.hasNext()) {
                     String key = (String) iter.next();
-                    log.debug(format(method,
+                    logger.debug(format(method,
                                      " form field after",
                                      key,
                                      (String) formpageFields.get(key)));
@@ -276,8 +273,8 @@ public class FilterPubcookie
             }
 
             tidyConnect = new ConnectPubcookie();
-            if (log.isDebugEnabled()) {
-                log.debug(format(method, "b4 second connect()"));
+            if (logger.isDebugEnabled()) {
+                logger.debug(format(method, "b4 second connect()"));
             }
             tidyConnect.connect(action,
                                 formpageFields,
@@ -285,29 +282,29 @@ public class FilterPubcookie
                                 TRUSTSTORE_LOCATION,
                                 TRUSTSTORE_PASSWORD);
             if (!tidyConnect.completedFully()) {
-                if (log.isDebugEnabled()) {
-                    log.debug(format(method, "result page did not load"));
+                if (logger.isDebugEnabled()) {
+                    logger.debug(format(method, "result page did not load"));
                 }
             } else {
                 Cookie[] resultpageCookies = tidyConnect.getResponseCookies();
-                if (log.isDebugEnabled()) {
-                    log.debug(format(method, " cookies receieved", "n", Integer
+                if (logger.isDebugEnabled()) {
+                    logger.debug(format(method, " cookies receieved", "n", Integer
                             .toString(resultpageCookies.length)));
                 }
                 for (Cookie cookie : resultpageCookies) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(format(method,
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(format(method,
                                          "another cookie",
                                          "cookie name" + cookie.getName()));
-                        log.debug(format(method,
+                        logger.debug(format(method,
                                          "another cookie",
                                          "length",
                                          Integer.toString(cookie.getName()
                                                  .length())));
                     }
                     if (PUBCOOKIE_NAME.equals(cookie.getName())) {
-                        if (log.isInfoEnabled()) {
-                            log.debug(format(method,
+                        if (logger.isInfoEnabled()) {
+                            logger.debug(format(method,
                                              " found pubcookie login cookie"));
                         }
                         authenticated = Boolean.TRUE;
@@ -318,18 +315,16 @@ public class FilterPubcookie
                     authenticated = Boolean.FALSE;
                 } else {
                     if (!authenticated.booleanValue()) {
-                        if (log.isDebugEnabled()) {
-                            log
-                                    .debug(format(method,
-                                                  "didn't find a pubcookie login cookie"));
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(format(method, "didn't find a pubcookie login cookie"));
                         }
                     }
                 }
             }
             cacheElement.populate(authenticated, null, null, null);
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 

@@ -15,7 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.jrdf.graph.ObjectNode;
 import org.jrdf.graph.PredicateNode;
@@ -58,8 +59,8 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class ResourceIndexIntegrationTest {
 
-    private static final Logger LOG =
-            Logger.getLogger(ResourceIndexIntegrationTest.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ResourceIndexIntegrationTest.class.getName());
 
     private static final String TEST_DIR = "target";
 
@@ -367,7 +368,7 @@ public abstract class ResourceIndexIntegrationTest {
                 for (String t : aStrings) {
                     out.append("  " + t + "\n");
                 }
-                LOG.warn(out.toString());
+                logger.warn(out.toString());
             }
             return false;
         }

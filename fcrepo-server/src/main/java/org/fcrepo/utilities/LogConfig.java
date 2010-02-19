@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import org.fcrepo.common.FaultException;
 
 /**
- * Log configuration utility methods.
+ * Logger configuration utility methods.
  * <p>
  * This class provides convenience methods for configuring Logback when
  * the default configuration files (logback.xml or logback-test.xml) are not

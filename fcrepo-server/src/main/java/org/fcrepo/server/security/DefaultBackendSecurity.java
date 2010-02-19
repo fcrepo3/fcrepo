@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security;
@@ -8,28 +8,25 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.BackendSecurityParserException;
 import org.fcrepo.server.errors.ModuleInitializationException;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Module for accessing backend service security configuration information.
- * 
+ *
  * @author Ross Wayland
  */
 public class DefaultBackendSecurity
         extends Module
         implements BackendSecurity {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DefaultBackendSecurity.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DefaultBackendSecurity.class);
 
     public static BackendSecuritySpec beSS = null;
 
@@ -43,7 +40,7 @@ public class DefaultBackendSecurity
      * <p>
      * Creates a new DefaultBackendSecurity.
      * </p>
-     * 
+     *
      * @param moduleParameters
      *        The name/value pair map of module parameters.
      * @param server
@@ -66,7 +63,7 @@ public class DefaultBackendSecurity
      * implementation of this method is dependent on the schema used to define
      * the parameter names for the role of
      * <code>org.fcrepo.server.storage.DefaultBackendSecurity</code>.
-     * 
+     *
      * @throws ModuleInitializationException
      *         If initialization values are invalid or initialization fails for
      *         some other reason.
@@ -76,7 +73,7 @@ public class DefaultBackendSecurity
 
         try {
             Server s_server = getServer();
-            LOG.debug("DefaultBackendSecurity initialized");
+            logger.debug("DefaultBackendSecurity initialized");
             String fedoraHome = Constants.FEDORA_HOME;
             if (fedoraHome == null) {
                 throw new ModuleInitializationException("[DefaultBackendSecurity] Module failed to initialize: "
@@ -85,13 +82,12 @@ public class DefaultBackendSecurity
             } else {
                 m_beSecurityPath = fedoraHome + "/server/config/beSecurity.xml";
             }
-            LOG.debug("m_beSecurityPath: " + m_beSecurityPath);
+            logger.debug("m_beSecurityPath: " + m_beSecurityPath);
 
             String validate = getParameter("beSecurity_validation");
             if (validate != null) {
                 if (!validate.equals("true") && !validate.equals("false")) {
-                    LOG
-                            .warn("Validation setting for backend "
+                    logger.warn("Validation setting for backend "
                                     + "security configuration file must be either \"true\" or \"false\". "
                                     + "Value specified was: \"" + validate
                                     + "\". Validation is defaulted to "
@@ -100,30 +96,28 @@ public class DefaultBackendSecurity
                     m_validate = new Boolean(validate).booleanValue();
                 }
             } else {
-                LOG
-                        .warn("Validation setting for backend "
+                logger.warn("Validation setting for backend "
                                 + "security configuration file was not specified. Validation is defaulted to "
                                 + "\"false\".");
             }
-            LOG.debug("beSecurity_validate: " + m_validate);
+            logger.debug("beSecurity_validate: " + m_validate);
 
             m_encoding = getParameter("beSecurity_char_encoding");
             if (m_encoding == null) {
                 m_encoding = "utf-8";
-                LOG
-                        .warn("Character encoding for backend "
-                                + "security configuration file was not specified. Encoding defaulted to "
-                                + "\"utf-8\".");
+                logger.warn("Character encoding for backend "
+                        + "security configuration file was not specified. Encoding defaulted to "
+                        + "\"utf-8\".");
             }
-            LOG.debug("beSecurity_char_encoding: " + m_encoding);
+            logger.debug("beSecurity_char_encoding: " + m_encoding);
 
             // initialize static BackendSecuritySpec instance
             setBackendSecuritySpec();
-            if (LOG.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 Set roleList = beSS.listRoleKeys();
                 Iterator iter = roleList.iterator();
                 while (iter.hasNext()) {
-                    LOG.debug("beSecurity ROLE: " + iter.next());
+                    logger.debug("beSecurity ROLE: " + iter.next());
                 }
             }
 
@@ -138,7 +132,7 @@ public class DefaultBackendSecurity
 
     /**
      * Parses the beSecurity configuration file.
-     * 
+     *
      * @throws BackendSecurityParserException
      *         If an error occurs in attempting to parse the beSecurity
      *         configuration file.
@@ -173,7 +167,7 @@ public class DefaultBackendSecurity
 
     /**
      * Initializes the static BackendSecuritySpec instance.
-     * 
+     *
      * @throws BackendSecurityParserException
      *         If an error occurs in attempting to parse the beSecurity
      *         configuration file.
@@ -187,7 +181,7 @@ public class DefaultBackendSecurity
      * beSecurity configurationfile. This method is used to refresh the
      * beSecurity configuration on the server when changes have been made to the
      * configuration file.
-     * 
+     *
      * @throws BackendSecurityParserException
      *         If an error occurs in attempting to parse the beSecurity
      *         configuration file.

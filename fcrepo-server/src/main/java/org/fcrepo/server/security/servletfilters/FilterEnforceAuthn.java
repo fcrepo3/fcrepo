@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security.servletfilters;
@@ -8,8 +8,8 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -17,15 +17,16 @@ import org.apache.commons.logging.LogFactory;
 public class FilterEnforceAuthn
         extends FilterSetup {
 
-    protected static Log log = LogFactory.getLog(FilterEnforceAuthn.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(FilterEnforceAuthn.class);
 
     @Override
     public boolean doThisSubclass(ExtendedHttpServletRequest request,
                                   HttpServletResponse response)
             throws Throwable {
         String method = "doThisSubclass() ";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         super.doThisSubclass(request, response);
         request.lockWrapper();
@@ -33,15 +34,14 @@ public class FilterEnforceAuthn
         boolean terminateServletFilterChain =
                 request.getUserPrincipal() == null;
         if (terminateServletFilterChain) {
-            if (log.isDebugEnabled()) {
-                log.debug(format(method, "no principal found, sending 401"));
+            if (logger.isDebugEnabled()) {
+                logger.debug(format(method, "no principal found, sending 401"));
             }
             String realm = "fedora";
             String value = "BASIC realm=\"" + realm + "\"";
             String name = "WWW-Authenticate";
             int sc = HttpServletResponse.SC_UNAUTHORIZED;
             response.reset();
-            //httpServletResponse.sendError(sc, "supply credentials"); //same as after
             if (response.containsHeader(name)) {
                 response.setHeader(name, value);
             } else {
@@ -50,14 +50,13 @@ public class FilterEnforceAuthn
             try {
                 response.sendError(sc, "supply credentials");
             } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            } //here, no bad auth msg at wget
+                logger.error("Error sending error response", e1);
+            }
             response.setContentType("text/plain");
             try {
                 response.flushBuffer();
             } catch (IOException e) {
-                showThrowable(e, log, "response flush error");
+                logger.error("Error flushing response", e);
             }
         }
         return terminateServletFilterChain;
@@ -66,12 +65,12 @@ public class FilterEnforceAuthn
     @Override
     public void destroy() {
         String method = "destroy()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         super.destroy();
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 

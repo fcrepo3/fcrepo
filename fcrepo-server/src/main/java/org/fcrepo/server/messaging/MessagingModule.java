@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.messaging;
@@ -17,8 +17,6 @@ import javax.naming.Context;
 
 import javax.jms.Session;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.DatastoreConfig;
 import org.fcrepo.server.Module;
@@ -28,12 +26,12 @@ import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.ModuleShutdownException;
 import org.fcrepo.server.messaging.JMSManager.DestinationType;
 import org.fcrepo.server.utilities.ServerUtility;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fedora's <code>Messaging</code> as a configurable module.
- * 
+ *
  * @author Edwin Shin
  * @version $Id$
  */
@@ -41,17 +39,16 @@ public class MessagingModule
         extends Module
         implements Messaging {
 
-    /** Logger for this class. */
-    private static Logger LOG =
-            Logger.getLogger(MessagingModule.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(MessagingModule.class);
 
     private Messaging msg;
 
     private JMSManager jmsMgr;
 
-    private static final String ACTIVEMQ_PREFIX = 
+    private static final String ACTIVEMQ_PREFIX =
             "org.apache.activemq.default.directory.prefix";
-    
+
     public MessagingModule(Map<String, String> moduleParameters,
                            Server server,
                            String role)
@@ -59,21 +56,22 @@ public class MessagingModule
         super(moduleParameters, server, role);
     }
 
+    @Override
     public void initModule() throws ModuleInitializationException {
 
         if (!enabled()) {
-            LOG.info("Messaging Module is disabled.");
+            logger.info("Messaging Module is disabled.");
             return;
         }
-        
+
         // Sets the location of the activemq-data directory
         // Property is ignored if the messaging provider is not ActiveMQ
         if (System.getProperty(ACTIVEMQ_PREFIX) == null) {
-            System.setProperty(ACTIVEMQ_PREFIX, 
-                               new File(Constants.FEDORA_HOME, "data").getPath() 
+            System.setProperty(ACTIVEMQ_PREFIX,
+                               new File(Constants.FEDORA_HOME, "data").getPath()
                                + File.separator);
         }
-        
+
         Properties jndiProps = getJNDISettings();
 
         try {
@@ -95,10 +93,12 @@ public class MessagingModule
         }
     }
 
+    @Override
     public void postInitModule() throws ModuleInitializationException {
 
     }
 
+    @Override
     public void shutdownModule() throws ModuleShutdownException {
         if(enabled()) {
             try {
@@ -127,23 +127,23 @@ public class MessagingModule
 
         if (providerURL == null || providerURL.length() == 0) {
             providerURL = "vm:(broker:(tcp://localhost:61616))";
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Using default provider url: " + providerURL);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Using default provider url: " + providerURL);
             }
         }
 
         if (connectionFactory == null || connectionFactory.length() == 0) {
             connectionFactory = "ConnectionFactory";
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Using default connection factory name: " + connectionFactory);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Using default connection factory name: " + connectionFactory);
             }
         }
 
         if (contextFactory == null || contextFactory.length() == 0) {
             contextFactory =
                     "org.apache.activemq.jndi.ActiveMQInitialContextFactory";
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Using default initial context factory: " + contextFactory);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Using default initial context factory: " + contextFactory);
             }
         } else if (contextFactory.equalsIgnoreCase("container")) {
             // assume jndi information is provided via the container
@@ -210,8 +210,8 @@ public class MessagingModule
                 }
 
                 try {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug(String
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(String
                                 .format("createDestination(%s, %s, %s, %s)",
                                         destName,
                                         destType,
@@ -249,13 +249,13 @@ public class MessagingModule
         }
         return dsConfig;
     }
-    
+
     // Check to see if messaging is enabled
     private boolean enabled() {
         String enabled = getParameter("enabled");
         return (enabled != null && enabled.equalsIgnoreCase("true"));
     }
-    
+
 
     public void close() throws MessagingException {
         if (msg != null) {

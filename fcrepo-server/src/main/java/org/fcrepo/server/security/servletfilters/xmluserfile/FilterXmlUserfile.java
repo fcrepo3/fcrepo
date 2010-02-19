@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security.servletfilters.xmluserfile;
@@ -10,13 +10,12 @@ import java.io.InputStream;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.servletfilters.BaseCaching;
 import org.fcrepo.server.security.servletfilters.CacheElement;
 import org.fcrepo.server.security.servletfilters.FinishedParsingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -27,7 +26,8 @@ public class FilterXmlUserfile
         extends BaseCaching
         implements Constants {
 
-    protected static Log log = LogFactory.getLog(FilterXmlUserfile.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(FilterXmlUserfile.class);
 
     private static final String FILEPATH_KEY = "filepath";
 
@@ -43,20 +43,20 @@ public class FilterXmlUserfile
     @Override
     public void destroy() {
         String method = "destroy()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         super.destroy();
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
     @Override
     protected void initThisSubclass(String key, String value) {
         String method = "initThisSubclass()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         boolean setLocally = false;
 
@@ -64,26 +64,26 @@ public class FilterXmlUserfile
             FILEPATH = value;
             setLocally = true;
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug(format(method, "deferring to super"));
+            if (logger.isDebugEnabled()) {
+                logger.debug(format(method, "deferring to super"));
             }
             super.initThisSubclass(key, value);
         }
         if (setLocally) {
-            if (log.isInfoEnabled()) {
-                log.info(method + "known parameter " + key + "==" + value);
+            if (logger.isInfoEnabled()) {
+                logger.info(method + "known parameter " + key + "==" + value);
             }
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
     @Override
     public void populateCacheElement(CacheElement cacheElement, String password) {
         String method = "populateCacheElement()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         Boolean authenticated = null;
         Map namedAttributes = null;
@@ -95,31 +95,22 @@ public class FilterXmlUserfile
             try {
                 is = new FileInputStream(getFilepath());
             } catch (Throwable th) {
-                showThrowable(th, log, "error reading tomcat users file "
-                        + getFilepath());
+                logger.error("error reading tomcat users file " + getFilepath(), th);
                 throw th;
-            }
-            if (log.isDebugEnabled()) {
-                log.debug("read tomcat-users.xml");
             }
 
             ParserXmlUserfile parser = new ParserXmlUserfile(is);
-            if (log.isDebugEnabled()) {
-                log.debug("got parser");
-            }
             try {
                 parser.parse(cacheElement.getUserid(), password);
-                if (log.isDebugEnabled()) {
-                    log.debug("back from parsing");
-                }
+                logger.debug("finished parsing");
             } catch (FinishedParsingException f) {
-                if (log.isDebugEnabled()) {
-                    log.debug(format(method, "got finished parsing exception"));
+                if (logger.isDebugEnabled()) {
+                    logger.debug(format(method, "got finished parsing exception"));
                 }
             } catch (Throwable th) {
                 String msg = "error parsing tomcat users file";
-                showThrowable(th, log, msg);
-                throw new IOException(msg);
+                logger.error(msg, th);
+                throw new IOException(msg, th);
             }
             authenticated = parser.getAuthenticated();
             namedAttributes = parser.getNamedAttributes();
@@ -127,19 +118,19 @@ public class FilterXmlUserfile
             authenticated = null;
             namedAttributes = null;
         }
-        if (log.isDebugEnabled()) {
-            log.debug(format(method, null, "authenticated"));
-            log.debug(authenticated);
-            log.debug(format(method, null, "namedAttributes"));
-            log.debug(namedAttributes);
-            log.debug(format(method, null, "errorMessage", errorMessage));
+        if (logger.isDebugEnabled()) {
+            logger.debug(format(method, null, "authenticated"));
+            logger.debug(authenticated.toString());
+            logger.debug(format(method, null, "namedAttributes"));
+            logger.debug(namedAttributes.toString());
+            logger.debug(format(method, null, "errorMessage", errorMessage));
         }
         cacheElement.populate(authenticated,
                               null,
                               namedAttributes,
                               errorMessage);
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 }

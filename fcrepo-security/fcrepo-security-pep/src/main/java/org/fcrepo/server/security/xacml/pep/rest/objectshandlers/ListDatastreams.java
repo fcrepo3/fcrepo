@@ -22,7 +22,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.URI;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,6 +33,7 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
@@ -45,21 +48,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.tidy.Tidy;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
-import org.fcrepo.server.security.xacml.pep.rest.filters.DataResponseWrapper;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
-import org.fcrepo.server.security.xacml.util.LogUtil;
-
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.DateTimeAttribute;
@@ -69,17 +57,33 @@ import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Status;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import org.w3c.tidy.Tidy;
+
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
+import org.fcrepo.server.security.xacml.pep.rest.filters.DataResponseWrapper;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Handles the ListDatastreams operation.
- * 
+ *
  * @author nish.naidoo@gmail.com
  */
 public class ListDatastreams
         extends AbstractFilter {
 
-    private static Logger log =
-            Logger.getLogger(ListDatastreams.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ListDatastreams.class);
 
     private ContextUtil contextUtil = null;
 
@@ -89,7 +93,7 @@ public class ListDatastreams
 
     /**
      * Default constructor.
-     * 
+     *
      * @throws PEPException
      */
     public ListDatastreams()
@@ -119,8 +123,8 @@ public class ListDatastreams
     public RequestCtx handleRequest(HttpServletRequest request,
                                     HttpServletResponse response)
             throws IOException, ServletException {
-        if (log.isDebugEnabled()) {
-            log.debug(this.getClass().getName() + "/handleRequest!");
+        if (logger.isDebugEnabled()) {
+            logger.debug(this.getClass().getName() + "/handleRequest!");
         }
 
         String path = request.getPathInfo();
@@ -168,7 +172,7 @@ public class ListDatastreams
                             pid,
                             null);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw new ServletException(e.getMessage(), e);
         }
 
@@ -191,18 +195,18 @@ public class ListDatastreams
         String body = new String(data);
 
         if (body.startsWith("<html>")) {
-            if (log.isDebugEnabled()) {
-                log.debug("filtering html");
+            if (logger.isDebugEnabled()) {
+                logger.debug("filtering html");
             }
             result = filterHTML(request, res);
         } else if (body.startsWith("<?xml")) {
-            if (log.isDebugEnabled()) {
-                log.debug("filtering html");
+            if (logger.isDebugEnabled()) {
+                logger.debug("filtering html");
             }
             result = filterXML(request, res);
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("not filtering due to unexpected output: " + body);
+            if (logger.isDebugEnabled()) {
+                logger.debug("not filtering due to unexpected output: " + body);
             }
             result = body;
         }
@@ -215,7 +219,7 @@ public class ListDatastreams
     /**
      * Parses an HTML based response and removes the items that are not
      * permitted.
-     * 
+     *
      * @param request
      *        the http servlet request
      * @param response
@@ -243,8 +247,8 @@ public class ListDatastreams
                     (NodeList) xpath.evaluate("//table[2]/tr",
                                               doc,
                                               XPathConstants.NODESET);
-            if (log.isDebugEnabled()) {
-                log.debug("number of rows found: " + rows.getLength());
+            if (logger.isDebugEnabled()) {
+                logger.debug("number of rows found: " + rows.getLength());
             }
         } catch (XPathExpressionException xpe) {
             throw new ServletException("Error parsing HTML for search results: ",
@@ -253,8 +257,8 @@ public class ListDatastreams
 
         // only the header row, no results.
         if (rows.getLength() < 2) {
-            if (log.isDebugEnabled()) {
-                log.debug("No results to filter.");
+            if (logger.isDebugEnabled()) {
+                logger.debug("No results to filter.");
             }
             return body;
         }
@@ -263,8 +267,8 @@ public class ListDatastreams
         for (int x = 1; x < rows.getLength(); x++) {
             NodeList elements = rows.item(x).getChildNodes();
             String dsid = elements.item(0).getFirstChild().getNodeValue();
-            if (log.isDebugEnabled()) {
-                log.debug("dsid: " + dsid);
+            if (logger.isDebugEnabled()) {
+                logger.debug("dsid: " + dsid);
             }
             dsids.put(dsid, rows.item(x));
         }
@@ -274,10 +278,9 @@ public class ListDatastreams
 
         for (Result r : results) {
             if (r.getResource() == null || "".equals(r.getResource())) {
-                log
-                        .warn("This resource has no resource identifier in the xacml response results!");
-            } else if (log.isDebugEnabled()) {
-                log.debug("Checking: " + r.getResource());
+                logger.warn("This resource has no resource identifier in the xacml response results!");
+            } else if (logger.isDebugEnabled()) {
+                logger.debug("Checking: " + r.getResource());
             }
 
             String[] ridComponents = r.getResource().split("\\/");
@@ -287,8 +290,8 @@ public class ListDatastreams
                     && r.getDecision() != Result.DECISION_PERMIT) {
                 Node node = dsids.get(rid);
                 node.getParentNode().removeChild(node);
-                if (log.isDebugEnabled()) {
-                    log.debug("Removing: " + r.getResource() + "[" + rid + "]");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Removing: " + r.getResource() + "[" + rid + "]");
                 }
             }
         }
@@ -308,7 +311,7 @@ public class ListDatastreams
     /**
      * Parses an XML based response and removes the items that are not
      * permitted.
-     * 
+     *
      * @param request
      *        the http servlet request
      * @param response
@@ -339,8 +342,8 @@ public class ListDatastreams
         NodeList datastreams = null;
         try {
             pid = xpath.evaluate("/objectDatastreams/@pid", doc);
-            if (log.isDebugEnabled()) {
-                log.debug("filterXML: pid = [" + pid + "]");
+            if (logger.isDebugEnabled()) {
+                logger.debug("filterXML: pid = [" + pid + "]");
             }
 
             datastreams =
@@ -353,8 +356,8 @@ public class ListDatastreams
         }
 
         if (datastreams.getLength() == 0) {
-            if (log.isDebugEnabled()) {
-                log.debug("No results to filter.");
+            if (logger.isDebugEnabled()) {
+                logger.debug("No results to filter.");
             }
 
             return body;
@@ -373,10 +376,9 @@ public class ListDatastreams
 
         for (Result r : results) {
             if (r.getResource() == null || "".equals(r.getResource())) {
-                log
-                        .warn("This resource has no resource identifier in the xacml response results!");
-            } else if (log.isDebugEnabled()) {
-                log.debug("Checking: " + r.getResource());
+                logger.warn("This resource has no resource identifier in the xacml response results!");
+            } else if (logger.isDebugEnabled()) {
+                logger.debug("Checking: " + r.getResource());
             }
 
             String[] ridComponents = r.getResource().split("\\/");
@@ -386,8 +388,8 @@ public class ListDatastreams
                     && r.getDecision() != Result.DECISION_PERMIT) {
                 Node node = dsids.get(rid);
                 node.getParentNode().removeChild(node);
-                if (log.isDebugEnabled()) {
-                    log.debug("Removing: " + r.getResource() + "[" + rid + "]");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Removing: " + r.getResource() + "[" + rid + "]");
                 }
             }
         }
@@ -406,7 +408,7 @@ public class ListDatastreams
 
     /**
      * Takes a given list of PID's and evaluates them.
-     * 
+     *
      * @param dsids
      *        the list of pids to check
      * @param request
@@ -423,8 +425,8 @@ public class ListDatastreams
             throws ServletException {
         Set<String> requests = new HashSet<String>();
         for (String dsid : dsids) {
-            if (log.isDebugEnabled()) {
-                log.debug("Checking: " + pid + "/" + dsid);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Checking: " + pid + "/" + dsid);
             }
 
             Map<URI, AttributeValue> actions =
@@ -452,13 +454,13 @@ public class ListDatastreams
                                               getEnvironment(request));
 
                 String r = contextUtil.makeRequestCtx(req);
-                if (log.isDebugEnabled()) {
-                    log.debug(r);
+                if (logger.isDebugEnabled()) {
+                    logger.debug(r);
                 }
 
                 requests.add(r);
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                logger.error(e.getMessage(), e);
                 throw new ServletException(e.getMessage(), e);
             }
         }
@@ -466,16 +468,16 @@ public class ListDatastreams
         String res = null;
         ResponseCtx resCtx = null;
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Number of requests: " + requests.size());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Number of requests: " + requests.size());
             }
 
             res =
                     getContextHandler().evaluateBatch(requests
                             .toArray(new String[requests.size()]));
 
-            if (log.isDebugEnabled()) {
-                log.debug("Response: " + res);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Response: " + res);
             }
 
             resCtx = contextUtil.makeResponseCtx(res);

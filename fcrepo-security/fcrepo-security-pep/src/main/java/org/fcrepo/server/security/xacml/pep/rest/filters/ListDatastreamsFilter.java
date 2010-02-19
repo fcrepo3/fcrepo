@@ -27,8 +27,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -40,7 +40,6 @@ import com.sun.xacml.attr.DateTimeAttribute;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
 
-
 /**
  * Handles the ListDatastream operation.
  * 
@@ -49,8 +48,8 @@ import com.sun.xacml.ctx.RequestCtx;
 public class ListDatastreamsFilter
         extends AbstractFilter {
 
-    private static Logger log =
-            Logger.getLogger(ListDatastreamsFilter.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ListDatastreamsFilter.class);
 
     /**
      * Default constructor.
@@ -72,14 +71,14 @@ public class ListDatastreamsFilter
                                     HttpServletResponse response)
             throws IOException, ServletException {
         if (request.getPathInfo() == null) {
-            log.error("Bad request: " + request.getRequestURI());
+            logger.error("Bad request: " + request.getRequestURI());
             throw new ServletException("Bad request: "
                     + request.getRequestURI());
         }
 
         String[] parts = request.getPathInfo().split("/");
         if (parts.length < 2) {
-            log.info("Not enough path components on the URI.");
+            logger.info("Not enough path components on the URI.");
             throw new ServletException("Not enough path components on the URI.");
         }
 
@@ -136,7 +135,7 @@ public class ListDatastreamsFilter
                             pid,
                             null);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw new ServletException(e);
         }
 

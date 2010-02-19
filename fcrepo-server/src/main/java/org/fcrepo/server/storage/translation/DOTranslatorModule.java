@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.storage.translation;
@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ModuleInitializationException;
@@ -21,6 +19,8 @@ import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.errors.UnsupportedTranslationException;
 import org.fcrepo.server.storage.types.DigitalObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -33,17 +33,16 @@ import org.fcrepo.server.storage.types.DigitalObject;
  * class name, denoting a <code>DOSerializer</code> or
  * <code>DODeserializer</code>, respectively.
  * </p>
- * 
+ *
  * @author Chris Wilper
  * @version $Id$
  */
 public class DOTranslatorModule
         extends Module
         implements DOTranslator {
-    
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DOTranslatorModule.class.getName());
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(DOTranslatorModule.class);
 
     /** Prefix for deserializer parameter names. */
     private static final String DESER_PARAM_PREFIX = "deserializer_";

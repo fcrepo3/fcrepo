@@ -12,11 +12,11 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.storage.types.MethodDef;
 import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.types.gen.Condition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -28,9 +28,8 @@ import org.fcrepo.server.types.gen.Condition;
  */
 public abstract class TypeUtility {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(TypeUtility.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(TypeUtility.class);
 
     public static org.fcrepo.server.types.gen.Datastream convertDatastreamToGenDatastream(org.fcrepo.server.storage.types.Datastream in) {
         org.fcrepo.server.types.gen.Datastream out =
@@ -462,7 +461,7 @@ public abstract class TypeUtility {
                     baos.write(buffer, 0, byteStream);
                 }
             } catch (IOException ioe) {
-                LOG.error("Error converting types", ioe);
+                logger.error("Error converting types", ioe);
             }
             genMIMETypedStream.setStream(baos.toByteArray());
             mimeTypedStream.close();

@@ -6,10 +6,6 @@ package org.fcrepo.server.utilities;
 
 import java.io.File;
 
-import java.util.logging.Handler;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -43,8 +39,9 @@ public class LogSetupContextListener implements ServletContextListener {
 
         // Replace java.util.logging's default handlers with one that
         // redirects everything to SLF4J
-        Logger rootLogger = LogManager.getLogManager().getLogger("");
-        Handler[] handlers = rootLogger.getHandlers();
+        java.util.logging.Logger rootLogger =
+                java.util.logging.LogManager.getLogManager().getLogger("");
+        java.util.logging.Handler[] handlers = rootLogger.getHandlers();
         for (int i = 0; i < handlers.length; i++) {
             rootLogger.removeHandler(handlers[i]);
         }

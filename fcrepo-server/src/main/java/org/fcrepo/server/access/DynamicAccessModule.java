@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.access;
@@ -12,8 +12,6 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
 
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
@@ -28,14 +26,16 @@ import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.MethodDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.Property;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Module Wrapper for DynamicAccessImpl.
- * 
+ *
  * <p>The Dynamic Access module will associate dynamic disseminators with
- * a digital object.  It will look to the Fedora repository configuration file 
- * to obtain a list of dynamic disseminators. Currently, the system supports 
+ * a digital object.  It will look to the Fedora repository configuration file
+ * to obtain a list of dynamic disseminators. Currently, the system supports
  * two types of dynamic disseminators: - Default (SDefPID=fedora-system:3 and
  * SDepPID=fedora-system:4) - Bootstrap (SDefPID=fedora-system:1 and
  * SDepPID=fedora-system:2). The Default disseminator that is associated with
@@ -47,16 +47,15 @@ import org.fcrepo.server.storage.types.Property;
  * defines methods to get the special metadata datastreams out of them, and some
  * other methods. (NOTE: The Bootstrap Disseminator functionality is NOT YET
  * IMPLEMENTED.
- * 
+ *
  * @author Sandy Payette
  */
 public class DynamicAccessModule
         extends Module
         implements Access {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DynamicAccessModule.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DynamicAccessModule.class);
 
     /**
      * An instance of the core implementation class for DynamicAccess. The
@@ -77,7 +76,7 @@ public class DynamicAccessModule
     /**
      * Creates and initializes the Dynmamic Access Module. When the server is
      * starting up, this is invoked as part of the initialization process.
-     * 
+     *
      * @param moduleParameters
      *        A pre-loaded Map of name-value pairs comprising the intended
      *        configuration of this Module.
@@ -115,7 +114,7 @@ public class DynamicAccessModule
         try {
             hostIP = InetAddress.getLocalHost();
         } catch (UnknownHostException uhe) {
-            LOG.error("Unable to resolve Fedora host", uhe);
+            logger.error("Unable to resolve Fedora host", uhe);
         }
         String fedoraServerHost = getServer().getParameter("fedoraServerHost");
         if (fedoraServerHost == null || fedoraServerHost.equals("")) {
@@ -144,7 +143,7 @@ public class DynamicAccessModule
     /**
      * Get a list of service definition identifiers for dynamic disseminators
      * associated with the digital object.
-     * 
+     *
      * @param context
      * @param PID
      *        identifier of digital object being reflected upon
@@ -164,7 +163,7 @@ public class DynamicAccessModule
      * Get the method defintions for a given dynamic disseminator that
      * is associated with the digital object. The dynamic disseminator is
      * identified by the sDefPID.
-     * 
+     *
      * @param context
      * @param PID
      *        identifier of digital object being reflected upon
@@ -187,7 +186,7 @@ public class DynamicAccessModule
      * Get an XML encoding of the service defintions for a given dynamic
      * disseminator that is associated with the digital object. The dynamic
      * disseminator is identified by the sDefPID.
-     * 
+     *
      * @param context
      * @param PID
      *        identifier of digital object being reflected upon
@@ -220,7 +219,7 @@ public class DynamicAccessModule
      * belongs to the dynamic service definition and is implemented by a
      * dynamic Service Deployment (which is an internal service in the
      * repository access subsystem).
-     * 
+     *
      * @param context
      * @param PID
      *        identifier of the digital object being disseminated
@@ -239,7 +238,7 @@ public class DynamicAccessModule
                                             Property[] userParms,
                                             Date asOfDateTime)
             throws ServerException {
-        
+
         setParameter("useCachedObject", "" + false); //<<<STILL REQUIRED?
 
         return da
@@ -257,10 +256,10 @@ public class DynamicAccessModule
 
     /**
      * Get the definitions for all dynamic disseminations on the object.
-     * 
-     * <p>This will return the method definitions for all methods for all of 
+     *
+     * <p>This will return the method definitions for all methods for all of
      * the dynamic disseminators associated with the object.
-     * 
+     *
      * @param context
      * @param PID
      *        identifier of digital object being reflected upon
@@ -279,7 +278,7 @@ public class DynamicAccessModule
      * Get the profile information for the digital object. This contain key
      * metadata and URLs for the Dissemination Index and Item Index of the
      * object.
-     * 
+     *
      * @param context
      * @param PID
      *        identifier of digital object being reflected upon

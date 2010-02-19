@@ -26,7 +26,8 @@ import java.util.Map;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -44,8 +45,8 @@ import com.sun.xacml.ctx.RequestCtx;
 public class AddDatastreamHandler
         extends AbstractOperationHandler {
 
-    private static Logger log =
-            Logger.getLogger(AddDatastreamHandler.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(AddDatastreamHandler.class);
 
     public AddDatastreamHandler()
             throws PEPException {
@@ -59,7 +60,7 @@ public class AddDatastreamHandler
 
     public RequestCtx handleRequest(MessageContext context)
             throws OperationHandlerException {
-        log.debug("AddDatastreamHandler/handleRequest!");
+        logger.debug("AddDatastreamHandler/handleRequest!");
 
         RequestCtx req = null;
         List<Object> oMap = null;
@@ -80,9 +81,9 @@ public class AddDatastreamHandler
 
         try {
             oMap = getSOAPRequestObjects(context);
-            log.debug("Retrieved SOAP Request Objects");
+            logger.debug("Retrieved SOAP Request Objects");
         } catch (AxisFault af) {
-            log.error("Error obtaining SOAP Request Objects", af);
+            logger.error("Error obtaining SOAP Request Objects", af);
             throw new OperationHandlerException("Error obtaining SOAP Request Objects",
                                                 af);
         }
@@ -102,12 +103,12 @@ public class AddDatastreamHandler
             checksum = (String) oMap.get(11);
             // logMessage = (String) oMap.get(12);
         } catch (Exception e) {
-            log.error("Error obtaining parameters", e);
+            logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",
                                                 e);
         }
 
-        log.debug("Extracted SOAP Request Objects");
+        logger.debug("Extracted SOAP Request Objects");
 
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
@@ -173,7 +174,7 @@ public class AddDatastreamHandler
                             pid,
                             dsID);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw new OperationHandlerException(e.getMessage(), e);
         }
 

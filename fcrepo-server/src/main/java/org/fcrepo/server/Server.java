@@ -27,8 +27,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -52,6 +50,8 @@ import org.fcrepo.server.security.Authorization;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.status.ServerState;
 import org.fcrepo.server.utilities.status.ServerStatusFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The starting point for working with a Fedora repository. This class handles
@@ -69,8 +69,8 @@ public abstract class Server
 
     public static final boolean GLOBAL_CHOICE = false;
 
-    /** Logger for this class. */
-    private static final Logger LOG = Logger.getLogger(Server.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(Server.class);
 
     /**
      * The ResourceBundle that provides access to constants from
@@ -473,19 +473,18 @@ public abstract class Server
             File configFile =
                     new File(m_homeDir + File.separator + CONFIG_DIR
                             + File.separator + CONFIG_FILE);
-            LOG.info("Server home is " + m_homeDir.toString());
+            logger.info("Server home is " + m_homeDir.toString());
             if (s_serverProfile == null) {
-                LOG
-                        .debug("fedora.serverProfile property not set... will always "
-                                + "use param 'value' attributes from configuration for param values.");
+                logger.debug("fedora.serverProfile property not set... will always "
+                        + "use param 'value' attributes from configuration for param values.");
             } else {
-                LOG.debug("fedora.serverProfile property was '"
+                logger.debug("fedora.serverProfile property was '"
                         + s_serverProfile + "'... will use param '"
                         + s_serverProfile + "value' attributes from "
                         + "configuration for param values, falling back to "
                         + "'value' attributes where unspecified.");
             }
-            LOG.debug("Loading and validating configuration file \""
+            logger.debug("Loading and validating configuration file \""
                     + configFile + "\"");
 
             // do the parsing and validation of configuration
@@ -531,7 +530,7 @@ public abstract class Server
             while (mRoles.hasNext()) {
                 String role = (String) mRoles.next();
                 String className = (String) moduleClassNames.get(role);
-                LOG.info("Initializing " + className);
+                logger.info("Initializing " + className);
                 try {
                     Class moduleClass = Class.forName(className);
                     Class param1Class =
@@ -540,7 +539,7 @@ public abstract class Server
                             Class.forName(MODULE_CONSTRUCTOR_PARAM2_CLASS);
                     Class param3Class =
                             Class.forName(MODULE_CONSTRUCTOR_PARAM3_CLASS);
-                    LOG.debug("Getting constructor " + className + "("
+                    logger.debug("Getting constructor " + className + "("
                             + MODULE_CONSTRUCTOR_PARAM1_CLASS + ","
                             + MODULE_CONSTRUCTOR_PARAM2_CLASS + ","
                             + MODULE_CONSTRUCTOR_PARAM3_CLASS + ")");
@@ -605,9 +604,9 @@ public abstract class Server
             while (mRoles.hasNext()) {
                 String r = (String) mRoles.next();
                 Module m = getModule(r);
-                LOG.info("Post-Initializing " + m.getClass().getName());
+                logger.info("Post-Initializing " + m.getClass().getName());
                 reqRoles = m.getRequiredModuleRoles();
-                LOG.debug("verifying dependencies have been loaded...");
+                logger.debug("verifying dependencies have been loaded...");
                 for (String element : reqRoles) {
                     if (getModule(element) == null) {
                         throw new ModuleInitializationException(MessageFormat
@@ -615,46 +614,45 @@ public abstract class Server
                                         new Object[] {element}), r);
                     }
                 }
-                LOG.debug(reqRoles.length + " dependencies, all loaded, ok.");
+                logger.debug(reqRoles.length + " dependencies, all loaded, ok.");
                 m.postInitModule();
             }
 
             // Do postInitServer for the Server instance
-            LOG.debug("Post-initializing server");
+            logger.debug("Post-initializing server");
             postInitServer();
 
             // flag that we're done initting
-            LOG.info("Server startup complete");
+            logger.info("Server startup complete");
             m_initialized = true;
         } catch (ServerInitializationException sie) {
             // these are caught and rethrown for two reasons:
             // 1) so they can be logged in the startup log, and
             // 2) so an attempt can be made to free resources tied up thus far
             //    via shutdown()
-            LOG.fatal("Server failed to initialize", sie);
+            logger.error("Server failed to initialize", sie);
             try {
                 shutdown(null);
             } catch (Throwable th) {
-                LOG.warn("Error shutting down server after failed startup", th);
+                logger.warn("Error shutting down server after failed startup", th);
             }
             throw sie;
         } catch (ModuleInitializationException mie) {
-            LOG.fatal("Module (" + mie.getRole() + ") failed to initialize",
+            logger.error("Module (" + mie.getRole() + ") failed to initialize",
                       mie);
             try {
                 shutdown(null);
             } catch (Throwable th) {
-                LOG.warn("Error shutting down server after failed startup", th);
+                logger.warn("Error shutting down server after failed startup", th);
             }
             throw mie;
         } catch (Throwable th) {
             String msg = "Fatal error while starting server";
-            LOG.fatal(msg, th);
+            logger.error(msg, th);
             try {
                 shutdown(null);
             } catch (Throwable oth) {
-                LOG
-                        .warn("Error shutting down server after failed startup",
+                logger.warn("Error shutting down server after failed startup",
                               oth);
             }
             throw new RuntimeException(msg, th);
@@ -704,7 +702,7 @@ public abstract class Server
             moduleAndDatastreamInfo.add(new HashMap());
             params.put(null, moduleAndDatastreamInfo);
         }
-        LOG.debug(MessageFormat.format(INIT_CONFIG_CONFIG_EXAMININGELEMENT,
+        logger.debug(MessageFormat.format(INIT_CONFIG_CONFIG_EXAMININGELEMENT,
                                        new Object[] {element.getLocalName(),
                                                dAttribute}));
         for (int i = 0; i < element.getChildNodes().getLength(); i++) {
@@ -759,7 +757,7 @@ public abstract class Server
                     }
                     params.put(nameNode.getNodeValue(), valueNode
                             .getNodeValue());
-                    LOG.debug(MessageFormat
+                    logger.debug(MessageFormat
                             .format(INIT_CONFIG_CONFIG_PARAMETERIS,
                                     new Object[] {nameNode.getNodeValue(),
                                             valueNode.getNodeValue()}));
@@ -936,7 +934,7 @@ public abstract class Server
             return instance;
         }
 
-        LOG.info("Starting up server");
+        logger.info("Starting up server");
 
         // else instantiate a new one given the class provided in the
         // root element in the config file and return it
@@ -1164,21 +1162,21 @@ public abstract class Server
     public final void shutdown(Context context) throws ServerShutdownException,
             ModuleShutdownException, AuthzException {
         Iterator roleIterator = loadedModuleRoles();
-        LOG.info("Shutting down server");
+        logger.info("Shutting down server");
         ModuleShutdownException mse = null;
         while (roleIterator.hasNext()) {
             Module m = getModule((String) roleIterator.next());
             String mName = m.getClass().getName();
             try {
-                LOG.info("Shutting down " + mName);
+                logger.info("Shutting down " + mName);
                 m.shutdownModule();
             } catch (ModuleShutdownException e) {
-                LOG.warn("Error shutting down module " + mName, e);
+                logger.warn("Error shutting down module " + mName, e);
                 mse = e;
             }
         }
         shutdownServer();
-        LOG.info("Server shutdown complete");
+        logger.info("Server shutdown complete");
         s_instances.remove(getHomeDir());
         if (mse != null) {
             throw mse;

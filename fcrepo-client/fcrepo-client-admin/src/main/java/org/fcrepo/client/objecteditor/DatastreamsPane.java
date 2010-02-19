@@ -39,12 +39,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.client.Administrator;
 import org.fcrepo.server.types.gen.Datastream;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Shows a tabbed pane, one for each datastream in the object, and one special
@@ -56,11 +54,10 @@ public class DatastreamsPane
         extends JPanel
         implements PotentiallyDirty, TabDrawer {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DatastreamsPane.class.getName());
-
     private static final long serialVersionUID = 1L;
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(DatastreamsPane.class);
 
     private final String m_pid;
 
@@ -248,7 +245,7 @@ public class DatastreamsPane
             Datastream[] versions =
                     Administrator.APIM.getDatastreamHistory(m_pid, dsID);
             m_currentVersionMap.put(dsID, versions[0]);
-            LOG.debug("New create date is: " + versions[0].getCreateDate());
+            logger.debug("New create date is: " + versions[0].getCreateDate());
             DatastreamPane replacement =
                     new DatastreamPane(m_owner, m_pid, versions, this);
             m_datastreamPanes[i] = replacement;

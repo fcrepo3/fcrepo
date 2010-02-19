@@ -347,11 +347,20 @@ public class Rebuild
         try {
             File fedoraHomeDir = new File(Constants.FEDORA_HOME);
 
-            // Configure logging from file & redirect java.util.logging to slf4j
+            // Configure logging from file
             System.setProperty("fedora.home", Constants.FEDORA_HOME);
             System.setProperty("logfile.extension", "-rebuild.log");
             LogConfig.initFromFile(new File(fedoraHomeDir,
                                             "server/config/logback.xml"));
+
+            // Replace java.util.logging's default handlers with one that
+            // redirects everything to SLF4J
+            java.util.logging.Logger rootLogger =
+                    java.util.logging.LogManager.getLogManager().getLogger("");
+            java.util.logging.Handler[] handlers = rootLogger.getHandlers();
+            for (int i = 0; i < handlers.length; i++) {
+                rootLogger.removeHandler(handlers[i]);
+            }
             SLF4JBridgeHandler.install();
 
             File serverDir = new File(fedoraHomeDir, "server");

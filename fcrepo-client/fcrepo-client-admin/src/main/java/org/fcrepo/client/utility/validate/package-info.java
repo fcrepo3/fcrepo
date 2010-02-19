@@ -14,8 +14,7 @@
  * <p>
  * <code>org.fcrepo.client.utility.validate.process</code> contains a client-side {@link ValidatorProcess}
  * that parses the command line arguments, queries Fedora for the requested objects, validates them.
- * It also has an implementation of {@link ValidatorResult} that uses Log4J to present and
- * control the output.
+ * It also has a simple implementation of {@link ValidatorResult}.
  * </p>
  * <p>
  * <code>org.fcrepo.client.utility.validate.remote</code> contains an implementation of {@link ObjectSource}

@@ -35,7 +35,8 @@ import net.sf.saxon.FeatureKeys;
 
 import org.apache.commons.io.IOUtils;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
@@ -59,7 +60,7 @@ import org.fcrepo.server.utilities.DateUtility;
  * @version $Id$
  */
 public class BaseRestResource {
-    private final Logger LOG = Logger.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     static final String[] EMPTY_STRING_ARRAY = new String[0];
     static final String DEFAULT_ENC = "UTF-8";
@@ -150,16 +151,16 @@ public class BaseRestResource {
     protected Response handleException(Exception ex) {
         if (ex instanceof ObjectNotInLowlevelStorageException ||
             ex instanceof DatastreamNotFoundException) {
-            LOG.warn("Resource not found: " + ex.getMessage() + "; unable to fulfill REST API request", ex);
+            logger.warn("Resource not found: " + ex.getMessage() + "; unable to fulfill REST API request", ex);
             return Response.status(Status.NOT_FOUND).entity(ex.getMessage()).type("text/plain").build();
         } else if (ex instanceof AuthzException) {
-            LOG.warn("Authorization failed; unable to fulfill REST API request", ex);
+            logger.warn("Authorization failed; unable to fulfill REST API request", ex);
             return Response.status(Status.UNAUTHORIZED).entity(ex.getMessage()).type("text/plain").build();
         } else if (ex instanceof IllegalArgumentException) {
-            LOG.warn("Bad request; unable to fulfill REST API request", ex);
+            logger.warn("Bad request; unable to fulfill REST API request", ex);
             return Response.status(Status.BAD_REQUEST).entity(ex.getMessage()).type("text/plain").build();
         } else {
-            LOG.error("Unexpected error fulfilling REST API request", ex);
+            logger.error("Unexpected error fulfilling REST API request", ex);
             throw new WebApplicationException(ex);
         }
     }

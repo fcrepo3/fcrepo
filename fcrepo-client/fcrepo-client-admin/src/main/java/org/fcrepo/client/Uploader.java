@@ -14,15 +14,8 @@ import java.io.InputStream;
 
 import java.util.HashMap;
 
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.utilities.StreamUtility;
-
-
 
 /**
  * A client to a Fedora server's upload facility, accessed via a
@@ -33,17 +26,7 @@ import org.fcrepo.server.utilities.StreamUtility;
  */
 public class Uploader {
 
-    private final MultiThreadedHttpConnectionManager m_cManager =
-            new MultiThreadedHttpConnectionManager();
-
-    private final String m_uploadURL;
-
-    private final UsernamePasswordCredentials m_creds;
-
     private final FedoraClient fc;
-
-    private static final Logger logger =
-            Logger.getLogger(FedoraClient.class.getName());
 
     /**
      * Construct an uploader to a certain repository as a certain user.
@@ -54,10 +37,6 @@ public class Uploader {
                     String user,
                     String pass)
             throws IOException {
-        m_uploadURL =
-                Administrator.getProtocol() + "://" + host + ":" + port + "/"
-                        + context + "/management/upload";
-        m_creds = new UsernamePasswordCredentials(user, pass);
         String baseURL =
                 Administrator.getProtocol() + "://" + host + ":" + port + "/"
                         + context;
@@ -74,10 +53,6 @@ public class Uploader {
                     String user,
                     String pass)
             throws IOException {
-        m_uploadURL =
-                protocol + "://" + host + ":" + port + context + "/"
-                        + "/management/upload";
-        m_creds = new UsernamePasswordCredentials(user, pass);
         String baseURL = protocol + "://" + host + ":" + port + "/" + context;
         fc = new FedoraClient(baseURL, user, pass);
     }

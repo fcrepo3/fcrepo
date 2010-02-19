@@ -26,8 +26,6 @@ import com.sun.xacml.ctx.Subject;
 import com.sun.xacml.finder.AttributeFinder;
 import com.sun.xacml.finder.PolicyFinder;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.authorization.AuthzDeniedException;
@@ -35,18 +33,16 @@ import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.authorization.AuthzOperationalException;
 import org.fcrepo.server.errors.authorization.AuthzPermittedException;
 import org.fcrepo.server.storage.DOManager;
-
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
  */
 public class PolicyEnforcementPoint {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(PolicyEnforcementPoint.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(PolicyEnforcementPoint.class);
 
     public static final String SUBACTION_SEPARATOR = "//";
 
@@ -115,7 +111,7 @@ public class PolicyEnforcementPoint {
             pidUri = new URI(Constants.OBJECT.PID.uri);
             namespaceUri = new URI(Constants.OBJECT.NAMESPACE.uri);
         } catch (URISyntaxException e) {
-            LOG.fatal("Bad URI syntax", e);
+            logger.error("Bad URI syntax", e);
         } finally {
             XACML_SUBJECT_ID_URI = xacmlSubjectIdUri;
             XACML_ACTION_ID_URI = xacmlActionIdUri;
@@ -134,7 +130,7 @@ public class PolicyEnforcementPoint {
             singleton = new PolicyEnforcementPoint();
         }
         count++;
-        LOG.debug("***another use (" + count + ") of XACMLPep singleton");
+        logger.debug("***another use (" + count + ") of XACMLPep singleton");
         return singleton;
     }
 
@@ -162,23 +158,23 @@ public class PolicyEnforcementPoint {
         resourceAttributeFinder.setOwnerIdSeparator(ownerIdSeparator);
         attrModules.add(resourceAttributeFinder);
         try {
-            LOG.debug("about to set contextAttributeFinder in original");
+            logger.debug("about to set contextAttributeFinder in original");
             contextAttributeFinder = ContextAttributeFinderModule.getInstance();
         } catch (Throwable t) {
             enforceMode = ENFORCE_MODE_DENY_ALL_REQUESTS;
-            LOG.error("Error in newPdp", t);
+            logger.error("Error in newPdp", t);
             if (t instanceof Exception) {
                 throw (Exception) t;
             }
             throw new Exception("wrapped", t);
         }
 
-        LOG.debug("just set contextAttributeFinder=" + contextAttributeFinder);
+        logger.debug("just set contextAttributeFinder=" + contextAttributeFinder);
         contextAttributeFinder.setServletContext(servletContext);
         attrModules.add(contextAttributeFinder);
 
         attrFinder.setModules(attrModules);
-        LOG.debug("before building policy finder");
+        logger.debug("before building policy finder");
 
         PolicyFinder policyFinder = new PolicyFinder();
 
@@ -194,15 +190,13 @@ public class PolicyEnforcementPoint {
                                        validateRepositoryPolicies,
                                        validateObjectPoliciesFromDatastream,
                                        policyParser);
-        LOG.debug("after constucting fedora policy finder module");
-        LOG
-                .debug("before adding fedora policy finder module to policy finder hashset");
+        logger.debug("after constucting fedora policy finder module");
+        logger.debug("before adding fedora policy finder module to policy finder hashset");
         policyModules.add(combinedPolicyModule);
-        LOG
-                .debug("after adding fedora policy finder module to policy finder hashset");
-        LOG.debug("o before setting policy finder hashset into policy finder");
+        logger.debug("after adding fedora policy finder module to policy finder hashset");
+        logger.debug("o before setting policy finder hashset into policy finder");
         policyFinder.setModules(policyModules);
-        LOG.debug("o after setting policy finder hashset into policy finder");
+        logger.debug("o after setting policy finder hashset into policy finder");
 
         PDP pdp = new PDP(new PDPConfig(attrFinder, policyFinder, null));
         synchronized (this) {
@@ -239,7 +233,7 @@ public class PolicyEnforcementPoint {
                         boolean validateObjectPoliciesFromDatastream,
                         PolicyParser policyParser,
                         String ownerIdSeparator) throws Exception {
-        LOG.debug("in initPep()");
+        logger.debug("in initPep()");
         destroy();
         this.policyParser = policyParser;
         this.enforceMode = enforceMode;
@@ -271,11 +265,11 @@ public class PolicyEnforcementPoint {
     }
 
     private final Set wrapSubjects(String subjectLoginId) {
-        LOG.debug("wrapSubjectIdAsSubjects(): " + subjectLoginId);
+        logger.debug("wrapSubjectIdAsSubjects(): " + subjectLoginId);
         StringAttribute stringAttribute = new StringAttribute("");
         Attribute subjectAttribute =
                 new Attribute(XACML_SUBJECT_ID_URI, null, null, stringAttribute);
-        LOG.debug("wrapSubjectIdAsSubjects(): subjectAttribute, id="
+        logger.debug("wrapSubjectIdAsSubjects(): subjectAttribute, id="
                 + subjectAttribute.getId() + ", type="
                 + subjectAttribute.getType() + ", value="
                 + subjectAttribute.getValue());
@@ -285,7 +279,7 @@ public class PolicyEnforcementPoint {
             stringAttribute = new StringAttribute(subjectLoginId);
             subjectAttribute =
                     new Attribute(SUBJECT_ID_URI, null, null, stringAttribute);
-            LOG.debug("wrapSubjectIdAsSubjects(): subjectAttribute, id="
+            logger.debug("wrapSubjectIdAsSubjects(): subjectAttribute, id="
                     + subjectAttribute.getId() + ", type="
                     + subjectAttribute.getType() + ", value="
                     + subjectAttribute.getValue());
@@ -374,21 +368,19 @@ public class PolicyEnforcementPoint {
                 //wait, if pdp update is in progress
             }
             if (ENFORCE_MODE_PERMIT_ALL_REQUESTS.equals(enforceMode)) {
-                LOG
-                        .debug("permitting request because enforceMode==ENFORCE_MODE_PERMIT_ALL_REQUESTS");
+                logger.debug("permitting request because enforceMode==ENFORCE_MODE_PERMIT_ALL_REQUESTS");
             } else if (ENFORCE_MODE_DENY_ALL_REQUESTS.equals(enforceMode)) {
-                LOG
-                        .debug("denying request because enforceMode==ENFORCE_MODE_DENY_ALL_REQUESTS");
+                logger.debug("denying request because enforceMode==ENFORCE_MODE_DENY_ALL_REQUESTS");
                 throw new AuthzDeniedException("all requests are currently denied");
             } else if (!ENFORCE_MODE_ENFORCE_POLICIES.equals(enforceMode)) {
-                LOG.debug("denying request because enforceMode is invalid");
+                logger.debug("denying request because enforceMode is invalid");
                 throw new AuthzOperationalException("invalid enforceMode from config");
             } else {
                 ResponseCtx response = null;
                 String contextIndex = null;
                 try {
                     contextIndex = (new Integer(next())).toString();
-                    LOG.debug("context index set=" + contextIndex);
+                    logger.debug("context index set=" + contextIndex);
                     Set subjects = wrapSubjects(subjectId);
                     Set actions = wrapActions(action, api, contextIndex);
                     Set resources = wrapResources(pid, namespace);
@@ -402,10 +394,10 @@ public class PolicyEnforcementPoint {
                     Iterator tempit = tempset.iterator();
                     while (tempit.hasNext()) {
                         Attribute tempobj = (Attribute) tempit.next();
-                        LOG.debug("request action has " + tempobj.getId() + "="
+                        logger.debug("request action has " + tempobj.getId() + "="
                                 + tempobj.getValue().toString());
                     }
-                    LOG.debug("about to ref contextAttributeFinder="
+                    logger.debug("about to ref contextAttributeFinder="
                             + contextAttributeFinder);
                     contextAttributeFinder.registerContext(contextIndex,
                                                            context);
@@ -415,17 +407,17 @@ public class PolicyEnforcementPoint {
                         response = pdp.evaluate(request);
                     } finally {
                         long dur = System.currentTimeMillis() - st;
-                        LOG.debug("Policy evaluation took " + dur + "ms.");
+                        logger.debug("Policy evaluation took " + dur + "ms.");
                     }
 
-                    LOG.debug("in pep, after evaluate() called");
+                    logger.debug("in pep, after evaluate() called");
                 } catch (Throwable t) {
-                    LOG.error("Error evaluating policy", t);
+                    logger.error("Error evaluating policy", t);
                     throw new AuthzOperationalException("");
                 } finally {
                     contextAttributeFinder.unregisterContext(contextIndex);
                 }
-                LOG.debug("in pep, before denyBiasedAuthz() called");
+                logger.debug("in pep, before denyBiasedAuthz() called");
                 if (!denyBiasedAuthz(response.getResults())) {
                     throw new AuthzDeniedException("");
                 }
@@ -435,7 +427,7 @@ public class PolicyEnforcementPoint {
             }
         } finally {
             long dur = System.currentTimeMillis() - enforceStartTime;
-            LOG.debug("Policy enforcement took " + dur + "ms.");
+            logger.debug("Policy enforcement took " + dur + "ms.");
         }
     }
 
@@ -467,7 +459,7 @@ public class PolicyEnforcementPoint {
                     break;
             }
         }
-        LOG.debug("AUTHZ:  permits=" + nPermits + " denies=" + nDenies
+        logger.debug("AUTHZ:  permits=" + nPermits + " denies=" + nDenies
                 + " indeterminates=" + nIndeterminates + " notApplicables="
                 + nNotApplicables + " unexpecteds=" + nWrongs);
         return nPermits >= 1 && nDenies == 0 && nIndeterminates == 0

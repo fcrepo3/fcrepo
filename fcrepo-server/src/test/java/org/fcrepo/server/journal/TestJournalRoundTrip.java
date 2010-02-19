@@ -380,7 +380,7 @@ public class TestJournalRoundTrip {
                             "lastPID",
                             "lastDsID",
                             true,
-                            "the Log!");
+                            "the Logger!");
     }
 
     /*

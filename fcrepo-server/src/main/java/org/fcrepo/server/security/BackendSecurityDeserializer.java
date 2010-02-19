@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security;
@@ -18,8 +18,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.log4j.Logger;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -27,22 +25,23 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.StreamIOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 /**
  * SAX parser to deserialize the beSecurity XML file that contains configuration
  * properties for backend services.
- * 
+ *
  * @author Sandy Payette
  */
 public class BackendSecurityDeserializer
         extends DefaultHandler
         implements Constants {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(BackendSecurityDeserializer.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(BackendSecurityDeserializer.class);
 
     /** Attribute names in the beSecurity spec file */
     public static final String CALL_BASIC_AUTH = "callBasicAuth";
@@ -104,7 +103,7 @@ public class BackendSecurityDeserializer
             throws GeneralException, StreamIOException,
             UnsupportedEncodingException {
 
-        LOG.debug("Parsing beSecurity file...");
+        logger.debug("Parsing beSecurity file...");
 
         tmp_level = 0;
         try {
@@ -123,7 +122,7 @@ public class BackendSecurityDeserializer
                     + "Root element not found in backend security config file.");
         }
 
-        LOG.debug("Parse successful.");
+        logger.debug("Parse successful.");
         return beSS;
     }
 
@@ -136,7 +135,7 @@ public class BackendSecurityDeserializer
         if (uri.equals(BE_SECURITY.uri)
                 && localName.equals("serviceSecurityDescription")) {
 
-            LOG.debug("start element uri=" + uri + " localName=" + localName
+            logger.debug("start element uri=" + uri + " localName=" + localName
                     + " tmp_level=" + tmp_level);
 
             tmp_role = grab(a, BE_SECURITY.uri, ROLE);
@@ -176,7 +175,7 @@ public class BackendSecurityDeserializer
                                              tmp_role,
                                              beProperties);
                 } else {
-                    LOG.debug("xml element depth exceeded");
+                    logger.debug("xml element depth exceeded");
                     throw new SAXException("BackendSecurityDeserializer: "
                             + "serviceSecurityDescription elements can only "
                             + "be nested two levels deep from root element!");
@@ -193,7 +192,7 @@ public class BackendSecurityDeserializer
     @Override
     public void endElement(String uri, String localName, String qName) {
 
-        LOG.debug("end element uri=" + uri + " localName=" + localName
+        logger.debug("end element uri=" + uri + " localName=" + localName
                 + " tmp_level=" + tmp_level);
         if (uri.equals(BE_SECURITY.uri)
                 && localName.equals("serviceSecurityDescription")) {
@@ -213,14 +212,14 @@ public class BackendSecurityDeserializer
 
     private void setProperty(String key, String value) {
         if (key != null && value != null) {
-            LOG.debug("Setting propery.  key=" + key + " value=" + value);
+            logger.debug("Setting propery.  key=" + key + " value=" + value);
             beProperties.put(key, value);
         }
     }
 
     private void inheritProperties(Hashtable inheritableProperties) {
 
-        LOG.debug("Setting inherited properties...");
+        logger.debug("Setting inherited properties...");
         Iterator it = inheritableProperties.keySet().iterator();
         while (it.hasNext()) {
             String key = (String) it.next();
@@ -232,7 +231,7 @@ public class BackendSecurityDeserializer
 
     private void validateProperties() throws GeneralException {
 
-        LOG.debug("Validating properties...");
+        logger.debug("Validating properties...");
         if (!beProperties.containsKey(CALL_BASIC_AUTH)) {
             setProperty(CALL_BASIC_AUTH, "false");
         }
@@ -260,7 +259,7 @@ public class BackendSecurityDeserializer
     }
 
     public static void main(String[] args) throws Exception {
-        LOG.debug("BackendSecurityDeserializer start main()...");
+        logger.debug("BackendSecurityDeserializer start main()...");
         BackendSecurityDeserializer bds =
                 new BackendSecurityDeserializer("UTF-8", false);
         BackendSecuritySpec beSS = bds.deserialize(args[0]);
@@ -270,14 +269,14 @@ public class BackendSecurityDeserializer
         Iterator iterRoles = allRoleKeys.iterator();
         while (iterRoles.hasNext()) {
             String roleKey = (String) iterRoles.next();
-            LOG.debug("************ ROLEKEY = " + roleKey);
-            // let's see all the properties for this role...    
+            logger.debug("************ ROLEKEY = " + roleKey);
+            // let's see all the properties for this role...
             Hashtable roleProperties = beSS.getSecuritySpec(roleKey);
             Iterator iterProps = roleProperties.keySet().iterator();
             while (iterProps.hasNext()) {
                 String propKey = (String) iterProps.next();
                 String propValue = (String) roleProperties.get(propKey);
-                LOG.debug(propKey + "=" + propValue);
+                logger.debug(propKey + "=" + propValue);
             }
         }
     }

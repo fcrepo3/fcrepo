@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.errors.authorization.AuthzDeniedException;
 import org.fcrepo.server.errors.authorization.AuthzOperationalException;
@@ -40,7 +38,6 @@ public class ServerController
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger logger = Logger.getLogger(ServerController.class);
     private static Server s_server;
 
     private ServerStatusFile _status;

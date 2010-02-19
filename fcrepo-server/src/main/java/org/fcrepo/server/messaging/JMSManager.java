@@ -5,6 +5,7 @@
 package org.fcrepo.server.messaging;
 
 import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -13,6 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
@@ -28,13 +33,10 @@ import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import org.apache.log4j.Logger;
 
 import org.fcrepo.server.errors.MessagingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -52,8 +54,8 @@ import org.fcrepo.server.errors.MessagingException;
   */
 public class JMSManager {
 
-    /** Logger for this class. */
-    private static Logger LOG = Logger.getLogger(JMSManager.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(JMSManager.class);
 
     /** Connection Factory Lookup Name */
     public static final String CONNECTION_FACTORY_NAME = "connection.factory.name";
@@ -200,7 +202,7 @@ public class JMSManager {
         try {
             destination = (Destination) jndiLookup(name);
         } catch (MessagingException me) {
-            LOG.debug("JNDI lookup for destination " + name + " failed. "
+            logger.debug("JNDI lookup for destination " + name + " failed. "
                     + "Destination must be created.");
             destination = null;
         }
@@ -208,10 +210,10 @@ public class JMSManager {
             // Create a topic or queue as specified
             try {
                 if (type.equals(DestinationType.Queue)) {
-                    LOG.debug("setupDestination() - creating Queue" + name);
+                    logger.debug("setupDestination() - creating Queue" + name);
                     destination = session.createQueue(name);
                 } else {
-                    LOG.debug("setupDestination() - creating Topic " + name);
+                    logger.debug("setupDestination() - creating Topic " + name);
                     destination = session.createTopic(name);
                 }
             } catch (JMSException e) {
@@ -247,8 +249,8 @@ public class JMSManager {
      * @throws Exception
      */
     public Message listen(String destName, String messageSelector) throws MessagingException {
-        if(LOG.isDebugEnabled()) {
-            LOG.debug("listen() - Synchronous listen on destination " + destName);
+        if(logger.isDebugEnabled()) {
+            logger.debug("listen() - Synchronous listen on destination " + destName);
         }
 
         JMSDestination jmsDest = getJMSDestination(destName);
@@ -280,8 +282,8 @@ public class JMSManager {
      * @throws Exception
      */
     public Message listen(Destination dest, String messageSelector) throws MessagingException {
-        if(LOG.isDebugEnabled()) {
-            LOG.debug("listen() - Synchronous listen on destination " + dest);
+        if(logger.isDebugEnabled()) {
+            logger.debug("listen() - Synchronous listen on destination " + dest);
         }
         try {
             Session s =
@@ -321,8 +323,8 @@ public class JMSManager {
      */
     public Message listen(String destName, String messageSelector, int timeout)
             throws MessagingException {
-        if(LOG.isDebugEnabled()) {
-            LOG.debug("listen() - Synchronous listen on destination "
+        if(logger.isDebugEnabled()) {
+            logger.debug("listen() - Synchronous listen on destination "
                       + destName + " with timeout " + timeout);
         }
 
@@ -356,8 +358,8 @@ public class JMSManager {
         // Set the caller as a topic subscriber or queue receiver as appropriate
         setupAsynchConsumer(jmsDest, messageSelector, callback);
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("listen() - Asynchronous listen on destination " + destName);
+        if (logger.isDebugEnabled()) {
+            logger.debug("listen() - Asynchronous listen on destination " + destName);
         }
     }
 
@@ -388,8 +390,8 @@ public class JMSManager {
             throw new MessagingException(e.getMessage(), e);
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("listen() - Asynchronous listen on destination " + dest);
+        if (logger.isDebugEnabled()) {
+            logger.debug("listen() - Asynchronous listen on destination " + dest);
         }
     }
 
@@ -473,8 +475,8 @@ public class JMSManager {
             throw new MessagingException(e.getMessage(), e);
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("listen() - Asynchronous durable listen on topic " + topic);
+        if (logger.isDebugEnabled()) {
+            logger.debug("listen() - Asynchronous durable listen on topic " + topic);
         }
 
         return subscriptionName;
@@ -496,8 +498,8 @@ public class JMSManager {
             throw new MessagingException(e.getMessage(), e);
         }
 
-        if(LOG.isDebugEnabled()) {
-            LOG.debug("send() - message sent to destination " + destName);
+        if(logger.isDebugEnabled()) {
+            logger.debug("send() - message sent to destination " + destName);
         }
     }
 
@@ -515,8 +517,8 @@ public class JMSManager {
             throw new MessagingException(e.getMessage(), e);
         }
 
-        if(LOG.isDebugEnabled()) {
-            LOG.debug("send() - message sent to destination " + dest);
+        if(logger.isDebugEnabled()) {
+            logger.debug("send() - message sent to destination " + dest);
         }
     }
 
@@ -538,8 +540,8 @@ public class JMSManager {
             throw new MessagingException(e.getMessage(), e);
         }
 
-        if(LOG.isDebugEnabled()) {
-            LOG.debug("send() - message sent to destination " + destName);
+        if(logger.isDebugEnabled()) {
+            logger.debug("send() - message sent to destination " + destName);
         }
     }
 
@@ -569,15 +571,15 @@ public class JMSManager {
                 //
                 if (jmsDest.producer != null) {
                     jmsDest.producer.close();
-                    LOG.debug("Closed producer for " + destName);
+                    logger.debug("Closed producer for " + destName);
                 }
                 if (jmsDest.consumer != null) {
                     jmsDest.consumer.close();
-                    LOG.debug("Closed consumer for " + destName);
+                    logger.debug("Closed consumer for " + destName);
                 }
                 if (jmsDest.session != null) {
                     jmsDest.session.close();
-                    LOG.debug("Closed session for " + destName);
+                    logger.debug("Closed session for " + destName);
                 }
 
                 jmsDest.destination = null;
@@ -639,7 +641,7 @@ public class JMSManager {
             String errMsg = "Unable to unsubscribe from subscription with name: "
                           + subscriptionName + " due to exception: "
                           + jmse.getMessage();
-            LOG.debug(errMsg, jmse);
+            logger.debug(errMsg, jmse);
             throw new MessagingException(errMsg, jmse);
         }
     }
@@ -663,9 +665,9 @@ public class JMSManager {
             connection.stop();
             connection.close();
             connected = false;
-            LOG.debug("Connection closed.");
+            logger.debug("Connection closed.");
         } catch (JMSException e) {
-            LOG.debug("Error closing Connection.");
+            logger.debug("Error closing Connection.");
             throw new MessagingException(e.getMessage(), e);
         }
     }
@@ -812,10 +814,10 @@ public class JMSManager {
             }
             connection.start();
             connected = true;
-            LOG.debug("connectToJMS - connected");
+            logger.debug("connectToJMS - connected");
         } catch (JMSException e) {
             connected = false;
-            LOG.error("JMSManager.connectToJMS - Exception occurred:");
+            logger.error("JMSManager.connectToJMS - Exception occurred:");
             throw new MessagingException(e.getMessage(), e);
         }
     }
@@ -943,29 +945,29 @@ public class JMSManager {
             initCtx = new InitialContext();
             Context envCtx = (Context) initCtx.lookup("java:comp/env");
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("InitalContext properties:");
-                LOG.debug("----------------");
+            if (logger.isDebugEnabled()) {
+                logger.debug("InitalContext properties:");
+                logger.debug("----------------");
 
                 Hashtable<?, ?> props = initCtx.getEnvironment();
                 Set<?> keys = props.keySet();
                 for (Object key : keys) {
-                    LOG.debug(key.toString() + "=" + props.get(key));
+                    logger.debug(key.toString() + "=" + props.get(key));
                 }
 
-                LOG.debug("java:comp/env context properties:");
-                LOG.debug("----------------");
+                logger.debug("java:comp/env context properties:");
+                logger.debug("----------------");
                 props = envCtx.getEnvironment();
                 keys = props.keySet();
 
                 for (Object key : keys) {
-                    LOG.debug(key.toString() + "=" + props.get(key));
+                    logger.debug(key.toString() + "=" + props.get(key));
                 }
-                LOG.debug("----------------");
+                logger.debug("----------------");
             }
             return envCtx;
         } catch (Exception e) {
-            LOG.error("getContext() failed with: " + e.getMessage());
+            logger.error("getContext() failed with: " + e.getMessage());
             throw new MessagingException(e.getMessage(), e);
         }
     }

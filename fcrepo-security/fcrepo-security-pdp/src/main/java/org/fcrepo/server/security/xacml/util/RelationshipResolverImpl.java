@@ -14,7 +14,8 @@ import java.util.Map;
 import java.util.Set;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
@@ -38,8 +39,8 @@ import org.fcrepo.server.storage.types.RelationshipTuple;
 public class RelationshipResolverImpl
         implements RelationshipResolver {
 
-    private static Logger log =
-            Logger.getLogger(RelationshipResolverImpl.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(RelationshipResolverImpl.class);
 
     /**
      * Designates the repository itself. Policies can apply to the repository,
@@ -109,8 +110,8 @@ public class RelationshipResolverImpl
      * lang.String)
      */
     public Set<String> getParents(String pid) throws MelcoeXacmlException {
-        if (log.isDebugEnabled()) {
-            log.debug("Obtaining parents for: " + pid);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Obtaining parents for: " + pid);
         }
 
         Set<String> parentPIDs = new HashSet<String>();
@@ -119,8 +120,8 @@ public class RelationshipResolverImpl
         }
 
         query: for (String relationship : relationships) {
-            if (log.isDebugEnabled()) {
-                log.debug("relationship query: " + pid + ", " + relationship);
+            if (logger.isDebugEnabled()) {
+                logger.debug("relationship query: " + pid + ", " + relationship);
             }
 
             Map<String, Set<String>> mapping;
@@ -133,8 +134,8 @@ public class RelationshipResolverImpl
                 // want to continue querying for Y's parents.
                 while (t != null) {
                     if (t instanceof ObjectNotInLowlevelStorageException) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Parent, " + pid + ", not found.");
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Parent, " + pid + ", not found.");
                         }
                         break query;
                     }
@@ -149,8 +150,8 @@ public class RelationshipResolverImpl
                     PID parentPID = PID.getInstance(parent);
                     // we want the parents in demo:123 form, not info:fedora/demo:123
                     parentPIDs.add(parentPID.toString());
-                    if (log.isDebugEnabled()) {
-                        log.debug("added parent " + parentPID.toString());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("added parent " + parentPID.toString());
                     }
                 }
             }
@@ -204,7 +205,7 @@ public class RelationshipResolverImpl
         try {
             server = Server.getInstance(new File(Constants.FEDORA_HOME), false);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new RuntimeException("Failed getting instance of Fedora", e);
         }
         apim =

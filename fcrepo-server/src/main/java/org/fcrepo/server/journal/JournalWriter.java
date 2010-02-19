@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.journal;
@@ -15,8 +15,6 @@ import java.util.Map;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.journal.entry.CreatorJournalEntry;
@@ -24,6 +22,8 @@ import org.fcrepo.server.journal.helpers.EncodingBase64InputStream;
 import org.fcrepo.server.journal.helpers.JournalHelper;
 import org.fcrepo.server.journal.xmlhelpers.AbstractXmlWriter;
 import org.fcrepo.server.journal.xmlhelpers.ContextXmlWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -62,15 +62,14 @@ import org.fcrepo.server.journal.xmlhelpers.ContextXmlWriter;
  * journal.</li>
  * </ul>
  * </p>
- * 
+ *
  * @author Jim Blake
  */
 public abstract class JournalWriter
         extends AbstractXmlWriter {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(JournalWriter.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(JournalWriter.class);
 
     /**
      * A single object on which to synchronize all writing operations. The most
@@ -101,7 +100,7 @@ public abstract class JournalWriter
                                                                     role,
                                                                     server},
                                                             parameters);
-        LOG.info("JournalWriter is " + journalWriter.toString());
+        logger.info("JournalWriter is " + journalWriter.toString());
         return (JournalWriter) journalWriter;
     }
 

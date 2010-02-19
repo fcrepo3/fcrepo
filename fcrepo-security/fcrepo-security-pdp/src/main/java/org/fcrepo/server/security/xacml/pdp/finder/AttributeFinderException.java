@@ -18,7 +18,8 @@
 
 package org.fcrepo.server.security.xacml.pdp.finder;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -26,26 +27,23 @@ import org.apache.log4j.Logger;
 public class AttributeFinderException
         extends Exception {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log =
-            Logger.getLogger(AttributeFinderException.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(AttributeFinderException.class);
 
     public AttributeFinderException() {
         super();
-        log.error("No message provided");
+        logger.error("No message provided");
     }
 
     public AttributeFinderException(String msg) {
         super(msg);
-        log.error(msg);
+        logger.error(msg);
     }
 
     public AttributeFinderException(String msg, Throwable t) {
         super(msg);
-        log.error(msg, t);
+        logger.error(msg, t);
     }
 }

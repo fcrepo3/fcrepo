@@ -23,8 +23,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
@@ -44,6 +42,8 @@ import org.fcrepo.server.storage.types.DatastreamDef;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -89,9 +89,8 @@ public class ListDatastreamsServlet
         extends HttpServlet
         implements Constants {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(ListDatastreamsServlet.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ListDatastreamsServlet.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -156,7 +155,7 @@ public class ListDatastreamsServlet
             try {
                 PID = Server.getPID(URIArray[5]).toString(); // normalize PID
             } catch (Throwable th) {
-                LOG.error("Bad pid syntax in request", th);
+                logger.error("Bad pid syntax in request", th);
                 throw new BadRequest400Exception(request,
                                                  ACTION_LABEL,
                                                  "",
@@ -166,7 +165,7 @@ public class ListDatastreamsServlet
                 // Request is a versioned listDatastreams request
                 versDateTime = DateUtility.convertStringToDate(URIArray[6]);
                 if (versDateTime == null) {
-                    LOG.error("Bad date format in request");
+                    logger.error("Bad date format in request");
                     throw new BadRequest400Exception(request,
                                                      ACTION_LABEL,
                                                      "",
@@ -175,10 +174,10 @@ public class ListDatastreamsServlet
                     asOfDateTime = versDateTime;
                 }
             }
-            LOG.debug("Listing datastreams (PID=" + PID + ", asOfDate="
+            logger.debug("Listing datastreams (PID=" + PID + ", asOfDate="
                     + versDateTime + ")");
         } else {
-            LOG.error("Bad syntax (expected 6 or 7 parts) in request");
+            logger.error("Bad syntax (expected 6 or 7 parts) in request");
             throw new BadRequest400Exception(request,
                                              ACTION_LABEL,
                                              "",
@@ -193,29 +192,29 @@ public class ListDatastreamsServlet
             Context context =
                     ReadOnlyContext.getContext(HTTP_REQUEST.REST.uri, request);
             listDatastreams(context, PID, asOfDateTime, xml, request, response);
-            LOG.debug("Finished listing datastreams");
+            logger.debug("Finished listing datastreams");
         } catch (ObjectNotFoundException e) {
-            LOG.error("Object not found for request: " + requestURI
+            logger.error("Object not found for request: " + requestURI
                     + " (actionLabel=" + ACTION_LABEL + ")", e);
             throw new NotFound404Exception(request,
                                            ACTION_LABEL,
                                            "",
                                            new String[0]);
         } catch (ObjectNotInLowlevelStorageException e) {
-            LOG.error("Object not found for request: " + requestURI
+            logger.error("Object not found for request: " + requestURI
                     + " (actionLabel=" + ACTION_LABEL + ")", e);
             throw new NotFound404Exception(request,
                                            ACTION_LABEL,
                                            "",
                                            new String[0]);
         } catch (AuthzException ae) {
-            LOG.error("Authorization failed while listing datastreams", ae);
+            logger.error("Authorization failed while listing datastreams", ae);
             throw RootException.getServletException(ae,
                                                     request,
                                                     ACTION_LABEL,
                                                     new String[0]);
         } catch (Throwable th) {
-            LOG.error("Error listing datastreams", th);
+            logger.error("Error listing datastreams", th);
             throw new InternalError500Exception("Error listing datastreams",
                                                 th,
                                                 request,
@@ -293,7 +292,7 @@ public class ListDatastreamsServlet
             throw e;
         } catch (Throwable th) {
             String message = "Error listing datastreams";
-            LOG.error(message, th);
+            logger.error(message, th);
             throw new GeneralException(message, th);
         } finally {
             try {
@@ -305,7 +304,7 @@ public class ListDatastreamsServlet
                 }
             } catch (Throwable th) {
                 String message = "Error closing output";
-                LOG.error(message, th);
+                logger.error(message, th);
                 throw new StreamIOException(message);
             }
         }
@@ -407,14 +406,14 @@ public class ListDatastreamsServlet
                     pw.flush();
                     pw.close();
                 } catch (IOException ioe) {
-                    LOG.error("WriteThread error", ioe);
+                    logger.error("WriteThread error", ioe);
                 } finally {
                     try {
                         if (pw != null) {
                             pw.close();
                         }
                     } catch (IOException ioe) {
-                        LOG.error("WriteThread error", ioe);
+                        logger.error("WriteThread error", ioe);
                     }
                 }
             }

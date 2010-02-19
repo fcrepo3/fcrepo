@@ -19,13 +19,9 @@
 package org.fcrepo.server.security.xacml.pdp.finder.policy;
 
 import java.net.URISyntaxException;
+
 import java.util.ArrayList;
 import java.util.List;
-
-
-import org.apache.log4j.Logger;
-
-import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManagerException;
 
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
@@ -34,18 +30,22 @@ import com.sun.xacml.finder.PolicyFinder;
 import com.sun.xacml.finder.PolicyFinderModule;
 import com.sun.xacml.finder.PolicyFinderResult;
 
+import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManagerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This is the PolicyFinderModule for the PDP. Its purpose is to basically find
  * policies. It interacts with a PolicyManager in order to obtain a policy or
  * policy set.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public class GenericPolicyFinderModule
         extends PolicyFinderModule {
 
-    private static final Logger log =
-            Logger.getLogger(GenericPolicyFinderModule.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(GenericPolicyFinderModule.class);
 
     private PolicyManager policyManager = null;
 
@@ -56,7 +56,7 @@ public class GenericPolicyFinderModule
     /**
      * Always returns <code>true</code> since this module does support finding
      * policies based on context.
-     * 
+     *
      * @return true
      */
     @Override
@@ -67,7 +67,7 @@ public class GenericPolicyFinderModule
     /**
      * Initialize this module. Typically this is called by
      * <code>PolicyFinder</code> when a PDP is created.
-     * 
+     *
      * @param finder
      *        the <code>PolicyFinder</code> using this module
      */
@@ -76,11 +76,10 @@ public class GenericPolicyFinderModule
         try {
             policyManager = new PolicyManager(finder);
         } catch (URISyntaxException use) {
-            log
-                    .fatal("Error initialising DBPolicyFinderModule due to improper URI:",
+            logger.error("Error initialising DBPolicyFinderModule due to improper URI:",
                            use);
         } catch (PolicyDataManagerException pdme) {
-            log.fatal("Error initialising DBPolicyFinderModule:", pdme);
+            logger.error("Error initialising DBPolicyFinderModule:", pdme);
         }
     }
 
@@ -89,7 +88,7 @@ public class GenericPolicyFinderModule
      * matches, then this either returns an error or a new policy wrapping the
      * multiple policies (depending on which constructor was used to construct
      * this instance).
-     * 
+     *
      * @param context
      *        the representation of the request data
      * @return the result of trying to find an applicable policy
@@ -107,8 +106,8 @@ public class GenericPolicyFinderModule
         } catch (TopLevelPolicyException tlpe) {
             return new PolicyFinderResult(tlpe.getStatus());
         } catch (PolicyDataManagerException pdme) {
-            if (log.isDebugEnabled()) {
-                log.debug("problem processing policy", pdme);
+            if (logger.isDebugEnabled()) {
+                logger.debug("problem processing policy", pdme);
             }
 
             List<String> codes = new ArrayList<String>();

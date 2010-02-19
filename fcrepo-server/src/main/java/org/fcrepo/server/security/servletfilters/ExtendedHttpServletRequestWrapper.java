@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security.servletfilters;
@@ -19,10 +19,9 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.apache.commons.codec.binary.Base64;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.fcrepo.server.errors.authorization.AuthzOperationalException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -32,8 +31,8 @@ public class ExtendedHttpServletRequestWrapper
         extends HttpServletRequestWrapper
         implements ExtendedHttpServletRequest {
 
-    private static Log log =
-            LogFactory.getLog(ExtendedHttpServletRequestWrapper.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(ExtendedHttpServletRequestWrapper.class);
 
     private String username = null;
 
@@ -61,11 +60,11 @@ public class ExtendedHttpServletRequestWrapper
     public void setSponsoredUser() throws Exception {
         String method = "setSponsoredUser";
         String sponsoredUser = "";
-        log.debug(method + " , isSponsoredUserRequested()=="
+        logger.debug(method + " , isSponsoredUserRequested()=="
                 + isSponsoredUserRequested());
         if (isSponsoredUserRequested()) {
             sponsoredUser = getFromHeader();
-            log.debug(method + " , sponsoredUser==" + sponsoredUser);
+            logger.debug(method + " , sponsoredUser==" + sponsoredUser);
         }
         setSponsoredUser(sponsoredUser);
     }
@@ -86,6 +85,7 @@ public class ExtendedHttpServletRequestWrapper
         this.authority = authority;
     }
 
+    @Override
     public Principal getUserPrincipal() {
         //this order reinforces that container-supplied userPrincipal should not be overridden in setUserPrincipal()
         Principal userPrincipal = super.getUserPrincipal();
@@ -110,6 +110,7 @@ public class ExtendedHttpServletRequestWrapper
         return getUserPrincipal() != null;
     }
 
+    @Override
     public String getRemoteUser() {
         String remoteUser = null;
         if (isUserSponsored()) {
@@ -128,7 +129,7 @@ public class ExtendedHttpServletRequestWrapper
     private final Map sponsoredAttributes = new Hashtable();
 
     public final void auditInnerMap(Map map) {
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             for (Iterator it = map.keySet().iterator(); it.hasNext();) {
                 String key = (String) it.next();
                 Object value = map.get(key);
@@ -165,28 +166,28 @@ public class ExtendedHttpServletRequestWrapper
                 } else {
                     sb.append("UNKNOWN");
                 }
-                log.debug(sb.toString());
+                logger.debug(sb.toString());
             }
         }
     }
 
     public final void auditInnerSet(Set set) {
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             for (Iterator it = set.iterator(); it.hasNext();) {
                 Object value = it.next();
                 if (value instanceof String) {
-                    log.debug(value);
+                    logger.debug((String) value);
                 } else {
-                    log.debug("UNKNOWN");
+                    logger.debug("UNKNOWN");
                 }
             }
         }
     }
 
     public final void auditOuterMap(Map map, String desc) {
-        if (log.isDebugEnabled()) {
-            log.debug("");
-            log.debug("auditing " + desc);
+        if (logger.isDebugEnabled()) {
+            logger.debug("");
+            logger.debug("auditing " + desc);
             for (Iterator it = map.keySet().iterator(); it.hasNext();) {
                 Object key = it.next();
                 Object inner = map.get(key);
@@ -197,13 +198,13 @@ public class ExtendedHttpServletRequestWrapper
                     authority = "<authority not a string>";
                 }
                 if (inner instanceof Map) {
-                    log.debug(authority + " maps to . . .");
+                    logger.debug(authority + " maps to . . .");
                     auditInnerMap((Map) inner);
                 } else if (inner instanceof Set) {
-                    log.debug(authority + " maps to . . .");
+                    logger.debug(authority + " maps to . . .");
                     auditInnerSet((Set) inner);
                 } else {
-                    log.debug(authority + " maps to an unknown object=="
+                    logger.debug(authority + " maps to an unknown object=="
                             + map.getClass().getName());
                 }
             }
@@ -211,12 +212,12 @@ public class ExtendedHttpServletRequestWrapper
     }
 
     public void audit() {
-        if (log.isDebugEnabled()) {
-            log.debug("\n===AUDIT===");
-            log.debug("auditing wrapped request");
+        if (logger.isDebugEnabled()) {
+            logger.debug("\n===AUDIT===");
+            logger.debug("auditing wrapped request");
             auditOuterMap(authenticatedAttributes, "authenticatedAttributes");
             auditOuterMap(sponsoredAttributes, "sponsoredAttributes");
-            log.debug("===AUDIT===\n");
+            logger.debug("===AUDIT===\n");
         }
     }
 
@@ -292,7 +293,7 @@ public class ExtendedHttpServletRequestWrapper
         if (map.containsKey(key)) {
             throw new Exception("map already contains key==" + key);
         }
-        log.debug("mapping " + key + " => " + value + " in " + map);
+        logger.debug("mapping " + key + " => " + value + " in " + map);
         map.put(key, value);
     }
 
@@ -344,80 +345,78 @@ public class ExtendedHttpServletRequestWrapper
         String msg = here + "header intact";
         if (header == null || "".equals(header)) {
             String exceptionMsg = msg + FAILED;
-            log.fatal(exceptionMsg + ", header==" + header);
+            logger.error(exceptionMsg + ", header==" + header);
             throw new Exception(exceptionMsg);
         }
-        log.debug(msg + SUCCEEDED);
+        logger.debug(msg + SUCCEEDED);
 
         String authschemeUsernamepassword[] = header.split("\\s+");
 
         msg = here + "header split";
         if (authschemeUsernamepassword.length != 2) {
             String exceptionMsg = msg + FAILED;
-            log.fatal(exceptionMsg + ", header==" + header);
+            logger.error(exceptionMsg + ", header==" + header);
             throw new Exception(exceptionMsg);
         }
-        log.debug(msg + SUCCEEDED);
+        logger.debug(msg + SUCCEEDED);
 
         msg = here + "auth scheme";
         String authscheme = authschemeUsernamepassword[0];
         if (authscheme == null && !BASIC.equalsIgnoreCase(authscheme)) {
             String exceptionMsg = msg + FAILED;
-            log.fatal(exceptionMsg + ", authscheme==" + authscheme);
+            logger.error(exceptionMsg + ", authscheme==" + authscheme);
             throw new Exception(exceptionMsg);
         }
-        log.debug(msg + SUCCEEDED);
+        logger.debug(msg + SUCCEEDED);
 
         msg = here + "digest non-null";
         String usernamepassword = authschemeUsernamepassword[1];
         if (usernamepassword == null || "".equals(usernamepassword)) {
             String exceptionMsg = msg + FAILED;
-            log.fatal(exceptionMsg + ", usernamepassword==" + usernamepassword);
+            logger.error(exceptionMsg + ", usernamepassword==" + usernamepassword);
             throw new Exception(exceptionMsg);
         }
-        log.debug(msg + SUCCEEDED + ", usernamepassword==" + usernamepassword);
+        logger.debug(msg + SUCCEEDED + ", usernamepassword==" + usernamepassword);
 
         byte[] encoded = usernamepassword.getBytes();
         msg = here + "digest base64-encoded";
         if (!Base64.isArrayByteBase64(encoded)) {
             String exceptionMsg = msg + FAILED;
-            log.fatal(exceptionMsg + ", encoded==" + encoded);
+            logger.error(exceptionMsg + ", encoded==" + encoded);
             throw new Exception(exceptionMsg);
         }
-        if (log.isDebugEnabled()) {
-            log.debug(msg + SUCCEEDED + ", encoded==" + encoded);
+        if (logger.isDebugEnabled()) {
+            logger.debug(msg + SUCCEEDED + ", encoded==" + encoded);
         }
 
         byte[] decodedAsByteArray = Base64.decodeBase64(encoded);
-        log.debug(here + "got decoded bytes" + SUCCEEDED
+        logger.debug(here + "got decoded bytes" + SUCCEEDED
                 + ", decodedAsByteArray==" + decodedAsByteArray);
 
         String decoded = new String(decodedAsByteArray); //decodedAsByteArray.toString();
-        log.debug(here + "got decoded string" + SUCCEEDED + ", decoded=="
+        logger.debug(here + "got decoded string" + SUCCEEDED + ", decoded=="
                 + decoded);
 
         msg = here + "digest decoded";
         if (decoded == null || "".equals(decoded)) {
             String exceptionMsg = msg + FAILED;
-            log.fatal(exceptionMsg + ", digest decoded==" + decoded);
+            logger.error(exceptionMsg + ", digest decoded==" + decoded);
             throw new Exception(exceptionMsg);
         }
-        log.debug(msg + SUCCEEDED);
+        logger.debug(msg + SUCCEEDED);
 
         String DELIMITER = ":";
         if (decoded == null) {
-            log
-                    .error("decoded user/password is null . . . returning 0-length strings");
+            logger.error("decoded user/password is null . . . returning 0-length strings");
             usernamePassword = new String[2];
             usernamePassword[0] = "";
             usernamePassword[1] = "";
         } else if (decoded.indexOf(DELIMITER) < 0) {
             String exceptionMsg = "decoded user/password lacks delimiter";
-            log.fatal(exceptionMsg + " . . . throwing exception");
+            logger.error(exceptionMsg + " . . . throwing exception");
             throw new Exception(exceptionMsg);
         } else if (decoded.startsWith(DELIMITER)) {
-            log
-                    .error("decoded user/password is lacks user . . . returning 0-length strings");
+            logger.error("decoded user/password is lacks user . . . returning 0-length strings");
             usernamePassword = new String[2];
             usernamePassword[0] = "";
             usernamePassword[1] = "";
@@ -432,10 +431,10 @@ public class ExtendedHttpServletRequestWrapper
         msg = here + "user/password split";
         if (usernamePassword.length != 2) {
             String exceptionMsg = msg + FAILED;
-            log.fatal(exceptionMsg + ", digest decoded==" + decoded);
+            logger.error(exceptionMsg + ", digest decoded==" + decoded);
             throw new Exception(exceptionMsg);
         }
-        log.debug(msg + SUCCEEDED);
+        logger.debug(msg + SUCCEEDED);
 
         return usernamePassword;
     }
@@ -443,20 +442,20 @@ public class ExtendedHttpServletRequestWrapper
     public static final String AUTHORIZATION = "Authorization";
 
     public final String getAuthorizationHeader() {
-        log.debug("getAuthorizationHeader()");
-        log.debug("getting this headers");
+        logger.debug("getAuthorizationHeader()");
+        logger.debug("getting this headers");
         for (Enumeration enu = getHeaderNames(); enu.hasMoreElements();) {
             String name = (String) enu.nextElement();
-            log.debug("another headername==" + name);
+            logger.debug("another headername==" + name);
             String value = getHeader(name);
-            log.debug("another headervalue==" + value);
+            logger.debug("another headervalue==" + value);
         }
-        log.debug("getting super headers");
+        logger.debug("getting super headers");
         for (Enumeration enu = super.getHeaderNames(); enu.hasMoreElements();) {
             String name = (String) enu.nextElement();
-            log.debug("another headername==" + name);
+            logger.debug("another headername==" + name);
             String value = super.getHeader(name);
-            log.debug("another headervalue==" + value);
+            logger.debug("another headervalue==" + value);
         }
         return getHeader(AUTHORIZATION);
     }
@@ -469,28 +468,28 @@ public class ExtendedHttpServletRequestWrapper
 
     public final String getUser() throws Exception {
         if (username == null) {
-            log.debug("username==null, so will grok now");
+            logger.debug("username==null, so will grok now");
             String authorizationHeader = getAuthorizationHeader();
-            log.debug("authorizationHeader==" + authorizationHeader);
+            logger.debug("authorizationHeader==" + authorizationHeader);
             if (authorizationHeader != null && !"".equals(authorizationHeader)) {
-                log.debug("authorizationHeader is intact");
+                logger.debug("authorizationHeader is intact");
                 String[] usernamePassword =
                         parseUsernamePassword(authorizationHeader);
-                log.debug("usernamePassword[] length=="
+                logger.debug("usernamePassword[] length=="
                         + usernamePassword.length);
                 username = usernamePassword[0];
-                log.debug("username (usernamePassword[0])==" + username);
+                logger.debug("username (usernamePassword[0])==" + username);
                 if (super.getRemoteUser() == null) {
-                    log.debug("had none before");
+                    logger.debug("had none before");
                 } else if (super.getRemoteUser() == username
                         || super.getRemoteUser().equals(username)) {
-                    log.debug("got same now");
+                    logger.debug("got same now");
                 } else {
                     throw new Exception("somebody got it wrong");
                 }
             }
         }
-        log.debug("return user==" + username);
+        logger.debug("return user==" + username);
         return username;
     }
 
@@ -503,7 +502,7 @@ public class ExtendedHttpServletRequestWrapper
                 password = usernamePassword[1];
             }
         }
-        log.debug("return password==" + password);
+        logger.debug("return password==" + password);
         return password;
     }
 
@@ -520,6 +519,7 @@ public class ExtendedHttpServletRequestWrapper
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *             {@link ServletContext#getRealPath(java.lang.String)}.
      */
+    @Override
     @Deprecated
     public String getRealPath(String path) {
         return super.getRealPath(path);
@@ -529,17 +529,19 @@ public class ExtendedHttpServletRequestWrapper
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *             {@link #isRequestedSessionIdFromURL()}.
      */
+    @Override
     @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
         return isRequestedSessionIdFromURL();
     }
 
+    @Override
     public boolean isSecure() {
-        log.debug("super.isSecure()==" + super.isSecure());
-        log.debug("this.getLocalPort()==" + getLocalPort());
-        log.debug("this.getProtocol()==" + getProtocol());
-        log.debug("this.getServerPort()==" + getServerPort());
-        log.debug("this.getRequestURI()==" + getRequestURI());
+        logger.debug("super.isSecure()==" + super.isSecure());
+        logger.debug("this.getLocalPort()==" + getLocalPort());
+        logger.debug("this.getProtocol()==" + getProtocol());
+        logger.debug("this.getServerPort()==" + getServerPort());
+        logger.debug("this.getRequestURI()==" + getRequestURI());
         return super.isSecure();
     }
 

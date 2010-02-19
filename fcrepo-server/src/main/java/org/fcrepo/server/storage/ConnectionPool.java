@@ -14,11 +14,11 @@ import java.util.Properties;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.utilities.DDLConverter;
 import org.fcrepo.server.utilities.TableCreatingConnection;
 import org.fcrepo.utilities.install.InstallOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -30,9 +30,8 @@ import org.fcrepo.utilities.install.InstallOptions;
  */
 public class ConnectionPool {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(ConnectionPool.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ConnectionPool.class);
 
     private DDLConverter ddlConverter;
 
@@ -283,8 +282,8 @@ public class ConnectionPool {
         try {
             return dataSource.getConnection();
         } finally {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Got connection from pool (" + toString() + ")");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Got connection from pool (" + toString() + ")");
             }
         }
     }
@@ -301,10 +300,10 @@ public class ConnectionPool {
         try {
             connection.close();
         } catch (SQLException sqle) {
-            LOG.warn("Unable to close connection", sqle);
+            logger.warn("Unable to close connection", sqle);
         } finally {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Returned connection to pool (" + toString() + ")");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Returned connection to pool (" + toString() + ")");
             }
         }
     }
@@ -335,10 +334,10 @@ public class ConnectionPool {
                 shutdownEmbeddedDB(username, password);
             }
         } catch (SQLException sqle) {
-            LOG.warn("Unable to close pool", sqle);
+            logger.warn("Unable to close pool", sqle);
         } finally {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Closed pool (" + toString() + ")");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Closed pool (" + toString() + ")");
             }
         }
     }
@@ -349,7 +348,7 @@ public class ConnectionPool {
     }
 
     private void shutdownEmbeddedDB(String username, String password) {
-        LOG.info("Shutting down embedded derby database.");
+        logger.info("Shutting down embedded derby database.");
         try {
             DriverManager.getConnection("jdbc:derby:;shutdown=true",
                                         username,
@@ -357,7 +356,7 @@ public class ConnectionPool {
         } catch (SQLException e) {
             // Shutdown throws the XJ015 exception to confirm success.
             if (!e.getSQLState().equals("XJ015")) {
-                LOG.error("Embedded Derby DB did not shut down normally.");
+                logger.error("Embedded Derby DB did not shut down normally.");
             }
         }
     }

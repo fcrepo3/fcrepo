@@ -1,26 +1,26 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.utilities;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of ThreadMonitor.
- * 
+ *
  * @author Chris Wilper
  */
 public class ThreadMonitorImpl
         implements ThreadMonitor {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(ThreadMonitorImpl.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ThreadMonitorImpl.class);
 
     private boolean m_stopRequested;
 
-    private boolean m_onlyMemory;
+    private final boolean m_onlyMemory;
 
     private int m_pollInterval;
 
@@ -39,9 +39,9 @@ public class ThreadMonitorImpl
                 Thread.sleep(m_pollInterval);
             } catch (InterruptedException ie) {
             }
-            LOG.info("Available Memory: " + Runtime.getRuntime().freeMemory());
+            logger.info("Available Memory: " + Runtime.getRuntime().freeMemory());
             if (!m_onlyMemory) {
-                LOG.info(getThreadTree());
+                logger.info(getThreadTree());
             }
         }
     }

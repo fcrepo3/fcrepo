@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Determines if the client is a flash player (based on a query string
@@ -35,7 +35,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FilterRestApiFlash implements Filter {
 
-    protected static Log log = LogFactory.getLog(FilterRestApiFlash.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(FilterRestApiFlash.class);
 
     /**
      * Required Filter method
@@ -50,8 +51,8 @@ public class FilterRestApiFlash implements Filter {
                          ServletResponse response,
                          FilterChain filterChain)
     throws IOException, ServletException {
-        if (log.isDebugEnabled()) {
-            log.debug("Entering FilterRestApiFlash.doThisSubclass()");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Entering FilterRestApiFlash.doThisSubclass()");
         }
 
         HttpServletRequest httpRequest = (HttpServletRequest)request;

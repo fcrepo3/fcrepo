@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.management;
@@ -15,8 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -30,7 +28,8 @@ import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Edwin Shin
@@ -40,9 +39,8 @@ public class ManagementModule
         extends Module
         implements Management, ManagementDelegate {
 
-    /** Logger for this class. */
-    private static Logger LOG =
-            Logger.getLogger(ManagementModule.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(ManagementModule.class);
 
     private Authorization m_fedoraXACMLModule;
 
@@ -59,9 +57,9 @@ public class ManagementModule
     private Hashtable<String, Long> m_uploadStartTime;
 
     private Management mgmt;
-    
+
     private AbstractInvocationHandler[] invocationHandlers;
-    
+
     /** Delay between purge of two uploaded files. */
     private long m_purgeDelayInMillis;
 
@@ -123,14 +121,14 @@ public class ManagementModule
 
         // initialize variables pertaining to checksumming datastreams.
         String auto = getParameter("autoChecksum");
-        LOG.debug("Got Parameter: autoChecksum = " + auto);
+        logger.debug("Got Parameter: autoChecksum = " + auto);
         if (auto.equalsIgnoreCase("true")) {
             Datastream.autoChecksum = true;
             Datastream.defaultChecksumType = getParameter("checksumAlgorithm");
         }
-        LOG.debug("autoChecksum is " + auto);
-        LOG.debug("defaultChecksumType is " + Datastream.defaultChecksumType);
-       
+        logger.debug("autoChecksum is " + auto);
+        logger.debug("defaultChecksumType is " + Datastream.defaultChecksumType);
+
         // get delay between purge of two uploaded files (default 1 minute)
         String purgeDelayInMillis = getParameter("purgeDelayInMillis");
         if (purgeDelayInMillis == null) {
@@ -144,7 +142,7 @@ public class ManagementModule
                 getRole());
         }
     }
-    
+
     @Override
     public void postInitModule() throws ModuleInitializationException {
         // Verify required modules have been loaded
@@ -184,7 +182,7 @@ public class ManagementModule
 
         mgmt = getProxyChain(m);
     }
-    
+
     @Override
     public void shutdownModule() throws ModuleShutdownException {
         if (invocationHandlers != null) {
@@ -506,7 +504,7 @@ public class ManagementModule
 
     /**
      * Build a proxy chain as configured by the module parameters.
-     * 
+     *
      * @param m
      *        The concrete Management implementation to wrap.
      * @return A proxy chain for Management
@@ -527,7 +525,7 @@ public class ManagementModule
      * ordering is ascending alphabetical, determined by the module parameter
      * names that begin with the string "decorator", e.g. "decorator1",
      * "decorator2".
-     * 
+     *
      * @return An array InvocationHandlers
      */
     private AbstractInvocationHandler[] getInvocationHandlers() throws Exception {

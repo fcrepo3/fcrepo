@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.log4j.Logger;
-
 import org.w3c.dom.Element;
 
 import org.fcrepo.common.Constants;
@@ -22,6 +20,8 @@ import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.DOWriter;
 import org.fcrepo.server.utilities.status.ServerState;
 import org.fcrepo.server.utilities.status.ServerStatusFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -33,8 +33,8 @@ import org.fcrepo.server.utilities.status.ServerStatusFile;
 public class BasicServer
         extends Server {
 
-    /** Logger for this class. */
-    private static Logger LOG = Logger.getLogger(BasicServer.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(BasicServer.class);
 
     public BasicServer(Element rootElement, File fedoraHomeDir)
             throws ServerInitializationException, ModuleInitializationException {
@@ -60,9 +60,9 @@ public class BasicServer
                     + "not given, but it's required.");
         }
 
-        LOG.info("Fedora Version: " + Server.VERSION);
-        LOG.info("Fedora Build Date: " + Server.BUILD_DATE);
-        LOG.info("Fedora Build Number: " + Server.BUILD_NUMBER);
+        logger.info("Fedora Version: " + Server.VERSION);
+        logger.info("Fedora Build Date: " + Server.BUILD_DATE);
+        logger.info("Fedora Build Number: " + Server.BUILD_NUMBER);
 
         ServerStatusFile status = getStatusFile();
         try {
@@ -132,7 +132,7 @@ public class BasicServer
         PID pid = new PID(objectName.uri.substring("info:fedora/".length()));
         boolean exists = doManager.objectExists(pid.toString());
         if (exists && firstRun) {
-            LOG.info("Purging old system object: " + pid.toString());
+            logger.info("Purging old system object: " + pid.toString());
             Context context = ReadOnlyContext.getContext(null,
                                                          null,
                                                          null,
@@ -149,7 +149,7 @@ public class BasicServer
             }
         }
         if (!exists) {
-            LOG.info("Ingesting new system object: " + pid.toString());
+            logger.info("Ingesting new system object: " + pid.toString());
             InputStream xml = getStream("org/fcrepo/server/resources/"
                                         + pid.toFilename() + ".xml");
             Context context = ReadOnlyContext.getContext(null,

@@ -78,7 +78,7 @@ public interface ILowlevelStorage {
      * Performs a consistency check against the object index if such an index
      * exists. The object index associates an object with a stored location.
      * If the implementation does not use an index, this is a no-op. If any
-     * inconsistencies are found, they will be reported to the system log.
+     * inconsistencies are found, they will be reported to the system logger.
      *
      * @throws LowlevelStorageException if an error occurs that prevents the
      *         consistency check from taking place.
@@ -150,7 +150,7 @@ public interface ILowlevelStorage {
      * index exists. The datastream index associates a datastream version with
      * a stored location. If the implementation does not use an index, this is
      * a no-op. If any inconsistencies are found, they will be reported to the
-     * system log.
+     * system logger.
      *
      * @throws LowlevelStorageException if an error occurs that prevents the
      *         consistency check from taking place.

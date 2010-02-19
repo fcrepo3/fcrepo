@@ -34,7 +34,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.security.jaas.auth.UserPrincipal;
 import org.fcrepo.server.security.jaas.util.DataUtils;
@@ -46,8 +47,8 @@ import org.w3c.dom.NodeList;
 public class XmlUsersFileModule
         implements LoginModule {
 
-    private static final Logger log =
-            Logger.getLogger(XmlUsersFileModule.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(XmlUsersFileModule.class);
 
     private Subject subject = null;
 
@@ -84,27 +85,27 @@ public class XmlUsersFileModule
 
         fedoraHome = System.getenv("FEDORA_HOME");
         if (fedoraHome == null || "".equals(fedoraHome)) {
-            log.error("FEDORA_HOME environment variable not set");
+            logger.error("FEDORA_HOME environment variable not set");
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("using FEDORA_HOME: " + fedoraHome);
+            if (logger.isDebugEnabled()) {
+                logger.debug("using FEDORA_HOME: " + fedoraHome);
             }
         }
 
         attributes = new HashMap<String, Set<String>>();
 
         if (debug) {
-            log.debug("login module initialised: " + this.getClass().getName());
+            logger.debug("login module initialised: " + this.getClass().getName());
         }
     }
 
     public boolean login() throws LoginException {
         if (debug) {
-            log.debug(this.getClass().getName() + " login called.");
+            logger.debug(this.getClass().getName() + " login called.");
         }
 
         if (fedoraHome == null || "".equals(fedoraHome.trim())) {
-            log.error("FEDORA_HOME environment variable not set");
+            logger.error("FEDORA_HOME environment variable not set");
             return false;
         }
 
@@ -144,7 +145,7 @@ public class XmlUsersFileModule
             subject.getPrincipals().add(principal);
             subject.getPublicCredentials().add(attributes);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return false;
         }
 
@@ -155,7 +156,7 @@ public class XmlUsersFileModule
         try {
             clear();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return false;
         }
 
@@ -166,7 +167,7 @@ public class XmlUsersFileModule
         try {
             clear();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return false;
         }
 
@@ -185,7 +186,7 @@ public class XmlUsersFileModule
         String xmlUsersFile = fedoraHome + "/server/config/fedora-users.xml";
         File file = new File(xmlUsersFile);
         if (!file.exists()) {
-            log.error("XmlUsersFile not found: " + file.getAbsolutePath());
+            logger.error("XmlUsersFile not found: " + file.getAbsolutePath());
             return false;
         }
 
@@ -231,7 +232,7 @@ public class XmlUsersFileModule
                 return true;
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
         }
 
         return false;

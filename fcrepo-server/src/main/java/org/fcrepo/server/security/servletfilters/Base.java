@@ -1,18 +1,19 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security.servletfilters;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
  */
 public class Base {
 
-    protected static Log log = LogFactory.getLog(Base.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(Base.class);
 
     protected static final String[] StringArrayPrototype = new String[0];
 
@@ -71,20 +72,6 @@ public class Base {
                 + (value == null ? "" : value);
     }
 
-    public final void showThrowable(Throwable th, Log log, String msg) {
-        if (log.isErrorEnabled()) {
-            if (msg != null) {
-                log.error(msg);
-            }
-            log.error(th);
-            log.error(th.getMessage());
-            if (th.getCause() != null) {
-                log.error(th.getCause().getMessage());
-            }
-            th.printStackTrace();
-        }
-    }
-
     public static final boolean booleanValue(String string) throws Exception {
         if (Boolean.TRUE.toString().equals(string)
                 || Boolean.FALSE.toString().equals(string)) {
@@ -97,17 +84,17 @@ public class Base {
     protected boolean initErrors = false;
 
     protected void initThisSubclass(String key, String value) {
-        log.debug("AFB.iTS");
+        logger.debug("AFB.iTS");
         String method = "initThisSubclass() ";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         initErrors = true;
-        if (log.isErrorEnabled()) {
-            log.error(format(method, "unknown parameter", key, value));
+        if (logger.isErrorEnabled()) {
+            logger.error(format(method, "unknown parameter", key, value));
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 

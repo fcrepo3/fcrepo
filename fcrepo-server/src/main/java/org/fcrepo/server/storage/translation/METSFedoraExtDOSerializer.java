@@ -13,8 +13,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.xml.format.XMLFormat;
 import org.fcrepo.server.errors.ObjectIntegrityException;
@@ -28,6 +26,8 @@ import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.utilities.StringUtility;
 import org.fcrepo.utilities.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.fcrepo.common.Models.SERVICE_DEPLOYMENT_3_0;
 
@@ -51,9 +51,8 @@ public class METSFedoraExtDOSerializer
      */
     public static final XMLFormat DEFAULT_FORMAT = METS_EXT1_1;
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(METSFedoraExtDOSerializer.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(METSFedoraExtDOSerializer.class);
 
     /** The format this serializer writes. */
     private final XMLFormat m_format;
@@ -105,7 +104,7 @@ public class METSFedoraExtDOSerializer
                           String encoding,
                           int transContext) throws ObjectIntegrityException,
             StreamIOException, UnsupportedEncodingException {
-        LOG.debug("Serializing " + m_format.uri + " for transContext: "
+        logger.debug("Serializing " + m_format.uri + " for transContext: "
                 + transContext);
         m_transContext = transContext;
         OutputStreamWriter osWriter = new OutputStreamWriter(out, encoding);

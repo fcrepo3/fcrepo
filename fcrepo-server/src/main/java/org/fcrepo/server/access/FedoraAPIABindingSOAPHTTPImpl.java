@@ -11,8 +11,6 @@ import java.rmi.RemoteException;
 import org.apache.axis.AxisFault;
 import org.apache.axis.types.NonNegativeInteger;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
@@ -24,6 +22,8 @@ import org.fcrepo.server.types.gen.FieldSearchResult;
 import org.fcrepo.server.utilities.AxisUtility;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.TypeUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -35,9 +35,8 @@ import org.fcrepo.server.utilities.TypeUtility;
 public class FedoraAPIABindingSOAPHTTPImpl
         implements org.fcrepo.server.access.FedoraAPIA {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(FedoraAPIABindingSOAPHTTPImpl.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(FedoraAPIABindingSOAPHTTPImpl.class);
 
     /** The Fedora Server instance. */
     private static Server s_server;
@@ -75,7 +74,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
                 debug = B1.booleanValue();
             }
         } catch (InitializationException ie) {
-            LOG.warn("Server initialization failed", ie);
+            logger.warn("Server initialization failed", ie);
             s_initialized = false;
             s_initException = ie;
         }
@@ -89,12 +88,12 @@ public class FedoraAPIABindingSOAPHTTPImpl
             String[] sDefs = s_access.getObjectHistory(context, PID);
             if (sDefs != null && debug) {
                 for (int i = 0; i < sDefs.length; i++) {
-                    LOG.debug("sDef[" + i + "] = " + sDefs[i]);
+                    logger.debug("sDef[" + i + "] = " + sDefs[i]);
                 }
             }
             return sDefs;
         } catch (Throwable th) {
-            LOG.error("Error getting object history", th);
+            logger.error("Error getting object history", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -143,7 +142,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
                             .convertMIMETypedStreamToGenMIMETypedStream(mimeTypedStream);
             return genMIMETypedStream;
         } catch (Throwable th) {
-            LOG.error("Error getting dissemination", th);
+            logger.error("Error getting dissemination", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -168,7 +167,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
                             .convertMIMETypedStreamToGenMIMETypedStream(mimeTypedStream);
             return genMIMETypedStream;
         } catch (OutOfMemoryError oome) {
-            LOG.error("Out of memory error getting "+ dsID +
+            logger.error("Out of memory error getting "+ dsID +
                       " datastream dissemination for " + PID);
             String exceptionText = "The datastream you are attempting to retrieve is too large " +
                                    "to transfer via getDatastreamDissemination (as determined " +
@@ -178,7 +177,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
                              "/get/" + PID + "/" + dsID;
             throw AxisFault.makeFault(new Exception(exceptionText + restURL));
         } catch (Throwable th) {
-            LOG.error("Error getting datastream dissemination", th);
+            logger.error("Error getting datastream dissemination", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -200,7 +199,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
             return TypeUtility
                     .convertFieldSearchResultToGenFieldSearchResult(result);
         } catch (Throwable th) {
-            LOG.error("Error finding objects", th);
+            logger.error("Error finding objects", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -215,7 +214,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
             return TypeUtility
                     .convertFieldSearchResultToGenFieldSearchResult(result);
         } catch (Throwable th) {
-            LOG.error("Error resuming finding objects", th);
+            logger.error("Error resuming finding objects", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -234,7 +233,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
                             .convertObjectMethodsDefArrayToGenObjectMethodsDefArray(objectMethodDefs);
             return genObjectMethodDefs;
         } catch (Throwable th) {
-            LOG.error("Error listing methods", th);
+            logger.error("Error listing methods", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -253,7 +252,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
                             .convertDatastreamDefArrayToGenDatastreamDefArray(datastreamDefs);
             return genDatastreamDefs;
         } catch (Throwable th) {
-            LOG.error("Error listing datastreams", th);
+            logger.error("Error listing datastreams", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -285,7 +284,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
                             .convertObjectProfileToGenObjectProfile(objectProfile);
             return genObjectProfile;
         } catch (Throwable th) {
-            LOG.error("Error getting object profile", th);
+            logger.error("Error getting object profile", th);
             throw AxisUtility.getFault(th);
         }
     }
@@ -309,7 +308,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
                     TypeUtility.convertReposInfoToGenReposInfo(repositoryInfo);
             return genRepositoryInfo;
         } catch (Throwable th) {
-            LOG.error("Error describing repository", th);
+            logger.error("Error describing repository", th);
             throw AxisUtility.getFault(th);
         }
     }

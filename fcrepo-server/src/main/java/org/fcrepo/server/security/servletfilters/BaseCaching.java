@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security.servletfilters;
@@ -12,8 +12,8 @@ import java.util.Vector;
 
 import javax.servlet.FilterConfig;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -22,23 +22,24 @@ public abstract class BaseCaching
         extends BaseContributing
         implements CacheElementPopulator {
 
-    protected static Log log = LogFactory.getLog(BaseCaching.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(BaseCaching.class);
 
     //use additional indirection level to distinguish multiple uses of the same code for different filter instances
     private static final Map superCache = new Hashtable();
 
     protected final Cache getCache(String filterName) {
         String method = "getCache()";
-        if (log.isDebugEnabled()) {
-            log.debug(enterExit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enterExit(method));
         }
         return (Cache) superCache.get(filterName);
     }
 
     private final void putCache(String filterName, Cache cache) {
         String method = "putCache()";
-        if (log.isDebugEnabled()) {
-            log.debug(enterExit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enterExit(method));
         }
         superCache.put(filterName, cache);
     }
@@ -46,8 +47,8 @@ public abstract class BaseCaching
     @Override
     public void init(FilterConfig filterConfig) {
         String method = "init()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         super.init(filterConfig);
         inited = false;
@@ -59,34 +60,31 @@ public abstract class BaseCaching
             }
         }
         if (initErrors) {
-            if (log.isErrorEnabled()) {
-                log
-                        .error(format(method,
-                                      "cache not set up correctly; see previous error"));
-            }
+            logger.error(format(method,
+                         "cache not set up correctly; see previous error"));
         }
         inited = true;
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
     @Override
     public void destroy() {
         String method = "destroy()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         super.destroy();
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
     protected Cache getNewCache() {
         String method = "getNewCache()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         Cache cache = new Cache(FILTER_NAME, "", //CACHE_KEY_SEPARATOR
                                 LOOKUP_SUCCESS_TIMEOUT_UNIT,
@@ -96,8 +94,8 @@ public abstract class BaseCaching
                                 LOOKUP_EXCEPTION_TIMEOUT_UNIT,
                                 LOOKUP_EXCEPTION_TIMEOUT_DURATION,
                                 this);
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
         return cache;
     }
@@ -162,8 +160,8 @@ public abstract class BaseCaching
     @Override
     protected void initThisSubclass(String key, String value) {
         String method = "initThisSubclass()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         boolean setLocally = false;
         if (LOOKUP_SUCCESS_TIMEOUT_UNIT_KEY.equals(key)) {
@@ -188,8 +186,8 @@ public abstract class BaseCaching
             try {
                 AUTHENTICATE = booleanValue(value);
             } catch (Exception e) {
-                if (log.isErrorEnabled()) {
-                    log.error(format(method,
+                if (logger.isErrorEnabled()) {
+                    logger.error(format(method,
                                      "known parameter, bad value",
                                      key,
                                      value));
@@ -206,35 +204,34 @@ public abstract class BaseCaching
             }
             setLocally = true;
         } else if (SPONSORED_USER_KEY.equals(key)) {
-            log.error(format(method,
+            logger.error(format(method,
                              null,
                              "\"SPONSORED_USER_KEY\"",
                              SPONSORED_USER_KEY));
-            log
-                    .error(format(method,
+            logger.error(format(method,
                                   null,
                                   "other filters associated with this filter for surrogates",
                                   value));
             String[] temp = value.split(",");
             FILTERS_CONTRIBUTING_SPONSORED_ATTRIBUTES = new Vector(temp.length);
             for (String element : temp) {
-                log.error(format(method, null, "adding", element));
+                logger.error(format(method, null, "adding", element));
                 FILTERS_CONTRIBUTING_SPONSORED_ATTRIBUTES.add(element);
             }
             setLocally = true;
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug(format(method, "deferring to super"));
+            if (logger.isDebugEnabled()) {
+                logger.debug(format(method, "deferring to super"));
             }
             super.initThisSubclass(key, value);
         }
         if (setLocally) {
-            if (log.isInfoEnabled()) {
-                log.info(format(method, "known parameter", key, value));
+            if (logger.isInfoEnabled()) {
+                logger.info(format(method, "known parameter", key, value));
             }
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
@@ -248,23 +245,23 @@ public abstract class BaseCaching
     public void authenticate(ExtendedHttpServletRequest extendedHttpServletRequest)
             throws Exception {
         String method = "authenticate()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         try {
             String userid = extendedHttpServletRequest.getUser();
-            if (log.isDebugEnabled()) {
-                log.debug(format(method, null, "userid", userid));
+            if (logger.isDebugEnabled()) {
+                logger.debug(format(method, null, "userid", userid));
             }
             boolean authenticated = false;
             if (userid != null && !"".equals(userid)) {
                 String password = extendedHttpServletRequest.getPassword();
-                if (log.isDebugEnabled()) {
-                    log.debug(format(method, null, "password", password));
+                if (logger.isDebugEnabled()) {
+                    logger.debug(format(method, null, "password", password));
                 }
                 Cache cache = getCache(FILTER_NAME);
-                if (log.isDebugEnabled()) {
-                    log.debug(format(method, "calling cache.authenticate()"));
+                if (logger.isDebugEnabled()) {
+                    logger.debug(format(method, "calling cache.authenticate()"));
                 }
                 Boolean result = cache.authenticate(this, userid, password);
                 authenticated = result != null && result.booleanValue();
@@ -274,20 +271,20 @@ public abstract class BaseCaching
                     extendedHttpServletRequest
                             .setAuthenticated(authenticatingPrincipal,
                                               FILTER_NAME);
-                    if (log.isDebugEnabled()) {
-                        log.debug(format(method, "set authenticated"));
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(format(method, "set authenticated"));
                     }
                 }
-                if (log.isDebugEnabled()) {
-                    log.debug(format(method, "calling audit", "user", userid));
+                if (logger.isDebugEnabled()) {
+                    logger.debug(format(method, "calling audit", "user", userid));
                 }
                 cache.audit(userid);
             }
         } catch (Throwable th) {
-            showThrowable(th, log, "general " + method + " failure");
+            logger.error("Error authenticating", th);
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
@@ -295,8 +292,8 @@ public abstract class BaseCaching
                                      String userid,
                                      String password) throws Exception {
         String method = "gatherAttributes()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         if (!extendedHttpServletRequest.isAuthenticated()) {
             throw new Exception();
@@ -304,28 +301,28 @@ public abstract class BaseCaching
         try {
             Cache cache = getCache(FILTER_NAME);
             /*
-             * if (log.isDebugEnabled()) log.debug(format(method, "calling
+             * if (logger.isDebugEnabled()) logger.debug(format(method, "calling
              * cache.getPredicates()")); Set predicates =
              * cache.getPredicates(this, userid, password);
              */
-            if (log.isDebugEnabled()) {
-                log.debug(format(method, "calling cache.getNamedValues()"));
+            if (logger.isDebugEnabled()) {
+                logger.debug(format(method, "calling cache.getNamedValues()"));
             }
             Map namedValues = cache.getNamedValues(this, userid, password);
             //extendedHttpServletRequest.addRoles(FILTER_NAME, predicates);
             extendedHttpServletRequest.addAttributes(FILTER_NAME, namedValues);
-            if (log.isDebugEnabled()) {
-                log.debug(format(method, "gatherAttributes calling audit"));
+            if (logger.isDebugEnabled()) {
+                logger.debug(format(method, "gatherAttributes calling audit"));
             }
             cache.audit(userid);
-            if (log.isDebugEnabled()) {
-                log.debug(format(method, "at end of gatherAttributes"));
+            if (logger.isDebugEnabled()) {
+                logger.debug(format(method, "at end of gatherAttributes"));
             }
         } catch (Throwable th) {
-            showThrowable(th, log, "general " + method + " failure");
+            logger.error("Error conributing attributes", th);
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
@@ -333,16 +330,16 @@ public abstract class BaseCaching
     public void contributeAuthenticatedAttributes(ExtendedHttpServletRequest extendedHttpServletRequest)
             throws Exception {
         String method = "gatherAuthenticatedAttributes()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         if (extendedHttpServletRequest.getUserPrincipal() != null) {
             String userid = extendedHttpServletRequest.getUser();
             String password = extendedHttpServletRequest.getPassword();
             contributeAttributes(extendedHttpServletRequest, userid, password);
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
@@ -350,8 +347,8 @@ public abstract class BaseCaching
     public void contributeSponsoredAttributes(ExtendedHttpServletRequest extendedHttpServletRequest)
             throws Exception {
         String method = "gatherSponsoredAttributes()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         String sponsoredUser = extendedHttpServletRequest.getFromHeader();
         if (sponsoredUser != null && !"".equals(sponsoredUser)) {
@@ -360,15 +357,15 @@ public abstract class BaseCaching
                                  sponsoredUser,
                                  password);
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
     public void populateCacheElement(CacheElement cacheElement, String password) {
         String method = "populateCacheElement()";
-        if (log.isWarnEnabled()) {
-            log.warn(format(method,
+        if (logger.isWarnEnabled()) {
+            logger.warn(format(method,
                             "must implement this method in filter subclass"));
         }
     }

@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.management;
@@ -9,28 +9,25 @@ import java.io.IOException;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.common.PID;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.storage.ConnectionPoolManager;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A wrapper around the DBPIDGenerator class that casts it as a Module.
- * 
+ *
  * @author Chris Wilper
  */
 public class BasicPIDGenerator
         extends Module
         implements PIDGenerator {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(BasicPIDGenerator.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(BasicPIDGenerator.class);
 
     private DBPIDGenerator m_pidGenerator;
 
@@ -38,7 +35,7 @@ public class BasicPIDGenerator
 
     /**
      * Constructs a BasicPIDGenerator.
-     * 
+     *
      * @param moduleParameters
      *        A pre-loaded Map of name-value pairs comprising the intended
      *        configuration of this Module.
@@ -58,7 +55,7 @@ public class BasicPIDGenerator
     @Override
     public void initModule() {
         // this parameter is no longer required; but if it's specified,
-        // we can automatically upgrade from a pre-1.2 version of Fedora by 
+        // we can automatically upgrade from a pre-1.2 version of Fedora by
         // making sure the old "last pid generated" value is respected later.
         String dir = getParameter("pidgen_log_dir");
         if (dir != null && !dir.equals("")) {
@@ -88,7 +85,7 @@ public class BasicPIDGenerator
             m_pidGenerator = new DBPIDGenerator(mgr.getPool(), m_oldPidGenDir);
         } catch (Exception e) {
             String msg = "Can't get default connection pool";
-            LOG.fatal(msg, e);
+            logger.error(msg, e);
             throw new ModuleInitializationException(msg, getRole());
         }
     }

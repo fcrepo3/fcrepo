@@ -19,23 +19,12 @@
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 import java.net.URI;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-
-import org.apache.axis.MessageContext;
-import org.apache.axis.message.RPCParam;
-import org.apache.log4j.Logger;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
-import org.fcrepo.server.types.gen.FieldSearchResult;
-import org.fcrepo.server.types.gen.ObjectFields;
 
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
@@ -45,24 +34,36 @@ import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Status;
 
+import org.apache.axis.MessageContext;
+import org.apache.axis.message.RPCParam;
+
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.ObjectFields;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * This class handles the filtering of search results for both the findObjects
  * and resumeFindObjects operations and is called by each of them.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public class FieldSearchResultHandler
         extends AbstractOperationHandler {
 
-    private static Logger log =
-            Logger.getLogger(FieldSearchResultHandler.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(FieldSearchResultHandler.class);
 
     private final ContextUtil contextUtil = new ContextUtil();
 
     /**
      * Default constructor.
-     * 
+     *
      * @throws PEPException
      */
     public FieldSearchResultHandler()
@@ -72,7 +73,7 @@ public class FieldSearchResultHandler
 
     /**
      * Removes non-permissable objects from the result list.
-     * 
+     *
      * @param context
      *        the message context
      * @param result
@@ -92,8 +93,8 @@ public class FieldSearchResultHandler
         }
 
         for (ObjectFields o : objs) {
-            if (log.isDebugEnabled()) {
-                log.debug("Checking: " + o.getPid());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Checking: " + o.getPid());
             }
 
             Map<URI, AttributeValue> actions =
@@ -125,7 +126,7 @@ public class FieldSearchResultHandler
 
                     requests.add(contextUtil.makeRequestCtx(req));
                 } catch (Exception e) {
-                    log.error(e.getMessage(), e);
+                    logger.error(e.getMessage(), e);
                     throw new OperationHandlerException(e.getMessage(), e);
                 }
             }
@@ -147,10 +148,9 @@ public class FieldSearchResultHandler
         List<ObjectFields> resultObjects = new ArrayList<ObjectFields>();
         for (Result r : results) {
             if (r.getResource() == null || "".equals(r.getResource())) {
-                log
-                        .warn("This resource has no resource identifier in the xacml response results!");
-            } else if (log.isDebugEnabled()) {
-                log.debug("Checking: " + r.getResource());
+                logger.warn("This resource has no resource identifier in the xacml response results!");
+            } else {
+                logger.debug("Checking: {}", r.getResource());
             }
 
             String[] ridComponents = r.getResource().split("\\/");
@@ -161,13 +161,12 @@ public class FieldSearchResultHandler
                 ObjectFields tmp = objects.get(rid);
                 if (tmp != null) {
                     resultObjects.add(tmp);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Adding: " + r.getResource() + "[" + rid
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Adding: " + r.getResource() + "[" + rid
                                 + "]");
                     }
                 } else {
-                    log
-                            .warn("Not adding this object as no object found for this key: "
+                    logger.warn("Not adding this object as no object found for this key: "
                                     + r.getResource() + "[" + rid + "]");
                 }
             }
@@ -211,7 +210,7 @@ public class FieldSearchResultHandler
                                                      resAttr,
                                                      getEnvironment(context));
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw new OperationHandlerException(e.getMessage(), e);
         }
 
@@ -235,7 +234,7 @@ public class FieldSearchResultHandler
                                  result);
             setSOAPResponseObject(context, param);
         } catch (Exception e) {
-            log.error("Error filtering Objects", e);
+            logger.error("Error filtering Objects", e);
             throw new OperationHandlerException("Error filtering Objects", e);
         }
 

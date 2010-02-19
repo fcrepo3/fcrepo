@@ -20,10 +20,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
 import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
@@ -31,7 +31,11 @@ import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
+
 import org.xml.sax.SAXException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A utility class for XML serialization.
@@ -42,8 +46,8 @@ import org.xml.sax.SAXException;
 @SuppressWarnings("deprecation")
 public class XmlSerializer {
 
-    /** Logger for this class. */
-    private static Logger LOG = Logger.getLogger(XmlSerializer.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(XmlSerializer.class);
 
     public static void serialize(InputStream in, OutputStream out)
             throws ParserConfigurationException, SAXException, IOException {
@@ -77,7 +81,7 @@ public class XmlSerializer {
              * Boolean.TRUE)) {
              * lsSerializer.getDomConfig().setParameter("format-pretty-print",
              * Boolean.TRUE); } else {
-             * LOG.warn("DOMConfiguration 'format-pretty-print' not supported. "
+             * logger.warn("DOMConfiguration 'format-pretty-print' not supported. "
              * + "Falling back to deprecated Xerces XMLSerializer.");
              * prettyPrintWithXMLSerializer(document, out); return; }
              */
@@ -99,7 +103,7 @@ public class XmlSerializer {
                     (DOMImplementationLS) domImplementation.getFeature("LS",
                                                                        "3.0");
             } catch(NoSuchMethodError nse) {
-                LOG.warn("Caught NoSuchMethodError for " +
+                logger.warn("Caught NoSuchMethodError for " +
                          domImplementation.getClass().getName() + "#getFeature. " +
                  		 "Trying fallback for DOMImplementationLS.");
                 try {
@@ -158,7 +162,7 @@ public class XmlSerializer {
             StreamResult outputTarget = new StreamResult(out);
             serializer.transform(xmlSource, outputTarget);
         } catch (TransformerException e) {
-            LOG.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }

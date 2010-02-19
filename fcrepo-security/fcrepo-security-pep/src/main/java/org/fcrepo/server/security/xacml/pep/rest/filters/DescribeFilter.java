@@ -29,7 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 
 
 import org.apache.axis.AxisFault;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -49,8 +50,8 @@ import com.sun.xacml.ctx.RequestCtx;
 public class DescribeFilter
         extends AbstractFilter {
 
-    private static Logger log =
-            Logger.getLogger(DescribeFilter.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DescribeFilter.class);
 
     /**
      * Default constructor.
@@ -103,7 +104,7 @@ public class DescribeFilter
                             "FedoraRepository",
                             null);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
             throw AxisFault.makeFault(e);
         }
 

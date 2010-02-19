@@ -19,7 +19,9 @@
 package org.fcrepo.server.security.xacml.pep.rest.objectshandlers;
 
 import java.io.IOException;
+
 import java.net.URI;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,34 +29,34 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
-import org.apache.log4j.Logger;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
-import org.fcrepo.server.security.xacml.util.LogUtil;
-
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.IntegerAttribute;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
 
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Handles the GetNextPID operation.
- * 
+ *
  * @author nish.naidoo@gmail.com
  */
 public class GetNextPID
         extends AbstractFilter {
 
-    private static Logger log = Logger.getLogger(GetNextPID.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(GetNextPID.class);
 
     /**
      * Default constructor.
-     * 
+     *
      * @throws PEPException
      */
     public GetNextPID()
@@ -71,8 +73,8 @@ public class GetNextPID
     public RequestCtx handleRequest(HttpServletRequest request,
                                     HttpServletResponse response)
             throws IOException, ServletException {
-        if (log.isDebugEnabled()) {
-            log.debug(this.getClass().getName() + "/handleRequest!");
+        if (logger.isDebugEnabled()) {
+            logger.debug(this.getClass().getName() + "/handleRequest!");
         }
 
         int numPids = -1;
@@ -118,7 +120,7 @@ public class GetNextPID
                             "FedoraRepository",
                             null);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw new ServletException(e.getMessage(), e);
         }
 

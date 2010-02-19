@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.validation;
@@ -7,6 +7,7 @@ package org.fcrepo.server.validation;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+
 import java.util.Properties;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,7 +19,6 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -26,18 +26,19 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Schematron validation with FedoraRules schema as default.
- * 
+ *
  * @author Sandy Payette
  */
 public class DOValidatorSchematronResult {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(DOValidatorSchematronResult.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(DOValidatorSchematronResult.class);
 
     private final StringBuffer string = new StringBuffer();
 
@@ -66,7 +67,7 @@ public class DOValidatorSchematronResult {
 
     /**
      * Check if the object passes Schematron validation
-     * 
+     *
      * @return <code>true</code>, object is valid, <code>false</code>
      *         object had errors.
      */
@@ -155,7 +156,7 @@ public class DOValidatorSchematronResult {
             }
             out.flush();
         } catch (Exception e) {
-            LOG.error("Error serializing node", e);
+            logger.error("Error serializing node", e);
         }
         return string.toString();
     }

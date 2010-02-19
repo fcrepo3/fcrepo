@@ -112,7 +112,7 @@ public class MultiFileJournalReader
 
     /**
      * Create an identifier string for the Journal Entry, so we can easily
-     * connect the entries in the Recovery Log with those in the Journal. Call
+     * connect the entries in the Recovery Logger with those in the Journal. Call
      * this before calling
      * {@link JournalReader#readJournalEntry(XMLEventReader)}, because the
      * reader is positioned at the beginning of the JournalEntry, so a peek()

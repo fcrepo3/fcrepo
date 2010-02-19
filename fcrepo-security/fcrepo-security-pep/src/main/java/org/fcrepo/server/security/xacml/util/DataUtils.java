@@ -11,15 +11,18 @@ import java.io.Writer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
+import org.w3c.dom.Document;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DataUtils {
 
-    private static final Logger log = Logger.getLogger(DataUtils.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(DataUtils.class);
 
     public static void saveDocument(String filename, byte[] document)
             throws Exception {
@@ -39,7 +42,7 @@ public class DataUtils {
             writer.flush();
             writer.close();
         } catch (Exception e) {
-            log.fatal("Unable to save file: " + filename, e);
+            logger.error("Unable to save file: " + filename, e);
             throw new Exception("Unable to save file: " + filename, e);
         }
     }
@@ -53,7 +56,7 @@ public class DataUtils {
             writer.flush();
             writer.close();
         } catch (Exception e) {
-            log.fatal("Unable to save file: " + filename, e);
+            logger.error("Unable to save file: " + filename, e);
         }
     }
 

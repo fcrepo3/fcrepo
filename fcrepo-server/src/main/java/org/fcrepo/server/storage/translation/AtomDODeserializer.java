@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.storage.translation;
@@ -36,8 +36,6 @@ import javax.activation.MimeType;
 
 import org.apache.commons.io.IOUtils;
 
-import org.apache.log4j.Logger;
-
 import org.apache.abdera.Abdera;
 import org.apache.abdera.ext.thread.ThreadHelper;
 import org.apache.abdera.i18n.iri.IRI;
@@ -67,6 +65,8 @@ import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.NormalizedURI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -74,7 +74,7 @@ import org.fcrepo.utilities.NormalizedURI;
 
 /**
  * Deserializer for Fedora Objects in Atom format.
- * 
+ *
  * @author Edwin Shin
  * @since 3.0
  * @version $Id$
@@ -84,9 +84,8 @@ public class AtomDODeserializer
 
     public static final XMLFormat DEFAULT_FORMAT = ATOM1_1;
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(AtomDODeserializer.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(AtomDODeserializer.class);
 
     /** The object to deserialize to. */
     private DigitalObject m_obj;
@@ -99,14 +98,14 @@ public class AtomDODeserializer
     /** The format this deserializer reads. */
     private final XMLFormat m_format;
 
-    private Abdera abdera = Abdera.getInstance();
+    private final Abdera abdera = Abdera.getInstance();
 
     private Feed m_feed;
 
     private XPath m_xpath;
-    
+
     private ZipInputStream m_zin;
-    
+
     /**
      * Temporary directory for the unpacked contents of an Atom Zip archive.
      */
@@ -148,7 +147,7 @@ public class AtomDODeserializer
                 throw new StreamIOException(e.getMessage(), e);
             }
         }
-        
+
         Parser parser = abdera.getParser();
         Document<Feed> feedDoc = parser.parse(in);
         m_feed = feedDoc.getRoot();
@@ -175,7 +174,7 @@ public class AtomDODeserializer
 
     /**
      * Set the Fedora Object properties from the Feed metadata.
-     * 
+     *
      * @throws ObjectIntegrityException
      */
     private void addObjectProperties() throws ObjectIntegrityException {
@@ -253,10 +252,10 @@ public class AtomDODeserializer
             try {
                 if (m_format.equals(ATOM_ZIP1_1)) {
                     ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                    FileUtils.copy(new FileInputStream(getContentSrcAsFile(entry.getContentSrc())), 
+                    FileUtils.copy(new FileInputStream(getContentSrcAsFile(entry.getContentSrc())),
                             bout);
                     ds.xmlContent = bout.toByteArray();
-                    
+
                 } else {
                     ds.xmlContent = entry.getContent().getBytes(m_encoding); //IOUtils.toByteArray(entry.getContentStream());
                 }
@@ -314,20 +313,20 @@ public class AtomDODeserializer
             // For Managed Content the URL is only checked when we are parsing a
             // a NEW ingest file because the URL is replaced with an internal identifier
             // once the repository has sucked in the content for storage.
-            
+
             if (m_obj.isNew()) {
                 ValidationUtility
                         .validateURL(contentLocation.toString(),ds.DSControlGrp);
             }
-            
+
             if (m_format.equals(ATOM_ZIP1_1)) {
                 if (!contentLocation.isAbsolute() && !contentLocation.isPathAbsolute()) {
                     File f = getContentSrcAsFile(contentLocation);
-                    contentLocation = new IRI(DatastreamManagedContent.TEMP_SCHEME + 
+                    contentLocation = new IRI(DatastreamManagedContent.TEMP_SCHEME +
                                               f.getAbsolutePath());
                 }
             }
-            
+
             ds.DSLocation = contentLocation.toString();
             ds.DSLocation =
                     (DOTranslationUtility.normalizeDSLocationURLs(m_obj
@@ -385,7 +384,7 @@ public class AtomDODeserializer
 
     /**
      * Parses the id to determine a datastreamId.
-     * 
+     *
      * @param id
      * @return
      */
@@ -460,7 +459,7 @@ public class AtomDODeserializer
 
     /**
      * Note: AUDIT datastreams always return false, otherwise defaults to true.
-     * 
+     *
      * @param entry
      * @return
      */
@@ -564,14 +563,14 @@ public class AtomDODeserializer
         ds.DSChecksumType = getDSChecksumType(entry);
         String checksum = getDSChecksum(entry);
         if (m_obj.isNew()) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("New Object: checking supplied checksum");
+            if (logger.isDebugEnabled()) {
+                logger.debug("New Object: checking supplied checksum");
             }
             if (checksum != null && !checksum.equals("")
                     && !checksum.equals(Datastream.CHECKSUM_NONE)) {
                 String tmpChecksum = ds.getChecksum();
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("checksum = " + tmpChecksum);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("checksum = " + tmpChecksum);
                 }
                 if (!checksum.equals(tmpChecksum)) {
                     throw new ValidationException("Checksum Mismatch: "
@@ -594,7 +593,7 @@ public class AtomDODeserializer
 
     /**
      * Returns the an Entry's contentSrc as a File relative to {@link #m_tempDir}.
-     * 
+     *
      * @param contentSrc
      * @return the contentSrc as a File relative to m_tempDir.
      * @throws ObjectIntegrityException
@@ -604,7 +603,7 @@ public class AtomDODeserializer
             throw new ObjectIntegrityException("contentSrc must not be absolute");
         }
         try {
-            // Normalize the IRI to resolve percent-encoding and 
+            // Normalize the IRI to resolve percent-encoding and
             // backtracking (e.g. "../")
             NormalizedURI nUri = new NormalizedURI(m_tempDir.toURI().toString() + contentSrc.toString());
             nUri.normalize();
@@ -613,14 +612,14 @@ public class AtomDODeserializer
             if (f.getParentFile().equals(m_tempDir)) {
                 return f;
             } else {
-                throw new ObjectIntegrityException(contentSrc.toString() 
+                throw new ObjectIntegrityException(contentSrc.toString()
                                                    + " is not a valid path.");
             }
         } catch (URISyntaxException e) {
             throw new ObjectIntegrityException(e.getMessage(), e);
         }
     }
-    
+
     private static class UpdatedIdComparator
             implements Comparator<Entry> {
 

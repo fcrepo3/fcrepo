@@ -6,8 +6,8 @@ package org.fcrepo.server.security.servletfilters;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Branan
@@ -15,14 +15,15 @@ import org.apache.commons.logging.LogFactory;
 public class FilterRestApiAuthn
         extends FilterEnforceAuthn {
 
-    protected static Log log = LogFactory.getLog(FilterRestApiAuthn.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(FilterRestApiAuthn.class);
 
     @Override
     public boolean doThisSubclass(ExtendedHttpServletRequest request,
                                   HttpServletResponse response)
             throws Throwable {
-        if (log.isDebugEnabled()) {
-            log.debug(enter("doThisSubclass()"));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter("doThisSubclass()"));
         }
 
         boolean enforceAuthN = false;

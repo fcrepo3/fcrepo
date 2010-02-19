@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.security.servletfilters;
@@ -10,8 +10,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -19,7 +19,8 @@ import org.apache.commons.logging.LogFactory;
 public class FilterFinalize
         extends FilterSetup {
 
-    protected static Log log = LogFactory.getLog(FilterFinalize.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(FilterFinalize.class);
 
     private static final boolean AUTHENTICATION_REQUIRED_DEFAULT = true;
 
@@ -59,18 +60,18 @@ public class FilterFinalize
 
     @Override
     protected void initThisSubclass(String key, String value) {
-        log.debug("FAT.iTS");
+        logger.debug("FAT.iTS");
         String method = "initThisSubclass() ";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         boolean setLocally = false;
         if (AUTHENTICATION_REQUIRED_KEY.equals(key)) {
             try {
                 AUTHENTICATION_REQUIRED = booleanValue(value);
             } catch (Exception e) {
-                if (log.isErrorEnabled()) {
-                    log.error(format(method, "bad value", key, value));
+                if (logger.isErrorEnabled()) {
+                    logger.error(format(method, "bad value", key, value));
                 }
                 initErrors = true;
             }
@@ -86,18 +87,18 @@ public class FilterFinalize
             URLS = temp.split(",");
             setLocally = true;
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug(format(method, "deferring to super"));
+            if (logger.isDebugEnabled()) {
+                logger.debug(format(method, "deferring to super"));
             }
             super.initThisSubclass(key, value);
         }
         if (setLocally) {
-            if (log.isInfoEnabled()) {
-                log.info(format(method, "known parameter", key, value));
+            if (logger.isInfoEnabled()) {
+                logger.info(format(method, "known parameter", key, value));
             }
         }
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 
@@ -106,8 +107,8 @@ public class FilterFinalize
                                   HttpServletResponse response)
             throws Throwable {
         String method = "doThisSubclass() ";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         super.doThisSubclass(request, response);
         request.lockWrapper();
@@ -116,15 +117,13 @@ public class FilterFinalize
             Object testFedoraAuxSubjectAttributes =
                     request.getAttribute(REQUEST_ATTRIBUTE_INPUT_NAME);
             if (testFedoraAuxSubjectAttributes == null) {
-                if (log.isDebugEnabled()) {
-                    log
-                            .debug(format(method,
+                if (logger.isDebugEnabled()) {
+                    logger.debug(format(method,
                                           "no aux subject attributes found"));
                 }
             } else if (!(testFedoraAuxSubjectAttributes instanceof Map)) {
-                if (log.isErrorEnabled()) {
-                    log
-                            .error(format(method,
+                if (logger.isErrorEnabled()) {
+                    logger.error(format(method,
                                           "aux subject attributes found, but not a Map"));
                 }
             } else {
@@ -135,18 +134,14 @@ public class FilterFinalize
                 while (auxSubjectRoleKeys.hasNext()) {
                     Object name = auxSubjectRoleKeys.next();
                     if (!(name instanceof String)) {
-                        if (log.isErrorEnabled()) {
-                            log
-                                    .error(format(method, "key not a String "
-                                            + name));
-                        }
+                        logger.error(format(method, "key not a String " + name));
                         errorsInMap = true;
                         break;
                     } else {
                         Object value = auxSubjectRoles.get(name);
                         if (!(value instanceof String[])) {
-                            if (log.isErrorEnabled()) {
-                                log.error(format(method, "value not a String"
+                            if (logger.isErrorEnabled()) {
+                                logger.error(format(method, "value not a String"
                                         + value));
                             }
                             errorsInMap = true;
@@ -155,20 +150,20 @@ public class FilterFinalize
                     }
                 }
                 if (errorsInMap) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(format(method, "errors in map"));
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(format(method, "errors in map"));
                     }
                 } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug(format(method, "no errors in map"));
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(format(method, "no errors in map"));
                     }
                     request.addAttributes(REQUEST_ATTRIBUTE_INPUT_AUTHORITY,
                                           auxSubjectRoles);
                 }
             }
         }
-        if (log.isDebugEnabled()) {
-            log.debug(format(method, "before stashing"));
+        if (logger.isDebugEnabled()) {
+            logger.debug(format(method, "before stashing"));
         }
         request.audit();
 
@@ -179,10 +174,10 @@ public class FilterFinalize
                 .hasNext();) {
             String name = (String) it.next();
             Object value = subjectAttributesMap.get(name);
-            log.debug("IN FILTER MAP HAS ATTRIBUTE " + name + "==" + value
+            logger.debug("IN FILTER MAP HAS ATTRIBUTE " + name + "==" + value
                     + " " + value.getClass().getName());
         }
-        log.debug("IN FILTER ROLE eduPersonAffiliation?=="
+        logger.debug("IN FILTER ROLE eduPersonAffiliation?=="
                 + request.isUserInRole("eduPersonAffiliation"));
 
         request.setAttribute(DELIVERY_NAME, subjectAttributesMap);
@@ -192,12 +187,12 @@ public class FilterFinalize
     @Override
     public void destroy() {
         String method = "destroy()";
-        if (log.isDebugEnabled()) {
-            log.debug(enter(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(enter(method));
         }
         super.destroy();
-        if (log.isDebugEnabled()) {
-            log.debug(exit(method));
+        if (logger.isDebugEnabled()) {
+            logger.debug(exit(method));
         }
     }
 

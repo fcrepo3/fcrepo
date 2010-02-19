@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.RepositoryConfigurationException;
 import org.fcrepo.server.errors.ServerException;
@@ -33,7 +31,8 @@ import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.DCFields;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.SQLUtility;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A FieldSearch implementation that uses a relational database as a backend.
@@ -43,9 +42,8 @@ import org.fcrepo.server.utilities.SQLUtility;
 public class FieldSearchSQLImpl
         implements FieldSearch {
 
-    /** Logger for this class. */
-    private static final Logger LOG =
-            Logger.getLogger(FieldSearchSQLImpl.class.getName());
+    private static final Logger logger =
+            LoggerFactory.getLogger(FieldSearchSQLImpl.class);
 
     /** Whether DC fields are being indexed or not. */
     private boolean m_indexDCFields = true;
@@ -127,17 +125,17 @@ public class FieldSearchSQLImpl
                               int maxResults,
                               int maxSecondsPerSession,
                               boolean indexDCFields) {
-        LOG.debug("Entering constructor");
+        logger.debug("Entering constructor");
         m_cPool = cPool;
         m_repoReader = repoReader;
         m_maxResults = maxResults;
         m_maxSecondsPerSession = maxSecondsPerSession;
         m_indexDCFields = indexDCFields;
-        LOG.debug("Exiting constructor");
+        logger.debug("Exiting constructor");
     }
 
     public void update(DOReader reader) throws ServerException {
-        LOG.debug("Entering update(DOReader)");
+        logger.debug("Entering update(DOReader)");
         String pid = reader.GetObjectPID();
         Connection conn = null;
         Statement st = null;
@@ -237,7 +235,7 @@ public class FieldSearchSQLImpl
                 dbRowValues[19] = getDbValue(dc.relations());
                 dbRowValues[20] = getDbValue(dc.coverages());
                 dbRowValues[21] = getDbValue(dc.rights());
-                LOG.debug("Formulating SQL and inserting/updating WITH DC...");
+                logger.debug("Formulating SQL and inserting/updating WITH DC...");
                 SQLUtility.replaceInto(conn,
                                        "doFields",
                                        DB_COLUMN_NAMES,
@@ -245,7 +243,7 @@ public class FieldSearchSQLImpl
                                        "pid",
                                        s_dbColumnNumeric);
             } else {
-                LOG.debug("Formulating SQL and inserting/updating WITHOUT DC...");
+                logger.debug("Formulating SQL and inserting/updating WITHOUT DC...");
                 SQLUtility.replaceInto(conn,
                                        "doFields",
                                        DB_COLUMN_NAMES_NODC,
@@ -270,13 +268,13 @@ public class FieldSearchSQLImpl
                         + sqle2.getMessage());
             } finally {
                 st = null;
-                LOG.debug("Exiting update(DOReader)");
+                logger.debug("Exiting update(DOReader)");
             }
         }
     }
 
     public boolean delete(String pid) throws ServerException {
-        LOG.debug("Entering delete(String)");
+        logger.debug("Entering delete(String)");
         Connection conn = null;
         Statement st = null;
         try {
@@ -302,7 +300,7 @@ public class FieldSearchSQLImpl
                         + sqle2.getMessage());
             } finally {
                 st = null;
-                LOG.debug("Exiting delete(String)");
+                logger.debug("Exiting delete(String)");
             }
         }
     }
@@ -365,7 +363,7 @@ public class FieldSearchSQLImpl
         while (iter.hasNext()) {
             FieldSearchResultSQLImpl r = iter.next();
             if (r.isExpired()) {
-                LOG.debug("listSession " + r.getToken()
+                logger.debug("listSession " + r.getToken()
                         + " expired; will forget it.");
                 toRemove.add(r.getToken());
             }
