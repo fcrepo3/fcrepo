@@ -96,11 +96,6 @@
     <servlet-class>org.fcrepo.server.oai.FedoraOAIProviderServlet</servlet-class>
   </servlet>
   <servlet>
-    <display-name>Fedora Report Servlet</display-name>
-    <servlet-name>ReportServlet</servlet-name>
-    <servlet-class>org.fcrepo.server.access.ReportServlet</servlet-class>
-  </servlet>
-  <servlet>
     <display-name>Fedora Resource Index Search Servlet</display-name>
     <servlet-name>RISearchServlet</servlet-name>
     <servlet-class>org.fcrepo.server.access.RISearchServlet</servlet-class>
@@ -191,10 +186,6 @@
   <servlet-mapping>
     <servlet-name>OAIProviderServlet</servlet-name>
     <url-pattern>/oai</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>ReportServlet</servlet-name>
-    <url-pattern>/report</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>RestServlet</servlet-name>
