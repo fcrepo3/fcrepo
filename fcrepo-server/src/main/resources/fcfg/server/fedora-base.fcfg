@@ -509,26 +509,6 @@
 	<module role="org.fcrepo.server.storage.ExternalContentManager" class="org.fcrepo.server.storage.DefaultExternalContentManager">
 		<comment>This module facilitates obtaining external content via HTTP</comment>
 	</module>
-	<module role="org.fcrepo.server.utilities.ThreadMonitor" class="org.fcrepo.server.utilities.ThreadMonitorModule">
-		<comment>Prints basic information about the system memory and running
-             threads to the log periodically for diagnostic purposes.</comment>
-		<param name="active" value="false">
-			<comment>(optional)
-			To make unspecified, comment out or delete the
-			whole param line as opposed to using an empty string, default=no.
-			Indicates whether to activate this module. "yes" or "true" activates it.</comment>
-		</param>
-		<param name="onlyMemory" value="false">
-			<comment>(optional, default=false) 
-            Only logs free memory, not thread details.</comment>
-		</param>
-		<param name="pollInterval" value="5000">
-			<comment>(optional)
-            To make unspecified, comment out or delete the whole 
-            param line as opposed to using an empty string, default=10000.
-            indicates how many milliseconds to wait between each polling.</comment>
-		</param>
-	</module>
 	<datastore id="localMySQLPool">
 		<comment>MySQL database on localhost with db name of fedora3. Each
              connection pool instance has several configuration parameter that
