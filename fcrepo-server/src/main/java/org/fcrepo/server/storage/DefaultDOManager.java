@@ -30,8 +30,12 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.RecoveryContext;
@@ -73,8 +77,6 @@ import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.DOValidator;
 import org.fcrepo.server.validation.DOValidatorImpl;
 import org.fcrepo.server.validation.ValidationUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 
@@ -1133,13 +1135,15 @@ public class DefaultDOManager
                             obj.datastreams(dsID).iterator()
                             .next();
                     String controlGroupType = dStream.DSControlGrp;
-                    if (controlGroupType.equalsIgnoreCase("M"))
                     // if it's managed, we might need to grab content
-                    {
+                    if (controlGroupType.equalsIgnoreCase("M")) {
                         // iterate over all versions of this dsID
                         for (Datastream dmc : obj.datastreams(dsID)) {
+                            String id =
+                                obj.getPid() + "+" + dmc.DatastreamID
+                                        + "+" + dmc.DSVersionID;
+                            // if it's a url, we need to grab content for this version
                             if (URL_PROTOCOL.matcher(dmc.DSLocation).matches()) {
-                                // if it's a url, we need to grab content for this version
                                 MIMETypedStream mimeTypedStream;
                                 if (dmc.DSLocation.startsWith(DatastreamManagedContent.UPLOADED_SCHEME)) {
                                     mimeTypedStream =
@@ -1183,9 +1187,6 @@ public class DefaultDOManager
                                                     + "location: "
                                                     + dmc.DSLocation);
                                 }
-                                String id =
-                                        obj.getPid() + "+" + dmc.DatastreamID
-                                                + "+" + dmc.DSVersionID;
                                 if (obj.isNew()) {
                                     m_permanentStore
                                             .addDatastream(id, mimeTypedStream
@@ -1219,12 +1220,11 @@ public class DefaultDOManager
                                 if(mimeTypedStream != null) {
                                     mimeTypedStream.close();
                                 }
-                            }
-                            else {
-                                String id =
-                                    obj.getPid() + "+" + dmc.DatastreamID
-                                            + "+" + dmc.DSVersionID;
-                                logger.warn("Inoperable DSLocation \"" + dmc.DSLocation + "\" given for " + id);
+                            } else {
+                                if (!dmc.DSLocation.equals(id)) {
+                                    logger.warn("Inoperable DSLocation \"" +
+                                                dmc.DSLocation + "\" given for " + id);
+                                }
                             }
                         }
                     }
