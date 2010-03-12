@@ -269,8 +269,9 @@ public class AuthFilterJAAS
         // add the roles that were obtained to the Subject.
         addRolesToSubject(subject, userRoles);
 
-        // add the roles that were obtained to the Fedora attribute location.
-        populateFedoraRoles(subject, userRoles, authRequest);
+        // populate FEDORA_AUX_SUBJECT_ATTRIBUTES with fedoraRole
+        // and any additional Subject attributes
+        populateFedoraAttributes(subject, userRoles, authRequest);
 
         chain.doFilter(authRequest, response);
 
@@ -480,19 +481,20 @@ public class AuthFilterJAAS
     }
 
     /**
-     * Add roles to where Fedora expects them -
-     * FEDORA_AUX_SUBJECT_ATTRIBUTES.fedoraRole.
+     * Add roles and other subject attributes where Fedora expects them -
+     * a Map called FEDORA_AUX_SUBJECT_ATTRIBUTES.  Roles will be put in
+     * "fedoraRole" and others will be named as-is.
      *
      * @param subject
      *        the subject from authentication.
      * @param userRoles
      *        the set of user roles.
      * @param request
-     *        the request in which to place the roles for Fedora.
+     *        the request in which to place the attributes.
      */
-    private void populateFedoraRoles(Subject subject,
-                                     Set<String> userRoles,
-                                     HttpServletRequest request) {
+    private void populateFedoraAttributes(Subject subject,
+                                          Set<String> userRoles,
+                                          HttpServletRequest request) {
         Map<String, Set<String>> attributes =
                 SubjectUtils.getAttributes(subject);
         if (attributes == null) {
