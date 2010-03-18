@@ -6,7 +6,7 @@
   <groupId>org.fcrepo</groupId>
   <artifactId>fcrepo</artifactId>
   <packaging>pom</packaging>
-  <version>3.3</version>
+  <version>3.3.1-SNAPSHOT</version>
   <name>Fedora Repository Project</name>
   <url>http://fedora-commons.org/</url>
 
@@ -19,7 +19,7 @@
     <license>
       <name>Apache License, Version 2.0</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-      <comments>Copyright (c) 2009 DuraSpace</comments>
+      <comments>Copyright (c) 2009-2010 DuraSpace</comments>
     </license>
   </licenses>
 
