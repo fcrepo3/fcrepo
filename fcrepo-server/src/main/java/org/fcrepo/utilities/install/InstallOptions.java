@@ -137,6 +137,7 @@ public class InstallOptions {
         System.out.println("***********************");
         System.out.println("  Fedora Installation ");
         System.out.println("***********************");
+        checkJavaVersion();
         System.out.println();
         System.out
                 .println("To install Fedora, please answer the following questions.");
@@ -269,6 +270,15 @@ public class InstallOptions {
         }
 
         inputOption(DEPLOY_LOCAL_SERVICES);
+    }
+
+    private static void checkJavaVersion() throws InstallationCancelledException {
+        String v = System.getProperty("java.version");
+        if (v.startsWith("1.3") || v.startsWith("1.4") || v.startsWith("1.5")) {
+            System.err.println("ERROR: Java " + v + " is too old; This version"
+                    + " of Fedora requires Java 1.6 or above.");
+            throw new InstallationCancelledException();
+        }
     }
 
     private String dashes(int len) {
@@ -464,6 +474,7 @@ public class InstallOptions {
 
         try {
             // validate the user input by attempting a database connection
+            System.out.print("Validating database connection...");
             db.test();
             // check if we need to update old table
             if (db.usesDOTable()) {
@@ -471,9 +482,13 @@ public class InstallOptions {
             }
 
             db.close();
+            System.out.println("OK\n");
             return true;
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            System.out.println("FAILED\n");
+            e.printStackTrace();
+            System.out.println(e.getClass().getName() + ": " + e.getMessage() + "\n");
+            System.out.println("ERROR validating database connection; see above.\n");
             return false;
         }
     }
