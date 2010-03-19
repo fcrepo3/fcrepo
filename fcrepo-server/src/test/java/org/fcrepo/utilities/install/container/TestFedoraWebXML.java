@@ -96,6 +96,7 @@ public class TestFedoraWebXML {
                                                             false,
                                                             true,
                                                             false,
+                                                            false,
                                                             "/foo/bar"));
         assertNotNull(webXML);
         writer = new StringWriter();
@@ -116,6 +117,7 @@ public class TestFedoraWebXML {
                                                             false,
                                                             true,
                                                             false,
+                                                            false,
                                                             ""));
         assertNotNull(webXML);
         writer = new StringWriter();
@@ -133,6 +135,7 @@ public class TestFedoraWebXML {
         webXML =
             new FedoraWebXML(webXMLFilePath, getOptions(false,
                                                         false,
+                                                        true,
                                                         true,
                                                         true,
                                                         ""));
@@ -155,6 +158,7 @@ public class TestFedoraWebXML {
         												false,
         												false,
         												false,
+        												false,
         												""));
         writer = new StringWriter();
         webXML.write(writer);
@@ -167,20 +171,23 @@ public class TestFedoraWebXML {
      * @param apiaA require AuthN for APIA
      * @param apiaS require SSL for APIA
      * @param apimS require SSL for APIM
-     * @param fesl require FeSL
+     * @param feslAuthN require FeSL AuthN
+     * @param feslAuthZ require FeSL AuthZ
      * @param fedoraHome path to FEDORA_HOME
      * @return
      */
     private WebXMLOptions getOptions(boolean apiaA,
                                      boolean apiaS,
                                      boolean apimS,
-                                     boolean fesl,
+                                     boolean feslAuthN,
+                                     boolean feslAuthZ,
                                      String fedoraHome) {
         WebXMLOptions options = new WebXMLOptions();
         options.setApiaAuth(apiaA);
         options.setApiaSSL(apiaS);
         options.setApimSSL(apimS);
-        options.setFesl(fesl);
+        options.setFeslAuthN(feslAuthN);
+        options.setFeslAuthZ(feslAuthZ);
         options.setFedoraHome(new File(fedoraHome));
         return options;
     }

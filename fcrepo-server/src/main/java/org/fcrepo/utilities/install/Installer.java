@@ -148,8 +148,8 @@ public class Installer {
                 installJDBCDriver(_dist, _opts, webinfLib);
             }
 
-            // FeSL configuration
-            if (_opts.getBooleanValue(InstallOptions.FESL_ENABLED, false)) {
+            // FeSL AuthZ configuration
+            if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
             	File originalWsdd = new File(warStage, "WEB-INF/server-config.wsdd");
             	originalWsdd.renameTo(new File(warStage, "WEB-INF/server-config.wsdd.backup.original"));
 
