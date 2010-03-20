@@ -7,6 +7,7 @@ package fedora.utilities.install.container;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,6 +30,7 @@ import fedora.server.config.webxml.ServletMapping;
 import fedora.server.config.webxml.UserDataConstraint;
 import fedora.server.config.webxml.WebResourceCollection;
 import fedora.server.config.webxml.WebXML;
+
 import fedora.utilities.install.InstallOptions;
 
 /**
@@ -110,7 +112,7 @@ public class FedoraWebXML {
     public FedoraWebXML(String webXML, WebXMLOptions options) {
         this.options = options;
         fedoraWebXML = fedora.server.config.webxml.WebXML.getInstance(webXML);
-        if (options.requireFesl()) {
+        if (options.requireFeslAuthN()) {
             FILTER_AUTHN = FILTER_JAAS;
         } else {
             FILTER_AUTHN = FILTER_ENFORCE_AUTHN;
@@ -128,13 +130,13 @@ public class FedoraWebXML {
     /**
      * Add or remove servlet filters based on configuration.
      * At the moment, this only adds or removes the FILTER_PEP servlet filter
-     * depending on whether or not FeSL was enabled.
+     * depending on whether or not FeSL AuthZ was enabled.
      */
     private void setFilters() {
     	Filter f = new Filter();
 		f.setFilterName(FILTER_PEP);
 		f.setFilterClass(FILTER_PEP_CLASS);
-    	if (options.requireFesl()) {
+    	if (options.requireFeslAuthZ()) {
     		fedoraWebXML.addFilter(f);
     	} else {
     		fedoraWebXML.removeFilter(f);
@@ -153,7 +155,7 @@ public class FedoraWebXML {
      * Set the servlet-mappings.
      */
     private void setServletMappings() {
-    	if (options.requireFesl()) {
+    	if (options.requireFeslAuthN()) {
     		for (String servletName : FESL_SERVLET_MAPPINGS.keySet()) {
     			addServletMapping(servletName, FESL_SERVLET_MAPPINGS.get(servletName));
     		}
@@ -170,7 +172,7 @@ public class FedoraWebXML {
     private void setFilterMappings() {
         Set<String> filterNames = new HashSet<String>();
         filterNames.add(FILTER_AUTHN);
-        if (options.requireFesl()) {
+        if (options.requireFeslAuthZ()) {
             filterNames.add(FILTER_PEP);
         }
 
@@ -195,15 +197,17 @@ public class FedoraWebXML {
         removeFilterMappings(Arrays.asList(FILTER_RESTAPI, FILTER_ENFORCE_AUTHN, FILTER_JAAS),
                              Arrays.asList("RestServlet"), null);
         Set<String> restFilters = new HashSet<String>();
-        if (options.requireFesl()) {
+        if (options.requireFeslAuthN()) {
             restFilters.add(FILTER_AUTHN);
-            restFilters.add(FILTER_PEP);
         } else {
             if (options.requireApiaAuth()) {
                 restFilters.add(FILTER_AUTHN);
             } else {
                 restFilters.add(FILTER_RESTAPI);
             }
+        }
+        if (options.requireFeslAuthZ()) {
+            restFilters.add(FILTER_PEP);
         }
         for (String fn : restFilters) {
             FilterMapping restFM = new FilterMapping();
@@ -212,8 +216,8 @@ public class FedoraWebXML {
             fedoraWebXML.addFilterMapping(restFM);
         }
 
-        // If FeSL is enabled, remove legacy filter-mappings
-        if (options.requireFesl()) {
+        // If FeSL AuthN is enabled, remove legacy filter-mappings
+        if (options.requireFeslAuthN()) {
             Collection<String> toDelete = Arrays.asList(FILTER_SETUP,
                                                         FILTER_XMLUSERFILE,
                                                         FILTER_FINALIZE);

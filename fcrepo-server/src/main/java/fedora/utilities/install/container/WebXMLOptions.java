@@ -20,8 +20,10 @@ public class WebXMLOptions {
     private boolean apiaSSL;
 
     private boolean apimSSL;
-    
-    private boolean fesl;
+
+    private boolean feslAuthN;
+
+    private boolean feslAuthZ;
 
     private File fedoraHome;
 
@@ -41,7 +43,10 @@ public class WebXMLOptions {
                 installOptions
                         .getBooleanValue(InstallOptions.APIM_SSL_REQUIRED,
                                          false);
-        fesl = installOptions.getBooleanValue(InstallOptions.FESL_ENABLED, false);
+        feslAuthN = installOptions.getBooleanValue(
+                InstallOptions.FESL_AUTHN_ENABLED, false);
+        feslAuthZ = installOptions.getBooleanValue(
+                InstallOptions.FESL_AUTHZ_ENABLED, false);
         fedoraHome =
                 new File(installOptions.getValue(InstallOptions.FEDORA_HOME));
     }
@@ -69,13 +74,21 @@ public class WebXMLOptions {
     public void setApimSSL(boolean apimSSL) {
         this.apimSSL = apimSSL;
     }
-    
-    public boolean requireFesl() {
-    	return fesl;
+
+    public boolean requireFeslAuthN() {
+    	return feslAuthN;
     }
-    
-    public void setFesl(boolean fesl) {
-    	this.fesl = fesl;
+
+    public boolean requireFeslAuthZ() {
+    	return feslAuthZ;
+    }
+
+    public void setFeslAuthN(boolean feslAuthN) {
+    	this.feslAuthN = feslAuthN;
+    }
+
+    public void setFeslAuthZ(boolean feslAuthZ) {
+    	this.feslAuthZ = feslAuthZ;
     }
 
     public File getFedoraHome() {
