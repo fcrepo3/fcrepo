@@ -544,6 +544,14 @@ public class TestRESTAPI
         assertEquals(SC_OK, get(true).getStatusCode());
     }
 
+    public void testFindObjectsBadSyntax() throws Exception {
+        url = "/objects?pid=true&query=label%3D%3F&maxResults=20";
+        // Try > 100 times; will hang if the connection isn't properly released
+        for (int i = 0; i < 101; i++) {
+            assertEquals(SC_INTERNAL_SERVER_ERROR, get(true).getStatusCode());
+        }
+    }
+
     public void testGetObjectHistory() throws Exception {
         url = String.format("/objects/%s/versions", pid.toString());
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());

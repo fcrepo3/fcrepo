@@ -122,31 +122,32 @@ public class FieldSearchResultSQLImpl
         m_maxResults = maxResults;
         m_maxSeconds = maxSeconds;
         m_conn = m_cPool.getConnection();
+        boolean success = false;
         try {
             m_statement = m_conn.createStatement();
             m_resultSet =
                     m_statement
                             .executeQuery(logAndGetQueryText(query,
                                                              m_resultFields)); //2004.05.02 wdn5e
-        } catch (SQLException sqle) {
-            // if there's any kind of problem getting the resultSet,
-            // give the connection back to the pool
-            try {
-                if (m_resultSet != null) {
-                    m_resultSet.close();
+            success = true;
+        } finally {
+            if (!success) {
+                try {
+                    if (m_resultSet != null) {
+                        m_resultSet.close();
+                    }
+                    if (m_statement != null) {
+                        m_statement.close();
+                    }
+                    if (m_conn != null) {
+                        m_cPool.free(m_conn);
+                    }
+                } catch (SQLException e) {
+                    LOG.warn("SQL error during failed query cleanup", e);
+                } finally {
+                    m_resultSet = null;
+                    m_statement = null;
                 }
-                if (m_statement != null) {
-                    m_statement.close();
-                }
-                if (m_conn != null) {
-                    m_cPool.free(m_conn);
-                }
-                throw sqle;
-            } catch (SQLException sqle2) {
-                throw sqle2;
-            } finally {
-                m_resultSet = null;
-                m_statement = null;
             }
         }
     }
