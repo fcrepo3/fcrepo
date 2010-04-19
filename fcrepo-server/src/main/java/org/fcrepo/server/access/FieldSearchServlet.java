@@ -407,7 +407,7 @@ public class FieldSearchServlet
                         for (String l : fieldsArray) {
                             html.append("<td valign=\"top\">");
                             if (l.equalsIgnoreCase("pid")) {
-                                html.append("<a href=\"get/");
+                                html.append("<a href=\"objects/");
                                 html.append(f.getPid());
                                 html.append("\">");
                                 html.append(f.getPid());
