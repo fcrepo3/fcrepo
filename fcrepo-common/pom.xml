@@ -47,6 +47,8 @@
           <serverSide>true</serverSide>
           <skeletonDeploy>true</skeletonDeploy>
           <wrapArrays>false</wrapArrays>
+          <useEmitter>true</useEmitter>
+          <typeMappingVersion>1.2</typeMappingVersion>
         </configuration>
 
         <executions>
