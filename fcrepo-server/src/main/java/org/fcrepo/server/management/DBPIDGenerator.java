@@ -129,13 +129,15 @@ public class DBPIDGenerator
     public synchronized PID generatePID(String namespace) throws IOException {
         int i = getHighestID(namespace);
         i++;
-        setHighestID(namespace, i);
 
         try {
             m_lastPID = new PID(namespace + ":" + i);
         } catch (MalformedPIDException e) {
             throw new IOException(e.getMessage());
         }
+
+        setHighestID(namespace, i);
+
         return m_lastPID;
     }
 
