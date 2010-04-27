@@ -185,7 +185,7 @@ public class InstallOptions {
             _map.put(DATABASE_JDBCURL, includedJDBCURL);
             _map.put(DATABASE_DRIVERCLASS, EMBEDDED_DATABASE_DRIVERCLASSNAME);
             _map.put(XACML_ENABLED, Boolean.toString(false));
-            _map.put(FESL_AUTHN_ENABLED, Boolean.toString(false));
+            _map.put(FESL_AUTHN_ENABLED, Boolean.toString(true));
             _map.put(FESL_AUTHZ_ENABLED, Boolean.toString(false));
             _map.put(RI_ENABLED, null); // false
             _map.put(MESSAGING_ENABLED, null); // false
