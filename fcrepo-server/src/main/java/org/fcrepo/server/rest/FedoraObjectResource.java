@@ -307,7 +307,6 @@ public class FedoraObjectResource extends BaseRestResource {
             @QueryParam(RestParam.OWNER_ID)
             String ownerID,
             @QueryParam(RestParam.STATE)
-            @DefaultValue("A")
             String state) {
         try {
             Context context = getContext();
