@@ -5,20 +5,18 @@
 
 package org.fcrepo.server.management;
 
+import org.fcrepo.server.Context;
+import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.journal.JournalConstants;
+import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.server.storage.types.RelationshipTuple;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import org.fcrepo.server.Context;
-import org.fcrepo.server.errors.ServerException;
-import org.fcrepo.server.journal.JournalConstants;
-import org.fcrepo.server.management.ManagementDelegate;
-import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.storage.types.RelationshipTuple;
 
 
 /**
@@ -62,7 +60,7 @@ public class MockManagementDelegate
         @Override
         public String toString() {
             return "Call[" + methodName + ", "
-                    + Arrays.deepToString(methodArgs) + "]";
+                   + Arrays.deepToString(methodArgs) + "]";
         }
 
         @Override
@@ -79,7 +77,7 @@ public class MockManagementDelegate
             Call that = (Call) obj;
 
             return methodName.equals(that.methodName)
-                    && equalArgs(methodArgs, that.methodArgs);
+                   && equalArgs(methodArgs, that.methodArgs);
         }
 
         private boolean equalArgs(Object[] args1, Object[] args2) {
@@ -88,12 +86,12 @@ public class MockManagementDelegate
             }
             for (int i = 0; i < args1.length; i++) {
                 if (args1[i] instanceof InputStream
-                        && args2[i] instanceof InputStream) {
+                    && args2[i] instanceof InputStream) {
                     // Input streams are considered equal, even if different types,
                     // and without testing the contents.
                     continue;
                 } else if (args1[i] instanceof Object[]
-                        && args2[i] instanceof Object[]) {
+                           && args2[i] instanceof Object[]) {
                     // Arrays are compared for equal members, not identical members.
                     if (Arrays.deepEquals((Object[]) args1[i],
                                           (Object[]) args2[i])) {
@@ -298,8 +296,7 @@ public class MockManagementDelegate
                                             String dsLocation,
                                             String checksumType,
                                             String checksum,
-                                            String logMessage,
-                                            boolean force)
+                                            String logMessage)
             throws ServerException {
         calls
                 .add(new Call(JournalConstants.METHOD_MODIFY_DATASTREAM_BY_REFERENCE,
@@ -313,8 +310,7 @@ public class MockManagementDelegate
                               dsLocation,
                               checksumType,
                               checksum,
-                              logMessage,
-                              force));
+                              logMessage));
         return new Date(111111L);
     }
 
@@ -328,8 +324,7 @@ public class MockManagementDelegate
                                         InputStream dsContent,
                                         String checksumType,
                                         String checksum,
-                                        String logMessage,
-                                        boolean force) throws ServerException {
+                                        String logMessage) throws ServerException {
         calls.add(new Call(JournalConstants.METHOD_MODIFY_DATASTREAM_BY_VALUE,
                            context,
                            pid,
@@ -341,8 +336,7 @@ public class MockManagementDelegate
                            dsContent,
                            checksumType,
                            checksum,
-                           logMessage,
-                           force));
+                           logMessage));
         return new Date(222222L);
     }
 
@@ -367,28 +361,24 @@ public class MockManagementDelegate
                                   String datastreamID,
                                   Date startDT,
                                   Date endDT,
-                                  String logMessage,
-                                  boolean force) throws ServerException {
+                                  String logMessage) throws ServerException {
         calls.add(new Call(JournalConstants.METHOD_PURGE_DATASTREAM,
                            context,
                            pid,
                            datastreamID,
                            startDT,
                            endDT,
-                           logMessage,
-                           force));
+                           logMessage));
         return new Date[0];
     }
 
     public Date purgeObject(Context context,
                             String pid,
-                            String logMessage,
-                            boolean force) throws ServerException {
+                            String logMessage) throws ServerException {
         calls.add(new Call(JournalConstants.METHOD_PURGE_OBJECT,
                            context,
                            pid,
-                           logMessage,
-                           force));
+                           logMessage));
         return new Date(654L);
     }
 

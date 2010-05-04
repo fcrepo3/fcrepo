@@ -5,32 +5,18 @@
 
 package org.fcrepo.test.api;
 
-import java.io.UnsupportedEncodingException;
-
-import java.util.Properties;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.Topic;
-
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-
+import javax.jms.*;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
 
 
 /**
@@ -41,7 +27,7 @@ import junit.framework.TestSuite;
  */
 public class TestManagementNotifications
         extends FedoraServerTestCase
-        implements MessageListener{
+        implements MessageListener {
 
     private FedoraAPIM apim;
     private TextMessage currentMessage;
@@ -60,7 +46,8 @@ public class TestManagementNotifications
 
         // create test xml datastream
         StringBuffer sb = new StringBuffer();
-        sb.append("<oai_dc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\">");
+        sb.append(
+                "<oai_dc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\">");
         sb.append("<dc:title>Dublin Core Record</dc:title>");
         sb.append("<dc:creator>Author</dc:creator>");
         sb.append("<dc:subject>Subject</dc:subject>");
@@ -77,12 +64,16 @@ public class TestManagementNotifications
         // create test FOXML object specifying pid=demo:998
         sb = new StringBuffer();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        sb.append("<foxml:digitalObject VERSION=\"1.1\" PID=\"demo:998\" xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd\">");
+        sb.append(
+                "<foxml:digitalObject VERSION=\"1.1\" PID=\"demo:998\" xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd\">");
         sb.append("  <foxml:objectProperties>");
         sb.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>");
-        sb.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\"Image of Coliseum in Rome\"/>");
-        sb.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#createdDate\" VALUE=\"2004-12-10T00:21:57Z\"/>");
-        sb.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/view#lastModifiedDate\" VALUE=\"2004-12-10T00:21:57Z\"/>");
+        sb.append(
+                "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\"Image of Coliseum in Rome\"/>");
+        sb.append(
+                "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#createdDate\" VALUE=\"2004-12-10T00:21:57Z\"/>");
+        sb.append(
+                "    <foxml:property NAME=\"info:fedora/fedora-system:def/view#lastModifiedDate\" VALUE=\"2004-12-10T00:21:57Z\"/>");
         sb.append("  </foxml:objectProperties>");
         sb.append("</foxml:digitalObject>");
 
@@ -112,11 +103,11 @@ public class TestManagementNotifications
 
         Context jndi = new InitialContext(props);
         ConnectionFactory jmsConnectionFactory =
-            (ConnectionFactory)jndi.lookup("ConnectionFactory");
+                (ConnectionFactory) jndi.lookup("ConnectionFactory");
         jmsConnection = jmsConnectionFactory.createConnection();
         jmsSession = jmsConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-        destination = (Topic)jndi.lookup("notificationTopic");
+        destination = (Topic) jndi.lookup("notificationTopic");
 
         messageConsumer = jmsSession.createConsumer(destination);
         messageConsumer.setMessageListener(this);
@@ -222,7 +213,7 @@ public class TestManagementNotifications
         // (4b) test purgeRelationship - object uri
         System.out.println("Running TestManagementNotifications.testPurgeRelationship...");
         purgeRelResult =
-                apim.purgeRelationship(PID.toURI(pid) ,
+                apim.purgeRelationship(PID.toURI(pid),
                                        "rel:isRelatedTo",
                                        "demo:6",
                                        false,
@@ -247,7 +238,7 @@ public class TestManagementNotifications
 
         // (5) test purgeObject
         System.out.println("Running TestManagementNotifications.testPurgeObject...");
-        String purgeResult = apim.purgeObject(pid, "Purging object " + pid, false);
+        String purgeResult = apim.purgeObject(pid, "Purging object " + pid);
         assertNotNull(purgeResult);
 
         // Check on the notification produced by purgeObject
@@ -256,13 +247,13 @@ public class TestManagementNotifications
     }
 
     /**
-     *  Test notifications on
-     *  1) addDatastream
-     *  2) modifyDatastreamByReference
-     *  3) modifyDatastreamByValue
-     *  4) setDatastreamState
-     *  5) setDatastreamVersionable
-     *  6) purgeDatastream
+     * Test notifications on
+     * 1) addDatastream
+     * 2) modifyDatastreamByReference
+     * 3) modifyDatastreamByValue
+     * 4) setDatastreamState
+     * 5) setDatastreamVersionable
+     * 6) purgeDatastream
      *
      * @throws Exception
      */
@@ -277,19 +268,19 @@ public class TestManagementNotifications
         String pid = "demo:14";
 
         String datastreamId =
-                    apim.addDatastream(pid,
-                                       "NEWDS1",
-                                       altIds,
-                                       "A New M-type Datastream",
-                                       true,
-                                       "text/xml",
-                                       "info:myFormatURI/Mtype/stuff#junk",
-                                       getBaseURL() + "/get/fedora-system:ContentModel-3.0/DC",
-                                       "M",
-                                       "A",
-                                       null,
-                                       null,
-                                       "adding new datastream");
+                apim.addDatastream(pid,
+                                   "NEWDS1",
+                                   altIds,
+                                   "A New M-type Datastream",
+                                   true,
+                                   "text/xml",
+                                   "info:myFormatURI/Mtype/stuff#junk",
+                                   getBaseURL() + "/get/fedora-system:ContentModel-3.0/DC",
+                                   "M",
+                                   "A",
+                                   null,
+                                   null,
+                                   "adding new datastream");
 
         // test that datastream was added
         assertEquals(datastreamId, "NEWDS1");
@@ -298,19 +289,19 @@ public class TestManagementNotifications
         checkNotification(pid, "addDatastream");
 
         datastreamId =
-                    apim.addDatastream(pid,
-                                       "NEWDS2",
-                                       altIds,
-                                       "A New X-type Datastream",
-                                       true,
-                                       "text/xml",
-                                       "info:myFormatURI/Mtype/stuff#junk",
-                                       getBaseURL() + "/get/fedora-system:ContentModel-3.0/DC",
-                                       "X",
-                                       "A",
-                                       null,
-                                       null,
-                                       "adding new datastream");
+                apim.addDatastream(pid,
+                                   "NEWDS2",
+                                   altIds,
+                                   "A New X-type Datastream",
+                                   true,
+                                   "text/xml",
+                                   "info:myFormatURI/Mtype/stuff#junk",
+                                   getBaseURL() + "/get/fedora-system:ContentModel-3.0/DC",
+                                   "X",
+                                   "A",
+                                   null,
+                                   null,
+                                   "adding new datastream");
 
         // test that datastream was added
         assertEquals(datastreamId, "NEWDS2");
@@ -330,8 +321,7 @@ public class TestManagementNotifications
                                                  getBaseURL() + "/get/fedora-system:ContentModel-3.0/DC",
                                                  null,
                                                  null,
-                                                 "modified datastream",
-                                                 false);
+                                                 "modified datastream");
         // test that method returned properly
         assertNotNull(updateTimestamp);
 
@@ -350,8 +340,7 @@ public class TestManagementNotifications
                                              dsXML,
                                              null,
                                              null,
-                                             "modified datastream",
-                                             false);
+                                             "modified datastream");
         // test that method returned properly
         assertNotNull(updateTimestamp);
 
@@ -390,25 +379,23 @@ public class TestManagementNotifications
                                      "NEWDS1",
                                      null,
                                      null,
-                                     "purging datastream NEWDS1",
-                                     false);
+                                     "purging datastream NEWDS1");
         assertTrue(results.length > 0);
 
         // Check on the notification produced by purgeDatastream
         checkNotification(pid, "purgeDatastream");
 
         results =
-            apim.purgeDatastream(pid,
-                                 "NEWDS2",
-                                 null,
-                                 null,
-                                 "purging datastream NEWDS2",
-                                 false);
+                apim.purgeDatastream(pid,
+                                     "NEWDS2",
+                                     null,
+                                     null,
+                                     "purging datastream NEWDS2");
         assertTrue(results.length > 0);
 
         // Check on the notification produced by purgeDatastream
         checkNotification(pid, "purgeDatastream");
-     }
+    }
 
     public void testSelectors() throws Exception {
         System.out.println("Running TestManagementNotifications.testSelectors...");
@@ -427,7 +414,7 @@ public class TestManagementNotifications
         checkNotification(pid, "ingest");
 
         // Purge - message selector should prevent message from being delivered
-        String purgeResult = apim.purgeObject(pid, "Purging object " + pid, false);
+        String purgeResult = apim.purgeObject(pid, "Purging object " + pid);
         assertNotNull(purgeResult);
         checkNoNotifications();
     }
@@ -442,8 +429,8 @@ public class TestManagementNotifications
         long startTime = System.currentTimeMillis();
         messageNumber++;
 
-        while(true) { // Wait for the notification message
-            if(messageCount >= messageNumber) {
+        while (true) { // Wait for the notification message
+            if (messageCount >= messageNumber) {
                 String failureText = "Notification did not include text: " + methodName;
                 assertTrue(failureText, currentMessage.getText().contains(methodName));
 
@@ -459,7 +446,7 @@ public class TestManagementNotifications
                 break;
             } else { // Check for timeout
                 long currentTime = System.currentTimeMillis();
-                if(currentTime > (startTime + messageTimeout)) {
+                if (currentTime > (startTime + messageTimeout)) {
                     fail("Timeout reached waiting for notification " +
                          "on message regarding: " + methodName);
                     break;
@@ -483,12 +470,12 @@ public class TestManagementNotifications
         long startTime = System.currentTimeMillis();
 
         while (true) { // Wait for the notification message
-            if(messageCount > messageNumber) {
+            if (messageCount > messageNumber) {
                 fail("No messages should be received during this test.");
                 break;
             } else { // Check for timeout
                 long currentTime = System.currentTimeMillis();
-                if(currentTime > (startTime + messageTimeout)) {
+                if (currentTime > (startTime + messageTimeout)) {
                     break;
                 } else {
                     try {
@@ -505,14 +492,14 @@ public class TestManagementNotifications
 
     /**
      * Handles messages sent as notifications.
-     *
+     * <p/>
      * {@inheritDoc}
      */
     public void onMessage(Message msg) {
-       if(msg instanceof TextMessage) {
-           currentMessage = (TextMessage) msg;
-           messageCount++;
-       }
+        if (msg instanceof TextMessage) {
+            currentMessage = (TextMessage) msg;
+            messageCount++;
+        }
     }
 
     public static void main(String[] args) {

@@ -4,19 +4,7 @@
  */
 package org.fcrepo.server.management;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import java.rmi.RemoteException;
-
-import java.util.Date;
-
 import org.apache.axis.types.NonNegativeInteger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
@@ -29,6 +17,10 @@ import org.fcrepo.server.utilities.TypeUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.*;
+import java.rmi.RemoteException;
+import java.util.Date;
+
 /**
  * Implements the Fedora management SOAP service.
  *
@@ -40,7 +32,9 @@ public class FedoraAPIMBindingSOAPHTTPImpl
     private static final Logger logger =
             LoggerFactory.getLogger(FedoraAPIMBindingSOAPHTTPImpl.class);
 
-    /** The Fedora Server instance */
+    /**
+     * The Fedora Server instance
+     */
     private static Server s_server;
 
     /**
@@ -49,7 +43,9 @@ public class FedoraAPIMBindingSOAPHTTPImpl
      */
     private static boolean s_initialized;
 
-    /** The exception indicating that initialization failed. */
+    /**
+     * The exception indicating that initialization failed.
+     */
     private static InitializationException s_initException;
 
     private static Management s_management;
@@ -157,6 +153,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
     }
 
     // temporarily here
+
     private void pipeStream(InputStream in, OutputStream out)
             throws StorageDeviceException {
         try {
@@ -177,7 +174,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
         }
     }
 
-    public String purgeObject(String PID, String logMessage, boolean force)
+    public String purgeObject(String PID, String logMessage)
             throws java.rmi.RemoteException {
         logger.debug("start: purgeObject, " + PID);
         assertInitialized();
@@ -185,8 +182,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
             return DateUtility.convertDateToString(s_management
                     .purgeObject(ReadOnlyContext.getSoapContext(),
                                  PID,
-                                 logMessage,
-                                 force));
+                                 logMessage));
         } catch (Throwable th) {
             logger.error("Error purging object", th);
             throw AxisUtility.getFault(th);
@@ -242,16 +238,15 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                               String dsLocation,
                                               String checksumType,
                                               String checksum,
-                                              String logMessage,
-                                              boolean force)
+                                              String logMessage)
             throws java.rmi.RemoteException {
         logger.debug("start: modifyDatastreamByReference, " + PID + ", "
-                + datastreamID);
+                     + datastreamID);
         assertInitialized();
         try {
             return DateUtility.convertDateToString(s_management
                     .modifyDatastreamByReference(ReadOnlyContext
-                                                         .getSoapContext(),
+                    .getSoapContext(),
                                                  PID,
                                                  datastreamID,
                                                  altIDs,
@@ -261,14 +256,13 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                                  dsLocation,
                                                  checksumType,
                                                  checksum,
-                                                 logMessage,
-                                                 force));
+                                                 logMessage));
         } catch (Throwable th) {
             logger.error("Error modifying datastream by reference", th);
             throw AxisUtility.getFault(th);
         } finally {
             logger.debug("end: modifyDatastreamByReference, " + PID + ", "
-                    + datastreamID);
+                         + datastreamID);
         }
     }
 
@@ -281,11 +275,10 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                           byte[] dsContent,
                                           String checksumType,
                                           String checksum,
-                                          String logMessage,
-                                          boolean force)
+                                          String logMessage)
             throws java.rmi.RemoteException {
         logger.debug("start: modifyDatastreamByValue, " + PID + ", "
-                + datastreamID);
+                     + datastreamID);
         assertInitialized();
         try {
             ByteArrayInputStream byteStream = null;
@@ -303,14 +296,14 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                              byteStream,
                                              checksumType,
                                              checksum,
-                                             logMessage,
-                                             force));
+                                             logMessage
+            ));
         } catch (Throwable th) {
             logger.error("Error modifying datastream by value", th);
             throw AxisUtility.getFault(th);
         } finally {
             logger.debug("end: modifyDatastreamByValue, " + PID + ", "
-                    + datastreamID);
+                         + datastreamID);
         }
     }
 
@@ -371,8 +364,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                     String datastreamID,
                                     String startDT,
                                     String endDT,
-                                    String logMessage,
-                                    boolean force)
+                                    String logMessage)
             throws java.rmi.RemoteException {
         logger.debug("start: purgeDatastream, " + PID + ", " + datastreamID);
         assertInitialized();
@@ -380,7 +372,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
             return toStringArray(s_management.purgeDatastream(ReadOnlyContext
                     .getSoapContext(), PID, datastreamID, DateUtility
                     .convertStringToDate(startDT), DateUtility
-                    .convertStringToDate(endDT), logMessage, force));
+                    .convertStringToDate(endDT), logMessage));
         } catch (Throwable th) {
             logger.error("Error purging datastream", th);
             throw AxisUtility.getFault(th);
@@ -398,8 +390,8 @@ public class FedoraAPIMBindingSOAPHTTPImpl
     }
 
     public org.fcrepo.server.types.gen.Datastream getDatastream(String PID,
-                                                            String datastreamID,
-                                                            String asOfDateTime)
+                                                                String datastreamID,
+                                                                String asOfDateTime)
             throws java.rmi.RemoteException {
         assertInitialized();
         try {
@@ -418,8 +410,8 @@ public class FedoraAPIMBindingSOAPHTTPImpl
     }
 
     public org.fcrepo.server.types.gen.Datastream[] getDatastreams(String PID,
-                                                               String asOfDateTime,
-                                                               String state)
+                                                                   String asOfDateTime,
+                                                                   String state)
             throws java.rmi.RemoteException {
         assertInitialized();
         try {
@@ -434,7 +426,8 @@ public class FedoraAPIMBindingSOAPHTTPImpl
         }
     }
 
-    private org.fcrepo.server.types.gen.Datastream[] getGenDatastreams(org.fcrepo.server.storage.types.Datastream[] intDatastreams) {
+    private org.fcrepo.server.types.gen.Datastream[] getGenDatastreams(
+            org.fcrepo.server.storage.types.Datastream[] intDatastreams) {
         org.fcrepo.server.types.gen.Datastream[] genDatastreams =
                 new org.fcrepo.server.types.gen.Datastream[intDatastreams.length];
         for (int i = 0; i < intDatastreams.length; i++) {
@@ -445,7 +438,8 @@ public class FedoraAPIMBindingSOAPHTTPImpl
         return genDatastreams;
     }
 
-    private org.fcrepo.server.types.gen.RelationshipTuple[] getGenRelsTuples(org.fcrepo.server.storage.types.RelationshipTuple[] intRelsTuples) {
+    private org.fcrepo.server.types.gen.RelationshipTuple[] getGenRelsTuples(
+            org.fcrepo.server.storage.types.RelationshipTuple[] intRelsTuples) {
         org.fcrepo.server.types.gen.RelationshipTuple[] genRelsTuples =
                 new org.fcrepo.server.types.gen.RelationshipTuple[intRelsTuples.length];
         for (int i = 0; i < intRelsTuples.length; i++) {
@@ -457,7 +451,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
     }
 
     public org.fcrepo.server.types.gen.Datastream[] getDatastreamHistory(String PID,
-                                                                     String datastreamID)
+                                                                         String datastreamID)
             throws java.rmi.RemoteException {
         assertInitialized();
         try {
@@ -498,15 +492,15 @@ public class FedoraAPIMBindingSOAPHTTPImpl
     }
 
     public org.fcrepo.server.types.gen.RelationshipTuple[] getRelationships(String subject,
-                                                                        String relationship)
+                                                                            String relationship)
             throws java.rmi.RemoteException {
         logger.debug("start: getRelationships");
         assertInitialized();
         try {
             org.fcrepo.server.storage.types.RelationshipTuple[] intRelationshipTuples = null;
             intRelationshipTuples =
-                s_management.getRelationships(ReadOnlyContext
-                    .getSoapContext(), subject, relationship);
+                    s_management.getRelationships(ReadOnlyContext
+                            .getSoapContext(), subject, relationship);
             return getGenRelsTuples(intRelationshipTuples);
         } catch (Throwable th) {
             logger.error("Error getting relationships", th);
@@ -526,7 +520,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
         assertInitialized();
         try {
             return s_management.addRelationship(ReadOnlyContext
-                                                        .getSoapContext(),
+                    .getSoapContext(),
                                                 subject,
                                                 relationship,
                                                 object,
@@ -550,12 +544,12 @@ public class FedoraAPIMBindingSOAPHTTPImpl
         assertInitialized();
         try {
             return s_management.purgeRelationship(ReadOnlyContext
-                                                  .getSoapContext(),
-                                          subject,
-                                          relationship,
-                                          object,
-                                          isLiteral,
-                                          datatype);
+                    .getSoapContext(),
+                                                  subject,
+                                                  relationship,
+                                                  object,
+                                                  isLiteral,
+                                                  datatype);
         } catch (Throwable th) {
             logger.error("Error purging relationships", th);
             throw AxisUtility.getFault(th);

@@ -5,19 +5,7 @@
 
 package org.fcrepo.server.journal;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Before;
-import org.junit.Test;
-
+import junit.framework.JUnit4TestAdapter;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.rdf.RDFName;
 import org.fcrepo.server.Context;
@@ -25,17 +13,20 @@ import org.fcrepo.server.errors.InvalidStateException;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.ModuleShutdownException;
 import org.fcrepo.server.errors.ServerException;
-import org.fcrepo.server.journal.JournalConstants;
-import org.fcrepo.server.journal.JournalConsumer;
-import org.fcrepo.server.journal.JournalCreator;
 import org.fcrepo.server.journal.entry.JournalEntryContext;
 import org.fcrepo.server.management.Management;
 import org.fcrepo.server.management.MockManagementDelegate;
 import org.fcrepo.server.management.MockManagementDelegate.Call;
+import org.junit.Before;
+import org.junit.Test;
 
-import junit.framework.JUnit4TestAdapter;
-
-
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
@@ -232,7 +223,7 @@ public class TestJournalRoundTrip {
 
     @Test
     public void getNextPID() throws ServerException {
-        expectInContext(Constants.RECOVERY.PID_LIST, new String[] {
+        expectInContext(Constants.RECOVERY.PID_LIST, new String[]{
                 "sillyPID_0", "sillyPID_1", "sillyPID_2", "sillyPID_3",
                 "sillyPID_4"});
         testJournaledMethod(JournalConstants.METHOD_GET_NEXT_PID,
@@ -284,15 +275,14 @@ public class TestJournalRoundTrip {
                             leadingContext,
                             "myPid",
                             "datastreamIdentifier",
-                            new String[] {"altID"},
+                            new String[]{"altID"},
                             "datastreamLabel",
                             "mime/type",
                             "formatUri",
                             "dsLocation",
                             "checksumType",
                             "checksum",
-                            "logMessage",
-                            false);
+                            "logMessage");
     }
 
     @Test
@@ -301,15 +291,14 @@ public class TestJournalRoundTrip {
                             leadingContext,
                             "myPid",
                             "datastreamIdentifier",
-                            new String[] {"altID"},
+                            new String[]{"altID"},
                             "datastreamLabel",
                             "mime/type",
                             "formatUri",
                             new ByteArrayInputStream(new byte[0]),
                             "checksumType",
                             "checksum",
-                            "logMessage",
-                            false);
+                            "logMessage");
     }
 
     @Test
@@ -331,8 +320,7 @@ public class TestJournalRoundTrip {
                             "dsID",
                             new Date(123),
                             new Date(456),
-                            "logMessage",
-                            true);
+                            "logMessage");
     }
 
     @Test
@@ -340,8 +328,7 @@ public class TestJournalRoundTrip {
         testJournaledMethod(JournalConstants.METHOD_PURGE_OBJECT,
                             leadingContext,
                             "aPID",
-                            "PurgeLogMessage",
-                            true);
+                            "PurgeLogMessage");
     }
 
     @Test
@@ -556,7 +543,7 @@ public class TestJournalRoundTrip {
     /**
      * Figure the class of each argument to the call, assuming that we always
      * use <code>boolean</code> or <code>int</code> rather than
-     * {@link Bookean} or {@link Integer}. Also, use {@link Context} and
+     * {@link Boolean} or {@link Integer}. Also, use {@link Context} and
      * {@link InputStream} rather than one of their subclasses.
      */
     private Class<?> getArgType(Object argument) {
@@ -614,8 +601,8 @@ public class TestJournalRoundTrip {
                                     MockManagementDelegate delegate) {
         if (delegate.getCallCount() != 1) {
             fail("Wrong number of " + label + " calls: expected 1, actual "
-                    + delegate.getCallCount() + ". Calls are as follows:\n"
-                    + delegate.getCalls());
+                 + delegate.getCallCount() + ". Calls are as follows:\n"
+                 + delegate.getCalls());
         }
         assertEquals(label + " calls", expectedCall, delegate.getCalls().get(0));
     }

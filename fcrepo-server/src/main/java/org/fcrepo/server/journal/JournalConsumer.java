@@ -4,11 +4,6 @@
  */
 package org.fcrepo.server.journal;
 
-import java.io.InputStream;
-
-import java.util.Date;
-import java.util.Map;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.InvalidStateException;
 import org.fcrepo.server.errors.ModuleInitializationException;
@@ -18,6 +13,10 @@ import org.fcrepo.server.journal.recoverylog.JournalRecoveryLog;
 import org.fcrepo.server.management.ManagementDelegate;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
+
+import java.io.InputStream;
+import java.util.Date;
+import java.util.Map;
 
 
 /**
@@ -126,8 +125,7 @@ public class JournalConsumer
      */
     public Date purgeObject(Context context,
                             String pid,
-                            String logMessage,
-                            boolean force) throws ServerException {
+                            String logMessage) throws ServerException {
         throw rejectCallsFromOutsideWhileInRecoveryMode();
     }
 
@@ -164,8 +162,7 @@ public class JournalConsumer
                                             String dsLocation,
                                             String checksumType,
                                             String checksum,
-                                            String logMessage,
-                                            boolean force)
+                                            String logMessage)
             throws ServerException {
         throw rejectCallsFromOutsideWhileInRecoveryMode();
     }
@@ -183,8 +180,7 @@ public class JournalConsumer
                                         InputStream dsContent,
                                         String checksumType,
                                         String checksum,
-                                        String logMessage,
-                                        boolean force) throws ServerException {
+                                        String logMessage) throws ServerException {
         throw rejectCallsFromOutsideWhileInRecoveryMode();
     }
 
@@ -196,8 +192,7 @@ public class JournalConsumer
                                   String datastreamID,
                                   Date startDT,
                                   Date endDT,
-                                  String logMessage,
-                                  boolean force) throws ServerException {
+                                  String logMessage) throws ServerException {
         throw rejectCallsFromOutsideWhileInRecoveryMode();
     }
 

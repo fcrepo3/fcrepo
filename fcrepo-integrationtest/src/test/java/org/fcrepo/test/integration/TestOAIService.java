@@ -4,30 +4,23 @@
  */
 package org.fcrepo.test.integration;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
-
-import org.w3c.dom.Document;
-
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.w3c.dom.Document;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -82,7 +75,7 @@ public class TestOAIService
         FedoraAPIM apim = client.getAPIM();
         FileInputStream in =
                 new FileInputStream(FEDORA_HOME
-                        + "/client/demo/foxml/local-server-demos/simple-document-demo/obj_demo_31.xml");
+                                    + "/client/demo/foxml/local-server-demos/simple-document-demo/obj_demo_31.xml");
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         StreamUtility.pipeStream(in, out, 4096);
@@ -97,7 +90,7 @@ public class TestOAIService
         result = getXMLQueryResult(request);
         assertXpathExists("/oai:OAI-PMH/oai:ListRecords/oai:record", result);
 
-        apim.purgeObject("demo:31", "for testing", false);
+        apim.purgeObject("demo:31", "for testing");
     }
 
     public static void main(String[] args) {

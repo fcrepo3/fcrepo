@@ -4,9 +4,8 @@
  */
 package org.fcrepo.test.integration;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.management.FedoraAPIM;
@@ -14,12 +13,8 @@ import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.fcrepo.utilities.ExecUtility;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-
-
-
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 
 /**
@@ -49,12 +44,12 @@ public class TestCommandLineUtilities
                      + "'", 0, sbErr.size());
         System.out.println("Re-ingesting object demo:5");
         ingestFoxmlFile(new File(FEDORA_HOME
-                + "/client/demo/foxml/local-server-demos/simple-image-demo/obj_demo_5.xml"));
+                                 + "/client/demo/foxml/local-server-demos/simple-image-demo/obj_demo_5.xml"));
         String out = sbOut.toString();
         String err = sbErr.toString();
         if (out.indexOf("Ingested pid: demo:5") == -1) {
             System.err.println("Command-line ingest failed: STDOUT='" + out
-                    + "', STDERR='" + err + "'");
+                               + "', STDERR='" + err + "'");
         }
         assertEquals(true, out.indexOf("Ingested pid: demo:5") != -1);
         System.out.println("Purge and ingest test succeeded");
@@ -63,9 +58,9 @@ public class TestCommandLineUtilities
     public void testBatchBuildAndBatchIngestAndPurge() throws Exception {
         System.out.println("Building batch objects");
         batchBuild(new File(FEDORA_HOME
-                           + "/client/demo/batch-demo/foxml-template.xml"),
+                            + "/client/demo/batch-demo/foxml-template.xml"),
                    new File(FEDORA_HOME
-                           + "/client/demo/batch-demo/object-specifics"),
+                            + "/client/demo/batch-demo/object-specifics"),
                    new File(FEDORA_HOME + "/client/demo/batch-demo/objects"),
                    new File(FEDORA_HOME + "/client/logs/build.log"));
         String out = sbOut.toString();
@@ -85,12 +80,12 @@ public class TestCommandLineUtilities
             assertEquals(true, false);
         }
         assertEquals(err
-                             .indexOf("10 objects successfully ingested into Fedora") != -1,
+                .indexOf("10 objects successfully ingested into Fedora") != -1,
                      true);
         String batchObjs[] =
                 {"demo:3010", "demo:3011", "demo:3012", "demo:3013",
-                        "demo:3014", "demo:3015", "demo:3016", "demo:3017",
-                        "demo:3018", "demo:3019"};
+                 "demo:3014", "demo:3015", "demo:3016", "demo:3017",
+                 "demo:3018", "demo:3019"};
         System.out.println("Purging batch objects");
         purgeFast(batchObjs);
         System.out.println("Build and ingest test succeeded");
@@ -99,29 +94,29 @@ public class TestCommandLineUtilities
     public void testBatchBuildIngestAndPurge() throws Exception {
         System.out.println("Building and Ingesting batch objects");
         batchBuildIngest(new File(FEDORA_HOME
-                                 + "/client/demo/batch-demo/foxml-template.xml"),
+                                  + "/client/demo/batch-demo/foxml-template.xml"),
                          new File(FEDORA_HOME
-                                 + "/client/demo/batch-demo/object-specifics"),
+                                  + "/client/demo/batch-demo/object-specifics"),
                          new File(FEDORA_HOME
-                                 + "/client/demo/batch-demo/objects"),
+                                  + "/client/demo/batch-demo/objects"),
                          new File(FEDORA_HOME
-                                 + "/server/logs/junit_buildingest.log"));
+                                  + "/server/logs/junit_buildingest.log"));
         String out = sbOut.toString();
         String err = sbErr.toString();
         assertEquals("Response did not contain expected string re: FOXML XML documents: <reponse>"
-                             + err + "</response>",
+                     + err + "</response>",
                      err
                              .indexOf("10 Fedora FOXML XML documents successfully created") != -1,
                      true);
         assertEquals("Response did not contain expected string re: objects successfully ingested: <reponse>"
-                             + err + "</reponse",
+                     + err + "</reponse",
                      err
                              .indexOf("10 objects successfully ingested into Fedora") != -1,
                      true);
         String batchObjs[] =
                 {"demo:3010", "demo:3011", "demo:3012", "demo:3013",
-                        "demo:3014", "demo:3015", "demo:3016", "demo:3017",
-                        "demo:3018", "demo:3019"};
+                 "demo:3014", "demo:3015", "demo:3016", "demo:3017",
+                 "demo:3018", "demo:3019"};
         System.out.println("Purging batch objects");
         purgeFast(batchObjs);
         System.out.println("Build/ingest test succeeded");
@@ -130,7 +125,7 @@ public class TestCommandLineUtilities
     public void testBatchModify() throws Exception {
         System.out.println("Running batch modify of objects");
         batchModify(new File(FEDORA_HOME
-                            + "/client/demo/batch-demo/modify-batch-directives.xml"),
+                             + "/client/demo/batch-demo/modify-batch-directives.xml"),
                     new File(FEDORA_HOME + "/server/logs/junit_modify.log"));
         String out = sbOut.toString();
         String err = sbErr.toString();
@@ -177,11 +172,11 @@ public class TestCommandLineUtilities
     public void testValidatePolicy() {
         System.out.println("Testing Validate Policies");
         File validDir =
-            new File("src/test/resources/XACMLTestPolicies/valid-policies");
+                new File("src/test/resources/XACMLTestPolicies/valid-policies");
         traverseAndValidate(validDir, true);
 
         File invalidDir =
-            new File("src/test/resources/XACMLTestPolicies/invalid-policies");
+                new File("src/test/resources/XACMLTestPolicies/invalid-policies");
         traverseAndValidate(invalidDir, false);
 
         System.out.println("Validate Policies test succeeded");
@@ -212,7 +207,7 @@ public class TestCommandLineUtilities
             public boolean accept(File dir, String name) {
                 if ((name.toLowerCase().startsWith("permit") || name
                         .toLowerCase().startsWith("deny"))
-                        && name.endsWith(".xml")) {
+                    && name.endsWith(".xml")) {
                     return true;
                 }
                 return false;
@@ -220,8 +215,8 @@ public class TestCommandLineUtilities
         });
         for (File element : testFiles) {
             System.out.println("Checking "
-                    + (expectValid ? "valid" : "invalid") + " policy: "
-                    + element.getName());
+                               + (expectValid ? "valid" : "invalid") + " policy: "
+                               + element.getName());
             execute(FEDORA_HOME + "/server/bin/validate-policy", element
                     .getAbsolutePath());
             String out = sbOut.toString();
@@ -229,11 +224,11 @@ public class TestCommandLineUtilities
 
             if (expectValid) {
                 assertTrue("Expected \"Validation successful\", but received \""
-                                   + out + "\"",
+                           + out + "\"",
                            out.indexOf("Validation successful") != -1);
             } else {
                 assertTrue("Expected \"Validation failed\", but received \""
-                        + out + "\"", out.indexOf("Validation failed") != -1);
+                           + out + "\"", out.indexOf("Validation failed") != -1);
             }
         }
     }
@@ -279,20 +274,20 @@ public class TestCommandLineUtilities
     }
 
     private static void purgeFast(String pid) throws Exception {
-        getAPIM().purgeObject(pid, "because", false);
+        getAPIM().purgeObject(pid, "because");
     }
 
     private static void purgeFast(String[] pids) throws Exception {
         FedoraAPIM apim = getAPIM();
         for (String element : pids) {
-            apim.purgeObject(element, "because", false);
+            apim.purgeObject(element, "because");
         }
     }
 
     private static FedoraAPIM getAPIM() throws Exception {
         String baseURL =
                 getProtocol() + "://" + getHost() + ":" + getPort() + "/"
-                        + getFedoraAppServerContext();
+                + getFedoraAppServerContext();
         FedoraClient client =
                 new FedoraClient(baseURL, getUsername(), getPassword());
         return client.getAPIM();
@@ -342,8 +337,9 @@ public class TestCommandLineUtilities
 
     private void batchModify(File batchDirectives, File logFile) {
         execute(FEDORA_HOME + "/client/bin/fedora-modify", getHost() + ":"
-                + getPort(), getUsername(), getPassword(), batchDirectives
-                .getAbsolutePath(), logFile.getAbsolutePath(), getProtocol(), "validate-only-option", getFedoraAppServerContext());
+                                                           + getPort(), getUsername(), getPassword(), batchDirectives
+                .getAbsolutePath(), logFile.getAbsolutePath(), getProtocol(), "validate-only-option",
+                getFedoraAppServerContext());
     }
 
     private void exportObj(String pid, File dir) {

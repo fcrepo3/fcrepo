@@ -12,7 +12,7 @@ import org.fcrepo.server.management.ManagementDelegate;
 
 /**
  * Adapter class for Management.modifyDatastreamByValue().
- * 
+ *
  * @author Jim Blake
  */
 public class ModifyDatastreamByValueMethod
@@ -24,7 +24,7 @@ public class ModifyDatastreamByValueMethod
 
     @Override
     public Object invoke(ManagementDelegate delegate) throws ServerException,
-            JournalException {
+                                                             JournalException {
         return delegate.modifyDatastreamByValue(parent.getContext(), parent
                 .getStringArgument(ARGUMENT_NAME_PID), parent
                 .getStringArgument(ARGUMENT_NAME_DS_ID), parent
@@ -35,8 +35,7 @@ public class ModifyDatastreamByValueMethod
                 .getStreamArgument(ARGUMENT_NAME_DS_CONTENT), parent
                 .getStringArgument(ARGUMENT_NAME_CHECKSUM_TYPE), parent
                 .getStringArgument(ARGUMENT_NAME_CHECKSUM), parent
-                .getStringArgument(ARGUMENT_NAME_LOG_MESSAGE), parent
-                .getBooleanArgument(ARGUMENT_NAME_FORCE));
+                .getStringArgument(ARGUMENT_NAME_LOG_MESSAGE));
     }
 
 }

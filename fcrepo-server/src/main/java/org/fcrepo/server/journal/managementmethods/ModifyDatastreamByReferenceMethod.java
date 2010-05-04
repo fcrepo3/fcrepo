@@ -11,7 +11,7 @@ import org.fcrepo.server.management.ManagementDelegate;
 
 /**
  * Adapter class for Management.modifyDatastreamByReference()
- * 
+ *
  * @author Jim Blake
  */
 public class ModifyDatastreamByReferenceMethod
@@ -33,8 +33,7 @@ public class ModifyDatastreamByReferenceMethod
                 .getStringArgument(ARGUMENT_NAME_DS_LOCATION), parent
                 .getStringArgument(ARGUMENT_NAME_CHECKSUM_TYPE), parent
                 .getStringArgument(ARGUMENT_NAME_CHECKSUM), parent
-                .getStringArgument(ARGUMENT_NAME_LOG_MESSAGE), parent
-                .getBooleanArgument(ARGUMENT_NAME_FORCE));
+                .getStringArgument(ARGUMENT_NAME_LOG_MESSAGE));
     }
 
 }

@@ -5,37 +5,24 @@
 
 package org.fcrepo.server.messaging;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
+import junit.framework.JUnit4TestAdapter;
+import org.fcrepo.server.MockContext;
+import org.fcrepo.server.errors.MessagingException;
+import org.fcrepo.server.management.Management;
+import org.fcrepo.server.management.MockManagementDelegate;
+import org.fcrepo.server.messaging.Messaging.MessageType;
+import org.fcrepo.server.proxy.ProxyFactory;
+import org.fcrepo.test.FedoraTestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 import javax.naming.Context;
-
-import junit.framework.JUnit4TestAdapter;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import org.fcrepo.server.MockContext;
-import org.fcrepo.server.errors.MessagingException;
-import org.fcrepo.server.management.Management;
-import org.fcrepo.server.management.MockManagementDelegate;
-import org.fcrepo.server.messaging.APIMMessage;
-import org.fcrepo.server.messaging.AtomAPIMMessage;
-import org.fcrepo.server.messaging.JMSManager;
-import org.fcrepo.server.messaging.Messaging;
-import org.fcrepo.server.messaging.MessagingImpl;
-import org.fcrepo.server.messaging.NotificationInvocationHandler;
-import org.fcrepo.server.messaging.Messaging.MessageType;
-import org.fcrepo.server.proxy.ProxyFactory;
-import org.fcrepo.test.FedoraTestCase;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 
 /**
@@ -102,7 +89,7 @@ public class NotificationInvocationHandlerTest
             Management proxy =
                     (Management) ProxyFactory
                             .getProxy(mgmt, invocationHandlers);
-            proxy.purgeObject(new MockContext(), "demo:test", null, false);
+            proxy.purgeObject(new MockContext(), "demo:test", null);
         } catch (Exception e) {
             listener.interrupt();
             throw e;
@@ -147,7 +134,6 @@ public class NotificationInvocationHandlerTest
         }
 
         /**
-         *
          * {@inheritDoc}
          */
         public void onMessage(Message msg) {

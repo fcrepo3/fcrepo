@@ -4,11 +4,6 @@
  */
 package org.fcrepo.server.journal;
 
-import java.io.InputStream;
-
-import java.util.Date;
-import java.util.Map;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ModuleInitializationException;
@@ -21,10 +16,14 @@ import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
+import java.util.Date;
+import java.util.Map;
+
 
 /**
  * This is the worker class to use in Journaling mode (normal mode).
- * <p>
+ * <p/>
  * Each time a "writing" Management method is called, create a
  * CreatorJournalEntry and ask it to invoke the method on the
  * ManagementDelegate. If a "read-only" Management method is called, just pass
@@ -142,14 +141,12 @@ public class JournalCreator
      */
     public Date purgeObject(Context context,
                             String pid,
-                            String logMessage,
-                            boolean force) throws ServerException {
+                            String logMessage) throws ServerException {
         try {
             CreatorJournalEntry cje =
                     new CreatorJournalEntry(METHOD_PURGE_OBJECT, context);
             cje.addArgument(ARGUMENT_NAME_PID, pid);
             cje.addArgument(ARGUMENT_NAME_LOG_MESSAGE, logMessage);
-            cje.addArgument(ARGUMENT_NAME_FORCE, force);
             return (Date) cje.invokeAndClose(delegate, writer);
         } catch (JournalException e) {
             throw new GeneralException("Problem creating the Journal", e);
@@ -208,8 +205,7 @@ public class JournalCreator
                                         InputStream dsContent,
                                         String checksumType,
                                         String checksum,
-                                        String logMessage,
-                                        boolean force) throws ServerException {
+                                        String logMessage) throws ServerException {
         try {
             CreatorJournalEntry cje =
                     new CreatorJournalEntry(METHOD_MODIFY_DATASTREAM_BY_VALUE,
@@ -224,7 +220,6 @@ public class JournalCreator
             cje.addArgument(ARGUMENT_NAME_CHECKSUM_TYPE, checksumType);
             cje.addArgument(ARGUMENT_NAME_CHECKSUM, checksum);
             cje.addArgument(ARGUMENT_NAME_LOG_MESSAGE, logMessage);
-            cje.addArgument(ARGUMENT_NAME_FORCE, force);
             return (Date) cje.invokeAndClose(delegate, writer);
         } catch (JournalException e) {
             throw new GeneralException("Problem creating the Journal", e);
@@ -244,8 +239,7 @@ public class JournalCreator
                                             String dsLocation,
                                             String checksumType,
                                             String checksum,
-                                            String logMessage,
-                                            boolean force)
+                                            String logMessage)
             throws ServerException {
         try {
             CreatorJournalEntry cje =
@@ -261,7 +255,6 @@ public class JournalCreator
             cje.addArgument(ARGUMENT_NAME_CHECKSUM_TYPE, checksumType);
             cje.addArgument(ARGUMENT_NAME_CHECKSUM, checksum);
             cje.addArgument(ARGUMENT_NAME_LOG_MESSAGE, logMessage);
-            cje.addArgument(ARGUMENT_NAME_FORCE, force);
             return (Date) cje.invokeAndClose(delegate, writer);
         } catch (JournalException e) {
             throw new GeneralException("Problem creating the Journal", e);
@@ -321,8 +314,7 @@ public class JournalCreator
                                   String datastreamID,
                                   Date startDT,
                                   Date endDT,
-                                  String logMessage,
-                                  boolean force) throws ServerException {
+                                  String logMessage) throws ServerException {
         try {
             CreatorJournalEntry cje =
                     new CreatorJournalEntry(METHOD_PURGE_DATASTREAM, context);
@@ -331,7 +323,6 @@ public class JournalCreator
             cje.addArgument(ARGUMENT_NAME_START_DATE, startDT);
             cje.addArgument(ARGUMENT_NAME_END_DATE, endDT);
             cje.addArgument(ARGUMENT_NAME_LOG_MESSAGE, logMessage);
-            cje.addArgument(ARGUMENT_NAME_FORCE, force);
             return (Date[]) cje.invokeAndClose(delegate, writer);
         } catch (JournalException e) {
             throw new GeneralException("Problem creating the Journal", e);

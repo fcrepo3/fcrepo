@@ -5,29 +5,14 @@
 
 package org.fcrepo.test.integration;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.StringReader;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
+import junit.framework.JUnit4TestAdapter;
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.Parser;
-
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
-
-import org.junit.After;
-import org.junit.Test;
-
 import org.fcrepo.client.utility.export.Export;
 import org.fcrepo.client.utility.ingest.Ingest;
 import org.fcrepo.common.PID;
@@ -35,12 +20,14 @@ import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.test.FedoraTestCase;
 import org.fcrepo.test.api.TestAPIM;
 import org.fcrepo.utilities.FileUtils;
+import org.junit.After;
+import org.junit.Test;
 
-import junit.framework.JUnit4TestAdapter;
-
-
-
-
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 
 /**
@@ -79,9 +66,9 @@ public class TestCommandLineFormats
         fileWriter.close();
 
         String[] parameters = {"f ", foxml10.getAbsolutePath(),
-                FOXML1_0.uri, getHost() + ":" + getPort(),
-                getUsername(), getPassword(), getProtocol(),
-                "\"Ingest\"", getFedoraAppServerContext()};
+                               FOXML1_0.uri, getHost() + ":" + getPort(),
+                               getUsername(), getPassword(), getProtocol(),
+                               "\"Ingest\"", getFedoraAppServerContext()};
 
         Ingest.main(parameters);
         foxml10.delete();
@@ -91,12 +78,16 @@ public class TestCommandLineFormats
             assertTrue(objectXML.length > 0);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:997']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']", xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']",
+                    xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']",
+                    xmlIn);
             assertXpathEvaluatesTo("6", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
         } finally {
-            apim.purgeObject("demo:997", "", false);
+            apim.purgeObject("demo:997", "");
         }
     }
 
@@ -109,9 +100,9 @@ public class TestCommandLineFormats
         fileWriter.close();
 
         String[] parameters = {"f ", foxml11.getAbsolutePath(),
-                FOXML1_1.uri, getHost() + ":" + getPort(),
-                getUsername(), getPassword(), getProtocol(),
-                "\"Ingest\"", getFedoraAppServerContext()};
+                               FOXML1_1.uri, getHost() + ":" + getPort(),
+                               getUsername(), getPassword(), getProtocol(),
+                               "\"Ingest\"", getFedoraAppServerContext()};
 
         Ingest.main(parameters);
         foxml11.delete();
@@ -121,12 +112,16 @@ public class TestCommandLineFormats
             assertTrue(objectXML.length > 0);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:998']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']", xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']",
+                    xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']",
+                    xmlIn);
             assertXpathEvaluatesTo("6", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
         } finally {
-            apim.purgeObject("demo:998", "", false);
+            apim.purgeObject("demo:998", "");
         }
     }
 
@@ -139,9 +134,9 @@ public class TestCommandLineFormats
         fileWriter.close();
 
         String[] parameters = {"f ", mets.getAbsolutePath(),
-                METS_EXT1_1.uri, getHost() + ":" + getPort(),
-                getUsername(), getPassword(), getProtocol(),
-                "\"Ingest\"", getFedoraAppServerContext()};
+                               METS_EXT1_1.uri, getHost() + ":" + getPort(),
+                               getUsername(), getPassword(), getProtocol(),
+                               "\"Ingest\"", getFedoraAppServerContext()};
 
         Ingest.main(parameters);
         mets.delete();
@@ -151,12 +146,16 @@ public class TestCommandLineFormats
             assertTrue(objectXML.length > 0);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:999']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']", xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']",
+                    xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']",
+                    xmlIn);
             assertXpathEvaluatesTo("6", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
         } finally {
-            apim.purgeObject("demo:999", "", false);
+            apim.purgeObject("demo:999", "");
         }
     }
 
@@ -169,9 +168,9 @@ public class TestCommandLineFormats
         fileWriter.close();
 
         String[] parameters = {"f ", mets.getAbsolutePath(),
-                METS_EXT1_0.uri, getHost() + ":" + getPort(),
-                getUsername(), getPassword(), getProtocol(),
-                "\"Ingest\"", getFedoraAppServerContext()};
+                               METS_EXT1_0.uri, getHost() + ":" + getPort(),
+                               getUsername(), getPassword(), getProtocol(),
+                               "\"Ingest\"", getFedoraAppServerContext()};
 
         Ingest.main(parameters);
         mets.delete();
@@ -181,12 +180,16 @@ public class TestCommandLineFormats
             assertTrue(objectXML.length > 0);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:999b']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']", xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']",
+                    xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']",
+                    xmlIn);
             assertXpathEvaluatesTo("6", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
         } finally {
-            apim.purgeObject("demo:999b", "", false);
+            apim.purgeObject("demo:999b", "");
         }
     }
 
@@ -199,9 +202,9 @@ public class TestCommandLineFormats
         fileWriter.close();
 
         String[] parameters = {"f ", atom.getAbsolutePath(),
-                ATOM1_1.uri, getHost() + ":" + getPort(),
-                getUsername(), getPassword(), getProtocol(),
-                "\"Ingest\"", getFedoraAppServerContext()};
+                               ATOM1_1.uri, getHost() + ":" + getPort(),
+                               getUsername(), getPassword(), getProtocol(),
+                               "\"Ingest\"", getFedoraAppServerContext()};
 
         Ingest.main(parameters);
         atom.delete();
@@ -211,12 +214,16 @@ public class TestCommandLineFormats
             assertTrue(objectXML.length > 0);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:1000']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']", xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']",
+                    xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']",
+                    xmlIn);
             assertXpathEvaluatesTo("7", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
         } finally {
-            apim.purgeObject("demo:1000", "", false);
+            apim.purgeObject("demo:1000", "");
         }
     }
 
@@ -229,9 +236,9 @@ public class TestCommandLineFormats
         fileWriter.close();
 
         String[] parameters = {"f ", atom.getAbsolutePath(),
-                ATOM_ZIP1_1.uri, getHost() + ":" + getPort(),
-                getUsername(), getPassword(), getProtocol(),
-                "\"Ingest\"", getFedoraAppServerContext()};
+                               ATOM_ZIP1_1.uri, getHost() + ":" + getPort(),
+                               getUsername(), getPassword(), getProtocol(),
+                               "\"Ingest\"", getFedoraAppServerContext()};
 
         Ingest.main(parameters);
         atom.delete();
@@ -241,12 +248,16 @@ public class TestCommandLineFormats
             assertTrue(objectXML.length > 0);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:1001']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']", xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']",
+                    xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']",
+                    xmlIn);
             assertXpathEvaluatesTo("4", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
         } finally {
-            apim.purgeObject("demo:1001", "", false);
+            apim.purgeObject("demo:1001", "");
         }
     }
 
@@ -258,18 +269,22 @@ public class TestCommandLineFormats
         try {
             File temp = File.createTempFile("temp", "");
             String[] parameters = {getHost() + ":" + getPort(),
-                    getUsername(), getPassword(), "demo:998", FOXML1_0.uri,
-                    "public", temp.getParent(), "http", getFedoraAppServerContext()};
+                                   getUsername(), getPassword(), "demo:998", FOXML1_0.uri,
+                                   "public", temp.getParent(), "http", getFedoraAppServerContext()};
 
             Export.main(parameters);
             File foxml10 = new File(temp.getParent() + "/demo_998.xml");
             FileInputStream fileReader = new FileInputStream(foxml10);
-                byte[] objectXML = new byte[fileReader.available()];
+            byte[] objectXML = new byte[fileReader.available()];
             fileReader.read(objectXML);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:998']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']", xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']",
+                    xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']",
+                    xmlIn);
             assertXpathEvaluatesTo("6", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
             assertXpathNotExists("foxml:digitalObject[@VERSION='1.1']", xmlIn);
@@ -277,7 +292,7 @@ public class TestCommandLineFormats
             temp.delete();
             foxml10.delete();
         } finally {
-            apim.purgeObject("demo:998", "Purge test object", false);
+            apim.purgeObject("demo:998", "Purge test object");
         }
     }
 
@@ -289,8 +304,8 @@ public class TestCommandLineFormats
         try {
             File temp = File.createTempFile("temp", "");
             String[] parameters = {getHost() + ":" + getPort(),
-                    getUsername(), getPassword(), "demo:998", FOXML1_1.uri,
-                    "public", temp.getParent(), "http", getFedoraAppServerContext()};
+                                   getUsername(), getPassword(), "demo:998", FOXML1_1.uri,
+                                   "public", temp.getParent(), "http", getFedoraAppServerContext()};
 
             Export.main(parameters);
             File foxml11 = new File(temp.getParent() + "/demo_998.xml");
@@ -299,8 +314,12 @@ public class TestCommandLineFormats
             fileReader.read(objectXML);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:998']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']", xmlIn);
-            assertXpathExists("//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']", xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']",
+                    xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']",
+                    xmlIn);
             assertXpathEvaluatesTo("6", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
             assertXpathExists("foxml:digitalObject[@VERSION='1.1']", xmlIn);
@@ -308,7 +327,7 @@ public class TestCommandLineFormats
             temp.delete();
             foxml11.delete();
         } finally {
-            apim.purgeObject("demo:998", "Purge test object", false);
+            apim.purgeObject("demo:998", "Purge test object");
         }
     }
 
@@ -320,8 +339,8 @@ public class TestCommandLineFormats
         try {
             File temp = File.createTempFile("temp", "");
             String[] parameters = {getHost() + ":" + getPort(),
-                    getUsername(), getPassword(), "demo:998", METS_EXT1_1.uri,
-                    "public", temp.getParent(), "http", getFedoraAppServerContext()};
+                                   getUsername(), getPassword(), "demo:998", METS_EXT1_1.uri,
+                                   "public", temp.getParent(), "http", getFedoraAppServerContext()};
 
             Export.main(parameters);
             File mets = new File(temp.getParent() + "/demo_998.xml");
@@ -337,7 +356,7 @@ public class TestCommandLineFormats
             temp.delete();
             mets.delete();
         } finally {
-            apim.purgeObject("demo:998", "Purge test object", false);
+            apim.purgeObject("demo:998", "Purge test object");
         }
     }
 
@@ -349,8 +368,8 @@ public class TestCommandLineFormats
         try {
             File temp = File.createTempFile("temp", "");
             String[] parameters = {getHost() + ":" + getPort(),
-                    getUsername(), getPassword(), "demo:998", METS_EXT1_0.uri,
-                    "public", temp.getParent(), "http", getFedoraAppServerContext()};
+                                   getUsername(), getPassword(), "demo:998", METS_EXT1_0.uri,
+                                   "public", temp.getParent(), "http", getFedoraAppServerContext()};
 
             Export.main(parameters);
             File mets = new File(temp.getParent() + "/demo_998.xml");
@@ -366,7 +385,7 @@ public class TestCommandLineFormats
             temp.delete();
             mets.delete();
         } finally {
-            apim.purgeObject("demo:998", "Purge test object", false);
+            apim.purgeObject("demo:998", "Purge test object");
         }
     }
 
@@ -378,8 +397,8 @@ public class TestCommandLineFormats
         try {
             File temp = File.createTempFile("temp", "");
             String[] parameters = {getHost() + ":" + getPort(),
-                    getUsername(), getPassword(), "demo:998", ATOM1_1.uri,
-                    "public", temp.getParent(), "http", getFedoraAppServerContext()};
+                                   getUsername(), getPassword(), "demo:998", ATOM1_1.uri,
+                                   "public", temp.getParent(), "http", getFedoraAppServerContext()};
 
             Export.main(parameters);
             File atom = new File(temp.getParent() + "/demo_998.xml");
@@ -389,7 +408,9 @@ public class TestCommandLineFormats
             String xmlIn = new String(objectXML, "UTF-8");
             // FIXME: Determine how to perform xpath tests with default namespace
             assertTrue(xmlIn.indexOf("<id>info:fedora/demo:998</id>") > -1);
-            assertTrue(xmlIn.indexOf("<title type=\"text\">Data Object (Coliseum) for Local Simple Image Demo</title>") > -1);
+            assertTrue(
+                    xmlIn.indexOf("<title type=\"text\">Data Object (Coliseum) for Local Simple Image Demo</title>") >
+                    -1);
             // assertXpathEvaluatesTo("info:fedora/demo:998", "feed/id", xmlIn);
             // assertXpathEvaluatesTo("Data Object (Coliseum) for Local Simple Image Demo", "feed/title[@type='text']", xmlIn);
             // assertXpathEvaluatesTo("6", "count(feed/entry)", xmlIn);
@@ -397,7 +418,7 @@ public class TestCommandLineFormats
             temp.delete();
             atom.delete();
         } finally {
-            apim.purgeObject("demo:998", "Purge test object", false);
+            apim.purgeObject("demo:998", "Purge test object");
         }
     }
 
@@ -408,8 +429,8 @@ public class TestCommandLineFormats
         try {
             File temp = File.createTempFile("temp", "");
             String[] parameters = {getHost() + ":" + getPort(),
-                    getUsername(), getPassword(), "demo:998", ATOM_ZIP1_1.uri,
-                    "archive", temp.getParent(), "http", getFedoraAppServerContext()};
+                                   getUsername(), getPassword(), "demo:998", ATOM_ZIP1_1.uri,
+                                   "archive", temp.getParent(), "http", getFedoraAppServerContext()};
 
             Export.main(parameters);
             File atom = new File(temp.getParent() + "/demo_998.zip");
@@ -437,7 +458,7 @@ public class TestCommandLineFormats
             temp.delete();
             atom.delete();
         } finally {
-            apim.purgeObject("demo:998", "Purge test object", false);
+            apim.purgeObject("demo:998", "Purge test object");
         }
     }
 

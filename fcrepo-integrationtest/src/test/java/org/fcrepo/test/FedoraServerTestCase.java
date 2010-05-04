@@ -4,18 +4,7 @@
  */
 package org.fcrepo.test;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.PrintStream;
-
-import java.util.Set;
-
 import org.custommonkey.xmlunit.XMLUnit;
-
-import org.w3c.dom.Document;
-
-import org.xml.sax.InputSource;
-
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.search.SearchResultParser;
 import org.fcrepo.client.utility.AutoPurger;
@@ -23,8 +12,13 @@ import org.fcrepo.client.utility.ingest.Ingest;
 import org.fcrepo.client.utility.ingest.IngestCounter;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.management.FedoraAPIM;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
-
+import java.io.File;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.util.Set;
 
 
 /**
@@ -47,8 +41,7 @@ public abstract class FedoraServerTestCase
     /**
      * Returns the requested HTTP resource as an XML Document
      *
-     * @param location
-     *        a URL relative to the Fedora base URL
+     * @param location a URL relative to the Fedora base URL
      * @return Document
      * @throws Exception
      */
@@ -96,9 +89,8 @@ public abstract class FedoraServerTestCase
      * hierarchy
      * </p>
      *
-     * @param path
-     *        format-independent path to a directory within the demo object
-     *        hierarchy.
+     * @param path format-independent path to a directory within the demo object
+     *             hierarchy.
      * @throws Exception
      */
     public static void ingestDemoObjects(String path) throws Exception {
@@ -150,7 +142,7 @@ public abstract class FedoraServerTestCase
         InputStream queryResult;
         queryResult =
                 client.get(getBaseURL() + "/search?query=pid~demo:*"
-                        + "&maxResults=1000&pid=true&xml=true", true, true);
+                           + "&maxResults=1000&pid=true&xml=true", true, true);
         SearchResultParser parser = new SearchResultParser(queryResult);
 
         return parser.getPIDs();
@@ -161,7 +153,7 @@ public abstract class FedoraServerTestCase
         FedoraAPIM apim = client.getAPIM();
 
         for (String pid : getDemoObjects()) {
-            AutoPurger.purge(apim, pid, null, false);
+            AutoPurger.purge(apim, pid, null);
         }
     }
 

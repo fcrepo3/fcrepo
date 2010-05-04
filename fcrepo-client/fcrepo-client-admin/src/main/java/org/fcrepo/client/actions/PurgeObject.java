@@ -4,20 +4,16 @@
  */
 package org.fcrepo.client.actions;
 
-import java.awt.event.ActionEvent;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.swing.AbstractAction;
-import javax.swing.JOptionPane;
-
 import org.fcrepo.client.Administrator;
 import org.fcrepo.client.objecteditor.ObjectEditorFrame;
 import org.fcrepo.client.utility.AutoPurger;
 import org.fcrepo.server.utilities.StringUtility;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 
 /**
@@ -76,7 +72,7 @@ public class PurgeObject
                                      "Purge Failure",
                                      StringUtility.prettyPrint(e.getClass()
                                              .getName()
-                                             + ": " + e.getMessage(), 70, null),
+                                                               + ": " + e.getMessage(), 70, null),
                                      e);
         }
         if (purger != null) {
@@ -87,15 +83,15 @@ public class PurgeObject
                 String reason =
                         JOptionPane
                                 .showInputDialog("Why are you permanently removing "
-                                        + pid + "?");
+                                                 + pid + "?");
                 if (reason != null) {
                     try {
-                        purger.purge(pid, reason, false); // DEFAULT_FORCE_PURGE
+                        purger.purge(pid, reason);
                     } catch (Exception e) {
                         Administrator.showErrorDialog(Administrator
                                 .getDesktop(), "Purge Failure", StringUtility
                                 .prettyPrint(e.getClass().getName() + ": "
-                                        + e.getMessage(), 70, null), e);
+                                             + e.getMessage(), 70, null), e);
                         failed = true;
                     }
                     if (!failed) {
@@ -115,18 +111,18 @@ public class PurgeObject
                     while (pidIter.hasNext()) {
                         try {
                             String pid = (String) pidIter.next();
-                            purger.purge(pid, reason, false); // DEFAULT_FORCE_PURGE
+                            purger.purge(pid, reason);
                         } catch (Exception e) {
                             Administrator
                                     .showErrorDialog(Administrator.getDesktop(),
                                                      "Purge Failure",
                                                      StringUtility
                                                              .prettyPrint(e
-                                                                                  .getClass()
-                                                                                  .getName()
-                                                                                  + ": "
-                                                                                  + e
-                                                                                          .getMessage(),
+                                                             .getClass()
+                                                             .getName()
+                                                                          + ": "
+                                                                          + e
+                                                             .getMessage(),
                                                                           70,
                                                                           null),
                                                      e);
@@ -136,7 +132,7 @@ public class PurgeObject
                     if (!failed) {
                         JOptionPane.showMessageDialog(Administrator
                                 .getDesktop(), "Purge of " + m_pids.size()
-                                + " objects succeeded.");
+                                               + " objects succeeded.");
                     }
                 }
             }

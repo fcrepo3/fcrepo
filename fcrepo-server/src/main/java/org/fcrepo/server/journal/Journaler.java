@@ -4,12 +4,6 @@
  */
 package org.fcrepo.server.journal;
 
-import java.io.InputStream;
-
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -22,6 +16,11 @@ import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.util.Date;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * A Management module that decorates a ManagementDelegate module with code that
@@ -127,9 +126,9 @@ public class Journaler
             inRecoveryMode = true;
         } else {
             throw new ModuleInitializationException("'"
-                    + PARAMETER_JOURNAL_MODE + "' parameter must be '"
-                    + VALUE_JOURNAL_MODE_NORMAL + "'(default) or '"
-                    + VALUE_JOURNAL_MODE_RECOVER + "'", getRole());
+                                                    + PARAMETER_JOURNAL_MODE + "' parameter must be '"
+                                                    + VALUE_JOURNAL_MODE_NORMAL + "'(default) or '"
+                                                    + VALUE_JOURNAL_MODE_RECOVER + "'", getRole());
         }
     }
 
@@ -199,9 +198,8 @@ public class Journaler
      */
     public Date purgeObject(Context context,
                             String pid,
-                            String logMessage,
-                            boolean force) throws ServerException {
-        return worker.purgeObject(context, pid, logMessage, force);
+                            String logMessage) throws ServerException {
+        return worker.purgeObject(context, pid, logMessage);
     }
 
     /**
@@ -250,8 +248,7 @@ public class Journaler
                                             String dsLocation,
                                             String checksumType,
                                             String checksum,
-                                            String logMessage,
-                                            boolean force)
+                                            String logMessage)
             throws ServerException {
         return worker.modifyDatastreamByReference(context,
                                                   pid,
@@ -263,8 +260,7 @@ public class Journaler
                                                   dsLocation,
                                                   checksumType,
                                                   checksum,
-                                                  logMessage,
-                                                  force);
+                                                  logMessage);
     }
 
     /**
@@ -280,8 +276,8 @@ public class Journaler
                                         InputStream dsContent,
                                         String checksumType,
                                         String checksum,
-                                        String logMessage,
-                                        boolean force) throws ServerException {
+                                        String logMessage
+    ) throws ServerException {
         return worker.modifyDatastreamByValue(context,
                                               pid,
                                               datastreamID,
@@ -292,8 +288,8 @@ public class Journaler
                                               dsContent,
                                               checksumType,
                                               checksum,
-                                              logMessage,
-                                              force);
+                                              logMessage
+        );
     }
 
     /**
@@ -304,15 +300,13 @@ public class Journaler
                                   String datastreamID,
                                   Date startDT,
                                   Date endDT,
-                                  String logMessage,
-                                  boolean force) throws ServerException {
+                                  String logMessage) throws ServerException {
         return worker.purgeDatastream(context,
                                       pid,
                                       datastreamID,
                                       startDT,
                                       endDT,
-                                      logMessage,
-                                      force);
+                                      logMessage);
     }
 
     /**

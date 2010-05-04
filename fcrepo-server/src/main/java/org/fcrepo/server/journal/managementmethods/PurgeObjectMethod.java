@@ -11,7 +11,7 @@ import org.fcrepo.server.management.ManagementDelegate;
 
 /**
  * Adapter class for Management.purgeObject().
- * 
+ *
  * @author Jim Blake
  */
 public class PurgeObjectMethod
@@ -25,8 +25,7 @@ public class PurgeObjectMethod
     public Object invoke(ManagementDelegate delegate) throws ServerException {
         return delegate.purgeObject(parent.getContext(), parent
                 .getStringArgument(ARGUMENT_NAME_PID), parent
-                .getStringArgument(ARGUMENT_NAME_LOG_MESSAGE), parent
-                .getBooleanArgument(ARGUMENT_NAME_FORCE));
+                .getStringArgument(ARGUMENT_NAME_LOG_MESSAGE));
     }
 
 }

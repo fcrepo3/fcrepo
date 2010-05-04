@@ -4,29 +4,6 @@
  */
 package org.fcrepo.server.rest;
 
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayWriter;
-import java.io.InputStream;
-
-import java.net.URI;
-import java.net.URLEncoder;
-
-import java.util.Date;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.access.ObjectProfile;
@@ -35,6 +12,16 @@ import org.fcrepo.server.utilities.StreamUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.ByteArrayInputStream;
+import java.io.CharArrayWriter;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.util.Date;
 
 
 /**
@@ -55,7 +42,7 @@ public class FedoraObjectResource extends BaseRestResource {
      * ("info:fedora/fedora-system:FOXML-1.1" or
      * "info:fedora/fedora-system:METSFedoraExt-1.1"), and encoded appropriately
      * for the specified export context ("public", "migrate", or "archive").
-     *
+     * <p/>
      * GET /objects/{pid}/export ? format context encoding
      */
     @Path("/export")
@@ -88,7 +75,7 @@ public class FedoraObjectResource extends BaseRestResource {
      * disseminator was created or modified in the object. These timestamps can
      * be used to request a timestamped dissemination request to view the object
      * as it appeared at a specific point in time.
-     *
+     * <p/>
      * GET /objects/{pid}/versions ? format
      */
     @Path("/versions")
@@ -122,7 +109,7 @@ public class FedoraObjectResource extends BaseRestResource {
      * Gets a profile of the object which includes key metadata fields and URLs
      * for the object Dissemination Index and the object Item Index. Can be
      * thought of as a default view of the object.
-     *
+     * <p/>
      * GET /objects/{pid}/objectXML
      */
     @Path("/objectXML")
@@ -146,11 +133,11 @@ public class FedoraObjectResource extends BaseRestResource {
      * Gets a profile of the object which includes key metadata fields and URLs
      * for the object Dissemination Index and the object Item Index. Can be
      * thought of as a default view of the object.
-     *
+     * <p/>
      * GET /objects/{pid} ? format asOfDateTime
      */
     @GET
-    @Produces( { HTML, XML })
+    @Produces({HTML, XML})
     public Response getObjectProfile(
             @PathParam(RestParam.PID)
             String pid,
@@ -182,21 +169,18 @@ public class FedoraObjectResource extends BaseRestResource {
 
     /**
      * Permanently removes an object from the repository.
-     *
-     * DELETE /objects/{pid} ? logMessage force
+     * <p/>
+     * DELETE /objects/{pid} ? logMessage
      */
     @DELETE
     public Response deleteObject(
             @PathParam(RestParam.PID)
             String pid,
             @QueryParam("logMessage")
-            String logMessage,
-            @QueryParam("force")
-            @DefaultValue("false")
-            boolean force) {
+            String logMessage) {
         try {
             Context context = getContext();
-            apiMService.purgeObject(context, pid, logMessage, force);
+            apiMService.purgeObject(context, pid, logMessage);
             return Response.noContent().build();
         } catch (Exception ex) {
             return handleException(ex);
@@ -206,11 +190,11 @@ public class FedoraObjectResource extends BaseRestResource {
     /**
      * Create/Update a new digital object. If no xml given in the body, will
      * create an empty object.
-     *
+     * <p/>
      * POST /objects/{pid} ? label logMessage format encoding namespace ownerId state
      */
     @POST
-    @Consumes({ XML, FORM })
+    @Consumes({XML, FORM})
     public Response createObject(
             @javax.ws.rs.core.Context
             HttpHeaders headers,
@@ -245,15 +229,15 @@ public class FedoraObjectResource extends BaseRestResource {
             // Determine if content is provided
             RestUtil restUtil = new RestUtil();
             RequestContent content =
-                restUtil.getRequestContent(servletRequest, headers);
-            if(content != null && content.getContentStream() != null) {
-                if(ignoreMime) {
+                    restUtil.getRequestContent(servletRequest, headers);
+            if (content != null && content.getContentStream() != null) {
+                if (ignoreMime) {
                     is = content.getContentStream();
                 } else {
                     // Make sure content is XML
                     String contentMime = content.getMimeType();
-                    if(contentMime != null &&
-                       TEXT_XML.isCompatible(MediaType.valueOf(contentMime))) {
+                    if (contentMime != null &&
+                        TEXT_XML.isCompatible(MediaType.valueOf(contentMime))) {
                         is = content.getContentStream();
                     }
                 }
@@ -273,10 +257,10 @@ public class FedoraObjectResource extends BaseRestResource {
                     newPID = true;
                 }
 
-                if(namespace != null && !namespace.equals("")) {
+                if (namespace != null && !namespace.equals("")) {
                     logger.warn("The namespace parameter is only applicable when object " +
-                             "content is not provided, thus the namespace provided '" +
-                             namespace + "' has been ignored.");
+                                "content is not provided, thus the namespace provided '" +
+                                namespace + "' has been ignored.");
                 }
             }
 
@@ -291,10 +275,10 @@ public class FedoraObjectResource extends BaseRestResource {
 
     /**
      * Update digital object
-     *
+     * <p/>
      * PUT /objects/{pid} ? label logMessage ownerId state
      *
-     * @see API-M.modifyObject
+     * @see org.fcrepo.server.management.Management#modifyObject(org.fcrepo.server.Context, String, String, String, String, String)
      */
     @PUT
     public Response updateObject(
@@ -326,7 +310,8 @@ public class FedoraObjectResource extends BaseRestResource {
         xml.append("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>\n");
         xml.append("<foxml:digitalObject VERSION=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
         xml.append("    xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\"\n");
-        xml.append("           xsi:schemaLocation=\"" + Constants.FOXML.uri + " " + Constants.FOXML1_1.xsdLocation + "\"");
+        xml.append(
+                "           xsi:schemaLocation=\"" + Constants.FOXML.uri + " " + Constants.FOXML1_1.xsdLocation + "\"");
         if (pid != null && pid.length() > 0) {
             xml.append("\n           PID=\"" + StreamUtility.enc(pid) + "\">\n");
         } else {
@@ -335,9 +320,9 @@ public class FedoraObjectResource extends BaseRestResource {
         xml.append("  <foxml:objectProperties>\n");
         xml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>\n");
         xml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\""
-                + StreamUtility.enc(label) + "\"/>\n");
+                   + StreamUtility.enc(label) + "\"/>\n");
         xml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#ownerId\" VALUE=\""
-                + ownerId + "\"/>\n");
+                   + ownerId + "\"/>\n");
         xml.append("  </foxml:objectProperties>\n");
         xml.append("</foxml:digitalObject>");
 

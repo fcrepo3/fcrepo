@@ -4,15 +4,12 @@
  */
 package org.fcrepo.test.integration.cma;
 
+import junit.framework.Assert;
+import org.fcrepo.client.FedoraClient;
+import org.fcrepo.test.FedoraServerTestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.test.FedoraServerTestCase;
-
-import junit.framework.Assert;
-
 
 import static org.fcrepo.test.integration.cma.Util.ingestTestObjects;
 
@@ -145,7 +142,9 @@ public class ConflictingDeploymentTests {
                 .contains("CONTENT_2"));
     }
 
-    /** Modifying the newest SDep should have no effect */
+    /**
+     * Modifying the newest SDep should have no effect
+     */
     @Test
     public void testModifyNewestSdep() throws Exception {
         ingestTestObjects(DEPLOYMENT_1_BASE);
@@ -162,14 +161,16 @@ public class ConflictingDeploymentTests {
                 .contains("CONTENT_1"));
     }
 
-    /** Represents the most likely case. Should pass with flying colours. */
+    /**
+     * Represents the most likely case. Should pass with flying colours.
+     */
     @Test
     public void testPurgeReplace() throws Exception {
         ingestTestObjects(DEPLOYMENT_1_BASE);
         ingestTestObjects(DEPLOYMENT_2_BASE);
 
         m_client.getAPIM()
-                .purgeObject(SDEP_1_PID, "removing first sDep", false);
+                .purgeObject(SDEP_1_PID, "removing first sDep");
 
         Assert.assertTrue("Did not disseminate expected content: ",
                           getDisseminatedContent().contains("CONTENT_2"));

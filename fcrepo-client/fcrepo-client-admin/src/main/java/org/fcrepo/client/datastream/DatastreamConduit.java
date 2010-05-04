@@ -4,18 +4,14 @@
  */
 package org.fcrepo.client.datastream;
 
-import java.net.MalformedURLException;
-
-import java.rmi.RemoteException;
-
-import javax.xml.rpc.ServiceException;
-
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.types.gen.Datastream;
 
-
+import javax.xml.rpc.ServiceException;
+import java.net.MalformedURLException;
+import java.rmi.RemoteException;
 
 
 /**
@@ -68,8 +64,7 @@ public class DatastreamConduit {
                                                    String location,
                                                    String checksumType,
                                                    String checksum,
-                                                   String logMessage,
-                                                   boolean force)
+                                                   String logMessage)
             throws RemoteException {
         skeleton.modifyDatastreamByReference(pid,
                                              dsId,
@@ -80,8 +75,7 @@ public class DatastreamConduit {
                                              location,
                                              checksumType,
                                              checksum,
-                                             logMessage,
-                                             force);
+                                             logMessage);
     }
 
     public void modifyDatastreamByReference(String pid,
@@ -93,8 +87,7 @@ public class DatastreamConduit {
                                             String location,
                                             String checksumType,
                                             String checksum,
-                                            String logMessage,
-                                            boolean force)
+                                            String logMessage)
             throws RemoteException {
         modifyDatastreamByReference(m_apim,
                                     pid,
@@ -106,8 +99,7 @@ public class DatastreamConduit {
                                     location,
                                     checksumType,
                                     checksum,
-                                    logMessage,
-                                    force);
+                                    logMessage);
     }
 
     public static void modifyDatastreamByValue(FedoraAPIM skeleton,
@@ -120,8 +112,7 @@ public class DatastreamConduit {
                                                byte[] content,
                                                String checksumType,
                                                String checksum,
-                                               String logMessage,
-                                               boolean force)
+                                               String logMessage)
             throws RemoteException {
         skeleton.modifyDatastreamByValue(pid,
                                          dsId,
@@ -132,8 +123,7 @@ public class DatastreamConduit {
                                          content,
                                          checksumType,
                                          checksum,
-                                         logMessage,
-                                         force);
+                                         logMessage);
     }
 
     public void modifyDatastreamByValue(String pid,
@@ -147,8 +137,7 @@ public class DatastreamConduit {
                                         String state,
                                         String checksumType,
                                         String checksum,
-                                        String logMessage,
-                                        boolean force) throws RemoteException {
+                                        String logMessage) throws RemoteException {
         modifyDatastreamByValue(m_apim,
                                 pid,
                                 dsId,
@@ -159,8 +148,7 @@ public class DatastreamConduit {
                                 content,
                                 checksumType,
                                 checksum,
-                                logMessage,
-                                force);
+                                logMessage);
     }
 
     public static String[] purgeDatastream(FedoraAPIM skeleton,
@@ -168,30 +156,26 @@ public class DatastreamConduit {
                                            String dsId,
                                            String startDT,
                                            String endDT,
-                                           String logMessage,
-                                           boolean force)
+                                           String logMessage)
             throws RemoteException {
         return skeleton.purgeDatastream(pid,
                                         dsId,
                                         startDT,
                                         endDT,
-                                        logMessage,
-                                        force);
+                                        logMessage);
     }
 
     public String[] purgeDatastream(String pid,
                                     String dsId,
                                     String startDT,
                                     String endDT,
-                                    String logMessage,
-                                    boolean force) throws RemoteException {
+                                    String logMessage) throws RemoteException {
         return purgeDatastream(m_apim,
                                pid,
                                dsId,
                                startDT,
                                endDT,
-                               logMessage,
-                               force);
+                               logMessage);
     }
 
     public static Datastream[] getDatastreamHistory(FedoraAPIM skeleton,
@@ -237,7 +221,7 @@ public class DatastreamConduit {
                 // NEW: use new client utility class
                 String baseURL =
                         protocol + "://" + hostName + ":" + portNum + "/"
-                                + context;
+                        + context;
                 FedoraClient fc = new FedoraClient(baseURL, username, password);
                 FedoraAPIM sourceRepoAPIM = fc.getAPIM();
                 //*******************************************
@@ -247,7 +231,7 @@ public class DatastreamConduit {
                 for (Datastream ds : datastreams) {
                     System.out.println("   Datastream : " + ds.getID());
                     System.out.println("Control Group : "
-                            + ds.getControlGroup().toString());
+                                       + ds.getControlGroup().toString());
                     System.out.println("  Versionable : " + ds.isVersionable());
                     System.out.println("    Mime Type : " + ds.getMIMEType());
                     System.out.println("   Format URI : " + ds.getFormatURI());
@@ -263,22 +247,22 @@ public class DatastreamConduit {
                             c.getDatastreamHistory(pid, ds.getID());
                     for (Datastream ver : versions) {
                         System.out.println("      VERSION : "
-                                + ver.getVersionID());
+                                           + ver.getVersionID());
                         System.out.println("        Created : "
-                                + ver.getCreateDate());
+                                           + ver.getCreateDate());
                         System.out.println("          Label : "
-                                + ver.getLabel());
+                                           + ver.getLabel());
                         System.out.println("       Location : "
-                                + ver.getLocation());
+                                           + ver.getLocation());
                     }
                     System.out.println("");
                 }
             }
         } catch (Exception e) {
             DatastreamConduit.showUsage(e.getClass().getName()
-                    + " - "
-                    + (e.getMessage() == null ? "(no detail provided)" : e
-                            .getMessage()));
+                                        + " - "
+                                        + (e.getMessage() == null ? "(no detail provided)" : e
+                    .getMessage()));
         }
     }
 }

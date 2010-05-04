@@ -4,12 +4,10 @@
  */
 package org.fcrepo.test;
 
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.management.FedoraAPIM;
-
 import junit.extensions.TestSetup;
 import junit.framework.Test;
-
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.management.FedoraAPIM;
 
 
 public class OneEmptyObjectTestSetup
@@ -29,15 +27,15 @@ public class OneEmptyObjectTestSetup
         StringBuffer xml = new StringBuffer();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         xml.append("<foxml:digitalObject VERSION=\"1.1\" xmlns:xsi=\""
-                + XSI.uri + "\"\n");
+                   + XSI.uri + "\"\n");
 
         xml.append("           xmlns:foxml=\"" + FOXML.uri + "\"\n");
         xml.append("           xsi:schemaLocation=\"" + FOXML.uri + " "
-                + FOXML1_1.xsdLocation + "\"\n");
+                   + FOXML1_1.xsdLocation + "\"\n");
         xml.append("\n           PID=\"" + pid + "\">\n");
         xml.append("  <foxml:objectProperties>\n");
         xml.append("    <foxml:property NAME=\"" + MODEL.LABEL.uri
-                + "\" VALUE=\"label\"/>\n");
+                   + "\" VALUE=\"label\"/>\n");
         xml.append("  </foxml:objectProperties>\n");
         xml.append("</foxml:digitalObject>");
         return xml.toString().getBytes("UTF-8");
@@ -53,7 +51,7 @@ public class OneEmptyObjectTestSetup
     @Override
     public void tearDown() throws Exception {
         System.out.println("Purging test object: " + m_pid);
-        m_apim.purgeObject(m_pid, "", false);
+        m_apim.purgeObject(m_pid, "");
     }
 
 }

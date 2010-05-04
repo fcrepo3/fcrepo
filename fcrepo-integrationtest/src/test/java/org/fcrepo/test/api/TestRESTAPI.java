@@ -4,39 +4,17 @@
  */
 package org.fcrepo.test.api;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
-import java.net.URL;
-import java.net.URLEncoder;
-
-import java.text.SimpleDateFormat;
-
-import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import junit.framework.TestSuite;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
-
-import org.junit.Test;
-
 import org.fcrepo.common.PID;
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
@@ -44,15 +22,17 @@ import org.fcrepo.server.types.gen.Datastream;
 import org.fcrepo.server.types.gen.MIMETypedStream;
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.Test;
 
-import junit.framework.TestSuite;
+import java.io.*;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
-import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
-import static org.apache.commons.httpclient.HttpStatus.SC_NO_CONTENT;
-import static org.apache.commons.httpclient.HttpStatus.SC_OK;
-import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
+import static org.apache.commons.httpclient.HttpStatus.*;
 
 
 /**
@@ -62,8 +42,8 @@ import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
  *
  * @author Edwin Shin
  * @author Bill Branan
- * @since 3.0
  * @version $Id$
+ * @since 3.0
  */
 public class TestRESTAPI
         extends FedoraServerTestCase {
@@ -95,7 +75,8 @@ public class TestRESTAPI
     private static String DS2LabelFilename = "Datastream 2 filename from label";
     private static String DS3LabelFilename = "Datastream 3 filename from label";
     private static String DodgyChars = "\\/*?&lt;&gt;:|";
-    private static String DS4LabelFilenameOriginal = "Datastream 4 filename " + DodgyChars + "from label"; // this one in foxml
+    private static String DS4LabelFilenameOriginal = "Datastream 4 filename " + DodgyChars + "from label";
+    // this one in foxml
     private static String DS4LabelFilename = "Datastream 4 filename from label"; // this should be the cleaned version
     private static String DS5ID = "DS5";
     private static String DS6ID = "DS6.xml";
@@ -122,9 +103,11 @@ public class TestRESTAPI
         sb.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>");
         sb.append("  </foxml:objectProperties>");
         sb.append("  <foxml:datastream ID=\"DC\" CONTROL_GROUP=\"X\" STATE=\"A\">");
-        sb.append("    <foxml:datastreamVersion FORMAT_URI=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" ID=\"DC1.0\" MIMETYPE=\"text/xml\" LABEL=\"Dublin Core Record for this object\">");
+        sb.append(
+                "    <foxml:datastreamVersion FORMAT_URI=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" ID=\"DC1.0\" MIMETYPE=\"text/xml\" LABEL=\"Dublin Core Record for this object\">");
         sb.append("      <foxml:xmlContent>");
-        sb.append("        <oai_dc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\">");
+        sb.append(
+                "        <oai_dc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\">");
         sb.append("          <dc:title>Coliseum in Rome</dc:title>");
         sb.append("          <dc:creator>Thornton Staples</dc:creator>");
         sb.append("          <dc:subject>Architecture, Roman</dc:subject>");
@@ -137,10 +120,12 @@ public class TestRESTAPI
         sb.append("    </foxml:datastreamVersion>");
         sb.append("  </foxml:datastream>");
         sb.append("  <foxml:datastream ID=\"RELS-EXT\" CONTROL_GROUP=\"M\" STATE=\"A\">");
-        sb.append("    <foxml:datastreamVersion FORMAT_URI=\"info:fedora/fedora-system:FedoraRELSExt-1.0\" ID=\"RELS-EXT.0\" MIMETYPE=\"application/rdf+xml\" LABEL=\"RDF Statements about this object\" CREATED=\"" + datetime + "\">");
+        sb.append(
+                "    <foxml:datastreamVersion FORMAT_URI=\"info:fedora/fedora-system:FedoraRELSExt-1.0\" ID=\"RELS-EXT.0\" MIMETYPE=\"application/rdf+xml\" LABEL=\"RDF Statements about this object\" CREATED=\"" +
+                datetime + "\">");
         sb.append("      <foxml:xmlContent>");
         sb.append("        <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""
-                        + "                 xmlns:rel=\"info:fedora/fedora-system:def/relations-external#\">");
+                  + "                 xmlns:rel=\"info:fedora/fedora-system:def/relations-external#\">");
         sb.append("          <rdf:Description rdf:about=\"info:fedora/demo:REST\">");
         sb.append("            <rel:hasFormalContentModel rdf:resource=\"info:fedora/demo:UVA_STD_IMAGE_1\"/>");
         sb.append("          </rdf:Description>");
@@ -160,18 +145,21 @@ public class TestRESTAPI
         sb.append("  <foxml:datastream CONTROL_GROUP=\"E\" ID=\"EXTDS\" STATE=\"A\" VERSIONABLE=\"true\">");
         sb.append("    <foxml:datastreamVersion ID=\"EXTDS1.0\" LABEL=\"External\" MIMETYPE=\"text/xml\">");
         sb.append("      <foxml:contentLocation REF=\"" + getBaseURL()
-                + "/get/demo:REST/DS1\" TYPE=\"URL\"/>");
+                  + "/get/demo:REST/DS1\" TYPE=\"URL\"/>");
         sb.append("    </foxml:datastreamVersion>");
         sb.append("  </foxml:datastream>");
         // datastreams for content-disposition header (get datastream filename) testing
         // RELS-INT: specifies filename for DS1
         sb.append("  <foxml:datastream ID=\"RELS-INT\" CONTROL_GROUP=\"M\" STATE=\"A\">");
-        sb.append("    <foxml:datastreamVersion FORMAT_URI=\"info:fedora/fedora-system:FedoraRELSInt-1.0\" ID=\"RELS-INT.0\" MIMETYPE=\"application/rdf+xml\" LABEL=\"RDF Statements about datastreams in this object\" CREATED=\"" + datetime + "\">");
+        sb.append(
+                "    <foxml:datastreamVersion FORMAT_URI=\"info:fedora/fedora-system:FedoraRELSInt-1.0\" ID=\"RELS-INT.0\" MIMETYPE=\"application/rdf+xml\" LABEL=\"RDF Statements about datastreams in this object\" CREATED=\"" +
+                datetime + "\">");
         sb.append("      <foxml:xmlContent>");
         sb.append("        <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""
-                        + "                 xmlns:fedora-model=\"" + MODEL.uri + "\">");
+                  + "                 xmlns:fedora-model=\"" + MODEL.uri + "\">");
         sb.append("          <rdf:Description rdf:about=\"info:fedora/demo:REST/DS1\">");
-        sb.append("            <fedora-model:" + MODEL.DOWNLOAD_FILENAME.localName + ">" + DS1RelsFilename + "</fedora-model:" + MODEL.DOWNLOAD_FILENAME.localName + ">");
+        sb.append("            <fedora-model:" + MODEL.DOWNLOAD_FILENAME.localName + ">" + DS1RelsFilename +
+                  "</fedora-model:" + MODEL.DOWNLOAD_FILENAME.localName + ">");
         sb.append("          </rdf:Description>");
         sb.append("        </rdf:RDF>");
         sb.append("      </foxml:xmlContent>");
@@ -181,7 +169,8 @@ public class TestRESTAPI
 
         // DS2:  label is filename, known mimetype of image/jpeg so extension (jpg) should be determined by mappings file
         sb.append("  <foxml:datastream ID=\"DS2\" CONTROL_GROUP=\"M\" STATE=\"A\">");
-        sb.append("    <foxml:datastreamVersion ID=\"DS2.0\" MIMETYPE=\"image/jpeg\" LABEL=\"" + DS2LabelFilename +"\">");
+        sb.append("    <foxml:datastreamVersion ID=\"DS2.0\" MIMETYPE=\"image/jpeg\" LABEL=\"" + DS2LabelFilename +
+                  "\">");
         sb.append("      <foxml:xmlContent>");
         sb.append("        <foo>");
         sb.append("          <bar>baz</bar>");
@@ -192,7 +181,9 @@ public class TestRESTAPI
 
         // DS3:  label is filename, mimetype unknown so extension should be default
         sb.append("  <foxml:datastream ID=\"DS3\" CONTROL_GROUP=\"X\" STATE=\"A\">");
-        sb.append("    <foxml:datastreamVersion ID=\"DS3.0\" MIMETYPE=\"unknown/mimetype\" LABEL=\"" + DS3LabelFilename +"\">");
+        sb.append(
+                "    <foxml:datastreamVersion ID=\"DS3.0\" MIMETYPE=\"unknown/mimetype\" LABEL=\"" + DS3LabelFilename +
+                "\">");
         sb.append("      <foxml:xmlContent>");
         sb.append("        <foo>");
         sb.append("          <bar>baz</bar>");
@@ -203,7 +194,9 @@ public class TestRESTAPI
 
         // DS4: label is filename, with illegal filename characters
         sb.append("  <foxml:datastream ID=\"DS4\" CONTROL_GROUP=\"X\" STATE=\"A\">");
-        sb.append("    <foxml:datastreamVersion ID=\"DS4.0\" MIMETYPE=\"text/xml\" LABEL=\"" + DS4LabelFilenameOriginal +"\">");
+        sb.append(
+                "    <foxml:datastreamVersion ID=\"DS4.0\" MIMETYPE=\"text/xml\" LABEL=\"" + DS4LabelFilenameOriginal +
+                "\">");
         sb.append("      <foxml:xmlContent>");
         sb.append("        <foo>");
         sb.append("          <bar>baz</bar>");
@@ -278,7 +271,7 @@ public class TestRESTAPI
 
     @Override
     public void tearDown() throws Exception {
-        apim.purgeObject(pid.toString(), "", false);
+        apim.purgeObject(pid.toString(), "");
     }
 
     @Test
@@ -292,6 +285,7 @@ public class TestRESTAPI
     //public void testDescribeRepository() throws Exception {}
 
     // API-A
+
     @Test
     public void testGetObjectProfile() throws Exception {
         url = String.format("/objects/%s", pid.toString());
@@ -334,7 +328,7 @@ public class TestRESTAPI
         assertEquals(SC_OK, get(true).getStatusCode());
 
         url = String.format("/objects/%s/methods?asOfDateTime=%s", pid
-                        .toString(), datetime);
+                .toString(), datetime);
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         assertEquals(SC_OK, get(true).getStatusCode());
     }
@@ -352,7 +346,7 @@ public class TestRESTAPI
         assertTrue(responseXML.contains("sDef=\"fedora-system:3\""));
 
         url = String.format("/objects/%s/methods/fedora-system:3?asOfDateTime=%s", pid
-                        .toString(), datetime);
+                .toString(), datetime);
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         assertEquals(SC_OK, get(true).getStatusCode());
     }
@@ -484,8 +478,8 @@ public class TestRESTAPI
 
         // Datastream profile as of the current date-time (XML format)
         url = String.format("/objects/%s/datastreams/RELS-EXT?asOfDateTime=%s&format=xml",
-                                pid.toString(),
-                                datetime);
+                            pid.toString(),
+                            datetime);
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         response = get(true);
         assertEquals(SC_OK, response.getStatusCode());
@@ -525,7 +519,7 @@ public class TestRESTAPI
 
     public void testFindObjects() throws Exception {
         url = String.format("/objects?pid=true&terms=%s&query=&resultFormat=xml",
-                              pid.toString());
+                            pid.toString());
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         assertEquals(SC_OK, get(true).getStatusCode());
     }
@@ -577,6 +571,7 @@ public class TestRESTAPI
     }
 
     // API-M
+
     public void testIngest() throws Exception {
         // Create new empty object
         url = String.format("/objects/new");
@@ -637,7 +632,7 @@ public class TestRESTAPI
 
         // Delete minimal object
         String minimalObjectPid =
-            extractPid(response.getResponseHeader("Location").getValue());
+                extractPid(response.getResponseHeader("Location").getValue());
         url = String.format("/objects/%s", minimalObjectPid);
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
         assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
@@ -721,7 +716,7 @@ public class TestRESTAPI
     public void testModifyDatastreamByReference() throws Exception {
         // Create BAR datastream
         url = String.format("/objects/%s/datastreams/BAR?controlGroup=M&dsLabel=bar",
-                                pid.toString());
+                            pid.toString());
         File temp = File.createTempFile("test", null);
         DataOutputStream os = new DataOutputStream(new FileOutputStream(temp));
         os.write(42);
@@ -767,7 +762,7 @@ public class TestRESTAPI
         // Update the location of the EXTDS datastream (E type datastream)
         String newLocation =
                 "http://" + getHost() + ":" + getPort() + "/"
-                        + getFedoraAppServerContext() + "/get/demo:REST/DC";
+                + getFedoraAppServerContext() + "/get/demo:REST/DC";
         url = String.format("/objects/%s/datastreams/EXTDS?dsLocation=%s",
                             pid.toString(), newLocation);
         assertEquals(SC_UNAUTHORIZED, put(false).getStatusCode());
@@ -816,7 +811,7 @@ public class TestRESTAPI
     public void testModifyDatastreamNoContent() throws Exception {
         String label = "Label";
         url = String.format("/objects/%s/datastreams/DS1?dsLabel=%s", pid
-                        .toString(), label);
+                .toString(), label);
 
         assertEquals(SC_UNAUTHORIZED, put("", false).getStatusCode());
         assertEquals(SC_OK, put("", true).getStatusCode());
@@ -982,7 +977,8 @@ public class TestRESTAPI
         url = "/objects/demo:REST/datastreams/DS2/content?download=true";
         HttpResponse response = get(true);
         assertEquals(SC_OK, response.getStatusCode());
-        CheckCDHeader(response, "attachment", TestRESTAPI.DS2LabelFilename + ".jpg"); // jpg should be from MIMETYPE mapping
+        CheckCDHeader(response, "attachment",
+                      TestRESTAPI.DS2LabelFilename + ".jpg"); // jpg should be from MIMETYPE mapping
 
         // filename from label, unknown MIMETYPE
         url = "/objects/demo:REST/datastreams/DS3/content?download=true";
@@ -1015,6 +1011,7 @@ public class TestRESTAPI
     }
 
     // check content disposition header of response
+
     private void CheckCDHeader(HttpResponse response, String expectedType, String expectedFilename) {
         String contentDisposition = "";
         Header[] headers = response.responseHeaders;
@@ -1028,6 +1025,7 @@ public class TestRESTAPI
 
 
     // helper methods
+
     private HttpClient getClient(boolean auth) {
         HttpClient client = new HttpClient();
         client.getParams().setAuthenticationPreemptive(true);
@@ -1035,7 +1033,7 @@ public class TestRESTAPI
             client
                     .getState()
                     .setCredentials(new AuthScope(getHost(), Integer
-                                            .valueOf(getPort()), "realm"),
+                            .valueOf(getPort()), "realm"),
                                     new UsernamePasswordCredentials(getUsername(),
                                                                     getPassword()));
         }
@@ -1045,9 +1043,6 @@ public class TestRESTAPI
     /**
      * Issues an HTTP GET for the specified URL.
      *
-     * @param url
-     *        The URL to GET: either an absolute URL or URL relative to the
-     *        Fedora webapp (e.g. "/objects/demo:10").
      * @param authenticate
      * @return HttpResponse
      * @throws Exception
@@ -1064,7 +1059,6 @@ public class TestRESTAPI
      * Issues an HTTP PUT to <code>url</code>. Callers are responsible for
      * calling releaseConnection() on the returned <code>HttpMethod</code>.
      *
-     * @param requestContent
      * @param authenticate
      * @return
      * @throws Exception
@@ -1173,6 +1167,7 @@ public class TestRESTAPI
     }
 
     // Supports legacy test runners
+
     public static junit.framework.Test suite() {
         TestSuite suite = new TestSuite("REST API TestSuite");
         suite.addTestSuite(TestRESTAPI.class);

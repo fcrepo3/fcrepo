@@ -4,18 +4,15 @@
  */
 package org.fcrepo.test.integration;
 
-import java.io.IOException;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.test.FedoraTestCase;
 import org.fcrepo.test.api.RISearchUtil;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-
+import java.io.IOException;
 
 
 /**
@@ -55,7 +52,7 @@ public class TestMisplacedNamespace
     @Override
     @After
     public void tearDown() throws Exception {
-        m_client.getAPIM().purgeObject(PID, "Cleanup", false);
+        m_client.getAPIM().purgeObject(PID, "Cleanup");
     }
 
     @Test
@@ -69,7 +66,7 @@ public class TestMisplacedNamespace
         } catch (Exception e) {
             /* Make sure the RI contains no trace of this object */
             RISearchUtil.checkSPOCount(m_client, "<info:fedora/" + PID
-                    + "> * *", 0);
+                                                 + "> * *", 0);
         }
 
         /* Ingest the good object. Should succeed */

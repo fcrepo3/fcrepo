@@ -4,33 +4,23 @@
  */
 package org.fcrepo.client.test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.PrintStream;
-
-import java.util.ArrayList;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import java.math.BigDecimal;
-
 import org.apache.axis.types.NonNegativeInteger;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
-
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
 
-
+import java.io.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**
@@ -40,7 +30,7 @@ import org.fcrepo.server.management.FedoraAPIM;
  * @author Bill Branan
  */
 public class PerformanceTests
-    implements Constants {
+        implements Constants {
 
     private FedoraAPIM apim;
     private FedoraAPIA apia;
@@ -53,7 +43,7 @@ public class PerformanceTests
     private static String DEMO_FOXML_TEXT;
 
     private static String datastream =
-        "http://local.fedora.server/fedora-demo/simple-image-demo/coliseum-thumb.jpg";
+            "http://local.fedora.server/fedora-demo/simple-image-demo/coliseum-thumb.jpg";
 
     private String host;
     private String port;
@@ -69,18 +59,23 @@ public class PerformanceTests
         // Test FOXML object
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        sb.append("<foxml:digitalObject PID=\"" + pid + "\" VERSION=\"1.1\" xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\"");
-        sb.append("  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd\">");
+        sb.append("<foxml:digitalObject PID=\"" + pid +
+                  "\" VERSION=\"1.1\" xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\"");
+        sb.append(
+                "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd\">");
         sb.append("  <foxml:objectProperties>");
         sb.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"Active\"/>");
         sb.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\"Test Object\"/>");
         sb.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#ownerId\" VALUE=\"fedoraAdmin\"/>");
-        sb.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#createdDate\" VALUE=\"2008-07-09T19:28:04.890Z\"/>");
-        sb.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/view#lastModifiedDate\" VALUE=\"2008-07-09T19:32:31.750Z\"/>");
+        sb.append(
+                "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#createdDate\" VALUE=\"2008-07-09T19:28:04.890Z\"/>");
+        sb.append(
+                "    <foxml:property NAME=\"info:fedora/fedora-system:def/view#lastModifiedDate\" VALUE=\"2008-07-09T19:32:31.750Z\"/>");
         sb.append("  </foxml:objectProperties>");
         sb.append("  <foxml:datastream CONTROL_GROUP=\"X\" ID=\"AUDIT\" STATE=\"A\" VERSIONABLE=\"false\">");
         sb.append("    <foxml:datastreamVersion CREATED=\"2008-07-09T19:28:04.890Z\"");
-        sb.append("      FORMAT_URI=\"info:fedora/fedora-system:format/xml.fedora.audit\" ID=\"AUDIT.0\" LABEL=\"Fedora Object Audit Trail\" MIMETYPE=\"text/xml\">");
+        sb.append(
+                "      FORMAT_URI=\"info:fedora/fedora-system:format/xml.fedora.audit\" ID=\"AUDIT.0\" LABEL=\"Fedora Object Audit Trail\" MIMETYPE=\"text/xml\">");
         sb.append("      <foxml:xmlContent>");
         sb.append("        <audit:auditTrail xmlns:audit=\"info:fedora/fedora-system:def/audit#\">");
         sb.append("          <audit:record ID=\"AUDREC1\">");
@@ -96,11 +91,13 @@ public class PerformanceTests
         sb.append("    </foxml:datastreamVersion>");
         sb.append("  </foxml:datastream>");
         sb.append("  <foxml:datastream CONTROL_GROUP=\"X\" ID=\"DC\" STATE=\"A\" VERSIONABLE=\"true\">");
-        sb.append("    <foxml:datastreamVersion CREATED=\"2008-07-09T19:28:04.890Z\" ID=\"DC1.0\" LABEL=\"Dublin Core Metadata\"");
+        sb.append(
+                "    <foxml:datastreamVersion CREATED=\"2008-07-09T19:28:04.890Z\" ID=\"DC1.0\" LABEL=\"Dublin Core Metadata\"");
         sb.append("      MIMETYPE=\"text/xml\" SIZE=\"226\">");
         sb.append("      <foxml:contentDigest DIGEST=\"none\" TYPE=\"DISABLED\"/>");
         sb.append("      <foxml:xmlContent>");
-        sb.append("        <oai_dc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\">");
+        sb.append(
+                "        <oai_dc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\">");
         sb.append("          <dc:title>Test Object</dc:title>");
         sb.append("          <dc:identifier>" + pid + "</dc:identifier>");
         sb.append("        </oai_dc:dc>");
@@ -108,7 +105,8 @@ public class PerformanceTests
         sb.append("    </foxml:datastreamVersion>");
         sb.append("  </foxml:datastream>");
         sb.append("  <foxml:datastream CONTROL_GROUP=\"X\" ID=\"XDS1\" STATE=\"A\" VERSIONABLE=\"true\">");
-        sb.append("    <foxml:datastreamVersion CREATED=\"2008-07-09T19:28:58.125Z\" ID=\"XDS1.0\" LABEL=\"XML Datastream 1\" MIMETYPE=\"text/xml\" SIZE=\"41\">");
+        sb.append(
+                "    <foxml:datastreamVersion CREATED=\"2008-07-09T19:28:58.125Z\" ID=\"XDS1.0\" LABEL=\"XML Datastream 1\" MIMETYPE=\"text/xml\" SIZE=\"41\">");
         sb.append("      <foxml:contentDigest DIGEST=\"none\" TYPE=\"DISABLED\"/>");
         sb.append("      <foxml:xmlContent>");
         sb.append("        <xml>Datastream Content</xml>");
@@ -116,7 +114,8 @@ public class PerformanceTests
         sb.append("    </foxml:datastreamVersion>");
         sb.append("  </foxml:datastream>");
         sb.append("  <foxml:datastream CONTROL_GROUP=\"X\" ID=\"XDS2\" STATE=\"A\" VERSIONABLE=\"true\">");
-        sb.append("    <foxml:datastreamVersion CREATED=\"2008-07-09T19:29:33.609Z\" ID=\"XDS2.0\" LABEL=\"XML Datastream 2\" MIMETYPE=\"text/xml\" SIZE=\"41\">");
+        sb.append(
+                "    <foxml:datastreamVersion CREATED=\"2008-07-09T19:29:33.609Z\" ID=\"XDS2.0\" LABEL=\"XML Datastream 2\" MIMETYPE=\"text/xml\" SIZE=\"41\">");
         sb.append("      <foxml:contentDigest DIGEST=\"none\" TYPE=\"DISABLED\"/>");
         sb.append("      <foxml:xmlContent>");
         sb.append("        <xml>Datastream Content</xml>");
@@ -124,7 +123,8 @@ public class PerformanceTests
         sb.append("    </foxml:datastreamVersion>");
         sb.append("  </foxml:datastream>");
         sb.append("  <foxml:datastream CONTROL_GROUP=\"M\" ID=\"MDS1\" STATE=\"A\" VERSIONABLE=\"true\">");
-        sb.append("    <foxml:datastreamVersion CREATED=\"2008-07-09T19:31:57.593Z\" ID=\"MDS1.0\" LABEL=\"Managed Datastream 1\" MIMETYPE=\"text/xml\" SIZE=\"0\">");
+        sb.append(
+                "    <foxml:datastreamVersion CREATED=\"2008-07-09T19:31:57.593Z\" ID=\"MDS1.0\" LABEL=\"Managed Datastream 1\" MIMETYPE=\"text/xml\" SIZE=\"0\">");
         sb.append("      <foxml:contentDigest DIGEST=\"none\" TYPE=\"DISABLED\"/>");
         sb.append("      <foxml:binaryContent>");
         sb.append("              PHhtbD5EYXRhc3RyZWFtIENvbnRlbnQ8L3htbD4=");
@@ -132,7 +132,8 @@ public class PerformanceTests
         sb.append("    </foxml:datastreamVersion>");
         sb.append("  </foxml:datastream>");
         sb.append("  <foxml:datastream CONTROL_GROUP=\"M\" ID=\"MDS2\" STATE=\"A\" VERSIONABLE=\"true\">");
-        sb.append("    <foxml:datastreamVersion CREATED=\"2008-07-09T19:32:31.750Z\" ID=\"MDS2.0\" LABEL=\"Managed Datastream 2\" MIMETYPE=\"text/xml\" SIZE=\"0\">");
+        sb.append(
+                "    <foxml:datastreamVersion CREATED=\"2008-07-09T19:32:31.750Z\" ID=\"MDS2.0\" LABEL=\"Managed Datastream 2\" MIMETYPE=\"text/xml\" SIZE=\"0\">");
         sb.append("      <foxml:contentDigest DIGEST=\"none\" TYPE=\"DISABLED\"/>");
         sb.append("      <foxml:binaryContent>");
         sb.append("              PHhtbD5EYXRhc3RyZWFtIENvbnRlbnQ8L3htbD4=");
@@ -151,14 +152,14 @@ public class PerformanceTests
         this.password = password;
         this.context = context;
 
-        String baseURL =  "http://" + host + ":" + port + "/" + context;
+        String baseURL = "http://" + host + ":" + port + "/" + context;
         FedoraClient fedoraClient = new FedoraClient(baseURL, username, password);
         apim = fedoraClient.getAPIM();
         apia = fedoraClient.getAPIA();
 
         PIDS = apim.getNextPID(new NonNegativeInteger(Integer.valueOf(iterations).toString()), "demo");
         FOXML = new byte[iterations][];
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             FOXML[i] = DEMO_FOXML_TEXT.replaceAll(pid, PIDS[i]).getBytes("UTF-8");
         }
     }
@@ -193,8 +194,7 @@ public class PerformanceTests
                                          datastream,
                                          null,
                                          null,
-                                         "Modify Datastream Test",
-                                         false);
+                                         "Modify Datastream Test");
     }
 
     private void runModifyDatastreamByValue(String pid) throws Exception {
@@ -208,16 +208,15 @@ public class PerformanceTests
                                      dsContent.getBytes(),
                                      null,
                                      null,
-                                     "Modify Datastream Test",
-                                     false);
+                                     "Modify Datastream Test");
     }
 
     private void runPurgeDatastream(String pid, String dsId) throws Exception {
-        apim.purgeDatastream(pid, dsId, null, null, "Purge Datastream Test", false);
+        apim.purgeDatastream(pid, dsId, null, null, "Purge Datastream Test");
     }
 
     private void runPurgeObject(String pid) throws Exception {
-        apim.purgeObject(pid, "Removing Test Object", false);
+        apim.purgeObject(pid, "Removing Test Object");
     }
 
     private void runGetDatastream(String pid) throws Exception {
@@ -230,7 +229,7 @@ public class PerformanceTests
         client.executeMethod(httpMethod);
         InputStream in = httpMethod.getResponseBodyAsStream();
         int input = in.read();
-        while(input > 0) {
+        while (input > 0) {
             input = in.read();
         }
     }
@@ -242,14 +241,14 @@ public class PerformanceTests
         long totalTime = 0;
         long startTime = 0;
         long stopTime = 0;
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             startTime = System.currentTimeMillis();
             runIngest(FOXML[0]);
             stopTime = System.currentTimeMillis();
             totalTime += (stopTime - startTime);
             runPurgeObject(PIDS[0]);
         }
-        long average = totalTime/iterations;
+        long average = totalTime / iterations;
         return average;
     }
 
@@ -261,7 +260,7 @@ public class PerformanceTests
         long startTime = 0;
         long stopTime = 0;
         runIngest(FOXML[0]);
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             startTime = System.currentTimeMillis();
             runAddDatastream(PIDS[0], "MDS3");
             stopTime = System.currentTimeMillis();
@@ -269,7 +268,7 @@ public class PerformanceTests
             runPurgeDatastream(PIDS[0], "MDS3");
         }
         runPurgeObject(PIDS[0]);
-        long average = totalTime/iterations;
+        long average = totalTime / iterations;
         return average;
     }
 
@@ -281,14 +280,14 @@ public class PerformanceTests
         long startTime = 0;
         long stopTime = 0;
         runIngest(FOXML[0]);
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             startTime = System.currentTimeMillis();
             runModifyDatastreamByRef(PIDS[0]);
             stopTime = System.currentTimeMillis();
             totalTime += (stopTime - startTime);
         }
         runPurgeObject(PIDS[0]);
-        long average = totalTime/iterations;
+        long average = totalTime / iterations;
         return average;
     }
 
@@ -300,14 +299,14 @@ public class PerformanceTests
         long startTime = 0;
         long stopTime = 0;
         runIngest(FOXML[0]);
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             startTime = System.currentTimeMillis();
             runModifyDatastreamByValue(PIDS[0]);
             stopTime = System.currentTimeMillis();
             totalTime += (stopTime - startTime);
         }
         runPurgeObject(PIDS[0]);
-        long average = totalTime/iterations;
+        long average = totalTime / iterations;
         return average;
     }
 
@@ -319,7 +318,7 @@ public class PerformanceTests
         long startTime = 0;
         long stopTime = 0;
         runIngest(FOXML[0]);
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             runAddDatastream(PIDS[0], "MDS3");
             startTime = System.currentTimeMillis();
             runPurgeDatastream(PIDS[0], "MDS3");
@@ -327,7 +326,7 @@ public class PerformanceTests
             totalTime += (stopTime - startTime);
         }
         runPurgeObject(PIDS[0]);
-        long average = totalTime/iterations;
+        long average = totalTime / iterations;
         return average;
     }
 
@@ -338,14 +337,14 @@ public class PerformanceTests
         long totalTime = 0;
         long startTime = 0;
         long stopTime = 0;
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             runIngest(FOXML[0]);
             startTime = System.currentTimeMillis();
             runPurgeObject(PIDS[0]);
             stopTime = System.currentTimeMillis();
             totalTime += (stopTime - startTime);
         }
-        long average = totalTime/iterations;
+        long average = totalTime / iterations;
         return average;
     }
 
@@ -358,7 +357,7 @@ public class PerformanceTests
         long stopTime = 0;
         runIngest(FOXML[0]);
         startTime = System.currentTimeMillis();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             runGetDatastream(PIDS[0]);
         }
         stopTime = System.currentTimeMillis();
@@ -379,11 +378,11 @@ public class PerformanceTests
         HttpMethod httpMethod = getHttpMethod(PIDS[0]);
         HttpClient client = getHttpClient();
         startTime = System.currentTimeMillis();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             client.executeMethod(httpMethod);
             InputStream in = httpMethod.getResponseBodyAsStream();
             int input = in.read();
-            while(input > 0) {
+            while (input > 0) {
                 input = in.read();
             }
         }
@@ -412,9 +411,9 @@ public class PerformanceTests
     }
 
     /**
-     *  @return total time to run all iterations
-     *          {ingest, addDatastream, modifyDatastreamByReference,
-     *           modifyDatastreamByValue, purgeDatastream, purgeObject}
+     * @return total time to run all iterations
+     *         {ingest, addDatastream, modifyDatastreamByReference,
+     *         modifyDatastreamByValue, purgeDatastream, purgeObject}
      */
     public long[] runThroughputTests() throws Exception {
         long ingestTime = 0;
@@ -428,7 +427,7 @@ public class PerformanceTests
 
         // Ingest
         startTime = System.currentTimeMillis();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             runIngest(FOXML[i]);
         }
         stopTime = System.currentTimeMillis();
@@ -436,7 +435,7 @@ public class PerformanceTests
 
         // Add Datastream
         startTime = System.currentTimeMillis();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             runAddDatastream(PIDS[i], "MDS3");
         }
         stopTime = System.currentTimeMillis();
@@ -444,7 +443,7 @@ public class PerformanceTests
 
         // Modify Datastream By Reference
         startTime = System.currentTimeMillis();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             runModifyDatastreamByRef(PIDS[i]);
         }
         stopTime = System.currentTimeMillis();
@@ -452,7 +451,7 @@ public class PerformanceTests
 
         // Modify Datastream By Value
         startTime = System.currentTimeMillis();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             runModifyDatastreamByValue(PIDS[i]);
         }
         stopTime = System.currentTimeMillis();
@@ -460,7 +459,7 @@ public class PerformanceTests
 
         // Purge Datastream
         startTime = System.currentTimeMillis();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             runPurgeDatastream(PIDS[i], "MDS1");
         }
         stopTime = System.currentTimeMillis();
@@ -468,7 +467,7 @@ public class PerformanceTests
 
         // Purge Object
         startTime = System.currentTimeMillis();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             runPurgeObject(PIDS[i]);
         }
         stopTime = System.currentTimeMillis();
@@ -487,10 +486,10 @@ public class PerformanceTests
     }
 
     /**
-     *  @return total time to run all iterations with threading
-     *          {ingest, addDatastream, modifyDatastreamByReference,
-     *           modifyDatastreamByValue, purgeDatastream, purgeObject,
-     *           getDatastream, getDatastreamREST}
+     * @return total time to run all iterations with threading
+     *         {ingest, addDatastream, modifyDatastreamByReference,
+     *         modifyDatastreamByValue, purgeDatastream, purgeObject,
+     *         getDatastream, getDatastreamREST}
      */
     public long[] runThreadedThroughputTests() throws Exception {
         long ingestTime = 0;
@@ -508,7 +507,7 @@ public class PerformanceTests
 
         // Ingest
         ArrayList<Callable<Boolean>> ingestRunnerList = new ArrayList<Callable<Boolean>>();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             ingestRunnerList.add(new MethodRunner(MethodType.INGEST, i));
         }
         startTime = System.currentTimeMillis();
@@ -518,7 +517,7 @@ public class PerformanceTests
 
         // Add Datastream
         ArrayList<Callable<Boolean>> addDatastreamRunnerList = new ArrayList<Callable<Boolean>>();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             addDatastreamRunnerList.add(new MethodRunner(MethodType.ADD_DATASTREAM, i));
         }
         startTime = System.currentTimeMillis();
@@ -528,7 +527,7 @@ public class PerformanceTests
 
         // Modify Datastream By Reference
         ArrayList<Callable<Boolean>> modDatastreamRefRunnerList = new ArrayList<Callable<Boolean>>();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             modDatastreamRefRunnerList.add(new MethodRunner(MethodType.MODIFY_DATASTREAM_REF, i));
         }
         startTime = System.currentTimeMillis();
@@ -538,7 +537,7 @@ public class PerformanceTests
 
         // Modify Datastream By Value
         ArrayList<Callable<Boolean>> modDatastreamValRunnerList = new ArrayList<Callable<Boolean>>();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             modDatastreamValRunnerList.add(new MethodRunner(MethodType.MODIFY_DATASTREAM_VAL, i));
         }
         startTime = System.currentTimeMillis();
@@ -548,7 +547,7 @@ public class PerformanceTests
 
         // Purge Datastream
         ArrayList<Callable<Boolean>> purgeDatastreamRunnerList = new ArrayList<Callable<Boolean>>();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             purgeDatastreamRunnerList.add(new MethodRunner(MethodType.PURGE_DATASTREAM, i));
         }
         startTime = System.currentTimeMillis();
@@ -558,7 +557,7 @@ public class PerformanceTests
 
         // Purge Object
         ArrayList<Callable<Boolean>> purgeObjectRunnerList = new ArrayList<Callable<Boolean>>();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             purgeObjectRunnerList.add(new MethodRunner(MethodType.PURGE_OBJECT, i));
         }
         startTime = System.currentTimeMillis();
@@ -568,7 +567,7 @@ public class PerformanceTests
 
         // Get Datastream
         ArrayList<Callable<Boolean>> getDatastreamRunnerList = new ArrayList<Callable<Boolean>>();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             getDatastreamRunnerList.add(new MethodRunner(MethodType.GET_DATASTREAM, i));
         }
         startTime = System.currentTimeMillis();
@@ -578,7 +577,7 @@ public class PerformanceTests
 
         // Get Datastream REST
         ArrayList<Callable<Boolean>> getDatastreamRestRunnerList = new ArrayList<Callable<Boolean>>();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             getDatastreamRestRunnerList.add(new MethodRunner(MethodType.GET_DATASTREAM_REST, i));
         }
         startTime = System.currentTimeMillis();
@@ -612,6 +611,7 @@ public class PerformanceTests
      * Runnable class to use within threads. Executes a
      * Fedora method based on the MethodType defined.
      */
+
     private class MethodRunner implements Callable<Boolean> {
 
         MethodType methodType;
@@ -623,21 +623,21 @@ public class PerformanceTests
         }
 
         public Boolean call() throws Exception {
-            if(methodType.equals(MethodType.INGEST)) {
+            if (methodType.equals(MethodType.INGEST)) {
                 runIngest(FOXML[index]);
-            }else if(methodType.equals(MethodType.ADD_DATASTREAM)) {
-               runAddDatastream(PIDS[index], "MDS3");
-            } else if(methodType.equals(MethodType.MODIFY_DATASTREAM_REF)) {
+            } else if (methodType.equals(MethodType.ADD_DATASTREAM)) {
+                runAddDatastream(PIDS[index], "MDS3");
+            } else if (methodType.equals(MethodType.MODIFY_DATASTREAM_REF)) {
                 runModifyDatastreamByRef(PIDS[index]);
-            } else if(methodType.equals(MethodType.MODIFY_DATASTREAM_VAL)) {
+            } else if (methodType.equals(MethodType.MODIFY_DATASTREAM_VAL)) {
                 runModifyDatastreamByValue(PIDS[index]);
-            } else if(methodType.equals(MethodType.PURGE_DATASTREAM)) {
+            } else if (methodType.equals(MethodType.PURGE_DATASTREAM)) {
                 runPurgeDatastream(PIDS[index], "MDS1");
-            } else if(methodType.equals(MethodType.PURGE_OBJECT)) {
+            } else if (methodType.equals(MethodType.PURGE_OBJECT)) {
                 runPurgeObject(PIDS[index]);
-            } else if(methodType.equals(MethodType.GET_DATASTREAM)) {
+            } else if (methodType.equals(MethodType.GET_DATASTREAM)) {
                 runGetDatastream(PIDS[index]);
-            } else if(methodType.equals(MethodType.GET_DATASTREAM_REST)) {
+            } else if (methodType.equals(MethodType.GET_DATASTREAM_REST)) {
                 runGetDatastreamRest(PIDS[index]);
             }
             return new Boolean(true);
@@ -654,15 +654,15 @@ public class PerformanceTests
     private static void usage() {
         System.out.println("Runs a set of performance tests over a running Fedora repository.");
         System.out.println("USAGE: ant performance-tests " +
-                                   "-Dhost=HOST " +
-                                   "-Dport=PORT " +
-                                   "-Dusername=USERNAME " +
-                                   "-Dpassword=PASSWORD " +
-                                   "-Diterations=NUM-ITERATIONS " +
-                                   "-Dthreads=NUM-THREADS " +
-                                   "-Dfile=OUTPUT-FILE " +
-                                   "-Dname=TEST-NAME" +
-                                   "[-Dcontext=CONTEXT]");
+                           "-Dhost=HOST " +
+                           "-Dport=PORT " +
+                           "-Dusername=USERNAME " +
+                           "-Dpassword=PASSWORD " +
+                           "-Diterations=NUM-ITERATIONS " +
+                           "-Dthreads=NUM-THREADS " +
+                           "-Dfile=OUTPUT-FILE " +
+                           "-Dname=TEST-NAME" +
+                           "[-Dcontext=CONTEXT]");
         System.out.println("Where:");
         System.out.println("  HOST = Host on which Fedora server is running.");
         System.out.println("  PORT = Port on which the Fedora server APIs can be accessed.");
@@ -675,7 +675,8 @@ public class PerformanceTests
         System.out.println("                If the file does not exist, it will be created, if the");
         System.out.println("                file does exist the new results will be appended.");
         System.out.println("  TEST-NAME   = A name for this test run.");
-        System.out.println("  CONTEXT     = The application server context Fedora is deployed in. This parameter is optional");
+        System.out.println(
+                "  CONTEXT     = The application server context Fedora is deployed in. This parameter is optional");
         System.out.println("Example:");
         System.out.println("ant performance-tests " +
                            "-Dhost=localhost " +
@@ -692,7 +693,7 @@ public class PerformanceTests
 
     public static void main(String[] args) throws Exception {
 
-        if(args.length < 8 || args.length > 9) {
+        if (args.length < 8 || args.length > 9) {
             usage();
         }
 
@@ -704,20 +705,20 @@ public class PerformanceTests
         String thrds = args[5];
         String output = args[6];
         String name = args[7];
-        String context  = Constants.FEDORA_DEFAULT_APP_CONTEXT;
+        String context = Constants.FEDORA_DEFAULT_APP_CONTEXT;
 
-        if(args.length == 9 && !args[8].equals("")){
+        if (args.length == 9 && !args[8].equals("")) {
             context = args[8];
         }
 
-        if(host == null || host.startsWith("$") ||
-           port == null || port.startsWith("$") ||
-           username == null || username.startsWith("$") ||
-           password == null || password.startsWith("$") ||
-           itr == null || itr.startsWith("$") ||
-           thrds == null || thrds.startsWith("$") ||
-           output == null || output.startsWith("$") ||
-           name == null || name.startsWith("$")) {
+        if (host == null || host.startsWith("$") ||
+            port == null || port.startsWith("$") ||
+            username == null || username.startsWith("$") ||
+            password == null || password.startsWith("$") ||
+            itr == null || itr.startsWith("$") ||
+            thrds == null || thrds.startsWith("$") ||
+            output == null || output.startsWith("$") ||
+            name == null || name.startsWith("$")) {
             usage();
         }
         name = name.replaceAll(",", ";");
@@ -730,7 +731,7 @@ public class PerformanceTests
         File tempFile = null;
         BufferedReader reader = null;
         String line = "";
-        if(outputFile.exists()) {
+        if (outputFile.exists()) {
             newFile = false;
 
             // Create a copy of the file to read from
@@ -748,7 +749,7 @@ public class PerformanceTests
         }
         PrintStream out = new PrintStream(outputFile);
 
-        if(newFile) {
+        if (newFile) {
             out.println("--------------------------------------------------------------" +
                         " Performance Test Results " +
                         "--------------------------------------------------------------");
@@ -777,9 +778,11 @@ public class PerformanceTests
         System.out.println("Running Threaded Throughput Tests...");
         long[] tptResults = tests.runThreadedThroughputTests();
 
-        if(newFile) {
-            out.println("1. Test performing each operation in isolation. Time (in ms) is the average required to perform each operation.");
-            out.println("test name, ingest, addDatastream, modifyDatastreamByReference, modifyDatastreamByValue, purgeDatastream, purgeObject, getDatastream, getDatastreamREST");
+        if (newFile) {
+            out.println(
+                    "1. Test performing each operation in isolation. Time (in ms) is the average required to perform each operation.");
+            out.println(
+                    "test name, ingest, addDatastream, modifyDatastreamByReference, modifyDatastreamByValue, purgeDatastream, purgeObject, getDatastream, getDatastreamREST");
         } else {
             line = reader.readLine();
             while (line != null && line.length() > 2) {
@@ -794,13 +797,14 @@ public class PerformanceTests
                     modifyValResults + ", " +
                     purgeDsResults + ", " +
                     purgeObjectResults + ", " +
-                    getDatastreamResults/iterations + ", " +
-                    getDatastreamRestResults/iterations);
+                    getDatastreamResults / iterations + ", " +
+                    getDatastreamRestResults / iterations);
 
         out.println();
-        if(newFile) {
+        if (newFile) {
             out.println("2. Operations-Per-Second based on results listed in item 1.");
-            out.println("test name, ingest, addDatastream, modifyDatastreamByReference, modifyDatastreamByValue, purgeDatastream, purgeObject, getDatastream, getDatastreamREST");
+            out.println(
+                    "test name, ingest, addDatastream, modifyDatastreamByReference, modifyDatastreamByValue, purgeDatastream, purgeObject, getDatastream, getDatastreamREST");
         } else {
             line = reader.readLine();
             while (line != null && line.length() > 2) {
@@ -808,14 +812,14 @@ public class PerformanceTests
                 line = reader.readLine();
             }
         }
-        double ingestPerSecond = 1000/(double)ingestResults;
-        double addDsPerSecond = 1000/(double)addDsResults;
-        double modifyRefPerSecond = 1000/(double)modifyRefResults;
-        double modifyValPerSecond = 1000/(double)modifyValResults;
-        double purgeDsPerSecond = 1000/(double)purgeDsResults;
-        double purgeObjPerSecond = 1000/(double)purgeObjectResults;
-        double getDatastreamPerSecond = 1000/((double)getDatastreamResults/iterations);
-        double getDatastreamRestPerSecond = 1000/((double)getDatastreamRestResults/iterations);
+        double ingestPerSecond = 1000 / (double) ingestResults;
+        double addDsPerSecond = 1000 / (double) addDsResults;
+        double modifyRefPerSecond = 1000 / (double) modifyRefResults;
+        double modifyValPerSecond = 1000 / (double) modifyValResults;
+        double purgeDsPerSecond = 1000 / (double) purgeDsResults;
+        double purgeObjPerSecond = 1000 / (double) purgeObjectResults;
+        double getDatastreamPerSecond = 1000 / ((double) getDatastreamResults / iterations);
+        double getDatastreamRestPerSecond = 1000 / ((double) getDatastreamRestResults / iterations);
         out.println(name + ", " +
                     round(ingestPerSecond) + ", " +
                     round(addDsPerSecond) + ", " +
@@ -827,9 +831,11 @@ public class PerformanceTests
                     round(getDatastreamRestPerSecond));
 
         out.println();
-        if(newFile) {
-            out.println("3. Test performing operations back-to-back. Time (in ms) is that required to perform all iterations.");
-            out.println("test name, ingest, addDatastream, modifyDatastreamByReference, modifyDatastreamByValue, purgeDatastream, purgeObject, getDatastream, getDatastreamREST");
+        if (newFile) {
+            out.println(
+                    "3. Test performing operations back-to-back. Time (in ms) is that required to perform all iterations.");
+            out.println(
+                    "test name, ingest, addDatastream, modifyDatastreamByReference, modifyDatastreamByValue, purgeDatastream, purgeObject, getDatastream, getDatastreamREST");
         } else {
             line = reader.readLine();
             while (line != null && line.length() > 2) {
@@ -848,9 +854,10 @@ public class PerformanceTests
                     getDatastreamRestResults);
 
         out.println();
-        if(newFile) {
+        if (newFile) {
             out.println("4. Operations-Per-Second based on results listed in item 3.");
-            out.println("test name, ingest, addDatastream, modifyDatastreamByReference, modifyDatastreamByValue, purgeDatastream, purgeObject, getDatastream, getDatastreamREST");
+            out.println(
+                    "test name, ingest, addDatastream, modifyDatastreamByReference, modifyDatastreamByValue, purgeDatastream, purgeObject, getDatastream, getDatastreamREST");
         } else {
             line = reader.readLine();
             while (line != null && line.length() > 2) {
@@ -858,14 +865,14 @@ public class PerformanceTests
                 line = reader.readLine();
             }
         }
-        double ingestItPerSecond = (double)(iterations * 1000)/tpResults[0];
-        double addDsItPerSecond = (double)(iterations * 1000)/tpResults[1];
-        double modifyRefItPerSecond = (double)(iterations * 1000)/tpResults[2];
-        double modifyValItPerSecond = (double)(iterations * 1000)/tpResults[3];
-        double purgeDsItPerSecond = (double)(iterations * 1000)/tpResults[4];
-        double purgeObjItPerSecond = (double)(iterations * 1000)/tpResults[5];
-        double getDsItPerSecond = (double)(iterations * 1000)/getDatastreamResults;
-        double getDsRestItPerSecond = (double)(iterations * 1000)/getDatastreamRestResults;
+        double ingestItPerSecond = (double) (iterations * 1000) / tpResults[0];
+        double addDsItPerSecond = (double) (iterations * 1000) / tpResults[1];
+        double modifyRefItPerSecond = (double) (iterations * 1000) / tpResults[2];
+        double modifyValItPerSecond = (double) (iterations * 1000) / tpResults[3];
+        double purgeDsItPerSecond = (double) (iterations * 1000) / tpResults[4];
+        double purgeObjItPerSecond = (double) (iterations * 1000) / tpResults[5];
+        double getDsItPerSecond = (double) (iterations * 1000) / getDatastreamResults;
+        double getDsRestItPerSecond = (double) (iterations * 1000) / getDatastreamRestResults;
         out.println(name + ", " +
                     round(ingestItPerSecond) + ", " +
                     round(addDsItPerSecond) + ", " +
@@ -877,9 +884,11 @@ public class PerformanceTests
                     round(getDsRestItPerSecond));
 
         out.println();
-        if(newFile) {
-            out.println("5. Test performing operations using a thread pool. Time (in ms) is that required to perform all iterations.");
-            out.println("test name, ingest, addDatastream, modifyDatastreamByReference, modifyDatastreamByValue, purgeDatastream, purgeObject, getDatastream, getDatastreamREST");
+        if (newFile) {
+            out.println(
+                    "5. Test performing operations using a thread pool. Time (in ms) is that required to perform all iterations.");
+            out.println(
+                    "test name, ingest, addDatastream, modifyDatastreamByReference, modifyDatastreamByValue, purgeDatastream, purgeObject, getDatastream, getDatastreamREST");
         } else {
             line = reader.readLine();
             while (line != null && line.length() > 2) {
@@ -898,9 +907,10 @@ public class PerformanceTests
                     tptResults[7]);
 
         out.println();
-        if(newFile) {
+        if (newFile) {
             out.println("6. Operations-Per-Second based on results listed in item 5.");
-            out.println("test name, ingest, addDatastream, modifyDatastreamByReference, modifyDatastreamByValue, purgeDatastream, purgeObject, getDatastream, getDatastreamREST");
+            out.println(
+                    "test name, ingest, addDatastream, modifyDatastreamByReference, modifyDatastreamByValue, purgeDatastream, purgeObject, getDatastream, getDatastreamREST");
         } else {
             line = reader.readLine();
             while (line != null && line.length() > 2) {
@@ -908,14 +918,14 @@ public class PerformanceTests
                 line = reader.readLine();
             }
         }
-        double thrdIngestItPerSecond = (double)(iterations * 1000)/tptResults[0];
-        double thrdAddDsItPerSecond = (double)(iterations * 1000)/tptResults[1];
-        double thrdModifyRefItPerSecond = (double)(iterations * 1000)/tptResults[2];
-        double thrdModifyValItPerSecond = (double)(iterations * 1000)/tptResults[3];
-        double thrdPurgeDsItPerSecond = (double)(iterations * 1000)/tptResults[4];
-        double thrdPurgeObjItPerSecond = (double)(iterations * 1000)/tptResults[5];
-        double thrdGetDsItPerSecond = (double)(iterations * 1000)/tptResults[6];
-        double thrdGetDsRestItPerSecond = (double)(iterations * 1000)/tptResults[7];
+        double thrdIngestItPerSecond = (double) (iterations * 1000) / tptResults[0];
+        double thrdAddDsItPerSecond = (double) (iterations * 1000) / tptResults[1];
+        double thrdModifyRefItPerSecond = (double) (iterations * 1000) / tptResults[2];
+        double thrdModifyValItPerSecond = (double) (iterations * 1000) / tptResults[3];
+        double thrdPurgeDsItPerSecond = (double) (iterations * 1000) / tptResults[4];
+        double thrdPurgeObjItPerSecond = (double) (iterations * 1000) / tptResults[5];
+        double thrdGetDsItPerSecond = (double) (iterations * 1000) / tptResults[6];
+        double thrdGetDsRestItPerSecond = (double) (iterations * 1000) / tptResults[7];
         out.println(name + ", " +
                     round(thrdIngestItPerSecond) + ", " +
                     round(thrdAddDsItPerSecond) + ", " +
@@ -926,7 +936,7 @@ public class PerformanceTests
                     round(thrdGetDsItPerSecond) + ", " +
                     round(thrdGetDsRestItPerSecond));
 
-        if(!newFile){
+        if (!newFile) {
             reader.close();
             tempFile.delete();
         }

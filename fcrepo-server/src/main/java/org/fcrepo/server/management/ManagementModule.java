@@ -4,17 +4,6 @@
  */
 package org.fcrepo.server.management;
 
-import java.io.File;
-import java.io.InputStream;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -30,6 +19,10 @@ import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * @author Edwin Shin
@@ -60,7 +53,9 @@ public class ManagementModule
 
     private AbstractInvocationHandler[] invocationHandlers;
 
-    /** Delay between purge of two uploaded files. */
+    /**
+     * Delay between purge of two uploaded files.
+     */
     private long m_purgeDelayInMillis;
 
     public ManagementModule(Map<String, String> moduleParameters,
@@ -82,11 +77,11 @@ public class ManagementModule
             m_uploadStorageMinutes = Integer.parseInt(min);
             if (m_uploadStorageMinutes < 1) {
                 throw new ModuleInitializationException("uploadStorageMinutes "
-                        + "must be 1 or more, if specified.", getRole());
+                                                        + "must be 1 or more, if specified.", getRole());
             }
         } catch (NumberFormatException nfe) {
             throw new ModuleInitializationException("uploadStorageMinutes must "
-                                                            + "be an integer, if specified.",
+                                                    + "be an integer, if specified.",
                                                     getRole());
         }
         // initialize storage area by 1) ensuring the directory is there
@@ -115,8 +110,8 @@ public class ManagementModule
             }
         } catch (Exception e) {
             throw new ModuleInitializationException("Error while initializing "
-                    + "temporary storage area: " + e.getClass().getName()
-                    + ": " + e.getMessage(), getRole(), e);
+                                                    + "temporary storage area: " + e.getClass().getName()
+                                                    + ": " + e.getMessage(), getRole(), e);
         }
 
         // initialize variables pertaining to checksumming datastreams.
@@ -132,14 +127,14 @@ public class ManagementModule
         // get delay between purge of two uploaded files (default 1 minute)
         String purgeDelayInMillis = getParameter("purgeDelayInMillis");
         if (purgeDelayInMillis == null) {
-          purgeDelayInMillis = "60000";
+            purgeDelayInMillis = "60000";
         }
         try {
             this.m_purgeDelayInMillis = Integer.parseInt(purgeDelayInMillis);
         } catch (NumberFormatException nfe) {
             throw new ModuleInitializationException(
-                "purgeDelayInMillis must be an integer, if specified.",
-                getRole());
+                    "purgeDelayInMillis must be an integer, if specified.",
+                    getRole());
         }
     }
 
@@ -151,14 +146,14 @@ public class ManagementModule
                         .getModule("org.fcrepo.server.storage.DOManager");
         if (m_manager == null) {
             throw new ModuleInitializationException("Can't get a DOManager "
-                    + "from Server.getModule", getRole());
+                                                    + "from Server.getModule", getRole());
         }
         m_contentManager =
                 (ExternalContentManager) getServer()
                         .getModule("org.fcrepo.server.storage.ExternalContentManager");
         if (m_contentManager == null) {
             throw new ModuleInitializationException("Can't get an ExternalContentManager "
-                                                            + "from Server.getModule",
+                                                    + "from Server.getModule",
                                                     getRole());
         }
 
@@ -166,8 +161,9 @@ public class ManagementModule
                 (Authorization) getServer()
                         .getModule("org.fcrepo.server.security.Authorization");
         if (m_fedoraXACMLModule == null) {
-            throw new ModuleInitializationException("Can't get Authorization module (in default management) from Server.getModule",
-                                                    getRole());
+            throw new ModuleInitializationException(
+                    "Can't get Authorization module (in default management) from Server.getModule",
+                    getRole());
         }
 
         Management m =
@@ -357,8 +353,7 @@ public class ManagementModule
                                             String dsLocation,
                                             String checksumType,
                                             String checksum,
-                                            String logMessage,
-                                            boolean force)
+                                            String logMessage)
             throws ServerException {
         return mgmt.modifyDatastreamByReference(context,
                                                 pid,
@@ -370,8 +365,7 @@ public class ManagementModule
                                                 dsLocation,
                                                 checksumType,
                                                 checksum,
-                                                logMessage,
-                                                force);
+                                                logMessage);
     }
 
     /**
@@ -387,8 +381,7 @@ public class ManagementModule
                                         InputStream dsContent,
                                         String checksumType,
                                         String checksum,
-                                        String logMessage,
-                                        boolean force) throws ServerException {
+                                        String logMessage) throws ServerException {
         return mgmt.modifyDatastreamByValue(context,
                                             pid,
                                             datastreamID,
@@ -399,8 +392,7 @@ public class ManagementModule
                                             dsContent,
                                             checksumType,
                                             checksum,
-                                            logMessage,
-                                            force);
+                                            logMessage);
     }
 
     /**
@@ -429,15 +421,13 @@ public class ManagementModule
                                   String datastreamID,
                                   Date startDT,
                                   Date endDT,
-                                  String logMessage,
-                                  boolean force) throws ServerException {
+                                  String logMessage) throws ServerException {
         return mgmt.purgeDatastream(context,
                                     pid,
                                     datastreamID,
                                     startDT,
                                     endDT,
-                                    logMessage,
-                                    force);
+                                    logMessage);
     }
 
     /**
@@ -445,9 +435,8 @@ public class ManagementModule
      */
     public Date purgeObject(Context context,
                             String pid,
-                            String logMessage,
-                            boolean force) throws ServerException {
-        return mgmt.purgeObject(context, pid, logMessage, force);
+                            String logMessage) throws ServerException {
+        return mgmt.purgeObject(context, pid, logMessage);
     }
 
     /**
@@ -505,8 +494,7 @@ public class ManagementModule
     /**
      * Build a proxy chain as configured by the module parameters.
      *
-     * @param m
-     *        The concrete Management implementation to wrap.
+     * @param m The concrete Management implementation to wrap.
      * @return A proxy chain for Management
      * @throws ModuleInitializationException
      */
@@ -551,8 +539,10 @@ public class ManagementModule
 
     private static AbstractInvocationHandler getInvocationHandler(String invocationHandler)
             throws Exception {
-        if (invocationHandler == null) return null;
+        if (invocationHandler == null) {
+            return null;
+        }
         Class<?> c = Class.forName(invocationHandler);
-        return (AbstractInvocationHandler)c.newInstance();
+        return (AbstractInvocationHandler) c.newInstance();
     }
 }

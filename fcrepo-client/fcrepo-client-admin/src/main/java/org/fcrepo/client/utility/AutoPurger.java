@@ -4,19 +4,14 @@
  */
 package org.fcrepo.client.utility;
 
-import java.io.IOException;
-
-import java.net.MalformedURLException;
-
-import java.rmi.RemoteException;
-
-import javax.xml.rpc.ServiceException;
-
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.management.FedoraAPIM;
 
-
+import javax.xml.rpc.ServiceException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.rmi.RemoteException;
 
 
 /**
@@ -31,16 +26,15 @@ public class AutoPurger {
         m_apim = apim;
     }
 
-    public void purge(String pid, String logMessage, boolean force)
+    public void purge(String pid, String logMessage)
             throws RemoteException, IOException {
-        purge(m_apim, pid, logMessage, force);
+        purge(m_apim, pid, logMessage);
     }
 
     public static void purge(FedoraAPIM skeleton,
                              String pid,
-                             String logMessage,
-                             boolean force) throws RemoteException, IOException {
-        skeleton.purgeObject(pid, logMessage, force);
+                             String logMessage) throws RemoteException, IOException {
+        skeleton.purgeObject(pid, logMessage);
     }
 
     /**
@@ -62,7 +56,8 @@ public class AutoPurger {
         System.err.println("  pid      is the id of the object to purge from the target repository.");
         System.err.println("  protocol is the protocol to communicate with repository (http or https)");
         System.err.println("  log      is a log message.");
-        System.out.println("  context  (optional) is a different web application server context of Fedora (default is fedora)");
+        System.out.println(
+                "  context  (optional) is a different web application server context of Fedora (default is fedora)");
 
         System.err.println();
         System.err.println("Example:");
@@ -91,24 +86,24 @@ public class AutoPurger {
 
                 String context = Constants.FEDORA_DEFAULT_APP_CONTEXT;
 
-                if (args.length == 7 && !args[6].equals("")){
-                  context = args[6];
+                if (args.length == 7 && !args[6].equals("")) {
+                    context = args[6];
                 }
                 // ******************************************
                 // NEW: use new client utility class
                 String baseURL =
                         protocol + "://" + hostName + ":" + portNum + "/"
-                                + context;
+                        + context;
                 FedoraClient fc = new FedoraClient(baseURL, args[1], args[2]);
                 AutoPurger a = new AutoPurger(fc.getAPIM());
                 //*******************************************
-                a.purge(pid, logMessage, false); // DEFAULT_FORCE_PURGE
+                a.purge(pid, logMessage);
             }
         } catch (Exception e) {
             AutoPurger.showUsage(e.getClass().getName()
-                    + " - "
-                    + (e.getMessage() == null ? "(no detail provided)" : e
-                            .getMessage()));
+                                 + " - "
+                                 + (e.getMessage() == null ? "(no detail provided)" : e
+                    .getMessage()));
         }
     }
 

@@ -8,13 +8,7 @@ import org.fcrepo.common.PID;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.test.FedoraServerTestCase;
 
-
-
-
-import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
-import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
-import static org.apache.commons.httpclient.HttpStatus.SC_OK;
-import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
+import static org.apache.commons.httpclient.HttpStatus.*;
 
 /**
  * Tests of the REST API based on the config Q settings.
@@ -23,8 +17,8 @@ import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
  * instead of just HTTP status codes
  *
  * @author Bill Branan
- * @since 3.0
  * @version $Id$
+ * @since 3.0
  */
 public class TestRESTAPIConfigQ
         extends FedoraServerTestCase {
@@ -42,7 +36,7 @@ public class TestRESTAPIConfigQ
         StringBuilder sb = new StringBuilder();
         sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        sb.append("<foxml:digitalObject VERSION=\"1.1\" PID=\""+pid.toString()+"\" ");
+        sb.append("<foxml:digitalObject VERSION=\"1.1\" PID=\"" + pid.toString() + "\" ");
         sb.append("  xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\" ");
         sb.append("  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ");
         sb.append("  xsi:schemaLocation=\"info:fedora/fedora-system:def/foxml# ");
@@ -85,7 +79,7 @@ public class TestRESTAPIConfigQ
         rest.url = String.format("/objects/%s", pid);
         assertEquals(SC_OK, rest.get(false).getStatusCode());
 
-        apim.purgeObject(pid.toString(), "", false);
+        apim.purgeObject(pid.toString(), "");
     }
 
 }

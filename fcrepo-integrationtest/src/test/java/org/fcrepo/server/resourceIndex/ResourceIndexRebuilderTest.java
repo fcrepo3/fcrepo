@@ -5,26 +5,11 @@
 
 package org.fcrepo.server.resourceIndex;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-
-import java.net.ConnectException;
-import java.net.Socket;
-
-import java.util.Date;
-import java.util.Map;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.config.ServerConfigurationParser;
 import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.resourceIndex.ResourceIndexRebuilder;
 import org.fcrepo.server.utilities.ServerUtility;
 import org.fcrepo.server.utilities.rebuild.Rebuild;
 import org.fcrepo.server.utilities.rebuild.Rebuilder;
@@ -34,18 +19,26 @@ import org.fcrepo.utilities.Foxml11Document;
 import org.fcrepo.utilities.Foxml11Document.ControlGroup;
 import org.fcrepo.utilities.Foxml11Document.Property;
 import org.fcrepo.utilities.Foxml11Document.State;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-
-
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.ConnectException;
+import java.net.Socket;
+import java.util.Date;
+import java.util.Map;
 
 
 /**
  * Test of the ResourceIndexRebuilder. Requires that Fedora already be installed.
  * Note that this is a long-running test because of the ingest & purge cycle.
- * 
+ *
  * @author Edwin Shin
- * @since 3.0
  * @version $Id: ResourceIndexRebuilderTest.java 7508 2008-07-15 04:00:43Z pangloss $
+ * @since 3.0
  */
 public class ResourceIndexRebuilderTest {
 
@@ -154,7 +147,7 @@ public class ResourceIndexRebuilderTest {
             System.out.println("Tomcat was already shut down.");
             return;
         }
-        
+
         String cmd = Constants.FEDORA_HOME + "/tomcat/bin/shutdown";
 
         String osName = System.getProperty("os.name");
@@ -198,7 +191,7 @@ public class ResourceIndexRebuilderTest {
     private void purgeObjects(int count) throws Exception {
         for (int i = 0; i < count; i++) {
             String pid = String.format("demo:ri%s", i);
-            apim.purgeObject(pid, null, false);
+            apim.purgeObject(pid, null);
         }
     }
 

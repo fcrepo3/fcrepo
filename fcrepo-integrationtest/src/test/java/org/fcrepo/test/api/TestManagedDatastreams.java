@@ -4,31 +4,13 @@
  */
 package org.fcrepo.test.api;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-
-import java.rmi.RemoteException;
-
-import java.security.MessageDigest;
-
-import java.util.Date;
-
+import junit.framework.JUnit4TestAdapter;
 import org.apache.abdera.Abdera;
 import org.apache.abdera.ext.thread.ThreadHelper;
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import org.fcrepo.common.PID;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.utilities.StringUtility;
@@ -37,17 +19,20 @@ import org.fcrepo.utilities.Foxml11Document;
 import org.fcrepo.utilities.Foxml11Document.ControlGroup;
 import org.fcrepo.utilities.Foxml11Document.Property;
 import org.fcrepo.utilities.Foxml11Document.State;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import junit.framework.JUnit4TestAdapter;
-
-
-
+import java.io.*;
+import java.rmi.RemoteException;
+import java.security.MessageDigest;
+import java.util.Date;
 
 
 /**
  * @author Edwin Shin
- * @since 3.0
  * @version $Id$
+ * @since 3.0
  */
 public class TestManagedDatastreams
         extends FedoraServerTestCase {
@@ -63,7 +48,7 @@ public class TestManagedDatastreams
             "temp:///tmp/foo.txt",
             "temp://tmp/foo.txt",
             "temp://../etc/passwd"
-            };
+    };
 
     private final String[] uploadedLocations = {
             "uploaded:///tmp/foo.txt",
@@ -135,7 +120,7 @@ public class TestManagedDatastreams
                 try {
                     addDatastream(pid, contentLocation);
                     fail("addDatastream should have failed with "
-                            + contentLocation);
+                         + contentLocation);
                 } catch (RemoteException e) {
                     assertTrue(e.getMessage().contains("ValidationException"));
                 }
@@ -145,14 +130,14 @@ public class TestManagedDatastreams
                 try {
                     addDatastream(pid, contentLocation);
                     fail("addDatastream should have failed with "
-                            + contentLocation);
+                         + contentLocation);
                 } catch (RemoteException e) {
                     assertTrue(e.getMessage().contains("StreamReadException"));
                 }
             }
 
         } finally {
-            apim.purgeObject(pid, "test", false);
+            apim.purgeObject(pid, "test");
         }
     }
 
@@ -185,7 +170,7 @@ public class TestManagedDatastreams
             // copy:// url
             modifyDatastreamByReference(pid, null);
         } finally {
-            apim.purgeObject(pid, "test", false);
+            apim.purgeObject(pid, "test");
         }
     }
 
@@ -204,16 +189,16 @@ public class TestManagedDatastreams
             assertEquals("DS", dsId);
 
             // Now ensure that bogus checksums do indeed fail
-            apim.purgeDatastream(pid, dsId, null, null, null, false);
+            apim.purgeDatastream(pid, dsId, null, null, null);
             checksum = "bogus";
             try {
                 addDatastream(pid, contentLocation, checksumType, checksum);
                 fail("Adding datastream with bogus checksum should have failed.");
-            } catch(RemoteException e) {
+            } catch (RemoteException e) {
                 assertTrue(e.getMessage().contains("Checksum Mismatch"));
             }
         } finally {
-            apim.purgeObject(pid, "test", false);
+            apim.purgeObject(pid, "test");
             if (temp != null) {
                 temp.delete();
             }
@@ -245,11 +230,11 @@ public class TestManagedDatastreams
             try {
                 modifyDatastreamByReference(pid, contentLocation, checksumType, checksum);
                 fail("Modifying datastream with bogus checksum should have failed.");
-            } catch(RemoteException e) {
+            } catch (RemoteException e) {
                 assertTrue(e.getMessage().contains("Checksum Mismatch"));
             }
         } finally {
-            apim.purgeObject(pid, "test", false);
+            apim.purgeObject(pid, "test");
             if (temp != null) {
                 temp.delete();
             }
@@ -306,15 +291,14 @@ public class TestManagedDatastreams
             throws Exception {
         return apim.modifyDatastreamByReference(pid,
                                                 "DS",
-                                                new String[] {},
+                                                new String[]{},
                                                 "testManagedDatastreams",
                                                 "text/plain",
                                                 "",
                                                 contentLocation,
                                                 checksumType,
                                                 checksum,
-                                                "testManagedDatastreams",
-                                                false);
+                                                "testManagedDatastreams");
     }
 
     private Feed createAtomObject(String spid, String contentLocation) throws Exception {

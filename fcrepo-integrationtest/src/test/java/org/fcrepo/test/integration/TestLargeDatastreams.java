@@ -4,13 +4,7 @@
  */
 package org.fcrepo.test.integration;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-
-import java.util.Random;
-
+import junit.framework.JUnit4TestAdapter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
@@ -21,25 +15,25 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.PartSource;
-
-import org.junit.Test;
-
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.types.gen.MIMETypedStream;
 import org.fcrepo.test.FedoraTestCase;
+import org.junit.Test;
 
-import junit.framework.JUnit4TestAdapter;
-
-
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Random;
 
 
 /**
  * Performs ingest and export tests using large datastreams.
  * This test creates and moves very large files and as such
  * takes significant time to run.
- *
+ * <p/>
  * Non-SSL transports *MUST* be available for all APIs in order
  * for this test to run properly.
  *
@@ -47,9 +41,9 @@ import junit.framework.JUnit4TestAdapter;
  */
 public class TestLargeDatastreams
         extends FedoraTestCase {
-    
+
     private FedoraClient fedoraClient;
-    
+
     private FedoraAPIM apim;
 
     private FedoraAPIA apia;
@@ -124,12 +118,12 @@ public class TestLargeDatastreams
         long exportFileAPIASize = exportAPIA("DS1");
 
         // If file was small enough to transfer via API-A
-        if(exportFileAPIASize >= 0) {
+        if (exportFileAPIASize >= 0) {
             assertEquals(fileSize, exportFileAPIASize);
         }
 
         // Clean up
-        apim.purgeObject(pid, "Removing Test Object", false);
+        apim.purgeObject(pid, "Removing Test Object");
         System.out.println("  Test Complete.");
     }
 
@@ -144,7 +138,7 @@ public class TestLargeDatastreams
                 new MultipartRequestEntity(parts, httpMethod.getParams()));
         HttpClient client = fedoraClient.getHttpClient();
         try {
-            
+
             int status = client.executeMethod(httpMethod);
             String response = new String(httpMethod.getResponseBody());
 
@@ -185,9 +179,9 @@ public class TestLargeDatastreams
         MIMETypedStream fileStream = null;
         try {
             fileStream = apia.getDatastreamDissemination(pid, dsId, null);
-        } catch(Exception e) {
-            if(e.getMessage().indexOf("The datastream you are attempting " +
-                                      "to retrieve is too large") > 0) {
+        } catch (Exception e) {
+            if (e.getMessage().indexOf("The datastream you are attempting " +
+                                       "to retrieve is too large") > 0) {
                 System.out.println("  Expected error generated in API-A export:");
                 System.out.println("    Error text: " + e.getMessage());
                 return -1;
@@ -199,14 +193,14 @@ public class TestLargeDatastreams
 
         return fileStream.getStream().length;
     }
-    
+
     /**
      * Replace newlines with the given string.
      */
     private static String replaceNewlines(String in, String replaceWith) {
         return in.replaceAll("\r", replaceWith).replaceAll("\n", replaceWith);
     }
-    
+
     public static junit.framework.Test suite() {
         return new JUnit4TestAdapter(TestLargeDatastreams.class);
     }
@@ -233,12 +227,12 @@ public class TestLargeDatastreams
 
         @Override
         public int available() throws IOException {
-            return (int)(fileSize - bytesRead);
+            return (int) (fileSize - bytesRead);
         }
 
         @Override
         public int read() throws IOException {
-            if(bytesRead < fileSize) {
+            if (bytesRead < fileSize) {
                 ++bytesRead;
                 return generator.nextInt(100);
             } else {

@@ -11,7 +11,7 @@ import org.fcrepo.server.management.ManagementDelegate;
 
 /**
  * Adapter class for Management.purgeDatastream().
- * 
+ *
  * @author Jim Blake
  */
 public class PurgeDatastreamMethod
@@ -28,8 +28,7 @@ public class PurgeDatastreamMethod
                 .getStringArgument(ARGUMENT_NAME_DS_ID), parent
                 .getDateArgument(ARGUMENT_NAME_START_DATE), parent
                 .getDateArgument(ARGUMENT_NAME_END_DATE), parent
-                .getStringArgument(ARGUMENT_NAME_LOG_MESSAGE), parent
-                .getBooleanArgument(ARGUMENT_NAME_FORCE));
+                .getStringArgument(ARGUMENT_NAME_LOG_MESSAGE));
     }
 
 }

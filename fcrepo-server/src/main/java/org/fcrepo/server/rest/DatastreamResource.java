@@ -4,28 +4,6 @@
  */
 package org.fcrepo.server.rest;
 
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.InputStream;
-
-import java.net.URLEncoder;
-
-import java.util.Date;
-import java.util.List;
-
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-
 import org.fcrepo.common.http.WebClient;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.rest.RestUtil.RequestContent;
@@ -34,12 +12,23 @@ import org.fcrepo.server.storage.types.DatastreamDef;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.utilities.DateUtility;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.util.Date;
+import java.util.List;
 
 
 /**
  * A rest controller to handle CRUD operations for the Fedora datasream API
  * (API-M) Request syntax:
- *
+ * <p/>
  * GET,PUT,POST,DELETE
  * prototol://hostname:port/fedora/objects/PID/datastreams/DSID/versions ? [dateTime][parmArray]
  * <ul>
@@ -65,7 +54,7 @@ public class DatastreamResource extends BaseRestResource {
      * Inquires upon all object Datastreams to obtain datastreams contained by a
      * digital object. This returns a set of datastream locations that represent
      * all possible datastreams available in the object.
-     *
+     * <p/>
      * GET /objects/{pid}/datastreams ? asOfDateTime format
      *
      * @param pid
@@ -104,39 +93,39 @@ public class DatastreamResource extends BaseRestResource {
 
     /**
      * Invoke API-M.getDatastream(context, pid, dsID, asOfDateTime)
-     *
+     * <p/>
      * GET /objects/{pid}/datastreams/{dsID} ? asOfDateTime & validateChecksum=true|false
      */
     @Path("/{dsID}")
     @GET
     public Response getDatastreamProfile(
-                     @PathParam(RestParam.PID)
-                     String pid,
-                     @PathParam(RestParam.DSID)
-                     String dsID,
-                     @QueryParam(RestParam.AS_OF_DATE_TIME)
-                     String dateTime,
-                     @QueryParam(RestParam.FORMAT)
-                     @DefaultValue(HTML)
-                     String format,
-                     @QueryParam(RestParam.VALIDATE_CHECKSUM)
-                     @DefaultValue("false")
-                     boolean validateChecksum) {
+            @PathParam(RestParam.PID)
+            String pid,
+            @PathParam(RestParam.DSID)
+            String dsID,
+            @QueryParam(RestParam.AS_OF_DATE_TIME)
+            String dateTime,
+            @QueryParam(RestParam.FORMAT)
+            @DefaultValue(HTML)
+            String format,
+            @QueryParam(RestParam.VALIDATE_CHECKSUM)
+            @DefaultValue("false")
+            boolean validateChecksum) {
         try {
             Date asOfDateTime = parseDate(dateTime);
             Context context = getContext();
             Datastream dsProfile = apiMService.getDatastream(context, pid, dsID, asOfDateTime);
 
-            if(dsProfile == null) {
+            if (dsProfile == null) {
                 return Response.status(Status.NOT_FOUND).type("text/plain").entity(
-                  "No datastream could be found. Either there is no datastream for " +
-                  "the digital object \""+pid+"\" with datastream ID of \""+dsID+
-                  "\"  OR  there are no datastreams that match the specified " +
-                  "date/time value of \""+dateTime+"\".").build();
+                        "No datastream could be found. Either there is no datastream for " +
+                        "the digital object \"" + pid + "\" with datastream ID of \"" + dsID +
+                        "\"  OR  there are no datastreams that match the specified " +
+                        "date/time value of \"" + dateTime + "\".").build();
             }
 
             String xml = getSerializer(context).
-                datastreamProfileToXML(pid, dsID, dsProfile, asOfDateTime, validateChecksum);
+                    datastreamProfileToXML(pid, dsID, dsProfile, asOfDateTime, validateChecksum);
 
             MediaType mime = RestHelper.getContentType(format);
 
@@ -154,7 +143,7 @@ public class DatastreamResource extends BaseRestResource {
 
     /**
      * Invoke API-A.getDatastreamDissemination(context, pid, dsID, asOfDateTime)
-     *
+     * <p/>
      * GET /objects/{pid}/datastreams/{dsID}/content ? asOfDateTime
      */
     @Path("/{dsID}/content")
@@ -173,12 +162,13 @@ public class DatastreamResource extends BaseRestResource {
         Context context = getContext();
         try {
             MIMETypedStream stream = apiAService.getDatastreamDissemination(
-                                                                        context,
-                                                                        pid,
-                                                                        dsID,
-                                                                        parseDate(dateTime));
+                    context,
+                    pid,
+                    dsID,
+                    parseDate(dateTime));
             if (datastreamFilenameHelper != null) {
-                datastreamFilenameHelper.addContentDispositionHeader(context, pid, dsID, download, parseDate(dateTime), stream);
+                datastreamFilenameHelper
+                        .addContentDispositionHeader(context, pid, dsID, download, parseDate(dateTime), stream);
 
             }
 
@@ -190,7 +180,7 @@ public class DatastreamResource extends BaseRestResource {
 
     /**
      * Invoke API-M.purgeDatastream
-     *
+     * <p/>
      * DELETE /objects/{pid}/datastreams/{dsID} ? startDT endDT logMessage force
      */
     @Path("/{dsID}")
@@ -205,17 +195,15 @@ public class DatastreamResource extends BaseRestResource {
             @QueryParam(RestParam.END_DT)
             String endDT,
             @QueryParam(RestParam.LOG_MESSAGE)
-            String logMessage,
-            @QueryParam(RestParam.FORCE)
-            @DefaultValue("false")
-            boolean force) {
+            String logMessage
+    ) {
 
         try {
             Context context = getContext();
             Date startDate = DateUtility.convertStringToDate(startDT);
             Date endDate = DateUtility.convertStringToDate(endDT);
             apiMService.purgeDatastream(context, pid, dsID, startDate,
-                                        endDate, logMessage, force);
+                                        endDate, logMessage);
             return Response.noContent().build();
         } catch (Exception ex) {
             return handleException(ex);
@@ -224,15 +212,15 @@ public class DatastreamResource extends BaseRestResource {
 
     /**
      * Modify an existing datastream.
-     *
+     * <p/>
      * PUT /objects/{pid}/datastreams/{dsID} ? dsLocation altIDs dsLabel versionable
-     *                                         dsState formatURI checksumType checksum
-     *                                         logMessage force
-     *
+     * dsState formatURI checksumType checksum
+     * logMessage force
+     * <p/>
      * Successful Response:
-     *   Status: 200 OK
-     *   Content-Type: text/xml
-     *   Body: XML datastream profile
+     * Status: 200 OK
+     * Content-Type: text/xml
+     * Body: XML datastream profile
      */
     @Path("/{dsID}")
     @PUT
@@ -262,30 +250,27 @@ public class DatastreamResource extends BaseRestResource {
             String mimeType,
             @QueryParam(RestParam.LOG_MESSAGE)
             String logMessage,
-            @QueryParam(RestParam.FORCE)
-            @DefaultValue("false")
-            boolean force,
             @QueryParam(RestParam.IGNORE_CONTENT)
             @DefaultValue("false")
             boolean ignoreContent) {
         return addOrUpdateDatastream(false, pid, dsID, headers.getMediaType(), mimeType,
                                      null, dsLocation, altIDs, dsLabel, versionable,
                                      dsState, formatURI, checksumType, checksum,
-                                     logMessage, force, ignoreContent);
+                                     logMessage, ignoreContent);
     }
 
     /**
      * Add or modify a datastream.
-     *
+     * <p/>
      * POST /objects/{pid}/datastreams/{dsID} ? controlGroup dsLocation altIDs dsLabel
-     *                                          versionable dsState formatURI
-     *                                          checksumType checksum logMessage
-     *
+     * versionable dsState formatURI
+     * checksumType checksum logMessage
+     * <p/>
      * Successful Response:
-     *   Status: 201 Created
-     *   Location: Datastream profile URL
-     *   Content-Type: text/xml
-     *   Body: XML datastream profile
+     * Status: 201 Created
+     * Location: Datastream profile URL
+     * Content-Type: text/xml
+     * Body: XML datastream profile
      */
     @Path("/{dsID}")
     @POST
@@ -322,7 +307,7 @@ public class DatastreamResource extends BaseRestResource {
         return addOrUpdateDatastream(true, pid, dsID, headers.getMediaType(), mimeType,
                                      controlGroup, dsLocation, altIDs, dsLabel,
                                      versionable, dsState, formatURI, checksumType,
-                                     checksum, logMessage, false, false);
+                                     checksum, logMessage, false);
     }
 
     protected Response addOrUpdateDatastream(
@@ -341,7 +326,6 @@ public class DatastreamResource extends BaseRestResource {
             String checksumType,
             String checksum,
             String logMessage,
-            boolean force,
             boolean ignoreContent) {
 
         try {
@@ -357,8 +341,8 @@ public class DatastreamResource extends BaseRestResource {
 
             // If a datastream is set to Deleted state, it must be set to
             // another state before any other changes can be made
-            if(existingDS != null && existingDS.DSState.equals("D") && dsState != null) {
-                if(dsState.equals("A") || dsState.equals("I")) {
+            if (existingDS != null && existingDS.DSState.equals("D") && dsState != null) {
+                if (dsState.equals("A") || dsState.equals("I")) {
                     apiMService.setDatastreamState(context, pid, dsID,
                                                    dsState, logMessage);
                     existingDS.DSState = dsState;
@@ -368,24 +352,24 @@ public class DatastreamResource extends BaseRestResource {
             InputStream is = null;
 
             // Determine if datastream content is included in the request
-            if(!ignoreContent) {
+            if (!ignoreContent) {
                 RestUtil restUtil = new RestUtil();
                 RequestContent content =
-                    restUtil.getRequestContent(servletRequest, headers);
+                        restUtil.getRequestContent(servletRequest, headers);
 
-                if(content != null && content.getContentStream() != null) {
+                if (content != null && content.getContentStream() != null) {
                     is = content.getContentStream();
                     // Give preference to the passed in mimeType
-                    if(mimeType == null && content.getMimeType() != null) {
+                    if (mimeType == null && content.getMimeType() != null) {
                         mimeType = content.getMimeType();
                     }
                 }
             }
 
             // Make sure that there is a mime type value
-            if(mimeType == null && mediaType != null) {
+            if (mimeType == null && mediaType != null) {
                 mimeType = mediaType.toString();
-            } else if(mimeType == null && mediaType == null) {
+            } else if (mimeType == null && mediaType == null) {
                 mimeType = existingDS.DSMIME;
             }
 
@@ -399,7 +383,7 @@ public class DatastreamResource extends BaseRestResource {
             if (existingDS == null) {
                 if (posted) {
                     if ((dsLocation == null || dsLocation.equals(""))
-                            && ("X".equals(controlGroup) || "M".equals(controlGroup))) {
+                        && ("X".equals(controlGroup) || "M".equals(controlGroup))) {
                         dsLocation = apiMService.putTempStream(context, is);
                     }
                     dsID = apiMService.addDatastream(context, pid, dsID, altIDs, dsLabel,
@@ -413,11 +397,11 @@ public class DatastreamResource extends BaseRestResource {
                 if ("X".equals(existingDS.DSControlGrp)) {
                     // Inline XML can only be modified by value. If there is no stream,
                     // but there is a dsLocation attempt to retrieve the content.
-                    if(is == null && dsLocation != null && !dsLocation.equals("")) {
+                    if (is == null && dsLocation != null && !dsLocation.equals("")) {
                         try {
                             WebClient webClient = new WebClient();
                             is = webClient.get(dsLocation, true);
-                        } catch(IOException ioe) {
+                        } catch (IOException ioe) {
                             throw new Exception("Could not retrive content from " +
                                                 dsLocation + " due to error: " +
                                                 ioe.getMessage());
@@ -426,13 +410,13 @@ public class DatastreamResource extends BaseRestResource {
                     apiMService.modifyDatastreamByValue(context, pid, dsID, altIDs,
                                                         dsLabel, mimeType, formatURI,
                                                         is, checksumType, checksum,
-                                                        logMessage, force);
+                                                        logMessage);
                 } else {
                     // Managed content can only be modified by reference.
                     // If there is no dsLocation, but there is a content stream,
                     // store the stream in a temporary location.
                     if (dsLocation == null && ("M".equals(existingDS.DSControlGrp))) {
-                        if(is != null) {
+                        if (is != null) {
                             dsLocation = apiMService.putTempStream(context, is);
                         } else {
                             dsLocation = null;
@@ -442,21 +426,21 @@ public class DatastreamResource extends BaseRestResource {
                     apiMService.modifyDatastreamByReference(context, pid, dsID, altIDs,
                                                             dsLabel, mimeType, formatURI,
                                                             dsLocation, checksumType,
-                                                            checksum, logMessage, force);
+                                                            checksum, logMessage);
                 }
 
-                if(dsState != null) {
-                    if(dsState.equals("A") ||
-                       dsState.equals("D") ||
-                       dsState.equals("I")) {
-                        if(!dsState.equals(existingDS.DSState)) {
+                if (dsState != null) {
+                    if (dsState.equals("A") ||
+                        dsState.equals("D") ||
+                        dsState.equals("I")) {
+                        if (!dsState.equals(existingDS.DSState)) {
                             apiMService.setDatastreamState(context, pid, dsID,
                                                            dsState, logMessage);
                         }
                     }
                 }
 
-                if(versionable != existingDS.DSVersionable) {
+                if (versionable != existingDS.DSVersionable) {
                     apiMService.setDatastreamVersionable(context, pid, dsID,
                                                          versionable, logMessage);
                 }
