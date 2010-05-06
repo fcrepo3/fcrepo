@@ -4,29 +4,21 @@
  */
 package org.fcrepo.server.messaging;
 
-import java.lang.reflect.Method;
-
-import java.util.Date;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
+import junit.framework.JUnit4TestAdapter;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.MockContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.management.Management;
-import org.fcrepo.server.messaging.APIMMessage;
-import org.fcrepo.server.messaging.AtomAPIMMessage;
-import org.fcrepo.server.messaging.FedoraMethod;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.test.FedoraTestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import junit.framework.JUnit4TestAdapter;
-
-
+import java.lang.reflect.Method;
+import java.util.Date;
 
 
 /**
@@ -87,10 +79,9 @@ public class AtomAPIMMessageTest extends FedoraTestCase {
 
         fm =
                 new FedoraMethod(Management.class
-                        .getDeclaredMethod("purgeObject", new Class[] {
-                                Context.class, String.class, String.class,
-                                boolean.class}), new Object[] {c, "demo:foo",
-                        "a log message", false}, "blah");
+                        .getDeclaredMethod("purgeObject", new Class[]{
+                        Context.class, String.class, String.class}), new Object[]{c, "demo:foo",
+                                                                                  "a log message", false}, "blah");
         message =
                 new AtomAPIMMessage(fm, baseURL, Server.VERSION, messageFormat);
         assertNotNull(message.getDate());
@@ -100,27 +91,27 @@ public class AtomAPIMMessageTest extends FedoraTestCase {
 
         fm =
                 new FedoraMethod(Management.class
-                                         .getDeclaredMethod("addDatastream",
-                                                            new Class[] {
-                                                                    Context.class,
-                                                                    String.class,
-                                                                    String.class,
-                                                                    String[].class,
-                                                                    String.class,
-                                                                    boolean.class,
-                                                                    String.class,
-                                                                    String.class,
-                                                                    String.class,
-                                                                    String.class,
-                                                                    String.class,
-                                                                    String.class,
-                                                                    String.class,
-                                                                    String.class}),
-                                 new Object[] {c, "demo:foo", "DS1",
-                                         new String[] {"altid1, altid2"},
-                                         "a label", true, "text/xml",
-                                         "some format uri", "dsLocation", "X",
-                                         "A", "none", "n/a", "a log message"},
+                        .getDeclaredMethod("addDatastream",
+                                           new Class[]{
+                                                   Context.class,
+                                                   String.class,
+                                                   String.class,
+                                                   String[].class,
+                                                   String.class,
+                                                   boolean.class,
+                                                   String.class,
+                                                   String.class,
+                                                   String.class,
+                                                   String.class,
+                                                   String.class,
+                                                   String.class,
+                                                   String.class,
+                                                   String.class}),
+                                 new Object[]{c, "demo:foo", "DS1",
+                                              new String[]{"altid1, altid2"},
+                                              "a label", true, "text/xml",
+                                              "some format uri", "dsLocation", "X",
+                                              "A", "none", "n/a", "a log message"},
                                  "asdf");
 
         message = new AtomAPIMMessage(fm, baseURL, Server.VERSION, messageFormat);
@@ -137,10 +128,10 @@ public class AtomAPIMMessageTest extends FedoraTestCase {
         ds.DSCreateDT = new Date();
         fm =
                 new FedoraMethod(Management.class
-                        .getDeclaredMethod("getDatastream", new Class[] {
-                                Context.class, String.class, String.class,
-                                Date.class}), new Object[] {c, "demo:foo",
-                        "DS1", new Date()}, ds);
+                        .getDeclaredMethod("getDatastream", new Class[]{
+                        Context.class, String.class, String.class,
+                        Date.class}), new Object[]{c, "demo:foo",
+                                                   "DS1", new Date()}, ds);
 
         message = new AtomAPIMMessage(fm, baseURL, Server.VERSION, messageFormat);
         assertNotNull(message.getDate());
@@ -156,13 +147,13 @@ public class AtomAPIMMessageTest extends FedoraTestCase {
                                       null);
         fm =
                 new FedoraMethod(Management.class
-                                         .getDeclaredMethod("getRelationships",
-                                                            new Class[] {
-                                                                    Context.class,
-                                                                    String.class,
-                                                                    String.class}),
-                                 new Object[] {c, "demo:foo", "urn:foo"},
-                                 new RelationshipTuple[] {tuple});
+                        .getDeclaredMethod("getRelationships",
+                                           new Class[]{
+                                                   Context.class,
+                                                   String.class,
+                                                   String.class}),
+                                 new Object[]{c, "demo:foo", "urn:foo"},
+                                 new RelationshipTuple[]{tuple});
         message = new AtomAPIMMessage(fm, baseURL, Server.VERSION, messageFormat);
     }
 
@@ -170,15 +161,14 @@ public class AtomAPIMMessageTest extends FedoraTestCase {
     public void testRoundTrip() throws Exception {
         Context context = new MockContext();
         Method method =
-                Management.class.getDeclaredMethod("purgeObject", new Class[] {
-                        Context.class, String.class, String.class,
-                        boolean.class});
+                Management.class.getDeclaredMethod("purgeObject", new Class[]{
+                        Context.class, String.class, String.class});
         Object returnValue = "return";
 
         // Quotes test
         String logMessage = "a log message with \"quotes\" included";
         Object[] parameters =
-                new Object[] {context, "demo:foo", logMessage, false};
+                new Object[]{context, "demo:foo", logMessage, false};
         FedoraMethod fm = new FedoraMethod(method, parameters, returnValue);
 
         APIMMessage message =
@@ -197,7 +187,7 @@ public class AtomAPIMMessageTest extends FedoraTestCase {
         // Special characters test
         logMessage =
                 "a log message with special characters (!@#$%^&*<>?`':;,.|[]{}) included";
-        parameters = new Object[] {context, "demo:foo", logMessage, false};
+        parameters = new Object[]{context, "demo:foo", logMessage, false};
         fm = new FedoraMethod(method, parameters, returnValue);
 
         message = new AtomAPIMMessage(fm, baseURL, Server.VERSION, messageFormat);

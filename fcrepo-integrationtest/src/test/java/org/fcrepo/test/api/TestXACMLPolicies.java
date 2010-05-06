@@ -128,15 +128,15 @@ public class TestXACMLPolicies
         Class modDSArgs[] =
                 {String.class, String.class, String[].class, String.class,
                  String.class, String.class, String.class, String.class,
-                 String.class, String.class, Boolean.TYPE};
+                 String.class, String.class};
         Object modDSParms1[] =
                 {"demo:5", "THUMBRES_IMG", null, null, null, null, null, null,
-                 null, null, Boolean.FALSE};
+                 null, null};
         Class purgeDSArgs[] =
                 {String.class, String.class, String.class, String.class,
-                 String.class, Boolean.TYPE};
+                 String.class};
         Object purgeDSParms1[] =
-                {"demo:5", "THUMBRES_IMG", null, null, null, Boolean.FALSE};
+                {"demo:5", "THUMBRES_IMG", null, null, null};
         Class setVersionableArgs[] =
                 {String.class, String.class, Boolean.TYPE, String.class};
         Object setVersionableFalse[] =
