@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 
 import java.net.InetAddress;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 
 import java.util.ArrayList;
@@ -747,9 +748,9 @@ public class DefaultAccess
                 "oai:" + repositoryInfo.OAINamespace + ":"
                         + repositoryInfo.samplePID;
         repositoryInfo.sampleSearchURL =
-                repositoryInfo.repositoryBaseURL + "/search";
+                repositoryInfo.repositoryBaseURL + "/objects";
         repositoryInfo.sampleAccessURL =
-                repositoryInfo.repositoryBaseURL + "/get/" + "demo:5";
+                repositoryInfo.repositoryBaseURL + "/objects/" + "demo:5"; // PID should be URL-encoded, but nothing to encode in this case
         repositoryInfo.sampleOAIURL =
                 repositoryInfo.repositoryBaseURL + "/oai?verb=Identify";
         repositoryInfo.retainPIDs = getRetainPIDs();
@@ -1035,15 +1036,20 @@ public class DefaultAccess
                                        Date versDateTime) {
         String dissIndexURL = null;
 
-        if (versDateTime == null) {
-            dissIndexURL =
-                    reposBaseURL + "/" + fedoraContext + "/get/" + PID
-                            + "/fedora-system:3/viewMethodIndex";
-        } else {
-            dissIndexURL =
-                    reposBaseURL + "/" + fedoraContext + "/get/" + PID
-                            + "/fedora-system:3/viewMethodIndex/"
-                            + DateUtility.convertDateToString(versDateTime);
+        try {
+            if (versDateTime == null) {
+                dissIndexURL =
+                        reposBaseURL + "/" + fedoraContext + "/objects/" + URLEncoder.encode(PID, "UTF-8")
+                                + "/methods/" + URLEncoder.encode("fedora-system:3", "UTF-8") + "/viewMethodIndex";
+            } else {
+                dissIndexURL =
+                        reposBaseURL + "/" + fedoraContext + "/objects/" + URLEncoder.encode(PID, "UTF-8")
+                                + "/methods" + URLEncoder.encode("fedora-system:3", "UTF-8") + "/viewMethodIndex?asOfDateTime="
+                                + DateUtility.convertDateToString(versDateTime);
+            }
+        } catch (UnsupportedEncodingException e) {
+            // should never happen...
+            throw new Error(e);
         }
         return dissIndexURL;
     }
@@ -1055,16 +1061,21 @@ public class DefaultAccess
                                        String PID,
                                        Date versDateTime) {
         String itemIndexURL = null;
-
-        if (versDateTime == null) {
-            itemIndexURL =
-                    reposBaseURL + "/" + fedoraContext + "/get/" + PID
-                            + "/fedora-system:3/viewItemIndex";
-        } else {
-            itemIndexURL =
-                    reposBaseURL + "/" + fedoraContext + "/get/" + PID
-                            + "/fedora-system:3/viewItemIndex/"
-                            + DateUtility.convertDateToString(versDateTime);
+        
+        try {
+            if (versDateTime == null) {
+                itemIndexURL =
+                        reposBaseURL + "/" + fedoraContext + "/objects/" + URLEncoder.encode(PID, "UTF-8")
+                                + "/methods/" + URLEncoder.encode("fedora-system:3", "UTF-8") + "/viewItemIndex";
+            } else {
+                itemIndexURL =
+                        reposBaseURL + "/" + fedoraContext + "/objects/" + URLEncoder.encode(PID, "UTF-8")
+                                + "/methods/" + URLEncoder.encode("fedora-system:3", "UTF-8") + "/viewItemIndex?asOfDateTime="
+                                + DateUtility.convertDateToString(versDateTime);
+            }
+        } catch (UnsupportedEncodingException e) {
+            // should never happen...
+            throw new Error(e);
         }
         return itemIndexURL;
     }
