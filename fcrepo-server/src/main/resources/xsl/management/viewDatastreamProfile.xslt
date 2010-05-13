@@ -40,7 +40,7 @@
                     <p />
                     <xsl:variable name="content-url">
                         <xsl:text>objects/</xsl:text>
-                        <xsl:value-of select="@pid" />
+                        <xsl:value-of select="encode-for-uri(@pid)" />
                         <xsl:text>/datastreams/</xsl:text>
                         <xsl:value-of select="@dsID" />
                         <xsl:text>/content</xsl:text>

@@ -71,7 +71,7 @@
                       <xsl:text>/</xsl:text>
                       <xsl:value-of select="$fedora"/>
                       <xsl:text>/objects/</xsl:text>
-                      <xsl:value-of select="../@pid"/>
+                      <xsl:value-of select="encode-for-uri(../@pid)"/>
                       <xsl:text>/datastreams/</xsl:text>
                       <xsl:value-of select="@dsid"/>
                       <xsl:if test="../@asOfDateTime">

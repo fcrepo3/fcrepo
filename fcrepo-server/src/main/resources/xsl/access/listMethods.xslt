@@ -76,9 +76,9 @@
     <xsl:text>/</xsl:text>
     <xsl:value-of select="$fedora"/>
     <xsl:text>/objects/</xsl:text>
-    <xsl:value-of select="../../@pid"/>
+    <xsl:value-of select="encode-for-uri(../../@pid)"/>
     <xsl:text>/methods/</xsl:text>
-    <xsl:value-of select="../@pid"/>
+    <xsl:value-of select="encode-for-uri(../@pid)"/>
     <xsl:text>/</xsl:text>
     <xsl:value-of select="@name"/>
   </xsl:attribute>
