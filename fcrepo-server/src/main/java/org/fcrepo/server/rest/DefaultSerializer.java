@@ -362,7 +362,7 @@ public class DefaultSerializer {
                             html.append(URLEncoder.encode(f.getPid(), "UTF-8"));
                         } catch (UnsupportedEncodingException e) {
                             // should never happen (UTF-8)
-                            throw new Error(e);
+                            throw new RuntimeException(e);
                         }
                         html.append("\">");
                         html.append(f.getPid());

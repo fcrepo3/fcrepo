@@ -1049,7 +1049,7 @@ public class DefaultAccess
             }
         } catch (UnsupportedEncodingException e) {
             // should never happen...
-            throw new Error(e);
+            throw new RuntimeException(e);
         }
         return dissIndexURL;
     }
@@ -1075,7 +1075,7 @@ public class DefaultAccess
             }
         } catch (UnsupportedEncodingException e) {
             // should never happen...
-            throw new Error(e);
+            throw new RuntimeException(e);
         }
         return itemIndexURL;
     }
