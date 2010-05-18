@@ -266,7 +266,7 @@ public class TestJournalRoundTrip {
                             "theLogMessage",
                             "aFormat",
                             "someEncoding",
-                            true);
+                            "new");
     }
 
     @Test

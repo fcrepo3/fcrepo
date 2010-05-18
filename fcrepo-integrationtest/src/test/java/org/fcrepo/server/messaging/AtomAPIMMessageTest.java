@@ -81,7 +81,7 @@ public class AtomAPIMMessageTest extends FedoraTestCase {
                 new FedoraMethod(Management.class
                         .getDeclaredMethod("purgeObject", new Class[]{
                         Context.class, String.class, String.class}), new Object[]{c, "demo:foo",
-                                                                                  "a log message", false}, "blah");
+                                                                                  "a log message"}, "blah");
         message =
                 new AtomAPIMMessage(fm, baseURL, Server.VERSION, messageFormat);
         assertNotNull(message.getDate());
@@ -168,7 +168,7 @@ public class AtomAPIMMessageTest extends FedoraTestCase {
         // Quotes test
         String logMessage = "a log message with \"quotes\" included";
         Object[] parameters =
-                new Object[]{context, "demo:foo", logMessage, false};
+                new Object[]{context, "demo:foo", logMessage};
         FedoraMethod fm = new FedoraMethod(method, parameters, returnValue);
 
         APIMMessage message =
@@ -187,7 +187,7 @@ public class AtomAPIMMessageTest extends FedoraTestCase {
         // Special characters test
         logMessage =
                 "a log message with special characters (!@#$%^&*<>?`':;,.|[]{}) included";
-        parameters = new Object[]{context, "demo:foo", logMessage, false};
+        parameters = new Object[]{context, "demo:foo", logMessage};
         fm = new FedoraMethod(method, parameters, returnValue);
 
         message = new AtomAPIMMessage(fm, baseURL, Server.VERSION, messageFormat);

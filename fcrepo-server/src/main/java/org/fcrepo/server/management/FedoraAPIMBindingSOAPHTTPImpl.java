@@ -85,7 +85,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                        logMessage,
                                        format,
                                        "UTF-8",
-                                       true);
+                                       "new");
         } catch (Throwable th) {
             logger.error("Error ingesting", th);
             throw AxisUtility.getFault(th);

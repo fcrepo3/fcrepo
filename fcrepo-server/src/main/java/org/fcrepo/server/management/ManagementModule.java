@@ -331,13 +331,13 @@ public class ManagementModule
                          String logMessage,
                          String format,
                          String encoding,
-                         boolean newPid) throws ServerException {
+                         String pid) throws ServerException {
         return mgmt.ingest(context,
                            serialization,
                            logMessage,
                            format,
                            encoding,
-                           newPid);
+                           pid);
     }
 
     /**

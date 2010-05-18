@@ -275,14 +275,14 @@ public class MockManagementDelegate
                          String logMessage,
                          String format,
                          String encoding,
-                         boolean newPid) throws ServerException {
+                         String pid) throws ServerException {
         calls.add(new Call(JournalConstants.METHOD_INGEST,
                            context,
                            serialization,
                            logMessage,
                            format,
                            encoding,
-                           newPid));
+                           pid));
         return "Ingest:" + getCallCount();
     }
 

@@ -98,7 +98,7 @@ public class JournalCreator
                          String logMessage,
                          String format,
                          String encoding,
-                         boolean newPid) throws ServerException {
+                         String pid) throws ServerException {
         try {
             CreatorJournalEntry cje =
                     new CreatorJournalEntry(METHOD_INGEST, context);
@@ -106,7 +106,7 @@ public class JournalCreator
             cje.addArgument(ARGUMENT_NAME_LOG_MESSAGE, logMessage);
             cje.addArgument(ARGUMENT_NAME_FORMAT, format);
             cje.addArgument(ARGUMENT_NAME_ENCODING, encoding);
-            cje.addArgument(ARGUMENT_NAME_NEW_PID, newPid);
+            cje.addArgument(ARGUMENT_NAME_NEW_PID, pid);
             return (String) cje.invokeAndClose(delegate, writer);
         } catch (JournalException e) {
             throw new GeneralException("Problem creating the Journal", e);

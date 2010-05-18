@@ -224,7 +224,6 @@ public class FedoraObjectResource extends BaseRestResource {
             Context context = getContext();
 
             InputStream is = null;
-            boolean newPID = false;
 
             // Determine if content is provided
             RestUtil restUtil = new RestUtil();
@@ -252,11 +251,7 @@ public class FedoraObjectResource extends BaseRestResource {
                 ownerID = context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri);
                 is = new ByteArrayInputStream(getFOXMLTemplate(pid, label, ownerID, encoding).getBytes());
             } else {
-                // content provided, but no pid
-                if (pid == null || pid.equals("new")) {
-                    newPID = true;
-                }
-
+               
                 if (namespace != null && !namespace.equals("")) {
                     logger.warn("The namespace parameter is only applicable when object " +
                                 "content is not provided, thus the namespace provided '" +
@@ -264,7 +259,7 @@ public class FedoraObjectResource extends BaseRestResource {
                 }
             }
 
-            pid = apiMService.ingest(context, is, logMessage, format, encoding, newPID);
+            pid = apiMService.ingest(context, is, logMessage, format, encoding, pid);
 
             URI createdLocation = uriInfo.getRequestUri().resolve(URLEncoder.encode(pid, DEFAULT_ENC));
             return Response.created(createdLocation).entity(pid).build();

@@ -65,9 +65,9 @@ public interface DOManager
      *        The format of the serialization.
      * @param encoding
      *        The character encoding.
-     * @param newPid
+     * @param pid
      *        Whether a new PID should be generated or the one indicated by the
-     *        InputStream should be used.
+     *        InputStream should be used. If set to "new", a new pid will be generated.
      * @return a writer.
      * @throws ServerException
      *         If anything went wrong.
@@ -77,7 +77,7 @@ public interface DOManager
                                              InputStream in,
                                              String format,
                                              String encoding,
-                                             boolean newPid)
+                                             String pid)
             throws ServerException;
     
     public boolean objectExists(String pid)

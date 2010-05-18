@@ -104,7 +104,7 @@ public class JournalConsumer
                          String logMessage,
                          String format,
                          String encoding,
-                         boolean newPid) throws ServerException {
+                         String pid) throws ServerException {
         throw rejectCallsFromOutsideWhileInRecoveryMode();
     }
 

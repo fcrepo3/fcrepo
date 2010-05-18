@@ -95,8 +95,9 @@ public class DefaultManagement
                          String logMessage,
                          String format,
                          String encoding,
-                         boolean newPid) throws ServerException {
+                         String pid) throws ServerException {
         DOWriter w = null;
+        String objPid = null;
         try {
             logger.debug("Entered ingest");
             w = m_manager.getIngestWriter(Server.USE_DEFINITIVE_STORE,
@@ -104,10 +105,10 @@ public class DefaultManagement
                                           serialization,
                                           format,
                                           encoding,
-                                          newPid);
-            String pid = w.GetObjectPID();
+                                          pid);
+            objPid = w.GetObjectPID();
 
-            m_authz.enforceIngest(context, pid, format, encoding);
+            m_authz.enforceIngest(context, objPid, format, encoding);
 
             // Only create an audit record if there is a log message to capture
             if (logMessage != null && !logMessage.equals("")) {
@@ -116,7 +117,7 @@ public class DefaultManagement
             }
 
             w.commit(logMessage);
-            return pid;
+            return objPid;
         } finally {
             // Logger completion
             if (logger.isInfoEnabled()) {
@@ -124,7 +125,7 @@ public class DefaultManagement
                 logMsg.append("objectXML");
                 logMsg.append(", format: ").append(format);
                 logMsg.append(", encoding: ").append(encoding);
-                logMsg.append(", newPid: ").append(newPid);
+                logMsg.append(", pid	: ").append(objPid);
                 logMsg.append(", logMessage: ").append(logMessage);
                 logMsg.append(")");
                 logger.info(logMsg.toString());

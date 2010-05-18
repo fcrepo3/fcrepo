@@ -8,6 +8,7 @@ import junit.framework.TestSuite;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.*;
@@ -56,7 +57,9 @@ public class TestRESTAPI
 
     private static byte[] DEMO_REST_FOXML;
 
-    private static String DEMO_MIN;
+    private static String DEMO_MIN;    
+    
+    private static String DEMO_MIN_PID;
 
     private final PID pid = PID.getInstance("demo:REST");
 
@@ -258,6 +261,28 @@ public class TestRESTAPI
 
         DEMO_MIN = sb.toString();
 
+        sb = new StringBuilder();
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        sb.append("<foxml:digitalObject VERSION=\"1.1\" PID=\"demo:1234\" ");
+        sb.append("  xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\" ");
+        sb.append("  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ");
+        sb.append("  xsi:schemaLocation=\"info:fedora/fedora-system:def/foxml# ");
+        sb.append("  http://www.fedora.info/definitions/1/0/foxml1-1.xsd\">");
+        sb.append("  <foxml:objectProperties>");
+        sb.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>");
+        sb.append("  </foxml:objectProperties>");
+        sb.append("  <foxml:datastream ID=\"DS1\" CONTROL_GROUP=\"M\" STATE=\"A\">");
+        sb.append("    <foxml:datastreamVersion ID=\"DS1.0\" MIMETYPE=\"text/xml\" LABEL=\"Datastream 1\">");
+        sb.append("      <foxml:xmlContent>");
+        sb.append("        <foo>");
+        sb.append("          <bar>baz</bar>");
+        sb.append("        </foo>");
+        sb.append("      </foxml:xmlContent>");
+        sb.append("    </foxml:datastreamVersion>");
+        sb.append("  </foxml:datastream>");
+        sb.append("</foxml:digitalObject>");
+
+        DEMO_MIN_PID = sb.toString();
 
     }
 
@@ -638,6 +663,52 @@ public class TestRESTAPI
         assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
     }
 
+    // Tests FCREPO-509
+    public void testIngestWithParameterPid() throws Exception {
+        
+        // Ingest minimal object with PID, use "new" as path parameter -> must succeed
+        url = String.format("/objects/new");
+        assertEquals(SC_UNAUTHORIZED, post(DEMO_MIN_PID, false).getStatusCode());
+        HttpResponse response  = post(DEMO_MIN_PID, true);
+        assertEquals(SC_CREATED, response.getStatusCode());
+
+            // clean up
+        url = String.format("/objects/%s", "demo:1234");
+        assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
+        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+        
+        // Ingest minimal object with PID, use a different PID than the one
+        // specified in the foxml -> must fail
+        url = String.format("/objects/%s","demo:234");
+        assertEquals(SC_UNAUTHORIZED, post(DEMO_MIN_PID, false).getStatusCode());
+        response  = post(DEMO_MIN_PID, true);
+        assertEquals(SC_INTERNAL_SERVER_ERROR, response.getStatusCode());
+
+        // Ingest minimal object with PID equals to the PID specified in the foxml
+        url = String.format("/objects/%s", "demo:1234");
+        assertEquals(SC_UNAUTHORIZED, post(DEMO_MIN_PID, false).getStatusCode());
+        response  = post(DEMO_MIN_PID, true);
+        assertEquals(SC_CREATED, response.getStatusCode());
+        
+        // clean up
+        url = String.format("/objects/%s", "demo:1234");
+        assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
+        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+
+        // Ingest minimal object with no PID, specify a PID parameter in the request
+        url = String.format("/objects/%s", "demo:234");
+        assertEquals(SC_UNAUTHORIZED, post(DEMO_MIN, false).getStatusCode());
+        response  = post(DEMO_MIN, true);
+        assertEquals(SC_CREATED, response.getStatusCode());
+
+        // clean up
+        url = String.format("/objects/%s", "demo:234");
+        assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
+        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+
+    }
+   
+    
     public void testModifyObject() throws Exception {
         url = String.format("/objects/%s?label=%s", pid.toString(), "foo");
         assertEquals(SC_UNAUTHORIZED, put("", false).getStatusCode());

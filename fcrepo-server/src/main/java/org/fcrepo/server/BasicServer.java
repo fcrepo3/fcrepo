@@ -161,7 +161,7 @@ public class BasicServer
                                                    xml,
                                                    Constants.FOXML1_1.uri,
                                                    "UTF-8",
-                                                   false);
+                                                   null);
             try {
                 w.commit("Pre-ingested by Fedora at startup");
             } finally {

@@ -491,7 +491,7 @@ public class TestLockingFollowingJournalReader
                 + FOXML1_1.uri
                 + "</argument>\n"
                 + "    <argument name=\"encoding\" type=\"string\">UTF-8</argument>\n"
-                + "    <argument name=\"newPid\" type=\"boolean\">true</argument>\n"
+                + "    <argument name=\"pid\" type=\"string\">new</argument>\n"
                 + "  </JournalEntry>\n" + "</FedoraJournal>\n";
     }
 
@@ -534,14 +534,14 @@ public class TestLockingFollowingJournalReader
                              String logMessage,
                              String format,
                              String encoding,
-                             boolean newPid) throws ServerException {
+                             String pid) throws ServerException {
             String result =
                     super.ingest(context,
                                  serialization,
                                  logMessage,
                                  format,
                                  encoding,
-                                 newPid);
+                                 pid);
 
             if (ingestOperation != null) {
                 ingestOperation.run();

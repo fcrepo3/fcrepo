@@ -27,7 +27,7 @@ public interface Management {
                          @PName("logMessage") String logMessage,
                          @PName("format") String format,
                          @PName("encoding") String encoding,
-                         @PName("newPid") boolean newPid) throws ServerException;
+                         @PName("pid") String pid) throws ServerException;
 
     public Date modifyObject(@PName("context") Context context,
                              @PName("pid") String pid,

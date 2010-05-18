@@ -34,7 +34,7 @@ public class IngestMethod
                         .getStringArgument(ARGUMENT_NAME_LOG_MESSAGE), parent
                         .getStringArgument(ARGUMENT_NAME_FORMAT), parent
                         .getStringArgument(ARGUMENT_NAME_ENCODING), parent
-                        .getBooleanArgument(ARGUMENT_NAME_NEW_PID));
+                        .getStringArgument(ARGUMENT_NAME_NEW_PID));
 
         // Store the PID for writing to the journal.
         parent.setRecoveryValue(Constants.RECOVERY.PID.uri, pid);

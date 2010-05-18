@@ -751,15 +751,16 @@ public class DefaultDOManager
      *        the format of the XML ingest file (e.g., FOXML, Fedora METS)
      * @param encoding
      *        the character encoding of the XML ingest file (e.g., UTF-8)
-     * @param newPid
-     *        true if the system should generate a new PID for the object
+     * @param pid
+     *        "new" if the system should generate a new PID for the object, otherwise
+     *        the value of the additional pid parameter for ingests (may be null or any valid pid) 
      */
     public synchronized DOWriter getIngestWriter(boolean cachedObjectRequired,
                                                  Context context,
                                                  InputStream in,
                                                  String format,
                                                  String encoding,
-                                                 boolean newPid)
+                                                 String pid)
             throws ServerException {
         logger.debug("Entered getIngestWriter");
 
@@ -845,6 +846,23 @@ public class DefaultDOManager
                     DigitalObjectUtil.updateLegacyDatastreams(obj);
                 }
 
+                // If the PID was supplied as additional parameter (see REST
+                // API), make sure it doesn't conflict with the (optional) PID 
+                // of the digital object
+                if (pid != null && pid.length() > 0 && !pid.equals("new")) {
+                    if (obj.getPid() != null && obj.getPid().length() > 0) {
+                        if (!pid.equals(obj.getPid())) {
+                            throw new GeneralException(
+                                    "The PID of the digital object and the PID provided as parameter are different. Digital object: "
+                                            + obj.getPid()
+                                            + " parameter: "
+                                            + pid);
+                        }
+                    } else {
+                        obj.setPid(pid);
+                    }
+
+                }
                 // PID VALIDATION:
                 // validate and normalized the provided pid, if any
                 if (obj.getPid() != null && obj.getPid().length() > 0) {
@@ -865,7 +883,7 @@ public class DefaultDOManager
                                 + e.getMessage());
                     }
                 } else {
-                    if (newPid) {
+                    if (pid.equals("new")) {
                         logger.debug("Client wants a new PID");
                         // yes... so do that, then set it in the obj.
                         String p = null;

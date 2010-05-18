@@ -669,7 +669,7 @@ public class SampleJournalEntries {
             entry.addArgument("message", "Metadata provider added by NSDL API");
             entry.addArgument("format", "foxml1.0");
             entry.addArgument("encoding", "UTF-8");
-            entry.addArgument("newPid", true);
+            entry.addArgument("pid", null);
 
             return entry;
         } catch (JournalException e) {

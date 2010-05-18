@@ -118,9 +118,10 @@ public class DatastreamManagedContent
                     // If validation has succeeded, assume an external resource.
                     // Fetch it, store it locally, update DSLocation
                     Context ctx = ReadOnlyContext.EMPTY;
+                               ContentManagerParams params = new ContentManagerParams(DSLocation);
+                    params.setContext(ctx);
                     MIMETypedStream stream = getExternalContentManager()
-                            .getExternalContent(
-                                    new ContentManagerParams(DSLocation));
+                            .getExternalContent(params);
                     DSLocation = getManagement().putTempStream(ctx, stream.getStream());
                     return getManagement().getTempStream(DSLocation);
                 } catch(ValidationException e) {

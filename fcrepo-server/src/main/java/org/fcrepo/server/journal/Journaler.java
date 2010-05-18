@@ -148,13 +148,13 @@ public class Journaler
                          String logMessage,
                          String format,
                          String encoding,
-                         boolean newPid) throws ServerException {
+                         String pid) throws ServerException {
         return worker.ingest(context,
                              serialization,
                              logMessage,
                              format,
                              encoding,
-                             newPid);
+                             pid);
     }
 
     /**
