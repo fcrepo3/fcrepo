@@ -369,7 +369,7 @@ public class DatastreamResource extends BaseRestResource {
             // Make sure that there is a mime type value
             if (mimeType == null && mediaType != null) {
                 mimeType = mediaType.toString();
-            } else if (mimeType == null && mediaType == null) {
+            } else if (mimeType == null && mediaType == null && existingDS != null) {
                 mimeType = existingDS.DSMIME;
             }
 
