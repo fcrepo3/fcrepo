@@ -36,4 +36,10 @@ public interface RestParam {
     String IGNORE_CONTENT = "ignoreContent";
     String IGNORE_MIME = "ignoreMime";
     String DOWNLOAD = "download";
+
+    String SUBJECT = "subject";
+    String PREDICATE = "predicate";
+    String OBJECT = "object";
+    String IS_LITERAL = "isLiteral";
+    String DATATYPE = "datatype";
 }

@@ -4,6 +4,26 @@
  */
 package org.fcrepo.server.rest;
 
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.util.Date;
+import java.util.List;
+
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
+
 import org.fcrepo.common.http.WebClient;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.rest.RestUtil.RequestContent;
@@ -12,21 +32,9 @@ import org.fcrepo.server.storage.types.DatastreamDef;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.utilities.DateUtility;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.util.Date;
-import java.util.List;
-
 
 /**
- * A rest controller to handle CRUD operations for the Fedora datasream API
+ * A rest controller to handle CRUD operations for the Fedora datastream API
  * (API-M) Request syntax:
  * <p/>
  * GET,PUT,POST,DELETE

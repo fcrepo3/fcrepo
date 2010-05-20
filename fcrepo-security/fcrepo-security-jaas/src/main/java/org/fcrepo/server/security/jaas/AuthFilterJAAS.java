@@ -21,15 +21,17 @@ package org.fcrepo.server.security.jaas;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-
 import java.security.Principal;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -38,11 +40,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.jaas.auth.AuthHttpServletRequestWrapper;
@@ -231,7 +228,9 @@ public class AuthFilterJAAS
                     boolean isObjectXML = requestPath.endsWith("/objectXML");
                     boolean isGetDatastream = requestPath.contains("/datastreams/") &&
                             !requestPath.endsWith("/content");
-                    boolean isAPIM = isExport || isObjectXML || isGetDatastream;
+                    boolean isGetRelationships = requestPath.endsWith("/relationships");
+                    boolean isAPIM = isExport || isObjectXML || isGetDatastream
+                    || isGetRelationships;
 
                     if (!isAPIM) {
                         chain.doFilter(request, response);

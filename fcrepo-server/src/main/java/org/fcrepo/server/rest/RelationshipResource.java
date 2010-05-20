@@ -1,0 +1,148 @@
+/* The contents of this file are subject to the license and copyright terms
+ * detailed in the license directory at the root of the source tree (also
+ * available online at http://fedora-commons.org/license/).
+ */
+package org.fcrepo.server.rest;
+
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.fcrepo.common.PID;
+import org.fcrepo.server.Context;
+import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.fcrepo.server.storage.types.TupleArrayTripleIterator;
+import org.trippi.RDFFormat;
+import org.trippi.TripleIterator;
+import org.trippi.TrippiException;
+
+
+/**
+ * A rest controller to handle CRUD operations for the Fedora relationships API.
+ *
+ * @author Edwin Shin
+ * @version $Id$
+ * @since 3.4.0
+ */
+@Path("/{pid}/relationships")
+public class RelationshipResource extends BaseRestResource {
+
+    /**
+     * Get relationships asserted by the object denoted by <i>pid</i>.
+     *
+     * @param pid The pid of the Fedora object, e.g. demo:1
+     * @param subject
+     * @param predicate
+     * @return N-TRIPLES
+     */
+    @GET
+    public Response getRelationships(
+            @PathParam(RestParam.PID)
+            String pid,
+            @QueryParam(RestParam.SUBJECT)
+            String subject,
+            @QueryParam(RestParam.PREDICATE)
+            String predicate) {
+        Context context = getContext();
+        if (subject == null) {
+            // assume the subject is the object as denoted by the pid
+            subject = PID.toURI(pid);
+        }
+        try {
+            RelationshipTuple[] tuples = apiMService.getRelationships(context, subject, predicate);
+            TripleIterator it = new TupleArrayTripleIterator(new ArrayList<RelationshipTuple>(Arrays.asList(tuples)));
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            // TODO may as well support the range of output formats
+            it.toStream(out, RDFFormat.N_TRIPLES);
+            return Response.ok(out.toString("UTF-8"), MediaType.TEXT_PLAIN_TYPE).build();
+        } catch (ServerException e) {
+            return handleException(e);
+        } catch (TrippiException e) {
+            return handleException(e);
+        } catch (UnsupportedEncodingException e) {
+            return handleException(e);
+        }
+    }
+
+    /**
+     * Add a relationship.
+     * <p/>
+     * POST /objects/{pid}/relationships/new ? subject predicate object isLiteral datatype
+     * <p/>
+     * Successful Response:
+     * Status: 200 OK
+     */
+    @Path("/new")
+    @POST
+    public Response addRelationship(
+            @PathParam(RestParam.PID)
+            String pid,
+            @QueryParam(RestParam.SUBJECT)
+            String subject,
+            @QueryParam(RestParam.PREDICATE)
+            String predicate,
+            @QueryParam(RestParam.OBJECT)
+            String object,
+            @QueryParam(RestParam.IS_LITERAL)
+            boolean isLiteral,
+            @QueryParam(RestParam.DATATYPE)
+            String datatype) {
+        Context context = getContext();
+        try {
+            if (subject == null) {
+                // assume the subject is the object as denoted by the pid
+                subject = PID.toURI(pid);
+            }
+            apiMService.addRelationship(context, subject, predicate, object, isLiteral, datatype);
+            return Response.ok().build();
+        } catch (ServerException e) {
+            return handleException(e);
+        }
+    }
+
+    /**
+     * Delete a relationship.
+     * <p/>
+     * POST /objects/{pid}/relationships ? subject predicate object isLiteral datatype
+     * <p/>
+     * Successful Response:
+     * Status: 204 OK
+     */
+    @DELETE
+    public Response purgeRelationship(
+            @PathParam(RestParam.PID)
+            String pid,
+            @QueryParam(RestParam.SUBJECT)
+            String subject,
+            @QueryParam(RestParam.PREDICATE)
+            String predicate,
+            @QueryParam(RestParam.OBJECT)
+            String object,
+            @QueryParam(RestParam.IS_LITERAL)
+            boolean isLiteral,
+            @QueryParam(RestParam.DATATYPE)
+            String datatype) {
+        Context context = getContext();
+        try {
+            if (subject == null) {
+                // assume the subject is the object as denoted by the pid
+                subject = PID.toURI(pid);
+            }
+            apiMService.purgeRelationship(context, subject, predicate, object, isLiteral, datatype);
+            return Response.noContent().build();
+        } catch (ServerException e) {
+            return handleException(e);
+        }
+    }
+}
