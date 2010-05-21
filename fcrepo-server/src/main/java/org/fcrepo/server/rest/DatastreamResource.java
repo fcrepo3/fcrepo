@@ -150,6 +150,52 @@ public class DatastreamResource extends BaseRestResource {
     }
 
     /**
+     * Invoke API-M.getDatastreamHistory(context,pid,dsId)
+     * 
+     * GET /objects/{pid}/datastreams/{dsID}/versions
+     * @param pid the PID of the digital object
+     * @param dsID the ID of the datastream
+     * @param format the desired format. Either html or "xml"
+     * @return the response, either in XML or XHTML format
+     */
+    @Path("/{dsID}/versions")
+    @GET
+    public Response getDatastreamHistory(
+            @PathParam(RestParam.PID)
+            String pid,
+            @PathParam(RestParam.DSID)
+            String dsID,
+            @QueryParam(RestParam.FORMAT)
+            @DefaultValue(HTML)
+            String format){
+    	try {
+    		Context context = getContext();
+			Datastream[] datastreamHistory = apiMService.getDatastreamHistory(context, pid, dsID);
+			
+            if (datastreamHistory == null || datastreamHistory.length == 0){
+			return Response.status(Status.NOT_FOUND).type("text/plain").entity(
+                    "No datastream history could be found. There is no datastream history for " +
+                    "the digital object \""+pid+"\" with datastream ID of \""+dsID).build();
+              
+            }
+
+            String xml = getSerializer(context).datastreamHistoryToXml(pid,dsID,datastreamHistory);
+			
+            MediaType mime = RestHelper.getContentType(format);
+	        
+			if (TEXT_HTML.isCompatible(mime)) {
+				CharArrayWriter writer = new CharArrayWriter();
+				transform(xml, "management/viewDatastreamHistory.xslt", writer);
+				xml = writer.toString();
+			}
+
+	    	return Response.ok(xml, mime).build();
+		} catch (Exception e) {
+			 return handleException(e);
+		}
+    }
+
+    /**
      * Invoke API-A.getDatastreamDissemination(context, pid, dsID, asOfDateTime)
      * <p/>
      * GET /objects/{pid}/datastreams/{dsID}/content ? asOfDateTime

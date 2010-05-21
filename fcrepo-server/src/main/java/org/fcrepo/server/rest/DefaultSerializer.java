@@ -16,6 +16,7 @@ import java.util.List;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.access.ObjectProfile;
+import org.fcrepo.server.management.DefaultManagement;
 import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.search.ObjectFields;
 import org.fcrepo.server.storage.types.Datastream;
@@ -24,11 +25,19 @@ import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.DateUtility;
-import org.fcrepo.server.utilities.StreamUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.fcrepo.server.utilities.StreamUtility.enc;
+
 
 
 
 public class DefaultSerializer {
+    private static final Logger logger =
+        LoggerFactory.getLogger(DefaultManagement.class);
+
+    
     String fedoraServerHost;
     String fedoraServerPort;
     String fedoraServerProtocol;
@@ -54,9 +63,9 @@ public class DefaultSerializer {
                 + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
                 + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                 + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/management/ "
-                + StreamUtility.enc(fedoraServerProtocol) + "://"
-                + StreamUtility.enc(fedoraServerHost) + ":"
-                + StreamUtility.enc(fedoraServerPort) + "/getNextPIDInfo.xsd\">\n");
+                + enc(fedoraServerProtocol) + "://"
+                + enc(fedoraServerHost) + ":"
+                + enc(fedoraServerPort) + "/getNextPIDInfo.xsd\">\n");
 
         // PID array serialization
         for (int i = 0; i < pidList.length; i++) {
@@ -80,31 +89,31 @@ public class DefaultSerializer {
                     + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
                     + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                     + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/access/ "
-                    + StreamUtility.enc(fedoraServerProtocol) + "://"
-                    + StreamUtility.enc(fedoraServerHost) + ":"
-                    + StreamUtility.enc(fedoraServerPort) + "/objectProfile.xsd\""
-                    + " pid=\"" + StreamUtility.enc(pid) + "\" >");
+                    + enc(fedoraServerProtocol) + "://"
+                    + enc(fedoraServerHost) + ":"
+                    + enc(fedoraServerPort) + "/objectProfile.xsd\""
+                    + " pid=\"" + enc(pid) + "\" >");
         } else {
             buffer.append("<objectProfile "
                     + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
                     + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                     + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/access/ "
-                    + StreamUtility.enc(fedoraServerProtocol) + "://"
-                    + StreamUtility.enc(fedoraServerHost) + ":"
-                    + StreamUtility.enc(fedoraServerPort) + "/objectProfile.xsd\""
-                    + " pid=\"" + StreamUtility.enc(pid) + "\"" + " dateTime=\""
+                    + enc(fedoraServerProtocol) + "://"
+                    + enc(fedoraServerHost) + ":"
+                    + enc(fedoraServerPort) + "/objectProfile.xsd\""
+                    + " pid=\"" + enc(pid) + "\"" + " dateTime=\""
                     + DateUtility.convertDateToString(versDateTime) + "\" >");
         }
 
         // PROFILE FIELDS SERIALIZATION
-        buffer.append("<objLabel>" + StreamUtility.enc(objProfile.objectLabel)
+        buffer.append("<objLabel>" + enc(objProfile.objectLabel)
                 + "</objLabel>");
-        buffer.append("<objOwnerId>" + StreamUtility.enc(objProfile.objectOwnerId)
+        buffer.append("<objOwnerId>" + enc(objProfile.objectOwnerId)
                 + "</objOwnerId>");
         buffer.append("<objModels>");
         for (String model: objProfile.objectModels) {
             buffer.append("<model>");
-            buffer.append(StreamUtility.enc(model));
+            buffer.append(enc(model));
             buffer.append("</model>");
         }
         buffer.append("</objModels>");
@@ -113,19 +122,49 @@ public class DefaultSerializer {
         String mDate = DateUtility.convertDateToString(objProfile.objectLastModDate);
         buffer.append("<objLastModDate>" + mDate + "</objLastModDate>");
         buffer.append("<objDissIndexViewURL>"
-                + StreamUtility.enc(objProfile.dissIndexViewURL)
+                + enc(objProfile.dissIndexViewURL)
                 + "</objDissIndexViewURL>");
         buffer.append("<objItemIndexViewURL>"
-                + StreamUtility.enc(objProfile.itemIndexViewURL)
+                + enc(objProfile.itemIndexViewURL)
                 + "</objItemIndexViewURL>");
         buffer.append("<objState>"
-                      + StreamUtility.enc(objProfile.objectState)
+                      + enc(objProfile.objectState)
                       + "</objState>");
         buffer.append("</objectProfile>");
 
         return buffer.toString();
     }
 
+    private String datastreamFieldSerialization(Datastream dsProfile, boolean validateChecksum){
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("<dsLabel>" + enc(dsProfile.DSLabel) + "</dsLabel>");
+        buffer.append("<dsVersionID>" + enc(dsProfile.DSVersionID) + "</dsVersionID>");
+
+        String cDate = DateUtility.convertDateToString(dsProfile.DSCreateDT);
+        buffer.append("<dsCreateDate>" + enc(cDate) + "</dsCreateDate>");
+
+        buffer.append("<dsState>" + enc(dsProfile.DSState) + "</dsState>");
+        buffer.append("<dsMIME>" + enc(dsProfile.DSMIME) + "</dsMIME>");
+        buffer.append("<dsFormatURI>" + enc(dsProfile.DSFormatURI) + "</dsFormatURI>");
+        buffer.append("<dsControlGroup>" + enc(dsProfile.DSControlGrp) + "</dsControlGroup>");
+        buffer.append("<dsSize>" + enc(Long.valueOf(dsProfile.DSSize).toString()) + "</dsSize>");
+        buffer.append("<dsVersionable>" + enc(Boolean.valueOf(dsProfile.DSVersionable).toString()) + "</dsVersionable>");
+        buffer.append("<dsInfoType>" + enc(dsProfile.DSInfoType) + "</dsInfoType>");
+        buffer.append("<dsLocation>" + enc(dsProfile.DSLocation) + "</dsLocation>");
+        buffer.append("<dsLocationType>" + enc(dsProfile.DSLocationType) + "</dsLocationType>");
+        buffer.append("<dsChecksumType>" + enc(dsProfile.DSChecksumType) + "</dsChecksumType>");
+        buffer.append("<dsChecksum>" + enc(dsProfile.DSChecksum) + "</dsChecksum>");
+        if (validateChecksum){
+            String valid = dsProfile.compareChecksum() ? "true" : "false";
+            buffer.append("<dsChecksumValid>" + valid + "</dsChecksumValid>");
+        }
+        String[] dsAltIDs = dsProfile.DatastreamAltIDs;
+        for(int i = 0; i < dsAltIDs.length; i++) {
+            buffer.append("<dsAltID>" + enc(dsAltIDs[i]) + "</dsAltID>");
+        }
+        return buffer.toString();
+    }
+    
     String datastreamProfileToXML(String pid, String dsID, Datastream dsProfile, Date versDateTime, boolean validateChecksum)
             throws IOException {
         StringBuffer buffer = new StringBuffer();
@@ -135,43 +174,19 @@ public class DefaultSerializer {
                       + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
                       + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                       + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/management/ "
-                      + StreamUtility.enc(fedoraServerProtocol) + "://"
-                      + StreamUtility.enc(fedoraServerHost) + ":"
-                      + StreamUtility.enc(fedoraServerPort) + "/datastreamProfile.xsd\""
-                      + " pid=\"" + StreamUtility.enc(pid) + "\""
-                      + " dsID=\"" + StreamUtility.enc(dsID) + "\"");
+                      + enc(fedoraServerProtocol) + "://"
+                      + enc(fedoraServerHost) + ":"
+                      + enc(fedoraServerPort) + "/datastreamProfile.xsd\""
+                      + " pid=\"" + enc(pid) + "\""
+                      + " dsID=\"" + enc(dsID) + "\"");
         if (versDateTime != null &&
             !DateUtility.convertDateToString(versDateTime).equalsIgnoreCase("")) {
             buffer.append(" dateTime=\"" + DateUtility.convertDateToString(versDateTime) + "\"");
         }
         buffer.append(" >");
-
-        // PROFILE FIELDS SERIALIZATION
-        buffer.append("<dsLabel>" + StreamUtility.enc(dsProfile.DSLabel) + "</dsLabel>");
-        buffer.append("<dsVersionID>" + StreamUtility.enc(dsProfile.DSVersionID) + "</dsVersionID>");
-
-        String cDate = DateUtility.convertDateToString(dsProfile.DSCreateDT);
-        buffer.append("<dsCreateDate>" + StreamUtility.enc(cDate) + "</dsCreateDate>");
-
-        buffer.append("<dsState>" + StreamUtility.enc(dsProfile.DSState) + "</dsState>");
-        buffer.append("<dsMIME>" + StreamUtility.enc(dsProfile.DSMIME) + "</dsMIME>");
-        buffer.append("<dsFormatURI>" + StreamUtility.enc(dsProfile.DSFormatURI) + "</dsFormatURI>");
-        buffer.append("<dsControlGroup>" + StreamUtility.enc(dsProfile.DSControlGrp) + "</dsControlGroup>");
-        buffer.append("<dsSize>" + StreamUtility.enc(Long.valueOf(dsProfile.DSSize).toString()) + "</dsSize>");
-        buffer.append("<dsVersionable>" + StreamUtility.enc(Boolean.valueOf(dsProfile.DSVersionable).toString()) + "</dsVersionable>");
-        buffer.append("<dsInfoType>" + StreamUtility.enc(dsProfile.DSInfoType) + "</dsInfoType>");
-        buffer.append("<dsLocation>" + StreamUtility.enc(dsProfile.DSLocation) + "</dsLocation>");
-        buffer.append("<dsLocationType>" + StreamUtility.enc(dsProfile.DSLocationType) + "</dsLocationType>");
-        buffer.append("<dsChecksumType>" + StreamUtility.enc(dsProfile.DSChecksumType) + "</dsChecksumType>");
-        buffer.append("<dsChecksum>" + StreamUtility.enc(dsProfile.DSChecksum) + "</dsChecksum>");
-        if (validateChecksum){
-            String valid = dsProfile.compareChecksum() ? "true" : "false";
-            buffer.append("<dsChecksumValid>" + valid + "</dsChecksumValid>");
-        }
-        String[] dsAltIDs = dsProfile.DatastreamAltIDs;
-        for(int i = 0; i < dsAltIDs.length; i++) {
-            buffer.append("<dsAltID>" + StreamUtility.enc(dsAltIDs[i]) + "</dsAltID>");
-        }
+        // ADD PROFILE FIELDS SERIALIZATION
+        buffer.append(datastreamFieldSerialization(dsProfile,validateChecksum));
+       
 
         buffer.append("</datastreamProfile>");
 
@@ -187,9 +202,9 @@ public class DefaultSerializer {
                 + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
                 + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                 + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/access/ "
-                + StreamUtility.enc(fedoraServerProtocol) + "://"
-                + StreamUtility.enc(fedoraServerHost) + ":"
-                + StreamUtility.enc(fedoraServerPort)
+                + enc(fedoraServerProtocol) + "://"
+                + enc(fedoraServerHost) + ":"
+                + enc(fedoraServerPort)
                 + "/fedoraObjectHistory.xsd\" pid=\"" + pid + "\" >");
 
         for (String ts : objectHistory) {
@@ -199,6 +214,34 @@ public class DefaultSerializer {
         return buffer.toString();
     }
 
+    String datastreamHistoryToXml(String pid, String dsID, Datastream[] history) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        buffer.append("<datastreamHistory "
+                      + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+                      + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+                      + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/management/ "
+                      + enc(fedoraServerProtocol) + "://"
+                      + enc(fedoraServerHost) + ":"
+                      + enc(fedoraServerPort) + "/datastreamHistory.xsd\""
+                      + " pid=\"" + enc(pid) + "\""
+                      + " dsID=\"" + enc(dsID) + "\">");
+       
+        for (Datastream ds : history){
+            buffer.append("<datastreamProfile ").append("pid=\"").append(
+                    enc(pid)).append("\"").append(" dsID=\"").append(enc(dsID))
+                    .append("\">");
+            buffer.append(datastreamFieldSerialization(ds,false));
+            buffer.append("</datastreamProfile>");
+
+        }
+        
+        buffer.append("</datastreamHistory>");
+        logger.error(buffer.toString());
+        return buffer.toString();
+
+    }    
+   
     String objectMethodsToXml(
             ObjectMethodsDef[] methodDefs,
             String pid,
@@ -213,19 +256,19 @@ public class DefaultSerializer {
                     + DateUtility.convertDateToString(versDateTime) + "\" ";
         String sDefElement = "";
         if (sDef != null)
-            sDefElement = "sDef=\"" + StreamUtility.enc(sDef) + "\" ";
+            sDefElement = "sDef=\"" + enc(sDef) + "\" ";
         buffer.append("<objectMethods "
                 + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
                 + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
                 + "xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/access/ "
-                + StreamUtility.enc(fedoraServerProtocol) + "://"
-                + StreamUtility.enc(fedoraServerHost) + ":"
-                + StreamUtility.enc(fedoraServerPort) + "/listMethods.xsd\""
-                + " pid=\"" + StreamUtility.enc(pid) + "\" "
+                + enc(fedoraServerProtocol) + "://"
+                + enc(fedoraServerHost) + ":"
+                + enc(fedoraServerPort) + "/listMethods.xsd\""
+                + " pid=\"" + enc(pid) + "\" "
                 + asOfDateTimeElement + sDefElement + "baseURL=\""
-                + StreamUtility.enc(fedoraServerProtocol) + "://"
-                + StreamUtility.enc(fedoraServerHost) + ":"
-                + StreamUtility.enc(fedoraServerPort) + "/" + fedoraAppServerContext + "/\" >");
+                + enc(fedoraServerProtocol) + "://"
+                + enc(fedoraServerHost) + ":"
+                + enc(fedoraServerPort) + "/" + fedoraAppServerContext + "/\" >");
 
         // ObjectMethodsDef SERIALIZATION
         String nextSdef = "null";
@@ -236,25 +279,25 @@ public class DefaultSerializer {
                 if (!currentSdef.equalsIgnoreCase(nextSdef)) {
                     if (!nextSdef.equals("null"))
                         buffer.append("</sDef>");
-                    buffer.append("<sDef pid=\"" + StreamUtility.enc(methodDefs[i].sDefPID)
+                    buffer.append("<sDef pid=\"" + enc(methodDefs[i].sDefPID)
                             + "\" >");
                 }
-                buffer.append("<method name=\"" + StreamUtility.enc(methodDefs[i].methodName)
+                buffer.append("<method name=\"" + enc(methodDefs[i].methodName)
                         + "\" >");
                 MethodParmDef[] methodParms = methodDefs[i].methodParmDefs;
                 for (int j = 0; j < methodParms.length; j++) {
                     buffer.append("<methodParm parmName=\""
-                            + StreamUtility.enc(methodParms[j].parmName)
+                            + enc(methodParms[j].parmName)
                             + "\" parmDefaultValue=\""
-                            + StreamUtility.enc(methodParms[j].parmDefaultValue)
+                            + enc(methodParms[j].parmDefaultValue)
                             + "\" parmRequired=\"" + methodParms[j].parmRequired
-                            + "\" parmLabel=\"" + StreamUtility.enc(methodParms[j].parmLabel)
+                            + "\" parmLabel=\"" + enc(methodParms[j].parmLabel)
                             + "\" >");
                     if (methodParms[j].parmDomainValues.length > 0) {
                         buffer.append("<methodParmDomain>");
                         for (int k = 0; k < methodParms[j].parmDomainValues.length; k++) {
                             buffer.append("<methodParmValue>"
-                                    + StreamUtility.enc(methodParms[j].parmDomainValues[k])
+                                    + enc(methodParms[j].parmDomainValues[k])
                                     + "</methodParmValue>");
                         }
                         buffer.append("</methodParmDomain>");
@@ -328,10 +371,10 @@ public class DefaultSerializer {
         }
         html.append("</font></td><td bgcolor=silver valign=top>&nbsp;&nbsp;&nbsp;</td><td valign=top>");
         html.append("Search all fields for phrase: <input type=\"text\" name=\"terms\" size=\"15\" value=\""
-                + (terms == null ? "" : StreamUtility.enc(terms))
+                + (terms == null ? "" : enc(terms))
                 + "\"> <a href=\"#\" onClick=\"javascript:alert('Search All Fields\\n\\nEnter a phrase.  Objects where any field contains the phrase will be returned.\\nThis is a case-insensitive search, and you may use the * or ? wildcards.\\n\\nExamples:\\n\\n  *o*\\n    finds objects where any field contains the letter o.\\n\\n  ?edora\\n    finds objects where a word starts with any letter and ends with edora.')\"><i>help</i></a><p> ");
         html.append("Or search specific field(s): <input type=\"text\" name=\"query\" size=\"15\" value=\""
-                + (query == null ? "" : StreamUtility.enc(query))
+                + (query == null ? "" : enc(query))
                 + "\"> <a href=\"#\" onClick=\"javascript:alert('Search Specific Field(s)\\n\\nEnter one or more conditions, separated by space.  Objects matching all conditions will be returned.\\nA condition is a field (choose from the field names on the left) followed by an operator, followed by a value.\\nThe = operator will match if the field\\'s entire value matches the value given.\\nThe ~ operator will match on phrases within fields, and accepts the ? and * wildcards.\\nThe &lt;, &gt;, &lt;=, and &gt;= operators can be used with numeric values, such as dates.\\n\\nExamples:\\n\\n  pid~demo:* description~fedora\\n    Matches all demo objects with a description containing the word fedora.\\n\\n  cDate&gt;=1976-03-04 creator~*n*\\n    Matches objects created on or after March 4th, 1976 where at least one of the creators has an n in their name.\\n\\n  mDate&gt;2002-10-2 mDate&lt;2002-10-2T12:00:00\\n    Matches objects modified sometime before noon (UTC) on October 2nd, 2002')\"><i>help</i></a><p> ");
         html.append("Maximum Results: <select name=\"maxResults\"><option value=\"20\">20</option><option value=\"40\">40</option><option value=\"60\">60</option><option value=\"80\">80</option></select> ");
         html.append("<p><input type=\"submit\" value=\"Search\"> ");
@@ -369,7 +412,7 @@ public class DefaultSerializer {
                         html.append("</a>");
                     } else if (l.equalsIgnoreCase("label")) {
                         if (f.getLabel() != null) {
-                            html.append(StreamUtility.enc(f.getLabel()));
+                            html.append(enc(f.getLabel()));
                         }
                     } else if (l.equalsIgnoreCase("state")) {
                         html.append(f.getState());
@@ -534,7 +577,7 @@ public class DefaultSerializer {
             if (i > 0) {
                 ret.append(", ");
             }
-            ret.append(StreamUtility.enc(l.get(i).getValue()));
+            ret.append(enc(l.get(i).getValue()));
         }
         return ret.toString();
     }
@@ -544,7 +587,7 @@ public class DefaultSerializer {
             String value,
             StringBuffer out) {
         if (value != null) {
-            out.append("      <" + name + ">" + StreamUtility.enc(value) + "</" + name
+            out.append("      <" + name + ">" + enc(value) + "</" + name
                     + ">\n");
         }
     }
@@ -575,33 +618,33 @@ public class DefaultSerializer {
                     + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
                     + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
                     + "xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/access/ "
-                    + StreamUtility.enc(fedoraServerProtocol) + "://"
-                    + StreamUtility.enc(fedoraServerHost) + ":"
-                    + StreamUtility.enc(fedoraServerPort) + "/listDatastreams.xsd\""
+                    + enc(fedoraServerProtocol) + "://"
+                    + enc(fedoraServerHost) + ":"
+                    + enc(fedoraServerPort) + "/listDatastreams.xsd\""
                     + " pid=\"" + pid + "\" " + "baseURL=\""
-                    + StreamUtility.enc(fedoraServerProtocol) + "://"
-                    + StreamUtility.enc(fedoraServerHost) + ":"
-                    + StreamUtility.enc(fedoraServerPort) + "/" + fedoraAppServerContext + "/\" >");
+                    + enc(fedoraServerProtocol) + "://"
+                    + enc(fedoraServerHost) + ":"
+                    + enc(fedoraServerPort) + "/" + fedoraAppServerContext + "/\" >");
         } else {
             xml.append("<objectDatastreams "
                     + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
                     + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
                     + "xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/access/ "
-                    + StreamUtility.enc(fedoraServerProtocol) + "://"
-                    + StreamUtility.enc(fedoraServerHost) + ":"
-                    + StreamUtility.enc(fedoraServerPort) + "/listDatastreams.xsd\""
-                    + " pid=\"" + StreamUtility.enc(pid) + "\" " + "asOfDateTime=\""
+                    + enc(fedoraServerProtocol) + "://"
+                    + enc(fedoraServerHost) + ":"
+                    + enc(fedoraServerPort) + "/listDatastreams.xsd\""
+                    + " pid=\"" + enc(pid) + "\" " + "asOfDateTime=\""
                     + DateUtility.convertDateToString(asOfDateTime) + "\" "
-                    + "baseURL=\"" + StreamUtility.enc(fedoraServerProtocol) + "://"
-                    + StreamUtility.enc(fedoraServerHost) + ":"
-                    + StreamUtility.enc(fedoraServerPort) + "/" + fedoraAppServerContext + "/\" >");
+                    + "baseURL=\"" + enc(fedoraServerProtocol) + "://"
+                    + enc(fedoraServerHost) + ":"
+                    + enc(fedoraServerPort) + "/" + fedoraAppServerContext + "/\" >");
         }
 
         // DatastreamDef SERIALIZATION
         for (int i = 0; i < dsDefs.length; i++) {
-            xml.append("    <datastream " + "dsid=\"" + StreamUtility.enc(dsDefs[i].dsID)
-                    + "\" " + "label=\"" + StreamUtility.enc(dsDefs[i].dsLabel) + "\" "
-                    + "mimeType=\"" + StreamUtility.enc(dsDefs[i].dsMIME) + "\" />");
+            xml.append("    <datastream " + "dsid=\"" + enc(dsDefs[i].dsID)
+                    + "\" " + "label=\"" + enc(dsDefs[i].dsLabel) + "\" "
+                    + "mimeType=\"" + enc(dsDefs[i].dsMIME) + "\" />");
         }
         xml.append("</objectDatastreams>");
 
