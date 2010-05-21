@@ -5,6 +5,8 @@
 package org.fcrepo.test.api;
 
 import junit.framework.TestSuite;
+
+import org.antlr.stringtemplate.StringTemplate;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -97,162 +99,27 @@ public class TestRESTAPI
 
     private boolean chunked = false;
 
-    static {
-        // TODO:  RELS-INT relationship from MODEL, not text
-        // Test FOXML object with RELS-EXT datastream
-        StringBuilder sb = new StringBuilder();
-        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        sb.append("<foxml:digitalObject VERSION=\"1.1\" PID=\"demo:REST\" ");
-        sb.append("  xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\" ");
-        sb.append("  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ");
-        sb.append("  xsi:schemaLocation=\"info:fedora/fedora-system:def/foxml# ");
-        sb.append("  http://www.fedora.info/definitions/1/0/foxml1-1.xsd\">");
-        sb.append("  <foxml:objectProperties>");
-        sb.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>");
-        sb.append("  </foxml:objectProperties>");
-        sb.append("  <foxml:datastream ID=\"DC\" CONTROL_GROUP=\"X\" STATE=\"A\">");
-        sb.append(
-                "    <foxml:datastreamVersion FORMAT_URI=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" ID=\"DC1.0\" MIMETYPE=\"text/xml\" LABEL=\"Dublin Core Record for this object\">");
-        sb.append("      <foxml:xmlContent>");
-        sb.append(
-                "        <oai_dc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\">");
-        sb.append("          <dc:title>Coliseum in Rome</dc:title>");
-        sb.append("          <dc:creator>Thornton Staples</dc:creator>");
-        sb.append("          <dc:subject>Architecture, Roman</dc:subject>");
-        sb.append("          <dc:description>Image of Coliseum in Rome</dc:description>");
-        sb.append("          <dc:publisher>University of Virginia Library</dc:publisher>");
-        sb.append("          <dc:format>image/jpeg</dc:format>");
-        sb.append("          <dc:identifier>demo:REST</dc:identifier>");
-        sb.append("        </oai_dc:dc>");
-        sb.append("      </foxml:xmlContent>");
-        sb.append("    </foxml:datastreamVersion>");
-        sb.append("  </foxml:datastream>");
-        sb.append("  <foxml:datastream ID=\"RELS-EXT\" CONTROL_GROUP=\"M\" STATE=\"A\">");
-        sb.append(
-                "    <foxml:datastreamVersion FORMAT_URI=\"info:fedora/fedora-system:FedoraRELSExt-1.0\" ID=\"RELS-EXT.0\" MIMETYPE=\"application/rdf+xml\" LABEL=\"RDF Statements about this object\" CREATED=\"" +
-                datetime + "\">");
-        sb.append("      <foxml:xmlContent>");
-        sb.append("        <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""
-                  + "                 xmlns:rel=\"info:fedora/fedora-system:def/relations-external#\">");
-        sb.append("          <rdf:Description rdf:about=\"info:fedora/demo:REST\">");
-        sb.append("            <rel:hasFormalContentModel rdf:resource=\"info:fedora/demo:UVA_STD_IMAGE_1\"/>");
-        sb.append("          </rdf:Description>");
-        sb.append("        </rdf:RDF>");
-        sb.append("      </foxml:xmlContent>");
-        sb.append("    </foxml:datastreamVersion>");
-        sb.append("  </foxml:datastream>");
-        sb.append("  <foxml:datastream ID=\"DS1\" CONTROL_GROUP=\"X\" STATE=\"A\">");
-        sb.append("    <foxml:datastreamVersion ID=\"DS1.0\" MIMETYPE=\"text/xml\" LABEL=\"Datastream 1\">");
-        sb.append("      <foxml:xmlContent>");
-        sb.append("        <foo>");
-        sb.append("          <bar>baz</bar>");
-        sb.append("        </foo>");
-        sb.append("      </foxml:xmlContent>");
-        sb.append("    </foxml:datastreamVersion>");
-        sb.append("  </foxml:datastream>");
-        sb.append("  <foxml:datastream CONTROL_GROUP=\"E\" ID=\"EXTDS\" STATE=\"A\" VERSIONABLE=\"true\">");
-        sb.append("    <foxml:datastreamVersion ID=\"EXTDS1.0\" LABEL=\"External\" MIMETYPE=\"text/xml\">");
-        sb.append("      <foxml:contentLocation REF=\"" + getBaseURL()
-                  + "/get/demo:REST/DS1\" TYPE=\"URL\"/>");
-        sb.append("    </foxml:datastreamVersion>");
-        sb.append("  </foxml:datastream>");
-        // datastreams for content-disposition header (get datastream filename) testing
-        // RELS-INT: specifies filename for DS1
-        sb.append("  <foxml:datastream ID=\"RELS-INT\" CONTROL_GROUP=\"M\" STATE=\"A\">");
-        sb.append(
-                "    <foxml:datastreamVersion FORMAT_URI=\"info:fedora/fedora-system:FedoraRELSInt-1.0\" ID=\"RELS-INT.0\" MIMETYPE=\"application/rdf+xml\" LABEL=\"RDF Statements about datastreams in this object\" CREATED=\"" +
-                datetime + "\">");
-        sb.append("      <foxml:xmlContent>");
-        sb.append("        <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""
-                  + "                 xmlns:fedora-model=\"" + MODEL.uri + "\">");
-        sb.append("          <rdf:Description rdf:about=\"info:fedora/demo:REST/DS1\">");
-        sb.append("            <fedora-model:" + MODEL.DOWNLOAD_FILENAME.localName + ">" + DS1RelsFilename +
-                  "</fedora-model:" + MODEL.DOWNLOAD_FILENAME.localName + ">");
-        sb.append("          </rdf:Description>");
-        sb.append("        </rdf:RDF>");
-        sb.append("      </foxml:xmlContent>");
-        sb.append("    </foxml:datastreamVersion>");
-        sb.append("  </foxml:datastream>");
-
-
-        // DS2:  label is filename, known mimetype of image/jpeg so extension (jpg) should be determined by mappings file
-        sb.append("  <foxml:datastream ID=\"DS2\" CONTROL_GROUP=\"M\" STATE=\"A\">");
-        sb.append("    <foxml:datastreamVersion ID=\"DS2.0\" MIMETYPE=\"image/jpeg\" LABEL=\"" + DS2LabelFilename +
-                  "\">");
-        sb.append("      <foxml:xmlContent>");
-        sb.append("        <foo>");
-        sb.append("          <bar>baz</bar>");
-        sb.append("        </foo>");
-        sb.append("      </foxml:xmlContent>");
-        sb.append("    </foxml:datastreamVersion>");
-        sb.append("  </foxml:datastream>");
-
-        // DS3:  label is filename, mimetype unknown so extension should be default
-        sb.append("  <foxml:datastream ID=\"DS3\" CONTROL_GROUP=\"X\" STATE=\"A\">");
-        sb.append(
-                "    <foxml:datastreamVersion ID=\"DS3.0\" MIMETYPE=\"unknown/mimetype\" LABEL=\"" + DS3LabelFilename +
-                "\">");
-        sb.append("      <foxml:xmlContent>");
-        sb.append("        <foo>");
-        sb.append("          <bar>baz</bar>");
-        sb.append("        </foo>");
-        sb.append("      </foxml:xmlContent>");
-        sb.append("    </foxml:datastreamVersion>");
-        sb.append("  </foxml:datastream>");
-
-        // DS4: label is filename, with illegal filename characters
-        sb.append("  <foxml:datastream ID=\"DS4\" CONTROL_GROUP=\"X\" STATE=\"A\">");
-        sb.append(
-                "    <foxml:datastreamVersion ID=\"DS4.0\" MIMETYPE=\"text/xml\" LABEL=\"" + DS4LabelFilenameOriginal +
-                "\">");
-        sb.append("      <foxml:xmlContent>");
-        sb.append("        <foo>");
-        sb.append("          <bar>baz</bar>");
-        sb.append("        </foo>");
-        sb.append("      </foxml:xmlContent>");
-        sb.append("    </foxml:datastreamVersion>");
-        sb.append("  </foxml:datastream>");
-
-        //DS5: no label, ID is filename
-        sb.append("  <foxml:datastream ID=\"DS5\" CONTROL_GROUP=\"X\" STATE=\"A\">");
-        sb.append("    <foxml:datastreamVersion ID=\"DS5.0\" MIMETYPE=\"text/xml\">");
-        sb.append("      <foxml:xmlContent>");
-        sb.append("        <foo>");
-        sb.append("          <bar>baz</bar>");
-        sb.append("        </foo>");
-        sb.append("      </foxml:xmlContent>");
-        sb.append("    </foxml:datastreamVersion>");
-        sb.append("  </foxml:datastream>");
-
-        // DS6: no label, ID is filename plus extension
-        sb.append("  <foxml:datastream ID=\"DS6.xml\" CONTROL_GROUP=\"X\" STATE=\"A\">");
-        sb.append("    <foxml:datastreamVersion ID=\"DS6.0\" MIMETYPE=\"text/xml\">");
-        sb.append("      <foxml:xmlContent>");
-        sb.append("        <foo>");
-        sb.append("          <bar>baz</bar>");
-        sb.append("        </foo>");
-        sb.append("      </foxml:xmlContent>");
-        sb.append("    </foxml:datastreamVersion>");
-        sb.append("  </foxml:datastream>");
-        sb.append("</foxml:digitalObject>");
-
-        try {
-            DEMO_REST = sb.toString();
-            DEMO_REST_FOXML = DEMO_REST.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException uee) {
-        }
-
-         
-    }
-
     @Override
     public void setUp() throws Exception {
-        apia = getFedoraClient().getAPIA();
-        apim = getFedoraClient().getAPIM();
-        apim.ingest(DEMO_REST_FOXML, FOXML1_1.uri, "ingesting new foxml object");
-        
+
         DEMO_MIN = FileUtils.readFileToString(new File(REST_RESOURCE_PATH + "/demo_min.xml"),"UTF-8");
         DEMO_MIN_PID = FileUtils.readFileToString(new File(REST_RESOURCE_PATH + "/demo_min_pid.xml"),"UTF-8");
+
+        StringTemplate tpl = new StringTemplate(FileUtils.readFileToString(new File(REST_RESOURCE_PATH + "/demo_rest.xml"),"UTF-8"));
+        tpl.setAttribute("MODEL_DOWNLOAD_FILENAME",  MODEL.DOWNLOAD_FILENAME.localName );
+        tpl.setAttribute("DS1_RELS_FILENAME", DS1RelsFilename);
+        tpl.setAttribute("MODEL_URI", MODEL.uri);
+        tpl.setAttribute("DATETIME", datetime);
+        tpl.setAttribute("FEDORA_BASE_URL", getBaseURL());
+        tpl.setAttribute("DS2_LABEL_FILENAME",  DS2LabelFilename);
+        tpl.setAttribute("DS3_LABEL_FILENAME",  DS3LabelFilename);
+        tpl.setAttribute("DS4_LABEL_FILENAME_ORIGINAL",DS4LabelFilenameOriginal);
+
+        DEMO_REST = tpl.toString();
+        apia = getFedoraClient().getAPIA();
+        apim = getFedoraClient().getAPIM();
+        apim.ingest(DEMO_REST.getBytes("UTF-8"), FOXML1_1.uri, "ingesting new foxml object");
+        
     }
 
     @Override
@@ -498,10 +365,12 @@ public class TestRESTAPI
                 
         String control = FileUtils.readFileToString(new File(
                 "src/test/resources/rest/datastreamHistory.xml"), "UTF-8");
-
+        StringTemplate tpl = new StringTemplate(control);
+        tpl.setAttribute("FEDORA_BASE_URL", getProtocol() +"://"+ getHost() + ":" + getPort());
+        
         // Diff must be identical
         XMLUnit.setIgnoreWhitespace(true);
-        Diff xmldiff = new Diff(control.toString(), responseXML);
+        Diff xmldiff = new Diff(tpl.toString(), responseXML);
         assertTrue(xmldiff.toString(), xmldiff.identical());
 
          // Sanity check
