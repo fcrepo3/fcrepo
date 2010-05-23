@@ -77,7 +77,7 @@ public class RelationshipResource extends BaseRestResource {
             format = format.toLowerCase();
             RDFFormat outputFormat;
             MediaType mediaType;
-            if (format == null || format.equalsIgnoreCase("xml") || format.equals("rdf/xml")) {
+            if (format.equalsIgnoreCase("xml") || format.equals("rdf/xml")) {
                 outputFormat = RDFFormat.RDF_XML;
                 mediaType = new MediaType("application", "rdf+xml");
             } else if (format.equals("n-triples") || format.equals("ntriples")) {
