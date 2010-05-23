@@ -10,10 +10,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -46,10 +48,12 @@ public class RelationshipResource extends BaseRestResource {
      *                e.g. info:fedora/demo:1.
      * @param predicate The predicate uri or null to match any predicate.
      * @param format one of "rdf/xml", "n-triples", "turtle", or "sparql".
-     *               Defaults to "rdf/xml".
+     *               If null, defaults to rdf/xml.
      * @return the relationships in the specified format.
      */
     @GET
+    @Produces({"application/rdf+xml", "text/plain", "application/x-turtle",
+        "application/sparql-results+xml"})
     public Response getRelationships(
             @PathParam(RestParam.PID)
             String pid,
@@ -58,6 +62,7 @@ public class RelationshipResource extends BaseRestResource {
             @QueryParam(RestParam.PREDICATE)
             String predicate,
             @QueryParam(RestParam.FORMAT)
+            @DefaultValue("rdf/xml")
             String format) {
         Context context = getContext();
         if (subject == null) {
