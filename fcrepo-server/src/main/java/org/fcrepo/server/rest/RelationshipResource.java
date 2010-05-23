@@ -41,10 +41,13 @@ public class RelationshipResource extends BaseRestResource {
     /**
      * Get relationships asserted by the object denoted by <i>pid</i>.
      *
-     * @param pid The pid of the Fedora object, e.g. demo:1
-     * @param subject
-     * @param predicate
-     * @return N-TRIPLES
+     * @param pid The pid of the Fedora object, e.g. demo:1.
+     * @param subject The subject uri. If null, defaults to the URI form of pid,
+     *                e.g. info:fedora/demo:1.
+     * @param predicate The predicate uri or null to match any predicate.
+     * @param format one of "rdf/xml", "n-triples", "turtle", or "sparql".
+     *               Defaults to "rdf/xml".
+     * @return the relationships in the specified format.
      */
     @GET
     public Response getRelationships(
@@ -53,7 +56,9 @@ public class RelationshipResource extends BaseRestResource {
             @QueryParam(RestParam.SUBJECT)
             String subject,
             @QueryParam(RestParam.PREDICATE)
-            String predicate) {
+            String predicate,
+            @QueryParam(RestParam.FORMAT)
+            String format) {
         Context context = getContext();
         if (subject == null) {
             // assume the subject is the object as denoted by the pid
@@ -63,9 +68,27 @@ public class RelationshipResource extends BaseRestResource {
             RelationshipTuple[] tuples = apiMService.getRelationships(context, subject, predicate);
             TripleIterator it = new TupleArrayTripleIterator(new ArrayList<RelationshipTuple>(Arrays.asList(tuples)));
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            // TODO may as well support the range of output formats
-            it.toStream(out, RDFFormat.N_TRIPLES);
-            return Response.ok(out.toString("UTF-8"), MediaType.TEXT_PLAIN_TYPE).build();
+
+            format = format.toLowerCase();
+            RDFFormat outputFormat;
+            MediaType mediaType;
+            if (format == null || format.equalsIgnoreCase("xml") || format.equals("rdf/xml")) {
+                outputFormat = RDFFormat.RDF_XML;
+                mediaType = new MediaType("application", "rdf+xml");
+            } else if (format.equals("n-triples") || format.equals("ntriples")) {
+                outputFormat = RDFFormat.N_TRIPLES;
+                mediaType = MediaType.TEXT_PLAIN_TYPE;
+            } else if (format.equals("turtle")) {
+                outputFormat = RDFFormat.TURTLE;
+                mediaType = new MediaType("application", "x-turtle");
+            } else if (format.equals("sparql")) {
+                outputFormat = RDFFormat.SPARQL;
+                mediaType = new MediaType("application", "sparql-results+xml");
+            } else {
+                throw new IllegalArgumentException("unknown format: " + format);
+            }
+            it.toStream(out, outputFormat);
+            return Response.ok(out.toString("UTF-8"), mediaType).build();
         } catch (ServerException e) {
             return handleException(e);
         } catch (TrippiException e) {
