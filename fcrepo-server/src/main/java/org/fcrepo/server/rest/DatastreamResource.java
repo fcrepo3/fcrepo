@@ -151,7 +151,7 @@ public class DatastreamResource extends BaseRestResource {
 
     /**
      * Invoke API-M.getDatastreamHistory(context,pid,dsId)
-     * 
+     *
      * GET /objects/{pid}/datastreams/{dsID}/versions
      * @param pid the PID of the digital object
      * @param dsID the ID of the datastream
@@ -171,18 +171,18 @@ public class DatastreamResource extends BaseRestResource {
     	try {
     		Context context = getContext();
 			Datastream[] datastreamHistory = apiMService.getDatastreamHistory(context, pid, dsID);
-			
+
             if (datastreamHistory == null || datastreamHistory.length == 0){
 			return Response.status(Status.NOT_FOUND).type("text/plain").entity(
                     "No datastream history could be found. There is no datastream history for " +
                     "the digital object \""+pid+"\" with datastream ID of \""+dsID).build();
-              
+
             }
 
             String xml = getSerializer(context).datastreamHistoryToXml(pid,dsID,datastreamHistory);
-			
+
             MediaType mime = RestHelper.getContentType(format);
-	        
+
 			if (TEXT_HTML.isCompatible(mime)) {
 				CharArrayWriter writer = new CharArrayWriter();
 				transform(xml, "management/viewDatastreamHistory.xslt", writer);
@@ -306,11 +306,13 @@ public class DatastreamResource extends BaseRestResource {
             String logMessage,
             @QueryParam(RestParam.IGNORE_CONTENT)
             @DefaultValue("false")
-            boolean ignoreContent) {
+            boolean ignoreContent,
+            @QueryParam(RestParam.LAST_MODIFIED_DATE)
+            String lastModifiedDate) {
         return addOrUpdateDatastream(false, pid, dsID, headers.getMediaType(), mimeType,
                                      null, dsLocation, altIDs, dsLabel, versionable,
                                      dsState, formatURI, checksumType, checksum,
-                                     logMessage, ignoreContent);
+                                     logMessage, ignoreContent, lastModifiedDate);
     }
 
     /**
@@ -361,7 +363,7 @@ public class DatastreamResource extends BaseRestResource {
         return addOrUpdateDatastream(true, pid, dsID, headers.getMediaType(), mimeType,
                                      controlGroup, dsLocation, altIDs, dsLabel,
                                      versionable, dsState, formatURI, checksumType,
-                                     checksum, logMessage, false);
+                                     checksum, logMessage, false, null);
     }
 
     protected Response addOrUpdateDatastream(
@@ -380,7 +382,8 @@ public class DatastreamResource extends BaseRestResource {
             String checksumType,
             String checksum,
             String logMessage,
-            boolean ignoreContent) {
+            boolean ignoreContent,
+            String lastModifiedDate) {
 
         try {
             String[] altIDs = {};

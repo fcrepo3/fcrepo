@@ -42,4 +42,5 @@ public interface RestParam {
     String OBJECT = "object";
     String IS_LITERAL = "isLiteral";
     String DATATYPE = "datatype";
+    String LAST_MODIFIED_DATE = "lastModifiedDate";
 }
