@@ -4,24 +4,36 @@
  */
 package org.fcrepo.server.rest;
 
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.Context;
-import org.fcrepo.server.access.ObjectProfile;
-import org.fcrepo.server.rest.RestUtil.RequestContent;
-import org.fcrepo.server.utilities.StreamUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.CharArrayWriter;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Date;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.Context;
+import org.fcrepo.server.access.ObjectProfile;
+import org.fcrepo.server.rest.RestUtil.RequestContent;
+import org.fcrepo.server.rest.param.DateTimeParam;
+import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.server.utilities.StreamUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -251,7 +263,7 @@ public class FedoraObjectResource extends BaseRestResource {
                 ownerID = context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri);
                 is = new ByteArrayInputStream(getFOXMLTemplate(pid, label, ownerID, encoding).getBytes());
             } else {
-               
+
                 if (namespace != null && !namespace.equals("")) {
                     logger.warn("The namespace parameter is only applicable when object " +
                                 "content is not provided, thus the namespace provided '" +
@@ -269,13 +281,23 @@ public class FedoraObjectResource extends BaseRestResource {
     }
 
     /**
-     * Update digital object
-     * <p/>
-     * PUT /objects/{pid} ? label logMessage ownerId state
+     * Update (modify) digital object.
+     * <p>PUT /objects/{pid} ? label logMessage ownerId state lastModifiedDate</p>
      *
+     * @param pid the persistent identifier
+     * @param label
+     * @param logMessage
+     * @param ownerID
+     * @param state
+     * @param lastModifiedDate Optional XSD dateTime to guard against concurrent
+     * modification. If provided (i.e. not null), the request will fail with an
+     * HTTP 409 Conflict if lastModifiedDate is earlier than the object's
+     * lastModifiedDate.
+     * @return The timestamp for this modification (as an XSD dateTime string)
      * @see org.fcrepo.server.management.Management#modifyObject(org.fcrepo.server.Context, String, String, String, String, String)
      */
     @PUT
+    @Produces(MediaType.TEXT_PLAIN)
     public Response updateObject(
             @PathParam(RestParam.PID)
             String pid,
@@ -286,11 +308,32 @@ public class FedoraObjectResource extends BaseRestResource {
             @QueryParam(RestParam.OWNER_ID)
             String ownerID,
             @QueryParam(RestParam.STATE)
-            String state) {
+            String state,
+            @QueryParam(RestParam.LAST_MODIFIED_DATE)
+            DateTimeParam lastModifiedDate) {
         try {
             Context context = getContext();
-            apiMService.modifyObject(context, pid, state, label, ownerID, logMessage);
-            return Response.ok().build();
+
+            // if specified, ensure that the request's lastModifiedDate is not
+            // earlier than the existing datastream's.
+            if (lastModifiedDate != null) {
+                ObjectProfile objProfile = apiAService.getObjectProfile(context, pid, null);
+                Date existingDT = objProfile.objectLastModDate;
+                if (lastModifiedDate.getValue().before(existingDT)) {
+                    String dt = DateUtility.convertDateToXSDString(existingDT);
+                    String msg = String.format("%s lastModifiedDate (%s) " +
+                                            "is more recent than the " +
+                                            "request (%s)",
+                                            pid,
+                                            dt,
+                                            lastModifiedDate.getOriginalParam());
+                    return Response.status(Response.Status.CONFLICT)
+                            .entity(msg).build();
+                }
+            }
+
+            Date lastModDate = apiMService.modifyObject(context, pid, state, label, ownerID, logMessage);
+            return Response.ok().entity(DateUtility.convertDateToXSDString(lastModDate)).build();
         } catch (Exception ex) {
             return handleException(ex);
         }
