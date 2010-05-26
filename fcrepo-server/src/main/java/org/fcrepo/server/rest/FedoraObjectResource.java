@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 @Path("/{pid}")
 public class FedoraObjectResource extends BaseRestResource {
     private final String FOXML1_1 = "info:fedora/fedora-system:FOXML-1.1";
+    private final String ATOMZIP1_1 = "info:fedora/fedora-system:ATOMZip-1.1";
 
     private static final Logger logger =
             LoggerFactory.getLogger(FedoraObjectResource.class);
@@ -59,7 +60,7 @@ public class FedoraObjectResource extends BaseRestResource {
      */
     @Path("/export")
     @GET
-    @Produces(XML)
+    @Produces({XML, ZIP})
     public Response getObjectExport(
             @PathParam(RestParam.PID)
             String pid,
@@ -75,7 +76,11 @@ public class FedoraObjectResource extends BaseRestResource {
         try {
             Context context = getContext();
             InputStream is = apiMService.export(context, pid, format, exportContext, encoding);
-            return Response.ok(is, TEXT_XML).build();
+            MediaType mediaType = TEXT_XML;
+            if (format.equals(ATOMZIP1_1)) {
+                mediaType = MediaType.valueOf(ZIP);
+            }
+            return Response.ok(is, mediaType).build();
         } catch (Exception ex) {
             return handleException(ex);
         }

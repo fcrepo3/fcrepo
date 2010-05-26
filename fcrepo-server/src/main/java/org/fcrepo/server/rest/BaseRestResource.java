@@ -59,12 +59,13 @@ public class BaseRestResource {
     static final String[] EMPTY_STRING_ARRAY = new String[0];
     static final String DEFAULT_ENC = "UTF-8";
 
-    public static final String XML = "text/xml";
-    public static final String HTML = "text/html";
     public static final String FORM = "multipart/form-data";
+    public static final String HTML = "text/html";
+    public static final String XML = "text/xml";
+    public static final String ZIP = "application/zip";
 
-    public static final MediaType TEXT_XML = new MediaType("text", "xml");
     public static final MediaType TEXT_HTML = new MediaType("text", "html");
+    public static final MediaType TEXT_XML = new MediaType("text", "xml");
 
     protected Server fedoraServer;
     protected Management apiMService;
