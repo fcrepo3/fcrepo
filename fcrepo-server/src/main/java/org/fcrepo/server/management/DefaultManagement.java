@@ -4,8 +4,27 @@
  */
 package org.fcrepo.server.management;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.commons.betwixt.XMLUtils;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
@@ -13,11 +32,30 @@ import org.fcrepo.common.rdf.SimpleURIReference;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.RecoveryContext;
 import org.fcrepo.server.Server;
-import org.fcrepo.server.errors.*;
+import org.fcrepo.server.errors.DatastreamLockedException;
+import org.fcrepo.server.errors.GeneralException;
+import org.fcrepo.server.errors.InvalidStateException;
+import org.fcrepo.server.errors.InvalidXMLNameException;
+import org.fcrepo.server.errors.ObjectLockedException;
+import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.errors.StreamReadException;
+import org.fcrepo.server.errors.StreamWriteException;
+import org.fcrepo.server.errors.ValidationException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.security.Authorization;
-import org.fcrepo.server.storage.*;
-import org.fcrepo.server.storage.types.*;
+import org.fcrepo.server.storage.ContentManagerParams;
+import org.fcrepo.server.storage.DOManager;
+import org.fcrepo.server.storage.DOReader;
+import org.fcrepo.server.storage.DOWriter;
+import org.fcrepo.server.storage.ExternalContentManager;
+import org.fcrepo.server.storage.types.AuditRecord;
+import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.server.storage.types.DatastreamManagedContent;
+import org.fcrepo.server.storage.types.DatastreamReferencedContent;
+import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
+import org.fcrepo.server.storage.types.MIMETypedStream;
+import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationConstants;
 import org.fcrepo.server.validation.ValidationUtility;
@@ -26,15 +64,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.regex.Pattern;
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 /**
  * Implements API-M without regard to the transport/messaging protocol.
@@ -153,7 +184,8 @@ public class DefaultManagement
                              String state,
                              String label,
                              String ownerId,
-                             String logMessage) throws ServerException {
+                             String logMessage,
+                             Date lastModifiedDate) throws ServerException {
         DOWriter w = null;
         try {
             logger.debug("Entered modifyObject");
@@ -166,6 +198,20 @@ public class DefaultManagement
             checkObjectLabel(label);
 
             w = m_manager.getWriter(Server.USE_DEFINITIVE_STORE, context, pid);
+
+            // if provided, check request lastModifiedDate against the object,
+            // rejecting the request if the object's mod date is more recent.
+            if (lastModifiedDate != null) {
+                if (lastModifiedDate.before(w.getLastModDate())) {
+                    String objDate = DateUtility.convertDateToXSDString(w.getLastModDate());
+                    String reqDate = DateUtility.convertDateToXSDString(lastModifiedDate);
+                    String msg = String.format("%s lastModifiedDate (%s) " +
+                                               "is more recent than the " +
+                                               "request (%s)", pid, objDate, reqDate);
+                    throw new ObjectLockedException(msg);
+               }
+            }
+
             if (state != null && !state.equals("")) {
                 if (!state.equals("A") && !state.equals("D")
                     && !state.equals("I")) {
@@ -529,7 +575,8 @@ public class DefaultManagement
                                             String dsLocation,
                                             String checksumType,
                                             String checksum,
-                                            String logMessage)
+                                            String logMessage,
+                                            Date lastModifiedDate)
             throws ServerException {
 
         // check for valid xml name for datastream ID
@@ -565,6 +612,21 @@ public class DefaultManagement
             w = m_manager.getWriter(Server.USE_DEFINITIVE_STORE, context, pid);
             org.fcrepo.server.storage.types.Datastream orig =
                     w.GetDatastream(datastreamId, null);
+
+            // if provided, check request lastModifiedDate against the datastream,
+            // rejecting the request if the datastream's mod date is more recent.
+            if (lastModifiedDate != null) {
+                if (lastModifiedDate.before(orig.DSCreateDT)) {
+                    String dsDate = DateUtility.convertDateToXSDString(w.getLastModDate());
+                    String reqDate = DateUtility.convertDateToXSDString(lastModifiedDate);
+                    String msg = String.format("%s/%s lastModifiedDate (%s) " +
+                                               "is more recent than the " +
+                                               "request (%s)", pid,
+                                               datastreamId, dsDate, reqDate);
+                    throw new DatastreamLockedException(msg);
+               }
+            }
+
             Date nowUTC; // variable for ds modified date
 
             // some forbidden scenarios...
@@ -721,7 +783,8 @@ public class DefaultManagement
                                         InputStream dsContent,
                                         String checksumType,
                                         String checksum,
-                                        String logMessage) throws ServerException {
+                                        String logMessage,
+                                        Date lastModifiedDate) throws ServerException {
 
         // check for valid xml name for datastream ID
         if (datastreamId != null) {
@@ -753,6 +816,20 @@ public class DefaultManagement
             w = m_manager.getWriter(Server.USE_DEFINITIVE_STORE, context, pid);
             org.fcrepo.server.storage.types.Datastream orig =
                     w.GetDatastream(datastreamId, null);
+
+            // if provided, check request lastModifiedDate against the datastream,
+            // rejecting the request if the datastream's mod date is more recent.
+            if (lastModifiedDate != null) {
+                if (lastModifiedDate.before(orig.DSCreateDT)) {
+                    String dsDate = DateUtility.convertDateToXSDString(w.getLastModDate());
+                    String reqDate = DateUtility.convertDateToXSDString(lastModifiedDate);
+                    String msg = String.format("%s/%s lastModifiedDate (%s) " +
+                                               "is more recent than the " +
+                                               "request (%s)", pid,
+                                               datastreamId, dsDate, reqDate);
+                    throw new DatastreamLockedException(msg);
+               }
+            }
 
             // some forbidden scenarios...
             if (orig.DSState.equals("D")) {

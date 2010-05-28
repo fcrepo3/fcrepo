@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.journal;
@@ -9,7 +9,7 @@ import javax.xml.namespace.QName;
 /**
  * A collection of String constants and QName constants used by the Journaler
  * and its associated classes.
- * 
+ *
  * @author Jim Blake
  */
 public interface JournalConstants {
@@ -224,6 +224,8 @@ public interface JournalConstants {
     String ARGUMENT_NAME_IN = "in";
 
     String ARGUMENT_NAME_LABEL = "label";
+
+    String ARGUMENT_NAME_LAST_MODIFIED_DATE = "lastModifiedDate";
 
     String ARGUMENT_NAME_LOCATION = "location";
 

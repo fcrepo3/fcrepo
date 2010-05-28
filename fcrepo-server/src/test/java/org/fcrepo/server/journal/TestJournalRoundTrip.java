@@ -5,7 +5,19 @@
 
 package org.fcrepo.server.journal;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import junit.framework.JUnit4TestAdapter;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.rdf.RDFName;
 import org.fcrepo.server.Context;
@@ -19,17 +31,6 @@ import org.fcrepo.server.management.MockManagementDelegate;
 import org.fcrepo.server.management.MockManagementDelegate.Call;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
 
 /**
  * Check every management method to be sure:
@@ -282,7 +283,8 @@ public class TestJournalRoundTrip {
                             "dsLocation",
                             "checksumType",
                             "checksum",
-                            "logMessage");
+                            "logMessage",
+                            new Date(253370761200L)); // Jan 1 9999);
     }
 
     @Test
@@ -298,7 +300,8 @@ public class TestJournalRoundTrip {
                             new ByteArrayInputStream(new byte[0]),
                             "checksumType",
                             "checksum",
-                            "logMessage");
+                            "logMessage",
+                            new Date(253370761200L)); // Jan 1 9999);
     }
 
     @Test
@@ -309,7 +312,8 @@ public class TestJournalRoundTrip {
                             "state",
                             "objectLabel",
                             "owner",
-                            "logMessage");
+                            "logMessage",
+                            new Date(253370761200L)); // Jan 1 9999);
     }
 
     @Test

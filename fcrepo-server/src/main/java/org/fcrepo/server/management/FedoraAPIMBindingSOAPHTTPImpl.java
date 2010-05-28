@@ -4,6 +4,15 @@
  */
 package org.fcrepo.server.management;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.rmi.RemoteException;
+import java.util.Date;
+
 import org.apache.axis.types.NonNegativeInteger;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.ReadOnlyContext;
@@ -16,10 +25,6 @@ import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.TypeUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.rmi.RemoteException;
-import java.util.Date;
 
 /**
  * Implements the Fedora management SOAP service.
@@ -108,7 +113,8 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                   state,
                                   label,
                                   ownerId,
-                                  logMessage));
+                                  logMessage,
+                                  null));
         } catch (Throwable th) {
             logger.error("Error modifying object", th);
             throw AxisUtility.getFault(th);
@@ -256,7 +262,8 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                                  dsLocation,
                                                  checksumType,
                                                  checksum,
-                                                 logMessage));
+                                                 logMessage,
+                                                 null));
         } catch (Throwable th) {
             logger.error("Error modifying datastream by reference", th);
             throw AxisUtility.getFault(th);
@@ -296,8 +303,8 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                              byteStream,
                                              checksumType,
                                              checksum,
-                                             logMessage
-            ));
+                                             logMessage,
+                                             null));
         } catch (Throwable th) {
             logger.error("Error modifying datastream by value", th);
             throw AxisUtility.getFault(th);

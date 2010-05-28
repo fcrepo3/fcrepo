@@ -318,26 +318,11 @@ public class FedoraObjectResource extends BaseRestResource {
             DateTimeParam lastModifiedDate) {
         try {
             Context context = getContext();
-
-            // if specified, ensure that the request's lastModifiedDate is not
-            // earlier than the existing datastream's.
+            Date requestModDate = null;
             if (lastModifiedDate != null) {
-                ObjectProfile objProfile = apiAService.getObjectProfile(context, pid, null);
-                Date existingDT = objProfile.objectLastModDate;
-                if (lastModifiedDate.getValue().before(existingDT)) {
-                    String dt = DateUtility.convertDateToXSDString(existingDT);
-                    String msg = String.format("%s lastModifiedDate (%s) " +
-                                            "is more recent than the " +
-                                            "request (%s)",
-                                            pid,
-                                            dt,
-                                            lastModifiedDate.getOriginalParam());
-                    return Response.status(Response.Status.CONFLICT)
-                            .entity(msg).build();
-                }
+                requestModDate = lastModifiedDate.getValue();
             }
-
-            Date lastModDate = apiMService.modifyObject(context, pid, state, label, ownerID, logMessage);
+            Date lastModDate = apiMService.modifyObject(context, pid, state, label, ownerID, logMessage, requestModDate);
             return Response.ok().entity(DateUtility.convertDateToXSDString(lastModDate)).build();
         } catch (Exception ex) {
             return handleException(ex);

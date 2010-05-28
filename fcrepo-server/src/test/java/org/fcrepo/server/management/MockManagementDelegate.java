@@ -5,18 +5,18 @@
 
 package org.fcrepo.server.management;
 
-import org.fcrepo.server.Context;
-import org.fcrepo.server.errors.ServerException;
-import org.fcrepo.server.journal.JournalConstants;
-import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.storage.types.RelationshipTuple;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import org.fcrepo.server.Context;
+import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.journal.JournalConstants;
+import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.server.storage.types.RelationshipTuple;
 
 
 /**
@@ -296,7 +296,8 @@ public class MockManagementDelegate
                                             String dsLocation,
                                             String checksumType,
                                             String checksum,
-                                            String logMessage)
+                                            String logMessage,
+                                            Date lastModifiedDate)
             throws ServerException {
         calls
                 .add(new Call(JournalConstants.METHOD_MODIFY_DATASTREAM_BY_REFERENCE,
@@ -310,7 +311,8 @@ public class MockManagementDelegate
                               dsLocation,
                               checksumType,
                               checksum,
-                              logMessage));
+                              logMessage,
+                              lastModifiedDate));
         return new Date(111111L);
     }
 
@@ -324,7 +326,8 @@ public class MockManagementDelegate
                                         InputStream dsContent,
                                         String checksumType,
                                         String checksum,
-                                        String logMessage) throws ServerException {
+                                        String logMessage,
+                                        Date lastModifiedDate) throws ServerException {
         calls.add(new Call(JournalConstants.METHOD_MODIFY_DATASTREAM_BY_VALUE,
                            context,
                            pid,
@@ -336,7 +339,8 @@ public class MockManagementDelegate
                            dsContent,
                            checksumType,
                            checksum,
-                           logMessage));
+                           logMessage,
+                           lastModifiedDate));
         return new Date(222222L);
     }
 
@@ -345,14 +349,16 @@ public class MockManagementDelegate
                              String state,
                              String label,
                              String ownerId,
-                             String logMessage) throws ServerException {
+                             String logMessage,
+                             Date lastModifiedDate) throws ServerException {
         calls.add(new Call(JournalConstants.METHOD_MODIFY_OBJECT,
                            context,
                            pid,
                            state,
                            label,
                            ownerId,
-                           logMessage));
+                           logMessage,
+                           lastModifiedDate));
         return new Date(10000L);
     }
 

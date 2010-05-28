@@ -4,6 +4,10 @@
  */
 package org.fcrepo.server.journal;
 
+import java.io.InputStream;
+import java.util.Date;
+import java.util.Map;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ModuleInitializationException;
@@ -15,10 +19,6 @@ import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.InputStream;
-import java.util.Date;
-import java.util.Map;
 
 
 /**
@@ -121,7 +121,8 @@ public class JournalCreator
                              String state,
                              String label,
                              String ownerId,
-                             String logMessage) throws ServerException {
+                             String logMessage,
+                             Date lastModifiedDate) throws ServerException {
         try {
             CreatorJournalEntry cje =
                     new CreatorJournalEntry(METHOD_MODIFY_OBJECT, context);
@@ -130,6 +131,7 @@ public class JournalCreator
             cje.addArgument(ARGUMENT_NAME_LABEL, label);
             cje.addArgument(ARGUMENT_NAME_OWNERID, ownerId);
             cje.addArgument(ARGUMENT_NAME_LOG_MESSAGE, logMessage);
+            cje.addArgument(ARGUMENT_NAME_LAST_MODIFIED_DATE, lastModifiedDate);
             return (Date) cje.invokeAndClose(delegate, writer);
         } catch (JournalException e) {
             throw new GeneralException("Problem creating the Journal", e);
@@ -205,7 +207,8 @@ public class JournalCreator
                                         InputStream dsContent,
                                         String checksumType,
                                         String checksum,
-                                        String logMessage) throws ServerException {
+                                        String logMessage,
+                                        Date lastModifiedDate) throws ServerException {
         try {
             CreatorJournalEntry cje =
                     new CreatorJournalEntry(METHOD_MODIFY_DATASTREAM_BY_VALUE,
@@ -220,6 +223,7 @@ public class JournalCreator
             cje.addArgument(ARGUMENT_NAME_CHECKSUM_TYPE, checksumType);
             cje.addArgument(ARGUMENT_NAME_CHECKSUM, checksum);
             cje.addArgument(ARGUMENT_NAME_LOG_MESSAGE, logMessage);
+            cje.addArgument(ARGUMENT_NAME_LAST_MODIFIED_DATE, lastModifiedDate);
             return (Date) cje.invokeAndClose(delegate, writer);
         } catch (JournalException e) {
             throw new GeneralException("Problem creating the Journal", e);
@@ -239,7 +243,8 @@ public class JournalCreator
                                             String dsLocation,
                                             String checksumType,
                                             String checksum,
-                                            String logMessage)
+                                            String logMessage,
+                                            Date lastModifiedDate)
             throws ServerException {
         try {
             CreatorJournalEntry cje =
@@ -255,6 +260,7 @@ public class JournalCreator
             cje.addArgument(ARGUMENT_NAME_CHECKSUM_TYPE, checksumType);
             cje.addArgument(ARGUMENT_NAME_CHECKSUM, checksum);
             cje.addArgument(ARGUMENT_NAME_LOG_MESSAGE, logMessage);
+            cje.addArgument(ARGUMENT_NAME_LAST_MODIFIED_DATE, lastModifiedDate);
             return (Date) cje.invokeAndClose(delegate, writer);
         } catch (JournalException e) {
             throw new GeneralException("Problem creating the Journal", e);

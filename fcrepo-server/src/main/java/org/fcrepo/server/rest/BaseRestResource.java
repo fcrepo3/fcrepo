@@ -35,7 +35,9 @@ import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.access.Access;
+import org.fcrepo.server.errors.DatastreamLockedException;
 import org.fcrepo.server.errors.DatastreamNotFoundException;
+import org.fcrepo.server.errors.ObjectLockedException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.management.Management;
@@ -154,6 +156,10 @@ public class BaseRestResource {
         } else if (ex instanceof IllegalArgumentException) {
             logger.warn("Bad request; unable to fulfill REST API request", ex);
             return Response.status(Status.BAD_REQUEST).entity(ex.getMessage()).type("text/plain").build();
+        } else if (ex instanceof ObjectLockedException ||
+                   ex instanceof DatastreamLockedException) {
+            logger.warn("Lock exception; unable to fulfill REST API request", ex);
+            return Response.status(Status.CONFLICT).entity(ex.getMessage()).type(MediaType.TEXT_PLAIN).build();
         } else {
             logger.error("Unexpected error fulfilling REST API request", ex);
             throw new WebApplicationException(ex);

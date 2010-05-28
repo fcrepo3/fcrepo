@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.journal.managementmethods;
@@ -33,7 +33,8 @@ public class ModifyDatastreamByReferenceMethod
                 .getStringArgument(ARGUMENT_NAME_DS_LOCATION), parent
                 .getStringArgument(ARGUMENT_NAME_CHECKSUM_TYPE), parent
                 .getStringArgument(ARGUMENT_NAME_CHECKSUM), parent
-                .getStringArgument(ARGUMENT_NAME_LOG_MESSAGE));
+                .getStringArgument(ARGUMENT_NAME_LOG_MESSAGE), parent
+                .getDateArgument(ARGUMENT_NAME_LAST_MODIFIED_DATE));
     }
 
 }

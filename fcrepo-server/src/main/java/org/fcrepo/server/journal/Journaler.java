@@ -4,6 +4,11 @@
  */
 package org.fcrepo.server.journal;
 
+import java.io.InputStream;
+import java.util.Date;
+import java.util.Map;
+import java.util.Properties;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -16,11 +21,6 @@ import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.InputStream;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * A Management module that decorates a ManagementDelegate module with code that
@@ -165,13 +165,15 @@ public class Journaler
                              String state,
                              String label,
                              String ownerId,
-                             String logMessage) throws ServerException {
+                             String logMessage,
+                             Date lastModifiedDate) throws ServerException {
         return worker.modifyObject(context,
                                    pid,
                                    state,
                                    label,
                                    ownerId,
-                                   logMessage);
+                                   logMessage,
+                                   lastModifiedDate);
     }
 
     /**
@@ -248,7 +250,8 @@ public class Journaler
                                             String dsLocation,
                                             String checksumType,
                                             String checksum,
-                                            String logMessage)
+                                            String logMessage,
+                                            Date lastModifiedDate)
             throws ServerException {
         return worker.modifyDatastreamByReference(context,
                                                   pid,
@@ -260,7 +263,8 @@ public class Journaler
                                                   dsLocation,
                                                   checksumType,
                                                   checksum,
-                                                  logMessage);
+                                                  logMessage,
+                                                  lastModifiedDate);
     }
 
     /**
@@ -276,7 +280,8 @@ public class Journaler
                                         InputStream dsContent,
                                         String checksumType,
                                         String checksum,
-                                        String logMessage
+                                        String logMessage,
+                                        Date lastModifiedDate
     ) throws ServerException {
         return worker.modifyDatastreamByValue(context,
                                               pid,
@@ -288,7 +293,8 @@ public class Journaler
                                               dsContent,
                                               checksumType,
                                               checksum,
-                                              logMessage
+                                              logMessage,
+                                              null
         );
     }
 

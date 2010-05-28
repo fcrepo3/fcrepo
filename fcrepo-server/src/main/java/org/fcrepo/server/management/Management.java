@@ -4,14 +4,14 @@
  */
 package org.fcrepo.server.management;
 
+import java.io.InputStream;
+import java.util.Date;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.messaging.PName;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
-
-import java.io.InputStream;
-import java.util.Date;
 
 
 /**
@@ -34,7 +34,8 @@ public interface Management {
                              @PName("state") String state,
                              @PName("label") String label,
                              @PName("ownerID") String ownerID,
-                             @PName("logMessage") String logMessage) throws ServerException;
+                             @PName("logMessage") String logMessage,
+                             @PName("lastModifiedDate") Date lastModifiedDate) throws ServerException;
 
     public InputStream getObjectXML(@PName("context") Context context, @PName("pid") String pid,
                                     @PName("encoding") String encoding)
@@ -75,7 +76,8 @@ public interface Management {
                                             @PName("dsLocation") String dsLocation,
                                             @PName("checksumType") String checksumType,
                                             @PName("checksum") String checksum,
-                                            @PName("logMessage") String logMessage)
+                                            @PName("logMessage") String logMessage,
+                                            @PName("lastModifiedDate") Date lastModifiedDate)
             throws ServerException;
 
     public Date modifyDatastreamByValue(@PName("context") Context context,
@@ -88,7 +90,8 @@ public interface Management {
                                         @PName("dsContent") InputStream dsContent,
                                         @PName("checksumType") String checksumType,
                                         @PName("checksum") String checksum,
-                                        @PName("logMessage") String logMessage) throws ServerException;
+                                        @PName("logMessage") String logMessage,
+                                        @PName("lastModifiedDate") Date lastModifiedDate) throws ServerException;
 
     public Date[] purgeDatastream(@PName("context") Context context,
                                   @PName("pid") String pid,

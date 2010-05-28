@@ -4,6 +4,10 @@
  */
 package org.fcrepo.server.journal;
 
+import java.io.InputStream;
+import java.util.Date;
+import java.util.Map;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.InvalidStateException;
 import org.fcrepo.server.errors.ModuleInitializationException;
@@ -13,10 +17,6 @@ import org.fcrepo.server.journal.recoverylog.JournalRecoveryLog;
 import org.fcrepo.server.management.ManagementDelegate;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
-
-import java.io.InputStream;
-import java.util.Date;
-import java.util.Map;
 
 
 /**
@@ -116,7 +116,8 @@ public class JournalConsumer
                              String state,
                              String label,
                              String ownerId,
-                             String logMessage) throws ServerException {
+                             String logMessage,
+                             Date lastModifiedDate) throws ServerException {
         throw rejectCallsFromOutsideWhileInRecoveryMode();
     }
 
@@ -162,7 +163,8 @@ public class JournalConsumer
                                             String dsLocation,
                                             String checksumType,
                                             String checksum,
-                                            String logMessage)
+                                            String logMessage,
+                                            Date lastModifiedDate)
             throws ServerException {
         throw rejectCallsFromOutsideWhileInRecoveryMode();
     }
@@ -180,7 +182,8 @@ public class JournalConsumer
                                         InputStream dsContent,
                                         String checksumType,
                                         String checksum,
-                                        String logMessage) throws ServerException {
+                                        String logMessage,
+                                        Date lastModifiedDate) throws ServerException {
         throw rejectCallsFromOutsideWhileInRecoveryMode();
     }
 

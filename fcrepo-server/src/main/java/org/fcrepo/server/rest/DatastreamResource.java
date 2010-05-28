@@ -391,22 +391,9 @@ public class DatastreamResource
             Datastream existingDS =
                     apiMService.getDatastream(context, pid, dsID, null);
 
-            // if specified, ensure that the request's lastModifiedDate is not
-            // earlier than the existing datastream's.
+            Date requestModDate = null;
             if (lastModifiedDate != null) {
-                Date existingDT = existingDS.DSCreateDT;
-                if (lastModifiedDate.getValue().before(existingDT)) {
-                    String dt = DateUtility.convertDateToXSDString(existingDT);
-                    String msg = String.format("%s/%s lastModifiedDate (%s) " +
-                                            "is more recent than the " +
-                                            "request (%s)",
-                                            pid,
-                                            dsID,
-                                            dt,
-                                            lastModifiedDate.getOriginalParam());
-                    return Response.status(Response.Status.CONFLICT)
-                            .entity(msg).build();
-                }
+                requestModDate = lastModifiedDate.getValue();
             }
 
             // If a datastream is set to Deleted state, it must be set to
@@ -506,7 +493,8 @@ public class DatastreamResource
                                                         is,
                                                         checksumType,
                                                         checksum,
-                                                        logMessage);
+                                                        logMessage,
+                                                        requestModDate);
                 } else {
                     // Managed content can only be modified by reference.
                     // If there is no dsLocation, but there is a content stream,
@@ -530,7 +518,8 @@ public class DatastreamResource
                                                             dsLocation,
                                                             checksumType,
                                                             checksum,
-                                                            logMessage);
+                                                            logMessage,
+                                                            requestModDate);
                 }
 
                 if (dsState != null) {

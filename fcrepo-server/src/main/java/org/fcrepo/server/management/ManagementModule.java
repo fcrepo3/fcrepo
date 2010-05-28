@@ -4,6 +4,16 @@
  */
 package org.fcrepo.server.management;
 
+import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -19,10 +29,6 @@ import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.InputStream;
-import java.util.*;
 
 /**
  * @author Edwin Shin
@@ -353,7 +359,8 @@ public class ManagementModule
                                             String dsLocation,
                                             String checksumType,
                                             String checksum,
-                                            String logMessage)
+                                            String logMessage,
+                                            Date lastModifiedDate)
             throws ServerException {
         return mgmt.modifyDatastreamByReference(context,
                                                 pid,
@@ -365,7 +372,8 @@ public class ManagementModule
                                                 dsLocation,
                                                 checksumType,
                                                 checksum,
-                                                logMessage);
+                                                logMessage,
+                                                lastModifiedDate);
     }
 
     /**
@@ -381,7 +389,8 @@ public class ManagementModule
                                         InputStream dsContent,
                                         String checksumType,
                                         String checksum,
-                                        String logMessage) throws ServerException {
+                                        String logMessage,
+                                        Date lastModifiedDate) throws ServerException {
         return mgmt.modifyDatastreamByValue(context,
                                             pid,
                                             datastreamID,
@@ -392,7 +401,8 @@ public class ManagementModule
                                             dsContent,
                                             checksumType,
                                             checksum,
-                                            logMessage);
+                                            logMessage,
+                                            lastModifiedDate);
     }
 
     /**
@@ -403,14 +413,16 @@ public class ManagementModule
                              String state,
                              String label,
                              String ownerId,
-                             String logMessage) throws ServerException {
+                             String logMessage,
+                             Date lastModifiedDate) throws ServerException {
 
         return mgmt.modifyObject(context,
                                  pid,
                                  state,
                                  label,
                                  ownerId,
-                                 logMessage);
+                                 logMessage,
+                                 lastModifiedDate);
     }
 
     /**
