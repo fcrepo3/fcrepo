@@ -143,7 +143,7 @@ public class TestAPIALite
         result = getXMLQueryResult("/listDatastreams/demo:5?xml=true");
         assertXpathEvaluatesTo("6",
                                String.format("count(/%s:objectDatastreams/%s:datastream)",
-                                             LIST_DATASTREAMS.prefix),
+                                             LIST_DATASTREAMS.prefix, LIST_DATASTREAMS.prefix),
                                result);
     }
 
