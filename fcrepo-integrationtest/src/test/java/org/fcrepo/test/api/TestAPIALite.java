@@ -7,23 +7,20 @@ package org.fcrepo.test.api;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
-
-import org.junit.After;
-import org.junit.Before;
-
-import org.w3c.dom.Document;
-
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.HttpInputStream;
 import org.fcrepo.common.Models;
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.After;
+import org.junit.Before;
+import org.w3c.dom.Document;
 
 
 
@@ -50,6 +47,7 @@ public class TestAPIALite
         nsMap.put(NS_FEDORA_TYPES_PREFIX, NS_FEDORA_TYPES);
         nsMap.put(OAI_DC.prefix, OAI_DC.uri);
         nsMap.put(DC.prefix, DC.uri);
+        nsMap.put(LIST_DATASTREAMS.prefix, LIST_DATASTREAMS.uri);
         NamespaceContext ctx = new SimpleNamespaceContext(nsMap);
         XMLUnit.setXpathNamespaceContext(ctx);
     }
@@ -144,7 +142,8 @@ public class TestAPIALite
         Document result;
         result = getXMLQueryResult("/listDatastreams/demo:5?xml=true");
         assertXpathEvaluatesTo("6",
-                               "count(/objectDatastreams/datastream)",
+                               String.format("count(/%s:objectDatastreams/%s:datastream)",
+                                             LIST_DATASTREAMS.prefix),
                                result);
     }
 
