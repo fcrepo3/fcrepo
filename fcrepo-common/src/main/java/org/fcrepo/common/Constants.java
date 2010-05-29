@@ -63,6 +63,7 @@ import org.fcrepo.common.xml.namespace.FedoraBatchModifyNamespace;
 import org.fcrepo.common.xml.namespace.FedoraBindingSpecNamespace;
 import org.fcrepo.common.xml.namespace.FedoraDSCompositeModelNamespace;
 import org.fcrepo.common.xml.namespace.FedoraFCFGNamespace;
+import org.fcrepo.common.xml.namespace.FedoraListDatastreamsNamespace;
 import org.fcrepo.common.xml.namespace.FedoraManagementNamespace;
 import org.fcrepo.common.xml.namespace.FedoraMethodMapNamespace;
 import org.fcrepo.common.xml.namespace.FedoraServiceProfileNamespace;
@@ -309,6 +310,12 @@ public interface Constants {
      * <code>info:fedora/fedora-system:def/foxml#</code>
      */
     public static final FOXMLNamespace FOXML = FOXMLNamespace.getInstance();
+
+    /**
+     * The Fedora ListDatastreams namespace;
+     * <code>info:fedora/fedora-system:def/listDatastreams#</code>
+     */
+    public static final FedoraListDatastreamsNamespace LIST_DATASTREAMS = FedoraListDatastreamsNamespace.getInstance();
 
     /**
      * The Fedora Management XML namespace;

@@ -9,14 +9,12 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PipedReader;
 import java.io.PipedWriter;
-
 import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -390,8 +388,9 @@ public class ListDatastreamsServlet
                                     + ":" + fedoraServerPort + "/"
                                     + fedoraAppServerContext + "/";
                     pw.write(" baseURL=\"" + baseURL + "\"");
+                    pw.write(" xmlns=\"" + LIST_DATASTREAMS.uri + "\"");
                     pw.write(" xmlns:xsi=\"" + XSI.uri + "\"");
-                    pw.write(" xsi:schemaLocation=\"" + ACCESS.uri);
+                    pw.write(" xsi:schemaLocation=\"" + LIST_DATASTREAMS.uri);
                     pw.write(" " + OBJ_DATASTREAMS1_0.xsdLocation + "\">");
                     // DatastreamDef SERIALIZATION
                     for (DatastreamDef element : dsDefs) {

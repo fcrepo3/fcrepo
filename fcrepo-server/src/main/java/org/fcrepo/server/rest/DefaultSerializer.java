@@ -4,11 +4,11 @@
  */
 package org.fcrepo.server.rest;
 
+import static org.fcrepo.server.utilities.StreamUtility.enc;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
 import java.net.URLEncoder;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -28,8 +28,6 @@ import org.fcrepo.server.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.fcrepo.server.utilities.StreamUtility.enc;
-
 
 
 
@@ -37,7 +35,7 @@ public class DefaultSerializer {
     private static final Logger logger =
         LoggerFactory.getLogger(DefaultManagement.class);
 
-    
+
     String fedoraServerHost;
     String fedoraServerPort;
     String fedoraServerProtocol;
@@ -164,7 +162,7 @@ public class DefaultSerializer {
         }
         return buffer.toString();
     }
-    
+
     String datastreamProfileToXML(String pid, String dsID, Datastream dsProfile, Date versDateTime, boolean validateChecksum)
             throws IOException {
         StringBuffer buffer = new StringBuffer();
@@ -186,7 +184,7 @@ public class DefaultSerializer {
         buffer.append(" >");
         // ADD PROFILE FIELDS SERIALIZATION
         buffer.append(datastreamFieldSerialization(dsProfile,validateChecksum));
-       
+
 
         buffer.append("</datastreamProfile>");
 
@@ -226,7 +224,7 @@ public class DefaultSerializer {
                       + enc(fedoraServerPort) + "/datastreamHistory.xsd\""
                       + " pid=\"" + enc(pid) + "\""
                       + " dsID=\"" + enc(dsID) + "\">");
-       
+
         for (Datastream ds : history){
             buffer.append("<datastreamProfile ").append("pid=\"").append(
                     enc(pid)).append("\"").append(" dsID=\"").append(enc(dsID))
@@ -235,13 +233,13 @@ public class DefaultSerializer {
             buffer.append("</datastreamProfile>");
 
         }
-        
+
         buffer.append("</datastreamHistory>");
         logger.error(buffer.toString());
         return buffer.toString();
 
-    }    
-   
+    }
+
     String objectMethodsToXml(
             ObjectMethodsDef[] methodDefs,
             String pid,
@@ -610,35 +608,26 @@ public class DefaultSerializer {
             String pid,
             Date asOfDateTime,
             DatastreamDef[] dsDefs) {
-        StringBuffer xml = new StringBuffer();
+        StringBuilder xml = new StringBuilder();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        if (asOfDateTime == null
-                || DateUtility.convertDateToString(asOfDateTime).equalsIgnoreCase("")) {
-            xml.append("<objectDatastreams "
-                    + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-                    + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                    + "xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/access/ "
-                    + enc(fedoraServerProtocol) + "://"
-                    + enc(fedoraServerHost) + ":"
-                    + enc(fedoraServerPort) + "/listDatastreams.xsd\""
-                    + " pid=\"" + pid + "\" " + "baseURL=\""
-                    + enc(fedoraServerProtocol) + "://"
-                    + enc(fedoraServerHost) + ":"
-                    + enc(fedoraServerPort) + "/" + fedoraAppServerContext + "/\" >");
-        } else {
-            xml.append("<objectDatastreams "
-                    + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-                    + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                    + "xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/access/ "
-                    + enc(fedoraServerProtocol) + "://"
-                    + enc(fedoraServerHost) + ":"
-                    + enc(fedoraServerPort) + "/listDatastreams.xsd\""
-                    + " pid=\"" + enc(pid) + "\" " + "asOfDateTime=\""
-                    + DateUtility.convertDateToString(asOfDateTime) + "\" "
-                    + "baseURL=\"" + enc(fedoraServerProtocol) + "://"
-                    + enc(fedoraServerHost) + ":"
-                    + enc(fedoraServerPort) + "/" + fedoraAppServerContext + "/\" >");
+
+        String dateString = "";
+        if (asOfDateTime != null) {
+            String tmp = DateUtility.convertDateToString(asOfDateTime);
+            if (tmp != null) {
+                dateString = String.format("asOfDateTime=\"%s\" ", tmp);
+            }
         }
+
+        xml.append("<objectDatastreams "
+                   + "xmlns=\"" + Constants.LIST_DATASTREAMS.uri + "\" "
+                   + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                   + "xsi:schemaLocation=\"" + Constants.LIST_DATASTREAMS.uri + " "
+                   + Constants.OBJ_DATASTREAMS1_0.xsdLocation + "\""
+                   + " pid=\"" + enc(pid) + "\" " + dateString
+                   + "baseURL=\"" + enc(fedoraServerProtocol) + "://"
+                   + enc(fedoraServerHost) + ":"
+                   + enc(fedoraServerPort) + "/" + fedoraAppServerContext + "/\" >");
 
         // DatastreamDef SERIALIZATION
         for (int i = 0; i < dsDefs.length; i++) {
