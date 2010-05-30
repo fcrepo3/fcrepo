@@ -378,8 +378,8 @@ public class FedoraAPIMBindingSOAPHTTPImpl
         try {
             return toStringArray(s_management.purgeDatastream(ReadOnlyContext
                     .getSoapContext(), PID, datastreamID, DateUtility
-                    .convertStringToDate(startDT), DateUtility
-                    .convertStringToDate(endDT), logMessage));
+                    .parseCheckedDate(startDT), DateUtility
+                    .parseCheckedDate(endDT), logMessage));
         } catch (Throwable th) {
             logger.error("Error purging datastream", th);
             throw AxisUtility.getFault(th);
@@ -408,7 +408,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                            PID,
                                            datastreamID,
                                            DateUtility
-                                                   .convertStringToDate(asOfDateTime));
+                                                   .parseCheckedDate(asOfDateTime));
             return TypeUtility.convertDatastreamToGenDatastream(ds);
         } catch (Throwable th) {
             logger.error("Error getting datastream", th);
@@ -425,7 +425,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
             org.fcrepo.server.storage.types.Datastream[] intDatastreams =
                     s_management.getDatastreams(ReadOnlyContext
                             .getSoapContext(), PID, DateUtility
-                            .convertStringToDate(asOfDateTime), state);
+                            .parseCheckedDate(asOfDateTime), state);
             return getGenDatastreams(intDatastreams);
         } catch (Throwable th) {
             logger.error("Error getting datastreams", th);

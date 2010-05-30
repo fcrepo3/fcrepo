@@ -80,7 +80,7 @@ public class DatastreamResource
                                     @QueryParam(RestParam.FORMAT) @DefaultValue(HTML) String format) {
 
         try {
-            Date asOfDateTime = parseDate(dateTime);
+            Date asOfDateTime = DateUtility.parseCheckedDate(dateTime);
             Context context = getContext();
             MediaType mime = RestHelper.getContentType(format);
             DatastreamDef[] dsDefs =
@@ -117,7 +117,7 @@ public class DatastreamResource
                                          @QueryParam(RestParam.FORMAT) @DefaultValue(HTML) String format,
                                          @QueryParam(RestParam.VALIDATE_CHECKSUM) @DefaultValue("false") boolean validateChecksum) {
         try {
-            Date asOfDateTime = parseDate(dateTime);
+            Date asOfDateTime = DateUtility.parseCheckedDate(dateTime);
             Context context = getContext();
             Datastream dsProfile =
                     apiMService.getDatastream(context, pid, dsID, asOfDateTime);
@@ -224,6 +224,7 @@ public class DatastreamResource
                                   @QueryParam(RestParam.DOWNLOAD) String download) {
         Context context = getContext();
         try {
+            Date asOfDateTime = DateUtility.parseCheckedDate(dateTime);
             MIMETypedStream stream =
                     apiAService.getDatastreamDissemination(context,
                                                            pid,
@@ -262,9 +263,9 @@ public class DatastreamResource
 
         try {
             Context context = getContext();
-            Date startDate = DateUtility.convertStringToDate(startDT);
-            Date endDate = DateUtility.convertStringToDate(endDT);
-            apiMService.purgeDatastream(context,
+            Date startDate = DateUtility.parseCheckedDate(startDT);
+            Date endDate = DateUtility.parseCheckedDate(endDT);
+            Date[] purged = apiMService.purgeDatastream(context,
                                         pid,
                                         dsID,
                                         startDate,

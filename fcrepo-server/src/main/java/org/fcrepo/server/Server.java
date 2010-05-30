@@ -8,12 +8,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
 import java.text.MessageFormat;
-
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,12 +24,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
-import org.xml.sax.SAXException;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.FaultException;
@@ -52,6 +44,10 @@ import org.fcrepo.server.utilities.status.ServerState;
 import org.fcrepo.server.utilities.status.ServerStatusFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  * The starting point for working with a Fedora repository. This class handles
@@ -1356,12 +1352,10 @@ public abstract class Server
                     + "context attribute: " + propName);
         }
 
-        Date currentDate = DateUtility.convertStringToDate(dateTimeValue);
-        if (currentDate == null) {
-            throw new GeneralException("Unparsable dateTime string: '"
-                    + dateTimeValue + "'");
-        } else {
-            return currentDate;
+        try {
+            return DateUtility.parseCheckedDate(dateTimeValue);
+        } catch (ParseException e) {
+            throw new GeneralException(e.getMessage());
         }
     }
 

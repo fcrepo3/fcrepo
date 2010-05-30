@@ -2,6 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.server.access;
 
 import java.io.BufferedReader;
@@ -12,9 +13,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PipedReader;
 import java.io.PipedWriter;
-
 import java.net.URLDecoder;
-
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -24,7 +24,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -55,9 +54,6 @@ import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
-
 
 /**
  * Implements the three methods GetObjectProfile, GetDissemination, and
@@ -234,8 +230,9 @@ public class FedoraAccessServlet
                 } else {
                     // If it DOES contain a colon, they were after a
                     // date/time-stamped object profile
-                    versDateTime = DateUtility.convertStringToDate(URIArray[6]);
-                    if (versDateTime == null) {
+                    try {
+                        versDateTime = DateUtility.parseCheckedDate(URIArray[6]);
+                    } catch (ParseException e) {
                         String message =
                                 "ObjectProfile Request Syntax Error: DateTime value "
                                         + "of \""
@@ -286,8 +283,10 @@ public class FedoraAccessServlet
                     // datastream, so this is a GetDatastreamDissemination
                     // request.
                     dsID = URLDecoder.decode(URIArray[6], "UTF-8");
-                    versDateTime = DateUtility.convertStringToDate(URIArray[7]);
-                    if (versDateTime == null) {
+
+                    try {
+                        versDateTime = DateUtility.parseCheckedDate(URIArray[7]);
+                    } catch (ParseException e) {
                         String message =
                                 "GetDatastreamDissemination Request Syntax Error: DateTime value "
                                         + "of \""
@@ -309,24 +308,17 @@ public class FedoraAccessServlet
                         logger.warn(message);
                         throw new ServletException("from FedoraAccessServlet"
                                 + message);
-                        /*
-                         * commented out for exception.jsp test
-                         * response.setStatus
-                         * (HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                         * response
-                         * .sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR
-                         * , message); return; commented out for exception.jsp
-                         * test
-                         */
                     }
+
                     asOfDateTime = versDateTime;
                     isGetDatastreamDisseminationRequest = true;
                 } else {
                     isGetDisseminationRequest = true;
                 }
             } else if (URIArray.length == 9) {
-                versDateTime = DateUtility.convertStringToDate(URIArray[8]);
-                if (versDateTime == null) {
+                try {
+                    versDateTime = DateUtility.parseCheckedDate(URIArray[8]);
+                } catch (ParseException e) {
                     String message =
                             "Dissemination Request Syntax Error: DateTime value "
                                     + "of \""
@@ -423,8 +415,8 @@ public class FedoraAccessServlet
 
         try {
             if (isGetObjectProfileRequest) {
-                logger.debug("Servicing getObjectProfile request " + "(PID=" + PID
-                        + ", asOfDate=" + versDateTime + ")");
+                logger.debug("Servicing getObjectProfile request " + "(PID="
+                        + PID + ", asOfDate=" + versDateTime + ")");
 
                 Context context =
                         ReadOnlyContext.getContext(HTTP_REQUEST.REST.uri,
@@ -490,8 +482,8 @@ public class FedoraAccessServlet
             throw new NotFound404Exception("", e, request, actionLabel, e
                     .getMessage(), new String[0]);
         } catch (DisseminationException e) {
-            logger.error("Dissemination failed: " + requestURI + " (actionLabel="
-                    + actionLabel + ")", e);
+            logger.error("Dissemination failed: " + requestURI
+                    + " (actionLabel=" + actionLabel + ")", e);
             throw new NotFound404Exception("", e, request, actionLabel, e
                     .getMessage(), new String[0]);
         } catch (ObjectNotInLowlevelStorageException e) {
@@ -631,8 +623,8 @@ public class FedoraAccessServlet
                         sb.append((String) headerValues.nextElement());
                     }
                     String value = sb.toString();
-                    logger.debug("FEDORASERVLET REQUEST HEADER CONTAINED: " + name
-                            + " : " + value);
+                    logger.debug("FEDORASERVLET REQUEST HEADER CONTAINED: "
+                            + name + " : " + value);
                 }
             }
 
@@ -759,8 +751,8 @@ public class FedoraAccessServlet
                         sb.append((String) headerValues.nextElement());
                     }
                     String value = sb.toString();
-                    logger.debug("FEDORASERVLET REQUEST HEADER CONTAINED: " + name
-                            + " : " + value);
+                    logger.debug("FEDORASERVLET REQUEST HEADER CONTAINED: "
+                            + name + " : " + value);
                 }
             }
 
@@ -971,7 +963,8 @@ public class FedoraAccessServlet
         try {
             s_server = Server.getInstance(new File(FEDORA_HOME), false);
             s_access =
-                    (Access) s_server.getModule("org.fcrepo.server.access.Access");
+                    (Access) s_server
+                            .getModule("org.fcrepo.server.access.Access");
         } catch (InitializationException ie) {
             throw new ServletException("Unable to get Fedora Server instance."
                     + ie.getMessage());

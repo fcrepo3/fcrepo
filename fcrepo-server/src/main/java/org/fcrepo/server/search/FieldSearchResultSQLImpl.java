@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -258,8 +258,10 @@ public class FieldSearchResultSQLImpl
                         // property must be parsable as a date... if ok,
                         // do (cDate, mDate, dcmDate)
                         // or (date) <- dcDate from dcDates table
-                        Date dt = DateUtility.parseDateAsUTC(cond.getValue());
-                        if (dt == null) {
+                        Date dt;
+                        try {
+                            dt = DateUtility.parseCheckedDate(cond.getValue());
+                        } catch (ParseException e) {
                             throw new QueryParseException("When using "
                                     + "equality or inequality operators "
                                     + "with a date-based value, the date "

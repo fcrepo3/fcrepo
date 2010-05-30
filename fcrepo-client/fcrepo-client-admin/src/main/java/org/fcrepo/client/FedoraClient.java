@@ -10,14 +10,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,20 +39,17 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
-
-import org.jrdf.graph.Literal;
-import org.jrdf.graph.Node;
-
-import org.trippi.RDFFormat;
-import org.trippi.TrippiException;
-import org.trippi.TupleIterator;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.utilities.DateUtility;
+import org.jrdf.graph.Literal;
+import org.jrdf.graph.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.trippi.RDFFormat;
+import org.trippi.TrippiException;
+import org.trippi.TupleIterator;
 
 /**
  * General-purpose utility class for Fedora clients. Provides methods to get
@@ -627,7 +621,7 @@ public class FedoraClient
                 Header header = head.getResponseHeader("last-modified");
                 if (header != null) {
                     String lastModified = header.getValue();
-                    return DateUtility.convertStringToDate(lastModified);
+                    return DateUtility.parseDateAsUTC(lastModified);
                 } else {
                     // return current date time
                     return new Date();

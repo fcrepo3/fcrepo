@@ -5,7 +5,6 @@
 package org.fcrepo.server.rest;
 
 import java.io.CharArrayWriter;
-
 import java.util.Date;
 
 import javax.ws.rs.DefaultValue;
@@ -22,6 +21,7 @@ import javax.ws.rs.core.UriInfo;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.Property;
+import org.fcrepo.server.utilities.DateUtility;
 
 
 /**
@@ -91,7 +91,7 @@ public class MethodResource extends BaseRestResource {
             @QueryParam(RestParam.AS_OF_DATE_TIME)
             String dTime) {
         try {
-            Date asOfDateTime = parseDate(dTime);
+            Date asOfDateTime = DateUtility.parseCheckedDate(dTime);
             return buildResponse(apiAService.getDissemination(
                     getContext(),
                     pid,
@@ -107,7 +107,7 @@ public class MethodResource extends BaseRestResource {
 
     private Response getObjectMethodsForSDefImpl(String pid, String sDef, String dTime, String format) {
         try {
-            Date asOfDateTime = parseDate(dTime);
+            Date asOfDateTime = DateUtility.parseCheckedDate(dTime);
             Context context = getContext();
             ObjectMethodsDef[] methodDefs = apiAService.listMethods(context, pid, asOfDateTime);
             String xml = getSerializer(context).objectMethodsToXml(methodDefs, pid, sDef, asOfDateTime);

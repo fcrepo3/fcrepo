@@ -5,12 +5,10 @@
 package org.fcrepo.server.access;
 
 import java.io.File;
-
 import java.rmi.RemoteException;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.types.NonNegativeInteger;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
@@ -136,7 +134,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
                                               methodName,
                                               properties,
                                               DateUtility
-                                                      .convertStringToDate(asOfDateTime));
+                                                      .parseCheckedDate(asOfDateTime));
             org.fcrepo.server.types.gen.MIMETypedStream genMIMETypedStream =
                     TypeUtility
                             .convertMIMETypedStreamToGenMIMETypedStream(mimeTypedStream);
@@ -160,8 +158,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
                             .getDatastreamDissemination(context,
                                                         PID,
                                                         dsID,
-                                                        DateUtility
-                                                                .convertStringToDate(asOfDateTime));
+                                                        DateUtility.parseCheckedDate(asOfDateTime));
             org.fcrepo.server.types.gen.MIMETypedStream genMIMETypedStream =
                     TypeUtility
                             .convertMIMETypedStreamToGenMIMETypedStream(mimeTypedStream);
@@ -227,7 +224,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
         try {
             org.fcrepo.server.storage.types.ObjectMethodsDef[] objectMethodDefs =
                     s_access.listMethods(context, PID, DateUtility
-                            .convertStringToDate(asOfDateTime));
+                            .parseCheckedDate(asOfDateTime));
             org.fcrepo.server.types.gen.ObjectMethodsDef[] genObjectMethodDefs =
                     TypeUtility
                             .convertObjectMethodsDefArrayToGenObjectMethodsDefArray(objectMethodDefs);
@@ -246,7 +243,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
         try {
             org.fcrepo.server.storage.types.DatastreamDef[] datastreamDefs =
                     s_access.listDatastreams(context, PID, DateUtility
-                            .convertStringToDate(asOfDateTime));
+                            .parseCheckedDate(asOfDateTime));
             org.fcrepo.server.types.gen.DatastreamDef[] genDatastreamDefs =
                     TypeUtility
                             .convertDatastreamDefArrayToGenDatastreamDefArray(datastreamDefs);
@@ -278,7 +275,7 @@ public class FedoraAPIABindingSOAPHTTPImpl
         try {
             org.fcrepo.server.access.ObjectProfile objectProfile =
                     s_access.getObjectProfile(context, PID, DateUtility
-                            .convertStringToDate(asOfDateTime));
+                            .parseCheckedDate(asOfDateTime));
             org.fcrepo.server.types.gen.ObjectProfile genObjectProfile =
                     TypeUtility
                             .convertObjectProfileToGenObjectProfile(objectProfile);

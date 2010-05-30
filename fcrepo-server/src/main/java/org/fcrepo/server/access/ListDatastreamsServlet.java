@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PipedReader;
 import java.io.PipedWriter;
+import java.text.ParseException;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -161,16 +162,16 @@ public class ListDatastreamsServlet
             }
             if (URIArray.length == 7) {
                 // Request is a versioned listDatastreams request
-                versDateTime = DateUtility.convertStringToDate(URIArray[6]);
-                if (versDateTime == null) {
+                try {
+                versDateTime = DateUtility.parseCheckedDate(URIArray[6]);
+                } catch(ParseException e) {
                     logger.error("Bad date format in request");
                     throw new BadRequest400Exception(request,
                                                      ACTION_LABEL,
                                                      "",
                                                      new String[0]);
-                } else {
-                    asOfDateTime = versDateTime;
                 }
+                asOfDateTime = versDateTime;
             }
             logger.debug("Listing datastreams (PID=" + PID + ", asOfDate="
                     + versDateTime + ")");

@@ -4,22 +4,13 @@
  */
 package org.fcrepo.server.rest;
 
-import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
-
 import javax.ws.rs.core.MediaType;
 
 import com.sun.jersey.server.impl.model.HttpHelper;
 
-import org.fcrepo.server.utilities.DateUtility;
-
 
 public class RestHelper {
-    static Date toDate(String s) {
-        return DateUtility.convertStringToDate(s);
-    }
-
     static boolean toBoolean(String s) {
         return (Boolean.TRUE == Boolean.parseBoolean(s));
     }

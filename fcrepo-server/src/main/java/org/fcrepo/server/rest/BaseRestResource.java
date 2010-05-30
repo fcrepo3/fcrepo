@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.StringReader;
 import java.io.Writer;
 import java.net.URI;
-import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
@@ -30,6 +29,7 @@ import javax.xml.transform.stream.StreamSource;
 import net.sf.saxon.FeatureKeys;
 
 import org.apache.commons.io.IOUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
@@ -43,7 +43,6 @@ import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.management.Management;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Property;
-import org.fcrepo.server.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +72,7 @@ public class BaseRestResource {
     protected Management apiMService;
     protected Access apiAService;
     protected String fedoraServerHost;
+    protected ObjectMapper mapper;
 
     protected DatastreamFilenameHelper datastreamFilenameHelper;
 
@@ -92,6 +92,7 @@ public class BaseRestResource {
             this.apiAService = (Access) fedoraServer.getModule("org.fcrepo.server.access.Access");
             this.fedoraServerHost = fedoraServer.getParameter("fedoraServerHost");
             datastreamFilenameHelper = new DatastreamFilenameHelper(fedoraServer, apiMService, apiAService );
+            mapper = new ObjectMapper();
         } catch (Exception ex) {
             throw new RestException("Unable to locate Fedora server instance", ex);
         }
@@ -164,17 +165,5 @@ public class BaseRestResource {
             logger.error("Unexpected error fulfilling REST API request", ex);
             throw new WebApplicationException(ex);
         }
-    }
-
-    protected static Date parseDate(String dTime) throws IllegalArgumentException {
-        Date date = null;
-        if (dTime != null) {
-            date = DateUtility.convertStringToDate(dTime);
-            if (date == null) {
-                throw new IllegalArgumentException(
-                        "Illegal date syntax: " + dTime);
-            }
-        }
-        return date;
     }
 }

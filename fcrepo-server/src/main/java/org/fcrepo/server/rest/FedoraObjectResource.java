@@ -165,7 +165,7 @@ public class FedoraObjectResource extends BaseRestResource {
             String format) {
 
         try {
-            Date asOfDateTime = parseDate(dateTime);
+            Date asOfDateTime = DateUtility.parseCheckedDate(dateTime);
             Context context = getContext();
             ObjectProfile objProfile = apiAService.getObjectProfile(context, pid, asOfDateTime);
             String xml = getSerializer(context).objectProfileToXML(objProfile, asOfDateTime);
@@ -197,8 +197,8 @@ public class FedoraObjectResource extends BaseRestResource {
             String logMessage) {
         try {
             Context context = getContext();
-            apiMService.purgeObject(context, pid, logMessage);
-            return Response.noContent().build();
+            Date d = apiMService.purgeObject(context, pid, logMessage);
+            return Response.ok(DateUtility.convertDateToXSDString(d), MediaType.TEXT_PLAIN_TYPE).build();
         } catch (Exception ex) {
             return handleException(ex);
         }

@@ -7,7 +7,6 @@ package org.fcrepo.server.utilities;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -175,18 +174,53 @@ public abstract class DateUtility {
     }
 
     /**
-     * Attempt to parse the given string of form: yyyy-MM-dd[THH:mm:ss[.SSS][Z]]
-     * as a Date. If the string is not of that form, return null.
+     * Convenience method for {@link #parseCheckedDate(String)} which does not
+     * throw an exception on error, but merely returns null.
      *
      * @param dateString
      *        the date string to parse
      * @return Date the date, if parse was successful; null otherwise
      */
     public static Date parseDateAsUTC(String dateString) {
-        if (dateString == null || dateString.length() == 0) {
+        try {
+            return parseCheckedDate(dateString);
+        } catch (ParseException e) {
             return null;
         }
+    }
 
+    /**
+     * Convenience method for {@link #parseCheckedDate(String)} that throws an
+     * unchecked exception.
+     *
+     * @param dateString the date string to parse
+     * @return a Date representation of the dateString
+     * @throws IllegalArgumentException if dateString is null, empty or is otherwise
+     * unable to be parsed.
+     */
+    public static Date parseUncheckedDate(String dateString) throws IllegalArgumentException {
+        try {
+            return parseCheckedDate(dateString);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+    }
+
+    /**
+     * Attempt to parse the given string of form: yyyy-MM-dd[THH:mm:ss[.SSS][Z]]
+     * as a Date.
+     *
+     * @param dateString the date string to parse
+     * @return a Date representation of the dateString
+     * @throws ParseException if dateString is null, empty or is otherwise
+     * unable to be parsed.
+     */
+    public static Date parseCheckedDate(String dateString) throws ParseException {
+        if (dateString == null) {
+            throw new ParseException("Argument cannot be null.", 0);
+        } else if (dateString.isEmpty()) {
+            throw new ParseException("Argument cannot be empty.", 0);
+        }
         SimpleDateFormat formatter = new SimpleDateFormat();
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         int length = dateString.length();
@@ -220,11 +254,6 @@ public abstract class DateUtility {
                 formatter.applyPattern("EEE, dd MMMM yyyyy HH:mm:ss z");
             }
         }
-        try {
-            return formatter.parse(dateString);
-        } catch (ParseException e) {
-            return null;
-        }
+        return formatter.parse(dateString);
     }
-
 }
