@@ -114,6 +114,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-bundle</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <dependency>
         <groupId>commons-httpclient</groupId>
         <artifactId>commons-httpclient</artifactId>
         <version>3.1</version>
@@ -143,7 +148,8 @@
         <groupId>org.apache.abdera</groupId>
         <artifactId>abdera-parser</artifactId>
         <version>0.4.0-incubating</version>
-        <exclusions>                                                                                          <exclusion>
+        <exclusions>
+          <exclusion>
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
           </exclusion>
@@ -155,13 +161,14 @@
       </dependency>
       <dependency>
         <groupId>org.apache.abdera</groupId>
-        <artifactId>abdera-extensions-main</artifactId>                                                     <version>0.4.0-incubating</version>
+        <artifactId>abdera-extensions-main</artifactId>
+        <version>0.4.0-incubating</version>
         <exclusions>
           <exclusion>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-client</artifactId>
           </exclusion>
-        </exclusions> 
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.derby</groupId>
@@ -254,6 +261,11 @@
             <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-mapper-asl</artifactId>
+        <version>1.5.2</version>
       </dependency>
       <dependency>
         <groupId>org.fcrepo</groupId>
@@ -440,8 +452,12 @@
     <repository>
       <id>java.net</id>
       <url>https://maven-repository.dev.java.net/nonav/repository</url>
-      <releases><enabled>false</enabled></releases>
-      <snapshots><enabled>false</enabled></snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
 
   </repositories>
