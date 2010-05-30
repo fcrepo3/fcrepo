@@ -9,6 +9,7 @@ import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -220,21 +222,20 @@ public class DatastreamResource
                                   @PathParam(RestParam.DSID) String dsID,
                                   @QueryParam(RestParam.AS_OF_DATE_TIME) String dateTime,
                                   @QueryParam(RestParam.DOWNLOAD) String download) {
-
         Context context = getContext();
         try {
             MIMETypedStream stream =
                     apiAService.getDatastreamDissemination(context,
                                                            pid,
                                                            dsID,
-                                                           parseDate(dateTime));
+                                                           asOfDateTime);
             if (datastreamFilenameHelper != null) {
                 datastreamFilenameHelper
                         .addContentDispositionHeader(context,
                                                      pid,
                                                      dsID,
                                                      download,
-                                                     parseDate(dateTime),
+                                                     asOfDateTime,
                                                      stream);
 
             }
@@ -252,6 +253,7 @@ public class DatastreamResource
      */
     @Path("/{dsID}")
     @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteDatastream(@PathParam(RestParam.PID) String pid,
                                      @PathParam(RestParam.DSID) String dsID,
                                      @QueryParam(RestParam.START_DT) String startDT,
@@ -268,7 +270,13 @@ public class DatastreamResource
                                         startDate,
                                         endDate,
                                         logMessage);
-            return Response.noContent().build();
+
+            // convert purged into a String[] so we can return it as a JSON array
+            List<String> results = new ArrayList<String>();
+            for (Date d : purged) {
+                results.add(DateUtility.convertDateToXSDString(d));
+            }
+            return Response.ok(mapper.writeValueAsString(results)).build();
         } catch (Exception ex) {
             return handleException(ex);
         }

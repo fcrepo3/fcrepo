@@ -4,6 +4,25 @@
  */
 package org.fcrepo.test.api;
 
+import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
+import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
+import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
+import static org.apache.commons.httpclient.HttpStatus.SC_NO_CONTENT;
+import static org.apache.commons.httpclient.HttpStatus.SC_OK;
+import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
+
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import junit.framework.TestSuite;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -12,7 +31,12 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
@@ -20,7 +44,6 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.io.FileUtils;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-
 import org.fcrepo.common.PID;
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
@@ -29,16 +52,6 @@ import org.fcrepo.server.types.gen.MIMETypedStream;
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.junit.Test;
-
-import java.io.*;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.apache.commons.httpclient.HttpStatus.*;
 
 
 /**
@@ -62,14 +75,14 @@ public class TestRESTAPI
 
     private static byte[] DEMO_REST_FOXML;
 
-    private static String DEMO_MIN;    
-    
+    private static String DEMO_MIN;
+
     private static String DEMO_MIN_PID;
 
     private final PID pid = PID.getInstance("demo:REST");
 
     private static final String REST_RESOURCE_PATH = "src/test/resources/rest";
-    
+
     // various download filenames used in test object for content-disposition header test
     // datastreams in test object (using these) are:
     // DS1 with label; also has relationship in RELS-INT specifying filename
@@ -119,7 +132,7 @@ public class TestRESTAPI
         apia = getFedoraClient().getAPIA();
         apim = getFedoraClient().getAPIM();
         apim.ingest(DEMO_REST.getBytes("UTF-8"), FOXML1_1.uri, "ingesting new foxml object");
-        
+
     }
 
     @Override
@@ -347,9 +360,9 @@ public class TestRESTAPI
         assertEquals(SC_NOT_FOUND, get(true).getStatusCode());
     }
 
-    
+
     public void testGetDatastreamHistory() throws Exception {
- 
+
         // Ingest minimal object
         url = "/objects/new";
         assertEquals(SC_UNAUTHORIZED, post(DEMO_MIN_PID, false).getStatusCode());
@@ -362,12 +375,12 @@ public class TestRESTAPI
         response = get(true);
         assertEquals(SC_OK, response.getStatusCode());
         String responseXML = new String(response.responseBody, "UTF-8");
-                
+
         String control = FileUtils.readFileToString(new File(
                 "src/test/resources/rest/datastreamHistory.xml"), "UTF-8");
         StringTemplate tpl = new StringTemplate(control);
         tpl.setAttribute("FEDORA_BASE_URL", getProtocol() +"://"+ getHost() + ":" + getPort());
-        
+
         // Diff must be identical
         XMLUnit.setIgnoreWhitespace(true);
         Diff xmldiff = new Diff(tpl.toString(), responseXML);
@@ -530,7 +543,7 @@ public class TestRESTAPI
 
     // Tests FCREPO-509
     public void testIngestWithParameterPid() throws Exception {
-        
+
         // Ingest minimal object with PID, use "new" as path parameter -> must succeed
         url = String.format("/objects/new");
         assertEquals(SC_UNAUTHORIZED, post(DEMO_MIN_PID, false).getStatusCode());
@@ -541,7 +554,7 @@ public class TestRESTAPI
         url = String.format("/objects/%s", "demo:1234");
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
         assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
-        
+
         // Ingest minimal object with PID, use a different PID than the one
         // specified in the foxml -> must fail
         url = String.format("/objects/%s","demo:234");
@@ -554,7 +567,7 @@ public class TestRESTAPI
         assertEquals(SC_UNAUTHORIZED, post(DEMO_MIN_PID, false).getStatusCode());
         response  = post(DEMO_MIN_PID, true);
         assertEquals(SC_CREATED, response.getStatusCode());
-        
+
         // clean up
         url = String.format("/objects/%s", "demo:1234");
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
@@ -572,8 +585,8 @@ public class TestRESTAPI
         assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
 
     }
-   
-    
+
+
     public void testModifyObject() throws Exception {
         url = String.format("/objects/%s?label=%s", pid.toString(), "foo");
         assertEquals(SC_UNAUTHORIZED, put("", false).getStatusCode());
@@ -783,7 +796,7 @@ public class TestRESTAPI
     public void testPurgeDatastream() throws Exception {
         url = String.format("/objects/%s/datastreams/RELS-EXT", pid.toString());
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
-        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+        assertEquals(SC_OK, delete(true).getStatusCode());
     }
 
     public void testGetNextPID() throws Exception {
