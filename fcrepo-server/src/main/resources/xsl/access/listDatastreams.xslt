@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
-  xmlns:listDatastreams="info:fedora/fedora-system:def/listDatastreams#"
+  xmlns:access="http://www.fedora.info/definitions/1/0/access/"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="listDatastreams">
+  exclude-result-prefixes="access">
   <xsl:param name="fedora" />
   <xsl:output method="html" indent="yes" />
-  <xsl:template match="listDatastreams:objectDatastreams">
+  <xsl:template match="access:objectDatastreams">
     <html>
       <head>
         <title>Object Datastreams HTML Presentation</title>
@@ -65,7 +65,7 @@
                 </b>
               </td>
             </tr>
-            <xsl:for-each select="//listDatastreams:datastream">
+            <xsl:for-each select="//access:datastream">
               <tr>
                 <td>
                   <a>

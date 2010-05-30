@@ -5,14 +5,14 @@
 
 package org.fcrepo.common.xml.format;
 
-import org.fcrepo.common.xml.namespace.FedoraListDatastreamsNamespace;
+import org.fcrepo.common.xml.namespace.FedoraAccessNamespace;
 
 /**
  * The Fedora Object Datastreams 1.0 XML format.
  *
  * <pre>
  * Format URI        : info:fedora/fedora-system:FedoraObjectDatastreams-1.0
- * Primary Namespace : info:fedora/fedora-system:def/listDatastreams#
+ * Primary Namespace : http://www.fedora.info/definitions/1/0/access/
  * XSD Schema URL    : http://www.fedora-commons.org/definitions/1/0/listDatastreams.xsd
  * </pre>
  *
@@ -30,7 +30,7 @@ public class FedoraObjectDatastreams1_0Format
      */
     private FedoraObjectDatastreams1_0Format() {
         super("info:fedora/fedora-system:FedoraObjectDatastreams-1.0",
-              FedoraListDatastreamsNamespace.getInstance(),
+              FedoraAccessNamespace.getInstance(),
               "http://www.fedora-commons.org/definitions/1/0/listDatastreams.xsd");
     }
 

@@ -388,9 +388,9 @@ public class ListDatastreamsServlet
                                     + ":" + fedoraServerPort + "/"
                                     + fedoraAppServerContext + "/";
                     pw.write(" baseURL=\"" + baseURL + "\"");
-                    pw.write(" xmlns=\"" + LIST_DATASTREAMS.uri + "\"");
+                    pw.write(" xmlns=\"" + ACCESS.uri + "\"");
                     pw.write(" xmlns:xsi=\"" + XSI.uri + "\"");
-                    pw.write(" xsi:schemaLocation=\"" + LIST_DATASTREAMS.uri);
+                    pw.write(" xsi:schemaLocation=\"" + ACCESS.uri);
                     pw.write(" " + OBJ_DATASTREAMS1_0.xsdLocation + "\">");
                     // DatastreamDef SERIALIZATION
                     for (DatastreamDef element : dsDefs) {

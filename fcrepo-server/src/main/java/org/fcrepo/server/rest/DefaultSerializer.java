@@ -620,9 +620,9 @@ public class DefaultSerializer {
         }
 
         xml.append("<objectDatastreams "
-                   + "xmlns=\"" + Constants.LIST_DATASTREAMS.uri + "\" "
+                   + "xmlns=\"" + Constants.ACCESS.uri + "\" "
                    + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                   + "xsi:schemaLocation=\"" + Constants.LIST_DATASTREAMS.uri + " "
+                   + "xsi:schemaLocation=\"" + Constants.ACCESS.uri + " "
                    + Constants.OBJ_DATASTREAMS1_0.xsdLocation + "\""
                    + " pid=\"" + enc(pid) + "\" " + dateString
                    + "baseURL=\"" + enc(fedoraServerProtocol) + "://"

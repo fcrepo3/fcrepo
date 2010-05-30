@@ -47,7 +47,7 @@ public class TestAPIALite
         nsMap.put(NS_FEDORA_TYPES_PREFIX, NS_FEDORA_TYPES);
         nsMap.put(OAI_DC.prefix, OAI_DC.uri);
         nsMap.put(DC.prefix, DC.uri);
-        nsMap.put(LIST_DATASTREAMS.prefix, LIST_DATASTREAMS.uri);
+        nsMap.put(ACCESS.prefix, ACCESS.uri);
         NamespaceContext ctx = new SimpleNamespaceContext(nsMap);
         XMLUnit.setXpathNamespaceContext(ctx);
     }
@@ -143,7 +143,7 @@ public class TestAPIALite
         result = getXMLQueryResult("/listDatastreams/demo:5?xml=true");
         assertXpathEvaluatesTo("6",
                                String.format("count(/%s:objectDatastreams/%s:datastream)",
-                                             LIST_DATASTREAMS.prefix, LIST_DATASTREAMS.prefix),
+                                             ACCESS.prefix, ACCESS.prefix),
                                result);
     }
 
