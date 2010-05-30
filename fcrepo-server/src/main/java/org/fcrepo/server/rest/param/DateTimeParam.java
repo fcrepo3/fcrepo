@@ -27,11 +27,7 @@ public class DateTimeParam
 
     @Override
     protected Date parse(String param) throws Throwable {
-        Date d = DateUtility.parseDateAsUTC(param);
-        if (d == null) {
-            throw new IllegalArgumentException("Failed to parse " + param);
-        }
-        return d;
+        return DateUtility.parseCheckedDate(param);
     }
 
     @Override
