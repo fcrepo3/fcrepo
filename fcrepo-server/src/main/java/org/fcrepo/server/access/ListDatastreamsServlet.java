@@ -163,7 +163,7 @@ public class ListDatastreamsServlet
             if (URIArray.length == 7) {
                 // Request is a versioned listDatastreams request
                 try {
-                versDateTime = DateUtility.parseCheckedDate(URIArray[6]);
+                versDateTime = DateUtility.parseDateStrict(URIArray[6]);
                 } catch(ParseException e) {
                     logger.error("Bad date format in request");
                     throw new BadRequest400Exception(request,

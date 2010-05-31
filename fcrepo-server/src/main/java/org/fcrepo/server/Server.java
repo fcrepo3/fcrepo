@@ -1353,7 +1353,7 @@ public abstract class Server
         }
 
         try {
-            return DateUtility.parseCheckedDate(dateTimeValue);
+            return DateUtility.parseDateStrict(dateTimeValue);
         } catch (ParseException e) {
             throw new GeneralException(e.getMessage());
         }

@@ -87,7 +87,7 @@ public class TestDateUtility
                         "1970-01-01T00:00:00", "1970-01-01",
                         "Thu, 01 Jan 1970 00:00:00 GMT"};
         for (String element : dates) {
-            assertEquals(EPOCH, DateUtility.parseDateAsUTC(element));
+            assertEquals(EPOCH, DateUtility.parseDateLoose(element));
         }
 
         String[] badDates =
@@ -95,12 +95,12 @@ public class TestDateUtility
                         "1970-1-1", "12345-01-01T00:00:00.000Z",
                         "12345-01-01T00:00:00."};
         for (String element : badDates) {
-            assertNull(DateUtility.parseDateAsUTC(element));
+            assertNull(DateUtility.parseDateLoose(element));
         }
 
-        assertEquals(ONE_CE, DateUtility.parseDateAsUTC(ONE_CE_XSD_DT));
-        assertEquals(ONE_BCE, DateUtility.parseDateAsUTC(ONE_BCE_XSD_DT));
-        assertEquals(TWO_BCE, DateUtility.parseDateAsUTC(TWO_BCE_XSD_DT));
+        assertEquals(ONE_CE, DateUtility.parseDateLoose(ONE_CE_XSD_DT));
+        assertEquals(ONE_BCE, DateUtility.parseDateLoose(ONE_BCE_XSD_DT));
+        assertEquals(TWO_BCE, DateUtility.parseDateLoose(TWO_BCE_XSD_DT));
     }
 
 }

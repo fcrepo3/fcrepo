@@ -589,7 +589,7 @@ public class FedoraClient
                     if (dateLiteral == null) {
                         throw new IOException("A row was returned, but it did not contain a 'date' binding");
                     }
-                    return DateUtility.parseDateAsUTC(dateLiteral
+                    return DateUtility.parseDateLoose(dateLiteral
                             .getLexicalForm());
                 } else {
                     throw new IOException("No rows were returned");
@@ -621,7 +621,7 @@ public class FedoraClient
                 Header header = head.getResponseHeader("last-modified");
                 if (header != null) {
                     String lastModified = header.getValue();
-                    return DateUtility.parseDateAsUTC(lastModified);
+                    return DateUtility.parseDateLoose(lastModified);
                 } else {
                     // return current date time
                     return new Date();

@@ -231,7 +231,7 @@ public class FedoraAccessServlet
                     // If it DOES contain a colon, they were after a
                     // date/time-stamped object profile
                     try {
-                        versDateTime = DateUtility.parseCheckedDate(URIArray[6]);
+                        versDateTime = DateUtility.parseDateStrict(URIArray[6]);
                     } catch (ParseException e) {
                         String message =
                                 "ObjectProfile Request Syntax Error: DateTime value "
@@ -285,7 +285,7 @@ public class FedoraAccessServlet
                     dsID = URLDecoder.decode(URIArray[6], "UTF-8");
 
                     try {
-                        versDateTime = DateUtility.parseCheckedDate(URIArray[7]);
+                        versDateTime = DateUtility.parseDateStrict(URIArray[7]);
                     } catch (ParseException e) {
                         String message =
                                 "GetDatastreamDissemination Request Syntax Error: DateTime value "
@@ -317,7 +317,7 @@ public class FedoraAccessServlet
                 }
             } else if (URIArray.length == 9) {
                 try {
-                    versDateTime = DateUtility.parseCheckedDate(URIArray[8]);
+                    versDateTime = DateUtility.parseDateStrict(URIArray[8]);
                 } catch (ParseException e) {
                     String message =
                             "Dissemination Request Syntax Error: DateTime value "

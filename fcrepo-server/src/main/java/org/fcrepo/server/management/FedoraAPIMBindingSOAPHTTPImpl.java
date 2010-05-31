@@ -360,7 +360,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
         try {
             return s_management.compareDatastreamChecksum(ReadOnlyContext
                     .getSoapContext(), PID, datastreamID, DateUtility
-                    .convertStringToDate(versionDate));
+                    .parseDateOrNull(versionDate));
         } catch (Throwable th) {
             logger.error("Error comparing datastream checksum", th);
             throw AxisUtility.getFault(th);
@@ -378,8 +378,8 @@ public class FedoraAPIMBindingSOAPHTTPImpl
         try {
             return toStringArray(s_management.purgeDatastream(ReadOnlyContext
                     .getSoapContext(), PID, datastreamID, DateUtility
-                    .parseCheckedDate(startDT), DateUtility
-                    .parseCheckedDate(endDT), logMessage));
+                    .parseDateOrNull(startDT), DateUtility
+                    .parseDateOrNull(endDT), logMessage));
         } catch (Throwable th) {
             logger.error("Error purging datastream", th);
             throw AxisUtility.getFault(th);
@@ -408,7 +408,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                            PID,
                                            datastreamID,
                                            DateUtility
-                                                   .parseCheckedDate(asOfDateTime));
+                                                   .parseDateOrNull(asOfDateTime));
             return TypeUtility.convertDatastreamToGenDatastream(ds);
         } catch (Throwable th) {
             logger.error("Error getting datastream", th);
@@ -425,7 +425,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
             org.fcrepo.server.storage.types.Datastream[] intDatastreams =
                     s_management.getDatastreams(ReadOnlyContext
                             .getSoapContext(), PID, DateUtility
-                            .parseCheckedDate(asOfDateTime), state);
+                            .parseDateOrNull(asOfDateTime), state);
             return getGenDatastreams(intDatastreams);
         } catch (Throwable th) {
             logger.error("Error getting datastreams", th);

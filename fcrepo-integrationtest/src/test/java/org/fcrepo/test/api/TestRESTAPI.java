@@ -7,7 +7,6 @@ package org.fcrepo.test.api;
 import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
 import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
-import static org.apache.commons.httpclient.HttpStatus.SC_NO_CONTENT;
 import static org.apache.commons.httpclient.HttpStatus.SC_OK;
 import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
 
@@ -394,7 +393,7 @@ public class TestRESTAPI
         // Clean up
         url = "/objects/demo:1234";
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
-        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+        assertEquals(SC_OK, delete(true).getStatusCode());
     }
 
     public void testGetDatastreamDissemination() throws Exception {
@@ -492,7 +491,7 @@ public class TestRESTAPI
         // Delete empty object
         url = String.format("/objects/%s", emptyObjectPid);
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
-        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+        assertEquals(SC_OK, delete(true).getStatusCode());
 
         // Ensure that GETs of the deleted object immediately give 404s (See FCREPO-594)
         assertEquals(SC_NOT_FOUND, get(true).getStatusCode());
@@ -509,12 +508,12 @@ public class TestRESTAPI
         // Delete empty "test" object
         url = String.format("/objects/%s", emptyObjectPid);
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
-        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+        assertEquals(SC_OK, delete(true).getStatusCode());
 
         // Delete the demo:REST object (ingested as part of setup)
         url = String.format("/objects/%s", pid.toString());
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
-        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+        assertEquals(SC_OK, delete(true).getStatusCode());
 
         // Ingest the demo:REST object
         url = String.format("/objects/%s", pid.toString());
@@ -538,7 +537,7 @@ public class TestRESTAPI
                 extractPid(response.getResponseHeader("Location").getValue());
         url = String.format("/objects/%s", minimalObjectPid);
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
-        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+        assertEquals(SC_OK, delete(true).getStatusCode());
     }
 
     // Tests FCREPO-509
@@ -553,7 +552,7 @@ public class TestRESTAPI
             // clean up
         url = String.format("/objects/%s", "demo:1234");
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
-        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+        assertEquals(SC_OK, delete(true).getStatusCode());
 
         // Ingest minimal object with PID, use a different PID than the one
         // specified in the foxml -> must fail
@@ -571,7 +570,7 @@ public class TestRESTAPI
         // clean up
         url = String.format("/objects/%s", "demo:1234");
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
-        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+        assertEquals(SC_OK, delete(true).getStatusCode());
 
         // Ingest minimal object with no PID, specify a PID parameter in the request
         url = String.format("/objects/%s", "demo:234");
@@ -582,7 +581,7 @@ public class TestRESTAPI
         // clean up
         url = String.format("/objects/%s", "demo:234");
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
-        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+        assertEquals(SC_OK, delete(true).getStatusCode());
 
     }
 
@@ -619,7 +618,7 @@ public class TestRESTAPI
         assertEquals(SC_CREATED, post("", true).getStatusCode());
         url = String.format("/objects/demo:TEST_PURGE");
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
-        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+        assertEquals(SC_OK, delete(true).getStatusCode());
     }
 
     public void testAddDatastream() throws Exception {
@@ -869,12 +868,12 @@ public class TestRESTAPI
         // Purge datastream
         url = String.format("/objects/%s/datastreams/TESTDS", pid);
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
-        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+        assertEquals(SC_OK, delete(true).getStatusCode());
 
         // Purge object
         url = String.format("/objects/%s", pid);
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
-        assertEquals(SC_NO_CONTENT, delete(true).getStatusCode());
+        assertEquals(SC_OK, delete(true).getStatusCode());
     }
 
     public void testChunked() throws Exception {

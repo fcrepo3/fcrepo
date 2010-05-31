@@ -27,7 +27,7 @@ public class DateTimeParam
 
     @Override
     protected Date parse(String param) throws Throwable {
-        return DateUtility.parseCheckedDate(param);
+        return DateUtility.parseDateOrNull(param);
     }
 
     @Override

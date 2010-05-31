@@ -260,7 +260,7 @@ public class FieldSearchResultSQLImpl
                         // or (date) <- dcDate from dcDates table
                         Date dt;
                         try {
-                            dt = DateUtility.parseCheckedDate(cond.getValue());
+                            dt = DateUtility.parseDateStrict(cond.getValue());
                         } catch (ParseException e) {
                             throw new QueryParseException("When using "
                                     + "equality or inequality operators "

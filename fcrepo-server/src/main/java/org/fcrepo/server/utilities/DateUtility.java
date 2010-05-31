@@ -31,7 +31,7 @@ public abstract class DateUtility {
      *         dateTime string argument is empty string or null)
      */
     public static Date convertStringToDate(String dateTime) {
-        return parseDateAsUTC(dateTime);
+        return parseDateLoose(dateTime);
     }
 
     /**
@@ -174,35 +174,40 @@ public abstract class DateUtility {
     }
 
     /**
-     * Convenience method for {@link #parseCheckedDate(String)} which does not
+     * Convenience method for {@link #parseDateStrict(String)} which does not
      * throw an exception on error, but merely returns null.
      *
      * @param dateString
      *        the date string to parse
      * @return Date the date, if parse was successful; null otherwise
      */
-    public static Date parseDateAsUTC(String dateString) {
+    public static Date parseDateLoose(String dateString) {
         try {
-            return parseCheckedDate(dateString);
+            return parseDateStrict(dateString);
         } catch (ParseException e) {
             return null;
         }
     }
 
     /**
-     * Convenience method for {@link #parseCheckedDate(String)} that throws an
-     * unchecked exception.
+     * Convenience method for {@link #parseDateStrict(String)} with the
+     * following difference: null or empty input returns null. Any other parse
+     * errors are wrapped as an IllegalArgumentException.
      *
      * @param dateString the date string to parse
-     * @return a Date representation of the dateString
-     * @throws IllegalArgumentException if dateString is null, empty or is otherwise
-     * unable to be parsed.
+     * @return a Date representation of the dateString or null
+     * @throws IllegalArgumentException if dateString is unable to be parsed.
      */
-    public static Date parseUncheckedDate(String dateString) throws IllegalArgumentException {
+    public static Date parseDateOrNull(String dateString) throws IllegalArgumentException {
+        if (dateString == null) {
+            return null;
+        } else if (dateString.isEmpty()) {
+            return null;
+        }
         try {
-            return parseCheckedDate(dateString);
+            return parseDateStrict(dateString);
         } catch (ParseException e) {
-            throw new IllegalArgumentException(e.getMessage());
+            throw new IllegalArgumentException(e.getMessage(), e);
         }
     }
 
@@ -215,7 +220,7 @@ public abstract class DateUtility {
      * @throws ParseException if dateString is null, empty or is otherwise
      * unable to be parsed.
      */
-    public static Date parseCheckedDate(String dateString) throws ParseException {
+    public static Date parseDateStrict(String dateString) throws ParseException {
         if (dateString == null) {
             throw new ParseException("Argument cannot be null.", 0);
         } else if (dateString.isEmpty()) {
