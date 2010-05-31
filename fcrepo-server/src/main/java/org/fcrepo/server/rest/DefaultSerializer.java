@@ -94,7 +94,7 @@ public class DefaultSerializer {
                 + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                 + " xsi:schemaLocation=\"" + Constants.OBJ_PROFILE1_0.namespace.uri + " "
                 + Constants.OBJ_PROFILE1_0.xsdLocation + "\""
-                + " pid=\"" + enc(pid) + "\"" + dateString +">");
+                + " pid=\"" + enc(pid) + "\" " + dateString +">");
 
         // PROFILE FIELDS SERIALIZATION
         buffer.append("<objLabel>" + enc(objProfile.objectLabel)

@@ -123,14 +123,16 @@ public class TestAPIALite
         Document result;
         result = getXMLQueryResult("/get/demo:5?xml=true");
         assertXpathEvaluatesTo("demo:5",
-                               "/objectProfile/attribute::pid",
+                               String.format("/%s:objectProfile/attribute::pid",
+                                             ACCESS.prefix),
                                result);
     }
 
     public void testGetObjectProfileBasicCModel() throws Exception {
-        String testExpression = "count("
-                + "/objectProfile/objModels/model[normalize-space()='"
-                + Models.FEDORA_OBJECT_CURRENT.uri + "'])";
+        String testExpression = String.format("count("
+                + "/%s:objectProfile/%s:objModels/%s:model[normalize-space()='"
+                + Models.FEDORA_OBJECT_CURRENT.uri + "'])",
+                ACCESS.prefix, ACCESS.prefix, ACCESS.prefix);
         for (String pid : new String[] { "demo:SmileyPens",
                                          "demo:SmileyGreetingCard" }) {
             Document result = getXMLQueryResult("/get/" + pid + "?xml=true");
