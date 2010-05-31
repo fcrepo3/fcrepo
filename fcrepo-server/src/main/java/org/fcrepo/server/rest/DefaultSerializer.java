@@ -76,32 +76,25 @@ public class DefaultSerializer {
     String objectProfileToXML(
             ObjectProfile objProfile,
             Date versDateTime) throws IOException {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         String pid = objProfile.PID;
+        String dateString = "";
+        if (versDateTime != null) {
+            String tmp = DateUtility.convertDateToString(versDateTime);
+            if (tmp != null) {
+                dateString = String.format("dateTime=\"%s\" ", tmp);
+            }
+        }
 
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        if (versDateTime == null
-                || DateUtility.convertDateToString(versDateTime).equalsIgnoreCase("")) {
-            buffer.append("<objectProfile "
-                    + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
-                    + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                    + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/access/ "
-                    + enc(fedoraServerProtocol) + "://"
-                    + enc(fedoraServerHost) + ":"
-                    + enc(fedoraServerPort) + "/objectProfile.xsd\""
-                    + " pid=\"" + enc(pid) + "\" >");
-        } else {
-            buffer.append("<objectProfile "
-                    + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
-                    + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                    + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/access/ "
-                    + enc(fedoraServerProtocol) + "://"
-                    + enc(fedoraServerHost) + ":"
-                    + enc(fedoraServerPort) + "/objectProfile.xsd\""
-                    + " pid=\"" + enc(pid) + "\"" + " dateTime=\""
-                    + DateUtility.convertDateToString(versDateTime) + "\" >");
-        }
+        buffer.append("<objectProfile "
+                + " xmlns=\"" + Constants.OBJ_PROFILE1_0.namespace.uri + "\" "
+                + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+                + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+                + " xsi:schemaLocation=\"" + Constants.OBJ_PROFILE1_0.namespace.uri + " "
+                + Constants.OBJ_PROFILE1_0.xsdLocation + "\""
+                + " pid=\"" + enc(pid) + "\"" + dateString +">");
 
         // PROFILE FIELDS SERIALIZATION
         buffer.append("<objLabel>" + enc(objProfile.objectLabel)
@@ -621,12 +614,12 @@ public class DefaultSerializer {
         }
 
         xml.append("<objectDatastreams "
-                   + "xmlns=\"" + Constants.ACCESS.uri + "\" "
-                   + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                   + "xsi:schemaLocation=\"" + Constants.ACCESS.uri + " "
+                   + " xmlns=\"" + Constants.OBJ_DATASTREAMS1_0.namespace.uri + "\" "
+                   + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                   + " xsi:schemaLocation=\"" + Constants.OBJ_DATASTREAMS1_0.namespace.uri + " "
                    + Constants.OBJ_DATASTREAMS1_0.xsdLocation + "\""
                    + " pid=\"" + enc(pid) + "\" " + dateString
-                   + "baseURL=\"" + enc(fedoraServerProtocol) + "://"
+                   + " baseURL=\"" + enc(fedoraServerProtocol) + "://"
                    + enc(fedoraServerHost) + ":"
                    + enc(fedoraServerPort) + "/" + fedoraAppServerContext + "/\" >");
 

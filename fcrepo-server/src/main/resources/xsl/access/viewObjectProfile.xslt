@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  xmlns:access="http://www.fedora.info/definitions/1/0/access/"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="access">
   <xsl:param name="fedora" />
   <xsl:output method="html" indent="yes" />
-  <xsl:template match="objectProfile">
+  <xsl:template match="access:objectProfile">
     <html>
       <head>
         <title>Object Profile HTML Presentation</title>
@@ -82,7 +84,7 @@
                 <strong>Object Label: </strong>
               </td>
               <td align="left">
-                <xsl:value-of select="objLabel" />
+                <xsl:value-of select="access:objLabel" />
               </td>
             </tr>
             <tr>
@@ -91,7 +93,7 @@
               </td>
               <td align="left">
                 <table border="0">
-                  <xsl:for-each select="objModels/model">
+                  <xsl:for-each select="access:objModels/access:model">
                     <tr>
                       <td>
                         <xsl:value-of select="." />
@@ -106,7 +108,7 @@
                 <strong>Object Creation Date: </strong>
               </td>
               <td align="left">
-                <xsl:value-of select="objCreateDate" />
+                <xsl:value-of select="access:objCreateDate" />
               </td>
             </tr>
             <tr>
@@ -114,7 +116,7 @@
                 <strong>Object Last Modified: </strong>
               </td>
               <td align="left">
-                <xsl:value-of select="objLastModDate" />
+                <xsl:value-of select="access:objLastModDate" />
               </td>
             </tr>
             <tr>
@@ -122,7 +124,7 @@
                 <strong>Object Owner Identifier: </strong>
               </td>
               <td align="left">
-                <xsl:value-of select="objOwnerId" />
+                <xsl:value-of select="access:objOwnerId" />
               </td>
             </tr>
             <tr>
@@ -130,7 +132,7 @@
                 <strong>Object State: </strong>
               </td>
               <td align="left">
-                <xsl:value-of select="objState" />
+                <xsl:value-of select="access:objState" />
               </td>
             </tr>
           </table>

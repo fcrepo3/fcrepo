@@ -878,6 +878,7 @@ public class FedoraAccessServlet
                                 + DateUtility.convertDateToString(versDateTime)
                                 + "\"");
                     }
+                    pw.write(" xmlns=\"" + OBJ_PROFILE1_0.namespace.uri + "\"");
                     pw.write(" xmlns:xsi=\"" + XSI.uri + "\""
                             + " xsi:schemaLocation=\""
                             + OBJ_PROFILE1_0.namespace.uri + " "
