@@ -261,7 +261,7 @@ public abstract class DateUtility {
                 formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss");
             } else if (length > 20 && length < 23) {
                 // right-pad millis with 0s
-                StringBuilder sb = new StringBuilder(dateString.substring(0, dateString.length()));
+                StringBuilder sb = new StringBuilder(dateString);
                 int dotIndex = sb.lastIndexOf(".");
                 int endIndex = sb.length() - 1;
                 int padding = 3 - (endIndex - dotIndex);
