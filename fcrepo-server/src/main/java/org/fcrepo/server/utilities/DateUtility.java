@@ -237,10 +237,15 @@ public abstract class DateUtility {
                 formatter.applyPattern("yyyy-MM-dd'Z'");
             } else if (length == 20) {
                 formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            } else if (length == 22) {
-                formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
-            } else if (length == 23) {
-                formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SS'Z'");
+            } else if (length > 21 && length < 24) {
+                // chop off the Z and right-pad with 0s
+                StringBuilder sb = new StringBuilder(dateString.substring(0, length - 1));
+                while (sb.length() < 23) {
+                    sb.append('0');
+                }
+                sb.append('Z');
+                dateString = sb.toString();
+                formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             } else if (length == 24) {
                 formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             }
@@ -249,10 +254,14 @@ public abstract class DateUtility {
                 formatter.applyPattern("yyyy-MM-dd");
             } else if (length == 19) {
                 formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss");
-            } else if (length == 21) {
-                formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.S");
-            } else if (length == 22) {
-                formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SS");
+            } else if (length > 20 && length < 23) {
+                // right-pad millis with 0s
+                StringBuilder sb = new StringBuilder(dateString);
+                while (sb.length() < 23) {
+                    sb.append('0');
+                }
+                dateString = sb.toString();
+                formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
             } else if (length == 23) {
                 formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
             } else if (dateString.endsWith("GMT") || dateString.endsWith("UTC")) {

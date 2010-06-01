@@ -9,7 +9,6 @@ import static org.junit.Assert.assertNull;
 
 import java.util.Date;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -105,7 +104,6 @@ public class TestDateUtility {
         assertEquals(TWO_BCE, DateUtility.parseDateLoose(TWO_BCE_XSD_DT));
     }
 
-    @Ignore
     @Test
     public void testMillis() throws Exception {
         // canonical form of 200 milliseconds after Epoch
@@ -114,7 +112,39 @@ public class TestDateUtility {
         String b = "1970-01-01T00:00:00.200Z";
         Date aDate = DateUtility.parseDateStrict(a);
         Date bDate = DateUtility.parseDateStrict(b);
+        assertEquals(200, aDate.getTime());
+        assertEquals(200, bDate.getTime());
+        assertEquals(a, DateUtility.convertDateToXSDString(aDate));
+        assertEquals(b, DateUtility.convertDateToString(bDate));
 
-        assertEquals(0, aDate.compareTo(bDate));
+        // canonical form of 20 milliseconds after Epoch
+        String c = "1970-01-01T00:00:00.02Z";
+        // also 20 ms after Epoch
+        String d = "1970-01-01T00:00:00.020Z";
+        Date cDate = DateUtility.parseDateStrict(c);
+        Date dDate = DateUtility.parseDateStrict(d);
+        assertEquals(20, cDate.getTime());
+        assertEquals(20, dDate.getTime());
+        assertEquals(c, DateUtility.convertDateToXSDString(cDate));
+        assertEquals(d, DateUtility.convertDateToString(dDate));
+
+        // canonical form of 2 milliseconds after Epoch
+        String e = "1970-01-01T00:00:00.002Z";
+        Date eDate = DateUtility.parseDateStrict(e);
+        assertEquals(2, eDate.getTime());
+        assertEquals(e, DateUtility.convertDateToXSDString(eDate));
+        assertEquals(e, DateUtility.convertDateToString(eDate));
+
+        // variations of Epoch
+        String f = "1970-01-01T00:00:00.0Z";
+        String g = "1970-01-01T00:00:00.00Z";
+        Date fDate = DateUtility.parseDateStrict(f);
+        Date gDate = DateUtility.parseDateStrict(g);
+        assertEquals(0, fDate.getTime());
+        assertEquals(0, gDate.getTime());
+        assertEquals(EPOCH_XSD_DT, DateUtility.convertDateToXSDString(fDate));
+        assertEquals(EPOCH_XSD_DT, DateUtility.convertDateToXSDString(gDate));
+        assertEquals(EPOCH_DT, DateUtility.convertDateToString(fDate));
+        assertEquals(EPOCH_DT, DateUtility.convertDateToString(gDate));
     }
 }
