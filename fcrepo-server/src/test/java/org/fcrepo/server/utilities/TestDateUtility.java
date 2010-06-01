@@ -96,7 +96,7 @@ public class TestDateUtility {
                         "1970-1-1", "12345-01-01T00:00:00.000Z",
                         "12345-01-01T00:00:00."};
         for (String element : badDates) {
-            assertNull(DateUtility.parseDateLoose(element));
+            assertNull(element + " not null", DateUtility.parseDateLoose(element));
         }
 
         assertEquals(ONE_CE, DateUtility.parseDateLoose(ONE_CE_XSD_DT));
@@ -146,5 +146,13 @@ public class TestDateUtility {
         assertEquals(EPOCH_XSD_DT, DateUtility.convertDateToXSDString(gDate));
         assertEquals(EPOCH_DT, DateUtility.convertDateToString(fDate));
         assertEquals(EPOCH_DT, DateUtility.convertDateToString(gDate));
+
+        // negative dates
+        String n = "-1234-01-01T00:00:00.2Z";
+        String o = "-1234-01-01T00:00:00.200Z";
+        Date nDate = DateUtility.parseDateStrict(n);
+        Date oDate = DateUtility.parseDateStrict(o);
+        assertEquals(nDate.getTime(), oDate.getTime());
+        assertEquals(n, DateUtility.convertDateToXSDString(nDate));
     }
 }
