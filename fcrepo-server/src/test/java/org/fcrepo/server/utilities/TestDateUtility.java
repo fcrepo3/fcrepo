@@ -4,17 +4,18 @@
  */
 package org.fcrepo.server.utilities;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.util.Date;
 
-import org.fcrepo.server.utilities.DateUtility;
-
-import junit.framework.TestCase;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * @author Edwin Shin
  */
-public class TestDateUtility
-        extends TestCase {
+public class TestDateUtility {
 
     protected final Date EPOCH = new Date(0L);
 
@@ -48,10 +49,7 @@ public class TestDateUtility
 
     protected final String TWO_BCE_XSD_DT = "-0001-01-01T00:00:00Z";
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(TestDateUtility.class);
-    }
-
+    @Test
     public void testConvertDateToString() {
         assertEquals(EPOCH_DT, DateUtility.convertDateToString(EPOCH));
         assertEquals(EPOCH_DT, DateUtility.convertDateToString(EPOCH, true));
@@ -61,14 +59,17 @@ public class TestDateUtility
         assertEquals(TWO_BCE_DT, DateUtility.convertDateToString(TWO_BCE));
     }
 
+    @Test
     public void testConvertDateToDateString() {
         assertEquals(EPOCH_D, DateUtility.convertDateToDateString(EPOCH));
     }
 
+    @Test
     public void testConvertDateToTimeString() {
         assertEquals(EPOCH_T, DateUtility.convertDateToTimeString(EPOCH));
     }
 
+    @Test
     public void testConvertDateToXSDString() {
         assertEquals(EPOCH_XSD_DT, DateUtility.convertDateToXSDString(EPOCH));
         assertEquals(ONE_CE_XSD_DT, DateUtility.convertDateToXSDString(ONE_CE));
@@ -78,6 +79,7 @@ public class TestDateUtility
                 .convertDateToXSDString(TWO_BCE));
     }
 
+    @Test
     public void testParseDate() {
         String[] dates =
                 {"1970-01-01T00:00:00.000Z", "1970-01-01T00:00:00.00Z",
@@ -103,4 +105,16 @@ public class TestDateUtility
         assertEquals(TWO_BCE, DateUtility.parseDateLoose(TWO_BCE_XSD_DT));
     }
 
+    @Ignore
+    @Test
+    public void testMillis() throws Exception {
+        // canonical form of 200 milliseconds after Epoch
+        String a = "1970-01-01T00:00:00.2Z";
+        // also 200 ms after Epoch
+        String b = "1970-01-01T00:00:00.200Z";
+        Date aDate = DateUtility.parseDateStrict(a);
+        Date bDate = DateUtility.parseDateStrict(b);
+
+        assertEquals(0, aDate.compareTo(bDate));
+    }
 }
