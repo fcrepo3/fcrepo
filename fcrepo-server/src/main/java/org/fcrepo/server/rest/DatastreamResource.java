@@ -250,7 +250,7 @@ public class DatastreamResource
     /**
      * Invoke API-M.purgeDatastream
      * <p/>
-     * DELETE /objects/{pid}/datastreams/{dsID} ? startDT endDT logMessage force
+     * DELETE /objects/{pid}/datastreams/{dsID} ? startDT endDT logMessage
      */
     @Path("/{dsID}")
     @DELETE
@@ -287,7 +287,7 @@ public class DatastreamResource
      * Modify an existing datastream.
      * <p/>
      * PUT /objects/{pid}/datastreams/{dsID} ? dsLocation altIDs dsLabel
-     * versionable dsState formatURI checksumType checksum logMessage force
+     * versionable dsState formatURI checksumType checksum logMessage
      * <p/>
      * Successful Response: Status: 200 OK Content-Type: text/xml Body: XML
      * datastream profile
