@@ -116,7 +116,8 @@ public class TestAPIALite
     public void testObjectHistory() throws Exception {
         Document result;
         result = getXMLQueryResult("/getObjectHistory/demo:5?xml=true");
-        assertXpathExists("/fedoraObjectHistory/objectChangeDate", result);
+        assertXpathExists(String.format("/%s:fedoraObjectHistory/%s:objectChangeDate",
+                                        ACCESS.prefix, ACCESS.prefix), result);
     }
 
     public void testGetObjectProfile() throws Exception {

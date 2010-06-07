@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" 
+  xmlns:access="http://www.fedora.info/definitions/1/0/access/"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="access">
   <xsl:param name="fedora"/>    
   <xsl:output method="html" indent="yes"/>
-  <xsl:template match="fedoraObjectHistory">
+  <xsl:template match="access:fedoraObjectHistory">
     <html>
       <head>
         <title>Object History HTML Presentation</title>
@@ -35,7 +38,7 @@
                 <strong>Object Component Creation/Modification Dates</strong>
               </td>
             </tr>
-            <xsl:for-each select="objectChangeDate">
+            <xsl:for-each select="access:objectChangeDate">
             <tr>
               <td align="left">
                 <xsl:value-of select="."/>

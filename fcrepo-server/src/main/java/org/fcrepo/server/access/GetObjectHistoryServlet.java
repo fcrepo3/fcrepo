@@ -9,9 +9,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PipedReader;
 import java.io.PipedWriter;
-
 import java.net.URLDecoder;
-
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -19,7 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -318,9 +315,10 @@ public class GetObjectHistoryServlet
                 try {
                     pw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
                     pw.write("<fedoraObjectHistory" + " pid=\"" + PID + "\""
+                            + " xmlns=\"" + OBJ_HISTORY1_0.namespace.uri + "\""
                             + " xmlns:xsd=\"" + XML_XSD.uri + "\""
                             + " xmlns:xsi=\"" + XSI.uri + "\""
-                            + " xsi:schemaLocation=\"" + ACCESS.uri + " "
+                            + " xsi:schemaLocation=\"" + OBJ_HISTORY1_0.namespace.uri + " "
                             + OBJ_HISTORY1_0.xsdLocation + "\">");
                     // Object History Serialization
                     for (String element : objectHistory) {

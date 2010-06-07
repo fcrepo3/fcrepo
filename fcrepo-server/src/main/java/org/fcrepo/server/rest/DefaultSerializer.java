@@ -188,16 +188,15 @@ public class DefaultSerializer {
     String objectHistoryToXml(
             String[] objectHistory,
             String pid) throws IOException {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         buffer.append("<fedoraObjectHistory "
+                + " xmlns=\"" + Constants.OBJ_HISTORY1_0.namespace.uri + "\""
                 + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
                 + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/access/ "
-                + enc(fedoraServerProtocol) + "://"
-                + enc(fedoraServerHost) + ":"
-                + enc(fedoraServerPort)
-                + "/fedoraObjectHistory.xsd\" pid=\"" + pid + "\" >");
+                + " xsi:schemaLocation=\"" + Constants.OBJ_HISTORY1_0.namespace.uri
+                + " " + Constants.OBJ_HISTORY1_0.xsdLocation + "\""
+                + " pid=\"" + pid + "\" >");
 
         for (String ts : objectHistory) {
             buffer.append("<objectChangeDate>" + ts + "</objectChangeDate>");
