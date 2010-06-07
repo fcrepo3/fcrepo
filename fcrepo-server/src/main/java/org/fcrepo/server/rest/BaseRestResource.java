@@ -140,7 +140,9 @@ public class BaseRestResource {
                 }
             }
 
-            builder.type(result.MIMEType);
+            if (!result.MIMEType.equals("")){
+                builder.type(result.MIMEType);
+            }
             builder.entity(result.getStream());
             return builder.build();
         }
