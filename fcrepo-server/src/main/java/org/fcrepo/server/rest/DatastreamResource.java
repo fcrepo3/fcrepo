@@ -299,7 +299,7 @@ public class DatastreamResource
                                      @QueryParam(RestParam.DS_LOCATION) String dsLocation,
                                      @QueryParam(RestParam.ALT_IDS) List<String> altIDs,
                                      @QueryParam(RestParam.DS_LABEL) String dsLabel,
-                                     @QueryParam(RestParam.VERSIONABLE) @DefaultValue("true") boolean versionable,
+                                     @QueryParam(RestParam.VERSIONABLE) Boolean versionable,
                                      @QueryParam(RestParam.DS_STATE) String dsState,
                                      @QueryParam(RestParam.FORMAT_URI) String formatURI,
                                      @QueryParam(RestParam.CHECKSUM_TYPE) String checksumType,
@@ -344,7 +344,7 @@ public class DatastreamResource
                                   @QueryParam(RestParam.DS_LOCATION) String dsLocation,
                                   @QueryParam(RestParam.ALT_IDS) List<String> altIDs,
                                   @QueryParam(RestParam.DS_LABEL) String dsLabel,
-                                  @QueryParam(RestParam.VERSIONABLE) @DefaultValue("true") boolean versionable,
+                                  @QueryParam(RestParam.VERSIONABLE) @DefaultValue("true") Boolean versionable,
                                   @QueryParam(RestParam.DS_STATE) @DefaultValue("A") String dsState,
                                   @QueryParam(RestParam.FORMAT_URI) String formatURI,
                                   @QueryParam(RestParam.CHECKSUM_TYPE) String checksumType,
@@ -379,7 +379,7 @@ public class DatastreamResource
                                              String dsLocation,
                                              List<String> altIDList,
                                              String dsLabel,
-                                             boolean versionable,
+                                             Boolean versionable,
                                              String dsState,
                                              String formatURI,
                                              String checksumType,
@@ -399,7 +399,9 @@ public class DatastreamResource
 
             Datastream existingDS =
                     apiMService.getDatastream(context, pid, dsID, null);
-
+            if (!posted && versionable == null && existingDS != null){
+                versionable = existingDS.DSVersionable;
+            }
             Date requestModDate = null;
             if (lastModifiedDate != null) {
                 requestModDate = lastModifiedDate.getValue();
