@@ -401,8 +401,9 @@ public class ListMethodsServlet
                             + StreamUtility.enc(fedoraServerHost) + ":"
                             + StreamUtility.enc(fedoraServerPort) + "/"
                             + fedoraAppServerContext + "/\"");
+                    pw.write(" xmlns=\"" + OBJ_METHODS1_0.namespace.uri + "\" ");
                     pw.write(" xmlns:xsi=\"" + XSI.uri + "\" ");
-                    pw.write(" xsi:schemaLocation=\"" + ACCESS.uri);
+                    pw.write(" xsi:schemaLocation=\"" + OBJ_METHODS1_0.namespace.uri);
                     pw.write(" " + OBJ_METHODS1_0.xsdLocation + "\">");
 
                     // ObjectMethodsDef SERIALIZATION

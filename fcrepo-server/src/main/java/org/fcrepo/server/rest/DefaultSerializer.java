@@ -249,12 +249,11 @@ public class DefaultSerializer {
         if (sDef != null)
             sDefElement = "sDef=\"" + enc(sDef) + "\" ";
         buffer.append("<objectMethods "
+                + "xmlns=\"" + Constants.OBJ_METHODS1_0.namespace.uri + "\" "
                 + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
                 + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                + "xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/access/ "
-                + enc(fedoraServerProtocol) + "://"
-                + enc(fedoraServerHost) + ":"
-                + enc(fedoraServerPort) + "/listMethods.xsd\""
+                + "xsi:schemaLocation=\"" + Constants.OBJ_METHODS1_0.namespace.uri + " "
+                + Constants.OBJ_METHODS1_0.xsdLocation + "\" "
                 + " pid=\"" + enc(pid) + "\" "
                 + asOfDateTimeElement + sDefElement + "baseURL=\""
                 + enc(fedoraServerProtocol) + "://"

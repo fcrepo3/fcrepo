@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" >
+<xsl:stylesheet version="1.0" 
+  xmlns:access="http://www.fedora.info/definitions/1/0/access/"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="access">
 <xsl:param name="fedora"/>
 <xsl:output method="html" indent="yes"/> 
-<xsl:template match="objectMethods">
+<xsl:template match="access:objectMethods">
   <html>
     <head>
       <title>Object Methods HTML Presentation</title>
@@ -65,11 +68,11 @@
   </html>
 </xsl:template>
 
-<xsl:template match="sdef">
+<xsl:template match="access:sdef">
 <xsl:apply-templates/>
 </xsl:template>
 
-<xsl:template match="method">
+<xsl:template match="access:method">
 <form>
   <xsl:attribute name="method">get</xsl:attribute>
   <xsl:attribute name="action">
@@ -96,7 +99,7 @@
       <input type="submit" value="Run"/>
     </td>
     <xsl:choose>
-      <xsl:when test="./methodParm/@parmName">
+      <xsl:when test="./access:methodParm/@parmName">
         <xsl:call-template name="parmTemplate"/>
       </xsl:when>
       <xsl:otherwise>
@@ -111,11 +114,11 @@
 </xsl:template>
 
 <xsl:template   name="parmTemplate" >
-<xsl:for-each select="methodParm">
+<xsl:for-each select="access:methodParm">
   <xsl:choose>
     <xsl:when test="position()=1">
       <xsl:choose>
-        <xsl:when test="methodParmDomain">
+        <xsl:when test="access:methodParmDomain">
           <td><b><font color="purple">
             <xsl:value-of select="@parmName"/>
             </font></b>
@@ -133,7 +136,7 @@
     </xsl:when>
     <xsl:otherwise>
       <xsl:choose>
-        <xsl:when test="methodParmDomain">
+        <xsl:when test="access:methodParmDomain">
           <tr>
             <td colspan="3" rowspan="1"></td>
             <td>
@@ -162,11 +165,11 @@
 <xsl:apply-templates/>
 </xsl:template>
 
-<xsl:template match="methodParmValue">
+<xsl:template match="access:methodParmValue">
 </xsl:template>
 
 <xsl:template name="valueTemplate">
-<xsl:for-each select="methodParmDomain/methodParmValue">
+<xsl:for-each select="access:methodParmDomain/access:methodParmValue">
   <td><xsl:value-of select="."/></td>
   <td>
     <input>

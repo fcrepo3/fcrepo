@@ -153,7 +153,8 @@ public class TestAPIALite
     public void testListMethods() throws Exception {
         Document result;
         result = getXMLQueryResult("/listMethods/demo:5?xml=true");
-        assertXpathEvaluatesTo("8", "count(/objectMethods/sDef/method)", result);
+        assertXpathEvaluatesTo("8", String.format("count(/%s:objectMethods/%s:sDef/%s:method)",
+                                                  ACCESS.prefix, ACCESS.prefix, ACCESS.prefix), result);
     }
 
     public static void main(String[] args) {
