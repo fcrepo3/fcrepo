@@ -162,11 +162,11 @@ public class DefaultSerializer {
 
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         buffer.append("<datastreamProfile "
-                      + " xmlns=\"" + Constants.OBJ_DATASTREAMS1_0.namespace.uri + "\" "
+                      + " xmlns=\"" + Constants.MANAGEMENT.uri + "\" "
                       + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
                       + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                       + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/management/ "
-                      + Constants.OBJ_DATASTREAMS1_0.xsdLocation + "\""
+                      + "http://www.fedora.info/definitions/1/0/datastreamProfile.xsd" + "\""
                       + " pid=\"" + enc(pid) + "\""
                       + " dsID=\"" + enc(dsID) + "\"");
         if (versDateTime != null &&
