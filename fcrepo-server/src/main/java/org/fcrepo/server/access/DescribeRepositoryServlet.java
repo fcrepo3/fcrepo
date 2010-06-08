@@ -9,16 +9,13 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PipedReader;
 import java.io.PipedWriter;
-
 import java.net.URLDecoder;
-
 import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -275,10 +272,12 @@ public class DescribeRepositoryServlet
             if (pw != null) {
                 try {
                     pw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                    pw.write("<fedoraRepository " + " xmlns:xsd=\""
-                            + XML_XSD.uri + "\"" + " xmlns:xsi=\"" + XSI.uri
-                            + "\"" + " xsi:schemaLocation=\"" + ACCESS.uri
-                            + " " + REPO_DESC1_0.xsdLocation + "\">");
+                    pw.write("<fedoraRepository"
+                            + " xmlns=\"" + REPO_DESC1_0.namespace.uri + "\""
+                            + " xmlns:xsd=\"" + XML_XSD.uri + "\""
+                            + " xmlns:xsi=\"" + XSI.uri + "\""
+                            + " xsi:schemaLocation=\"" + ACCESS.uri + " "
+                            + REPO_DESC1_0.xsdLocation + "\">");
 
                     // REPOSITORY INFO FIELDS SERIALIZATION
                     pw.write("<repositoryName>" + repositoryInfo.repositoryName

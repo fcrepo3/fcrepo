@@ -61,7 +61,8 @@ public class TestAPIALite
     public void testDescribeRepository() throws Exception {
         Document result;
         result = getXMLQueryResult("/describe?xml=true");
-        assertXpathExists("/fedoraRepository/repositoryName", result);
+        assertXpathExists(String.format("/%s:fedoraRepository/%s:repositoryName",
+                                        ACCESS.prefix, ACCESS.prefix), result);
     }
 
     public void testGetDatastreamDissemination() throws Exception {
