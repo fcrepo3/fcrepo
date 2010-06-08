@@ -209,12 +209,11 @@ public class DefaultSerializer {
         StringBuffer buffer = new StringBuffer();
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         buffer.append("<datastreamHistory "
+                      + " xmlns=\"" + Constants.MANAGEMENT.uri + "\" "
                       + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
                       + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                       + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/management/ "
-                      + enc(fedoraServerProtocol) + "://"
-                      + enc(fedoraServerHost) + ":"
-                      + enc(fedoraServerPort) + "/datastreamHistory.xsd\""
+                      + "http://www.fedora.info/definitions/1/0/datastreamHistory.xsd" + "\""
                       + " pid=\"" + enc(pid) + "\""
                       + " dsID=\"" + enc(dsID) + "\">");
 

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <datastreamHistory xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns="http://www.fedora.info/definitions/1/0/management/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xsi:schemaLocation="http://www.fedora.info/definitions/1/0/management/ $FEDORA_BASE_URL$/datastreamHistory.xsd" 
+    xsi:schemaLocation="http://www.fedora.info/definitions/1/0/management/ http://www.fedora.info/definitions/1/0/datastreamHistory.xsd" 
     pid="demo:1234" 
     dsID="DS1">
   <datastreamProfile pid="demo:1234" dsID="DS1">
