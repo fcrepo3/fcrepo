@@ -4,28 +4,40 @@
  */
 package org.fcrepo.test.api;
 
-import junit.framework.Assert;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import org.apache.axis.AxisFault;
-import org.apache.axis.types.NonNegativeInteger;
-import org.custommonkey.xmlunit.NamespaceContext;
-import org.custommonkey.xmlunit.SimpleNamespaceContext;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.Datastream;
-import org.fcrepo.test.DemoObjectTestSetup;
-import org.fcrepo.test.FedoraServerTestCase;
-import org.junit.After;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+
 import java.rmi.RemoteException;
-import java.util.*;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import org.apache.axis.AxisFault;
+import org.apache.axis.types.NonNegativeInteger;
+
+import org.custommonkey.xmlunit.NamespaceContext;
+import org.custommonkey.xmlunit.SimpleNamespaceContext;
+import org.custommonkey.xmlunit.XMLUnit;
+
+import org.junit.After;
+
+import junit.framework.Assert;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.types.gen.Datastream;
+
+import org.fcrepo.test.DemoObjectTestSetup;
+import org.fcrepo.test.FedoraServerTestCase;
 
 
 public class TestAPIM
@@ -1570,6 +1582,90 @@ public class TestAPIM
         checksum = apim.compareDatastreamChecksum("demo:14", "NEWDS2", null);
         assertTrue(checksum.length() > 0);
         assertTrue(checksum.equals("none"));
+
+        // test adding new M datastream with checksum (FCREPO-696)
+        // use demo:14/NEWDS2 as the source as we have the already-calculated checksum from above
+        String checksum3 = "3aff11a78a8335a54b75e02d85a0caa3"; // tip: if this is wrong (ie demo:14/NEWDS2 changes) the axis fault will give the correct value
+        datastreamId =
+            apim.addDatastream("demo:14",
+                               "CHECKSUMDS",
+                               null,
+                               "datastream for testing checksums",
+                               true,
+                               null,
+                               null,
+                               getBaseURL() + "/get/demo:14/NEWDS2",
+                               "M",
+                               "A",
+                               "MD5",
+                               checksum3,
+            "creating datastream with checksum");
+
+        // check the checksum
+        String checksum4 = apim.compareDatastreamChecksum("demo:14", "CHECKSUMDS", null);
+        assertTrue(checksum3.equals(checksum4));
+
+        // add again, new datastream, incorrect checksum
+        try {
+            datastreamId =
+                apim.addDatastream("demo:14",
+                                              "CHECKSUMDSFAIL",
+                                              null,
+                                              "datastream for testing checksums",
+                                              true,
+                                              null,
+                                              null,
+                                              getBaseURL() + "/get/demo:14/NEWDS2",
+                                              "M",
+                                              "A",
+                                              "MD5",
+                                              "4aff31a28b8335a24b95e02d85a0caa4",
+                                              "creating datastream with checksum");
+            // fail if datastream was modified
+            Assert.fail();
+        } catch (AxisFault af) {
+            assertTrue(af.getFaultString()
+                       .contains("Checksum Mismatch"));
+        }
+
+        // modify datastream with incorrect checksum (same contents, incorrect checksum)
+        try {
+            datastreamId =
+                apim.modifyDatastreamByReference("demo:14",
+                                                 "CHECKSUMDS",
+                                                 null,
+                                                 null,
+                                                 null,
+                                                 null,
+                                                 getBaseURL() + "/get/demo:14/NEWDS2",
+                                                 "MD5",
+                                                 "4aff31a28b8335a24b95e02d85a0caa4",
+                                                 "modifying datastream with incorrect checksum");
+            // fail if datastream was modified
+            Assert.fail();
+        } catch (AxisFault af) {
+            assertTrue(af.getFaultString()
+                       .contains("Checksum Mismatch"));
+        }
+
+        // modify again this time with correct checksum
+        datastreamId =
+            apim.modifyDatastreamByReference("demo:14",
+                                             "CHECKSUMDS",
+                                             null,
+                                             null,
+                                             null,
+                                             null,
+                                             getBaseURL() + "/get/demo:14/NEWDS2",
+                                             "MD5",
+                                             checksum3,
+            "modifying datastream with correct checksum");
+
+        // check the checksum
+        checksum4 = apim.compareDatastreamChecksum("demo:14", "CHECKSUMDS", null);
+        assertTrue(checksum3.equals(checksum3));
+
+
 
         // (5) test purgeDatastream
         System.out.println("Running TestAPIM.testPurgeDatastream...");

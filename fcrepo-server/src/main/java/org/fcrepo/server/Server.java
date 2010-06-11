@@ -8,10 +8,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
 import java.text.MessageFormat;
 import java.text.ParseException;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,10 +28,20 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+
+import org.xml.sax.SAXException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.FaultException;
 import org.fcrepo.common.MalformedPIDException;
 import org.fcrepo.common.PID;
+
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.config.ServerConfigurationParser;
 import org.fcrepo.server.errors.GeneralException;
@@ -42,12 +55,6 @@ import org.fcrepo.server.security.Authorization;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.status.ServerState;
 import org.fcrepo.server.utilities.status.ServerStatusFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 /**
  * The starting point for working with a Fedora repository. This class handles
@@ -408,6 +415,11 @@ public abstract class Server
     private File m_homeDir;
 
     /**
+     * The server's directory for (temp) uploaded files
+     */
+    private File m_uploadDir;
+
+    /**
      * Datastore configurations initialized from the server config file.
      */
     private Map<String, DatastoreConfig> m_datastoreConfigs;
@@ -459,6 +471,7 @@ public abstract class Server
             m_initialized = false;
             m_loadedModules = new HashMap<String, Module>();
             m_homeDir = new File(homeDir, "server");
+            m_uploadDir = new File(m_homeDir, "management/upload");
 
             m_statusFile = new ServerStatusFile(m_homeDir);
 
@@ -1052,6 +1065,15 @@ public abstract class Server
     public final File getHomeDir() {
         return m_homeDir;
     }
+
+    /**
+    * Gets the server's temp file upload directory.
+    *
+    * @return The directory.
+    */
+   public final File getUploadDir() {
+       return m_uploadDir;
+   }
 
     /**
      * Gets a loaded <code>Module</code>.
