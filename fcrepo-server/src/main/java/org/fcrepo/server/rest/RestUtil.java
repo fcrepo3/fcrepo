@@ -105,7 +105,7 @@ public class RestUtil {
                 List<String> lengthHeaders =
                     headers.getRequestHeader("Content-Length");
                 if(lengthHeaders != null && lengthHeaders.size() > 0) {
-                    rContent.size = Integer.parseInt(lengthHeaders.get(0));
+                    rContent.size = Long.parseLong(lengthHeaders.get(0));
                 }
             }
         }
@@ -116,7 +116,7 @@ public class RestUtil {
     class RequestContent {
         private InputStream contentStream = null;
         private String mimeType = null;
-        private int size = 0;
+        private long size = 0;
 
         /**
          * @return the contentStream
@@ -135,7 +135,7 @@ public class RestUtil {
         /**
          * @return the size
          */
-        public int getSize() {
+        public long getSize() {
             return size;
         }
     }
