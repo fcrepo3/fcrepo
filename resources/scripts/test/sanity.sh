@@ -78,15 +78,15 @@ if [ $? -ne 0 ]; then
   echo "Shutting down Tomcat..."
   $CATALINA_HOME/bin/shutdown.sh
   sleep 15
-  mv $FEDORA_HOME/server/logs $BUILD_HOME/build/server-logs/org.fcrepo.test.AllSystemTestsConfigB
-  mv $FEDORA_HOME/tomcat/logs/catalina.out $BUILD_HOME/build/server-logs/catalina.out.AllSystemTestsConfigB.log
+  mv $FEDORA_HOME/server/logs $BUILD_HOME/build/server-logs/org.fcrepo.test.configB
+  mv $FEDORA_HOME/tomcat/logs/catalina.out $BUILD_HOME/build/server-logs/catalina.out.configB.log
   exit 1
 fi
 echo "Shutting down tomcat..."
 $CATALINA_HOME/bin/shutdown.sh
 sleep 15
-mv $FEDORA_HOME/server/logs $BUILD_HOME/build/server-logs/org.fcrepo.test.AllSystemTestsConfigB
-mv $FEDORA_HOME/tomcat/logs/catalina.out $BUILD_HOME/build/server-logs/catalina.out.AllSystemTestsConfigB.log
+mv $FEDORA_HOME/server/logs $BUILD_HOME/build/server-logs/org.fcrepo.test.configB
+mv $FEDORA_HOME/tomcat/logs/catalina.out $BUILD_HOME/build/server-logs/catalina.out.configB.log
 
 #
 # End of Config B Tests
@@ -123,15 +123,15 @@ if [ $? -ne 0 ]; then
   echo "Shutting down Tomcat..."
   $CATALINA_HOME/bin/shutdown.sh
   sleep 15
-  mv $FEDORA_HOME/server/logs $BUILD_HOME/build/server-logs/org.fcrepo.test.AllSystemTestsConfigA
-  mv $FEDORA_HOME/tomcat/logs/catalina.out $BUILD_HOME/build/server-logs/catalina.out.AllSystemTestsConfigA.log
+  mv $FEDORA_HOME/server/logs $BUILD_HOME/build/server-logs/org.fcrepo.test.configA
+  mv $FEDORA_HOME/tomcat/logs/catalina.out $BUILD_HOME/build/server-logs/catalina.out.configA.log
   exit 1
 fi
 echo "Shutting down tomcat..."
 $CATALINA_HOME/bin/shutdown.sh
 sleep 15
-mv $FEDORA_HOME/server/logs $BUILD_HOME/build/server-logs/org.fcrepo.test.AllSystemTestsConfigA
-mv $FEDORA_HOME/tomcat/logs/catalina.out $BUILD_HOME/build/server-logs/catalina.out.AllSystemTestsConfigA.log
+mv $FEDORA_HOME/server/logs $BUILD_HOME/build/server-logs/org.fcrepo.test.configA
+mv $FEDORA_HOME/tomcat/logs/catalina.out $BUILD_HOME/build/server-logs/catalina.out.configA.log
 
 #
 # End of Config A Tests
@@ -168,15 +168,15 @@ if [ $? -ne 0 ]; then
   echo "Shutting down Tomcat..."
   $CATALINA_HOME/bin/shutdown.sh
   sleep 15
-  mv $FEDORA_HOME/server/logs $BUILD_HOME/build/server-logs/org.fcrepo.test.AllSystemTestsConfigQ
-  mv $FEDORA_HOME/tomcat/logs/catalina.out $BUILD_HOME/build/server-logs/catalina.out.AllSystemTestsConfigQ.log
+  mv $FEDORA_HOME/server/logs $BUILD_HOME/build/server-logs/org.fcrepo.test.configQ
+  mv $FEDORA_HOME/tomcat/logs/catalina.out $BUILD_HOME/build/server-logs/catalina.out.configQ.log
   exit 1
 fi
 echo "Shutting down tomcat..."
 $CATALINA_HOME/bin/shutdown.sh
 sleep 15
-mv $FEDORA_HOME/server/logs $BUILD_HOME/build/server-logs/org.fcrepo.test.AllSystemTestsConfigQ
-mv $FEDORA_HOME/tomcat/logs/catalina.out $BUILD_HOME/build/server-logs/catalina.out.AllSystemTestsConfigQ.log
+mv $FEDORA_HOME/server/logs $BUILD_HOME/build/server-logs/org.fcrepo.test.configQ
+mv $FEDORA_HOME/tomcat/logs/catalina.out $BUILD_HOME/build/server-logs/catalina.out.configQ.log
 
 #
 # End of Config Q Tests
