@@ -92,6 +92,10 @@
 
                   <systemProperties>
                     <property>
+                        <name>fedora.authorize.access</name>
+                        <value>false</value>
+                    </property>
+                    <property>
                       <name>logback.configurationFile</name>
                       <value>src/test/resources/logback.xml</value>
                     </property>
@@ -212,6 +216,11 @@
 
                   <systemProperties>
                     <property>
+                        <name>fedora.authorize.access</name>
+                        <value>false</value>
+                    </property>
+                  
+                    <property>
                       <name>logback.configurationFile</name>
                       <value>src/test/resources/logback.xml</value>
                     </property>
@@ -331,6 +340,11 @@
                   <skip>${integration.test.skip}</skip>
 
                   <systemProperties>
+                    <property>
+                        <name>fedora.authorize.access</name>
+                        <value>true</value>
+                    </property>
+                  
                     <property>
                       <name>logback.configurationFile</name>
                       <value>src/test/resources/logback.xml</value>

@@ -12,7 +12,8 @@ import org.junit.runners.Suite;
         org.fcrepo.test.api.TestAPIAConfigA.class,
         org.fcrepo.test.api.TestAPIALiteConfigA.class,
         org.fcrepo.test.api.TestHTTPStatusCodesConfigA.class,
-        org.fcrepo.test.api.TestManyDisseminations.class})
+        org.fcrepo.test.api.TestManyDisseminations.class,
+        org.fcrepo.test.api.TestRESTAPI.class})
 public class AllSystemTestsConfigA {
 
     // Supports legacy tests runners
@@ -27,7 +28,7 @@ public class AllSystemTestsConfigA {
         suite.addTest(org.fcrepo.test.api.TestAPIALiteConfigA.suite());
         suite.addTest(org.fcrepo.test.api.TestHTTPStatusCodesConfigA.suite());
         suite.addTest(org.fcrepo.test.api.TestManyDisseminations.suite());
-
+        suite.addTest(org.fcrepo.test.api.TestRESTAPI.suite());
         return suite;
     }
 }
