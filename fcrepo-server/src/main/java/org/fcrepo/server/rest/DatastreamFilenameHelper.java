@@ -8,6 +8,7 @@ import java.io.File;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,17 +18,20 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.access.Access;
 import org.fcrepo.server.management.Management;
-import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.server.storage.RDFRelationshipReader;
+import org.fcrepo.server.storage.types.DatastreamDef;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.server.storage.types.RelationshipTuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 
@@ -277,24 +281,30 @@ public class DatastreamFilenameHelper {
      * @throws Exception
      */
     private  final String getFilenameFromRels(Context context, String pid, String dsid, String MIMETYPE) throws Exception {
-        String filename = null;
-        // find any "has filename" relationships with the datastream URI as the subject
-        // TODO: this is based on the current state of RELS-INT; in theory it should use the state at asOfDateTime, but we don't
-        // yet have the API-M calls to support this...
-        RelationshipTuple[] filenameRels = m_apiMService.getRelationships(context, Constants.FEDORA.uri + pid + "/" + dsid, FILENAME_REL);
-        // should only be 0 or 1
-        if (filenameRels.length == 1) {
-            if (filenameRels[0].isLiteral) {
-                filename = filenameRels[0].object;
-            } else {
-                logger.warn("Object " + pid + " datastream " + dsid + " specifies a filename which is not a literal in RELS-INT");
-                filename = "";
+        String filename = "";
+
+        // read rels directly from RELS-INT - can't use Management.getRelationships as this requires auth
+        MIMETypedStream relsInt = m_apiAService.getDatastreamDissemination(context, pid, "RELS-INT", null);
+        Set<RelationshipTuple> relsIntTuples = RDFRelationshipReader.readRelationships(relsInt.getStream());
+
+        // find the tuple specifying the filename
+        int matchingTuples = 0;
+        for ( RelationshipTuple tuple : relsIntTuples ) {
+            if (tuple.subject.equals(Constants.FEDORA.uri + pid + "/" + dsid) && tuple.predicate.equals(FILENAME_REL)) {
+                // use the first found relationship by default (report warning later if there are more)
+                if (matchingTuples == 0) {
+                    if (tuple.isLiteral) {
+                        filename = tuple.object;
+                    } else {
+                        logger.warn("Object " + pid + " datastream " + dsid + " specifies a filename which is not a literal in RELS-INT");
+                        filename = "";
+                    }
+                }
+                matchingTuples++;
             }
-        } else {
-            if (filenameRels.length > 1) {
-                logger.warn("Object " + pid + " datastream " + dsid + " specifies more than one filename in RELS-INT");
-            }
-            filename = "";
+        }
+        if (matchingTuples > 1) {
+            logger.warn("Object " + pid + " datastream " + dsid + " specifies more than one filename in RELS-INT.");
         }
         return filename;
 
@@ -311,9 +321,20 @@ public class DatastreamFilenameHelper {
      * @throws Exception
      */
     private final String getFilenameFromLabel(Context context, String pid, String dsid, Date asOfDateTime, String MIMETYPE) throws Exception {
-        Datastream ds = m_apiMService.getDatastream(context, pid, dsid, asOfDateTime);
-        String filename = ds.DSLabel;
+
+        // can't get datastream label directly from datastream as this is an API-M call
+        // instead get list of datastream defs, as these contain labels
+        DatastreamDef[] datastreams = m_apiAService.listDatastreams(context, pid, asOfDateTime);
+
+        String filename = "";
+        for ( DatastreamDef datastream : datastreams) {
+            if (datastream.dsID.equals(dsid)) {
+                filename = datastream.dsLabel;
+                break;
+            }
+        }
         return filename;
+
 
     }
     /**
