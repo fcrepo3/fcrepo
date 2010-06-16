@@ -25,17 +25,19 @@ import org.akubraproject.BlobStore;
 import org.akubraproject.BlobStoreConnection;
 import org.akubraproject.DuplicateBlobException;
 import org.akubraproject.MissingBlobException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.FaultException;
 import org.fcrepo.common.MalformedPIDException;
 import org.fcrepo.common.PID;
+
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.ObjectAlreadyInLowlevelStorageException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.storage.lowlevel.IListable;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 
@@ -102,9 +104,9 @@ public class AkubraLowlevelStorage
     // ILowlevelStorage methods
     //
 
-    public void addDatastream(String dsKey, InputStream content)
+    public long addDatastream(String dsKey, InputStream content)
             throws LowlevelStorageException {
-        add(datastreamStore, dsKey, content);
+        return add(datastreamStore, dsKey, content);
     }
 
     public void addObject(String objectKey, InputStream content)
@@ -138,9 +140,9 @@ public class AkubraLowlevelStorage
         remove(objectStore, objectKey);
     }
 
-    public void replaceDatastream(String dsKey, InputStream content)
+    public long replaceDatastream(String dsKey, InputStream content)
             throws LowlevelStorageException {
-        replace(datastreamStore, dsKey, content, forceSafeDatastreamOverwrites);
+        return replace(datastreamStore, dsKey, content, forceSafeDatastreamOverwrites);
     }
 
     public void replaceObject(String objectKey, InputStream content)
@@ -174,7 +176,7 @@ public class AkubraLowlevelStorage
     // Private implementation methods
     //
 
-    private static void add(BlobStore store,
+    private static long add(BlobStore store,
                             String key,
                             InputStream content)
             throws ObjectAlreadyInLowlevelStorageException {
@@ -185,6 +187,13 @@ public class AkubraLowlevelStorage
             Blob blob = getBlob(connection, blobId, null);
             OutputStream out = openOutputStream(blob, -1, false);
             copy(content, out);
+            try {
+                return blob.getSize();
+            } catch (MissingBlobException e) { // should never happen
+                throw new RuntimeException("Missing blob after adding the blob: " +e.getMessage(), e);
+            } catch (IOException e) { // should also never happen
+                throw new RuntimeException("Error reading blob size: " +e.getMessage(), e);
+            }
         } catch (DuplicateBlobException e) {
             throw new ObjectAlreadyInLowlevelStorageException(key, e);
         } finally {
@@ -220,7 +229,7 @@ public class AkubraLowlevelStorage
         }
     }
 
-    private static void replace(BlobStore store,
+    private static long replace(BlobStore store,
                                 String key,
                                 InputStream content,
                                 boolean forceSafeOverwrite)
@@ -240,6 +249,13 @@ public class AkubraLowlevelStorage
                 }
             } else {
                 throw new ObjectNotInLowlevelStorageException(key);
+            }
+            try {
+                return blob.getSize();
+            } catch (MissingBlobException e) { // should never happen
+                throw new RuntimeException("Missing blob after replcaing the blob: " +e.getMessage(), e);
+            } catch (IOException e) { // should also never happen
+                throw new RuntimeException("Error reading blob size: " +e.getMessage(), e);
             }
         } catch (DuplicateBlobException wontHappen) {
             throw new FaultException(wontHappen);

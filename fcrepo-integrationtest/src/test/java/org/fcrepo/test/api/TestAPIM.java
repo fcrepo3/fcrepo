@@ -1272,6 +1272,16 @@ public class TestAPIM
                                "count(//foxml:datastream[@ID!='AUDIT'])",
                                xmlIn);
 
+        // check datastream size - compare against original content
+        Datastream origManagedContent = apim.getDatastream("fedora-system:ContentModel-3.0", "DC", null);
+        long managedContentSize = origManagedContent.getSize();
+
+        assertXpathExists(
+                          "//foxml:datastreamVersion[@ID='NEWDS1.0' and @SIZE='" + managedContentSize + "']",
+                          xmlIn);
+
+
+
         //test adding X type datastream
         altIds[0] = "Datastream 2 Alternate ID";
         datastreamId =
@@ -1402,6 +1412,14 @@ public class TestAPIM
         assertXpathEvaluatesTo("8",
                                "count(//foxml:datastream[@ID!='AUDIT'])",
                                xmlIn);
+        // check size
+        assertXpathExists(
+                          "//foxml:datastreamVersion[@ID='NEWDS1.0' and @SIZE='" + managedContentSize + "']",
+                          xmlIn);
+        // check size in getDatastreamDissemination
+        Datastream ds1 = apim.getDatastream("demo:14", "NEWDS1", null);
+        assertEquals(managedContentSize, ds1.getSize());
+
 
         // (3) test modifyDatastreamByValue
         System.out.println("Running TestAPIM.testModifyDatastreamByValue...");

@@ -10,18 +10,20 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.storage.lowlevel.IListable;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 
 
 
@@ -94,14 +96,14 @@ public class AkubraLowlevelStorageModule
         impl.auditObject();
     }
 
-    public void addDatastream(String pid, InputStream content)
+    public long addDatastream(String pid, InputStream content)
             throws LowlevelStorageException {
-        impl.addDatastream(pid, content);
+        return impl.addDatastream(pid, content);
     }
 
-    public void replaceDatastream(String pid, InputStream content)
+    public long replaceDatastream(String pid, InputStream content)
             throws LowlevelStorageException {
-        impl.replaceDatastream(pid, content);
+        return impl.replaceDatastream(pid, content);
     }
 
     public InputStream retrieveDatastream(String pid)

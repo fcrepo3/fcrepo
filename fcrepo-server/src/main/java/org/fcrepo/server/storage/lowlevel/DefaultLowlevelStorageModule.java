@@ -145,14 +145,14 @@ public class DefaultLowlevelStorageModule
         m_llstore.auditObject();
     }
 
-    public void addDatastream(String pid, InputStream content)
+    public long addDatastream(String pid, InputStream content)
             throws LowlevelStorageException {
-        m_llstore.addDatastream(pid, content);
+        return m_llstore.addDatastream(pid, content);
     }
 
-    public void replaceDatastream(String pid, InputStream content)
+    public long replaceDatastream(String pid, InputStream content)
             throws LowlevelStorageException {
-        m_llstore.replaceDatastream(pid, content);
+        return m_llstore.replaceDatastream(pid, content);
     }
 
     public InputStream retrieveDatastream(String pid)

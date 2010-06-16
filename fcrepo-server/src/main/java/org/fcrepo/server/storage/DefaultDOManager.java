@@ -753,7 +753,7 @@ public class DefaultDOManager
      *        the character encoding of the XML ingest file (e.g., UTF-8)
      * @param pid
      *        "new" if the system should generate a new PID for the object, otherwise
-     *        the value of the additional pid parameter for ingests (may be null or any valid pid) 
+     *        the value of the additional pid parameter for ingests (may be null or any valid pid)
      */
     public synchronized DOWriter getIngestWriter(boolean cachedObjectRequired,
                                                  Context context,
@@ -847,7 +847,7 @@ public class DefaultDOManager
                 }
 
                 // If the PID was supplied as additional parameter (see REST
-                // API), make sure it doesn't conflict with the (optional) PID 
+                // API), make sure it doesn't conflict with the (optional) PID
                 // of the digital object
                 if (pid != null && pid.length() > 0 && !pid.equals("new")) {
                     if (obj.getPid() != null && obj.getPid().length() > 0) {
@@ -1201,15 +1201,15 @@ public class DefaultDOManager
                                     logger.info("Getting managed datastream from remote location: " + dmc.DSLocation);
                                 }
                                 if (obj.isNew()) {
-                                    m_permanentStore.addDatastream(internalId, mimeTypedStream.getStream());
+                                    dmc.DSSize = m_permanentStore.addDatastream(internalId, mimeTypedStream.getStream());
                                 } else {
                                     // object already existed...so we may need to call
                                     // replace if "add" indicates that it was already there
                                     try {
-                                        m_permanentStore
+                                        dmc.DSSize = m_permanentStore
                                                 .addDatastream(internalId, mimeTypedStream.getStream());
                                     } catch (ObjectAlreadyInLowlevelStorageException oailse) {
-                                        m_permanentStore
+                                        dmc.DSSize = m_permanentStore
                                                 .replaceDatastream(internalId, mimeTypedStream.getStream());
                                     }
                                 }

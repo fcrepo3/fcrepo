@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.fcrepo.common.FaultException;
+
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.ObjectAlreadyInLowlevelStorageException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
@@ -95,14 +96,14 @@ public class DefaultLowlevelStorage
         objectStore.audit();
     }
 
-    public void addDatastream(String pid, InputStream content)
+    public long addDatastream(String pid, InputStream content)
             throws LowlevelStorageException {
-        datastreamStore.add(pid, content);
+        return datastreamStore.add(pid, content);
     }
 
-    public void replaceDatastream(String pid, InputStream content)
+    public long replaceDatastream(String pid, InputStream content)
             throws LowlevelStorageException {
-        datastreamStore.replace(pid, content);
+        return datastreamStore.replace(pid, content);
     }
 
     public InputStream retrieveDatastream(String pid)
@@ -214,8 +215,9 @@ public class DefaultLowlevelStorage
         /**
          * add to lowlevel store content of Fedora object not already in
          * lowlevel store
+         * @return size - size of the object stored
          */
-        public final void add(String pid, InputStream content)
+        public final long add(String pid, InputStream content)
                 throws LowlevelStorageException {
             String filePath;
             File file = null;
@@ -248,13 +250,14 @@ public class DefaultLowlevelStorage
             }
             fileSystem.write(file, content);
             pathRegistry.put(pid, filePath);
+            return file.length();
         }
 
         /**
          * replace into low-level store content of Fedora object already in
          * lowlevel store
          */
-        public final void replace(String pid, InputStream content)
+        public final long replace(String pid, InputStream content)
                 throws LowlevelStorageException {
             String filePath;
             File file = null;
@@ -284,6 +287,7 @@ public class DefaultLowlevelStorage
                 throw newFile;
             }
             fileSystem.rewrite(file, content);
+            return file.length();
         }
 
         /** get content of Fedora object from low-level store */

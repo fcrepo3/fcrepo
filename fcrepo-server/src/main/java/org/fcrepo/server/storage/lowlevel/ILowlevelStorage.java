@@ -93,8 +93,9 @@ public interface ILowlevelStorage {
      * @param content the content.
      * @throws LowlevelStorageException if the datastream version already
      *         exists or cannot be added for any other reason.
+     * @returns size - the size of the added object in bytes
      */
-    public void addDatastream(String dsKey, InputStream content)
+    public long addDatastream(String dsKey, InputStream content)
             throws LowlevelStorageException;
 
     /**
@@ -105,8 +106,9 @@ public interface ILowlevelStorage {
      * @param content the content.
      * @throws LowlevelStorageException if the datastream version does not
      *         already exist or cannot be replaced for any other reason.
+     * @returns size - the size of the added object in bytes
      */
-    public void replaceDatastream(String dsKey, InputStream content)
+    public long replaceDatastream(String dsKey, InputStream content)
             throws LowlevelStorageException;
 
     /**

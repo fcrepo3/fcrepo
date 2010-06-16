@@ -29,9 +29,13 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.common.xml.format.XMLFormat;
+
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.errors.ValidationException;
@@ -47,9 +51,8 @@ import org.fcrepo.server.storage.types.Disseminator;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationUtility;
+
 import org.fcrepo.utilities.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 
@@ -794,6 +797,8 @@ public class FOXMLDODeserializer
         ds.DSMIME = m_dsMimeType;
         ds.DSControlGrp = m_dsControlGrp;
         ds.DSState = m_dsState;
+        if (m_dsControlGrp.equals("M"))
+            ds.DSSize = m_dsSize; // X datastreams have their own instantiator; E and R don't have (persisted) SIZE
         ds.DSLocation = m_dsLocation;
         ds.DSLocationType = m_dsLocationType;
         ds.DSInfoType = ""; // METS legacy
