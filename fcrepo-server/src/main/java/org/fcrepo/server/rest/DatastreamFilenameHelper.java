@@ -26,6 +26,7 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.access.Access;
+import org.fcrepo.server.errors.DatastreamNotFoundException;
 import org.fcrepo.server.management.Management;
 import org.fcrepo.server.storage.RDFRelationshipReader;
 import org.fcrepo.server.storage.types.DatastreamDef;
@@ -284,7 +285,12 @@ public class DatastreamFilenameHelper {
         String filename = "";
 
         // read rels directly from RELS-INT - can't use Management.getRelationships as this requires auth
-        MIMETypedStream relsInt = m_apiAService.getDatastreamDissemination(context, pid, "RELS-INT", null);
+        MIMETypedStream relsInt;
+        try {
+            relsInt = m_apiAService.getDatastreamDissemination(context, pid, "RELS-INT", null);
+        } catch (DatastreamNotFoundException e) {
+            return ""; // no RELS-INT - so no filename
+        }
         Set<RelationshipTuple> relsIntTuples = RDFRelationshipReader.readRelationships(relsInt.getStream());
 
         // find the tuple specifying the filename
