@@ -58,6 +58,10 @@
     <extension>xls</extension>
   </mime-mapping>
   <mime-mapping>
+    <mime-type>application/vnd.ms-word</mime-type>
+    <extension>doc</extension>
+  </mime-mapping>
+  <mime-mapping>
     <mime-type>application/vnd.ms-powerpoint</mime-type>
     <extension>ppt</extension>
   </mime-mapping>
