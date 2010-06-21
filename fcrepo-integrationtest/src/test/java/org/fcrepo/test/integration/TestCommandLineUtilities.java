@@ -4,17 +4,22 @@
  */
 package org.fcrepo.test.integration;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.test.DemoObjectTestSetup;
-import org.fcrepo.test.FedoraServerTestCase;
-import org.fcrepo.utilities.ExecUtility;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import org.fcrepo.client.FedoraClient;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.management.FedoraAPIM;
+
+import org.fcrepo.test.DemoObjectTestSetup;
+import org.fcrepo.test.FedoraServerTestCase;
+
+import org.fcrepo.utilities.ExecUtility;
 
 
 /**
@@ -123,6 +128,8 @@ public class TestCommandLineUtilities
     }
 
     public void testBatchModify() throws Exception {
+        // Note: test will fail if default control group for DC datastreams (fedora.fcfg) is not X
+        // as the modify script specifies control group "X" when modifying DC
         System.out.println("Running batch modify of objects");
         batchModify(new File(FEDORA_HOME
                              + "/client/demo/batch-demo/modify-batch-directives.xml"),

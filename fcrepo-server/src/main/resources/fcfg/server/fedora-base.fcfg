@@ -188,6 +188,15 @@
 	    	character encoding that should be used. Default is UTF-8.</comment>
 	   	</param>
 	    <param name="defaultExportFormat" value="info:fedora/fedora-system:FOXML-1.1"/>
+        <param name="defaultDCControlGroup" value="X">
+            <comment>The control group to use for the system-generated DC datastream
+            if no DC datastream is present on ingest.  Must be "X" or "M".</comment>
+        </param>
+        <param name="defaultRELSControlGroup" value="X">
+            <comment>The control group to use for system-generated RELS-EXT and 
+            RELS-INT datastreams where these are not already present when
+            adding relationships via addRelationship.  Must be "X" or "M".</comment>
+        </param>
         <param name="gSearchRESTURL" value="http://localhost:8080/fedoragsearch/rest">
             <comment>The REST endpoint of the Fedora Generic Search service.
             This parameter is only required if GSearchDOManager is 

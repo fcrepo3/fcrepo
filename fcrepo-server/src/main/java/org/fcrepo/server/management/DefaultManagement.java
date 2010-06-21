@@ -9,9 +9,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -25,10 +28,22 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+
 import org.apache.commons.betwixt.XMLUtils;
+
+import org.jrdf.graph.URIReference;
+
+import org.w3c.dom.Document;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
 import org.fcrepo.common.rdf.SimpleURIReference;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.RecoveryContext;
 import org.fcrepo.server.Server;
@@ -55,17 +70,11 @@ import org.fcrepo.server.storage.types.DatastreamReferencedContent;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.fcrepo.server.storage.types.XMLDatastreamProcessor;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationConstants;
 import org.fcrepo.server.validation.ValidationUtility;
-import org.jrdf.graph.URIReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 /**
  * Implements API-M without regard to the transport/messaging protocol.
@@ -449,7 +458,7 @@ public class DefaultManagement
                     dsm.xmlContent = getEmbeddableXML(in);
                     ValidationUtility.validateReservedDatastream(PID.getInstance(pid),
                                                                  dsID,
-                                                                 dsm.getContentStream());
+                                                                 dsm);
                     if (mimeTypedStream != null) {
                         mimeTypedStream.close();
                     }
@@ -516,6 +525,13 @@ public class DefaultManagement
             ds.DatastreamAltIDs = altIDs;
             ds.DSMIME = MIMEType;
             ds.DSChecksumType = Datastream.validateChecksumType(checksumType);
+
+            // M reserved datastream validation (X done above)
+            if (controlGroup.equals("M")) {
+                ValidationUtility.validateReservedDatastream(PID.getInstance(pid),
+                                                             dsID,
+                                                             ds);
+            }
 
             if (checksum != null && checksumType != null) {
                 String check = ds.getChecksum();
@@ -714,6 +730,12 @@ public class DefaultManagement
             newds.DSLocation = dsLocation;
             newds.DSChecksumType = checksumType;
 
+            // validate reserved datastreams (type M and X)
+            ValidationUtility.validateReservedDatastream(PID.getInstance(pid),
+                                                         datastreamId,
+                                                         newds);
+
+
             // next, add the datastream via the object writer
             w.addDatastream(newds, orig.DSVersionable);
 
@@ -814,8 +836,9 @@ public class DefaultManagement
 
             checkDatastreamLabel(dsLabel);
             w = m_manager.getWriter(Server.USE_DEFINITIVE_STORE, context, pid);
-            org.fcrepo.server.storage.types.Datastream orig =
+            Datastream orig =
                     w.GetDatastream(datastreamId, null);
+            XMLDatastreamProcessor origxml = new XMLDatastreamProcessor(orig);
 
             // if provided, check request lastModifiedDate against the datastream,
             // rejecting the request if the datastream's mod date is more recent.
@@ -835,9 +858,9 @@ public class DefaultManagement
             if (orig.DSState.equals("D")) {
                 throw new GeneralException("Changing attributes on deleted datastreams is forbidden.");
             }
-            if (!orig.DSControlGrp.equals("X")) {
-                throw new GeneralException("Only content of inline XML datastreams may"
-                                           + " be modified by value.\n"
+            if (!orig.DSControlGrp.equals("X") && !orig.DSControlGrp.equals("M")) {
+                throw new GeneralException("Only content of inline XML and managed content"
+                                           + " datastreams may be modified by value.\n"
                                            + "Use modifyDatastreamByReference instead.");
             }
 
@@ -862,19 +885,21 @@ public class DefaultManagement
                 checksumType = Datastream.validateChecksumType(checksumType);
             }
 
-            DatastreamXMLMetadata newds = new DatastreamXMLMetadata();
-            newds.DSMDClass = ((DatastreamXMLMetadata) orig).DSMDClass;
+            // create new datastream (version) based on existing one
+            XMLDatastreamProcessor newdsxml = origxml.newVersion();
+            Datastream newds = newdsxml.getDatastream();
+            newdsxml.setDSMDClass(origxml.getDSMDClass());
             if (dsContent == null) {
                 // If the dsContent input stream parm is null,
                 // that means "do not change the content".
                 // Accordingly, here we just make a copy of the old content.
-                newds.xmlContent = ((DatastreamXMLMetadata) orig).xmlContent;
+                newdsxml.setXMLContent(origxml.getXMLContent());
             } else {
                 // set and validate the content
-                newds.xmlContent = getEmbeddableXML(dsContent);
+                newdsxml.setXMLContent(getEmbeddableXML(dsContent));
                 ValidationUtility.validateReservedDatastream(PID.getInstance(pid),
                                                              orig.DatastreamID,
-                                                             newds.getContentStream());
+                                                             newds);
             }
 
             // update ds attributes that are common to all versions...
@@ -1815,7 +1840,7 @@ public class DefaultManagement
                                     + "' because it expired.");
                     } else {
                         logger.warn("Could not remove expired uploaded file '"
-                                    + id + "'. Check permissions in management/upload/ directory.");
+                                    + id + "'. Check permissions in " + m_tempDir.getPath() + " directory.");
                     }
                 }
             }

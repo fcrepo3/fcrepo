@@ -10,16 +10,19 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.FaultException;
 import org.fcrepo.common.PID;
+
 import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.errors.ValidationException;
 import org.fcrepo.server.security.PolicyParser;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamManagedContent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 
@@ -87,10 +90,10 @@ public abstract class ValidationUtility {
             throws ValidationException {
         try {
             for (Datastream ds: reader.GetDatastreams(null, null)) {
-                if ("X".equals(ds.DSControlGrp)) {
+                if ("X".equals(ds.DSControlGrp) || "M".equals(ds.DSControlGrp)) {
                     validateReservedDatastream(PID.getInstance(reader.GetObjectPID()),
                                                ds.DatastreamID,
-                                               ds.getContentStream());
+                                               ds);
                 }
             }
         } catch (ValidationException e) {
@@ -107,17 +110,31 @@ public abstract class ValidationUtility {
      */
     public static void validateReservedDatastream(PID pid,
                                                   String dsId,
-                                                  InputStream content)
+                                                  Datastream ds)
             throws ValidationException {
+
+        // NB: only want to generate inputstream from .getContentStream() once
+        // we know that this is a datastream to validate
+        // to prevent reading of non-reserved datstream content when it is not needed
+        InputStream content = null;
+
+        try {
         if ("POLICY".equals(dsId)) {
+                content = ds.getContentStream();
             validatePOLICY(content);
         } else if ("RELS-EXT".equals(dsId) || "RELS-INT".equals(dsId)) {
+                content = ds.getContentStream();
             validateRELS(pid, dsId, content);
-        } else {
+            }
+        } catch (StreamIOException e) {
+            throw new ValidationException("Failed to get content stream for " + pid + "/" + dsId + ": " + e.getMessage(), e);
+        }
+
+        if (content != null) {
             try {
                 content.close();
             } catch (IOException e) {
-                logger.warn("Error closing stream", e);
+                throw new ValidationException("Error closing content stream for " + pid + "/" + dsId + ": " + e.getMessage(), e);
             }
         }
     }

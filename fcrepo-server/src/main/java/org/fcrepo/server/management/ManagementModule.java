@@ -6,6 +6,7 @@ package org.fcrepo.server.management;
 
 import java.io.File;
 import java.io.InputStream;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -13,6 +14,9 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
@@ -27,8 +31,6 @@ import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Edwin Shin
@@ -94,7 +96,7 @@ public class ManagementModule
         // and 2) reading in the existing files, if any, and setting their
         // startTime to the current time.
         try {
-            m_tempDir = new File(getServer().getHomeDir(), "management/upload");
+            m_tempDir = getServer().getUploadDir();
             if (!m_tempDir.isDirectory()) {
                 m_tempDir.mkdirs();
             }

@@ -1,0 +1,6 @@
+<rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
+          <rdf:Description rdf:about="info:fedora/demo:SmileyPens_M">
+            <rel:isMemberOf rdf:resource="info:fedora/demo:SmileyStuff"></rel:isMemberOf>
+            <fedora-model:hasModel rdf:resource="info:fedora/demo:DualResImage"></fedora-model:hasModel>
+          </rdf:Description>
+        </rdf:RDF>

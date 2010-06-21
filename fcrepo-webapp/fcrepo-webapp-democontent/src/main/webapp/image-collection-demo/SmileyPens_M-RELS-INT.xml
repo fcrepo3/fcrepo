@@ -1,0 +1,11 @@
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:exif="http://ns.adobe.com/exif/1.0/">
+          <rdf:Description rdf:about="info:fedora/demo:SmileyPens_M/MEDIUM_SIZE">
+            <exif:PixelXDimension>320</exif:PixelXDimension>
+            <exif:PixelYDimension>240</exif:PixelYDimension>
+          </rdf:Description>
+          <rdf:Description rdf:about="info:fedora/demo:SmileyPens_M/FULL_SIZE">
+            <exif:PixelXDimension>800</exif:PixelXDimension>
+
+            <exif:PixelYDimension>600</exif:PixelYDimension>
+          </rdf:Description>
+        </rdf:RDF>

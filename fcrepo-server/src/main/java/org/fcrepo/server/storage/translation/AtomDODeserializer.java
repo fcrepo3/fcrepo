@@ -49,10 +49,14 @@ import org.apache.abdera.parser.Parser;
 import org.apache.abdera.util.MimeTypeHelper;
 import org.apache.abdera.xpath.XPath;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.MalformedPIDException;
 import org.fcrepo.common.PID;
 import org.fcrepo.common.xml.format.XMLFormat;
+
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.errors.ValidationException;
@@ -63,10 +67,9 @@ import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.validation.ValidationUtility;
+
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.NormalizedURI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 

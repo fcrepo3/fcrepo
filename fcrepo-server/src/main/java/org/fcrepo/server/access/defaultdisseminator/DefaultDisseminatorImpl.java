@@ -22,6 +22,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.access.Access;
 import org.fcrepo.server.access.ObjectProfile;
@@ -30,11 +31,12 @@ import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.DOReader;
-import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
+import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.MethodDef;
 import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
+
 import org.fcrepo.utilities.XmlTransformUtility;
 
 
@@ -264,11 +266,11 @@ public class DefaultDisseminatorImpl
      */
     public MIMETypedStream viewDublinCore() throws ServerException {
         // get dublin core record as xml
-        DatastreamXMLMetadata dcmd = null;
+        Datastream dcmd = null;
         InputStream in = null;
         try {
             dcmd =
-                    (DatastreamXMLMetadata) reader.GetDatastream("DC",
+                    reader.GetDatastream("DC",
                                                                  asOfDateTime);
             in =
                     new ByteArrayInputStream(new ObjectInfoAsXML()

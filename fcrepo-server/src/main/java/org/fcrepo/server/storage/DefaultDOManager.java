@@ -65,11 +65,11 @@ import org.fcrepo.server.storage.translation.DOTranslator;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamManagedContent;
-import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.DigitalObjectUtil;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.fcrepo.server.storage.types.XMLDatastreamProcessor;
 import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.DCFields;
 import org.fcrepo.server.utilities.SQLUtility;
@@ -939,7 +939,7 @@ public class DefaultDOManager
                 getWriteLock(obj.getPid());
 
                 // DEFAULT DATASTREAMS:
-                populateDC(obj, w, nowUTC);
+                populateDC(context, obj, w, nowUTC);
 
                 // DATASTREAM VALIDATION
                 ValidationUtility.validateReservedDatastreams(w);
@@ -989,21 +989,24 @@ public class DefaultDOManager
      * If there is already a DC datastream, ensure one of the
      * dc:identifier values is the PID of the object.
      */
-    private static void populateDC(DigitalObject obj,
+    private static void populateDC(Context ctx,
+                                   DigitalObject obj,
                                    DOWriter w,
                                    Date nowUTC)
             throws IOException, ServerException {
         logger.debug("Adding/Checking default DC datastream");
-        DatastreamXMLMetadata dc =
-                (DatastreamXMLMetadata) w.GetDatastream("DC", null);
+        Datastream dc =
+                w.GetDatastream("DC", null);
         DCFields dcf;
+        XMLDatastreamProcessor dcxml = null;
+
         if (dc == null) {
-            dc = new DatastreamXMLMetadata("UTF-8");
-            dc.DSMDClass = 0;
+            dcxml = new XMLDatastreamProcessor("DC");
+            dc = dcxml.getDatastream();
             //dc.DSMDClass=DatastreamXMLMetadata.DESCRIPTIVE;
             dc.DatastreamID = "DC";
             dc.DSVersionID = "DC1.0";
-            dc.DSControlGrp = "X";
+            //dc.DSControlGrp = "X"; set by XMLDatastreamProcessor instead
             dc.DSCreateDT = nowUTC;
             dc.DSLabel = "Dublin Core Record for this object";
             dc.DSMIME = "text/xml";
@@ -1017,7 +1020,8 @@ public class DefaultDOManager
             }
             w.addDatastream(dc, dc.DSVersionable);
         } else {
-            dcf = new DCFields(new ByteArrayInputStream(dc.xmlContent));
+            dcxml = new XMLDatastreamProcessor(dc);
+            dcf = new DCFields(new ByteArrayInputStream(dcxml.getXMLContent()));
         }
         // ensure one of the dc:identifiers is the pid
         boolean sawPid = false;
@@ -1031,7 +1035,7 @@ public class DefaultDOManager
         }
         // set the value of the dc datastream according to what's in the DCFields object
         try {
-            dc.xmlContent = dcf.getAsXML().getBytes("UTF-8");
+            dcxml.setXMLContent(dcf.getAsXML().getBytes("UTF-8"));
         } catch (UnsupportedEncodingException uee) {
             // safely ignore... we know UTF-8 works
         }
@@ -1056,6 +1060,27 @@ public class DefaultDOManager
         if (remove) {
 
             logger.info("Committing removal of " + obj.getPid());
+
+            // RESOURCE INDEX:
+            // remove digital object from the resourceIndex
+            // (nb: must happen before datastream storage removal - as relationships might be in managed datastreams)
+            if (m_resourceIndex.getIndexLevel() != ResourceIndex.INDEX_LEVEL_OFF) {
+                try {
+                    logger.info("Deleting from ResourceIndex");
+                    m_resourceIndex.deleteObject(new SimpleDOReader(null,
+                                                                    null,
+                                                                    null,
+                                                                    null,
+                                                                    null,
+                                                                    obj));
+                    logger.debug("Finished deleting from ResourceIndex");
+                } catch (ServerException se) {
+                    logger.warn("Object couldn't be removed from ResourceIndex ("
+                            + se.getMessage()
+                            + "), but that might be ok; continuing with purge");
+                }
+            }
+
 
             // DATASTREAM STORAGE:
             // remove any managed content datastreams associated with object
@@ -1116,24 +1141,6 @@ public class DefaultDOManager
                         + "), but that might be ok; continuing with purge");
             }
 
-            // RESOURCE INDEX:
-            // remove digital object from the resourceIndex
-            if (m_resourceIndex.getIndexLevel() != ResourceIndex.INDEX_LEVEL_OFF) {
-                try {
-                    logger.info("Deleting from ResourceIndex");
-                    m_resourceIndex.deleteObject(new SimpleDOReader(null,
-                                                                    null,
-                                                                    null,
-                                                                    null,
-                                                                    null,
-                                                                    obj));
-                    logger.debug("Finished deleting from ResourceIndex");
-                } catch (ServerException se) {
-                    logger.warn("Object couldn't be removed from ResourceIndex ("
-                            + se.getMessage()
-                            + "), but that might be ok; continuing with purge");
-                }
-            }
 
             // OBJECT INGEST (ADD) OR MODIFY...
         } else {
@@ -1213,16 +1220,22 @@ public class DefaultDOManager
                                                 .replaceDatastream(internalId, mimeTypedStream.getStream());
                                     }
                                 }
+                                if(mimeTypedStream != null) {
+                                    mimeTypedStream.close();
                                 if (dmc.DSLocation.startsWith(DatastreamManagedContent.TEMP_SCHEME)) {
                                     // delete the temp file created to store the binary content from archive
                                     File file = new File(dmc.DSLocation.substring(7));
-                                    file.delete();
+                                    if (file.exists()) {
+                                        if (!file.delete()) {
+                                            logger.warn("Failed to remove temp file, marked for deletion when VM closes: " + file.toString());
+                                            file.deleteOnExit();
+                                }
+                                    } else
+                                        logger.warn("Cannot delete temp file as it no longer exists: " + file.getAbsolutePath());
                                 }
                                 // Reset dsLocation in object to new internal location.
                                 dmc.DSLocation = internalId;
                                 logger.info("Replaced managed datastream location with internal id: " + internalId);
-                                if(mimeTypedStream != null) {
-                                    mimeTypedStream.close();
                                 }
                             } else if (!internalId.equals(dmc.DSLocation)) {
                                 logger.warn("Unrecognized DSLocation \"" + dmc.DSLocation + "\" given for datastream "

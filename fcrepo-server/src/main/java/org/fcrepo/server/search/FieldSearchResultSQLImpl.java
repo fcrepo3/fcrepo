@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ObjectIntegrityException;
@@ -25,11 +28,9 @@ import org.fcrepo.server.errors.UnrecognizedFieldException;
 import org.fcrepo.server.storage.ConnectionPool;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.RepositoryReader;
-import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
+import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.MD5Utility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -490,9 +491,9 @@ public class FieldSearchResultSQLImpl
         ObjectFields f;
         // If there's a DC record available, use SAX to parse the most
         // recent version of it into f.
-        DatastreamXMLMetadata dcmd = null;
+        Datastream dcmd = null;
         try {
-            dcmd = (DatastreamXMLMetadata) r.GetDatastream("DC", null);
+            dcmd = r.GetDatastream("DC", null);
         } catch (ClassCastException cce) {
             throw new ObjectIntegrityException("Object " + r.GetObjectPID()
                     + " has a DC datastream, but it's not inline XML.");

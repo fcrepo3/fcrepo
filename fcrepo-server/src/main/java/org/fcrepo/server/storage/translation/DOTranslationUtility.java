@@ -314,7 +314,7 @@ public abstract class DOTranslationUtility
      * "http://myrepo.com:8080/fedora/get/demo:1/sdef:1/getFoo?in="
      * http://myrepo.com:8080/fedora/get/demo:2/DC"
      *
-     * @param xmlContent
+     * @param m_xmlContent
      * @return String with all relative repository URLs and Fedora local URLs
      *         converted to absolute URL syntax.
      */

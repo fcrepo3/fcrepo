@@ -4,28 +4,39 @@
  */
 package org.fcrepo.test.api;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+
+import java.net.URLEncoder;
+
+import java.rmi.RemoteException;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.common.Constants;
-import org.fcrepo.common.Models;
-import org.fcrepo.common.PID;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.RelationshipTuple;
-import org.fcrepo.test.FedoraServerTestCase;
-import org.openrdf.rio.ntriples.NTriplesParser;
+
 import org.trippi.TripleIterator;
 import org.trippi.io.RIOTripleIterator;
 
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.Map;
+import org.openrdf.rio.ntriples.NTriplesParser;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import org.fcrepo.client.FedoraClient;
+
+import org.fcrepo.common.Constants;
+import org.fcrepo.common.Models;
+import org.fcrepo.common.PID;
+
+import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.types.gen.RelationshipTuple;
+
+import org.fcrepo.test.FedoraServerTestCase;
+import org.fcrepo.test.ManagedContentTranslator;
 
 
 /**
@@ -71,8 +82,18 @@ public class TestRelationships
             "demo:888", // deprecated
             "info:fedora/demo:888",
             "info:fedora/demo:888/DS1",
-            "info:fedora/demo:888/DS2"};
+            "info:fedora/demo:888/DS2",
+            // objects with managed content RELS-EXT/RELS-INT
+            "demo:777m", // deprecated
+            "info:fedora/demo:777m",
+            "info:fedora/demo:777m/DS1",
+            "info:fedora/demo:777m/DS2",
+            "demo:888m", // deprecated
+            "info:fedora/demo:888m",
+            "info:fedora/demo:888m/DS1",
+            "info:fedora/demo:888m/DS2"};
 
+    // test objects.  Note that setup also creates clones of these with managed content RELS-EXT/RELS-INT (and DC)
     static {
         // Test FOXML object with RELS-EXT and RELS-INT datastream
         StringBuilder sb = new StringBuilder();
@@ -169,12 +190,18 @@ public class TestRelationships
 
         apim.ingest(DEMO_888_FOXML, FOXML1_1.uri, "ingesting new foxml object");
         apim.ingest(DEMO_777_FOXML, FOXML1_1.uri, "ingesting new foxml object");
+
+        // managed content versions of above (reserved datastreams translated from X to M)
+        ManagedContentTranslator.createManagedClone(apim, "demo:888", "demo:888m");
+        ManagedContentTranslator.createManagedClone(apim, "demo:777", "demo:777m");
     }
 
     @Override
     public void tearDown() throws Exception {
         apim.purgeObject("demo:777", "");
         apim.purgeObject("demo:888", "");
+        apim.purgeObject("demo:777m", "");
+        apim.purgeObject("demo:888m", "");
         XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
     }
 

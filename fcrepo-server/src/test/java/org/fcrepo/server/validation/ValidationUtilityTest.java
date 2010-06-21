@@ -10,8 +10,11 @@ import org.junit.Test;
 
 import org.xml.sax.SAXException;
 
+import junit.framework.JUnit4TestAdapter;
+
 import org.fcrepo.common.FaultException;
 import org.fcrepo.common.PID;
+
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.errors.ValidationException;
 import org.fcrepo.server.security.MockPolicyParser;
@@ -19,19 +22,15 @@ import org.fcrepo.server.security.PolicyParser;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.MockRepositoryReader;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
+import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.ObjectBuilder;
-import org.fcrepo.server.utilities.StreamUtility;
-import org.fcrepo.server.validation.ValidationUtility;
 
-import junit.framework.JUnit4TestAdapter;
-
-
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import static org.fcrepo.server.security.TestPolicyParser.POLICY_GOODENOUGH;
 import static org.fcrepo.server.security.TestPolicyParser.POLICY_QUESTIONABLE;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Unit tests for ValidationUtility.
@@ -72,12 +71,12 @@ public class ValidationUtilityTest {
         for (String url : urls_managed) {
             ValidationUtility.validateURL(url,"M");
         }
-        
+
         String[] urls = {"http://localhost",
                         "http://localhost:8080",
                         "uploaded:///tmp/foo.xml",
                         };
-        
+
         for (String url : urls) {
            ValidationUtility.validateURL(url,"M");
         }
@@ -229,16 +228,24 @@ public class ValidationUtilityTest {
     private static void validatePolicy(PolicyParser parser, String policy)
             throws IOException, SAXException, ValidationException {
         ValidationUtility.setPolicyParser(parser);
+        // need a datastream to validate
+        DatastreamXMLMetadata dsxml = new DatastreamXMLMetadata();
+        dsxml.xmlContent = policy.getBytes();
+
         ValidationUtility.validateReservedDatastream(PID.getInstance(TEST_PID),
                                                      "POLICY",
-                                                     StreamUtility.getStream(policy));
+                                                     dsxml);
     }
 
     private static void validateRels(String dsId, String rels)
             throws ValidationException {
+        // need a datastream to validate
+        DatastreamXMLMetadata dsxml = new DatastreamXMLMetadata();
+        dsxml.xmlContent = rels.getBytes();
+
         ValidationUtility.validateReservedDatastream(PID.getInstance(TEST_PID),
                                                      dsId,
-                                                     StreamUtility.getStream(rels));
+                                                     dsxml);
     }
 
     private static void validateReserved(PolicyParser parser, String[] dsData)

@@ -9,12 +9,12 @@ import java.io.InputStream;
 import java.util.Date;
 
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.access.ObjectProfile;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.utilities.DCFields;
@@ -187,7 +187,7 @@ public class ObjectInfoAsXML
         return out.toString();
     }
 
-    public String getOAIDublinCore(DatastreamXMLMetadata dublinCore)
+    public String getOAIDublinCore(Datastream dublinCore)
             throws ServerException {
         DCFields dc;
         if (dublinCore == null) {

@@ -24,7 +24,7 @@
       </foxml:xmlContent>
     </foxml:datastreamVersion>
   </foxml:datastream>
-  <foxml:datastream ID="RELS-EXT" CONTROL_GROUP="M" STATE="A">
+  <foxml:datastream ID="RELS-EXT" CONTROL_GROUP="X" STATE="A">
     <foxml:datastreamVersion FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT.0" MIMETYPE="application/rdf+xml" LABEL="RDF Statements about this object" CREATED="$DATETIME$">
       <foxml:xmlContent>
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
@@ -51,7 +51,7 @@
   </foxml:datastream>
 <!--  datastreams for content-disposition header (get datastream filename) testing -->
 <!--  RELS-INT: specifies filename for DS1 -->
-  <foxml:datastream ID="RELS-INT" CONTROL_GROUP="M" STATE="A">
+  <foxml:datastream ID="RELS-INT" CONTROL_GROUP="X" STATE="A">
     <foxml:datastreamVersion FORMAT_URI="info:fedora/fedora-system:FedoraRELSInt-1.0" ID="RELS-INT.0" MIMETYPE="application/rdf+xml" LABEL="RDF Statements about datastreams in this object" CREATED="$DATETIME$">
       <foxml:xmlContent>
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:fedora-model="$MODEL_URI$">

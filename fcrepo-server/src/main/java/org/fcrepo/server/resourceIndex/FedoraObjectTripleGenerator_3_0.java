@@ -21,10 +21,10 @@ import org.fcrepo.common.rdf.RDFName;
 import org.fcrepo.common.rdf.SimpleLiteral;
 import org.fcrepo.common.rdf.SimpleTriple;
 import org.fcrepo.common.rdf.SimpleURIReference;
+
 import org.fcrepo.server.errors.ResourceIndexException;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.DCFields;
@@ -70,7 +70,7 @@ public class FedoraObjectTripleGenerator_3_0
             for (Datastream ds : datastreams) {
                 addCoreDatastreamTriples(ds, objURI, set);
                 if (ds.DatastreamID.equals("DC")) {
-                    addDCTriples((DatastreamXMLMetadata) ds, objURI, set);
+                    addDCTriples(ds, objURI, set);
                 }
             }
 
@@ -146,7 +146,7 @@ public class FedoraObjectTripleGenerator_3_0
      * Add a statement about the object for each predicate, value pair expressed
      * in the DC datastream.
      */
-    private void addDCTriples(DatastreamXMLMetadata ds,
+    private void addDCTriples(Datastream ds,
                               URIReference objURI,
                               Set<Triple> set) throws Exception {
         DCFields dc = new DCFields(ds.getContentStream());

@@ -4,21 +4,27 @@
  */
 package org.fcrepo.test;
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.PrintStream;
+
+import java.util.Set;
+
 import org.custommonkey.xmlunit.XMLUnit;
+
+import org.w3c.dom.Document;
+
+import org.xml.sax.InputSource;
+
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.search.SearchResultParser;
 import org.fcrepo.client.utility.AutoPurger;
 import org.fcrepo.client.utility.ingest.Ingest;
 import org.fcrepo.client.utility.ingest.IngestCounter;
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.util.Set;
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.management.FedoraAPIM;
 
 
 /**
@@ -127,6 +133,13 @@ public abstract class FedoraServerTestCase
                                   new PrintStream(File.createTempFile("demo",
                                                                       null)),
                                   new IngestCounter());
+        // clone some demo objects to managed-content equivalents for reserved datastreams (RELS-*, DC)
+        try {
+            ManagedContentTranslator.createManagedClone(client.getAPIM(), "demo:SmileyPens", "demo:SmileyPens_M");
+            ManagedContentTranslator.createManagedClone(client.getAPIM(), "demo:SmileyBeerGlass", "demo:SmileyBeerGlass_M");
+        } catch (Exception e) { // ignore errors, just log (for cases where ingest repeated before purge done)
+            System.out.println("Could not create managed clone test objects: " + e.getMessage());
+    }
     }
 
     /**

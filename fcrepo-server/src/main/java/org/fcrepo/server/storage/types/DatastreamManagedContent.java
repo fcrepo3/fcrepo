@@ -1,3 +1,4 @@
+
 /* The contents of this file are subject to the license and copyright terms
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
@@ -10,6 +11,9 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
 
 import org.fcrepo.server.Context;
@@ -18,7 +22,6 @@ import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.errors.ValidationException;
-import org.fcrepo.server.management.Management;
 import org.fcrepo.server.storage.ContentManagerParams;
 import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
@@ -34,6 +37,10 @@ import org.fcrepo.server.validation.ValidationUtility;
 public class DatastreamManagedContent
         extends Datastream {
 
+    private static final Logger logger =
+        LoggerFactory.getLogger(DatastreamManagedContent.class);
+
+
     /**
      * Internal scheme to indicating that a copy should made of the resource.
      */
@@ -45,11 +52,13 @@ public class DatastreamManagedContent
 
     private static ILowlevelStorage s_llstore;
 
-    private static Management s_mgmt;
+    private static Server m_server;
 
     private static ExternalContentManager s_ecm;
 
     private static File m_tempUploadDir;
+
+    public int DSMDClass = 0;
 
     public DatastreamManagedContent() {
     }
@@ -64,11 +73,8 @@ public class DatastreamManagedContent
     private ILowlevelStorage getLLStore() throws Exception {
         if (s_llstore == null) {
             try {
-                Server server =
-                        Server.getInstance(new File(Constants.FEDORA_HOME),
-                                           false);
                 s_llstore =
-                        (ILowlevelStorage) server
+                        (ILowlevelStorage) getServer()
                                 .getModule("org.fcrepo.server.storage.lowlevel.ILowlevelStorage");
             } catch (InitializationException ie) {
                 throw new Exception("Unable to get LLStore Module: "
@@ -77,27 +83,15 @@ public class DatastreamManagedContent
         }
         return s_llstore;
     }
-
-    private Management getManagement() throws Exception {
-        if (s_mgmt == null) {
-            Server server;
-            try {
-                server = Server.getInstance(new File(Constants.FEDORA_HOME),
-                                   false);
-                s_mgmt = (Management) server.getModule("org.fcrepo.server.management.Management");
-            } catch (InitializationException e) {
-                throw new Exception("Unable to get Management Module: "
-                                    + e.getMessage(), e);
-            }
-        }
-        return s_mgmt;
-    }
-
+    /**
+     * Get the location for storing temporary uploaded files (not for general temporary files)
+     * @return the directory
+     * @throws Exception
+     */
     private File getTempUploadDir() throws Exception {
         if (m_tempUploadDir == null) {
             try {
-                m_tempUploadDir = Server.getInstance(new File(Constants.FEDORA_HOME),
-                                   false).getUploadDir();
+                m_tempUploadDir = getServer().getUploadDir();
             } catch (InitializationException e) {
                 throw new Exception("Unable to get server: " + e.getMessage(), e);
             }
@@ -105,13 +99,22 @@ public class DatastreamManagedContent
         return m_tempUploadDir;
     }
 
+    private Server getServer() throws Exception {
+        if (m_server == null) {
+            try {
+                m_server = Server.getInstance(new File(Constants.FEDORA_HOME),
+                                              false);
+            } catch (InitializationException e) {
+                throw new Exception("Unable to get Server: " + e.getMessage(), e);
+            }
+        }
+        return m_server;
+    }
+
     private ExternalContentManager getExternalContentManager() throws Exception {
         if (s_ecm == null) {
-            Server server;
             try {
-                server = Server.getInstance(new File(Constants.FEDORA_HOME),
-                                   false);
-                s_ecm = (ExternalContentManager) server
+                s_ecm = (ExternalContentManager) getServer()
                         .getModule("org.fcrepo.server.storage.ExternalContentManager");
             } catch (InitializationException e) {
                 throw new Exception("Unable to get ExternalContentManager Module: "
@@ -183,4 +186,45 @@ public class DatastreamManagedContent
                     + "\". Reason: " + th.getMessage(), th);
         }
     }
+
+    /**
+     * Set the contents of this managed datastream by storing as a temp file.  If the previous content
+     * was stored in a temp file, clean up this file.
+     * @param stream - the data to store in this datastream
+     * @throws StreamIOException
+     */
+    public void putContentStream(MIMETypedStream stream) throws StreamIOException {
+
+        // TODO: refactor to use proper temp file management - FCREPO-718
+        // for now, write to new temp file, clean up existing location
+        String oldDSLocation = DSLocation;
+        try {
+            // note: don't use temp upload dir, use (container's) temp dir (upload dir is for uploads)
+            File tempFile = File.createTempFile("managedcontentupdate", null);
+            OutputStream os = new FileOutputStream(tempFile);
+            StreamUtility.pipeStream(stream.getStream(), os, 32768);
+            DSLocation = TEMP_SCHEME + tempFile.getAbsolutePath();
+        } catch (Exception e) {
+            throw new StreamIOException("Error creating new temp file for updated managed content (existing content is:" + oldDSLocation + ")", e);
+        }
+
+        // if old location was a temp location, clean it up
+        // (if old location was uploaded, DefaultManagement should do this, but refactor up as part of FCREPO-718)
+        if (oldDSLocation != null && oldDSLocation.startsWith(TEMP_SCHEME)) {
+            File oldFile;
+            try {
+                oldFile = new File(oldDSLocation.substring(TEMP_SCHEME.length()));
+            } catch (Exception e) {
+                throw new StreamIOException("Error removing old temp file while updating managed content (location: " + oldDSLocation + ")", e);
+            }
+            if (oldFile.exists()) {
+                if (!oldFile.delete()) {
+                    logger.warn("Failed to delete temp file, marked for deletion when VM closes " + oldFile.getAbsolutePath());
+                    oldFile.deleteOnExit();
+                }
+            } else
+                logger.warn("Cannot delete temp file as it no longer exists " + oldFile.getAbsolutePath());
+        }
+    }
+
 }

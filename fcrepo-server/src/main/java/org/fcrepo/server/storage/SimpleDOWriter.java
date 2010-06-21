@@ -27,6 +27,7 @@ import org.fcrepo.common.PID;
 import org.fcrepo.common.rdf.SimpleLiteral;
 import org.fcrepo.common.rdf.SimpleTriple;
 import org.fcrepo.common.rdf.SimpleURIReference;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.GeneralException;
@@ -34,8 +35,8 @@ import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.translation.DOTranslator;
 import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
+import org.fcrepo.server.storage.types.XMLDatastreamProcessor;
 import org.fcrepo.server.utilities.FilteredTripleIterator;
 import org.fcrepo.server.validation.ValidationUtility;
 
@@ -275,6 +276,7 @@ public class SimpleDOWriter
         Triple toAdd =
                 createTriple(subject, relationship, object, isLiteral, datatype);
         Datastream relsDatastream = GetDatastream(dsId, null);
+        XMLDatastreamProcessor dsxml = null;
         if (relsDatastream == null) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             Map<String, String> map = new HashMap<String, String>();
@@ -293,8 +295,8 @@ public class SimpleDOWriter
                 throw new GeneralException(e.getMessage(), e);
             }
 
-            DatastreamXMLMetadata newds = new DatastreamXMLMetadata();
-            newds.DatastreamID = dsId;
+            dsxml = new XMLDatastreamProcessor(dsId);
+            Datastream newds = dsxml.getDatastream();
             newds.DatastreamAltIDs = new String[0];
             // formats for internal datastreams
             if (dsId.equals("RELS-EXT")) {
@@ -304,7 +306,7 @@ public class SimpleDOWriter
                     newds.DSFormatURI = RELS_INT1_0.uri;
             }
             newds.DSMIME = "application/rdf+xml";
-            newds.DSControlGrp = "X";
+            //newds.DSControlGrp = "X"; set by XMLDatastreamProcessor instead
             newds.DSInfoType = null;
             newds.DSState = "A";
             newds.DSVersionable = false;
@@ -314,14 +316,15 @@ public class SimpleDOWriter
             newds.DSLocation = null;
             newds.DSLocationType = null;
             newds.DSChecksumType = Datastream.getDefaultChecksumType();
-            newds.xmlContent = out.toByteArray();
-            newds.DSSize = newds.xmlContent.length;
+            dsxml.setXMLContent(out.toByteArray());
+            newds.DSSize = dsxml.getXMLContent().length;
 
             ValidationUtility.validateReservedDatastream(PID.getInstance(m_obj.getPid()),
                                                          newds.DatastreamID,
-                                                         newds.getContentStream());
+                                                         newds);
             addDatastream(newds, false);
         } else { // (relsDatastream != null)
+            dsxml = new XMLDatastreamProcessor(relsDatastream);
             FilteredTripleIterator newIter = null;
             try {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -332,14 +335,17 @@ public class SimpleDOWriter
                 newIter.toStream(out, RDFFormat.RDF_XML, false);
 
                 if (newIter.wasChangeMade()) {
-                    DatastreamXMLMetadata newds = new DatastreamXMLMetadata();
-                    newds.DSMDClass =
-                            ((DatastreamXMLMetadata) relsDatastream).DSMDClass;
+                    XMLDatastreamProcessor newdsxml = dsxml.newVersion();
+                    Datastream newds = newdsxml.getDatastream();
+
+                    // TODO: only for XML Metadata datastream
+                    newdsxml.setDSMDClass(dsxml.getDSMDClass());
+
                     newds.DatastreamID = relsDatastream.DatastreamID;
                     newds.DatastreamAltIDs = relsDatastream.DatastreamAltIDs;
                     newds.DSFormatURI = relsDatastream.DSFormatURI;
                     newds.DSMIME = relsDatastream.DSMIME;
-                    newds.DSControlGrp = "X";
+                    // newds.DSControlGrp = "X"; set by XMLDatastreamProcessor
                     newds.DSInfoType = relsDatastream.DSInfoType;
                     newds.DSState = relsDatastream.DSState;
                     newds.DSVersionable = relsDatastream.DSVersionable;
@@ -349,12 +355,12 @@ public class SimpleDOWriter
                     newds.DSLocation = null;
                     newds.DSLocationType = null;
                     newds.DSChecksumType = relsDatastream.DSChecksumType;
-                    newds.xmlContent = out.toByteArray();
-                    newds.DSSize = newds.xmlContent.length;
+                    newdsxml.setXMLContent(out.toByteArray());
+                    newds.DSSize = newdsxml.getXMLContent().length;
 
                     ValidationUtility.validateReservedDatastream(PID.getInstance(m_obj.getPid()),
                                                                  newds.DatastreamID,
-                                                                 newds.getContentStream());
+                                                                 newds);
                     addDatastream(newds, newds.DSVersionable);
                 } else {
                     // relationship already exists
@@ -404,6 +410,7 @@ public class SimpleDOWriter
             // relationship does not exist
             return false;
         } else { // (relsExt != null)
+            XMLDatastreamProcessor dsxml = new XMLDatastreamProcessor(relsDatastream);
             InputStream relsDatastreamIS = relsDatastream.getContentStream();
 
             TripleIterator iter = null;
@@ -417,14 +424,16 @@ public class SimpleDOWriter
                 newIter.toStream(out, RDFFormat.RDF_XML, false);
 
                 if (newIter.wasChangeMade()) {
-                    DatastreamXMLMetadata newds = new DatastreamXMLMetadata();
-                    newds.DSMDClass =
-                            ((DatastreamXMLMetadata) relsDatastream).DSMDClass;
+                    XMLDatastreamProcessor newdsxml = dsxml.newVersion();
+                    Datastream newds = newdsxml.getDatastream();
+                    // TODO: setting of this on DatastreamAsXML
+                    // TODO: wrap original datastream in handler class
+                    newdsxml.setDSMDClass(dsxml.getDSMDClass());
                     newds.DatastreamID = dsId;
                     newds.DatastreamAltIDs = relsDatastream.DatastreamAltIDs;
                     newds.DSFormatURI = relsDatastream.DSFormatURI;
                     newds.DSMIME = relsDatastream.DSMIME;
-                    newds.DSControlGrp = "X";
+                    // newds.DSControlGrp = "X"; set by XMLDatastreamProcessor
                     newds.DSInfoType = relsDatastream.DSInfoType;
                     newds.DSState = relsDatastream.DSState;
                     newds.DSVersionable = relsDatastream.DSVersionable;
@@ -435,12 +444,12 @@ public class SimpleDOWriter
                     newds.DSLocation = null;
                     newds.DSLocationType = null;
                     newds.DSChecksumType = relsDatastream.DSChecksumType;
-                    newds.xmlContent = out.toByteArray();
-                    newds.DSSize = newds.xmlContent.length;
+                    newdsxml.setXMLContent(out.toByteArray());
+                    newds.DSSize = newdsxml.getXMLContent().length;
 
                     ValidationUtility.validateReservedDatastream(PID.getInstance(m_obj.getPid()),
                                                                  newds.DatastreamID,
-                                                                 newds.getContentStream());
+                                                                 newds);
                     addDatastream(newds, newds.DSVersionable);
                 } else {
                     // relationship does not exist

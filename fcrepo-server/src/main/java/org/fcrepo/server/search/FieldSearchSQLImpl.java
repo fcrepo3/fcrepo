@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.RepositoryConfigurationException;
 import org.fcrepo.server.errors.ServerException;
@@ -26,13 +29,11 @@ import org.fcrepo.server.errors.UnrecognizedFieldException;
 import org.fcrepo.server.storage.ConnectionPool;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.RepositoryReader;
-import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
+import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.DCFields;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.SQLUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A FieldSearch implementation that uses a relational database as a backend.
@@ -173,9 +174,9 @@ public class FieldSearchSQLImpl
             dbRowValues[5] = "" + date.getTime();
 
             // do dc stuff if needed
-            DatastreamXMLMetadata dcmd = null;
+            Datastream dcmd = null;
             try {
-                dcmd = (DatastreamXMLMetadata) reader.GetDatastream("DC", null);
+                dcmd = reader.GetDatastream("DC", null);
             } catch (ClassCastException cce) {
                 throw new ObjectIntegrityException("Object "
                         + reader.GetObjectPID()

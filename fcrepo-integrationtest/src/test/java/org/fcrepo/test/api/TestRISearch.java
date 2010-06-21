@@ -4,17 +4,17 @@
  */
 package org.fcrepo.test.api;
 
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.common.Constants;
-import org.fcrepo.common.Models;
-import org.fcrepo.common.PID;
-import org.fcrepo.test.DemoObjectTestSetup;
-import org.fcrepo.test.FedoraServerTestCase;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.fcrepo.client.FedoraClient;
 
+import org.fcrepo.common.Constants;
+import org.fcrepo.common.Models;
+import org.fcrepo.common.PID;
+
+import org.fcrepo.test.DemoObjectTestSetup;
+import org.fcrepo.test.FedoraServerTestCase;
 
 import static org.fcrepo.test.api.RISearchUtil.checkSPOCount;
 
@@ -25,7 +25,7 @@ import static org.fcrepo.test.api.RISearchUtil.checkSPOCount;
  * @author Chris Wilper
  */
 public class TestRISearch
-        extends FedoraServerTestCase {
+extends FedoraServerTestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite("TestRISearch TestSuite");
@@ -40,6 +40,7 @@ public class TestRISearch
     public void testRISearchBasicCModel() throws Exception {
         FedoraClient client = getFedoraClient();
         for (String pid : new String[] { "demo:SmileyPens",
+                "demo:SmileyPens_M",
                                          "demo:SmileyGreetingCard" }) {
             String query = "<" + PID.toURI(pid) + ">"
                         + " <" + Constants.MODEL.HAS_MODEL.uri + ">"
@@ -56,6 +57,7 @@ public class TestRISearch
         FedoraClient client = getFedoraClient();
         String collectionPid = "demo:SmileyStuff";
         for (String pid : new String[] { "demo:SmileyPens",
+                "demo:SmileyPens_M",
                                          "demo:SmileyGreetingCard" }) {
             String query = "<" + PID.toURI(pid) + ">"
                         + " <" + Constants.RELS_EXT.IS_MEMBER_OF.uri + ">"
@@ -71,6 +73,7 @@ public class TestRISearch
     public void testRISearchRelsInt() throws Exception {
         FedoraClient client = getFedoraClient();
         for (String pid : new String[] { "demo:SmileyPens" ,
+                "demo:SmileyPens_M",
                                          "demo:SmileyGreetingCard" }) {
             String query = "<" + PID.toURI(pid) + "/MEDIUM_SIZE" + ">"
                         + " <" + "http://ns.adobe.com/exif/1.0/PixelXDimension" + ">"

@@ -1352,17 +1352,18 @@ public class TestAPIM
                                xmlIn);
 
 
-        // test adding RELS-EXT and RELS-INT datastreams triggers validation
-        // add RELS-EXT from a different object; will be invalid for this object
+        // test adding RELS-EXT, RELS-INT and DC datastreams triggers validation
+        // add RELS-EXT from a different object - will be invalid as RELS-* for this object
+        // (bad subject URI) and is also not valid DC
         // FIXME: consider refactoring into a general validation test suite
 
-        for (String relsDsId : new String[]{"RELS-EXT", "RELS-INT"}) {
+        for (String reservedDSID : new String[]{"RELS-EXT", "RELS-INT", "DC"}) {
             try {
                 altIds[0] = "Datastream 2 Alternate ID";
                 datastreamId =
                         apim
                                 .addDatastream("demo:18",
-                                               relsDsId,
+                                               reservedDSID,
                                                altIds,
                                                "A New RELS Datastream",
                                                true,
@@ -1373,10 +1374,82 @@ public class TestAPIM
                                                "A",
                                                null,
                                                null,
-                                               "adding new datastream");
-                fail(relsDsId + " was not validated on addDatastream");
+                                               "adding new invalid datastream");
+                fail(reservedDSID + " was not validated on addDatastream");
             } catch (RemoteException e) {
             }
+        }
+
+        // same for RELS-EXT and RELS-INT as managed content datastreams using demo:SmileyBeerGlass_M (managed content version of SmileyBeerGlass)
+        // object has pre-existing RELS-EXTso purge first
+        // FIXME: can't do this for DC as (default) content model checks make sure that datastreams used by disseminators can't be removed
+        String mcPID = "demo:SmileyBeerGlass_M";
+        String[] purgedDatastreams = apim.purgeDatastream(mcPID, "RELS-EXT", null, null, "Purge managed content datastream RELS-EXT" + mcPID);
+        assertTrue("Check purged managed datastream RELS-EXT", purgedDatastreams.length == 1);
+        for (String reservedDSID : new String[]{"RELS-EXT", "RELS-INT"}) {
+            try {
+                altIds[0] = "Datastream 2 Alternate ID";
+                datastreamId =
+                        apim
+                                .addDatastream(mcPID,
+                                               reservedDSID,
+                                               altIds,
+                                               "A New RELS Datastream",
+                                               true,
+                                               "application/rdf+xml",
+                                               "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                               getBaseURL() + "/get/fedora-system:ContentModel-3.0/RELS-EXT",
+                                               "M",
+                                               "A",
+                                               null,
+                                               null,
+                                               "adding new invalid datastream");
+                fail(reservedDSID + " was not validated on addDatastream (managed)");
+            } catch (RemoteException e) {
+            }
+        }
+
+        // add RELS-EXT, RELS-INT valid datastreams type M
+        // strictly speaking adding managed RELS-EXT etc should be covered by other add managed tests,
+        // but there's sufficient reserved-datastream-specific code to warrant this
+        // FIXME: also do for DC, can't do unless DC is purged, content model checks currently prevent this (DC used in default content model)
+        mcPID = "demo:SmileyPens_M";
+        purgedDatastreams = apim.purgeDatastream(mcPID, "RELS-EXT", null, null, "Purge managed content datastream RELS-EXT" + mcPID);
+        assertTrue("Check purged managed datastream RELS-EXT", purgedDatastreams.length == 1);
+        purgedDatastreams = apim.purgeDatastream(mcPID, "RELS-INT", null, null, "Purge managed content datastream RELS-INT" + mcPID);
+        assertTrue("Check purged managed datastream RELS-INT", purgedDatastreams.length == 1);
+
+        for (String reservedDSID : new String[]{"RELS-EXT", "RELS-INT"}) {
+            altIds[0] = "Datastream 2 Alternate ID";
+            datastreamId =
+                    apim
+                            .addDatastream(mcPID,
+                                           reservedDSID,
+                                           altIds,
+                                           "A New RELS Datastream",
+                                           true,
+                                           "application/rdf+xml",
+                                           "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                           getDemoBaseURL() + "/image-collection-demo/SmileyPens_M-" + reservedDSID + ".xml",
+                                           "M",
+                                           "A",
+                                           null,
+                                           null,
+                                           "adding new invalid datastream");
+
+            // check added datastreams
+            objectXML = apim.getObjectXML(mcPID);
+            assertTrue(objectXML.length > 0);
+            xmlIn = new String(objectXML, "UTF-8");
+            assertXpathExists("foxml:digitalObject[@PID='" + mcPID + "']", xmlIn);
+            assertXpathExists("//foxml:datastream[@ID='" + reservedDSID + "' and @CONTROL_GROUP='M' and @STATE='A']",
+                              xmlIn);
+            assertXpathExists(
+                    "//foxml:datastream[@ID='" + reservedDSID + "']/foxml:datastreamVersion[@ID='" + reservedDSID + ".0' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='info:fedora/fedora-system:FedoraRELSExt-1.0']",
+                    xmlIn);
+            assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
+                              xmlIn);
+
         }
 
 
@@ -1420,6 +1493,68 @@ public class TestAPIM
         Datastream ds1 = apim.getDatastream("demo:14", "NEWDS1", null);
         assertEquals(managedContentSize, ds1.getSize());
 
+        // test modifyDatastreamByReference RELS-EXT, RELS-INT triggers validation for managed content datastreams
+        // add RELS-EXT from some other object as that will be invalid for this object
+        // using demo:SmileyBeerGlass_M (managed content version of SmileyBeerGlass)
+        // TODO: DC also
+        mcPID = "demo:SmileyPens_M";
+        for (String reservedDSID : new String[]{"RELS-EXT", "RELS-INT"}) {
+            try {
+                altIds[0] = "Datastream 2 Alternate ID";
+                datastreamId =
+                    apim
+                    .modifyDatastreamByReference(mcPID,
+                                                 reservedDSID,
+                                                 altIds,
+                                                 "A New RELS Datastream",
+                                                 "application/rdf+xml",
+                                                 "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                                 getBaseURL() + "/get/fedora-system:ContentModel-3.0/RELS-EXT",
+                                                 null,
+                                                 null,
+                                                 "modifying by reference invalid datastream");
+                fail(reservedDSID + " was not validated on modifyDatastreamByReference");
+            } catch (RemoteException e) {
+            }
+        }
+
+        // modifyDatastreamByReference RELS-EXT, RELS-INT with valid content
+        // strictly speaking adding managed RELS-EXT etc should be covered by other add managed tests,
+        // but there's sufficient reserved-datastream-specific code to warrant this
+        // TODO: do for DC also
+        mcPID = "demo:SmileyPens_M";
+
+        for (String reservedDSID : new String[]{"RELS-EXT", "RELS-INT"}) {
+            altIds[0] = "Datastream 2 Alternate ID";
+            datastreamId =
+                apim
+                .modifyDatastreamByReference(mcPID,
+                                             reservedDSID,
+                                             altIds,
+                                             "A New RELS Datastream",
+                                             "application/rdf+xml",
+                                             "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                             getDemoBaseURL() + "/image-collection-demo/SmileyPens_M-" + reservedDSID + ".xml",
+                                             null,
+                                             null,
+                                             "modify reserved datastream by reference with valid content");
+
+
+            // check  datastreams
+            objectXML = apim.getObjectXML(mcPID);
+            assertTrue(objectXML.length > 0);
+            xmlIn = new String(objectXML, "UTF-8");
+            assertXpathExists("foxml:digitalObject[@PID='" + mcPID + "']", xmlIn);
+            assertXpathExists("//foxml:datastream[@ID='" + reservedDSID + "' and @CONTROL_GROUP='M' and @STATE='A']",
+                              xmlIn);
+            assertXpathExists(
+                    "//foxml:datastream[@ID='" + reservedDSID + "']/foxml:datastreamVersion[@ID='" + reservedDSID + ".1' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='info:fedora/fedora-system:FedoraRELSExt-1.0']",
+                    xmlIn);
+            assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
+                              xmlIn);
+
+        }
+
 
         // (3) test modifyDatastreamByValue
         System.out.println("Running TestAPIM.testModifyDatastreamByValue...");
@@ -1457,7 +1592,45 @@ public class TestAPIM
                                "count(//foxml:datastream[@ID!='AUDIT'])",
                                xmlIn);
 
-        // test modifyDatastreamByValue triggers RELS-EXT and RELS-INT validation
+        // (3.1) test modifyDatastreamByValue of M type modify
+        System.out.println("Running TestAPIM.testModifyDatastreamByValue...");
+        altIds = new String[1];
+        altIds[0] = "Datastream 1 Modified Alternate ID";
+        datastreamId =
+                apim
+                        .modifyDatastreamByValue("demo:14",
+                                                 "NEWDS1",
+                                                 altIds,
+                                                 "Modified M-type Datastream",
+                                                 "text/xml",
+                                                 "info:newMyFormatURI/Xtype/stuff#junk",
+                                                 dsXML,
+                                                 null,
+                                                 null,
+                                                 "modified datastream by value (M)");
+
+        // test that datastream was modified
+        objectXML = apim.getObjectXML("demo:14");
+        assertTrue(objectXML.length > 0);
+        xmlIn = new String(objectXML, "UTF-8");
+        //System.out.println("***** Testcase: TestAPIM.testModifyDatastreamByValue NEWDS2\n"+xmlIn);
+        assertXpathExists("foxml:digitalObject[@PID='demo:14']", xmlIn);
+        assertXpathExists("//foxml:datastream[@ID='NEWDS1' and @CONTROL_GROUP='M' and @STATE='A']",
+                          xmlIn);
+        assertXpathExists(
+                "//foxml:datastreamVersion[@ID='NEWDS1.2' and @MIMETYPE='text/xml' and @LABEL='Modified M-type Datastream' and @ALT_IDS='Datastream 1 Modified Alternate ID' and @FORMAT_URI='info:newMyFormatURI/Xtype/stuff#junk']",
+                xmlIn);
+        assertXpathExists("foxml:digitalObject/foxml:datastream[@ID='NEWDS1'][//dc:identifier='Identifier 5']",
+                          xmlIn);
+        assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['modifyDatastreamByValue']",
+                          xmlIn);
+        assertXpathEvaluatesTo("8",
+                               "count(//foxml:datastream[@ID!='AUDIT'])",
+                               xmlIn);
+
+
+
+        // test modifyDatastreamByValue triggers RELS-EXT and RELS-INT validation for type "X"
         // RELS datastream content is invalid as it's for a different object
         // FIXME: consider refactoring into a general validation test suite
         for (String relsDsId : new String[]{"RELS-EXT", "RELS-INT"}) {
@@ -1480,6 +1653,86 @@ public class TestAPIM
             }
         }
 
+        // test modifyDatastreamByValue RELS-EXT, RELS-INT triggers validation for type "M"
+        // using demo:SmileyPens_M (managed content version of demo:SmileyPens)
+        // TODO: do for DC also
+        mcPID = "demo:SmileyPens_M";
+        for (String reservedDSID : new String[]{"RELS-EXT", "RELS-INT"}) {
+            try {
+                altIds[0] = "Datastream 2 Alternate ID";
+
+                datastreamId =
+                    apim
+                    .modifyDatastreamByValue(mcPID,
+                                             reservedDSID,
+                                             altIds,
+                                             "A New RELS Datastream",
+                                             "application/rdf+xml",
+                                             "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                             "<node>with valid xml but not valid content for RELS-* or DC</node>".getBytes(),
+                                             null,
+                                             null,
+                                             "modifying by value M type reserved datastream");
+                fail(reservedDSID + " was not validated on modifyDatastreamByReference");
+            } catch (RemoteException e) {
+            }
+        }
+
+        // modifyDatastreamByValue RELS-EXT, RELS-INT with valid content, type "M"
+        // strictly speaking adding managed RELS-EXT etc should be covered by other add managed tests,
+        // but there's sufficient reserved-datastream-specific code to warrant this
+        // TODO: DC also?
+        mcPID = "demo:SmileyPens_M";
+
+        // some minimal rels valid content for demo:SmileyPens
+        String[] relsContent = new String[] {
+                                 "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " +
+                                 "xmlns:rel=\"http://www.example.org/test#\">" +
+                                 "<rdf:Description rdf:about=\"info:fedora/demo:SmileyPens_M\">" +
+                                 "<rel:dummy>stuff</rel:dummy>" +
+                                 "</rdf:Description>" +
+                                 "</rdf:RDF>",
+                                 "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " +
+                                 "xmlns:rel=\"http://www.example.org/test#\">" +
+                                 "<rdf:Description rdf:about=\"info:fedora/demo:SmileyPens_M/DC\">" +
+                                 "<rel:dummy>stuff</rel:dummy>" +
+                                 "</rdf:Description>" +
+                                 "</rdf:RDF>"
+        };
+
+        String[] relsIDs = new String[]{"RELS-EXT", "RELS-INT"};
+        for (int i = 0; i < relsIDs.length; i++) {
+            String reservedDSID = relsIDs[i];
+            altIds[0] = "Datastream 2 Alternate ID";
+
+
+            datastreamId =
+                apim
+                .modifyDatastreamByValue(mcPID,
+                                         reservedDSID,
+                                         altIds,
+                                         "A New RELS Datastream",
+                                         "application/rdf+xml",
+                                         "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                         relsContent[i].getBytes(),
+                                         null,
+                                         null,
+                                         "modify reserved M datastream by value with valid content");
+
+            // check  datastreams
+            objectXML = apim.getObjectXML(mcPID);
+            assertTrue(objectXML.length > 0);
+            xmlIn = new String(objectXML, "UTF-8");
+            assertXpathExists("foxml:digitalObject[@PID='" + mcPID + "']", xmlIn);
+            assertXpathExists("//foxml:datastream[@ID='" + reservedDSID + "' and @CONTROL_GROUP='M' and @STATE='A']",
+                              xmlIn);
+            assertXpathExists(
+                    "//foxml:datastream[@ID='" + reservedDSID + "']/foxml:datastreamVersion[@ID='" + reservedDSID + ".2' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='info:fedora/fedora-system:FedoraRELSExt-1.0']",
+                    xmlIn);
+            assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
+                              xmlIn);
+
+        }
 
         // (3.5) test modifyDatastreamByValue of METHODMAP datastream of BMech object
         System.out
@@ -1529,7 +1782,7 @@ public class TestAPIM
             assertTrue(af.getFaultString()
                     .contains("Unknown checksum algorithm specified:"));
         }
-        // test adding M type datastream with unimplemented checksum type and no altIDs, should fail throwing exception
+        // test modifyDatastreamByValue X type datastream with unimplemented checksum type and no altIDs, should fail throwing exception
         try {
             datastreamId =
                     apim.modifyDatastreamByValue("demo:14",
