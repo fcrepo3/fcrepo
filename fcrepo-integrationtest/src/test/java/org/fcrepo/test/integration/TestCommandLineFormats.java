@@ -5,29 +5,42 @@
 
 package org.fcrepo.test.integration;
 
-import junit.framework.JUnit4TestAdapter;
-import org.apache.abdera.Abdera;
-import org.apache.abdera.model.Document;
-import org.apache.abdera.model.Feed;
-import org.apache.abdera.parser.Parser;
-import org.custommonkey.xmlunit.NamespaceContext;
-import org.custommonkey.xmlunit.SimpleNamespaceContext;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.fcrepo.client.utility.export.Export;
-import org.fcrepo.client.utility.ingest.Ingest;
-import org.fcrepo.common.PID;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.test.FedoraTestCase;
-import org.fcrepo.test.api.TestAPIM;
-import org.fcrepo.utilities.FileUtils;
-import org.junit.After;
-import org.junit.Test;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.StringReader;
 
-import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import org.apache.abdera.Abdera;
+import org.apache.abdera.model.Document;
+import org.apache.abdera.model.Feed;
+import org.apache.abdera.parser.Parser;
+
+import org.custommonkey.xmlunit.NamespaceContext;
+import org.custommonkey.xmlunit.SimpleNamespaceContext;
+import org.custommonkey.xmlunit.XMLUnit;
+
+import org.junit.After;
+import org.junit.Test;
+
+import junit.framework.JUnit4TestAdapter;
+
+import org.fcrepo.client.utility.export.Export;
+import org.fcrepo.client.utility.ingest.Ingest;
+
+import org.fcrepo.common.PID;
+
+import org.fcrepo.server.management.FedoraAPIM;
+
+import org.fcrepo.test.FedoraTestCase;
+import org.fcrepo.test.api.TestAPIM;
+
+import org.fcrepo.utilities.FileUtils;
 
 
 /**
@@ -87,7 +100,7 @@ public class TestCommandLineFormats
             assertXpathEvaluatesTo("6", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
         } finally {
-            apim.purgeObject("demo:997", "");
+            apim.purgeObject("demo:997", "", false);
         }
     }
 
@@ -121,7 +134,7 @@ public class TestCommandLineFormats
             assertXpathEvaluatesTo("6", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
         } finally {
-            apim.purgeObject("demo:998", "");
+            apim.purgeObject("demo:998", "", false);
         }
     }
 
@@ -155,7 +168,7 @@ public class TestCommandLineFormats
             assertXpathEvaluatesTo("6", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
         } finally {
-            apim.purgeObject("demo:999", "");
+            apim.purgeObject("demo:999", "", false);
         }
     }
 
@@ -189,7 +202,7 @@ public class TestCommandLineFormats
             assertXpathEvaluatesTo("6", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
         } finally {
-            apim.purgeObject("demo:999b", "");
+            apim.purgeObject("demo:999b", "", false);
         }
     }
 
@@ -223,7 +236,7 @@ public class TestCommandLineFormats
             assertXpathEvaluatesTo("7", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
         } finally {
-            apim.purgeObject("demo:1000", "");
+            apim.purgeObject("demo:1000", "", false);
         }
     }
 
@@ -257,7 +270,7 @@ public class TestCommandLineFormats
             assertXpathEvaluatesTo("4", "count(//foxml:datastream)", xmlIn);
             assertXpathNotExists("//foxml:disseminator", xmlIn);
         } finally {
-            apim.purgeObject("demo:1001", "");
+            apim.purgeObject("demo:1001", "", false);
         }
     }
 
@@ -292,7 +305,7 @@ public class TestCommandLineFormats
             temp.delete();
             foxml10.delete();
         } finally {
-            apim.purgeObject("demo:998", "Purge test object");
+            apim.purgeObject("demo:998", "Purge test object", false);
         }
     }
 
@@ -327,7 +340,7 @@ public class TestCommandLineFormats
             temp.delete();
             foxml11.delete();
         } finally {
-            apim.purgeObject("demo:998", "Purge test object");
+            apim.purgeObject("demo:998", "Purge test object", false);
         }
     }
 
@@ -356,7 +369,7 @@ public class TestCommandLineFormats
             temp.delete();
             mets.delete();
         } finally {
-            apim.purgeObject("demo:998", "Purge test object");
+            apim.purgeObject("demo:998", "Purge test object", false);
         }
     }
 
@@ -385,7 +398,7 @@ public class TestCommandLineFormats
             temp.delete();
             mets.delete();
         } finally {
-            apim.purgeObject("demo:998", "Purge test object");
+            apim.purgeObject("demo:998", "Purge test object", false);
         }
     }
 
@@ -418,7 +431,7 @@ public class TestCommandLineFormats
             temp.delete();
             atom.delete();
         } finally {
-            apim.purgeObject("demo:998", "Purge test object");
+            apim.purgeObject("demo:998", "Purge test object", false);
         }
     }
 
@@ -458,7 +471,7 @@ public class TestCommandLineFormats
             temp.delete();
             atom.delete();
         } finally {
-            apim.purgeObject("demo:998", "Purge test object");
+            apim.purgeObject("demo:998", "Purge test object", false);
         }
     }
 

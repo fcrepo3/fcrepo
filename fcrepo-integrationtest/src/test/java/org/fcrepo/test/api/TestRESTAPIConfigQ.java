@@ -5,10 +5,15 @@
 package org.fcrepo.test.api;
 
 import org.fcrepo.common.PID;
+
 import org.fcrepo.server.management.FedoraAPIM;
+
 import org.fcrepo.test.FedoraServerTestCase;
 
-import static org.apache.commons.httpclient.HttpStatus.*;
+import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
+import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
+import static org.apache.commons.httpclient.HttpStatus.SC_OK;
+import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
 
 /**
  * Tests of the REST API based on the config Q settings.
@@ -79,7 +84,7 @@ public class TestRESTAPIConfigQ
         rest.url = String.format("/objects/%s", pid);
         assertEquals(SC_OK, rest.get(false).getStatusCode());
 
-        apim.purgeObject(pid.toString(), "");
+        apim.purgeObject(pid.toString(), "", false);
     }
 
 }

@@ -1,35 +1,41 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 
 package org.fcrepo.server.resourceIndex;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+
+import java.net.ConnectException;
+import java.net.Socket;
+
+import java.util.Date;
+import java.util.Map;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
+
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.config.ServerConfigurationParser;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.utilities.ServerUtility;
 import org.fcrepo.server.utilities.rebuild.Rebuild;
 import org.fcrepo.server.utilities.rebuild.Rebuilder;
+
 import org.fcrepo.test.FedoraTestCase;
+
 import org.fcrepo.utilities.ExecUtility;
 import org.fcrepo.utilities.Foxml11Document;
 import org.fcrepo.utilities.Foxml11Document.ControlGroup;
 import org.fcrepo.utilities.Foxml11Document.Property;
 import org.fcrepo.utilities.Foxml11Document.State;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.net.ConnectException;
-import java.net.Socket;
-import java.util.Date;
-import java.util.Map;
 
 
 /**
@@ -191,7 +197,7 @@ public class ResourceIndexRebuilderTest {
     private void purgeObjects(int count) throws Exception {
         for (int i = 0; i < count; i++) {
             String pid = String.format("demo:ri%s", i);
-            apim.purgeObject(pid, null);
+            apim.purgeObject(pid, null, false);
         }
     }
 

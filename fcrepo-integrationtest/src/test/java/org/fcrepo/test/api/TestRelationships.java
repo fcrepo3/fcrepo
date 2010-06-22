@@ -38,7 +38,6 @@ import org.fcrepo.server.types.gen.RelationshipTuple;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.fcrepo.test.ManagedContentTranslator;
 
-
 /**
  * Tests for the various relationship API-M methods. Tests assume a running
  * instance of the Fedora server with Resource Index enabled.
@@ -198,10 +197,10 @@ public class TestRelationships
 
     @Override
     public void tearDown() throws Exception {
-        apim.purgeObject("demo:777", "");
-        apim.purgeObject("demo:888", "");
-        apim.purgeObject("demo:777m", "");
-        apim.purgeObject("demo:888m", "");
+        apim.purgeObject("demo:777", "", false);
+        apim.purgeObject("demo:888", "", false);
+        apim.purgeObject("demo:777m", "", false);
+        apim.purgeObject("demo:888m", "", false);
         XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
     }
 

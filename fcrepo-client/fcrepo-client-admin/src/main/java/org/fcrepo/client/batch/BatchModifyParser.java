@@ -4,28 +4,44 @@
  */
 package org.fcrepo.client.batch;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.apache.axis.types.NonNegativeInteger;
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.client.Uploader;
-import org.fcrepo.client.batch.types.Datastream;
-import org.fcrepo.client.batch.types.DigitalObject;
-import org.fcrepo.client.utility.ingest.AutoIngestor;
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.*;
-import org.fcrepo.server.utilities.StreamUtility;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
+import org.fcrepo.client.FedoraClient;
+import org.fcrepo.client.Uploader;
+import org.fcrepo.client.batch.types.Datastream;
+import org.fcrepo.client.batch.types.DigitalObject;
+import org.fcrepo.client.utility.ingest.AutoIngestor;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.access.FedoraAPIA;
+import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.types.gen.ComparisonOperator;
+import org.fcrepo.server.types.gen.Condition;
+import org.fcrepo.server.types.gen.FieldSearchQuery;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.ObjectFields;
+import org.fcrepo.server.utilities.StreamUtility;
 
 
 /**
@@ -709,7 +725,8 @@ public class BatchModifyParser
                     String purgedPid = null;
                     purgedPid =
                             APIM.purgeObject(m_obj.pid,
-                                             "PurgeObject");
+                                             "PurgeObject",
+                                             false);
                     if (purgedPid != null) {
                         succeededCount++;
                         logSucceededDirective(m_obj.pid,
@@ -812,7 +829,8 @@ public class BatchModifyParser
                                                  m_ds.dsID,
                                                  m_ds.asOfDate,
                                                  m_ds.endDate,
-                                                 m_ds.logMessage);
+                                                 m_ds.logMessage,
+                                                 false);
                     if (versionsPurged.length > 0) {
                         succeededCount++;
                         if (m_ds.asOfDate != null && m_ds.endDate != null) {
@@ -889,7 +907,8 @@ public class BatchModifyParser
                                                      m_ds.xmlContent,
                                                      m_ds.checksumType,
                                                      m_ds.checksum,
-                                                     m_ds.logMessage);
+                                                     m_ds.logMessage,
+                                                     false);
                     } else if (m_ds.dsControlGrp.equalsIgnoreCase("E")
                                || m_ds.dsControlGrp.equalsIgnoreCase("M")
                                || m_ds.dsControlGrp.equalsIgnoreCase("R")) {
@@ -902,7 +921,8 @@ public class BatchModifyParser
                                                          m_ds.dsLocation,
                                                          m_ds.checksumType,
                                                          m_ds.checksum,
-                                                         m_ds.logMessage);
+                                                         m_ds.logMessage,
+                                                         false);
                     }
                     succeededCount++;
                     logSucceededDirective(m_ds.objectPID,

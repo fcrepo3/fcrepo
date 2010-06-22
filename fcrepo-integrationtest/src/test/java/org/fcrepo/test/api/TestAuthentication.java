@@ -15,14 +15,16 @@ import org.junit.After;
 
 import org.w3c.dom.Document;
 
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.test.FedoraServerTestCase;
-import org.fcrepo.test.OneEmptyObjectTestSetup;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import org.fcrepo.client.FedoraClient;
+
+import org.fcrepo.server.access.FedoraAPIA;
+import org.fcrepo.server.management.FedoraAPIM;
+
+import org.fcrepo.test.FedoraServerTestCase;
+import org.fcrepo.test.OneEmptyObjectTestSetup;
 
 
 

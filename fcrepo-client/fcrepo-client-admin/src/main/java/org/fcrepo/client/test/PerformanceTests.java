@@ -4,23 +4,33 @@
  */
 package org.fcrepo.client.test;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.io.PrintStream;
+
+import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import java.math.BigDecimal;
+
 import org.apache.axis.types.NonNegativeInteger;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+
 import org.fcrepo.client.FedoraClient;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
-
-import java.io.*;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 /**
@@ -194,7 +204,8 @@ public class PerformanceTests
                                          datastream,
                                          null,
                                          null,
-                                         "Modify Datastream Test");
+                                         "Modify Datastream Test",
+                                         false);
     }
 
     private void runModifyDatastreamByValue(String pid) throws Exception {
@@ -208,15 +219,16 @@ public class PerformanceTests
                                      dsContent.getBytes(),
                                      null,
                                      null,
-                                     "Modify Datastream Test");
+                                     "Modify Datastream Test",
+                                     false);
     }
 
     private void runPurgeDatastream(String pid, String dsId) throws Exception {
-        apim.purgeDatastream(pid, dsId, null, null, "Purge Datastream Test");
+        apim.purgeDatastream(pid, dsId, null, null, "Purge Datastream Test", false);
     }
 
     private void runPurgeObject(String pid) throws Exception {
-        apim.purgeObject(pid, "Removing Test Object");
+        apim.purgeObject(pid, "Removing Test Object", false);
     }
 
     private void runGetDatastream(String pid) throws Exception {

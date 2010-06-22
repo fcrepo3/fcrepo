@@ -4,23 +4,55 @@
  */
 package org.fcrepo.client.objecteditor;
 
-import org.fcrepo.client.Administrator;
-import org.fcrepo.server.types.gen.Datastream;
-import org.fcrepo.server.utilities.StreamUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FileDialog;
+import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.util.HashMap;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.*;
-import java.util.HashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.fcrepo.client.Administrator;
+
+import org.fcrepo.server.types.gen.Datastream;
+import org.fcrepo.server.utilities.StreamUtility;
 
 
 /**
@@ -1099,7 +1131,8 @@ public class DatastreamPane
                                                            content,
                                                            checksumType,
                                                            null, // checksum
-                                                           logMessage);
+                                                           logMessage,
+                                                           false);
             } else if (M) {
                 String loc = null; // if not set, server will not change content
                 if (m_importFile != null) {
@@ -1119,7 +1152,8 @@ public class DatastreamPane
                                                                loc,
                                                                checksumType,
                                                                null, // checksum
-                                                               logMessage);
+                                                               logMessage,
+                                                               false);
             } else {
                 // external ref or redirect
                 Administrator.APIM
@@ -1133,7 +1167,8 @@ public class DatastreamPane
                                                              .getText(),
                                                      checksumType,
                                                      null, // checksum
-                                                     logMessage);
+                                                     logMessage,
+                                                     false);
             }
         }
 
@@ -1552,7 +1587,8 @@ public class DatastreamPane
                                                          .getCreateDate(),
                                                  m_versions[sIndex1]
                                                          .getCreateDate(),
-                                                 "DatastreamPane generated this logMessage." // DEFAULT_LOGMESSAGE
+                                                 "DatastreamPane generated this logMessage.", // DEFAULT_LOGMESSAGE
+                                                 false
                                 );
                         if (removeAll) {
                             m_owner.remove(m_versions[0].getID());

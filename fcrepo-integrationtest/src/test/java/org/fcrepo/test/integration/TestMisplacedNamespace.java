@@ -4,15 +4,18 @@
  */
 package org.fcrepo.test.integration;
 
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.server.utilities.StreamUtility;
-import org.fcrepo.test.FedoraTestCase;
-import org.fcrepo.test.api.RISearchUtil;
+import java.io.IOException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
+import org.fcrepo.client.FedoraClient;
+
+import org.fcrepo.server.utilities.StreamUtility;
+
+import org.fcrepo.test.FedoraTestCase;
+import org.fcrepo.test.api.RISearchUtil;
 
 
 /**
@@ -52,7 +55,7 @@ public class TestMisplacedNamespace
     @Override
     @After
     public void tearDown() throws Exception {
-        m_client.getAPIM().purgeObject(PID, "Cleanup");
+        m_client.getAPIM().purgeObject(PID, "Cleanup", false);
     }
 
     @Test

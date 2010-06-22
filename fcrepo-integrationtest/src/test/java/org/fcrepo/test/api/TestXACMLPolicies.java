@@ -4,21 +4,33 @@
  */
 package org.fcrepo.test.api;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
 import org.fcrepo.client.FedoraClient;
+
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
 import org.fcrepo.server.types.gen.Property;
 import org.fcrepo.server.utilities.ServerUtility;
 import org.fcrepo.server.utilities.StreamUtility;
+
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
-
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 
 /**
@@ -128,15 +140,15 @@ public class TestXACMLPolicies
         Class modDSArgs[] =
                 {String.class, String.class, String[].class, String.class,
                  String.class, String.class, String.class, String.class,
-                 String.class, String.class};
+                 String.class, String.class, boolean.class};
         Object modDSParms1[] =
                 {"demo:5", "THUMBRES_IMG", null, null, null, null, null, null,
-                 null, null};
+                 null, null, false};
         Class purgeDSArgs[] =
                 {String.class, String.class, String.class, String.class,
-                 String.class};
+                 String.class, boolean.class};
         Object purgeDSParms1[] =
-                {"demo:5", "THUMBRES_IMG", null, null, null};
+                {"demo:5", "THUMBRES_IMG", null, null, null, false};
         Class setVersionableArgs[] =
                 {String.class, String.class, Boolean.TYPE, String.class};
         Object setVersionableFalse[] =
@@ -861,7 +873,7 @@ public class TestXACMLPolicies
 
     private void removeObjectSpecificPolicies() {
         try {
-            admin.getAPIM().purgeObject("demo:ObjSpecificTest", "");
+            admin.getAPIM().purgeObject("demo:ObjSpecificTest", "", false);
         } catch (Exception e) {
             throw new RuntimeException("Failure removing object-specific "
                                        + "policies", e);
@@ -915,7 +927,7 @@ public class TestXACMLPolicies
 
     private void removeTestObject(String pid) {
         try {
-            admin.getAPIM().purgeObject(pid, "");
+            admin.getAPIM().purgeObject(pid, "", false);
         } catch (Exception e) {
             throw new RuntimeException("Failure removing test object: " + pid, e);
         }

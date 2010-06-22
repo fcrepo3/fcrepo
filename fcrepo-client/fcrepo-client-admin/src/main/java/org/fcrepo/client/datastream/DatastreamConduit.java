@@ -4,14 +4,18 @@
  */
 package org.fcrepo.client.datastream;
 
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.Datastream;
+import java.net.MalformedURLException;
+
+import java.rmi.RemoteException;
 
 import javax.xml.rpc.ServiceException;
-import java.net.MalformedURLException;
-import java.rmi.RemoteException;
+
+import org.fcrepo.client.FedoraClient;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.types.gen.Datastream;
 
 
 /**
@@ -75,7 +79,8 @@ public class DatastreamConduit {
                                              location,
                                              checksumType,
                                              checksum,
-                                             logMessage);
+                                             logMessage,
+                                             false);
     }
 
     public void modifyDatastreamByReference(String pid,
@@ -123,7 +128,8 @@ public class DatastreamConduit {
                                          content,
                                          checksumType,
                                          checksum,
-                                         logMessage);
+                                         logMessage,
+                                         false);
     }
 
     public void modifyDatastreamByValue(String pid,
@@ -162,7 +168,8 @@ public class DatastreamConduit {
                                         dsId,
                                         startDT,
                                         endDT,
-                                        logMessage);
+                                        logMessage,
+                                        false);
     }
 
     public String[] purgeDatastream(String pid,

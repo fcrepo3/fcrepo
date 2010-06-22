@@ -281,13 +281,13 @@ public class TestCommandLineUtilities
     }
 
     private static void purgeFast(String pid) throws Exception {
-        getAPIM().purgeObject(pid, "because");
+        getAPIM().purgeObject(pid, "because", false);
     }
 
     private static void purgeFast(String[] pids) throws Exception {
         FedoraAPIM apim = getAPIM();
         for (String element : pids) {
-            apim.purgeObject(element, "because");
+            apim.purgeObject(element, "because", false);
         }
     }
 

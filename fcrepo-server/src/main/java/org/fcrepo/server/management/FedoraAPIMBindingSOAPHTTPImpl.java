@@ -10,11 +10,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import java.rmi.RemoteException;
+
 import java.util.Date;
 
 import org.apache.axis.types.NonNegativeInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.InitializationException;
@@ -23,8 +30,6 @@ import org.fcrepo.server.errors.StorageDeviceException;
 import org.fcrepo.server.utilities.AxisUtility;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.TypeUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implements the Fedora management SOAP service.
@@ -180,7 +185,7 @@ public class FedoraAPIMBindingSOAPHTTPImpl
         }
     }
 
-    public String purgeObject(String PID, String logMessage)
+    public String purgeObject(String PID, String logMessage, boolean force)
             throws java.rmi.RemoteException {
         logger.debug("start: purgeObject, " + PID);
         assertInitialized();
@@ -244,7 +249,8 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                               String dsLocation,
                                               String checksumType,
                                               String checksum,
-                                              String logMessage)
+                                              String logMessage,
+                                              boolean force)
             throws java.rmi.RemoteException {
         logger.debug("start: modifyDatastreamByReference, " + PID + ", "
                      + datastreamID);
@@ -282,7 +288,8 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                           byte[] dsContent,
                                           String checksumType,
                                           String checksum,
-                                          String logMessage)
+                                          String logMessage,
+                                          boolean force)
             throws java.rmi.RemoteException {
         logger.debug("start: modifyDatastreamByValue, " + PID + ", "
                      + datastreamID);
@@ -371,7 +378,8 @@ public class FedoraAPIMBindingSOAPHTTPImpl
                                     String datastreamID,
                                     String startDT,
                                     String endDT,
-                                    String logMessage)
+                                    String logMessage,
+                                    boolean force)
             throws java.rmi.RemoteException {
         logger.debug("start: purgeDatastream, " + PID + ", " + datastreamID);
         assertInitialized();

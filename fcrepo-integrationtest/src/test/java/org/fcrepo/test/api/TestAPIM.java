@@ -1175,7 +1175,7 @@ public class TestAPIM
         Iterator<String> it = serverAssignedPIDs.iterator();
         while (it.hasNext()) {
             pid = it.next();
-            result = apim.purgeObject(pid, "purging object " + pid);
+            result = apim.purgeObject(pid, "purging object " + pid, false);
             assertNotNull(result);
         }
     }
@@ -1384,7 +1384,7 @@ public class TestAPIM
         // object has pre-existing RELS-EXTso purge first
         // FIXME: can't do this for DC as (default) content model checks make sure that datastreams used by disseminators can't be removed
         String mcPID = "demo:SmileyBeerGlass_M";
-        String[] purgedDatastreams = apim.purgeDatastream(mcPID, "RELS-EXT", null, null, "Purge managed content datastream RELS-EXT" + mcPID);
+        String[] purgedDatastreams = apim.purgeDatastream(mcPID, "RELS-EXT", null, null, "Purge managed content datastream RELS-EXT" + mcPID, false);
         assertTrue("Check purged managed datastream RELS-EXT", purgedDatastreams.length == 1);
         for (String reservedDSID : new String[]{"RELS-EXT", "RELS-INT"}) {
             try {
@@ -1414,9 +1414,9 @@ public class TestAPIM
         // but there's sufficient reserved-datastream-specific code to warrant this
         // FIXME: also do for DC, can't do unless DC is purged, content model checks currently prevent this (DC used in default content model)
         mcPID = "demo:SmileyPens_M";
-        purgedDatastreams = apim.purgeDatastream(mcPID, "RELS-EXT", null, null, "Purge managed content datastream RELS-EXT" + mcPID);
+        purgedDatastreams = apim.purgeDatastream(mcPID, "RELS-EXT", null, null, "Purge managed content datastream RELS-EXT" + mcPID, false);
         assertTrue("Check purged managed datastream RELS-EXT", purgedDatastreams.length == 1);
-        purgedDatastreams = apim.purgeDatastream(mcPID, "RELS-INT", null, null, "Purge managed content datastream RELS-INT" + mcPID);
+        purgedDatastreams = apim.purgeDatastream(mcPID, "RELS-INT", null, null, "Purge managed content datastream RELS-INT" + mcPID, false);
         assertTrue("Check purged managed datastream RELS-INT", purgedDatastreams.length == 1);
 
         for (String reservedDSID : new String[]{"RELS-EXT", "RELS-INT"}) {
@@ -1467,7 +1467,8 @@ public class TestAPIM
                                                         getBaseURL() + "/get/fedora-system:ContentModel-3.0/DC",
                                                         null,
                                                         null,
-                                                        "modified datastream");
+                                                        "modified datastream",
+                                                        false);
 
         // test that datastream was modified
         objectXML = apim.getObjectXML("demo:14");
@@ -1512,7 +1513,8 @@ public class TestAPIM
                                                  getBaseURL() + "/get/fedora-system:ContentModel-3.0/RELS-EXT",
                                                  null,
                                                  null,
-                                                 "modifying by reference invalid datastream");
+                                                 "modifying by reference invalid datastream",
+                                                 false);
                 fail(reservedDSID + " was not validated on modifyDatastreamByReference");
             } catch (RemoteException e) {
             }
@@ -1537,7 +1539,8 @@ public class TestAPIM
                                              getDemoBaseURL() + "/image-collection-demo/SmileyPens_M-" + reservedDSID + ".xml",
                                              null,
                                              null,
-                                             "modify reserved datastream by reference with valid content");
+                                             "modify reserved datastream by reference with valid content",
+                                             false);
 
 
             // check  datastreams
@@ -1571,7 +1574,8 @@ public class TestAPIM
                                                  dsXML,
                                                  null,
                                                  null,
-                                                 "modified datastream");
+                                                 "modified datastream",
+                                                 false);
 
         // test that datastream was modified
         objectXML = apim.getObjectXML("demo:14");
@@ -1607,7 +1611,8 @@ public class TestAPIM
                                                  dsXML,
                                                  null,
                                                  null,
-                                                 "modified datastream by value (M)");
+                                                 "modified datastream by value (M)",
+                                                 false);
 
         // test that datastream was modified
         objectXML = apim.getObjectXML("demo:14");
@@ -1647,7 +1652,8 @@ public class TestAPIM
                                                          demo1001_relsext,
                                                          null,
                                                          null,
-                                                         "modifying datastream");
+                                                         "modifying datastream",
+                                                         false);
                 fail(relsDsId + " was not validated on modifyDatastreamByValue");
             } catch (RemoteException e) {
             }
@@ -1672,7 +1678,8 @@ public class TestAPIM
                                              "<node>with valid xml but not valid content for RELS-* or DC</node>".getBytes(),
                                              null,
                                              null,
-                                             "modifying by value M type reserved datastream");
+                                             "modifying by value M type reserved datastream",
+                                             false);
                 fail(reservedDSID + " was not validated on modifyDatastreamByReference");
             } catch (RemoteException e) {
             }
@@ -1717,7 +1724,8 @@ public class TestAPIM
                                          relsContent[i].getBytes(),
                                          null,
                                          null,
-                                         "modify reserved M datastream by value with valid content");
+                                         "modify reserved M datastream by value with valid content",
+                                         false);
 
             // check  datastreams
             objectXML = apim.getObjectXML(mcPID);
@@ -1748,7 +1756,8 @@ public class TestAPIM
                                                  null,
                                                  null,
                                                  null,
-                                                 "modified datastream");
+                                                 "modified datastream",
+                                                 false);
 
         // test that datastream was modified
         objectXML = apim.getObjectXML("demo:2");
@@ -1775,7 +1784,8 @@ public class TestAPIM
                                                  null,
                                                  "MD6",
                                                  null,
-                                                 "turned on checksumming");
+                                                 "turned on checksumming",
+                                                 false);
             // fail if datastream was modified
             Assert.fail();
         } catch (AxisFault af) {
@@ -1794,7 +1804,8 @@ public class TestAPIM
                                                  null,
                                                  "TIGER",
                                                  null,
-                                                 "turned on checksumming");
+                                                 "turned on checksumming",
+                                                 false);
             // fail if datastream was modified
             Assert.fail();
         } catch (AxisFault af) {
@@ -1811,7 +1822,8 @@ public class TestAPIM
                                              null,
                                              "MD5",
                                              null,
-                                             "turned on checksumming");
+                                             "turned on checksumming",
+                                             false);
 
         // test that datastream has a checksum that compares correctly
         String checksum =
@@ -1829,7 +1841,8 @@ public class TestAPIM
                                              null,
                                              "MD5",
                                              checksum,
-                                             "turned off checksumming");
+                                             "turned off checksumming",
+                                             false);
 
         // test that datastream has a checksum that compares correctly
         String checksum2 =
@@ -1847,7 +1860,8 @@ public class TestAPIM
                                              null,
                                              "DISABLED",
                                              null,
-                                             "turned off checksumming");
+                                             "turned off checksumming",
+                                             false);
 
         // test that datastream has a checksum that compares correctly
         checksum = apim.compareDatastreamChecksum("demo:14", "NEWDS2", null);
@@ -1911,7 +1925,8 @@ public class TestAPIM
                                                  getBaseURL() + "/get/demo:14/NEWDS2",
                                                  "MD5",
                                                  "4aff31a28b8335a24b95e02d85a0caa4",
-                                                 "modifying datastream with incorrect checksum");
+                                                 "modifying datastream with incorrect checksum",
+                                                 false);
             // fail if datastream was modified
             Assert.fail();
         } catch (AxisFault af) {
@@ -1930,7 +1945,8 @@ public class TestAPIM
                                              getBaseURL() + "/get/demo:14/NEWDS2",
                                              "MD5",
                                              checksum3,
-            "modifying datastream with correct checksum");
+            "modifying datastream with correct checksum",
+            false);
 
         // check the checksum
         checksum4 = apim.compareDatastreamChecksum("demo:14", "CHECKSUMDS", null);
@@ -1946,7 +1962,8 @@ public class TestAPIM
                                      "NEWDS1",
                                      "1900-01-01T00:00:00.000Z",
                                      null,
-                                     "purging datastream NEWDS1");
+                                     "purging datastream NEWDS1",
+                                     false);
         for (String element : results) {
             System.out
                     .println(
@@ -1961,7 +1978,8 @@ public class TestAPIM
                                      "NEWDS2",
                                      null,
                                      null,
-                                     "purging datastream NEWDS2");
+                                     "purging datastream NEWDS2",
+                                     false);
         for (String element : results) {
             System.out
                     .println(
@@ -1976,7 +1994,8 @@ public class TestAPIM
                                      "NEWDS3",
                                      "1900-01-01T00:00:00.000Z",
                                      "9999-01-01T00:00:00.000Z",
-                                     "purging datastream NEWDS3");
+                                     "purging datastream NEWDS3",
+                                     false);
         for (String element : results) {
             System.out
                     .println(
@@ -2385,7 +2404,7 @@ public class TestAPIM
         assertXpathEvaluatesTo("5", "count(//foxml:datastream[@ID!='AUDIT'])", xmlIn);
 
         // purge foxml 1.0 object
-        apim.purgeObject(pid, "purging object demo:997");
+        apim.purgeObject(pid, "purging object demo:997", false);
 
 
         // test ingesting mets 1.0 object
@@ -2416,7 +2435,7 @@ public class TestAPIM
         assertXpathExists("METS:mets[@LABEL='Data Object (Coliseum) for Local Simple Image Demo']", xmlIn);
 
         // purge mets 1.0 object
-        apim.purgeObject(pid, "purging object demo:999b");
+        apim.purgeObject(pid, "purging object demo:999b", false);
     }
 
     public static void main(String[] args) {

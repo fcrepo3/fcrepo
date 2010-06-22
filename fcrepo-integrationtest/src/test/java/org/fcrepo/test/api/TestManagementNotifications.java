@@ -5,18 +5,32 @@
 
 package org.fcrepo.test.api;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import org.fcrepo.common.PID;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.test.DemoObjectTestSetup;
-import org.fcrepo.test.FedoraServerTestCase;
+import java.io.UnsupportedEncodingException;
 
-import javax.jms.*;
+import java.util.Properties;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import java.io.UnsupportedEncodingException;
-import java.util.Properties;
+
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.Topic;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import org.fcrepo.common.PID;
+
+import org.fcrepo.server.management.FedoraAPIM;
+
+import org.fcrepo.test.DemoObjectTestSetup;
+import org.fcrepo.test.FedoraServerTestCase;
 
 
 /**
@@ -238,7 +252,7 @@ public class TestManagementNotifications
 
         // (5) test purgeObject
         System.out.println("Running TestManagementNotifications.testPurgeObject...");
-        String purgeResult = apim.purgeObject(pid, "Purging object " + pid);
+        String purgeResult = apim.purgeObject(pid, "Purging object " + pid, false);
         assertNotNull(purgeResult);
 
         // Check on the notification produced by purgeObject
@@ -321,7 +335,8 @@ public class TestManagementNotifications
                                                  getBaseURL() + "/get/fedora-system:ContentModel-3.0/DC",
                                                  null,
                                                  null,
-                                                 "modified datastream");
+                                                 "modified datastream",
+                                                 false);
         // test that method returned properly
         assertNotNull(updateTimestamp);
 
@@ -340,7 +355,8 @@ public class TestManagementNotifications
                                              dsXML,
                                              null,
                                              null,
-                                             "modified datastream");
+                                             "modified datastream",
+                                             false);
         // test that method returned properly
         assertNotNull(updateTimestamp);
 
@@ -379,7 +395,8 @@ public class TestManagementNotifications
                                      "NEWDS1",
                                      null,
                                      null,
-                                     "purging datastream NEWDS1");
+                                     "purging datastream NEWDS1",
+                                     false);
         assertTrue(results.length > 0);
 
         // Check on the notification produced by purgeDatastream
@@ -390,7 +407,8 @@ public class TestManagementNotifications
                                      "NEWDS2",
                                      null,
                                      null,
-                                     "purging datastream NEWDS2");
+                                     "purging datastream NEWDS2",
+                                     false);
         assertTrue(results.length > 0);
 
         // Check on the notification produced by purgeDatastream
@@ -414,7 +432,7 @@ public class TestManagementNotifications
         checkNotification(pid, "ingest");
 
         // Purge - message selector should prevent message from being delivered
-        String purgeResult = apim.purgeObject(pid, "Purging object " + pid);
+        String purgeResult = apim.purgeObject(pid, "Purging object " + pid, false);
         assertNotNull(purgeResult);
         checkNoNotifications();
     }

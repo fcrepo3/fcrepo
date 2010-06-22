@@ -4,7 +4,13 @@
  */
 package org.fcrepo.test.integration;
 
-import junit.framework.JUnit4TestAdapter;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+
+import java.util.Random;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
@@ -15,18 +21,18 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.PartSource;
+
+import org.junit.Test;
+
+import junit.framework.JUnit4TestAdapter;
+
 import org.fcrepo.client.FedoraClient;
+
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.types.gen.MIMETypedStream;
-import org.fcrepo.test.FedoraTestCase;
-import org.junit.Test;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Random;
+import org.fcrepo.test.FedoraTestCase;
 
 
 /**
@@ -53,7 +59,7 @@ public class TestLargeDatastreams
     private static byte[] DEMO_FOXML;
 
     private static long gigabyte = 1073741824;
-    private long fileSize = gigabyte * 5;
+    private final long fileSize = gigabyte * 5;
 
     static {
         // Test FOXML object
@@ -123,7 +129,7 @@ public class TestLargeDatastreams
         }
 
         // Clean up
-        apim.purgeObject(pid, "Removing Test Object");
+        apim.purgeObject(pid, "Removing Test Object", false);
         System.out.println("  Test Complete.");
     }
 

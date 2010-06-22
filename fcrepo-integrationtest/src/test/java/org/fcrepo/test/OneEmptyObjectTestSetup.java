@@ -6,7 +6,9 @@ package org.fcrepo.test;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.management.FedoraAPIM;
 
 
@@ -51,7 +53,7 @@ public class OneEmptyObjectTestSetup
     @Override
     public void tearDown() throws Exception {
         System.out.println("Purging test object: " + m_pid);
-        m_apim.purgeObject(m_pid, "");
+        m_apim.purgeObject(m_pid, "", false);
     }
 
 }

@@ -4,12 +4,15 @@
  */
 package org.fcrepo.test.integration.cma;
 
-import junit.framework.Assert;
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.test.FedoraServerTestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import junit.framework.Assert;
+
+import org.fcrepo.client.FedoraClient;
+
+import org.fcrepo.test.FedoraServerTestCase;
 
 import static org.fcrepo.test.integration.cma.Util.ingestTestObjects;
 
@@ -170,7 +173,7 @@ public class ConflictingDeploymentTests {
         ingestTestObjects(DEPLOYMENT_2_BASE);
 
         m_client.getAPIM()
-                .purgeObject(SDEP_1_PID, "removing first sDep");
+                .purgeObject(SDEP_1_PID, "removing first sDep", false);
 
         Assert.assertTrue("Did not disseminate expected content: ",
                           getDisseminatedContent().contains("CONTENT_2"));

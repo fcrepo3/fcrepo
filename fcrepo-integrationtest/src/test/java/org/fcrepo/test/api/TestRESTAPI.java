@@ -151,7 +151,7 @@ extends FedoraServerTestCase {
 
     @Override
     public void tearDown() throws Exception {
-        apim.purgeObject(pid.toString(), "");
+        apim.purgeObject(pid.toString(), "", false);
     }
 
     // determine if test config specifies that Access requests should be authorized

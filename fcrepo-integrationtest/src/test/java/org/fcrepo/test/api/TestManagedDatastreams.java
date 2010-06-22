@@ -4,29 +4,44 @@
  */
 package org.fcrepo.test.api;
 
-import junit.framework.JUnit4TestAdapter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.Writer;
+
+import java.rmi.RemoteException;
+
+import java.security.MessageDigest;
+
+import java.util.Date;
+
 import org.apache.abdera.Abdera;
 import org.apache.abdera.ext.thread.ThreadHelper;
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
-import org.fcrepo.common.PID;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.utilities.StringUtility;
-import org.fcrepo.test.FedoraServerTestCase;
-import org.fcrepo.utilities.Foxml11Document;
-import org.fcrepo.utilities.Foxml11Document.ControlGroup;
-import org.fcrepo.utilities.Foxml11Document.Property;
-import org.fcrepo.utilities.Foxml11Document.State;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
-import java.rmi.RemoteException;
-import java.security.MessageDigest;
-import java.util.Date;
+import junit.framework.JUnit4TestAdapter;
+
+import org.fcrepo.common.PID;
+
+import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.utilities.StringUtility;
+
+import org.fcrepo.test.FedoraServerTestCase;
+
+import org.fcrepo.utilities.Foxml11Document;
+import org.fcrepo.utilities.Foxml11Document.ControlGroup;
+import org.fcrepo.utilities.Foxml11Document.Property;
+import org.fcrepo.utilities.Foxml11Document.State;
 
 
 /**
@@ -137,7 +152,7 @@ public class TestManagedDatastreams
             }
 
         } finally {
-            apim.purgeObject(pid, "test");
+            apim.purgeObject(pid, "test", false);
         }
     }
 
@@ -170,7 +185,7 @@ public class TestManagedDatastreams
             // copy:// url
             modifyDatastreamByReference(pid, null);
         } finally {
-            apim.purgeObject(pid, "test");
+            apim.purgeObject(pid, "test", false);
         }
     }
 
@@ -189,7 +204,7 @@ public class TestManagedDatastreams
             assertEquals("DS", dsId);
 
             // Now ensure that bogus checksums do indeed fail
-            apim.purgeDatastream(pid, dsId, null, null, null);
+            apim.purgeDatastream(pid, dsId, null, null, null, false);
             checksum = "bogus";
             try {
                 addDatastream(pid, contentLocation, checksumType, checksum);
@@ -198,7 +213,7 @@ public class TestManagedDatastreams
                 assertTrue(e.getMessage().contains("Checksum Mismatch"));
             }
         } finally {
-            apim.purgeObject(pid, "test");
+            apim.purgeObject(pid, "test", false);
             if (temp != null) {
                 temp.delete();
             }
@@ -234,7 +249,7 @@ public class TestManagedDatastreams
                 assertTrue(e.getMessage().contains("Checksum Mismatch"));
             }
         } finally {
-            apim.purgeObject(pid, "test");
+            apim.purgeObject(pid, "test", false);
             if (temp != null) {
                 temp.delete();
             }
@@ -298,7 +313,8 @@ public class TestManagedDatastreams
                                                 contentLocation,
                                                 checksumType,
                                                 checksum,
-                                                "testManagedDatastreams");
+                                                "testManagedDatastreams",
+                                                false);
     }
 
     private Feed createAtomObject(String spid, String contentLocation) throws Exception {

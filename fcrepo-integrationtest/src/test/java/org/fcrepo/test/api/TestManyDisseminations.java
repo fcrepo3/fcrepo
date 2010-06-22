@@ -5,20 +5,25 @@
 
 package org.fcrepo.test.api;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.common.Constants;
-import org.fcrepo.common.Models;
-import org.fcrepo.common.PID;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.test.FedoraServerTestCase;
-
 import java.io.InputStream;
+
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
+
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import org.fcrepo.client.FedoraClient;
+
+import org.fcrepo.common.Constants;
+import org.fcrepo.common.Models;
+import org.fcrepo.common.PID;
+
+import org.fcrepo.server.management.FedoraAPIM;
+
+import org.fcrepo.test.FedoraServerTestCase;
 
 
 /**
@@ -171,10 +176,10 @@ public class TestManyDisseminations
 
         @Override
         public void tearDown() throws Exception {
-            APIM.purgeObject(DATA_OBJECT_PID, "");
-            APIM.purgeObject(SDEP_OBJECT_PID, "");
-            APIM.purgeObject(SDEF_OBJECT_PID, "");
-            APIM.purgeObject(CMODEL_OBJECT_PID, "");
+            APIM.purgeObject(DATA_OBJECT_PID, "", false);
+            APIM.purgeObject(SDEP_OBJECT_PID, "", false);
+            APIM.purgeObject(SDEF_OBJECT_PID, "", false);
+            APIM.purgeObject(CMODEL_OBJECT_PID, "", false);
         }
 
         private static byte[] getCModelObject() throws Exception {

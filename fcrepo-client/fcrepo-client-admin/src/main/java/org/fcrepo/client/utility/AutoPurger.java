@@ -4,14 +4,19 @@
  */
 package org.fcrepo.client.utility;
 
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.management.FedoraAPIM;
+import java.io.IOException;
+
+import java.net.MalformedURLException;
+
+import java.rmi.RemoteException;
 
 import javax.xml.rpc.ServiceException;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.rmi.RemoteException;
+
+import org.fcrepo.client.FedoraClient;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.management.FedoraAPIM;
 
 
 /**
@@ -34,7 +39,7 @@ public class AutoPurger {
     public static void purge(FedoraAPIM skeleton,
                              String pid,
                              String logMessage) throws RemoteException, IOException {
-        skeleton.purgeObject(pid, logMessage);
+        skeleton.purgeObject(pid, logMessage, false);
     }
 
     /**
