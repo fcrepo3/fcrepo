@@ -68,21 +68,47 @@
             <xsl:for-each select="//access:datastream">
               <tr>
                 <td>
-                  <a>
-                    <xsl:attribute name="href">
-                      <xsl:text>/</xsl:text>
-                      <xsl:value-of select="$fedora"/>
-                      <xsl:text>/objects/</xsl:text>
-                      <xsl:value-of select="encode-for-uri(../@pid)"/>
-                      <xsl:text>/datastreams/</xsl:text>
-                      <xsl:value-of select="@dsid"/>
-                      <xsl:if test="../@asOfDateTime">
-                        <xsl:text>/?asOfDateTime=</xsl:text>
-                        <xsl:value-of select="../@asOfDateTime" />
-                      </xsl:if>
-                    </xsl:attribute>
-                    <xsl:value-of select="@dsid"/>
-                  </a>
+                  <table width="100%">
+                    <tr>
+                      <td width="65%">
+                        <a>
+                          <xsl:attribute name="href">
+                            <xsl:text>/</xsl:text>
+                            <xsl:value-of select="$fedora"/>
+                            <xsl:text>/objects/</xsl:text>
+                            <xsl:value-of select="encode-for-uri(../@pid)"/>
+                            <xsl:text>/datastreams/</xsl:text>
+                            <xsl:value-of select="@dsid"/>
+                            <xsl:if test="../@asOfDateTime">
+                              <xsl:text>/?asOfDateTime=</xsl:text>
+                              <xsl:value-of select="../@asOfDateTime" />
+                            </xsl:if>
+                          </xsl:attribute>
+                          <xsl:value-of select="@dsid"/>
+                        </a>
+                      </td>
+                      <td width="35%">
+                        <font size="-1">
+                          <a>
+                            <xsl:attribute name="href">
+                              <xsl:text>/</xsl:text>
+                              <xsl:value-of select="$fedora"/>
+                              <xsl:text>/objects/</xsl:text>
+                              <xsl:value-of select="encode-for-uri(../@pid)"/>
+                              <xsl:text>/datastreams/</xsl:text>
+                              <xsl:value-of select="@dsid"/>
+                              <xsl:text>/content</xsl:text>
+                              <xsl:if test="../@asOfDateTime">
+                                <xsl:text>?asOfDateTime=</xsl:text>
+                                <xsl:value-of select="../@asOfDateTime" />
+                              </xsl:if>
+                            </xsl:attribute>
+                            <xsl:text>view content</xsl:text>
+                          </a>
+                        </font>
+                      </td>
+                    </tr>
+                  </table>
                 </td>
                 <td>
                   <xsl:value-of select="@label" />
