@@ -41,16 +41,26 @@
             </xsl:otherwise>
           </xsl:choose>
                     <p />
+                    <xsl:variable name="history-url">
+                        <xsl:text>objects/</xsl:text>
+                        <xsl:value-of select="encode-for-uri(@pid)" />
+                        <xsl:text>/datastreams/</xsl:text>
+                        <xsl:value-of select="@dsID" />
+                        <xsl:text>/history</xsl:text>
+                    </xsl:variable>
+                    
                     <xsl:variable name="content-url">
                         <xsl:text>objects/</xsl:text>
                         <xsl:value-of select="encode-for-uri(@pid)" />
                         <xsl:text>/datastreams/</xsl:text>
                         <xsl:value-of select="@dsID" />
                         <xsl:text>/content</xsl:text>
-                    </xsl:variable>        
-                    <font size="+1">
+                    </xsl:variable>
+                   <font size="+1">
+                      <a href="/{$fedora}/{$history-url}">View the Version History of this Datastream</a>
+                      <p/>
                       <a href="/{$fedora}/{$content-url}">View the Content of this Datastream</a>
-                    </font>
+                   </font>
           <p/>          
           <hr/>
           <table width="784" border="1" cellpadding="5" cellspacing="5" bgcolor="silver">

@@ -160,7 +160,7 @@ public class DatastreamResource
 
     /**
      * Invoke API-M.getDatastreamHistory(context,pid,dsId) GET
-     * /objects/{pid}/datastreams/{dsID}/versions
+     * /objects/{pid}/datastreams/{dsID}/history
      *
      * @param pid
      *        the PID of the digital object
@@ -170,7 +170,7 @@ public class DatastreamResource
      *        the desired format. Either html or "xml"
      * @return the response, either in XML or XHTML format
      */
-    @Path("/{dsID}/versions")
+    @Path("/{dsID}/history")
     @GET
     public Response getDatastreamHistory(@PathParam(RestParam.PID) String pid,
                                          @PathParam(RestParam.DSID) String dsID,

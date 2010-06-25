@@ -427,7 +427,7 @@ extends FedoraServerTestCase {
         assertEquals(SC_CREATED, response.getStatusCode());
 
         // Get history in XML format
-        url = String.format("/objects/demo:1234/datastreams/DS1/versions?format=xml");
+        url = String.format("/objects/demo:1234/datastreams/DS1/history?format=xml");
         if (this.getAuthAccess())
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         response = get(true);
