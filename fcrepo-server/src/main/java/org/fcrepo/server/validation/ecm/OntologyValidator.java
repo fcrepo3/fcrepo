@@ -138,7 +138,12 @@ public class OntologyValidator {
     private void checkMaxCardinality(String maxCardinality, String relationName, NodeList objectRelations,
                                      Validation validation, String contentModel) {
         int count = countRelations(relationName, objectRelations);
-        int cardint = Integer.parseInt(maxCardinality);
+        int cardint;
+        try {
+            cardint = Integer.parseInt(maxCardinality.trim());
+        } catch (NumberFormatException e) {
+            return;
+        }
         if (count > cardint) {
             validation.setValid(false);
             validation.getObjectProblems()
@@ -161,7 +166,12 @@ public class OntologyValidator {
     private void checkMinCardinality(String minCardinality, String relationName, NodeList relations,
                                      Validation validation, String contentModel) {
         int count = countRelations(relationName, relations);
-        int cardint = Integer.parseInt(minCardinality);
+        int cardint;
+        try {
+            cardint = Integer.parseInt(minCardinality.trim());
+        } catch (NumberFormatException e) {
+            return;
+        }
         if (count < cardint) {
             validation.setValid(false);
             validation.getObjectProblems()
@@ -184,7 +194,12 @@ public class OntologyValidator {
     private void checkCardinality(String cardinality, String relationName, NodeList relations,
                                   Validation validation, String contentModel) {
         int count = countRelations(relationName, relations);
-        int cardint = Integer.parseInt(cardinality);
+        int cardint;
+        try {
+            cardint = Integer.parseInt(cardinality.trim());
+        } catch (NumberFormatException e) {
+            return;
+        }
         if (count != cardint) {
             validation.setValid(false);
             validation.getObjectProblems()
