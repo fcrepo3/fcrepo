@@ -1,78 +1,451 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <foxml:digitalObject PID="fedora-system:ServiceDeployment-3.0" VERSION="1.1"
-  xmlns:foxml="info:fedora/fedora-system:def/foxml#"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
-  <foxml:objectProperties>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Content Model Object for Service Deployment Objects"/>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-02T05:09:43.796Z"/>
-    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-10-24T17:41:57.937Z"/>
-  </foxml:objectProperties> 
-  <foxml:datastream CONTROL_GROUP="X" ID="AUDIT" STATE="A" VERSIONABLE="false">
-    <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.796Z"
-      FORMAT_URI="info:fedora/fedora-system:format/xml.fedora.audit" ID="AUDIT.0" LABEL="Audit Trail for this object" MIMETYPE="text/xml">
-      <foxml:xmlContent>
-        <audit:auditTrail xmlns:audit="info:fedora/fedora-system:def/audit#">
-          <audit:record ID="AUDREC1">
-            <audit:process type="Fedora API-M"/>
-            <audit:action>modifyDatastreamByValue</audit:action>
-            <audit:componentID>DS-COMPOSITE-MODEL</audit:componentID>
-            <audit:responsibility>fedoraAdmin</audit:responsibility>
-            <audit:date>2008-10-24T17:41:57.937Z</audit:date>
-            <audit:justification>Modified DS-COMPOSITE-MODEL to include new versions of DSINPUTSPEC and METHODMAP</audit:justification>
-          </audit:record>
-        </audit:auditTrail>
-      </foxml:xmlContent>
-    </foxml:datastreamVersion>
-  </foxml:datastream>  
-  <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="false">
-    <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.406Z"
-      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0"
-      LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
-      <foxml:xmlContent>
-        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
-          <dc:title>Content Model Object for Service Deployment Objects</dc:title>
-          <dc:identifier>fedora-system:ServiceDeployment-3.0</dc:identifier>
-        </oai_dc:dc>
-      </foxml:xmlContent>
-    </foxml:datastreamVersion>
-  </foxml:datastream>
-  <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="false">
-    <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.406Z"
-      FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT1.0"
-      LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
-      <foxml:xmlContent>
-        <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-          <rdf:Description rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0">
-            <fedora-model:hasModel rdf:resource="info:fedora/fedora-system:ContentModel-3.0"/>
-          </rdf:Description>
-        </rdf:RDF>
-      </foxml:xmlContent>
-    </foxml:datastreamVersion>
-  </foxml:datastream>
-  <foxml:datastream CONTROL_GROUP="X" ID="DS-COMPOSITE-MODEL" STATE="A" VERSIONABLE="false">
-    <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.406Z"
-      FORMAT_URI="info:fedora/fedora-system:FedoraDSCompositeModel-1.0"
-      ID="DS-COMPOSITE-MODEL1.0" LABEL="Datastream Composite Model" MIMETYPE="text/xml">
-      <foxml:xmlContent>
-        <dsCompositeModel xmlns="info:fedora/fedora-system:def/dsCompositeModel#">
-          <dsTypeModel ID="RELS-EXT">
-            <form FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" MIME="application/rdf+xml"/>
-          </dsTypeModel>
-          <dsTypeModel ID="METHODMAP">
-            <form FORMAT_URI="info:fedora/fedora-system:FedoraSDepMethodMap-1.0" MIME="text/xml"/>
-            <form FORMAT_URI="info:fedora/fedora-system:FedoraSDepMethodMap-1.1" MIME="text/xml"/>
-          </dsTypeModel>
-          <dsTypeModel ID="DSINPUTSPEC">
-            <form FORMAT_URI="info:fedora/fedora-system:FedoraDSInputSpec-1.0" MIME="text/xml"/>
-            <form FORMAT_URI="info:fedora/fedora-system:FedoraDSInputSpec-1.1" MIME="text/xml"/>
-          </dsTypeModel>
-          <dsTypeModel ID="WSDL">
-            <form FORMAT_URI="http://schemas.xmlsoap.org/wsdl/" MIME="text/xml"/>
-          </dsTypeModel>
-        </dsCompositeModel>
-      </foxml:xmlContent>
-    </foxml:datastreamVersion>
-  </foxml:datastream>
+                     xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+    <foxml:objectProperties>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#label"
+                        VALUE="Content Model Object for Service Deployment Objects"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-02T05:09:43.796Z"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-10-24T17:41:57.937Z"/>
+    </foxml:objectProperties>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.406Z"
+                                 FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0"
+                                 LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
+                           xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+                    <dc:title>Content Model Object for Service Deployment Objects</dc:title>
+                    <dc:identifier>fedora-system:ServiceDeployment-3.0</dc:identifier>
+                </oai_dc:dc>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.406Z"
+                                 FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT1.0"
+                                 LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
+            <foxml:xmlContent>
+                <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                    <rdf:Description rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0">
+                        <fedora-model:hasModel rdf:resource="info:fedora/fedora-system:ContentModel-3.0"/>
+                    </rdf:Description>
+                </rdf:RDF>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="ONTOLOGY" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion
+                FORMAT_URI="info:fedora/fedora-system:FedoraOntology-1.0" ID="ONTOLOGY1.0"
+                LABEL="Class declaration for this content model" MIMETYPE="application/rdf+xml">
+            <foxml:xmlContent>
+                <rdf:RDF
+                        xmlns:owl="http://www.w3.org/2002/07/owl#"
+                        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                        xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0_class">
+                        <rdfs:subClassOf>
+                            <owl:Restriction>
+                                <owl:onProperty
+                                        rdf:resource="info:fedora/fedora-system:def/model#isDeploymentOf"/>
+                                <owl:allValuesFrom
+                                        rdf:resource="info:fedora/fedora-system:ServiceDefinition-3.0_class"/>
+                            </owl:Restriction>
+                        </rdfs:subClassOf>
+                        <rdfs:subClassOf>
+                            <owl:Restriction>
+                                <owl:onProperty
+                                        rdf:resource="info:fedora/fedora-system:def/model#isContractorOf"/>
+                                <owl:allValuesFrom rdf:resource="info:fedora/fedora-system:ContentModel-3.0_class"/>
+                            </owl:Restriction>
+                        </rdfs:subClassOf>
+                    </owl:Class>
+                    <owl:ObjectProperty
+                            rdf:about="info:fedora/fedora-system:def/model#isDeploymentOf"/>
+                    <owl:ObjectProperty
+                            rdf:about="info:fedora/fedora-system:def/model#isContractorOf"/>
+                </rdf:RDF>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+
+    <foxml:datastream CONTROL_GROUP="X" ID="DS-COMPOSITE-MODEL" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.406Z"
+                                 FORMAT_URI="info:fedora/fedora-system:FedoraDSCompositeModel-1.0"
+                                 ID="DS-COMPOSITE-MODEL1.0" LABEL="Datastream Composite Model" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <dsCompositeModel xmlns="info:fedora/fedora-system:def/dsCompositeModel#">
+                    <dsTypeModel ID="RELS-EXT">
+                        <form FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" MIME="application/rdf+xml"/>
+                    </dsTypeModel>
+                    <dsTypeModel ID="METHODMAP">
+                        <form FORMAT_URI="info:fedora/fedora-system:FedoraSDepMethodMap-1.0" MIME="text/xml"/>
+                        <form FORMAT_URI="info:fedora/fedora-system:FedoraSDepMethodMap-1.1" MIME="text/xml"/>
+                        <extension name="SCHEMA">
+                            <reference type="xsd" datastream="METHODMAP-1.0-SCHEMA"/>
+                        </extension>
+                        <extension name="SCHEMA">
+                            <reference type="xsd" datastream="METHODMAP-1.1-SCHEMA"/>
+                        </extension>
+                    </dsTypeModel>
+                    <dsTypeModel ID="DSINPUTSPEC">
+                        <form FORMAT_URI="info:fedora/fedora-system:FedoraDSInputSpec-1.0" MIME="text/xml"/>
+                        <form FORMAT_URI="info:fedora/fedora-system:FedoraDSInputSpec-1.1" MIME="text/xml"/>
+                        <extension name="SCHEMA">
+                            <reference type="xsd" datastream="DSINPUTSPEC-1.0-SCHEMA"/>
+                        </extension>
+                        <extension name="SCHEMA">
+                            <reference type="xsd" datastream="DSINPUTSPEC-1.1-SCHEMA"/>
+                        </extension>
+                    </dsTypeModel>
+                    <dsTypeModel ID="WSDL">
+                        <form FORMAT_URI="http://schemas.xmlsoap.org/wsdl/" MIME="text/xml"/>
+                        <extension name="SCHEMA">
+                            <reference type="xsd" datastream="WSDL-SCHEMA"/>
+                        </extension>
+                    </dsTypeModel>
+                </dsCompositeModel>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+
+    <foxml:datastream CONTROL_GROUP="X" ID="METHODMAP-1.0-SCHEMA" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="METHODMAP-1.0-SCHEMA1.0" LABEL="METHODMAP-1.0 xml schema" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <!--***********************************************************************-->
+                <!-- TITLE       : Fedora Service Deployment Method Map 1.0 XSD Schema     -->
+                <!-- DESCRIPTION : Extends the Service Definition schema by adding         -->
+                <!--               deployment-related attributes and elements.             -->
+                <!--***********************************************************************-->
+                <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                            targetNamespace="http://fedora.comm.nsdlib.org/service/methodmap"
+                            elementFormDefault="qualified">
+                    <xsd:element name="MethodMap">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="Method" maxOccurs="unbounded">
+                                    <xsd:complexType>
+                                        <xsd:sequence>
+                                            <xsd:element name="UserInputParm" minOccurs="0" maxOccurs="unbounded">
+                                                <xsd:complexType>
+                                                    <xsd:sequence>
+                                                        <xsd:element name="ValidParmValues" minOccurs="0">
+                                                            <xsd:complexType>
+                                                                <xsd:sequence>
+                                                                    <xsd:element name="ValidParm" maxOccurs="unbounded">
+                                                                        <xsd:complexType>
+                                                                            <xsd:attribute name="value" use="required">
+                                                                                <xsd:simpleType>
+                                                                                    <xsd:restriction base="xsd:string"/>
+                                                                                </xsd:simpleType>
+                                                                            </xsd:attribute>
+                                                                        </xsd:complexType>
+                                                                    </xsd:element>
+                                                                </xsd:sequence>
+                                                            </xsd:complexType>
+                                                        </xsd:element>
+                                                    </xsd:sequence>
+                                                    <xsd:attribute name="parmName" type="xsd:string"/>
+                                                    <xsd:attribute name="label" type="xsd:string" use="optional"/>
+                                                    <xsd:attribute name="required" type="xsd:boolean"/>
+                                                    <xsd:attribute name="defaultValue" type="xsd:string"/>
+                                                    <xsd:attribute name="passBy">
+                                                        <xsd:simpleType>
+                                                            <xsd:restriction base="xsd:string">
+                                                                <xsd:enumeration value="VALUE"/>
+                                                                <xsd:enumeration value="URL_REF"/>
+                                                            </xsd:restriction>
+                                                        </xsd:simpleType>
+                                                    </xsd:attribute>
+                                                </xsd:complexType>
+                                            </xsd:element>
+                                            <xsd:element name="DatastreamInputParm" minOccurs="0" maxOccurs="unbounded">
+                                                <xsd:complexType>
+                                                    <xsd:attribute name="parmName" type="xsd:string"/>
+                                                    <xsd:attribute name="label" type="xsd:string" use="optional"/>
+                                                    <xsd:attribute name="required" type="xsd:boolean"/>
+                                                    <xsd:attribute name="passBy">
+                                                        <xsd:simpleType>
+                                                            <xsd:restriction base="xsd:string">
+                                                                <xsd:enumeration value="VALUE"/>
+                                                                <xsd:enumeration value="URL_REF"/>
+                                                            </xsd:restriction>
+                                                        </xsd:simpleType>
+                                                    </xsd:attribute>
+                                                </xsd:complexType>
+                                            </xsd:element>
+                                            <xsd:element name="MethodReturnType">
+                                                <xsd:complexType>
+                                                    <xsd:attribute name="wsdlMsgName" type="xsd:string"/>
+                                                    <xsd:attribute name="wsdlMsgTOMIME" type="xsd:string"/>
+                                                </xsd:complexType>
+                                            </xsd:element>
+                                        </xsd:sequence>
+                                        <xsd:attribute name="operationName" type="xsd:string"/>
+                                        <xsd:attribute name="operationLabel" type="xsd:string" use="optional"/>
+                                        <xsd:attribute name="wsdlMsgName" type="xsd:string"/>
+                                        <xsd:attribute name="wsdlMsgOutput" type="xsd:string"/>
+                                    </xsd:complexType>
+                                </xsd:element>
+                            </xsd:sequence>
+                            <xsd:attribute name="bDefPID" type="xsd:string" use="required"/>
+                            <xsd:attribute name="name" type="xsd:string" use="required"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:schema>
+
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="METHODMAP-1.1-SCHEMA" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="METHODMAP-1.1-SCHEMA1.0" LABEL="METHODMAP-1.1 xml schema" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <!--***********************************************************************-->
+                <!-- TITLE       : Fedora Service Deployment Method Map 1.1 XSD Schema     -->
+                <!-- DESCRIPTION : Extends the Service Definition schema by adding         -->
+                <!--               deployment-related attributes and elements.             -->
+                <!--***********************************************************************-->
+                <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                            targetNamespace="http://fedora.comm.nsdlib.org/service/methodmap"
+                            elementFormDefault="qualified">
+                    <xsd:element name="MethodMap">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="Method" maxOccurs="unbounded">
+                                    <xsd:complexType>
+                                        <xsd:sequence>
+                                            <xsd:element name="UserInputParm" minOccurs="0" maxOccurs="unbounded">
+                                                <xsd:complexType>
+                                                    <xsd:sequence>
+                                                        <xsd:element name="ValidParmValues" minOccurs="0">
+                                                            <xsd:complexType>
+                                                                <xsd:sequence>
+                                                                    <xsd:element name="ValidParm" maxOccurs="unbounded">
+                                                                        <xsd:complexType>
+                                                                            <xsd:attribute name="value" use="required">
+                                                                                <xsd:simpleType>
+                                                                                    <xsd:restriction base="xsd:string"/>
+                                                                                </xsd:simpleType>
+                                                                            </xsd:attribute>
+                                                                        </xsd:complexType>
+                                                                    </xsd:element>
+                                                                </xsd:sequence>
+                                                            </xsd:complexType>
+                                                        </xsd:element>
+                                                    </xsd:sequence>
+                                                    <xsd:attribute name="parmName" type="xsd:string"/>
+                                                    <xsd:attribute name="label" type="xsd:string" use="optional"/>
+                                                    <xsd:attribute name="required" type="xsd:boolean"/>
+                                                    <xsd:attribute name="defaultValue" type="xsd:string"/>
+                                                    <xsd:attribute name="passBy">
+                                                        <xsd:simpleType>
+                                                            <xsd:restriction base="xsd:string">
+                                                                <xsd:enumeration value="VALUE"/>
+                                                                <xsd:enumeration value="URL_REF"/>
+                                                            </xsd:restriction>
+                                                        </xsd:simpleType>
+                                                    </xsd:attribute>
+                                                </xsd:complexType>
+                                            </xsd:element>
+                                            <xsd:element name="DatastreamInputParm" minOccurs="0" maxOccurs="unbounded">
+                                                <xsd:complexType>
+                                                    <xsd:attribute name="parmName" type="xsd:string"/>
+                                                    <xsd:attribute name="label" type="xsd:string" use="optional"/>
+                                                    <xsd:attribute name="required" type="xsd:boolean"/>
+                                                    <xsd:attribute name="passBy">
+                                                        <xsd:simpleType>
+                                                            <xsd:restriction base="xsd:string">
+                                                                <xsd:enumeration value="VALUE"/>
+                                                                <xsd:enumeration value="URL_REF"/>
+                                                            </xsd:restriction>
+                                                        </xsd:simpleType>
+                                                    </xsd:attribute>
+                                                </xsd:complexType>
+                                            </xsd:element>
+                                            <xsd:element name="MethodReturnType">
+                                                <xsd:complexType>
+                                                    <xsd:attribute name="wsdlMsgName" type="xsd:string"/>
+                                                    <xsd:attribute name="wsdlMsgTOMIME" type="xsd:string"/>
+                                                </xsd:complexType>
+                                            </xsd:element>
+                                        </xsd:sequence>
+                                        <xsd:attribute name="operationName" type="xsd:string"/>
+                                        <xsd:attribute name="operationLabel" type="xsd:string" use="optional"/>
+                                        <xsd:attribute name="wsdlMsgName" type="xsd:string"/>
+                                        <xsd:attribute name="wsdlMsgOutput" type="xsd:string"/>
+                                    </xsd:complexType>
+                                </xsd:element>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:schema>
+
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="DSINPUTSPEC-1.0-SCHEMA" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="DSINPUTSPEC-1.0-SCHEMA1.0" LABEL="DSINPUTSPEC-1.0 xml schema" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                           targetNamespace="http://fedora.comm.nsdlib.org/service/bindspec"
+                           elementFormDefault="qualified">
+                    <xs:element name="DSInputSpec">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element ref="DSInput" maxOccurs="unbounded"/>
+                            </xs:sequence>
+                            <xs:attribute name="label" use="required">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string"/>
+                                </xs:simpleType>
+                            </xs:attribute>
+                            <xs:attribute name="bDefPID" use="required">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string"/>
+                                </xs:simpleType>
+                            </xs:attribute>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="DSInput">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element ref="DSInputLabel"/>
+                                <xs:element ref="DSMIME"/>
+                                <xs:element ref="DSInputInstruction"/>
+                            </xs:sequence>
+                            <xs:attribute name="wsdlMsgPartName" use="required">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string"/>
+                                </xs:simpleType>
+                            </xs:attribute>
+                            <xs:attribute name="DSMin" use="required">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:nonNegativeInteger"/>
+                                </xs:simpleType>
+                            </xs:attribute>
+                            <xs:attribute name="DSMax" use="required">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:nonNegativeInteger"/>
+                                </xs:simpleType>
+                            </xs:attribute>
+                            <xs:attribute name="DSOrdinality" use="required">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:boolean"/>
+                                </xs:simpleType>
+                            </xs:attribute>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="DSInputInstruction">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string"/>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="DSInputLabel">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string"/>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="DSMIME">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string"/>
+                        </xs:simpleType>
+                    </xs:element>
+                </xs:schema>
+
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="DSINPUTSPEC-1.1-SCHEMA" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="DSINPUTSPEC-1.1-SCHEMA1.0" LABEL="DSINPUTSPEC-1.1 xml schema" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                           targetNamespace="http://fedora.comm.nsdlib.org/service/bindspec"
+                           elementFormDefault="qualified">
+                    <xs:element name="DSInputSpec">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element ref="DSInput" maxOccurs="unbounded"/>
+                            </xs:sequence>
+                            <xs:attribute name="label" use="required">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string"/>
+                                </xs:simpleType>
+                            </xs:attribute>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="DSInput">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element ref="DSInputLabel"/>
+                                <xs:element ref="DSMIME"/>
+                                <xs:element ref="DSInputInstruction"/>
+                            </xs:sequence>
+                            <xs:attribute name="wsdlMsgPartName" use="required">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string"/>
+                                </xs:simpleType>
+                            </xs:attribute>
+                            <xs:attribute name="DSMin" use="required">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:nonNegativeInteger"/>
+                                </xs:simpleType>
+                            </xs:attribute>
+                            <xs:attribute name="DSMax" use="required">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:nonNegativeInteger"/>
+                                </xs:simpleType>
+                            </xs:attribute>
+                            <xs:attribute name="DSOrdinality" use="required">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:boolean"/>
+                                </xs:simpleType>
+                            </xs:attribute>
+                            <xs:attribute name="pid" use="optional">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string"/>
+                                </xs:simpleType>
+                            </xs:attribute>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="DSInputInstruction">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string"/>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="DSInputLabel">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string"/>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="DSMIME">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string"/>
+                        </xs:simpleType>
+                    </xs:element>
+                </xs:schema>
+
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="WSDL-SCHEMA" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="WSDL-SCHEMA1.0" LABEL="WSDL xml schema" MIMETYPE="text/xml">
+            <foxml:contentLocation TYPE="URL" REF="http://schemas.xmlsoap.org/wsdl/"/>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+
 </foxml:digitalObject>

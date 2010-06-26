@@ -5,27 +5,18 @@
 
 package org.fcrepo.server.storage.types;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
-import org.jrdf.graph.ObjectNode;
-import org.jrdf.graph.PredicateNode;
-import org.jrdf.graph.Triple;
-
-import org.trippi.TripleIterator;
-import org.trippi.TrippiException;
-
 import org.fcrepo.common.rdf.SimpleLiteral;
 import org.fcrepo.common.rdf.SimpleTriple;
 import org.fcrepo.common.rdf.SimpleURIReference;
-import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.jrdf.graph.ObjectNode;
+import org.jrdf.graph.PredicateNode;
+import org.jrdf.graph.Triple;
+import org.trippi.TripleIterator;
+import org.trippi.TrippiException;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 
 
 public class TupleArrayTripleIterator

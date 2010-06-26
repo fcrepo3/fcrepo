@@ -5,18 +5,19 @@
 
 package org.fcrepo.server.management;
 
+import org.fcrepo.server.Context;
+import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.journal.JournalConstants;
+import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.fcrepo.server.storage.types.Validation;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import org.fcrepo.server.Context;
-import org.fcrepo.server.errors.ServerException;
-import org.fcrepo.server.journal.JournalConstants;
-import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.storage.types.RelationshipTuple;
 
 
 /**
@@ -402,6 +403,14 @@ public class MockManagementDelegate
                            isLiteral,
                            datatype));
         return false;
+    }
+
+    @Override
+    public Validation validate(Context context, String pid,
+                               Date asOfDateTime) throws ServerException {
+        //TODO implement
+
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public String putTempStream(Context context, InputStream in)

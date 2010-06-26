@@ -4,36 +4,27 @@
  */
 package org.fcrepo.server.rest;
 
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.Context;
+import org.fcrepo.server.access.ObjectProfile;
+import org.fcrepo.server.rest.RestUtil.RequestContent;
+import org.fcrepo.server.rest.param.DateTimeParam;
+import org.fcrepo.server.storage.types.Validation;
+import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.server.utilities.StreamUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.CharArrayWriter;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Date;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.Context;
-import org.fcrepo.server.access.ObjectProfile;
-import org.fcrepo.server.rest.RestUtil.RequestContent;
-import org.fcrepo.server.rest.param.DateTimeParam;
-import org.fcrepo.server.utilities.DateUtility;
-import org.fcrepo.server.utilities.StreamUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -49,6 +40,29 @@ public class FedoraObjectResource extends BaseRestResource {
 
     private static final Logger logger =
             LoggerFactory.getLogger(FedoraObjectResource.class);
+
+    @Path("/validate")
+    @GET
+    @Produces({XML})
+    public Response doObjectValidation(
+            @PathParam(RestParam.PID)
+            String pid,
+            @QueryParam(RestParam.AS_OF_DATE_TIME)
+            String dateTime) {
+        try {
+            Context context = getContext();
+            Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
+            MediaType mediaType = TEXT_XML;
+
+            Validation validation = apiMService.validate(context, pid, asOfDateTime);
+
+            String xml = getSerializer(context).objectValidationToXml(validation);
+            return Response.ok(xml, mediaType).build();
+        } catch (Exception ex) {
+            return handleException(ex);
+        }
+    }
+
 
     /**
      * Exports the entire digital object in the specified XML format
@@ -289,15 +303,15 @@ public class FedoraObjectResource extends BaseRestResource {
      * Update (modify) digital object.
      * <p>PUT /objects/{pid} ? label logMessage ownerId state lastModifiedDate</p>
      *
-     * @param pid the persistent identifier
+     * @param pid              the persistent identifier
      * @param label
      * @param logMessage
      * @param ownerID
      * @param state
      * @param lastModifiedDate Optional XSD dateTime to guard against concurrent
-     * modification. If provided (i.e. not null), the request will fail with an
-     * HTTP 409 Conflict if lastModifiedDate is earlier than the object's
-     * lastModifiedDate.
+     *                         modification. If provided (i.e. not null), the request will fail with an
+     *                         HTTP 409 Conflict if lastModifiedDate is earlier than the object's
+     *                         lastModifiedDate.
      * @return The timestamp for this modification (as an XSD dateTime string)
      * @see org.fcrepo.server.management.Management#modifyObject(org.fcrepo.server.Context, String, String, String, String, String)
      */
@@ -322,7 +336,8 @@ public class FedoraObjectResource extends BaseRestResource {
             if (lastModifiedDate != null) {
                 requestModDate = lastModifiedDate.getValue();
             }
-            Date lastModDate = apiMService.modifyObject(context, pid, state, label, ownerID, logMessage, requestModDate);
+            Date lastModDate =
+                    apiMService.modifyObject(context, pid, state, label, ownerID, logMessage, requestModDate);
             return Response.ok().entity(DateUtility.convertDateToXSDString(lastModDate)).build();
         } catch (Exception ex) {
             return handleException(ex);

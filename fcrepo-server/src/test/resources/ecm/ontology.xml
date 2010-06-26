@@ -1,0 +1,48 @@
+<rdf:RDF
+        xmlns:owl="http://www.w3.org/2002/07/owl#"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.w3.org/2002/07/owl# ontology.xml1.xsd
+                            http://www.w3.org/1999/02/22-rdf-syntax-ns# ontology.xml.xsd
+                            http://www.w3.org/2000/01/rdf-schema# ontology.xml2.xsd">
+    <owl:Class rdf:about="info:fedora/demo:contentModel2_class">
+
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty
+                        rdf:resource="http://demo.relations.are.us/#demorelation2"/>
+                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel1_class"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty
+                        rdf:resource="http://demo.relations.are.us/#demorelation2"/>
+                <owl:someValuesFrom rdf:resource="info:fedora/demo:contentModel1_class"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty
+                        rdf:resource="http://demo.relations.are.us/#demorelation2"/>
+                <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty
+                        rdf:resource="http://demo.relations.are.us/#demorelation2"/>
+                <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</owl:maxCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource=""/>
+                <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</owl:cardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <owl:ObjectProperty
+            rdf:about="http://demo.relations.are.us/#demorelation2"/>
+</rdf:RDF>

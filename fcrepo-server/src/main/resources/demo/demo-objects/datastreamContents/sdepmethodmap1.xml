@@ -1,0 +1,28 @@
+<fmm:MethodMap
+        name="MethodMap - Image Collection" xmlns:fmm="http://fedora.comm.nsdlib.org/service/methodmap">
+    <fmm:Method operationLabel="An html representation of the collection"
+                operationName="view" wsdlMsgName="viewRequest" wsdlMsgOutput="dissemResponse">
+        <fmm:DatastreamInputParm defaultValue=""
+                                 label="Stylesheet to transform LIST into html" parmName="XSLT"
+                                 passBy="URL_REF" required="true"/>
+        <fmm:DatastreamInputParm defaultValue=""
+                                 label="The result of the list dissemination as a datastream"
+                                 parmName="LIST" passBy="URL_REF" required="true"/>
+        <fmm:DefaultInputParm defaultValue="yes"
+                              label="Whether to reload the stylesheet each time"
+                              parmName="CLEAR_CACHE" passBy="VALUE" required="true"/>
+        <fmm:MethodReturnType wsdlMsgName="dissemResponse" wsdlMsgTOMIME="text/html"/>
+    </fmm:Method>
+    <fmm:Method operationLabel="An xml list of members in the collection"
+                operationName="list" wsdlMsgName="listRequest" wsdlMsgOutput="dissemResponse">
+        <fmm:DefaultInputParm defaultValue="tuples" label="" parmName="TYPE"
+                              passBy="VALUE" required="true"/>
+        <fmm:DatastreamInputParm defaultValue="" label="" parmName="QUERY"
+                                 passBy="URL_REF" required="true"/>
+        <fmm:DefaultInputParm defaultValue="itql" label="" parmName="LANG"
+                              passBy="VALUE" required="true"/>
+        <fmm:DefaultInputParm defaultValue="Sparql" label=""
+                              parmName="FORMAT" passBy="VALUE" required="true"/>
+        <fmm:MethodReturnType wsdlMsgName="dissemResponse" wsdlMsgTOMIME="text/xml"/>
+    </fmm:Method>
+</fmm:MethodMap>

@@ -4,21 +4,15 @@
  */
 package org.fcrepo.server.utilities;
 
-import java.io.IOException;
-
-import java.util.LinkedList;
-import java.util.List;
-
+import org.fcrepo.mock.server.utilities.MockTableSpec;
+import org.fcrepo.server.errors.InconsistentTableSpecException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.fcrepo.mock.server.utilities.MockTableSpec;
-import org.fcrepo.server.errors.InconsistentTableSpecException;
-import org.fcrepo.server.utilities.DerbyDDLConverter;
-import org.fcrepo.server.utilities.TableSpec;
-
-
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -34,55 +28,55 @@ public class DerbyDDLConverterIntegrationTest {
 
     private final String OBJECT_PATHS_TABLE_SPEC =
             "CREATE TABLE objectPaths (\n  "
-                    + "tokenDbID INT NOT NULL GENERATED ALWAYS AS IDENTITY,\n  "
-                    + "token VARCHAR(64) UNIQUE NOT NULL DEFAULT '',\n  "
-                    + "path VARCHAR(255) NOT NULL DEFAULT '',\n  "
-                    + "PRIMARY KEY (tokenDbID))";
+            + "tokenDbID INT NOT NULL GENERATED ALWAYS AS IDENTITY,\n  "
+            + "token VARCHAR(64) UNIQUE NOT NULL DEFAULT '',\n  "
+            + "path VARCHAR(255) NOT NULL DEFAULT '',\n  "
+            + "PRIMARY KEY (tokenDbID))";
 
     private final String DATASTREAM_PATHS_TABLE_SPEC =
             "CREATE TABLE datastreamPaths (\n  "
-                    + "tokenDbID INT NOT NULL GENERATED ALWAYS AS IDENTITY,\n  "
-                    + "token VARCHAR(199) UNIQUE NOT NULL DEFAULT '',\n  "
-                    + "path VARCHAR(255) NOT NULL DEFAULT '',\n  "
-                    + "PRIMARY KEY (tokenDbID))";
+            + "tokenDbID INT NOT NULL GENERATED ALWAYS AS IDENTITY,\n  "
+            + "token VARCHAR(199) UNIQUE NOT NULL DEFAULT '',\n  "
+            + "path VARCHAR(255) NOT NULL DEFAULT '',\n  "
+            + "PRIMARY KEY (tokenDbID))";
 
     private final String PID_GEN_TABLE_SPEC =
             "CREATE TABLE pidGen (\n  "
-                    + "namespace VARCHAR(255) NOT NULL,\n  "
-                    + "highestID INT NOT NULL)";
+            + "namespace VARCHAR(255) NOT NULL,\n  "
+            + "highestID INT NOT NULL)";
 
     private final String DO_REGISTRY_TABLE_SPEC =
             "CREATE TABLE doRegistry (\n  " + "doPID VARCHAR(64) NOT NULL,\n  "
-                    + "systemVersion SMALLINT NOT NULL DEFAULT 0,\n  "
-                    + "ownerId VARCHAR(64),\n  "
-                    + "objectState VARCHAR(1) NOT NULL DEFAULT 'A',\n  "
-                    + "label VARCHAR(255) DEFAULT '',\n  "
-                    + "PRIMARY KEY (doPID))";
+            + "systemVersion SMALLINT NOT NULL DEFAULT 0,\n  "
+            + "ownerId VARCHAR(64),\n  "
+            + "objectState VARCHAR(1) NOT NULL DEFAULT 'A',\n  "
+            + "label VARCHAR(255) DEFAULT '',\n  "
+            + "PRIMARY KEY (doPID))";
 
     private final String MODEL_DEPLOYMENT_MAP_TABLE_SPEC =
             "CREATE TABLE modelDeploymentMap (\n  "
-                    + "cModel VARCHAR(64) NOT NULL,\n  "
-                    + "sDef VARCHAR(64) NOT NULL,\n  "
-                    + "sDep VARCHAR(64) NOT NULL)";
+            + "cModel VARCHAR(64) NOT NULL,\n  "
+            + "sDef VARCHAR(64) NOT NULL,\n  "
+            + "sDep VARCHAR(64) NOT NULL)";
 
     private final String DO_FIELDS_TABLE_SPEC =
             "CREATE TABLE doFields (\n  " + "pid VARCHAR(64) NOT NULL,\n  "
-                    + "label VARCHAR(255),\n  "
-                    + "state VARCHAR(1) NOT NULL DEFAULT 'A',\n  "
-                    + "ownerId VARCHAR(64),\n  " + "cDate BIGINT NOT NULL,\n  "
-                    + "mDate BIGINT NOT NULL,\n  " + "dcmDate BIGINT,\n  "
-                    + "dcTitle CLOB,\n  " + "dcCreator CLOB,\n  "
-                    + "dcSubject CLOB,\n  " + "dcDescription CLOB,\n  "
-                    + "dcPublisher CLOB,\n  " + "dcContributor CLOB,\n  "
-                    + "dcDate CLOB,\n  " + "dcType CLOB,\n  "
-                    + "dcFormat CLOB,\n  " + "dcIdentifier CLOB,\n  "
-                    + "dcSource CLOB,\n  " + "dcLanguage CLOB,\n  "
-                    + "dcRelation CLOB,\n  " + "dcCoverage CLOB,\n  "
-                    + "dcRights CLOB)";
+            + "label VARCHAR(255),\n  "
+            + "state VARCHAR(1) NOT NULL DEFAULT 'A',\n  "
+            + "ownerId VARCHAR(64),\n  " + "cDate BIGINT NOT NULL,\n  "
+            + "mDate BIGINT NOT NULL,\n  " + "dcmDate BIGINT,\n  "
+            + "dcTitle CLOB,\n  " + "dcCreator CLOB,\n  "
+            + "dcSubject CLOB,\n  " + "dcDescription CLOB,\n  "
+            + "dcPublisher CLOB,\n  " + "dcContributor CLOB,\n  "
+            + "dcDate CLOB,\n  " + "dcType CLOB,\n  "
+            + "dcFormat CLOB,\n  " + "dcIdentifier CLOB,\n  "
+            + "dcSource CLOB,\n  " + "dcLanguage CLOB,\n  "
+            + "dcRelation CLOB,\n  " + "dcCoverage CLOB,\n  "
+            + "dcRights CLOB)";
 
     private final String DC_DATES_TABLE_SPEC =
             "CREATE TABLE dcDates (\n  " + "pid VARCHAR(64) NOT NULL,\n  "
-                    + "dcDate BIGINT NOT NULL)";
+            + "dcDate BIGINT NOT NULL)";
 
     private final String DO_FIELDS_INDEX =
             "CREATE INDEX doFields_pid ON doFields (pid)";
@@ -135,7 +129,7 @@ public class DerbyDDLConverterIntegrationTest {
         final int NUM_SPECS = 7;
         int numTableSpecs = tableSpecs.size();
         assertTrue("There should be " + NUM_SPECS + " tableSpecs: "
-                + numTableSpecs, numTableSpecs == NUM_SPECS);
+                   + numTableSpecs, numTableSpecs == NUM_SPECS);
     }
 
     private void verifyAndEliminateStatement(String stmt) {
@@ -153,6 +147,7 @@ public class DerbyDDLConverterIntegrationTest {
     }
 
     // Supports legacy test runners
+
     public static junit.framework.Test suite() {
         return new junit.framework.JUnit4TestAdapter(DerbyDDLConverterIntegrationTest.class);
     }

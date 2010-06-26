@@ -4,77 +4,39 @@
  */
 package org.fcrepo.server.management;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import java.text.SimpleDateFormat;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.util.regex.Pattern;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
 import org.apache.commons.betwixt.XMLUtils;
-
-import org.jrdf.graph.URIReference;
-
-import org.w3c.dom.Document;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
 import org.fcrepo.common.rdf.SimpleURIReference;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.RecoveryContext;
 import org.fcrepo.server.Server;
-import org.fcrepo.server.errors.DatastreamLockedException;
-import org.fcrepo.server.errors.GeneralException;
-import org.fcrepo.server.errors.InvalidStateException;
-import org.fcrepo.server.errors.InvalidXMLNameException;
-import org.fcrepo.server.errors.ObjectLockedException;
-import org.fcrepo.server.errors.ServerException;
-import org.fcrepo.server.errors.StreamReadException;
-import org.fcrepo.server.errors.StreamWriteException;
-import org.fcrepo.server.errors.ValidationException;
+import org.fcrepo.server.errors.*;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.security.Authorization;
-import org.fcrepo.server.storage.ContentManagerParams;
-import org.fcrepo.server.storage.DOManager;
-import org.fcrepo.server.storage.DOReader;
-import org.fcrepo.server.storage.DOWriter;
-import org.fcrepo.server.storage.ExternalContentManager;
-import org.fcrepo.server.storage.types.AuditRecord;
-import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.storage.types.DatastreamManagedContent;
-import org.fcrepo.server.storage.types.DatastreamReferencedContent;
-import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
-import org.fcrepo.server.storage.types.MIMETypedStream;
-import org.fcrepo.server.storage.types.RelationshipTuple;
-import org.fcrepo.server.storage.types.XMLDatastreamProcessor;
+import org.fcrepo.server.storage.*;
+import org.fcrepo.server.storage.types.*;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationConstants;
 import org.fcrepo.server.validation.ValidationUtility;
+import org.fcrepo.server.validation.ecm.EcmValidator;
+import org.jrdf.graph.URIReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 /**
  * Implements API-M without regard to the transport/messaging protocol.
@@ -105,6 +67,7 @@ public class DefaultManagement
     private long m_lastPurgeInMillis = System.currentTimeMillis();
 
     private final long m_purgeDelayInMillis;
+    private EcmValidator ecmValidator;
 
     /**
      * @param purgeDelayInMillis milliseconds to delay before removing
@@ -128,6 +91,7 @@ public class DefaultManagement
         m_tempDir = tempDir;
         m_uploadStartTime = uploadStartTime;
         m_purgeDelayInMillis = purgeDelayInMillis;
+        ecmValidator = new EcmValidator(doMgr); //TODO, this should be controllable with the fcfg
     }
 
     public String ingest(Context context,
@@ -218,7 +182,7 @@ public class DefaultManagement
                                                "is more recent than the " +
                                                "request (%s)", pid, objDate, reqDate);
                     throw new ObjectLockedException(msg);
-               }
+                }
             }
 
             if (state != null && !state.equals("")) {
@@ -640,7 +604,7 @@ public class DefaultManagement
                                                "request (%s)", pid,
                                                datastreamId, dsDate, reqDate);
                     throw new DatastreamLockedException(msg);
-               }
+                }
             }
 
             Date nowUTC; // variable for ds modified date
@@ -851,7 +815,7 @@ public class DefaultManagement
                                                "request (%s)", pid,
                                                datastreamId, dsDate, reqDate);
                     throw new DatastreamLockedException(msg);
-               }
+                }
             }
 
             // some forbidden scenarios...
@@ -1751,6 +1715,45 @@ public class DefaultManagement
 
             finishModification(w, "purgeRelationship");
         }
+    }
+
+    /**
+     * Validate the object against the datacontracts from the objects content model. This method just delegates the validation
+     * to EcmValidator
+     *
+     * @param context      the call context
+     * @param pid          the pid of the object to validate
+     * @param asOfDateTime the datetime to get to object as
+     * @return The result of the validation
+     * @see org.fcrepo.server.validation.ecm.EcmValidator
+     */
+    public Validation validate(Context context,
+                               String pid,
+                               Date asOfDateTime) throws ServerException {
+
+        try {
+            logger.debug("Entered validate");
+
+            m_authz.enforceValidate(context,
+                                    pid,
+                                    asOfDateTime);
+            return ecmValidator.validate(context, pid, asOfDateTime);
+
+        } finally {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
+                StringBuilder logMsg =
+                        new StringBuilder("Completed validate(");
+                logMsg.append("pid: ").append(pid);
+                logMsg.append(", asOfDateTime: ").append(asOfDateTime);
+                logMsg.append(")");
+                logger.info(logMsg.toString());
+            }
+
+            logger.debug("Exiting validate");
+        }
+
+
     }
 
     /**

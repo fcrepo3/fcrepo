@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="demo:contentModel2" VERSION="1.1"
+                     xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+
+    <foxml:objectProperties>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Content Model Object for All Objects"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-02T05:09:43.796Z"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-07-02T05:09:43.796Z"/>
+    </foxml:objectProperties>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
+                                 FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0"
+                                 LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
+                           xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+                    <dc:title>Content Model 2 for ECM test</dc:title>
+                    <dc:identifier>demo:contentModel2</dc:identifier>
+                </oai_dc:dc>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
+                                 FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT1.0"
+                                 LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
+            <foxml:xmlContent>
+                <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                    <rdf:Description rdf:about="info:fedora/demo:contentModel2">
+                        <fedora-model:hasModel rdf:resource="info:fedora/fedora-system:ContentModel-3.0"/>
+                    </rdf:Description>
+                </rdf:RDF>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="ONTOLOGY" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion
+                FORMAT_URI="info:fedora/fedora-system:FedoraOntology-1.0" ID="ONTOLOGY1.0"
+                LABEL="Class declaration for this content model" MIMETYPE="application/rdf+xml">
+            <foxml:xmlContent>
+                <rdf:RDF
+                        xmlns:owl="http://www.w3.org/2002/07/owl#"
+                        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                        xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+                    <owl:Class rdf:about="info:fedora/demo:contentModel2_class">
+                        <rdfs:subClassOf>
+                            <owl:Restriction>
+                                <owl:onProperty
+                                        rdf:resource="http://demo.relations.are.us/#demorelation2"/>
+                                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel1_class"/>
+                            </owl:Restriction>
+                        </rdfs:subClassOf>
+                        <rdfs:subClassOf>
+                            <owl:Restriction>
+                                <owl:onProperty
+                                        rdf:resource="http://demo.relations.are.us/#demorelation2"/>
+                                <owl:someValuesFrom rdf:resource="info:fedora/demo:contentModel1_class"/>
+                            </owl:Restriction>
+                        </rdfs:subClassOf>
+                        <rdfs:subClassOf>
+                            <owl:Restriction>
+                                <owl:onProperty
+                                        rdf:resource="http://demo.relations.are.us/#demorelation2"/>
+                                <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1
+                                </owl:minCardinality>
+                            </owl:Restriction>
+                        </rdfs:subClassOf>
+                        <rdfs:subClassOf>
+                            <owl:Restriction>
+                                <owl:onProperty
+                                        rdf:resource="http://demo.relations.are.us/#demorelation2"/>
+                                <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1
+                                </owl:maxCardinality>
+                            </owl:Restriction>
+                        </rdfs:subClassOf>
+                        <rdfs:subClassOf>
+                            <owl:Restriction>
+                                <owl:onProperty
+                                        rdf:resource="http://demo.relations.are.us/#demorelation2"/>
+                                <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1
+                                </owl:cardinality>
+                            </owl:Restriction>
+                        </rdfs:subClassOf>
+                    </owl:Class>
+                    <owl:ObjectProperty
+                            rdf:about="http://demo.relations.are.us/#demorelation2"/>
+                </rdf:RDF>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="DS-COMPOSITE-MODEL" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
+                                 FORMAT_URI="info:fedora/fedora-system:FedoraDSCompositeModel-1.0"
+                                 ID="DS-COMPOSITE-MODEL1.0" LABEL="Datastream Composite Model" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <dsCompositeModel xmlns="info:fedora/fedora-system:def/dsCompositeModel#">
+                    <dsTypeModel ID="Demo2Stream1">
+                        <form FORMAT_URI="http://demo.uris.are.us/demo1uri" MIME="text/xml"/>
+                        <extension name="SCHEMA">
+                            <reference type="xsd" datastream="Demo2_SCHEMA1"/>
+                        </extension>
+                    </dsTypeModel>
+                    <dsTypeModel ID="Demo2Stream2">
+                        <form FORMAT_URI="http://demo.uris.are.us/demo1uri" MIME="text/xml"/>
+                        <extension name="SCHEMA">
+                            <reference type="xsd" datastream="Demo2_SCHEMA2"/>
+                        </extension>
+                    </dsTypeModel>
+                </dsCompositeModel>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="Demo2_SCHEMA1" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="Demo1_SCHEMA11.0" LABEL="OAI DC xml schema" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                    <xs:simpleType name="stringtype">
+                        <xs:restriction base="xs:string"/>
+                    </xs:simpleType>
+
+                    <xs:simpleType name="inttype">
+                        <xs:restriction base="xs:positiveInteger"/>
+                    </xs:simpleType>
+
+                    <xs:simpleType name="dectype">
+                        <xs:restriction base="xs:decimal"/>
+                    </xs:simpleType>
+
+                    <xs:simpleType name="orderidtype">
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="[0-9]{6}"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+
+                    <xs:complexType name="shiptotype">
+                        <xs:sequence>
+                            <xs:element name="name" type="stringtype"/>
+                            <xs:element name="address" type="stringtype"/>
+                            <xs:element name="city" type="stringtype"/>
+                            <xs:element name="country" type="stringtype"/>
+                        </xs:sequence>
+                    </xs:complexType>
+
+                    <xs:complexType name="itemtype">
+                        <xs:sequence>
+                            <xs:element name="title" type="stringtype"/>
+                            <xs:element name="note" type="stringtype" minOccurs="0"/>
+                            <xs:element name="quantity" type="inttype"/>
+                            <xs:element name="price" type="dectype"/>
+                        </xs:sequence>
+                    </xs:complexType>
+
+                    <xs:complexType name="shipordertype">
+                        <xs:sequence>
+                            <xs:element name="orderperson" type="stringtype"/>
+                            <xs:element name="shipto" type="shiptotype"/>
+                            <xs:element name="item" maxOccurs="unbounded" type="itemtype"/>
+                        </xs:sequence>
+                        <xs:attribute name="orderid" type="orderidtype" use="required"/>
+                    </xs:complexType>
+
+                    <xs:element name="shiporder" type="shipordertype"/>
+
+                </xs:schema>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="Demo2_SCHEMA2" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="Demo1_SCHEMA21.0" LABEL="OAI DC xml schema" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+                    <xsd:element name="mails" type="mailsType"/>
+
+                    <xsd:complexType name="mailsType">
+                        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                            <xsd:element name="mail" type="mailType"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+
+                    <xsd:complexType name="mailType">
+                        <xsd:sequence>
+                            <xsd:element name="envelope" type="envelopeType"/>
+                            <xsd:element name="body" type="bodyType"/>
+                            <xsd:element name="attachment" type="attachmentType"
+                                         minOccurs="0" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                        <xsd:attribute use="required" name="id" type="xsd:integer"/>
+                    </xsd:complexType>
+
+                    <xsd:element name="header">
+                        <xsd:complexType>
+                            <xsd:simpleContent>
+                                <xsd:extension base="xsd:string">
+                                    <xsd:attribute ref="name" use="required"/>
+                                </xsd:extension>
+                            </xsd:simpleContent>
+                        </xsd:complexType>
+                    </xsd:element>
+
+                    <xsd:element name="Date" type="xsd:dateTime"/>
+
+                    <xsd:complexType name="envelopeType">
+                        <xsd:sequence>
+                            <xsd:element name="From" type="xsd:string"/>
+                            <xsd:element name="To" type="xsd:string"/>
+                            <xsd:element ref="Date"/>
+                            <xsd:element name="Subject" type="xsd:string"/>
+                            <xsd:element ref="header" minOccurs="0" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                        <xsd:attribute name="From" type="xsd:string" use="required"/>
+                    </xsd:complexType>
+
+                    <xsd:simpleType name="bodyType">
+                        <xsd:restriction base="xsd:string"/>
+                    </xsd:simpleType>
+
+                    <xsd:complexType name="attachmentType">
+                        <xsd:group ref="attachmentContent"/>
+                        <xsd:attribute ref="name" use="required"/>
+                    </xsd:complexType>
+
+                    <xsd:group name="attachmentContent">
+                        <xsd:sequence>
+                            <xsd:element name="mimetype">
+                                <xsd:complexType>
+                                    <xsd:attributeGroup ref="mimeTypeAttributes"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="content" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:group>
+
+                    <xsd:attribute name="name" type="xsd:string"/>
+
+                    <xsd:attributeGroup name="mimeTypeAttributes">
+                        <xsd:attribute name="type" type="mimeTopLevelType" use="required"/>
+                        <xsd:attribute name="subtype" type="xsd:string" use="required"/>
+                    </xsd:attributeGroup>
+
+                    <xsd:simpleType name="mimeTopLevelType">
+                        <xsd:restriction base="xsd:string">
+                            <xsd:enumeration value="text"/>
+                            <xsd:enumeration value="multipart"/>
+                            <xsd:enumeration value="application"/>
+                            <xsd:enumeration value="message"/>
+                            <xsd:enumeration value="image"/>
+                            <xsd:enumeration value="audio"/>
+                            <xsd:enumeration value="video"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+
+                </xsd:schema>
+
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+
+</foxml:digitalObject>

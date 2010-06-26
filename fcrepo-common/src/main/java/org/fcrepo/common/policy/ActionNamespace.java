@@ -8,7 +8,7 @@ import com.sun.xacml.attr.StringAttribute;
 
 /**
  * The Fedora Action XACML namespace.
- *
+ * <p/>
  * <pre>
  * Namespace URI    : urn:fedora:names:fedora:2.1:action
  * </pre>
@@ -103,6 +103,8 @@ public class ActionNamespace
 
     public final XacmlName RETRIEVE_FILE;
 
+    public final XacmlName VALIDATE;
+
     private ActionNamespace(XacmlNamespace parent, String localName) {
         super(parent, localName);
         API = addName(new XacmlName(this, "api", StringAttribute.identifier));
@@ -167,7 +169,10 @@ public class ActionNamespace
                                       "contextId",
                                       StringAttribute.identifier)); //internal callback support
         RETRIEVE_FILE =
-            addName(new XacmlName(this, "id-retrieveFile"));
+                addName(new XacmlName(this, "id-retrieveFile"));
+        VALIDATE =
+                addName(new XacmlName(this, "id-validate"));
+
         // Values of CONTEXT_ID are sequential numerals, hence not enumerated here.
     }
 

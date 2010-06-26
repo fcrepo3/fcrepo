@@ -17,23 +17,25 @@ Syntax:
   language.
 -->
 <xsd:schema
-    targetNamespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <xsd:element name="RDF">
-    <xsd:complexType>
-      <xsd:sequence>
-        <xsd:element minOccurs="1" maxOccurs="unbounded" name="Description">
-          <xsd:complexType mixed="true">
-            <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-              <xsd:any processContents="lax"/>
+        targetNamespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:element name="RDF">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element minOccurs="1" maxOccurs="unbounded" name="Description">
+                    <xsd:complexType mixed="true">
+                        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                            <xsd:any processContents="lax"/>
+                        </xsd:sequence>
+                        <!--
+                                                <xsd:attribute name="resource" use="optional" type="xsd:anyURI"/>
+                                                <xsd:attribute name="datatype" use="optional" type="xsd:anyURI"/>
+                        -->
+                        <xsd:attribute name="about" type="xsd:anyURI"/>
+                    </xsd:complexType>
+                </xsd:element>
             </xsd:sequence>
-            <xsd:attribute name="resource" use="optional" type="xsd:anyURI"/>
-            <xsd:attribute name="datatype" use="optional" type="xsd:anyURI"/>
-          </xsd:complexType>
-        </xsd:element>
-      </xsd:sequence>
-      <xsd:attribute name="about" type="xsd:anyURI"/>
-    </xsd:complexType>
-  </xsd:element>
+        </xsd:complexType>
+    </xsd:element>
 </xsd:schema>

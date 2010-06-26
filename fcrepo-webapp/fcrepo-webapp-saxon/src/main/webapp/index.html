@@ -2,31 +2,42 @@
 <head><title>Saxon webapp</title></head>
 <body bgcolor="#DADADA">
 <h3>Welcome to the Saxon XSLT Processor*<cite></cite> Local Service</h3>
-<p>This local service provides an XSLT Transformation Engine for transforming 
-  XML-encoded source documents using a supplied XSLT stylesheet. The service functions 
-  as a java servlet and can be invoked usingthe following syntax:</p>
-<p><b>http://<font color="#008040">&lt;hostname&gt;</font>:<font color="#008040">&lt;port-number&gt;</font>/saxon/SaxonServlet?source=<font color="#008040">&lt;xml-source&gt;</font>&amp;style=<font color="#008040">&lt;xsl-stylesheet&gt;</font>&amp;<font color="#FF0000">clear-stylesheet-cache=yes</font></b></p>
+
+<p>This local service provides an XSLT Transformation Engine for transforming
+    XML-encoded source documents using a supplied XSLT stylesheet. The service functions
+    as a java servlet and can be invoked usingthe following syntax:</p>
+
+<p><b>http://<font color="#008040">&lt;hostname&gt;</font>:<font color="#008040">&lt;port-number&gt;</font>/saxon/SaxonServlet?source=<font
+        color="#008040">&lt;xml-source&gt;</font>&amp;style=<font color="#008040">
+    &lt;xsl-stylesheet&gt;</font>&amp;<font color="#FF0000">clear-stylesheet-cache=yes</font></b></p>
+
 <p><font color="#000000">where:</font></p>
 <ul>
-  <li><font color="#008040">&lt;hostname&gt;</font><font color="#000000"> The 
-    hostname of the Fedora server; default is localhost.</font></li>
-  <li><font color="#008040">&lt;port-number&gt;</font><font color="#000000"> The 
-    port number on which the Fedora server is running; default 8080.</font></li>
-  <li><font color="#008040">&lt;xml-source&gt;</font><font color="#000000"> The 
-    URL of the XML source file.</font></li>
-  <li><font color="#008040">&lt;xsl-stylesheet&gt;</font><font color="#000000"> 
-    The URL of the XSLT stylesheet file.</font></li>
-  <li><font color="#FF0000">clear-stylesheet-cache</font><font color="#000000"> 
-    An optional parameter indicating if the stylesheet cache is to be cleared. 
-    A value of of &quot;yes&quot; signals to clear the stylesheet cache. If the 
-    parameter is omitted or has any other value, the stylesheet cache remains 
-    untouched. </font></li>
+    <li><font color="#008040">&lt;hostname&gt;</font><font color="#000000"> The
+        hostname of the Fedora server; default is localhost.</font></li>
+    <li><font color="#008040">&lt;port-number&gt;</font><font color="#000000"> The
+        port number on which the Fedora server is running; default 8080.</font></li>
+    <li><font color="#008040">&lt;xml-source&gt;</font><font color="#000000"> The
+        URL of the XML source file.</font></li>
+    <li><font color="#008040">&lt;xsl-stylesheet&gt;</font><font color="#000000">
+        The URL of the XSLT stylesheet file.</font></li>
+    <li><font color="#FF0000">clear-stylesheet-cache</font><font color="#000000">
+        An optional parameter indicating if the stylesheet cache is to be cleared.
+        A value of of &quot;yes&quot; signals to clear the stylesheet cache. If the
+        parameter is omitted or has any other value, the stylesheet cache remains
+        untouched. </font></li>
 </ul>
 <p><font color="#000000">Example:</font></p>
-<p><font color="#000000"><a href="http://localhost:8080/saxon/SaxonServlet?source=http://dl.lib.virginia.edu/data/xmltext/ead/viu03270&amp;style=http://dl.lib.virginia.edu/bin/ead/xsl/document.xsl">http://localhost:8080/saxon/SaxonServlet?source=http://dl.lib.virginia.edu/data/xmltext/ead/viu03270&amp;style=http://dl.lib.virginia.edu/bin/xsl/ead/document.xsl</a></font></p>
+
+<p><font color="#000000"><a
+        href="http://localhost:8080/saxon/SaxonServlet?source=http://dl.lib.virginia.edu/data/xmltext/ead/viu03270&amp;style=http://dl.lib.virginia.edu/bin/ead/xsl/document.xsl">http://localhost:8080/saxon/SaxonServlet?source=http://dl.lib.virginia.edu/data/xmltext/ead/viu03270&amp;style=http://dl.lib.virginia.edu/bin/xsl/ead/document.xsl</a></font>
+</p>
+
 <p>&nbsp;</p>
-<p><cite>* This service uses the SAXON XSLT Processor from Michael Kay which is 
-  licensed under the Mozilla Public License <a href="http://www.mozilla.org/MPL/">(MPL)</a>. 
-  For additonal information regarding the SAXON XSLT Processor, please refer to 
-  the Saxon project web site on SourceForge at: <a href="http://saxon.sourceforge.net">http://saxon.sourceforge.net</a>.</cite></p>
+
+<p><cite>* This service uses the SAXON XSLT Processor from Michael Kay which is
+    licensed under the Mozilla Public License <a href="http://www.mozilla.org/MPL/">(MPL)</a>.
+    For additonal information regarding the SAXON XSLT Processor, please refer to
+    the Saxon project web site on SourceForge at: <a
+            href="http://saxon.sourceforge.net">http://saxon.sourceforge.net</a>.</cite></p>
 </html>

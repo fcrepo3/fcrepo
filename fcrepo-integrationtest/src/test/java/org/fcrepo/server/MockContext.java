@@ -7,9 +7,6 @@ package org.fcrepo.server;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.fcrepo.server.Context;
-import org.fcrepo.server.MultiValueMap;
-
 
 /**
  * Context object for testing.

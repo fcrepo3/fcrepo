@@ -6,8 +6,6 @@ package org.fcrepo.common;
 
 import java.io.File;
 
-import org.fcrepo.common.Constants;
-
 /**
  * @author Edwin Shin
  */

@@ -4,24 +4,8 @@
  */
 package org.fcrepo.server.management;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import java.rmi.RemoteException;
-
-import java.util.Date;
-
 import org.apache.axis.types.NonNegativeInteger;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.InitializationException;
@@ -30,6 +14,12 @@ import org.fcrepo.server.errors.StorageDeviceException;
 import org.fcrepo.server.utilities.AxisUtility;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.TypeUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.rmi.RemoteException;
+import java.util.Date;
 
 /**
  * Implements the Fedora management SOAP service.
@@ -571,6 +561,26 @@ public class FedoraAPIMBindingSOAPHTTPImpl
         } finally {
             logger.debug("end: purgeRelationship");
         }
+    }
+
+    @Override
+    public org.fcrepo.server.types.gen.Validation validate(String pid, String asOfDateTime) throws RemoteException {
+        logger.debug("start: validate");
+        assertInitialized();
+        try {
+            return TypeUtility.convertValidationToGenValidation(s_management.validate(ReadOnlyContext
+                    .getSoapContext(),
+                                                                                      pid,
+                                                                                      DateUtility
+                                                                                              .parseDateOrNull(
+                                                                                              asOfDateTime)));
+        } catch (Throwable th) {
+            logger.error("Error purging relationships", th);
+            throw AxisUtility.getFault(th);
+        } finally {
+            logger.debug("end: purgeRelationship");
+        }
+
     }
 
 }

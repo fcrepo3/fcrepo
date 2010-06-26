@@ -4,26 +4,17 @@
  */
 package org.fcrepo.server.storage.types;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
-import java.util.Date;
-import java.util.Iterator;
-
-import org.jrdf.graph.URIReference;
-
 import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.translation.FOXML1_1DODeserializer;
 import org.fcrepo.server.storage.translation.FOXML1_1DOSerializer;
-import org.fcrepo.server.storage.types.BasicDigitalObject;
-import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.storage.types.DatastreamManagedContent;
-import org.fcrepo.server.storage.types.DatastreamReferencedContent;
-import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
-import org.fcrepo.server.storage.types.DigitalObject;
+import org.jrdf.graph.URIReference;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.Date;
+import java.util.Iterator;
 
 
 /**
@@ -41,6 +32,17 @@ public abstract class ObjectBuilder {
         addDatastream(obj, id, ds);
     }
 
+    public static void addEDatastream(DigitalObject obj, String id, String url, String mime) {
+        DatastreamReferencedContent ds = new DatastreamReferencedContent();
+        ds.DSControlGrp = "E";
+        ds.DSMIME = mime;
+        ds.DSLocation = url;
+        ds.DSLocationType = "URL";
+        ds.DSSize = 1;
+        addDatastream(obj, id, ds);
+    }
+
+
     public static void addRDatastream(DigitalObject obj, String id) {
         DatastreamReferencedContent ds = new DatastreamReferencedContent();
         ds.DSControlGrp = "R";
@@ -52,8 +54,8 @@ public abstract class ObjectBuilder {
     }
 
     public static void addXDatastream(DigitalObject obj,
-                                         String id,
-                                         String xml) {
+                                      String id,
+                                      String xml) {
         DatastreamXMLMetadata ds = new DatastreamXMLMetadata();
         ds.DSControlGrp = "X";
         ds.DSMIME = "text/xml";
@@ -64,6 +66,23 @@ public abstract class ObjectBuilder {
         }
         addDatastream(obj, id, ds);
     }
+
+    public static void addXDatastream(DigitalObject obj,
+                                      String id,
+                                      String xml,
+                                      String formatURI) {
+        DatastreamXMLMetadata ds = new DatastreamXMLMetadata();
+        ds.DSControlGrp = "X";
+        ds.DSMIME = "text/xml";
+        ds.DSFormatURI = formatURI;
+        ds.DSSize = xml.length();
+        try {
+            ds.xmlContent = xml.getBytes("UTF-8");
+        } catch (Exception e) {
+        }
+        addDatastream(obj, id, ds);
+    }
+
 
     public static void addMDatastream(DigitalObject obj, String id) {
         DatastreamManagedContent ds = new DatastreamManagedContent();
@@ -80,7 +99,7 @@ public abstract class ObjectBuilder {
                                       Datastream ds) {
         int size = 0;
         for (Datastream d : obj.datastreams(id)) {
-            size ++;
+            size++;
         }
         ds.DatastreamID = id;
         ds.DSState = "A";
@@ -115,13 +134,13 @@ public abstract class ObjectBuilder {
 
         StringBuilder rdf = new StringBuilder();
         rdf.append("<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" "
-                        + "xmlns:fedora-model=\"info:fedora/fedora-system:def/model#\">\n"
-                        + "<rdf:Description rdf:about=\"");
+                   + "xmlns:fedora-model=\"info:fedora/fedora-system:def/model#\">\n"
+                   + "<rdf:Description rdf:about=\"");
         rdf.append(PID.getInstance(pid).toURI() + "\">\n");
         for (URIReference model : models) {
             rdf.append("<fedora-model:hasModel rdf:resource=\""
-                    + model.getURI().toString()
-                    + "\"></fedora-model:hasModel>\n");
+                       + model.getURI().toString()
+                       + "\"></fedora-model:hasModel>\n");
         }
         rdf.append("</rdf:Description></rdf:RDF>");
 
@@ -142,7 +161,7 @@ public abstract class ObjectBuilder {
 
         // make sure DOTranslationUtility doesn't die
         if (System.getProperty("fedoraServerHost") == null
-                || System.getProperty("fedoraServerPort") == null) {
+            || System.getProperty("fedoraServerPort") == null) {
             System.setProperty("fedoraServerHost", "localhost");
             System.setProperty("fedoraServerPort", "8080");
         }
@@ -212,11 +231,14 @@ public abstract class ObjectBuilder {
         x.append("</rdf:RDF>");
         return x.toString();
     }
+
     /**
      * Sets any un-set dates in the object to the given date.
      */
     public static void setDates(DigitalObject obj, Date date) {
-        if (obj.getCreateDate() == null) obj.setCreateDate(date);
+        if (obj.getCreateDate() == null) {
+            obj.setCreateDate(date);
+        }
         Iterator<String> dsIds = obj.datastreamIdIterator();
         while (dsIds.hasNext()) {
             String dsid = dsIds.next();

@@ -4,20 +4,6 @@
  */
 package org.fcrepo.server.management;
 
-import java.io.File;
-import java.io.InputStream;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -31,6 +17,13 @@ import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.fcrepo.server.storage.types.Validation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * @author Edwin Shin
@@ -468,6 +461,14 @@ public class ManagementModule
                                       object,
                                       isLiteral,
                                       datatype);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Validation validate(Context context, String pid,
+                               Date asOfDateTime) throws ServerException {
+        return mgmt.validate(context, pid, asOfDateTime);
     }
 
     /**

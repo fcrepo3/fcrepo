@@ -4,10 +4,10 @@
  */
 package org.fcrepo.server.security;
 
-import java.util.Date;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.authorization.AuthzException;
+
+import java.util.Date;
 
 
 /**
@@ -247,4 +247,5 @@ public interface Authorization {
     public void enforceRetrieveFile(Context context, String fileURI)
             throws AuthzException;
 
+    public void enforceValidate(Context context, String pid, Date asOfDateTime) throws AuthzException;
 }

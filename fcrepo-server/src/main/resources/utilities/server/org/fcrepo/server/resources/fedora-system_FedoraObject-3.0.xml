@@ -1,50 +1,734 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <foxml:digitalObject PID="fedora-system:FedoraObject-3.0" VERSION="1.1"
-  xmlns:foxml="info:fedora/fedora-system:def/foxml#"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
-  <foxml:objectProperties>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Content Model Object for All Objects"/>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-02T05:09:43.796Z"/>
-    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-07-02T05:09:43.796Z"/>
-  </foxml:objectProperties>
-  <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="false">
-    <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
-      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0"
-      LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
-      <foxml:xmlContent>
-        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
-          <dc:title>Content Model Object for All Objects</dc:title>
-          <dc:identifier>fedora-system:FedoraObject-3.0</dc:identifier>
-        </oai_dc:dc>
-      </foxml:xmlContent>
-    </foxml:datastreamVersion>
-  </foxml:datastream>
-  <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="false">
-    <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
-      FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT1.0"
-      LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
-      <foxml:xmlContent>
-        <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-          <rdf:Description rdf:about="info:fedora/fedora-system:FedoraObject-3.0">
-            <fedora-model:hasModel rdf:resource="info:fedora/fedora-system:ContentModel-3.0"/>
-          </rdf:Description>
-        </rdf:RDF>
-      </foxml:xmlContent>
-    </foxml:datastreamVersion>
-  </foxml:datastream>
-  <foxml:datastream CONTROL_GROUP="X" ID="DS-COMPOSITE-MODEL" STATE="A" VERSIONABLE="false">
-    <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
-      FORMAT_URI="info:fedora/fedora-system:FedoraDSCompositeModel-1.0"
-      ID="DS-COMPOSITE-MODEL1.0" LABEL="Datastream Composite Model" MIMETYPE="text/xml">
-      <foxml:xmlContent>
-        <dsCompositeModel xmlns="info:fedora/fedora-system:def/dsCompositeModel#">
-          <dsTypeModel ID="DC">
-            <form FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" MIME="text/xml"/>
-          </dsTypeModel>
-        </dsCompositeModel>
-      </foxml:xmlContent>
-    </foxml:datastreamVersion>
-  </foxml:datastream>
+                     xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+
+    <foxml:objectProperties>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Content Model Object for All Objects"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-02T05:09:43.796Z"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-07-02T05:09:43.796Z"/>
+    </foxml:objectProperties>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
+                                 FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0"
+                                 LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
+                           xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+                    <dc:title>Content Model Object for All Objects</dc:title>
+                    <dc:identifier>fedora-system:FedoraObject-3.0</dc:identifier>
+                </oai_dc:dc>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
+                                 FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT1.0"
+                                 LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
+            <foxml:xmlContent>
+                <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                    <rdf:Description rdf:about="info:fedora/fedora-system:FedoraObject-3.0">
+                        <fedora-model:hasModel rdf:resource="info:fedora/fedora-system:ContentModel-3.0"/>
+                    </rdf:Description>
+                </rdf:RDF>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="ONTOLOGY" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion
+                FORMAT_URI="info:fedora/fedora-system:FedoraOntology-1.0" ID="ONTOLOGY1.0"
+                LABEL="Class declaration for this content model" MIMETYPE="application/rdf+xml">
+            <foxml:xmlContent>
+                <rdf:RDF
+                        xmlns:owl="http://www.w3.org/2002/07/owl#"
+                        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                        xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0_class">
+                        <rdfs:subClassOf>
+                            <owl:Restriction>
+                                <owl:onProperty
+                                        rdf:resource="info:fedora/fedora-system:def/model#hasModel"/>
+                                <owl:allValuesFrom rdf:resource="info:fedora/fedora-system:ContentModel-3.0_class"/>
+                            </owl:Restriction>
+                        </rdfs:subClassOf>
+                    </owl:Class>
+                    <owl:ObjectProperty
+                            rdf:about="info:fedora/fedora-system:def/model#hasModel"/>
+                </rdf:RDF>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="DS-COMPOSITE-MODEL" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
+                                 FORMAT_URI="info:fedora/fedora-system:FedoraDSCompositeModel-1.0"
+                                 ID="DS-COMPOSITE-MODEL1.0" LABEL="Datastream Composite Model" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <dsCompositeModel xmlns="info:fedora/fedora-system:def/dsCompositeModel#">
+                    <dsTypeModel ID="DC">
+                        <form FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" MIME="text/xml"/>
+                        <extension name="SCHEMA">
+                            <reference type="xsd" datastream="OAI_DC-SCHEMA"/>
+                        </extension>
+                    </dsTypeModel>
+                    <dsTypeModel ID="RELS-EXT" optional="true">
+                        <form FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" MIME="application/rdf+xml"/>
+                        <extension name="SCHEMA">
+                            <reference type="xsd" datastream="RELS-EXT-SCHEMA"/>
+                        </extension>
+                    </dsTypeModel>
+                    <dsTypeModel ID="RELS-INT" optional="true">
+                        <form FORMAT_URI="info:fedora/fedora-system:FedoraRELSInt-1.0" MIME="application/rdf+xml"/>
+                        <extension name="SCHEMA">
+                            <reference type="xsd" datastream="RELS-INT-SCHEMA"/>
+                        </extension>
+                    </dsTypeModel>
+                    <dsTypeModel ID="POLICY" optional="true">
+                        <form FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" MIME="application/rdf+xml"/>
+                        <extension name="SCHEMA">
+                            <reference type="xsd" datastream="POLICY-SCHEMA"/>
+                        </extension>
+                    </dsTypeModel>
+                    <dsTypeModel ID="AUDIT" optional="true"/>
+                </dsCompositeModel>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <!--
+        <foxml:datastream CONTROL_GROUP="E" ID="OAI_DC_SCHEMA" STATE="A" VERSIONABLE="false">
+            <foxml:datastreamVersion ID="OAI_DC_SCHEMA1.0" LABEL="OAI DC xml schema" MIMETYPE="text/xml">
+                <foxml:contentLocation TYPE="URL" REF="http://www.openarchives.org/OAI/2.0/oai_dc.xsd"/>
+            </foxml:datastreamVersion>
+        </foxml:datastream>
+    -->
+    <foxml:datastream CONTROL_GROUP="X" ID="OAI_DC-SCHEMA" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="OAI_DC-SCHEMA1.0" LABEL="OAI DC xml schema" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <schema targetNamespace="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns="http://www.w3.org/2001/XMLSchema"
+                        elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+                    <annotation>
+                        <documentation>
+                            XML Schema 2002-03-18 by Pete Johnston.
+                            Adjusted for usage in the OAI-PMH.
+                            Schema imports the Dublin Core elements from the DCMI schema for unqualified Dublin Core.
+                            2002-12-19 updated to use simpledc20021212.xsd (instead of simpledc20020312.xsd)
+                        </documentation>
+                    </annotation>
+
+                    <import namespace="http://purl.org/dc/elements/1.1/"
+                            schemaLocation="../SIMPLEDC-SCHEMA"/>
+
+                    <element name="dc" type="oai_dc:oai_dcType"/>
+
+                    <complexType name="oai_dcType">
+                        <choice minOccurs="0" maxOccurs="unbounded">
+                            <element ref="dc:title"/>
+                            <element ref="dc:creator"/>
+                            <element ref="dc:subject"/>
+                            <element ref="dc:description"/>
+                            <element ref="dc:publisher"/>
+                            <element ref="dc:contributor"/>
+                            <element ref="dc:date"/>
+                            <element ref="dc:type"/>
+                            <element ref="dc:format"/>
+                            <element ref="dc:identifier"/>
+                            <element ref="dc:source"/>
+                            <element ref="dc:language"/>
+                            <element ref="dc:relation"/>
+                            <element ref="dc:coverage"/>
+                            <element ref="dc:rights"/>
+                        </choice>
+                    </complexType>
+
+                </schema>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="SIMPLEDC-SCHEMA" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="SIMPLEDC-SCHEMA1.0" LABEL="Simple DC xml schema" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                           xmlns="http://purl.org/dc/elements/1.1/"
+                           targetNamespace="http://purl.org/dc/elements/1.1/"
+                           elementFormDefault="qualified"
+                           attributeFormDefault="unqualified">
+
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                            Simple DC XML Schema, 2002-10-09
+                            by Pete Johnston (p.johnston@ukoln.ac.uk),
+                            Carl Lagoze (lagoze@cs.cornell.edu), Andy Powell (a.powell@ukoln.ac.uk),
+                            Herbert Van de Sompel (hvdsomp@yahoo.com).
+                            This schema defines terms for Simple Dublin Core, i.e. the 15
+                            elements from the http://purl.org/dc/elements/1.1/ namespace, with
+                            no use of encoding schemes or element refinements.
+                            Default content type for all elements is xs:string with xml:lang
+                            attribute available.
+
+                            Supercedes version of 2002-03-12.
+                            Amended to remove namespace declaration for http://www.w3.org/XML/1998/namespace namespace,
+                            and to reference lang attribute via built-in xml: namespace prefix.
+                            xs:appinfo also removed.
+                        </xs:documentation>
+                    </xs:annotation>
+
+                    <xs:import namespace="http://www.w3.org/XML/1998/namespace"
+                               schemaLocation="../XML-SCHEMA">
+                    </xs:import>
+
+                    <xs:element name="title" type="elementType"/>
+                    <xs:element name="creator" type="elementType"/>
+                    <xs:element name="subject" type="elementType"/>
+                    <xs:element name="description" type="elementType"/>
+                    <xs:element name="publisher" type="elementType"/>
+                    <xs:element name="contributor" type="elementType"/>
+                    <xs:element name="date" type="elementType"/>
+                    <xs:element name="type" type="elementType"/>
+                    <xs:element name="format" type="elementType"/>
+
+                    <xs:element name="identifier" type="elementType"/>
+                    <xs:element name="source" type="elementType"/>
+                    <xs:element name="language" type="elementType"/>
+                    <xs:element name="relation" type="elementType"/>
+                    <xs:element name="coverage" type="elementType"/>
+                    <xs:element name="rights" type="elementType"/>
+
+                    <xs:group name="elementsGroup">
+                        <xs:sequence>
+
+                            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                <xs:element ref="title"/>
+                                <xs:element ref="creator"/>
+                                <xs:element ref="subject"/>
+                                <xs:element ref="description"/>
+                                <xs:element ref="publisher"/>
+                                <xs:element ref="contributor"/>
+                                <xs:element ref="date"/>
+                                <xs:element ref="type"/>
+
+                                <xs:element ref="format"/>
+                                <xs:element ref="identifier"/>
+                                <xs:element ref="source"/>
+                                <xs:element ref="language"/>
+                                <xs:element ref="relation"/>
+                                <xs:element ref="coverage"/>
+                                <xs:element ref="rights"/>
+                            </xs:choice>
+                        </xs:sequence>
+
+                    </xs:group>
+
+                    <xs:complexType name="elementType">
+                        <xs:simpleContent>
+                            <xs:extension base="xs:string">
+                                <xs:attribute ref="xml:lang" use="optional"/>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+
+                </xs:schema>
+
+
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+    <foxml:datastream CONTROL_GROUP="X" ID="XML-SCHEMA" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="XML-SCHEMA1.0" LABEL="Simple DC xml schema" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <xs:schema targetNamespace="http://www.w3.org/XML/1998/namespace"
+                           xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="en">
+
+                    <xs:annotation>
+                        <xs:documentation>
+                            See http://www.w3.org/XML/1998/namespace.html and
+                            http://www.w3.org/TR/REC-xml for information about this namespace.
+
+                            This schema document describes the XML namespace, in a form
+                            suitable for import by other schema documents.
+
+                            Note that local names in this namespace are intended to be defined
+                            only by the World Wide Web Consortium or its subgroups. The
+                            following names are currently defined in this namespace and should
+                            not be used with conflicting semantics by any Working Group,
+                            specification, or document instance:
+
+                            base (as an attribute name): denotes an attribute whose value
+                            provides a URI to be used as the base for interpreting any
+                            relative URIs in the scope of the element on which it
+                            appears; its value is inherited. This name is reserved
+                            by virtue of its definition in the XML Base specification.
+
+                            lang (as an attribute name): denotes an attribute whose value
+                            is a language code for the natural language of the content of
+                            any element; its value is inherited. This name is reserved
+                            by virtue of its definition in the XML specification.
+
+                            space (as an attribute name): denotes an attribute whose
+                            value is a keyword indicating what whitespace processing
+                            discipline is intended for the content of the element; its
+                            value is inherited. This name is reserved by virtue of its
+                            definition in the XML specification.
+
+                            Father (in any context at all): denotes Jon Bosak, the chair of
+                            the original XML Working Group. This name is reserved by
+                            the following decision of the W3C XML Plenary and
+                            XML Coordination groups:
+
+                            In appreciation for his vision, leadership and dedication
+                            the W3C XML Plenary on this 10th day of February, 2000
+                            reserves for Jon Bosak in perpetuity the XML name
+                            xml:Father
+                        </xs:documentation>
+                    </xs:annotation>
+
+                    <xs:annotation>
+                        <xs:documentation>This schema defines attributes and an attribute group
+                            suitable for use by
+                            schemas wishing to allow xml:base, xml:lang or xml:space attributes
+                            on elements they define.
+
+                            To enable this, such a schema must import this schema
+                            for the XML namespace, e.g. as follows:
+                            &lt;schema . . .>
+                            . . .
+                            &lt;import namespace="http://www.w3.org/XML/1998/namespace"
+                            schemaLocation="http://www.w3.org/2001/03/xml.xsd"/>
+
+                            Subsequently, qualified reference to any of the attributes
+                            or the group defined below will have the desired effect, e.g.
+
+                            &lt;type . . .>
+                            . . .
+                            &lt;attributeGroup ref="xml:specialAttrs"/>
+
+                            will define a type which will schema-validate an instance
+                            element with any of those attributes
+                        </xs:documentation>
+
+                    </xs:annotation>
+
+                    <xs:annotation>
+                        <xs:documentation>In keeping with the XML Schema WG's standard versioning
+                            policy, this schema document will persist at
+                            http://www.w3.org/2001/03/xml.xsd.
+                            At the date of issue it can also be found at
+                            http://www.w3.org/2001/xml.xsd.
+                            The schema document at that URI may however change in the future,
+                            in order to remain compatible with the latest version of XML Schema
+                            itself. In other words, if the XML Schema namespace changes, the version
+                            of this document at
+                            http://www.w3.org/2001/xml.xsd will change
+                            accordingly; the version at
+                            http://www.w3.org/2001/03/xml.xsd will not change.
+                        </xs:documentation>
+                    </xs:annotation>
+
+                    <xs:attribute name="lang" type="xs:language">
+                        <xs:annotation>
+                            <xs:documentation>In due course, we should install the relevant ISO 2- and 3-letter
+                                codes as the enumerated possible values . . .
+                            </xs:documentation>
+
+                        </xs:annotation>
+                    </xs:attribute>
+
+                    <xs:attribute name="space" default="preserve">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:NCName">
+                                <xs:enumeration value="default"/>
+                                <xs:enumeration value="preserve"/>
+                            </xs:restriction>
+
+                        </xs:simpleType>
+                    </xs:attribute>
+
+                    <xs:attribute name="base" type="xs:anyURI">
+                        <xs:annotation>
+                            <xs:documentation>See http://www.w3.org/TR/xmlbase/ for
+                                information about this attribute.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+
+                    <xs:attributeGroup name="specialAttrs">
+                        <xs:attribute ref="xml:base"/>
+                        <xs:attribute ref="xml:lang"/>
+                        <xs:attribute ref="xml:space"/>
+                    </xs:attributeGroup>
+
+                </xs:schema>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+
+    <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT-SCHEMA" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="RELS-EXT-SCHEMA1.0" LABEL="RELS-EXT xml schema" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <!--
+                About this Schema:
+                  This schema describes the "RELS-EXT" format, which is a specialization of
+                  RDF/XML used by "RELS-EXT" datastreams in Fedora.  Datastreams in this
+                  format have FORMAT_URI "info:fedora/fedora-system:FedoraRELSExt-1.0".
+
+                Syntax:
+                  The root element, [RDF], must contain exactly one [Description] element
+                  with an "about" attribute.  The [Description] element may contain any
+                  number of child elements from any namespace.  Each such element may
+                  have an rdf:resource attribute, an rdf:datatype attribute, or text
+                  content.
+
+                  Note that the RELS-EXT format is not fully expressable in the W3C XML Schema
+                  language.  Additional restrictions on this format are documented in the
+                  javadocs for RelsExtValidator.
+                -->
+                <xsd:schema
+                        targetNamespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                        xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                        elementFormDefault="qualified"
+                        attributeFormDefault="qualified">
+                    <xsd:element name="RDF">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element minOccurs="1" maxOccurs="1" name="Description">
+                                    <xsd:complexType mixed="true">
+                                        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                                            <xsd:any processContents="lax"/>
+                                        </xsd:sequence>
+                                        <xsd:attribute name="about" type="xsd:anyURI"/>
+                                    </xsd:complexType>
+                                </xsd:element>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:schema>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+
+    <foxml:datastream CONTROL_GROUP="X" ID="RELS-INT-SCHEMA" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="RELS-INT-SCHEMA1.0" LABEL="RELS-INT xml schema" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <!--
+                About this Schema:
+                  This schema describes the "RELS-INT" format, which is a specialization
+                  of RDF/XML used by "RELS-INT" datastreams in Fedora.  Datastreams in this
+                  experimental format have FORMAT_URI
+                  "info:fedora/fedora-system:FedoraRELSInt-1.0".
+
+                Syntax:
+                  The root element, [RDF], must contain one or more [Description] elements
+                  with an "about" attribute.  The [Description] element may contain any
+                  number of child elements from any namespace.  Each such element may
+                  have an rdf:resource attribute, an rdf:datatype attribute, or text
+                  content.
+
+                  Note that the RELS-INT format is not fully expressable in the W3C XML Schema
+                  language.
+                -->
+                <xsd:schema
+                        targetNamespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                        xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                    <xsd:element name="RDF">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element minOccurs="1" maxOccurs="unbounded" name="Description">
+                                    <xsd:complexType mixed="true">
+                                        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                                            <xsd:any processContents="lax"/>
+                                        </xsd:sequence>
+                                        <xsd:attribute name="resource" use="optional" type="xsd:anyURI"/>
+                                        <xsd:attribute name="datatype" use="optional" type="xsd:anyURI"/>
+                                    </xsd:complexType>
+                                </xsd:element>
+                            </xsd:sequence>
+                            <xsd:attribute name="about" type="xsd:anyURI"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:schema>
+
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+
+    <foxml:datastream CONTROL_GROUP="X" ID="POLICY-SCHEMA" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="POLICY-SCHEMA1.0" LABEL="POLICY xml schema" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <xs:schema targetNamespace="urn:oasis:names:tc:xacml:1.0:policy"
+                           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                           xmlns:xacml="urn:oasis:names:tc:xacml:1.0:policy"
+                           elementFormDefault="qualified"
+                           attributeFormDefault="unqualified">
+                    <!-- -->
+                    <xs:element name="PolicySet" type="xacml:PolicySetType"/>
+                    <xs:complexType name="PolicySetType">
+                        <xs:sequence>
+                            <xs:element ref="xacml:Description" minOccurs="0"/>
+                            <xs:element ref="xacml:PolicySetDefaults" minOccurs="0"/>
+                            <xs:element ref="xacml:Target"/>
+                            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                <xs:element ref="xacml:PolicySet"/>
+                                <xs:element ref="xacml:Policy"/>
+                                <xs:element ref="xacml:PolicySetIdReference"/>
+                                <xs:element ref="xacml:PolicyIdReference"/>
+                            </xs:choice>
+                            <xs:element ref="xacml:Obligations" minOccurs="0"/>
+                        </xs:sequence>
+                        <xs:attribute name="PolicySetId" type="xs:anyURI" use="required"/>
+                        <xs:attribute name="PolicyCombiningAlgId" type="xs:anyURI" use="required"/>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="PolicySetIdReference" type="xs:anyURI"/>
+                    <xs:element name="PolicyIdReference" type="xs:anyURI"/>
+                    <!-- -->
+                    <xs:element name="PolicySetDefaults" type="xacml:DefaultsType"/>
+                    <xs:element name="PolicyDefaults" type="xacml:DefaultsType"/>
+                    <xs:complexType name="DefaultsType">
+                        <xs:sequence>
+                            <xs:choice>
+                                <xs:element ref="xacml:XPathVersion"/>
+                            </xs:choice>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="XPathVersion" type="xs:anyURI"/>
+                    <!-- -->
+                    <xs:element name="Policy" type="xacml:PolicyType"/>
+                    <xs:complexType name="PolicyType">
+                        <xs:sequence>
+                            <xs:element ref="xacml:Description" minOccurs="0"/>
+                            <xs:element ref="xacml:PolicyDefaults" minOccurs="0"/>
+                            <xs:element ref="xacml:Target"/>
+                            <xs:element ref="xacml:Rule" minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element ref="xacml:Obligations" minOccurs="0"/>
+                        </xs:sequence>
+                        <xs:attribute name="PolicyId" type="xs:anyURI" use="required"/>
+                        <xs:attribute name="RuleCombiningAlgId" type="xs:anyURI" use="required"/>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="Description" type="xs:string"/>
+                    <!-- -->
+                    <xs:element name="Rule" type="xacml:RuleType"/>
+                    <xs:complexType name="RuleType">
+                        <xs:sequence>
+                            <xs:element ref="xacml:Description" minOccurs="0"/>
+                            <xs:element ref="xacml:Target" minOccurs="0"/>
+                            <xs:element ref="xacml:Condition" minOccurs="0"/>
+                        </xs:sequence>
+                        <xs:attribute name="RuleId" type="xs:anyURI" use="required"/>
+                        <xs:attribute name="Effect" type="xacml:EffectType" use="required"/>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:simpleType name="EffectType">
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="Permit"/>
+                            <xs:enumeration value="Deny"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                    <!-- -->
+                    <xs:element name="Target" type="xacml:TargetType"/>
+                    <xs:complexType name="TargetType">
+                        <xs:sequence>
+                            <xs:element ref="xacml:Subjects"/>
+                            <xs:element ref="xacml:Resources"/>
+                            <xs:element ref="xacml:Actions"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="Subjects" type="xacml:SubjectsType"/>
+                    <xs:complexType name="SubjectsType">
+                        <xs:choice>
+                            <xs:element ref="xacml:Subject" maxOccurs="unbounded"/>
+                            <xs:element ref="xacml:AnySubject"/>
+                        </xs:choice>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="Subject" type="xacml:SubjectType"/>
+                    <xs:complexType name="SubjectType">
+                        <xs:sequence>
+                            <xs:element ref="xacml:SubjectMatch" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="AnySubject"/>
+                    <!-- -->
+                    <xs:element name="Resources" type="xacml:ResourcesType"/>
+                    <xs:complexType name="ResourcesType">
+                        <xs:choice>
+                            <xs:element ref="xacml:Resource" maxOccurs="unbounded"/>
+                            <xs:element ref="xacml:AnyResource"/>
+                        </xs:choice>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="AnyResource"/>
+                    <!-- -->
+                    <xs:element name="Resource" type="xacml:ResourceType"/>
+                    <xs:complexType name="ResourceType">
+                        <xs:sequence>
+                            <xs:element ref="xacml:ResourceMatch" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="Actions" type="xacml:ActionsType"/>
+                    <xs:complexType name="ActionsType">
+                        <xs:choice>
+                            <xs:element ref="xacml:Action" maxOccurs="unbounded"/>
+                            <xs:element ref="xacml:AnyAction"/>
+                        </xs:choice>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="AnyAction"/>
+                    <!-- -->
+                    <xs:element name="Action" type="xacml:ActionType"/>
+                    <xs:complexType name="ActionType">
+                        <xs:sequence>
+                            <xs:element ref="xacml:ActionMatch" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="SubjectMatch" type="xacml:SubjectMatchType"/>
+                    <xs:complexType name="SubjectMatchType">
+                        <xs:sequence>
+                            <xs:element ref="xacml:AttributeValue"/>
+                            <xs:choice>
+                                <xs:element ref="xacml:SubjectAttributeDesignator"/>
+                                <xs:element ref="xacml:AttributeSelector"/>
+                            </xs:choice>
+                        </xs:sequence>
+                        <xs:attribute name="MatchId" type="xs:anyURI" use="required"/>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="ResourceMatch" type="xacml:ResourceMatchType"/>
+                    <xs:complexType name="ResourceMatchType">
+                        <xs:sequence>
+                            <xs:element ref="xacml:AttributeValue"/>
+                            <xs:choice>
+                                <xs:element ref="xacml:ResourceAttributeDesignator"/>
+                                <xs:element ref="xacml:AttributeSelector"/>
+                            </xs:choice>
+                        </xs:sequence>
+                        <xs:attribute name="MatchId" type="xs:anyURI" use="required"/>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="ActionMatch" type="xacml:ActionMatchType"/>
+                    <xs:complexType name="ActionMatchType">
+                        <xs:sequence>
+                            <xs:element ref="xacml:AttributeValue"/>
+                            <xs:choice>
+                                <xs:element ref="xacml:ActionAttributeDesignator"/>
+                                <xs:element ref="xacml:AttributeSelector"/>
+                            </xs:choice>
+                        </xs:sequence>
+                        <xs:attribute name="MatchId" type="xs:anyURI" use="required"/>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="AttributeSelector" type="xacml:AttributeSelectorType"/>
+                    <xs:complexType name="AttributeSelectorType">
+                        <xs:attribute name="RequestContextPath" type="xs:string" use="required"/>
+                        <xs:attribute name="DataType" type="xs:anyURI" use="required"/>
+                        <xs:attribute name="MustBePresent" type="xs:boolean" use="optional" default="false"/>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="ResourceAttributeDesignator" type="xacml:AttributeDesignatorType"/>
+                    <xs:element name="ActionAttributeDesignator" type="xacml:AttributeDesignatorType"/>
+                    <xs:element name="EnvironmentAttributeDesignator" type="xacml:AttributeDesignatorType"/>
+                    <!-- -->
+                    <xs:complexType name="AttributeDesignatorType">
+                        <xs:attribute name="AttributeId" type="xs:anyURI" use="required"/>
+                        <xs:attribute name="DataType" type="xs:anyURI" use="required"/>
+                        <xs:attribute name="Issuer" type="xs:string" use="optional"/>
+                        <xs:attribute name="MustBePresent" type="xs:boolean" use="optional" default="false"/>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="SubjectAttributeDesignator" type="xacml:SubjectAttributeDesignatorType"/>
+                    <xs:complexType name="SubjectAttributeDesignatorType">
+                        <xs:complexContent>
+                            <xs:extension base="xacml:AttributeDesignatorType">
+                                <xs:attribute name="SubjectCategory" type="xs:anyURI" use="optional"
+                                              default="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"/>
+                            </xs:extension>
+                        </xs:complexContent>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="AttributeValue" type="xacml:AttributeValueType"/>
+                    <xs:complexType name="AttributeValueType" mixed="true">
+                        <xs:sequence>
+                            <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:attribute name="DataType" type="xs:anyURI" use="required"/>
+                        <xs:anyAttribute namespace="##any" processContents="lax"/>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="Function" type="xacml:FunctionType"/>
+                    <xs:complexType name="FunctionType">
+                        <xs:attribute name="FunctionId" type="xs:anyURI" use="required"/>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="Apply" type="xacml:ApplyType"/>
+                    <xs:element name="Condition" type="xacml:ApplyType"/>
+                    <!-- -->
+                    <xs:complexType name="ApplyType">
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                            <xs:element ref="xacml:Apply"/>
+                            <xs:element ref="xacml:Function"/>
+                            <xs:element ref="xacml:AttributeValue"/>
+                            <xs:element ref="xacml:SubjectAttributeDesignator"/>
+                            <xs:element ref="xacml:ResourceAttributeDesignator"/>
+                            <xs:element ref="xacml:ActionAttributeDesignator"/>
+                            <xs:element ref="xacml:EnvironmentAttributeDesignator"/>
+                            <xs:element ref="xacml:AttributeSelector"/>
+                        </xs:choice>
+                        <xs:attribute name="FunctionId" type="xs:anyURI" use="required"/>
+                        <!-- Legal types for the first and subsequent operands are defined in the accompanying table -->
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="Obligations" type="xacml:ObligationsType"/>
+                    <xs:complexType name="ObligationsType">
+                        <xs:sequence>
+                            <xs:element ref="xacml:Obligation" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="Obligation" type="xacml:ObligationType"/>
+                    <xs:complexType name="ObligationType">
+                        <xs:sequence>
+                            <xs:element ref="xacml:AttributeAssignment" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:attribute name="ObligationId" type="xs:anyURI" use="required"/>
+                        <xs:attribute name="FulfillOn" type="xacml:EffectType" use="required"/>
+                    </xs:complexType>
+                    <!-- -->
+                    <xs:element name="AttributeAssignment" type="xacml:AttributeAssignmentType"/>
+                    <xs:complexType name="AttributeAssignmentType" mixed="true">
+                        <xs:complexContent mixed="true">
+                            <xs:extension base="xacml:AttributeValueType">
+                                <xs:attribute name="AttributeId" type="xs:anyURI" use="required"/>
+                            </xs:extension>
+                        </xs:complexContent>
+                    </xs:complexType>
+                    <!-- -->
+                </xs:schema>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
+
 </foxml:digitalObject>

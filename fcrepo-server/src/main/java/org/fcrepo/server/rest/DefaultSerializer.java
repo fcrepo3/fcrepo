@@ -4,7 +4,17 @@
  */
 package org.fcrepo.server.rest;
 
-import static org.fcrepo.server.utilities.StreamUtility.enc;
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.Context;
+import org.fcrepo.server.access.ObjectProfile;
+import org.fcrepo.server.management.DefaultManagement;
+import org.fcrepo.server.search.FieldSearchResult;
+import org.fcrepo.server.search.ObjectFields;
+import org.fcrepo.server.storage.types.*;
+import org.fcrepo.server.utilities.DCField;
+import org.fcrepo.server.utilities.DateUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -12,28 +22,14 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.Context;
-import org.fcrepo.server.access.ObjectProfile;
-import org.fcrepo.server.management.DefaultManagement;
-import org.fcrepo.server.search.FieldSearchResult;
-import org.fcrepo.server.search.ObjectFields;
-import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.storage.types.DatastreamDef;
-import org.fcrepo.server.storage.types.MethodParmDef;
-import org.fcrepo.server.storage.types.ObjectMethodsDef;
-import org.fcrepo.server.utilities.DCField;
-import org.fcrepo.server.utilities.DateUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
+import static org.fcrepo.server.utilities.StreamUtility.enc;
 
 
 public class DefaultSerializer {
     private static final Logger logger =
-        LoggerFactory.getLogger(DefaultManagement.class);
+            LoggerFactory.getLogger(DefaultManagement.class);
 
 
     String fedoraServerHost;
@@ -46,7 +42,8 @@ public class DefaultSerializer {
         this.fedoraServerPort = context.getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.uri);
         this.fedoraAppServerContext = context.getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME);
 
-        if (Constants.HTTP_REQUEST.SECURE.uri.equals(context.getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri))) {
+        if (Constants.HTTP_REQUEST.SECURE.uri
+                .equals(context.getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri))) {
             this.fedoraServerProtocol = "https";
         } else {
             this.fedoraServerProtocol = "http";
@@ -58,12 +55,12 @@ public class DefaultSerializer {
         StringBuffer xml = new StringBuffer();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         xml.append("<pidList "
-                + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
-                + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/management/ "
-                + enc(fedoraServerProtocol) + "://"
-                + enc(fedoraServerHost) + ":"
-                + enc(fedoraServerPort) + "/getNextPIDInfo.xsd\">\n");
+                   + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+                   + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+                   + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/management/ "
+                   + enc(fedoraServerProtocol) + "://"
+                   + enc(fedoraServerHost) + ":"
+                   + enc(fedoraServerPort) + "/getNextPIDInfo.xsd\">\n");
 
         // PID array serialization
         for (int i = 0; i < pidList.length; i++) {
@@ -89,20 +86,20 @@ public class DefaultSerializer {
 
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         buffer.append("<objectProfile "
-                + " xmlns=\"" + Constants.OBJ_PROFILE1_0.namespace.uri + "\" "
-                + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
-                + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                + " xsi:schemaLocation=\"" + Constants.OBJ_PROFILE1_0.namespace.uri + " "
-                + Constants.OBJ_PROFILE1_0.xsdLocation + "\""
-                + " pid=\"" + enc(pid) + "\" " + dateString +">");
+                      + " xmlns=\"" + Constants.OBJ_PROFILE1_0.namespace.uri + "\" "
+                      + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+                      + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+                      + " xsi:schemaLocation=\"" + Constants.OBJ_PROFILE1_0.namespace.uri + " "
+                      + Constants.OBJ_PROFILE1_0.xsdLocation + "\""
+                      + " pid=\"" + enc(pid) + "\" " + dateString + ">");
 
         // PROFILE FIELDS SERIALIZATION
         buffer.append("<objLabel>" + enc(objProfile.objectLabel)
-                + "</objLabel>");
+                      + "</objLabel>");
         buffer.append("<objOwnerId>" + enc(objProfile.objectOwnerId)
-                + "</objOwnerId>");
+                      + "</objOwnerId>");
         buffer.append("<objModels>");
-        for (String model: objProfile.objectModels) {
+        for (String model : objProfile.objectModels) {
             buffer.append("<model>");
             buffer.append(enc(model));
             buffer.append("</model>");
@@ -113,11 +110,11 @@ public class DefaultSerializer {
         String mDate = DateUtility.convertDateToString(objProfile.objectLastModDate);
         buffer.append("<objLastModDate>" + mDate + "</objLastModDate>");
         buffer.append("<objDissIndexViewURL>"
-                + enc(objProfile.dissIndexViewURL)
-                + "</objDissIndexViewURL>");
+                      + enc(objProfile.dissIndexViewURL)
+                      + "</objDissIndexViewURL>");
         buffer.append("<objItemIndexViewURL>"
-                + enc(objProfile.itemIndexViewURL)
-                + "</objItemIndexViewURL>");
+                      + enc(objProfile.itemIndexViewURL)
+                      + "</objItemIndexViewURL>");
         buffer.append("<objState>"
                       + enc(objProfile.objectState)
                       + "</objState>");
@@ -126,7 +123,7 @@ public class DefaultSerializer {
         return buffer.toString();
     }
 
-    private String datastreamFieldSerialization(Datastream dsProfile, boolean validateChecksum){
+    private String datastreamFieldSerialization(Datastream dsProfile, boolean validateChecksum) {
         StringBuffer buffer = new StringBuffer();
         buffer.append("<dsLabel>" + enc(dsProfile.DSLabel) + "</dsLabel>");
         buffer.append("<dsVersionID>" + enc(dsProfile.DSVersionID) + "</dsVersionID>");
@@ -139,24 +136,26 @@ public class DefaultSerializer {
         buffer.append("<dsFormatURI>" + enc(dsProfile.DSFormatURI) + "</dsFormatURI>");
         buffer.append("<dsControlGroup>" + enc(dsProfile.DSControlGrp) + "</dsControlGroup>");
         buffer.append("<dsSize>" + enc(Long.valueOf(dsProfile.DSSize).toString()) + "</dsSize>");
-        buffer.append("<dsVersionable>" + enc(Boolean.valueOf(dsProfile.DSVersionable).toString()) + "</dsVersionable>");
+        buffer.append(
+                "<dsVersionable>" + enc(Boolean.valueOf(dsProfile.DSVersionable).toString()) + "</dsVersionable>");
         buffer.append("<dsInfoType>" + enc(dsProfile.DSInfoType) + "</dsInfoType>");
         buffer.append("<dsLocation>" + enc(dsProfile.DSLocation) + "</dsLocation>");
         buffer.append("<dsLocationType>" + enc(dsProfile.DSLocationType) + "</dsLocationType>");
         buffer.append("<dsChecksumType>" + enc(dsProfile.DSChecksumType) + "</dsChecksumType>");
         buffer.append("<dsChecksum>" + enc(dsProfile.DSChecksum) + "</dsChecksum>");
-        if (validateChecksum){
+        if (validateChecksum) {
             String valid = dsProfile.compareChecksum() ? "true" : "false";
             buffer.append("<dsChecksumValid>" + valid + "</dsChecksumValid>");
         }
         String[] dsAltIDs = dsProfile.DatastreamAltIDs;
-        for(int i = 0; i < dsAltIDs.length; i++) {
+        for (int i = 0; i < dsAltIDs.length; i++) {
             buffer.append("<dsAltID>" + enc(dsAltIDs[i]) + "</dsAltID>");
         }
         return buffer.toString();
     }
 
-    String datastreamProfileToXML(String pid, String dsID, Datastream dsProfile, Date versDateTime, boolean validateChecksum)
+    String datastreamProfileToXML(String pid, String dsID, Datastream dsProfile, Date versDateTime,
+                                  boolean validateChecksum)
             throws IOException {
         StringBuffer buffer = new StringBuffer();
 
@@ -175,7 +174,7 @@ public class DefaultSerializer {
         }
         buffer.append(" >");
         // ADD PROFILE FIELDS SERIALIZATION
-        buffer.append(datastreamFieldSerialization(dsProfile,validateChecksum));
+        buffer.append(datastreamFieldSerialization(dsProfile, validateChecksum));
 
 
         buffer.append("</datastreamProfile>");
@@ -189,12 +188,12 @@ public class DefaultSerializer {
         StringBuilder buffer = new StringBuilder();
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         buffer.append("<fedoraObjectHistory "
-                + " xmlns=\"" + Constants.OBJ_HISTORY1_0.namespace.uri + "\""
-                + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
-                + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                + " xsi:schemaLocation=\"" + Constants.OBJ_HISTORY1_0.namespace.uri
-                + " " + Constants.OBJ_HISTORY1_0.xsdLocation + "\""
-                + " pid=\"" + pid + "\" >");
+                      + " xmlns=\"" + Constants.OBJ_HISTORY1_0.namespace.uri + "\""
+                      + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+                      + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+                      + " xsi:schemaLocation=\"" + Constants.OBJ_HISTORY1_0.namespace.uri
+                      + " " + Constants.OBJ_HISTORY1_0.xsdLocation + "\""
+                      + " pid=\"" + pid + "\" >");
 
         for (String ts : objectHistory) {
             buffer.append("<objectChangeDate>" + ts + "</objectChangeDate>");
@@ -215,11 +214,11 @@ public class DefaultSerializer {
                       + " pid=\"" + enc(pid) + "\""
                       + " dsID=\"" + enc(dsID) + "\">");
 
-        for (Datastream ds : history){
+        for (Datastream ds : history) {
             buffer.append("<datastreamProfile ").append("pid=\"").append(
                     enc(pid)).append("\"").append(" dsID=\"").append(enc(dsID))
                     .append("\">");
-            buffer.append(datastreamFieldSerialization(ds,false));
+            buffer.append(datastreamFieldSerialization(ds, false));
             buffer.append("</datastreamProfile>");
 
         }
@@ -239,23 +238,25 @@ public class DefaultSerializer {
 
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         String asOfDateTimeElement = "";
-        if (versDateTime != null)
+        if (versDateTime != null) {
             asOfDateTimeElement = "asOfDateTime=\""
-                    + DateUtility.convertDateToString(versDateTime) + "\" ";
+                                  + DateUtility.convertDateToString(versDateTime) + "\" ";
+        }
         String sDefElement = "";
-        if (sDef != null)
+        if (sDef != null) {
             sDefElement = "sDef=\"" + enc(sDef) + "\" ";
+        }
         buffer.append("<objectMethods "
-                + "xmlns=\"" + Constants.OBJ_METHODS1_0.namespace.uri + "\" "
-                + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-                + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                + "xsi:schemaLocation=\"" + Constants.OBJ_METHODS1_0.namespace.uri + " "
-                + Constants.OBJ_METHODS1_0.xsdLocation + "\" "
-                + " pid=\"" + enc(pid) + "\" "
-                + asOfDateTimeElement + sDefElement + "baseURL=\""
-                + enc(fedoraServerProtocol) + "://"
-                + enc(fedoraServerHost) + ":"
-                + enc(fedoraServerPort) + "/" + fedoraAppServerContext + "/\" >");
+                      + "xmlns=\"" + Constants.OBJ_METHODS1_0.namespace.uri + "\" "
+                      + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+                      + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                      + "xsi:schemaLocation=\"" + Constants.OBJ_METHODS1_0.namespace.uri + " "
+                      + Constants.OBJ_METHODS1_0.xsdLocation + "\" "
+                      + " pid=\"" + enc(pid) + "\" "
+                      + asOfDateTimeElement + sDefElement + "baseURL=\""
+                      + enc(fedoraServerProtocol) + "://"
+                      + enc(fedoraServerHost) + ":"
+                      + enc(fedoraServerPort) + "/" + fedoraAppServerContext + "/\" >");
 
         // ObjectMethodsDef SERIALIZATION
         String nextSdef = "null";
@@ -264,28 +265,29 @@ public class DefaultSerializer {
             currentSdef = methodDefs[i].sDefPID;
             if (sDef == null || currentSdef.equals(sDef)) {
                 if (!currentSdef.equalsIgnoreCase(nextSdef)) {
-                    if (!nextSdef.equals("null"))
+                    if (!nextSdef.equals("null")) {
                         buffer.append("</sDef>");
+                    }
                     buffer.append("<sDef pid=\"" + enc(methodDefs[i].sDefPID)
-                            + "\" >");
+                                  + "\" >");
                 }
                 buffer.append("<method name=\"" + enc(methodDefs[i].methodName)
-                        + "\" >");
+                              + "\" >");
                 MethodParmDef[] methodParms = methodDefs[i].methodParmDefs;
                 for (int j = 0; j < methodParms.length; j++) {
                     buffer.append("<methodParm parmName=\""
-                            + enc(methodParms[j].parmName)
-                            + "\" parmDefaultValue=\""
-                            + enc(methodParms[j].parmDefaultValue)
-                            + "\" parmRequired=\"" + methodParms[j].parmRequired
-                            + "\" parmLabel=\"" + enc(methodParms[j].parmLabel)
-                            + "\" >");
+                                  + enc(methodParms[j].parmName)
+                                  + "\" parmDefaultValue=\""
+                                  + enc(methodParms[j].parmDefaultValue)
+                                  + "\" parmRequired=\"" + methodParms[j].parmRequired
+                                  + "\" parmLabel=\"" + enc(methodParms[j].parmLabel)
+                                  + "\" >");
                     if (methodParms[j].parmDomainValues.length > 0) {
                         buffer.append("<methodParmDomain>");
                         for (int k = 0; k < methodParms[j].parmDomainValues.length; k++) {
                             buffer.append("<methodParmValue>"
-                                    + enc(methodParms[j].parmDomainValues[k])
-                                    + "</methodParmValue>");
+                                          + enc(methodParms[j].parmDomainValues[k])
+                                          + "</methodParmValue>");
                         }
                         buffer.append("</methodParmDomain>");
                     }
@@ -296,8 +298,9 @@ public class DefaultSerializer {
                 nextSdef = currentSdef;
             }
         }
-        if (!nextSdef.equals("null"))
+        if (!nextSdef.equals("null")) {
             buffer.append("</sDef>");
+        }
         buffer.append("</objectMethods>");
 
         return buffer.toString();
@@ -322,7 +325,8 @@ public class DefaultSerializer {
         html.append("<html><head><title>Search Repository</title></head>");
         html.append("<body><center>");
         html.append("<table width=\"784\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">");
-        html.append("<tr><td width=\"141\" height=\"134\" valign=\"top\"><img src=\"" + "/" + fedoraAppServerContext + "/images/newlogo2.jpg\" width=\"141\" height=\"134\"/></td>");
+        html.append("<tr><td width=\"141\" height=\"134\" valign=\"top\"><img src=\"" + "/" + fedoraAppServerContext +
+                    "/images/newlogo2.jpg\" width=\"141\" height=\"134\"/></td>");
         html.append("<td width=\"643\" valign=\"top\">");
         html.append("<center><h2>Fedora Repository</h2>");
         html.append("<h3>Find Objects</h3>");
@@ -349,21 +353,26 @@ public class DefaultSerializer {
             }
 
             html.append("<input type='checkbox' name='"
-                    + searchableFields[i]
-                    + "' value='true' "
-                    + ((RestParam.PID.equals(searchableFields[i])
-                            || "title".equals(searchableFields[i]) || fieldHash.contains(searchableFields[i])) ? "checked"
-                            : "") + "> <a href='#'>" + searchableFields[i] + "</a><br>");
+                        + searchableFields[i]
+                        + "' value='true' "
+                        + ((RestParam.PID.equals(searchableFields[i])
+                            || "title".equals(searchableFields[i]) || fieldHash.contains(searchableFields[i])) ?
+                           "checked"
+                                                                                                               : "") +
+                        "> <a href='#'>" + searchableFields[i] + "</a><br>");
             html.append("\n");
         }
         html.append("</font></td><td bgcolor=silver valign=top>&nbsp;&nbsp;&nbsp;</td><td valign=top>");
         html.append("Search all fields for phrase: <input type=\"text\" name=\"terms\" size=\"15\" value=\""
-                + (terms == null ? "" : enc(terms))
-                + "\"> <a href=\"#\" onClick=\"javascript:alert('Search All Fields\\n\\nEnter a phrase.  Objects where any field contains the phrase will be returned.\\nThis is a case-insensitive search, and you may use the * or ? wildcards.\\n\\nExamples:\\n\\n  *o*\\n    finds objects where any field contains the letter o.\\n\\n  ?edora\\n    finds objects where a word starts with any letter and ends with edora.')\"><i>help</i></a><p> ");
+                    + (terms == null ? "" : enc(terms))
+                    +
+                    "\"> <a href=\"#\" onClick=\"javascript:alert('Search All Fields\\n\\nEnter a phrase.  Objects where any field contains the phrase will be returned.\\nThis is a case-insensitive search, and you may use the * or ? wildcards.\\n\\nExamples:\\n\\n  *o*\\n    finds objects where any field contains the letter o.\\n\\n  ?edora\\n    finds objects where a word starts with any letter and ends with edora.')\"><i>help</i></a><p> ");
         html.append("Or search specific field(s): <input type=\"text\" name=\"query\" size=\"15\" value=\""
-                + (query == null ? "" : enc(query))
-                + "\"> <a href=\"#\" onClick=\"javascript:alert('Search Specific Field(s)\\n\\nEnter one or more conditions, separated by space.  Objects matching all conditions will be returned.\\nA condition is a field (choose from the field names on the left) followed by an operator, followed by a value.\\nThe = operator will match if the field\\'s entire value matches the value given.\\nThe ~ operator will match on phrases within fields, and accepts the ? and * wildcards.\\nThe &lt;, &gt;, &lt;=, and &gt;= operators can be used with numeric values, such as dates.\\n\\nExamples:\\n\\n  pid~demo:* description~fedora\\n    Matches all demo objects with a description containing the word fedora.\\n\\n  cDate&gt;=1976-03-04 creator~*n*\\n    Matches objects created on or after March 4th, 1976 where at least one of the creators has an n in their name.\\n\\n  mDate&gt;2002-10-2 mDate&lt;2002-10-2T12:00:00\\n    Matches objects modified sometime before noon (UTC) on October 2nd, 2002')\"><i>help</i></a><p> ");
-        html.append("Maximum Results: <select name=\"maxResults\"><option value=\"20\">20</option><option value=\"40\">40</option><option value=\"60\">60</option><option value=\"80\">80</option></select> ");
+                    + (query == null ? "" : enc(query))
+                    +
+                    "\"> <a href=\"#\" onClick=\"javascript:alert('Search Specific Field(s)\\n\\nEnter one or more conditions, separated by space.  Objects matching all conditions will be returned.\\nA condition is a field (choose from the field names on the left) followed by an operator, followed by a value.\\nThe = operator will match if the field\\'s entire value matches the value given.\\nThe ~ operator will match on phrases within fields, and accepts the ? and * wildcards.\\nThe &lt;, &gt;, &lt;=, and &gt;= operators can be used with numeric values, such as dates.\\n\\nExamples:\\n\\n  pid~demo:* description~fedora\\n    Matches all demo objects with a description containing the word fedora.\\n\\n  cDate&gt;=1976-03-04 creator~*n*\\n    Matches objects created on or after March 4th, 1976 where at least one of the creators has an n in their name.\\n\\n  mDate&gt;2002-10-2 mDate&lt;2002-10-2T12:00:00\\n    Matches objects modified sometime before noon (UTC) on October 2nd, 2002')\"><i>help</i></a><p> ");
+        html.append(
+                "Maximum Results: <select name=\"maxResults\"><option value=\"20\">20</option><option value=\"40\">40</option><option value=\"60\">60</option><option value=\"80\">80</option></select> ");
         html.append("<p><input type=\"submit\" value=\"Search\"> ");
         html.append("</td></tr></table></center>");
         html.append("</form><hr size=1>");
@@ -371,7 +380,8 @@ public class DefaultSerializer {
         if (result != null) {
             List<ObjectFields> objectFieldList = result.objectFieldsList();
 
-            html.append("<center><table width=\"90%\" border=\"1\" cellpadding=\"5\" cellspacing=\"5\" bgcolor=\"silver\">\n");
+            html.append(
+                    "<center><table width=\"90%\" border=\"1\" cellpadding=\"5\" cellspacing=\"5\" bgcolor=\"silver\">\n");
             html.append("<tr>");
             for (int i = 0; i < wantedFields.length; i++) {
                 html.append("<td valign=\"top\"><strong>");
@@ -464,7 +474,7 @@ public class DefaultSerializer {
                     long viewingStart = result.getCursor() + 1;
                     long viewingEnd = result.objectFieldsList().size() + viewingStart - 1;
                     html.append("<p>Viewing results " + viewingStart + " to "
-                            + viewingEnd);
+                                + viewingEnd);
                     if (result.getCompleteListSize() != -1) {
                         html.append(" of " + result.getCompleteListSize());
                     }
@@ -474,15 +484,15 @@ public class DefaultSerializer {
                 html.append("\n");
                 for (String field : wantedFields) {
                     html.append("<input type=\"hidden\" name=\"" + field
-                            + "\" value=\"true\">");
+                                + "\" value=\"true\">");
                     html.append("\n");
                 }
 
                 html.append("\n");
                 html.append("\n<input type=\"hidden\" name=\"sessionToken\" value=\""
-                        + result.getToken() + "\">\n");
+                            + result.getToken() + "\">\n");
                 html.append("\n<input type=\"hidden\" name=\"maxResults\" value=\""
-                        + maxResults + "\">\n");
+                            + maxResults + "\">\n");
                 html.append("<input type=\"submit\" value=\"More Results &gt;\"></form>");
             }
             html.append("</center>\n");
@@ -509,12 +519,12 @@ public class DefaultSerializer {
             }
             if (result.getCompleteListSize() != -1) {
                 xmlBuf.append("    <completeListSize>" + result.getCompleteListSize()
-                        + "</completeListSize>\n");
+                              + "</completeListSize>\n");
             }
             if (result.getExpirationDate() != null) {
                 xmlBuf.append("    <expirationDate>"
-                        + DateUtility.convertDateToString(result.getExpirationDate())
-                        + "</expirationDate>\n");
+                              + DateUtility.convertDateToString(result.getExpirationDate())
+                              + "</expirationDate>\n");
             }
             xmlBuf.append("  </listSession>\n");
         }
@@ -575,7 +585,7 @@ public class DefaultSerializer {
             StringBuffer out) {
         if (value != null) {
             out.append("      <" + name + ">" + enc(value) + "</" + name
-                    + ">\n");
+                       + ">\n");
         }
     }
 
@@ -589,8 +599,9 @@ public class DefaultSerializer {
             String name,
             Date dt,
             StringBuffer out) {
-        if (dt != null)
+        if (dt != null) {
             appendXML(name, DateUtility.convertDateToString(dt), out);
+        }
     }
 
     public String dataStreamsToXML(
@@ -621,11 +632,63 @@ public class DefaultSerializer {
         // DatastreamDef SERIALIZATION
         for (int i = 0; i < dsDefs.length; i++) {
             xml.append("    <datastream " + "dsid=\"" + enc(dsDefs[i].dsID)
-                    + "\" " + "label=\"" + enc(dsDefs[i].dsLabel) + "\" "
-                    + "mimeType=\"" + enc(dsDefs[i].dsMIME) + "\" />");
+                       + "\" " + "label=\"" + enc(dsDefs[i].dsLabel) + "\" "
+                       + "mimeType=\"" + enc(dsDefs[i].dsMIME) + "\" />");
         }
         xml.append("</objectDatastreams>");
 
         return xml.toString();
     }
+
+    public String objectValidationToXml(Validation validation) {
+        StringBuilder buffer = new StringBuilder();
+        String pid = validation.getPid();
+        Date date = validation.getAsOfDateTime();
+        String dateString = "";
+        boolean valid = validation.isValid();
+        if (date != null) {
+            dateString = DateUtility.convertDateToString(date);
+        }
+        buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        buffer.append("<validation "
+                      + "pid=\"" + enc(pid) + "\" " +
+                      "valid=\"" + valid + "\">\n");
+        buffer.append("  <asOfDateTime>" + dateString + "</asOfDateTime>\n");
+        buffer.append("  <contentModels>\n");
+        for (String model : validation.getContentModels()) {
+            buffer.append("    <model>");
+            buffer.append(enc(model));
+            buffer.append("</model>\n");
+        }
+        buffer.append("  </contentModels>\n");
+
+        buffer.append("  <problems>\n");
+        for (String problem : validation.getObjectProblems()) {
+            buffer.append("    <problem>");
+            buffer.append(problem);
+            buffer.append("</problem>\n");
+        }
+        buffer.append("  </problems>\n");
+
+        buffer.append("  <datastreamProblems>\n");
+        Map<String, List<String>> dsprobs = validation.getDatastreamProblems();
+        for (String ds : dsprobs.keySet()) {
+            List<String> problems = dsprobs.get(ds);
+            buffer.append("    <datastream");
+            buffer.append(" datastreamID=\"");
+            buffer.append(ds);
+            buffer.append("\">\n");
+            for (String problem : problems) {
+                buffer.append("      <problem>");
+                buffer.append(problem);
+                buffer.append("</problem>\n");
+            }
+            buffer.append("    </datastream>");
+        }
+        buffer.append("  </datastreamProblems>\n");
+        buffer.append("</validation>");
+        return buffer.toString();
+    }
+
+
 }

@@ -4,10 +4,6 @@
  */
 package org.fcrepo.server.journal;
 
-import java.io.InputStream;
-import java.util.Date;
-import java.util.Map;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ModuleInitializationException;
@@ -15,10 +11,16 @@ import org.fcrepo.server.errors.ModuleShutdownException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.journal.entry.CreatorJournalEntry;
 import org.fcrepo.server.management.ManagementDelegate;
+import org.fcrepo.server.messaging.PName;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.fcrepo.server.storage.types.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.util.Date;
+import java.util.Map;
 
 
 /**
@@ -406,6 +408,7 @@ public class JournalCreator
         }
     }
 
+
     //
     // -------------------------------------------------------------------------
     //
@@ -493,5 +496,14 @@ public class JournalCreator
     public InputStream getTempStream(String id) throws ServerException {
         return delegate.getTempStream(id);
     }
+
+    /**
+     * Let the delegate do it.
+     */
+    public Validation validate(@PName("context") Context context, @PName("pid") String pid,
+                               @PName("asOfDateTime") Date asOfDateTime) throws ServerException {
+        return delegate.validate(context, pid, asOfDateTime);
+    }
+
 
 }

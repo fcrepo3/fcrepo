@@ -4,14 +4,15 @@
  */
 package org.fcrepo.server.management;
 
-import java.io.InputStream;
-import java.util.Date;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.messaging.PName;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.fcrepo.server.storage.types.Validation;
+
+import java.io.InputStream;
+import java.util.Date;
 
 
 /**
@@ -162,4 +163,8 @@ public interface Management {
                                      @PName("isLiteral") boolean isLiteral,
                                      @PName("datatype") String datatype) throws ServerException;
 
+
+    public Validation validate(@PName("context") Context context,
+                               @PName("pid") String pid,
+                               @PName("asOfDateTime") Date asOfDateTime) throws ServerException;
 }

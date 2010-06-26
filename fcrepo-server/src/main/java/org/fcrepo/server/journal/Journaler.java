@@ -4,11 +4,6 @@
  */
 package org.fcrepo.server.journal;
 
-import java.io.InputStream;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -17,10 +12,17 @@ import org.fcrepo.server.errors.ModuleShutdownException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.management.Management;
 import org.fcrepo.server.management.ManagementDelegate;
+import org.fcrepo.server.messaging.PName;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.fcrepo.server.storage.types.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.util.Date;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * A Management module that decorates a ManagementDelegate module with code that
@@ -453,6 +455,15 @@ public class Journaler
                                         object,
                                         isLiteral,
                                         datatype);
+    }
+
+    /**
+     * Delegate to the JournalWorker.
+     */
+
+    public Validation validate(@PName("context") Context context, @PName("pid") String pid,
+                               @PName("asOfDateTime") Date asOfDateTime) throws ServerException {
+        return worker.validate(context, pid, asOfDateTime);
     }
 
 }

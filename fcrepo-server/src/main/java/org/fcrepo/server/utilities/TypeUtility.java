@@ -4,19 +4,20 @@
  */
 package org.fcrepo.server.utilities;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import java.util.Arrays;
-import java.util.HashSet;
-
 import org.fcrepo.server.storage.types.MethodDef;
 import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.types.gen.Condition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -31,7 +32,8 @@ public abstract class TypeUtility {
     private static final Logger logger =
             LoggerFactory.getLogger(TypeUtility.class);
 
-    public static org.fcrepo.server.types.gen.Datastream convertDatastreamToGenDatastream(org.fcrepo.server.storage.types.Datastream in) {
+    public static org.fcrepo.server.types.gen.Datastream convertDatastreamToGenDatastream(
+            org.fcrepo.server.storage.types.Datastream in) {
         org.fcrepo.server.types.gen.Datastream out =
                 new org.fcrepo.server.types.gen.Datastream();
         String group = in.DSControlGrp;
@@ -56,7 +58,8 @@ public abstract class TypeUtility {
         return out;
     }
 
-    public static org.fcrepo.server.types.gen.FieldSearchResult convertFieldSearchResultToGenFieldSearchResult(org.fcrepo.server.search.FieldSearchResult result) {
+    public static org.fcrepo.server.types.gen.FieldSearchResult convertFieldSearchResultToGenFieldSearchResult(
+            org.fcrepo.server.search.FieldSearchResult result) {
         org.fcrepo.server.types.gen.FieldSearchResult ret =
                 new org.fcrepo.server.types.gen.FieldSearchResult();
         ret
@@ -68,12 +71,13 @@ public abstract class TypeUtility {
             sess.setToken(result.getToken());
             if (result.getCursor() > -1) {
                 sess.setCursor(new org.apache.axis.types.NonNegativeInteger(""
-                        + result.getCursor()));
+                                                                            + result.getCursor()));
             }
             if (result.getCompleteListSize() > -1) {
                 sess
                         .setCompleteListSize(new org.apache.axis.types.NonNegativeInteger(""
-                                + result.getCompleteListSize()));
+                                                                                          +
+                                                                                          result.getCompleteListSize()));
             }
             if (result.getExpirationDate() != null) {
                 sess.setExpirationDate(DateUtility.convertDateToString(result
@@ -84,9 +88,10 @@ public abstract class TypeUtility {
         return ret;
     }
 
-    public static org.fcrepo.server.search.FieldSearchQuery convertGenFieldSearchQueryToFieldSearchQuery(org.fcrepo.server.types.gen.FieldSearchQuery gen)
+    public static org.fcrepo.server.search.FieldSearchQuery convertGenFieldSearchQueryToFieldSearchQuery(
+            org.fcrepo.server.types.gen.FieldSearchQuery gen)
             throws org.fcrepo.server.errors.InvalidOperatorException,
-            org.fcrepo.server.errors.QueryParseException {
+                   org.fcrepo.server.errors.QueryParseException {
         if (gen.getTerms() != null) {
             return new org.fcrepo.server.search.FieldSearchQuery(gen.getTerms());
         } else {
@@ -95,9 +100,10 @@ public abstract class TypeUtility {
         }
     }
 
-    public static java.util.List convertGenConditionArrayToSearchConditionList(org.fcrepo.server.types.gen.Condition[] genConditions)
+    public static java.util.List convertGenConditionArrayToSearchConditionList(
+            org.fcrepo.server.types.gen.Condition[] genConditions)
             throws org.fcrepo.server.errors.InvalidOperatorException,
-            org.fcrepo.server.errors.QueryParseException {
+                   org.fcrepo.server.errors.QueryParseException {
         java.util.ArrayList list = new java.util.ArrayList();
         if (genConditions != null) {
             for (Condition c : genConditions) {
@@ -108,7 +114,8 @@ public abstract class TypeUtility {
         return list;
     }
 
-    public static org.fcrepo.server.types.gen.ObjectFields[] convertSearchObjectFieldsListToGenObjectFieldsArray(java.util.List sfList) {
+    public static org.fcrepo.server.types.gen.ObjectFields[] convertSearchObjectFieldsListToGenObjectFieldsArray(
+            java.util.List sfList) {
         org.fcrepo.server.types.gen.ObjectFields[] genFields =
                 new org.fcrepo.server.types.gen.ObjectFields[sfList.size()];
         for (int i = 0; i < sfList.size(); i++) {
@@ -323,11 +330,11 @@ public abstract class TypeUtility {
      * array of org.fcrepo.server.types.gen.MethodParmDef.
      * </p>
      *
-     * @param methodParmDefs
-     *        An array of org.fcrepo.server.storage.types.MethodParmDef.
+     * @param methodParmDefs An array of org.fcrepo.server.storage.types.MethodParmDef.
      * @return An array of org.fcrepo.server.types.gen.MethodParmDef.
      */
-    public static org.fcrepo.server.types.gen.MethodParmDef[] convertMethodParmDefArrayToGenMethodParmDefArray(org.fcrepo.server.storage.types.MethodParmDef[] methodParmDefs) {
+    public static org.fcrepo.server.types.gen.MethodParmDef[] convertMethodParmDefArrayToGenMethodParmDefArray(
+            org.fcrepo.server.storage.types.MethodParmDef[] methodParmDefs) {
         if (methodParmDefs != null) {
             org.fcrepo.server.types.gen.MethodParmDef[] genMethodParmDefs =
                     new org.fcrepo.server.types.gen.MethodParmDef[methodParmDefs.length];
@@ -351,11 +358,11 @@ public abstract class TypeUtility {
      * instance of org.fcrepo.server.types.gen.MethodParmDef.
      * </p>
      *
-     * @param methodParmDef
-     *        An instance of org.fcrepo.server.storage.types.MethodParmDef.
+     * @param methodParmDef An instance of org.fcrepo.server.storage.types.MethodParmDef.
      * @return An instance of org.fcrepo.server.types.gen.MethodParmDef.
      */
-    public static org.fcrepo.server.types.gen.MethodParmDef convertMethodParmDefToGenMethodParmDef(org.fcrepo.server.storage.types.MethodParmDef methodParmDef) {
+    public static org.fcrepo.server.types.gen.MethodParmDef convertMethodParmDefToGenMethodParmDef(
+            org.fcrepo.server.storage.types.MethodParmDef methodParmDef) {
         if (methodParmDef != null) {
             org.fcrepo.server.types.gen.MethodParmDef genMethodParmDef =
                     new org.fcrepo.server.types.gen.MethodParmDef();
@@ -381,11 +388,11 @@ public abstract class TypeUtility {
      * of org.fcrepo.server.storage.types.MethodParmDef.
      * </p>
      *
-     * @param genMethodParmDefs
-     *        An array of org.fcrepo.server.types.gen.MethodParmDef.
+     * @param genMethodParmDefs An array of org.fcrepo.server.types.gen.MethodParmDef.
      * @return An array of org.fcrepo.server.storage.types.MethodParmDef.
      */
-    public static org.fcrepo.server.storage.types.MethodParmDef[] convertGenMethodParmDefArrayToMethodParmDefArray(org.fcrepo.server.types.gen.MethodParmDef[] genMethodParmDefs) {
+    public static org.fcrepo.server.storage.types.MethodParmDef[] convertGenMethodParmDefArrayToMethodParmDefArray(
+            org.fcrepo.server.types.gen.MethodParmDef[] genMethodParmDefs) {
         if (genMethodParmDefs != null) {
             org.fcrepo.server.storage.types.MethodParmDef[] methodParmDefs =
                     new org.fcrepo.server.storage.types.MethodParmDef[genMethodParmDefs.length];
@@ -409,11 +416,11 @@ public abstract class TypeUtility {
      * instance of org.fcrepo.server.types.gen.MethodParmDef.
      * </p>
      *
-     * @param genMethodParmDef
-     *        An instance of org.fcrepo.server.storage.types.MethodParmDef.
+     * @param genMethodParmDef An instance of org.fcrepo.server.storage.types.MethodParmDef.
      * @return An instance of org.fcrepo.server.types.gen.MethodParmDef.
      */
-    public static org.fcrepo.server.storage.types.MethodParmDef convertGenMethodParmDefToMethodParmDef(org.fcrepo.server.types.gen.MethodParmDef genMethodParmDef) {
+    public static org.fcrepo.server.storage.types.MethodParmDef convertGenMethodParmDefToMethodParmDef(
+            org.fcrepo.server.types.gen.MethodParmDef genMethodParmDef) {
         if (genMethodParmDef != null) {
             org.fcrepo.server.storage.types.MethodParmDef methodParmDef =
                     new org.fcrepo.server.storage.types.MethodParmDef();
@@ -439,11 +446,11 @@ public abstract class TypeUtility {
      * an instance of org.fcrepo.server.types.gen.MIMETypedStream.
      * </p>
      *
-     * @param mimeTypedStream
-     *        An instance of org.fcrepo.server.storage.types.MIMETypedStream.
+     * @param mimeTypedStream An instance of org.fcrepo.server.storage.types.MIMETypedStream.
      * @return An instance of org.fcrepo.server.types.gen.MIMETypedStream.
      */
-    public static org.fcrepo.server.types.gen.MIMETypedStream convertMIMETypedStreamToGenMIMETypedStream(org.fcrepo.server.storage.types.MIMETypedStream mimeTypedStream) {
+    public static org.fcrepo.server.types.gen.MIMETypedStream convertMIMETypedStreamToGenMIMETypedStream(
+            org.fcrepo.server.storage.types.MIMETypedStream mimeTypedStream) {
         if (mimeTypedStream != null) {
             org.fcrepo.server.types.gen.MIMETypedStream genMIMETypedStream =
                     new org.fcrepo.server.types.gen.MIMETypedStream();
@@ -480,11 +487,11 @@ public abstract class TypeUtility {
      * instance of org.fcrepo.server.storage.types.MIMETypedStream.
      * </p>
      *
-     * @param genMIMETypedStream
-     *        An instance of org.fcrepo.server.types.gen.MIMETypedStream.
+     * @param genMIMETypedStream An instance of org.fcrepo.server.types.gen.MIMETypedStream.
      * @return an instance of org.fcrepo.server.storage.types.MIMETypedStream.
      */
-    public static org.fcrepo.server.storage.types.MIMETypedStream convertGenMIMETypedStreamToMIMETypedStream(org.fcrepo.server.types.gen.MIMETypedStream genMIMETypedStream) {
+    public static org.fcrepo.server.storage.types.MIMETypedStream convertGenMIMETypedStreamToMIMETypedStream(
+            org.fcrepo.server.types.gen.MIMETypedStream genMIMETypedStream) {
         if (genMIMETypedStream != null) {
             InputStream is =
                     new ByteArrayInputStream(genMIMETypedStream.getStream());
@@ -492,9 +499,9 @@ public abstract class TypeUtility {
                     genMIMETypedStream.getHeader();
             org.fcrepo.server.storage.types.MIMETypedStream mimeTypedStream =
                     new org.fcrepo.server.storage.types.MIMETypedStream(genMIMETypedStream
-                                                                            .getMIMEType(),
-                                                                    is,
-                                                                    convertGenPropertyArrayToPropertyArray(header));
+                            .getMIMEType(),
+                                                                        is,
+                                                                        convertGenPropertyArrayToPropertyArray(header));
             return mimeTypedStream;
 
         } else {
@@ -508,11 +515,11 @@ public abstract class TypeUtility {
      * array of org.fcrepo.server.storage.types.ObjectMethodsDef.
      * </p>
      *
-     * @param genObjectMethodDefs
-     *        An array of org.fcrepo.server.types.gen.ObjectMethodsDef.
+     * @param genObjectMethodDefs An array of org.fcrepo.server.types.gen.ObjectMethodsDef.
      * @return An array of org.fcrepo.server.storage.types.ObjectMethodsDef.
      */
-    public static org.fcrepo.server.storage.types.ObjectMethodsDef[] convertGenObjectMethodsDefArrayToObjectMethodsDefArray(org.fcrepo.server.types.gen.ObjectMethodsDef[] genObjectMethodDefs) {
+    public static org.fcrepo.server.storage.types.ObjectMethodsDef[] convertGenObjectMethodsDefArrayToObjectMethodsDefArray(
+            org.fcrepo.server.types.gen.ObjectMethodsDef[] genObjectMethodDefs) {
         if (genObjectMethodDefs != null) {
             org.fcrepo.server.storage.types.ObjectMethodsDef[] objectMethodDefs =
                     new org.fcrepo.server.storage.types.ObjectMethodsDef[genObjectMethodDefs.length];
@@ -553,11 +560,11 @@ public abstract class TypeUtility {
      * instance of org.fcrepo.server.storage.types.ObjectMethodsDef.
      * </p>
      *
-     * @param genObjectMethodDef
-     *        An instance of org.fcrepo.server.types.gen.ObjectMethodsDef.
+     * @param genObjectMethodDef An instance of org.fcrepo.server.types.gen.ObjectMethodsDef.
      * @return An instance of org.fcrepo.server.storage.types.ObjectMethodsDef.
      */
-    public static org.fcrepo.server.storage.types.ObjectMethodsDef convertGenObjectMethodsDefToObjectMethodsDef(org.fcrepo.server.types.gen.ObjectMethodsDef genObjectMethodDef) {
+    public static org.fcrepo.server.storage.types.ObjectMethodsDef convertGenObjectMethodsDefToObjectMethodsDef(
+            org.fcrepo.server.types.gen.ObjectMethodsDef genObjectMethodDef) {
         if (genObjectMethodDef != null) {
             org.fcrepo.server.storage.types.ObjectMethodsDef objectMethodDef =
                     new org.fcrepo.server.storage.types.ObjectMethodsDef();
@@ -587,11 +594,11 @@ public abstract class TypeUtility {
      * array of org.fcrepo.server.types.gen.ObjectMethodsDef.
      * </p>
      *
-     * @param objectMethodDefs
-     *        An array of org.fcrepo.server.storage.types.ObjectMethodsDef.
+     * @param objectMethodDefs An array of org.fcrepo.server.storage.types.ObjectMethodsDef.
      * @return An array of org.fcrepo.server.types.gen.ObjectMethodsDef.
      */
-    public static org.fcrepo.server.types.gen.ObjectMethodsDef[] convertObjectMethodsDefArrayToGenObjectMethodsDefArray(org.fcrepo.server.storage.types.ObjectMethodsDef[] objectMethodDefs) {
+    public static org.fcrepo.server.types.gen.ObjectMethodsDef[] convertObjectMethodsDefArrayToGenObjectMethodsDefArray(
+            org.fcrepo.server.storage.types.ObjectMethodsDef[] objectMethodDefs) {
         if (objectMethodDefs != null) {
             org.fcrepo.server.types.gen.ObjectMethodsDef[] genObjectMethodDefs =
                     new org.fcrepo.server.types.gen.ObjectMethodsDef[objectMethodDefs.length];
@@ -631,11 +638,11 @@ public abstract class TypeUtility {
      * an instance of org.fcrepo.server.types.gen.ObjectMethodsDef.
      * </p>
      *
-     * @param objectMethodDef
-     *        An instance of org.fcrepo.server.storage.types.ObjectMethodsDef.
+     * @param objectMethodDef An instance of org.fcrepo.server.storage.types.ObjectMethodsDef.
      * @return An instance of org.fcrepo.server.types.gen.ObjectMethodsDef.
      */
-    public static org.fcrepo.server.types.gen.ObjectMethodsDef convertObjectMethodsDefToGenObjectMethodsDef(org.fcrepo.server.storage.types.ObjectMethodsDef objectMethodDef) {
+    public static org.fcrepo.server.types.gen.ObjectMethodsDef convertObjectMethodsDefToGenObjectMethodsDef(
+            org.fcrepo.server.storage.types.ObjectMethodsDef objectMethodDef) {
         if (objectMethodDef != null) {
             org.fcrepo.server.types.gen.ObjectMethodsDef genObjectMethodDef =
                     new org.fcrepo.server.types.gen.ObjectMethodsDef();
@@ -655,11 +662,11 @@ public abstract class TypeUtility {
      * instance of org.fcrepo.server.access.ObjectProfile.
      * </p>
      *
-     * @param genObjectProfile
-     *        An instance of org.fcrepo.server.types.gen.ObjectProfile.
+     * @param genObjectProfile An instance of org.fcrepo.server.types.gen.ObjectProfile.
      * @return An instance of org.fcrepo.server.access.ObjectProfile.
      */
-    public static org.fcrepo.server.access.ObjectProfile convertGenObjectProfileToObjectProfile(org.fcrepo.server.types.gen.ObjectProfile genObjectProfile) {
+    public static org.fcrepo.server.access.ObjectProfile convertGenObjectProfileToObjectProfile(
+            org.fcrepo.server.types.gen.ObjectProfile genObjectProfile) {
         if (genObjectProfile != null) {
             org.fcrepo.server.access.ObjectProfile objectProfile =
                     new org.fcrepo.server.access.ObjectProfile();
@@ -684,7 +691,8 @@ public abstract class TypeUtility {
         }
     }
 
-    public static org.fcrepo.server.types.gen.ObjectProfile convertObjectProfileToGenObjectProfile(org.fcrepo.server.access.ObjectProfile objectProfile) {
+    public static org.fcrepo.server.types.gen.ObjectProfile convertObjectProfileToGenObjectProfile(
+            org.fcrepo.server.access.ObjectProfile objectProfile) {
         if (objectProfile != null) {
             org.fcrepo.server.types.gen.ObjectProfile genObjectProfile =
                     new org.fcrepo.server.types.gen.ObjectProfile();
@@ -707,7 +715,8 @@ public abstract class TypeUtility {
         }
     }
 
-    public static org.fcrepo.server.types.gen.RepositoryInfo convertReposInfoToGenReposInfo(org.fcrepo.server.access.RepositoryInfo repositoryInfo) {
+    public static org.fcrepo.server.types.gen.RepositoryInfo convertReposInfoToGenReposInfo(
+            org.fcrepo.server.access.RepositoryInfo repositoryInfo) {
         if (repositoryInfo != null) {
             org.fcrepo.server.types.gen.RepositoryInfo genRepositoryInfo =
                     new org.fcrepo.server.types.gen.RepositoryInfo();
@@ -743,11 +752,11 @@ public abstract class TypeUtility {
      * org.fcrepo.server.storage.types.Property.
      * </p>
      *
-     * @param genProperties
-     *        An array of org.fcrepo.server.types.gen.Property.
+     * @param genProperties An array of org.fcrepo.server.types.gen.Property.
      * @return An array of org.fcrepo.server.storage.types.Property.
      */
-    public static org.fcrepo.server.storage.types.Property[] convertGenPropertyArrayToPropertyArray(org.fcrepo.server.types.gen.Property[] genProperties) {
+    public static org.fcrepo.server.storage.types.Property[] convertGenPropertyArrayToPropertyArray(
+            org.fcrepo.server.types.gen.Property[] genProperties) {
         if (genProperties != null) {
             org.fcrepo.server.storage.types.Property[] properties =
                     new org.fcrepo.server.storage.types.Property[genProperties.length];
@@ -770,11 +779,11 @@ public abstract class TypeUtility {
      * of org.fcrepo.server.storage.types.Property.
      * </p>
      *
-     * @param genProperty
-     *        An instance of org.fcrepo.server.types.gen.Property.
+     * @param genProperty An instance of org.fcrepo.server.types.gen.Property.
      * @return An instance of org.fcrepo.server.storage.types.Property.
      */
-    public static org.fcrepo.server.storage.types.Property convertGenPropertyToProperty(org.fcrepo.server.types.gen.Property genProperty) {
+    public static org.fcrepo.server.storage.types.Property convertGenPropertyToProperty(
+            org.fcrepo.server.types.gen.Property genProperty) {
         org.fcrepo.server.storage.types.Property property =
                 new org.fcrepo.server.storage.types.Property();
         if (genProperty != null) {
@@ -790,11 +799,11 @@ public abstract class TypeUtility {
      * of org.fcrepo.server.types.gen.Property.
      * </p>
      *
-     * @param properties
-     *        An array of org.fcrepo.server.storage.typesProperty.
+     * @param properties An array of org.fcrepo.server.storage.typesProperty.
      * @return An array of org.fcrepo.server.types.gen.Property.
      */
-    public static org.fcrepo.server.types.gen.Property[] convertPropertyArrayToGenPropertyArray(org.fcrepo.server.storage.types.Property[] properties) {
+    public static org.fcrepo.server.types.gen.Property[] convertPropertyArrayToGenPropertyArray(
+            org.fcrepo.server.storage.types.Property[] properties) {
         if (properties != null) {
             org.fcrepo.server.types.gen.Property[] genProperties =
                     new org.fcrepo.server.types.gen.Property[properties.length];
@@ -817,11 +826,11 @@ public abstract class TypeUtility {
      * instance of org.fcrepo.server.types.gen.Property.
      * </p>
      *
-     * @param property
-     *        An instance of org.fcrepo.server.storage.types.Property.
+     * @param property An instance of org.fcrepo.server.storage.types.Property.
      * @return An instance of org.fcrepo.server.types.gen.Property.
      */
-    public static org.fcrepo.server.types.gen.Property convertPropertyToGenProperty(org.fcrepo.server.storage.types.Property property) {
+    public static org.fcrepo.server.types.gen.Property convertPropertyToGenProperty(
+            org.fcrepo.server.storage.types.Property property) {
         org.fcrepo.server.types.gen.Property genProperty =
                 new org.fcrepo.server.types.gen.Property();
         if (property != null) {
@@ -831,7 +840,8 @@ public abstract class TypeUtility {
         return genProperty;
     }
 
-    public static org.fcrepo.server.types.gen.RelationshipTuple convertRelsTupleToGenRelsTuple(org.fcrepo.server.storage.types.RelationshipTuple in) {
+    public static org.fcrepo.server.types.gen.RelationshipTuple convertRelsTupleToGenRelsTuple(
+            org.fcrepo.server.storage.types.RelationshipTuple in) {
         if (in == null) {
             return null;
         }
@@ -845,7 +855,8 @@ public abstract class TypeUtility {
         return out;
     }
 
-    public static org.fcrepo.server.types.gen.DatastreamDef convertDatastreamDefToGenDatastreamDef(org.fcrepo.server.storage.types.DatastreamDef in) {
+    public static org.fcrepo.server.types.gen.DatastreamDef convertDatastreamDefToGenDatastreamDef(
+            org.fcrepo.server.storage.types.DatastreamDef in) {
         org.fcrepo.server.types.gen.DatastreamDef out =
                 new org.fcrepo.server.types.gen.DatastreamDef();
         out.setID(in.dsID);
@@ -855,18 +866,19 @@ public abstract class TypeUtility {
         return out;
     }
 
-    public static org.fcrepo.server.storage.types.DatastreamDef convertGenDatastreamDefToDatastreamDef(org.fcrepo.server.types.gen.DatastreamDef genDatastreamDef) {
+    public static org.fcrepo.server.storage.types.DatastreamDef convertGenDatastreamDefToDatastreamDef(
+            org.fcrepo.server.types.gen.DatastreamDef genDatastreamDef) {
         if (genDatastreamDef == null) {
             return new org.fcrepo.server.storage.types.DatastreamDef(null,
-                                                                 null,
-                                                                 null);
+                                                                     null,
+                                                                     null);
         } else {
             return new org.fcrepo.server.storage.types.DatastreamDef(genDatastreamDef
-                                                                         .getID(),
-                                                                 genDatastreamDef
-                                                                         .getLabel(),
-                                                                 genDatastreamDef
-                                                                         .getMIMEType());
+                    .getID(),
+                                                                     genDatastreamDef
+                                                                             .getLabel(),
+                                                                     genDatastreamDef
+                                                                             .getMIMEType());
         }
     }
 
@@ -958,7 +970,8 @@ public abstract class TypeUtility {
     //      }
     //  }
 
-    public static org.fcrepo.server.types.gen.DatastreamDef[] convertDatastreamDefArrayToGenDatastreamDefArray(org.fcrepo.server.storage.types.DatastreamDef[] dsDefs) {
+    public static org.fcrepo.server.types.gen.DatastreamDef[] convertDatastreamDefArrayToGenDatastreamDefArray(
+            org.fcrepo.server.storage.types.DatastreamDef[] dsDefs) {
 
         if (dsDefs != null) {
             org.fcrepo.server.types.gen.DatastreamDef[] genDatastreamDefs =
@@ -975,6 +988,31 @@ public abstract class TypeUtility {
             return null;
         }
     }
+
+    public static org.fcrepo.server.types.gen.Validation convertValidationToGenValidation(
+            org.fcrepo.server.storage.types.Validation validation) {
+
+        if (validation == null) {
+            return null;
+        }
+        org.fcrepo.server.types.gen.Validation genvalid = new org.fcrepo.server.types.gen.Validation();
+        genvalid.setValid(validation.isValid());
+        genvalid.setPid(validation.getPid());
+        genvalid.setObjModels(validation.getContentModels().toArray(new String[0]));
+        genvalid.setObjProblems(validation.getObjectProblems().toArray(new String[0]));
+
+        Map<String, List<String>> dsprobs = validation.getDatastreamProblems();
+
+        String[][] gendsprobs = new String[dsprobs.keySet().size()][1];
+        int i = 0;
+        for (String key : dsprobs.keySet()) {
+            gendsprobs[i] = dsprobs.get(key).toArray(new String[0]);
+            i++;
+        }
+        genvalid.setDatastreamProblems(gendsprobs);
+        return genvalid;
+    }
+
 
     //  public static org.fcrepo.server.storage.types.DSBinding[]
     //      convertGenDatastreamBindingArrayToDSBindingArray(
@@ -1001,7 +1039,8 @@ public abstract class TypeUtility {
     //    }
     //  }
 
-    public static org.fcrepo.server.storage.types.DatastreamDef[] convertGenDatastreamDefArrayToDatastreamDefArray(org.fcrepo.server.types.gen.DatastreamDef[] genDatastreamDefs) {
+    public static org.fcrepo.server.storage.types.DatastreamDef[] convertGenDatastreamDefArrayToDatastreamDefArray(
+            org.fcrepo.server.types.gen.DatastreamDef[] genDatastreamDefs) {
 
         if (genDatastreamDefs != null) {
             org.fcrepo.server.storage.types.DatastreamDef[] dsDefs =
@@ -1081,7 +1120,7 @@ public abstract class TypeUtility {
             System.out.println("\n----- Started with these values:");
             for (MethodDef element : methodDef) {
                 System.out.println("name: " + element.methodName + "\nlabel: "
-                        + element.methodLabel + "\nparms:\n");
+                                   + element.methodLabel + "\nparms:\n");
                 org.fcrepo.server.storage.types.MethodParmDef[] methodParmDef =
                         null;
                 methodParmDef = element.methodParms;
@@ -1089,9 +1128,9 @@ public abstract class TypeUtility {
                     methodParmDef = element.methodParms;
                     for (MethodParmDef element2 : methodParmDef) {
                         System.out.println("parmname: " + element2.parmName
-                                + "\nparmLabel: " + element2.parmLabel
-                                + "\nparmDefault: " + element2.parmDefaultValue
-                                + "\nparmrequired: " + element2.parmRequired);
+                                           + "\nparmLabel: " + element2.parmLabel
+                                           + "\nparmDefault: " + element2.parmDefaultValue
+                                           + "\nparmrequired: " + element2.parmRequired);
                     }
                 }
             }
@@ -1099,16 +1138,16 @@ public abstract class TypeUtility {
             System.out.println("\nObjectMethod  values:");
             for (int i = 0; i < objectMethods.length; i++) {
                 System.out.println("ObjectMethod[" + i + "] = " + "\nPID = "
-                        + objectMethods[i].PID + "\nsDefPID = "
-                        + objectMethods[i].sDefPID + "\nmethod = "
-                        + objectMethods[i].methodName);
+                                   + objectMethods[i].PID + "\nsDefPID = "
+                                   + objectMethods[i].sDefPID + "\nmethod = "
+                                   + objectMethods[i].methodName);
             }
 
             System.out.println("\nProperty  values:");
             for (int i = 0; i < properties.length; i++) {
                 System.out.println("Prop[" + i + "] = " + "\nname = "
-                        + properties[i].name + "\nvalue = "
-                        + properties[i].value);
+                                   + properties[i].name + "\nvalue = "
+                                   + properties[i].value);
             }
 
             System.out.println("\n----- Starting with MIMETypedStream of:");
@@ -1121,8 +1160,8 @@ public abstract class TypeUtility {
             InputStream is = new ByteArrayInputStream(stream);
             org.fcrepo.server.storage.types.MIMETypedStream mimeTypedStream =
                     new org.fcrepo.server.storage.types.MIMETypedStream("text/plain",
-                                                                    is,
-                                                                    null);
+                                                                        is,
+                                                                        null);
             System.out.println("MIMEType: " + mimeTypedStream.MIMEType);
             int byteStream = 0;
             byte[] buffer = new byte[255];
@@ -1130,7 +1169,7 @@ public abstract class TypeUtility {
                 System.out.write(buffer, 0, byteStream);
             }
             System.out.println("\n----- Converting GenMIMETypedStream to "
-                    + " MIMETypedStream");
+                               + " MIMETypedStream");
             org.fcrepo.server.types.gen.MIMETypedStream genMIMETypedStream =
                     TypeUtility
                             .convertMIMETypedStreamToGenMIMETypedStream(mimeTypedStream);
@@ -1142,7 +1181,7 @@ public abstract class TypeUtility {
                 System.out.write(buffer, 0, byteStream);
             }
             System.out.println("\n----- Converting MIMETypedStream to "
-                    + " GenMIMETypedStream");
+                               + " GenMIMETypedStream");
             mimeTypedStream =
                     TypeUtility
                             .convertGenMIMETypedStreamToMIMETypedStream(genMIMETypedStream);
@@ -1155,49 +1194,49 @@ public abstract class TypeUtility {
             mimeTypedStream.close();
 
             System.out.println("\n----- Converting ObjectMethodsDefArray to "
-                    + "GenObjectMethodsDefArray");
+                               + "GenObjectMethodsDefArray");
             org.fcrepo.server.types.gen.ObjectMethodsDef[] genObjectMethods = null;
             genObjectMethods =
                     TypeUtility
                             .convertObjectMethodsDefArrayToGenObjectMethodsDefArray(objectMethods);
             for (int i = 0; i < genObjectMethods.length; i++) {
                 System.out.println("GenProp[" + i + "]: " + "\nPID = "
-                        + genObjectMethods[i].getPID() + "\nsDefPID = "
-                        + genObjectMethods[i].getServiceDefinitionPID()
-                        + "\nmethod = " + genObjectMethods[i].getMethodName());
+                                   + genObjectMethods[i].getPID() + "\nsDefPID = "
+                                   + genObjectMethods[i].getServiceDefinitionPID()
+                                   + "\nmethod = " + genObjectMethods[i].getMethodName());
             }
             System.out
                     .println("\n----- Converting GenObjectMethodsDefArray to "
-                            + "ObjectMethodsDefArray");
+                             + "ObjectMethodsDefArray");
             objectMethods =
                     TypeUtility
                             .convertGenObjectMethodsDefArrayToObjectMethodsDefArray(genObjectMethods);
             for (int i = 0; i < objectMethods.length; i++) {
                 System.out.println("ObjectMethods[" + i + "]: " + "\nPID = "
-                        + objectMethods[i].PID + "\nsDefPID = "
-                        + objectMethods[i].sDefPID + "\nmethod = "
-                        + objectMethods[i].methodName);
+                                   + objectMethods[i].PID + "\nsDefPID = "
+                                   + objectMethods[i].sDefPID + "\nmethod = "
+                                   + objectMethods[i].methodName);
             }
 
             System.out.println("\n----- Converting PropertyArray to "
-                    + "GenPropertyArray");
+                               + "GenPropertyArray");
             org.fcrepo.server.types.gen.Property[] genProperties =
                     TypeUtility
                             .convertPropertyArrayToGenPropertyArray(properties);
             for (int i = 0; i < genProperties.length; i++) {
                 System.out.println("GenProp[" + i + "]: " + "\nname = "
-                        + genProperties[i].getName() + "\nvalue = "
-                        + genProperties[i].getValue());
+                                   + genProperties[i].getName() + "\nvalue = "
+                                   + genProperties[i].getValue());
             }
             System.out.println("\n----- Converting GenPropertyArray to "
-                    + "PropertyArray");
+                               + "PropertyArray");
             properties =
                     TypeUtility
                             .convertGenPropertyArrayToPropertyArray(genProperties);
             for (int i = 0; i < properties.length; i++) {
                 System.out.println("Prop[" + i + "]: " + "\nname = "
-                        + properties[i].name + "\nvalue = "
-                        + properties[i].value);
+                                   + properties[i].name + "\nvalue = "
+                                   + properties[i].value);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
