@@ -85,7 +85,7 @@
 		based on the MIMETYPE (using the default if no appropriate mapping is specified);
 		never: never generate an extension.</comment>
 	</param>
-	<param name="datstreamDefaultFilename" value="download">
+	<param name="datastreamDefaultFilename" value="download">
 		<comment>Filename to use for datastream downloads when none can be determined from the
 		sources listed in datastreamFilenameSource.</comment>
 	</param>

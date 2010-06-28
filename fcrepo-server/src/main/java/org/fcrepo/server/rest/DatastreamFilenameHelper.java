@@ -89,7 +89,7 @@ public class DatastreamFilenameHelper {
         m_datastreamExtensionMappingId = fedoraServer.getParameter("datastreamExtensionMappingId");
         m_datastreamExtensionMappingRels = fedoraServer.getParameter("datastreamExtensionMappingRels");
         m_datastreamExtensionMappingDefault = fedoraServer.getParameter("datastreamExtensionMappingDefault");
-        m_datastreamDefaultFilename = fedoraServer.getParameter("datstreamDefaultFilename");
+        m_datastreamDefaultFilename = fedoraServer.getParameter("datastreamDefaultFilename");
         m_datastreamDefaultExtension = fedoraServer.getParameter("datastreamDefaultExtension");
 
         m_apiMService = management;
