@@ -423,7 +423,10 @@
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-bundle</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-multipart</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.sun.xml.stream</groupId>
       <artifactId>sjsxp</artifactId>

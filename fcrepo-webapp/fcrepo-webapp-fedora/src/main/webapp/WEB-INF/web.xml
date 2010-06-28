@@ -130,6 +130,19 @@
       <param-value>com.sun.jersey.api.container.filter.PostReplaceFilter</param-value>
     </init-param>
   </servlet>
+  <servlet>
+    <display-name>Fedora REST API Upload Servlet</display-name>
+    <servlet-name>UploadRestServlet</servlet-name>
+    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>com.sun.jersey.config.property.packages</param-name>
+      <param-value>org.fcrepo.server.upload</param-value>
+    </init-param>
+    <init-param>
+      <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
+      <param-value>com.sun.jersey.api.container.filter.PostReplaceFilter</param-value>
+    </init-param>
+  </servlet>
 
   <servlet-mapping>
     <servlet-name>AxisServlet</servlet-name>
@@ -190,6 +203,10 @@
   <servlet-mapping>
     <servlet-name>RestServlet</servlet-name>
     <url-pattern>/objects/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UploadRestServlet</servlet-name>
+    <url-pattern>/upload</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>RestServlet</servlet-name>

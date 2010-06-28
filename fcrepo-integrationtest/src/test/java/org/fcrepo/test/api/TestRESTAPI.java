@@ -1028,6 +1028,40 @@ extends FedoraServerTestCase {
 
     }
 
+    @Test
+    public void testUpload() throws Exception {
+        String uploadUrl =  "/upload";
+
+        // Test working case.
+        PostMethod post = new PostMethod(getBaseURL() + uploadUrl);
+        File temp = File.createTempFile("test.txt", null);
+        FileUtils.writeStringToFile(temp, "This is the upload test file");
+
+        Part[] parts = { new FilePart("file", temp) };
+        MultipartRequestEntity entity = new MultipartRequestEntity(parts, post
+            .getParams());
+
+        post.setRequestEntity(entity);
+        getClient(true).executeMethod(post);
+        HttpResponse response = new HttpResponse(post);
+
+        assertEquals(202,response.getStatusCode());
+        assertTrue(response.getResponseBodyString().startsWith("uploaded://"));
+
+        // Test content not supplied
+        post = new PostMethod(getBaseURL() + uploadUrl);
+        entity = new MultipartRequestEntity(new Part[]{}, post
+            .getParams());
+
+        post.setRequestEntity(entity);
+        getClient(true).executeMethod(post);
+        response = new HttpResponse(post);
+
+        assertEquals(500,response.getStatusCode());
+    }
+
+
+
     // check content disposition header of response
 
     private void CheckCDHeader(HttpResponse response, String expectedType, String expectedFilename) {
