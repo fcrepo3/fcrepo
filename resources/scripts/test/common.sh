@@ -15,8 +15,8 @@ CATALINA_HOME=$FEDORA_HOME/tomcat
 #-------------------------------------------
 
 echo "[Global Settings]"
-echo "JAVA5_HOME    = $JAVA5_HOME"
-echo "JAVA6_HOME    = $JAVA6_HOME"
+echo "JAVA_OPTS     = $JAVA_OPTS"
+echo "MAVEN_OPTS    = $MAVEN_OPTS"
 echo "BUILD_HOME    = $BUILD_HOME"
 echo "FEDORA_HOME   = $FEDORA_HOME"
 echo "CATALINA_HOME = $CATALINA_HOME"

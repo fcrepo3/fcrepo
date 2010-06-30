@@ -3,7 +3,7 @@
 
 These scripts are used by our continuous integration service:
 
-    http://fedora-commons.org/bamboo
+    https://bamboo.duraspace.org/browse/FCREPO
 
 They can also be used to support running tests in your own development
 environment.  Before using these scripts in your environment, you should

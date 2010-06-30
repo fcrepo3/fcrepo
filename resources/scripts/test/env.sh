@@ -6,14 +6,18 @@
 #       in the Config*.properties files
 #
 
+# Comfortable memory settings for Tomcat and Maven
+JAVA_OPTS="-Xms384m -Xmx384m -XX:PermSize=192m -XX:MaxPermSize=192m"
+MAVEN_OPTS="$JAVA_OPTS"
+
 # Where is JDK 1.6 installed?
-JAVA6_HOME=/usr/local/jdk1.6.0_11
+JAVA6_HOME=/usr/lib/jvm/java-6-sun
 
 # Where is maven installed?
-M2_HOME=/usr/local/maven
+M2_HOME=/usr/share/maven2
 
 # Where is the Fedora source distribution to be tested?
-BUILD_HOME=$HOME/agent-home/xml-data/build-dir/FCREPO-LINUXSAN
+BUILD_HOME=$HOME/bamboo-agent-home/xml-data/build-dir/FCREPO-LINUXSAN
 
 # Where should test instances of Fedora be installed?
 # This will be created and cleared out by test scripts as necessary.
@@ -30,5 +34,7 @@ PEP_NOCACHE=true
 #
 CATALINA_HOME=$FEDORA_HOME/tomcat
 
+export JAVA_OPTS
+export MAVEN_OPTS
 export FEDORA_HOME
 export CATALINA_HOME
