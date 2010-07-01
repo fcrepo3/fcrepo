@@ -3,7 +3,7 @@
 #
 # CHANGE THESE SETTINGS AS APPROPRIATE FOR YOUR TEST ENVIRONMENT
 # NOTE: You should also change the environment-specific setttings
-#       in the Config*.properties files
+#       in the Config*.properties files.
 #
 
 # Comfortable memory settings for Tomcat and Maven
@@ -25,6 +25,9 @@ FEDORA_HOME=$HOME/fedora-home
 
 # When installed, what port will non-secure http requests be on?
 HTTP_PORT=9080
+
+# What hostname will the Fedora webapp be accessable on?
+FEDORA_HOSTNAME=localhost
 
 # Special test case situation where PEP caching needs to be disabled.
 PEP_NOCACHE=true

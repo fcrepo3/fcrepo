@@ -71,7 +71,7 @@ echo ""
 echo "[Running ConfigB Tests...]"
 
 cd $BUILD_HOME/fcrepo-integrationtest
-$M2_HOME/bin/mvn integration-test -P configB -Dfedora.baseURL=http://fedcommdevsrv1.nsdlib.org:9080/fedora -Dfedora.hostname=fedcommdevsrv1.nsdlib.org -Dfedora.port=9080
+$M2_HOME/bin/mvn integration-test -P configB -Dfedora.baseURL=http://$FEDORA_HOSTNAME:$HTTP_PORT/fedora -Dfedora.hostname=$FEDORA_HOSTNAME -Dfedora.port=$HTTP_PORT
 if [ $? -ne 0 ]; then
   echo ""
   echo "ERROR: Failed ConfigB tests; see above"
@@ -116,7 +116,7 @@ echo ""
 echo "[Running ConfigA Tests...]"
 
 cd $BUILD_HOME/fcrepo-integrationtest
-$M2_HOME/bin/mvn integration-test -P configA -Dfedora.baseURL=http://fedcommdevsrv1.nsdlib.org:9080/fedora -Dfedora.hostname=fedcommdevsrv1.nsdlib.org -Dfedora.port=9080
+$M2_HOME/bin/mvn integration-test -P configA -Dfedora.baseURL=http://$FEDORA_HOSTNAME:$HTTP_PORT/fedora -Dfedora.hostname=$FEDORA_HOSTNAME -Dfedora.port=$HTTP_PORT
 if [ $? -ne 0 ]; then
   echo ""
   echo "ERROR: Failed ConfigA tests; see above"
@@ -161,7 +161,7 @@ echo ""
 echo "[Running ConfigQ Tests...]"
 
 cd $BUILD_HOME/fcrepo-integrationtest
-$M2_HOME/bin/mvn integration-test -P configQ -Dfedora.baseURL=http://fedcommdevsrv1.nsdlib.org:9080/fedora -Dfedora.hostname=fedcommdevsrv1.nsdlib.org -Dfedora.port=9080
+$M2_HOME/bin/mvn integration-test -P configQ -Dfedora.baseURL=http://$FEDORA_HOSTNAME:$HTTP_PORT/fedora -Dfedora.hostname=$FEDORA_HOSTNAME -Dfedora.port=$HTTP_PORT
 if [ $? -ne 0 ]; then
   echo ""
   echo "ERROR: Failed ConfigQ tests; see above"
