@@ -1526,6 +1526,14 @@ public class TestAPIM
 
         for (String reservedDSID : new String[]{"RELS-EXT", "RELS-INT"}) {
             altIds[0] = "Datastream 2 Alternate ID";
+
+            String uri = null;
+            if (reservedDSID.equals("RELS-EXT")) {
+                uri = "info:fedora/fedora-system:FedoraRELSExt-1.0";
+            } else if (reservedDSID.equals("RELS-INT")) {
+                uri = "info:fedora/fedora-system:FedoraRELSInt-1.0";
+            }
+
             datastreamId =
                     apim
                             .modifyDatastreamByReference(mcPID,
@@ -1533,7 +1541,7 @@ public class TestAPIM
                                                          altIds,
                                                          "A New RELS Datastream",
                                                          "application/rdf+xml",
-                                                         "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                                         uri,
                                                          getDemoBaseURL() + "/image-collection-demo/SmileyPens_M-" +
                                                          reservedDSID + ".xml",
                                                          null,
@@ -1551,7 +1559,8 @@ public class TestAPIM
                               xmlIn);
             assertXpathExists(
                     "//foxml:datastream[@ID='" + reservedDSID + "']/foxml:datastreamVersion[@ID='" + reservedDSID +
-                    ".1' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='info:fedora/fedora-system:FedoraRELSExt-1.0']",
+                    ".1' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='" +
+                    uri + "']",
                     xmlIn);
             assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
                               xmlIn);
@@ -1640,6 +1649,13 @@ public class TestAPIM
         for (String relsDsId : new String[]{"RELS-EXT", "RELS-INT"}) {
             try {
                 altIds[0] = "Datastream 2 Alternate ID";
+                String uri = null;
+                if (relsDsId.equals("RELS-EXT")) {
+                    uri = "info:fedora/fedora-system:FedoraRELSExt-1.0";
+                } else if (relsDsId.equals("RELS-INT")) {
+                    uri = "info:fedora/fedora-system:FedoraRELSInt-1.0";
+                }
+
                 datastreamId =
                         apim
                                 .modifyDatastreamByValue("demo:SmileyGreetingCard",
@@ -1647,7 +1663,7 @@ public class TestAPIM
                                                          altIds,
                                                          "Modified RELS Datastream",
                                                          "application/rdf+xml",
-                                                         "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                                         uri,
                                                          demo1001_relsext,
                                                          null,
                                                          null,
@@ -1666,6 +1682,13 @@ public class TestAPIM
             try {
                 altIds[0] = "Datastream 2 Alternate ID";
 
+                String uri = null;
+                if (reservedDSID.equals("RELS-EXT")) {
+                    uri = "info:fedora/fedora-system:FedoraRELSExt-1.0";
+                } else if (reservedDSID.equals("RELS-INT")) {
+                    uri = "info:fedora/fedora-system:FedoraRELSInt-1.0";
+                }
+
                 datastreamId =
                         apim
                                 .modifyDatastreamByValue(mcPID,
@@ -1673,7 +1696,7 @@ public class TestAPIM
                                                          altIds,
                                                          "A New RELS Datastream",
                                                          "application/rdf+xml",
-                                                         "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                                         uri,
                                                          "<node>with valid xml but not valid content for RELS-* or DC</node>".getBytes(),
                                                          null,
                                                          null,
@@ -1711,6 +1734,12 @@ public class TestAPIM
             String reservedDSID = relsIDs[i];
             altIds[0] = "Datastream 2 Alternate ID";
 
+            String uri = null;
+            if (reservedDSID.equals("RELS-EXT")) {
+                uri = "info:fedora/fedora-system:FedoraRELSExt-1.0";
+            } else if (reservedDSID.equals("RELS-INT")) {
+                uri = "info:fedora/fedora-system:FedoraRELSInt-1.0";
+            }
 
             datastreamId =
                     apim
@@ -1719,7 +1748,7 @@ public class TestAPIM
                                                      altIds,
                                                      "A New RELS Datastream",
                                                      "application/rdf+xml",
-                                                     "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                                     uri,
                                                      relsContent[i].getBytes(),
                                                      null,
                                                      null,
@@ -1735,7 +1764,8 @@ public class TestAPIM
                               xmlIn);
             assertXpathExists(
                     "//foxml:datastream[@ID='" + reservedDSID + "']/foxml:datastreamVersion[@ID='" + reservedDSID +
-                    ".2' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='info:fedora/fedora-system:FedoraRELSExt-1.0']",
+                    ".2' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='" +
+                    uri + "']",
                     xmlIn);
             assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
                               xmlIn);
