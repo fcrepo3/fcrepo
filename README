@@ -46,8 +46,15 @@ the Fedora server configured in a specific way.
 These tests do not depend on external hosts and can therefore be
 run without external network access.
 
+Installation properties files are supplied in the resources/properties/scripts
+folder (you will need to customise folder locations and DNS names to
+suit your own installation).  These files can be supplied as arguments to the
+installer jar file to simplify setting up test scenarios.
+
 To execute a test suite, make sure the server has been started[*] and 
-that $FEDORA_HOME points to the correct directory. Then enter:
+that $FEDORA_HOME and $CATALINA_HOME point to the correct folder.
+
+Then enter:
 
   mvn integration-test -P config[A|B|Q]
 
@@ -59,6 +66,12 @@ the line above:
   -Ddemo.format=mets
   -Ddemo.format=atom
   -Ddemo.format=atom-zip
+  
+To run individual tests, supply the name of the test as a parameter, but
+note that you will need to be running Maven from within the 
+fcrepo-integrationtest folder, eg:
+  
+  mvn integration-test -P configA -Dtest=TestRESTAPI
 
 There are some system tests that are not included in the system
 test suites due to the time required to execute the test,
