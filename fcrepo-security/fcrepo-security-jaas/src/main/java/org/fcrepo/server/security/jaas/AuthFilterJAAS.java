@@ -224,6 +224,9 @@ public class AuthFilterJAAS
         // If API-A AuthN is off, for all GET requests via the REST API,
         // except those which are known to be part of API-M,
         // just continue the chain and return after processing the chain.
+        // FIXME: As other servlets that require authn also go through this filter,
+        // there's probably a neater way to ensure we are only catching API-A methods
+        // currently we are explicitly testing for other management URLs/paths
         if (!authnAPIA) {
             if(req.getMethod().equals("GET")) {
                 String requestPath = req.getPathInfo();
@@ -241,9 +244,6 @@ public class AuthFilterJAAS
                 boolean isManagement = fullPath.endsWith("/management/control") || fullPath.endsWith("/management/getNextPID");
                 boolean isAPIM = isExport || isObjectXML || isGetDatastream
                 || isGetRelationships || isValidate || isManagement;
-
-                if (requestPath.equals(""))
-                        logger.warn("Empty request path, full path is " + fullPath);
 
                 if (!isAPIM) {
                     chain.doFilter(request, response);
