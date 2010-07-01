@@ -30,6 +30,7 @@ import org.fcrepo.server.config.webxml.ServletMapping;
 import org.fcrepo.server.config.webxml.UserDataConstraint;
 import org.fcrepo.server.config.webxml.WebResourceCollection;
 import org.fcrepo.server.config.webxml.WebXML;
+
 import org.fcrepo.utilities.install.InstallOptions;
 
 
@@ -214,6 +215,11 @@ public class FedoraWebXML {
             FilterMapping restFM = new FilterMapping();
             restFM.setFilterName(fn);
             restFM.addServletName("RestServlet");
+            fedoraWebXML.addFilterMapping(restFM);
+            // and rest upload servlet
+            restFM = new FilterMapping();
+            restFM.setFilterName(FILTER_AUTHN);
+            restFM.addServletName("UploadRestServlet");
             fedoraWebXML.addFilterMapping(restFM);
         }
 

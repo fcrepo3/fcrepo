@@ -21,17 +21,15 @@ package org.fcrepo.server.security.jaas;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+
 import java.security.Principal;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.security.auth.Subject;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -41,13 +39,20 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.security.jaas.auth.AuthHttpServletRequestWrapper;
 import org.fcrepo.server.security.jaas.auth.handler.UsernamePasswordCallbackHandler;
 import org.fcrepo.server.security.jaas.util.Base64;
 import org.fcrepo.server.security.jaas.util.SubjectUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -222,20 +227,27 @@ public class AuthFilterJAAS
         if (!authnAPIA) {
             if(req.getMethod().equals("GET")) {
                 String requestPath = req.getPathInfo();
-                if(requestPath != null) {
-                    // potentially extra String evals, but aiming for clarity
-                    boolean isExport = requestPath.endsWith("/export");
-                    boolean isObjectXML = requestPath.endsWith("/objectXML");
-                    boolean isGetDatastream = requestPath.contains("/datastreams/") &&
-                            !requestPath.endsWith("/content");
-                    boolean isGetRelationships = requestPath.endsWith("/relationships");
-                    boolean isAPIM = isExport || isObjectXML || isGetDatastream
-                    || isGetRelationships;
+                if (requestPath == null)
+                    requestPath = ""; // null is returned eg for /fedora/objects? - API-A, so we still want to do the below...
+                String fullPath = req.getRequestURI();
+                // potentially extra String evals, but aiming for clarity
+                boolean isExport = requestPath.endsWith("/export");
+                boolean isObjectXML = requestPath.endsWith("/objectXML");
+                boolean isGetDatastream = requestPath.contains("/datastreams/") &&
+                        !requestPath.endsWith("/content");
+                boolean isGetRelationships = requestPath.endsWith("/relationships");
+                boolean isValidate = requestPath.endsWith("/validate");
+                // management get methods (LITE API, control)
+                boolean isManagement = fullPath.endsWith("/management/control") || fullPath.endsWith("/management/getNextPID");
+                boolean isAPIM = isExport || isObjectXML || isGetDatastream
+                || isGetRelationships || isValidate || isManagement;
 
-                    if (!isAPIM) {
-                        chain.doFilter(request, response);
-                        return;
-                    }
+                if (requestPath.equals(""))
+                        logger.warn("Empty request path, full path is " + fullPath);
+
+                if (!isAPIM) {
+                    chain.doFilter(request, response);
+                    return;
                 }
             }
         }
