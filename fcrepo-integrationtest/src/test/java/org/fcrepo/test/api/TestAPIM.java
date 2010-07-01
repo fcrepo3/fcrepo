@@ -4,40 +4,30 @@
  */
 package org.fcrepo.test.api;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
-import java.rmi.RemoteException;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import org.apache.axis.AxisFault;
-import org.apache.axis.types.NonNegativeInteger;
-
-import org.custommonkey.xmlunit.NamespaceContext;
-import org.custommonkey.xmlunit.SimpleNamespaceContext;
-import org.custommonkey.xmlunit.XMLUnit;
-
-import org.junit.After;
-
 import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
+import org.apache.axis.AxisFault;
+import org.apache.axis.types.NonNegativeInteger;
+import org.custommonkey.xmlunit.NamespaceContext;
+import org.custommonkey.xmlunit.SimpleNamespaceContext;
+import org.custommonkey.xmlunit.XMLUnit;
+import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.Constants;
-
+import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.Datastream;
-
+import org.fcrepo.server.types.gen.*;
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.After;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.rmi.RemoteException;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
 public class TestAPIM
@@ -1277,9 +1267,8 @@ public class TestAPIM
         long managedContentSize = origManagedContent.getSize();
 
         assertXpathExists(
-                          "//foxml:datastreamVersion[@ID='NEWDS1.0' and @SIZE='" + managedContentSize + "']",
-                          xmlIn);
-
+                "//foxml:datastreamVersion[@ID='NEWDS1.0' and @SIZE='" + managedContentSize + "']",
+                xmlIn);
 
 
         //test adding X type datastream
@@ -1384,7 +1373,9 @@ public class TestAPIM
         // object has pre-existing RELS-EXTso purge first
         // FIXME: can't do this for DC as (default) content model checks make sure that datastreams used by disseminators can't be removed
         String mcPID = "demo:SmileyBeerGlass_M";
-        String[] purgedDatastreams = apim.purgeDatastream(mcPID, "RELS-EXT", null, null, "Purge managed content datastream RELS-EXT" + mcPID, false);
+        String[] purgedDatastreams =
+                apim.purgeDatastream(mcPID, "RELS-EXT", null, null, "Purge managed content datastream RELS-EXT" + mcPID,
+                                     false);
         assertTrue("Check purged managed datastream RELS-EXT", purgedDatastreams.length == 1);
         for (String reservedDSID : new String[]{"RELS-EXT", "RELS-INT"}) {
             try {
@@ -1414,9 +1405,13 @@ public class TestAPIM
         // but there's sufficient reserved-datastream-specific code to warrant this
         // FIXME: also do for DC, can't do unless DC is purged, content model checks currently prevent this (DC used in default content model)
         mcPID = "demo:SmileyPens_M";
-        purgedDatastreams = apim.purgeDatastream(mcPID, "RELS-EXT", null, null, "Purge managed content datastream RELS-EXT" + mcPID, false);
+        purgedDatastreams =
+                apim.purgeDatastream(mcPID, "RELS-EXT", null, null, "Purge managed content datastream RELS-EXT" + mcPID,
+                                     false);
         assertTrue("Check purged managed datastream RELS-EXT", purgedDatastreams.length == 1);
-        purgedDatastreams = apim.purgeDatastream(mcPID, "RELS-INT", null, null, "Purge managed content datastream RELS-INT" + mcPID, false);
+        purgedDatastreams =
+                apim.purgeDatastream(mcPID, "RELS-INT", null, null, "Purge managed content datastream RELS-INT" + mcPID,
+                                     false);
         assertTrue("Check purged managed datastream RELS-INT", purgedDatastreams.length == 1);
 
         for (String reservedDSID : new String[]{"RELS-EXT", "RELS-INT"}) {
@@ -1430,7 +1425,8 @@ public class TestAPIM
                                            true,
                                            "application/rdf+xml",
                                            "info:fedora/fedora-system:FedoraRELSExt-1.0",
-                                           getDemoBaseURL() + "/image-collection-demo/SmileyPens_M-" + reservedDSID + ".xml",
+                                           getDemoBaseURL() + "/image-collection-demo/SmileyPens_M-" + reservedDSID +
+                                           ".xml",
                                            "M",
                                            "A",
                                            null,
@@ -1445,7 +1441,8 @@ public class TestAPIM
             assertXpathExists("//foxml:datastream[@ID='" + reservedDSID + "' and @CONTROL_GROUP='M' and @STATE='A']",
                               xmlIn);
             assertXpathExists(
-                    "//foxml:datastream[@ID='" + reservedDSID + "']/foxml:datastreamVersion[@ID='" + reservedDSID + ".0' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='info:fedora/fedora-system:FedoraRELSExt-1.0']",
+                    "//foxml:datastream[@ID='" + reservedDSID + "']/foxml:datastreamVersion[@ID='" + reservedDSID +
+                    ".0' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='info:fedora/fedora-system:FedoraRELSExt-1.0']",
                     xmlIn);
             assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
                               xmlIn);
@@ -1488,8 +1485,8 @@ public class TestAPIM
                                xmlIn);
         // check size
         assertXpathExists(
-                          "//foxml:datastreamVersion[@ID='NEWDS1.0' and @SIZE='" + managedContentSize + "']",
-                          xmlIn);
+                "//foxml:datastreamVersion[@ID='NEWDS1.0' and @SIZE='" + managedContentSize + "']",
+                xmlIn);
         // check size in getDatastreamDissemination
         Datastream ds1 = apim.getDatastream("demo:14", "NEWDS1", null);
         assertEquals(managedContentSize, ds1.getSize());
@@ -1503,18 +1500,19 @@ public class TestAPIM
             try {
                 altIds[0] = "Datastream 2 Alternate ID";
                 datastreamId =
-                    apim
-                    .modifyDatastreamByReference(mcPID,
-                                                 reservedDSID,
-                                                 altIds,
-                                                 "A New RELS Datastream",
-                                                 "application/rdf+xml",
-                                                 "info:fedora/fedora-system:FedoraRELSExt-1.0",
-                                                 getBaseURL() + "/get/fedora-system:ContentModel-3.0/RELS-EXT",
-                                                 null,
-                                                 null,
-                                                 "modifying by reference invalid datastream",
-                                                 false);
+                        apim
+                                .modifyDatastreamByReference(mcPID,
+                                                             reservedDSID,
+                                                             altIds,
+                                                             "A New RELS Datastream",
+                                                             "application/rdf+xml",
+                                                             "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                                             getBaseURL() +
+                                                             "/get/fedora-system:ContentModel-3.0/RELS-EXT",
+                                                             null,
+                                                             null,
+                                                             "modifying by reference invalid datastream",
+                                                             false);
                 fail(reservedDSID + " was not validated on modifyDatastreamByReference");
             } catch (RemoteException e) {
             }
@@ -1529,18 +1527,19 @@ public class TestAPIM
         for (String reservedDSID : new String[]{"RELS-EXT", "RELS-INT"}) {
             altIds[0] = "Datastream 2 Alternate ID";
             datastreamId =
-                apim
-                .modifyDatastreamByReference(mcPID,
-                                             reservedDSID,
-                                             altIds,
-                                             "A New RELS Datastream",
-                                             "application/rdf+xml",
-                                             "info:fedora/fedora-system:FedoraRELSExt-1.0",
-                                             getDemoBaseURL() + "/image-collection-demo/SmileyPens_M-" + reservedDSID + ".xml",
-                                             null,
-                                             null,
-                                             "modify reserved datastream by reference with valid content",
-                                             false);
+                    apim
+                            .modifyDatastreamByReference(mcPID,
+                                                         reservedDSID,
+                                                         altIds,
+                                                         "A New RELS Datastream",
+                                                         "application/rdf+xml",
+                                                         "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                                         getDemoBaseURL() + "/image-collection-demo/SmileyPens_M-" +
+                                                         reservedDSID + ".xml",
+                                                         null,
+                                                         null,
+                                                         "modify reserved datastream by reference with valid content",
+                                                         false);
 
 
             // check  datastreams
@@ -1551,7 +1550,8 @@ public class TestAPIM
             assertXpathExists("//foxml:datastream[@ID='" + reservedDSID + "' and @CONTROL_GROUP='M' and @STATE='A']",
                               xmlIn);
             assertXpathExists(
-                    "//foxml:datastream[@ID='" + reservedDSID + "']/foxml:datastreamVersion[@ID='" + reservedDSID + ".1' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='info:fedora/fedora-system:FedoraRELSExt-1.0']",
+                    "//foxml:datastream[@ID='" + reservedDSID + "']/foxml:datastreamVersion[@ID='" + reservedDSID +
+                    ".1' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='info:fedora/fedora-system:FedoraRELSExt-1.0']",
                     xmlIn);
             assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
                               xmlIn);
@@ -1634,7 +1634,6 @@ public class TestAPIM
                                xmlIn);
 
 
-
         // test modifyDatastreamByValue triggers RELS-EXT and RELS-INT validation for type "X"
         // RELS datastream content is invalid as it's for a different object
         // FIXME: consider refactoring into a general validation test suite
@@ -1668,18 +1667,18 @@ public class TestAPIM
                 altIds[0] = "Datastream 2 Alternate ID";
 
                 datastreamId =
-                    apim
-                    .modifyDatastreamByValue(mcPID,
-                                             reservedDSID,
-                                             altIds,
-                                             "A New RELS Datastream",
-                                             "application/rdf+xml",
-                                             "info:fedora/fedora-system:FedoraRELSExt-1.0",
-                                             "<node>with valid xml but not valid content for RELS-* or DC</node>".getBytes(),
-                                             null,
-                                             null,
-                                             "modifying by value M type reserved datastream",
-                                             false);
+                        apim
+                                .modifyDatastreamByValue(mcPID,
+                                                         reservedDSID,
+                                                         altIds,
+                                                         "A New RELS Datastream",
+                                                         "application/rdf+xml",
+                                                         "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                                         "<node>with valid xml but not valid content for RELS-* or DC</node>".getBytes(),
+                                                         null,
+                                                         null,
+                                                         "modifying by value M type reserved datastream",
+                                                         false);
                 fail(reservedDSID + " was not validated on modifyDatastreamByReference");
             } catch (RemoteException e) {
             }
@@ -1692,19 +1691,19 @@ public class TestAPIM
         mcPID = "demo:SmileyPens_M";
 
         // some minimal rels valid content for demo:SmileyPens
-        String[] relsContent = new String[] {
-                                 "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " +
-                                 "xmlns:rel=\"http://www.example.org/test#\">" +
-                                 "<rdf:Description rdf:about=\"info:fedora/demo:SmileyPens_M\">" +
-                                 "<rel:dummy>stuff</rel:dummy>" +
-                                 "</rdf:Description>" +
-                                 "</rdf:RDF>",
-                                 "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " +
-                                 "xmlns:rel=\"http://www.example.org/test#\">" +
-                                 "<rdf:Description rdf:about=\"info:fedora/demo:SmileyPens_M/DC\">" +
-                                 "<rel:dummy>stuff</rel:dummy>" +
-                                 "</rdf:Description>" +
-                                 "</rdf:RDF>"
+        String[] relsContent = new String[]{
+                "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " +
+                "xmlns:rel=\"http://www.example.org/test#\">" +
+                "<rdf:Description rdf:about=\"info:fedora/demo:SmileyPens_M\">" +
+                "<rel:dummy>stuff</rel:dummy>" +
+                "</rdf:Description>" +
+                "</rdf:RDF>",
+                "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " +
+                "xmlns:rel=\"http://www.example.org/test#\">" +
+                "<rdf:Description rdf:about=\"info:fedora/demo:SmileyPens_M/DC\">" +
+                "<rel:dummy>stuff</rel:dummy>" +
+                "</rdf:Description>" +
+                "</rdf:RDF>"
         };
 
         String[] relsIDs = new String[]{"RELS-EXT", "RELS-INT"};
@@ -1714,18 +1713,18 @@ public class TestAPIM
 
 
             datastreamId =
-                apim
-                .modifyDatastreamByValue(mcPID,
-                                         reservedDSID,
-                                         altIds,
-                                         "A New RELS Datastream",
-                                         "application/rdf+xml",
-                                         "info:fedora/fedora-system:FedoraRELSExt-1.0",
-                                         relsContent[i].getBytes(),
-                                         null,
-                                         null,
-                                         "modify reserved M datastream by value with valid content",
-                                         false);
+                    apim
+                            .modifyDatastreamByValue(mcPID,
+                                                     reservedDSID,
+                                                     altIds,
+                                                     "A New RELS Datastream",
+                                                     "application/rdf+xml",
+                                                     "info:fedora/fedora-system:FedoraRELSExt-1.0",
+                                                     relsContent[i].getBytes(),
+                                                     null,
+                                                     null,
+                                                     "modify reserved M datastream by value with valid content",
+                                                     false);
 
             // check  datastreams
             objectXML = apim.getObjectXML(mcPID);
@@ -1735,7 +1734,8 @@ public class TestAPIM
             assertXpathExists("//foxml:datastream[@ID='" + reservedDSID + "' and @CONTROL_GROUP='M' and @STATE='A']",
                               xmlIn);
             assertXpathExists(
-                    "//foxml:datastream[@ID='" + reservedDSID + "']/foxml:datastreamVersion[@ID='" + reservedDSID + ".2' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='info:fedora/fedora-system:FedoraRELSExt-1.0']",
+                    "//foxml:datastream[@ID='" + reservedDSID + "']/foxml:datastreamVersion[@ID='" + reservedDSID +
+                    ".2' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='info:fedora/fedora-system:FedoraRELSExt-1.0']",
                     xmlIn);
             assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
                               xmlIn);
@@ -1870,21 +1870,22 @@ public class TestAPIM
 
         // test adding new M datastream with checksum (FCREPO-696)
         // use demo:14/NEWDS2 as the source as we have the already-calculated checksum from above
-        String checksum3 = "3aff11a78a8335a54b75e02d85a0caa3"; // tip: if this is wrong (ie demo:14/NEWDS2 changes) the axis fault will give the correct value
+        String checksum3 =
+                "3aff11a78a8335a54b75e02d85a0caa3"; // tip: if this is wrong (ie demo:14/NEWDS2 changes) the axis fault will give the correct value
         datastreamId =
-            apim.addDatastream("demo:14",
-                               "CHECKSUMDS",
-                               null,
-                               "datastream for testing checksums",
-                               true,
-                               null,
-                               null,
-                               getBaseURL() + "/get/demo:14/NEWDS2",
-                               "M",
-                               "A",
-                               "MD5",
-                               checksum3,
-            "creating datastream with checksum");
+                apim.addDatastream("demo:14",
+                                   "CHECKSUMDS",
+                                   null,
+                                   "datastream for testing checksums",
+                                   true,
+                                   null,
+                                   null,
+                                   getBaseURL() + "/get/demo:14/NEWDS2",
+                                   "M",
+                                   "A",
+                                   "MD5",
+                                   checksum3,
+                                   "creating datastream with checksum");
 
         // check the checksum
         String checksum4 = apim.compareDatastreamChecksum("demo:14", "CHECKSUMDS", null);
@@ -1893,29 +1894,49 @@ public class TestAPIM
         // add again, new datastream, incorrect checksum
         try {
             datastreamId =
-                apim.addDatastream("demo:14",
-                                              "CHECKSUMDSFAIL",
-                                              null,
-                                              "datastream for testing checksums",
-                                              true,
-                                              null,
-                                              null,
-                                              getBaseURL() + "/get/demo:14/NEWDS2",
-                                              "M",
-                                              "A",
-                                              "MD5",
-                                              "4aff31a28b8335a24b95e02d85a0caa4",
-                                              "creating datastream with checksum");
+                    apim.addDatastream("demo:14",
+                                       "CHECKSUMDSFAIL",
+                                       null,
+                                       "datastream for testing checksums",
+                                       true,
+                                       null,
+                                       null,
+                                       getBaseURL() + "/get/demo:14/NEWDS2",
+                                       "M",
+                                       "A",
+                                       "MD5",
+                                       "4aff31a28b8335a24b95e02d85a0caa4",
+                                       "creating datastream with checksum");
             // fail if datastream was modified
             Assert.fail();
         } catch (AxisFault af) {
             assertTrue(af.getFaultString()
-                       .contains("Checksum Mismatch"));
+                    .contains("Checksum Mismatch"));
         }
 
         // modify datastream with incorrect checksum (same contents, incorrect checksum)
         try {
             datastreamId =
+                    apim.modifyDatastreamByReference("demo:14",
+                                                     "CHECKSUMDS",
+                                                     null,
+                                                     null,
+                                                     null,
+                                                     null,
+                                                     getBaseURL() + "/get/demo:14/NEWDS2",
+                                                     "MD5",
+                                                     "4aff31a28b8335a24b95e02d85a0caa4",
+                                                     "modifying datastream with incorrect checksum",
+                                                     false);
+            // fail if datastream was modified
+            Assert.fail();
+        } catch (AxisFault af) {
+            assertTrue(af.getFaultString()
+                    .contains("Checksum Mismatch"));
+        }
+
+        // modify again this time with correct checksum
+        datastreamId =
                 apim.modifyDatastreamByReference("demo:14",
                                                  "CHECKSUMDS",
                                                  null,
@@ -1924,34 +1945,13 @@ public class TestAPIM
                                                  null,
                                                  getBaseURL() + "/get/demo:14/NEWDS2",
                                                  "MD5",
-                                                 "4aff31a28b8335a24b95e02d85a0caa4",
-                                                 "modifying datastream with incorrect checksum",
+                                                 checksum3,
+                                                 "modifying datastream with correct checksum",
                                                  false);
-            // fail if datastream was modified
-            Assert.fail();
-        } catch (AxisFault af) {
-            assertTrue(af.getFaultString()
-                       .contains("Checksum Mismatch"));
-        }
-
-        // modify again this time with correct checksum
-        datastreamId =
-            apim.modifyDatastreamByReference("demo:14",
-                                             "CHECKSUMDS",
-                                             null,
-                                             null,
-                                             null,
-                                             null,
-                                             getBaseURL() + "/get/demo:14/NEWDS2",
-                                             "MD5",
-                                             checksum3,
-            "modifying datastream with correct checksum",
-            false);
 
         // check the checksum
         checksum4 = apim.compareDatastreamChecksum("demo:14", "CHECKSUMDS", null);
         assertTrue(checksum3.equals(checksum3));
-
 
 
         // (5) test purgeDatastream
@@ -2436,6 +2436,28 @@ public class TestAPIM
 
         // purge mets 1.0 object
         apim.purgeObject(pid, "purging object demo:999b", false);
+    }
+
+
+    public void testValidate() throws Exception {
+
+        // test getting xml for object demo:5
+        System.out.println("Running TestAPIM.testValidate...");
+        FedoraClient client = getFedoraClient();
+        FedoraAPIA apia = client.getAPIA();
+
+        String[] resultFields = {"pid"};
+        NonNegativeInteger maxResults = new NonNegativeInteger("" + 1000);
+        FieldSearchQuery query = new FieldSearchQuery(null, "*");
+        FieldSearchResult result =
+                apia.findObjects(resultFields, maxResults, query);
+        ObjectFields[] fields = result.getResultList();
+        for (ObjectFields objectFields : fields) {
+            String pid = objectFields.getPid();
+            System.out.println("Validating object '" + pid + "'");
+            Validation validation = apim.validate(pid, null);
+            assertTrue(validation.isValid());
+        }
     }
 
     public static void main(String[] args) {

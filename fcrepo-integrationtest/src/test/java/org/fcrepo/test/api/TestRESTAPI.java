@@ -4,63 +4,39 @@
  */
 package org.fcrepo.test.api;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
-import java.net.URL;
-import java.net.URLEncoder;
-
-import java.text.SimpleDateFormat;
-
-import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import junit.framework.TestSuite;
+import org.antlr.stringtemplate.StringTemplate;
+import org.apache.axis.types.NonNegativeInteger;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
-
 import org.apache.commons.io.FileUtils;
-
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-
-import org.junit.Test;
-
-import org.antlr.stringtemplate.StringTemplate;
-
-import junit.framework.TestSuite;
-
 import org.fcrepo.common.PID;
-
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.Datastream;
-import org.fcrepo.server.types.gen.MIMETypedStream;
-
+import org.fcrepo.server.types.gen.*;
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.Test;
 
-import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
-import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
-import static org.apache.commons.httpclient.HttpStatus.SC_OK;
-import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
+import java.io.*;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.apache.commons.httpclient.HttpStatus.*;
 
 
 /**
@@ -74,7 +50,7 @@ import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
  * @since 3.0
  */
 public class TestRESTAPI
-extends FedoraServerTestCase {
+        extends FedoraServerTestCase {
 
     private FedoraAPIA apia;
 
@@ -121,26 +97,27 @@ extends FedoraServerTestCase {
     protected String url;
 
     private static final String datetime =
-        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    .format(new Date());
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                    .format(new Date());
 
     private boolean chunked = false;
 
     @Override
     public void setUp() throws Exception {
 
-        DEMO_MIN = FileUtils.readFileToString(new File(REST_RESOURCE_PATH + "/demo_min.xml"),"UTF-8");
-        DEMO_MIN_PID = FileUtils.readFileToString(new File(REST_RESOURCE_PATH + "/demo_min_pid.xml"),"UTF-8");
+        DEMO_MIN = FileUtils.readFileToString(new File(REST_RESOURCE_PATH + "/demo_min.xml"), "UTF-8");
+        DEMO_MIN_PID = FileUtils.readFileToString(new File(REST_RESOURCE_PATH + "/demo_min_pid.xml"), "UTF-8");
 
-        StringTemplate tpl = new StringTemplate(FileUtils.readFileToString(new File(REST_RESOURCE_PATH + "/demo_rest.xml"),"UTF-8"));
-        tpl.setAttribute("MODEL_DOWNLOAD_FILENAME",  MODEL.DOWNLOAD_FILENAME.localName );
+        StringTemplate tpl = new StringTemplate(
+                FileUtils.readFileToString(new File(REST_RESOURCE_PATH + "/demo_rest.xml"), "UTF-8"));
+        tpl.setAttribute("MODEL_DOWNLOAD_FILENAME", MODEL.DOWNLOAD_FILENAME.localName);
         tpl.setAttribute("DS1_RELS_FILENAME", DS1RelsFilename);
         tpl.setAttribute("MODEL_URI", MODEL.uri);
         tpl.setAttribute("DATETIME", datetime);
         tpl.setAttribute("FEDORA_BASE_URL", getBaseURL());
-        tpl.setAttribute("DS2_LABEL_FILENAME",  DS2LabelFilename);
-        tpl.setAttribute("DS3_LABEL_FILENAME",  DS3LabelFilename);
-        tpl.setAttribute("DS4_LABEL_FILENAME_ORIGINAL",DS4LabelFilenameOriginal);
+        tpl.setAttribute("DS2_LABEL_FILENAME", DS2LabelFilename);
+        tpl.setAttribute("DS3_LABEL_FILENAME", DS3LabelFilename);
+        tpl.setAttribute("DS4_LABEL_FILENAME_ORIGINAL", DS4LabelFilenameOriginal);
 
         DEMO_REST = tpl.toString();
         apia = getFedoraClient().getAPIA();
@@ -155,6 +132,7 @@ extends FedoraServerTestCase {
     }
 
     // determine if test config specifies that Access requests should be authorized
+
     private boolean getAuthAccess() {
         if (authorizeAccess == null) {
             String property = System.getProperty(authAccessProperty);
@@ -163,8 +141,11 @@ extends FedoraServerTestCase {
             } else if (property.equals("false")) {
                 authorizeAccess = false;
             } else {
-                assertTrue("Failed to determine whether to perform authorization on Access requests from: " + authAccessProperty, false);
-                throw new RuntimeException("Failed to determine whether to perform authorization on Access requests from: " + authAccessProperty);
+                assertTrue("Failed to determine whether to perform authorization on Access requests from: " +
+                           authAccessProperty, false);
+                throw new RuntimeException(
+                        "Failed to determine whether to perform authorization on Access requests from: " +
+                        authAccessProperty);
             }
 
         }
@@ -176,8 +157,9 @@ extends FedoraServerTestCase {
     public void testGetWADL() throws Exception {
         url = "/objects/application.wadl";
 
-        if (getAuthAccess())
+        if (getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
     }
 
@@ -188,13 +170,15 @@ extends FedoraServerTestCase {
     @Test
     public void testGetObjectProfile() throws Exception {
         url = String.format("/objects/%s", pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
 
         url = String.format("/objects/%s?format=xml", pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         String responseXML = new String(response.responseBody, "UTF-8");
@@ -207,56 +191,64 @@ extends FedoraServerTestCase {
         assertTrue(responseXML.contains("<objState>"));
 
         url =
-            String.format("/objects/%s?asOfDateTime=%s",
-                          pid.toString(),
-                          datetime);
-        if (this.getAuthAccess())
+                String.format("/objects/%s?asOfDateTime=%s",
+                              pid.toString(),
+                              datetime);
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
 
         // sanity check
         url = String.format("/objects/%s", "demo:BOGUS_PID");
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_NOT_FOUND, get(getAuthAccess()).getStatusCode());
     }
 
     public void testListMethods() throws Exception {
         url = String.format("/objects/%s/methods", pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
 
         url = String.format("/objects/%s/methods?format=xml", pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
 
         url = String.format("/objects/%s/methods?asOfDateTime=%s", pid
-                            .toString(), datetime);
-        if (this.getAuthAccess())
+                .toString(), datetime);
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
     }
 
     public void testListMethodsForSDep() throws Exception {
         url = String.format("/objects/%s/methods/fedora-system:3", pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
 
         url = String.format("/objects/%s/methods/fedora-system:3?format=xml", pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         String responseXML = new String(response.responseBody, "UTF-8");
         assertTrue(responseXML.contains("sDef=\"fedora-system:3\""));
 
         url = String.format("/objects/%s/methods/fedora-system:3?asOfDateTime=%s", pid
-                            .toString(), datetime);
-        if (this.getAuthAccess())
+                .toString(), datetime);
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
     }
 
@@ -266,8 +258,9 @@ extends FedoraServerTestCase {
 
     public void testGETMethodBuiltInBadMethod() throws Exception {
         url = String.format("/objects/%s/methods/fedora-system:3/noSuchMethod", pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertFalse(SC_OK == get(getAuthAccess()).getStatusCode());
     }
 
@@ -278,8 +271,9 @@ extends FedoraServerTestCase {
 
     public void testGETMethodBuiltInNoArg() throws Exception {
         url = String.format("/objects/%s/methods/fedora-system:3/viewMethodIndex", pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
     }
 
@@ -289,8 +283,9 @@ extends FedoraServerTestCase {
 
     public void testGETMethodCustomBadMethod() throws Exception {
         url = "/objects/demo:14/methods/demo:12/noSuchMethod";
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertFalse(SC_OK == get(getAuthAccess()).getStatusCode());
     }
 
@@ -301,15 +296,17 @@ extends FedoraServerTestCase {
 
     public void testGETMethodCustomNoArg() throws Exception {
         url = "/objects/demo:14/methods/demo:12/getDocumentStyle1";
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
     }
 
     public void testGETMethodCustomGoodUserArg() throws Exception {
         url = "/objects/demo:29/methods/demo:27/resizeImage?width=50";
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         assertEquals(1486, response.getResponseBody().length);
@@ -318,8 +315,9 @@ extends FedoraServerTestCase {
 
     public void testGETMethodCustomGoodUserArgGoodDate() throws Exception {
         url = "/objects/demo:29/methods/demo:27/resizeImage?width=50&asOfDateTime=" + datetime;
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         assertEquals(1486, response.getResponseBody().length);
@@ -328,57 +326,65 @@ extends FedoraServerTestCase {
 
     public void testGETMethodCustomUserArgBadDate() throws Exception {
         url = "/objects/demo:14/methods/demo:12/getDocumentStyle1?width=50&asOfDateTime=badDate";
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertFalse(SC_OK == get(getAuthAccess()).getStatusCode());
     }
 
     public void testGETMethodCustomUserArgEarlyDate() throws Exception {
         url = "/objects/demo:14/methods/demo:12/getDocumentStyle1?width=50&asOfDateTime=1999-11-21T16:38:32.200Z";
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_NOT_FOUND, get(getAuthAccess()).getStatusCode());
     }
 
     public void testGETMethodCustomGoodDate() throws Exception {
         url = "/objects/demo:14/methods/demo:12/getDocumentStyle1?asOfDateTime=" + datetime;
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
     }
 
     public void testGETMethodCustomBadDate() throws Exception {
         url = "/objects/demo:14/methods/demo:12/getDocumentStyle1?asOfDateTime=badDate";
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertFalse(SC_OK == get(getAuthAccess()).getStatusCode());
     }
 
     public void testGETMethodCustomEarlyDate() throws Exception {
         url = "/objects/demo:14/methods/demo:12/getDocumentStyle1?asOfDateTime=1999-11-21T16:38:32.200Z";
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_NOT_FOUND, get(getAuthAccess()).getStatusCode());
     }
 
     public void testListDatastreams() throws Exception {
         url = String.format("/objects/%s/datastreams", pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
 
         url =
-            String.format("/objects/%s/datastreams?format=xml", pid
-                          .toString());
-        if (this.getAuthAccess())
+                String.format("/objects/%s/datastreams?format=xml", pid
+                        .toString());
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
 
         url =
-            String.format("/objects/%s/datastreams?asOfDateTime=%s", pid
-                          .toString(), datetime);
-        if (this.getAuthAccess())
+                String.format("/objects/%s/datastreams?asOfDateTime=%s", pid
+                        .toString(), datetime);
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
     }
 
@@ -411,8 +417,8 @@ extends FedoraServerTestCase {
 
         // sanity check
         url =
-            String.format("/objects/%s/datastreams/BOGUS_DSID", pid
-                          .toString());
+                String.format("/objects/%s/datastreams/BOGUS_DSID", pid
+                        .toString());
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         assertEquals(SC_NOT_FOUND, get(true).getStatusCode());
     }
@@ -428,16 +434,17 @@ extends FedoraServerTestCase {
 
         // Get history in XML format
         url = String.format("/objects/demo:1234/datastreams/DS1/history?format=xml");
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         response = get(true);
         assertEquals(SC_OK, response.getStatusCode());
         String responseXML = new String(response.responseBody, "UTF-8");
 
         String control = FileUtils.readFileToString(new File(
-        "src/test/resources/rest/datastreamHistory.xml"), "UTF-8");
+                "src/test/resources/rest/datastreamHistory.xml"), "UTF-8");
         StringTemplate tpl = new StringTemplate(control);
-        tpl.setAttribute("FEDORA_BASE_URL", getProtocol() +"://"+ getHost() + ":" + getPort());
+        tpl.setAttribute("FEDORA_BASE_URL", getProtocol() + "://" + getHost() + ":" + getPort());
 
         // Diff must be identical
         XMLUnit.setIgnoreWhitespace(true);
@@ -445,7 +452,7 @@ extends FedoraServerTestCase {
         assertTrue(xmldiff.toString(), xmldiff.identical());
 
         // Sanity check
-        url ="/objects/demo:1234/datastreams/BOGUS_DSID";
+        url = "/objects/demo:1234/datastreams/BOGUS_DSID";
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         assertEquals(SC_NOT_FOUND, get(true).getStatusCode());
 
@@ -457,8 +464,9 @@ extends FedoraServerTestCase {
 
     public void testGetDatastreamDissemination() throws Exception {
         url = String.format("/objects/%s/datastreams/RELS-EXT/content", pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         String responseXML = new String(response.responseBody, "UTF-8");
@@ -467,8 +475,9 @@ extends FedoraServerTestCase {
         url = String.format("/objects/%s/datastreams/RELS-EXT/content?asOfDateTime=%s",
                             pid.toString(),
                             datetime);
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         responseXML = new String(response.responseBody, "UTF-8");
@@ -476,37 +485,41 @@ extends FedoraServerTestCase {
 
         // sanity check
         url = String.format("/objects/%s/datastreams/BOGUS_DSID/content", pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_NOT_FOUND, get(getAuthAccess()).getStatusCode());
     }
 
     public void testFindObjects() throws Exception {
         url = String.format("/objects?pid=true&terms=%s&query=&resultFormat=xml",
                             pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
     }
 
     public void testResumeFindObjects() throws Exception {
         url = "/objects?pid=true&query=&resultFormat=xml";
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
 
         String responseXML = new String(response.responseBody, "UTF-8");
         String sessionToken =
-            responseXML.substring(responseXML.indexOf("<token>") + 7,
-                                  responseXML.indexOf("</token>"));
+                responseXML.substring(responseXML.indexOf("<token>") + 7,
+                                      responseXML.indexOf("</token>"));
 
         url =
-            String
-            .format("/objects?pid=true&query=&format=xml&sessionToken=%s",
-                    sessionToken);
-        if (this.getAuthAccess())
+                String
+                        .format("/objects?pid=true&query=&format=xml&sessionToken=%s",
+                                sessionToken);
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
     }
 
@@ -520,13 +533,15 @@ extends FedoraServerTestCase {
 
     public void testGetObjectHistory() throws Exception {
         url = String.format("/objects/%s/versions", pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
 
         url = String.format("/objects/%s/versions?format=xml", pid.toString());
-        if (this.getAuthAccess())
+        if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
     }
 
@@ -601,19 +616,20 @@ extends FedoraServerTestCase {
 
         // Delete minimal object
         String minimalObjectPid =
-            extractPid(response.getResponseHeader("Location").getValue());
+                extractPid(response.getResponseHeader("Location").getValue());
         url = String.format("/objects/%s", minimalObjectPid);
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
         assertEquals(SC_OK, delete(true).getStatusCode());
     }
 
     // Tests FCREPO-509
+
     public void testIngestWithParameterPid() throws Exception {
 
         // Ingest minimal object with PID, use "new" as path parameter -> must succeed
         url = String.format("/objects/new");
         assertEquals(SC_UNAUTHORIZED, post(DEMO_MIN_PID, false).getStatusCode());
-        HttpResponse response  = post(DEMO_MIN_PID, true);
+        HttpResponse response = post(DEMO_MIN_PID, true);
         assertEquals(SC_CREATED, response.getStatusCode());
 
         // clean up
@@ -623,15 +639,15 @@ extends FedoraServerTestCase {
 
         // Ingest minimal object with PID, use a different PID than the one
         // specified in the foxml -> must fail
-        url = String.format("/objects/%s","demo:234");
+        url = String.format("/objects/%s", "demo:234");
         assertEquals(SC_UNAUTHORIZED, post(DEMO_MIN_PID, false).getStatusCode());
-        response  = post(DEMO_MIN_PID, true);
+        response = post(DEMO_MIN_PID, true);
         assertEquals(SC_INTERNAL_SERVER_ERROR, response.getStatusCode());
 
         // Ingest minimal object with PID equals to the PID specified in the foxml
         url = String.format("/objects/%s", "demo:1234");
         assertEquals(SC_UNAUTHORIZED, post(DEMO_MIN_PID, false).getStatusCode());
-        response  = post(DEMO_MIN_PID, true);
+        response = post(DEMO_MIN_PID, true);
         assertEquals(SC_CREATED, response.getStatusCode());
 
         // clean up
@@ -642,7 +658,7 @@ extends FedoraServerTestCase {
         // Ingest minimal object with no PID, specify a PID parameter in the request
         url = String.format("/objects/%s", "demo:234");
         assertEquals(SC_UNAUTHORIZED, post(DEMO_MIN, false).getStatusCode());
-        response  = post(DEMO_MIN, true);
+        response = post(DEMO_MIN, true);
         assertEquals(SC_CREATED, response.getStatusCode());
 
         // clean up
@@ -667,14 +683,44 @@ extends FedoraServerTestCase {
         assertEquals(SC_OK, get(true).getStatusCode());
     }
 
+    public void testValidate() throws Exception {
+
+        try {
+            //ingestDemoObjects();
+
+
+            String[] resultFields = {"pid"};
+            NonNegativeInteger maxResults = new NonNegativeInteger("" + 1000);
+            FieldSearchQuery query = new FieldSearchQuery(null, "*");
+            FieldSearchResult result =
+                    apia.findObjects(resultFields, maxResults, query);
+
+            ObjectFields[] fields = result.getResultList();
+            for (ObjectFields objectFields : fields) {
+                String pid = objectFields.getPid();
+                System.out.println("validating object '" + pid.toString() + "'");
+                url = String.format("/objects/%s/validate", pid.toString());
+                HttpResponse getTrue = get(true);
+                assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+                assertEquals(SC_OK, getTrue.getStatusCode());
+                String responseXML = getTrue.getResponseBodyString();
+                System.out.println(responseXML);
+                assertXpathExists("/validation[@valid='true']", responseXML);
+            }
+        } finally {
+            //purgeDemoObjects();
+        }
+    }
+
+
     public void testExportObject() throws Exception {
         url = String.format("/objects/%s/export", pid.toString());
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         assertEquals(SC_OK, get(true).getStatusCode());
 
         url =
-            String.format("/objects/%s/export?context=public", pid
-                          .toString());
+                String.format("/objects/%s/export?context=public", pid
+                        .toString());
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         assertEquals(SC_OK, get(true).getStatusCode());
     }
@@ -705,7 +751,7 @@ extends FedoraServerTestCase {
         assertEquals(response.getResponseBodyString(),
                      get(true).getResponseBodyString());
 
-        // managed (M) datastream
+// managed (M) datastream
         String mimeType = "text/plain";
         dsPath = "/objects/" + pid + "/datastreams/BAR";
         url = dsPath + "?controlGroup=M&dsLabel=bar&mimeType=" + mimeType;
@@ -739,7 +785,7 @@ extends FedoraServerTestCase {
         assertEquals(SC_UNAUTHORIZED, post(temp, false).getStatusCode());
         assertEquals(SC_CREATED, post(temp, true).getStatusCode());
 
-        // Update the content of the BAR datastream (using PUT)
+// Update the content of the BAR datastream (using PUT)
         url = String.format("/objects/%s/datastreams/BAR", pid.toString());
         assertEquals(SC_UNAUTHORIZED, put(temp, false).getStatusCode());
         HttpResponse response = put(temp, true);
@@ -749,11 +795,11 @@ extends FedoraServerTestCase {
         assertEquals(response.getResponseBodyString(),
                      get(true).getResponseBodyString());
 
-        // Ensure 404 on attempt to update BOGUS_DS via PUT
+// Ensure 404 on attempt to update BOGUS_DS via PUT
         url = "/objects/" + pid + "/datastreams/BOGUS_DS";
         assertEquals(SC_NOT_FOUND, put(temp, true).getStatusCode());
 
-        // Update the content of the BAR datastream (using POST)
+// Update the content of the BAR datastream (using POST)
         url = String.format("/objects/%s/datastreams/BAR", pid.toString());
         response = post(temp, true);
         assertEquals(SC_CREATED, response.getStatusCode());
@@ -765,19 +811,19 @@ extends FedoraServerTestCase {
         assertEquals(response.getResponseBodyString(),
                      get(true).getResponseBodyString());
 
-        // Update the label of the BAR datastream
+// Update the label of the BAR datastream
         String newLabel = "tikibar";
         url = String.format("/objects/%s/datastreams/BAR?dsLabel=%s",
                             pid.toString(), newLabel);
         assertEquals(SC_UNAUTHORIZED, put(false).getStatusCode());
         assertEquals(SC_OK, put(true).getStatusCode());
         assertEquals(newLabel, apim.getDatastream(pid.toString(), "BAR", null)
-                     .getLabel());
+                .getLabel());
 
-        // Update the location of the EXTDS datastream (E type datastream)
+// Update the location of the EXTDS datastream (E type datastream)
         String newLocation =
-            "http://" + getHost() + ":" + getPort() + "/"
-            + getFedoraAppServerContext() + "/get/demo:REST/DC";
+                "http://" + getHost() + ":" + getPort() + "/"
+                + getFedoraAppServerContext() + "/get/demo:REST/DC";
         url = String.format("/objects/%s/datastreams/EXTDS?dsLocation=%s",
                             pid.toString(), newLocation);
         assertEquals(SC_UNAUTHORIZED, put(false).getStatusCode());
@@ -787,17 +833,17 @@ extends FedoraServerTestCase {
                                                      "EXTDS",
                                                      null).getLocation());
         String dcDS =
-            new String(apia.getDatastreamDissemination(pid.toString(),
-                                                       "DC",
-                                                       null).getStream());
+                new String(apia.getDatastreamDissemination(pid.toString(),
+                                                           "DC",
+                                                           null).getStream());
         String extDS =
-            new String(apia.getDatastreamDissemination(pid.toString(),
-                                                       "EXTDS",
-                                                       null).getStream());
+                new String(apia.getDatastreamDissemination(pid.toString(),
+                                                           "EXTDS",
+                                                           null).getStream());
         assertEquals(dcDS, extDS);
 
-        // Update DS1 by reference (X type datastream)
-        // Error expected because attempting to access internal DS with API-A auth on
+// Update DS1 by reference (X type datastream)
+// Error expected because attempting to access internal DS with API-A auth on
         if (getAuthAccess()) {
             // only ConfigB has API-A auth on
             url = String.format("/objects/%s/datastreams/DS1?dsLocation=%s",
@@ -822,14 +868,14 @@ extends FedoraServerTestCase {
         assertEquals(SC_OK, put(xmlData, true).getStatusCode());
 
         MIMETypedStream ds1 =
-            apia.getDatastreamDissemination(pid.toString(), "DS1", null);
+                apia.getDatastreamDissemination(pid.toString(), "DS1", null);
         assertXMLEqual(xmlData, new String(ds1.getStream(), "UTF-8"));
     }
 
     public void testModifyDatastreamNoContent() throws Exception {
         String label = "Label";
         url = String.format("/objects/%s/datastreams/DS1?dsLabel=%s", pid
-                            .toString(), label);
+                .toString(), label);
 
         assertEquals(SC_UNAUTHORIZED, put("", false).getStatusCode());
         assertEquals(SC_OK, put("", true).getStatusCode());
@@ -841,8 +887,8 @@ extends FedoraServerTestCase {
     public void testSetDatastreamState() throws Exception {
         String state = "D";
         url =
-            String.format("/objects/%s/datastreams/DS1?dsState=%s", pid
-                          .toString(), state);
+                String.format("/objects/%s/datastreams/DS1?dsState=%s", pid
+                        .toString(), state);
         assertEquals(SC_UNAUTHORIZED, put("", false).getStatusCode());
         assertEquals(SC_OK, put("", true).getStatusCode());
 
@@ -853,8 +899,8 @@ extends FedoraServerTestCase {
     public void testSetDatastreamVersionable() throws Exception {
         boolean versionable = false;
         url =
-            String.format("/objects/%s/datastreams/DS1?versionable=%s", pid
-                          .toString(), versionable);
+                String.format("/objects/%s/datastreams/DS1?versionable=%s", pid
+                        .toString(), versionable);
         assertEquals(SC_UNAUTHORIZED, put("", false).getStatusCode());
         assertEquals(SC_OK, put("", true).getStatusCode());
 
@@ -877,7 +923,7 @@ extends FedoraServerTestCase {
     public void testLifecycle() throws Exception {
         HttpResponse response = null;
 
-        // Get next PID
+// Get next PID
         url = "/objects/nextPID?format=xml";
         assertEquals(SC_UNAUTHORIZED, post("", false).getStatusCode());
         response = post("", true);
@@ -885,26 +931,26 @@ extends FedoraServerTestCase {
 
         String responseXML = new String(response.responseBody, "UTF-8");
         String pid =
-            responseXML.substring(responseXML.indexOf("<pid>") + 5,
-                                  responseXML.indexOf("</pid>"));
+                responseXML.substring(responseXML.indexOf("<pid>") + 5,
+                                      responseXML.indexOf("</pid>"));
 
-        // Ingest object
+// Ingest object
         String label = "Lifecycle-Test-Label";
         url = String.format("/objects/%s?label=%s", pid, label);
         assertEquals(SC_UNAUTHORIZED, post("", false).getStatusCode());
         assertEquals(SC_CREATED, post("", true).getStatusCode());
 
-        // Add datastream
+// Add datastream
         String datastreamData = "<test>Test Datastream</test>";
         url =
-            String
-            .format("/objects/%s/datastreams/TESTDS?controlGroup=X&dsLabel=Test",
-                    pid.toString());
+                String
+                        .format("/objects/%s/datastreams/TESTDS?controlGroup=X&dsLabel=Test",
+                                pid.toString());
         assertEquals(SC_UNAUTHORIZED, post(datastreamData, false)
-                     .getStatusCode());
+                .getStatusCode());
         assertEquals(SC_CREATED, post(datastreamData, true).getStatusCode());
 
-        // Get object XML
+// Get object XML
         url = String.format("/objects/%s/objectXML", pid);
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         response = get(true);
@@ -913,20 +959,20 @@ extends FedoraServerTestCase {
         assertTrue(responseXML.indexOf(label) > 0);
         assertTrue(responseXML.indexOf(datastreamData) > 0);
 
-        // Modify object
+// Modify object
         label = "Updated-Label";
         url = String.format("/objects/%s?label=%s", pid.toString(), label);
         assertEquals(SC_UNAUTHORIZED, put("", false).getStatusCode());
         assertEquals(SC_OK, put("", true).getStatusCode());
 
-        // Modify datastream
+// Modify datastream
         datastreamData = "<test>Update Test</test>";
         url = String.format("/objects/%s/datastreams/TESTDS", pid.toString());
         assertEquals(SC_UNAUTHORIZED, put(datastreamData, false)
-                     .getStatusCode());
+                .getStatusCode());
         assertEquals(SC_OK, put(datastreamData, true).getStatusCode());
 
-        // Export
+// Export
         url = String.format("/objects/%s/export", pid.toString());
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         response = get(true);
@@ -935,12 +981,12 @@ extends FedoraServerTestCase {
         assertTrue(responseXML.indexOf(label) > 0);
         assertTrue(responseXML.indexOf(datastreamData) > 0);
 
-        // Purge datastream
+// Purge datastream
         url = String.format("/objects/%s/datastreams/TESTDS", pid);
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
         assertEquals(SC_OK, delete(true).getStatusCode());
 
-        // Purge object
+// Purge object
         url = String.format("/objects/%s", pid);
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
         assertEquals(SC_OK, delete(true).getStatusCode());
@@ -959,18 +1005,18 @@ extends FedoraServerTestCase {
         url = String.format("/objects/%s", "BOGUS_PID");
         assertEquals(SC_INTERNAL_SERVER_ERROR, post("", true).getStatusCode());
 
-        // With flash=true parameter response should be 200
+// With flash=true parameter response should be 200
         url = String.format("/objects/%s?flash=true", "BOGUS_PID");
         assertEquals(SC_OK, post("", true).getStatusCode());
     }
 
-    // test correct content-disposition header on getDatastreamDissemination
-    // Note that these tests are dependent on the following configuration in fedora.fcfg
-    // Datastream filename sources: rels, label, id
-    // Datastream extension preferences:
-    // rels: never (filename always sourced from relationship)
-    // label: always (filename always determined from mime-type to extension mapping)
-    // id: ifmissing (filename sourced from mapping if none present in datastream id)
+// test correct content-disposition header on getDatastreamDissemination
+// Note that these tests are dependent on the following configuration in fedora.fcfg
+// Datastream filename sources: rels, label, id
+// Datastream extension preferences:
+// rels: never (filename always sourced from relationship)
+// label: always (filename always determined from mime-type to extension mapping)
+// id: ifmissing (filename sourced from mapping if none present in datastream id)
 
 
     @Test
@@ -981,7 +1027,7 @@ extends FedoraServerTestCase {
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "inline", TestRESTAPI.DS1RelsFilename);
-        // again with download
+// again with download
         url = url + "?download=true";
         response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
@@ -998,13 +1044,13 @@ extends FedoraServerTestCase {
         CheckCDHeader(response, "attachment",
                       TestRESTAPI.DS2LabelFilename + ".jpg"); // jpg should be from MIMETYPE mapping
 
-        // filename from label, unknown MIMETYPE
+// filename from label, unknown MIMETYPE
         url = "/objects/demo:REST/datastreams/DS3/content?download=true";
         response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "attachment", TestRESTAPI.DS3LabelFilename + ".bin"); // default extension from config
 
-        // filename from label with illegal characters, known MIMETYPE
+// filename from label with illegal characters, known MIMETYPE
         url = "/objects/demo:REST/datastreams/DS4/content?download=true";
         response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
@@ -1020,7 +1066,7 @@ extends FedoraServerTestCase {
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "attachment", TestRESTAPI.DS5ID + ".xml"); // xml from mimetype mapping
 
-        // filename from id, id contains extension (no label present)
+// filename from id, id contains extension (no label present)
         url = "/objects/demo:REST/datastreams/DS6.xml/content?download=true";
         response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
@@ -1030,39 +1076,38 @@ extends FedoraServerTestCase {
 
     @Test
     public void testUpload() throws Exception {
-        String uploadUrl =  "/upload";
+        String uploadUrl = "/upload";
 
-        // Test working case.
+// Test working case.
         PostMethod post = new PostMethod(getBaseURL() + uploadUrl);
         File temp = File.createTempFile("test.txt", null);
         FileUtils.writeStringToFile(temp, "This is the upload test file");
 
-        Part[] parts = { new FilePart("file", temp) };
+        Part[] parts = {new FilePart("file", temp)};
         MultipartRequestEntity entity = new MultipartRequestEntity(parts, post
-            .getParams());
+                .getParams());
 
         post.setRequestEntity(entity);
         getClient(true).executeMethod(post);
         HttpResponse response = new HttpResponse(post);
 
-        assertEquals(202,response.getStatusCode());
+        assertEquals(202, response.getStatusCode());
         assertTrue(response.getResponseBodyString().startsWith("uploaded://"));
 
-        // Test content not supplied
+// Test content not supplied
         post = new PostMethod(getBaseURL() + uploadUrl);
         entity = new MultipartRequestEntity(new Part[]{}, post
-            .getParams());
+                .getParams());
 
         post.setRequestEntity(entity);
         getClient(true).executeMethod(post);
         response = new HttpResponse(post);
 
-        assertEquals(500,response.getStatusCode());
+        assertEquals(500, response.getStatusCode());
     }
 
 
-
-    // check content disposition header of response
+// check content disposition header of response
 
     private void CheckCDHeader(HttpResponse response, String expectedType, String expectedFilename) {
         String contentDisposition = "";
@@ -1076,18 +1121,18 @@ extends FedoraServerTestCase {
     }
 
 
-    // helper methods
+// helper methods
 
     private HttpClient getClient(boolean auth) {
         HttpClient client = new HttpClient();
         client.getParams().setAuthenticationPreemptive(true);
         if (auth) {
             client
-            .getState()
-            .setCredentials(new AuthScope(getHost(), Integer
-                                          .valueOf(getPort()), "realm"),
-                                          new UsernamePasswordCredentials(getUsername(),
-                                                                          getPassword()));
+                    .getState()
+                    .setCredentials(new AuthScope(getHost(), Integer
+                            .valueOf(getPort()), "realm"),
+                                    new UsernamePasswordCredentials(getUsername(),
+                                                                    getPassword()));
         }
         return client;
     }
@@ -1120,28 +1165,28 @@ extends FedoraServerTestCase {
     }
 
     protected HttpResponse put(String requestContent, boolean authenticate)
-    throws Exception {
+            throws Exception {
         return putOrPost("PUT", requestContent, authenticate);
     }
 
     protected HttpResponse post(String requestContent, boolean authenticate)
-    throws Exception {
+            throws Exception {
         return putOrPost("POST", requestContent, authenticate);
     }
 
     protected HttpResponse put(File requestContent, boolean authenticate)
-    throws Exception {
+            throws Exception {
         return putOrPost("PUT", requestContent, authenticate);
     }
 
     protected HttpResponse post(File requestContent, boolean authenticate)
-    throws Exception {
+            throws Exception {
         return putOrPost("POST", requestContent, authenticate);
     }
 
 
     private HttpResponse getOrDelete(String method, boolean authenticate)
-    throws Exception {
+            throws Exception {
         if (url == null || url.length() == 0) {
             throw new IllegalArgumentException("url must be a non-empty value");
         } else if (!(url.startsWith("http://") || url.startsWith("https://"))) {
@@ -1194,19 +1239,19 @@ extends FedoraServerTestCase {
                 httpMethod.setContentChunked(chunked);
                 if (requestContent instanceof String) {
                     httpMethod
-                    .setRequestEntity(new StringRequestEntity((String) requestContent,
-                                                              "text/xml",
-                    "utf-8"));
+                            .setRequestEntity(new StringRequestEntity((String) requestContent,
+                                                                      "text/xml",
+                                                                      "utf-8"));
                 } else if (requestContent instanceof File) {
                     Part[] parts =
-                    {
-                            new StringPart("param_name", "value"),
-                            new FilePart(((File) requestContent)
-                                         .getName(), (File) requestContent)};
+                            {
+                                    new StringPart("param_name", "value"),
+                                    new FilePart(((File) requestContent)
+                                            .getName(), (File) requestContent)};
                     httpMethod
-                    .setRequestEntity(new MultipartRequestEntity(parts,
-                                                                 httpMethod
-                                                                 .getParams()));
+                            .setRequestEntity(new MultipartRequestEntity(parts,
+                                                                         httpMethod
+                                                                                 .getParams()));
                 } else {
                     throw new IllegalArgumentException("requestContent must be a String or File");
                 }
@@ -1221,7 +1266,7 @@ extends FedoraServerTestCase {
     }
 
 
-    // Supports legacy test runners
+// Supports legacy test runners
 
     public static junit.framework.Test suite() {
         TestSuite suite = new TestSuite("REST API TestSuite");
@@ -1247,7 +1292,7 @@ extends FedoraServerTestCase {
         }
 
         HttpResponse(HttpMethod method)
-        throws IOException {
+                throws IOException {
             statusCode = method.getStatusCode();
             responseBody = method.getResponseBody();
             responseHeaders = method.getResponseHeaders();
