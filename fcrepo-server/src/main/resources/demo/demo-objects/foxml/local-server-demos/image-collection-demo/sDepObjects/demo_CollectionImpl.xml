@@ -62,10 +62,10 @@
                     </fmm:Method>
                     <fmm:Method operationLabel="An xml list of members in the collection"
                                 operationName="list" wsdlMsgName="listRequest" wsdlMsgOutput="dissemResponse">
-                        <fmm:DefaultInputParm defaultValue="tuples" label="" parmName="TYPE"
-                                              passBy="VALUE" required="true"/>
                         <fmm:DatastreamInputParm defaultValue="" label="" parmName="QUERY"
                                                  passBy="URL_REF" required="true"/>
+                        <fmm:DefaultInputParm defaultValue="tuples" label="" parmName="TYPE"
+                                              passBy="VALUE" required="true"/>
                         <fmm:DefaultInputParm defaultValue="itql" label="" parmName="LANG"
                                               passBy="VALUE" required="true"/>
                         <fmm:DefaultInputParm defaultValue="Sparql" label=""

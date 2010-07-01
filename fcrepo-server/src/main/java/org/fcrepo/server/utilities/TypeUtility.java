@@ -7,6 +7,7 @@ package org.fcrepo.server.utilities;
 import org.fcrepo.server.storage.types.MethodDef;
 import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.types.gen.Condition;
+import org.fcrepo.server.types.gen.DatastreamProblem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1003,13 +1004,13 @@ public abstract class TypeUtility {
 
         Map<String, List<String>> dsprobs = validation.getDatastreamProblems();
 
-        String[][] gendsprobs = new String[dsprobs.keySet().size()][1];
+        DatastreamProblem[] genDatastreamProblems = new DatastreamProblem[dsprobs.keySet().size()];
         int i = 0;
         for (String key : dsprobs.keySet()) {
-            gendsprobs[i] = dsprobs.get(key).toArray(new String[0]);
+            genDatastreamProblems[i] = new DatastreamProblem(key, dsprobs.get(key).toArray(new String[0]));
             i++;
         }
-        genvalid.setDatastreamProblems(gendsprobs);
+        genvalid.setDatastreamProblems(genDatastreamProblems);
         return genvalid;
     }
 

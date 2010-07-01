@@ -522,9 +522,6 @@
         </complexType>
     </element>
 
-    <!--             -->
-    <!-- Array Types -->
-    <!--             -->
     <element name="validate">
         <complexType>
             <sequence>
@@ -533,6 +530,7 @@
             </sequence>
         </complexType>
     </element>
+
     <element name="validateResponse">
         <complexType>
             <sequence>
@@ -540,6 +538,11 @@
             </sequence>
         </complexType>
     </element>
+
+
+    <!--             -->
+    <!-- Array Types -->
+    <!--             -->
 
     <complexType name="ArrayOfString">
         <sequence>
@@ -807,26 +810,9 @@
         </sequence>
     </complexType>
 
-    <!--                   -->
-    <!-- Misc Simple Types -->
-    <!--                   -->
-
-    <simpleType name="passByRef">
-        <restriction base="xsd:string">
-            <enumeration value="URL_REF"/>
-        </restriction>
-    </simpleType>
-
-
-    <simpleType name="passByValue">
-        <restriction base="xsd:string">
-            <enumeration value="VALUE"/>
-        </restriction>
-    </simpleType>
-
     <complexType name="Validation">
         <sequence>
-            <element name="asOfDateTime" type="xsd:dateTime"/>
+            <element name="asOfDateTime" type="xsd:dateTime" nillable="true"/>
             <element name="objModels" nillable="true">
                 <complexType>
                     <sequence>
@@ -844,33 +830,43 @@
             <element name="datastreamProblems" nillable="true">
                 <complexType>
                     <sequence>
-                        <element name="problem" minOccurs="0" maxOccurs="unbounded">
-                            <complexType>
-                                <sequence>
-                                    <element name="problem" minOccurs="0" maxOccurs="unbounded" type="string"/>
-                                </sequence>
-                                <attribute name="datastreamID" use="required">
-                                    <simpleType>
-                                        <restriction base="string"/>
-                                    </simpleType>
-                                </attribute>
-                            </complexType>
-                        </element>
+                        <element name="datastream" minOccurs="0" maxOccurs="unbounded"
+                                 type="fedora-types:datastreamProblem"/>
                     </sequence>
                 </complexType>
             </element>
         </sequence>
-        <attribute name="pid" use="required">
-            <simpleType>
-                <restriction base="xsd:string"/>
-            </simpleType>
-        </attribute>
-        <attribute name="valid" use="required">
-            <simpleType>
-                <restriction base="xsd:boolean"/>
-            </simpleType>
-        </attribute>
+        <attribute name="pid" use="required" type="xsd:string"/>
+        <attribute name="valid" use="required" type="xsd:boolean"/>
     </complexType>
+
+
+    <complexType name="datastreamProblem">
+        <sequence>
+            <element name="datastreamID" minOccurs="1" maxOccurs="1" type="xsd:string"/>
+            <element name="problem" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+        </sequence>
+
+    </complexType>
+
+
+    <!--                   -->
+    <!-- Misc Simple Types -->
+    <!--                   -->
+
+    <simpleType name="passByRef">
+        <restriction base="xsd:string">
+            <enumeration value="URL_REF"/>
+        </restriction>
+    </simpleType>
+
+
+    <simpleType name="passByValue">
+        <restriction base="xsd:string">
+            <enumeration value="VALUE"/>
+        </restriction>
+    </simpleType>
+
 
     <simpleType name="datastreamInputType">
         <restriction base="xsd:string">

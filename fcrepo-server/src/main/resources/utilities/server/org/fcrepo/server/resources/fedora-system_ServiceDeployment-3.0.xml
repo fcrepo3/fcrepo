@@ -435,7 +435,7 @@
                         <xs:complexType>
                             <xs:sequence>
                                 <xs:element ref="tns:DSInputLabel"/>
-                                <xs:element ref="tns:DSMIME"/>
+                                <xs:element ref="tns:DSMIME" maxOccurs="unbounded"/>
                                 <xs:element ref="tns:DSInputInstruction"/>
                             </xs:sequence>
                             <xs:attribute name="wsdlMsgPartName" use="required">

@@ -445,7 +445,9 @@
                 <xsd:schema
                         targetNamespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                         xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                        xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                        elementFormDefault="qualified"
+                        attributeFormDefault="qualified">
                     <xsd:element name="RDF">
                         <xsd:complexType>
                             <xsd:sequence>
@@ -454,12 +456,10 @@
                                         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                                             <xsd:any processContents="lax"/>
                                         </xsd:sequence>
-                                        <xsd:attribute name="resource" use="optional" type="xsd:anyURI"/>
-                                        <xsd:attribute name="datatype" use="optional" type="xsd:anyURI"/>
+                                        <xsd:attribute name="about" type="xsd:anyURI"/>
                                     </xsd:complexType>
                                 </xsd:element>
                             </xsd:sequence>
-                            <xsd:attribute name="about" type="xsd:anyURI"/>
                         </xsd:complexType>
                     </xsd:element>
                 </xsd:schema>

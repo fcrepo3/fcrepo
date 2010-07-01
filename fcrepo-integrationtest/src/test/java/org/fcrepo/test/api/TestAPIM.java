@@ -2456,6 +2456,21 @@ public class TestAPIM
             String pid = objectFields.getPid();
             System.out.println("Validating object '" + pid + "'");
             Validation validation = apim.validate(pid, null);
+            if (!validation.isValid()) {
+                System.out.println("PID " + validation.getPid());
+                System.out.println("Valid " + validation.isValid());
+                System.out.println("Problems");
+                for (String problem : validation.getObjProblems()) {
+                    System.out.println(problem);
+                }
+                System.out.println("Datastream Problems");
+                for (DatastreamProblem datastreamProblem : validation.getDatastreamProblems()) {
+                    System.out.println("DS ID " + datastreamProblem.getDatastreamID());
+                    for (String problem : datastreamProblem.getProblem()) {
+                        System.out.println(problem);
+                    }
+                }
+            }
             assertTrue(validation.isValid());
         }
     }

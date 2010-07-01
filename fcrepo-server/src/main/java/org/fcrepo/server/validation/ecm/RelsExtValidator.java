@@ -63,8 +63,11 @@ public class RelsExtValidator {
         }
         OntologyValidator ontologyValidator = new OntologyValidator(doMgr, context);
         Datastream relsextDS = currentObjectReader.GetDatastream("RELS-EXT", asOfDateTime);
-        InputStream relsExtStream = relsextDS.getContentStream();
+        if (relsextDS != null) {
+            InputStream relsExtStream = relsextDS.getContentStream();
+            ontologyValidator.validate(relsExtStream, ontologies, validation, currentObjectReader.GetObjectPID());
+        }
 
-        ontologyValidator.validate(relsExtStream, ontologies, validation, currentObjectReader.GetObjectPID());
+
     }
 }
