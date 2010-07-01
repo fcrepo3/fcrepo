@@ -25,12 +25,12 @@
 
   <issueManagement>
     <system>jira</system>
-    <url>https://fedora-commons.org/jira/browse/FCREPO</url>
+    <url>https://jira.duraspace.org/browse/FCREPO</url>
   </issueManagement>
 
   <ciManagement>
     <system>bamboo</system>
-    <url>https://fedora-commons.org/bamboo/browse/FCREPO</url>
+    <url>https://bamboo.duraspace.org/browse/FCREPO</url>
   </ciManagement>
 
   <developers>
