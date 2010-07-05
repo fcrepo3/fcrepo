@@ -108,7 +108,7 @@
                                  FORMAT_URI="http://schemas.xmlsoap.org/wsdl/" ID="WSDL1.0"
                                  LABEL="WSDL Bindings" MIMETYPE="text/xml">
             <foxml:xmlContent>
-                <wsdl:definitions name="Image Collection" targetNamespace="bmech"
+                <wsdl:definitions name="ImageCollection" targetNamespace="bmech"
                                   xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
                                   xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
                                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap"
