@@ -6,7 +6,6 @@ package org.fcrepo.server.rest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -21,16 +20,14 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.trippi.RDFFormat;
-import org.trippi.TripleIterator;
-import org.trippi.TrippiException;
-
 import org.fcrepo.common.PID;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.storage.types.TupleArrayTripleIterator;
+import org.trippi.RDFFormat;
+import org.trippi.TripleIterator;
+import org.trippi.TrippiException;
 
 
 /**
@@ -170,8 +167,8 @@ public class RelationshipResource extends BaseRestResource {
                 // assume the subject is the object as denoted by the pid
                 subject = PID.toURI(pid);
             }
-            apiMService.purgeRelationship(context, subject, predicate, object, isLiteral, datatype);
-            return Response.noContent().build();
+            boolean result = apiMService.purgeRelationship(context, subject, predicate, object, isLiteral, datatype);
+            return Response.ok(Boolean.toString(result), MediaType.TEXT_PLAIN_TYPE).build();
         } catch (ServerException e) {
             return handleException(e);
         }
