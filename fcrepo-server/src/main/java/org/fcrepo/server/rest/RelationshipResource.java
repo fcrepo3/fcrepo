@@ -145,7 +145,7 @@ public class RelationshipResource extends BaseRestResource {
      * DELETE /objects/{pid}/relationships ? subject predicate object isLiteral datatype
      * <p/>
      * Successful Response:
-     * Status: 204 OK
+     * Status: 200 OK
      */
     @DELETE
     public Response purgeRelationship(
