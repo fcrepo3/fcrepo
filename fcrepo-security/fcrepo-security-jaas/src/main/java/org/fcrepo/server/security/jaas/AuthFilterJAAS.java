@@ -218,21 +218,23 @@ public class AuthFilterJAAS
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
-        // This is a hack to skip authentication of API-A methods via the
+        // This is a hack to skip challenge authentication of API-A methods via the
         // REST API if API-A AuthN is off (as indicated by the "authnAPIA"
         // filter init-param).
         // If API-A AuthN is off, for all GET requests via the REST API,
-        // except those which are known to be part of API-M,
-        // just continue the chain and return after processing the chain.
+        // except those which are known to be part of API-M, don't challenge for authentication
+        // (but do pick up any preemptive credentials that are supplied)
         // FIXME: As other servlets that require authn also go through this filter,
         // there's probably a neater way to ensure we are only catching API-A methods
         // currently we are explicitly testing for other management URLs/paths
+        boolean doChallenge = true;
         if (!authnAPIA) {
             if(req.getMethod().equals("GET")) {
                 String requestPath = req.getPathInfo();
                 if (requestPath == null)
                     requestPath = ""; // null is returned eg for /fedora/objects? - API-A, so we still want to do the below...
                 String fullPath = req.getRequestURI();
+                // API-M methods
                 // potentially extra String evals, but aiming for clarity
                 boolean isExport = requestPath.endsWith("/export");
                 boolean isObjectXML = requestPath.endsWith("/objectXML");
@@ -242,13 +244,9 @@ public class AuthFilterJAAS
                 boolean isValidate = requestPath.endsWith("/validate");
                 // management get methods (LITE API, control)
                 boolean isManagement = fullPath.endsWith("/management/control") || fullPath.endsWith("/management/getNextPID");
-                boolean isAPIM = isExport || isObjectXML || isGetDatastream
+                // challenge if API-M or one of the above other services (otherwise we assume it is API-A)
+                doChallenge = isExport || isObjectXML || isGetDatastream
                 || isGetRelationships || isValidate || isManagement;
-
-                if (!isAPIM) {
-                    chain.doFilter(request, response);
-                    return;
-                }
             }
         }
 
@@ -260,8 +258,14 @@ public class AuthFilterJAAS
         Subject subject = authenticate(req);
 
         if (subject == null) {
-            loginForm(res);
-            return;
+            if (doChallenge) {
+                loginForm(res);
+                return;
+            } else {
+                // no auth required, and none supplied, do rest of chain
+                chain.doFilter(request, response);
+                return;
+            }
         }
 
         // obtain the user principal from the subject and add to servlet.
