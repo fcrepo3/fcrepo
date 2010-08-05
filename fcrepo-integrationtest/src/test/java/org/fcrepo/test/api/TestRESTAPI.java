@@ -4,39 +4,68 @@
  */
 package org.fcrepo.test.api;
 
-import junit.framework.TestSuite;
-import org.antlr.stringtemplate.StringTemplate;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
+import java.net.URL;
+import java.net.URLEncoder;
+
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.axis.types.NonNegativeInteger;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+
 import org.apache.commons.io.FileUtils;
+
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.fcrepo.common.PID;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.*;
-import org.fcrepo.test.DemoObjectTestSetup;
-import org.fcrepo.test.FedoraServerTestCase;
+
 import org.junit.Test;
 
-import java.io.*;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.antlr.stringtemplate.StringTemplate;
 
-import static org.apache.commons.httpclient.HttpStatus.*;
+import junit.framework.TestSuite;
+
+import org.fcrepo.common.PID;
+
+import org.fcrepo.server.access.FedoraAPIA;
+import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.types.gen.Datastream;
+import org.fcrepo.server.types.gen.FieldSearchQuery;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.MIMETypedStream;
+import org.fcrepo.server.types.gen.ObjectFields;
+
+import org.fcrepo.test.DemoObjectTestSetup;
+import org.fcrepo.test.FedoraServerTestCase;
+
+import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
+import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
+import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
+import static org.apache.commons.httpclient.HttpStatus.SC_OK;
+import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
 
 
 /**
@@ -387,6 +416,26 @@ public class TestRESTAPI
         }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
     }
+
+    // if an object is marked as deleted, only administrators have access (default XACML policy)
+    // see FCREPO-753: this also tests that preemptive auth can still take place when api-a auth is not required
+    public void testDeletedObject() throws Exception {
+        // only test if api-a auth is disabled (configA)
+        if (!this.getAuthAccess()) {
+
+            // mark object as deleted
+            apim.modifyObject(pid.toString(), "D", null, null, "Mark object as deleted");
+
+            // verify no unauth access
+            url = String.format("/objects/%s/datastreams", pid.toString());
+            assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+            // verify auth access for administrator
+            assertEquals(SC_OK, get(true).getStatusCode());
+
+        }
+
+    }
+
 
     public void testGetDatastreamProfile() throws Exception {
         // Datastream profile in HTML format
