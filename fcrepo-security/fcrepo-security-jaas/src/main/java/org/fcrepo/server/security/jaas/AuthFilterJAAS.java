@@ -227,6 +227,8 @@ public class AuthFilterJAAS
         // FIXME: As other servlets that require authn also go through this filter,
         // there's probably a neater way to ensure we are only catching API-A methods
         // currently we are explicitly testing for other management URLs/paths
+        // (probably should test fullPath for {appcontext}/objects (REST API) and then
+        // test path for API-A methods, maybe regex to make it explicit)
         boolean doChallenge = true;
         if (!authnAPIA) {
             if(req.getMethod().equals("GET")) {
@@ -244,9 +246,11 @@ public class AuthFilterJAAS
                 boolean isValidate = requestPath.endsWith("/validate");
                 // management get methods (LITE API, control)
                 boolean isManagement = fullPath.endsWith("/management/control") || fullPath.endsWith("/management/getNextPID");
+                // user servlet
+                boolean isUserServlet = fullPath.endsWith("/user");
                 // challenge if API-M or one of the above other services (otherwise we assume it is API-A)
                 doChallenge = isExport || isObjectXML || isGetDatastream
-                || isGetRelationships || isValidate || isManagement;
+                || isGetRelationships || isValidate || isManagement || isUserServlet;
             }
         }
 
