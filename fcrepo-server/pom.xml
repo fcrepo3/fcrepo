@@ -1,832 +1,847 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.fcrepo</groupId>
-    <artifactId>fcrepo</artifactId>
-    <version>3.4-SNAPSHOT</version>
-  </parent>
+    <parent>
+        <groupId>org.fcrepo</groupId>
+        <artifactId>fcrepo</artifactId>
+        <version>3.4-SNAPSHOT</version>
+    </parent>
 
-  <artifactId>fcrepo-server</artifactId>
-  <packaging>jar</packaging>
-  <name>Fedora Server Library</name>
+    <artifactId>fcrepo-server</artifactId>
+    <packaging>jar</packaging>
+    <name>Fedora Server Library</name>
 
-  <properties>
-    <demo.src.dir>${basedir}/src/main/resources/demo</demo.src.dir>
-    <fedora.home.build.dir>${basedir}/build/home</fedora.home.build.dir>
+    <properties>
+        <demo.src.dir>${basedir}/src/main/resources/demo</demo.src.dir>
+        <fedora.home.build.dir>${basedir}/build/home</fedora.home.build.dir>
 
-    <fedora.hostname>localhost</fedora.hostname>
-    <fedora.port>8080</fedora.port>
-    <fedora.appServerContext>fedora</fedora.appServerContext>
+        <fedora.hostname>localhost</fedora.hostname>
+        <fedora.port>8080</fedora.port>
+        <fedora.appServerContext>fedora</fedora.appServerContext>
 
-  </properties>
+    </properties>
 
-  <build>
+    <build>
 
-    <!-- This 'resource' directory should be migrated to default location -->
-    <resources>
-      <resource>
-        <directory>../resources/server</directory>
-        <filtering>true</filtering>
-      </resource>
-      <resource>
-        <directory>src/main/resources/properties</directory>
-      </resource>
-      <resource>
-        <directory>src/main/resources/dbspec/server</directory>
-      </resource>
-      <resource>
-        <directory>src/main/resources/utilities/server</directory>
-      </resource>
-    </resources>
-
-
-    <plugins>
-<!-- 
-  Note: This plugin was defined as required by: client, integrationtest, & server.test.
-     It is certainly required by fedorahome.zip (integrationtest) & server.test. 
-     The other two dependencies listed above are questionable.
--->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.1.1</version>
-        <executions>
-
-          <execution>
-            <id>demo-convert-mets</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>java</goal>
-            </goals>
-            <configuration>
-              <mainClass>org.fcrepo.server.storage.translation.ConvertObjectSerialization</mainClass>
-              <arguments>
-                <argument>${basedir}/src/main/resources/demo/demo-objects/foxml</argument>
-                <argument>${project.build.directory}/client/demo/mets</argument>
-                <argument>org.fcrepo.server.storage.translation.FOXML1_1DODeserializer</argument>
-                <argument>org.fcrepo.server.storage.translation.METSFedoraExt1_1DOSerializer</argument>
-                <argument>true</argument>
-                <argument>xml</argument>
-                <argument>xml</argument>
-              </arguments>
-              <classpathScope>runtime</classpathScope>
-            </configuration>
-          </execution>
-          <execution>
-            <id>demo-convert-atom</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>java</goal>
-            </goals>
-            <configuration>
-              <mainClass>org.fcrepo.server.storage.translation.ConvertObjectSerialization</mainClass>
-              <arguments>
-                <argument>${basedir}/src/main/resources/demo/demo-objects/foxml</argument>
-                <argument>${project.build.directory}/client/demo/atom</argument>
-                <argument>org.fcrepo.server.storage.translation.FOXML1_1DODeserializer</argument>
-                <argument>org.fcrepo.server.storage.translation.Atom1_1DOSerializer</argument>
-                <argument>true</argument>
-                <argument>xml</argument>
-                <argument>xml</argument>
-              </arguments>
-              <classpathScope>runtime</classpathScope>
-            </configuration>
-          </execution>
-          <execution>
-            <id>demo-convert-atomzip</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>java</goal>
-            </goals>
-            <configuration>
-              <mainClass>org.fcrepo.server.storage.translation.ConvertObjectSerialization</mainClass>
-              <arguments>
-                <argument>${basedir}/src/main/resources/demo/demo-objects/foxml</argument>
-                <argument>${project.build.directory}/client/demo/atom-zip</argument>
-                <argument>org.fcrepo.server.storage.translation.FOXML1_1DODeserializer</argument>
-                <argument>org.fcrepo.server.storage.translation.AtomZip1_1DOSerializer</argument>
-                <argument>false</argument>
-                <argument>xml</argument>
-                <argument>zip</argument>
-              </arguments>
-              <classpathScope>runtime</classpathScope>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+        <!-- This 'resource' directory should be migrated to default location -->
+        <resources>
+            <resource>
+                <directory>../resources/server</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources/properties</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources/dbspec/server</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources/utilities/server</directory>
+            </resource>
+        </resources>
 
 
-      <!-- ** 
-        This plugin needs to be removed when ANT is gone.
-        The unit/integration test regex's should be defined at root/pom.xml
-      ** -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.4.2</version>
-        <configuration> 
-          <systemProperties>
-
-            <property>
-              <name>fedora.hostname</name>
-              <value>${fedora.hostname}</value>
-            </property>
-            <property>
-              <name>fedora.port</name>
-              <value>${fedora.port}</value>
-            </property>
-            <property>
-              <name>fedora.appServerContext</name>
-              <value>${fedora.appServerContext}</value>
-            </property>
-
-          </systemProperties>
-          <includes>
-            <include>**/Test*</include>
-            <include>**/*Test.class</include>
-          </includes>
-          <excludes>
-            <exclude>${integrationTests}</exclude>
-            <exclude>${nestedClassTests}</exclude>
-          </excludes>
-        </configuration>
-        <executions>
-          <execution>
-            <id>int-test</id>
-            <phase>integration-test</phase>
-            <goals>
-              <goal>test</goal>
-            </goals>
-            <configuration>
-              <skip>${integration.test.skip}</skip>
-              <systemProperties>
-
-                <property>
-                  <name>fedora.hostname</name>
-                  <value>${fedora.hostname}</value>
-                </property>
-                <property>
-                  <name>fedora.port</name>
-                  <value>${fedora.port}</value>
-                </property>
-                <property>
-                  <name>fedora.appServerContext</name>
-                  <value>${fedora.appServerContext}</value>
-                </property>
-
-              </systemProperties>
-              <excludes>
-                <exclude>${instrumentedTests}</exclude>
-                <exclude>${nestedClassTests}</exclude>
-                <exclude>**/All*</exclude>
-              </excludes>
-              <includes>
-                <include>${integrationTests}</include>
-              </includes>
-            </configuration>
-          </execution>
-        </executions>  
-      </plugin>
-
-      <!-- Some of the server test classes are needed by /integrationtest -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-
-          <execution>
-            <id>jar-tests</id>
-            <phase>package</phase>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-
-          <execution>
-            <id>rmi-journal-recv-main</id>
-            <phase>package</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-
-            <configuration>   
-              <classifier>rmi-journal-recv-main</classifier>
-              
-              <archive>
-                <manifest>
-                  <mainClass>org.fcrepo.server.journal.readerwriter.multicast.rmi.RmiJournalReceiver</mainClass>
-                </manifest>
-              </archive>
-
-              <includes>
-                <include>org/fcrepo/server/journal/readerwriter/multicast/**</include>
-                <include>org/fcrepo/server/journal/JournalException.class</include>
-              </includes>
-            </configuration> 
-          </execution>
-
-          <execution>
-            <id>cli-loader-main</id>
-            <phase>package</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-
-            <configuration>   
-              <classifier>cli-loader-main</classifier>
-              
-              <archive>
-                <manifest>
-                  <mainClass>org.fcrepo.server.utilities.rebuild.cli.CLILoader</mainClass>
-                  <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                </manifest>
-
-                <manifestEntries>
-                  <Version>${buildNumber}</Version>
-                  <Build>${timestamp}</Build>
-                </manifestEntries>
-              </archive>
-              <includes>
-                <include>org/fcrepo/server/utilities/rebuild/cli/**</include>
-              </includes>
-            </configuration> 
-          </execution> 
-        </executions>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2-beta-4</version>
-
-        <executions>
-          <execution>
-            <id>rmi-journal-recv-jar-assembly</id> 
-            <phase>package</phase> 
-            <goals>
-              <goal>single</goal> 
-            </goals>
-
-            <configuration>
-              <descriptors>
-                <descriptor>${basedir}/src/main/resources/assemblies/rmi-journal-recv-jar.xml</descriptor>
-              </descriptors>
-             
-              <archive>
-                <manifest>
-                  <mainClass>com.simontuffs.onejar.Boot</mainClass>
-                  <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                </manifest>
-               <!-- 
-                 Note: may want to add svn version info here 
-                --> 
-                <manifestEntries>
-                  <Version>${buildNumber}</Version>
-                  <Build>${timestamp}</Build>
-                <!--
-                  <Version>${fedora.version}</Version>
-                  <Build>${build.tstamp}</Build>
-                -->
-                </manifestEntries>
-              </archive>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>rmi-journal-recv-zip-assembly</id> 
-            <phase>package</phase> 
-            <goals>
-              <goal>single</goal> 
-            </goals>
-
-            <configuration>
-              <descriptors>
-                <descriptor>${basedir}/src/main/resources/assemblies/rmi-journal-recv-zip.xml</descriptor>
-              </descriptors>
-            </configuration>
-          </execution>
-          
-        </executions>
-
-      </plugin>
-
-    </plugins>
-
-  </build>
-
-  <profiles>
-
-   <profile>
-      <id>fedora-installer</id>
-
-      <activation>
-        <property>
-          <name>fedora</name>
-          <value>installer</value>
-        </property>
-      </activation>
-
-      <build>
         <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.1.1</version>
-            <executions>
+            <!--
+              Note: This plugin was defined as required by: client, integrationtest, & server.test.
+                 It is certainly required by fedorahome.zip (integrationtest) & server.test.
+                 The other two dependencies listed above are questionable.
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
 
-              <execution>
-                <id>gen-vocab</id>
-                <phase>process-classes</phase>
-                <goals>
-                  <goal>java</goal>
-                </goals>
+                    <execution>
+                        <id>demo-convert-mets</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.fcrepo.server.storage.translation.ConvertObjectSerialization</mainClass>
+                            <arguments>
+                                <argument>${basedir}/src/main/resources/demo/demo-objects/foxml</argument>
+                                <argument>${project.build.directory}/client/demo/mets</argument>
+                                <argument>org.fcrepo.server.storage.translation.FOXML1_1DODeserializer</argument>
+                                <argument>org.fcrepo.server.storage.translation.METSFedoraExt1_1DOSerializer</argument>
+                                <argument>true</argument>
+                                <argument>xml</argument>
+                                <argument>xml</argument>
+                            </arguments>
+                            <classpathScope>runtime</classpathScope>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>demo-convert-atom</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.fcrepo.server.storage.translation.ConvertObjectSerialization</mainClass>
+                            <arguments>
+                                <argument>${basedir}/src/main/resources/demo/demo-objects/foxml</argument>
+                                <argument>${project.build.directory}/client/demo/atom</argument>
+                                <argument>org.fcrepo.server.storage.translation.FOXML1_1DODeserializer</argument>
+                                <argument>org.fcrepo.server.storage.translation.Atom1_1DOSerializer</argument>
+                                <argument>true</argument>
+                                <argument>xml</argument>
+                                <argument>xml</argument>
+                            </arguments>
+                            <classpathScope>runtime</classpathScope>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>demo-convert-atomzip</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.fcrepo.server.storage.translation.ConvertObjectSerialization</mainClass>
+                            <arguments>
+                                <argument>${basedir}/src/main/resources/demo/demo-objects/foxml</argument>
+                                <argument>${project.build.directory}/client/demo/atom-zip</argument>
+                                <argument>org.fcrepo.server.storage.translation.FOXML1_1DODeserializer</argument>
+                                <argument>org.fcrepo.server.storage.translation.AtomZip1_1DOSerializer</argument>
+                                <argument>false</argument>
+                                <argument>xml</argument>
+                                <argument>zip</argument>
+                            </arguments>
+                            <classpathScope>runtime</classpathScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <!-- **
+             This plugin needs to be removed when ANT is gone.
+             The unit/integration test regex's should be defined at root/pom.xml
+           ** -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.4.2</version>
+
                 <configuration>
-                  <mainClass>org.fcrepo.common.policy.Release2_1Namespace</mainClass>
-                  <arguments>
-                    <argument>${project.build.directory}/vocabulary.txt</argument>
-                  </arguments>
-                  <!-- 
-                      Note: this execution has the following dependencies:
-                          openrdf-sesame-2.2.1-onejar.jar
-                          mulgara-core-2.1.4.jar
-                          fedora-common.jar
-                   -->
+                    <forkMode>never</forkMode>
+
+
+                    <systemProperties>
+
+                        <property>
+                            <name>fedora.hostname</name>
+                            <value>${fedora.hostname}</value>
+                        </property>
+                        <property>
+                            <name>fedora.port</name>
+                            <value>${fedora.port}</value>
+                        </property>
+                        <property>
+                            <name>fedora.appServerContext</name>
+                            <value>${fedora.appServerContext}</value>
+                        </property>
+
+                    </systemProperties>
+                    <includes>
+                        <include>**/Test*</include>
+                        <include>**/*Test.class</include>
+                    </includes>
+                    <excludes>
+                        <exclude>${integrationTests}</exclude>
+                        <exclude>${nestedClassTests}</exclude>
+                    </excludes>
                 </configuration>
-              </execution>
-            </executions>
+                <executions>
+                    <execution>
+                        <id>int-test</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${integration.test.skip}</skip>
+                            <systemProperties>
 
-          </plugin>
+                                <property>
+                                    <name>fedora.hostname</name>
+                                    <value>${fedora.hostname}</value>
+                                </property>
+                                <property>
+                                    <name>fedora.port</name>
+                                    <value>${fedora.port}</value>
+                                </property>
+                                <property>
+                                    <name>fedora.appServerContext</name>
+                                    <value>${fedora.appServerContext}</value>
+                                </property>
 
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>utilities-main</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
- 
-                <configuration>   
-      
-                  <classifier>utilities-main</classifier>
-                  <archive>
-                    <manifest>
-                      <mainClass>org.fcrepo.utilities.install.Installer</mainClass>
-                    </manifest>
-                  </archive>
+                            </systemProperties>
+                            <excludes>
+                                <exclude>${instrumentedTests}</exclude>
+                                <exclude>${nestedClassTests}</exclude>
+                                <exclude>**/All*</exclude>
+                            </excludes>
+                            <includes>
+                                <include>${integrationTests}</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-                  <includes>
-                    <include>org/fcrepo/utilities/**</include>
-                    <include>org/fcrepo/server/**</include>
-                    <include>**/fedorausers-mapping.xml</include>
-                    <include>**/webxml-mapping.xml</include>
-                  </includes>
-                </configuration> 
-              </execution>
-            </executions>
-          </plugin> 
+            <!-- Some of the server test classes are needed by /integrationtest -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+
+                    <execution>
+                        <id>jar-tests</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>rmi-journal-recv-main</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+
+                        <configuration>
+                            <classifier>rmi-journal-recv-main</classifier>
+
+                            <archive>
+                                <manifest>
+                                    <mainClass>org.fcrepo.server.journal.readerwriter.multicast.rmi.RmiJournalReceiver
+                                    </mainClass>
+                                </manifest>
+                            </archive>
+
+                            <includes>
+                                <include>org/fcrepo/server/journal/readerwriter/multicast/**</include>
+                                <include>org/fcrepo/server/journal/JournalException.class</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>cli-loader-main</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+
+                        <configuration>
+                            <classifier>cli-loader-main</classifier>
+
+                            <archive>
+                                <manifest>
+                                    <mainClass>org.fcrepo.server.utilities.rebuild.cli.CLILoader</mainClass>
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                </manifest>
+
+                                <manifestEntries>
+                                    <Version>${buildNumber}</Version>
+                                    <Build>${timestamp}</Build>
+                                </manifestEntries>
+                            </archive>
+                            <includes>
+                                <include>org/fcrepo/server/utilities/rebuild/cli/**</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-4</version>
+
+                <executions>
+                    <execution>
+                        <id>rmi-journal-recv-jar-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${basedir}/src/main/resources/assemblies/rmi-journal-recv-jar.xml
+                                </descriptor>
+                            </descriptors>
+
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.simontuffs.onejar.Boot</mainClass>
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                </manifest>
+                                <!--
+                                 Note: may want to add svn version info here
+                                -->
+                                <manifestEntries>
+                                    <Version>${buildNumber}</Version>
+                                    <Build>${timestamp}</Build>
+                                    <!--
+                                      <Version>${fedora.version}</Version>
+                                      <Build>${build.tstamp}</Build>
+                                    -->
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>rmi-journal-recv-zip-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${basedir}/src/main/resources/assemblies/rmi-journal-recv-zip.xml
+                                </descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+
+                </executions>
+
+            </plugin>
+
         </plugins>
-      </build>
-    </profile>
-  </profiles>
 
-  <dependencies>
-  
-    <dependency>
-      <groupId>asm</groupId>
-      <artifactId>asm</artifactId>
-      <version>3.1</version>
-    </dependency>
+    </build>
 
-    <dependency>
-      <groupId>axis</groupId>
-      <artifactId>axis-wsdl4j</artifactId>
-      <version>1.3</version>
-      <exclusions>
-        <exclusion>
-          <groupId>wsdl4j</groupId>
-          <artifactId>wsdl4j</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency> 
- 
-    <dependency>
-      <groupId>com.google.collections</groupId>
-      <artifactId>google-collections</artifactId>
-      <version>1.0-rc2</version>
-    </dependency>
-        
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-bundle</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey.contribs</groupId>
-      <artifactId>jersey-multipart</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.xml.stream</groupId>
-      <artifactId>sjsxp</artifactId>
-      <version>1.0.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.xml.stream</groupId>
-          <artifactId>stax-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+    <profiles>
 
-    <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
-    </dependency>
+        <profile>
+            <id>fedora-installer</id>
 
-    <dependency>
-      <groupId>commons-betwixt</groupId>
-      <artifactId>commons-betwixt</artifactId>
-    </dependency>
+            <activation>
+                <property>
+                    <name>fedora</name>
+                    <value>installer</value>
+                </property>
+            </activation>
 
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>1.3</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <version>3.1</version>
-    </dependency>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.1.1</version>
+                        <executions>
 
-    <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
-      <version>1.2.1</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>commons-discovery</groupId>
-      <artifactId>commons-discovery</artifactId>
-    </dependency>
-    
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-    </dependency>
-    
-    <dependency>
-      <groupId>commons-fileupload</groupId>
-      <artifactId>commons-fileupload</artifactId>
-      <version>1.2.1</version>
-    </dependency>
+                            <execution>
+                                <id>gen-vocab</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>org.fcrepo.common.policy.Release2_1Namespace</mainClass>
+                                    <arguments>
+                                        <argument>${project.build.directory}/vocabulary.txt</argument>
+                                    </arguments>
+                                    <!--
+                                       Note: this execution has the following dependencies:
+                                           openrdf-sesame-2.2.1-onejar.jar
+                                           mulgara-core-2.1.4.jar
+                                           fedora-common.jar
+                                    -->
+                                </configuration>
+                            </execution>
+                        </executions>
 
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>1.4</version>
-    </dependency>
+                    </plugin>
 
-    <dependency>
-      <groupId>dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-      <version>1.6.1</version>
-    </dependency>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>utilities-main</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
 
-    <dependency>
-      <groupId>fast-md5</groupId>
-      <artifactId>fast-md5</artifactId>
-      <version>2.5</version>
-    </dependency>
+                                <configuration>
 
-    <dependency>
-      <groupId>gnu.getopt</groupId>
-      <artifactId>java-getopt</artifactId>
-      <version>1.0.13</version>
-    </dependency>
+                                    <classifier>utilities-main</classifier>
+                                    <archive>
+                                        <manifest>
+                                            <mainClass>org.fcrepo.utilities.install.Installer</mainClass>
+                                        </manifest>
+                                    </archive>
 
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>persistence-api</artifactId>
-    </dependency>
+                                    <includes>
+                                        <include>org/fcrepo/utilities/**</include>
+                                        <include>org/fcrepo/server/**</include>
+                                        <include>**/fedorausers-mapping.xml</include>
+                                        <include>**/webxml-mapping.xml</include>
+                                    </includes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
-    <dependency>
-      <groupId>javax.resource</groupId>
-      <artifactId>connector-api</artifactId>
-      <version>1.5</version>
-    </dependency>
+    <dependencies>
 
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>    
-    
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
-      <version>1.0</version>
-    </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>3.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>javax.xml</groupId>
-      <artifactId>jsr173</artifactId>
-      <version>1.0</version>
-    </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-wsdl4j</artifactId>
+            <version>1.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>wsdl4j</groupId>
+                    <artifactId>wsdl4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-    <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-      <version>2.1.3</version>
-    </dependency>
+        <dependency>
+            <groupId>com.google.collections</groupId>
+            <artifactId>google-collections</artifactId>
+            <version>1.0-rc2</version>
+        </dependency>
 
-    <dependency>
-      <groupId>javax.xml</groupId>
-      <artifactId>jaxrpc-api</artifactId>
-      <version>1.1</version>
-    </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-bundle</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>jersey-multipart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.stream</groupId>
+            <artifactId>sjsxp</artifactId>
+            <version>1.0.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.stream</groupId>
+                    <artifactId>stax-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.xml.stream</groupId>
-          <artifactId>stax-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>jaxen</groupId>
-      <artifactId>jaxen</artifactId>
-      <version>1.1.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>xom</groupId>
-          <artifactId>xom</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+        <dependency>
+            <groupId>commons-betwixt</groupId>
+            <artifactId>commons-betwixt</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>jdom</groupId>
-      <artifactId>jdom</artifactId>
-      <version>1.0</version>
-    </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.3</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.abdera</groupId>
-      <artifactId>abdera-core</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.abdera</groupId>
-      <artifactId>abdera-extensions-main</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.2.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.abdera</groupId>
-      <artifactId>abdera-i18n</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.abdera</groupId>
-      <artifactId>abdera-parser</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-all</artifactId>
-      <version>5.1.0</version>
-    </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.derby</groupId>
-      <artifactId>derby</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.ws.commons.axiom</groupId>
-      <artifactId>axiom-api</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.ws.commons.axiom</groupId>
-      <artifactId>axiom-impl</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>fast-md5</groupId>
+            <artifactId>fast-md5</artifactId>
+            <version>2.5</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>gnu.getopt</groupId>
+            <artifactId>java-getopt</artifactId>
+            <version>1.0.13</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.codehaus.jettison</groupId>
-      <artifactId>jettison</artifactId>
-      <version>1.0.1</version>
-    </dependency>
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>persistence-api</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>org.akubraproject</groupId>
-      <artifactId>akubra-core</artifactId>
-      <version>0.3</version>
-    </dependency>
+        <dependency>
+            <groupId>javax.resource</groupId>
+            <artifactId>connector-api</artifactId>
+            <version>1.5</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.akubraproject</groupId>
-      <artifactId>akubra-fs</artifactId>
-      <version>0.3</version>
-    </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>org.akubraproject</groupId>
-      <artifactId>akubra-map</artifactId>
-      <version>0.3</version>
-    </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
+            <version>1.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.akubraproject</groupId>
-      <artifactId>akubra-mem</artifactId>
-      <version>0.3</version>
-    </dependency>
+        <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jsr173</artifactId>
+            <version>1.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>axis</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.1.3</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>GroboTestingJUnit-core</artifactId>
-      <version>1.2.1</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jaxrpc-api</artifactId>
+            <version>1.1</version>
+        </dependency>
 
-    <!-- Note: No demonstrated evidence of use.  DWD 9/15/2009 -->
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>jakarta-oro</artifactId>
-      <version>2.0.5</version>
-    </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.stream</groupId>
+                    <artifactId>stax-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-    <!-- This is needed only to trigger the rmi-journal-rcv.jar assembly. -->
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>one-jar-boot</artifactId>
-      <version>0.96</version>
-    </dependency>
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>1.1.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xom</groupId>
+                    <artifactId>xom</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>saxon</artifactId>
-      <version>9.0</version>
-    </dependency>
+        <dependency>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>1.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>saxon-dom</artifactId>
-      <version>9.0</version>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.abdera</groupId>
+            <artifactId>abdera-core</artifactId>
+        </dependency>
 
-    <!-- For the Journal Receiver Assembly -->
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>trippi-core</artifactId>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>trippi-mptstore</artifactId>
-      <version>1.4.3</version>
-    </dependency>
-   
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>trippi-mulgara</artifactId>
-      <version>1.4.3</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>fcrepo-common</artifactId>
-      <version>${project.version}</version>
-    </dependency> 
+        <dependency>
+            <groupId>org.apache.abdera</groupId>
+            <artifactId>abdera-extensions-main</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>fcrepo-common</artifactId>
-      <classifier>tests</classifier>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.abdera</groupId>
+            <artifactId>abdera-i18n</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-beans</artifactId>
-      <version>2.5.6</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.abdera</groupId>
+            <artifactId>abdera-parser</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>2.5.6</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    
-    <dependency>
-      <groupId>net.java.dev.stax-utils</groupId>
-      <artifactId>stax-utils</artifactId>
-      <version>20060502</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.bea.xml</groupId>
-          <artifactId>jsr173-ri</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-all</artifactId>
+            <version>5.1.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>rome</groupId>
-      <artifactId>rome</artifactId>
-      <version>0.9</version>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>sunxacml</artifactId>
-      <classifier>melcoe</classifier>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>Tidy</artifactId>
-      <version>1.0</version>
-    </dependency>
-    
-    <!-- Note: No evidence of current use.  DWD 9/18/2000 -->
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>tt-bytecode</artifactId>
-      <version>1.0</version>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-api</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-impl</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>log4j-over-slf4j</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+            <version>1.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>org.akubraproject</groupId>
+            <artifactId>akubra-core</artifactId>
+            <version>0.3</version>
+        </dependency>
 
-    <dependency>
-      <groupId>ch.qos.logback</groupId>                                                           
-      <artifactId>logback-classic</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>org.akubraproject</groupId>
+            <artifactId>akubra-fs</artifactId>
+            <version>0.3</version>
+        </dependency>
 
-    <dependency>
-      <groupId>xerces</groupId>
-      <artifactId>xercesImpl</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>org.akubraproject</groupId>
+            <artifactId>akubra-map</artifactId>
+            <version>0.3</version>
+        </dependency>
 
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-      <version>1.3.04</version>
-    </dependency>
+        <dependency>
+            <groupId>org.akubraproject</groupId>
+            <artifactId>akubra-mem</artifactId>
+            <version>0.3</version>
+        </dependency>
 
-    <dependency>
-      <groupId>xmlunit</groupId>
-      <artifactId>xmlunit</artifactId>
-    </dependency>
-  </dependencies>
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>axis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>GroboTestingJUnit-core</artifactId>
+            <version>1.2.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Note: No demonstrated evidence of use.  DWD 9/15/2009 -->
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>jakarta-oro</artifactId>
+            <version>2.0.5</version>
+        </dependency>
+
+        <!-- This is needed only to trigger the rmi-journal-rcv.jar assembly. -->
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>one-jar-boot</artifactId>
+            <version>0.96</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>saxon</artifactId>
+            <version>9.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>saxon-dom</artifactId>
+            <version>9.0</version>
+        </dependency>
+
+        <!-- For the Journal Receiver Assembly -->
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>trippi-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>trippi-mptstore</artifactId>
+            <version>1.4.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>trippi-mulgara</artifactId>
+            <version>1.4.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>fcrepo-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>fcrepo-common</artifactId>
+            <classifier>tests</classifier>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>2.5.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>2.5.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>net.java.dev.stax-utils</groupId>
+            <artifactId>stax-utils</artifactId>
+            <version>20060502</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.bea.xml</groupId>
+                    <artifactId>jsr173-ri</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>rome</groupId>
+            <artifactId>rome</artifactId>
+            <version>0.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>sunxacml</artifactId>
+            <classifier>melcoe</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>Tidy</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <!-- Note: No evidence of current use.  DWD 9/18/2000 -->
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>tt-bytecode</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.3.04</version>
+        </dependency>
+
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>owlapi</groupId>
+            <artifactId>owlapi</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+    </dependencies>
 
 </project>
