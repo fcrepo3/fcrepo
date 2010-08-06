@@ -59,6 +59,11 @@
                             </owl:Restriction>
                         </rdfs:subClassOf>
                     </owl:Class>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0/DC#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0/RELS-EXT#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0/RELS-INT#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0/POLICY#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0/AUDIT#Class"/>
                     <owl:ObjectProperty
                             rdf:about="info:fedora/fedora-system:def/model#hasModel"/>
                 </rdf:RDF>

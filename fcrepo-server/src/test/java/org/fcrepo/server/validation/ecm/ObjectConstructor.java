@@ -109,5 +109,40 @@ public class ObjectConstructor {
         return object;
     }
 
+    public static DigitalObject produceDataObject3()
+            throws FileNotFoundException, ObjectIntegrityException, StreamIOException, UnsupportedEncodingException {
+        FOXML1_1DODeserializer deserialiser = new FOXML1_1DODeserializer();
+        BasicDigitalObject object = new BasicDigitalObject();
+        FileInputStream in = new FileInputStream("src/test/resources/ecm/dataobject3.xml");
+        deserialiser.deserialize(in, object, "UTF-8", DOTranslationUtility.AS_IS);
+        return object;
+    }
+
+    public static DigitalObject produceDataObject5()
+            throws FileNotFoundException, ObjectIntegrityException, StreamIOException, UnsupportedEncodingException {
+        FOXML1_1DODeserializer deserialiser = new FOXML1_1DODeserializer();
+        BasicDigitalObject object = new BasicDigitalObject();
+        FileInputStream in = new FileInputStream("src/test/resources/ecm/dataobject5.xml");
+        deserialiser.deserialize(in, object, "UTF-8", DOTranslationUtility.AS_IS);
+        return object;
+    }
+
+    public static DigitalObject produceDataObject6()
+            throws FileNotFoundException, ObjectIntegrityException, StreamIOException, UnsupportedEncodingException {
+        FOXML1_1DODeserializer deserialiser = new FOXML1_1DODeserializer();
+        BasicDigitalObject object = new BasicDigitalObject();
+        FileInputStream in = new FileInputStream("src/test/resources/ecm/dataobject6.xml");
+        deserialiser.deserialize(in, object, "UTF-8", DOTranslationUtility.AS_IS);
+        return object;
+    }
+
+    public static DigitalObject produceDataObject7()
+            throws FileNotFoundException, ObjectIntegrityException, StreamIOException, UnsupportedEncodingException {
+        FOXML1_1DODeserializer deserialiser = new FOXML1_1DODeserializer();
+        BasicDigitalObject object = new BasicDigitalObject();
+        FileInputStream in = new FileInputStream("src/test/resources/ecm/dataobject7.xml");
+        deserialiser.deserialize(in, object, "UTF-8", DOTranslationUtility.AS_IS);
+        return object;
+    }
 
 }

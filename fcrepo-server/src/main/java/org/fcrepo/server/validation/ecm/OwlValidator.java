@@ -151,11 +151,11 @@ public class OwlValidator {
                 }
                 String datastream = "info:fedora/" + currentObjectReader.GetObjectPID() + "/" + datastreamName;
                 NodeList relationsNodes = xpathselector
-                        .selectNodeList(relsint, "/rdf:RDF/rdf:Description[@rdf:about='_" + datastream + "']/*");
+                        .selectNodeList(relsint, "/rdf:RDF/rdf:Description[@rdf:about='" + datastream + "']/*");
                 checkMinCardinality(relationsNodes, restrictionVisitor, validation);
                 checkMaxCardinality(relationsNodes, restrictionVisitor, validation);
                 checkExactCardinality(relationsNodes, restrictionVisitor, validation);
-                //checkSomeValuesFrom(relsint, datastream, restrictionVisitor,validation);
+                checkSomeValuesFrom(relationsNodes, restrictionVisitor, validation, context);
                 checkAllValuesFrom(relationsNodes, restrictionVisitor, validation, context);
                 restrictionVisitor.reset();
             }
@@ -182,6 +182,7 @@ public class OwlValidator {
             checkMaxCardinality(relationsNodes, restrictionVisitor, validation);
             checkExactCardinality(relationsNodes, restrictionVisitor, validation);
             checkAllValuesFrom(relationsNodes, restrictionVisitor, validation, context);
+            checkSomeValuesFrom(relationsNodes, restrictionVisitor, validation, context);
             restrictionVisitor.reset();
         }
 
@@ -225,7 +226,7 @@ public class OwlValidator {
 
                     if (lastIndexOfSlash > 0) {//target is a datastream
 
-                        targetPid = target.substring(0, lastIndexOfSlash - 1);
+                        targetPid = target.substring(0, lastIndexOfSlash);
                         dsname = target.substring(lastIndexOfSlash);
                     } else { //target is an object
                         targetPid = target;
@@ -253,6 +254,93 @@ public class OwlValidator {
             }
         }
     }
+
+    private void checkSomeValuesFrom(NodeList relationsNodes,
+                                     RestrictionVisitor restrictionVisitor, Validation validation, Context context)
+            throws ServerException {
+
+        Map<OWLObjectProperty, OWLClass> map = restrictionVisitor.getSomeValuesFrom();
+        for (OWLObjectProperty owlObjectProperty : map.keySet()) {
+            String ontologyrelation = owlObjectProperty.getIRI().toString();
+            OWLClass requiredclass = map.get(owlObjectProperty);
+            String requiredTarget = requiredclass.getIRI().toString().replace("#Class", "");
+
+            if (relationsNodes == null) {
+                validation.setValid(false);
+
+                validation.getObjectProblems().add("The relation '" + ontologyrelation + "' should have at least one" +
+                                                   "value from the from the" +
+                                                   "class '" + requiredTarget + "' and exist at least once");
+                continue;
+            }
+            int count = countRelations(ontologyrelation, relationsNodes);
+            if (count < 1) {
+                validation.setValid(false);
+
+                validation.getObjectProblems().add("The relation '" + ontologyrelation + "' should have at least one" +
+                                                   "value from the from the" +
+                                                   "class '" + requiredTarget + "' and exist at least once");
+                continue;
+            }
+
+            boolean found = false;
+            for (int i = 0; i < relationsNodes.getLength(); i++) {
+                Node relation = relationsNodes.item(i);
+                String objectRelationName = relation.getNamespaceURI() + relation.getLocalName();//Qualified name
+                if (objectRelationName.equals(ontologyrelation)) {//This is one of the restricted relations
+                    Node targetNode = relation.getAttributes()
+                            .getNamedItemNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "resource");
+                    if (targetNode == null) {
+                        //TODO broken relation
+                        continue;
+                    }
+                    String target = targetNode.getTextContent();
+                    if (!target.startsWith("info:fedora/")) {
+                        continue;
+                    } else {
+                        target = target.substring("info:fedora/".length());
+                    }
+                    int lastIndexOfSlash = target.lastIndexOf("/");
+                    String targetPid;
+
+                    String dsname = "";
+
+                    if (lastIndexOfSlash > 0) {//target is a datastream
+
+                        targetPid = target.substring(0, lastIndexOfSlash - 1);
+                        dsname = target.substring(lastIndexOfSlash);
+                    } else { //target is an object
+                        targetPid = target;
+                    }
+                    DOReader targetReader = doMgr.getReader(false, context, targetPid);
+                    List<String> targetContentModels = targetReader.getContentModels();
+
+
+                    for (String targetContentModel : targetContentModels) {
+                        targetContentModel = targetContentModel + dsname;
+                        if (targetContentModel.equals(requiredTarget)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        break;
+                    }
+                }
+            }
+            if (found == false) {
+                validation.setValid(false);
+
+                validation.getObjectProblems().add("The relation '" + ontologyrelation + "' should have at least one" +
+                                                   "value from the from the" +
+                                                   "class '" + requiredTarget + "'");
+
+            }
+        }
+
+
+    }
+
 
     private void checkMinCardinality(NodeList relationsNodes,
                                      RestrictionVisitor restrictionVisitor, Validation validation) {

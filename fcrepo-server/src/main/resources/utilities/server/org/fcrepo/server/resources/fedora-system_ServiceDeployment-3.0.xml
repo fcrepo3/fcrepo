@@ -67,6 +67,9 @@
                             </owl:Restriction>
                         </rdfs:subClassOf>
                     </owl:Class>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0/METHODMAP#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0/DSINPUTSPEC#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0/WSDL#Class"/>
                     <owl:ObjectProperty
                             rdf:about="info:fedora/fedora-system:def/model#isDeploymentOf"/>
                     <owl:ObjectProperty

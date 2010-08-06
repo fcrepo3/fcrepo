@@ -32,6 +32,11 @@ public class EcmTest extends TestCase {
         mockRepositoryReader.putObject(ObjectConstructor.producefedoraObject30());
         mockRepositoryReader.putObject(ObjectConstructor.produceDataObject1());
         mockRepositoryReader.putObject(ObjectConstructor.produceDataObject2());
+        mockRepositoryReader.putObject(ObjectConstructor.produceDataObject3());
+
+        mockRepositoryReader.putObject(ObjectConstructor.produceDataObject5());
+        mockRepositoryReader.putObject(ObjectConstructor.produceDataObject6());
+        mockRepositoryReader.putObject(ObjectConstructor.produceDataObject7());
         reader = mockRepositoryReader;
     }
 
@@ -68,6 +73,42 @@ public class EcmTest extends TestCase {
 
         Validation validation3 = ecm.validate(null, "demo:contentModel1", null);
         assertTrue("contentmodel1 failed validation: " + objectValidationToXml(validation3), validation3.isValid());
+
+    }
+
+    @Test
+    public void testEcm4() throws Exception {
+        EcmValidator ecm = new EcmValidator(reader);
+
+        Validation validation3 = ecm.validate(null, "demo:dataObject3", null);
+        assertFalse("DataObject3 succeeded validation: " + objectValidationToXml(validation3), validation3.isValid());
+
+    }
+
+    @Test
+    public void testEcm5() throws Exception {
+        EcmValidator ecm = new EcmValidator(reader);
+
+        Validation validation3 = ecm.validate(null, "demo:dataObject5", null);
+        assertFalse("DataObject5 succeeded validation: " + objectValidationToXml(validation3), validation3.isValid());
+
+    }
+
+    @Test
+    public void testEcm6() throws Exception {
+        EcmValidator ecm = new EcmValidator(reader);
+
+        Validation validation3 = ecm.validate(null, "demo:dataObject6", null);
+        assertFalse("DataObject6 succeeded validation: " + objectValidationToXml(validation3), validation3.isValid());
+
+    }
+
+    @Test
+    public void testEcm7() throws Exception {
+        EcmValidator ecm = new EcmValidator(reader);
+
+        Validation validation3 = ecm.validate(null, "demo:dataObject7", null);
+        assertFalse("DataObject7 succeeded validation: " + objectValidationToXml(validation3), validation3.isValid());
 
     }
 
