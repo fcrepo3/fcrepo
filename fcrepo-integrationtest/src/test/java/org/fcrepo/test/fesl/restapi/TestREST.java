@@ -15,16 +15,19 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import org.fcrepo.test.fesl.util.DataUtils;
-import org.fcrepo.test.fesl.util.FedoraUtil;
-import org.fcrepo.test.fesl.util.HttpUtils;
-import org.fcrepo.test.fesl.util.LoadDataset;
-import org.fcrepo.test.fesl.util.RemoveDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import junit.framework.JUnit4TestAdapter;
 
+import org.fcrepo.test.fesl.util.DataUtils;
+import org.fcrepo.test.fesl.util.FedoraUtil;
+import org.fcrepo.test.fesl.util.HttpUtils;
+import org.fcrepo.test.fesl.util.LoadDataset;
+import org.fcrepo.test.fesl.util.RemoveDataset;
+
+// FIXME: these tests largely check that REST API calls work when FeSL is enabled - conficC
+// could consider instead just running the main TestRESTAPI test instead?
 
 public class TestREST {
 
@@ -90,7 +93,7 @@ public class TestREST {
 
             boolean check =
                     response
-                            .contains("<a href=\"objects/test:1000003\">test:1000003</a>");
+                            .contains("<a href=\"objects/test%3A1000003\">test:1000003</a>");
             Assert.assertTrue("Expected object data not found", check);
         } catch (Exception re) {
             Assert.fail(re.getMessage());
@@ -112,7 +115,7 @@ public class TestREST {
 
             boolean check =
                     response
-                            .contains("<a href=\"objects/test:1000003\">test:1000003</a>");
+                            .contains("<a href=\"objects/test%3A1000003\">test:1000003</a>");
             Assert.assertTrue("Expected object data not found", check);
         } catch (Exception re) {
             Assert.fail(re.getMessage());

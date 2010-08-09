@@ -19,12 +19,17 @@
 package org.fcrepo.server.security.xacml.pep;
 
 import java.security.MessageDigest;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import com.sun.xacml.ctx.Attribute;
+import com.sun.xacml.ctx.RequestCtx;
+import com.sun.xacml.ctx.Subject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,10 +38,6 @@ import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.util.AttributeComparator;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.SubjectComparator;
-
-import com.sun.xacml.ctx.Attribute;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.Subject;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -51,7 +52,7 @@ public class ResponseCacheImpl
 
     private static final int DEFAULT_CACHE_SIZE = 1000;
 
-    private static final long DEFAULT_TTL = 10 * 60 * 1000;
+    private static final long DEFAULT_TTL = 10 * 60 * 1000; // 10 minutes
 
     private final int CACHE_SIZE;
 
@@ -67,7 +68,7 @@ public class ResponseCacheImpl
 
     /**
      * The default constructor that initialises the cache with default values.
-     * 
+     *
      * @throws PEPException
      */
     public ResponseCacheImpl()
@@ -78,7 +79,7 @@ public class ResponseCacheImpl
     /**
      * Constructor that initialises the cache with the size and time to live
      * values.
-     * 
+     *
      * @param size
      *        size of the cache
      * @param ttl
@@ -206,7 +207,7 @@ public class ResponseCacheImpl
 
     /**
      * Given a request, this method generates a hash.
-     * 
+     *
      * @param request
      *        the request to hash
      * @return the hash
@@ -260,7 +261,7 @@ public class ResponseCacheImpl
 
     /**
      * Utility function to add an attribute to the hash digest.
-     * 
+     *
      * @param a
      *        the attribute to hash
      */
@@ -278,7 +279,7 @@ public class ResponseCacheImpl
 
     /**
      * Converts a hash into its hexadecimal string representation.
-     * 
+     *
      * @param bytes
      *        the byte array to convert
      * @return the hexadecimal string representation

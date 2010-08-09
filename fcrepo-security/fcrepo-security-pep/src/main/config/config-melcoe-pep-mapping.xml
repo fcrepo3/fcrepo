@@ -43,6 +43,7 @@
 		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-dsstate" to="update" />
 		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-resolveDatastream" to="read" />
 		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-reloadPolicies" to="admin" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-managePolicies" to="admin" />
 		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getRelationships" to="read" />
 		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-addRelationship" to="create" />
 		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-purgeRelationship" to="delete" />

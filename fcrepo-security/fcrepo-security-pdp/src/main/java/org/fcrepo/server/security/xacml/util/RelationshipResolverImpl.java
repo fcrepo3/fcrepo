@@ -1,10 +1,11 @@
 /**
- * 
+ *
  */
 
 package org.fcrepo.server.security.xacml.util;
 
 import java.io.File;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,12 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
@@ -33,7 +34,7 @@ import org.fcrepo.server.storage.types.RelationshipTuple;
 /**
  * A RelationshipResolver that resolves relationships via
  * {@link Management#getRelationships(org.fcrepo.server.Context, String, String)}.
- * 
+ *
  * @author Edwin Shin
  */
 public class RelationshipResolverImpl
@@ -66,12 +67,13 @@ public class RelationshipResolverImpl
      * Constructor that takes a map of parent-child predicates (relationships).
      * {@link ContextHandlerImpl} builds the map from the relationship-resolver
      * section of config-melcoe-pep.xml (in WEB-INF/classes).
-     * 
+     *
      * @param options
      * @throws MelcoePDPException
      */
     public RelationshipResolverImpl(Map<String, String> options) {
         relationships = new ArrayList<String>();
+        // FIXME:  should add default relationship if no parent-child-relationship option is present, instead of options being empty
         if (options.isEmpty()) {
             relationships.add(DEFAULT_RELATIONSHIP);
         } else {
@@ -130,18 +132,17 @@ public class RelationshipResolverImpl
             } catch (MelcoeXacmlException e) {
                 Throwable t = e.getCause();
                 // An object X, may legitimately declare a parent relation to
-                // another object, Y which does not exist. Therefore, we don't 
+                // another object, Y which does not exist. Therefore, we don't
                 // want to continue querying for Y's parents.
-                while (t != null) {
-                    if (t instanceof ObjectNotInLowlevelStorageException) {
+                if (t != null && t instanceof ObjectNotInLowlevelStorageException) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("Parent, " + pid + ", not found.");
                         }
                         break query;
-                    }
-                }
+                } else {
                 // Unexpected error, so we throw back the original
                 throw e;
+            }
             }
 
             Set<String> parents = mapping.get(relationship);
@@ -174,8 +175,8 @@ public class RelationshipResolverImpl
                     getApiM().getRelationships(getContext(),
                                                subject.toURI(),
                                                relationship);
-            // Anticipating searches which fail because the object identified by 
-            // pid may not exist in the Fedora repository, since objects can 
+            // Anticipating searches which fail because the object identified by
+            // pid may not exist in the Fedora repository, since objects can
             // declare parent relationships to objects that do not exist
         } catch (ServerException e) {
             throw new MelcoeXacmlException(e.getMessage(), e);
@@ -234,7 +235,7 @@ public class RelationshipResolverImpl
      * Returns a PID object for the requested String. This method will return a
      * PID for a variety of pid permutations, e.g. demo:1, info:fedora/demo:1,
      * demo:1/DS1, info:fedora/demo:1/sdef:foo/sdep:bar/methodBaz.
-     * 
+     *
      * @param pid
      * @return a PID object
      */

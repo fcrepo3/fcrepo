@@ -32,11 +32,14 @@ import com.sun.xacml.ctx.RequestCtx;
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.LogUtil;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -149,6 +152,13 @@ public class ModifyDatastreamByReferenceHandler
             actions.put(Constants.ACTION.API.getURI(),
                         new StringAttribute(Constants.ACTION.APIM.getURI()
                                 .toASCIIString()));
+            // modifying the FeSL policy datastream requires policy management permissions
+            if (dsID != null && dsID.equals(FedoraPolicyStore.POLICY_DATASTREAM)) {
+                actions.put(Constants.ACTION.ID.getURI(),
+                            new StringAttribute(Constants.ACTION.MANAGE_POLICIES.getURI().toASCIIString()));
+
+            }
+
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),

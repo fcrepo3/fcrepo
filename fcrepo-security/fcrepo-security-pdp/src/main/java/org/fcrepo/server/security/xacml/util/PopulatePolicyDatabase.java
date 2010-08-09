@@ -29,10 +29,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
-import org.fcrepo.server.security.xacml.pdp.data.DbXmlPolicyDataManager;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManagerException;
+import org.fcrepo.server.security.xacml.pdp.MelcoePDPException;
+import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyStore;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreFactory;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyUtils;
 
 /**
+ * Populates the policy store from XACML files in the policies directory
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public class PopulatePolicyDatabase {
@@ -43,28 +49,30 @@ public class PopulatePolicyDatabase {
     private static final String POLICY_HOME =
             MelcoePDP.PDP_HOME.getAbsolutePath() + "/policies";
 
-    private static DbXmlPolicyDataManager dbXmlPolicyDataManager;
+    private static PolicyStore policyStore;
 
     private static Set<String> policyNames = new HashSet<String>();
 
     static {
         try {
-            dbXmlPolicyDataManager = new DbXmlPolicyDataManager();
-        } catch (PolicyDataManagerException e) {
+            PolicyStoreFactory f = new PolicyStoreFactory();
+            policyStore = f.newPolicyStore();
+        } catch (PolicyStoreException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) throws PolicyDataManagerException,
+    public static void main(String[] args) throws PolicyStoreException,
             FileNotFoundException {
-        dbXmlPolicyDataManager = new DbXmlPolicyDataManager();
+        PolicyStoreFactory f = new PolicyStoreFactory();
+        policyStore = f.newPolicyStore();
         logger.info("Adding");
         add();
         logger.info("Listing");
         list();
     }
 
-    public static void add() throws PolicyDataManagerException,
+    public static void add() throws PolicyStoreException,
             FileNotFoundException {
         logger.info("Starting clock!");
         long time1 = System.nanoTime();
@@ -74,27 +82,54 @@ public class PopulatePolicyDatabase {
         logger.info("Time taken: " + (time2 - time1));
     }
 
-    public static void addDocuments() throws PolicyDataManagerException,
+    public static void addDocuments() throws PolicyStoreException,
             FileNotFoundException {
         File[] files = getPolicyFiles();
         if (files.length == 0) {
             return;
         }
+        PolicyUtils utils = new PolicyUtils();
+
+        // don't fail if a single policy fails, instead continue and list failed policies when done
+        StringBuilder failedPolicies = new StringBuilder();
 
         for (File f : files) {
-            if (dbXmlPolicyDataManager.contains(f)) {
+            try {
+                String policyID = utils.getPolicyName(f);
+
+                // TODO: name mangling only if Fedora policy store; use consts for ns from that
+                if (policyStore instanceof FedoraPolicyStore) {
+
+                    // get the policy ID - note that adding a policy with no name will generate a PID from
+                    // the policy ID, but using the default PID namespace; we want specific namespace for bootstrap policies hence doing this here
+                    // if XACML policy ID contains a pid separator, escape it
+                    if (policyID.contains(":")) {
+                        policyID = policyID.replace(":", "%3A");
+                    }
+                    policyID = FedoraPolicyStore.BOOTSTRAP_POLICY_NAMESPACE + ":" + policyID;
+                }
+
+                if (policyStore.contains(policyID)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Policy database already contains " + f.getName()
+                        logger.debug("Policy database already contains " + policyID + " (" + f.getName()+ ")"
                             + ". Skipping.");
                 }
             } else {
-                policyNames.add(dbXmlPolicyDataManager.addPolicy(f));
+                    policyNames.add(policyStore.addPolicy(f, policyID));
             }
+            } catch (MelcoePDPException e){
+                logger.warn("Failed to add bootstrap policy " + f.getName() + " - " + e.getMessage());
+                failedPolicies.append(f.getName() + "\n");
+        }
+
+    }
+        if (failedPolicies.length() != 0) {
+            throw new PolicyStoreException("Failed to load some bootstrap policies: " + failedPolicies.toString());
         }
     }
 
-    public static void list() throws PolicyDataManagerException {
-        List<String> docNames = dbXmlPolicyDataManager.listPolicies();
+    public static void list() throws PolicyStoreException {
+        List<String> docNames = policyStore.listPolicies();
         for (String s : docNames) {
             logger.info("doc: " + s);
         }

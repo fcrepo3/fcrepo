@@ -20,7 +20,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManagerException;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ public class AttributeFinderConfigUtil {
             String filename = home + "/conf/config-attribute-finder.xml";
             File f = new File(filename);
             if (!f.exists()) {
-                throw new PolicyDataManagerException("Could not locate config file: "
+                throw new PolicyStoreException("Could not locate config file: "
                         + f.getAbsolutePath());
             }
 
@@ -197,7 +197,7 @@ public class AttributeFinderConfigUtil {
         String filename = home + "/conf/config-attribute-finder.xml";
         File f = new File(filename);
         if (!f.exists()) {
-            throw new PolicyDataManagerException("Could not locate config file: "
+            throw new PolicyStoreException("Could not locate config file: "
                     + f.getAbsolutePath());
         }
 

@@ -1,22 +1,23 @@
 
 package org.fcrepo.server.security.xacml.test;
 
-import org.fcrepo.server.security.xacml.pdp.data.DbXmlPolicyDataManager;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManager;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManagerException;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyStore;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreFactory;
 
 public class TestDbxmlPolicyDataManager {
 
-    private static PolicyDataManager pdm = null;
+    private static PolicyStore pdm = null;
 
     /**
      * @param args
      */
-    public static void main(String[] args) throws PolicyDataManagerException {
+    public static void main(String[] args) throws PolicyStoreException {
         String str = "<test/>";
         String str2 = "<testing/>";
 
-        pdm = new DbXmlPolicyDataManager();
+        PolicyStoreFactory f = new PolicyStoreFactory();
+        pdm = f.newPolicyStore();
 
         pdm.addPolicy(str, "test-nish");
         byte[] docb = pdm.getPolicy("test-nish");

@@ -12,24 +12,25 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
-
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
-import org.w3c.dom.Document;
 
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.client.HttpInputStream;
-import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
-import org.fcrepo.server.security.xacml.pdp.data.DbXmlPolicyDataManager;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManager;
-import org.fcrepo.test.DemoObjectTestSetup;
-import org.fcrepo.test.FedoraServerTestCase;
-import org.fcrepo.test.fesl.util.DataUtils;
+import org.w3c.dom.Document;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import org.fcrepo.client.FedoraClient;
+import org.fcrepo.client.HttpInputStream;
+
+import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
+
+import org.fcrepo.test.DemoObjectTestSetup;
+import org.fcrepo.test.FedoraServerTestCase;
+import org.fcrepo.test.fesl.util.DataUtils;
+import org.fcrepo.test.fesl.util.PolicyUtils;
 
 
 
@@ -44,6 +45,8 @@ import junit.framework.TestSuite;
  */
 public class TestHTTPStatusCodesConfigC
         extends FedoraServerTestCase {
+
+    private static PolicyUtils policyUtils = null;
 
     public static final String TEST_OBJ = "demo:SmileyBucket";
 
@@ -138,6 +141,16 @@ public class TestHTTPStatusCodesConfigC
         TestSuite suite = new TestSuite("TestHTTPStatusCodes TestSuite");
         suite.addTestSuite(TestHTTPStatusCodesConfigC.class);
         return new DemoObjectTestSetup(suite);
+    }
+
+    @Override
+    public void setUp() {
+        try {
+            policyUtils = new PolicyUtils(getFedoraClient());
+        } catch (Exception e) {
+            assertTrue(e.getMessage(), false );
+        }
+
     }
 
     //---
@@ -528,7 +541,7 @@ public class TestHTTPStatusCodesConfigC
         writeStringToFile(xml, policyFile);
 
         // for new policy store...
-        addPolicy(xml);
+        addPolicy(policyFile);
     }
 
     private static void removeSystemWidePolicyFile(String filename)
@@ -639,20 +652,16 @@ public class TestHTTPStatusCodesConfigC
 		return pid;
 	}
 
-	private static String addPolicy(String policy) throws Exception
+	private static String addPolicy(File policy) throws Exception
 	{
-		PolicyDataManager polMan = new DbXmlPolicyDataManager();
-		String policyId = getPolicyId(policy.getBytes());
-		polMan.addPolicy(new String(policy), policyId);
-		Thread.sleep(1000);
-
-		return policyId;
+	    return policyUtils.addPolicy(policy);
+		//Thread.sleep(1000);
+		//return policyId;
 	}
 
 	private static void delPolicy(String policyId) throws Exception
 	{
-		PolicyDataManager polMan = new DbXmlPolicyDataManager();
-		polMan.deletePolicy(policyId);
-		Thread.sleep(1000);
+	    policyUtils.delPolicy(policyId);
+		//Thread.sleep(1000);
 	}
 }

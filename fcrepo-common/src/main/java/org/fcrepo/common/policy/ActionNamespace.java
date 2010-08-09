@@ -91,6 +91,8 @@ public class ActionNamespace
 
     public final XacmlName RELOAD_POLICIES;
 
+    public final XacmlName MANAGE_POLICIES;
+
     public final XacmlName SET_DATASTREAM_VERSIONABLE;
 
     public final XacmlName COMPARE_DATASTREAM_CHECKSUM;
@@ -160,6 +162,7 @@ public class ActionNamespace
         RESOLVE_DATASTREAM =
                 addName(new XacmlName(this, "id-resolveDatastream"));
         RELOAD_POLICIES = addName(new XacmlName(this, "id-reloadPolicies"));
+        MANAGE_POLICIES = addName(new XacmlName(this, "id-managePolicies"));
         GET_RELATIONSHIPS = addName(new XacmlName(this, "id-getRelationships"));
         ADD_RELATIONSHIP = addName(new XacmlName(this, "id-addRelationship"));
         PURGE_RELATIONSHIP =

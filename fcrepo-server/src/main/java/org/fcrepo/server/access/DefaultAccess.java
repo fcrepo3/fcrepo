@@ -25,8 +25,26 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+import java.net.InetAddress;
+import java.net.URLDecoder;
+import java.net.UnknownHostException;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -637,10 +655,13 @@ public class DefaultAccess
             profile.objectModels.add(rel.object);
         }
 */
+        // "bootstrap" context won't have the uri to determine security
+        String securityUri = context
+        .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri);
 
+        if (securityUri != null) {
         String reposBaseURL =
-                getReposBaseURL(context
-                                        .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri)
+                getReposBaseURL(securityUri
                                         .equals(Constants.HTTP_REQUEST.SECURE.uri) ? "https"
                                         : "http",
                                 context
@@ -657,6 +678,7 @@ public class DefaultAccess
                                             .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME),
                                     reader.GetObjectPID(),
                                     versDateTime);
+        }
         return profile;
     }
 

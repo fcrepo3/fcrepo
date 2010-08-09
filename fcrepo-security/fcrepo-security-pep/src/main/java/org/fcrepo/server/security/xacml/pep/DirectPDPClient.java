@@ -20,7 +20,6 @@ package org.fcrepo.server.security.xacml.pep;
 
 import java.util.Map;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ import org.fcrepo.server.security.xacml.pdp.MelcoePDPImpl;
 /**
  * This is the Web Services based client for the MelcoePDP. It uses the classes
  * in org.fcrepo.server.security.xacml.pdp.client which are the Web Service client stubs.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public class DirectPDPClient
@@ -43,19 +42,22 @@ public class DirectPDPClient
 
     /**
      * Initialises the DirectPDPClient class.
-     * 
+     *
      * @param options
      *        a Map of options for this class
      * @throws PEPException
      */
     public DirectPDPClient(Map<String, String> options)
             throws PEPException {
+        // FIXME: this constructor is not required - no options - but is called by pep ContextHandlerImpl
+        /*
         try {
             client = new MelcoePDPImpl();
         } catch (Exception e) {
             logger.error("Could not initialise the PEP Client.");
             throw new PEPException("Could not initialise the PEP Client.", e);
         }
+        */
     }
 
     /*
@@ -69,7 +71,7 @@ public class DirectPDPClient
 
         String response = null;
         try {
-            response = client.evaluate(request);
+            response = getClient().evaluate(request);
         } catch (Exception e) {
             logger.error("Error evaluating request.", e);
             throw new PEPException("Error evaluating request", e);
@@ -90,12 +92,26 @@ public class DirectPDPClient
 
         String response = null;
         try {
-            response = client.evaluateBatch(request);
+            response = getClient().evaluateBatch(request);
         } catch (Exception e) {
             logger.error("Error evaluating request.", e);
             throw new PEPException("Error evaluating request", e);
         }
 
         return response;
+    }
+    private MelcoePDP getClient() throws PEPException {
+        // lazy instantiation - as MelcoePDPImpl attempts to load policies when it is constructed,
+        // if we are using Fedora as a policy store the server won't be running at this point and therefore the load will fail
+        if (client == null) {
+            try {
+                client = new MelcoePDPImpl();
+            } catch (Exception e) {
+                logger.error("Could not initialise the PEP Client.");
+                throw new PEPException("Could not initialise the PEP Client.", e);
+            }
+        }
+        return client;
+
     }
 }

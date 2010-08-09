@@ -748,10 +748,10 @@ public class TestRESTAPI
             for (ObjectFields objectFields : fields) {
                 String pid = objectFields.getPid();
                 System.out.println("validating object '" + pid.toString() + "'");
-                url = String.format("/objects/%s/validate", pid.toString());
+                url = String.format("/objects/%s/validate", URLEncoder.encode(pid.toString(), "UTF-8"));
                 HttpResponse getTrue = get(true);
-                assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
-                assertEquals(SC_OK, getTrue.getStatusCode());
+                assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false).getStatusCode());
+                assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
                 String responseXML = getTrue.getResponseBodyString();
                 System.out.println(responseXML);
                 assertXpathExists("/validation[@valid='true']", responseXML);

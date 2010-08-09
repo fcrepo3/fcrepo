@@ -33,9 +33,10 @@ import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 
-import org.fcrepo.server.security.xacml.util.PopulatePolicyDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.fcrepo.server.security.xacml.util.PopulatePolicyDatabase;
 
 /**
  * This is an implementation of the MelcoePDP interface. It provides for the
@@ -68,7 +69,11 @@ public class MelcoePDPImpl
             // Loads the policies in PDP_HOME/policies
             // Does not monitor the directory for changes, nor will
             // subsequently deleted policies be removed from the policy store
+            try {
             PopulatePolicyDatabase.addDocuments();
+            } catch (Exception e) {
+                throw new MelcoePDPException("Error loading bootstrap FeSL policies", e);
+            }
             //
 
             // Ensure we have the configuration file.
@@ -92,12 +97,13 @@ public class MelcoePDPImpl
         }
     }
 
+
     /*
      * (non-Javadoc)
      * @see org.fcrepo.server.security.xacml.pdp.MelcoePDP#evaluate(java.lang.String)
      */
     public String evaluate(String request) throws EvaluationException {
-        logger.debug("evaluating request");
+        logger.debug("evaluating request: {}", request);
 
         RequestCtx req = null;
         ByteArrayInputStream is = new ByteArrayInputStream(request.getBytes());
@@ -113,6 +119,8 @@ public class MelcoePDPImpl
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         res.encode(os, new Indenter());
 
+        logger.debug("response is: {}", os.toString());
+
         return os.toString();
     }
 
@@ -121,9 +129,7 @@ public class MelcoePDPImpl
      * @see org.fcrepo.server.security.xacml.pdp.MelcoePDP#evaluateBatch(java.lang.String[])
      */
     public String evaluateBatch(String[] requests) throws EvaluationException {
-        if (logger.isDebugEnabled()) {
             logger.debug("evaluating request batch");
-        }
 
         Set<Result> results = new HashSet<Result>();
 

@@ -1,6 +1,4 @@
 /*
- * File: PolicyDataManagerService.java
- *
  * Copyright 2007 Macquarie E-Learning Centre Of Excellence
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +17,7 @@
 package org.fcrepo.server.security.xacml.pdp.data;
 
 import java.io.UnsupportedEncodingException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,35 +26,39 @@ import org.fcrepo.server.security.xacml.util.AttributeBean;
 
 
 /**
- * This is a wrapper class for a PolicyDataManager class that exposes the
+ * This is a wrapper class for a PolicyStore class that exposes the
  * management interface as a web service. The wrapper was needed as WSDL does
  * not support classes that container function overloading.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
- * @see PolicyDataManager
- * @see DbXmlPolicyDataManager
+ * @see PolicyStore
  */
-public class PolicyDataManagerService {
+// FIXME: not publicly exposed in FeSL
+public class PolicyStoreService {
 
-    private PolicyDataManager policyDataManager = null;
+    private PolicyStore policyStorer = null;
+    // FIXME: not currently initialised (just fix compilation errors) - only required by lastUpdate, which itself is probably not required
+    private final PolicyIndex policyIndex = null;
 
-    public PolicyDataManagerService()
-            throws PolicyDataManagerException {
-        setPolicyDataManager(new DbXmlPolicyDataManager());
+
+    public PolicyStoreService()
+            throws PolicyStoreException {
+        PolicyStoreFactory factory = new PolicyStoreFactory();
+        setPolicyStore(factory.newPolicyStore());
     }
 
     /**
      * Retrieves the document of the given name from the document store and
      * returns it as an array of bytes.
-     * 
+     *
      * @param name
      *        the document name to return
      * @return the document as a byte array
-     * @throws PolicyDataManagerException
+     * @throws PolicyStoreException
      */
     public DocumentInfo getPolicy(String name)
-            throws PolicyDataManagerException {
-        byte[] documentData = policyDataManager.getPolicy(name);
+            throws PolicyStoreException {
+        byte[] documentData = policyStorer.getPolicy(name);
         if (documentData == null) {
             return null;
         }
@@ -64,7 +67,7 @@ public class PolicyDataManagerService {
         try {
             data = new String(documentData, "UTF-8");
         } catch (UnsupportedEncodingException uee) {
-            throw new PolicyDataManagerException(uee.getMessage(), uee);
+            throw new PolicyStoreException(uee.getMessage(), uee);
         }
 
         DocumentInfo docInfo = new DocumentInfo(name, data);
@@ -73,54 +76,54 @@ public class PolicyDataManagerService {
 
     /**
      * Adds a policy document to the document store.
-     * 
+     *
      * @param document
      *        the document to add as a String
      * @param name
      *        the name of the document to add. This can be null for extracting
      *        the name from the policy itself.
      * @return the name of the document that was added.
-     * @throws PolicyDataManagerException
+     * @throws PolicyStoreException
      */
     public String addPolicy(String document, String name)
-            throws PolicyDataManagerException {
-        return policyDataManager.addPolicy(document, name);
+            throws PolicyStoreException {
+        return policyStorer.addPolicy(document, name);
     }
 
     /**
      * Removes the document of the given name from the document store.
-     * 
+     *
      * @param name
      *        the name of the document to remove.
-     * @throws PolicyDataManagerException
+     * @throws PolicyStoreException
      */
-    public boolean deletePolicy(String name) throws PolicyDataManagerException {
-        return policyDataManager.deletePolicy(name);
+    public boolean deletePolicy(String name) throws PolicyStoreException {
+        return policyStorer.deletePolicy(name);
     }
 
     /**
      * Updates a document of the given name by replacing it with the new
      * document provided as a String.
-     * 
+     *
      * @param name
      *        the name of the document to update.
      * @param newDocument
      *        the new document as a String.
-     * @throws PolicyDataManagerException
+     * @throws PolicyStoreException
      */
     public boolean updatePolicy(String name, String newDocument)
-            throws PolicyDataManagerException {
-        return policyDataManager.updatePolicy(name, newDocument);
+            throws PolicyStoreException {
+        return policyStorer.updatePolicy(name, newDocument);
     }
 
     /**
      * Lists all documents in the document store.
-     * 
+     *
      * @return array of Strings that are the names of all stored documents.
-     * @throws PolicyDataManagerException
+     * @throws PolicyStoreException
      */
-    public String[] listPolicies() throws PolicyDataManagerException {
-        List<String> result = policyDataManager.listPolicies();
+    public String[] listPolicies() throws PolicyStoreException {
+        List<String> result = policyStorer.listPolicies();
         return result.toArray(new String[result.size()]);
     }
 
@@ -128,27 +131,28 @@ public class PolicyDataManagerService {
      * Get the time of the latest add/update/delete operation from the document
      * store in milliseconds. The time is based on the document store servers
      * unix epoch time.
-     * 
+     *
      * @return the time the document store was last updated.
      */
     public long lastUpdate() {
-        return policyDataManager.getLastUpdate();
+        //return policyDataManager.getLastUpdate();
+        return 0;  // FIXME:
     }
 
     /**
      * Search for policies that contain all the attribute id/value pairs in the
      * array of AttributeBeans.
-     * 
+     *
      * @param attributes
      *        Array of AttributeBeans that contain the attributes for which to
      *        search for.
      * @return array of DocumentInfo objects. Each contains the document name
      *         and the byte[] data.
-     * @throws PolicyDataManagerException
+     * @throws PolicyStoreException
      */
     public DocumentInfo[] findPolicies(AttributeBean[] attributes)
-            throws PolicyDataManagerException {
-        Map<String, byte[]> result = policyDataManager.findPolicies(attributes);
+            throws PolicyIndexException {
+        Map<String, byte[]> result = policyIndex.findPolicies(attributes);
         if (result == null) {
             return null;
         }
@@ -159,7 +163,7 @@ public class PolicyDataManagerService {
             try {
                 data = new String(result.get(name), "UTF-8");
             } catch (UnsupportedEncodingException uee) {
-                throw new PolicyDataManagerException(uee.getMessage(), uee);
+                throw new PolicyIndexException(uee.getMessage(), uee);
             }
 
             DocumentInfo d = new DocumentInfo(name, data);
@@ -171,15 +175,15 @@ public class PolicyDataManagerService {
     /**
      * @return the policyDataManager
      */
-    public PolicyDataManager getPolicyDataManager() {
-        return policyDataManager;
+    public PolicyStore getPolicyDataManager() {
+        return policyStorer;
     }
 
     /**
-     * @param policyDataManager
+     * @param policyStore
      *        the policyDataManager to set
      */
-    public void setPolicyDataManager(PolicyDataManager policyDataManager) {
-        this.policyDataManager = policyDataManager;
+    public void setPolicyStore(PolicyStore policyStore) {
+        this.policyStorer = policyStore;
     }
 }

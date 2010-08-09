@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<pdm-fedora>
+	<object>
+		<pid-namespace name="policy"/>
+		<!-- content model (URI form) -->
+		<!--
+		<content-model name="info:fedora/policy:ContentModel"/>
+		-->
+		<datastream-control-group name="M"/>
+		<collection name="info:fedora/changeme:1"/>
+		<collection-relationship name="isMemberOf"/>
+	</object>
+	<schemaConfig validation="false">
+			<schema
+				namespace="urn:oasis:names:tc:xacml:2.0:context:schema:os"
+				location="http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-context-schema-os.xsd"/>
+			<schema
+				namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+				location="http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd"/>
+	</schemaConfig>
+</pdm-fedora>

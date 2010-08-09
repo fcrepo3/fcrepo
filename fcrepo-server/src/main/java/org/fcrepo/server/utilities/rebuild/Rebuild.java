@@ -16,7 +16,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.bridge.SLF4JBridgeHandler;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.Server;
 import org.fcrepo.server.config.Configuration;
 import org.fcrepo.server.config.ModuleConfiguration;
@@ -33,8 +36,8 @@ import org.fcrepo.server.storage.translation.FOXML1_1DODeserializer;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.utilities.ServerUtility;
+
 import org.fcrepo.utilities.LogConfig;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * Entry-point for rebuilding various aspects of the repository.
@@ -53,7 +56,8 @@ public class Rebuild
      */
     public static String[] REBUILDERS =
             new String[] {"org.fcrepo.server.resourceIndex.ResourceIndexRebuilder",
-                    "org.fcrepo.server.utilities.rebuild.SQLRebuilder"};
+                    "org.fcrepo.server.utilities.rebuild.SQLRebuilder",
+                    "org.fcrepo.server.security.xacml.pdp.data.PolicyIndexRebuilder"};
 
     public Rebuild(Rebuilder rebuilder,
                    Map<String, String> options,

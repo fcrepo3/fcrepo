@@ -27,6 +27,7 @@ import org.fcrepo.server.security.BESecurityConfig;
 import org.fcrepo.server.security.DefaultRoleConfig;
 import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
 import org.fcrepo.server.security.servletfilters.xmluserfile.User;
+
 import org.fcrepo.utilities.ExecUtility;
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.Zip;
@@ -210,6 +211,12 @@ public class FedoraHome {
 
         props.put("module.org.fcrepo.server.access.Access:doMediateDatastreams",
                   _opts.getValue(InstallOptions.APIA_AUTH_REQUIRED));
+
+        // FeSL AuthZ needs a management decorator for syncing the policy cache with policies in objects
+        if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
+            // NOTE: assumes messaging decorator only is present in fedora-base.fcfg as decorator1
+            props.put("module.org.fcrepo.server.management.Management:decorator2", "org.fcrepo.server.security.xacml.pdp.decorator.PolicyIndexInvocationHandler");
+        }
 
         try {
             FileInputStream fis = new FileInputStream(fcfgBase);

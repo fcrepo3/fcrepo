@@ -19,28 +19,14 @@
 package org.fcrepo.server.security.xacml.pdp.finder.policy;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
+
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManager;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManagerException;
 
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
@@ -55,11 +41,20 @@ import com.sun.xacml.combine.PolicyCombiningAlgorithm;
 import com.sun.xacml.ctx.Status;
 import com.sun.xacml.finder.PolicyFinder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.fcrepo.server.security.xacml.pdp.data.Config;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyConfigException;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyIndex;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyIndexException;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyIndexFactory;
+
 /**
- * This class interacts with the policy store on behalf of the PolicyFinder
+ * This class interacts with the policy cache on behalf of the PolicyFinder
  * modules. It also does the matching of the policies and creation of policy
  * sets.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public class PolicyManager {
@@ -67,7 +62,7 @@ public class PolicyManager {
     private static final Logger logger =
             LoggerFactory.getLogger(PolicyManager.class);
 
-    private PolicyDataManager policyDataManager = null;
+    private PolicyIndex policyIndex = null;
 
     private PolicyCombiningAlgorithm combiningAlg = null;
 
@@ -84,61 +79,38 @@ public class PolicyManager {
     /**
      * This constructor creates a PolicyManager instance. It takes a
      * PolicyFinder its argument. Its purpose is to obtain a set of policies
-     * from the Policy Store, match them against the evaluation context and
+     * from the Policy Index , match them against the evaluation context and
      * return a policy or policy set that conforms to the evaluation context.
-     * 
+     *
      * @param polFinder
      *        the policy finder
      * @throws URISyntaxException
-     * @throws {@link PolicyDataManagerException}
+     * @throws {@link PolicyStoreException}
      */
     public PolicyManager(PolicyFinder polFinder)
-            throws URISyntaxException, PolicyDataManagerException {
-        String home = MelcoePDP.PDP_HOME.getAbsolutePath();
+            throws URISyntaxException, PolicyIndexException {
 
-        String filename = home + "/conf/config-policy-manager.xml";
-        File f = new File(filename);
-        if (!f.exists()) {
-            throw new PolicyDataManagerException("Could not locate config file: "
-                    + f.getAbsolutePath());
-        }
-
-        try {
-            String policyDataManagerClassname = null;
             String policyCombiningAlgorithmClassname = null;
 
-            DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = factory.newDocumentBuilder();
-            Document doc = docBuilder.parse(new FileInputStream(f));
+        PolicyIndexFactory indexFactory = new PolicyIndexFactory();
 
-            NodeList nodes =
-                    doc.getElementsByTagName("PolicyManager").item(0)
-                            .getChildNodes();
-
-            for (int x = 0; x < nodes.getLength(); x++) {
-                Node node = nodes.item(x);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    if (node.getNodeName().equals("PolicyDataManager")) {
-                        policyDataManagerClassname =
-                                node.getFirstChild().getNodeValue();
-                    } else if (node.getNodeName()
-                            .equals("PolicyCombiningAlgorithm")) {
-                        policyCombiningAlgorithmClassname =
-                                node.getFirstChild().getNodeValue();
+        try {
+            policyIndex = indexFactory.newPolicyIndex();
+        } catch (PolicyIndexException e) {
+            throw new PolicyIndexException("Error getting PolicyIndex", e);
                     }
+        try {
+            policyCombiningAlgorithmClassname = Config.policyCombiningAlgorithmClassName();
+        } catch (PolicyConfigException e) {
+            throw new PolicyIndexException("Error reading config for PolicyCombiningAlgorithm", e);
                 }
-            }
-
-            policyDataManager =
-                    (PolicyDataManager) Class
-                            .forName(policyDataManagerClassname).newInstance();
+        try {
             combiningAlg =
                     (PolicyCombiningAlgorithm) Class
                             .forName(policyCombiningAlgorithmClassname)
                             .newInstance();
         } catch (Exception e) {
-            throw new PolicyDataManagerException(e);
+            throw new PolicyIndexException("Error instantiating PolicyCombiningAlgorithm", e);
         }
 
         policyReader = new PolicyReader(polFinder, null);
@@ -163,17 +135,17 @@ public class PolicyManager {
      * Obtains a policy or policy set of matching policies from the policy
      * store. If more than one policy is returned it creates a dynamic policy
      * set that contains all the applicable policies.
-     * 
+     *
      * @param eval
      *        the Evaluation Context
      * @return the Policy/PolicySet that applies to this EvaluationCtx
      * @throws TopLevelPolicyException
-     * @throws {@link PolicyDataManagerException}
+     * @throws {@link PolicyStoreException}
      */
     public AbstractPolicy getPolicy(EvaluationCtx eval)
-            throws TopLevelPolicyException, PolicyDataManagerException {
+            throws TopLevelPolicyException, PolicyIndexException {
         Map<String, byte[]> potentialPolicies =
-                policyDataManager.getPolicies(eval);
+                policyIndex.getPolicies(eval);
         logger.debug("Obtained policies: " + potentialPolicies.size());
 
         AbstractPolicy policy = matchPolicies(eval, potentialPolicies);
@@ -188,7 +160,7 @@ public class PolicyManager {
      * only the ones that match. If there is more than one policy, a new dynamic
      * policy set is created and returned. Otherwise the policy that is found is
      * returned.
-     * 
+     *
      * @param eval
      *        the Evaluation Context
      * @param policyList

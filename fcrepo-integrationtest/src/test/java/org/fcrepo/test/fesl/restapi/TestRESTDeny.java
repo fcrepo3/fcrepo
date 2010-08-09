@@ -14,14 +14,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.fcrepo.test.fesl.util.AuthorizationDeniedException;
-import org.fcrepo.test.fesl.util.DataUtils;
-import org.fcrepo.test.fesl.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import junit.framework.JUnit4TestAdapter;
 
+import org.fcrepo.test.fesl.util.AuthorizationDeniedException;
+import org.fcrepo.test.fesl.util.DataUtils;
+import org.fcrepo.test.fesl.util.HttpUtils;
+
+// FIXME: test currently not run; is this redundant as the main REST API tests will cover this if run when FeSL enabled?
 
 public class TestRESTDeny {
 

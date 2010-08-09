@@ -19,7 +19,9 @@
 package org.fcrepo.server.security.xacml.pep.rest.objectshandlers;
 
 import java.io.IOException;
+
 import java.net.URI;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,25 +29,26 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
-import org.fcrepo.server.security.xacml.util.LogUtil;
-
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.DateTimeAttribute;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+
 
 /**
  * Handles the PurgeDatastream operation.
- * 
+ *
  * @author nish.naidoo@gmail.com
  */
 public class PurgeDatastream
@@ -56,7 +59,7 @@ public class PurgeDatastream
 
     /**
      * Default constructor.
-     * 
+     *
      * @throws PEPException
      */
     public PurgeDatastream()
@@ -116,6 +119,13 @@ public class PurgeDatastream
             actions.put(Constants.ACTION.API.getURI(),
                         new StringAttribute(Constants.ACTION.APIM.getURI()
                                 .toASCIIString()));
+            // modifying the FeSL policy datastream requires policy management permissions
+            if (dsid != null && dsid.equals(FedoraPolicyStore.POLICY_DATASTREAM)) {
+                actions.put(Constants.ACTION.ID.getURI(),
+                            new StringAttribute(Constants.ACTION.MANAGE_POLICIES.getURI().toASCIIString()));
+
+            }
+
 
             req =
                     getContextHandler().buildRequest(getSubjects(request),

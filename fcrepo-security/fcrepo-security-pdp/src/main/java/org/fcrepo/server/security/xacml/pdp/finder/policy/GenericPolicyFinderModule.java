@@ -30,9 +30,10 @@ import com.sun.xacml.finder.PolicyFinder;
 import com.sun.xacml.finder.PolicyFinderModule;
 import com.sun.xacml.finder.PolicyFinderResult;
 
-import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.fcrepo.server.security.xacml.pdp.data.PolicyIndexException;
 
 /**
  * This is the PolicyFinderModule for the PDP. Its purpose is to basically find
@@ -78,7 +79,7 @@ public class GenericPolicyFinderModule
         } catch (URISyntaxException use) {
             logger.error("Error initialising DBPolicyFinderModule due to improper URI:",
                            use);
-        } catch (PolicyDataManagerException pdme) {
+        } catch (PolicyIndexException pdme) {
             logger.error("Error initialising DBPolicyFinderModule:", pdme);
         }
     }
@@ -105,7 +106,7 @@ public class GenericPolicyFinderModule
             return new PolicyFinderResult(policy);
         } catch (TopLevelPolicyException tlpe) {
             return new PolicyFinderResult(tlpe.getStatus());
-        } catch (PolicyDataManagerException pdme) {
+        } catch (PolicyIndexException pdme) {
             if (logger.isDebugEnabled()) {
                 logger.debug("problem processing policy", pdme);
             }

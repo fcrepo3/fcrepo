@@ -1,6 +1,4 @@
 /*
- * File: PolicyDataManagerException.java
- *
  * Copyright 2007 Macquarie E-Learning Centre Of Excellence
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,27 +16,27 @@
 
 package org.fcrepo.server.security.xacml.pdp.data;
 
-public class PolicyDataManagerException
+public class PolicyStoreException
         extends Exception {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
-    public PolicyDataManagerException() {
+    public PolicyStoreException() {
         super();
     }
 
-    public PolicyDataManagerException(String message) {
+    public PolicyStoreException(String message) {
         super(message);
     }
 
-    public PolicyDataManagerException(Throwable cause) {
+    public PolicyStoreException(Throwable cause) {
         super(cause);
     }
 
-    public PolicyDataManagerException(String message, Throwable cause) {
+    public PolicyStoreException(String message, Throwable cause) {
         super(message, cause);
     }
 }

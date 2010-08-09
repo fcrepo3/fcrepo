@@ -23,16 +23,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.fcrepo.server.security.xacml.pdp.data.DbXmlPolicyDataManager;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyDataManagerException;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyStore;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreFactory;
 import org.fcrepo.server.security.xacml.util.PolicyFileFilter;
 
 /**
@@ -45,13 +46,15 @@ public class TestPolicyDatabase {
 
     private static final String POLICY_HOME = "C:/Code/policies";
 
-    private static DbXmlPolicyDataManager dbXmlPolicyDataManager;
+    private static PolicyStore dbXmlPolicyDataManager;
 
     private static Set<String> policyNames = new HashSet<String>();
 
-    public static void main(String[] args) throws PolicyDataManagerException,
+    public static void main(String[] args) throws PolicyStoreException,
             FileNotFoundException {
-        dbXmlPolicyDataManager = new DbXmlPolicyDataManager();
+        PolicyStoreFactory f = new PolicyStoreFactory();
+        dbXmlPolicyDataManager = f.newPolicyStore();
+
         logger.info("Adding");
         add();
         logger.info("Listing");
@@ -70,7 +73,7 @@ public class TestPolicyDatabase {
         list();
     }
 
-    public static void add() throws PolicyDataManagerException,
+    public static void add() throws PolicyStoreException,
             FileNotFoundException {
         logger.info("Starting clock!");
         long time1 = System.nanoTime();
@@ -80,23 +83,23 @@ public class TestPolicyDatabase {
         logger.info("Time taken: " + (time2 - time1));
     }
 
-    public static void delete(String name) throws PolicyDataManagerException {
+    public static void delete(String name) throws PolicyStoreException {
         dbXmlPolicyDataManager.deletePolicy(name);
         policyNames.remove(name);
     }
 
-    public static void update() throws PolicyDataManagerException {
+    public static void update() throws PolicyStoreException {
         String name = "au:edu:mq:melcoe:ramp:fedora:xacml:2.0:policy:3";
         byte[] doc = dbXmlPolicyDataManager.getPolicy(name);
         dbXmlPolicyDataManager.updatePolicy(name, new String(doc));
     }
 
-    public static void get(String name) throws PolicyDataManagerException {
+    public static void get(String name) throws PolicyStoreException {
         byte[] doc = dbXmlPolicyDataManager.getPolicy(name);
         logger.info(new String(doc));
     }
 
-    public static void addDocuments() throws PolicyDataManagerException,
+    public static void addDocuments() throws PolicyStoreException,
             FileNotFoundException {
         File[] files = getPolicyFiles();
         for (File f : files) {
@@ -120,14 +123,14 @@ public class TestPolicyDatabase {
         }
     }
 
-    public static void list() throws PolicyDataManagerException {
+    public static void list() throws PolicyStoreException {
         List<String> docNames = dbXmlPolicyDataManager.listPolicies();
         for (String s : docNames) {
             logger.info("doc: " + s);
         }
     }
 
-    public static void clean() throws PolicyDataManagerException {
+    public static void clean() throws PolicyStoreException {
         Set<String> pn = new HashSet<String>(policyNames);
 
         for (String s : pn) {

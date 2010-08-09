@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<PolicyManager>
-	<PolicyDataManager>org.fcrepo.server.security.xacml.pdp.data.DbXmlPolicyDataManager</PolicyDataManager>
-	<PolicyCombiningAlgorithm>org.fcrepo.server.security.xacml.pdp.HierarchicalLowestChildDenyOverridesPolicyAlg</PolicyCombiningAlgorithm>
-</PolicyManager>

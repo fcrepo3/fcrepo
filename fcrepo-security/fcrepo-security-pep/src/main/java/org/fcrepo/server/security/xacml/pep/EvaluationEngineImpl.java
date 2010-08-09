@@ -25,10 +25,11 @@ import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -107,9 +108,15 @@ public class EvaluationEngineImpl
                 response = client.evaluate(r);
 
                 // Add this new result to the cache if caching is enabled
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Adding PDP evaluation results to cache");
+                }
                 if (responseCache != null) {
                     responseCache.addCacheItem(r, response);
                 }
+            } else if (logger.isDebugEnabled()) {
+                logger.debug("Item found in cache");
+
             }
 
             b = System.currentTimeMillis();
