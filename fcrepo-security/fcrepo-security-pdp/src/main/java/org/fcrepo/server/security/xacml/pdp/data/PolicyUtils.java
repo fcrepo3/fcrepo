@@ -24,6 +24,8 @@ import javax.xml.validation.Validator;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import org.xml.sax.SAXException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,15 +91,18 @@ public class PolicyUtils {
 
     public void validate(byte[] document, String name)
     throws MelcoePDPException {
-        try {
-            if (validator != null) {
-                log.debug("validating document: {}", name);
+        if (validator != null) {
+            log.debug("validating document: {}", name);
+            try {
                 validator
                 .validate(new StreamSource(new ByteArrayInputStream(document)));
+            } catch (SAXException e) {
+                // log error also for easier debugging of the actual validation error
+                log.error("Policy: " + name + " is invalid.  Validation error: \n" + e.getMessage());
+                throw new MelcoePDPException("Could not validate policy: " + name, e);
+            } catch (IOException e) {
+                throw new MelcoePDPException("Could not validate policy: " + name, e);
             }
-        } catch (Exception e) {
-            throw new MelcoePDPException("Could not validate policy: "
-                                                 + name, e);
         }
     }
 

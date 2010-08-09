@@ -315,21 +315,21 @@ extends AbstractInvocationHandler {
      * Add policy to cache/index
      * @param pid
      * @param dsContent
+     * @throws PolicyIndexException
+     * @throws IOException
      */
-    private void addPolicy(String pid, InputStream dsContent)  {
+    private void addPolicy(String pid, InputStream dsContent) throws PolicyIndexException  {
         LOG.debug("Adding policy " + pid);
 
         String policy;
+
         try {
             policy = IOUtils.toString(dsContent);
-        } catch (IOException e) {
-            LOG.error("Error reading object's policy datastream " + pid, e);
-            return;
-        }
-        try {
             policyIndex.addPolicy(policy, pid);
+        } catch (IOException e) {
+            throw new PolicyIndexException("Error adding policy " + pid + " to policy index", e);
         } catch (PolicyIndexException e) {
-            LOG.error("Error adding policy to cache " + pid, e);
+            throw new PolicyIndexException("Error adding policy " + pid + " to policy index", e);
         }
 
         // TODO: invalidate PEP cache here? - or do in all policyIndex.addPolicy ?
@@ -339,14 +339,15 @@ extends AbstractInvocationHandler {
     /**
      * Remove the specified policy from the cache
      * @param pid
+     * @throws PolicyIndexException
      */
-    private void deletePolicy(String pid)  {
+    private void deletePolicy(String pid) throws PolicyIndexException  {
         LOG.debug("Deleting policy " + pid);
 
         try {
             policyIndex.deletePolicy(pid);
         } catch (PolicyIndexException e) {
-            LOG.error("Error deleting policy from cache " + pid, e);
+            throw new PolicyIndexException("Error deleting policy " + pid + " from policy index", e);
         }
 
     }
@@ -355,21 +356,21 @@ extends AbstractInvocationHandler {
      * Update the specified policy in the cache with new content
      * @param pid
      * @param dsContent
+     * @throws PolicyIndexException
      */
-    private void updatePolicy(String pid, InputStream dsContent)  {
+    private void updatePolicy(String pid, InputStream dsContent) throws PolicyIndexException  {
         LOG.debug("Updating policy " + pid);
 
         String policy;
         try {
             policy = IOUtils.toString(dsContent);
         } catch (IOException e) {
-            LOG.error("Error reading object's policy datastream " + pid, e);
-            return;
+            throw new PolicyIndexException("Error updating policy " + pid + " in policy index", e);
         }
         try {
             policyIndex.updatePolicy(pid, policy);
         } catch (PolicyIndexException e) {
-            LOG.error("Error updating policy in cache " + pid, e);
+            throw new PolicyIndexException("Error updating policy " + pid + " in policy index", e);
         }
 
     }

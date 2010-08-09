@@ -21,20 +21,22 @@
 				</SubjectMatch>
 			</Subject>
 		</Subjects>
-		<Environment>
-			<EnvironmentMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
-				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">127.0.0.1</AttributeValue>
-				<EnvironmentAttributeDesignator
-					AttributeId="urn:fedora:names:fedora:2.1:environment:httpRequest:clientIpAddress"
-					DataType="http://www.w3.org/2001/XMLSchema#string" />
-			</EnvironmentMatch>
-			<EnvironmentMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
-				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">::1</AttributeValue>
-				<EnvironmentAttributeDesignator
-					AttributeId="urn:fedora:names:fedora:2.1:environment:httpRequest:clientIpAddress"
-					DataType="http://www.w3.org/2001/XMLSchema#string" />
-			</EnvironmentMatch>
-		</Environment>
+        <Environments>
+    		<Environment>
+    			<EnvironmentMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+    				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">127.0.0.1</AttributeValue>
+    				<EnvironmentAttributeDesignator
+    					AttributeId="urn:fedora:names:fedora:2.1:environment:httpRequest:clientIpAddress"
+    					DataType="http://www.w3.org/2001/XMLSchema#string" />
+    			</EnvironmentMatch>
+    			<EnvironmentMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+    				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">::1</AttributeValue>
+    				<EnvironmentAttributeDesignator
+    					AttributeId="urn:fedora:names:fedora:2.1:environment:httpRequest:clientIpAddress"
+    					DataType="http://www.w3.org/2001/XMLSchema#string" />
+    			</EnvironmentMatch>
+    		</Environment>
+        </Environments>
 	</Target>
 	<Rule Effect="Permit" RuleId="au:edu:mq:melcoe:ramp:fedora:xacml:2.0:rule:generic-permit" />
 </Policy>
