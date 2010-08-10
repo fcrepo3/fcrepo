@@ -455,28 +455,30 @@ public class TestHTTPStatusCodesConfigC
                 + "  </user>\n" + "</fedora-users>");
         addSystemWidePolicyFile("deny-all-if-unauthorized.xml",
                                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                                        + "<Policy xmlns=\"urn:oasis:names:tc:xacml:1.0:policy\"\n"
-                                        + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
-                                        + "    PolicyId=\"deny-all-if-unauthorized\""
-                                        + "    RuleCombiningAlgId=\"urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable\">\n"
-                                        + "  <Description>deny all api-a and api-m access if subject has fedoraRole unauthorized</Description>\n"
-                                        + "  <Target>\n"
-                                        + "    <Subjects>\n"
-                                        + "      <AnySubject/>\n"
-                                        + "    </Subjects>\n"
-                                        + "    <Resources>\n"
-                                        + "      <AnyResource/>\n"
-                                        + "    </Resources>\n"
-                                        + "    <Actions>\n"
-                                        + "      <AnyAction/>\n"
-                                        + "    </Actions>\n"
-                                        + "  </Target>\n"
-                                        + "  <Rule RuleId=\"1\" Effect=\"Deny\">\n"
-                                        + "    <Condition FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-is-in\">\n"
-                                        + "      <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">unauthorized</AttributeValue>\n"
-                                        + "      <SubjectAttributeDesignator AttributeId=\"fedoraRole\" DataType=\"http://www.w3.org/2001/XMLSchema#string\"/>\n"
-                                        + "    </Condition>\n" + "  </Rule>\n"
-                                        + "</Policy>");
+                                + "<Policy "
+                                + "xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" "
+                                + "xmlns:xacml-context=\"urn:oasis:names:tc:xacml:2.0:context:schema:os\" "
+                                + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                                + "xsi:schemaLocation=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os "
+                                + "http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd "
+                                + "urn:oasis:names:tc:xacml:2.0:context:schema:os "
+                                + "http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-context-schema-os.xsd\" "
+                                + "PolicyId=\"deny-all-if-unauthorized\" "
+                                + "RuleCombiningAlgId=\"urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides\">"
+                                + "  <Description>deny all api-a and api-m access if subject has fedoraRole unauthorized</Description>\n"
+                                + "  <Target>\n"
+                                + "    <Subjects>\n"
+                                + "      <Subject>\n"
+                                + "        <SubjectMatch MatchId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n"
+                                + "          <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">unauthorized</AttributeValue>\n"
+                                + "          <SubjectAttributeDesignator AttributeId=\"urn:fedora:names:fedora:2.1:subject:role\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" />\n"
+                                + "        </SubjectMatch>\n"
+                                + "      </Subject>\n"
+                                + "    </Subjects>\n"
+                                + "  </Target>\n"
+                                + "  <Rule RuleId=\"1\" Effect=\"Deny\"/>\n"
+                                + "</Policy>");
+
         reloadPolicies();
     }
 
@@ -563,7 +565,8 @@ public class TestHTTPStatusCodesConfigC
     }
 
     private static void reloadPolicies() throws Exception {
-        getClient(true, true, true).reloadPolicies();
+        // not needed for FeSL
+        //getClient(true, true, true).reloadPolicies();
     }
 
     private static void checkGetCode(FedoraClient client,

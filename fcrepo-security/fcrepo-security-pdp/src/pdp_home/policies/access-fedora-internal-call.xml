@@ -29,6 +29,8 @@
     					AttributeId="urn:fedora:names:fedora:2.1:environment:httpRequest:clientIpAddress"
     					DataType="http://www.w3.org/2001/XMLSchema#string" />
     			</EnvironmentMatch>
+    		</Environment>
+    		<Environment>
     			<EnvironmentMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
     				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">::1</AttributeValue>
     				<EnvironmentAttributeDesignator
