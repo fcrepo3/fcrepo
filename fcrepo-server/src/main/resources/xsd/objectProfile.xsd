@@ -20,6 +20,11 @@
 					<xs:restriction base="xs:string" />
 				</xs:simpleType>
 			</xs:attribute>
+            <xs:attribute name="dateTime" use="optional">
+                <xs:simpleType>
+                    <xs:restriction base="xs:dateTime" />
+                </xs:simpleType>
+            </xs:attribute>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="objCreateDate">
