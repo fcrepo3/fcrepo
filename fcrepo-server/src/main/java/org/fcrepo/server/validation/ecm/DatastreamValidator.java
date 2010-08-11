@@ -86,8 +86,8 @@ public class DatastreamValidator {
             validation.getDatastreamProblems().put(dsid, problems);
         }
 
-        //TODO some error code here?
-        problems.add("Datastream '" + dsid + "' is required by the content model '" + contentmodel + "'");
+
+        problems.add(Errors.missingRequiredDatastream(dsid,contentmodel));
         validation.setValid(false);
     }
 }

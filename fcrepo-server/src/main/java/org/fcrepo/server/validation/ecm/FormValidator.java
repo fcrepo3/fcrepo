@@ -55,9 +55,7 @@ public class FormValidator {
             }
             //TODO some error code here?
             String contentmodel = contentmodelReader.GetObjectPID();
-            problems.add(
-                    "Datastream '" + dsid + "' is does not have the FORMAT_URI and MIME_TYPE attributes required by '" +
-                    contentmodel + "'");
+            problems.add(Errors.invalidFormatURIorMimeType(dsid,contentmodel));
             validation.setValid(false);
         }
     }

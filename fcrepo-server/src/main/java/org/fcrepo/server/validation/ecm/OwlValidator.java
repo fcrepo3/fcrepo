@@ -6,6 +6,7 @@ import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.validation.ecm.jaxb.DsCompositeModel;
 import org.fcrepo.server.validation.ecm.jaxb.DsTypeModel;
@@ -112,29 +113,7 @@ public class OwlValidator {
         //Make a new restrition visitor.
         RestrictionVisitor restrictionVisitor =
                 new RestrictionVisitor(Collections.singleton(mergedOntology));
-        Datastream relsIntDS = currentObjectReader.GetDatastream("RELS-INT", asOfDateTime);
-        InputStream relsIntStream = null;
-        if (relsIntDS != null) {
-            relsIntStream = relsIntDS.getContentStream();
-        } else {
-            String emptyRelsInt = "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
-                                  "</rdf:RDF>";
-            relsIntStream = new ByteArrayInputStream(emptyRelsInt.getBytes());
-        }
-        Document relsint = DOM.streamToDOM(relsIntStream, true);
-
-        Datastream relsExtDS = currentObjectReader.GetDatastream("RELS-EXT", asOfDateTime);
-        InputStream relsExtStream;
-        if (relsExtDS != null) {
-            relsExtStream = relsExtDS.getContentStream();
-        } else {
-            String pid = currentObjectReader.GetObjectPID();
-            String emptyRelsExt = "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
-                                  "    <rdf:Description rdf:about=\"info:fedora/" + pid + "\"/>\n" +
-                                  "</rdf:RDF>";
-            relsExtStream = new ByteArrayInputStream(emptyRelsExt.getBytes());
-        }
-        Document relsext = DOM.streamToDOM(relsExtStream, true);
+        Set<RelationshipTuple> relations = currentObjectReader.getRelationships();
 
 
         for (String contentmodel : contentmodels) {
@@ -150,21 +129,23 @@ public class OwlValidator {
                     superCls.accept(restrictionVisitor);
                 }
                 String datastream = "info:fedora/" + currentObjectReader.GetObjectPID() + "/" + datastreamName;
+/*
                 NodeList relationsNodes = xpathselector
-                        .selectNodeList(relsint, "/rdf:RDF/rdf:Description[@rdf:about='" + datastream + "']/*");
-                checkMinCardinality(relationsNodes, restrictionVisitor, validation);
-                checkMaxCardinality(relationsNodes, restrictionVisitor, validation);
-                checkExactCardinality(relationsNodes, restrictionVisitor, validation);
-                checkSomeValuesFrom(relationsNodes, restrictionVisitor, validation, context);
-                checkAllValuesFrom(relationsNodes, restrictionVisitor, validation, context);
+                        .selectNodeList(relsint, "/rdf:RDF/rdf:Description[@rdf:about='" + datastream + "']*/
+/*");
+*/
+                Set<RelationshipTuple> relationsAbout = getRelationsSubjectTo(relations, datastream);
+
+                checkMinCardinality(datastream, relationsAbout, restrictionVisitor, validation);
+                checkMaxCardinality(datastream, relationsAbout, restrictionVisitor, validation);
+                checkExactCardinality(datastream, relationsAbout, restrictionVisitor, validation);
+                checkSomeValuesFrom(datastream, relationsAbout, restrictionVisitor, validation, context);
+                checkAllValuesFrom(datastream, relationsAbout, restrictionVisitor, validation, context);
                 restrictionVisitor.reset();
             }
+
         }
 
-        String qualpid = "info:fedora/" + currentObjectReader.GetObjectPID();
-        String xpathquery = "/rdf:RDF/rdf:Description[@rdf:about='" + qualpid + "']/*";
-        NodeList relationsNodes = xpathselector
-                .selectNodeList(relsext, xpathquery);
 
         for (String contentmodel : contentmodels) {
             IRI objectDeclaration = toIRI(contentmodel, null);
@@ -177,77 +158,55 @@ public class OwlValidator {
                 superCls.accept(restrictionVisitor);
             }
 
+            String pid = "info:fedora/" + currentObjectReader.GetObjectPID();
+            Set<RelationshipTuple> relationsAbout = getRelationsSubjectTo(relations, pid);
 
-            checkMinCardinality(relationsNodes, restrictionVisitor, validation);
-            checkMaxCardinality(relationsNodes, restrictionVisitor, validation);
-            checkExactCardinality(relationsNodes, restrictionVisitor, validation);
-            checkAllValuesFrom(relationsNodes, restrictionVisitor, validation, context);
-            checkSomeValuesFrom(relationsNodes, restrictionVisitor, validation, context);
+            checkMinCardinality(pid, relationsAbout, restrictionVisitor, validation);
+            checkMaxCardinality(pid, relationsAbout, restrictionVisitor, validation);
+            checkExactCardinality(pid, relationsAbout, restrictionVisitor, validation);
+            checkSomeValuesFrom(pid, relationsAbout, restrictionVisitor, validation, context);
+            checkAllValuesFrom(pid, relationsAbout, restrictionVisitor, validation, context);
             restrictionVisitor.reset();
         }
 
     }
 
-    private void checkAllValuesFrom(NodeList relationsNodes,
+    private Set<RelationshipTuple> getRelationsSubjectTo(Set<RelationshipTuple> relations, String datastream) {
+        HashSet<RelationshipTuple> found = new HashSet<RelationshipTuple>();
+        for (RelationshipTuple relation : relations) {
+            if (relation.subject.equals(datastream)){
+                found.add(relation);
+            }
+        }
+        return found;
+    }
+
+    private void checkAllValuesFrom(String subject, Set<RelationshipTuple> relations,
                                     RestrictionVisitor restrictionVisitor, Validation validation, Context context)
             throws ServerException {
-        if (relationsNodes == null) {
-            //not a problem
-            return;
-        }
 
         Map<OWLObjectProperty, OWLClass> map = restrictionVisitor.getAllValuesFrom();
         for (OWLObjectProperty owlObjectProperty : map.keySet()) {
             String ontologyrelation = owlObjectProperty.getIRI().toString();
             OWLClass requiredclass = map.get(owlObjectProperty);
+            String requiredTarget = requiredclass.getIRI().toString();
 
-
-            int count = 0;
-            for (int i = 0; i < relationsNodes.getLength(); i++) {
-                Node relation = relationsNodes.item(i);
-                String objectRelationName = relation.getNamespaceURI() + relation.getLocalName();//Qualified name
+            for (RelationshipTuple relation : relations) {
+                String objectRelationName = relation.predicate;
                 if (objectRelationName.equals(ontologyrelation)) {//This is one of the restricted relations
-                    Node targetNode = relation.getAttributes()
-                            .getNamedItemNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "resource");
-                    if (targetNode == null) {
-                        //broken relation
-                        continue;
-                    }
-                    String target = targetNode.getTextContent();
-                    if (!target.startsWith("info:fedora/")) {
-                        continue;
-                    } else {
-                        target = target.substring("info:fedora/".length());
-                    }
-                    int lastIndexOfSlash = target.lastIndexOf("/");
-                    String targetPid;
 
-                    String dsname = "";
-
-                    if (lastIndexOfSlash > 0) {//target is a datastream
-
-                        targetPid = target.substring(0, lastIndexOfSlash);
-                        dsname = target.substring(lastIndexOfSlash);
-                    } else { //target is an object
-                        targetPid = target;
-                    }
-                    DOReader targetReader = doMgr.getReader(false, context, targetPid);
-                    List<String> targetContentModels = targetReader.getContentModels();
-                    String requiredTarget = requiredclass.getIRI().toString().replace("#Class", "");
+                    String target = relation.object;
+                    List<String> classes = getClassesOfTarget(target, context);
                     boolean found = false;
-                    for (String targetContentModel : targetContentModels) {
-                        targetContentModel = targetContentModel + dsname;
-                        if (targetContentModel.equals(requiredTarget)) {
+                    for (String aClass : classes) {
+                        if (aClass.equals(requiredclass.getIRI().toString())){
                             found = true;
                             break;
                         }
                     }
                     if (found == false) {
                         validation.setValid(false);
-
-                        validation.getObjectProblems().add("The relation '" + relation.getNamespaceURI() +
-                                                           relation.getLocalName() + "' is restricted to values from " +
-                                                           "class '" + requiredTarget + "'");
+                        validation.getObjectProblems().add(Errors.allValuesFromViolation(subject, ontologyrelation,requiredTarget));
 
                     }
                 }
@@ -255,7 +214,37 @@ public class OwlValidator {
         }
     }
 
-    private void checkSomeValuesFrom(NodeList relationsNodes,
+    private List<String> getClassesOfTarget(String target, Context context) throws ServerException {
+
+        List<String> classes = new ArrayList<String>();
+        if (!target.startsWith("info:fedora/")) {
+            return new ArrayList<String>();
+        } else {
+            target = target.substring("info:fedora/".length());
+        }
+        int lastIndexOfSlash = target.lastIndexOf("/");
+        String targetPid;
+
+        String dsname = "";
+
+        if (lastIndexOfSlash > 0) {//target is a datastream
+
+            targetPid = target.substring(0, lastIndexOfSlash);
+            dsname = "/"+target.substring(lastIndexOfSlash+1);
+        } else { //target is an object
+            targetPid = target;
+        }
+        DOReader targetReader = doMgr.getReader(false, context, targetPid);
+        List<String> targetContentModels = targetReader.getContentModels();
+        for (String targetContentModel : targetContentModels) {
+            targetContentModel = targetContentModel +dsname+"#Class";
+            classes.add(targetContentModel);
+        }
+        return classes;
+
+    }
+
+    private void checkSomeValuesFrom(String subject, Set<RelationshipTuple> relations,
                                      RestrictionVisitor restrictionVisitor, Validation validation, Context context)
             throws ServerException {
 
@@ -263,115 +252,79 @@ public class OwlValidator {
         for (OWLObjectProperty owlObjectProperty : map.keySet()) {
             String ontologyrelation = owlObjectProperty.getIRI().toString();
             OWLClass requiredclass = map.get(owlObjectProperty);
-            String requiredTarget = requiredclass.getIRI().toString().replace("#Class", "");
+            String requiredTarget = requiredclass.getIRI().toString();
 
-            if (relationsNodes == null) {
-                validation.setValid(false);
-
-                validation.getObjectProblems().add("The relation '" + ontologyrelation + "' should have at least one" +
-                                                   "value from the from the" +
-                                                   "class '" + requiredTarget + "' and exist at least once");
-                continue;
-            }
-            int count = countRelations(ontologyrelation, relationsNodes);
+            int count = countRelations(ontologyrelation, relations);
             if (count < 1) {
                 validation.setValid(false);
 
-                validation.getObjectProblems().add("The relation '" + ontologyrelation + "' should have at least one" +
-                                                   "value from the from the" +
-                                                   "class '" + requiredTarget + "' and exist at least once");
+                validation.getObjectProblems().add(Errors.someValuesFromViolationNoSuchRelation(subject, ontologyrelation,requiredTarget));
                 continue;
             }
 
+
             boolean found = false;
-            for (int i = 0; i < relationsNodes.getLength(); i++) {
-                Node relation = relationsNodes.item(i);
-                String objectRelationName = relation.getNamespaceURI() + relation.getLocalName();//Qualified name
+            for (RelationshipTuple relation : relations) {
+                String objectRelationName = relation.predicate;
                 if (objectRelationName.equals(ontologyrelation)) {//This is one of the restricted relations
-                    Node targetNode = relation.getAttributes()
-                            .getNamedItemNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "resource");
-                    if (targetNode == null) {
-                        //TODO broken relation
-                        continue;
-                    }
-                    String target = targetNode.getTextContent();
-                    if (!target.startsWith("info:fedora/")) {
-                        continue;
-                    } else {
-                        target = target.substring("info:fedora/".length());
-                    }
-                    int lastIndexOfSlash = target.lastIndexOf("/");
-                    String targetPid;
 
-                    String dsname = "";
+                    String target = relation.object;
+                    List<String> classes = getClassesOfTarget(target, context);
 
-                    if (lastIndexOfSlash > 0) {//target is a datastream
-
-                        targetPid = target.substring(0, lastIndexOfSlash - 1);
-                        dsname = target.substring(lastIndexOfSlash);
-                    } else { //target is an object
-                        targetPid = target;
-                    }
-                    DOReader targetReader = doMgr.getReader(false, context, targetPid);
-                    List<String> targetContentModels = targetReader.getContentModels();
-
-
-                    for (String targetContentModel : targetContentModels) {
-                        targetContentModel = targetContentModel + dsname;
-                        if (targetContentModel.equals(requiredTarget)) {
+                    for (String aClass : classes) {
+                        if (aClass.equals(requiredclass.getIRI().toString())){
                             found = true;
                             break;
                         }
+                    }
+                    if (found == false) {
+                        validation.setValid(false);
+                        validation.getObjectProblems().add(
+                                Errors.someValuesFromViolationWrongClassOfTarget(subject,
+                                                                                 ontologyrelation,
+                                                                                 requiredTarget));
                     }
                     if (found) {
                         break;
                     }
                 }
             }
-            if (found == false) {
-                validation.setValid(false);
-
-                validation.getObjectProblems().add("The relation '" + ontologyrelation + "' should have at least one" +
-                                                   "value from the from the" +
-                                                   "class '" + requiredTarget + "'");
-
-            }
         }
 
 
     }
 
 
-    private void checkMinCardinality(NodeList relationsNodes,
+    private void checkMinCardinality(String subject, Set<RelationshipTuple> relations,
                                      RestrictionVisitor restrictionVisitor, Validation validation) {
 
         Map<OWLObjectProperty, Integer> map = restrictionVisitor.getMinCardinality();
         for (OWLObjectProperty owlObjectProperty : map.keySet()) {
             String ontologyrelation = owlObjectProperty.getIRI().toString();
-            int count = countRelations(ontologyrelation, relationsNodes);
+            int count = countRelations(ontologyrelation, relations);
             int min = map.get(owlObjectProperty);
             if (count < min) {
                 validation.setValid(false);
                 validation.getObjectProblems()
-                        .add("The relation '" + ontologyrelation + "' should at least exist '" + min + "' times.");
+                        .add(Errors.minCardinalityViolation(subject, ontologyrelation,min));
             }
         }
 
 
     }
 
-    private void checkMaxCardinality(NodeList relationsNodes,
+    private void checkMaxCardinality(String subject, Set<RelationshipTuple> relations,
                                      RestrictionVisitor restrictionVisitor, Validation validation) {
 
         Map<OWLObjectProperty, Integer> map = restrictionVisitor.getMaxCardinality();
         for (OWLObjectProperty owlObjectProperty : map.keySet()) {
             String ontologyrelation = owlObjectProperty.getIRI().toString();
-            int count = countRelations(ontologyrelation, relationsNodes);
+            int count = countRelations(ontologyrelation, relations);
             int max = map.get(owlObjectProperty);
             if (count > max) {
                 validation.setValid(false);
                 validation.getObjectProblems()
-                        .add("The relation '" + ontologyrelation + "' should exist at most '" + max + "' times.");
+                        .add(Errors.maxCardinalityViolation(subject, ontologyrelation,max));
             }
         }
 
@@ -379,23 +332,19 @@ public class OwlValidator {
     }
 
 
-    private void checkExactCardinality(NodeList relationsNodes,
+    private void checkExactCardinality(String subject, Set<RelationshipTuple> relations,
                                        RestrictionVisitor restrictionVisitor, Validation validation) {
 
         Map<OWLObjectProperty, Integer> map = restrictionVisitor.getCardinality();
         for (OWLObjectProperty owlObjectProperty : map.keySet()) {
             String ontologyrelation = owlObjectProperty.getIRI().toString();
             int count;
-            if (relationsNodes != null) {
-                count = countRelations(ontologyrelation, relationsNodes);
-            } else {
-                count = 0;
-            }
+            count = countRelations(ontologyrelation, relations);
             Integer exact = map.get(owlObjectProperty);
             if (count != exact) {
                 validation.setValid(false);
                 validation.getObjectProblems()
-                        .add("The relation '" + ontologyrelation + "' should exist exactly '" + exact + "' times.");
+                        .add(Errors.exactCardinalityViolation(subject, ontologyrelation,exact));
             }
         }
 
@@ -410,21 +359,19 @@ public class OwlValidator {
      * @param objectRelations the list of relations
      * @return the number of relations with relationName in the list
      */
-    private int countRelations(String relationName, NodeList objectRelations) {
+    private int countRelations(String relationName, Set<RelationshipTuple> objectRelations) {
 
         int count = 0;
         if (objectRelations == null) {
             return 0;
         }
-        for (int i = 0; i < objectRelations.getLength(); i++) {
-            Node relation = objectRelations.item(i);
-            String objectRelationName = relation.getNamespaceURI() + relation.getLocalName();//Qualified name
-            if (objectRelationName.equals(relationName)) {//This is one of the restricted relations
+        for (RelationshipTuple objectRelation : objectRelations) {
+            if (objectRelation.predicate.equals(relationName)) {//This is one of the restricted relations
                 count++;
             }
+
         }
         return count;
-
     }
 
 
