@@ -27,13 +27,12 @@ public class DatastreamValidator {
 
     private FormValidator formValidator;
     private RepositoryReader doMgr;
-    private RelsIntValidator relsIntValidator;
+
 
     public DatastreamValidator(RepositoryReader doMgr) {
         this.doMgr = doMgr;
         schemaValidator = new SchemaValidator(doMgr);
         formValidator = new FormValidator();
-        relsIntValidator = new RelsIntValidator(doMgr);
     }
 
     public void validate(Context context, DOReader currentObjectReader, Date asOfDateTime,
@@ -74,8 +73,6 @@ public class DatastreamValidator {
                 formValidator.checkFormAndMime(typeModel, objectDatastream, validation, contentmodelReader);
                 schemaValidator
                         .validate(context, typeModel, objectDatastream, validation, contentmodelReader, asOfDateTime);
-                relsIntValidator
-                        .checkRelsInt(typeModel, objectDatastream, validation, contentmodelReader, asOfDateTime);
             }
         }
 
@@ -89,8 +86,8 @@ public class DatastreamValidator {
             validation.getDatastreamProblems().put(dsid, problems);
         }
 
-        //TODO some error code here?
-        problems.add("Datastream '" + dsid + "' is required by the content model '" + contentmodel + "'");
+
+        problems.add(Errors.missingRequiredDatastream(dsid,contentmodel));
         validation.setValid(false);
     }
 }

@@ -51,16 +51,19 @@
                         xmlns:owl="http://www.w3.org/2002/07/owl#"
                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0_class">
+                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#Class">
                         <rdfs:subClassOf>
                             <owl:Restriction>
                                 <owl:onProperty
                                         rdf:resource="info:fedora/fedora-system:def/model#hasService"/>
                                 <owl:allValuesFrom
-                                        rdf:resource="info:fedora/fedora-system:ServiceDefinition-3.0_class"/>
+                                        rdf:resource="info:fedora/fedora-system:ServiceDefinition-3.0#Class"/>
                             </owl:Restriction>
                         </rdfs:subClassOf>
                     </owl:Class>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0/RELS-EXT#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0/DS-COMPOSITE-MODEL#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0/ONTOLOGY#Class"/>
                     <owl:ObjectProperty
                             rdf:about="info:fedora/fedora-system:def/model#hasService"/>
                 </rdf:RDF>
@@ -221,7 +224,7 @@
                     <xs:complexType name="RDFType">
                         <xs:sequence>
                             <xs:element ref="owl:Class" xmlns:owl="http://www.w3.org/2002/07/owl#" minOccurs="1"
-                                        maxOccurs="1"/>
+                                        maxOccurs="unbounded"/>
                             <xs:element ref="owl:ObjectProperty" xmlns:owl="http://www.w3.org/2002/07/owl#"
                                         minOccurs="0" maxOccurs="unbounded"/>
                         </xs:sequence>

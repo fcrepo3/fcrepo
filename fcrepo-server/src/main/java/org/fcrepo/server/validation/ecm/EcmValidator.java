@@ -24,7 +24,7 @@ public class EcmValidator {
     private static final XPath xpathCompiler =
             XPathFactory.newInstance().newXPath();
 
-    private RelsExtValidator relsExtValidator;
+    private OwlValidator relsExtValidator;
 
 
     private DatastreamValidator datastreamValidator;
@@ -32,7 +32,7 @@ public class EcmValidator {
     public EcmValidator(RepositoryReader doMgr) {
 
         this.doMgr = doMgr;
-        relsExtValidator = new RelsExtValidator(doMgr);
+        relsExtValidator = new OwlValidator(doMgr);
 
         datastreamValidator = new DatastreamValidator(doMgr);
     }

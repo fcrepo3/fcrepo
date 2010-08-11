@@ -43,6 +43,26 @@
         </foxml:datastreamVersion>
     </foxml:datastream>
 
+    <foxml:datastream CONTROL_GROUP="X" ID="RELS-INT" STATE="A" VERSIONABLE="false">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
+                                 FORMAT_URI="info:fedora/fedora-system:FedoraRELSInt-1.0" ID="RELS-INT1.0"
+                                 LABEL="RDF Statements about datastreams in this object" MIMETYPE="application/rdf+xml">
+            <foxml:xmlContent>
+                <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                    <rdf:Description rdf:about="info:fedora/demo:dataObject1/Demo1Stream1">
+                        <demorelation1 xmlns="http://demo.relations.are.us/#"
+                                       rdf:resource="info:fedora/demo:dataObject2"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="info:fedora/demo:dataObject1/Demo1Stream2">
+                        <demorelation2 xmlns="http://demo.relations.are.us/#"
+                                       rdf:resource="info:fedora/demo:dataObject1/Demo1Stream1"/>
+                    </rdf:Description>
+                </rdf:RDF>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+
 
     <foxml:datastream CONTROL_GROUP="X" ID="Demo1Stream1" STATE="A" VERSIONABLE="false">
         <foxml:datastreamVersion ID="Demo1Stream11.0" LABEL="OAI DC xml schema" MIMETYPE="text/xml"

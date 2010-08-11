@@ -48,7 +48,9 @@
                         xmlns:owl="http://www.w3.org/2002/07/owl#"
                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDefinition-3.0_class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDefinition-3.0#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDefinition-3.0/RELS-EXT#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDefinition-3.0/METHODMAP#Class"/>
                 </rdf:RDF>
             </foxml:xmlContent>
         </foxml:datastreamVersion>

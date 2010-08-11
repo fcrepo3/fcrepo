@@ -119,11 +119,7 @@ public class SchemaValidator {
         try {
             schema = schemaFactory.newSchema(new StreamSource(schemaStream));
         } catch (SAXException e) {
-            problems.add(
-                    "Content Model error: Unable to parse the validation "
-                    + "schema '" + schemaID + "'for datastream '" + datastreamID + "' from content model '" +
-                    contentModel + "'." +
-                    "The following error was encountered '" + e.getMessage() + "'");
+            problems.add(Errors.unableToParseSchema(schemaID,datastreamID,contentModel,e));
             return problems;
         }
         try {
@@ -131,14 +127,9 @@ public class SchemaValidator {
             validator.setErrorHandler(errorhandler);
             validator.validate(new StreamSource(objectStream));
         } catch (SAXException e) {
-            problems.add(
-                    "Data error: Invalid content in datastream '" + datastreamID + "', in regards to " +
-                    "schema '" + schemaID + "' the content model '" + contentModel + "'"
-                    + "'. " + e.getMessage());
+            problems.add(Errors.invalidContentInDatastream(datastreamID,schemaID,contentModel,e));
         } catch (IOException e) {
-            problems.add(
-                    "Data error: Unable to read datastream '" +
-                    datastreamID + "'. " + e.getMessage());
+            problems.add(Errors.unableToReadDatastream(datastreamID,e));
         }
         return problems;
     }
@@ -321,23 +312,17 @@ public class SchemaValidator {
         @Override
         public void warning(SAXParseException exception) throws SAXException {
             //TODO should these be reported?
-            problems.add("Encountered schema validation warning while parsing datastream '" + datastreamID +
-                         "' with the schema '" + schemaID + "' from content model '" + contentModel +
-                         "'. The warning was '" + exception.getLocalizedMessage() + "'");
+            problems.add(Errors.schemaValidationWarning(datastreamID,schemaID,contentModel,exception));
         }
 
         @Override
         public void error(SAXParseException exception) throws SAXException {
-            problems.add("Encountered schema validation error while parsing datastream '" + datastreamID +
-                         "' with the schema '" + schemaID + "' from content model '" + contentModel +
-                         "'. The error was '" + exception.getLocalizedMessage() + "'");
+            problems.add(Errors.schemaValidationError(datastreamID,schemaID,contentModel,exception));
         }
 
         @Override
         public void fatalError(SAXParseException exception) throws SAXException {
-            problems.add("Encountered schema validation fatal error while parsing datastream '" + datastreamID +
-                         "' with the schema '" + schemaID + "' from content model '" + contentModel +
-                         "'. The fatal error was '" + exception.getLocalizedMessage() + "'");
+            problems.add(Errors.schemaValidationFatalError(datastreamID,schemaID,contentModel,exception));
         }
 
     }
