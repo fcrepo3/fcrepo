@@ -369,7 +369,7 @@ public class SimpleDOReader
      * {@inheritDoc}
      */
     public String[] getObjectHistory(String PID) {
-        String[] dsIDs = ListDatastreamIDs("A");
+        String[] dsIDs = ListDatastreamIDs(null);
         TreeSet<String> modDates = new TreeSet<String>();
         for (String element : dsIDs) {
             Date[] dsDates = getDatastreamVersions(element);
