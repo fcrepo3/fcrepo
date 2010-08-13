@@ -50,12 +50,12 @@
                         xmlns:owl="http://www.w3.org/2002/07/owl#"
                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-                    <owl:Class rdf:about="info:fedora/demo:contentModel1#">
+                    <owl:Class rdf:about="info:fedora/demo:contentModel1#class">
                         <rdfs:subClassOf>
                             <owl:Restriction>
                                 <owl:onProperty
                                         rdf:resource="http://demo.relations.are.us/#demorelation1"/>
-                                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel2#"/>
+                                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel2#class"/>
                             </owl:Restriction>
                         </rdfs:subClassOf>
                         <rdfs:subClassOf>
@@ -83,12 +83,12 @@
                             </owl:Restriction>
                         </rdfs:subClassOf>
                     </owl:Class>
-                    <owl:Class rdf:about="info:fedora/demo:contentModel1#datastreams/Demo1Stream1">
+                    <owl:Class rdf:about="info:fedora/demo:contentModel1#datastreams/Demo1Stream1/class">
                         <rdfs:subClassOf>
                             <owl:Restriction>
                                 <owl:onProperty
                                         rdf:resource="http://demo.relations.are.us/#demorelation1"/>
-                                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel2#"/>
+                                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel2#class"/>
                             </owl:Restriction>
                         </rdfs:subClassOf>
                         <rdfs:subClassOf>
@@ -108,7 +108,7 @@
                             </owl:Restriction>
                         </rdfs:subClassOf>
                     </owl:Class>
-                    <owl:Class rdf:about="info:fedora/demo:contentModel1#datastreams/Demo1Stream2">
+                    <owl:Class rdf:about="info:fedora/demo:contentModel1#datastreams/Demo1Stream2/class">
                         <rdfs:subClassOf>
                             <owl:Restriction>
                                 <owl:onProperty
@@ -121,7 +121,7 @@
                             <owl:Restriction>
                                 <owl:onProperty
                                         rdf:resource="http://demo.relations.are.us/#demorelation2"/>
-                                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel1#datastreams/Demo1Stream1"/>
+                                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel1#datastreams/Demo1Stream1/class"/>
                             </owl:Restriction>
                         </rdfs:subClassOf>
                         <rdfs:subClassOf>

@@ -50,20 +50,20 @@
                         xmlns:owl="http://www.w3.org/2002/07/owl#"
                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#">
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#class">
                         <rdfs:subClassOf>
                             <owl:Restriction>
                                 <owl:onProperty
                                         rdf:resource="info:fedora/fedora-system:def/model#hasModel"/>
-                                <owl:allValuesFrom rdf:resource="info:fedora/fedora-system:ContentModel-3.0#"/>
+                                <owl:allValuesFrom rdf:resource="info:fedora/fedora-system:ContentModel-3.0#class"/>
                             </owl:Restriction>
                         </rdfs:subClassOf>
                     </owl:Class>
-                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/DC"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/RELS-EXT"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/RELS-INT"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/POLICY"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/AUDIT"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/DC/class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/RELS-EXT/class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/RELS-INT/class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/POLICY/class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/AUDIT/class"/>
                     <owl:ObjectProperty
                             rdf:about="info:fedora/fedora-system:def/model#hasModel"/>
                 </rdf:RDF>

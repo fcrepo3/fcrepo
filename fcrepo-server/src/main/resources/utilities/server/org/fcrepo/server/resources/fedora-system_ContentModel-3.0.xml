@@ -51,19 +51,19 @@
                         xmlns:owl="http://www.w3.org/2002/07/owl#"
                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#">
+                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#class">
                         <rdfs:subClassOf>
                             <owl:Restriction>
                                 <owl:onProperty
                                         rdf:resource="info:fedora/fedora-system:def/model#hasService"/>
                                 <owl:allValuesFrom
-                                        rdf:resource="info:fedora/fedora-system:ServiceDefinition-3.0#"/>
+                                        rdf:resource="info:fedora/fedora-system:ServiceDefinition-3.0#class"/>
                             </owl:Restriction>
                         </rdfs:subClassOf>
                     </owl:Class>
-                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#datastreams/RELS-EXT"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#datastreams/DS-COMPOSITE-MODEL"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#datastreams/ONTOLOGY"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#datastreams/RELS-EXT/class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#datastreams/DS-COMPOSITE-MODEL/class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#datastreams/ONTOLOGY/class"/>
                     <owl:ObjectProperty
                             rdf:about="info:fedora/fedora-system:def/model#hasService"/>
                 </rdf:RDF>
