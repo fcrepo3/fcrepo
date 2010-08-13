@@ -48,6 +48,7 @@ public class EcmValidator {
 
         List<String> contentmodels = currentObjectReader.getContentModels();
         Validation validation = new Validation(pid);
+        validation.setAsOfDateTime(asOfDateTime);
         validation.setContentModels(contentmodels);
 
         relsExtValidator.validate(context, asOfDateTime, currentObjectReader, validation);
