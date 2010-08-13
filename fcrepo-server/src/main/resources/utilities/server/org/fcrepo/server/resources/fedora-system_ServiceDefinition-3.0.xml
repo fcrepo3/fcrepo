@@ -48,9 +48,9 @@
                         xmlns:owl="http://www.w3.org/2002/07/owl#"
                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDefinition-3.0#Class"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDefinition-3.0/RELS-EXT#Class"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDefinition-3.0/METHODMAP#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDefinition-3.0#"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDefinition-3.0#datastreams/RELS-EXT"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDefinition-3.0#datastreams/METHODMAP"/>
                 </rdf:RDF>
             </foxml:xmlContent>
         </foxml:datastreamVersion>
@@ -69,7 +69,7 @@
                     <dsTypeModel ID="METHODMAP">
                         <form FORMAT_URI="info:fedora/fedora-system:FedoraSDefMethodMap-1.0" MIME="text/xml"/>
                         <extension name="SCHEMA">
-                            <reference type="xsd" datastream="METHODMAP-SCHEMA"/>
+                            <reference type="datastream" value="METHODMAP-SCHEMA"/>
                         </extension>
                     </dsTypeModel>
                 </dsCompositeModel>

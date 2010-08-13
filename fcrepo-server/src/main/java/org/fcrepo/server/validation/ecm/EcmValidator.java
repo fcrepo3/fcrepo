@@ -3,6 +3,7 @@ package org.fcrepo.server.validation.ecm;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.DOReader;
+import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.Validation;
 
@@ -20,6 +21,7 @@ import java.util.List;
  */
 public class EcmValidator {
     private RepositoryReader doMgr;
+    private ExternalContentManager m_exExternalContentManager;
 
     private static final XPath xpathCompiler =
             XPathFactory.newInstance().newXPath();
@@ -29,12 +31,13 @@ public class EcmValidator {
 
     private DatastreamValidator datastreamValidator;
 
-    public EcmValidator(RepositoryReader doMgr) {
+    public EcmValidator(RepositoryReader doMgr, ExternalContentManager m_exExternalContentManager) {
 
         this.doMgr = doMgr;
+        this.m_exExternalContentManager = m_exExternalContentManager;
         relsExtValidator = new OwlValidator(doMgr);
 
-        datastreamValidator = new DatastreamValidator(doMgr);
+                datastreamValidator = new DatastreamValidator(doMgr);
     }
 
     public Validation validate(Context context, String pid, Date asOfDateTime)
@@ -49,7 +52,7 @@ public class EcmValidator {
 
         relsExtValidator.validate(context, asOfDateTime, currentObjectReader, validation);
 
-        datastreamValidator.validate(context, currentObjectReader, asOfDateTime, validation);
+        datastreamValidator.validate(context, currentObjectReader, asOfDateTime, validation, m_exExternalContentManager);
 
         return validation;
     }

@@ -129,7 +129,7 @@
                 <version>2.4.2</version>
 
                 <configuration>
-                    <!--                    <forkMode>never</forkMode>-->
+                                        <!--<forkMode>never</forkMode>-->
 
 
                     <systemProperties>

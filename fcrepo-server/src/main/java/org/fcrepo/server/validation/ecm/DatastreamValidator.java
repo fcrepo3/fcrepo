@@ -3,6 +3,7 @@ package org.fcrepo.server.validation.ecm;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.DOReader;
+import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.Validation;
@@ -36,7 +37,7 @@ public class DatastreamValidator {
     }
 
     public void validate(Context context, DOReader currentObjectReader, Date asOfDateTime,
-                         Validation validation) throws ServerException {
+                         Validation validation, ExternalContentManager m_exExternalContentManager) throws ServerException {
 
 
         // /Datastream validation stuff
@@ -72,7 +73,7 @@ public class DatastreamValidator {
 
                 formValidator.checkFormAndMime(typeModel, objectDatastream, validation, contentmodelReader);
                 schemaValidator
-                        .validate(context, typeModel, objectDatastream, validation, contentmodelReader, asOfDateTime);
+                        .validate(context, typeModel, objectDatastream, validation, contentmodelReader, asOfDateTime,m_exExternalContentManager);
             }
         }
 

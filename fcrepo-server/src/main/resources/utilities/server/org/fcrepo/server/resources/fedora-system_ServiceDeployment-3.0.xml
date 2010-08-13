@@ -50,26 +50,26 @@
                         xmlns:owl="http://www.w3.org/2002/07/owl#"
                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0#Class">
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0#">
                         <rdfs:subClassOf>
                             <owl:Restriction>
                                 <owl:onProperty
                                         rdf:resource="info:fedora/fedora-system:def/model#isDeploymentOf"/>
                                 <owl:allValuesFrom
-                                        rdf:resource="info:fedora/fedora-system:ServiceDefinition-3.0#Class"/>
+                                        rdf:resource="info:fedora/fedora-system:ServiceDefinition-3.0#"/>
                             </owl:Restriction>
                         </rdfs:subClassOf>
                         <rdfs:subClassOf>
                             <owl:Restriction>
                                 <owl:onProperty
                                         rdf:resource="info:fedora/fedora-system:def/model#isContractorOf"/>
-                                <owl:allValuesFrom rdf:resource="info:fedora/fedora-system:ContentModel-3.0#Class"/>
+                                <owl:allValuesFrom rdf:resource="info:fedora/fedora-system:ContentModel-3.0#"/>
                             </owl:Restriction>
                         </rdfs:subClassOf>
                     </owl:Class>
-                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0/METHODMAP#Class"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0/DSINPUTSPEC#Class"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0/WSDL#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0#datastreams/METHODMAP"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0#datastreams/DSINPUTSPEC"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ServiceDeployment-3.0#datastreams/WSDL"/>
                     <owl:ObjectProperty
                             rdf:about="info:fedora/fedora-system:def/model#isDeploymentOf"/>
                     <owl:ObjectProperty
@@ -100,7 +100,7 @@
                                                 </extension>
                         -->
                         <extension name="SCHEMA">
-                            <reference type="xsd" datastream="METHODMAP-1.1-SCHEMA"/>
+                            <reference type="datastream" value="METHODMAP-1.1-SCHEMA"/>
                         </extension>
                     </dsTypeModel>
                     <dsTypeModel ID="DSINPUTSPEC">
@@ -114,13 +114,13 @@
                                                 </extension>
                         -->
                         <extension name="SCHEMA">
-                            <reference type="xsd" datastream="DSINPUTSPEC-1.1-SCHEMA"/>
+                            <reference type="datastream" value="DSINPUTSPEC-1.1-SCHEMA"/>
                         </extension>
                     </dsTypeModel>
                     <dsTypeModel ID="WSDL">
                         <form FORMAT_URI="http://schemas.xmlsoap.org/wsdl/" MIME="text/xml"/>
                         <extension name="SCHEMA">
-                            <reference type="xsd" datastream="WSDL-SCHEMA"/>
+                            <reference type="datastream" value="WSDL-SCHEMA"/>
                         </extension>
                     </dsTypeModel>
                 </dsCompositeModel>

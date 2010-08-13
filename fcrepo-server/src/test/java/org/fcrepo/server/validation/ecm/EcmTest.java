@@ -50,7 +50,7 @@ public class EcmTest extends TestCase {
 
     @Test
     public void testEcm1() throws Exception {
-        EcmValidator ecm = new EcmValidator(reader);
+        EcmValidator ecm = new EcmValidator(reader,null);
 
         Validation validation1 = ecm.validate(null, "demo:dataObject1", null);
         assertTrue("Dataobject1 failed validation: " + objectValidationToXml(validation1), validation1.isValid());
@@ -59,7 +59,7 @@ public class EcmTest extends TestCase {
 
     @Test
     public void testEcm2() throws Exception {
-        EcmValidator ecm = new EcmValidator(reader);
+        EcmValidator ecm = new EcmValidator(reader,null);
 
 
         Validation validation2 = ecm.validate(null, "demo:dataObject2", null);
@@ -69,7 +69,7 @@ public class EcmTest extends TestCase {
 
     @Test
     public void testEcm3() throws Exception {
-        EcmValidator ecm = new EcmValidator(reader);
+        EcmValidator ecm = new EcmValidator(reader,null);
 
         Validation validation3 = ecm.validate(null, "demo:contentModel1", null);
         assertTrue("contentmodel1 failed validation: " + objectValidationToXml(validation3), validation3.isValid());
@@ -78,7 +78,7 @@ public class EcmTest extends TestCase {
 
     @Test
     public void testEcm4() throws Exception {
-        EcmValidator ecm = new EcmValidator(reader);
+        EcmValidator ecm = new EcmValidator(reader,null);
 
         Validation validation3 = ecm.validate(null, "demo:dataObject3", null);
         assertFalse("DataObject3 succeeded validation: " + objectValidationToXml(validation3), validation3.isValid());
@@ -87,7 +87,7 @@ public class EcmTest extends TestCase {
 
     @Test
     public void testEcm5() throws Exception {
-        EcmValidator ecm = new EcmValidator(reader);
+        EcmValidator ecm = new EcmValidator(reader,null);
 
         Validation validation3 = ecm.validate(null, "demo:dataObject5", null);
         assertFalse("DataObject5 succeeded validation: " + objectValidationToXml(validation3), validation3.isValid());
@@ -96,7 +96,7 @@ public class EcmTest extends TestCase {
 
     @Test
     public void testEcm6() throws Exception {
-        EcmValidator ecm = new EcmValidator(reader);
+        EcmValidator ecm = new EcmValidator(reader,null);
 
         Validation validation3 = ecm.validate(null, "demo:dataObject6", null);
         assertFalse("DataObject6 succeeded validation: " + objectValidationToXml(validation3), validation3.isValid());
@@ -105,7 +105,7 @@ public class EcmTest extends TestCase {
 
     @Test
     public void testEcm7() throws Exception {
-        EcmValidator ecm = new EcmValidator(reader);
+        EcmValidator ecm = new EcmValidator(reader,null);
 
         Validation validation3 = ecm.validate(null, "demo:dataObject7", null);
         assertFalse("DataObject7 succeeded validation: " + objectValidationToXml(validation3), validation3.isValid());

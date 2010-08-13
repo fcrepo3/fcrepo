@@ -51,19 +51,19 @@
                         xmlns:owl="http://www.w3.org/2002/07/owl#"
                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#Class">
+                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#">
                         <rdfs:subClassOf>
                             <owl:Restriction>
                                 <owl:onProperty
                                         rdf:resource="info:fedora/fedora-system:def/model#hasService"/>
                                 <owl:allValuesFrom
-                                        rdf:resource="info:fedora/fedora-system:ServiceDefinition-3.0#Class"/>
+                                        rdf:resource="info:fedora/fedora-system:ServiceDefinition-3.0#"/>
                             </owl:Restriction>
                         </rdfs:subClassOf>
                     </owl:Class>
-                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0/RELS-EXT#Class"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0/DS-COMPOSITE-MODEL#Class"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0/ONTOLOGY#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#datastreams/RELS-EXT"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#datastreams/DS-COMPOSITE-MODEL"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:ContentModel-3.0#datastreams/ONTOLOGY"/>
                     <owl:ObjectProperty
                             rdf:about="info:fedora/fedora-system:def/model#hasService"/>
                 </rdf:RDF>
@@ -84,13 +84,13 @@
                     <dsTypeModel ID="DS-COMPOSITE-MODEL" optional="true">
                         <form FORMAT_URI="info:fedora/fedora-system:FedoraDSCompositeModel-1.0" MIME="text/xml"/>
                         <extension name="SCHEMA">
-                            <reference type="xsd" datastream="DS-COMPOSITE-MODEL-SCHEMA"/>
+                            <reference type="datastream" value="DS-COMPOSITE-MODEL-SCHEMA"/>
                         </extension>
                     </dsTypeModel>
                     <dsTypeModel ID="ONTOLOGY" optional="true">
                         <form FORMAT_URI="info:fedora/fedora-system:FedoraOntology-1.0" MIME="application/rdf+xml"/>
                         <extension name="SCHEMA">
-                            <reference type="xsd" datastream="RDF-SCHEMA"/>
+                            <reference type="datastream" value="RDF-SCHEMA"/>
                         </extension>
                     </dsTypeModel>
                 </dsCompositeModel>
@@ -215,7 +215,7 @@
                         targetNamespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                         xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-                    <xs:import namespace="http://www.w3.org/2002/07/owl#" schemaLocation="../OWL-SCHEMA"/>
+                    <xs:import namespace="http://www.w3.org/2002/07/owl#" schemaLocation="$THIS$/OWL-SCHEMA"/>
                     <xs:element name="RDF" type="rdf:RDFType" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
 
                     <xs:attribute name="resource" type="xs:anyURI"/>
@@ -247,9 +247,9 @@
                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
 
-                    <xs:import namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#" schemaLocation="../RDF-SCHEMA"/>
+                    <xs:import namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#" schemaLocation="$THIS$/RDF-SCHEMA"/>
 
-                    <xs:import namespace="http://www.w3.org/2000/01/rdf-schema#" schemaLocation="../RDFS-SCHEMA"/>
+                    <xs:import namespace="http://www.w3.org/2000/01/rdf-schema#" schemaLocation="$THIS$/RDFS-SCHEMA"/>
 
                     <xs:element name="Class" type="owl:ClassType" xmlns:owl="http://www.w3.org/2002/07/owl#"/>
 
@@ -324,7 +324,7 @@
                         xmlns:owl="http://www.w3.org/2002/07/owl#"
                         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
 
-                    <xs:import namespace="http://www.w3.org/2002/07/owl#" schemaLocation="../OWL-SCHEMA"/>
+                    <xs:import namespace="http://www.w3.org/2002/07/owl#" schemaLocation="$THIS$/OWL-SCHEMA"/>
                     <xs:element name="subClassOf" type="rdfs:subClassOfType"/>
 
                     <xs:complexType name="subClassOfType">

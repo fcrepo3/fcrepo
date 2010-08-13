@@ -230,14 +230,14 @@ public class OwlValidator {
         if (lastIndexOfSlash > 0) {//target is a datastream
 
             targetPid = target.substring(0, lastIndexOfSlash);
-            dsname = "/"+target.substring(lastIndexOfSlash+1);
+            dsname = "datastreams/"+target.substring(lastIndexOfSlash+1);
         } else { //target is an object
             targetPid = target;
         }
         DOReader targetReader = doMgr.getReader(false, context, targetPid);
         List<String> targetContentModels = targetReader.getContentModels();
         for (String targetContentModel : targetContentModels) {
-            targetContentModel = targetContentModel +dsname+"#Class";
+            targetContentModel = targetContentModel+"#" +dsname;
             classes.add(targetContentModel);
         }
         return classes;
@@ -380,11 +380,11 @@ public class OwlValidator {
             contentmodel = "info:fedora/" + contentmodel;
         }
         if (datastreamName != null) {
-            datastreamName = "/" + datastreamName;
+            datastreamName = "datastreams/" + datastreamName;
         } else {
             datastreamName = "";
         }
-        return IRI.create(contentmodel + datastreamName + "#Class");
+        return IRI.create(contentmodel + "#"+datastreamName);
     }
 
     private List<String> getDatastreamNames(Context context, String contentmodel, Date asOfDateTime)

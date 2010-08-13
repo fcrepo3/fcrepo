@@ -24,10 +24,10 @@ public class Errors {
 
     }
 
-    public static String invalidContentInDatastream(String datastreamID, String schemaID, String contentModel,
+    public static String invalidContentInDatastream(String datastreamID, String contentModel,
                                                     Exception e) {
         return "Data error: Invalid content in datastream '" + datastreamID + "', in regards to " +
-               "schema '" + schemaID + "' the content model '" + contentModel + "'"
+               "schema the content model '" + contentModel + "'"
                + "'. " + e.getMessage();
 
     }
@@ -38,25 +38,25 @@ public class Errors {
 
     }
 
-    public static String schemaValidationWarning(String datastreamID, String schemaID, String contentModel,
+    public static String schemaValidationWarning(String datastreamID, String contentModel,
                                                  SAXParseException exception) {
         return "Encountered schema validation warning while parsing datastream '" + datastreamID +
-               "' with the schema '" + schemaID + "' from content model '" + contentModel +
+               "' with the schema from content model '" + contentModel +
                "'. The warning was '" + exception.getLocalizedMessage() + "'";
     }
 
-    public static String schemaValidationError(String datastreamID, String schemaID, String contentModel,
+    public static String schemaValidationError(String datastreamID, String contentModel,
                                                SAXParseException exception) {
         return "Encountered schema validation error while parsing datastream '" + datastreamID +
-               "' with the schema '" + schemaID + "' from content model '" + contentModel +
+               "' with the schema from content model '" + contentModel +
                "'. The error was '" + exception.getLocalizedMessage() + "'";
     }
 
 
-    public static String schemaValidationFatalError(String datastreamID, String schemaID, String contentModel,
+    public static String schemaValidationFatalError(String datastreamID, String contentModel,
                                                     SAXParseException exception) {
         return "Encountered schema validation fatal error while parsing datastream '" + datastreamID +
-               "' with the schema '" + schemaID + "' from content model '" + contentModel +
+               "' with the schema from content model '" + contentModel +
                "'. The fatal error was '" + exception.getLocalizedMessage() + "'";
     }
 
@@ -99,5 +99,15 @@ public class Errors {
 
     public static String exactCardinalityViolation(String subject, String ontologyrelation,int exact) {
         return "The relation '" + ontologyrelation + "' in '"+subject+"'  should exist exactly '" + exact + "' times.";
+    }
+
+    public static String schemaNotFound(String contentmodel) {
+        //TODO
+        return null;  //To change body of created methods use File | Settings | File Templates.
+    }
+
+    public static String schemaCannotParse(String contentmodel, String datastreamID, SAXException e) {
+        //TODO
+        return null;  //To change body of created methods use File | Settings | File Templates.
     }
 }

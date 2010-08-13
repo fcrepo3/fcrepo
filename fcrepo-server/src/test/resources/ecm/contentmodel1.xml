@@ -50,12 +50,12 @@
                         xmlns:owl="http://www.w3.org/2002/07/owl#"
                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-                    <owl:Class rdf:about="info:fedora/demo:contentModel1#Class">
+                    <owl:Class rdf:about="info:fedora/demo:contentModel1#">
                         <rdfs:subClassOf>
                             <owl:Restriction>
                                 <owl:onProperty
                                         rdf:resource="http://demo.relations.are.us/#demorelation1"/>
-                                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel2#Class"/>
+                                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel2#"/>
                             </owl:Restriction>
                         </rdfs:subClassOf>
                         <rdfs:subClassOf>
@@ -83,12 +83,12 @@
                             </owl:Restriction>
                         </rdfs:subClassOf>
                     </owl:Class>
-                    <owl:Class rdf:about="info:fedora/demo:contentModel1/Demo1Stream1#Class">
+                    <owl:Class rdf:about="info:fedora/demo:contentModel1#datastreams/Demo1Stream1">
                         <rdfs:subClassOf>
                             <owl:Restriction>
                                 <owl:onProperty
                                         rdf:resource="http://demo.relations.are.us/#demorelation1"/>
-                                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel2#Class"/>
+                                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel2#"/>
                             </owl:Restriction>
                         </rdfs:subClassOf>
                         <rdfs:subClassOf>
@@ -108,7 +108,7 @@
                             </owl:Restriction>
                         </rdfs:subClassOf>
                     </owl:Class>
-                    <owl:Class rdf:about="info:fedora/demo:contentModel1/Demo1Stream2#Class">
+                    <owl:Class rdf:about="info:fedora/demo:contentModel1#datastreams/Demo1Stream2">
                         <rdfs:subClassOf>
                             <owl:Restriction>
                                 <owl:onProperty
@@ -121,7 +121,7 @@
                             <owl:Restriction>
                                 <owl:onProperty
                                         rdf:resource="http://demo.relations.are.us/#demorelation2"/>
-                                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel1/Demo1Stream1#Class"/>
+                                <owl:allValuesFrom rdf:resource="info:fedora/demo:contentModel1#datastreams/Demo1Stream1"/>
                             </owl:Restriction>
                         </rdfs:subClassOf>
                         <rdfs:subClassOf>
@@ -170,16 +170,16 @@
                         <form FORMAT_URI="http://demo.uris.are.us/demo1uri1" MIME="text/xml"/>
                         <form FORMAT_URI="http://demo.uris.are.us/demo1uri2" MIME="text/xml"/>
                         <extension name="SCHEMA">
-                            <reference type="xsd" datastream="Demo1_SCHEMA1"/>
+                            <reference type="datastream" value="Demo1_SCHEMA1"/>
                         </extension>
                         <extension name="SCHEMA">
-                            <reference type="xsd" datastream="Demo1_SCHEMA2"/>
+                            <reference type="datastream" value="Demo1_SCHEMA2"/>
                         </extension>
                     </dsTypeModel>
                     <dsTypeModel ID="Demo1Stream2" optional="true">
                         <form FORMAT_URI="http://demo.uris.are.us/demo1uri" MIME="text/xml"/>
                         <extension name="SCHEMA">
-                            <reference type="xsd" datastream="Demo1_SCHEMA2"/>
+                            <reference type="datastream" value="Demo1_SCHEMA2"/>
                         </extension>
                     </dsTypeModel>
                 </dsCompositeModel>

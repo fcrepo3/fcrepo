@@ -91,7 +91,7 @@ public class DefaultManagement
         m_tempDir = tempDir;
         m_uploadStartTime = uploadStartTime;
         m_purgeDelayInMillis = purgeDelayInMillis;
-        ecmValidator = new EcmValidator(doMgr); //TODO, this should be controllable with the fcfg
+        ecmValidator = new EcmValidator(doMgr,m_contentManager); //TODO, this should be controllable with the fcfg
     }
 
     public String ingest(Context context,

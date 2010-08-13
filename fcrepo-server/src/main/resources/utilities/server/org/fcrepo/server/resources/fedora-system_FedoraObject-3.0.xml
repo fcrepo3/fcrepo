@@ -50,20 +50,20 @@
                         xmlns:owl="http://www.w3.org/2002/07/owl#"
                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#Class">
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#">
                         <rdfs:subClassOf>
                             <owl:Restriction>
                                 <owl:onProperty
                                         rdf:resource="info:fedora/fedora-system:def/model#hasModel"/>
-                                <owl:allValuesFrom rdf:resource="info:fedora/fedora-system:ContentModel-3.0#Class"/>
+                                <owl:allValuesFrom rdf:resource="info:fedora/fedora-system:ContentModel-3.0#"/>
                             </owl:Restriction>
                         </rdfs:subClassOf>
                     </owl:Class>
-                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0/DC#Class"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0/RELS-EXT#Class"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0/RELS-INT#Class"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0/POLICY#Class"/>
-                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0/AUDIT#Class"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/DC"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/RELS-EXT"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/RELS-INT"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/POLICY"/>
+                    <owl:Class rdf:about="info:fedora/fedora-system:FedoraObject-3.0#datastreams/AUDIT"/>
                     <owl:ObjectProperty
                             rdf:about="info:fedora/fedora-system:def/model#hasModel"/>
                 </rdf:RDF>
@@ -80,25 +80,25 @@
                     <dsTypeModel ID="DC">
                         <form FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" MIME="text/xml"/>
                         <extension name="SCHEMA">
-                            <reference type="xsd" datastream="OAI_DC-SCHEMA"/>
+                            <reference type="datastream" value="OAI_DC-SCHEMA"/>
                         </extension>
                     </dsTypeModel>
                     <dsTypeModel ID="RELS-EXT" optional="true">
                         <form FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" MIME="application/rdf+xml"/>
                         <extension name="SCHEMA">
-                            <reference type="xsd" datastream="RELS-EXT-SCHEMA"/>
+                            <reference type="datastream" value="RELS-EXT-SCHEMA"/>
                         </extension>
                     </dsTypeModel>
                     <dsTypeModel ID="RELS-INT" optional="true">
                         <form FORMAT_URI="info:fedora/fedora-system:FedoraRELSInt-1.0" MIME="application/rdf+xml"/>
                         <extension name="SCHEMA">
-                            <reference type="xsd" datastream="RELS-INT-SCHEMA"/>
+                            <reference type="datastream" value="RELS-INT-SCHEMA"/>
                         </extension>
                     </dsTypeModel>
                     <dsTypeModel ID="POLICY" optional="true">
                         <form FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" MIME="application/rdf+xml"/>
                         <extension name="SCHEMA">
-                            <reference type="xsd" datastream="POLICY-SCHEMA"/>
+                            <reference type="datastream" value="POLICY-SCHEMA"/>
                         </extension>
                     </dsTypeModel>
                     <dsTypeModel ID="AUDIT" optional="true"/>
@@ -133,7 +133,7 @@
                     </annotation>
 
                     <import namespace="http://purl.org/dc/elements/1.1/"
-                            schemaLocation="../SIMPLEDC-SCHEMA"/>
+                            schemaLocation="$THIS$/SIMPLEDC-SCHEMA"/>
 
                     <element name="dc" type="oai_dc:oai_dcType"/>
 
@@ -191,7 +191,7 @@
                     </xs:annotation>
 
                     <xs:import namespace="http://www.w3.org/XML/1998/namespace"
-                               schemaLocation="../XML-SCHEMA">
+                               schemaLocation="$THIS$/XML-SCHEMA">
                     </xs:import>
 
                     <xs:element name="title" type="elementType"/>

@@ -3,9 +3,12 @@ package org.fcrepo.server.validation.ecm;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.errors.StreamIOException;
+import org.fcrepo.server.storage.ContentManagerParams;
 import org.fcrepo.server.storage.DOReader;
+import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.validation.ecm.jaxb.DsTypeModel;
 import org.fcrepo.server.validation.ecm.jaxb.Extension;
@@ -17,6 +20,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -43,53 +48,103 @@ public class SchemaValidator {
     }
 
     void validate(Context context, DsTypeModel typeModel, Datastream objectDatastream, Validation validation,
-                  DOReader contentmodelReader, Date asOfDateTime) throws ServerException {
+                  DOReader contentmodelReader, Date asOfDateTime, ExternalContentManager m_exExternalContentManager) throws ServerException {
 
         List<Extension> extensions = typeModel.getExtension();
-        Map<String, List<String>> schemaStreamsToProblemsMap = new HashMap<String, List<String>>();
+        List<List<String>> schemaStreamsToProblemsMap = new ArrayList<List<String>>();
         for (Extension extension : extensions) {
             String name = extension.getName();
-            if ("SCHEMA".equals(name)) {
-                List<Element> contents = extension.getAny();
-                Element reference = null;
-                for (Element content : contents) {
-                    String tagname = content.getTagName();
-                    if (tagname.equals("reference")) {
-                        reference = content;
-                        break;
-                    }
-                }
-                if (reference != null) {
-                    String type = reference.getAttribute("type");
-                    if (!"xsd".equals(type)) {
-                        continue;
-                    }
-                    String datastream = reference.getAttribute("datastream");
-                    Datastream schemaDS = contentmodelReader.GetDatastream(datastream, asOfDateTime);
-                    if (schemaDS == null) {//No schema datastream, ignore and continue
-                        continue;
-                    }
 
-                    LSResourceResolver resourceResolver
-                            = new ResourceResolver(context, doMgr, contentmodelReader, asOfDateTime);
 
-                    List<String> problems = checkSchema(resourceResolver, objectDatastream.getContentStream(),
-                                                        schemaDS.getContentStream(),
-                                                        contentmodelReader.GetObjectPID(),
-                                                        objectDatastream.DatastreamID, schemaDS.DatastreamID);
-                    schemaStreamsToProblemsMap.put(datastream, problems);
-                    if (problems
-                            .isEmpty()) {//if multiple SCHEMAS have been defined, only one is needed to be compliant. If one schema
-                        //produce no errors, do not bother validating against the others.
-                        break;
-                    }
+            Element reference = null;
+            Source source = null;
+
+            if (!"SCHEMA".equals(name)) {//ignore non schema extensions
+                continue;
+            }
+
+            List<Element> contents = extension.getAny();
+            for (Element content : contents) { //find the reference
+                String tagname = content.getTagName();
+                if (tagname.equals("reference")) {
+                    reference = content;
+                    break;
                 }
             }
 
+            if (reference == null){ //if no reference
+                boolean found = false;
+                for (Element content : contents) {
+                    if ( content.getNodeType() == Element.ELEMENT_NODE){
+                        source = new DOMSource(content);//parse the inline schema
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found){//empty tag
+                    List<String> validationProblems = validation.getDatastreamProblems(objectDatastream.DatastreamID);
+                    validationProblems.add(Errors.schemaNotFound(contentmodelReader.GetObjectPID()));
+                    validation.setValid(false);
+                }
+            }
+            else {
+                String type = reference.getAttribute("type");
+                String value = reference.getAttribute("value");
+
+                if ("datastream".equalsIgnoreCase(type)) {
+                    Datastream schemaDS = contentmodelReader.GetDatastream(value, asOfDateTime);
+                    if (schemaDS == null) {//No schema datastream, ignore and continue
+                        continue;
+                    }
+                    InputStream schemaStream;
+                    schemaStream = schemaDS.getContentStream();
+                    source = new StreamSource(schemaStream);
+
+                } else if ("url".equalsIgnoreCase(type)){
+                    InputStream schemaStream;
+                    ContentManagerParams params = new ContentManagerParams(value);
+                    MIMETypedStream externalContent = m_exExternalContentManager.getExternalContent(params);
+                    schemaStream = externalContent.getStream();
+                    source = new StreamSource(schemaStream);
+                } else { //reference used, but type not recognized
+                    List<String> validationProblems = validation.getDatastreamProblems(objectDatastream.DatastreamID);
+                    validationProblems.add(Errors.schemaNotFound(contentmodelReader.GetObjectPID()));
+                    validation.setValid(false);
+                    continue;
+                }
+
+            }
+
+            LSResourceResolver resourceResolver
+                    = new ResourceResolver(context, doMgr, contentmodelReader, asOfDateTime);
+
+
+            Schema schema;
+            try {
+                schema = parseAsSchema(source, resourceResolver);
+            } catch (SAXException e) {
+                List<String> validationProblems = validation.getDatastreamProblems(objectDatastream.DatastreamID);
+                validationProblems.add(Errors.schemaCannotParse(contentmodelReader.GetObjectPID(),objectDatastream.DatastreamID,e));
+                validation.setValid(false);
+                continue;
+            }
+
+            List<String> problems = checkSchema( objectDatastream.getContentStream(),
+                                                 schema,
+                                                 contentmodelReader.GetObjectPID(),
+                                                 objectDatastream.DatastreamID);
+            schemaStreamsToProblemsMap.add(problems);
+            if (problems.isEmpty()) {//if multiple SCHEMAS have been defined, only one is needed to be compliant. If one schema
+                //produce no errors, do not bother validating against the others.
+                break;
+
+            }
         }
+
+
         boolean foundProblem = false;
-        for (String schemaStream : schemaStreamsToProblemsMap.keySet()) {
-            if (!schemaStreamsToProblemsMap.get(schemaStream).isEmpty()) {
+        for (List<String> problems : schemaStreamsToProblemsMap) {
+            if (!problems.isEmpty()){
                 foundProblem = true;
                 break;
             }
@@ -97,37 +152,36 @@ public class SchemaValidator {
         if (foundProblem) {
             validation.setValid(false);
             List<String> validationProblems = validation.getDatastreamProblems(objectDatastream.DatastreamID);
-            for (String schemaStream : schemaStreamsToProblemsMap.keySet()) {
-                validationProblems.addAll(schemaStreamsToProblemsMap.get(schemaStream));
+            for (List<String> problems : schemaStreamsToProblemsMap) {
+                validationProblems.addAll(problems);
             }
         }
-
     }
 
 
-    public List<String> checkSchema(LSResourceResolver resolver, InputStream objectStream, InputStream schemaStream,
-                                    String contentModel,
-                                    String datastreamID, String schemaID) {
+    private Schema parseAsSchema(Source input, LSResourceResolver resolver) throws SAXException {
         SchemaFactory schemaFactory = SchemaFactory
                 .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema;
         schemaFactory.setResourceResolver(resolver);
+
+        schema = schemaFactory.newSchema(input);
+        return schema;
+    }
+
+    public List<String> checkSchema(InputStream objectStream, Schema schema,
+                                    String contentModel,
+                                    String datastreamID) {
+
         List<String> problems = new ArrayList<String>();
-        ErrorHandler errorhandler = new ReportingErrorHandler(problems, contentModel, datastreamID, schemaID);
+        ErrorHandler errorhandler = new ReportingErrorHandler(problems, contentModel, datastreamID);
 
-
-        try {
-            schema = schemaFactory.newSchema(new StreamSource(schemaStream));
-        } catch (SAXException e) {
-            problems.add(Errors.unableToParseSchema(schemaID,datastreamID,contentModel,e));
-            return problems;
-        }
         try {
             Validator validator = schema.newValidator();
             validator.setErrorHandler(errorhandler);
             validator.validate(new StreamSource(objectStream));
         } catch (SAXException e) {
-            problems.add(Errors.invalidContentInDatastream(datastreamID,schemaID,contentModel,e));
+            problems.add(Errors.invalidContentInDatastream(datastreamID,contentModel,e));
         } catch (IOException e) {
             problems.add(Errors.unableToReadDatastream(datastreamID,e));
         }
@@ -158,24 +212,9 @@ public class SchemaValidator {
             if (systemId == null) {
                 return null;
             }
-            if (systemId.startsWith("../../")) { //other object
+            if (systemId.startsWith("$THIS$/")) {//other datastream in this object
                 String[] tokens = systemId.split("/");
-                //String is of the format ../../pid/DSID
-                try {
-                    DOReader otherobject = doMgr.getReader(false, context, tokens[2]);
-                    Datastream schemastream = otherobject.GetDatastream(tokens[3], asOfDateTime);
-                    LSInput input = new MyLSInput(schemastream);
-                    input.setBaseURI(baseURI);
-                    input.setPublicId(publicId);
-                    input.setBaseURI(baseURI);
-                    return input;
-                } catch (ServerException e) {
-                    return null;
-                }
-
-            } else if (systemId.startsWith("../")) {//other datastream in this object
-                String[] tokens = systemId.split("/");
-                //String is of the format ../DSID
+                //String is of the format $THIS$/DSID
                 try {
                     final Datastream schemastream = contentmodelReader.GetDatastream(tokens[1], asOfDateTime);
                     LSInput input = new MyLSInput(schemastream);
@@ -297,32 +336,32 @@ public class SchemaValidator {
         private List<String> problems;
         private String contentModel;
         private String datastreamID;
-        private String schemaID;
+
 
 
         public ReportingErrorHandler(List<String> problems,
                                      String contentModel,
-                                     String datastreamID, String schemaID) {
+                                     String datastreamID) {
             this.problems = problems;
             this.contentModel = contentModel;
             this.datastreamID = datastreamID;
-            this.schemaID = schemaID;
+
         }
 
         @Override
         public void warning(SAXParseException exception) throws SAXException {
             //TODO should these be reported?
-            problems.add(Errors.schemaValidationWarning(datastreamID,schemaID,contentModel,exception));
+            problems.add(Errors.schemaValidationWarning(datastreamID,contentModel,exception));
         }
 
         @Override
         public void error(SAXParseException exception) throws SAXException {
-            problems.add(Errors.schemaValidationError(datastreamID,schemaID,contentModel,exception));
+            problems.add(Errors.schemaValidationError(datastreamID,contentModel,exception));
         }
 
         @Override
         public void fatalError(SAXParseException exception) throws SAXException {
-            problems.add(Errors.schemaValidationFatalError(datastreamID,schemaID,contentModel,exception));
+            problems.add(Errors.schemaValidationFatalError(datastreamID,contentModel,exception));
         }
 
     }

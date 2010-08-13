@@ -95,7 +95,7 @@ Semantics:
     <xsd:element name="reference">
         <xsd:complexType>
             <xsd:attribute name="type"/>
-            <xsd:attribute name="datastream"/>
+            <xsd:attribute name="value"/>
         </xsd:complexType>
     </xsd:element>
 </xsd:schema>
