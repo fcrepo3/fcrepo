@@ -4,22 +4,15 @@
  */
 package org.fcrepo.utilities.install;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.*;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import java.util.Properties;
 
+import org.apache.commons.io.IOUtils;
+import org.fcrepo.server.config.ModuleConfiguration;
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.config.ServerConfigurationParser;
 import org.fcrepo.server.resourceIndex.ResourceIndex;
@@ -45,6 +38,8 @@ public class FedoraHome {
     private final boolean _clientOnlyInstall;
 
     private InetAddress _host;
+
+    private boolean _usingAkubra;
 
     public FedoraHome(Distribution dist, InstallOptions opts) {
         _dist = dist;
@@ -102,6 +97,9 @@ public class FedoraHome {
      */
     private void configure() throws InstallationFailedException {
         configureFCFG();
+        if (_usingAkubra) {
+            configureAkubra();
+        }
         configureFedoraUsers();
         configureBeSecurity();
     }
@@ -223,9 +221,62 @@ public class FedoraHome {
             ServerConfiguration config =
                     new ServerConfigurationParser(fis).parse();
             config.applyProperties(props);
+
+            // If using akubra-fs, set the class of the module and clear params.
+            String llStoreType = _opts.getValue(InstallOptions.LLSTORE_TYPE);
+            if (llStoreType.equals("akubra-fs")) {
+                ModuleConfiguration mConfig = config.getModuleConfiguration(
+                    "org.fcrepo.server.storage.lowlevel.ILowlevelStorage");
+                mConfig.setClassName(
+                    "org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorageModule");
+                mConfig.getParameters().clear();
+                _usingAkubra = true;
+            }
+
             config.serialize(new FileOutputStream(fcfg));
         } catch (IOException e) {
             throw new InstallationFailedException(e.getMessage(), e);
+        }
+    }
+
+    private void configureAkubra() throws InstallationFailedException {
+        // Rewrite server/config/akubra-llstore.xml replacing the
+        // /tmp/[object|datastream]Store constructor-arg values
+        // with $FEDORA_HOME/data/[object|datastream]Store
+        BufferedReader reader = null;
+        PrintWriter writer = null;
+        try {
+            File file = new File(_installDir,
+                    "server/config/akubra-llstore.xml");
+            reader = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(file), "UTF-8"));
+
+            File dataDir = new File(_installDir, "data");
+            String oPath = dataDir.getPath() + File.separator + "objectStore";
+            String dPath = dataDir.getPath() + File.separator + "datastreamStore";
+            StringBuilder xml = new StringBuilder();
+
+            String line = reader.readLine();
+            while (line != null) {
+                if (line.indexOf("/tmp/objectStore") != -1) {
+                    line = "    <constructor-arg value=\"" + oPath + "\"/>";
+                } else if (line.indexOf("/tmp/datastreamStore") != -1) {
+                    line = "    <constructor-arg value=\"" + dPath + "\"/>";
+                }
+                xml.append(line + "\n");
+                line = reader.readLine();
+            }
+            reader.close();
+
+            writer = new PrintWriter(new OutputStreamWriter(
+                    new FileOutputStream(file), "UTF-8"));
+            writer.print(xml.toString());
+            writer.close();
+        } catch (IOException e) {
+            IOUtils.closeQuietly(reader);
+            IOUtils.closeQuietly(writer);
+            throw new InstallationFailedException(e.getClass().getName()
+                    + ":" + e.getMessage());
         }
     }
 

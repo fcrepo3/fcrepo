@@ -76,6 +76,8 @@ public class InstallOptions {
 
     public static final String FESL_DBXML_HOME = "fesl.dbxml.home";
 
+    public static final String LLSTORE_TYPE = "llstore.type";
+
     public static final String RI_ENABLED = "ri.enabled";
 
     public static final String MESSAGING_ENABLED = "messaging.enabled";
@@ -187,6 +189,7 @@ public class InstallOptions {
             _map.put(XACML_ENABLED, Boolean.toString(false));
             _map.put(FESL_AUTHN_ENABLED, Boolean.toString(true));
             _map.put(FESL_AUTHZ_ENABLED, Boolean.toString(false));
+            _map.put(LLSTORE_TYPE, null); // akubra-fs
             _map.put(RI_ENABLED, null); // false
             _map.put(MESSAGING_ENABLED, null); // false
             _map.put(DEPLOY_LOCAL_SERVICES, null); // true
@@ -267,6 +270,7 @@ public class InstallOptions {
         	inputOption(XACML_ENABLED);
         }
 
+        inputOption(LLSTORE_TYPE);
         inputOption(RI_ENABLED);
         inputOption(MESSAGING_ENABLED);
         if (getValue(MESSAGING_ENABLED).equals(Boolean.toString(true))) {
