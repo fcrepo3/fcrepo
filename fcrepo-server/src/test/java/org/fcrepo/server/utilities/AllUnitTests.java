@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses( {TestDateUtility.class, DCFieldsTest.class})
+@Suite.SuiteClasses( {TestDateUtility.class, DCFieldsTest.class, PIDStreamIterableWrapperTest.class})
 public class AllUnitTests {
 
 }

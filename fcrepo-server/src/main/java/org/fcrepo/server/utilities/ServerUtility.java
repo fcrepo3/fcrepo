@@ -7,10 +7,13 @@ package org.fcrepo.server.utilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import java.net.URI;
 
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
+
+import org.apache.commons.io.IOUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,6 +124,22 @@ public class ServerUtility {
     }
 
     /**
+     * Hits the given Fedora Server URL and returns the response as a String.
+     * Throws an IOException if the response code is not 200(OK).
+     */
+    private static InputStream getServerResponseAsStream(String protocol,
+                                            String user,
+                                            String pass,
+                                            String path) throws IOException {
+        String url = getBaseURL(protocol) + path;
+        logger.info("Getting URL: " + url);
+        UsernamePasswordCredentials creds =
+                new UsernamePasswordCredentials(user, pass);
+        return new WebClient().get(url, true, creds);
+    }
+
+
+    /**
      * Tell whether the given URL appears to be referring to somewhere within
      * the Fedora webapp.
      */
@@ -170,6 +189,25 @@ public class ServerUtility {
 
     }
 
+
+    public static InputStream modifyDatastreamControlGroup(String protocol, String user, String pass, String pidspec, String datastreamspec, String controlGroup, boolean addXMLHeader, boolean reformat, boolean setMIMETypeCharset) throws IOException {
+
+        String path = "/management/control?action=modifyDatastreamControlGroup" +
+                        "&pid=" + pidspec +
+                        "&dsID=" + datastreamspec +
+                        "&controlGroup=" + controlGroup +
+                        "&addXMLHeader=" + addXMLHeader +
+                        "&reformat=" + reformat +
+                        "&setMIMETypeCharset=" + setMIMETypeCharset;
+
+        return getServerResponseAsStream(protocol,
+                          user,
+                          pass,
+                          path);
+
+
+    }
+
     /**
      * Initializes the web client http connection settings.
      */
@@ -202,9 +240,22 @@ public class ServerUtility {
      * pass
      */
     public static void main(String[] args) {
-        if (args.length == 3) {
+
+        if (args.length < 1) {
+            System.out.println("Parameters:  method arg1 arg2 arg3 etc");
+            System.out.println("");
+            System.out.println("Methods:");
+            System.out.println("    reloadpolicies");
+            System.out.println("    migratedatastreamcontrolgroup");
+            System.exit(0);
+        }
+
+        String method = args[0].toLowerCase();
+
+        if (method.equals("reloadpolicies")) {
+            if (args.length == 4) {
             try {
-                reloadPolicies(args[0], args[1], args[2]);
+                    reloadPolicies(args[1], args[2], args[3]);
                 System.out.println("SUCCESS: Policies have been reloaded");
                 System.exit(0);
             } catch (Throwable th) {
@@ -217,6 +268,83 @@ public class ServerUtility {
             System.err.println("ERROR: Three arguments required: "
                     + "http|https username password");
             System.exit(1);
+        }
+        } else if (method.equals("migratedatastreamcontrolgroup")) {
+
+            // too many args
+            if (args.length > 10) {
+                System.err.println("ERROR: too many arguments provided");
+                System.exit(1);
+    }
+
+            // too few
+            if (args.length < 7) {
+
+                System.err.println("ERROR: insufficient arguments provided.  Arguments are: ");
+                System.err.println("    protocol [http|https]"); // 1; 0 is method
+                System.err.println("    user"); // 2
+                System.err.println("    password"); // 3
+                System.err.println("    pid - either"); // 4
+                System.err.println("        a single pid, eg demo:object");
+                System.err.println("        list of pids separated by commas, eg demo:object1,demo:object2");
+                System.err.println("        name of file containing pids, eg file:///path/to/file");
+                System.err.println("    dsid - either"); // 5
+                System.err.println("        a single datastream id, eg DC");
+                System.err.println("        list of ids separated by commas, eg DC,RELS-EXT");
+                System.err.println("    controlGroup - target control group (note only M is implemented)"); // 6
+                System.err.println("    addXMLHeader - add an XML header to the datastream [true|false, default false]"); // 7
+                System.err.println("    reformat - reformat the XML [true|false, default false]"); // 8
+                System.err.println("    setMIMETypeCharset - add charset=UTF-8 to the MIMEType [true|false, default false]"); // 9
+                System.exit(1);
+            }
+
+
+            try {
+                // optional args
+                boolean addXMLHeader = getArgBoolean(args, 7, false);
+                boolean reformat = getArgBoolean(args, 8, false);
+                boolean setMIMETypeCharset = getArgBoolean(args, 9, false);;
+
+                InputStream is = modifyDatastreamControlGroup(args[1], args[2], args[3], args[4], args[5], args[6], addXMLHeader, reformat, setMIMETypeCharset);
+
+                IOUtils.copy(is, System.out);
+                is.close();
+
+                System.out.println("SUCCESS: Datastreams modified");
+                System.exit(0);
+
+            } catch (Throwable th) {
+                th.printStackTrace();
+                System.err
+                .println("ERROR: migrating datastream control group failed; see above");
+                System.exit(1);
+            }
+
+
+        } else {
+            System.err.println("ERROR: unrecognised method " + method);
+            System.exit(1);
+        }
+    }
+    /**
+     * Get boolean argument from list of arguments at position; use defaultValue if not present
+     * @param args
+     * @param position
+     * @param defaultValue
+     * @return
+     */
+    private static boolean getArgBoolean(String[] args, int position, boolean defaultValue) {
+        if (args.length > position) {
+            String lowerArg = args[position].toLowerCase();
+            if (lowerArg.equals("true") || lowerArg.equals("yes")) {
+                return true;
+            } else if (lowerArg.equals("false") || lowerArg.equals("no")) {
+                return false;
+            } else {
+                throw new IllegalArgumentException(args[position] + " not a valid value.  Specify true or false");
+            }
+        } else {
+            return defaultValue;
         }
     }
 

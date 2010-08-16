@@ -4,6 +4,20 @@
  */
 package org.fcrepo.server.management;
 
+import java.io.File;
+import java.io.InputStream;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -18,12 +32,6 @@ import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.storage.types.Validation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.InputStream;
-import java.util.*;
 
 /**
  * @author Edwin Shin
@@ -51,6 +59,12 @@ public class ManagementModule
     private Hashtable<String, Long> m_uploadStartTime;
 
     private Management mgmt;
+
+    // FIXME: FCREPO-765
+    // this only required temporarily, remove once admin methods migrated
+    // to an admin module
+    DefaultManagement defaultManagement = null;
+
 
     private AbstractInvocationHandler[] invocationHandlers;
 
@@ -178,6 +192,10 @@ public class ManagementModule
                                       m_purgeDelayInMillis);
 
         mgmt = getProxyChain(m);
+        // FIXME: FCREPO-765
+        // need to keep a reference to DefaultManagement for admin functions
+        // remove this once migrated to an Admin module
+        defaultManagement = (DefaultManagement)m;
     }
 
     @Override
@@ -560,4 +578,37 @@ public class ManagementModule
         Class<?> c = Class.forName(invocationHandler);
         return (AbstractInvocationHandler) c.newInstance();
     }
+
+    /**********************************************************************************
+     * Administrative methods - see FCREPO-765
+     *
+     * These methods are used for administrative/utility/migration functions.
+     *
+     * These are duplicates of the same in DefaultManagement
+     *
+     * These methods should be migrated to an Administration module (and API).
+     *
+     **********************************************************************************/
+
+
+    /**
+     * Migrate the datastream from one control group to another, returning list of versions migrated.
+     * Only supports migration from X (inline) to M (managed content).
+     *
+     * @param context
+     * @param pid
+     * @param dsID
+     * @param controlGroup - new Control Group for datastream
+     * @param ignoreAlreadyDone - if true don't return an error if datastream already has desired control group
+     * @param addXMLHeader - add an XML header declaring UTF-8 character encoding to datastream content
+     * @param reformat - reformat the XML (in the same format as used for inline XML)
+     * @param setMIMETypeCharset - add charset declaration (UTF-8) to the MIMEType, and add text/xml MIMEType if no MIMEType is set
+     * @return array of versions migrated
+     * @throws ServerException
+     */
+    public Date[] modifyDatastreamControlGroup(Context context, String pid, String dsID, String controlGroup, boolean addXMLHeader, boolean reformat, boolean setMIMETypeCharset) throws ServerException {
+
+        return defaultManagement.modifyDatastreamControlGroup(context, pid, dsID, controlGroup, addXMLHeader, reformat, setMIMETypeCharset);
+    }
+
 }

@@ -4,39 +4,89 @@
  */
 package org.fcrepo.server.management;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import java.text.SimpleDateFormat;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+
 import org.apache.commons.betwixt.XMLUtils;
+
+import org.apache.commons.io.IOUtils;
+
+import org.jrdf.graph.URIReference;
+
+import org.w3c.dom.Document;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
 import org.fcrepo.common.rdf.SimpleURIReference;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.RecoveryContext;
 import org.fcrepo.server.Server;
-import org.fcrepo.server.errors.*;
+import org.fcrepo.server.errors.DatastreamLockedException;
+import org.fcrepo.server.errors.DatastreamNotFoundException;
+import org.fcrepo.server.errors.GeneralException;
+import org.fcrepo.server.errors.InvalidStateException;
+import org.fcrepo.server.errors.InvalidXMLNameException;
+import org.fcrepo.server.errors.ObjectLockedException;
+import org.fcrepo.server.errors.ObjectNotFoundException;
+import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
+import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.errors.StreamReadException;
+import org.fcrepo.server.errors.StreamWriteException;
+import org.fcrepo.server.errors.ValidationException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.security.Authorization;
-import org.fcrepo.server.storage.*;
-import org.fcrepo.server.storage.types.*;
+import org.fcrepo.server.storage.ContentManagerParams;
+import org.fcrepo.server.storage.DOManager;
+import org.fcrepo.server.storage.DOReader;
+import org.fcrepo.server.storage.DOWriter;
+import org.fcrepo.server.storage.ExternalContentManager;
+import org.fcrepo.server.storage.types.AuditRecord;
+import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.server.storage.types.DatastreamManagedContent;
+import org.fcrepo.server.storage.types.DatastreamReferencedContent;
+import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
+import org.fcrepo.server.storage.types.MIMETypedStream;
+import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.fcrepo.server.storage.types.Validation;
+import org.fcrepo.server.storage.types.XMLDatastreamProcessor;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationConstants;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.server.validation.ecm.EcmValidator;
-import org.jrdf.graph.URIReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.regex.Pattern;
 
 /**
  * Implements API-M without regard to the transport/messaging protocol.
@@ -67,7 +117,10 @@ public class DefaultManagement
     private long m_lastPurgeInMillis = System.currentTimeMillis();
 
     private final long m_purgeDelayInMillis;
-    private EcmValidator ecmValidator;
+    private final EcmValidator ecmValidator;
+
+    // FCREPO-765: move to Admin module
+    private static final String xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 
     /**
      * @param purgeDelayInMillis milliseconds to delay before removing
@@ -1460,6 +1513,10 @@ public class DefaultManagement
      * </p>
      */
     private byte[] getEmbeddableXML(InputStream in) throws GeneralException {
+        return getXML(in, false);
+    }
+
+    private byte[] getXML(InputStream in, boolean includeXMLDeclaration) throws GeneralException {
         // parse with xerces and re-serialize the fixed xml to a byte array
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1467,7 +1524,7 @@ public class DefaultManagement
             fmt.setIndent(2);
             fmt.setLineWidth(120);
             fmt.setPreserveSpace(false);
-            fmt.setOmitXMLDeclaration(true);
+            fmt.setOmitXMLDeclaration(!includeXMLDeclaration);
             fmt.setOmitDocumentType(true);
             XMLSerializer ser = new XMLSerializer(out, fmt);
             DocumentBuilderFactory factory =
@@ -1485,7 +1542,6 @@ public class DefaultManagement
             throw new GeneralException("XML was not well-formed. " + message, e);
         }
     }
-
     private void checkDatastreamID(String id) throws ValidationException {
         checkString(id,
                     "Datastream id",
@@ -1756,6 +1812,7 @@ public class DefaultManagement
 
     }
 
+
     /**
      * Creates a new audit record and adds it to the digital object audit trail.
      */
@@ -1847,6 +1904,193 @@ public class DefaultManagement
                     }
                 }
             }
+        }
+    }
+
+    /**********************************************************************************
+     * Administrative methods - see FCREPO-765
+     *
+     * These methods are used for administrative/utility/migration functions.
+     *
+     * They are defined in DefaultManagement but are not present in Management -
+     * there is no commitment to providing these methods in the future.
+     *
+     * These methods should be migrated to an Administration module (and API).
+     *
+     **********************************************************************************/
+
+
+    /**
+     * Migrate the datastream from one control group to another, returning list of versions migrated.
+     * Only supports migration from X (inline) to M (managed content).  Returns an array of date/times of the
+     * datastream versions migrated (empty if datastream already had the desired control group).  Throws
+     * ObjectNotFoundException/DatastreamNotFoundException if object or datastream does not exist.
+     *
+     * @param context
+     * @param pid
+     * @param dsID
+     * @param controlGroup - new Control Group for datastream
+     * @param ignoreAlreadyDone - if true don't return an error if datastream already has desired control group
+     * @param addXMLHeader - add an XML header declaring UTF-8 character encoding to datastream content
+     * @param reformat - reformat the XML (in the same format as used for inline XML)
+     * @param setMIMETypeCharset - add charset declaration (UTF-8) to the MIMEType, and add text/xml MIMEType if no MIMEType is set
+     * @return array of versions migrated
+     * @throws ServerException
+     */
+    public Date[] modifyDatastreamControlGroup(Context context, String pid, String dsID, String controlGroup, boolean addXMLHeader, boolean reformat, boolean setMIMETypeCharset) throws ServerException {
+
+        DOWriter w = null;
+
+        try {
+
+            logger.debug("Entered modifyDatastreamControlGroup");
+
+            // FIXME: see FCREPO-765 - add proper auth when migrating this to an Admin module, for now use same permissions as reloading policies
+            m_authz.enforceReloadPolicies(context);
+
+            if (!controlGroup.equals("M"))
+                throw new GeneralException("Invalid target controlGroup " + controlGroup + ".  Only \"M\" is currently supported");
+
+            try {
+                w = m_manager.getWriter(false, context, pid);
+            } catch (ObjectNotInLowlevelStorageException e ){
+                throw new ObjectNotFoundException("Object " + pid + " does not exist.");
+            }
+
+            Datastream currentDS = w.GetDatastream(dsID, null);
+            if (currentDS == null) {
+                    throw new DatastreamNotFoundException("Datastream " + dsID + " not found");
+            }
+
+            if (currentDS.DSControlGrp.equals("X")) {
+
+                // take a copy of the existing datastream versions
+                Date[] versions = w.getDatastreamVersions(dsID);
+                Map<Date, Datastream> copyDS = new HashMap<Date, Datastream>();
+                for (Date version: versions) {
+                    Datastream d = w.GetDatastream(dsID, version);
+                    copyDS.put(version, d.copy());
+                }
+
+                // purge the existing datastream (all versions)
+                w.removeDatastream(dsID, null, null);
+
+                // add back each datastream version in reverse order as managed content
+                // (order might not strictly be necessary)
+                Arrays.sort(versions);
+                for (int i = versions.length - 1; i >= 0; i--) {
+
+                    // get a managed content copy of this datastream version
+                    DatastreamXMLMetadata existing = (DatastreamXMLMetadata)copyDS.get(versions[i]);
+                    DatastreamManagedContent newDS = new DatastreamManagedContent();
+                    existing.copy(newDS);
+
+                    // X control group will have been copied over by above, reset it
+                    newDS.DSControlGrp = controlGroup;
+
+                    // probably not necessary, but just in case...
+                    newDS.DSLocation = null;
+                    newDS.DSLocationType = null;
+
+                    // add character encoding to mime type (will always be UTF-8 as it has come from X datastream in FOXML)
+                    if (setMIMETypeCharset) {
+                        if (newDS.DSMIME != null && !newDS.DSMIME.equals("") & !newDS.DSMIME.contains("charset=")) {
+                            newDS.DSMIME = newDS.DSMIME + "; charset=UTF-8";
+                        } else {
+                            newDS.DSMIME = "text/xml; charset=UTF-8";
+                        }
+                    }
+
+                    byte[] byteContent;
+
+                    // Note: use getContentStream() rather than getting bytes directly, as this is how
+                    // X datastreams are disseminated (we want the M content to be identical on
+                    // dissemination)
+                    if (reformat) {
+                        byteContent = this.getXML(existing.getContentStream(), addXMLHeader);
+                    } else {
+                        // add just the XML header declaring encoding, if requested
+                        if (addXMLHeader) {
+                            byte[] header;
+                            try {
+                                header = xmlHeader.getBytes("UTF-8");
+                            } catch (UnsupportedEncodingException e) {
+                                // should never happen
+                                throw new RuntimeException(e);
+                            }
+                            byte[] existingContent;
+                            try {
+                                existingContent = IOUtils.toByteArray(existing.getContentStream());
+                            } catch (IOException e) {
+                                throw new GeneralException("Error reading existing content from X datastream", e);
+                            }
+                            byteContent = Arrays.copyOf(header, header.length + existingContent.length);
+                            System.arraycopy(existing.xmlContent, 0, byteContent, header.length, existingContent.length);
+                        } else {
+                            try {
+                                byteContent = IOUtils.toByteArray(existing.getContentStream());
+                            } catch (IOException e) {
+                                throw new GeneralException("Error reading existing content from X datastream", e);
+                            }
+                        }
+                    }
+
+                    // add the content stream
+                    MIMETypedStream content = new MIMETypedStream(null, new ByteArrayInputStream(byteContent), null);
+                    newDS.putContentStream(content);
+
+                    // checksum only needs recalc if we added a header
+                    // note getChecksum() caters for checksum type set to disabled
+                    if (addXMLHeader) {
+                        logger.debug("Recalculating checksum.  Type=" + newDS.DSChecksumType + " Existing checksum: " + newDS.DSChecksum != null ? newDS.DSChecksum : "none");
+
+                        // forces computation rather than return existing
+                        newDS.DSChecksum = Datastream.CHECKSUM_NONE;
+                        newDS.DSChecksum = newDS.getChecksum();
+
+                        logger.debug("New checksum: " + newDS.DSChecksum);
+                        logger.debug("Testing new checksum, response is {}", newDS.compareChecksum());
+                    }
+
+                    w.addDatastream(newDS, true);
+                }
+
+                Date nowUTC = Server.getCurrentDate(context);
+                String logMessage = "Modified datastream control group for " + pid + " " + dsID + " from " + currentDS.DSControlGrp + " to " + controlGroup;
+                addAuditRecord(context,
+                               w,
+                               "modifyDatastreamControlGroup",
+                               dsID,
+                               logMessage,
+                               nowUTC);
+
+                w.commit(logMessage);
+                return versions;
+
+            } else { // existing control group is not X
+                if (currentDS.DSControlGrp.equals("M")) {
+                    // nothing modified
+                    return new Date[0];
+                } else {
+                    throw new GeneralException("Original control group must be X, it is " + currentDS.DSControlGrp);
+                }
+            }
+
+        } finally {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
+
+                StringBuilder logMsg =
+                        new StringBuilder("Completed modifyDatastreamControlGroup(");
+                logMsg.append("pid: ").append(pid);
+                logMsg.append(", datastream: ").append(dsID);
+                logMsg.append(", new control group: ").append(controlGroup);
+                logMsg.append(", add XML header: ").append(addXMLHeader);
+                logMsg.append(", set MIMEType charset: ").append(setMIMETypeCharset);
+                logMsg.append(")");
+                logger.info(logMsg.toString());
+            }
+            finishModification(w, "modifyDatastreamControlGroup");
         }
     }
 

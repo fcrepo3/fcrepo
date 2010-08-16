@@ -15,7 +15,8 @@ import org.junit.runners.Suite;
         org.fcrepo.test.api.TestRelationships.class,
         org.fcrepo.test.api.TestRISearch.class,
         org.fcrepo.test.api.TestManagementNotifications.class,
-        org.fcrepo.test.api.TestRESTAPI.class})
+        org.fcrepo.test.api.TestRESTAPI.class,
+        org.fcrepo.test.api.TestAdminAPI.class})
 public class AllSystemTestsConfigB {
 
     // Supports legacy tests runners
@@ -33,6 +34,8 @@ public class AllSystemTestsConfigB {
         suite.addTest(org.fcrepo.test.api.TestRISearch.suite());
         suite.addTest(org.fcrepo.test.api.TestManagementNotifications.suite());
         suite.addTest(org.fcrepo.test.api.TestRESTAPI.suite());
+        suite.addTest(org.fcrepo.test.api.TestAdminAPI.suite());
+
 
         return suite;
     }

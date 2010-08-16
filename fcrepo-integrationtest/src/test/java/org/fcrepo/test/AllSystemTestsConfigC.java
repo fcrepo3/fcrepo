@@ -18,7 +18,8 @@ import org.junit.runners.Suite;
         org.fcrepo.server.messaging.AtomAPIMMessageTest.class,
         org.fcrepo.server.storage.translation.DOTranslationUtilityTest.class,
         org.fcrepo.client.utility.ingest.TestIngest.class,
-        org.fcrepo.test.api.TestRESTAPI.class})
+        org.fcrepo.test.api.TestRESTAPI.class,
+        org.fcrepo.test.api.TestAdminAPI.class})
 public class AllSystemTestsConfigC {
 
     // Supports legacy tests runners
@@ -39,6 +40,7 @@ public class AllSystemTestsConfigC {
         suite.addTest(org.fcrepo.server.messaging.AtomAPIMMessageTest.suite());
         suite.addTest(org.fcrepo.server.storage.translation.DOTranslationUtilityTest.suite());
         suite.addTest(org.fcrepo.client.utility.ingest.TestIngest.suite());
+        suite.addTest(org.fcrepo.test.api.TestAdminAPI.suite());
 
         return suite;
     }

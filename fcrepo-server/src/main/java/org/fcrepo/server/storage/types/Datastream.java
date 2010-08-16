@@ -12,11 +12,12 @@ import java.security.NoSuchAlgorithmException;
 
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.utilities.StringUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -120,7 +121,7 @@ public class Datastream {
 
     public String getChecksumType() {
         if (DSChecksumType == null || DSChecksumType.equals("")
-                || DSChecksumType.equals("none")) {
+                || DSChecksumType.equals(CHECKSUM_NONE)) {
             DSChecksumType = getDefaultChecksumType();
             if (DSChecksumType == null) {
                 logger.warn("checksumType is null");
@@ -130,7 +131,7 @@ public class Datastream {
     }
 
     public String getChecksum() {
-        if (DSChecksum == null || DSChecksum.equals("none")) {
+        if (DSChecksum == null || DSChecksum.equals(CHECKSUM_NONE)) {
             DSChecksum = computeChecksum(getChecksumType());
         }
         logger.debug("Checksum = " + DSChecksum);
@@ -141,14 +142,14 @@ public class Datastream {
         if (csType != null) {
             DSChecksumType = csType;
         }
-        logger.debug("setting ChecksumType to " + DSChecksumType);
+        logger.debug("setting checksum using type: " + DSChecksumType);
         DSChecksum = computeChecksum(DSChecksumType);
         return DSChecksum;
     }
 
     public boolean compareChecksum() {
         if (DSChecksumType == null || DSChecksumType.equals("")
-                || DSChecksumType.equals("none")) {
+                || DSChecksumType.equals(CHECKSUM_NONE)) {
             return false;
         }
         if (DSChecksum == null) {
@@ -166,12 +167,12 @@ public class Datastream {
 
     private String computeChecksum(String csType) {
         logger.debug("checksumType is " + csType);
-        String checksum = "none";
+        String checksum = CHECKSUM_NONE;
         if (csType == null) {
             logger.warn("checksumType is null");
         }
         if (csType.equals(CHECKSUMTYPE_DISABLED)) {
-            checksum = "none";
+            checksum = CHECKSUM_NONE;
             return checksum;
         }
         try {
@@ -190,7 +191,7 @@ public class Datastream {
                 checksum = StringUtility.byteArraytoHexString(md.digest());
             }
         } catch (NoSuchAlgorithmException e) {
-            checksum = "none";
+            checksum = CHECKSUM_NONE;
         } catch (StreamIOException e) {
             // TODO Auto-generated catch block
             checksum = CHECKSUM_IOEXCEPTION;
@@ -279,6 +280,8 @@ public class Datastream {
         target.DSSize = DSSize;
         target.DSLocation = DSLocation;
         target.DSLocationType = DSLocationType;
+        target.DSChecksumType = DSChecksumType;
+        target.DSChecksum = DSChecksum;
     }
 
 }
