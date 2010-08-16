@@ -1,8 +1,23 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.storage.translation;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+
+import java.util.Date;
+import java.util.Iterator;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import org.apache.commons.io.IOUtils;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.ext.thread.ThreadHelper;
@@ -16,6 +31,7 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
 import org.fcrepo.common.xml.format.XMLFormat;
+
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.storage.types.Datastream;
@@ -23,43 +39,30 @@ import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
+
 import org.fcrepo.utilities.MimeTypeUtils;
-
-import org.apache.commons.io.IOUtils;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * <p>Serializes a Fedora Object in Atom with Threading Extensions.</p>
- * 
- * <p>A Fedora Digital Object is represented as an atom:feed and 
+ *
+ * <p>A Fedora Digital Object is represented as an atom:feed and
  * Datastreams are represented as an atom:entries.</p>
- * 
- * <p>The hierarchy of Datastreams their Datastream Versions is 
+ *
+ * <p>The hierarchy of Datastreams their Datastream Versions is
  * represented via the Atom Threading Extensions.
- * For convenience, a datastream entry references its latest datastream 
- * version entry with an atom:link element. For example, a DC datastream 
+ * For convenience, a datastream entry references its latest datastream
+ * version entry with an atom:link element. For example, a DC datastream
  * entry with a reference to its most recent version: <br/>
  * <code>&lt;link href="info:fedora/demo:foo/DC/2008-04-01T12:30:15.123" rel="alternate"/&gt</code></p>
- * 
- * <p>Each datastream version refers to its parent datastream via a 
- * thr:in-reply-to element. For example, the entry for a DC datastream 
+ *
+ * <p>Each datastream version refers to its parent datastream via a
+ * thr:in-reply-to element. For example, the entry for a DC datastream
  * version would include:<br/>
  * <code>&lt;thr:in-reply-to ref="info:fedora/demo:foo/DC"/&gt;</code></p>
- * 
+ *
  * @see <a href="http://atomenabled.org/developers/syndication/atom-format-spec.php">The Atom Syndication Format</a>
  * @see <a href="http://www.ietf.org/rfc/rfc4685.txt">Atom Threading Extensions</a>
- * 
+ *
  * @author Edwin Shin
  * @since 3.0
  * @version $Id$
@@ -88,9 +91,9 @@ public class AtomDOSerializer
     private PID m_pid;
 
     protected Feed m_feed;
-    
+
     private ZipOutputStream m_zout;
-    
+
     public AtomDOSerializer() {
         this(DEFAULT_FORMAT);
     }
@@ -124,7 +127,7 @@ public class AtomDOSerializer
         m_transContext = transContext;
         m_pid = PID.getInstance(m_obj.getPid());
         m_feed = abdera.newFeed();
-        
+
         if (m_format.equals(ATOM_ZIP1_1)) {
             m_zout = new ZipOutputStream(out);
         }
@@ -275,9 +278,9 @@ public class AtomDOSerializer
      * is a separate array list in the DigitalObject class. Audit trail
      * datastream re-created from audit records. There is only ONE version of
      * the audit trail datastream
-     * 
+     *
      * @throws ObjectIntegrityException
-     * @throws StreamIOException 
+     * @throws StreamIOException
      */
     private void addAuditDatastream() throws ObjectIntegrityException, StreamIOException {
         if (m_obj.getAuditRecords().size() == 0) {
@@ -357,7 +360,7 @@ public class AtomDOSerializer
         } else {
             content = new String(ds.xmlContent, m_encoding);
         }
-        
+
         if (m_format.equals(ATOM_ZIP1_1)) {
             String name = ds.DSVersionID + ".xml";
             try {
@@ -415,7 +418,9 @@ public class AtomDOSerializer
                 dsLocation = vds.DSVersionID + "." + MimeTypeUtils.fileExtensionForMIMEType(vds.DSMIME);
                 try {
                     m_zout.putNextEntry(new ZipEntry(dsLocation));
-                    IOUtils.copy(vds.getContentStream(), m_zout);
+                    InputStream is = vds.getContentStream();
+                    IOUtils.copy(is, m_zout);
+                    is.close();
                     m_zout.closeEntry();
                 } catch(IOException e) {
                     throw new StreamIOException(e.getMessage(), e);
@@ -426,7 +431,7 @@ public class AtomDOSerializer
                             .normalizeDSLocationURLs(m_obj.getPid(),
                                                      vds,
                                                      m_transContext).DSLocation);
-                
+
             }
             iri = new IRI(dsLocation);
             entry.setSummary(vds.DSVersionID);
