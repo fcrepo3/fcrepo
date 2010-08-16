@@ -8,7 +8,9 @@ package org.fcrepo.server.rest;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.URLEncoder;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,6 +30,8 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.fcrepo.common.http.WebClient;
+import org.fcrepo.common.http.WebClientConfiguration;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.rest.RestUtil.RequestContent;
 import org.fcrepo.server.rest.param.DateTimeParam;
@@ -485,7 +489,8 @@ public class DatastreamResource
                     if (is == null && dsLocation != null
                             && !dsLocation.equals("")) {
                         try {
-                            WebClient webClient = new WebClient();
+                            WebClientConfiguration webconfig = fedoraServer.getWebClientConfig();
+                            WebClient webClient = new WebClient(webconfig);
                             is = webClient.get(dsLocation, true);
                         } catch (IOException ioe) {
                             throw new Exception("Could not retrive content from "

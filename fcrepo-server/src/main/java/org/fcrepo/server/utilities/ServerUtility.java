@@ -12,12 +12,15 @@ import java.net.URI;
 
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 
-import org.fcrepo.common.Constants;
-import org.fcrepo.common.http.WebClient;
-import org.fcrepo.server.config.ServerConfiguration;
-import org.fcrepo.server.config.ServerConfigurationParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.fcrepo.common.Constants;
+import org.fcrepo.common.http.WebClient;
+import org.fcrepo.common.http.WebClientConfiguration;
+
+import org.fcrepo.server.config.ServerConfiguration;
+import org.fcrepo.server.config.ServerConfigurationParser;
 
 
 
@@ -112,7 +115,9 @@ public class ServerUtility {
         logger.info("Getting URL: " + url);
         UsernamePasswordCredentials creds =
                 new UsernamePasswordCredentials(user, pass);
-        return new WebClient().getResponseAsString(url, true, creds);
+        WebClientConfiguration webconfig = new WebClientConfiguration();
+        initWebClientConfig(webconfig);
+        return new WebClient(webconfig).getResponseAsString(url, true, creds);
     }
 
     /**
@@ -163,6 +168,33 @@ public class ServerUtility {
             }
         }
 
+    }
+
+    /**
+     * Initializes the web client http connection settings.
+     */
+    private static void initWebClientConfig(WebClientConfiguration wconf) {
+
+        if (CONFIG.getParameter("httpClientTimeoutSecs").getValue() != null)
+            wconf.setTimeoutSecs(Integer.parseInt(CONFIG.getParameter("httpClientTimeoutSecs").getValue()));
+
+        if (CONFIG.getParameter("httpClientSocketTimeoutSecs") != null)
+            wconf.setSockTimeoutSecs(Integer.parseInt(CONFIG.getParameter("httpClientSocketTimeoutSecs").getValue()));
+
+        if (CONFIG.getParameter("httpClientMaxConnectionsPerHost") != null)
+            wconf.setMaxConnPerHost(Integer.parseInt(CONFIG.getParameter("httpClientMaxConnectionsPerHost").getValue()));
+
+        if (CONFIG.getParameter("httpClientMaxTotalConnections") != null)
+            wconf.setMaxTotalConn(Integer.parseInt(CONFIG.getParameter("httpClientMaxTotalConnections").getValue()));
+
+        if (CONFIG.getParameter("httpClientFollowRedirects") != null)
+            wconf.setFollowRedirects(Boolean.parseBoolean(CONFIG.getParameter("httpClientFollowRedirects").getValue()));
+
+        if (CONFIG.getParameter("httpClientMaxFollowRedirects") != null)
+            wconf.setMaxRedirects(Integer.parseInt(CONFIG.getParameter("httpClientMaxFollowRedirects").getValue()));
+
+        if (CONFIG.getParameter("httpClientUserAgent") != null)
+            wconf.setUserAgent(CONFIG.getParameter("httpClientUserAgent").getValue());
     }
 
     /**

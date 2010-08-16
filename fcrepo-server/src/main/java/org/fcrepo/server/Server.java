@@ -41,6 +41,7 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.common.FaultException;
 import org.fcrepo.common.MalformedPIDException;
 import org.fcrepo.common.PID;
+import org.fcrepo.common.http.WebClientConfiguration;
 
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.config.ServerConfigurationParser;
@@ -446,6 +447,11 @@ public abstract class Server
             System.getProperty("fedora.serverProfile");
 
     /**
+     * Web Client http connection configuration object
+     */
+    private WebClientConfiguration m_webClientConfig;
+
+    /**
      * Initializes the Server based on configuration.
      * <p>
      * </p>
@@ -532,6 +538,9 @@ public abstract class Server
                         .put(id, new DatastoreConfig((HashMap) datastoreParams
                                 .get(id)));
             }
+
+            // Initialize the web client configuration
+            initWebClientConfig();
 
             // initialize each module
             m_statusFile.append(ServerState.STARTING, "Initializing Modules");
@@ -1398,6 +1407,42 @@ public abstract class Server
             throw new FaultException("Error loading server configuration",
                                      e);
         }
+    }
+
+    /**
+     * Initializes the web client http connection settings.
+     */
+    private void initWebClientConfig() {
+        m_webClientConfig = new WebClientConfiguration();
+
+        if (getParameter("httpClientTimeoutSecs") != null)
+            m_webClientConfig.setTimeoutSecs(Integer.parseInt(getParameter("httpClientTimeoutSecs")));
+
+        if (getParameter("httpClientSocketTimeoutSecs") != null)
+            m_webClientConfig.setSockTimeoutSecs(Integer.parseInt(getParameter("httpClientSocketTimeoutSecs")));
+
+        if (getParameter("httpClientMaxConnectionsPerHost") != null)
+            m_webClientConfig.setMaxConnPerHost(Integer.parseInt(getParameter("httpClientMaxConnectionsPerHost")));
+
+        if (getParameter("httpClientMaxTotalConnections") != null)
+            m_webClientConfig.setMaxTotalConn(Integer.parseInt(getParameter("httpClientMaxTotalConnections")));
+
+        if (getParameter("httpClientFollowRedirects") != null)
+            m_webClientConfig.setFollowRedirects(Boolean.parseBoolean(getParameter("httpClientFollowRedirects")));
+
+        if (getParameter("httpClientMaxFollowRedirects") != null)
+            m_webClientConfig.setMaxRedirects(Integer.parseInt(getParameter("httpClientMaxFollowRedirects")));
+
+        if (getParameter("httpClientUserAgent") != null)
+            m_webClientConfig.setUserAgent(getParameter("httpClientUserAgent"));
+    }
+
+    /**
+     * Gets the web client http connection configuration object.
+     * @return the web client http connection configuration
+     */
+    public WebClientConfiguration getWebClientConfig() {
+        return m_webClientConfig;
     }
 
 }

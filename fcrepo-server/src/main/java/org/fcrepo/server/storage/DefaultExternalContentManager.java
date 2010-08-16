@@ -16,8 +16,13 @@ import javax.activation.MimetypesFileTypeMap;
 
 import org.apache.commons.httpclient.Header;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.http.HttpInputStream;
 import org.fcrepo.common.http.WebClient;
+import org.fcrepo.common.http.WebClientConfiguration;
+
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.GeneralException;
@@ -31,8 +36,6 @@ import org.fcrepo.server.security.BackendSecuritySpec;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.server.utilities.ServerUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -57,6 +60,8 @@ public class DefaultExternalContentManager
     private String fedoraServerPort;
 
     private String fedoraServerRedirectPort;
+
+    private WebClientConfiguration m_httpconfig;
 
     private WebClient m_http;
 
@@ -104,8 +109,12 @@ public class DefaultExternalContentManager
             fedoraServerRedirectPort =
                     s_server.getParameter("fedoraRedirectPort");
 
-            m_http = new WebClient();
-            m_http.USER_AGENT = m_userAgent;
+            m_httpconfig = s_server.getWebClientConfig();
+            if (m_httpconfig.getUserAgent() == null ) {
+                m_httpconfig.setUserAgent(m_userAgent);
+            }
+
+            m_http = new WebClient(m_httpconfig);
 
         } catch (Throwable th) {
             throw new ModuleInitializationException("[DefaultExternalContentManager] "

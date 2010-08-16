@@ -95,7 +95,30 @@
 	<param name="datastreamExtensionMappingSource" value="mime-to-extensions.xml">
 		<comment>Source of mappings from MIMETYPE to file extension</comment>
 	</param>
-
+    <param name="httpClientTimeoutSecs" value="20">
+		<comment>Number of seconds Fedora http client will wait for a connection before timing 
+		out.</comment>
+	</param>
+	<param name="httpClientSocketTimeoutSecs" value="120">
+		<comment>Number of seconds Fedora http client will wait for data coming across an 
+		established http connection.</comment>
+	</param>
+	<param name="httpClientMaxConnectionsPerHost" value="5">
+		<comment>Maximum number of Fedora http client connections allowed to a given host.</comment>
+	</param>
+	<param name="httpClientMaxTotalConnections" value="5">
+		<comment>Maximum number of total Fedora http client connections allowed at once.</comment>
+	</param>
+	<param name="httpClientFollowRedirects" value="true">
+		<comment>Should the Fedora http client follow redirects?</comment>
+	</param>
+	<param name="httpClientMaxFollowRedirects" value="3">
+		<comment>Maximun number of redirects the Fedora http client will follow (only if 
+		httpClientFollowRedirects is set to true.)</comment>
+	</param>
+	<param name="httpClientUserAgent" value="Fedora">
+		<comment>The value to be set for the User-Agent HTTP request header.</comment>
+	</param>
 	<module role="org.fcrepo.server.storage.lowlevel.ILowlevelStorage" 
 			class="org.fcrepo.server.storage.lowlevel.DefaultLowlevelStorageModule">
 		<param name="object_store_base" value="data/objects" isFilePath="true">

@@ -16,15 +16,18 @@ import java.util.Map;
 
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.http.HttpInputStream;
 import org.fcrepo.common.http.WebClient;
+import org.fcrepo.common.http.WebClientConfiguration;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.types.DigitalObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 
@@ -72,6 +75,9 @@ public class GSearchDOManager
 
     /** Credentials we'll use for GSearch authentication, if enabled. */
     private UsernamePasswordCredentials _gSearchCredentials;
+
+    /** HTPP client configuration */
+    private WebClientConfiguration _webClientConfig;
 
     /** HTTP client we'll use for sending GSearch update signals. */
     private WebClient _webClient;
@@ -133,7 +139,8 @@ public class GSearchDOManager
         }
 
         // finally, init the http client we'll use
-        _webClient = new WebClient();
+        _webClientConfig = getServer().getWebClientConfig();
+        _webClient = new WebClient(_webClientConfig);
     }
 
     /**
