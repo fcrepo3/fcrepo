@@ -224,7 +224,7 @@ public class FedoraHome {
 
             // If using akubra-fs, set the class of the module and clear params.
             String llStoreType = _opts.getValue(InstallOptions.LLSTORE_TYPE);
-            if (llStoreType.equals("akubra-fs")) {
+            if (llStoreType == null || llStoreType.equals("akubra-fs")) {
                 ModuleConfiguration mConfig = config.getModuleConfiguration(
                     "org.fcrepo.server.storage.lowlevel.ILowlevelStorage");
                 mConfig.setClassName(
