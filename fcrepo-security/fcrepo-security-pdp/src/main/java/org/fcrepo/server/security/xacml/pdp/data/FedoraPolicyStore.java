@@ -72,6 +72,13 @@ implements PolicyStore {
     // escaping to use for ":" in policy names
     private static final String PID_SEPARATOR_ESCAPED = "%3A"; // = "__";
 
+
+    private static final char[] hexChar = {
+        '0' , '1' , '2' , '3' ,
+        '4' , '5' , '6' , '7' ,
+        '8' , '9' , 'A' , 'B' ,
+        'C' , 'D' , 'E' , 'F'};
+
     // read from config file:
     private String pidNamespace = "";
     private String contentModel = "";
@@ -498,14 +505,48 @@ implements PolicyStore {
     private String getPID(String name) throws PolicyStoreException {
 
         String pid;
-        if (name.contains(":")) {
+        // only bootstrap policies specify the PID namespace, all others follow the config
+        if (name.startsWith(BOOTSTRAP_POLICY_NAMESPACE + ":")) {
             pid = name;
         } else {
-            pid = pidNamespace + ":" + name;
+            // TODO: would be nice to have the PID class contain a method for this
+            // (could be used as a generic method instead of the from-filename etc methods)
+
+            // name might contain non-legal PID characters so encode them
+            StringBuffer out = new StringBuffer();
+            for (int i = 0; i < name.length(); i++) {
+                char c = name.charAt(i);
+                // valid pid characters
+                if (isAlphaNum(c) || c == '-' || c == '.' || c == '~'
+                    || c == '_') {
+                out.append(c);
+                } else {
+                    // do each byte
+                    // FIXME: percent-encoding causing various issues
+                    // (not least with web admin client)
+                    out.append("_");
+                    /*
+                    byte[] bytes;
+                    try {
+                        bytes = Character.toString(c).getBytes("UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        // should never happen
+                        throw new RuntimeException(e);
+                    }
+                    for (byte b : bytes ) {
+                        // percent-encode the byte
+                        out.append("%");
+                        out.append(hexChar[(b >>> 4) & 0xf]);
+                        out.append(hexChar[b & 0xf]);
+                    }
+                    */
+                }
+            }
+            pid = pidNamespace + ":" + out.toString();
         }
 
-
         try {
+            // just in case...
             return PID.normalize(pid);
         } catch (MalformedPIDException e) {
             throw new PolicyStoreException("Invalid policy name '" + name
@@ -707,5 +748,11 @@ implements PolicyStore {
 
         return foxml.toString();
     }
+
+    private static boolean isAlphaNum(char c) {
+        return c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A'
+                && c <= 'Z';
+    }
+
 
 }
