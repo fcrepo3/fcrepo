@@ -244,6 +244,8 @@ public class HttpUtils {
             while ((len = is.read(buf)) >= 0) {
                 res.write(buf, 0, len);
             }
+            // close input stream - with Akubra on Windows failing to close the stream means the object can't be purged
+            is.close();
 
             body = new String(res.toByteArray());
             if (body.contains("Fedora: 403")) {

@@ -325,6 +325,9 @@ extends AbstractInvocationHandler {
 
         try {
             policy = IOUtils.toString(dsContent);
+            // make sure stream is closed - with Akubra on Windows this can leave the stream open
+            // and leave the file locked (prevents a purge later)
+            dsContent.close();
             policyIndex.addPolicy(policy, pid);
         } catch (IOException e) {
             throw new PolicyIndexException("Error adding policy " + pid + " to policy index", e);
@@ -364,6 +367,9 @@ extends AbstractInvocationHandler {
         String policy;
         try {
             policy = IOUtils.toString(dsContent);
+            // make sure stream is closed (IOUtils does not close)
+            // this can leave the file locked in Akubra
+            dsContent.close();
         } catch (IOException e) {
             throw new PolicyIndexException("Error updating policy " + pid + " in policy index", e);
         }
