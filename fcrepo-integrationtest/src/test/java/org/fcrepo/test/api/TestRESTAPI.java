@@ -38,6 +38,7 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -747,13 +748,13 @@ public class TestRESTAPI
             ObjectFields[] fields = result.getResultList();
             for (ObjectFields objectFields : fields) {
                 String pid = objectFields.getPid();
-                System.out.println("validating object '" + pid.toString() + "'");
+                //System.out.println("validating object '" + pid.toString() + "'");
                 url = String.format("/objects/%s/validate", URLEncoder.encode(pid.toString(), "UTF-8"));
                 HttpResponse getTrue = get(true);
                 assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false).getStatusCode());
                 assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
                 String responseXML = getTrue.getResponseBodyString();
-                System.out.println(responseXML);
+                //System.out.println(responseXML);
                 assertXpathExists("/validation[@valid='true']", responseXML);
             }
         } finally {
@@ -1174,7 +1175,7 @@ public class TestRESTAPI
 
     private HttpClient getClient(boolean auth) {
         HttpClient client = new HttpClient();
-        client.getParams().setAuthenticationPreemptive(true);
+        client.getParams().setAuthenticationPreemptive(auth);
         if (auth) {
             client
                     .getState()
@@ -1343,7 +1344,8 @@ public class TestRESTAPI
         HttpResponse(HttpMethod method)
                 throws IOException {
             statusCode = method.getStatusCode();
-            responseBody = method.getResponseBody();
+            responseBody = IOUtils.toByteArray(method.getResponseBodyAsStream());
+            // responseBody = method.getResponseBody();
             responseHeaders = method.getResponseHeaders();
             responseFooters = method.getResponseFooters();
         }
