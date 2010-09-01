@@ -376,25 +376,13 @@ public class SQLRebuilder
     private void registerObject(DigitalObject obj)
             throws StorageDeviceException {
         String pid = obj.getPid();
-        String userId = obj.getOwnerId();
-        String label = obj.getLabel();
-
-        // label or contentModelId may be null...set to blank if so
-        String theLabel = label;
-        if (theLabel == null) {
-            theLabel = "";
-        }
         Connection conn = null;
         Statement s1 = null;
         try {
-            String query =
-                    "INSERT INTO doRegistry (doPID, " + "ownerId, label) "
-                            + "VALUES ('" + pid + "', '" + userId + "', '"
-                            + SQLUtility.aposEscape(theLabel) + "')";
             conn = m_connectionPool.getConnection();
             s1 = conn.createStatement();
-            s1.executeUpdate(query);
-
+            s1.executeUpdate("INSERT INTO doRegistry (doPID) "
+                    + "VALUES ('" + pid + "')");
             if (obj.hasContentModel(Models.SERVICE_DEPLOYMENT_3_0)){
                 updateDeploymentMap(obj, conn);
             }

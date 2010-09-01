@@ -947,8 +947,7 @@ public class DefaultDOManager
                 // REGISTRY:
                 // at this point the object is valid, so make a record
                 // of it in the digital object registry
-                registerObject(obj, getUserId(context), obj.getLabel(), obj
-                        .getCreateDate(), obj.getLastModDate());
+                registerObject(obj);
                 return w;
             } catch (IOException e) {
 
@@ -1553,72 +1552,18 @@ public class DefaultDOManager
         }
     }
 
-    public String getOwnerId(String pid) throws StorageDeviceException,
-            ObjectNotFoundException {
-        Connection conn = null;
-        Statement s = null;
-        ResultSet results = null;
-        try {
-            String query =
-                    "SELECT ownerId " + "FROM doRegistry " + "WHERE doPID='"
-                            + pid + "'";
-            conn = m_connectionPool.getConnection();
-            s = conn.createStatement();
-            results = s.executeQuery(query);
-            if (results.next()) {
-                return results.getString(1);
-            } else {
-                throw new ObjectNotFoundException("Object " + pid
-                        + " not found in object registry.");
-            }
-        } catch (SQLException sqle) {
-            throw new StorageDeviceException("Unexpected error from SQL database: "
-                    + sqle.getMessage());
-        } finally {
-            try {
-                if (results != null) {
-                    results.close();
-                }
-                if (s != null) {
-                    s.close();
-                }
-                if (conn != null) {
-                    m_connectionPool.free(conn);
-                }
-            } catch (SQLException sqle) {
-                throw new StorageDeviceException("Unexpected error from SQL database: "
-                        + sqle.getMessage());
-            } finally {
-                results = null;
-                s = null;
-            }
-        }
-    }
-
     /**
      * Adds a new object. The caller *must* ensure the object does not already
      * exist in the registry before calling this method.
      */
-    private void registerObject(DigitalObject obj,
-                                String userId,
-                                String label,
-                                Date createDate,
-                                Date lastModDate) throws StorageDeviceException {
-        String theLabel = label;
-        String pid = obj.getPid();
-        if (theLabel == null) {
-            theLabel = "";
-        }
+    private void registerObject(DigitalObject obj) throws StorageDeviceException {
         Connection conn = null;
         Statement st = null;
         try {
-            String query =
-                    "INSERT INTO doRegistry (doPID,  " + "ownerId, label) "
-                            + "VALUES ('" + pid + "', '" + userId + "', '"
-                            + SQLUtility.aposEscape(theLabel) + "')";
             conn = m_connectionPool.getConnection();
             st = conn.createStatement();
-            st.executeUpdate(query);
+            st.executeUpdate("INSERT INTO doRegistry (doPID) "
+                    + "VALUES ('" + obj.getPid() + "')");
         } catch (SQLException sqle) {
             // clean up if the INSERT didn't succeeed
             try {

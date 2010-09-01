@@ -34,14 +34,8 @@
                one each time a change is committed to the definitive store.
       </comment>
 		</column>
-		<column name="ownerId" type="varchar(64)" notNull="false">
-			<comment>The userId of the user who owns the object.</comment>
-		</column>
 		<column name="objectState" type="varchar(1)" notNull="true" default="A">
 			<comment>The state of the object (currently unused)</comment>
-		</column>
-		<column name="label" type="varchar(255)" notNull="false" default="">
-			<comment>The label of the object.</comment>
 		</column>
 	</table>
 	
