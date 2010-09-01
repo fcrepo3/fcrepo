@@ -245,7 +245,9 @@ public class HttpUtils {
                 res.write(buf, 0, len);
             }
             // close input stream - with Akubra on Windows failing to close the stream means the object can't be purged
-            is.close();
+            // removed - exercises FCREPO-775 (sometimes)
+            // (if client reads whole of stream but doesn't close this should not prevent a purge of the datastream)
+            //is.close();
 
             body = new String(res.toByteArray());
             if (body.contains("Fedora: 403")) {
