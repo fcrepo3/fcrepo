@@ -25,6 +25,7 @@ import org.fcrepo.server.errors.ValidationException;
 import org.fcrepo.server.storage.ContentManagerParams;
 import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
+import org.fcrepo.server.utilities.AutoClosingInputStream;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationUtility;
 
@@ -137,7 +138,7 @@ public class DatastreamManagedContent
                 File uploadedFile = new File(getTempUploadDir(), internalId);
                 // check it has not been automatically purged (see DefaultManagement.purgeUploadedFiles())
                 if (uploadedFile.exists()) {
-                    return new FileInputStream(uploadedFile);
+                    return new AutoClosingInputStream(new FileInputStream(uploadedFile));
                 } else {
                     throw new StreamIOException("Uploaded file " + DSLocation + " no longer exists.");
                 }
@@ -148,7 +149,7 @@ public class DatastreamManagedContent
                 File tempFile = new File(fileName);
                 // check it has not been removed elsewhere (should not happen)
                 if (tempFile.exists()) {
-                    return new FileInputStream(tempFile);
+                    return new AutoClosingInputStream(new FileInputStream(tempFile));
                 } else {
                     throw new StreamIOException("Temp file " + DSLocation + " no longer exists.");
                 }
@@ -172,12 +173,12 @@ public class DatastreamManagedContent
                     OutputStream os = new FileOutputStream(tempFile);
                     StreamUtility.pipeStream(stream.getStream(), os, 32768);
                     DSLocation = TEMP_SCHEME + tempFile.getAbsolutePath();
-                    return new FileInputStream(new File(tempFile.getAbsolutePath()));
+                    return new AutoClosingInputStream(new FileInputStream(new File(tempFile.getAbsolutePath())));
 
                 } catch(ValidationException e) {
                     // At this point, assume it's an internal id
                     // (e.g. demo:foo+DS1+DS1.0)
-                    return getLLStore().retrieveDatastream(DSLocation);
+                    return new AutoClosingInputStream(getLLStore().retrieveDatastream(DSLocation));
                 }
             }
         } catch (Throwable th) {
