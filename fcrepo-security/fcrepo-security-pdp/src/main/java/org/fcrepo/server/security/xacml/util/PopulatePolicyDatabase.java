@@ -43,6 +43,8 @@ import org.fcrepo.server.security.xacml.pdp.data.PolicyUtils;
  */
 public class PopulatePolicyDatabase {
 
+    private static boolean policiesLoaded = false;
+
     private static final Logger logger =
             LoggerFactory.getLogger(PopulatePolicyDatabase.class);
 
@@ -82,8 +84,12 @@ public class PopulatePolicyDatabase {
         logger.info("Time taken: " + (time2 - time1));
     }
 
-    public static void addDocuments() throws PolicyStoreException,
-            FileNotFoundException {
+    public static synchronized void addDocuments() throws PolicyStoreException,
+    FileNotFoundException {
+
+        if (policiesLoaded)
+            return;
+
         File[] files = getPolicyFiles();
         if (files.length == 0) {
             return;
@@ -110,22 +116,23 @@ public class PopulatePolicyDatabase {
                 }
 
                 if (policyStore.contains(policyID)) {
-                if (logger.isDebugEnabled()) {
+                    if (logger.isDebugEnabled()) {
                         logger.debug("Policy database already contains " + policyID + " (" + f.getName()+ ")"
-                            + ". Skipping.");
-                }
-            } else {
+                                     + ". Skipping.");
+                    }
+                } else {
                     policyNames.add(policyStore.addPolicy(f, policyID));
-            }
+                }
             } catch (MelcoePDPException e){
                 logger.warn("Failed to add bootstrap policy " + f.getName() + " - " + e.getMessage());
                 failedPolicies.append(f.getName() + "\n");
-        }
+            }
 
-    }
+        }
         if (failedPolicies.length() != 0) {
             throw new PolicyStoreException("Failed to load some bootstrap policies: " + failedPolicies.toString());
         }
+        policiesLoaded = true;
     }
 
     public static void list() throws PolicyStoreException {
