@@ -947,7 +947,7 @@ public class DefaultDOManager
                 // REGISTRY:
                 // at this point the object is valid, so make a record
                 // of it in the digital object registry
-                registerObject(obj);
+                registerObject(obj, obj.getCreateDate(), obj.getLastModDate());
                 return w;
             } catch (IOException e) {
 
@@ -1501,18 +1501,6 @@ public class DefaultDOManager
     }
 
     /**
-     * Gets the userId property from the context... if it's not populated,
-     * throws an InvalidContextException.
-     */
-    private String getUserId(Context context) throws InvalidContextException {
-        String ret = context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri);
-        if (ret == null) {
-            throw new InvalidContextException("The context identifies no userId, but a user must be identified for this operation.");
-        }
-        return ret;
-    }
-
-    /**
      * Checks the object registry for the given object.
      */
     public boolean objectExists(String pid) throws StorageDeviceException {
@@ -1556,14 +1544,23 @@ public class DefaultDOManager
      * Adds a new object. The caller *must* ensure the object does not already
      * exist in the registry before calling this method.
      */
-    private void registerObject(DigitalObject obj) throws StorageDeviceException {
+    private void registerObject(DigitalObject obj,
+                                Date createDate,
+                                Date lastModDate) throws StorageDeviceException {
+        String theLabel = "the label field is no longer used";
+        String ownerID = "the ownerID field is no longer used";
+        String pid = obj.getPid();
+
         Connection conn = null;
         Statement st = null;
         try {
+            String query =
+                    "INSERT INTO doRegistry (doPID,  " + "ownerId, label) "
+                            + "VALUES ('" + pid + "', '" + ownerID + "', '"
+                            + theLabel + "')";
             conn = m_connectionPool.getConnection();
             st = conn.createStatement();
-            st.executeUpdate("INSERT INTO doRegistry (doPID) "
-                    + "VALUES ('" + obj.getPid() + "')");
+            st.executeUpdate(query);
         } catch (SQLException sqle) {
             // clean up if the INSERT didn't succeeed
             try {
