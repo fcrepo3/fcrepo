@@ -23,8 +23,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
@@ -48,10 +52,7 @@ import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.RelationshipTuple;
-import org.fcrepo.server.utilities.SQLUtility;
 import org.fcrepo.server.utilities.TableSpec;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A Rebuilder for the SQL database.
@@ -376,13 +377,20 @@ public class SQLRebuilder
     private void registerObject(DigitalObject obj)
             throws StorageDeviceException {
         String pid = obj.getPid();
+        String userId = "the userID field is no longer used";
+        String label = "the label field is no longer used";
+
         Connection conn = null;
         Statement s1 = null;
         try {
+            String query =
+                    "INSERT INTO doRegistry (doPID, " + "ownerId, label) "
+                            + "VALUES ('" + pid + "', '" + userId + "', '"
+                            + label + "')";
             conn = m_connectionPool.getConnection();
             s1 = conn.createStatement();
-            s1.executeUpdate("INSERT INTO doRegistry (doPID) "
-                    + "VALUES ('" + pid + "')");
+            s1.executeUpdate(query);
+
             if (obj.hasContentModel(Models.SERVICE_DEPLOYMENT_3_0)){
                 updateDeploymentMap(obj, conn);
             }
