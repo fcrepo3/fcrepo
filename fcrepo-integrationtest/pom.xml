@@ -298,6 +298,7 @@
                     <include>**/SharedDeploymentTests.class</include>
                     <include>**/ContentModelDSInputTest.class</include>
                     <include>**/TestAdminAPI.class</include>
+                    <include>**/TestAPIM2.class</include>
                     
 
                   </includes>
