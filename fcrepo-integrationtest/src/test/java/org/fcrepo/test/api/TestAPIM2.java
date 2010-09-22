@@ -5,16 +5,11 @@
 package org.fcrepo.test.api;
 
 import java.io.File;
-import java.io.FileInputStream;
 
 import java.rmi.RemoteException;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Properties;
-import java.util.Set;
 
 import org.apache.axis.types.NonNegativeInteger;
 
@@ -23,8 +18,6 @@ import org.apache.commons.io.FileUtils;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
-
-import org.antlr.stringtemplate.StringTemplate;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -39,6 +32,7 @@ import org.fcrepo.server.types.gen.FieldSearchQuery;
 import org.fcrepo.server.types.gen.FieldSearchResult;
 
 import org.fcrepo.test.FedoraServerTestCase;
+import org.fcrepo.test.TemplatedResourceIterator;
 
 /**
  * Test APIM based on templating of resource files
@@ -147,14 +141,14 @@ public class TestAPIM2
         NonNegativeInteger maxResults = new NonNegativeInteger("100");
 
 
-        String termsTemplate = "demo:*$value$";
+        String termsTemplate = "$value$";
         TemplatedResourceIterator tri = new TemplatedResourceIterator(termsTemplate, "src/test/resources/APIM2/searchvalues");
         while (tri.hasNext()) {
             FieldSearchQuery query;
             FieldSearchResult res;
 
             // using conditions
-            Condition[] conditions = {new Condition("pid", ComparisonOperator.fromString("eq"), "demo:1" + tri.getAttributeValue("value"))};
+            Condition[] conditions = {new Condition("pid", ComparisonOperator.fromString("eq"), tri.getAttributeValue("value"))};
             query = new FieldSearchQuery(conditions, null);
             try {
                 res = apia.findObjects(resultFields, maxResults, query);
@@ -163,7 +157,6 @@ public class TestAPIM2
                     throw e;
             }
 
-            // using query
             String terms = tri.next();
             query = new FieldSearchQuery(null, terms);
             try {
@@ -269,138 +262,4 @@ public class TestAPIM2
         junit.textui.TestRunner.run(TestAPIM2.class);
     }
 
-    /**
-     * Iterator that takes a set of attribute values from a values file
-     * and iterates by repeatedly substituting in the next set of values into the
-     * template
-     *
-     * values file format: java properties, with
-     * template.attribute.sets.count=n :
-     *   number of sets to iterate over
-     * template.attribute.set.0.someattribute1=value1:
-     * template.attribute.set.0.someattribute2=value2:
-     *   when on set iteration 0, substitute $someattribute1$ with value1
-     *   and similarly $someattribute2$ with value2
-     * nb: sets are zero-indexed, numbered 0 to count - 1
-     *     escape backslashes to \\
-     *
-     * @author Stephen Bayliss
-     * @version $Id$
-     */
-    // TODO: consider moving out to utils, could be used by other tests
-    class TemplatedResourceIterator implements Iterator<String> {
-
-        // template source
-        private final String m_templateSource;
-
-        // properties file contains attributes and values to substitute
-        private final String m_valuesFilename;
-        private final Properties m_values;
-        private final Set<String> m_propertyNames;
-
-        // number of sets to iterate
-        private final int m_setCount;
-        // index of next set to return with next()
-        private int m_nextSet = 0;
-
-        // for validation of consistent attribute counts across sets
-        int m_lastAttributeCount = -1;
-
-        // character escaping to perform
-        private final boolean m_escapeXML;
-
-        TemplatedResourceIterator(String template, String valuesFilename) throws Exception {
-            this(template, valuesFilename, false);
-        }
-        TemplatedResourceIterator(String template, String valuesFilename, boolean escapeXML) throws Exception {
-            m_escapeXML = escapeXML;
-
-            m_values = new Properties();
-            m_valuesFilename = valuesFilename;
-            m_values.load(new FileInputStream(m_valuesFilename));
-
-            m_setCount = Integer.parseInt(m_values.getProperty("template.attribute.sets.count"));
-            m_propertyNames = m_values.stringPropertyNames();
-
-            // the stuff to template
-            m_templateSource = template;
-
-        }
-
-        @Override
-        public boolean hasNext() {
-            return (m_nextSet < m_setCount);
-        }
-
-        @Override
-        public String next() {
-
-            if (m_nextSet >= m_setCount)
-                throw new NoSuchElementException();
-
-            // all properties in the current set start with...
-            String setPropertyNamePrefix = "template.attribute.set." + m_nextSet + ".";
-
-            StringTemplate tpl = new StringTemplate(m_templateSource);
-
-            int attributeCount = 0; // count number of attributes specified for replacement
-            for (String propertyName : m_propertyNames) {
-                // property for an attribute for the current set?
-                if (propertyName.startsWith(setPropertyNamePrefix)) {
-                    // get attribute name and value
-                    String attributeName = propertyName.replace(setPropertyNamePrefix, "");
-                    String attributeValue = m_values.getProperty(propertyName);
-
-                    // escape value if necessary
-                    String value;
-                    if (m_escapeXML) {
-                        value = escapeXML(attributeValue);
-                    } else {
-                        value = attributeValue;
-                    }
-
-                    tpl.setAttribute(attributeName, value);
-
-                    attributeCount++;
-                }
-            }
-            // some checks
-            if (attributeCount == 0)
-                throw new RuntimeException("No attributes found for set " + m_nextSet + " (" + m_valuesFilename + ")" );
-            if (m_lastAttributeCount != -1) {
-                if (m_lastAttributeCount != attributeCount)
-                    throw new RuntimeException("Number of attributes is different in sets " + (m_nextSet -1) + " and " + m_nextSet + " (" + m_valuesFilename + ")" );
-            }
-            m_lastAttributeCount = attributeCount;
-
-            m_nextSet++;
-            return tpl.toString();
-        }
-
-        public String getAttributeValue(String attributeName) {
-            // gets a named attribute for the current set
-            String propertyName = "template.attribute.set." + m_nextSet + "." + attributeName;
-            return m_values.getProperty(propertyName);
-        }
-
-        @Override
-        public void remove() {
-            throw new RuntimeException("Method remove() is not supported");
-
-        }
-
-        // TODO: make generic, allow different forms of escaping?
-        private String escapeXML(String toEscape) {
-            String res = toEscape;
-            // standard xml entities
-            // nb cast to CharSequence to prevent regex matching
-            res = res.replace("\"", "&quot;");
-            res = res.replace("'", "&apos;");
-            res = res.replace("&", "&amp;");
-            res = res.replace("<", "&lt;");
-            res = res.replace(">", "&gt;");
-
-            return res;
-        }
-    }
 }
