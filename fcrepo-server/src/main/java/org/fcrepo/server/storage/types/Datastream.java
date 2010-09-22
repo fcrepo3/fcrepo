@@ -175,11 +175,12 @@ public class Datastream {
             checksum = CHECKSUM_NONE;
             return checksum;
         }
+        InputStream is = null;
         try {
             MessageDigest md = MessageDigest.getInstance(csType);
             logger.debug("Classname = " + this.getClass().getName());
             logger.debug("location = " + DSLocation);
-            InputStream is = getContentStreamForChecksum();
+            is = getContentStreamForChecksum();
             if (is != null) {
                 byte buffer[] = new byte[5000];
                 int numread;
@@ -187,6 +188,7 @@ public class Datastream {
                 while ((numread = is.read(buffer, 0, 5000)) > 0) {
                     md.update(buffer, 0, numread);
                 }
+                is.close();
                 logger.debug("...Done reading content");
                 checksum = StringUtility.byteArraytoHexString(md.digest());
             }
@@ -200,6 +202,14 @@ public class Datastream {
             // TODO Auto-generated catch block
             checksum = CHECKSUM_IOEXCEPTION;
             logger.warn("IOException reading datastream to generate checksum");
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    logger.warn("IOException closing stream (computeChecksum) in finally");
+                }
+            }
         }
         return checksum;
     }
