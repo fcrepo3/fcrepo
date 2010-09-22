@@ -18,12 +18,14 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.fcrepo.common.MalformedPIDException;
-import org.fcrepo.common.PID;
-import org.fcrepo.server.storage.ConnectionPool;
-import org.fcrepo.server.utilities.SQLUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.fcrepo.common.MalformedPIDException;
+import org.fcrepo.common.PID;
+
+import org.fcrepo.server.storage.ConnectionPool;
+import org.fcrepo.server.utilities.SQLUtility;
 
 /**
  * A PIDGenerator that uses a database to keep track of the highest pid it knows
@@ -61,7 +63,7 @@ public class DBPIDGenerator
         ResultSet results = null;
         Connection conn = null;
         try {
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadOnlyConnection();
             String query = "SELECT namespace, highestID FROM pidGen";
             s = conn.createStatement();
             results = s.executeQuery(query);
@@ -188,7 +190,7 @@ public class DBPIDGenerator
         // write the new highest id in the database, too
         Connection conn = null;
         try {
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadWriteConnection();
             SQLUtility.replaceInto(conn,
                                    "pidGen",
                                    new String[] {"namespace", "highestID"},

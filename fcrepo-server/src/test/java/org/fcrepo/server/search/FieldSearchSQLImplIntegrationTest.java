@@ -13,22 +13,18 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.fcrepo.server.search.Condition;
-import org.fcrepo.server.search.FieldSearchQuery;
-import org.fcrepo.server.search.FieldSearchResult;
-import org.fcrepo.server.search.FieldSearchSQLImpl;
 import org.fcrepo.server.storage.ConnectionPool;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.MockRepositoryReader;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
 
+import static org.junit.Assert.assertEquals;
 
 import static org.fcrepo.server.storage.types.ObjectBuilder.addXDatastream;
 import static org.fcrepo.server.storage.types.ObjectBuilder.getDC;
 import static org.fcrepo.server.storage.types.ObjectBuilder.getTestObject;
 import static org.fcrepo.server.storage.types.ObjectBuilder.setDates;
-import static org.junit.Assert.assertEquals;
 
 
 public class FieldSearchSQLImplIntegrationTest {
@@ -89,7 +85,7 @@ public class FieldSearchSQLImplIntegrationTest {
                                        testWhileIdle,
                                        whenExhaustedAction);
         }
-        Connection conn = cPool.getConnection();
+        Connection conn = cPool.getReadWriteConnection();
         executeUpdate(conn, "DROP TABLE doFields", true);
         executeUpdate(conn, "DROP TABLE dcDates", true);
         executeUpdate(conn, "CREATE TABLE doFields (\n"

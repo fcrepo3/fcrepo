@@ -7,25 +7,24 @@ package org.fcrepo.mock.sql;
 
 import java.sql.Array;
 import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.NClob;
-import java.sql.SQLClientInfoException;
-import java.sql.SQLXML;
-import java.sql.Struct;
-import java.util.Properties;
-
 import java.sql.CallableStatement;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.NClob;
 import java.sql.PreparedStatement;
+import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
+import java.sql.Struct;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * A partial implementation of {@link Connection} for use in unit tests. Add
@@ -43,6 +42,8 @@ public class MockConnection
     protected boolean closed;
 
     protected boolean autoCommit;
+
+    protected boolean readOnly = false;
 
     protected SQLWarning warnings;
 
@@ -111,6 +112,14 @@ public class MockConnection
         return stmt;
     }
 
+    public boolean isReadOnly() throws SQLException {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean arg0) throws SQLException {
+        readOnly = arg0;
+    }
+
     // ----------------------------------------------------------------------
     // Un-implemented methods
     // ----------------------------------------------------------------------
@@ -146,10 +155,6 @@ public class MockConnection
 
     public Map<String, Class<?>> getTypeMap() throws SQLException {
         throw new RuntimeException("MockConnection.getTypeMap not implemented");
-    }
-
-    public boolean isReadOnly() throws SQLException {
-        throw new RuntimeException("MockConnection.isReadOnly not implemented");
     }
 
     public String nativeSQL(String arg0) throws SQLException {
@@ -217,10 +222,6 @@ public class MockConnection
 
     public void setHoldability(int arg0) throws SQLException {
         throw new RuntimeException("MockConnection.setHoldability not implemented");
-    }
-
-    public void setReadOnly(boolean arg0) throws SQLException {
-        throw new RuntimeException("MockConnection.setReadOnly not implemented");
     }
 
     public Savepoint setSavepoint() throws SQLException {

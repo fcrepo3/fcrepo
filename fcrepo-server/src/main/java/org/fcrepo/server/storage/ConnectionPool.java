@@ -14,11 +14,13 @@ import java.util.Properties;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 
-import org.fcrepo.server.utilities.DDLConverter;
-import org.fcrepo.server.utilities.TableCreatingConnection;
-import org.fcrepo.utilities.install.InstallOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.fcrepo.server.utilities.DDLConverter;
+import org.fcrepo.server.utilities.TableCreatingConnection;
+
+import org.fcrepo.utilities.install.InstallOptions;
 
 
 
@@ -148,6 +150,8 @@ public class ConnectionPool {
                     (BasicDataSource) BasicDataSourceFactory
                             .createDataSource(props);
             dataSource.setDriverClassName(driver);
+            // by default, connections are read-only
+            dataSource.setDefaultReadOnly(true);
         } catch (Exception e) {
             throw new SQLException("Error initializing connection pool", e);
         }
@@ -263,14 +267,15 @@ public class ConnectionPool {
         if (ddlConverter == null) {
             return null;
         } else {
-            Connection c = getConnection();
+            Connection c = getReadWriteConnection();
             return new TableCreatingConnection(c, ddlConverter);
         }
     }
 
     /**
      * <p>
-     * Gets the next available connection.
+     * Gets the next available connection.  Connection is read-only, see
+     * getReadWriteConnection() for performing updates
      * </p>
      *
      * @return The next available connection.
@@ -278,9 +283,12 @@ public class ConnectionPool {
      *         If the maximum number of connections has been reached or there is
      *         some other problem in obtaining the connection.
      */
-    public Connection getConnection() throws SQLException {
+    public Connection getReadOnlyConnection() throws SQLException {
         try {
-            return dataSource.getConnection();
+            Connection conn = dataSource.getConnection();
+         // not really needed as connections read only by default, but just in case...
+            conn.setReadOnly(true);
+            return conn;
         } finally {
             if (logger.isDebugEnabled()) {
                 logger.debug("Got connection from pool (" + toString() + ")");
@@ -288,6 +296,28 @@ public class ConnectionPool {
         }
     }
 
+    /**
+     * <p>
+     * Gets the next available connection.  Connection is read-write, only
+     * use if updates are to be performed, otherwise use getReadOnlyConnection()
+     * </p>
+     *
+     * @return The next available connection.
+     * @throws SQLException
+     *         If the maximum number of connections has been reached or there is
+     *         some other problem in obtaining the connection.
+     */
+    public Connection getReadWriteConnection() throws SQLException {
+        try {
+            Connection conn = dataSource.getConnection();
+            conn.setReadOnly(false);
+            return conn;
+        } finally {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Got connection from pool (" + toString() + ")");
+            }
+        }
+    }
     /**
      * <p>
      * Releases the specified connection and returns it to the pool.
@@ -298,6 +328,8 @@ public class ConnectionPool {
      */
     public void free(Connection connection) {
         try {
+            // ensure connections returned to pool as read-only
+            connection.setReadOnly(true);
             connection.close();
         } catch (SQLException sqle) {
             logger.warn("Unable to close connection", sqle);

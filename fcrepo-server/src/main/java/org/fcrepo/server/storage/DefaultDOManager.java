@@ -399,7 +399,7 @@ public class DefaultDOManager
         Statement s = null;
         ResultSet r = null;
         try {
-            c = m_connectionPool.getConnection();
+            c = m_connectionPool.getReadOnlyConnection();
             s =
                     c.createStatement(ResultSet.TYPE_FORWARD_ONLY,
                                       ResultSet.CONCUR_READ_ONLY);
@@ -1352,7 +1352,7 @@ public class DefaultDOManager
                 Statement s = null;
                 ResultSet results = null;
                 try {
-                    conn = m_connectionPool.getConnection();
+                    conn = m_connectionPool.getReadWriteConnection();
                     String query =
                             "SELECT systemVersion " + "FROM doRegistry "
                                     + "WHERE doPID='" + obj.getPid() + "'";
@@ -1512,7 +1512,7 @@ public class DefaultDOManager
             String query =
                     "SELECT doPID " + "FROM doRegistry " + "WHERE doPID='"
                             + pid + "'";
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadOnlyConnection();
             s = conn.createStatement();
             results = s.executeQuery(query);
             return results.next(); // 'true' if match found, else 'false'
@@ -1556,7 +1556,7 @@ public class DefaultDOManager
                     "INSERT INTO doRegistry (doPID,  " + "ownerId, label) "
                             + "VALUES ('" + pid + "', '" + ownerID + "', '"
                             + theLabel + "')";
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadWriteConnection();
             st = conn.createStatement();
             st.executeUpdate(query);
         } catch (SQLException sqle) {
@@ -1594,7 +1594,7 @@ public class DefaultDOManager
         Connection conn = null;
         Statement st = null;
         try {
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadWriteConnection();
             st = conn.createStatement();
             st
                     .executeUpdate("DELETE FROM doRegistry WHERE doPID='" + pid
@@ -1743,7 +1743,7 @@ public class DefaultDOManager
         Statement s = null;
         ResultSet results = null;
         try {
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadOnlyConnection();
             s = conn.createStatement();
             StringBuffer query = new StringBuffer();
             query.append("SELECT doPID FROM doRegistry ");
@@ -1857,7 +1857,7 @@ public class DefaultDOManager
 
         Connection conn = null;
         try {
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadOnlyConnection();
 
             StringBuffer hash = new StringBuffer();
             hash.append(getNumObjectsWithVersion(conn, 0));

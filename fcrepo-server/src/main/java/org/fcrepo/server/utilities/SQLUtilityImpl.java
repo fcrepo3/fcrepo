@@ -21,11 +21,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.server.config.DatastoreConfiguration;
 import org.fcrepo.server.errors.InconsistentTableSpecException;
 import org.fcrepo.server.storage.ConnectionPool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -278,7 +279,7 @@ class SQLUtilityImpl
         List<TableSpec> nonExisting = null;
         Connection conn = null;
         try {
-            conn = cPool.getConnection();
+            conn = cPool.getReadOnlyConnection();
             nonExisting =
                     i_getNonExistingTables(conn, TableSpec
                             .getTableSpecs(dbSpec));
