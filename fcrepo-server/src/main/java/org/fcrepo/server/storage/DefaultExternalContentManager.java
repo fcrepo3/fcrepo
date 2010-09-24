@@ -4,11 +4,15 @@
  */
 package org.fcrepo.server.storage;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 
 import java.net.URI;
 import java.net.URL;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -19,6 +23,7 @@ import org.apache.commons.httpclient.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.fcrepo.common.Constants;
 import org.fcrepo.common.http.HttpInputStream;
 import org.fcrepo.common.http.WebClient;
 import org.fcrepo.common.http.WebClientConfiguration;
@@ -53,6 +58,9 @@ public class DefaultExternalContentManager
             LoggerFactory.getLogger(DefaultExternalContentManager.class);
 
     private static final String DEFAULT_MIMETYPE="text/plain";
+
+    private Map<String, String[]> edsCreds;
+
     private String m_userAgent;
 
     private String fedoraServerHost;
@@ -116,16 +124,35 @@ public class DefaultExternalContentManager
 
             m_http = new WebClient(m_httpconfig);
 
+            // populate edsCreds
+            edsCreds = new HashMap<String, String[]>();
+            File edsCredsFile = new File(Constants.FEDORA_HOME, "server/config/eds-creds.conf");
+            if (edsCredsFile.exists()) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(edsCredsFile)));
+                try {
+                    String line = reader.readLine();
+                    int lineNum = 0;
+                    while (line != null) {
+                        lineNum++;
+                        line = line.trim();
+                        if (line.length() > 0 && line.charAt(0) != '#') {
+                            String[] p = line.split(" ");
+                            if (p.length != 3) {
+                                throw new RuntimeException("Error in eds-creds.conf, line #" + lineNum + ": expected 3 space-delimited tokens (url prefix, username, password)");
+                            }
+                            edsCreds.put(p[0], new String[] { p[1], p[2] });
+                        }
+                        line = reader.readLine();
+                    }
+                    logger.info("Configured " + edsCreds.size() + " credential(s) from eds-creds.conf");
+                } finally {
+                    reader.close();
+                }
+            } else {
+                logger.info("eds-creds.conf not present; credentials will not be used for external datastream access");
+            }
         } catch (Throwable th) {
-            throw new ModuleInitializationException("[DefaultExternalContentManager] "
-                                                            + "An external content manager "
-                                                            + "could not be instantiated. The underlying error was a "
-                                                            + th.getClass()
-                                                                    .getName()
-                                                            + "The message was \""
-                                                            + th.getMessage()
-                                                            + "\".",
-                                                    getRole());
+            throw new ModuleInitializationException("Initialization error", getRole(), th);
         }
     }
 
@@ -146,6 +173,7 @@ public class DefaultExternalContentManager
                 return getFromFilesystem(params);
             }
             if (params.getProtocol().equals("http") || params.getProtocol().equals("https")){
+                addCredentialsIfNeeded(params);
                 return getFromWeb(params);
             }
             throw new GeneralException("protocol for retrieval of external content not supported. URL: " + params.getUrl());
@@ -158,6 +186,20 @@ public class DefaultExternalContentManager
                     + "  The message "
                     + "was  \""
                     + ex.getMessage() + "\"  .  ",ex);
+        }
+    }
+
+    // sets the username and password of the given params if the url
+    // starts with one of the prefixes specified in eds-creds.conf
+    private void addCredentialsIfNeeded(ContentManagerParams params) {
+        String url = params.getUrl();
+        for (String prefix: edsCreds.keySet()) {
+            if (url.startsWith(prefix)) {
+                String[] creds = edsCreds.get(prefix);
+                params.setUsername(creds[0]);
+                params.setPassword(creds[1]);
+                break;
+            }
         }
     }
 

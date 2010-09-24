@@ -1,0 +1,49 @@
+This branch contains an experimental version of Fedora that supports
+passing Basic Authentication credentials for "E" datastreams, through
+the use of a global configuration file, server/config/eds-creds.conf
+
+To build it:
+------------
+1) Make sure you have a recent subversion command line client.
+   If you don't, you can get one for your OS at:
+   http://subversion.apache.org/packages.html
+2) Make sure you have a recent version of maven installed.
+   If you don't, you can download it from:
+   http://maven.apache.org/download.html
+3) Check out the branch from subversion, via:
+     svn co https://fedora-commons.svn.sourceforge.net/svnroot/fedora-commons/fedora/branches/fcrepo-748
+4) Build the installer using maven, via:
+     cd fcrepo-748
+     mvn install -P fedora-installer
+     (if you haven't yet built a recent version of Fedora, this will take a while)
+
+To install it:
+--------------
+Do a normal installation[1], but instead of running the installer downloaded from
+sourceforge, use fcrepo-installer/target/fcrepo-installer-3.5-SNAPSHOT.jar
+
+[1] https://wiki.duraspace.org/display/FCR30/Installation+and+Configuration+Guide
+
+To test it:
+-----------
+Before starting Fedora, copy the eds-creds.conf file (from this directory) into 
+the $FEDORA_HOME/server/conf/ directory.
+
+Start Fedora via $CATALINA_HOME/bin/startup.sh
+
+Visit http://localhost:8080/fedora/admin in your browser, and ingest the
+test_eds-creds.xml file.  This Fedora object already contains an "E" datastream
+with ID "DS" that points to a Basic Authentication protected URL on the web.
+The eds-creds.conf file you copied already contains the proper credentials for
+accessing this URL.
+
+Visit http://localhost:8080/fedora/objects/test:eds-creds/datastreams/DS/content
+in your browser. If it worked properly, you should see that the body of the page
+says "Basic Authentication test passed successfully".
+
+To configure it for your own use:
+---------------------------------
+Read the comments in the $FEDORA_HOME/server/conf/eds-creds.conf file to
+understand how the configuration works.
+
+When you make your own changes to this file, Fedora (tomcat) must be restarted.

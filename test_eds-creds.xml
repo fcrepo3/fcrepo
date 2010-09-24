@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="test:eds-creds" VERSION="1.1" xmlns:foxml="info:fedora/fedora-system:def/foxml#">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="External Datastream Credentials Test"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="E" ID="DS">
+    <foxml:datastreamVersion ID="DS.0" LABEL="Test datastream" MIMETYPE="text/html">
+      <foxml:contentLocation REF="http://handle.library.cornell.edu/control/authBasic/authTest/" TYPE="URL"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>
