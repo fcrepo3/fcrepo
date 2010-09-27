@@ -6,10 +6,8 @@ package fedora.server.utilities;
 
 import java.net.URL;
 import java.net.URLConnection;
-
 import java.sql.Driver;
 import java.sql.DriverManager;
-
 import java.util.Enumeration;
 
 import javax.servlet.ServletContextEvent;
@@ -17,26 +15,19 @@ import javax.servlet.ServletContextListener;
 
 /**
  * Cleanup listener for general resource handling
- *
+ * 
  * @version $Id$
  */
 public class CleanupContextListener implements ServletContextListener {
 
     /*
      * Initialize any resources required by the application
-     *
+     * 
      * @see
      * javax.servlet.ServletContextListener#contextInitialized(javax.servlet
      * .ServletContextEvent)
      */
     public void contextInitialized(ServletContextEvent event) {
-        // If fedora.home servlet context init param is defined, make sure
-        // it is used for the value of Constants.FEDORA_HOME
-        String contextFH = event.getServletContext().getInitParameter("fedora.home");
-        if (contextFH != null && !contextFH.equals("")) {
-            System.setProperty("servlet.fedora.home", contextFH);
-        }
-
         // On Windows, URL caches can cause problems, particularly with
         // undeployment
         // So, here we attempt to disable them if we detect that we are running
@@ -57,7 +48,7 @@ public class CleanupContextListener implements ServletContextListener {
 
     /**
      * Clean up resources used by the application when stopped
-     *
+     * 
      * @seejavax.servlet.ServletContextListener#contextDestroyed(javax.servlet
      * .ServletContextEvent)
      */

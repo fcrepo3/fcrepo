@@ -35,8 +35,6 @@ public class RmiTransportWriter
 
     private long itemIndex;
 
-    private boolean m_closed = false;
-
     /**
      * When the writer is created, open the connection to the receiver.
      */
@@ -79,10 +77,7 @@ public class RmiTransportWriter
     @Override
     public void close() throws IOException {
         try {
-            if (!m_closed) {
-                receiver.closeFile();
-                m_closed= true;
-            }
+            receiver.closeFile();
         } catch (JournalException e) {
             IOException wrapper = new IOException();
             wrapper.initCause(e);

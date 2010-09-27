@@ -4,10 +4,6 @@
 		<element name="web-app">
 			<attribute name="id" property="id" />
 			<attribute name="version" property="version" />
-            <attribute name="xmlns" property="xmlns" />
-            <attribute name="xmlns:xsi" property="xmlns_xsi" />
-            <attribute name="xsi:schemaLocation" property="xsi_schemaLocation" />
-            
 			<element name="display-name" property="displayName" />
 			
 			<element name="listener" property="listeners" />

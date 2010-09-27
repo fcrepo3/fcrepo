@@ -1,14 +1,14 @@
 /*
  * File: AuthFilterJAAS.java
- *
+ * 
  * Copyright 2009 Muradora
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -73,7 +73,7 @@ import fedora.common.Constants;
  * </p>
  * </li>
  * </ul>
- *
+ * 
  * @author nish.naidoo@gmail.com
  */
 public class AuthFilterJAAS
@@ -106,7 +106,7 @@ public class AuthFilterJAAS
 
     private Set<String> roleAttributeNames = null;
 
-    private boolean authnAPIA = true;
+    private Set<String> excludedUris = null;
 
     public void init(FilterConfig filterConfig) throws ServletException {
         // get FEDORA_HOME. This being set is mandatory.
@@ -148,8 +148,16 @@ public class AuthFilterJAAS
             }
         }
 
-        tmp = filterConfig.getInitParameter("authnAPIA");
-        authnAPIA = Boolean.parseBoolean(tmp);
+        tmp = filterConfig.getInitParameter("excludeUris");
+        excludedUris = new HashSet<String>();
+        if (tmp != null) {
+            String[] names = tmp.split(" *, *");
+            if (names != null && names.length > 0) {
+                for (String n : names) {
+                    excludedUris.add(n);
+                }
+            }
+        }
 
         tmp = filterConfig.getInitParameter("userClassNames");
         userClassNames = new HashSet<String>();
@@ -211,28 +219,18 @@ public class AuthFilterJAAS
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
-        // This is a hack to skip authentication of API-A methods via the
-        // REST API if API-A AuthN is off (as indicated by the "authnAPIA"
-        // filter init-param).
-        // If API-A AuthN is off, for all GET requests via the REST API,
-        // except those which are known to be part of API-M,
-        // just continue the chain and return after processing the chain.
-        if (!authnAPIA) {
-            if(req.getMethod().equals("GET")) {
-                String requestPath = req.getPathInfo();
-                if(requestPath != null) {
-                    // potentially extra String evals, but aiming for clarity
-                    boolean isExport = requestPath.endsWith("/export");
-                    boolean isObjectXML = requestPath.endsWith("/objectXML");
-                    boolean isGetDatastream = requestPath.contains("/datastreams/") &&
-                            !requestPath.endsWith("/content");
-                    boolean isAPIM = isExport || isObjectXML || isGetDatastream;
-
-                    if (!isAPIM) {
-                        chain.doFilter(request, response);
-                        return;
-                    }
+        // if the servlet is in our excluded list, just continue the
+        // chain and return after processing the chain.
+        if (excludedUris != null && excludedUris.size() > 0) {
+            if (excludedUris.contains(req.getServletPath())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("skipping authentication on servlet: "
+                            + req.getServletPath());
                 }
+
+                chain.doFilter(request, response);
+
+                return;
             }
         }
 
@@ -282,7 +280,7 @@ public class AuthFilterJAAS
     /**
      * Sends a 401 error to the browser. This forces a login box to be displayed
      * allowing the user to login.
-     *
+     * 
      * @param response
      *        the response to set the headers and status
      */
@@ -301,7 +299,7 @@ public class AuthFilterJAAS
      * Performs the authentication. Once a Subject is obtained, it is stored in
      * the users session. Subsequent requests check for the existence of this
      * object before performing the authentication again.
-     *
+     * 
      * @param req
      *        the servlet request.
      * @return a user principal that was extracted from the login context.
@@ -365,7 +363,7 @@ public class AuthFilterJAAS
      * defined by a Principal class that can be defined in the web.xml file. If
      * this is undefined, the first principal found is assumed to be the
      * userPrincipal.
-     *
+     * 
      * @param subject
      *        the subject returned from authentication.
      * @return the userPrincipal associated with the given subject.
@@ -406,7 +404,7 @@ public class AuthFilterJAAS
     /**
      * Obtains the roles for the user based on the class names and attribute
      * names provided in the web.xml file.
-     *
+     * 
      * @param subject
      *        the subject returned from authentication.
      * @return a set of strings that represent the users roles.
@@ -446,7 +444,7 @@ public class AuthFilterJAAS
 
     /**
      * Adds roles to the Subject object.
-     *
+     * 
      * @param subject
      *        the subject that was returned from authentication.
      * @param userRoles
@@ -477,9 +475,9 @@ public class AuthFilterJAAS
     /**
      * Add roles to where Fedora expects them -
      * FEDORA_AUX_SUBJECT_ATTRIBUTES.fedoraRole.
-     *
+     * 
      * @param subject
-     *        the subject from authentication.
+     *        the aubject from authentication.
      * @param userRoles
      *        the set of user roles.
      * @param request

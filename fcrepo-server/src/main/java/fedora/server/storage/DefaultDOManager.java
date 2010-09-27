@@ -1146,11 +1146,11 @@ public class DefaultDOManager
                             obj.datastreams(dsID).iterator()
                             .next();
                     String controlGroupType = dStream.DSControlGrp;
+                    if (controlGroupType.equalsIgnoreCase("M"))
                     // if it's managed, we might need to grab content
-                    if (controlGroupType.equalsIgnoreCase("M")) {
+                    {
                         // iterate over all versions of this dsID
                         for (Datastream dmc : obj.datastreams(dsID)) {
-                            String internalId =  obj.getPid() + "+" + dmc.DatastreamID + "+" + dmc.DSVersionID;
                             if (URL_PROTOCOL.matcher(dmc.DSLocation).matches()) {
                                 // if it's a url, we need to grab content for this version
                                 MIMETypedStream mimeTypedStream;
@@ -1192,7 +1192,8 @@ public class DefaultDOManager
                                     }
                                 } else {
                                     ContentManagerParams params = new ContentManagerParams(DOTranslationUtility
-                                            .makeAbsoluteURLs(dmc.DSLocation.toString()), dmc.DSMIME, null, null);
+                                            .makeAbsoluteURLs(dmc.DSLocation
+                                                    .toString()),dmc.DSMIME,null,null);
                                     params.setContext(context);
                                     mimeTypedStream = m_contentManager.getExternalContent(params);
                                     LOG
@@ -1200,17 +1201,26 @@ public class DefaultDOManager
                                                     + "location: "
                                                     + dmc.DSLocation);
                                 }
+                                String id =
+                                        obj.getPid() + "+" + dmc.DatastreamID
+                                                + "+" + dmc.DSVersionID;
                                 if (obj.isNew()) {
-                                    m_permanentStore.addDatastream(internalId, mimeTypedStream.getStream());
+                                    m_permanentStore
+                                            .addDatastream(id, mimeTypedStream
+                                                    .getStream());
                                 } else {
                                     // object already existed...so we may need to call
                                     // replace if "add" indicates that it was already there
                                     try {
                                         m_permanentStore
-                                                .addDatastream(internalId, mimeTypedStream.getStream());
+                                                .addDatastream(id,
+                                                               mimeTypedStream
+                                                                       .getStream());
                                     } catch (ObjectAlreadyInLowlevelStorageException oailse) {
                                         m_permanentStore
-                                                .replaceDatastream(internalId, mimeTypedStream.getStream());
+                                                .replaceDatastream(id,
+                                                                   mimeTypedStream
+                                                                           .getStream());
                                     }
                                 }
                                 if (dmc.DSLocation.startsWith(DatastreamManagedContent.TEMP_SCHEME)) {
@@ -1221,14 +1231,19 @@ public class DefaultDOManager
                                     file.delete();
                                 }
                                 // Reset dsLocation in object to new internal location.
-                                dmc.DSLocation = internalId;
-                                LOG.info("Replaced managed datastream location with internal id: " + internalId);
+                                dmc.DSLocation = id;
+                                LOG
+                                        .info("Replaced managed datastream location with "
+                                                + "internal id: " + id);
                                 if(mimeTypedStream != null) {
                                     mimeTypedStream.close();
                                 }
-                            } else if (!internalId.equals(dmc.DSLocation)) {
-                                LOG.warn("Unrecognized DSLocation \"" + dmc.DSLocation + "\" given for datastream "
-                                        + dmc.DatastreamID + " of object " + obj.getPid());
+                            }
+                            else {
+                                String id =
+                                    obj.getPid() + "+" + dmc.DatastreamID
+                                            + "+" + dmc.DSVersionID;
+                                LOG.warn("Inoperable DSLocation \"" + dmc.DSLocation + "\" given for " + id);
                             }
                         }
                     }

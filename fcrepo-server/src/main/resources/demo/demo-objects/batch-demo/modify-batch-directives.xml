@@ -613,7 +613,7 @@
 	<!--         purge only if no dependencies exist. This parameter is     -->
 	<!--         currently not implemented in the server.                   -->	
 	<!-- ****************************************************************** -->
-	<fbm:purgeDatastream pid="demo:32" dsID="SCREENDUP" asOfDate="1900-01-01T00:00:00.000Z" endDate="2030-03-20T00:00:00.000Z" logMessage="BatchModify - purgeDatastream"/>
+	<fbm:purgeDatastream pid="demo:32" dsID="SCREENDUP" asOfDate="1900-01-01T00:00:00.000Z" endDate="2010-01-01T00:00:00.000Z" logMessage="BatchModify - purgeDatastream"/>
 	
 	<!-- ****************************************************************** -->
 	<!-- Change the state of datastream DS1 to deleted                      -->

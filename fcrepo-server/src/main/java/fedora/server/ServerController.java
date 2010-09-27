@@ -186,6 +186,14 @@ public class ServerController
 
     @Override
     public void init() throws ServletException {
+
+        // if fedora.home servlet context init param is present and non-empty,
+        // this will cause Constants.FEDORA_HOME reflect the value.
+        String contextFH = getServletContext().getInitParameter("fedora.home");
+        if (contextFH != null && !contextFH.equals("")) {
+            System.setProperty("servlet.fedora.home", contextFH);
+        }
+
         File fedoraHomeDir = getFedoraHomeDir();
 
         // get file for writing startup status

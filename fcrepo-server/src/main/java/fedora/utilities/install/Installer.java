@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
-
 import java.util.Map;
 import java.util.Properties;
 
@@ -175,16 +174,16 @@ public class Installer {
                             .equals("true")) {
                 new File(webinfLib, Distribution.LOG4J).delete();
             }
-
-            // FeSL AuthZ configuration
-            if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
+            
+            // FeSL configuration
+            if (_opts.getBooleanValue(InstallOptions.FESL_ENABLED, false)) {
             	File originalWsdd = new File(warStage, "WEB-INF/server-config.wsdd");
             	originalWsdd.renameTo(new File(warStage, "WEB-INF/server-config.wsdd.backup.original"));
-
+            	
             	File feslWsdd = new File(warStage, "WEB-INF/melcoe-pep-server-config.wsdd");
             	feslWsdd.renameTo(new File(warStage, "WEB-INF/server-config.wsdd"));
             }
-
+            
             File fedoraWar = new File(installDir, fedoraWarName + ".war");
             Zip.zip(fedoraWar, warStage.listFiles());
             return fedoraWar;

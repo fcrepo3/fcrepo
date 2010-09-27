@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -71,11 +70,9 @@ public class InstallOptions {
     public static final String DATABASE_PASSWORD = "database.password";
 
     public static final String XACML_ENABLED = "xacml.enabled";
-
-    public static final String FESL_AUTHN_ENABLED = "fesl.authn.enabled";
-
-    public static final String FESL_AUTHZ_ENABLED = "fesl.authz.enabled";
-
+    
+    public static final String FESL_ENABLED = "fesl.enabled";
+    
     public static final String FESL_DBXML_HOME = "fesl.dbxml.home";
 
     public static final String RI_ENABLED = "ri.enabled";
@@ -141,7 +138,6 @@ public class InstallOptions {
         System.out.println("***********************");
         System.out.println("  Fedora Installation ");
         System.out.println("***********************");
-        checkJavaVersion();
         System.out.println();
         System.out
                 .println("To install Fedora, please answer the following questions.");
@@ -187,8 +183,7 @@ public class InstallOptions {
             _map.put(DATABASE_JDBCURL, includedJDBCURL);
             _map.put(DATABASE_DRIVERCLASS, EMBEDDED_DATABASE_DRIVERCLASSNAME);
             _map.put(XACML_ENABLED, Boolean.toString(false));
-            _map.put(FESL_AUTHN_ENABLED, Boolean.toString(false));
-            _map.put(FESL_AUTHZ_ENABLED, Boolean.toString(false));
+            _map.put(FESL_ENABLED, Boolean.toString(false));
             _map.put(RI_ENABLED, null); // false
             _map.put(MESSAGING_ENABLED, null); // false
             _map.put(DEPLOY_LOCAL_SERVICES, null); // true
@@ -262,31 +257,27 @@ public class InstallOptions {
             }
         }
 
-        inputOption(FESL_AUTHN_ENABLED);
-        inputOption(FESL_AUTHZ_ENABLED);
-        if (getValue(FESL_AUTHZ_ENABLED).equals(Boolean.toString(true))) {
+        inputOption(FESL_ENABLED);
+        if (getValue(FESL_ENABLED).equals(Boolean.toString(true))) {
             inputOption(FESL_DBXML_HOME);
             // Disable legacy authz if FeSL is enabled
             _map.put(XACML_ENABLED, Boolean.toString(false));
         } else {
         	inputOption(XACML_ENABLED);
         }
-
+        
         inputOption(RI_ENABLED);
         inputOption(MESSAGING_ENABLED);
         if (getValue(MESSAGING_ENABLED).equals(Boolean.toString(true))) {
             inputOption(MESSAGING_URI);
         }
 
-        inputOption(DEPLOY_LOCAL_SERVICES);
-    }
-
-    private static void checkJavaVersion() throws InstallationCancelledException {
-        String v = System.getProperty("java.version");
-        if (v.startsWith("1.3") || v.startsWith("1.4")) {
-            System.err.println("ERROR: Java " + v + " is too old; This version"
-                    + " of Fedora requires Java 1.5 or above.");
-            throw new InstallationCancelledException();
+        // If using an "other" servlet container, we can't automatically deploy
+        // the local services, so don't even bother to ask.
+        if (getValue(SERVLET_ENGINE).equals(OTHER)) {
+            _map.put(DEPLOY_LOCAL_SERVICES, "false");
+        } else {
+            inputOption(DEPLOY_LOCAL_SERVICES);
         }
     }
 
@@ -442,7 +433,7 @@ public class InstallOptions {
     public Collection<String> getOptionNames() {
     	return _map.keySet();
     }
-
+    
     /**
      * Apply defaults to the options, where possible.
      */
@@ -460,7 +451,7 @@ public class InstallOptions {
      * Validate the options, assuming defaults have already been applied.
      * Validation for a given option might entail more than a syntax check. It
      * might check whether a given directory exists, for example.
-     *
+     * 
      */
     private void validateAll() throws OptionValidationException {
         boolean unattended = getBooleanValue(UNATTENDED, false);
@@ -483,7 +474,6 @@ public class InstallOptions {
 
         try {
             // validate the user input by attempting a database connection
-            System.out.print("Validating database connection...");
             db.test();
             // check if we need to update old table
             if (db.usesDOTable()) {
@@ -491,13 +481,9 @@ public class InstallOptions {
             }
 
             db.close();
-            System.out.println("OK\n");
             return true;
         } catch (Exception e) {
-            System.out.println("FAILED\n");
-            e.printStackTrace();
-            System.out.println(e.getClass().getName() + ": " + e.getMessage() + "\n");
-            System.out.println("ERROR validating database connection; see above.\n");
+            System.err.println(e.getMessage());
             return false;
         }
     }

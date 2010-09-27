@@ -5,7 +5,7 @@
   <groupId>org.fcrepo</groupId>
   <artifactId>fcrepo-client-webadmin</artifactId>
   <packaging>swf</packaging>
-  <version>3.3.1-SNAPSHOT</version>
+  <version>3.3</version>
   <name>Fedora Web Admin Client (Flash)</name>
 
   <!--
