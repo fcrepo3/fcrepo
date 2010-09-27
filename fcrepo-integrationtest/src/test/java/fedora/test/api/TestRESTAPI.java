@@ -40,14 +40,13 @@ import org.junit.Test;
 import junit.framework.TestSuite;
 
 import fedora.common.PID;
-
 import fedora.server.access.FedoraAPIA;
 import fedora.server.management.FedoraAPIM;
 import fedora.server.types.gen.Datastream;
 import fedora.server.types.gen.MIMETypedStream;
-
 import fedora.test.DemoObjectTestSetup;
 import fedora.test.FedoraServerTestCase;
+import fedora.test.TemplatedResourceIterator;
 
 import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
 import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -530,6 +529,22 @@ public class TestRESTAPI
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         assertEquals(SC_OK, get(true).getStatusCode());
     }
+
+    public void testFindObjectsQuery() throws Exception {
+        String templateUrl = "/search?$value$";
+        TemplatedResourceIterator tri = new TemplatedResourceIterator(templateUrl, "src/test/resources/APIM2/restsearchvalues");
+        while (tri.hasNext()) {
+
+            url = tri.next();
+            HttpResponse resp = get(true);
+            //assertEquals(SC_OK, resp.getStatusCode());
+
+            url = String.format("/objects/new");
+            HttpResponse response = post("", true);
+            assertEquals(SC_CREATED, response.getStatusCode());
+        }
+    }
+
 
     public void testResumeFindObjects() throws Exception {
         url = "/objects?pid=true&query=&resultFormat=xml";

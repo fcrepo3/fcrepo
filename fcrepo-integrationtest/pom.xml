@@ -279,6 +279,7 @@
                     <include>**/TestCommandLineUtilities.class</include>
                     <include>**/SharedDeploymentTests.class</include>
                     <include>**/ContentModelDSInputTest.class</include>
+                    <include>**/TestAPIM2.class</include>
 
                   </includes>
                   <excludes>
@@ -594,6 +595,13 @@
       <artifactId>fcrepo-security-pdp</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>stringtemplate</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
 
   </dependencies>
 </project>

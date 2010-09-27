@@ -12,7 +12,9 @@ import org.junit.runners.Suite;
         fedora.test.api.TestAPIAConfigA.class,
         fedora.test.api.TestAPIALiteConfigA.class,
         fedora.test.api.TestHTTPStatusCodesConfigA.class,
-        fedora.test.api.TestManyDisseminations.class})
+        fedora.test.api.TestManyDisseminations.class,
+        fedora.test.api.TestAPIM2.class})
+
 public class AllSystemTestsConfigA {
 
     // Supports legacy tests runners
@@ -27,6 +29,7 @@ public class AllSystemTestsConfigA {
         suite.addTest(fedora.test.api.TestAPIALiteConfigA.suite());
         suite.addTest(fedora.test.api.TestHTTPStatusCodesConfigA.suite());
         suite.addTest(fedora.test.api.TestManyDisseminations.suite());
+        suite.addTest(fedora.test.api.TestAPIM2.suite());
 
         return suite;
     }
