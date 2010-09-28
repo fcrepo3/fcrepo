@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package fedora.server.utilities;
@@ -35,7 +35,7 @@ import fedora.server.storage.ConnectionPool;
  * Some of the methods involve no JDBC objects, and so are not delegated to the
  * instance.
  * </p>
- * 
+ *
  * @author Chris Wilper
  */
 public abstract class SQLUtility {
@@ -66,7 +66,7 @@ public abstract class SQLUtility {
 
     /**
      * Adds or replaces a row in the given table.
-     * 
+     *
      * @param conn
      *        the connection to use
      * @param table
@@ -98,7 +98,7 @@ public abstract class SQLUtility {
 
     /**
      * Updates an existing row.
-     * 
+     *
      * @return false if the row did not previously exist and therefore was not
      *         updated.
      */
@@ -118,7 +118,7 @@ public abstract class SQLUtility {
 
     /**
      * Adds a new row.
-     * 
+     *
      * @throws SQLException
      *         if the row could not be added.
      */
@@ -143,61 +143,6 @@ public abstract class SQLUtility {
                                                InputStream dbSpec)
             throws IOException, InconsistentTableSpecException, SQLException {
         instance.i_createNonExistingTables(cPool, dbSpec);
-    }
-
-    /*
-     * ------------------------------------------------------------------------
-     * These methods involve no JDBC objects, and so remain at the class level.
-     * ------------------------------------------------------------------------
-     */
-
-    public static String slashEscaped(String in) {
-        StringBuffer out = new StringBuffer();
-        for (int i = 0; i < in.length(); i++) {
-            char c = in.charAt(i);
-            if (c == '\\') {
-                out.append("\\\\"); // slash slash
-            } else {
-                out.append(c);
-            }
-        }
-        return out.toString();
-    }
-
-    public static String backslashEscape(String in) {
-        if (in == null) {
-            return in;
-        }
-        if (in.indexOf("\\") == -1) {
-            return in;
-        }
-        StringBuffer out = new StringBuffer();
-        for (int i = 0; i < in.length(); i++) {
-            char c = in.charAt(i);
-            if (c == '\\') {
-                out.append('\\');
-            }
-            out.append(c);
-        }
-        return out.toString();
-    }
-
-    public static String aposEscape(String in) {
-        if (in == null) {
-            return in;
-        }
-        if (in.indexOf("'") == -1) {
-            return in;
-        }
-        StringBuffer out = new StringBuffer();
-        for (int i = 0; i < in.length(); i++) {
-            char c = in.charAt(i);
-            if (c == '\'') {
-                out.append('\'');
-            }
-            out.append(c);
-        }
-        return out.toString();
     }
 
     /*

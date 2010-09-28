@@ -4,6 +4,27 @@
  */
 package fedora.server.utilities.rebuild;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+
 import fedora.common.Constants;
 import fedora.common.Models;
 import fedora.server.Context;
@@ -29,26 +50,7 @@ import fedora.server.storage.lowlevel.ILowlevelStorage;
 import fedora.server.storage.types.Datastream;
 import fedora.server.storage.types.DigitalObject;
 import fedora.server.storage.types.RelationshipTuple;
-import fedora.server.utilities.SQLUtility;
 import fedora.server.utilities.TableSpec;
-import org.apache.log4j.Logger;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * A Rebuilder for the SQL database.
@@ -377,21 +379,16 @@ public class SQLRebuilder
     private void registerObject(DigitalObject obj)
             throws StorageDeviceException {
         String pid = obj.getPid();
-        String userId = obj.getOwnerId();
-        String label = obj.getLabel();
+        String userId = "field is no longer used";
+        String label = "field is no longer used";
 
-        // label or contentModelId may be null...set to blank if so
-        String theLabel = label;
-        if (theLabel == null) {
-            theLabel = "";
-        }
         Connection conn = null;
         Statement s1 = null;
         try {
             String query =
                     "INSERT INTO doRegistry (doPID, " + "ownerId, label) "
                             + "VALUES ('" + pid + "', '" + userId + "', '"
-                            + SQLUtility.aposEscape(theLabel) + "')";
+                            + label + "')";
             conn = m_connectionPool.getConnection();
             s1 = conn.createStatement();
             s1.executeUpdate(query);

@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 
 import fedora.common.Constants;
 import fedora.common.Models;
-
 import fedora.server.Context;
 import fedora.server.Module;
 import fedora.server.RecoveryContext;
@@ -939,8 +938,7 @@ public class DefaultDOManager
                 // REGISTRY:
                 // at this point the object is valid, so make a record
                 // of it in the digital object registry
-                registerObject(obj, getUserId(context), obj.getLabel(), obj
-                        .getCreateDate(), obj.getLastModDate());
+                registerObject(obj);
                 return w;
             } catch (IOException e) {
 
@@ -1510,18 +1508,6 @@ public class DefaultDOManager
     }
 
     /**
-     * Gets the userId property from the context... if it's not populated,
-     * throws an InvalidContextException.
-     */
-    private String getUserId(Context context) throws InvalidContextException {
-        String ret = context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri);
-        if (ret == null) {
-            throw new InvalidContextException("The context identifies no userId, but a user must be identified for this operation.");
-        }
-        return ret;
-    }
-
-    /**
      * Checks the object registry for the given object.
      */
     public boolean objectExists(String pid) throws StorageDeviceException {
@@ -1607,12 +1593,9 @@ public class DefaultDOManager
      * Adds a new object. The caller *must* ensure the object does not already
      * exist in the registry before calling this method.
      */
-    private void registerObject(DigitalObject obj,
-                                String userId,
-                                String label,
-                                Date createDate,
-                                Date lastModDate) throws StorageDeviceException {
-        String theLabel = label;
+    private void registerObject(DigitalObject obj) throws StorageDeviceException {
+        String theLabel = "label field is no longer used";
+        String userId = "ownerId field is no longer used";
         String pid = obj.getPid();
         if (theLabel == null) {
             theLabel = "";
@@ -1623,7 +1606,7 @@ public class DefaultDOManager
             String query =
                     "INSERT INTO doRegistry (doPID,  " + "ownerId, label) "
                             + "VALUES ('" + pid + "', '" + userId + "', '"
-                            + SQLUtility.aposEscape(theLabel) + "')";
+                            + theLabel + "')";
             conn = m_connectionPool.getConnection();
             st = conn.createStatement();
             st.executeUpdate(query);

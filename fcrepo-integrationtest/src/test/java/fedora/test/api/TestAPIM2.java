@@ -170,7 +170,7 @@ public class TestAPIM2
             } catch (RemoteException e) {
                 if (!e
                         .getMessage()
-                        .startsWith("org.fcrepo.server.errors.QueryParseException"))
+                        .startsWith("fedora.server.errors.QueryParseException"))
                     throw e;
             }
 
@@ -182,7 +182,7 @@ public class TestAPIM2
             } catch (RemoteException e) {
                 if (!e
                         .getMessage()
-                        .startsWith("org.fcrepo.server.errors.QueryParseException"))
+                        .startsWith("fedora.server.errors.QueryParseException"))
                     throw e;
             }
 
