@@ -389,7 +389,7 @@ public class SQLRebuilder
                     "INSERT INTO doRegistry (doPID, " + "ownerId, label) "
                             + "VALUES ('" + pid + "', '" + userId + "', '"
                             + label + "')";
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadWriteConnection();
             s1 = conn.createStatement();
             s1.executeUpdate(query);
 

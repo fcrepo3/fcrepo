@@ -121,7 +121,7 @@ public class FieldSearchResultSQLImpl
         m_resultFields = resultFields;
         m_maxResults = maxResults;
         m_maxSeconds = maxSeconds;
-        m_conn = m_cPool.getConnection();
+        m_conn = m_cPool.getReadOnlyConnection();
         try {
             m_statement = m_conn.createStatement();
             m_resultSet =

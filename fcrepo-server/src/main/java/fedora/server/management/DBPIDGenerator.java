@@ -1,6 +1,6 @@
-/* The contents of this file are subject to the license and copyright terms     
- * detailed in the license directory at the root of the source tree (also   
- * available online at http://fedora-commons.org/license/).    
+/* The contents of this file are subject to the license and copyright terms
+ * detailed in the license directory at the root of the source tree (also
+ * available online at http://fedora-commons.org/license/).
  */
 package fedora.server.management;
 
@@ -22,14 +22,13 @@ import org.apache.log4j.Logger;
 
 import fedora.common.MalformedPIDException;
 import fedora.common.PID;
-
 import fedora.server.storage.ConnectionPool;
 import fedora.server.utilities.SQLUtility;
 
 /**
  * A PIDGenerator that uses a database to keep track of the highest pid it knows
  * about for each namespace.
- * 
+ *
  * @author Chris Wilper
  */
 public class DBPIDGenerator
@@ -63,7 +62,7 @@ public class DBPIDGenerator
         ResultSet results = null;
         Connection conn = null;
         try {
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadOnlyConnection();
             String query = "SELECT namespace, highestID FROM pidGen";
             s = conn.createStatement();
             results = s.executeQuery(query);
@@ -188,7 +187,7 @@ public class DBPIDGenerator
         // write the new highest id in the database, too
         Connection conn = null;
         try {
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadWriteConnection();
             SQLUtility.replaceInto(conn,
                                    "pidGen",
                                    new String[] {"namespace", "highestID"},

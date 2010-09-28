@@ -141,7 +141,7 @@ public class FieldSearchSQLImpl
         Connection conn = null;
         Statement st = null;
         try {
-            conn = m_cPool.getConnection();
+            conn = m_cPool.getReadWriteConnection();
             String[] dbRowValues;
             if (m_indexDCFields) {
                 dbRowValues = new String[DB_COLUMN_NAMES.length];
@@ -279,7 +279,7 @@ public class FieldSearchSQLImpl
         Connection conn = null;
         Statement st = null;
         try {
-            conn = m_cPool.getConnection();
+            conn = m_cPool.getReadWriteConnection();
             st = conn.createStatement();
             st.executeUpdate("DELETE FROM doFields WHERE pid='" + pid + "'");
             st.executeUpdate("DELETE FROM dcDates WHERE pid='" + pid + "'");

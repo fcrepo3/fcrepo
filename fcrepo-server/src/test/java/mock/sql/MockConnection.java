@@ -54,6 +54,8 @@ public class MockConnection
     protected final List<MockPreparedStatement> preparedStatements =
             new ArrayList<MockPreparedStatement>();
 
+    protected boolean readOnly = false;
+
     public void reset() {
         closed = false;
         autoCommit = false;
@@ -151,7 +153,7 @@ public class MockConnection
     }
 
     public boolean isReadOnly() throws SQLException {
-        throw new RuntimeException("MockConnection.isReadOnly not implemented");
+        return readOnly;
     }
 
     public String nativeSQL(String arg0) throws SQLException {
@@ -222,7 +224,7 @@ public class MockConnection
     }
 
     public void setReadOnly(boolean arg0) throws SQLException {
-        throw new RuntimeException("MockConnection.setReadOnly not implemented");
+        readOnly = arg0;
     }
 
     public Savepoint setSavepoint() throws SQLException {

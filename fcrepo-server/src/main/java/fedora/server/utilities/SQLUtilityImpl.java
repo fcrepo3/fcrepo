@@ -276,7 +276,7 @@ class SQLUtilityImpl
         List<TableSpec> nonExisting = null;
         Connection conn = null;
         try {
-            conn = cPool.getConnection();
+            conn = cPool.getReadWriteConnection();
             nonExisting =
                     i_getNonExistingTables(conn, TableSpec
                             .getTableSpecs(dbSpec));

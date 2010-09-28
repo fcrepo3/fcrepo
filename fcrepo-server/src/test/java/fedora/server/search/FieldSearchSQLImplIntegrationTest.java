@@ -84,7 +84,7 @@ public class FieldSearchSQLImplIntegrationTest {
                                        testWhileIdle,
                                        whenExhaustedAction);
         }
-        Connection conn = cPool.getConnection();
+        Connection conn = cPool.getReadWriteConnection();
         executeUpdate(conn, "DROP TABLE doFields", true);
         executeUpdate(conn, "DROP TABLE dcDates", true);
         executeUpdate(conn, "CREATE TABLE doFields (\n"
