@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package fedora.server.search;
@@ -43,7 +43,7 @@ public class Condition {
 
     /**
      * Gets a List of Conditions from a string like: a=x b~'that\'s' c>='z'
-     * 
+     *
      * @param query
      *        The query string.
      * @return The Conditions.
@@ -61,10 +61,7 @@ public class Condition {
         for (int i = 0; i < query.length(); i++) {
             char c = query.charAt(i);
             if (inProp) {
-                if (c == ' ') {
-                    throw new QueryParseException("Found <space> at character "
-                            + i + " but expected <operator> or <alphanum>");
-                } else if (c == '=') {
+                if (c == '=') {
                     oper = Operator.EQUALS;
                     inProp = false;
                     inValue = true;
@@ -108,8 +105,12 @@ public class Condition {
                                 + "immediately following '<' operator, but "
                                 + "expected a value.");
                     }
-                } else {
+                } else if ((c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A)) {
                     prop.append(c);
+                } else {
+                    throw new QueryParseException("Found ' " + c
+                            + "' at character " + i
+                            + " but expected operator");
                 }
             } else if (inValue) {
                 if (prop.toString().length() == 0) {

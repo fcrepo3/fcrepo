@@ -539,9 +539,6 @@ public class TestRESTAPI
             HttpResponse resp = get(true);
             //assertEquals(SC_OK, resp.getStatusCode());
 
-            url = String.format("/objects/new");
-            HttpResponse response = post("", true);
-            assertEquals(SC_CREATED, response.getStatusCode());
         }
     }
 
