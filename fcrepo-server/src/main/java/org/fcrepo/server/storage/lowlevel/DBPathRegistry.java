@@ -23,13 +23,14 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.LowlevelStorageInconsistencyException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.storage.ConnectionPool;
 import org.fcrepo.server.utilities.SQLUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -62,7 +63,7 @@ public class DBPathRegistry
         ResultSet rs = null;
         try {
             int paths = 0;
-            connection = connectionPool.getConnection();
+            connection = connectionPool.getReadOnlyConnection();
             statement = connection.createStatement();
             rs =
                     statement.executeQuery("SELECT path FROM "
@@ -113,7 +114,7 @@ public class DBPathRegistry
         Connection connection = null;
         Statement statement = null;
         try {
-            connection = connectionPool.getConnection();
+            connection = connectionPool.getReadWriteConnection();
             statement = connection.createStatement();
             if (statement.execute(sql)) {
                 throw new LowlevelStorageException(true,
@@ -167,7 +168,7 @@ public class DBPathRegistry
         }
         Connection conn = null;
         try {
-            conn = connectionPool.getConnection();
+            conn = connectionPool.getReadWriteConnection();
             SQLUtility.replaceInto(conn, getRegistryName(), new String[] {
                     "token", "path"}, new String[] {pid, path}, "token");
         } catch (SQLException e1) {
@@ -237,7 +238,7 @@ public class DBPathRegistry
             tempFile = File.createTempFile("fedora-keys", ".tmp");
             writer = new PrintWriter(new OutputStreamWriter(
                     new FileOutputStream(tempFile)));
-            connection = connectionPool.getConnection();
+            connection = connectionPool.getReadOnlyConnection();
             statement = connection.createStatement();
             rs = statement.executeQuery("SELECT token FROM "
                     + getRegistryName());

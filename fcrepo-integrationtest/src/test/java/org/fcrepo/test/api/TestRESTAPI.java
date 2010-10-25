@@ -38,6 +38,7 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -60,6 +61,7 @@ import org.fcrepo.server.types.gen.ObjectFields;
 
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.fcrepo.test.TemplatedResourceIterator;
 
 import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
 import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -549,6 +551,25 @@ public class TestRESTAPI
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
     }
 
+/** Disabled until FCREPO-798 is public
+
+    public void testFindObjectsQuery() throws Exception {
+        String templateUrl = "/search?$value$";
+        TemplatedResourceIterator tri = new TemplatedResourceIterator(templateUrl, "src/test/resources/APIM2/restsearchvalues");
+        while (tri.hasNext()) {
+
+            url = tri.next();
+            HttpResponse resp = get(getAuthAccess());
+            //assertEquals(SC_OK, resp.getStatusCode());
+
+            url = String.format("/objects/new");
+            HttpResponse response = post("", true);
+            assertEquals(SC_CREATED, response.getStatusCode());
+        }
+    }
+*/
+
+
     public void testResumeFindObjects() throws Exception {
         url = "/objects?pid=true&query=&resultFormat=xml";
         if (this.getAuthAccess()) {
@@ -747,13 +768,13 @@ public class TestRESTAPI
             ObjectFields[] fields = result.getResultList();
             for (ObjectFields objectFields : fields) {
                 String pid = objectFields.getPid();
-                System.out.println("validating object '" + pid.toString() + "'");
+                //System.out.println("validating object '" + pid.toString() + "'");
                 url = String.format("/objects/%s/validate", URLEncoder.encode(pid.toString(), "UTF-8"));
                 HttpResponse getTrue = get(true);
                 assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false).getStatusCode());
                 assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
                 String responseXML = getTrue.getResponseBodyString();
-                System.out.println(responseXML);
+                //System.out.println(responseXML);
                 assertXpathExists("/validation[@valid='true']", responseXML);
             }
         } finally {
@@ -1174,7 +1195,7 @@ public class TestRESTAPI
 
     private HttpClient getClient(boolean auth) {
         HttpClient client = new HttpClient();
-        client.getParams().setAuthenticationPreemptive(true);
+        client.getParams().setAuthenticationPreemptive(auth);
         if (auth) {
             client
                     .getState()
@@ -1343,7 +1364,8 @@ public class TestRESTAPI
         HttpResponse(HttpMethod method)
                 throws IOException {
             statusCode = method.getStatusCode();
-            responseBody = method.getResponseBody();
+            //responseBody = method.getResponseBody();
+            responseBody = IOUtils.toByteArray(method.getResponseBodyAsStream());
             responseHeaders = method.getResponseHeaders();
             responseFooters = method.getResponseFooters();
         }

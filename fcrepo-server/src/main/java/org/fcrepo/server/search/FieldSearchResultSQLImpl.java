@@ -8,7 +8,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import java.text.ParseException;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -122,7 +124,7 @@ public class FieldSearchResultSQLImpl
         m_resultFields = resultFields;
         m_maxResults = maxResults;
         m_maxSeconds = maxSeconds;
-        m_conn = m_cPool.getConnection();
+        m_conn = m_cPool.getReadOnlyConnection();
         boolean success = false;
         try {
             m_statement = m_conn.createStatement();

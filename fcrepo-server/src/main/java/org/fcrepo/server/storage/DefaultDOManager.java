@@ -399,7 +399,7 @@ public class DefaultDOManager
         Statement s = null;
         ResultSet r = null;
         try {
-            c = m_connectionPool.getConnection();
+            c = m_connectionPool.getReadOnlyConnection();
             s =
                     c.createStatement(ResultSet.TYPE_FORWARD_ONLY,
                                       ResultSet.CONCUR_READ_ONLY);
@@ -1352,7 +1352,7 @@ public class DefaultDOManager
                 Statement s = null;
                 ResultSet results = null;
                 try {
-                    conn = m_connectionPool.getConnection();
+                    conn = m_connectionPool.getReadWriteConnection();
                     String query =
                             "SELECT systemVersion " + "FROM doRegistry "
                                     + "WHERE doPID='" + obj.getPid() + "'";
@@ -1501,18 +1501,6 @@ public class DefaultDOManager
     }
 
     /**
-     * Gets the userId property from the context... if it's not populated,
-     * throws an InvalidContextException.
-     */
-    private String getUserId(Context context) throws InvalidContextException {
-        String ret = context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri);
-        if (ret == null) {
-            throw new InvalidContextException("The context identifies no userId, but a user must be identified for this operation.");
-        }
-        return ret;
-    }
-
-    /**
      * Checks the object registry for the given object.
      */
     public boolean objectExists(String pid) throws StorageDeviceException {
@@ -1524,7 +1512,7 @@ public class DefaultDOManager
             String query =
                     "SELECT doPID " + "FROM doRegistry " + "WHERE doPID='"
                             + pid + "'";
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadOnlyConnection();
             s = conn.createStatement();
             results = s.executeQuery(query);
             return results.next(); // 'true' if match found, else 'false'
@@ -1557,13 +1545,20 @@ public class DefaultDOManager
      * exist in the registry before calling this method.
      */
     private void registerObject(DigitalObject obj) throws StorageDeviceException {
+        String theLabel = "the label field is no longer used";
+        String ownerID = "the ownerID field is no longer used";
+        String pid = obj.getPid();
+
         Connection conn = null;
         Statement st = null;
         try {
-            conn = m_connectionPool.getConnection();
+            String query =
+                    "INSERT INTO doRegistry (doPID,  " + "ownerId, label) "
+                            + "VALUES ('" + pid + "', '" + ownerID + "', '"
+                            + theLabel + "')";
+            conn = m_connectionPool.getReadWriteConnection();
             st = conn.createStatement();
-            st.executeUpdate("INSERT INTO doRegistry (doPID) "
-                    + "VALUES ('" + obj.getPid() + "')");
+            st.executeUpdate(query);
         } catch (SQLException sqle) {
             // clean up if the INSERT didn't succeeed
             try {
@@ -1599,7 +1594,7 @@ public class DefaultDOManager
         Connection conn = null;
         Statement st = null;
         try {
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadWriteConnection();
             st = conn.createStatement();
             st
                     .executeUpdate("DELETE FROM doRegistry WHERE doPID='" + pid
@@ -1748,7 +1743,7 @@ public class DefaultDOManager
         Statement s = null;
         ResultSet results = null;
         try {
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadOnlyConnection();
             s = conn.createStatement();
             StringBuffer query = new StringBuffer();
             query.append("SELECT doPID FROM doRegistry ");
@@ -1862,7 +1857,7 @@ public class DefaultDOManager
 
         Connection conn = null;
         try {
-            conn = m_connectionPool.getConnection();
+            conn = m_connectionPool.getReadOnlyConnection();
 
             StringBuffer hash = new StringBuffer();
             hash.append(getNumObjectsWithVersion(conn, 0));
