@@ -17,7 +17,9 @@ JAVA6_HOME=/usr/lib/jvm/java-6-sun
 M2_HOME=/usr/share/maven2
 
 # Where is the Fedora source distribution to be tested?
-BUILD_HOME=$HOME/bamboo-agent-home/xml-data/build-dir/FCREPO-LINUXSAN
+if [ -z "$BUILD_HOME" ]; then
+  BUILD_HOME=`pwd`
+fi
 
 # Where should test instances of Fedora be installed?
 # This will be created and cleared out by test scripts as necessary.
@@ -37,6 +39,7 @@ PEP_NOCACHE=true
 #
 CATALINA_HOME=$FEDORA_HOME/tomcat
 
+export BUILD_HOME
 export JAVA_OPTS
 export MAVEN_OPTS
 export FEDORA_HOME
