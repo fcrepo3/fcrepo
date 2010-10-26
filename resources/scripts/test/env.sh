@@ -18,7 +18,7 @@ M2_HOME=/usr/share/maven2
 
 # Where is the Fedora source distribution to be tested?
 if [ -z "$BUILD_HOME" ]; then
-  BUILD_HOME=.
+  BUILD_HOME=`pwd`
 fi
 
 # Where should test instances of Fedora be installed?
