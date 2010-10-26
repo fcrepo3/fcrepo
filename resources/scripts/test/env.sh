@@ -39,6 +39,7 @@ PEP_NOCACHE=true
 #
 CATALINA_HOME=$FEDORA_HOME/tomcat
 
+export BUILD_HOME
 export JAVA_OPTS
 export MAVEN_OPTS
 export FEDORA_HOME
