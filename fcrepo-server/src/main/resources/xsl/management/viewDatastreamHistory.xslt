@@ -35,7 +35,7 @@
                             <xsl:value-of select="encode-for-uri(@pid)" />
                             <xsl:text>/datastreams/</xsl:text>
                             <xsl:value-of select="@dsID" />
-                            <xsl:text>/content?asOfVersionDate=</xsl:text>
+                            <xsl:text>/content?asOfDateTime=</xsl:text>
                             <xsl:value-of select="management:dsCreateDate"></xsl:value-of>
                         </xsl:variable>
 
