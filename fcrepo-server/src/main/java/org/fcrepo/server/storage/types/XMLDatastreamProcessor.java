@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 
+import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ModuleInitializationException;
@@ -161,13 +162,20 @@ public class XMLDatastreamProcessor {
      * Get the XML content of the datastream wrapped by this class
      * @return
      */
-    public byte[] getXMLContent() {
+    public byte [] getXMLContent() {
+        return getXMLContent(null);
+    }
+    public byte[] getXMLContent(Context ctx) {
         // could use getContentStream generically instead?
         if (m_dsType == DS_TYPE.INLINE_XML)
             return ((DatastreamXMLMetadata)m_ds).xmlContent;
         else if (m_dsType == DS_TYPE.MANAGED)
             try {
-                return IOUtils.toByteArray(((DatastreamManagedContent)m_ds).getContentStream());
+                if (ctx == null) {
+                    return IOUtils.toByteArray(((DatastreamManagedContent)m_ds).getContentStream());
+                } else {
+                    return IOUtils.toByteArray(((DatastreamManagedContent)m_ds).getContentStream(ctx));
+                }
             } catch (IOException e) {
                 throw new RuntimeException("Unable to read managed stream contents", e);
             } catch (StreamIOException e) {

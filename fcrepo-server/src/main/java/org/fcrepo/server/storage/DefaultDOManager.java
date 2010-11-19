@@ -1020,7 +1020,8 @@ public class DefaultDOManager
             w.addDatastream(dc, dc.DSVersionable);
         } else {
             dcxml = new XMLDatastreamProcessor(dc);
-            dcf = new DCFields(new ByteArrayInputStream(dcxml.getXMLContent()));
+            // note: context may be required to get through authz as content could be filesystem file (or URL)
+            dcf = new DCFields(new ByteArrayInputStream(dcxml.getXMLContent(ctx)));
         }
         // ensure one of the dc:identifiers is the pid
         boolean sawPid = false;
