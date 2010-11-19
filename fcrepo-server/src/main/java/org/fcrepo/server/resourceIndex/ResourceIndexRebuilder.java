@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.resourceIndex;
@@ -13,9 +13,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.trippi.TriplestoreConnector;
+import javax.annotation.Resource;
 
-import org.fcrepo.server.config.DatastoreConfiguration;
+import org.trippi.TriplestoreConnector;
+import org.trippi.impl.mulgara.MulgaraConnector;
+
+import org.fcrepo.server.Module;
 import org.fcrepo.server.config.ModuleConfiguration;
 import org.fcrepo.server.config.Parameter;
 import org.fcrepo.server.config.ServerConfiguration;
@@ -23,19 +26,48 @@ import org.fcrepo.server.errors.ResourceIndexException;
 import org.fcrepo.server.storage.SimpleDOReader;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.utilities.rebuild.Rebuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
 
 
 /**
  * A Rebuilder for the resource index.
  */
 public class ResourceIndexRebuilder
-        implements Rebuilder {
+        implements ApplicationContextAware, Rebuilder {
 
-    private ServerConfiguration m_serverConfig;
+    private static Logger logger = LoggerFactory.getLogger(ResourceIndexRebuilder.class.getName());
+
+    private static final String moduleName = "org.fcrepo.server.resourceIndex.ResourceIndex";
+    private static final String configName = "org.fcrepo.server.resourceIndex.ResourceIndexConfiguration";
+
+    private ModuleConfiguration m_riConfig;
+
+    private ApplicationContext m_context;
 
     private ResourceIndex m_ri;
 
     private TriplestoreConnector m_conn;
+
+    private TripleGenerator m_generator;
+
+    public ResourceIndexRebuilder(){
+
+    }
+
+    @Resource(name = "org.trippi.TriplestoreConnector")
+    public void setTriplestoreConnector(TriplestoreConnector conn){
+        m_conn = conn;
+    }
+
+    @Resource(name = configName)
+    public void setModuleConfiguration(ModuleConfiguration riConfig) {
+        m_riConfig = riConfig;
+    }
 
     /**
      * Get a short phrase describing what the user can do with this rebuilder.
@@ -54,55 +86,60 @@ public class ResourceIndexRebuilder
 
     /**
      * Initialize the rebuilder, given the server configuration.
-     * 
+     *
      * @returns a map of option names to plaintext descriptions.
      */
-    public Map<String, String> init(File serverDir,
-                                    ServerConfiguration serverConfig) {
-        m_serverConfig = serverConfig;
-        Map<String, String> m = new HashMap<String, String>();
+    public void setServerConfiguration(ServerConfiguration serverConfig){
+        // not needed
+    }
 
+    public void setServerDir(File serverBaseDir) {
+        // not needed
+    }
+
+    public void init() {
+
+    }
+
+    public Map<String, String> getOptions() {
+        Map<String, String> m = new HashMap<String, String>();
         return m;
+    }
+
+    @Resource(name = "org.fcrepo.server.resourceIndex.ModelBasedTripleGenerator")
+    public void setTripleGenerator(TripleGenerator generator) {
+        m_generator = generator;
     }
 
     /**
      * Validate the provided options and perform any necessary startup tasks.
      */
     public void start(Map<String, String> options)
-            throws ResourceIndexException {
+    throws ResourceIndexException {
         // validate options
 
         // do startup tasks
-        ModuleConfiguration riMC =
-                m_serverConfig
-                        .getModuleConfiguration("org.fcrepo.server.resourceIndex.ResourceIndex");
-        int riLevel = Integer.parseInt(riMC.getParameter("level").getValue());
-        String riDatastore = riMC.getParameter("datastore").getValue();
-        DatastoreConfiguration tsDC =
-                m_serverConfig.getDatastoreConfiguration(riDatastore);
-        String tsConnector = tsDC.getParameter("connectorClassName").getValue();
 
-        String tsPath = null;
-        if (tsConnector.equals("org.trippi.impl.mulgara.MulgaraConnector")) {
-            Parameter remoteParm = tsDC.getParameter("remote");
-            if (remoteParm != null
-                    && remoteParm.getValue().equalsIgnoreCase("false")) {
-                tsPath = tsDC.getParameter("path").getValue(true);
+        String levelValue;
+        if (m_riConfig == null){ //must have been configured outside fcfg
+            Module riModule = m_context.getBean(moduleName,Module.class);
+            if (riModule != null){
+                logger.warn("ModuleConfiguration bean unavailable; getting Module bean");
+                levelValue = riModule.getParameter("level");
+            }
+            else {
+                logger.error("Cannot load ResourceIndex module definition from Spring config or Fedora config");
+                throw new ResourceIndexException("Cannot locate ResourceIndex module definition in Spring config or Fedora config");
             }
         }
-
-        Iterator<Parameter> it;
-        Parameter p;
-
-        Map<String, String> tsTC = new HashMap<String, String>();
-        it = tsDC.getParameters().iterator();
-        while (it.hasNext()) {
-            p = it.next();
-            tsTC.put(p.getName(), p.getValue(p.getIsFilePath()));
+        else {
+            levelValue = m_riConfig.getParameter("level",Parameter.class).getValue();
         }
+        int riLevel = Integer.parseInt(levelValue);
 
         Map<String, String> aliasMap = new HashMap<String, String>();
-        it = riMC.getParameters().iterator();
+        Iterator<Parameter> it = m_riConfig.getParameters(Parameter.class).iterator();
+        Parameter p;
         while (it.hasNext()) {
             p = it.next();
             String pName = p.getName();
@@ -112,18 +149,38 @@ public class ResourceIndexRebuilder
             }
         }
 
+
+        System.out.println("Initializing triplestore interface...");
+        try {
+            if (m_conn instanceof MulgaraConnector){
+                String path = m_conn.getConfiguration().get("path");
+                dropIndex(path);
+            }
+
+            m_ri = new ResourceIndexImpl(m_conn, m_generator, riLevel, false);
+            m_ri.setAliasMap(aliasMap);
+        } catch (Exception e) {
+            logger.error("Failed to initialize new Resource Index",e);
+            e.printStackTrace(System.err);
+            throw new ResourceIndexException("Failed to initialize new Resource Index",
+                                             e);
+        }
+
+    }
+
+    private void dropIndex(String tsPath){
         if (tsPath == null) {
             BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(System.in));
+                new BufferedReader(new InputStreamReader(System.in));
             System.out.println();
             System.out
-                    .println("NOTE: You must now manually re-initialize (clear) ");
+            .println("NOTE: You must now manually re-initialize (clear) ");
             System.out
-                    .println("      the existing triplestore.  The RI rebuilder");
+            .println("      the existing triplestore.  The RI rebuilder");
             System.out
-                    .println("      cannot yet automatically perform this step ");
+            .println("      cannot yet automatically perform this step ");
             System.out
-                    .println("      for this type of triplestore.  Press enter");
+            .println("      for this type of triplestore.  Press enter");
             System.out.println("      when finished.");
             try {
                 reader.readLine();
@@ -136,24 +193,11 @@ public class ResourceIndexRebuilder
             File cleanDir = new File(tsPath);
             cleanDir.mkdir();
         }
-
-        System.out.println("Initializing triplestore interface...");
-        try {
-            m_conn = TriplestoreConnector.init(tsConnector, tsTC);
-
-            TripleGenerator generator = new ModelBasedTripleGenerator();
-
-            m_ri = new ResourceIndexImpl(m_conn, generator, riLevel, false);
-            m_ri.setAliasMap(aliasMap);
-        } catch (Exception e) {
-            throw new ResourceIndexException("Failed to initialize new Resource Index",
-                                             e);
-        }
     }
 
     /**
      * Add the data of interest for the given object.
-     * 
+     *
      * @throws ResourceIndexException
      */
     public void addObject(DigitalObject obj) throws ResourceIndexException {
@@ -196,4 +240,12 @@ public class ResourceIndexRebuilder
 
         return result;
     }//deleteDirectory()
+
+    @Override
+    public void setApplicationContext(ApplicationContext context)
+            throws BeansException {
+        m_context = context;
+
+    }
+
 }

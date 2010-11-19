@@ -16,14 +16,14 @@ import java.util.Properties;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
 
 import org.w3c.dom.Document;
 
-import org.fcrepo.server.config.ServerConfiguration;
-import org.fcrepo.server.config.ServerConfigurationParser;
 import org.fcrepo.test.FedoraTestCase;
 
 
@@ -109,7 +109,9 @@ public class TestServerConfiguration
         Document generated =
                 builder.parse(new ByteArrayInputStream(out.toByteArray()));
         XMLUnit.setIgnoreWhitespace(true);
-        assertXMLEqual(original, generated);
+        Diff diff = new Diff(original, generated);
+        diff.overrideElementQualifier(new ElementNameAndAttributeQualifier());
+        assertXMLEqual(diff,true);
     }
 
     private Document getDocument(ByteArrayOutputStream out) throws Exception {

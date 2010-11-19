@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.utilities;
@@ -8,6 +8,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.AxisFault;
 
+import org.fcrepo.common.FaultException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.errors.authorization.AuthzDeniedException;
 import org.fcrepo.server.errors.authorization.AuthzException;
@@ -17,7 +18,7 @@ import org.fcrepo.server.errors.authorization.AuthzPermittedException;
 
 /**
  * Utility methods for working with Axis.
- * 
+ *
  * @author Chris Wilper
  */
 public abstract class AxisUtility {
@@ -86,9 +87,16 @@ public abstract class AxisUtility {
                 return getFault((ServerException) th);
             }
         } else {
-            return AxisFault
-                    .makeFault(new Exception("Uncaught exception from Fedora Server",
-                                             th));
+            if (th instanceof FaultException){
+                return AxisFault.makeFault((FaultException)th);
+            }
+            else {
+                AxisFault fault = AxisFault
+                .makeFault(new Exception("Uncaught exception from Fedora Server",
+                                         th));
+                fault.addFaultDetailString(th.toString());
+                return fault;
+            }
         }
     }
 

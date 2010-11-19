@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.fcrepo.server.config.DatastoreConfiguration;
 import org.fcrepo.server.config.ModuleConfiguration;
+import org.fcrepo.server.config.Parameter;
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.errors.InconsistentTableSpecException;
 import org.fcrepo.server.storage.ConnectionPool;
@@ -46,7 +47,7 @@ public abstract class SQLUtility {
         ModuleConfiguration mcfg =
                 fcfg
                         .getModuleConfiguration("org.fcrepo.server.storage.ConnectionPoolManager");
-        String defaultPool = mcfg.getParameter("defaultPoolName").getValue();
+        String defaultPool = mcfg.getParameter("defaultPoolName",Parameter.class).getValue();
         DatastoreConfiguration dcfg =
                 fcfg.getDatastoreConfiguration(defaultPool);
         return getConnectionPool(dcfg);

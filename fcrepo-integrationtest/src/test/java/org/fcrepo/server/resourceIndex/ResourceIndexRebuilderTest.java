@@ -7,7 +7,6 @@ package org.fcrepo.server.resourceIndex;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 
 import java.net.ConnectException;
 import java.net.Socket;
@@ -21,12 +20,13 @@ import org.junit.Test;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
-
+import org.fcrepo.server.Server;
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.config.ServerConfigurationParser;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.utilities.ServerUtility;
 import org.fcrepo.server.utilities.rebuild.Rebuild;
+import org.fcrepo.server.utilities.rebuild.RebuildServer;
 import org.fcrepo.server.utilities.rebuild.Rebuilder;
 
 import org.fcrepo.test.FedoraTestCase;
@@ -96,17 +96,13 @@ public class ResourceIndexRebuilderTest {
     }
 
     private void rebuild() throws Exception {
-        Rebuilder rebuilder;
-        File serverDir = new File(new File(Constants.FEDORA_HOME), "server");
-        ServerConfigurationParser parser =
-                new ServerConfigurationParser(new FileInputStream(new File(serverDir,
-                                                                           "config/fedora.fcfg")));
-        ServerConfiguration serverConfig = parser.parse();
-        rebuilder = new ResourceIndexRebuilder();
-        Map<String, String> options = rebuilder.init(serverDir, serverConfig);
+        Server server = RebuildServer.getInstance(new File(Constants.FEDORA_HOME));
+        Rebuilder rebuilder = server.getBean(ResourceIndexRebuilder.class);
+
+        Map<String, String> options = rebuilder.getOptions();
 
         try {
-            new Rebuild(rebuilder, options, serverConfig);
+            new Rebuild(rebuilder, options, server);
         } catch (Exception e) {
             e.printStackTrace();
             junit.framework.Assert.fail(e.getMessage());

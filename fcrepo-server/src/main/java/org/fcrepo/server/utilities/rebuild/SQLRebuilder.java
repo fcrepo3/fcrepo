@@ -34,6 +34,7 @@ import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.config.DatastoreConfiguration;
 import org.fcrepo.server.config.ModuleConfiguration;
+import org.fcrepo.server.config.Parameter;
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.LowlevelStorageException;
@@ -91,9 +92,20 @@ public class SQLRebuilder
      *
      * @returns a map of option names to plaintext descriptions.
      */
-    public Map<String, String> init(File serverDir,
-                                    ServerConfiguration serverConfig) {
+    public void setServerConfiguration(ServerConfiguration serverConfig) {
         m_serverConfig = serverConfig;
+    }
+
+    public void setServerDir(File serverBaseDir) {
+
+    }
+
+    public void init() {
+
+    }
+
+    public Map<String, String> getOptions()
+ {
         Map<String, String> m = new HashMap<String, String>();
         return m;
     }
@@ -472,14 +484,14 @@ public class SQLRebuilder
                 m_serverConfig
                         .getModuleConfiguration("org.fcrepo.server.storage.ConnectionPoolManager");
         String datastoreID =
-                poolConfig.getParameter("defaultPoolName").getValue();
+                poolConfig.getParameter("defaultPoolName",Parameter.class).getValue();
         DatastoreConfiguration dbConfig =
                 m_serverConfig.getDatastoreConfiguration(datastoreID);
-        return getConnection(dbConfig.getParameter("jdbcDriverClass")
+        return getConnection(dbConfig.getParameter("jdbcDriverClass",Parameter.class)
                                      .getValue(),
-                             dbConfig.getParameter("jdbcURL").getValue(),
-                             dbConfig.getParameter("dbUsername").getValue(),
-                             dbConfig.getParameter("dbPassword").getValue());
+                             dbConfig.getParameter("jdbcURL",Parameter.class).getValue(),
+                             dbConfig.getParameter("dbUsername",Parameter.class).getValue(),
+                             dbConfig.getParameter("dbPassword",Parameter.class).getValue());
     }
 
     private static Connection getConnection(String driverClass,

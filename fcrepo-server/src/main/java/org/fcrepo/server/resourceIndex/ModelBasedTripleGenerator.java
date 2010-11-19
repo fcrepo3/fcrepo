@@ -1,8 +1,13 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.resourceIndex;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.jrdf.graph.Triple;
 
@@ -15,11 +20,6 @@ import static org.fcrepo.common.Models.FEDORA_OBJECT_3_0;
 import static org.fcrepo.common.Models.SERVICE_DEFINITION_3_0;
 import static org.fcrepo.common.Models.SERVICE_DEPLOYMENT_3_0;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * Generates an object's triples based upon its declared content models.
  * <p>
@@ -27,7 +27,7 @@ import java.util.Set;
  * {@link TripleGenerator} for that model. Returns the union of all triples
  * created by these generators.
  * </p>
- * 
+ *
  * @author Aaron Birkland
  */
 public class ModelBasedTripleGenerator
@@ -53,7 +53,7 @@ public class ModelBasedTripleGenerator
     }
 
     /** Contains the initialized triple generators for each model */
-    private Map<String, TripleGenerator> m_generators =
+    private final Map<String, TripleGenerator> m_generators =
             new HashMap<String, TripleGenerator>();
 
     /**
@@ -76,9 +76,13 @@ public class ModelBasedTripleGenerator
         }
     }
 
+    public void setTripleGenerators(Map<String,? extends TripleGenerator> generators){
+        m_generators.putAll(generators);
+    }
+
     /**
      * Gets all triples implied by the object's models.
-     * 
+     *
      * @param reader
      *        Reads the current object
      * @return Set of all triples implied by the object's models.

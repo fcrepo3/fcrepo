@@ -414,6 +414,7 @@ public class AkubraLowlevelStorage
         try {
             return connection.getBlob(blobId, hints);
         } catch (Exception e) {
+            logger.error(e.toString(),e);
             throw new FaultException("System error getting blob handle", e);
         }
     }
@@ -425,6 +426,7 @@ public class AkubraLowlevelStorage
         } catch (MissingBlobException e) { // subclass of IOException
             throw e;
         } catch (IOException e) {
+            logger.error(e.toString(),e);
             throw new FaultException("System error opening input stream", e);
         }
     }
@@ -438,6 +440,7 @@ public class AkubraLowlevelStorage
         } catch (DuplicateBlobException e) { // subclass of IOException
             throw e;
         } catch (IOException e) {
+            logger.error(e.toString(),e);
             throw new FaultException("System error opening output stream", e);
         }
     }
@@ -446,6 +449,7 @@ public class AkubraLowlevelStorage
         try {
             return blob.exists();
         } catch (IOException e) {
+            logger.error(e.toString(),e);
             throw new FaultException(
                     "System error determining existence of blob", e);
         }
@@ -453,8 +457,14 @@ public class AkubraLowlevelStorage
 
     private static void delete(Blob blob) {
         try {
-            blob.delete();
+            if (blob.exists()){
+                blob.delete();
+            }
+            else {
+                logger.warn("Attempted to delete non-existent blob " + blob.getCanonicalId());
+            }
         } catch (IOException e) {
+            logger.error(e.toString(),e);
             throw new FaultException("System error deleting blob", e);
         }
     }
@@ -463,6 +473,7 @@ public class AkubraLowlevelStorage
         try {
             return connection.listBlobIds(null); // all
         } catch (IOException e) {
+            logger.error(e.toString(),e);
             throw new FaultException("System error listing blob ids", e);
         }
     }
@@ -471,6 +482,7 @@ public class AkubraLowlevelStorage
         try {
             return IOUtils.copyLarge(source, sink);
         } catch (IOException e) {
+            logger.error(e.toString(),e);
             throw new FaultException("System error copying stream", e);
         } finally {
             IOUtils.closeQuietly(source);

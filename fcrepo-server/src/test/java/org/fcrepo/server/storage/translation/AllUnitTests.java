@@ -8,8 +8,6 @@ package org.fcrepo.server.storage.translation;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import org.fcrepo.server.storage.translation.AllUnitTests;
-
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses( {TestDOTranslatorImpl.class,
@@ -44,8 +42,8 @@ public class AllUnitTests {
         suite.addTest(TestMETSFedoraExt1_1DOSerializer.suite());
         suite.addTest(TestMETSFedoraExt1_1DODeserializer.suite());
 
-        suite.addTest(TestAtomDOSerializer.suite());
-        suite.addTest(TestAtomDODeserializer.suite());
+//        suite.addTest(TestAtomDOSerializer.suite());
+//        suite.addTest(TestAtomDODeserializer.suite());
 
         return suite;
     }

@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.config.DatastoreConfiguration;
+import org.fcrepo.server.config.Parameter;
 import org.fcrepo.server.errors.InconsistentTableSpecException;
 import org.fcrepo.server.storage.ConnectionPool;
 
@@ -45,44 +46,44 @@ class SQLUtilityImpl
     @Override
     protected ConnectionPool i_getConnectionPool(DatastoreConfiguration cpDC)
             throws SQLException {
-        String cpUsername = cpDC.getParameter("dbUsername").getValue();
-        String cpPassword = cpDC.getParameter("dbPassword").getValue();
-        String cpURL = cpDC.getParameter("jdbcURL").getValue();
-        String cpDriver = cpDC.getParameter("jdbcDriverClass").getValue();
-        String cpDDLConverter = cpDC.getParameter("ddlConverter").getValue();
+        String cpUsername = cpDC.getParameter("dbUsername",Parameter.class).getValue();
+        String cpPassword = cpDC.getParameter("dbPassword",Parameter.class).getValue();
+        String cpURL = cpDC.getParameter("jdbcURL",Parameter.class).getValue();
+        String cpDriver = cpDC.getParameter("jdbcDriverClass",Parameter.class).getValue();
+        String cpDDLConverter = cpDC.getParameter("ddlConverter",Parameter.class).getValue();
         int cpMaxActive =
-                Integer.parseInt(cpDC.getParameter("maxActive").getValue());
+                Integer.parseInt(cpDC.getParameter("maxActive",Parameter.class).getValue());
         int cpMaxIdle =
-                Integer.parseInt(cpDC.getParameter("maxIdle").getValue());
+                Integer.parseInt(cpDC.getParameter("maxIdle",Parameter.class).getValue());
         long cpMaxWait =
-                Long.parseLong(cpDC.getParameter("maxWait").getValue());
+                Long.parseLong(cpDC.getParameter("maxWait",Parameter.class).getValue());
         int cpMinIdle =
-                Integer.parseInt(cpDC.getParameter("minIdle").getValue());
+                Integer.parseInt(cpDC.getParameter("minIdle",Parameter.class).getValue());
         long cpMinEvictableIdleTimeMillis =
-                Long.parseLong(cpDC.getParameter("minEvictableIdleTimeMillis")
+                Long.parseLong(cpDC.getParameter("minEvictableIdleTimeMillis",Parameter.class)
                         .getValue());
         int cpNumTestsPerEvictionRun =
-                Integer.parseInt(cpDC.getParameter("numTestsPerEvictionRun")
+                Integer.parseInt(cpDC.getParameter("numTestsPerEvictionRun",Parameter.class)
                         .getValue());
         long cpTimeBetweenEvictionRunsMillis =
                 Long.parseLong(cpDC
-                        .getParameter("timeBetweenEvictionRunsMillis")
+                        .getParameter("timeBetweenEvictionRunsMillis",Parameter.class)
                         .getValue());
         String cpValidationQuery = null;
         if (cpDC.getParameter("validationQuery") != null) {
-            cpValidationQuery = cpDC.getParameter("validationQuery").getValue();
+            cpValidationQuery = cpDC.getParameter("validationQuery",Parameter.class).getValue();
         }
         boolean cpTestOnBorrow =
-                Boolean.parseBoolean(cpDC.getParameter("testOnBorrow")
+                Boolean.parseBoolean(cpDC.getParameter("testOnBorrow",Parameter.class)
                         .getValue());
         boolean cpTestOnReturn =
-                Boolean.parseBoolean(cpDC.getParameter("testOnReturn")
+                Boolean.parseBoolean(cpDC.getParameter("testOnReturn",Parameter.class)
                         .getValue());
         boolean cpTestWhileIdle =
-                Boolean.parseBoolean(cpDC.getParameter("testWhileIdle")
+                Boolean.parseBoolean(cpDC.getParameter("testWhileIdle",Parameter.class)
                         .getValue());
         byte cpWhenExhaustedAction =
-                Byte.parseByte(cpDC.getParameter("whenExhaustedAction")
+                Byte.parseByte(cpDC.getParameter("whenExhaustedAction",Parameter.class)
                         .getValue());
 
         DDLConverter ddlConverter = null;

@@ -356,12 +356,12 @@ public class ConnectionPoolManagerImpl
      */
     @Override
     public void shutdownModule() throws ModuleShutdownException {
+        super.shutdownModule();
 
         for (Map.Entry<String, ConnectionPool> e : h_ConnectionPools.entrySet()) {
             e.getValue().close();
         }
 
-        super.shutdownModule();
     }
 
 }

@@ -12,9 +12,7 @@ import java.util.Map;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ConnectionPoolNotFoundException;
 import org.fcrepo.server.errors.ModuleInitializationException;
-import org.fcrepo.server.management.Management;
 import org.fcrepo.server.management.PIDGenerator;
-import org.fcrepo.server.resourceIndex.ResourceIndex;
 import org.fcrepo.server.search.FieldSearch;
 import org.fcrepo.server.storage.ConnectionPoolManager;
 import org.fcrepo.server.storage.DefaultDOManager;
@@ -53,14 +51,11 @@ public class RebuildDOManager
 
     @Override
     public void postInitModule() throws ModuleInitializationException {
-        // get ref to management module
-        m_management =
-                (Management) getServer()
-                        .getModule("org.fcrepo.server.management.Management");
-        if (m_management == null) {
-            //   throw new ModuleInitializationException(
-            //           "Management module not loaded.", getRole());
-        }
+        // does not use management module
+//        m_management =
+//                (Management) getServer()
+//                        .getModule("org.fcrepo.server.management.Management");
+
         // get ref to contentmanager module
         m_contentManager =
                 (ExternalContentManager) getServer()
@@ -94,10 +89,10 @@ public class RebuildDOManager
             throw new ModuleInitializationException("DOValidator not loaded.",
                                                     getRole());
         }
-        // get ref to ResourceIndex (ok if it's not loaded)
-        m_resourceIndex =
-                (ResourceIndex) getServer()
-                        .getModule("org.fcrepo.server.resourceIndex.ResourceIndex");
+        // will not use ref to ResourceIndex (ok if it's not loaded)
+//        m_resourceIndex =
+//                (ResourceIndex) getServer()
+//                        .getModule("org.fcrepo.server.resourceIndex.ResourceIndex");
 
         // now get the connectionpool
         ConnectionPoolManager cpm =
@@ -114,8 +109,9 @@ public class RebuildDOManager
                 m_connectionPool = cpm.getPool(m_storagePool);
             }
         } catch (ConnectionPoolNotFoundException cpnfe) {
+            String storagePool = (m_storagePool == null)?"[null]":m_storagePool;
             throw new ModuleInitializationException("Couldn't get required "
-                    + "connection pool...wasn't found", getRole());
+                    + "connection pool " + storagePool + " ...wasn't found", getRole());
         }
         try {
             String dbSpec =

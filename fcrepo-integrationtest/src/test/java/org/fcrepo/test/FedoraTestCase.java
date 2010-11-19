@@ -81,20 +81,17 @@ public abstract class FedoraTestCase
     }
 
     public static String getHost() {
-        return getServerConfiguration().getParameter("fedoraServerHost")
-                .getValue();
+        return getServerConfiguration().getParameter("fedoraServerHost");
     }
 
     public static String getPort() {
         String port = null;
         if (getProtocol().equals("http")) {
             port =
-                    getServerConfiguration().getParameter("fedoraServerPort")
-                            .getValue();
+                    getServerConfiguration().getParameter("fedoraServerPort");
         } else {
             port =
-                    getServerConfiguration().getParameter("fedoraRedirectPort")
-                            .getValue();
+                    getServerConfiguration().getParameter("fedoraRedirectPort");
         }
         return port;
     }
@@ -103,14 +100,13 @@ public abstract class FedoraTestCase
         if (System.getProperty("fedoraAppServerContext") != null) {
             return System.getProperty("fedoraAppServerContext");
         }
-        return getServerConfiguration().getParameter("fedoraAppServerContext")
-                .getValue();
+        return getServerConfiguration().getParameter("fedoraAppServerContext");
     }
 
     public static String getDemoAppServerContext() {
         return getServerConfiguration()
                 .getParameter("fedoraDemoAppServerContext") != null ? getServerConfiguration()
-                .getParameter("fedoraDemoAppServerContext").getValue()
+                .getParameter("fedoraDemoAppServerContext")
                 : "fedora-demo";
     }
 

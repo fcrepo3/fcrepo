@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.utilities.rebuild;
@@ -14,10 +14,10 @@ import org.fcrepo.server.storage.types.DigitalObject;
 
 /**
  * Interface for a class that rebuilds some aspect of the repository.
- * 
- * <p>It is expected that clients of this interface will first call init, then 
+ *
+ * <p>It is expected that clients of this interface will first call init, then
  * start, then addObject (possibly a series of times), then finish.
- * 
+ *
  * @author Chris Wilper
  */
 public interface Rebuilder {
@@ -29,11 +29,16 @@ public interface Rebuilder {
 
     /**
      * Initialize the rebuilder, given the server configuration.
-     * 
+     *
      * @returns a map of option names to plaintext descriptions.
      */
-    public Map<String, String> init(File serverBaseDir,
-                                    ServerConfiguration serverConfig)
+    public void setServerConfiguration(ServerConfiguration serverConfig);
+
+    public void setServerDir(File serverBaseDir);
+
+    public void init();
+
+    public Map<String, String> getOptions()
             throws Exception;
 
     /**

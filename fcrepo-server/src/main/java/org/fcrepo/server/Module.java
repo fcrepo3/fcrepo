@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server;
@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.ModuleShutdownException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -26,11 +28,15 @@ import org.fcrepo.server.errors.ModuleShutdownException;
  * <code>getModule(String)</code> instance method of the <code>Server</code>
  * class.
  * </p>
- * 
+ *
  * @author Chris Wilper
  */
 public abstract class Module
         extends Pluggable {
+
+    private static final Logger logger =
+        LoggerFactory.getLogger(Module.class);
+
 
     private final String m_role;
 
@@ -42,7 +48,7 @@ public abstract class Module
      * </p>
      * When the server is starting up, this is invoked as part of the
      * initialization process.
-     * 
+     *
      * @param moduleParameters
      *        A pre-loaded Map of name-value pairs comprising the intended
      *        configuration of this Module.
@@ -61,13 +67,13 @@ public abstract class Module
         super(moduleParameters);
         m_role = role;
         m_server = server;
-        initModule();
+        //initModule();
     }
 
     /**
      * Gets the <code>Server</code> instance to which this <code>Module</code>
      * belongs.
-     * 
+     *
      * @return The <code>Server</code> instance.
      */
     public Server getServer() {
@@ -80,7 +86,7 @@ public abstract class Module
      * </p>
      * <i>Role</i> is the name of the class or interface that this concrete
      * <code>Module</code> extends or implements.
-     * 
+     *
      * @return String The role.
      */
     public final String getRole() {
@@ -89,7 +95,7 @@ public abstract class Module
 
     /**
      * Initializes the Module based on configuration parameters.
-     * 
+     *
      * @throws ModuleInitializationException
      *         If initialization values are invalid or initialization fails for
      *         some other reason.
@@ -103,7 +109,7 @@ public abstract class Module
     /**
      * Second stage of Module initialization. This is guaranteed to run after
      * all Modules' initModule() methods have run.
-     * 
+     *
      * @throws ModuleInitializationException
      *         If initialization values are invalid or initialization fails for
      *         some other reason.
@@ -116,7 +122,7 @@ public abstract class Module
 
     /**
      * Frees system resources allocated by this Module.
-     * 
+     *
      * @throws ModuleShutdownException
      *         If there is a problem freeing system resources. Note that if
      *         there is a problem, it won't end up aborting the shutdown
@@ -124,6 +130,7 @@ public abstract class Module
      *         recover from exceptional situations before throwing an exception.
      */
     public void shutdownModule() throws ModuleShutdownException {
+        logger.info("Shutting down " + getClass().getName());
         if (1 == 2) {
             throw new ModuleShutdownException(null, null);
         }

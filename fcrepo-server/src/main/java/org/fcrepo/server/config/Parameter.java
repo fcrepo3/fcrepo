@@ -1,11 +1,12 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.config;
 
 import java.io.File;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.fcrepo.common.Constants;
@@ -39,13 +40,21 @@ public class Parameter
         m_profileValues = profileValues;
     }
 
+    public Parameter(String name) {
+        this(name, null, false, null, new HashMap<String,String>());
+    }
+
+    private Parameter(String name, String value) {
+        this(name, value, false, null, new HashMap<String,String>());
+    }
+
     public String getName() {
         return m_name;
     }
 
     /**
      * Gets the value of the parameter. Same as getValue(false).
-     * 
+     *
      * @return The value of the parameter
      */
     public String getValue() {
@@ -56,7 +65,7 @@ public class Parameter
      * Gets the value of the parameter. Prepends the location of FEDORA_HOME if
      * asAbsolutePath is true and the parameter location does not already
      * specify an absolute pathname.
-     * 
+     *
      * @param asAbsolutePath
      *        Whether to return the parameter value as an absolute file path
      *        relative to FEDORA_HOME.

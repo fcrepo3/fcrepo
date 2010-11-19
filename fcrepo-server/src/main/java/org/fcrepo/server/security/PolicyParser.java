@@ -149,11 +149,7 @@ public class PolicyParser {
             factory.setIgnoringComments(true);
             factory.setNamespaceAware(true);
             DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.setErrorHandler(new ErrorHandler() {
-                public void error(SAXParseException e) throws SAXParseException { throw e; }
-                public void fatalError(SAXParseException e) throws SAXParseException { throw e; }
-                public void warning(SAXParseException e) throws SAXParseException { throw e; }
-            });
+            builder.setErrorHandler(new ThrowAllErrorHandler());
             return builder;
         } catch (ParserConfigurationException e) {
             throw new FaultException(e);
@@ -222,5 +218,14 @@ public class PolicyParser {
     private static void fail(Exception e) {
         e.printStackTrace();
         fail(e.getClass().getName() + ": See above for detail");
+    }
+/**
+ * This class is a workaround to some shift in the behavior of anonymous inner classes
+ *
+ */
+    public static class ThrowAllErrorHandler implements ErrorHandler {
+        public void error(SAXParseException e) throws SAXParseException { throw e; }
+        public void fatalError(SAXParseException e) throws SAXParseException { throw e; }
+        public void warning(SAXParseException e) throws SAXParseException { throw e; }
     }
 }

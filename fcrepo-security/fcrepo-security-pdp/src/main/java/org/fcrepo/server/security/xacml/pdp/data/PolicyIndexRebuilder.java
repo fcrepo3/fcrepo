@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -62,17 +61,6 @@ public class PolicyIndexRebuilder
     }
 
     @Override
-    public Map<String, String> init(File serverBaseDir,
-                                    ServerConfiguration serverConfig)
-            throws Exception {
-
-        PolicyIndexFactory factory = new PolicyIndexFactory();
-        m_policyIndex = factory.newPolicyIndex();
-
-        return new HashMap<String, String>();
-    }
-
-    @Override
     public boolean shouldStopServer() {
         return true;
     }
@@ -99,6 +87,31 @@ public class PolicyIndexRebuilder
             } catch (IOException e) {
             }
         }
+    }
+
+    @Override
+    public Map<String, String> getOptions() throws Exception {
+        return null;
+    }
+
+    @Override
+    public void init() {
+        PolicyIndexFactory factory = new PolicyIndexFactory();
+        try {
+            m_policyIndex = factory.newPolicyIndex();
+        } catch (PolicyIndexException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setServerConfiguration(ServerConfiguration serverConfig) {
+        // not needed
+    }
+
+    @Override
+    public void setServerDir(File serverBaseDir) {
+        // not needed
     }
 
 }

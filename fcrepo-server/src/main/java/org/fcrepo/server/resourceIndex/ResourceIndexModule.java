@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.resourceIndex;
@@ -34,17 +34,21 @@ import org.fcrepo.server.errors.ModuleShutdownException;
 import org.fcrepo.server.errors.ResourceIndexException;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.utilities.status.ServerState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 /**
  * Fedora's <code>ResourceIndex</code> as a configurable module.
- * 
+ *
  * @author Chris Wilper
  */
 public class ResourceIndexModule
         extends Module
         implements ResourceIndex {
+    private static final Logger logger =
+        LoggerFactory.getLogger(ResourceIndexModule.class);
 
     /**
      * The instance this module wraps.
@@ -97,17 +101,28 @@ public class ResourceIndexModule
         }
         boolean syncUpdates = getBoolean("syncUpdates", false);
         try {
-            TriplestoreConnector connector =
+            TriplestoreConnector connector = null;
+            String ds = getParameter("datastore");
+            if (ds != null){
+                logger.info("Configuring triplestore connector from fcfg datastore configuration " + ds);
+                connector =
                     getConnector(getServer()
-                            .getDatastoreConfig(getRequired("datastore")));
+                                 .getDatastoreConfig(ds));
 
-            TripleGenerator generator = new ModelBasedTripleGenerator();
+            } else {
+                logger.info("Configuring triplestore from bean " + TriplestoreConnector.class.getName());
+                connector =
+                    getServer().getBean(TriplestoreConnector.class.getName(),TriplestoreConnector.class);
+            }
+            TripleGenerator generator =
+                getServer().getBean(ModelBasedTripleGenerator.class.getName(), ModelBasedTripleGenerator.class);
 
             _ri = new ResourceIndexImpl(connector,
                                         generator,
                                         level,
                                         syncUpdates);
             setAliasMap(getAliases());
+
         } catch (Exception e) {
             throw new ModuleInitializationException("Error initializing RI",
                                                     getRole(),
@@ -206,7 +221,7 @@ public class ResourceIndexModule
 
     /**
      * Shutdown the RI module by closing the wrapped ResourceIndex.
-     * 
+     *
      * @throws ModuleShutdownException
      *         if any error occurs while closing.
      */

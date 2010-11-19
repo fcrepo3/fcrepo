@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.config;
@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -22,7 +23,7 @@ import org.fcrepo.common.Constants;
 
 /**
  * Fedora server configuration.
- * 
+ *
  * @author Chris Wilper
  */
 public class ServerConfiguration
@@ -115,30 +116,30 @@ public class ServerConfiguration
                 + "\">");
 
         // do server parameters first
-        serializeParameters(getParameters(), 2, out);
+        serializeParameters(getParameters(Parameter.class), 2, out);
         // next, modules
-        Iterator mIter = getModuleConfigurations().iterator();
+        Iterator<ModuleConfiguration> mIter = getModuleConfigurations().iterator();
         while (mIter.hasNext()) {
-            ModuleConfiguration mc = (ModuleConfiguration) mIter.next();
+            ModuleConfiguration mc = mIter.next();
             out.println("  <module role=\"" + mc.getRole() + "\" class=\""
                     + mc.getClassName() + "\">");
             String comment = strip(mc.getComment());
             if (comment != null) {
                 out.println("    <comment>" + comment + "</comment>");
             }
-            serializeParameters(mc.getParameters(), 4, out);
+            serializeParameters(mc.getParameters(Parameter.class), 4, out);
             out.println("  </module>");
         }
         // finally, datastores
-        Iterator dIter = getDatastoreConfigurations().iterator();
+        Iterator<DatastoreConfiguration> dIter = getDatastoreConfigurations().iterator();
         while (dIter.hasNext()) {
-            DatastoreConfiguration dc = (DatastoreConfiguration) dIter.next();
+            DatastoreConfiguration dc = dIter.next();
             out.println("  <datastore id=\"" + dc.getId() + "\">");
             String comment = strip(dc.getComment());
             if (comment != null) {
                 out.println("    <comment>" + comment + "</comment>");
             }
-            serializeParameters(dc.getParameters(), 4, out);
+            serializeParameters(dc.getParameters(Parameter.class), 4, out);
             out.println("  </datastore>");
         }
 
@@ -146,10 +147,10 @@ public class ServerConfiguration
         out.close();
     }
 
-    private void serializeParameters(List params, int indentBy, PrintStream out) {
-        Iterator paramIter = params.iterator();
+    private void serializeParameters(Collection<Parameter> params, int indentBy, PrintStream out) {
+        Iterator<Parameter> paramIter = params.iterator();
         while (paramIter.hasNext()) {
-            out.println(getParamXMLString((Parameter) paramIter.next(),
+            out.println(getParamXMLString(paramIter.next(),
                                           indentBy));
         }
     }
@@ -170,11 +171,11 @@ public class ServerConfiguration
             out.append(" isFilePath=\"true\"");
         }
         if (p.getProfileValues() != null) {
-            Iterator iter = p.getProfileValues().keySet().iterator();
+            Iterator<String> iter = p.getProfileValues().keySet().iterator();
             while (iter.hasNext()) {
-                String profileName = (String) iter.next();
+                String profileName = iter.next();
                 String profileVal =
-                        (String) p.getProfileValues().get(profileName);
+                        p.getProfileValues().get(profileName);
                 out.append(" " + profileName + "value=\"" + enc(profileVal)
                         + "\"");
             }

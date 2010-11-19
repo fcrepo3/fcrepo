@@ -104,6 +104,15 @@
     </fileSet>
 
     <fileSet>
+      <directory>../fcrepo-server/src/main/resources/fcfg/server/spring</directory>
+      <outputDirectory>/server/config/spring</outputDirectory>
+      <includes>
+        <include>README.txt</include>
+        <include>triple-generator.xml</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
       <directory>../fcrepo-server/src/main/resources/xsl/management</directory>
       <outputDirectory>/server/management</outputDirectory>
       <includes>

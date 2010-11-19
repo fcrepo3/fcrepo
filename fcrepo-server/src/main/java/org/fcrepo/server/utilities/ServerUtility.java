@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.http.WebClient;
 import org.fcrepo.common.http.WebClientConfiguration;
-
+import org.fcrepo.server.config.Parameter;
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.config.ServerConfigurationParser;
 
@@ -84,15 +84,15 @@ public class ServerUtility {
     public static String getBaseURL(String protocol) {
         String port;
         if (protocol.equals("http")) {
-            port = CONFIG.getParameter(FEDORA_SERVER_PORT).getValue();
+            port = CONFIG.getParameter(FEDORA_SERVER_PORT,Parameter.class).getValue();
         } else if (protocol.equals("https")) {
-            port = CONFIG.getParameter(FEDORA_REDIRECT_PORT).getValue();
+            port = CONFIG.getParameter(FEDORA_REDIRECT_PORT,Parameter.class).getValue();
         } else {
             throw new RuntimeException("Unrecogonized protocol: " + protocol);
         }
         return protocol + "://"
-                + CONFIG.getParameter(FEDORA_SERVER_HOST).getValue() + ":"
-                + port + "/" + CONFIG.getParameter(FEDORA_SERVER_CONTEXT).getValue();
+                + CONFIG.getParameter(FEDORA_SERVER_HOST,Parameter.class).getValue() + ":"
+                + port + "/" + CONFIG.getParameter(FEDORA_SERVER_CONTEXT,Parameter.class).getValue();
     }
 
     /**
@@ -153,7 +153,7 @@ public class ServerUtility {
         }
 
         // host must be configured hostname or localhost
-        String fHost = CONFIG.getParameter(FEDORA_SERVER_HOST).getValue();
+        String fHost = CONFIG.getParameter(FEDORA_SERVER_HOST,Parameter.class).getValue();
         String host = uri.getHost();
         if (!host.equals(fHost) && !host.equals("localhost")) {
             return false;
@@ -162,14 +162,14 @@ public class ServerUtility {
         // path must begin with configured webapp context
         String path = uri.getPath();
         String fedoraContext = CONFIG.getParameter(
-                FEDORA_SERVER_CONTEXT).getValue();
+                FEDORA_SERVER_CONTEXT,Parameter.class).getValue();
         if (!path.startsWith("/" + fedoraContext + "/")) {
             return false;
         }
 
         // port specification must match http or https port as appropriate
-        String httpPort = CONFIG.getParameter(FEDORA_SERVER_PORT).getValue();
-        String httpsPort = CONFIG.getParameter(FEDORA_REDIRECT_PORT).getValue();
+        String httpPort = CONFIG.getParameter(FEDORA_SERVER_PORT,Parameter.class).getValue();
+        String httpsPort = CONFIG.getParameter(FEDORA_REDIRECT_PORT,Parameter.class).getValue();
         if (uri.getPort() == -1) {
             // unspecified, so fedoraPort must be 80 (http), or 443 (https)
             if (scheme.equals("http")) {
@@ -213,26 +213,26 @@ public class ServerUtility {
      */
     private static void initWebClientConfig(WebClientConfiguration wconf) {
 
-        if (CONFIG.getParameter("httpClientTimeoutSecs").getValue() != null)
-            wconf.setTimeoutSecs(Integer.parseInt(CONFIG.getParameter("httpClientTimeoutSecs").getValue()));
+        if (CONFIG.getParameter("httpClientTimeoutSecs") != null)
+            wconf.setTimeoutSecs(Integer.parseInt(CONFIG.getParameter("httpClientTimeoutSecs")));
 
         if (CONFIG.getParameter("httpClientSocketTimeoutSecs") != null)
-            wconf.setSockTimeoutSecs(Integer.parseInt(CONFIG.getParameter("httpClientSocketTimeoutSecs").getValue()));
+            wconf.setSockTimeoutSecs(Integer.parseInt(CONFIG.getParameter("httpClientSocketTimeoutSecs")));
 
         if (CONFIG.getParameter("httpClientMaxConnectionsPerHost") != null)
-            wconf.setMaxConnPerHost(Integer.parseInt(CONFIG.getParameter("httpClientMaxConnectionsPerHost").getValue()));
+            wconf.setMaxConnPerHost(Integer.parseInt(CONFIG.getParameter("httpClientMaxConnectionsPerHost")));
 
         if (CONFIG.getParameter("httpClientMaxTotalConnections") != null)
-            wconf.setMaxTotalConn(Integer.parseInt(CONFIG.getParameter("httpClientMaxTotalConnections").getValue()));
+            wconf.setMaxTotalConn(Integer.parseInt(CONFIG.getParameter("httpClientMaxTotalConnections")));
 
         if (CONFIG.getParameter("httpClientFollowRedirects") != null)
-            wconf.setFollowRedirects(Boolean.parseBoolean(CONFIG.getParameter("httpClientFollowRedirects").getValue()));
+            wconf.setFollowRedirects(Boolean.parseBoolean(CONFIG.getParameter("httpClientFollowRedirects")));
 
         if (CONFIG.getParameter("httpClientMaxFollowRedirects") != null)
-            wconf.setMaxRedirects(Integer.parseInt(CONFIG.getParameter("httpClientMaxFollowRedirects").getValue()));
+            wconf.setMaxRedirects(Integer.parseInt(CONFIG.getParameter("httpClientMaxFollowRedirects")));
 
         if (CONFIG.getParameter("httpClientUserAgent") != null)
-            wconf.setUserAgent(CONFIG.getParameter("httpClientUserAgent").getValue());
+            wconf.setUserAgent(CONFIG.getParameter("httpClientUserAgent"));
     }
 
     /**
@@ -269,6 +269,7 @@ public class ServerUtility {
                     + "http|https username password");
             System.exit(1);
         }
+
         } else if (method.equals("migratedatastreamcontrolgroup")) {
 
             // too many args

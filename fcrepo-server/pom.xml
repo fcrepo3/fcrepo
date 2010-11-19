@@ -618,7 +618,7 @@
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
         </dependency>
-
+    
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
@@ -676,6 +676,42 @@
             <scope>test</scope>
         </dependency>
 
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>3.0.3.RELEASE</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+    	<groupId>org.springframework</groupId>
+    	<artifactId>spring-context</artifactId>
+    	<version>3.0.3.RELEASE</version>
+    	<type>jar</type>
+    	<scope>compile</scope>
+    	<exclusions>
+    		<exclusion>
+    			<artifactId>commons-logging</artifactId>
+    			<groupId>commons-logging</groupId>
+    		</exclusion>
+    	</exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+      <version>3.0.3.RELEASE</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
         <!-- Note: No demonstrated evidence of use.  DWD 9/15/2009 -->
         <dependency>
             <groupId>org.fcrepo</groupId>
@@ -702,22 +738,22 @@
             <version>9.0</version>
         </dependency>
 
-        <!-- For the Journal Receiver Assembly -->
         <dependency>
             <groupId>org.fcrepo</groupId>
             <artifactId>trippi-core</artifactId>
+            <version>1.5.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.fcrepo</groupId>
             <artifactId>trippi-mptstore</artifactId>
-            <version>1.4.3</version>
+            <version>1.5.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.fcrepo</groupId>
             <artifactId>trippi-mulgara</artifactId>
-            <version>1.4.3</version>
+            <version>1.5.0</version>
         </dependency>
 
         <dependency>
@@ -734,31 +770,7 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>2.5.6</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>2.5.6</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
+       <dependency>
             <groupId>net.java.dev.stax-utils</groupId>
             <artifactId>stax-utils</artifactId>
             <version>20060502</version>
@@ -769,7 +781,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+ 
         <dependency>
             <groupId>rome</groupId>
             <artifactId>rome</artifactId>

@@ -7,23 +7,23 @@ package org.fcrepo.server.utilities.rebuild;
 import java.io.File;
 import java.io.IOException;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import java.text.MessageFormat;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.parsers.ParserConfigurationException;
+import org.trippi.TriplestoreConnector;
 
 import org.w3c.dom.Element;
 
-import org.xml.sax.SAXException;
-
 import org.fcrepo.server.Server;
+import org.fcrepo.server.config.DatastoreConfiguration;
+import org.fcrepo.server.config.ModuleConfiguration;
+import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.ServerInitializationException;
+import org.fcrepo.server.resourceIndex.ResourceIndex;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.context.annotation.ScannedGenericBeanDefinition;
 
 
 /**
@@ -31,6 +31,13 @@ import org.fcrepo.server.errors.ServerInitializationException;
  */
 public class RebuildServer
         extends Server {
+
+    /**
+     * Default Rebuilders that the rebuild utility knows about.
+     */
+    public static String[] REBUILDERS =
+        new String[] {"org.fcrepo.server.resourceIndex.ResourceIndexRebuilder",
+    "org.fcrepo.server.utilities.rebuild.SQLRebuilder","org.fcrepo.server.security.xacml.pdp.data.PolicyIndexRebuilder"};
 
     /**
      * @param rootConfigElement
@@ -43,13 +50,61 @@ public class RebuildServer
         super(rootConfigElement, homeDir);
     }
 
+    protected RebuildServer(File homeDir)
+    throws ServerInitializationException, ModuleInitializationException {
+        super(homeDir);
+    }
+
+    @Override
+    protected void registerBeanDefinitions()
+            throws ServerInitializationException{
+        ServerConfiguration sc = getConfig();
+        ModuleConfiguration rim = sc.getModuleConfiguration(ResourceIndex.class.getName());
+        if (rim != null){
+            String ds = rim.getParameter("datastore");
+            if (ds != null){
+                DatastoreConfiguration dsConfig = sc.getDatastoreConfiguration(ds);
+                if (dsConfig != null){
+                    try{
+                        String name = TriplestoreConnector.class.getName();
+                        GenericBeanDefinition beanDefinition = Server.getTriplestoreConnectorBeanDefinition(dsConfig);
+                        beanDefinition.setAttribute("name", name);
+                        beanDefinition.setAttribute("id", name);
+                        registerBeanDefinition(name, beanDefinition);
+                    }
+                    catch (IOException e){
+                        throw new ServerInitializationException(e.toString(),e);
+                    }
+                }
+            }
+        }
+        for (String rebuilder:REBUILDERS){
+            try{
+                ScannedGenericBeanDefinition beanDefinition = Server.getScannedBeanDefinition(rebuilder);
+                beanDefinition.setAutowireCandidate(true);
+                beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_NAME);
+                beanDefinition.setAttribute("id", rebuilder);
+                beanDefinition.setAttribute("name", rebuilder);
+                beanDefinition.setInitMethodName("init");
+                beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
+                beanDefinition.setDependencyCheck(AbstractBeanDefinition.DEPENDENCY_CHECK_NONE);
+                registerBeanDefinition(rebuilder, beanDefinition);
+            }
+            catch (IOException e){
+                throw new ServerInitializationException(e.toString(),e);
+            }
+        }
+    }
+
     @Override
     protected boolean overrideModuleRole(String moduleRole) {
-        if (moduleRole.indexOf("Authorization") != -1
-                || moduleRole.indexOf("Access") != -1
-                || moduleRole.indexOf("OAIProvider") != -1
-                || moduleRole.indexOf("Management") != -1
-                || moduleRole.indexOf("ResourceIndex") != -1) {
+        if ("org.fcrepo.server.security.Authorization".equals(moduleRole)
+                || "org.fcrepo.server.access.Access".equals(moduleRole)
+                || "org.fcrepo.server.access.DynamicAccess".equals(moduleRole)
+                || "org.fcrepo.oai.OAIProvider".equals(moduleRole)
+                || "org.fcrepo.oai.OAIProvider".equals(moduleRole)
+                || "org.fcrepo.server.management.Management".equals(moduleRole)
+                || "org.fcrepo.server.resourceIndex.ResourceIndex".equals(moduleRole)) {
             return true;
         }
         return false;
@@ -80,110 +135,18 @@ public class RebuildServer
         // instantiate a new special purpose server for rebuilding
         // SQL databases given the class provided in the root element
         // in the config file and return it
-        File configFile = null;
-        try {
-            DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            configFile =
-                    new File(homeDir + File.separator + "server"
-                            + File.separator + CONFIG_DIR + File.separator
-                            + CONFIG_FILE);
-            // suck it in
-            Element rootElement =
-                    builder.parse(configFile).getDocumentElement();
-            // ensure root element name ok
-            if (!rootElement.getLocalName().equals(CONFIG_ELEMENT_ROOT)) {
-                throw new ServerInitializationException(MessageFormat
-                        .format(INIT_CONFIG_SEVERE_BADROOTELEMENT,
-                                new Object[] {configFile, CONFIG_ELEMENT_ROOT,
-                                        rootElement.getLocalName()}));
-            }
-            // ensure namespace specified properly
-            if (!rootElement.getNamespaceURI().equals(CONFIG_NAMESPACE)) {
-                throw new ServerInitializationException(MessageFormat
-                        .format(INIT_CONFIG_SEVERE_BADNAMESPACE, new Object[] {
-                                configFile, CONFIG_NAMESPACE}));
-            }
-            // select <server class="THIS_PART"> .. </server>
+
             String className = "org.fcrepo.server.utilities.rebuild.RebuildServer";
             try {
-                Class serverClass = Class.forName(className);
-                Class param1Class =
-                        Class.forName(SERVER_CONSTRUCTOR_PARAM1_CLASS);
-                Class param2Class =
-                        Class.forName(SERVER_CONSTRUCTOR_PARAM2_CLASS);
-                Constructor serverConstructor =
-                        serverClass.getConstructor(new Class[] {param1Class,
-                                param2Class});
-                Server inst =
-                        (Server) serverConstructor.newInstance(new Object[] {
-                                rootElement, homeDir});
+                Server inst = new RebuildServer(homeDir);
                 s_instances.put(homeDir, inst);
                 return inst;
-            } catch (ClassNotFoundException cnfe) {
-                throw new ServerInitializationException(MessageFormat
-                        .format(INIT_SERVER_SEVERE_CLASSNOTFOUND,
-                                new Object[] {className}));
-            } catch (IllegalAccessException iae) {
-                // improbable
-                throw new ServerInitializationException(MessageFormat
-                        .format(INIT_SERVER_SEVERE_ILLEGALACCESS,
-                                new Object[] {className}));
             } catch (IllegalArgumentException iae) {
                 // improbable
                 throw new ServerInitializationException(MessageFormat
                         .format(INIT_SERVER_SEVERE_BADARGS,
                                 new Object[] {className}));
-            } catch (InstantiationException ie) {
-                throw new ServerInitializationException(MessageFormat
-                        .format(INIT_SERVER_SEVERE_MISSINGCONSTRUCTOR,
-                                new Object[] {className}));
-            } catch (NoSuchMethodException nsme) {
-                throw new ServerInitializationException(MessageFormat
-                        .format(INIT_SERVER_SEVERE_ISABSTRACT,
-                                new Object[] {className}));
-            } catch (InvocationTargetException ite) {
-                // throw the constructor's thrown exception, if any
-                try {
-                    throw ite.getCause(); // as of java 1.4
-                } catch (ServerInitializationException sie) {
-                    throw sie;
-                } catch (ModuleInitializationException mie) {
-                    throw mie;
-                } catch (Throwable t) {
-                    // a runtime error..shouldn't happen, but if it does...
-                    StringBuffer s = new StringBuffer();
-                    s.append(t.getClass().getName());
-                    s.append(":[z] ");
-                    for (int i = 0; i < t.getStackTrace().length; i++) {
-                        s.append(t.getStackTrace()[i] + "\n");
-                    }
-                    throw new ServerInitializationException(s.toString());
-                }
             }
-        } catch (ParserConfigurationException pce) {
-            throw new ServerInitializationException(INIT_XMLPARSER_SEVERE_MISSING);
-        } catch (FactoryConfigurationError fce) {
-            throw new ServerInitializationException(INIT_XMLPARSER_SEVERE_MISSING);
-        } catch (IOException ioe) {
-            throw new ServerInitializationException(MessageFormat
-                    .format(INIT_CONFIG_SEVERE_UNREADABLE, new Object[] {
-                            configFile, ioe.getMessage()}));
-        } catch (IllegalArgumentException iae) {
-            throw new ServerInitializationException(MessageFormat
-                    .format(INIT_CONFIG_SEVERE_UNREADABLE, new Object[] {
-                            configFile, iae.getMessage()}));
-        } catch (SAXException saxe) {
-            throw new ServerInitializationException(MessageFormat
-                    .format(INIT_CONFIG_SEVERE_MALFORMEDXML, new Object[] {
-                            configFile, saxe.getMessage()}));
-        }
-    }
-
-    @Override
-    protected void initServer() throws ServerInitializationException {
     }
 
 }

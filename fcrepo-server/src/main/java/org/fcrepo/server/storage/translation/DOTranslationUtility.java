@@ -34,6 +34,7 @@ import org.fcrepo.common.Models;
 import org.fcrepo.common.rdf.RDFName;
 import org.fcrepo.common.xml.namespace.QName;
 import org.fcrepo.server.Server;
+import org.fcrepo.server.config.Parameter;
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.StreamIOException;
@@ -253,13 +254,13 @@ public abstract class DOTranslationUtility
             // are not defined, read them from server configuration
             ServerConfiguration config = Server.getConfig();
             fedoraServerHost =
-                    config.getParameter("fedoraServerHost").getValue();
+                    config.getParameter("fedoraServerHost",Parameter.class).getValue();
             fedoraServerPort =
-                    config.getParameter("fedoraServerPort").getValue();
+                    config.getParameter("fedoraServerPort",Parameter.class).getValue();
             fedoraAppServerContext =
-                    config.getParameter("fedoraAppServerContext").getValue();
+                    config.getParameter("fedoraAppServerContext",Parameter.class).getValue();
             fedoraServerPortSSL =
-                    config.getParameter("fedoraRedirectPort").getValue();
+                    config.getParameter("fedoraRedirectPort",Parameter.class).getValue();
             if (fedoraServerPort.equals("80")) {
                 m_serverOnPort80 = true;
             }

@@ -85,7 +85,7 @@ public class AtomAPIMMessage
     private static final Logger logger =
             LoggerFactory.getLogger(AtomAPIMMessage.class);
 
-    private final Abdera abdera = Abdera.getInstance();
+    private final Abdera abdera = new Abdera();
 
     private final static String TYPES_NS = Constants.TYPES.uri;
 
@@ -280,7 +280,7 @@ public class AtomAPIMMessage
         Writer sWriter = new StringWriter();
 
         try {
-            entry.writeTo("prettyxml", sWriter);
+            entry.writeTo(abdera.getWriterFactory().getWriter("prettyxml"), sWriter);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

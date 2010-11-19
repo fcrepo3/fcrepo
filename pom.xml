@@ -142,17 +142,29 @@
       <dependency>
         <groupId>org.apache.abdera</groupId>
         <artifactId>abdera-core</artifactId>
-        <version>0.4.0-incubating</version>
+        <version>1.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.abdera</groupId>
         <artifactId>abdera-i18n</artifactId>
-        <version>0.4.0-incubating</version>
+        <version>1.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.abdera</groupId>
         <artifactId>abdera-parser</artifactId>
-        <version>0.4.0-incubating</version>
+        <version>1.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.woodstox</groupId>
@@ -167,7 +179,7 @@
       <dependency>
         <groupId>org.apache.abdera</groupId>
         <artifactId>abdera-extensions-main</artifactId>
-        <version>0.4.0-incubating</version>
+        <version>1.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.apache.abdera</groupId>
@@ -275,7 +287,7 @@
       <dependency>
         <groupId>org.fcrepo</groupId>
         <artifactId>trippi-core</artifactId>
-        <version>1.4.3</version>
+        <version>1.5.0</version>
         <exclusions>
           <exclusion>
             <groupId>log4j</groupId>
@@ -414,6 +426,18 @@
       </releases>
       <snapshots>
         <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>apache-snapshots</id>
+      <name>Apache Release Repository</name>
+      <url>https://repository.apache.org/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
       </snapshots>
     </repository>
 

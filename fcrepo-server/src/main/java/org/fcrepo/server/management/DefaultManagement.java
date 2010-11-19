@@ -1306,7 +1306,7 @@ public class DefaultManagement
         // and return the identifier-that-looks-like-a-url
         long now = System.currentTimeMillis();
         m_uploadStartTime.put("" + id, new Long(now));
-        return "uploaded://" + id;
+        return DatastreamManagedContent.UPLOADED_SCHEME + id;
     }
 
     private synchronized int getNextTempId(Context context) {
@@ -2093,5 +2093,4 @@ public class DefaultManagement
             finishModification(w, "modifyDatastreamControlGroup");
         }
     }
-
 }
