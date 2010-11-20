@@ -126,6 +126,13 @@ public class DatastreamManagedContent
 
     @Override
     public InputStream getContentStream() throws StreamIOException {
+        return getContentStream(null);
+    }
+
+    // Note: might seem strage to pass through the Context, but DatastreamManagedContent looks after
+    // datastreams before they have been ingested, ie while location is still external (file, URL), so without
+    // Context authz will fail
+    public InputStream getContentStream(Context ctx) throws StreamIOException {
         try {
             // For new or modified datastreams, the new bytestream hasn't yet been
             // committed. However, we need to access it in order to compute
@@ -160,8 +167,10 @@ public class DatastreamManagedContent
                     ValidationUtility.validateURL(DSLocation, this.DSControlGrp);
                     // If validation has succeeded, assume an external resource.
                     // Fetch it, store it locally, update DSLocation
-                    Context ctx = ReadOnlyContext.EMPTY;
-                               ContentManagerParams params = new ContentManagerParams(DSLocation);
+                    if (ctx == null) {
+                        ctx = ReadOnlyContext.EMPTY;
+                    }
+                   ContentManagerParams params = new ContentManagerParams(DSLocation);
                     params.setContext(ctx);
                     MIMETypedStream stream = getExternalContentManager()
                             .getExternalContent(params);
