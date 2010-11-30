@@ -148,6 +148,7 @@ public class PolicyFinderModule
                                   policies);
             policyFinderResult = new PolicyFinderResult(policySet);
         } catch (Exception e) {
+            logger.warn("PolicyFinderModule seriously failed to evaluate a policy ", e);
             policyFinderResult =
                     new PolicyFinderResult(new Status(ERROR_CODE_LIST, e
                             .getMessage()));
@@ -164,7 +165,7 @@ public class PolicyFinderModule
             Datastream ds = reader.GetDatastream("POLICY", null);
             if (ds != null) {
                 logger.debug("Using POLICY for " + pid);
-                return m_policyParser
+                return m_policyParser //TODO performance hole. Each copy() performs schema parsing, which is expensive
                         .copy().parse(ds.getContentStream(),
                                       m_validateObjectPoliciesFromDatastream);
             } else {
