@@ -24,6 +24,9 @@ public class FormValidator {
                           DOReader contentmodelReader) throws ServerException {
         List<Form> forms = typeModel.getForm();
         boolean valid = false;
+        if (forms.size() == 0){
+            valid = true;
+        }
         for (Form form : forms) {
             boolean uriMatch = true;
             if (form.getFORMATURI() != null) {
