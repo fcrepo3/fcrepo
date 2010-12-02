@@ -96,7 +96,7 @@
                         </extension>
                     </dsTypeModel>
                     <dsTypeModel ID="POLICY" optional="true">
-                        <form FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" MIME="application/rdf+xml"/>
+                        <form MIME="application/rdf+xml"/>
                         <extension name="SCHEMA">
                             <reference type="datastream" value="POLICY-SCHEMA"/>
                         </extension>
