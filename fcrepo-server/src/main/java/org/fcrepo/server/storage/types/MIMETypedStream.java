@@ -27,7 +27,7 @@ public class MIMETypedStream {
 
     public Property[] header;
 
-    private final boolean gotStream = false;
+    private boolean gotStream = false;
 
     /**
      * Constructs a MIMETypedStream.
@@ -53,11 +53,13 @@ public class MIMETypedStream {
      *
      * @return The byte stream
      */
-    public InputStream getStream() {
+    public synchronized InputStream getStream() {
+        gotStream = true;
         return stream;
     }
 
-    public void setStream(InputStream stream) {
+    public synchronized void setStream(InputStream stream) {
+        gotStream = false;
         this.stream = stream;
     }
 
