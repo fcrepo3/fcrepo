@@ -19,7 +19,7 @@
     <license>
       <name>Apache License, Version 2.0</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-      <comments>Copyright (c) 2009 DuraSpace</comments>
+      <comments>Copyright (c) 2010 DuraSpace</comments>
     </license>
   </licenses>
 
@@ -61,12 +61,17 @@
 
     <developer>
       <name>Davis, Daniel</name>
-      <email>ddavis@fedora-commons.org</email>
+      <email>ddavis@duraspace.org</email>
     </developer>
 
     <developer>
-      <name>Pedersen, Gert</name>
+      <name>Pedersen, Gert Schmeltz</name>
       <email>gsp@dtic.dtu.dk</email>
+    </developer>
+
+    <developer>
+      <name>Scott Prater</name>
+      <email>sprater@gmail.com</email>
     </developer>
 
     <developer>
