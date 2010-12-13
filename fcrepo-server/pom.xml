@@ -250,7 +250,7 @@
                                 </manifest>
 
                                 <manifestEntries>
-                                    <Version>${buildNumber}</Version>
+                                    <Version>${project.version}</Version>
                                     <Build>${timestamp}</Build>
                                 </manifestEntries>
                             </archive>
@@ -285,16 +285,9 @@
                                     <mainClass>com.simontuffs.onejar.Boot</mainClass>
                                     <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                                 </manifest>
-                                <!--
-                                 Note: may want to add svn version info here
-                                -->
                                 <manifestEntries>
-                                    <Version>${buildNumber}</Version>
+                                    <Version>${project.version}</Version>
                                     <Build>${timestamp}</Build>
-                                    <!--
-                                      <Version>${fedora.version}</Version>
-                                      <Build>${build.tstamp}</Build>
-                                    -->
                                 </manifestEntries>
                             </archive>
                         </configuration>
