@@ -90,12 +90,8 @@
             <manifest>
               <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
             </manifest>
-
-            <!--
-              Note: The version and build need to be generated.
-            -->
             <manifestEntries>
-              <Version>${buildNumber}</Version>
+              <Version>${project.version}</Version>
               <Build>${timestamp}</Build>
             </manifestEntries>
           </archive>

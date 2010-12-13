@@ -60,10 +60,6 @@
             </goals>
             <configuration>
               <finalName>${project.artifactId}-${project.version}</finalName>
-              <!-- <classifier>fedora-messaging</classifier> -->
-              <!-- may want to add svn version info here 
-              <classifier>fedora-${fedora.version}</classifier>
-              -->
               <archive>
                 <addMavenDescriptor>false</addMavenDescriptor>
                 <manifest>
@@ -71,12 +67,8 @@
                   <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                 </manifest>
                 <manifestEntries>
-                  <Version>${buildNumber}</Version>
+                  <Version>${project.version}</Version>
                   <Build>${timestamp}</Build>
-                  <!--
-                  <Version>${fedora.version}</Version>
-                  <Build>${build.tstamp}</Build>
-                  -->
                 </manifestEntries>
               </archive>
             </configuration>

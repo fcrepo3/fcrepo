@@ -81,9 +81,6 @@
             </goals>
             <configuration>
               <classifier>fedora</classifier>
-              <!-- may want to add svn version info here 
-              <classifier>fedora-${fedora.version}</classifier>
-              -->
               <archive>
                 <manifest>
                   <mainClass>org.fcrepo.client.Administrator</mainClass>
@@ -92,12 +89,8 @@
                   <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                 </manifest>
                 <manifestEntries>
-                  <Version>${buildNumber}</Version>
+                  <Version>${project.version}</Version>
                   <Build>${timestamp}</Build>
-                 <!--
-                  <Version>${fedora.version}</Version>
-                  <Build>${build.tstamp}</Build>
-                 -->
                 </manifestEntries>
               </archive>
             </configuration>
