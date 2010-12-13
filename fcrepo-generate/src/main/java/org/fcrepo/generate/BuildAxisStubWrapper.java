@@ -245,6 +245,7 @@ public class BuildAxisStubWrapper {
                 String pkg = args[2];
                 String cls = args[3];
                 File wrapper = new File(args[4]);
+                wrapper.getParentFile().mkdirs();
                 new BuildAxisStubWrapper(stub, template, pkg, cls, wrapper);
             } else {
                 throw new IOException("Must supply " + argCount + " arguments.");
