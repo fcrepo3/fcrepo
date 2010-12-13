@@ -492,9 +492,9 @@
   </repositories>
 
   <scm>
-    <connection>scm:svn:https://fedora-commons.svn.sourceforge.net/svnroot/fedora-commons/fedora/trunk</connection>
-    <developerConnection>scm:svn:https://fedora-commons.svn.sourceforge.net/svnroot/fedora-commons/fedora/trunk</developerConnection>
-    <url>http://fedora-commons.svn.sourceforge.net/viewvc/fedora-commons/fedora/trunk</url>
+    <connection>scm:git:git://github.com/fcrepo/fcrepo.git</connection>
+    <developerConnection>scm:git:git@github.com:fcrepo/fcrepo.git</developerConnection>
+    <url>https://github.com/fcrepo/fcrepo</url>
   </scm>
 
   <build>
