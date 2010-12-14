@@ -60,7 +60,7 @@ public class TestCommandLineUtilities
         System.out.println("Purge and ingest test succeeded");
     }
 
-    public void testBatchBuildAndBatchIngestAndPurge() throws Exception {
+    public void DISABLEDBatchBuildAndBatchIngestAndPurge() throws Exception {
         System.out.println("Building batch objects");
         batchBuild(new File(FEDORA_HOME
                             + "/client/demo/batch-demo/foxml-template.xml"),
@@ -96,7 +96,7 @@ public class TestCommandLineUtilities
         System.out.println("Build and ingest test succeeded");
     }
 
-    public void testBatchBuildIngestAndPurge() throws Exception {
+    public void DISABLEDBatchBuildIngestAndPurge() throws Exception {
         System.out.println("Building and Ingesting batch objects");
         batchBuildIngest(new File(FEDORA_HOME
                                   + "/client/demo/batch-demo/foxml-template.xml"),
