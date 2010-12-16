@@ -175,6 +175,9 @@ public class DefaultExternalContentManager
                                                     knownMimeType);
             Property[] headerArray =
                     toPropertyArray(response.getResponseHeaders());
+            if (mimeType == null || mimeType.equals("")) {
+                mimeType = DEFAULT_MIMETYPE;
+            }
             return new MIMETypedStream(mimeType, response, headerArray);
         } catch (Exception e) {
             throw new GeneralException("Error getting " + url, e);
