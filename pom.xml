@@ -539,7 +539,6 @@
               <directory>.</directory>
               <includes>
                 <include>build/</include>
-                <include>stubwrappers/</include>
                 <include>test/</include>
                 <include>**/activemq-data/</include>
                 <include>**/derby.log</include>
