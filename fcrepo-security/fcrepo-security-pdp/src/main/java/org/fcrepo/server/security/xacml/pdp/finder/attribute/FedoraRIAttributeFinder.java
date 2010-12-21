@@ -15,13 +15,14 @@ import com.sun.xacml.attr.StandardAttributeFactory;
 import com.sun.xacml.cond.EvaluationResult;
 import com.sun.xacml.finder.AttributeFinderModule;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderConfigUtil;
 import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderException;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.RelationshipResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FedoraRIAttributeFinder
         extends AttributeFinderModule {
@@ -123,6 +124,7 @@ public class FedoraRIAttributeFinder
                                           URI subjectCategory,
                                           EvaluationCtx context,
                                           int designatorType) {
+
         String resourceId = context.getResourceId().encode();
         if (logger.isDebugEnabled()) {
             logger.debug("RIAttributeFinder: [" + attributeType.toString() + "] "
@@ -169,16 +171,49 @@ public class FedoraRIAttributeFinder
         return result;
     }
 
-    private EvaluationResult getEvaluationResult(String pid,
+    /**
+     *
+     * @param resourceID - the hierarchical XACML resource ID
+     * @param attribute - attribute to get
+     * @param type
+     * @return
+     * @throws AttributeFinderException
+     */
+    private EvaluationResult getEvaluationResult(String resourceID,
                                                  String attribute,
                                                  URI type)
             throws AttributeFinderException {
+
+        // split up the path of the hierarchical resource id
+        String resourceParts[] = resourceID.split("/");
+
+        // either the last part is the pid, or the last-but one is the pid and the last is the datastream
+        // if we have a pid, we query on that, if we have a datastream we query on the datastream
+        String subject;
+        if (resourceParts.length > 1) {
+            if (resourceParts[resourceParts.length - 1].contains(":")) { // ends with a pid, we have pid only
+                subject = resourceParts[resourceParts.length - 1];
+            } else { // datastream
+                String pid = resourceParts[resourceParts.length - 2];
+                subject = pid + "/" + resourceParts[resourceParts.length - 1];
+            }
+        } else {
+            // eg /FedoraRepository, not a valid path to PID or PID/DS
+            logger.debug("Resource ID not valid path to PID or datastream: " + resourceID);
+            return new EvaluationResult(BagAttribute.createEmptyBag(type));
+        }
+
+
         Map<String, Set<String>> relationships;
+        // FIXME: this is querying for all relationships, and then filtering the one we want
+        // better to query directly on the one we want (but currently no public method on relationship resolver to do this)
         try {
-            relationships = relationshipResolver.getRelationships(pid);
+            logger.debug("Getting relationships for " + subject);
+            relationships = relationshipResolver.getRelationships(subject);
         } catch (MelcoeXacmlException e) {
             throw new AttributeFinderException(e.getMessage(), e);
         }
+
         Set<String> results = relationships.get(attribute);
         if (results == null || results.size() == 0) {
             return new EvaluationResult(BagAttribute.createEmptyBag(type));
