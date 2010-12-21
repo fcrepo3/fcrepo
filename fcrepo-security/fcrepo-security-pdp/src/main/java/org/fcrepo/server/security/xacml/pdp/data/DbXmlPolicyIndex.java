@@ -795,8 +795,9 @@ class DbXmlPolicyIndex
         // specifically anySubject, anyResource metadata elements are not changing
         // if Subjects and Resources elements are added/deleted from document.
         // So do a delete then an add
+
         deletePolicy(name);
-        this.addPolicy(newDocument, name);
+        addPolicy(newDocument, name);
 
         /* original code below works apart from metadata update not happening
         try {
