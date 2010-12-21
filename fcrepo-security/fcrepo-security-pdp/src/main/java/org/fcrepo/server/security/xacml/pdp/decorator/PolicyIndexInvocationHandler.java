@@ -135,7 +135,7 @@ extends AbstractInvocationHandler {
                         // if the indexing status has changed, make appropriate changes to the policy cache/index
                         if (indexedBefore != policyAfter.isPolicyActive()) {
                             if (policyAfter.isPolicyActive() ) {
-                                addPolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
+                                addOrUpdatePolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
                             } else {
                                 deletePolicy(managementMethod.parameters.pid);
                             }
@@ -157,7 +157,7 @@ extends AbstractInvocationHandler {
                                                                null);
                                 // add to the cache if required
                                 if (policyAfter.isPolicyActive()) {
-                                    addPolicy((String)returnValue, policyAfter.getDsContent());
+                                    addOrUpdatePolicy((String)returnValue, policyAfter.getDsContent());
                                 }
 
                                 break;
@@ -216,7 +216,7 @@ extends AbstractInvocationHandler {
                         // if indexing status has changed, update the cache/index
                         if (wasIndexed != policyAfter.isPolicyActive()) {
                             if (policyAfter.isPolicyActive()) {
-                                addPolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
+                                addOrUpdatePolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
                             } else {
                                 deletePolicy(managementMethod.parameters.pid);
                             }
@@ -238,7 +238,7 @@ extends AbstractInvocationHandler {
                                                                managementMethod.parameters.dsID,
                                                                managementMethod.parameters.dsState);
                                 if (policyAfter.isPolicyActive())
-                                    addPolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
+                                    addOrUpdatePolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
 
                                 break;
                             case DELETE:
@@ -270,7 +270,7 @@ extends AbstractInvocationHandler {
                                                                managementMethod.parameters.dsID,
                                                                null);
                                 if (policyAfter.isPolicyActive())
-                                    updatePolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
+                                    addOrUpdatePolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
 
                                 break;
 
@@ -312,14 +312,14 @@ extends AbstractInvocationHandler {
     }
 
     /**
-     * Add policy to cache/index
+     * Add/update policy to cache/index
      * @param pid
      * @param dsContent
      * @throws PolicyIndexException
      * @throws IOException
      */
-    private void addPolicy(String pid, InputStream dsContent) throws PolicyIndexException  {
-        LOG.debug("Adding policy " + pid);
+    private void addOrUpdatePolicy(String pid, InputStream dsContent) throws PolicyIndexException  {
+        LOG.debug("Adding/Updating policy " + pid);
 
         String policy;
 
@@ -328,7 +328,11 @@ extends AbstractInvocationHandler {
             // make sure stream is closed - with Akubra on Windows this can leave the stream open
             // and leave the file locked (prevents a purge later)
             dsContent.close();
-            policyIndex.addPolicy(policy, pid);
+            if (policyIndex.contains(pid)) {
+                policyIndex.updatePolicy(pid, policy);
+            } else {
+                policyIndex.addPolicy(policy, pid);
+            }
         } catch (IOException e) {
             throw new PolicyIndexException("Error adding policy " + pid + " to policy index", e);
         } catch (PolicyIndexException e) {
@@ -348,38 +352,15 @@ extends AbstractInvocationHandler {
         LOG.debug("Deleting policy " + pid);
 
         try {
-            policyIndex.deletePolicy(pid);
+            // in case the policy doesn't exist (corrupt policy index, failed to add because invalid, etc)
+            if (policyIndex.contains(pid)) {
+                policyIndex.deletePolicy(pid);
+            }
         } catch (PolicyIndexException e) {
             throw new PolicyIndexException("Error deleting policy " + pid + " from policy index", e);
         }
-
     }
 
-    /**
-     * Update the specified policy in the cache with new content
-     * @param pid
-     * @param dsContent
-     * @throws PolicyIndexException
-     */
-    private void updatePolicy(String pid, InputStream dsContent) throws PolicyIndexException  {
-        LOG.debug("Updating policy " + pid);
-
-        String policy;
-        try {
-            policy = IOUtils.toString(dsContent);
-            // make sure stream is closed (IOUtils does not close)
-            // this can leave the file locked in Akubra
-            dsContent.close();
-        } catch (IOException e) {
-            throw new PolicyIndexException("Error updating policy " + pid + " in policy index", e);
-        }
-        try {
-            policyIndex.updatePolicy(pid, policy);
-        } catch (PolicyIndexException e) {
-            throw new PolicyIndexException("Error updating policy " + pid + " in policy index", e);
-        }
-
-    }
 
 
 }
