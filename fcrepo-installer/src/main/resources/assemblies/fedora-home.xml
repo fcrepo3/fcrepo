@@ -69,6 +69,7 @@
     <fileSet>
       <directory>../fcrepo-server/src/main/resources/scripts/bat/server</directory>
       <outputDirectory>/server/bin</outputDirectory>
+      <lineEnding>dos</lineEnding>
       <filtered>true</filtered>
     </fileSet>  
 
@@ -248,6 +249,7 @@
     <fileSet>
       <directory>../fcrepo-client/fcrepo-client-admin/src/main/resources/scripts/bat/client</directory>
       <outputDirectory>/client/bin</outputDirectory>
+      <lineEnding>dos</lineEnding>
       <filtered>true</filtered>
     </fileSet>  
 
@@ -268,7 +270,20 @@
 
     <fileSet>
       <directory>../fcrepo-client/fcrepo-client-admin/src/main/resources/demo/demo-soapclient</directory>
+      <excludes>
+        <exclude>*.bat</exclude>
+      </excludes>
       <outputDirectory>/client/demo/soapclient</outputDirectory>
+      <filtered>true</filtered>
+    </fileSet>  
+
+    <fileSet>
+      <directory>../fcrepo-client/fcrepo-client-admin/src/main/resources/demo/demo-soapclient</directory>
+      <includes>
+        <include>*.bat</include>
+      </includes>
+      <outputDirectory>/client/demo/soapclient</outputDirectory>
+      <lineEnding>dos</lineEnding>
       <filtered>true</filtered>
     </fileSet>  
 

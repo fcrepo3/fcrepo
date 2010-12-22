@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
+import org.fcrepo.common.MalformedPIDException;
 import org.fcrepo.common.PID;
 
 import org.fcrepo.server.Context;
@@ -160,20 +161,47 @@ public class RelationshipResolverImpl
         return parentPIDs;
     }
 
-    public Map<String, Set<String>> getRelationships(String pid)
+    public Map<String, Set<String>> getRelationships(String subject)
             throws MelcoeXacmlException {
-        return getRelationships(pid, null);
+        return getRelationships(subject, null);
     }
 
-    private Map<String, Set<String>> getRelationships(String pid,
+    private Map<String, Set<String>> getRelationships(String subject,
                                                       String relationship)
             throws MelcoeXacmlException {
-        PID subject = getNormalizedPID(pid);
+
+        // strip off info URI part if present
+        String strippedSubject;
+        if (subject.startsWith(Constants.FEDORA.uri)) {
+            strippedSubject = subject.substring(Constants.FEDORA.uri.length());
+        } else {
+            strippedSubject = subject;
+        }
+        // split into pid + datastream (if present), validate PID and then recombine datastream back in using URI form of PID
+        String parts[] = strippedSubject.split("/");
+        PID pid;
+        try {
+            pid = new PID(parts[0]);
+        } catch (MalformedPIDException e1) {
+            logger.warn("Invalid subject argumet for getRelationships: " + subject + ". PID part of URI is malformed");
+            return new HashMap<String, Set<String>>();
+        }
+
+        String subjectURI;
+        if (parts.length == 1) {
+            subjectURI = pid.toURI();
+        } else if (parts.length == 2) {
+            subjectURI = pid.toURI() + "/" + parts[1]; // add datastream
+        } else {
+            logger.warn("Invalid subject argumet for getRelationships: " + subject + ". Should be pid or datastream (URI form optional");
+            return new HashMap<String, Set<String>>();
+        }
+
         RelationshipTuple[] tuples;
         try {
             tuples =
                     getApiM().getRelationships(getContext(),
-                                               subject.toURI(),
+                                               subjectURI,
                                                relationship);
             // Anticipating searches which fail because the object identified by
             // pid may not exist in the Fedora repository, since objects can
@@ -239,6 +267,7 @@ public class RelationshipResolverImpl
      * @param pid
      * @return a PID object
      */
+    // FIXME: does not appear to be used anywhere
     protected PID getNormalizedPID(String pid) {
         // strip the leading "info:fedora/" if any
         if (pid.startsWith(Constants.FEDORA.uri)) {
