@@ -73,7 +73,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
             // FIXME: redundant, bootstrap policies will allow this
             String policyId = policyUtils.addPolicy("test-access-admin.xml");
 
-            LoadDataset.main(null);
+            LoadDataset.load(fedoraUrl, username, password);
 
             // httpUtils.get("/fedora/risearch?flush=true");
 
@@ -88,6 +88,13 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
     @Override
     @After
     public void tearDown() {
+        PropertyResourceBundle prop =
+            (PropertyResourceBundle) ResourceBundle.getBundle(PROPERTIES);
+        String username = prop.getString("fedora.admin.username");
+        String password = prop.getString("fedora.admin.password");
+        //String fedoraUrl = prop.getString("fedora.url");
+        String fedoraUrl = FedoraUtil.getBaseURL();
+
         try {
             if (logger.isDebugEnabled()) {
                 logger.debug("Tearing down...");
@@ -99,7 +106,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
             // Load the admin policy to give us rights to remove objects
             String policyId = policyUtils.addPolicy("test-access-admin.xml");
 
-            RemoveDataset.main(null);
+            RemoveDataset.remove(fedoraUrl, username, password);
 
             // Now that objects are loaded, remove the policy
             policyUtils.delPolicy(policyId);

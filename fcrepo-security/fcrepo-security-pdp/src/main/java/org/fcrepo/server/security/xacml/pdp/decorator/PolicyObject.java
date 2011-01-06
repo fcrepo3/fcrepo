@@ -112,10 +112,10 @@ public class PolicyObject {
      * @throws ServerException
      */
     public boolean isDatastreamActive() throws ServerException {
-        if (m_dsState == null)
-            m_dsState = getDatastream().DSState;
+        if (m_dsState == null && getDatastream() != null)
+            m_dsState = m_datastream.DSState;
 
-        return m_dsState.equals("A");
+        return m_dsState != null && m_dsState.equals("A");
     }
 
     /**
@@ -153,12 +153,12 @@ public class PolicyObject {
      * @throws ServerException
      */
     public InputStream getDsContent() throws ServerException {
-        if (m_dsContent == null) {
+        if (m_dsContent == null && getDatastream() != null) {
             m_dsContent = getDatastream().getContentStream();
-        }
 
-        // remember we found the policy datastream
-        m_hasPolicyDatastream = true;
+            // remember we found the policy datastream
+            m_hasPolicyDatastream = true;
+        }
         return m_dsContent;
     }
 

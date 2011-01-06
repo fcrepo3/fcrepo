@@ -10,9 +10,8 @@ import java.util.regex.Pattern;
 
 import org.apache.http.client.ClientProtocolException;
 
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.slf4j.Logger;
@@ -20,8 +19,10 @@ import org.slf4j.LoggerFactory;
 
 import junit.framework.JUnit4TestAdapter;
 
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.test.FedoraServerTestCase;
 import org.fcrepo.test.fesl.util.DataUtils;
-import org.fcrepo.test.fesl.util.FedoraUtil;
 import org.fcrepo.test.fesl.util.HttpUtils;
 import org.fcrepo.test.fesl.util.LoadDataset;
 import org.fcrepo.test.fesl.util.RemoveDataset;
@@ -29,7 +30,7 @@ import org.fcrepo.test.fesl.util.RemoveDataset;
 // FIXME: these tests largely check that REST API calls work when FeSL is enabled - conficC
 // could consider instead just running the main TestRESTAPI test instead?
 
-public class TestREST {
+public class TestREST extends FedoraServerTestCase implements Constants {
 
     private static final Logger logger =
             LoggerFactory.getLogger(TestREST.class);
@@ -45,35 +46,42 @@ public class TestREST {
         return new JUnit4TestAdapter(TestREST.class);
     }
 
-    @BeforeClass
-    public static void setup() {
+    @Override
+    public void setUp() {
         PropertyResourceBundle prop =
                 (PropertyResourceBundle) ResourceBundle.getBundle(PROPERTIES);
         String username = prop.getString("fedora.admin.username");
         String password = prop.getString("fedora.admin.password");
         //String fedoraUrl = prop.getString("fedora.url");
-        String fedoraUrl = FedoraUtil.getBaseURL();
+        String fedoraUrl = getProtocol() + "://" + getHost() + ":" + getPort() + "/" + getFedoraAppServerContext();
 
         try {
             logger.debug("Setting up...");
 
-            httpUtils = new HttpUtils(fedoraUrl, username, password);
+            httpUtils = new HttpUtils(getBaseURL(), username, password);
 
-            LoadDataset.main(null);
+            LoadDataset.load(fedoraUrl, username, password);
         } catch (Exception e) {
             logger.error(e.getMessage());
             Assert.fail(e.getMessage());
         }
     }
 
-    @AfterClass
-    public static void teardown() {
+    @Override
+    @After
+    public  void tearDown() {
+        PropertyResourceBundle prop =
+            (PropertyResourceBundle) ResourceBundle.getBundle(PROPERTIES);
+        String username = prop.getString("fedora.admin.username");
+        String password = prop.getString("fedora.admin.password");
+        //  String fedoraUrl = prop.getString("fedora.url");
+        String fedoraUrl = getProtocol() + "://" + getHost() + ":" + getPort() + "/" + getFedoraAppServerContext();
         try {
             if (logger.isDebugEnabled()) {
                 logger.debug("Tearing down...");
             }
 
-            RemoveDataset.main(null);
+            RemoveDataset.remove(fedoraUrl, username, password);
         } catch (Exception e) {
             logger.error(e.getMessage());
             Assert.fail(e.getMessage());
@@ -96,6 +104,7 @@ public class TestREST {
                             .contains("<a href=\"objects/test%3A1000003\">test:1000003</a>");
             Assert.assertTrue("Expected object data not found", check);
         } catch (Exception re) {
+            re.printStackTrace();
             Assert.fail(re.getMessage());
         }
     }
