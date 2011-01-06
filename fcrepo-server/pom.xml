@@ -839,7 +839,7 @@
         <dependency>
             <groupId>owlapi</groupId>
             <artifactId>owlapi</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.0-patched</version>
         </dependency>
 
     </dependencies>
