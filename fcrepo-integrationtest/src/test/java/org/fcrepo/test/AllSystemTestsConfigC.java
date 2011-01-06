@@ -12,6 +12,7 @@ import org.junit.runners.Suite;
         org.fcrepo.test.api.TestAuthentication.class,
         org.fcrepo.test.api.TestHTTPStatusCodesConfigC.class,
         org.fcrepo.test.fesl.policy.TestPolicies.class,
+        org.fcrepo.test.fesl.policyindex.TestPolicyIndex.class,
         org.fcrepo.test.fesl.restapi.TestREST.class,
         org.fcrepo.test.api.TestRelationships.class,
         org.fcrepo.test.api.TestRISearch.class,
@@ -33,6 +34,7 @@ public class AllSystemTestsConfigC {
         suite.addTest(org.fcrepo.test.api.TestAuthentication.suite());
         suite.addTest(org.fcrepo.test.api.TestHTTPStatusCodesConfigC.suite());
         suite.addTest(org.fcrepo.test.fesl.policy.TestPolicies.suite());
+        suite.addTest(org.fcrepo.test.fesl.policyindex.TestPolicyIndex.suite());
         suite.addTest(org.fcrepo.test.fesl.restapi.TestREST.suite());
         suite.addTest(org.fcrepo.test.api.TestRelationships.suite());
         suite.addTest(org.fcrepo.test.api.TestRISearch.suite());

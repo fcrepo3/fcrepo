@@ -51,6 +51,7 @@ public class HttpUtils {
 
     public HttpUtils(String baseURL, String username, String password)
             throws Exception {
+
         try {
             URL url = new URL(baseURL);
 
@@ -70,6 +71,7 @@ public class HttpUtils {
                         new AuthScope(url.getHost(),
                                       url.getPort(),
                                       AuthScope.ANY_REALM);
+                authScope = new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT);
                 Credentials credentials =
                         new UsernamePasswordCredentials(username, password);
                 client.getCredentialsProvider().setCredentials(authScope,
@@ -232,6 +234,7 @@ public class HttpUtils {
 
         HttpResponse response = client.execute(httpHost, request, httpContext);
         int sc = response.getStatusLine().getStatusCode();
+
         String phrase = response.getStatusLine().getReasonPhrase();
 
         String body = "";
@@ -297,4 +300,5 @@ public class HttpUtils {
             authState.setCredentials(creds);
         }
     }
+
 }

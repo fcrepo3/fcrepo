@@ -1,0 +1,17 @@
+﻿Test objects
+
+Represents hieararchies of objects and collections as follows:
+
+test:1000000 - collection
+  test:1000001 - collection
+    test:1000002
+    test:1000003
+    test:1000004
+    test:1000005
+  test:1000006 - collection
+    test:1000007
+    test:1000008
+    test:1000009
+    test:1000010
+    test:1000011
+    test:1000012

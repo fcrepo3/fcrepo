@@ -3,9 +3,6 @@ package org.fcrepo.test.fesl.util;
 
 import java.io.File;
 
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
-
 import org.w3c.dom.Document;
 
 import org.slf4j.Logger;
@@ -23,12 +20,7 @@ public class RemoveDataset {
 
     private static HttpUtils client = null;
 
-    public static void main(String[] args) {
-        PropertyResourceBundle prop =
-                (PropertyResourceBundle) ResourceBundle.getBundle(PROPERTIES);
-        String username = prop.getString("fedora.admin.username");
-        String password = prop.getString("fedora.admin.password");
-        String fedoraUrl = prop.getString("fedora.url");
+    public static void remove(String fedoraUrl, String username, String password) {
 
         try {
             client = new HttpUtils(fedoraUrl, username, password);
@@ -41,7 +33,6 @@ public class RemoveDataset {
         File[] files = dataDir.listFiles(new XmlFilenameFilter());
 
         for (File f : files) {
-            logger.info("Loading foxml object: " + f.getName());
             try {
                 Document doc = DataUtils.getDocumentFromFile(f);
                 String pid = doc.getDocumentElement().getAttribute("PID");
