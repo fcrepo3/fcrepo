@@ -1661,7 +1661,7 @@ public class DefaultAuthorization
                     .getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
                              target,
                              Constants.ACTION.APIM.uri,
-                             fileURI,
+                             "",
                              extractNamespace(fileURI),
                              context);
         } finally {
