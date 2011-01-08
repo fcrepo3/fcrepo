@@ -150,6 +150,7 @@ public class PolicyStoreService {
      *         and the byte[] data.
      * @throws PolicyStoreException
      */
+    @SuppressWarnings("deprecation")
     public DocumentInfo[] findPolicies(AttributeBean[] attributes)
             throws PolicyIndexException {
         Map<String, byte[]> result = policyIndex.findPolicies(attributes);

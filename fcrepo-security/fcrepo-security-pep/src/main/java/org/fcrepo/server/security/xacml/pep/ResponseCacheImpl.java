@@ -98,6 +98,7 @@ public class ResponseCacheImpl
 
         CACHE_SIZE = size.intValue();
 
+        // Note - HashMap, ArrayList are not thread-safe
         requestCache = new HashMap<String, String>(CACHE_SIZE);
         requestCacheTimeTracker = new HashMap<String, Long>(CACHE_SIZE);
         requestCacheUsageTracker = new ArrayList<String>(CACHE_SIZE);
@@ -120,24 +121,28 @@ public class ResponseCacheImpl
         try {
             hash = makeHash(request);
 
-            // if we have a maxxed cache, remove least used item
-            if (requestCache.size() >= CACHE_SIZE) {
-                String key = requestCacheUsageTracker.remove(0);
-                requestCache.remove(key);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Purging cache element");
-                }
-            }
+            // thread-safety on cache operations
+            synchronized (requestCache) {
 
-            requestCache.put(hash, response);
-            requestCacheUsageTracker.add(hash);
-            requestCacheTimeTracker.put(hash, new Long(System
-                    .currentTimeMillis()));
+                // if we have a maxxed cache, remove least used item
+                if (requestCache.size() >= CACHE_SIZE) {
+                    String key = requestCacheUsageTracker.remove(0);
+                    requestCache.remove(key);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Purging cache element");
+                    }
+                }
+
+                requestCache.put(hash, response);
+                requestCacheUsageTracker.add(hash);
+                requestCacheTimeTracker.put(hash, new Long(System
+                                                           .currentTimeMillis()));
+            }
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Adding Cache Item (" + requestCache.size() + "/"
-                        + requestCacheUsageTracker.size() + "/"
-                        + requestCacheTimeTracker.size() + "): " + hash);
+                             + requestCacheUsageTracker.size() + "/"
+                             + requestCacheTimeTracker.size() + "): " + hash);
             }
         } catch (Exception e) {
             logger.warn("Error adding cache item: " + e.getMessage(), e);
@@ -155,38 +160,42 @@ public class ResponseCacheImpl
         try {
             hash = makeHash(request);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Getting Cache Item (" + requestCache.size() + "/"
-                        + requestCacheUsageTracker.size() + "/"
-                        + requestCacheTimeTracker.size() + "): " + hash);
-            }
-
-            response = requestCache.get(hash);
-
-            if (response == null) {
-                return null;
-            }
-
-            // if this item is older than CACHE_ITEM_TTL then we can't use it
-            long usedLast =
-                    System.currentTimeMillis()
-                            - requestCacheTimeTracker.get(hash).longValue();
-            if (usedLast > TTL) {
-                requestCache.remove(hash);
-                requestCacheUsageTracker.remove(hash);
-                requestCacheTimeTracker.remove(hash);
+            // thread-safety on cache operations
+            synchronized (requestCache) {
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("CACHE_ITEM_TTL exceeded: " + hash);
+                    logger.debug("Getting Cache Item (" + requestCache.size() + "/"
+                                 + requestCacheUsageTracker.size() + "/"
+                                 + requestCacheTimeTracker.size() + "): " + hash);
                 }
 
-                return null;
-            }
+                response = requestCache.get(hash);
 
-            // we just used this item, move it to the end of the list (items at
-            // beginning get removed...)
-            requestCacheUsageTracker.add(requestCacheUsageTracker
-                    .remove(requestCacheUsageTracker.indexOf(hash)));
+                if (response == null) {
+                    return null;
+                }
+
+                // if this item is older than CACHE_ITEM_TTL then we can't use it
+                long usedLast =
+                    System.currentTimeMillis()
+                    - requestCacheTimeTracker.get(hash).longValue();
+                if (usedLast > TTL) {
+                    requestCache.remove(hash);
+                    requestCacheUsageTracker.remove(hash);
+                    requestCacheTimeTracker.remove(hash);
+
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("CACHE_ITEM_TTL exceeded: " + hash);
+                    }
+
+                    return null;
+                }
+
+                // we just used this item, move it to the end of the list (items at
+                // beginning get removed...)
+                requestCacheUsageTracker.add(requestCacheUsageTracker
+                                             .remove(requestCacheUsageTracker.indexOf(hash)));
+            }
         } catch (Exception e) {
             logger.warn("Error getting cache item: " + e.getMessage(), e);
             response = null;
@@ -200,9 +209,12 @@ public class ResponseCacheImpl
      * @see org.fcrepo.server.security.xacml.pep.ResponseCache#invalidate()
      */
     public void invalidate() {
-        requestCache = new HashMap<String, String>(CACHE_SIZE);
-        requestCacheTimeTracker = new HashMap<String, Long>(CACHE_SIZE);
-        requestCacheUsageTracker = new ArrayList<String>(CACHE_SIZE);
+        // thread-safety on cache operations
+        synchronized (requestCache) {
+            requestCache = new HashMap<String, String>(CACHE_SIZE);
+            requestCacheTimeTracker = new HashMap<String, Long>(CACHE_SIZE);
+            requestCacheUsageTracker = new ArrayList<String>(CACHE_SIZE);
+        }
     }
 
     /**
@@ -221,40 +233,44 @@ public class ResponseCacheImpl
         } catch (MelcoeXacmlException pe) {
             throw new CacheException("Error converting request", pe);
         }
+        byte[] hash = null;
+        // ensure thread safety, don't want concurrent invocations of this method all modifying digest at once
+        // (alternative is to construct a new digest for each(
+        synchronized(digest) {
+            digest.reset();
 
-        digest.reset();
+            Set<Attribute> attributes = null;
 
-        Set<Attribute> attributes = null;
-
-        Set<Subject> subjects = new TreeSet(new SubjectComparator());
-        subjects.addAll(reqCtx.getSubjects());
-        for (Subject s : subjects) {
-            attributes = new TreeSet(new AttributeComparator());
-            attributes.addAll(s.getAttributes());
-            for (Attribute a : attributes) {
-                hashAttribute(a);
+            Set<Subject> subjects = new TreeSet(new SubjectComparator());
+            subjects.addAll(reqCtx.getSubjects());
+            for (Subject s : subjects) {
+                attributes = new TreeSet(new AttributeComparator());
+                attributes.addAll(s.getAttributes());
+                for (Attribute a : attributes) {
+                    hashAttribute(a, digest);
+                }
             }
-        }
 
-        attributes = new TreeSet(new AttributeComparator());
-        attributes.addAll(reqCtx.getResource());
-        for (Attribute a : attributes) {
-            hashAttribute(a);
-        }
+            attributes = new TreeSet(new AttributeComparator());
+            attributes.addAll(reqCtx.getResource());
+            for (Attribute a : attributes) {
+                hashAttribute(a, digest);
+            }
 
-        attributes = new TreeSet(new AttributeComparator());
-        attributes.addAll(reqCtx.getAction());
-        for (Attribute a : attributes) {
-            hashAttribute(a);
-        }
+            attributes = new TreeSet(new AttributeComparator());
+            attributes.addAll(reqCtx.getAction());
+            for (Attribute a : attributes) {
+                hashAttribute(a, digest);
+            }
 
-        attributes = new TreeSet(new AttributeComparator());
-        attributes.addAll(reqCtx.getEnvironmentAttributes());
-        for (Attribute a : attributes) {
-            hashAttribute(a);
-        }
+            attributes = new TreeSet(new AttributeComparator());
+            attributes.addAll(reqCtx.getEnvironmentAttributes());
+            for (Attribute a : attributes) {
+                hashAttribute(a, digest);
+            }
 
-        byte[] hash = digest.digest();
+            hash = digest.digest();
+        }
 
         return byte2hex(hash);
     }
@@ -265,15 +281,15 @@ public class ResponseCacheImpl
      * @param a
      *        the attribute to hash
      */
-    private void hashAttribute(Attribute a) {
-        digest.update(a.getId().toString().getBytes());
-        digest.update(a.getType().toString().getBytes());
-        digest.update(a.getValue().encode().getBytes());
+    private static void hashAttribute(Attribute a, MessageDigest dig) {
+        dig.update(a.getId().toString().getBytes());
+        dig.update(a.getType().toString().getBytes());
+        dig.update(a.getValue().encode().getBytes());
         if (a.getIssuer() != null) {
-            digest.update(a.getIssuer().getBytes());
+            dig.update(a.getIssuer().getBytes());
         }
         if (a.getIssueInstant() != null) {
-            digest.update(a.getIssueInstant().encode().getBytes());
+            dig.update(a.getIssueInstant().encode().getBytes());
         }
     }
 

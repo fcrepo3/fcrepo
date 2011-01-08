@@ -27,7 +27,6 @@ import com.sleepycat.dbxml.XmlException;
 import com.sleepycat.dbxml.XmlIndexSpecification;
 import com.sleepycat.dbxml.XmlManager;
 import com.sleepycat.dbxml.XmlManagerConfig;
-import com.sleepycat.dbxml.XmlTransaction;
 import com.sleepycat.dbxml.XmlUpdateContext;
 import com.sleepycat.dbxml.XmlValue;
 
@@ -76,113 +75,110 @@ public class DbXmlManager {
         initConfig();
 
         File envHome = new File(DB_HOME);
-        XmlTransaction txn = null;
+        EnvironmentConfig envCfg = new EnvironmentConfig();
+
+        //envCfg.setRunRecovery(true);
+        envCfg.setAllowCreate(true);
+        envCfg.setInitializeCache(true);
+        envCfg.setInitializeLocking(false);
+        envCfg.setInitializeLogging(true);
+        envCfg.setTransactional(false);
+
+        XmlManagerConfig managerCfg = new XmlManagerConfig();
+        managerCfg.setAdoptEnvironment(true);
+        managerCfg.setAllowExternalAccess(true);
+
+        XmlContainerConfig containerCfg = new XmlContainerConfig();
+        containerCfg.setAllowCreate(true);
+        containerCfg.setTransactional(false);
+
         try {
-            try {
-                EnvironmentConfig envCfg = new EnvironmentConfig();
-                if (log.isDebugEnabled()) {
-                    log.debug("Lockers: " + envCfg.getMaxLockers());
-                    log.debug("LockObjects: " + envCfg.getMaxLockObjects());
-                    log.debug("Locks: " + envCfg.getMaxLocks());
-                }
-
-                // envCfg.setRunRecovery(true);
-                envCfg.setAllowCreate(true);
-                envCfg.setInitializeCache(true);
-                envCfg.setInitializeLocking(true);
-                envCfg.setInitializeLogging(true);
-                envCfg.setTransactional(true);
-                envCfg.setMaxLockers(10000);
-                envCfg.setMaxLockObjects(10000);
-                envCfg.setMaxLocks(10000);
-
-                XmlManagerConfig managerCfg = new XmlManagerConfig();
-                managerCfg.setAdoptEnvironment(true);
-                managerCfg.setAllowExternalAccess(true);
-
-                XmlContainerConfig containerCfg = new XmlContainerConfig();
-                containerCfg.setAllowCreate(true);
-                containerCfg.setTransactional(true);
-
-                env = new Environment(envHome, envCfg);
-                manager = new XmlManager(env, managerCfg);
-                // XmlManager.setLogCategory(XmlManager.CATEGORY_NONE, true);
-                // XmlManager.setLogLevel(XmlManager.LEVEL_WARNING, true);
-
-                updateContext = manager.createUpdateContext();
-
-                txn = manager.createTransaction();
-                if (manager.existsContainer(CONTAINER) == 0) {
-                    container =
-                            manager.createContainer(txn,
-                                                    CONTAINER,
-                                                    containerCfg);
-
-                    // if we just created a container we also need to add an
-                    // index
-                    XmlIndexSpecification is =
-                            container.getIndexSpecification(txn);
-
-                    int idxType = 0;
-                    int syntaxType = 0;
-
-                    // Add the attribute value index
-                    idxType |= XmlIndexSpecification.PATH_EDGE;
-                    idxType |= XmlIndexSpecification.NODE_ELEMENT;
-                    idxType |= XmlIndexSpecification.KEY_EQUALITY;
-                    syntaxType = XmlValue.STRING;
-                    is.addIndex(XACML20_POLICY_NS,
-                                "AttributeValue",
-                                idxType,
-                                syntaxType);
-
-                    // Add the metadata default index
-                    idxType = 0;
-                    idxType |= XmlIndexSpecification.PATH_NODE;
-                    idxType |= XmlIndexSpecification.NODE_METADATA;
-                    idxType |= XmlIndexSpecification.KEY_PRESENCE;
-                    syntaxType = XmlValue.NONE;
-                    is.addDefaultIndex(idxType, syntaxType);
-
-                    container.setIndexSpecification(txn, is, updateContext);
-                } else {
-                    container =
-                            manager.openContainer(txn, CONTAINER, containerCfg);
-                }
-
-                txn.commit();
-                log.info("Opened Container: " + CONTAINER);
-
-            } catch (Exception e) {
-                log.error("Could not start database subsystem.", e);
-                txn.abort();
-                close();
-                throw new PolicyStoreException(e.getMessage(), e);
-            }
-        } catch (XmlException xe) {
-            throw new PolicyStoreException("Error aborting transaction: "
-                    + xe.getMessage(), xe);
+            env = new Environment(envHome, envCfg);
+            manager = new XmlManager(env, managerCfg);
+            // XmlManager.setLogCategory(XmlManager.CATEGORY_NONE, true);
+            // XmlManager.setLogLevel(XmlManager.LEVEL_WARNING, true);
+            updateContext = manager.createUpdateContext();
+        } catch (Exception e) {
+            log.error("Error opening container: " + e.getMessage(), e);
+            close();
+            throw new PolicyStoreException(e.getMessage(), e);
         }
+
+        try {
+            if (manager.existsContainer(CONTAINER) == 0) {
+                container =
+                    manager.createContainer(CONTAINER,
+                                            containerCfg);
+
+                // if we just created a container we also need to add an
+                // index
+                XmlIndexSpecification is =
+                    container.getIndexSpecification();
+
+                int idxType = 0;
+                int syntaxType = 0;
+
+                // Add the attribute value index
+                idxType |= XmlIndexSpecification.PATH_EDGE;
+                idxType |= XmlIndexSpecification.NODE_ELEMENT;
+                idxType |= XmlIndexSpecification.KEY_EQUALITY;
+                syntaxType = XmlValue.STRING;
+                is.addIndex(XACML20_POLICY_NS,
+                            "AttributeValue",
+                            idxType,
+                            syntaxType);
+
+                // Add the metadata default index
+                idxType = 0;
+                idxType |= XmlIndexSpecification.PATH_NODE;
+                idxType |= XmlIndexSpecification.NODE_METADATA;
+                idxType |= XmlIndexSpecification.KEY_PRESENCE;
+                syntaxType = XmlValue.NONE;
+                is.addDefaultIndex(idxType, syntaxType);
+
+                container.setIndexSpecification(is, updateContext);
+            } else {
+                container =
+                    manager.openContainer(CONTAINER, containerCfg);
+            }
+
+        } catch (XmlException e) {
+            if(e.getDatabaseException() instanceof com.sleepycat.db.DeadlockException){
+                log.error("Caught deadlock exception, create/open container", e);
+            }
+            log.error("Could not start database subsystem.", e);
+            close();
+            throw new PolicyStoreException(e.getMessage(), e);
+        }
+
+
+        log.info("Opened Container: " + CONTAINER);
+
+
     }
 
     /**
      * Closes the dbxml container and manager.
      */
     public void close() {
-        try {
-            if (container != null) {
+        if (container != null) {
+            try {
                 container.close();
                 container = null;
                 log.info("Closed container");
+            } catch (XmlException e) {
+                log.warn("close failed: " + e.getMessage(), e);
             }
+        }
 
-            if (manager != null) {
+        if (manager != null) {
+            try {
                 manager.close();
                 manager = null;
                 log.info("Closed manager");
+            } catch (XmlException e) {
+                log.warn("close failed: " + e.getMessage(), e);
             }
-        } catch (Exception de) {
-            log.warn(de.getMessage());
         }
     }
 
@@ -334,6 +330,7 @@ public class DbXmlManager {
 
 
     /*
+     * FIXME: should not rely on finalize, should close explicitly
      * (non-Javadoc)
      * @see java.lang.Object#finalize()
      */
