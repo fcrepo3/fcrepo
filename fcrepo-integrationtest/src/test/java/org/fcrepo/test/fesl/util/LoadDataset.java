@@ -18,7 +18,7 @@ public class LoadDataset {
 
     private static HttpUtils client = null;
 
-    public static void load(String fedoraUrl, String username, String password) {
+    public static void load(String fedoraUrl, String username, String password) throws Exception {
 
         try {
             client = new HttpUtils(fedoraUrl, username, password);
@@ -31,12 +31,12 @@ public class LoadDataset {
         File[] files = dataDir.listFiles(new XmlFilenameFilter());
 
         for (File f : files) {
-            try {
+            //try {
                 byte[] data = DataUtils.loadFile(f);
                 client.post("/fedora/objects/new", null, data);
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
+            //} catch (Exception e) {
+            //    logger.error(e.getMessage(), e);
+            //}
         }
     }
 }

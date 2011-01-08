@@ -64,6 +64,8 @@ public interface PolicyIndex {
      *         array of the policy itself
      * @throws PolicyIndexException
      */
+    // FIXME: only used by PolicyStoreService, which is a legacy class from Muradora.  Remove this method
+    @Deprecated
     Map<String, byte[]> findPolicies(AttributeBean[] attributes)
             throws PolicyIndexException;
 

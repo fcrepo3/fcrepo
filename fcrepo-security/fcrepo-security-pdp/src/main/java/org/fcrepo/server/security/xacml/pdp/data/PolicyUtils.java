@@ -94,8 +94,10 @@ public class PolicyUtils {
         if (validator != null) {
             log.debug("validating document: {}", name);
             try {
-                validator
-                .validate(new StreamSource(new ByteArrayInputStream(document)));
+                // Validator is not thread-safe
+                synchronized (validator) {
+                    validator.validate(new StreamSource(new ByteArrayInputStream(document)));
+                }
             } catch (SAXException e) {
                 // log error also for easier debugging of the actual validation error
                 log.error("Policy: " + name + " is invalid.  Validation error: \n" + e.getMessage());

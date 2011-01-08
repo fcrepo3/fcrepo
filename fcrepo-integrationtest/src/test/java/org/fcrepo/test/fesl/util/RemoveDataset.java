@@ -20,7 +20,7 @@ public class RemoveDataset {
 
     private static HttpUtils client = null;
 
-    public static void remove(String fedoraUrl, String username, String password) {
+    public static void remove(String fedoraUrl, String username, String password) throws Exception {
 
         try {
             client = new HttpUtils(fedoraUrl, username, password);
@@ -33,16 +33,16 @@ public class RemoveDataset {
         File[] files = dataDir.listFiles(new XmlFilenameFilter());
 
         for (File f : files) {
-            try {
+            // try {
                 Document doc = DataUtils.getDocumentFromFile(f);
                 String pid = doc.getDocumentElement().getAttribute("PID");
                 if (logger.isDebugEnabled()) {
                     logger.debug("Deleting object: " + pid);
                 }
                 client.delete("/fedora/objects/" + pid, null);
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
+            //} catch (Exception e) {
+            //    logger.error(e.getMessage(), e);
+            //}
         }
     }
 }
