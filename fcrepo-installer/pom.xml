@@ -1,321 +1,321 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.fcrepo</groupId>
-		<artifactId>fcrepo</artifactId>
-		<version>3.5-SNAPSHOT</version>
-	</parent>
+  <parent>
+    <groupId>org.fcrepo</groupId>
+    <artifactId>fcrepo</artifactId>
+    <version>3.5-SNAPSHOT</version>
+  </parent>
 
-	<artifactId>fcrepo-installer</artifactId>
-	<packaging>pom</packaging>
-	<name>Fedora Installer</name>
+  <artifactId>fcrepo-installer</artifactId>
+  <packaging>pom</packaging>
+  <name>Fedora Installer</name>
 
-	<build>
+  <build>
 
-		<!--
-			This 'resource' directory should be migrated to default location
-		-->
-		<resources>
-			<resource>
-				<directory>../resources/server</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
+    <!--
+      This 'resource' directory should be migrated to default location
+    -->
+    <resources>
+      <resource>
+        <directory>../resources/server</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
 
-	</build>
+  </build>
 
-	<profiles>
-		<profile>
-			<id>fedora-installer</id>
+  <profiles>
+    <profile>
+      <id>fedora-installer</id>
 
-			<activation>
-				<property>
-					<name>fedora</name>
-					<value>installer</value>
-				</property>
-			</activation>
+      <activation>
+        <property>
+          <name>fedora</name>
+          <value>installer</value>
+        </property>
+      </activation>
 
-			<build>
-				<plugins>
+      <build>
+        <plugins>
 
-					<plugin>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.2-beta-4</version>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.2-beta-4</version>
 
-						<executions>
+            <executions>
 
-							<!-- Create the fedorahome.zip -->
-							<execution>
-								<id>fedora-home-assembly</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
+              <!-- Create the fedorahome.zip -->
+              <execution>
+                <id>fedora-home-assembly</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
 
-								<configuration>
-									<filters>
-										<filter>${basedir}/src/main/filters/filter.properties</filter>
-									</filters>
-									<descriptors>
-										<descriptor>${basedir}/src/main/assembly/fedora-home.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
+                <configuration>
+                  <filters>
+                    <filter>${basedir}/src/main/filters/filter.properties</filter>
+                  </filters>
+                  <descriptors>
+                    <descriptor>${basedir}/src/main/assembly/fedora-home.xml</descriptor>
+                  </descriptors>
+                </configuration>
+              </execution>
 
-							<!-- Create the fedora installer -->
-							<execution>
-								<id>fedora-installer-assembly</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
+              <!-- Create the fedora installer -->
+              <execution>
+                <id>fedora-installer-assembly</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
 
-								<configuration>
+                <configuration>
 
-									<appendAssemblyId>false</appendAssemblyId>
-									<finalName>fcrepo-installer-${project.version}</finalName>
+                  <appendAssemblyId>false</appendAssemblyId>
+                  <finalName>fcrepo-installer-${project.version}</finalName>
 
-									<descriptors>
-										<descriptor>src/main/assembly/fedora-installer.xml</descriptor>
-									</descriptors>
-									<archive>
-										<manifest>
-											<mainClass>com.simontuffs.onejar.Boot</mainClass>
-										</manifest>
-									</archive>
-								</configuration>
-							</execution>
+                  <descriptors>
+                    <descriptor>src/main/assembly/fedora-installer.xml</descriptor>
+                  </descriptors>
+                  <archive>
+                    <manifest>
+                      <mainClass>com.simontuffs.onejar.Boot</mainClass>
+                    </manifest>
+                  </archive>
+                </configuration>
+              </execution>
 
-						</executions>
+            </executions>
 
-					</plugin>
-				</plugins>
-			</build>
+          </plugin>
+        </plugins>
+      </build>
 
-			<dependencies>
-				<dependency>
-					<groupId>commons-beanutils</groupId>
-					<artifactId>commons-beanutils</artifactId>
-				</dependency>
+      <dependencies>
+        <dependency>
+          <groupId>commons-beanutils</groupId>
+          <artifactId>commons-beanutils</artifactId>
+        </dependency>
 
-				<dependency>
-					<groupId>commons-betwixt</groupId>
-					<artifactId>commons-betwixt</artifactId>
-				</dependency>
+        <dependency>
+          <groupId>commons-betwixt</groupId>
+          <artifactId>commons-betwixt</artifactId>
+        </dependency>
 
-				<dependency>
-					<groupId>commons-collections</groupId>
-					<artifactId>commons-collections</artifactId>
-					<version>3.1</version>
-				</dependency>
+        <dependency>
+          <groupId>commons-collections</groupId>
+          <artifactId>commons-collections</artifactId>
+          <version>3.1</version>
+        </dependency>
 
-				<dependency>
-					<groupId>javax.activation</groupId>
-					<artifactId>activation</artifactId>
-					<version>1.1.1</version>
-				</dependency>
+        <dependency>
+          <groupId>javax.activation</groupId>
+          <artifactId>activation</artifactId>
+          <version>1.1.1</version>
+        </dependency>
 
-				<dependency>
-					<groupId>org.fcrepo</groupId>
-					<artifactId>fcrepo-webapp-fedora</artifactId>
-					<version>${project.version}</version>
-					<type>war</type>
-				</dependency>
+        <dependency>
+          <groupId>org.fcrepo</groupId>
+          <artifactId>fcrepo-webapp-fedora</artifactId>
+          <version>${project.version}</version>
+          <type>war</type>
+        </dependency>
 
-				<dependency>
-					<groupId>org.fcrepo</groupId>
-					<artifactId>fcrepo-server</artifactId>
-					<classifier>utilities-main</classifier>
-					<version>${project.version}</version>
-				</dependency>
+        <dependency>
+          <groupId>org.fcrepo</groupId>
+          <artifactId>fcrepo-server</artifactId>
+          <classifier>utilities-main</classifier>
+          <version>${project.version}</version>
+        </dependency>
 
-				<dependency>
-					<groupId>org.fcrepo</groupId>
-					<artifactId>fcrepo-server</artifactId>
-					<classifier>cli-loader-main</classifier>
-					<version>${project.version}</version>
-				</dependency>
+        <dependency>
+          <groupId>org.fcrepo</groupId>
+          <artifactId>fcrepo-server</artifactId>
+          <classifier>cli-loader-main</classifier>
+          <version>${project.version}</version>
+        </dependency>
 
-				<dependency>
-					<groupId>org.fcrepo</groupId>
-					<artifactId>apache-tomcat</artifactId>
-					<version>6.0.29</version>
-					<type>zip</type>
-				</dependency>
-			</dependencies>
+        <dependency>
+          <groupId>org.fcrepo</groupId>
+          <artifactId>apache-tomcat</artifactId>
+          <version>6.0.29</version>
+          <type>zip</type>
+        </dependency>
+      </dependencies>
 
-		</profile>
-	</profiles>
+    </profile>
+  </profiles>
 
-	<dependencies>
+  <dependencies>
 
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derbyclient</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derbyclient</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>commons-digester</groupId>
-			<artifactId>commons-digester</artifactId>
-			<version>1.7</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+    <dependency>
+      <groupId>commons-digester</groupId>
+      <artifactId>commons-digester</artifactId>
+      <version>1.7</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>log4j-over-slf4j</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4.1</version>
-		</dependency>
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4.1</version>
+    </dependency>
 
-		<dependency>
-			<groupId>mckoi</groupId>
-			<artifactId>mckoi</artifactId>
-			<version>1.0.2</version>
-			<scope>runtime</scope>
-		</dependency>
+    <dependency>
+      <groupId>mckoi</groupId>
+      <artifactId>mckoi</artifactId>
+      <version>1.0.2</version>
+      <scope>runtime</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.6</version>
-			<scope>runtime</scope>
-		</dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.6</version>
+      <scope>runtime</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-common</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-security-pdp</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-security-pdp</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-webapp-democontent</artifactId>
-			<type>war</type>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-webapp-democontent</artifactId>
+      <type>war</type>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-webapp-fop</artifactId>
-			<type>war</type>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-webapp-fop</artifactId>
+      <type>war</type>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-webapp-saxon</artifactId>
-			<type>war</type>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-webapp-saxon</artifactId>
+      <type>war</type>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-server</artifactId>
-			<classifier>cli-loader-main</classifier>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-server</artifactId>
+      <classifier>cli-loader-main</classifier>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-webapp-imagemanip</artifactId>
-			<type>war</type>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-webapp-imagemanip</artifactId>
+      <type>war</type>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-client-admin</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-client-admin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<!--
-			<dependency> <groupId>org.fcrepo</groupId>
-			<artifactId>client</artifactId> <classifier>fedora</classifier>
-			<version>1.0.0</version> </dependency>
-		-->
+    <!--
+      <dependency> <groupId>org.fcrepo</groupId>
+      <artifactId>client</artifactId> <classifier>fedora</classifier>
+      <version>1.0.0</version> </dependency>
+    -->
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-client-messaging</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-client-messaging</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-client-messaging</artifactId>
-			<version>${project.version}</version>
-			<classifier>fedora-messaging</classifier>
-			<type>zip</type>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-client-messaging</artifactId>
+      <version>${project.version}</version>
+      <classifier>fedora-messaging</classifier>
+      <type>zip</type>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-webapp-fedora</artifactId>
-			<type>war</type>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-webapp-fedora</artifactId>
+      <type>war</type>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>one-jar-boot</artifactId>
-			<version>0.96</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>one-jar-boot</artifactId>
+      <version>0.96</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>mulgara-core</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>mulgara-core</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>8.3-603.jdbc3</version>
-			<scope>runtime</scope>
-		</dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>8.3-603.jdbc3</version>
+      <scope>runtime</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+    </dependency>
 
-	</dependencies>
+  </dependencies>
 </project>
