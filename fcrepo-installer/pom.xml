@@ -57,10 +57,10 @@
 
 								<configuration>
 									<filters>
-										<filter>src/main/filters/filter.properties</filter>
+										<filter>${basedir}/src/main/filters/filter.properties</filter>
 									</filters>
 									<descriptors>
-										<descriptor>src/main/assembly/fedora-home.xml</descriptor>
+										<descriptor>${basedir}/src/main/assembly/fedora-home.xml</descriptor>
 									</descriptors>
 								</configuration>
 							</execution>
@@ -137,6 +137,13 @@
 					<artifactId>fcrepo-server</artifactId>
 					<classifier>cli-loader-main</classifier>
 					<version>${project.version}</version>
+				</dependency>
+
+				<dependency>
+					<groupId>org.fcrepo</groupId>
+					<artifactId>apache-tomcat</artifactId>
+					<version>6.0.29</version>
+					<type>zip</type>
 				</dependency>
 			</dependencies>
 
