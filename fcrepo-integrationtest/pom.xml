@@ -42,7 +42,7 @@
         <filtering>true</filtering>
       </resource>
     </resources>
-    
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -86,112 +86,81 @@
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.4.2</version>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>2.7.1</version>
 
             <executions>
 
               <execution>
-                <id>int-test-Q</id>
+                <id>integration-test</id>
                 <phase>integration-test</phase>
                 <goals>
-                  <goal>test</goal>
+                  <goal>integration-test</goal>
                 </goals>
+              </execution>
 
-                <configuration>
-                  <skip>${integration.test.skip}</skip>
-
-                  <systemProperties>
-                    <property>
-                      <name>fedora.authorize.access</name>
-                      <value>false</value>
-                    </property>
-                    <property>
-                      <name>logback.configurationFile</name>
-                      <value>src/test/resources/logback.xml</value>
-                    </property>
-                    <property>
-                      <name>fedora.home</name>
-                      <value>${fedora.home}</value>
-                    </property>
-                    <property>
-                      <name>javax.net.ssl.trustStore</name>
-                      <value>${javax.net.ssl.trustStore}</value>
-                    </property>
-                    <property>
-                      <name>fedora.username</name>
-                      <value>${fedora.username}</value>
-                    </property>
-                    <property>
-                      <name>fedora.password</name>
-                      <value>${fedora.password}</value>
-                    </property>
-                    <property>
-                      <name>demo.format</name>
-                      <value></value>
-                    </property>
-
-                    <property>
-                      <name>fedora.hostname</name>
-                      <value>${fedora.hostname}</value>
-                    </property>
-                    <property>
-                      <name>fedora.port</name>
-                      <value>${fedora.port}</value>
-                    </property>
-                    <property>
-                      <name>fedora.appServerContext</name>
-                      <value>${fedora.appServerContext}</value>
-                    </property>
-                    <property>
-                      <name>fedora.baseURL</name>
-                      <value>${fedora.baseURL}</value>
-                    </property>
-
-                    <property>
-                      <name>org.apache.activemq.default.directory.prefix</name>
-                      <value>${org.apache.activemq.default.directory.prefix}</value>
-                    </property>
-                  </systemProperties>
-
-                  <includes>
-
-                    <include>**/AtomAPIMMessageTest.class</include>
-                    <include>**/NotificationInvocationHandlerTest.class</include>
-
-                    <!--
-                      Has bug in source-code
-                      <include>**/SimpleDeploymentTests.class</include>
-                    -->
-
-                    <include>**/DOTranslationUtilityTest.class</include>
-                    <include>**/TestIngest.class</include>
-                    <include>**/TestAPIA.class</include>
-                    <include>**/TestAPIAConfigA.class</include>
-                    <include>**/TestAPIALite.class</include>
-                    <include>**/TestAPIALiteConfigA.class</include>
-                    <include>**/TestAPIM.class</include>
-                    <include>**/TestAPIMLite.class</include>
-                    <include>**/TestHTTPStatusCodesConfigQ.class</include>
-                    <include>**/TestManagedDatastreams.class</include>
-                    <include>**/TestManyDisseminations.class</include>
-                    <include>**/TestCommandLineFormats.class</include>
-                    <include>**/TestOAIService.class</include>
-                    <include>**/TestServerConfiguration.class</include>
-                    <include>**/ConflictingDeploymentTests.class</include>
-                    <include>**/SharedDeploymentTests.class</include>
-                    <include>**/TestCommandLineUtilities.class</include>
-                    <include>**/ContentModelDSInputTest.class</include>
-
-                  </includes>
-                  <excludes>
-                    <exclude>${instrumentedTests}</exclude>
-                    <exclude>${nestedClassTests}</exclude>
-                  </excludes>
-
-                </configuration>
+              <execution>
+                <id>verify</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
               </execution>
             </executions>
+
+            <configuration>
+
+              <systemPropertyVariables>
+                <fedora.authorize.access>false</fedora.authorize.access>
+                <logback.configurationFile>src/test/resources/logback.xml</logback.configurationFile>
+                <fedora.home>${fedora.home}</fedora.home>
+                <javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
+                <fedora.username>${fedora.username}</fedora.username>
+                <fedora.password>${fedora.password}</fedora.password>
+                <demo.format></demo.format>
+                <fedora.hostname>${fedora.hostname}</fedora.hostname>
+                <fedora.port>8080</fedora.port>
+                <fedora.appServerContext>${fedora.appServerContext}</fedora.appServerContext>
+                <fedora.baseURL>http://localhost:8080/fedora</fedora.baseURL>
+                <org.apache.activemq.default.directory.prefix>${org.apache.activemq.default.directory.prefix}</org.apache.activemq.default.directory.prefix>
+              </systemPropertyVariables>
+
+              <includes>
+
+                <include>**/AtomAPIMMessageTest.class</include>
+                <include>**/NotificationInvocationHandlerTest.class</include>
+
+                <!--
+                  Has bug in source-code
+                  <include>**/SimpleDeploymentTests.class</include>
+                -->
+
+                <include>**/DOTranslationUtilityTest.class</include>
+                <include>**/TestIngest.class</include>
+                <include>**/TestAPIA.class</include>
+                <include>**/TestAPIAConfigA.class</include>
+                <include>**/TestAPIALite.class</include>
+                <include>**/TestAPIALiteConfigA.class</include>
+                <include>**/TestAPIM.class</include>
+                <include>**/TestAPIMLite.class</include>
+                <include>**/TestHTTPStatusCodesConfigQ.class</include>
+                <include>**/TestManagedDatastreams.class</include>
+                <include>**/TestManyDisseminations.class</include>
+                <include>**/TestCommandLineFormats.class</include>
+                <include>**/TestOAIService.class</include>
+                <include>**/TestServerConfiguration.class</include>
+                <include>**/ConflictingDeploymentTests.class</include>
+                <include>**/SharedDeploymentTests.class</include>
+                <include>**/TestCommandLineUtilities.class</include>
+                <include>**/ContentModelDSInputTest.class</include>
+
+              </includes>
+              <excludes>
+                <exclude>${instrumentedTests}</exclude>
+                <exclude>${nestedClassTests}</exclude>
+              </excludes>
+
+            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -209,121 +178,87 @@
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.4.2</version>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>2.7.1</version>
 
             <executions>
-
               <execution>
-                <id>int-test-A</id>
+                <id>integration-test</id>
                 <phase>integration-test</phase>
                 <goals>
-                  <goal>test</goal>
+                  <goal>integration-test</goal>
                 </goals>
+              </execution>
 
-
-                <configuration>
-                  <skip>${integration.test.skip}</skip>
-
-                  <systemProperties>
-                    <property>
-                      <name>fedora.authorize.access</name>
-                      <value>false</value>
-                    </property>
-
-                    <property>
-                      <name>logback.configurationFile</name>
-                      <value>src/test/resources/logback.xml</value>
-                    </property>
-                    <property>
-                      <name>fedora.home</name>
-                      <value>${fedora.home}</value>
-                    </property>
-                    <property>
-                      <name>javax.net.ssl.trustStore</name>
-                      <value>${javax.net.ssl.trustStore}</value>
-                    </property>
-                    <property>
-                      <name>fedora.username</name>
-                      <value>${fedora.username}</value>
-                    </property>
-                    <property>
-                      <name>fedora.password</name>
-                      <value>${fedora.password}</value>
-                    </property>
-                    <property>
-                      <name>demo.format</name>
-                      <value></value>
-                    </property>
-
-                    <property>
-                      <name>fedora.hostname</name>
-                      <value>${fedora.hostname}</value>
-                    </property>
-                    <property>
-                      <name>fedora.port</name>
-                      <value>${fedora.port}</value>
-                    </property>
-                    <property>
-                      <name>fedora.appServerContext</name>
-                      <value>${fedora.appServerContext}</value>
-                    </property>
-                    <property>
-                      <name>fedora.baseURL</name>
-                      <value>${fedora.baseURL}</value>
-                    </property>
-
-                    <property>
-                      <name>org.apache.activemq.default.directory.prefix</name>
-                      <value>${org.apache.activemq.default.directory.prefix}</value>
-                    </property>
-                  </systemProperties>
-
-                  <includes>
-
-                    <!--
-                      Has bug in source-code
-                      <include>**/SimpleDeploymentTests.class</include>
-                    -->
-
-                    <include>**/AtomAPIMMessageTest.class</include>
-                    <include>**/NotificationInvocationHandlerTest.class</include>
-                    <include>**/DOTranslationUtilityTest.class</include>
-                    <include>**/TestIngest.class</include>
-                    <include>**/TestAPIA.class</include>
-                    <include>**/TestAPIAConfigA.class</include>
-                    <include>**/TestAPIALite.class</include>
-                    <include>**/TestAPIALiteConfigA.class</include>
-                    <include>**/TestAPIM.class</include>
-                    <include>**/TestAPIMLite.class</include>
-                    <include>**/TestRESTAPI.class</include>
-                    <include>**/TestHTTPStatusCodes.class</include>
-                    <include>**/TestHTTPStatusCodesConfigA.class</include>
-                    <include>**/TestManagedDatastreams.class</include>
-                    <include>**/TestManyDisseminations.class</include>
-                    <include>**/TestCommandLineFormats.class</include>
-                    <include>**/TestOAIService.class</include>
-                    <include>**/TestServerConfiguration.class</include>
-                    <include>**/ConflictingDeploymentTests.class</include>
-                    <include>**/TestCommandLineUtilities.class</include>
-                    <include>**/SharedDeploymentTests.class</include>
-                    <include>**/ContentModelDSInputTest.class</include>
-                    <include>**/TestAdminAPI.class</include>
-
-                    <!--
-                      Disabled until FCREPO-798 is public
-                      <include>**/TestAPIM2.class</include>
-                    -->
-
-                  </includes>
-                  <excludes>
-                    <exclude>${instrumentedTests}</exclude>
-                    <exclude>${nestedClassTests}</exclude>
-                  </excludes>
-
-                </configuration>
+              <execution>
+                <id>verify</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
               </execution>
             </executions>
+
+            <configuration>
+
+              <systemPropertyVariables>
+                <fedora.authorize.access>false</fedora.authorize.access>
+                <logback.configurationFile>src/test/resources/logback.xml</logback.configurationFile>
+                <fedora.home>${fedora.home}</fedora.home>
+                <javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
+                <fedora.username>${fedora.username}</fedora.username>
+                <fedora.password>${fedora.password}</fedora.password>
+                <demo.format></demo.format>
+                <fedora.hostname>${fedora.hostname}</fedora.hostname>
+                <fedora.port>${fedora.port}</fedora.port>
+                <fedora.appServerContext>${fedora.appServerContext}</fedora.appServerContext>
+                <fedora.baseURL>${fedora.baseURL}</fedora.baseURL>
+                <org.apache.activemq.default.directory.prefix>${org.apache.activemq.default.directory.prefix}</org.apache.activemq.default.directory.prefix>
+              </systemPropertyVariables>
+
+              <includes>
+
+                <!--
+                  Has bug in source-code
+                  <include>**/SimpleDeploymentTests.class</include>
+                -->
+
+                <include>**/AtomAPIMMessageTest.class</include>
+                <include>**/NotificationInvocationHandlerTest.class</include>
+                <include>**/DOTranslationUtilityTest.class</include>
+                <include>**/TestIngest.class</include>
+                <include>**/TestAPIA.class</include>
+                <include>**/TestAPIAConfigA.class</include>
+                <include>**/TestAPIALite.class</include>
+                <include>**/TestAPIALiteConfigA.class</include>
+                <include>**/TestAPIM.class</include>
+                <include>**/TestAPIMLite.class</include>
+                <include>**/TestRESTAPI.class</include>
+                <include>**/TestHTTPStatusCodes.class</include>
+                <include>**/TestHTTPStatusCodesConfigA.class</include>
+                <include>**/TestManagedDatastreams.class</include>
+                <include>**/TestManyDisseminations.class</include>
+                <include>**/TestCommandLineFormats.class</include>
+                <include>**/TestOAIService.class</include>
+                <include>**/TestServerConfiguration.class</include>
+                <include>**/ConflictingDeploymentTests.class</include>
+                <include>**/TestCommandLineUtilities.class</include>
+                <include>**/SharedDeploymentTests.class</include>
+                <include>**/ContentModelDSInputTest.class</include>
+                <include>**/TestAdminAPI.class</include>
+
+                <!--
+                  Disabled until FCREPO-798 is public
+                  <include>**/TestAPIM2.class</include>
+                -->
+
+              </includes>
+              <excludes>
+                <exclude>${instrumentedTests}</exclude>
+                <exclude>${nestedClassTests}</exclude>
+              </excludes>
+
+            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -341,120 +276,87 @@
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.4.2</version>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>2.7.1</version>
 
             <executions>
-
               <execution>
-                <id>int-test-B</id>
+                <id>integration-test</id>
                 <phase>integration-test</phase>
                 <goals>
-                  <goal>test</goal>
+                  <goal>integration-test</goal>
                 </goals>
+              </execution>
 
-
-                <configuration>
-                  <skip>${integration.test.skip}</skip>
-
-                  <systemProperties>
-                    <property>
-                      <name>fedora.authorize.access</name>
-                      <value>true</value>
-                    </property>
-
-                    <property>
-                      <name>logback.configurationFile</name>
-                      <value>src/test/resources/logback.xml</value>
-                    </property>
-                    <property>
-                      <name>fedora.home</name>
-                      <value>${fedora.home}</value>
-                    </property>
-                    <property>
-                      <name>javax.net.ssl.trustStore</name>
-                      <value>${javax.net.ssl.trustStore}</value>
-                    </property>
-                    <property>
-                      <name>fedora.username</name>
-                      <value>${fedora.username}</value>
-                    </property>
-                    <property>
-                      <name>fedora.password</name>
-                      <value>${fedora.password}</value>
-                    </property>
-                    <property>
-                      <name>demo.format</name>
-                      <value></value>
-                    </property>
-
-                    <property>
-                      <name>fedora.hostname</name>
-                      <value>${fedora.hostname}</value>
-                    </property>
-                    <property>
-                      <name>fedora.port</name>
-                      <value>${fedora.port}</value>
-                    </property>
-                    <property>
-                      <name>fedora.appServerContext</name>
-                      <value>${fedora.appServerContext}</value>
-                    </property>
-                    <property>
-                      <name>fedora.baseURL</name>
-                      <value>${fedora.baseURL}</value>
-                    </property>
-
-                    <property>
-                      <name>org.apache.activemq.default.directory.prefix</name>
-                      <value>${org.apache.activemq.default.directory.prefix}</value>
-                    </property>
-                  </systemProperties>
-
-                  <includes>
-
-                    <include>**/NotificationInvocationHandlerTest.class</include>
-
-                    <!--
-                      Has bug in source-code
-                      <include>**/SimpleDeploymentTests.class</include>
-                    -->
-
-                    <include>**/AtomAPIMMessageTest.class</include>
-                    <include>**/DOTranslationUtilityTest.class</include>
-                    <include>**/TestIngest.class</include>
-                    <include>**/TestAPIA.class</include>
-                    <include>**/TestAPIALite.class</include>
-                    <include>**/TestAPIM.class</include>
-                    <include>**/TestAPIMLite.class</include>
-                    <include>**/TestAuthentication.class</include>
-                    <include>**/TestHTTPStatusCodes.class</include>
-                    <include>**/TestHTTPStatusCodesConfigB.class</include>
-                    <include>**/TestManagedDatastreams.class</include>
-                    <include>**/TestManagementNotifications.class</include>
-                    <include>**/TestRelationships.class</include>
-                    <include>**/TestRESTAPI.class</include>
-                    <include>**/TestRISearch.class</include>
-                    <include>**/TestOAIService.class</include>
-                    <include>**/TestCommandLineFormats.class</include>
-                    <include>**/TestServerConfiguration.class</include>
-                    <include>**/ConflictingDeploymentTests.class</include>
-                    <include>**/SharedDeploymentTests.class</include>
-                    <include>**/TestXACMLPolicies.class</include>
-                    <include>**/ContentModelDSInputTest.class</include>
-                    <include>**/TestCommandLineUtilities.class</include>
-                    <include>**/TestMisplacedNamespace.class</include>
-                    <include>**/TestAdminAPI.class</include>
-
-
-                  </includes>
-                  <excludes>
-                    <exclude>${instrumentedTests}</exclude>
-                    <exclude>${nestedClassTests}</exclude>
-                  </excludes>
-                </configuration>
+              <execution>
+                <id>verify</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
               </execution>
             </executions>
+
+            <configuration>
+
+              <systemPropertyVariables>
+                <fedora.authorize.access>true</fedora.authorize.access>
+                <logback.configurationFile>src/test/resources/logback.xml</logback.configurationFile>
+                <fedora.home>${fedora.home}</fedora.home>
+                <javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
+                <fedora.username>${fedora.username}</fedora.username>
+                <fedora.password>${fedora.password}</fedora.password>
+                <demo.format></demo.format>
+                <fedora.hostname>${fedora.hostname}</fedora.hostname>
+                <fedora.port>${fedora.port}</fedora.port>
+                <fedora.appServerContext>${fedora.appServerContext}</fedora.appServerContext>
+                <fedora.baseURL>${fedora.baseURL}</fedora.baseURL>
+                <org.apache.activemq.default.directory.prefix>${org.apache.activemq.default.directory.prefix}</org.apache.activemq.default.directory.prefix>
+              </systemPropertyVariables>
+
+              <includes>
+
+                <include>**/NotificationInvocationHandlerTest.class</include>
+
+                <!--
+                  Has bug in source-code
+                  <include>**/SimpleDeploymentTests.class</include>
+                -->
+
+                <include>**/AtomAPIMMessageTest.class</include>
+                <include>**/DOTranslationUtilityTest.class</include>
+                <include>**/TestIngest.class</include>
+                <include>**/TestAPIA.class</include>
+                <include>**/TestAPIALite.class</include>
+                <include>**/TestAPIM.class</include>
+                <include>**/TestAPIMLite.class</include>
+                <include>**/TestAuthentication.class</include>
+                <include>**/TestHTTPStatusCodes.class</include>
+                <include>**/TestHTTPStatusCodesConfigB.class</include>
+                <include>**/TestManagedDatastreams.class</include>
+                <include>**/TestManagementNotifications.class</include>
+                <include>**/TestRelationships.class</include>
+                <include>**/TestRESTAPI.class</include>
+                <include>**/TestRISearch.class</include>
+                <include>**/TestOAIService.class</include>
+                <include>**/TestCommandLineFormats.class</include>
+                <include>**/TestServerConfiguration.class</include>
+                <include>**/ConflictingDeploymentTests.class</include>
+                <include>**/SharedDeploymentTests.class</include>
+                <include>**/TestXACMLPolicies.class</include>
+                <include>**/ContentModelDSInputTest.class</include>
+                <include>**/TestCommandLineUtilities.class</include>
+                <include>**/TestMisplacedNamespace.class</include>
+                <include>**/TestAdminAPI.class</include>
+
+
+              </includes>
+              <excludes>
+                <exclude>${instrumentedTests}</exclude>
+                <exclude>${nestedClassTests}</exclude>
+              </excludes>
+            </configuration>
+
           </plugin>
         </plugins>
       </build>
@@ -472,127 +374,95 @@
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
+            <artifactId>maven-failsafe-plugin</artifactId>
             <version>2.4.2</version>
 
             <executions>
-
               <execution>
-                <id>int-test-C</id>
+                <id>integration-test</id>
                 <phase>integration-test</phase>
                 <goals>
-                  <goal>test</goal>
+                  <goal>integration-test</goal>
                 </goals>
+              </execution>
 
-
-                <configuration>
-                  <skip>${integration.test.skip}</skip>
-
-                  <systemProperties>
-                    <property>
-                      <name>fedora.authorize.access</name>
-                      <value>true</value>
-                    </property>
-                    <property>
-                      <name>logback.configurationFile</name>
-                      <value>src/test/resources/logback.xml</value>
-                    </property>
-                    <property>
-                      <name>fedora.home</name>
-                      <value>${fedora.home}</value>
-                    </property>
-                    <property>
-                      <name>javax.net.ssl.trustStore</name>
-                      <value>${javax.net.ssl.trustStore}</value>
-                    </property>
-                    <property>
-                      <name>fedora.username</name>
-                      <value>${fedora.username}</value>
-                    </property>
-                    <property>
-                      <name>fedora.password</name>
-                      <value>${fedora.password}</value>
-                    </property>
-                    <property>
-                      <name>demo.format</name>
-                      <value></value>
-                    </property>
-
-                    <property>
-                      <name>fedora.hostname</name>
-                      <value>${fedora.hostname}</value>
-                    </property>
-                    <property>
-                      <name>fedora.port</name>
-                      <value>${fedora.port}</value>
-                    </property>
-                    <property>
-                      <name>fedora.appServerContext</name>
-                      <value>${fedora.appServerContext}</value>
-                    </property>
-                    <property>
-                      <name>fedora.baseURL</name>
-                      <value>${fedora.baseURL}</value>
-                    </property>
-
-                    <property>
-                      <name>org.apache.activemq.default.directory.prefix</name>
-                      <value>${org.apache.activemq.default.directory.prefix}</value>
-                    </property>
-                  </systemProperties>
-
-                  <includes>
-
-                    <include>**/NotificationInvocationHandlerTest.class</include>
-
-                    <!--
-                      Has bug in source-code
-                      <include>**/SimpleDeploymentTests.class</include>
-                    -->
-
-                    <include>**/AtomAPIMMessageTest.class</include>
-                    <include>**/DOTranslationUtilityTest.class</include>
-                    <include>**/TestIngest.class</include>
-                    <include>**/TestAPIA.class</include>
-                    <include>**/TestAPIALite.class</include>
-                    <include>**/TestAPIM.class</include>
-                    <include>**/TestAPIMLite.class</include>
-                    <include>**/TestAuthentication.class</include>
-                    <include>**/TestHTTPStatusCodesConfigC.class</include>
-                    <!--
-                      <include>**/TestHTTPStatusCodesConfigB.class</include>
-                    -->
-                    <include>**/TestManagedDatastreams.class</include>
-                    <!--
-                      <include>**/TestManagementNotifications.class</include>
-                    -->
-                    <include>**/TestRelationships.class</include>
-                    <include>**/TestRESTAPI.class</include>
-                    <include>**/TestRISearch.class</include>
-                    <include>**/TestOAIService.class</include>
-                    <include>**/TestCommandLineFormats.class</include>
-                    <include>**/TestServerConfiguration.class</include>
-                    <include>**/ConflictingDeploymentTests.class</include>
-                    <include>**/SharedDeploymentTests.class</include>
-                    <include>**/TestAdminAPI.class</include>
-                    <!--
-                      <include>**/TestXACMLPolicies.class</include>
-                    -->
-                    <include>**/ContentModelDSInputTest.class</include>
-                    <include>**/TestCommandLineUtilities.class</include>
-                    <include>**/TestMisplacedNamespace.class</include>
-                    <include>**/TestREST.class</include>
-                    <include>**/TestPolicies.class</include>
-                    <include>**/TestPolicyIndex.class</include>
-
-                  </includes>
-                  <excludes>
-                    <exclude>${instrumentedTests}</exclude>
-                    <exclude>${nestedClassTests}</exclude>
-                  </excludes>
-                </configuration>
+              <execution>
+                <id>verify</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
               </execution>
             </executions>
+
+
+            <configuration>
+
+              <systemPropertyVariables>
+                <fedora.authorize.access>true</fedora.authorize.access>
+                <logback.configurationFile>src/test/resources/logback.xml</logback.configurationFile>
+                <fedora.home>${fedora.home}</fedora.home>
+                <javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
+                <fedora.username>${fedora.username}</fedora.username>
+                <fedora.password>${fedora.password}</fedora.password>
+                <demo.format></demo.format>
+                <fedora.hostname>${fedora.hostname}</fedora.hostname>
+                <fedora.port>${fedora.port}</fedora.port>
+                <fedora.appServerContext>${fedora.appServerContext}</fedora.appServerContext>
+                <fedora.baseURL>${fedora.baseURL}</fedora.baseURL>
+                <org.apache.activemq.default.directory.prefix>${org.apache.activemq.default.directory.prefix}</org.apache.activemq.default.directory.prefix>
+              </systemPropertyVariables>
+
+              <includes>
+
+                <include>**/NotificationInvocationHandlerTest.class</include>
+
+                <!--
+                  Has bug in source-code
+                  <include>**/SimpleDeploymentTests.class</include>
+                -->
+
+                <include>**/AtomAPIMMessageTest.class</include>
+                <include>**/DOTranslationUtilityTest.class</include>
+                <include>**/TestIngest.class</include>
+                <include>**/TestAPIA.class</include>
+                <include>**/TestAPIALite.class</include>
+                <include>**/TestAPIM.class</include>
+                <include>**/TestAPIMLite.class</include>
+                <include>**/TestAuthentication.class</include>
+                <include>**/TestHTTPStatusCodesConfigC.class</include>
+                <!--
+                  <include>**/TestHTTPStatusCodesConfigB.class</include>
+                -->
+                <include>**/TestManagedDatastreams.class</include>
+                <!--
+                  <include>**/TestManagementNotifications.class</include>
+                -->
+                <include>**/TestRelationships.class</include>
+                <include>**/TestRESTAPI.class</include>
+                <include>**/TestRISearch.class</include>
+                <include>**/TestOAIService.class</include>
+                <include>**/TestCommandLineFormats.class</include>
+                <include>**/TestServerConfiguration.class</include>
+                <include>**/ConflictingDeploymentTests.class</include>
+                <include>**/SharedDeploymentTests.class</include>
+                <include>**/TestAdminAPI.class</include>
+                <!--
+                  <include>**/TestXACMLPolicies.class</include>
+                -->
+                <include>**/ContentModelDSInputTest.class</include>
+                <include>**/TestCommandLineUtilities.class</include>
+                <include>**/TestMisplacedNamespace.class</include>
+                <include>**/TestREST.class</include>
+                <include>**/TestPolicies.class</include>
+                <include>**/TestPolicyIndex.class</include>
+
+              </includes>
+              <excludes>
+                <exclude>${instrumentedTests}</exclude>
+                <exclude>${nestedClassTests}</exclude>
+              </excludes>
+            </configuration>
           </plugin>
         </plugins>
       </build>
