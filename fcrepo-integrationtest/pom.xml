@@ -20,9 +20,12 @@
     <fedora.password>fedoraAdmin</fedora.password>
 
     <fedora.hostname>localhost</fedora.hostname>
-    <fedora.port>8080</fedora.port>
+    <fedora.port>9080</fedora.port>
     <fedora.appServerContext>fedora</fedora.appServerContext>
-    <fedora.baseURL>http://localhost:8080/fedora</fedora.baseURL>
+    <fedora.baseURL>http://localhost:9080/fedora</fedora.baseURL>
+
+    <tomcat.port.ssl>9443</tomcat.port.ssl>
+    <tomcat.port.shutdown>9005</tomcat.port.shutdown>
 
     <org.apache.activemq.default.directory.prefix>${project.build.directory}</org.apache.activemq.default.directory.prefix>
   </properties>
@@ -32,6 +35,14 @@
     are only run by specifying a profile (configA/B/Q)
   -->
   <build>
+
+    <resources>
+      <resource>
+        <directory>resources/confg</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
