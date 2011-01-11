@@ -1,7 +1,8 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.utilities;
 
 import java.io.BufferedReader;
@@ -11,17 +12,22 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Utility class for executing commands and sending the command's output to a
  * given OutputStream.
- * 
+ *
  * @author Edwin Shin
  */
 public class ExecUtility {
+
     public static Process exec(String cmd) {
         return exec(cmd, null, System.out, null);
     }
-    
+
     public static Process exec(String[] cmd) {
         return exec(cmd, null, System.out, null);
     }
@@ -29,7 +35,7 @@ public class ExecUtility {
     public static Process exec(String cmd, OutputStream out) {
         return exec(cmd, null, out, null);
     }
-    
+
     public static Process exec(String[] cmd, OutputStream out) {
         return exec(cmd, null, out, null);
     }
@@ -37,24 +43,28 @@ public class ExecUtility {
     public static Process exec(String cmd, File dir) {
         return exec(cmd, dir, System.out, null);
     }
-    
+
     public static Process exec(String[] cmd, File dir) {
         return exec(cmd, dir, System.out, null);
     }
-    
-    public static Process exec(String cmd, File dir, OutputStream out,
+
+    public static Process exec(String cmd,
+                               File dir,
+                               OutputStream out,
                                OutputStream err) {
-        return exec(new String[]{cmd}, dir, out, err);
+        return exec(new String[] {cmd}, dir, out, err);
     }
 
-    public static Process exec(String[] cmd, File dir, OutputStream out,
-            OutputStream err) {
+    public static Process exec(String[] cmd,
+                               File dir,
+                               OutputStream out,
+                               OutputStream err) {
         Process cp = null;
         try {
             if (dir == null) {
-                cp = Runtime.getRuntime().exec(cmd, null);
+                cp = Runtime.getRuntime().exec(cmd, getEnv());
             } else {
-                cp = Runtime.getRuntime().exec(cmd, null, dir);
+                cp = Runtime.getRuntime().exec(cmd, getEnv(), dir);
             }
 
             // Print stdio of cmd
@@ -72,10 +82,12 @@ public class ExecUtility {
                 }
                 String err_line;
                 String in_line;
-                BufferedReader input = new BufferedReader(
-                        new InputStreamReader(cp.getInputStream()));
-                BufferedReader error = new BufferedReader(
-                        new InputStreamReader(cp.getErrorStream()));
+                BufferedReader input =
+                        new BufferedReader(new InputStreamReader(cp
+                                .getInputStream()));
+                BufferedReader error =
+                        new BufferedReader(new InputStreamReader(cp
+                                .getErrorStream()));
                 while (true) {
                     try {
                         cp.exitValue();
@@ -97,15 +109,13 @@ public class ExecUtility {
                         }
                     }
                 }
-                // Read any remaining buffered output from the process 
+                // Read any remaining buffered output from the process
                 // after it terminates
-                while (error.ready())
-                {
+                while (error.ready()) {
                     err_line = error.readLine();
                     perr.println(err_line);
-                } 
-                while (input.ready()) 
-                {
+                }
+                while (input.ready()) {
                     in_line = input.readLine();
                     pout.println(in_line);
                 }
@@ -121,16 +131,17 @@ public class ExecUtility {
     public static Process execCommandLineUtility(String cmd) {
         return execCommandLineUtility(cmd, System.out, null);
     }
-    
+
     public static Process execCommandLineUtility(String[] cmd) {
         return execCommandLineUtility(cmd, System.out, null);
     }
 
-    public static Process execCommandLineUtility(String cmd, OutputStream out,
-            OutputStream err) {
+    public static Process execCommandLineUtility(String cmd,
+                                                 OutputStream out,
+                                                 OutputStream err) {
         return execCommandLineUtility(new String[] {cmd}, out, err);
     }
-    
+
     public static Process execCommandLineUtility(String[] cmd,
                                                  OutputStream out,
                                                  OutputStream err) {
@@ -144,11 +155,11 @@ public class ExecUtility {
         }
         return exec(cmd, null, out, err);
     }
-    
+
     public static Process altExec(String cmd) {
-        return altExec(new String[]{cmd});
+        return altExec(new String[] {cmd});
     }
-    
+
     public static Process altExec(String[] cmd) {
         int result;
         // prepare buffers for process output and error streams
@@ -156,13 +167,13 @@ public class ExecUtility {
         StringBuffer out = new StringBuffer();
 
         try {
-            Process proc = Runtime.getRuntime().exec(cmd);
+            Process proc = Runtime.getRuntime().exec(cmd, getEnv());
             //create thread for reading inputStream (process' stdout)
-            StreamReaderThread outThread = new StreamReaderThread(proc
-                    .getInputStream(), out);
+            StreamReaderThread outThread =
+                    new StreamReaderThread(proc.getInputStream(), out);
             //create thread for reading errorStream (process' stderr)
-            StreamReaderThread errThread = new StreamReaderThread(proc
-                    .getErrorStream(), err);
+            StreamReaderThread errThread =
+                    new StreamReaderThread(proc.getErrorStream(), err);
             //start both threads
             outThread.start();
             errThread.start();
@@ -178,8 +189,7 @@ public class ExecUtility {
                 System.out.println("Process output:\n" + out.toString());
                 System.out.println("Process error:\n" + err.toString());
             } else {
-                System.out.println("Process " + cmd
-                        + " executed successfully");
+                System.out.println("Process " + cmd + " executed successfully");
                 System.out.println("Process output:\n" + out.toString());
                 System.out.println("Process error:\n" + err.toString());
             }
@@ -189,6 +199,31 @@ public class ExecUtility {
             //throw e;
         }
         return null;
+    }
+
+    private static String[] getEnv() {
+
+        ArrayList<String> fixedEnv = new ArrayList<String>();
+
+        Map<String, String> env = new HashMap<String, String>(System.getenv());
+
+        if (!env.containsKey("FEDORA_HOME")
+                && System.getProperty("fedora.home") != null) {
+            env.put("FEDORA_HOME", System.getProperty("fedora.home"));
+        }
+
+        if (!env.containsKey("CATALINA_HOME")
+                && System.getProperty("fedora.home") != null) {
+            env.put("CATALINA_HOME", System.getProperty("fedora.home")
+                    + File.separator + "tomcat");
+        }
+
+        for (String envName : env.keySet()) {
+            fixedEnv.add(String.format("%s=%s", envName, env.get(envName)));
+        }
+
+        return fixedEnv.toArray(new String[0]);
+
     }
 
 }
