@@ -92,8 +92,8 @@
 
                   <systemProperties>
                     <property>
-                        <name>fedora.authorize.access</name>
-                        <value>false</value>
+                      <name>fedora.authorize.access</name>
+                      <value>false</value>
                     </property>
                     <property>
                       <name>logback.configurationFile</name>
@@ -216,10 +216,10 @@
 
                   <systemProperties>
                     <property>
-                        <name>fedora.authorize.access</name>
-                        <value>false</value>
+                      <name>fedora.authorize.access</name>
+                      <value>false</value>
                     </property>
-                  
+
                     <property>
                       <name>logback.configurationFile</name>
                       <value>src/test/resources/logback.xml</value>
@@ -299,8 +299,8 @@
                     <include>**/ContentModelDSInputTest.class</include>
                     <include>**/TestAdminAPI.class</include>
 
-                    <!-- 
-                      Disabled until FCREPO-798 is public 
+                    <!--
+                      Disabled until FCREPO-798 is public
                       <include>**/TestAPIM2.class</include>
                     -->
 
@@ -348,10 +348,10 @@
 
                   <systemProperties>
                     <property>
-                        <name>fedora.authorize.access</name>
-                        <value>true</value>
+                      <name>fedora.authorize.access</name>
+                      <value>true</value>
                     </property>
-                  
+
                     <property>
                       <name>logback.configurationFile</name>
                       <value>src/test/resources/logback.xml</value>
@@ -434,7 +434,7 @@
                     <include>**/TestCommandLineUtilities.class</include>
                     <include>**/TestMisplacedNamespace.class</include>
                     <include>**/TestAdminAPI.class</include>
-                    
+
 
                   </includes>
                   <excludes>
@@ -448,7 +448,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <profile>
       <id>configC</id>
       <activation>
@@ -479,8 +479,8 @@
 
                   <systemProperties>
                     <property>
-                        <name>fedora.authorize.access</name>
-                        <value>true</value>
+                      <name>fedora.authorize.access</name>
+                      <value>true</value>
                     </property>
                     <property>
                       <name>logback.configurationFile</name>
@@ -548,12 +548,12 @@
                     <include>**/TestAPIMLite.class</include>
                     <include>**/TestAuthentication.class</include>
                     <include>**/TestHTTPStatusCodesConfigC.class</include>
-					<!--
-                    <include>**/TestHTTPStatusCodesConfigB.class</include>
+                    <!--
+                      <include>**/TestHTTPStatusCodesConfigB.class</include>
                     -->
                     <include>**/TestManagedDatastreams.class</include>
-					<!--
-                    <include>**/TestManagementNotifications.class</include>
+                    <!--
+                      <include>**/TestManagementNotifications.class</include>
                     -->
                     <include>**/TestRelationships.class</include>
                     <include>**/TestRESTAPI.class</include>
@@ -565,7 +565,7 @@
                     <include>**/SharedDeploymentTests.class</include>
                     <include>**/TestAdminAPI.class</include>
                     <!--
-                    <include>**/TestXACMLPolicies.class</include>
+                      <include>**/TestXACMLPolicies.class</include>
                     -->
                     <include>**/ContentModelDSInputTest.class</include>
                     <include>**/TestCommandLineUtilities.class</include>
