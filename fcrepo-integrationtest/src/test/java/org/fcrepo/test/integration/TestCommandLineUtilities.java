@@ -35,49 +35,62 @@ public class TestCommandLineUtilities
 
     static TestCommandLineUtilities curTest = null;
 
+    private static final String RESOURCEBASE =
+        "src/test/resources/test-objects/foxml/cli-utils";
+
+    private static final String LOGDIR =
+        RESOURCEBASE + "/logs";
+
+    private static final String BUILDDIR =
+        RESOURCEBASE + "/temp";
+
+    private static File logDir = null;
+    private static File buildDir = null;
+
+
     public static Test suite() {
         TestSuite suite = new TestSuite("Command Line Utilities TestSuite");
         suite.addTestSuite(TestCommandLineUtilities.class);
         return new DemoObjectTestSetup(suite);
     }
 
-    public void testFedoraPurgeAndIngest() {
-        System.out.println("Purging object demo:5");
-        System.out.println("FEDORA-HOME = " + FEDORA_HOME);
-        purgeUsingScript("demo:5");
-        assertEquals("Expected empty STDERR output, got '" + sbErr.toString()
-                     + "'", 0, sbErr.size());
-        System.out.println("Re-ingesting object demo:5");
-        ingestFoxmlFile(new File(FEDORA_HOME
-                                 + "/client/demo/foxml/local-server-demos/simple-image-demo/obj_demo_5.xml"));
+    public void testFedoraIngestAndPurge() {
+        System.out.println("Ingesting object test:1001");
+        ingestFoxmlFile(new File(RESOURCEBASE
+                                 + "/test1001.xml"));
         String out = sbOut.toString();
         String err = sbErr.toString();
-        if (out.indexOf("Ingested pid: demo:5") == -1) {
+        if (out.indexOf("Ingested pid: test:1001") == -1) {
             System.err.println("Command-line ingest failed: STDOUT='" + out
                                + "', STDERR='" + err + "'");
         }
-        assertEquals(true, out.indexOf("Ingested pid: demo:5") != -1);
-        System.out.println("Purge and ingest test succeeded");
+        assertEquals(true, out.indexOf("Ingested pid: test:1001") != -1);
+
+        System.out.println("Purging object test:1001");
+        System.out.println("FEDORA-HOME = " + FEDORA_HOME);
+        purgeUsingScript("test:1001");
+        assertEquals("Expected empty STDERR output, got '" + sbErr.toString()
+                     + "'", 0, sbErr.size());
+
+        System.out.println("Ingest and purge test succeeded");
     }
 
-    public void DISABLEDBatchBuildAndBatchIngestAndPurge() throws Exception {
+    public void testBatchBuildAndBatchIngestAndPurge() throws Exception {
         System.out.println("Building batch objects");
-        batchBuild(new File(FEDORA_HOME
-                            + "/client/demo/batch-demo/foxml-template.xml"),
-                   new File(FEDORA_HOME
-                            + "/client/demo/batch-demo/object-specifics"),
-                   new File(FEDORA_HOME + "/client/demo/batch-demo/objects"),
-                   new File(FEDORA_HOME + "/client/logs/build.log"));
-        String out = sbOut.toString();
+        batchBuild(new File(RESOURCEBASE
+                            + "/templates/foxml-template.xml"),
+                   new File(RESOURCEBASE
+                            + "/batch-objs"),
+                   buildDir,
+                   new File(LOGDIR + "/build.log"));
         String err = sbErr.toString();
         assertEquals(err,
                      true,
                      err
                              .indexOf("10 Fedora FOXML XML documents successfully created") != -1);
         System.out.println("Ingesting batch objects");
-        batchIngest(new File(FEDORA_HOME + "/client/demo/batch-demo/objects"),
-                    new File(FEDORA_HOME + "/server/logs/junit_ingest.log"));
-        out = sbOut.toString();
+        batchIngest(buildDir,
+                    new File(LOGDIR + "/junit_ingest.log"));
         err = sbErr.toString();
         if (err.indexOf("10 objects successfully ingested into Fedora") == -1) {
             System.out
@@ -88,25 +101,23 @@ public class TestCommandLineUtilities
                 .indexOf("10 objects successfully ingested into Fedora") != -1,
                      true);
         String batchObjs[] =
-                {"demo:3010", "demo:3011", "demo:3012", "demo:3013",
-                 "demo:3014", "demo:3015", "demo:3016", "demo:3017",
-                 "demo:3018", "demo:3019"};
+                {"test:0001", "test:0002", "test:0003", "test:0004",
+                 "test:0005", "test:0006", "test:0007", "test:0008",
+                 "test:0009", "test:0010"};
         System.out.println("Purging batch objects");
         purgeFast(batchObjs);
         System.out.println("Build and ingest test succeeded");
     }
 
-    public void DISABLEDBatchBuildIngestAndPurge() throws Exception {
+    public void testBatchBuildIngestAndPurge() throws Exception {
         System.out.println("Building and Ingesting batch objects");
-        batchBuildIngest(new File(FEDORA_HOME
-                                  + "/client/demo/batch-demo/foxml-template.xml"),
-                         new File(FEDORA_HOME
-                                  + "/client/demo/batch-demo/object-specifics"),
-                         new File(FEDORA_HOME
-                                  + "/client/demo/batch-demo/objects"),
-                         new File(FEDORA_HOME
-                                  + "/server/logs/junit_buildingest.log"));
-        String out = sbOut.toString();
+        batchBuildIngest(new File(RESOURCEBASE
+                                  + "/templates/foxml-template.xml"),
+                         new File(RESOURCEBASE
+                                  + "/batch-objs"),
+                         buildDir,
+                         new File(LOGDIR
+                                  + "/junit_buildingest.log"));
         String err = sbErr.toString();
         assertEquals("Response did not contain expected string re: FOXML XML documents: <reponse>"
                      + err + "</response>",
@@ -119,9 +130,9 @@ public class TestCommandLineUtilities
                              .indexOf("10 objects successfully ingested into Fedora") != -1,
                      true);
         String batchObjs[] =
-                {"demo:3010", "demo:3011", "demo:3012", "demo:3013",
-                 "demo:3014", "demo:3015", "demo:3016", "demo:3017",
-                 "demo:3018", "demo:3019"};
+                {"test:0001", "test:0002", "test:0003", "test:0004",
+                 "test:0005", "test:0006", "test:0007", "test:0008",
+                 "test:0009", "test:0010"};
         System.out.println("Purging batch objects");
         purgeFast(batchObjs);
         System.out.println("Build/ingest test succeeded");
@@ -131,9 +142,9 @@ public class TestCommandLineUtilities
         // Note: test will fail if default control group for DC datastreams (fedora.fcfg) is not X
         // as the modify script specifies control group "X" when modifying DC
         System.out.println("Running batch modify of objects");
-        batchModify(new File(FEDORA_HOME
-                             + "/client/demo/batch-demo/modify-batch-directives.xml"),
-                    new File(FEDORA_HOME + "/server/logs/junit_modify.log"));
+        batchModify(new File(RESOURCEBASE
+                             + "/modify-batch-directives.xml"),
+                    new File(LOGDIR + "/junit_modify.log"));
         String out = sbOut.toString();
         String err = sbErr.toString();
         if (out.indexOf("25 modify directives successfully processed.") == -1) {
@@ -148,26 +159,35 @@ public class TestCommandLineUtilities
                 .indexOf("25 modify directives successfully processed.") == -1);
         assertEquals(false, out.indexOf("0 modify directives failed.") == -1);
         System.out.println("Purging batch modify object");
-        purgeFast("demo:32");
+        purgeFast("test:1002");
         System.out.println("Batch modify test succeeded");
     }
 
     public void testExport() {
         System.out.println("Testing fedora-export");
+        System.out.println("Ingesting object test:1001");
+        ingestFoxmlFile(new File(RESOURCEBASE
+                                 + "/test1001.xml"));
+        String out = sbOut.toString();
+        String err = sbErr.toString();
+        if (out.indexOf("Ingested pid: test:1001") == -1) {
+            System.err.println("Command-line ingest failed: STDOUT='" + out
+                               + "', STDERR='" + err + "'");
+        }
+        assertEquals(true, out.indexOf("Ingested pid: test:1001") != -1);
+
         File outFile =
-                new File(FEDORA_HOME + "/client/demo/batch-demo/demo_5.xml");
-        String absPath = outFile.getAbsolutePath();
+                new File(RESOURCEBASE + "/test_1001.xml");
         if (outFile.exists()) {
             outFile.delete();
         }
-        System.out.println("Exporting object demo:5");
-        exportObj("demo:5", new File(FEDORA_HOME + "/client/demo/batch-demo"));
-        String out = sbOut.toString();
-        String err = sbErr.toString();
-        assertEquals(out.indexOf("Exported demo:5") != -1, true);
+        System.out.println("Exporting object test:1001");
+        exportObj("test:1001", new File(RESOURCEBASE));
+        out = sbOut.toString();
+        err = sbErr.toString();
+        assertEquals(out.indexOf("Exported test:1001") != -1, true);
         File outFile2 =
-                new File(FEDORA_HOME + "/client/demo/batch-demo/demo_5.xml");
-        String absPath2 = outFile2.getAbsolutePath();
+                new File(RESOURCEBASE + "/test_1001.xml");
         assertEquals(outFile2.exists(), true);
         System.out.println("Deleting exported file");
         if (outFile2.exists()) {
@@ -227,7 +247,6 @@ public class TestCommandLineUtilities
             execute(FEDORA_HOME + "/server/bin/validate-policy", element
                     .getAbsolutePath());
             String out = sbOut.toString();
-            String err = sbErr.toString();
 
             if (expectValid) {
                 assertTrue("Expected \"Validation successful\", but received \""
@@ -238,20 +257,6 @@ public class TestCommandLineUtilities
                            + out + "\"", out.indexOf("Validation failed") != -1);
             }
         }
-    }
-
-    private void ingestFoxmlDirectory(File dir) {
-        execute(FEDORA_HOME + "/client/bin/fedora-ingest",
-                "d",
-                dir.getAbsolutePath(),
-                FOXML1_1.uri,
-                "DMO",
-                getHost() + ":" + getPort(),
-                getUsername(),
-                getPassword(),
-                getProtocol(),
-                "junit ingest",
-                getFedoraAppServerContext());
     }
 
     private void ingestFoxmlFile(File f) {
@@ -381,6 +386,43 @@ public class TestCommandLineUtilities
     public void setUp() throws Exception {
         sbOut = new ByteArrayOutputStream();
         sbErr = new ByteArrayOutputStream();
+
+        System.out.println("Creating temporary build and log directories");
+        buildDir = new File(BUILDDIR);
+        if(!buildDir.exists()) {
+            buildDir.mkdir();
+        }
+
+        logDir = new File(LOGDIR);
+        if(!logDir.exists()) {
+            logDir.mkdir();
+        }
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        System.out.println("Deleting temporary build and log directories");
+        if (buildDir.exists() && buildDir.isDirectory()) {
+            String[] list = buildDir.list();
+            if (list != null) {
+               for (int i = 0; i < list.length; i++) {
+                   File entry = new File(buildDir, list[i]);
+                   entry.delete();
+                }
+            }
+            buildDir.delete();
+        }
+
+        if (logDir.exists() && logDir.isDirectory()) {
+            String[] list = logDir.list();
+            if (list != null) {
+               for (int i = 0; i < list.length; i++) {
+                   File entry = new File(logDir, list[i]);
+                   entry.delete();
+               }
+            }
+            logDir.delete();
+        }
     }
 
     public static void main(String[] args) {
