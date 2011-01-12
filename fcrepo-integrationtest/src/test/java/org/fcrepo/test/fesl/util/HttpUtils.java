@@ -29,6 +29,7 @@ import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
@@ -61,6 +62,9 @@ public class HttpUtils {
             httpHost =
                     new HttpHost(url.getHost(), url.getPort(), url
                             .getProtocol());
+            // default timeouts are zero, so set some
+            HttpConnectionParams.setConnectionTimeout(client.getParams(), 1000 * 30); // 60 seconds
+            HttpConnectionParams.setSoTimeout(client.getParams(), 1000 * 30); // 60 seconds
 
             if (username != null && password != null) {
                 httpContext.setAttribute("preemptive-auth", basicAuth);

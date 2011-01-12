@@ -10,10 +10,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
+import java.util.ArrayList;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
-
-import org.apache.axis.types.NonNegativeInteger;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -78,6 +77,8 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
 
     private FedoraAPIM apim = null;
 
+    private PolicyIndexUtils policyIndexUtils = null;
+
     private static String POLICY_DATASTREAM = FedoraPolicyStore.POLICY_DATASTREAM;
 
     //private PolicyUtils policyUtils = null;
@@ -118,6 +119,8 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
             httpUtils = new HttpUtils(getBaseURL(), "testuser", "testuser");
 
             apim = getFedoraClient().getAPIM();
+
+            policyIndexUtils = new PolicyIndexUtils(apim);
 
             LoadDataset.load(fedoraUrl, username, password);
 
@@ -256,15 +259,15 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         String pid, pidA, pidB;
 
         // add non-policy object
-        pid = addPolicyObject("X", "A", null);
+        pid = policyIndexUtils.addPolicyObject("X", "A", null);
 
         // check policies not in force
         assertFalse(checkPolicyEnforcement("A"));
         assertFalse(checkPolicyEnforcement("B"));
 
         // add policy objects
-        pidA = addPolicyObject("A", "A", "A");
-        pidB = addPolicyObject("B", "A", "A");
+        pidA =  policyIndexUtils.addPolicyObject("A", "A", "A");
+        pidB =  policyIndexUtils.addPolicyObject("B", "A", "A");
 
         // check policies in force
         assertTrue(checkPolicyEnforcement("A"));
@@ -302,8 +305,8 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         // add policy objects
         assertFalse(checkPolicyEnforcement("A"));
         assertFalse(checkPolicyEnforcement("B"));
-        pidA = addPolicyObject("A", "A", "A");
-        pidB = addPolicyObject("B", "A", "A");
+        pidA =  policyIndexUtils.addPolicyObject("A", "A", "A");
+        pidB =  policyIndexUtils.addPolicyObject("B", "A", "A");
         assertTrue(checkPolicyEnforcement("A"));
         assertTrue(checkPolicyEnforcement("B"));
 
@@ -373,7 +376,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         assertTrue(checkPolicyEnforcement("B"));
 
         // add policy A object with object state inactive
-        pidA = addPolicyObject("A", "I", "A");
+        pidA =  policyIndexUtils.addPolicyObject("A", "I", "A");
 
         // check policy A not in force
         assertFalse(checkPolicyEnforcement("A"));
@@ -400,7 +403,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         apim.purgeObject(pidA, "purging A", false);
 
         // add policy object with object state and datastream state inactive
-        pidA = addPolicyObject("A", "I", "I");
+        pidA =  policyIndexUtils.addPolicyObject("A", "I", "I");
 
         // check policy A not in force
         assertFalse(checkPolicyEnforcement("A"));
@@ -493,7 +496,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         String pid;
 
         // add policy A object
-        pid = addPolicyObject("A", "A", "A");
+        pid =  policyIndexUtils.addPolicyObject("A", "A", "A");
 
         // check policy A in force
         assertTrue(checkPolicyEnforcement("A"));
@@ -515,7 +518,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         assertFalse(checkPolicyEnforcement("A"));
 
         // modify by value to policy B
-        apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null, getPolicy("B").getBytes("UTF-8"), null, null, "modify to policy B", false);
+        apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null,  PolicyIndexUtils.getPolicy("B").getBytes("UTF-8"), null, null, "modify to policy B", false);
 
         // check policy B in force
         assertTrue(checkPolicyEnforcement("B"));
@@ -524,7 +527,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         assertFalse(checkPolicyEnforcement("A"));
 
         // modify by value to policy A (needed for version purge test, or will revert back to the invalid version pending FCREPO-770)
-        apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null, getPolicy("A").getBytes("UTF-8"), null, null, "modify to policy B", false);
+        apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null,  PolicyIndexUtils.getPolicy("A").getBytes("UTF-8"), null, null, "modify to policy B", false);
         // check
         assertTrue(checkPolicyEnforcement("A"));
         assertFalse(checkPolicyEnforcement("B"));
@@ -545,7 +548,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         assertFalse(checkPolicyEnforcement("B"));
 
         // add datastream  state inactive, policy A
-        String pidTemp = addPolicyObject("A", "A", "A");
+        String pidTemp =  policyIndexUtils.addPolicyObject("A", "A", "A");
         apim.addDatastream(pid, POLICY_DATASTREAM, null, "FESL policy datastream", true, "text/xml", null, fedoraUrl + "/objects/" + pidTemp + "/datastreams/FESLPOLICY/content", "M", "I", null, null, "add policy datastream by reference");
         apim.purgeObject(pidTemp, "removing temp object", false);
 
@@ -583,7 +586,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         // add Policy A datastream object (for content)
         // add datastream by reference, from this new object
         // purge the new object
-        pidTemp = addPolicyObject("A", "A", "A");
+        pidTemp =  policyIndexUtils.addPolicyObject("A", "A", "A");
         apim.addDatastream(pid, POLICY_DATASTREAM, null, "FESL policy datastream", true, "text/xml", null, fedoraUrl + "/objects/" + pidTemp + "/datastreams/FESLPOLICY/content", "M", "A", null, null, "add policy datastream by reference");
         apim.purgeObject(pidTemp, "removing temp object", false);
 
@@ -591,7 +594,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         assertTrue(checkPolicyEnforcement("A"));
 
         // modify datastream by reference to policy B (as above, by reference from a temp object created then purged afterwards)
-        pidTemp = addPolicyObject("B", "A", "A");
+        pidTemp =  policyIndexUtils.addPolicyObject("B", "A", "A");
         apim.modifyDatastreamByReference(pid, POLICY_DATASTREAM, null, "FESL policy datastream", "text/xml", null, fedoraUrl + "/objects/" + pidTemp + "/datastreams/FESLPOLICY/content", null, null, "modiy FESLPOLICY to policy B", false);
         apim.purgeObject(pidTemp, "removing temp object", false);
 
@@ -608,7 +611,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         assertTrue(checkPolicyEnforcement("B"));
 
         // modify datastream by reference to policy A - as per above
-        pidTemp = addPolicyObject("A", "A", "A");
+        pidTemp =  policyIndexUtils.addPolicyObject("A", "A", "A");
         apim.modifyDatastreamByReference(pid, POLICY_DATASTREAM, null, "FESL policy datastream", "text/xml", null, fedoraUrl + "/objects/" + pidTemp + "/datastreams/FESLPOLICY/content", null, null, "modiy FESLPOLICY to policy B", false);
         apim.purgeObject(pidTemp, "removing temp object", false);
 
@@ -622,7 +625,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         apim.setDatastreamVersionable(pid, POLICY_DATASTREAM, true, "");
 
         // modify datastream by reference to policy B
-        pidTemp = addPolicyObject("B", "A", "A");
+        pidTemp =  policyIndexUtils.addPolicyObject("B", "A", "A");
         apim.modifyDatastreamByReference(pid, POLICY_DATASTREAM, null, "FESL policy datastream", "text/xml", null, fedoraUrl + "/objects/" + pidTemp + "/datastreams/FESLPOLICY/content", null, null, "modiy FESLPOLICY to policy B", false);
         apim.purgeObject(pidTemp, "removing temp object", false);
 
@@ -635,112 +638,119 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
 
     }
 
-    // TODO: add some stress testing (particularly for FCREPO-576)
-    // would be good to add some concurrency testing as well
-    /*
+    // some stress testing - concurrent adds, reads, deletes
 
     @Test
     public void testManyModifications() throws Exception {
-        // add object with no policy
 
-        // add datastream by reference
+        final int updatersCount = 5; // number of concurrent update threads
+        final int updatersPolicyCount = 10; // number of policies each update thread adds/reads/deletes
+        final int readersCount = 10; // number of concurrent read threads
 
-        // check policy A in force
 
-        for (int i = 0 ; i < 50 ; i++) {
-            // modify to policy A
+        ArrayList<PolicyIndexExerciser> updaters = new ArrayList<PolicyIndexExerciser>();
+        ArrayList<PolicyIndexExerciser> readers = new ArrayList<PolicyIndexExerciser>();
 
-            // modify to policy B
 
+        // construct the updaters
+        for (int e = 0; e < updatersCount; e++) {
+            // get the pids
+            String[] pids =  policyIndexUtils.getNextPids(updatersPolicyCount);
+            PolicyIndexExerciser ex = new PolicyIndexExerciser(getBaseURL(),
+                                                                 "testuser",
+                                                                 "testuser",
+                                                                 fedoraUrl,
+                                                                 username,
+                                                                 password,
+                                                                 pids);
+            updaters.add(ex);
+        }
+        // and the readers
+        for (int e = 0; e < readersCount; e++) {
+            // get the pids
+            PolicyIndexExerciser ex = new PolicyIndexExerciser(getBaseURL(),
+                                                                 "testuser",
+                                                                 "testuser"
+                                                                 );
+            readers.add(ex);
         }
 
-        // check policy B in force
+        // kick them all off, readers first
+        for (PolicyIndexExerciser ex : readers) {
+            ex.start();
+        }
+        for (PolicyIndexExerciser ex : updaters) {
+            ex.start();
+        }
 
-        // check policy A not in force
-    }
-    */
+        // wait until at least one updater has actually started
+        int maxSleepSeconds = 20;
+        while (PolicyIndexExerciser.updaterRunningCount() == 0) {
+            Thread.sleep(1000);
+            maxSleepSeconds--;
+            if (maxSleepSeconds == 0)
+                // serious problem if none of the threads have started
+                Assert.fail("No threads have started");
+        }
 
-    // helper methods
+        // wait until they have all finished
+        maxSleepSeconds = 60 * 10; // try for 10 mins, probably way too long...
+        while (PolicyIndexExerciser.updaterRunningCount() > 0) {
+            Thread.sleep(1000); // wait a second
+            maxSleepSeconds--;
+            if (maxSleepSeconds == 0) {
+                break;
+            }
+        }
 
-    /**
-     * add a new policy object, specifying
-     *    policy name (full name is test-policy-X.xml, where X is supplied name, see test-objects/xacml
-     *      (use A, B)
-     *    object state (A, I, D)
-     *    datastream state (A, I, D)
-     *
-     * If datastream state is null, no datastream is created (ie this is a policy object without a policy datastream,
-     * or, a generic object)
-     *
-     * returns:
-     *   PID of object created
-     * @throws IOException
-     *
-     */
-    private String addPolicyObject(String policy, String objectState, String datastreamState) throws IOException {
-        // nb, must be in demo: namespace for tearDown to purge
-        String pid = apim.getNextPID(new NonNegativeInteger("1"), "demo")[0];
+        // stop the readers
+        for (PolicyIndexExerciser ex : readers) {
+            ex.stopit();
+        }
 
-        StringBuilder foxml = new StringBuilder();
-        if (datastreamState != null)
-            if (!"AID".contains(datastreamState))
-                throw new RuntimeException("Invalid datastreamState parameter " + datastreamState);
-        if (!"AID".contains(objectState))
-            throw new RuntimeException("Invalid datastreamState parameter " + datastreamState);
-
-        foxml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        foxml.append("<foxml:digitalObject VERSION=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
-        foxml.append("    xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\"\n");
-        foxml.append("           xsi:schemaLocation=\"" + Constants.FOXML.uri
-                     + " " + Constants.FOXML1_1.xsdLocation + "\"");
-        foxml.append("\n           PID=\"" + StreamUtility.enc(pid)
-                         + "\">\n");
-        foxml.append("  <foxml:objectProperties>\n");
-        foxml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"" + objectState + "\"/>\n");
-        foxml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\""
-                + StreamUtility.enc("test policy object") + "\"/>\n");
-        foxml.append("  </foxml:objectProperties>\n");
-
-        // policy datastream, unless null/empty string specified
-        if (datastreamState != null) {
-            foxml.append("<foxml:datastream ID=\"" + FedoraPolicyStore.POLICY_DATASTREAM + "\" STATE=\"" + datastreamState
-                         + "\" CONTROL_GROUP=\"X\">");
-            foxml.append("<foxml:datastreamVersion ID=\"POLICY.0\" MIMETYPE=\"text/xml\" LABEL=\"XACML policy datastream\">");
-
-            foxml.append("  <foxml:xmlContent>");
-
-            // the policy
-            foxml.append(getPolicy(policy));
-
-            foxml.append("    </foxml:xmlContent>");
-
-            foxml.append("  </foxml:datastreamVersion>");
-            foxml.append("</foxml:datastream>");
+        // wait until they have actually finished
+        maxSleepSeconds = 60 * 5; // try for 5 mins, probably way too long...
+        while (PolicyIndexExerciser.readerRunningCount() > 0) {
+            Thread.sleep(1000); // wait a second
+            maxSleepSeconds--;
+            if (maxSleepSeconds == 0) {
+                break;
+            }
         }
 
 
-        foxml.append("</foxml:digitalObject>");
+        // report any failures
+        for (PolicyIndexExerciser ex : updaters) {
+            if (ex.failed()) {
+                System.out.println("PolicyIndexExerciser failed.  Last URL was: " + ex.lastUrl());
+                System.out.println("Error was: " + ex.failure().getMessage());
+            }
+        }
+        // report any failures
+        for (PolicyIndexExerciser ex : readers) {
+            if (ex.failed()) {
+                System.out.println("PolicyIndexExerciser failed.  Last URL was: " + ex.lastUrl());
+                System.out.println("Error was: " + ex.failure().getMessage());
+            }
+        }
 
-        apim.ingest(foxml.toString().getBytes("UTF-8"), FOXML1_1.uri,
-                    "ingesting new foxml object");
+        // check for non-completed exercisers
+        assertTrue("Some policy index exercisers did not complete", PolicyIndexExerciser.updaterRunningCount() == 0);
+        assertTrue("Some policy index exercisers did not complete", PolicyIndexExerciser.readerRunningCount() == 0);
 
-        return pid;
+        // check for failures
+        assertTrue("Some policy index operations reported errors", PolicyIndexExerciser.updaterPassedCount() == updatersCount);
+        assertTrue("Some policy index operations reported errors", PolicyIndexExerciser.readerPassedCount() == readersCount);
+
+        // check no policies active
+        assertFalse(checkPolicyEnforcement("A"));
+        assertFalse(checkPolicyEnforcement("B"));
+
+
+
+
+
     }
-
-    private String getPolicy(String policy) throws IOException {
-
-        StringBuilder sb = new StringBuilder();
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("src/test/resources/test-objects/xacml/test-policy-" + policy + ".xml"),"UTF-8"));
-        String ln;
-        while ((ln = br.readLine()) != null)
-            sb.append(ln + "\n");
-        return sb.toString();
-
-
-    }
-
-
 
     /**
      * Check policy enforcement for specified policy
@@ -768,5 +778,6 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         }
         return permitted;
     }
+
 
 }

@@ -349,11 +349,7 @@ extends AbstractInvocationHandler {
             // make sure stream is closed - with Akubra on Windows this can leave the stream open
             // and leave the file locked (prevents a purge later)
             dsContent.close();
-            if (policyIndex.contains(pid)) {
-                policyIndex.updatePolicy(pid, policy);
-            } else {
-                policyIndex.addPolicy(policy, pid);
-            }
+            policyIndex.addPolicy(policy, pid);
         } catch (IOException e) {
             throw new GeneralException("Error adding policy " + pid + " to policy index: " + e.getMessage(), e);
         } catch (PolicyIndexException e) {
@@ -374,9 +370,7 @@ extends AbstractInvocationHandler {
 
         try {
             // in case the policy doesn't exist (corrupt policy index, failed to add because invalid, etc)
-            if (policyIndex.contains(pid)) {
-                policyIndex.deletePolicy(pid);
-            }
+            policyIndex.deletePolicy(pid);
         } catch (PolicyIndexException e) {
             throw new GeneralException("Error deleting policy " + pid + " from policy index: " + e.getMessage(), e);
         }
