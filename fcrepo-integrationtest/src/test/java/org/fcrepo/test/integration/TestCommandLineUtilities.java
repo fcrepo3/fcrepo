@@ -166,14 +166,13 @@ public class TestCommandLineUtilities
     public void testBatchPurge() throws Exception {
         System.out.println("Batch purging objects from file containing PIDs");
         /* first ingest the objects */
-        batchBuildIngest(new File(FEDORA_HOME
-                                  + "/client/demo/batch-demo/foxml-template.xml"),
-                         new File(FEDORA_HOME
-                                  + "/client/demo/batch-demo/object-specifics"),
-                         new File(FEDORA_HOME
-                                  + "/client/demo/batch-demo/objects"),
-                         new File(FEDORA_HOME
-                                  + "/server/logs/junit_buildingestpurge.log"));
+        batchBuildIngest(new File(RESOURCEBASE
+                                  + "/templates/foxml-template.xml"),
+                         new File(RESOURCEBASE
+                                  + "/batch-objs"),
+                         buildDir,
+                         new File(LOGDIR
+                                  + "/junit_buildingest.log"));
         /* try to purge from a bogus file */
         batchPurge(new File("/bogus/file"));
         String out = sbOut.toString();
