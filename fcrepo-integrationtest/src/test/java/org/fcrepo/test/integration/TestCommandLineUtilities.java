@@ -111,7 +111,6 @@ public class TestCommandLineUtilities
 
     public void testBatchBuildIngestAndPurge() throws Exception {
         System.out.println("Building and Ingesting batch objects");
-<<<<<<< HEAD
         batchBuildIngest(new File(RESOURCEBASE
                                   + "/templates/foxml-template.xml"),
                          new File(RESOURCEBASE
@@ -119,19 +118,6 @@ public class TestCommandLineUtilities
                          buildDir,
                          new File(LOGDIR
                                   + "/junit_buildingest.log"));
-=======
-        batchBuildIngest(new File(FEDORA_HOME
-                                  + "/client/demo/batch-demo/foxml-template.xml"),
-                         new File(FEDORA_HOME
-                                  + "/client/demo/batch-demo/object-specifics"),
-                         new File(FEDORA_HOME
-                                  + "/client/demo/batch-demo/objects"),
-                         new File(FEDORA_HOME
-                                  + "/server/logs/junit_buildingest.log"));
-
-
-        String out = sbOut.toString();
->>>>>>> 3bdc444... FCREPO-756: Batch purge objects from the command line
         String err = sbErr.toString();
         assertEquals("Response did not contain expected string re: FOXML XML documents: <reponse>"
                      + err + "</response>",
