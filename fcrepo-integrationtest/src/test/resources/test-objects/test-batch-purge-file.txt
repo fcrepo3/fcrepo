@@ -1,0 +1,15 @@
+# Test objects for AutoPurge batch purge of PIDs from a file
+# One pid per line, ignore comments and whitespace (uses PidFileIterator)
+test:0001
+
+test:0002
+test:0003
+test:0004
+test:0005
+test:0006
+test:0007
+test:0008
+
+# Another comment
+test:0009
+test:0010
