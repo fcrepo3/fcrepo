@@ -20,12 +20,14 @@
     <fedora.password>fedoraAdmin</fedora.password>
 
     <fedora.hostname>localhost</fedora.hostname>
-    <fedora.port>9080</fedora.port>
+    <fedora.port>8080</fedora.port>
     <fedora.appServerContext>fedora</fedora.appServerContext>
-    <fedora.baseURL>http://localhost:9080/fedora</fedora.baseURL>
+    <fedora.baseURL>http://localhost:8080/fedora</fedora.baseURL>
 
-    <tomcat.port.ssl>9443</tomcat.port.ssl>
-    <tomcat.port.shutdown>9005</tomcat.port.shutdown>
+    <tomcat.home>${fedora.home}/tomcat</tomcat.home>
+    <tomcat.url>${fedora.baseURL}</tomcat.url>
+    <tomcat.port.ssl>8443</tomcat.port.ssl>
+    <tomcat.port.shutdown>8005</tomcat.port.shutdown>
 
     <org.apache.activemq.default.directory.prefix>${project.build.directory}</org.apache.activemq.default.directory.prefix>
   </properties>
@@ -38,7 +40,7 @@
 
     <resources>
       <resource>
-        <directory>resources/confg</directory>
+        <directory>src/test/resources/confg</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
@@ -82,8 +84,67 @@
           <value>Q</value>
         </property>
       </activation>
+
+      <properties>
+        <install.properties>${project.build.directory}/test-classes/config/ConfigQ.properties</install.properties>
+      </properties>
+
       <build>
         <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>start-fedora</id>
+                <phase>pre-integration-test</phase>
+                <configuration>
+                  <target>
+                    <echo>Installing Fedora</echo>
+                    <ant antfile="src/test/scripts/installer-run.xml"
+                      target="install" inheritrefs="true" />
+                    <echo>Starting Fedora</echo>
+                    <ant antfile="src/test/scripts/tomcat-run.xml"
+                      target="tomcat-start" inheritrefs="true" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+
+              <execution>
+                <id>stop-fedora</id>
+                <phase>post-integration-test</phase>
+                <configuration>
+                  <target>
+                    <echo>Stopping Fedora</echo>
+                    <ant antfile="src/test/scripts/tomcat-run.xml"
+                      target="tomcat-stop" inheritrefs="true" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>ant-contrib</groupId>
+                <artifactId>ant-contrib</artifactId>
+                <version>1.0b3</version>
+                <exclusions>
+                  <exclusion>
+                    <groupId>ant</groupId>
+                    <artifactId>ant</artifactId>
+                  </exclusion>
+                </exclusions>
+              </dependency>
+            </dependencies>
+          </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
@@ -174,8 +235,67 @@
           <value>A</value>
         </property>
       </activation>
+
+      <properties>
+        <install.properties>${project.build.directory}/test-classes/config/ConfigQ.properties</install.properties>
+      </properties>
+
       <build>
         <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>start-fedora</id>
+                <phase>pre-integration-test</phase>
+                <configuration>
+                  <target>
+                    <echo>Installing Fedora</echo>
+                    <ant antfile="src/test/scripts/installer-run.xml"
+                      target="install" inheritrefs="true" />
+                    <echo>Starting Fedora</echo>
+                    <ant antfile="src/test/scripts/tomcat-run.xml"
+                      target="tomcat-start" inheritrefs="true" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+
+              <execution>
+                <id>stop-fedora</id>
+                <phase>post-integration-test</phase>
+                <configuration>
+                  <target>
+                    <echo>Stopping Fedora</echo>
+                    <ant antfile="src/test/scripts/tomcat-run.xml"
+                      target="tomcat-stop" inheritrefs="true" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>ant-contrib</groupId>
+                <artifactId>ant-contrib</artifactId>
+                <version>1.0b3</version>
+                <exclusions>
+                  <exclusion>
+                    <groupId>ant</groupId>
+                    <artifactId>ant</artifactId>
+                  </exclusion>
+                </exclusions>
+              </dependency>
+            </dependencies>
+          </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
@@ -272,8 +392,67 @@
           <value>B</value>
         </property>
       </activation>
+
+      <properties>
+        <install.properties>${project.build.directory}/test-classes/config/ConfigQ.properties</install.properties>
+      </properties>
+
       <build>
         <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>start-fedora</id>
+                <phase>pre-integration-test</phase>
+                <configuration>
+                  <target>
+                    <echo>Installing Fedora</echo>
+                    <ant antfile="src/test/scripts/installer-run.xml"
+                      target="install" inheritrefs="true" />
+                    <echo>Starting Fedora</echo>
+                    <ant antfile="src/test/scripts/tomcat-run.xml"
+                      target="tomcat-start" inheritrefs="true" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+
+              <execution>
+                <id>stop-fedora</id>
+                <phase>post-integration-test</phase>
+                <configuration>
+                  <target>
+                    <echo>Stopping Fedora</echo>
+                    <ant antfile="src/test/scripts/tomcat-run.xml"
+                      target="tomcat-stop" inheritrefs="true" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>ant-contrib</groupId>
+                <artifactId>ant-contrib</artifactId>
+                <version>1.0b3</version>
+                <exclusions>
+                  <exclusion>
+                    <groupId>ant</groupId>
+                    <artifactId>ant</artifactId>
+                  </exclusion>
+                </exclusions>
+              </dependency>
+            </dependencies>
+          </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
@@ -370,8 +549,67 @@
           <value>C</value>
         </property>
       </activation>
+
+      <properties>
+        <install.properties>${project.build.directory}/test-classes/config/ConfigQ.properties</install.properties>
+      </properties>
+
       <build>
         <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>start-fedora</id>
+                <phase>pre-integration-test</phase>
+                <configuration>
+                  <target>
+                    <echo>Installing Fedora</echo>
+                    <ant antfile="src/test/scripts/installer-run.xml"
+                      target="install" inheritrefs="true" />
+                    <echo>Starting Fedora</echo>
+                    <ant antfile="src/test/scripts/tomcat-run.xml"
+                      target="tomcat-start" inheritrefs="true" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+
+              <execution>
+                <id>stop-fedora</id>
+                <phase>post-integration-test</phase>
+                <configuration>
+                  <target>
+                    <echo>Stopping Fedora</echo>
+                    <ant antfile="src/test/scripts/tomcat-run.xml"
+                      target="tomcat-stop" inheritrefs="true" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>ant-contrib</groupId>
+                <artifactId>ant-contrib</artifactId>
+                <version>1.0b3</version>
+                <exclusions>
+                  <exclusion>
+                    <groupId>ant</groupId>
+                    <artifactId>ant</artifactId>
+                  </exclusion>
+                </exclusions>
+              </dependency>
+            </dependencies>
+          </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
