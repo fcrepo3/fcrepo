@@ -237,7 +237,7 @@
       </activation>
 
       <properties>
-        <install.properties>${project.build.directory}/test-classes/config/ConfigQ.properties</install.properties>
+        <install.properties>${project.build.directory}/test-classes/config/ConfigA.properties</install.properties>
       </properties>
 
       <build>
@@ -394,7 +394,7 @@
       </activation>
 
       <properties>
-        <install.properties>${project.build.directory}/test-classes/config/ConfigQ.properties</install.properties>
+        <install.properties>${project.build.directory}/test-classes/config/ConfigB.properties</install.properties>
       </properties>
 
       <build>
@@ -551,7 +551,7 @@
       </activation>
 
       <properties>
-        <install.properties>${project.build.directory}/test-classes/config/ConfigQ.properties</install.properties>
+        <install.properties>${project.build.directory}/test-classes/config/ConfigC.properties</install.properties>
       </properties>
 
       <build>
@@ -613,7 +613,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.4.2</version>
+            <version>2.7.1</version>
 
             <executions>
               <execution>

@@ -144,7 +144,7 @@ public class TestCommandLineUtilities
         if (out.indexOf("25 modify directives successfully processed.") == -1) {
             System.err.println(out);
         }
-        assertEquals(false, out
+        assertEquals(String.format("%s; %s", out, err), false, out
                 .indexOf("25 modify directives successfully processed.") == -1);
         assertEquals(false, out.indexOf("0 modify directives failed.") == -1);
         System.out.println("Purging batch modify object");
