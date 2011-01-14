@@ -46,6 +46,34 @@
     </resources>
 
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.1</version>
+        <executions>
+          <execution>
+            <id>copy-installer</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.fcrepo</groupId>
+                  <artifactId>fcrepo-installer</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/bin</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -799,6 +827,12 @@
       <groupId>org.antlr</groupId>
       <artifactId>stringtemplate</artifactId>
       <version>3.2.1</version>
+    </dependency>
+    
+    <dependency>
+     <groupId>org.fcrepo</groupId>
+     <artifactId>fcrepo-installer</artifactId>
+     <version>${project.version}</version>
     </dependency>
 
   </dependencies>

@@ -3,9 +3,11 @@
   <target name="install">
     <delete dir="${fedora.home}" failonerror="false" />
     <mkdir dir="${fedora.home}" />
-    <echo>Installer: ${basedir}/../fcrepo-installer/target/fcrepo-installer-${project.version}.jar</echo>
+    <echo>Installer: ${basedir}/target/bin/fcrepo-installer-${project.version}.jar
+    </echo>
     <echo>Properties: ${install.properties}</echo>
-    <java jar="${basedir}/../fcrepo-installer/target/fcrepo-installer-${project.version}.jar"
+    <java
+      jar="${basedir}/target/bin/fcrepo-installer-${project.version}.jar"
       fork="true" spawn="false" failonerror="true">
       <arg line="${install.properties}" />
       <env key="FEDORA_HOME" value="${fedora.home}" />
