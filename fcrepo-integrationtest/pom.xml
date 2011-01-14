@@ -78,6 +78,7 @@
 
     <profile>
       <id>configQ</id>
+
       <activation>
         <property>
           <name>config</name>
@@ -87,6 +88,7 @@
 
       <properties>
         <install.properties>${project.build.directory}/test-classes/config/ConfigQ.properties</install.properties>
+        <test.report.directory>${project.build.directory}/failsafe-reports/configQ</test.report.directory>
       </properties>
 
       <build>
@@ -170,6 +172,9 @@
             </executions>
 
             <configuration>
+
+              <summaryFile>${test.report.directory}/failsafe-summary.xml</summaryFile>
+              <reportsDirectory>${test.report.directory}</reportsDirectory>
 
               <systemPropertyVariables>
                 <fedora.authorize.access>false</fedora.authorize.access>
@@ -229,6 +234,7 @@
 
     <profile>
       <id>configA</id>
+
       <activation>
         <property>
           <name>config</name>
@@ -238,6 +244,7 @@
 
       <properties>
         <install.properties>${project.build.directory}/test-classes/config/ConfigA.properties</install.properties>
+        <test.report.directory>${project.build.directory}/failsafe-reports/configA</test.report.directory>
       </properties>
 
       <build>
@@ -320,6 +327,9 @@
             </executions>
 
             <configuration>
+
+              <summaryFile>${test.report.directory}/failsafe-summary.xml</summaryFile>
+              <reportsDirectory>${test.report.directory}</reportsDirectory>
 
               <systemPropertyVariables>
                 <fedora.authorize.access>false</fedora.authorize.access>
@@ -386,6 +396,7 @@
 
     <profile>
       <id>configB</id>
+
       <activation>
         <property>
           <name>config</name>
@@ -395,6 +406,7 @@
 
       <properties>
         <install.properties>${project.build.directory}/test-classes/config/ConfigB.properties</install.properties>
+        <test.report.directory>${project.build.directory}/failsafe-reports/configB</test.report.directory>
       </properties>
 
       <build>
@@ -477,6 +489,9 @@
             </executions>
 
             <configuration>
+
+              <summaryFile>${test.report.directory}/failsafe-summary.xml</summaryFile>
+              <reportsDirectory>${test.report.directory}</reportsDirectory>
 
               <systemPropertyVariables>
                 <fedora.authorize.access>true</fedora.authorize.access>
@@ -552,6 +567,7 @@
 
       <properties>
         <install.properties>${project.build.directory}/test-classes/config/ConfigC.properties</install.properties>
+        <test.report.directory>${project.build.directory}/failsafe-reports/configC</test.report.directory>
       </properties>
 
       <build>
@@ -635,6 +651,9 @@
 
 
             <configuration>
+
+              <summaryFile>${test.report.directory}/failsafe-summary.xml</summaryFile>
+              <reportsDirectory>${test.report.directory}</reportsDirectory>
 
               <systemPropertyVariables>
                 <fedora.authorize.access>true</fedora.authorize.access>
