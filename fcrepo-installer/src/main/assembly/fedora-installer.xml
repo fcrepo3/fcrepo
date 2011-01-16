@@ -27,10 +27,11 @@
 
     <!-- Top-level entries -->
     <fileSet>
-      <directory>../resources/inc</directory>
+      <directory>src/main/resources</directory>
       <outputDirectory>/resources</outputDirectory>
       <includes>
         <include>keystore</include>
+        <include>truststore</include>
       </includes>
     </fileSet>
   </fileSets>

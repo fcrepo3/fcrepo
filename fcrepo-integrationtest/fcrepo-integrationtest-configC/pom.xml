@@ -15,7 +15,7 @@
 
   <properties>
     <fedora.home>${project.build.directory}/fcrepo-${project.version}</fedora.home>
-    <javax.net.ssl.trustStore>${basedir}/../resources/inc/keystore</javax.net.ssl.trustStore>
+    <javax.net.ssl.trustStore>${project.build.directory}/ext/fcrepo-installer/resources/truststore</javax.net.ssl.trustStore>
     <fedora.username>fedoraAdmin</fedora.username>
     <fedora.password>fedoraAdmin</fedora.password>
 
@@ -73,7 +73,29 @@
               </artifactItems>
             </configuration>
           </execution>
-
+          
+          <!-- Place a copy of truststore in build dir -->
+          <execution>
+            <id>unpack-truststore</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.fcrepo</groupId>
+                  <artifactId>fcrepo-installer</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/ext/fcrepo-installer</outputDirectory>
+                  <includes>**/truststore</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          
           <!--
             Put physical copy of fedora install/run ant scripts into
             build dir

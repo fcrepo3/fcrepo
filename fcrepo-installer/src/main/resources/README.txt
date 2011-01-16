@@ -16,7 +16,7 @@ http://tomcat.apache.org/tomcat-6.0-doc/ssl-howto.html
 Updating the Bundled Tomcat
 ---------------------------
 Download and deploy the distribution as a third-party artifact:
-mvn deploy:deploy-file -Durl=https://m2.duraspace.org/content/repositories/thirdparty -DrepositoryId=duraspace-thirdparty -Dfile=apache-tomcat-X.Y.Z.zip -DgroupId=org.fcrepo -DartifactId=apache-tomcat -Dversion=6.0.29 -Dpackaging=zip
+mvn deploy:deploy-file -Durl=https://m2.duraspace.org/content/repositories/thirdparty -DrepositoryId=duraspace-thirdparty -Dfile=apache-tomcat-X.Y.Z.zip -DgroupId=org.fcrepo -DartifactId=apache-tomcat -Dversion=X.Y.Z -Dpackaging=zip
 Update fcrepo-server/src/main/resources/properties/resources/install.properties
 Update fcrepo-installer/src/main/assembly/fedora-installer.xml
 Update fcrepo-server/src/main/java/org/fcrepo/utilities/install/container/BundledTomcat.java
