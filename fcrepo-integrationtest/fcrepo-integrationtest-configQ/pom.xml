@@ -14,7 +14,7 @@
   <name>Fedora Integration Test - Configuration Q</name>
 
   <properties>
-    <fedora.home>${env.FEDORA_HOME}</fedora.home>
+    <fedora.home>${project.build.directory}/fcrepo-${project.version}</fedora.home>
     <javax.net.ssl.trustStore>${basedir}/../resources/inc/keystore</javax.net.ssl.trustStore>
     <fedora.username>fedoraAdmin</fedora.username>
     <fedora.password>fedoraAdmin</fedora.password>
