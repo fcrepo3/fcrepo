@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.fcrepo</groupId>
+    <artifactId>fcrepo</artifactId>
+    <version>3.5-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>fcrepo-integrationtest-configB</artifactId>
+  <packaging>jar</packaging>
+  <name>Fedora Integration Test - Configuration B</name>
+
+  <properties>
+    <fedora.home>${env.FEDORA_HOME}</fedora.home>
+    <javax.net.ssl.trustStore>${basedir}/../resources/inc/keystore</javax.net.ssl.trustStore>
+    <fedora.username>fedoraAdmin</fedora.username>
+    <fedora.password>fedoraAdmin</fedora.password>
+
+    <fedora.hostname>localhost</fedora.hostname>
+    <fedora.port>8080</fedora.port>
+    <fedora.appServerContext>fedora</fedora.appServerContext>
+    <fedora.baseURL>http://localhost:8080/fedora</fedora.baseURL>
+
+    <tomcat.home>${fedora.home}/tomcat</tomcat.home>
+    <tomcat.url>${fedora.baseURL}</tomcat.url>
+    <tomcat.port.ssl>8443</tomcat.port.ssl>
+    <tomcat.port.shutdown>8005</tomcat.port.shutdown>
+
+    <org.apache.activemq.default.directory.prefix>${project.build.directory}</org.apache.activemq.default.directory.prefix>
+
+    <install.properties>${project.build.directory}/test-classes/config/ConfigB.properties</install.properties>
+    <test.report.directory>${project.build.directory}/failsafe-reports/configB</test.report.directory>
+  </properties>
+
+  <build>
+
+    <resources>
+      <resource>
+        <directory>src/test/resources/confg</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.1</version>
+        <executions>
+          <execution>
+            <id>copy-installer</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.fcrepo</groupId>
+                  <artifactId>fcrepo-installer</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/bin</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <id>start-fedora</id>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <target>
+                <echo>Installing Fedora</echo>
+                <ant antfile="src/test/scripts/installer-run.xml"
+                  target="install" inheritrefs="true" />
+                <echo>Starting Fedora</echo>
+                <ant antfile="src/test/scripts/tomcat-run.xml"
+                  target="tomcat-start" inheritrefs="true" />
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+
+          <execution>
+            <id>stop-fedora</id>
+            <phase>post-integration-test</phase>
+            <configuration>
+              <target>
+                <echo>Stopping Fedora</echo>
+                <ant antfile="src/test/scripts/tomcat-run.xml"
+                  target="tomcat-stop" inheritrefs="true" />
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>ant-contrib</groupId>
+            <artifactId>ant-contrib</artifactId>
+            <version>1.0b3</version>
+            <exclusions>
+              <exclusion>
+                <groupId>ant</groupId>
+                <artifactId>ant</artifactId>
+              </exclusion>
+            </exclusions>
+          </dependency>
+        </dependencies>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.7.1</version>
+
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+          </execution>
+
+          <execution>
+            <id>verify</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+
+        <configuration>
+
+          <summaryFile>${test.report.directory}/failsafe-summary.xml</summaryFile>
+          <reportsDirectory>${test.report.directory}</reportsDirectory>
+
+          <systemPropertyVariables>
+            <fedora.authorize.access>true</fedora.authorize.access>
+            <logback.configurationFile>src/test/resources/logback.xml</logback.configurationFile>
+            <fedora.home>${fedora.home}</fedora.home>
+            <javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
+            <fedora.username>${fedora.username}</fedora.username>
+            <fedora.password>${fedora.password}</fedora.password>
+            <demo.format></demo.format>
+            <fedora.hostname>${fedora.hostname}</fedora.hostname>
+            <fedora.port>${fedora.port}</fedora.port>
+            <fedora.appServerContext>${fedora.appServerContext}</fedora.appServerContext>
+            <fedora.baseURL>${fedora.baseURL}</fedora.baseURL>
+            <org.apache.activemq.default.directory.prefix>${org.apache.activemq.default.directory.prefix}</org.apache.activemq.default.directory.prefix>
+          </systemPropertyVariables>
+
+          <includes>
+
+            <include>**/NotificationInvocationHandlerTest.class</include>
+
+            <!--
+              Has bug in source-code
+              <include>**/SimpleDeploymentTests.class</include>
+            -->
+
+            <include>**/AtomAPIMMessageTest.class</include>
+            <include>**/DOTranslationUtilityTest.class</include>
+            <include>**/TestIngest.class</include>
+            <include>**/TestAPIA.class</include>
+            <include>**/TestAPIALite.class</include>
+            <include>**/TestAPIM.class</include>
+            <include>**/TestAPIMLite.class</include>
+            <include>**/TestAuthentication.class</include>
+            <include>**/TestHTTPStatusCodes.class</include>
+            <include>**/TestHTTPStatusCodesConfigB.class</include>
+            <include>**/TestManagedDatastreams.class</include>
+            <include>**/TestManagementNotifications.class</include>
+            <include>**/TestRelationships.class</include>
+            <include>**/TestRESTAPI.class</include>
+            <include>**/TestRISearch.class</include>
+            <include>**/TestOAIService.class</include>
+            <include>**/TestCommandLineFormats.class</include>
+            <include>**/TestServerConfiguration.class</include>
+            <include>**/ConflictingDeploymentTests.class</include>
+            <include>**/SharedDeploymentTests.class</include>
+            <include>**/TestXACMLPolicies.class</include>
+            <include>**/ContentModelDSInputTest.class</include>
+            <include>**/TestCommandLineUtilities.class</include>
+            <include>**/TestMisplacedNamespace.class</include>
+            <include>**/TestAdminAPI.class</include>
+
+
+          </includes>
+          <excludes>
+            <exclude>${instrumentedTests}</exclude>
+            <exclude>${nestedClassTests}</exclude>
+          </excludes>
+        </configuration>
+
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-common</artifactId>
+      <classifier>tests</classifier>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-server</artifactId>
+      <classifier>tests</classifier>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-client-admin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>xmlunit</groupId>
+      <artifactId>xmlunit</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.0.1</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+      <version>4.0.1</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>net.jcip</groupId>
+      <artifactId>jcip-annotations</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-security-pdp</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>stringtemplate</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-installer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+  </dependencies>
+</project>
