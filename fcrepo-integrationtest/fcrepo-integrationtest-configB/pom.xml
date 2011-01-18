@@ -15,7 +15,7 @@
 
   <profiles>
     <profile>
-      <id>manually-disabled</id>
+      <id>explicitly-disabled</id>
       <activation>
         <property>
           <name>configB</name>
@@ -24,6 +24,31 @@
       </activation>
       <properties>
         <integration.test.skip>true</integration.test.skip>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>exclusive</id>
+      <activation>
+        <property>
+          <name>config</name>
+        </property>
+      </activation>
+      <properties>
+        <integration.test.skip>true</integration.test.skip>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>explicitly-enabled</id>
+      <activation>
+        <property>
+          <name>config</name>
+          <value>B</value>
+        </property>
+      </activation>
+      <properties>
+        <integration.test.skip>false</integration.test.skip>
       </properties>
     </profile>
 

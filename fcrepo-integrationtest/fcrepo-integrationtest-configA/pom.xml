@@ -15,7 +15,7 @@
 
   <profiles>
     <profile>
-      <id>manually-disabled</id>
+      <id>explicitly-disabled</id>
       <activation>
         <property>
           <name>configA</name>
@@ -27,6 +27,31 @@
       </properties>
     </profile>
 
+    <profile>
+      <id>exclusive</id>
+      <activation>
+        <property>
+          <name>config</name>
+        </property>
+      </activation>
+      <properties>
+        <integration.test.skip>true</integration.test.skip>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>explicitly-enabled</id>
+      <activation>
+        <property>
+          <name>config</name>
+          <value>A</value>
+        </property>
+      </activation>
+      <properties>
+        <integration.test.skip>false</integration.test.skip>
+      </properties>
+    </profile>
+    
     <profile>
       <id>FEDORA_HOME-not-defined</id>
       <activation>
