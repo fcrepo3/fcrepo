@@ -13,8 +13,34 @@
   <packaging>jar</packaging>
   <name>Fedora Integration Test - Configuration B</name>
 
+  <profiles>
+    <profile>
+      <id>FEDORA_HOME-not-defined</id>
+      <activation>
+        <property>
+          <name>!env.FEDORA_HOME</name>
+        </property>
+      </activation>
+      <properties>
+        <fedora.home>${project.build.directory}/fcrepo-${project.version}</fedora.home>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>FEDORA_HOME-is-defined</id>
+      <activation>
+        <property>
+          <name>env.FEDORA_HOME</name>
+        </property>
+      </activation>
+      <properties>
+        <fedora.home>${env.FEDORA_HOME}</fedora.home>
+      </properties>
+    </profile>
+
+  </profiles>
+
   <properties>
-    <fedora.home>${project.build.directory}/fcrepo-${project.version}</fedora.home>
     <javax.net.ssl.trustStore>${project.build.directory}/ext/fcrepo-installer/resources/truststore</javax.net.ssl.trustStore>
     <fedora.username>fedoraAdmin</fedora.username>
     <fedora.password>fedoraAdmin</fedora.password>
@@ -52,7 +78,7 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <version>2.1</version>
 
-        <!-- Put a physical copy of installer artifact in build dir -->
+        <!-- Place a physical copy of installer artifact in build dir -->
         <executions>
           <execution>
             <id>copy-installer</id>
