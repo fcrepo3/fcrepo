@@ -256,6 +256,7 @@
             <fedora.appServerContext>${fedora.appServerContext}</fedora.appServerContext>
             <fedora.baseURL>${fedora.baseURL}</fedora.baseURL>
             <org.apache.activemq.default.directory.prefix>${org.apache.activemq.default.directory.prefix}</org.apache.activemq.default.directory.prefix>
+            <fcrepo-integrationtest-core.classes>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes/</fcrepo-integrationtest-core.classes>
           </systemPropertyVariables>
 
           <includes>

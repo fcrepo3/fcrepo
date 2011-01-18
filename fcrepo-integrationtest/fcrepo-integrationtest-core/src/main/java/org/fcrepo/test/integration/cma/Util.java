@@ -2,6 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.test.integration.cma;
 
 import java.io.File;
@@ -15,11 +16,7 @@ import org.fcrepo.client.utility.ingest.IngestCounter;
 import org.fcrepo.server.types.gen.ObjectMethodsDef;
 import org.fcrepo.test.FedoraTestCase;
 
-
-
-
 import static org.fcrepo.common.Constants.FOXML1_1;
-
 
 public abstract class Util {
 
@@ -59,7 +56,14 @@ public abstract class Util {
 
         System.out.println("Ingesting test objects in FOXML format from "
                 + specificPath);
-        dir = new File("src/test/resources/test-objects/foxml" + specificPath);
+
+        String base = "src/test/resources/";
+
+        if (System.getProperty("fcrepo-integrationtest-core.classes") != null) {
+            base = System.getProperty("fcrepo-integrationtest-core.classes");
+        }
+
+        dir = new File(base + "test-objects/foxml" + specificPath);
 
         FedoraClient client = FedoraTestCase.getFedoraClient();
 
