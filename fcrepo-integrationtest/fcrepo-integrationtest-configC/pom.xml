@@ -15,6 +15,19 @@
 
   <profiles>
     <profile>
+      <id>manually-disabled</id>
+      <activation>
+        <property>
+          <name>configC</name>
+          <value>false</value>
+        </property>
+      </activation>
+      <properties>
+        <integration.test.skip>true</integration.test.skip>
+      </properties>
+    </profile>
+
+    <profile>
       <id>FEDORA_HOME-not-defined</id>
       <activation>
         <property>
@@ -39,7 +52,7 @@
                 <id>start-fedora</id>
                 <phase>pre-integration-test</phase>
                 <configuration>
-                  <target>
+                  <target unless="${integration.test.skip}">
                     <echo>Installing Fedora</echo>
                     <ant
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
@@ -59,7 +72,7 @@
                 <id>stop-fedora</id>
                 <phase>post-integration-test</phase>
                 <configuration>
-                  <target>
+                  <target unless="${integration.test.skip}">
                     <echo>Stopping Fedora</echo>
                     <ant
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml"
@@ -111,7 +124,7 @@
   </profiles>
 
   <properties>
-    <javax.net.ssl.trustStore>${project.build.directory}/ext/fcrepo-installer/resources/truststore</javax.net.ssl.trustStore>
+    <javax.net.ssl.trustStore>${fedora.home}/server/truststore</javax.net.ssl.trustStore>
     <fedora.username>fedoraAdmin</fedora.username>
     <fedora.password>fedoraAdmin</fedora.password>
 
@@ -163,28 +176,6 @@
                   <type>jar</type>
                   <overWrite>true</overWrite>
                   <outputDirectory>${project.build.directory}/ext/fcrepo-installer</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-
-          <!-- Place a copy of truststore in build dir -->
-          <execution>
-            <id>unpack-truststore</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.fcrepo</groupId>
-                  <artifactId>fcrepo-installer</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/ext/fcrepo-installer</outputDirectory>
-                  <includes>**/truststore</includes>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -273,6 +264,8 @@
         </executions>
 
         <configuration>
+
+          <skip>${integration.test.skip}</skip>
 
           <systemPropertyVariables>
             <fedora.authorize.access>true</fedora.authorize.access>
