@@ -2,6 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.server.config;
 
 import java.io.ByteArrayInputStream;
@@ -20,18 +21,19 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
+import org.custommonkey.xmlunit.XMLTestCase;
 import org.custommonkey.xmlunit.XMLUnit;
 
 import org.w3c.dom.Document;
 
-import org.fcrepo.test.FedoraTestCase;
-
+import org.fcrepo.common.FedoraTestConstants;
 
 /**
  * @author Edwin Shin
  */
 public class TestServerConfiguration
-        extends FedoraTestCase {
+        extends XMLTestCase
+        implements FedoraTestConstants {
 
     // FIXME: Refactor 'FedoraTestCase' so this test can go back to '/server'.
     private static final File FCFG_BASE =
@@ -42,10 +44,6 @@ public class TestServerConfiguration
     private DocumentBuilder builder;
 
     private ByteArrayOutputStream out;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(TestServerConfiguration.class);
-    }
 
     @Override
     protected void setUp() throws Exception {
@@ -111,10 +109,11 @@ public class TestServerConfiguration
         XMLUnit.setIgnoreWhitespace(true);
         Diff diff = new Diff(original, generated);
         diff.overrideElementQualifier(new ElementNameAndAttributeQualifier());
-        assertXMLEqual(diff,true);
+        assertXMLEqual(diff, true);
     }
 
     private Document getDocument(ByteArrayOutputStream out) throws Exception {
-        return XMLUnit.buildControlDocument(new String(out.toByteArray(), "UTF-8"));
+        return XMLUnit.buildControlDocument(new String(out.toByteArray(),
+                                                       "UTF-8"));
     }
 }

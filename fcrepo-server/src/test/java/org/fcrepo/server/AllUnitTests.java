@@ -10,6 +10,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses( {
+        org.fcrepo.server.config.AllUnitTests.class,
         org.fcrepo.server.journal.AllUnitTests.class,
         org.fcrepo.server.messaging.AllUnitTests.class,
         org.fcrepo.server.proxy.AllUnitTests.class,
