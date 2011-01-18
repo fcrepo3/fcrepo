@@ -227,7 +227,7 @@ public class Administrator
         m_aboutPic = new JLabel(aboutIcon);
         m_aboutText =
                 new JLabel("<html>"
-                        + "<p>Copyright 2009, DuraSpace</p>"
+                        + "<p>Copyright 2009-2011, DuraSpace</p>"
                         + "<p>Copyright 2008-2009, Fedora Commons, Inc.</p>"
                         + "<p>Copyright 2002-2007, The Rector and Visitors of the</p>"
                         + "<p>University of Virginia and Cornell University.</p><p></p>"
