@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.attr.AttributeDesignator;
@@ -74,12 +75,13 @@ class DbXmlPolicyIndex
 
     private DbXmlManager dbXmlManager = null;
 
-    private long lastUpdate;
+    private volatile long lastUpdate;
 
     private PolicyUtils utils;
 
     private  Map<String, XmlQueryExpression> queries = null;
 
+    // FIXME: potentially not thread-safe, however only currently used in the deprecated findPolicies method
     private  XmlQueryExpression[] searchQueries = null;
 
 
@@ -87,7 +89,7 @@ class DbXmlPolicyIndex
             throws PolicyStoreException {
         init();
 
-        queries = new HashMap<String, XmlQueryExpression>();
+        queries = new ConcurrentHashMap<String, XmlQueryExpression>();
 
         searchQueries = new XmlQueryExpression[10];
 
@@ -202,56 +204,43 @@ class DbXmlPolicyIndex
             throw new PolicyIndexException("Error while constructing query", e);
         }
 
-        // retry strategy on queries - if a write happens during the query, an exception is thrown
-        // catch the error and retry, with a small delay
-        // (this is transactionless strategy, handle concurrency issues here rather in dbxml transactions)
-        // (note, requires single-threaded updates)
-        int retries = 20;
-        Exception cause = null;
-        while (retries >= 0) {
-            try {
-                b = System.nanoTime();
-                total += b - a;
-                if (log.isDebugEnabled()) {
-                    log.debug("Query prep. time: " + (b - a) + "ns");
-                }
+        DbXmlManager.readLock.lock();
+        try {
+            b = System.nanoTime();
+            total += b - a;
+            if (log.isDebugEnabled()) {
+                log.debug("Query prep. time: " + (b - a) + "ns");
+            }
 
-                // execute the query
-                a = System.nanoTime();
+            // execute the query
+            a = System.nanoTime();
 
-                XmlResults results = qe.execute(context);
+            XmlResults results = qe.execute(context);
 
-                b = System.nanoTime();
-                total += b - a;
-                if (log.isDebugEnabled()) {
-                    log.debug("Query exec. time: " + (b - a) + "ns");
-                }
+            b = System.nanoTime();
+            total += b - a;
+            if (log.isDebugEnabled()) {
+                log.debug("Query exec. time: " + (b - a) + "ns");
+            }
 
-                // process results
-                while (results.hasNext()) {
+            // process results
+            while (results.hasNext()) {
 
-                    XmlValue value = results.next();
-                    byte[] content = value.asDocument().getContent();
-                    if (content.length > 0) {
-                        documents.put(value.asDocument().getName(), content);
-                    } else {
-                        throw new PolicyIndexException("Zero-length result found");
-                    }
-                }
-                results.delete();
-                break;
-            } catch (XmlException xe) {
-                log.info("Error getting results.  Operation will be retried.  Retries to go: " + retries + " - " + xe.getMessage());                cause = xe;
-                retries--;
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    log.warn("Thread sleep error");
+                XmlValue value = results.next();
+                byte[] content = value.asDocument().getContent();
+                if (content.length > 0) {
+                    documents.put(value.asDocument().getName(), content);
+                } else {
+                    throw new PolicyIndexException("Zero-length result found");
                 }
             }
-        }
-        if (retries == 0) {
-            throw new PolicyIndexException("Find policies failed, retries attempted.  Last error was " + cause.getMessage(), cause);
+            results.delete();
+        } catch (XmlException xe) {
+            log.error("Error getting query results." + xe.getMessage());
+            throw new PolicyIndexException("Error getting query results." + xe.getMessage(), xe);
+
+        } finally {
+            DbXmlManager.readLock.unlock();
         }
 
         if (log.isDebugEnabled()) {
@@ -272,11 +261,12 @@ class DbXmlPolicyIndex
      *        the context for the query
      * @return an XmlQueryExpression that can be executed
      * @throws XmlException
+     * @throws XmlException
      * @throws PolicyIndexException
      */
     private XmlQueryExpression getQuery(Map<String, Set<AttributeBean>> attributeMap,
                                         XmlQueryContext context,
-                                        int r) throws XmlException, PolicyIndexException {
+                                        int r) throws XmlException  {
         // The dimensions for this query.
         StringBuilder sb = new StringBuilder();
         for (Set<AttributeBean> attributeBeans : attributeMap.values()) {
@@ -303,16 +293,7 @@ class DbXmlPolicyIndex
         // Once we have created a query, we can parse it and store the
         // execution plan. This is an expensive operation that we do
         // not want to have to do more than once for each dimension
-        try {
-
-            result = dbXmlManager.manager.prepare(query, context);
-        } catch (XmlException xe) {
-            if(xe.getDatabaseException() instanceof com.sleepycat.db.DeadlockException){
-                log.error("Caught deadlock exception, getQuery");
-
-            }
-            throw xe;
-        }
+        result = dbXmlManager.manager.prepare(query, context);
 
         queries.put(hash, result);
 
@@ -603,6 +584,7 @@ class DbXmlPolicyIndex
     @Override
     public Map<String, byte[]> findPolicies(AttributeBean[] attributes)
             throws PolicyIndexException {
+        log.error("findPolicies is deprecated");
         if (attributes == null || attributes.length == 0) {
             throw new PolicyIndexException("attribute array cannot be null or zero length");
         }
@@ -639,15 +621,8 @@ class DbXmlPolicyIndex
                     sb.append("and $id = $id" + x + " ");
                 }
                 sb.append("return $doc");
-                try {
-                    searchQueries[attributes.length] = dbXmlManager.manager
-                    .prepare(sb.toString(), context);
-                } catch (XmlException xe) {
-                    if(xe.getDatabaseException() instanceof com.sleepycat.db.DeadlockException){
-                        log.error("Caught deadlock exception, findPolicies (prepare)");
-                    }
-                    throw xe;
-                }
+                searchQueries[attributes.length] = dbXmlManager.manager
+                .prepare(sb.toString(), context);
 
 
             }
@@ -778,56 +753,50 @@ class DbXmlPolicyIndex
             throws PolicyIndexException {
 
         String docName = null;
-        // all updates on a single thread, as transactions are not used
-        synchronized (DbXmlPolicyIndex.class) {
+        DbXmlManager.writeLock.lock();
+        try {
+            // if it already exists, delete it, before adding new
+            // nb - do before validation, if new doc is invalid we don't want the old one left in place, to maintain sync with Fedora objects
+            // FIXME: review this strategy with FCREPO-576 and FCREPO-770
+            boolean exists = true;
             try {
-                // if it already exists, delete it, before adding new
-                // nb - do before validation, if new doc is invalid we don't want the old one left in place, to maintain sync with Fedora objects
-                // FIXME: review this strategy with FCREPO-576 and FCREPO-770
-                boolean exists = true;
-                try {
-                    dbXmlManager.container.getDocument(name,
-                                                       new XmlDocumentConfig().setLazyDocs(true));
-                } catch (XmlException e) {
-                    if(e.getDatabaseException() instanceof com.sleepycat.db.DeadlockException){
-                        log.error("Caught deadlock exception, contains");
-                    }
-                    if (e.getErrorCode() == XmlException.DOCUMENT_NOT_FOUND) {
-                        exists = false;
-                    } else {
-                        throw new PolicyIndexException("Error executing contains. " + e.getMessage(), e);
-                    }
-                }
-
-                if (exists) {
-                    dbXmlManager.container.deleteDocument(name);
-                }
-
-                // FIXME: better handled at a higher level, see FCREPO-770
-                try {
-                    utils.validate(document, name);
-                } catch (MelcoePDPException e) {
-                    throw new PolicyIndexException(e);
-                }
-
-                XmlDocument doc = makeDocument(name, document);
-                docName = doc.getName();
-                log.debug("Adding document: " + docName);
-                dbXmlManager.container.putDocument(doc,
-                                                   dbXmlManager.updateContext);
-                setLastUpdate(System.currentTimeMillis());
-            } catch (XmlException xe) {
-                if (xe.getDatabaseException() instanceof com.sleepycat.db.DeadlockException) {
-                    log.error("Caught deadlock exception, addPolicy");
-                }
-                if (xe.getErrorCode() == XmlException.UNIQUE_ERROR) {
-                    throw new PolicyIndexException("Document already exists: "
-                                                   + docName);
+                dbXmlManager.container.getDocument(name,
+                                                   new XmlDocumentConfig().setLazyDocs(true));
+            } catch (XmlException e) {
+                if (e.getErrorCode() == XmlException.DOCUMENT_NOT_FOUND) {
+                    exists = false;
                 } else {
-                    throw new PolicyIndexException("Error adding policy: "
-                                                   + xe.getMessage(), xe);
+                    throw new PolicyIndexException("Error executing contains. " + e.getMessage(), e);
                 }
             }
+
+            if (exists) {
+                dbXmlManager.container.deleteDocument(name);
+            }
+
+            // FIXME: better handled at a higher level, see FCREPO-770
+            try {
+                utils.validate(document, name);
+            } catch (MelcoePDPException e) {
+                throw new PolicyIndexException(e);
+            }
+
+            XmlDocument doc = makeDocument(name, document);
+            docName = doc.getName();
+            log.debug("Adding document: " + docName);
+            dbXmlManager.container.putDocument(doc,
+                                               dbXmlManager.updateContext);
+            setLastUpdate(System.currentTimeMillis());
+        } catch (XmlException xe) {
+            if (xe.getErrorCode() == XmlException.UNIQUE_ERROR) {
+                throw new PolicyIndexException("Document already exists: "
+                                               + docName);
+            } else {
+                throw new PolicyIndexException("Error adding policy: "
+                                               + xe.getMessage(), xe);
+            }
+        } finally {
+            DbXmlManager.writeLock.unlock();
         }
 
         return docName;
@@ -841,22 +810,20 @@ class DbXmlPolicyIndex
      */
     public boolean deletePolicy(String name) throws PolicyIndexException {
         log.debug("Deleting document: " + name);
-        // all updates on a single thread - not using transactions
-        synchronized (DbXmlPolicyIndex.class) {
-            try {
-                dbXmlManager.container.deleteDocument(name, dbXmlManager.updateContext);
-                setLastUpdate(System.currentTimeMillis());
-            } catch (XmlException xe) {
-                if (xe.getDatabaseException() instanceof com.sleepycat.db.DeadlockException) {
-                    log.error("Caught deadlock exception, deletePolicy");
-                }
-                // safe delete - only warn if not found
-                if (xe.getDbError() == XmlException.DOCUMENT_NOT_FOUND){
-                    log.warn("Error deleting document: " + name + " - document does not exist");
-                } else {
-                    throw new PolicyIndexException("Error deleting document: " + name + xe.getMessage(), xe);
-                }
+
+        DbXmlManager.writeLock.lock();
+        try {
+            dbXmlManager.container.deleteDocument(name, dbXmlManager.updateContext);
+            setLastUpdate(System.currentTimeMillis());
+        } catch (XmlException xe) {
+            // safe delete - only warn if not found
+            if (xe.getDbError() == XmlException.DOCUMENT_NOT_FOUND){
+                log.warn("Error deleting document: " + name + " - document does not exist");
+            } else {
+                throw new PolicyIndexException("Error deleting document: " + name + xe.getMessage(), xe);
             }
+        } finally {
+            DbXmlManager.writeLock.unlock();
         }
         return true;
     }
@@ -876,6 +843,9 @@ class DbXmlPolicyIndex
         // if Subjects and Resources elements are added/deleted from document.
         // So do a delete then an add
 
+        // Note - method is not currently used (pending a tidy-up as part of FCREPO-576)
+        // if method is used then there should be a single writeLock covering this whole transaction.
+        // ("add" currently covers this functionality - it is currently a "safe put" that does a delete if necessary first)
         deletePolicy(name);
         addPolicy(newDocument, name);
 
@@ -921,19 +891,14 @@ class DbXmlPolicyIndex
     public byte[] getPolicy(String name) throws PolicyIndexException {
         log.debug("Getting document: " + name);
         XmlDocument doc = null;
-            try {
-                doc = dbXmlManager.container.getDocument(name);
-            } catch (XmlException xe) {
-
-                if(xe.getDatabaseException() instanceof com.sleepycat.db.DeadlockException){
-                    log.error("Caught deadlock exception, getPolicy");
-                }
-                throw new PolicyIndexException("Error retrieving document: " + name + xe.getMessage()  + " - " + xe.getDatabaseException().getMessage(), xe);
-            }
+        DbXmlManager.readLock.lock();
         try {
+            doc = dbXmlManager.container.getDocument(name);
             return doc.getContent();
-        } catch (XmlException e) {
-            throw new PolicyIndexException("Error retrieving document content " + e.getMessage(), e);
+        } catch (XmlException xe) {
+            throw new PolicyIndexException("Error getting Policy: " + name + xe.getMessage()  + " - " + xe.getDatabaseException().getMessage(), xe);
+        } finally {
+            DbXmlManager.readLock.unlock();
         }
     }
 
@@ -948,18 +913,18 @@ class DbXmlPolicyIndex
     public boolean contains(String policyName)
             throws PolicyIndexException {
         log.debug("Determining if document exists: " + policyName);
+        DbXmlManager.readLock.lock();
         try {
             dbXmlManager.container.getDocument(policyName,
                                                new XmlDocumentConfig().setLazyDocs(true));
         } catch (XmlException e) {
-            if(e.getDatabaseException() instanceof com.sleepycat.db.DeadlockException){
-                log.error("Caught deadlock exception, contains");
-            }
             if (e.getErrorCode() == XmlException.DOCUMENT_NOT_FOUND) {
                 return false;
             } else {
                 throw new PolicyIndexException("Error executing contains. " + e.getMessage(), e);
             }
+        } finally {
+            DbXmlManager.readLock.unlock();
         }
 
         return true;
@@ -991,6 +956,7 @@ class DbXmlPolicyIndex
         log.debug("Listing policies");
         List<String> documents = new ArrayList<String>();
 
+        DbXmlManager.readLock.lock();
         try {
             XmlDocumentConfig docConf = new XmlDocumentConfig();
             XmlResults results = dbXmlManager.container.getAllDocuments(docConf);
@@ -1000,10 +966,9 @@ class DbXmlPolicyIndex
             }
             results.delete();
         } catch (XmlException xe) {
-            if(xe.getDatabaseException() instanceof com.sleepycat.db.DeadlockException){
-                log.error("Caught deadlock exception, listPolicies");
-            }
             throw new PolicyIndexException("Error listing policies. " + xe.getMessage(), xe);
+        } finally {
+            DbXmlManager.readLock.unlock();
         }
 
         return documents;

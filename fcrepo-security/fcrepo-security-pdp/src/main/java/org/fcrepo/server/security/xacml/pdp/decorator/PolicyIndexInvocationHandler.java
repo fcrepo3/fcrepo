@@ -195,7 +195,8 @@ extends AbstractInvocationHandler {
 
 
             case DATASTREAM: // operations on datastreams
-                if (managementMethod.parameters.dsID.equals(FedoraPolicyStore.POLICY_DATASTREAM)) {
+                // note, DS ID can be null - server-assigned ID
+                if (managementMethod.parameters.dsID != null && managementMethod.parameters.dsID.equals(FedoraPolicyStore.POLICY_DATASTREAM)) {
                     switch (managementMethod.component) {
                         case STATE: // datastream state change
 

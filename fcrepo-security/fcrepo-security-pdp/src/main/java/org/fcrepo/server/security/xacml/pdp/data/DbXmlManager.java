@@ -12,6 +12,8 @@ import java.net.URL;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -69,6 +71,10 @@ public class DbXmlManager {
     public Environment env = null;
 
     public Validator validator = null;
+
+    private static final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+    public static final Lock readLock = rwl.readLock();
+    public static final Lock writeLock = rwl.writeLock();
 
     public DbXmlManager()
             throws PolicyStoreException {
@@ -161,24 +167,31 @@ public class DbXmlManager {
      * Closes the dbxml container and manager.
      */
     public void close() {
-        if (container != null) {
-            try {
-                container.close();
-                container = null;
-                log.info("Closed container");
-            } catch (XmlException e) {
-                log.warn("close failed: " + e.getMessage(), e);
+        // getting a read lock will ensure all writes have finished
+        // if we are really closing assume that we don't care about reads
+        readLock.lock();
+        try {
+            if (container != null) {
+                try {
+                    container.close();
+                    container = null;
+                    log.info("Closed container");
+                } catch (XmlException e) {
+                    log.warn("close failed: " + e.getMessage(), e);
+                }
             }
-        }
 
-        if (manager != null) {
-            try {
-                manager.close();
-                manager = null;
-                log.info("Closed manager");
-            } catch (XmlException e) {
-                log.warn("close failed: " + e.getMessage(), e);
+            if (manager != null) {
+                try {
+                    manager.close();
+                    manager = null;
+                    log.info("Closed manager");
+                } catch (XmlException e) {
+                    log.warn("close failed: " + e.getMessage(), e);
+                }
             }
+        } finally {
+            readLock.unlock();
         }
     }
 
