@@ -117,9 +117,6 @@ public abstract class Server
     /** The build date of this release. */
     public static String BUILD_DATE = s_const.getString("buildDate");
 
-    /** The build number of this release. */
-    public static String BUILD_NUMBER = s_const.getString("buildNumber");
-
     /** The name of the property that tells the server where it's based. */
     public static String HOME_PROPERTY = s_const.getString("home.property");
 

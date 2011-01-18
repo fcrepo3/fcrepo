@@ -114,6 +114,8 @@
     <instrumentedTests>**/*Test*__*.class</instrumentedTests>
     <nestedClassTests>**/*Test*$*.class</nestedClassTests>
     <integration.test.skip>false</integration.test.skip>
+    <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss 'UTC'Z</maven.build.timestamp.format>                                                                     
+    <timestamp>${maven.build.timestamp}</timestamp>
   </properties>
 
   <dependencyManagement>

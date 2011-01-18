@@ -62,7 +62,6 @@ public class BasicServer
 
         logger.info("Fedora Version: " + Server.VERSION);
         logger.info("Fedora Build Date: " + Server.BUILD_DATE);
-        logger.info("Fedora Build Number: " + Server.BUILD_NUMBER);
 
         ServerStatusFile status = getStatusFile();
         try {
@@ -70,8 +69,6 @@ public class BasicServer
                     "Fedora Version: " + Server.VERSION);
             status.append(ServerState.STARTING,
                     "Fedora Build Date: " + Server.BUILD_DATE);
-            status.append(ServerState.STARTING,
-                    "Fedora Build Number: " + Server.BUILD_NUMBER);
             status.append(ServerState.STARTING, "Server Host Name: "
                     + fedoraServerHost);
             status.append(ServerState.STARTING, "Server Port: "
