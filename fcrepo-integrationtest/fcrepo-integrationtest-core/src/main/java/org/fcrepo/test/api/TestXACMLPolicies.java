@@ -2,6 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.test.api;
 
 import java.io.BufferedReader;
@@ -31,7 +32,6 @@ import org.fcrepo.server.utilities.StreamUtility;
 
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
-
 
 /**
  * Tests involving XACML policies, for API-A and API-M.
@@ -99,11 +99,19 @@ public class TestXACMLPolicies
         final String hasRestricted = "test:HasRestrictedCModel";
         addTestObject(hasRestricted, null, restrictedCModel);
 
-        final String hasUnrestrictedAndRestricted = "test:HasUnrestrictedAndRestrictedCModel";
-        addTestObject(hasUnrestrictedAndRestricted, null, unrestrictedCModel, restrictedCModel);
+        final String hasUnrestrictedAndRestricted =
+                "test:HasUnrestrictedAndRestrictedCModel";
+        addTestObject(hasUnrestrictedAndRestricted,
+                      null,
+                      unrestrictedCModel,
+                      restrictedCModel);
 
-        final String hasRestrictedAndUnrestricted = "test:HasRestrictedAndUnrestrictedCModel";
-        addTestObject(hasRestrictedAndUnrestricted, null, restrictedCModel, unrestrictedCModel);
+        final String hasRestrictedAndUnrestricted =
+                "test:HasRestrictedAndUnrestrictedCModel";
+        addTestObject(hasRestrictedAndUnrestricted,
+                      null,
+                      restrictedCModel,
+                      unrestrictedCModel);
 
         try {
             assertTrue(canWrite(admin, hasUnrestricted));
@@ -118,8 +126,7 @@ public class TestXACMLPolicies
         }
     }
 
-    private boolean canWrite(FedoraClient client, String pid)
-            throws Exception {
+    private boolean canWrite(FedoraClient client, String pid) throws Exception {
         FedoraAPIM apim = client.getAPIM();
         try {
             apim.modifyObject(pid, null, null, null, "log message");
@@ -139,14 +146,14 @@ public class TestXACMLPolicies
         String URL3 = getDemoBaseURL() + "/simple-image-demo/col3.jpg";
         Class modDSArgs[] =
                 {String.class, String.class, String[].class, String.class,
-                 String.class, String.class, String.class, String.class,
-                 String.class, String.class, boolean.class};
+                        String.class, String.class, String.class, String.class,
+                        String.class, String.class, boolean.class};
         Object modDSParms1[] =
                 {"demo:5", "THUMBRES_IMG", null, null, null, null, null, null,
-                 null, null, false};
+                        null, null, false};
         Class purgeDSArgs[] =
                 {String.class, String.class, String.class, String.class,
-                 String.class, boolean.class};
+                        String.class, boolean.class};
         Object purgeDSParms1[] =
                 {"demo:5", "THUMBRES_IMG", null, null, null, false};
         Class setVersionableArgs[] =
@@ -276,18 +283,22 @@ public class TestXACMLPolicies
 
             Class getDissArgs[] =
                     {String.class, String.class, String.class,
-                     Property[].class, String.class};
+                            Property[].class, String.class};
             Object getDissParms[] = {"demo:5", "demo:1", "getHigh", null, null};
             Object getDissParms2[] =
                     {"demo:29", "demo:27", "grayscaleImage", null, null};
             Class modObjArgs[] =
                     {String.class, String.class, String.class, String.class,
-                     String.class};
+                            String.class};
             Object modObjParms[] = {"demo:31", null, null, null, null};
 
             // APIA access by user without access- should fail
             // testuser2 does not have permission to access api-a at all, so this should fail
-            invokeAPIAFailure(testuser2, "testuser2", "getDatastreamDissemination", getDDArgs, getDDParms);
+            invokeAPIAFailure(testuser2,
+                              "testuser2",
+                              "getDatastreamDissemination",
+                              getDDArgs,
+                              getDDParms);
 
             // APIA access by user without access- should fail
             // testuser3 does not have permission to access Datastreams named THUMBRES_IMG, so this should fail
@@ -418,7 +429,7 @@ public class TestXACMLPolicies
         // APIA access by user without access- should fail
         try {
             System.out.println("Testing " + functionToTest
-                               + " from invalid user: " + username);
+                    + " from invalid user: " + username);
 
             FedoraAPIM apim1 = user.getAPIM();
             Method func = apim1.getClass().getMethod(functionToTest, args);
@@ -430,24 +441,30 @@ public class TestXACMLPolicies
                 org.apache.axis.AxisFault af =
                         (org.apache.axis.AxisFault) cause;
                 System.out.println("    Reason = "
-                                   + af.getFaultReason().substring(af.getFaultReason()
-                        .lastIndexOf(".") + 1));
+                        + af.getFaultReason().substring(af.getFaultReason()
+                                .lastIndexOf(".") + 1));
                 assertTrue(af.getFaultReason().contains("AuthzDeniedException"));
                 System.out.println("Access denied correctly");
             } else {
                 System.out.println("Got exception: "
-                                   + cause.getClass().getName());
+                        + cause.getClass().getName());
                 fail("Illegal access dis-allowed for some other reason");
             }
         } catch (IOException ioe) {
-            System.out
-                    .println("    Reason = " + ioe.getMessage()/* .substring(ioe.getMessage().lastIndexOf("[")) */);
+            System.out.println("    Reason = " + ioe.getMessage()/*
+                                                                  * .substring(ioe
+                                                                  * .
+                                                                  * getMessage()
+                                                                  * .
+                                                                  * lastIndexOf(
+                                                                  * "["))
+                                                                  */);
             assertTrue(ioe.getMessage().contains("[403 Forbidden]"));
             System.out.println("Access denied correctly");
             // exception was expected, all is A-OK
         } catch (Exception ae) {
             System.out.println("Some other exception: "
-                               + ae.getClass().getName());
+                    + ae.getClass().getName());
             fail("Some other exception");
         }
     }
@@ -481,7 +498,7 @@ public class TestXACMLPolicies
         try {
             // testuser1 does have permission to access demo:5 datastreams, so this should succeed
             System.out.println("Testing " + functionToTest
-                               + " from valid user: " + username);
+                    + " from valid user: " + username);
             FedoraAPIM apim1 = user.getAPIM();
             Method func = apim1.getClass().getMethod(functionToTest, args);
             Object result = func.invoke(apim1, parms);
@@ -498,7 +515,7 @@ public class TestXACMLPolicies
                 fail("Legal access dis-allowed");
             } else {
                 System.out.println("Got exception: "
-                                   + cause.getClass().getName());
+                        + cause.getClass().getName());
                 fail("Legal access dis-allowed");
             }
         } catch (Exception e) {
@@ -517,7 +534,7 @@ public class TestXACMLPolicies
         // APIA access by user without access- should fail
         try {
             System.out.println("Testing " + functionToTest
-                               + " from invalid user: " + username);
+                    + " from invalid user: " + username);
 
             FedoraAPIA apia1 = user.getAPIA();
             Method func = apia1.getClass().getMethod(functionToTest, args);
@@ -529,25 +546,25 @@ public class TestXACMLPolicies
                 org.apache.axis.AxisFault af =
                         (org.apache.axis.AxisFault) cause;
                 System.out.println("    Reason = "
-                                   + af.getFaultReason().substring(af.getFaultReason()
-                        .lastIndexOf(".") + 1));
+                        + af.getFaultReason().substring(af.getFaultReason()
+                                .lastIndexOf(".") + 1));
                 assertTrue(af.getFaultReason().contains("AuthzDeniedException"));
                 System.out.println("Access denied correctly");
             } else {
                 System.out.println("Got exception: "
-                                   + cause.getClass().getName());
+                        + cause.getClass().getName());
                 fail("Illegal access dis-allowed for some other reason");
             }
         } catch (IOException ioe) {
             System.out.println("    Reason = "
-                               + ioe.getMessage().substring(ioe.getMessage()
-                    .lastIndexOf("[")));
+                    + ioe.getMessage().substring(ioe.getMessage()
+                            .lastIndexOf("[")));
             assertTrue(ioe.getMessage().contains("[403 Forbidden]"));
             System.out.println("Access denied correctly");
             // exception was expected, all is A-OK
         } catch (Exception ae) {
             System.out.println("Some other exception: "
-                               + ae.getClass().getName());
+                    + ae.getClass().getName());
             fail("Illegal access dis-allowed for some other reason");
         }
     }
@@ -561,7 +578,7 @@ public class TestXACMLPolicies
         try {
             // testuser1 does have permission to access demo:5 datastreams, so this should succeed
             System.out.println("Testing " + functionToTest
-                               + " from valid user: " + username);
+                    + " from valid user: " + username);
             FedoraAPIA apia1 = user.getAPIA();
             Method func = apia1.getClass().getMethod(functionToTest, args);
             Object result = func.invoke(apia1, parms);
@@ -579,7 +596,7 @@ public class TestXACMLPolicies
                 fail("Legal access dis-allowed");
             } else {
                 System.out.println("Got exception: "
-                                   + cause.getClass().getName());
+                        + cause.getClass().getName());
                 fail("Legal access dis-allowed");
             }
         } catch (Exception e) {
@@ -616,8 +633,16 @@ public class TestXACMLPolicies
     }
 
     public void installJunitPolicies() {
-        System.out.println("Copying Policies For Testing");
-        File junitDir = new File("src/test/resources/XACMLTestPolicies/junit");
+
+        String base =
+                System.getProperty("fcrepo-integrationtest-core.classes") != null ? System
+                        .getProperty("fcrepo-integrationtest-core.classes")
+                        : "src/test/resources/";
+
+        File junitDir = new File(base + "XACMLTestPolicies/junit");
+
+        System.out.println("Copying Policies For Testing from " + junitDir.getAbsolutePath());
+
         File junitsaveDir =
                 new File(FEDORA_HOME,
                          "data/fedora-xacml-policies/repository-policies/junit");
@@ -648,7 +673,7 @@ public class TestXACMLPolicies
             public boolean accept(File dir, String name) {
                 if ((name.toLowerCase().startsWith("permit") || name
                         .toLowerCase().startsWith("deny"))
-                    && name.endsWith(".xml")) {
+                        && name.endsWith(".xml")) {
                     return true;
                 }
                 return false;
@@ -709,7 +734,7 @@ public class TestXACMLPolicies
     private void backupFedoraUsersFile() {
         fedoraUsersBackup =
                 new File(FedoraUsers.fedoraUsersXML.getAbsolutePath()
-                         + ".backup");
+                        + ".backup");
         System.out.println("Backing Up Fedora Users");
         if (!fedoraUsersBackup.exists()) {
             try {
@@ -734,45 +759,81 @@ public class TestXACMLPolicies
         if (sep == null) {
             sep = "\n";
         }
-        String data = "<?xml version='1.0' ?>  " + sep
-                      + "<fedora-users>" + sep
-                      + "    <user name=\"" + getUsername() + "\" password=\"" + getPassword() + "\">" + sep
-                      + "      <attribute name=\"fedoraRole\">" + sep
-                      + "        <value>administrator</value>" + sep
-                      + "      </attribute>" + sep
-                      + "    </user>" + sep
-                      + "    <user name=\"fedoraIntCallUser\" password=\"changeme\">" + sep
-                      + "      <attribute name=\"fedoraRole\">" + sep
-                      + "        <value>fedoraInternalCall-1</value>" + sep
-                      + "        <value>fedoraInternalCall-2</value>" + sep
-                      + "      </attribute>" + sep
-                      + "    </user>" + sep
-                      + "    <user name=\"testuser1\" password=\"testuser1\"/>" + sep
-                      + "    <user name=\"testuser2\" password=\"testuser2\"/>" + sep
-                      + "    <user name=\"testuser3\" password=\"testuser3\"/>" + sep
-                      + "    <user name=\"testuser4\" password=\"testuser4\"/>" + sep
-                      + "    <user name=\"testuserroleA\" password=\"testuserroleA\">" + sep
-                      + "      <attribute name=\"fedoraRole\">" + sep
-                      + "        <value>roleA</value>" + sep
-                      + "      </attribute>" + sep
-                      + "    </user>" + sep
-                      + "    <user name=\"testuserroleB\" password=\"testuserroleB\">" + sep
-                      + "      <attribute name=\"fedoraRole\">" + sep
-                      + "        <value>roleB</value>" + sep
-                      + "      </attribute>" + sep
-                      + "    </user>" + sep
-                      + "    <user name=\"testuserroleC\" password=\"testuserroleC\">" + sep
-                      + "      <attribute name=\"fedoraRole\">" + sep
-                      + "        <value>roleC</value>" + sep
-                      + "      </attribute>" + sep
-                      + "    </user>" + sep
-                      + "    <user name=\"testuserroleC2\" password=\"testuserroleC2\">" + sep
-                      + "      <attribute name=\"fedoraRole\">" + sep
-                      + "        <value>roleC</value>" + sep
-                      + "        <value>roleUntrusted</value>" + sep
-                      + "      </attribute>" + sep
-                      + "    </user>" + sep
-                      + "  </fedora-users>";
+        String data =
+                "<?xml version='1.0' ?>  "
+                        + sep
+                        + "<fedora-users>"
+                        + sep
+                        + "    <user name=\""
+                        + getUsername()
+                        + "\" password=\""
+                        + getPassword()
+                        + "\">"
+                        + sep
+                        + "      <attribute name=\"fedoraRole\">"
+                        + sep
+                        + "        <value>administrator</value>"
+                        + sep
+                        + "      </attribute>"
+                        + sep
+                        + "    </user>"
+                        + sep
+                        + "    <user name=\"fedoraIntCallUser\" password=\"changeme\">"
+                        + sep
+                        + "      <attribute name=\"fedoraRole\">"
+                        + sep
+                        + "        <value>fedoraInternalCall-1</value>"
+                        + sep
+                        + "        <value>fedoraInternalCall-2</value>"
+                        + sep
+                        + "      </attribute>"
+                        + sep
+                        + "    </user>"
+                        + sep
+                        + "    <user name=\"testuser1\" password=\"testuser1\"/>"
+                        + sep
+                        + "    <user name=\"testuser2\" password=\"testuser2\"/>"
+                        + sep
+                        + "    <user name=\"testuser3\" password=\"testuser3\"/>"
+                        + sep
+                        + "    <user name=\"testuser4\" password=\"testuser4\"/>"
+                        + sep
+                        + "    <user name=\"testuserroleA\" password=\"testuserroleA\">"
+                        + sep
+                        + "      <attribute name=\"fedoraRole\">"
+                        + sep
+                        + "        <value>roleA</value>"
+                        + sep
+                        + "      </attribute>"
+                        + sep
+                        + "    </user>"
+                        + sep
+                        + "    <user name=\"testuserroleB\" password=\"testuserroleB\">"
+                        + sep
+                        + "      <attribute name=\"fedoraRole\">"
+                        + sep
+                        + "        <value>roleB</value>"
+                        + sep
+                        + "      </attribute>"
+                        + sep
+                        + "    </user>"
+                        + sep
+                        + "    <user name=\"testuserroleC\" password=\"testuserroleC\">"
+                        + sep
+                        + "      <attribute name=\"fedoraRole\">"
+                        + sep
+                        + "        <value>roleC</value>"
+                        + sep
+                        + "      </attribute>"
+                        + sep
+                        + "    </user>"
+                        + sep
+                        + "    <user name=\"testuserroleC2\" password=\"testuserroleC2\">"
+                        + sep + "      <attribute name=\"fedoraRole\">" + sep
+                        + "        <value>roleC</value>" + sep
+                        + "        <value>roleUntrusted</value>" + sep
+                        + "      </attribute>" + sep + "    </user>" + sep
+                        + "  </fedora-users>";
         try {
             FileOutputStream fu =
                     new FileOutputStream(FedoraUsers.fedoraUsersXML);
@@ -816,25 +877,29 @@ public class TestXACMLPolicies
         try {
             StringBuffer xml = new StringBuffer();
             xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            xml.append(
-                    "<foxml:digitalObject VERSION=\"1.1\" PID=\"demo:ObjSpecificTest\" xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\">");
+            xml
+                    .append("<foxml:digitalObject VERSION=\"1.1\" PID=\"demo:ObjSpecificTest\" xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\">");
             xml.append("  <foxml:objectProperties>");
-            xml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>");
-            xml.append(
-                    "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\"ObjSpecificTest\"/>");
-            xml.append(
-                    "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#createdDate\" VALUE=\"2004-12-10T00:21:57Z\"/>");
-            xml.append(
-                    "    <foxml:property NAME=\"info:fedora/fedora-system:def/view#lastModifiedDate\" VALUE=\"2004-12-10T00:21:57Z\"/>");
+            xml
+                    .append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>");
+            xml
+                    .append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\"ObjSpecificTest\"/>");
+            xml
+                    .append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#createdDate\" VALUE=\"2004-12-10T00:21:57Z\"/>");
+            xml
+                    .append("    <foxml:property NAME=\"info:fedora/fedora-system:def/view#lastModifiedDate\" VALUE=\"2004-12-10T00:21:57Z\"/>");
             xml.append("  </foxml:objectProperties>");
-            xml.append("  <foxml:datastream ID=\"POLICY\" CONTROL_GROUP=\"X\" STATE=\"A\">");
-            xml.append("    <foxml:datastreamVersion FORMAT_URI=\"" + XACML_POLICY1_0.uri +
-                       "\" ID=\"POLICY1.0\" MIMETYPE=\"text/xml\" LABEL=\"Policy\">");
+            xml
+                    .append("  <foxml:datastream ID=\"POLICY\" CONTROL_GROUP=\"X\" STATE=\"A\">");
+            xml
+                    .append("    <foxml:datastreamVersion FORMAT_URI=\""
+                            + XACML_POLICY1_0.uri
+                            + "\" ID=\"POLICY1.0\" MIMETYPE=\"text/xml\" LABEL=\"Policy\">");
             xml.append("         <foxml:xmlContent>");
-            xml.append(
-                    "<Policy PolicyId=\"POLICY\" RuleCombiningAlgId=\"urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable\"");
-            xml.append(
-                    "  xmlns=\"urn:oasis:names:tc:xacml:1.0:policy\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">");
+            xml
+                    .append("<Policy PolicyId=\"POLICY\" RuleCombiningAlgId=\"urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable\"");
+            xml
+                    .append("  xmlns=\"urn:oasis:names:tc:xacml:1.0:policy\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">");
             xml.append("  <Description>");
             xml.append("    Denies all to user with id testuserroleC2");
             xml.append("  </Description>");
@@ -850,11 +915,14 @@ public class TestXACMLPolicies
             xml.append("    </Actions>");
             xml.append("  </Target>");
             xml.append("  <Rule Effect=\"Deny\" RuleId=\"1\">");
-            xml.append("    <Condition FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-is-in\">");
-            xml.append(
-                    "      <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">roleUntrusted</AttributeValue>");
-            xml.append("      <SubjectAttributeDesignator AttributeId=\"fedoraRole\"");
-            xml.append("        DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"false\"/>");
+            xml
+                    .append("    <Condition FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-is-in\">");
+            xml
+                    .append("      <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">roleUntrusted</AttributeValue>");
+            xml
+                    .append("      <SubjectAttributeDesignator AttributeId=\"fedoraRole\"");
+            xml
+                    .append("        DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"false\"/>");
             xml.append("    </Condition>");
             xml.append("  </Rule>");
             xml.append("</Policy>");
@@ -867,7 +935,7 @@ public class TestXACMLPolicies
                                    "");
         } catch (Exception e) {
             throw new RuntimeException("Failure adding object-specific "
-                                       + "policies", e);
+                    + "policies", e);
         }
     }
 
@@ -876,7 +944,7 @@ public class TestXACMLPolicies
             admin.getAPIM().purgeObject("demo:ObjSpecificTest", "", false);
         } catch (Exception e) {
             throw new RuntimeException("Failure removing object-specific "
-                                       + "policies", e);
+                    + "policies", e);
         }
     }
 
@@ -884,32 +952,40 @@ public class TestXACMLPolicies
         try {
             StringBuffer xml = new StringBuffer();
             xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            xml.append("<foxml:digitalObject VERSION=\"1.1\" PID=\"" + pid +
-                       "\" xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\">");
+            xml
+                    .append("<foxml:digitalObject VERSION=\"1.1\" PID=\""
+                            + pid
+                            + "\" xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\">");
             xml.append("  <foxml:objectProperties>");
             if (ownerId != null && ownerId.trim().length() > 0) {
-                xml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#ownerId\" VALUE=\"");
+                xml
+                        .append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#ownerId\" VALUE=\"");
                 xml.append(ownerId.trim());
                 xml.append("\"/>");
             }
-            xml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>");
-            xml.append(
-                    "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\"MultiOwnerObject\"/>");
-            xml.append(
-                    "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#createdDate\" VALUE=\"2004-12-10T00:21:57Z\"/>");
-            xml.append(
-                    "    <foxml:property NAME=\"info:fedora/fedora-system:def/view#lastModifiedDate\" VALUE=\"2004-12-10T00:21:57Z\"/>");
+            xml
+                    .append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>");
+            xml
+                    .append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\"MultiOwnerObject\"/>");
+            xml
+                    .append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#createdDate\" VALUE=\"2004-12-10T00:21:57Z\"/>");
+            xml
+                    .append("    <foxml:property NAME=\"info:fedora/fedora-system:def/view#lastModifiedDate\" VALUE=\"2004-12-10T00:21:57Z\"/>");
             xml.append("  </foxml:objectProperties>");
             if (cModelPIDs != null) {
-                xml.append("<foxml:datastream CONTROL_GROUP=\"X\" ID=\"RELS-EXT\">");
-                xml.append(
-                        "  <foxml:datastreamVersion CREATED=\"2008-07-02T05:09:43.375Z\" FORMAT_URI=\"info:fedora/fedora-system:FedoraRELSExt-1.0\" ID=\"RELS-EXT1.0\" LABEL=\"RDF Statements about this object\" MIMETYPE=\"application/rdf+xml\">");
+                xml
+                        .append("<foxml:datastream CONTROL_GROUP=\"X\" ID=\"RELS-EXT\">");
+                xml
+                        .append("  <foxml:datastreamVersion CREATED=\"2008-07-02T05:09:43.375Z\" FORMAT_URI=\"info:fedora/fedora-system:FedoraRELSExt-1.0\" ID=\"RELS-EXT1.0\" LABEL=\"RDF Statements about this object\" MIMETYPE=\"application/rdf+xml\">");
                 xml.append("    <foxml:xmlContent>");
-                xml.append(
-                        "      <rdf:RDF xmlns:fedora-model=\"info:fedora/fedora-system:def/model#\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">");
-                xml.append("        <rdf:Description rdf:about=\"info:fedora/" + pid + "\">");
+                xml
+                        .append("      <rdf:RDF xmlns:fedora-model=\"info:fedora/fedora-system:def/model#\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">");
+                xml.append("        <rdf:Description rdf:about=\"info:fedora/"
+                        + pid + "\">");
                 for (String cModelPID : cModelPIDs) {
-                    xml.append("          <fedora-model:hasModel rdf:resource=\"info:fedora/" + cModelPID + "\"/>");
+                    xml
+                            .append("          <fedora-model:hasModel rdf:resource=\"info:fedora/"
+                                    + cModelPID + "\"/>");
                 }
                 xml.append("        </rdf:Description>");
                 xml.append("      </rdf:RDF>");
@@ -919,7 +995,8 @@ public class TestXACMLPolicies
             }
             xml.append("</foxml:digitalObject>");
             admin.getAPIM().ingest(xml.toString().getBytes("UTF-8"),
-                                   FOXML1_1.uri, "");
+                                   FOXML1_1.uri,
+                                   "");
         } catch (Exception e) {
             throw new RuntimeException("Failure adding test object: " + pid, e);
         }
@@ -929,7 +1006,8 @@ public class TestXACMLPolicies
         try {
             admin.getAPIM().purgeObject(pid, "", false);
         } catch (Exception e) {
-            throw new RuntimeException("Failure removing test object: " + pid, e);
+            throw new RuntimeException("Failure removing test object: " + pid,
+                                       e);
         }
     }
 
