@@ -553,7 +553,7 @@ public class TestRESTAPI
 
         String control =
                 FileUtils
-                        .readFileToString(new File("src/test/resources/rest/datastreamHistory.xml"),
+                        .readFileToString(new File(REST_RESOURCE_PATH + "/datastreamHistory.xml"),
                                           "UTF-8");
         StringTemplate tpl = new StringTemplate(control);
         tpl.setAttribute("FEDORA_BASE_URL", getProtocol() + "://" + getHost()
