@@ -204,7 +204,7 @@ public class TestCommandLineUtilities
         System.out.println("Batch purge test succeeded");
     }
 
-    public void testExport() {
+    public void testExport() throws Exception {
         System.out.println("Testing fedora-export");
         System.out.println("Ingesting object test:1001");
         ingestFoxmlFile(new File(RESOURCEBASE
@@ -234,6 +234,7 @@ public class TestCommandLineUtilities
         if (outFile2.exists()) {
             outFile2.delete();
         }
+        purgeFast("test:1001");
         System.out.println("Export test succeeded");
     }
 
