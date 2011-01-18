@@ -146,8 +146,6 @@ public class Administrator
 
     public static String BUILD_DATE = s_const.getString("buildDate");
 
-    public static String BUILD_NUMBER = s_const.getString("buildNumber");
-
     public static final void showErrorDialog(Component parent,
                                              String title,
                                              String explanation,
@@ -242,7 +240,6 @@ public class Administrator
                         + "<p>limitations under the License.</p><p></p>"
                         + "<p><b>Version: </b>" + VERSION + "</p>"
                         + "<p><b>Build Date: </b>" + BUILD_DATE + "</p>"
-                        + "<p><b>Build Number: </b>" + BUILD_NUMBER + "</p>"
                         + "<p></p>"
                         + "<p>See http://fedora-commons.org/ for more information.</p></html>");
 
