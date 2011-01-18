@@ -239,7 +239,7 @@
     
     <!-- Client entries -->
     <fileSet>
-      <directory>../resources/inc</directory>
+      <directory>src/main/resources</directory>
       <outputDirectory>/client</outputDirectory>
       <includes>
         <include>truststore</include>
