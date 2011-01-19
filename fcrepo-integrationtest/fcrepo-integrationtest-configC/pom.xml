@@ -14,6 +14,32 @@
   <name>Fedora Integration Test - Configuration C</name>
 
   <profiles>
+
+    <profile>
+      <id>dbxml-property-not-defined</id>
+      <activation>
+        <property>
+          <name>!dbxml.home</name>
+        </property>
+      </activation>
+      <properties>
+        <integration.test.skip>true</integration.test.skip>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>DBXML_HOME-is-defined</id>
+      <activation>
+        <property>
+          <name>env.DBXML_HOME</name>
+        </property>
+      </activation>
+      <properties>
+        <dbxml.home>${env.DBXML_HOME}</dbxml.home>
+        <integration.test.skip>false</integration.test.skip>
+      </properties>
+    </profile>
+
     <profile>
       <id>explicitly-disabled</id>
       <activation>
@@ -26,7 +52,7 @@
         <integration.test.skip>true</integration.test.skip>
       </properties>
     </profile>
-    
+
     <profile>
       <id>exclusive</id>
       <activation>
@@ -38,7 +64,7 @@
         <integration.test.skip>true</integration.test.skip>
       </properties>
     </profile>
-    
+
     <profile>
       <id>explicitly-enabled</id>
       <activation>
@@ -61,7 +87,7 @@
       </activation>
       <properties>
         <fedora.home>${project.build.directory}/fcrepo-${project.version}</fedora.home>
-        <fedora.install.properties>${project.build.directory}/test-classes/config/ConfigA.properties</fedora.install.properties>
+        <fedora.install.properties>${project.build.directory}/test-classes/config/ConfigC.properties</fedora.install.properties>
         <fedora.install.version>${project.version}</fedora.install.version>
       </properties>
 
@@ -143,6 +169,7 @@
       </activation>
       <properties>
         <fedora.home>${env.FEDORA_HOME}</fedora.home>
+        <integration.test.skip>false</integration.test.skip>
       </properties>
     </profile>
 
