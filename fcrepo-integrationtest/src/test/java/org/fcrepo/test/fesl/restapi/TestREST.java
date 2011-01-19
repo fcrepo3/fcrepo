@@ -351,7 +351,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
 
         try {
             File f =
-                    new File(RESOURCEBASE + "/fesl-test/test-AddDatastream.xml");
+                    new File(RESOURCEBASE + "/fesl-test/test-addDatastream.xml");
             byte[] data = DataUtils.loadFile(f);
 
             String url =
@@ -540,7 +540,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
 
         try {
             File f =
-                    new File(RESOURCEBASE + "/fesl-test/test-AddDatastream.xml");
+                    new File(RESOURCEBASE + "/fesl-test/test-addDatastream.xml");
             byte[] data = DataUtils.loadFile(f);
 
             // Add test datastream
@@ -636,7 +636,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
 
         try {
             File f =
-                    new File(RESOURCEBASE + "/fesl-test/test-AddDatastream.xml");
+                    new File(RESOURCEBASE + "/fesl-test/test-addDatastream.xml");
             byte[] data = DataUtils.loadFile(f);
 
             // add datastream
@@ -734,7 +734,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
 
         try {
             File f =
-                    new File(RESOURCEBASE + "/fesl-test/test-AddDatastream.xml");
+                    new File(RESOURCEBASE + "/fesl-test/test-addDatastream.xml");
             byte[] data = DataUtils.loadFile(f);
 
             // Add test datastream
@@ -784,7 +784,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
 
         try {
             File f =
-                    new File(RESOURCEBASE + "/fesl-test/test-AddDatastream.xml");
+                    new File(RESOURCEBASE + "/fesl-test/test-addDatastream.xml");
             byte[] data = DataUtils.loadFile(f);
 
             // Add test datastream
