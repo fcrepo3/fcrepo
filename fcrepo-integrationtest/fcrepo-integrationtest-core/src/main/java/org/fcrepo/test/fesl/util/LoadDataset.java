@@ -14,7 +14,10 @@ public class LoadDataset {
     private static final String PROPERTIES = "fedora";
 
     private static final String RESOURCEBASE =
-            "src/test/resources/test-objects/foxml";
+        System.getProperty("fcrepo-integrationtest-core.classes") != null ? System
+                .getProperty("fcrepo-integrationtest-core.classes")
+                + "test-objects/foxml"
+                : "src/test/resources/test-objects/foxml";
 
     private static HttpUtils client = null;
 
