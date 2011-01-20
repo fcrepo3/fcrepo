@@ -2,13 +2,21 @@
 
   <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
   <target name="tomcat-start">
-    <java jar="${tomcat.home}/bin/bootstrap.jar" fork="yes" dir="${tomcat.home}" spawn="true">
-      <jvmarg value="-Djava.io.tmpdir=${tomcat.home}/temp" />
-      <jvmarg value="-XX:MaxPermSize=512M" />
-      <jvmarg value="-Xmx512M" />
-      <env key="FEDORA_HOME" value="${fedora.home}" />
-      <arg line="start" />
-    </java>
+    <parallel>
+      <java jar="${tomcat.home}/bin/bootstrap.jar" fork="yes" dir="${tomcat.home}" spawn="true">
+        <jvmarg value="-Djava.io.tmpdir=${tomcat.home}/temp" />
+        <jvmarg value="-XX:MaxPermSize=512M" />
+        <jvmarg value="-Xmx512M" />
+        <env key="FEDORA_HOME" value="${fedora.home}" />
+        <arg line="start" />
+      </java>
+      <sequential>
+        <waitfor maxwait="30" maxwaitunit="second" checkevery="2">
+          <socket server="127.0.0.1" port="${fedora.port}"/>
+        </waitfor>
+        <echo>Fedora started</echo>
+      </sequential>
+    </parallel>
   </target>
 
   <target name="tomcat-stop">
