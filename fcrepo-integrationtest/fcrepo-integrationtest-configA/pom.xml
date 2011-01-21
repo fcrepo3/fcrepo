@@ -38,7 +38,7 @@
         <integration.test.skip>true</integration.test.skip>
       </properties>
     </profile>
-    
+
     <profile>
       <id>explicitly-enabled</id>
       <activation>
@@ -51,7 +51,7 @@
         <integration.test.skip>false</integration.test.skip>
       </properties>
     </profile>
-    
+
     <profile>
       <id>FEDORA_HOME-not-defined</id>
       <activation>
@@ -291,6 +291,8 @@
         <configuration>
 
           <skip>${integration.test.skip}</skip>
+
+          <summaryFile>${project.build.directory}/failsafe-reports/failsafe-summary.xml</summaryFile>
 
           <systemPropertyVariables>
             <fedora.authorize.access>false</fedora.authorize.access>

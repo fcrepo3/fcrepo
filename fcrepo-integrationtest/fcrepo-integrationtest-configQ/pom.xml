@@ -291,6 +291,7 @@
         <configuration>
 
           <skip>${integration.test.skip}</skip>
+          <summaryFile>${project.build.directory}/failsafe-reports/failsafe-summary.xml</summaryFile>
 
           <systemPropertyVariables>
             <fedora.authorize.access>false</fedora.authorize.access>
