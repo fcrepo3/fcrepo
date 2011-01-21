@@ -263,7 +263,7 @@
 
         <executions>
           <execution>
-            <id>integration-test</id>
+            <id>fcrepo-integrationtest-core</id>
             <phase>integration-test</phase>
             <goals>
               <goal>integration-test</goal>
@@ -271,7 +271,59 @@
             <configuration>
               <testClassesDirectory>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes</testClassesDirectory>
               <reportsDirectory>${project.build.directory}/failsafe-reports/fcrepo-integrationtest-core</reportsDirectory>
+              <summaryFile>${project.build.directory}/failsafe-reports/fcrepo-integrationtest-core/failsafe-summary.xml</summaryFile>
+
+              <includes>
+
+                <!--
+                  Has bug in source-code
+                  <include>**/SimpleDeploymentTests.class</include>
+                -->
+
+                <include>**/AtomAPIMMessageTest.class</include>
+                <include>**/NotificationInvocationHandlerTest.class</include>
+                <include>**/DOTranslationUtilityTest.class</include>
+                <include>**/TestIngest.class</include>
+                <include>**/TestAPIA.class</include>
+                <include>**/TestAPIAConfigA.class</include>
+                <include>**/TestAPIALite.class</include>
+                <include>**/TestAPIALiteConfigA.class</include>
+                <include>**/TestAPIM.class</include>
+                <include>**/TestAPIMLite.class</include>
+                <include>**/TestRESTAPI.class</include>
+                <include>**/TestHTTPStatusCodes.class</include>
+                <include>**/TestHTTPStatusCodesConfigA.class</include>
+                <include>**/TestManagedDatastreams.class</include>
+                <include>**/TestManyDisseminations.class</include>
+                <include>**/TestCommandLineFormats.class</include>
+                <include>**/TestOAIService.class</include>
+                <include>**/TestServerConfiguration.class</include>
+                <include>**/ConflictingDeploymentTests.class</include>
+                <include>**/TestCommandLineUtilities.class</include>
+                <include>**/SharedDeploymentTests.class</include>
+                <include>**/ContentModelDSInputTest.class</include>
+                <include>**/TestAdminAPI.class</include>
+
+                <!--
+                  Disabled until FCREPO-798 is public
+                  <include>**/TestAPIM2.class</include>
+                -->
+
+              </includes>
+
+              <excludes>
+                <exclude>${instrumentedTests}</exclude>
+                <exclude>${nestedClassTests}</exclude>
+              </excludes>
+
             </configuration>
+          </execution>
+
+          <execution>
+            <id>local-tests</id>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
           </execution>
 
           <execution>
@@ -281,8 +333,10 @@
               <goal>verify</goal>
             </goals>
             <configuration>
-              <testClassesDirectory>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes</testClassesDirectory>
-              <reportsDirectory>${project.build.directory}/failsafe-reports/fcrepo-integrationtest-core</reportsDirectory>
+              <summaryFiles>
+                <summaryFile>${project.build.directory}/failsafe-reports/fcrepo-integrationtest-core/failsafe-summary.xml</summaryFile>
+                <summaryFile>${project.build.directory}/failsafe-reports/failsafe-summary.xml</summaryFile>
+              </summaryFiles>
             </configuration>
           </execution>
 
@@ -291,8 +345,6 @@
         <configuration>
 
           <skip>${integration.test.skip}</skip>
-
-          <summaryFile>${project.build.directory}/failsafe-reports/failsafe-summary.xml</summaryFile>
 
           <systemPropertyVariables>
             <fedora.authorize.access>false</fedora.authorize.access>
@@ -309,48 +361,6 @@
             <org.apache.activemq.default.directory.prefix>${org.apache.activemq.default.directory.prefix}</org.apache.activemq.default.directory.prefix>
             <fcrepo-integrationtest-core.classes>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes/</fcrepo-integrationtest-core.classes>
           </systemPropertyVariables>
-
-          <includes>
-
-            <!--
-              Has bug in source-code
-              <include>**/SimpleDeploymentTests.class</include>
-            -->
-
-            <include>**/AtomAPIMMessageTest.class</include>
-            <include>**/NotificationInvocationHandlerTest.class</include>
-            <include>**/DOTranslationUtilityTest.class</include>
-            <include>**/TestIngest.class</include>
-            <include>**/TestAPIA.class</include>
-            <include>**/TestAPIAConfigA.class</include>
-            <include>**/TestAPIALite.class</include>
-            <include>**/TestAPIALiteConfigA.class</include>
-            <include>**/TestAPIM.class</include>
-            <include>**/TestAPIMLite.class</include>
-            <include>**/TestRESTAPI.class</include>
-            <include>**/TestHTTPStatusCodes.class</include>
-            <include>**/TestHTTPStatusCodesConfigA.class</include>
-            <include>**/TestManagedDatastreams.class</include>
-            <include>**/TestManyDisseminations.class</include>
-            <include>**/TestCommandLineFormats.class</include>
-            <include>**/TestOAIService.class</include>
-            <include>**/TestServerConfiguration.class</include>
-            <include>**/ConflictingDeploymentTests.class</include>
-            <include>**/TestCommandLineUtilities.class</include>
-            <include>**/SharedDeploymentTests.class</include>
-            <include>**/ContentModelDSInputTest.class</include>
-            <include>**/TestAdminAPI.class</include>
-
-            <!--
-              Disabled until FCREPO-798 is public
-              <include>**/TestAPIM2.class</include>
-            -->
-
-          </includes>
-          <excludes>
-            <exclude>${instrumentedTests}</exclude>
-            <exclude>${nestedClassTests}</exclude>
-          </excludes>
 
         </configuration>
       </plugin>

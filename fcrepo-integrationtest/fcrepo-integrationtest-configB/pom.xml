@@ -38,7 +38,7 @@
         <integration.test.skip>true</integration.test.skip>
       </properties>
     </profile>
-    
+
     <profile>
       <id>explicitly-enabled</id>
       <activation>
@@ -263,26 +263,76 @@
 
         <executions>
           <execution>
-            <id>integration-test</id>
-            <phase>integration-test</phase>
+            <id>fcrepo-integrationtest-core</id>
             <goals>
               <goal>integration-test</goal>
             </goals>
             <configuration>
               <testClassesDirectory>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes</testClassesDirectory>
               <reportsDirectory>${project.build.directory}/failsafe-reports/fcrepo-integrationtest-core</reportsDirectory>
+              <summaryFile>${project.build.directory}/failsafe-reports/fcrepo-integrationtest-core/failsafe-summary.xml</summaryFile>
+
+              <includes>
+
+                <include>**/NotificationInvocationHandlerTest.class</include>
+
+                <!--
+                  Has bug in source-code
+                  <include>**/SimpleDeploymentTests.class</include>
+                -->
+
+                <include>**/AtomAPIMMessageTest.class</include>
+                <include>**/DOTranslationUtilityTest.class</include>
+                <include>**/TestIngest.class</include>
+                <include>**/TestAPIA.class</include>
+                <include>**/TestAPIALite.class</include>
+                <include>**/TestAPIM.class</include>
+                <include>**/TestAPIMLite.class</include>
+                <include>**/TestAuthentication.class</include>
+                <include>**/TestHTTPStatusCodes.class</include>
+                <include>**/TestHTTPStatusCodesConfigB.class</include>
+                <include>**/TestManagedDatastreams.class</include>
+                <include>**/TestManagementNotifications.class</include>
+                <include>**/TestRelationships.class</include>
+                <include>**/TestRESTAPI.class</include>
+                <include>**/TestRISearch.class</include>
+                <include>**/TestOAIService.class</include>
+                <include>**/TestCommandLineFormats.class</include>
+                <include>**/TestServerConfiguration.class</include>
+                <include>**/ConflictingDeploymentTests.class</include>
+                <include>**/SharedDeploymentTests.class</include>
+                <include>**/TestXACMLPolicies.class</include>
+                <include>**/ContentModelDSInputTest.class</include>
+                <include>**/TestCommandLineUtilities.class</include>
+                <include>**/TestMisplacedNamespace.class</include>
+                <include>**/TestAdminAPI.class</include>
+              </includes>
+
+              <excludes>
+                <exclude>${instrumentedTests}</exclude>
+                <exclude>${nestedClassTests}</exclude>
+              </excludes>
+
             </configuration>
           </execution>
 
           <execution>
+            <id>local-tests</id>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+          </execution>
+
+          <execution>
             <id>verify</id>
-            <phase>verify</phase>
             <goals>
               <goal>verify</goal>
             </goals>
             <configuration>
-              <testClassesDirectory>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes</testClassesDirectory>
-              <reportsDirectory>${project.build.directory}/failsafe-reports/fcrepo-integrationtest-core</reportsDirectory>
+              <summaryFiles>
+                <summaryFile>${project.build.directory}/failsafe-reports/fcrepo-integrationtest-core/failsafe-summary.xml</summaryFile>
+                <summaryFile>${project.build.directory}/failsafe-reports/failsafe-summary.xml</summaryFile>
+              </summaryFiles>
             </configuration>
           </execution>
 
@@ -291,7 +341,8 @@
         <configuration>
 
           <skip>${integration.test.skip}</skip>
-          <summaryFile>${project.build.directory}/failsafe-reports/failsafe-summary.xml</summaryFile>
+
+          <encoding>UTF-8</encoding>
 
           <systemPropertyVariables>
             <fedora.authorize.access>true</fedora.authorize.access>
@@ -308,48 +359,6 @@
             <org.apache.activemq.default.directory.prefix>${org.apache.activemq.default.directory.prefix}</org.apache.activemq.default.directory.prefix>
             <fcrepo-integrationtest-core.classes>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes/</fcrepo-integrationtest-core.classes>
           </systemPropertyVariables>
-
-          <includes>
-
-            <include>**/NotificationInvocationHandlerTest.class</include>
-
-            <!--
-              Has bug in source-code
-              <include>**/SimpleDeploymentTests.class</include>
-            -->
-
-            <include>**/AtomAPIMMessageTest.class</include>
-            <include>**/DOTranslationUtilityTest.class</include>
-            <include>**/TestIngest.class</include>
-            <include>**/TestAPIA.class</include>
-            <include>**/TestAPIALite.class</include>
-            <include>**/TestAPIM.class</include>
-            <include>**/TestAPIMLite.class</include>
-            <include>**/TestAuthentication.class</include>
-            <include>**/TestHTTPStatusCodes.class</include>
-            <include>**/TestHTTPStatusCodesConfigB.class</include>
-            <include>**/TestManagedDatastreams.class</include>
-            <include>**/TestManagementNotifications.class</include>
-            <include>**/TestRelationships.class</include>
-            <include>**/TestRESTAPI.class</include>
-            <include>**/TestRISearch.class</include>
-            <include>**/TestOAIService.class</include>
-            <include>**/TestCommandLineFormats.class</include>
-            <include>**/TestServerConfiguration.class</include>
-            <include>**/ConflictingDeploymentTests.class</include>
-            <include>**/SharedDeploymentTests.class</include>
-            <include>**/TestXACMLPolicies.class</include>
-            <include>**/ContentModelDSInputTest.class</include>
-            <include>**/TestCommandLineUtilities.class</include>
-            <include>**/TestMisplacedNamespace.class</include>
-            <include>**/TestAdminAPI.class</include>
-
-
-          </includes>
-          <excludes>
-            <exclude>${instrumentedTests}</exclude>
-            <exclude>${nestedClassTests}</exclude>
-          </excludes>
 
         </configuration>
       </plugin>
