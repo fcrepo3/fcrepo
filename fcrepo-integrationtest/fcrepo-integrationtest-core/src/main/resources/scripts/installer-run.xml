@@ -1,0 +1,17 @@
+<project name="installer-run">
+
+  <target name="install">
+    <delete dir="${fedora.home}" failonerror="false" />
+    <mkdir dir="${fedora.home}" />
+    <echo>Installer: ${basedir}/target/ext/fcrepo-installer/fcrepo-installer-${fedora.install.version}.jar</echo>
+    <echo>Properties: ${fedora.install.properties}</echo>
+    <java
+      jar="${basedir}/target/ext/fcrepo-installer/fcrepo-installer-${fedora.install.version}.jar"
+      fork="true" spawn="false" failonerror="true">
+      <arg line="${fedora.install.properties}" />
+      <env key="FEDORA_HOME" value="${fedora.home}" />
+      <env key="CATALINA_HOME" value="${tomcat.home}" />
+    </java>
+  </target>
+
+</project>

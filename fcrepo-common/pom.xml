@@ -229,63 +229,44 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>ant-replace-wsdd</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+
+            <configuration>
+              <tasks>
+                <replace
+                  file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/deploy.wsdd"
+                  token="Fedora-API-M-Port-SOAPHTTP" value="management" />
+                <replace
+                  file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/deploy.wsdd"
+                  token="*&quot;/&gt;"
+                  value="*&quot;/&gt;&lt;parameter name=&quot;scope&quot; value=&quot;application&quot;/&gt;" />
+                <replace
+                  file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/deploy.wsdd"
+                  token="Fedora-API-A-Port-SOAPHTTP" value="access" />
+                <replace
+                  file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/undeploy.wsdd"
+                  token="Fedora-API-M-Port-SOAPHTTP" value="management" />
+                <replace
+                  file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/undeploy.wsdd"
+                  token="Fedora-API-A-Port-SOAPHTTP" value="access" />
+              </tasks>
+            </configuration>
+
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
 
   </build>
-
-  <profiles>
-
-    <profile>
-      <id>fedora-installer</id>
-
-      <activation>
-        <property>
-          <name>fedora</name>
-          <value>installer</value>
-        </property>
-      </activation>
-
-      <build>
-        <plugins>
-
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>ant-replace-wsdd</id>
-                <phase>process-classes</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-
-                <configuration>
-                  <tasks>
-                    <replace
-                      file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/deploy.wsdd"
-                      token="Fedora-API-M-Port-SOAPHTTP" value="management" />
-                    <replace
-                      file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/deploy.wsdd"
-                      token="*&quot;/&gt;"
-                      value="*&quot;/&gt;&lt;parameter name=&quot;scope&quot; value=&quot;application&quot;/&gt;" />
-                    <replace
-                      file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/deploy.wsdd"
-                      token="Fedora-API-A-Port-SOAPHTTP" value="access" />
-                    <replace
-                      file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/undeploy.wsdd"
-                      token="Fedora-API-M-Port-SOAPHTTP" value="management" />
-                    <replace
-                      file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/undeploy.wsdd"
-                      token="Fedora-API-A-Port-SOAPHTTP" value="access" />
-                  </tasks>
-                </configuration>
-
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
   <dependencies>
 

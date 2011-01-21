@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>fcrepo-installer</artifactId>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
   <name>Fedora Installer</name>
 
   <build>
@@ -25,132 +25,112 @@
       </resource>
     </resources>
 
+    <plugins>
+
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2-beta-4</version>
+
+        <executions>
+
+          <!-- Create the fedorahome.zip -->
+          <execution>
+            <id>fedora-home-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+
+            <configuration>
+              <filters>
+                <filter>${basedir}/src/main/filters/filter.properties</filter>
+              </filters>
+              <descriptors>
+                <descriptor>${basedir}/src/main/assembly/fedora-home.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+
+          <!-- Create the fedora installer -->
+          <execution>
+            <id>fedora-installer-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+
+            <configuration>
+
+              <appendAssemblyId>false</appendAssemblyId>
+              <finalName>fcrepo-installer-${project.version}</finalName>
+
+              <descriptors>
+                <descriptor>src/main/assembly/fedora-installer.xml</descriptor>
+              </descriptors>
+              <archive>
+                <manifest>
+                  <mainClass>com.simontuffs.onejar.Boot</mainClass>
+                </manifest>
+              </archive>
+            </configuration>
+          </execution>
+
+        </executions>
+
+      </plugin>
+    </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>fedora-installer</id>
-
-      <activation>
-        <property>
-          <name>fedora</name>
-          <value>installer</value>
-        </property>
-      </activation>
-
-      <build>
-        <plugins>
-
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.2-beta-4</version>
-
-            <executions>
-
-              <!-- Create the fedorahome.zip -->
-              <execution>
-                <id>fedora-home-assembly</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-
-                <configuration>
-                  <filters>
-                    <filter>${basedir}/src/main/filters/filter.properties</filter>
-                  </filters>
-                  <descriptors>
-                    <descriptor>${basedir}/src/main/assembly/fedora-home.xml</descriptor>
-                  </descriptors>
-                </configuration>
-              </execution>
-
-              <!-- Create the fedora installer -->
-              <execution>
-                <id>fedora-installer-assembly</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-
-                <configuration>
-
-                  <appendAssemblyId>false</appendAssemblyId>
-                  <finalName>fcrepo-installer-${project.version}</finalName>
-
-                  <descriptors>
-                    <descriptor>src/main/assembly/fedora-installer.xml</descriptor>
-                  </descriptors>
-                  <archive>
-                    <manifest>
-                      <mainClass>com.simontuffs.onejar.Boot</mainClass>
-                    </manifest>
-                  </archive>
-                </configuration>
-              </execution>
-
-            </executions>
-
-          </plugin>
-        </plugins>
-      </build>
-
-      <dependencies>
-        <dependency>
-          <groupId>commons-beanutils</groupId>
-          <artifactId>commons-beanutils</artifactId>
-        </dependency>
-
-        <dependency>
-          <groupId>commons-betwixt</groupId>
-          <artifactId>commons-betwixt</artifactId>
-        </dependency>
-
-        <dependency>
-          <groupId>commons-collections</groupId>
-          <artifactId>commons-collections</artifactId>
-          <version>3.1</version>
-        </dependency>
-
-        <dependency>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
-          <version>1.1.1</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.fcrepo</groupId>
-          <artifactId>fcrepo-webapp-fedora</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-        </dependency>
-
-        <dependency>
-          <groupId>org.fcrepo</groupId>
-          <artifactId>fcrepo-server</artifactId>
-          <classifier>utilities-main</classifier>
-          <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.fcrepo</groupId>
-          <artifactId>fcrepo-server</artifactId>
-          <classifier>cli-loader-main</classifier>
-          <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.fcrepo</groupId>
-          <artifactId>apache-tomcat</artifactId>
-          <version>6.0.29</version>
-          <type>zip</type>
-        </dependency>
-      </dependencies>
-
-    </profile>
-  </profiles>
-
   <dependencies>
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-betwixt</groupId>
+      <artifactId>commons-betwixt</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>activation</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-webapp-fedora</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-server</artifactId>
+      <classifier>utilities-main</classifier>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-server</artifactId>
+      <classifier>cli-loader-main</classifier>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>apache-tomcat</artifactId>
+      <version>6.0.29</version>
+      <type>zip</type>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.derby</groupId>
