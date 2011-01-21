@@ -156,7 +156,7 @@
     <fedora.hostname>localhost</fedora.hostname>
     <fedora.port>8080</fedora.port>
     <fedora.appServerContext>fedora</fedora.appServerContext>
-    <fedora.baseURL>http://localhost:8080/fedora</fedora.baseURL>
+    <fedora.baseURL>http://localhost:${fedora.port}/${fedora.appServerContext}</fedora.baseURL>
 
     <tomcat.home>${fedora.home}/tomcat</tomcat.home>
     <tomcat.url>${fedora.baseURL}</tomcat.url>
