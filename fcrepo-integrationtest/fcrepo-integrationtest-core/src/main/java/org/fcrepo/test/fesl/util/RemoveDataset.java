@@ -16,11 +16,15 @@ public class RemoveDataset {
     private static final String PROPERTIES = "fedora";
 
     private static final String RESOURCEBASE =
-            "src/test/resources/test-objects/foxml";
+            System.getProperty("fcrepo-integrationtest-core.classes") != null ? System
+                    .getProperty("fcrepo-integrationtest-core.classes")
+                    + "test-objects/foxml"
+                    : "src/test/resources/test-objects/foxml";
 
     private static HttpUtils client = null;
 
-    public static void remove(String fedoraUrl, String username, String password) throws Exception {
+    public static void remove(String fedoraUrl, String username, String password)
+            throws Exception {
 
         try {
             client = new HttpUtils(fedoraUrl, username, password);
@@ -34,12 +38,12 @@ public class RemoveDataset {
 
         for (File f : files) {
             // try {
-                Document doc = DataUtils.getDocumentFromFile(f);
-                String pid = doc.getDocumentElement().getAttribute("PID");
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Deleting object: " + pid);
-                }
-                client.delete("/fedora/objects/" + pid, null);
+            Document doc = DataUtils.getDocumentFromFile(f);
+            String pid = doc.getDocumentElement().getAttribute("PID");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Deleting object: " + pid);
+            }
+            client.delete("/fedora/objects/" + pid, null);
             //} catch (Exception e) {
             //    logger.error(e.getMessage(), e);
             //}

@@ -38,7 +38,10 @@ public class TestREST extends FedoraServerTestCase implements Constants {
     private static final String PROPERTIES = "fedora";
 
     private static final String RESOURCEBASE =
-            "src/test/resources/test-objects/foxml";
+        System.getProperty("fcrepo-integrationtest-core.classes") != null ? System
+                .getProperty("fcrepo-integrationtest-core.classes")
+                + "test-objects/foxml"
+                : "src/test/resources/test-objects/foxml";
 
     private static HttpUtils httpUtils = null;
 
@@ -351,7 +354,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
 
         try {
             File f =
-                    new File(RESOURCEBASE + "/fesl-test/test-AddDatastream.xml");
+                    new File(RESOURCEBASE + "/fesl-test/test-addDatastream.xml");
             byte[] data = DataUtils.loadFile(f);
 
             String url =
@@ -540,7 +543,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
 
         try {
             File f =
-                    new File(RESOURCEBASE + "/fesl-test/test-AddDatastream.xml");
+                    new File(RESOURCEBASE + "/fesl-test/test-addDatastream.xml");
             byte[] data = DataUtils.loadFile(f);
 
             // Add test datastream
@@ -636,7 +639,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
 
         try {
             File f =
-                    new File(RESOURCEBASE + "/fesl-test/test-AddDatastream.xml");
+                    new File(RESOURCEBASE + "/fesl-test/test-addDatastream.xml");
             byte[] data = DataUtils.loadFile(f);
 
             // add datastream
@@ -734,7 +737,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
 
         try {
             File f =
-                    new File(RESOURCEBASE + "/fesl-test/test-AddDatastream.xml");
+                    new File(RESOURCEBASE + "/fesl-test/test-addDatastream.xml");
             byte[] data = DataUtils.loadFile(f);
 
             // Add test datastream
@@ -784,7 +787,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
 
         try {
             File f =
-                    new File(RESOURCEBASE + "/fesl-test/test-AddDatastream.xml");
+                    new File(RESOURCEBASE + "/fesl-test/test-addDatastream.xml");
             byte[] data = DataUtils.loadFile(f);
 
             // Add test datastream
