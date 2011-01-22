@@ -11,20 +11,32 @@
         <arg line="start" />
       </java>
       <sequential>
-        <waitfor maxwait="30" maxwaitunit="second" checkevery="2">
+        <waitfor maxwait="60" maxwaitunit="second" checkevery="2" timeoutproperty="timeout">
           <socket server="127.0.0.1" port="${fedora.port}"/>
         </waitfor>
+        <fail if="timeout">Tomcat did not start in time</fail>
         <echo>Fedora started</echo>
       </sequential>
     </parallel>
   </target>
 
   <target name="tomcat-stop">
+    <parallel>
     <java jar="${tomcat.home}/bin/bootstrap.jar" fork="yes" dir="${tomcat.home}" spawn="true">
       <jvmarg value="-Djava.io.tmpdir=${tomcat.home}/temp" />
       <env key="FEDORA_HOME" value="${fedora.home}" />
       <arg line="stop" />
     </java>
+    <sequential>
+      <waitfor maxwait="60" maxwaitunit="second" checkevery="2" timeoutproperty="timeout">
+        <not>
+          <socket server="127.0.0.1" port="${fedora.port}"/>
+        </not>
+      </waitfor>
+      <fail if="timeout">Tomcat did not stop in time</fail>
+      <echo>Fedora stopped</echo>
+    </sequential>
+    </parallel>
   </target>
 
 </project>
