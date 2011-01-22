@@ -109,25 +109,6 @@
                 </goals>
               </execution>
             </executions>
-            <dependencies>
-              <dependency>
-                <groupId>ant-contrib</groupId>
-                <artifactId>ant-contrib</artifactId>
-                <version>1.0b3</version>
-
-                <!--
-                  ant-contrib pulls in a very old version of Ant that
-                  causes problems. Just use the one pulled in as a
-                  dependency of the antrun plugin.
-                -->
-                <exclusions>
-                  <exclusion>
-                    <groupId>ant</groupId>
-                    <artifactId>ant</artifactId>
-                  </exclusion>
-                </exclusions>
-              </dependency>
-            </dependencies>
           </plugin>
 
         </plugins>
