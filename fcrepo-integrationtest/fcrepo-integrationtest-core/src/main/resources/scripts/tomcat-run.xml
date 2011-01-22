@@ -27,7 +27,7 @@
       <arg line="stop" />
     </java>
     <sequential>
-      <waitfor maxwait="60" maxwaitunit="second" checkevery="2" timeoutproperty="timeout">
+      <waitfor maxwait="120" maxwaitunit="second" checkevery="2" timeoutproperty="timeout">
         <not>
           <socket server="127.0.0.1" port="${fedora.port}"/>
         </not>
