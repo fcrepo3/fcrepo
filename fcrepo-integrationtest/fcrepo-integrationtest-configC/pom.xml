@@ -79,10 +79,10 @@
     </profile>
 
     <profile>
-      <id>FEDORA_HOME-not-defined</id>
+      <id>fedora.home-not-defined</id>
       <activation>
         <property>
-          <name>!env.FEDORA_HOME</name>
+          <name>!fedora.home</name>
         </property>
       </activation>
       <properties>
@@ -142,14 +142,14 @@
     </profile>
 
     <profile>
-      <id>FEDORA_HOME-is-defined</id>
+      <id>fedora.home-is-defined</id>
       <activation>
         <property>
-          <name>env.FEDORA_HOME</name>
+          <name>fedora.home</name>
         </property>
       </activation>
       <properties>
-        <fedora.home>${env.FEDORA_HOME}</fedora.home>
+        <fedora.home>${fedora.home}</fedora.home>
         <integration.test.skip>false</integration.test.skip>
       </properties>
     </profile>
@@ -375,6 +375,10 @@
             <org.apache.activemq.default.directory.prefix>${org.apache.activemq.default.directory.prefix}</org.apache.activemq.default.directory.prefix>
             <fcrepo-integrationtest-core.classes>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes/</fcrepo-integrationtest-core.classes>
           </systemPropertyVariables>
+
+          <environmentVariables>
+            <FEDORA_HOME>${fedora.home}</FEDORA_HOME>
+          </environmentVariables>
 
         </configuration>
       </plugin>
