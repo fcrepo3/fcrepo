@@ -11,10 +11,10 @@ Building Fedora
 To build the executable installer, make sure you have maven2
 installed and enter the following:
 
-  mvn install -P fedora-installer
+  mvn install
 
 This generates fcrepo-installer-VERSION.jar, which can be found in
-/installer/target
+fcrepo-installer/target
 
 Running Unit Tests
 =====================
@@ -26,37 +26,66 @@ Running System Tests
 The system tests consist of functional "black box" tests to be
 executed against a running Fedora server.  These tests are divided
 into top-level suites, where each suite is intended to be run with
-the Fedora server configured in a specific way.
+the Fedora server configured in a specific way.  By default, maven
+will install and run a properly configured Fedora instance for each
+plausible system test configuration.
 
   [configA]
-    When running this suite, the server should be configured
+    When running this suite, the server shall be configured
     with API-A authentication turned OFF, SSL required for API-M,
     XACML enabled, and the Resource Index disabled.
 
   [configB]
-    When running this suite, the server should be configured
+    When running this suite, the server shall be configured
     with API-A authentication turned ON, with the
     Resource Index, REST api, and Messaging modules enabled.
     
+  [configC]
+   When running this suite, the server shall be configured
+    with API-A authentication turned ON, with the
+    Resource Index, REST api, and fesl authZ enabled.
+    By default, this suite will be skipped unless (a) test are being
+    run against an externally-deployed Fedora or (b) DBXML_HOME 
+    system property is set.  This is necessary for authZ to work, as are
+    the system properties PEP_NOCACHE=true and perhaps LD_LIBRARY_PATH.
+    See fesl documentation.
+    
   [configQ]
-    When running this suite, the server should be configured
+    When running this suite, the server shall be configured
     with the default options provided by 'quick install'.
     It can be used to verify the successful installation of 'quick install'.
     
 These tests do not depend on external hosts and can therefore be
 run without external network access.
 
-Installation properties files are supplied in the resources/properties/scripts
-folder (you will need to customise folder locations and DNS names to
-suit your own installation).  These files can be supplied as arguments to the
-installer jar file to simplify setting up test scenarios.
+Installation properties files are supplied in the 
+fcrepo-integrationtest-core/src/main/resources/config
+folder if you wish to manually configure and run an instance
+of Fedora to test against.  You will need to customise folder locations 
+and DNS names to suit your own installation.  These files can be supplied
+as arguments to the installer jar file to simplify setting up test scenarios.
 
-To execute a test suite, make sure the server has been started[*] and 
-that $FEDORA_HOME and $CATALINA_HOME point to the correct folder.
+In order to use an externally-run fedora instance, you must define the
+-Dfedora.home=${FEDORA_HOME} system property.  If that is set, maven will not
+attempt to install or run its own Fedora instance, and will assume that 
+a running and properrly configured instance is available.
 
-Then enter:
+All applicable integration/system test suites will be run through any of the following:
+mvn verify
+mvn install
+mvn deploy
 
-  mvn integration-test -P config[A|B|Q]
+Specific test suites can be disabled by defining system properties
+such as: 
+-DconfigA=false
+-DconfigB=false, etc.  
+multiple suites can be disabled at one time
+
+A single integration test suite can be run by defining system properties
+such as 
+-Dconfig=A (run only configA)
+-Dconfig=B (run only configB)
+(etc)
 
 By default, each test will run using the demo objects in
 FOXML format.  To run the same tests using the demo objects
@@ -67,11 +96,11 @@ the line above:
   -Ddemo.format=atom
   -Ddemo.format=atom-zip
   
-To run individual tests, supply the name of the test as a parameter, but
-note that you will need to be running Maven from within the 
-fcrepo-integrationtest folder, eg:
+To run individual integration/system tests, supply the name of the test
+as a value of the property 'it.test'
   
-  mvn integration-test -P configA -Dtest=TestRESTAPI
+ mvn verify -Dit.test=org.fcrepo.test.api.TestManagedDatastreams
+
 
 There are some system tests that are not included in the system
 test suites due to the time required to execute the test,
@@ -85,10 +114,8 @@ the following tests fall into that category:
     dependencies on external hosts and can therefore be 
     run without external internet access.
   
-  To run this test, make sure the server has been started[*] 
-  Then, from within the integrationtest sub-module enter:
     
-    mvn integration-test -P config[A|Q] -Dtest=org.fcrepo.test.integration.TestLargeDatastreams
+    mvn verify -Dconfig=[A|Q] -Dtest=org.fcrepo.test.integration.TestLargeDatastreams
 
 Running system tests with an alternate host or webapp context
 =============================================================
@@ -97,10 +124,9 @@ http://localhost:8080/fedora/.  A different server port may be
 chosen with no consequence.
 
 However, if the fedora server uses an alternate app
-server context (i.e. not /fedora), you must set the environment
-variable WEBAPP_NAME to the alternate context name.  This variable
-is used by command-line utilities.  System tests involving these 
-utilities may fail if WEBAPP_NAME is not set properly.
+server context (i.e. not /fedora), (or if you want integration tests to 
+run as such) you must set the system property 
+-Dfedora.appServerContext=${WEBAPP_NAME}
 
 Additionally, if your test instance of Fedora is not on the same 
 host from which you are running the tests, you must manually 
