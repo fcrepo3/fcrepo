@@ -337,6 +337,7 @@
 
           <environmentVariables>
             <FEDORA_HOME>${fedora.home}</FEDORA_HOME>
+            <WEBAPP_NAME>${fedora.appServerContext}</WEBAPP_NAME>
           </environmentVariables>
 
         </configuration>
