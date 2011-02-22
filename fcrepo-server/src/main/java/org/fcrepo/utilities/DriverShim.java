@@ -13,9 +13,9 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import java.util.Properties;
 
@@ -124,8 +124,9 @@ public class DriverShim
             Connection conn =
                     DriverManager.getConnection(args[2], args[3], args[4]);
             String tbl = args[5];
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM " + tbl);
+            PreparedStatement st = conn.prepareStatement("SELECT COUNT(*) FROM ?");
+            st.setString(1, tbl);
+            ResultSet rs = st.executeQuery();
             rs.next();
             System.out.println("The " + tbl + " table has " + rs.getInt(1)
                     + " rows.");
