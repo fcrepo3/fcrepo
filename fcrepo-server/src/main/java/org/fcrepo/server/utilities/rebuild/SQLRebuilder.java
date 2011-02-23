@@ -74,6 +74,7 @@ public class SQLRebuilder
     /**
      * Get a short phrase describing what the user can do with this rebuilder.
      */
+    @Override
     public String getAction() {
         return "Rebuild SQL database.";
     }
@@ -82,6 +83,7 @@ public class SQLRebuilder
      * Returns true is the server _must_ be shut down for this rebuilder to
      * safely operate.
      */
+    @Override
     public boolean shouldStopServer() {
         return true;
     }
@@ -91,18 +93,22 @@ public class SQLRebuilder
      *
      * @returns a map of option names to plaintext descriptions.
      */
+    @Override
     public void setServerConfiguration(ServerConfiguration serverConfig) {
         m_serverConfig = serverConfig;
     }
 
+    @Override
     public void setServerDir(File serverBaseDir) {
 
     }
 
+    @Override
     public void init() {
 
     }
 
+    @Override
     public Map<String, String> getOptions()
  {
         Map<String, String> m = new HashMap<String, String>();
@@ -112,6 +118,7 @@ public class SQLRebuilder
     /**
      * Validate the provided options and perform any necessary startup tasks.
      */
+    @Override
     public void start(Map<String, String> options) throws Exception {
         // This must be done before starting "RebuildServer"
         // rather than after, so any application caches
@@ -252,6 +259,7 @@ public class SQLRebuilder
     /**
      * Add the data of interest for the given object.
      */
+    @Override
     public void addObject(DigitalObject obj) {
         // CURRENT TIME:
         // Get the current time to use for created dates on object
@@ -453,6 +461,7 @@ public class SQLRebuilder
     /**
      * Free up any system resources associated with rebuilding.
      */
+    @Override
     public void finish() {
         // nothing to do
     }

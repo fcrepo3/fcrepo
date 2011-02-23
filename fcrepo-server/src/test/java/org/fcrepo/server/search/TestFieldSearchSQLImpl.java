@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -33,6 +34,7 @@ import org.junit.Test;
 
 import org.fcrepo.mock.sql.MockConnection;
 import org.fcrepo.mock.sql.MockDriver;
+import org.fcrepo.mock.sql.MockPreparedStatement;
 import org.fcrepo.mock.sql.MockStatement;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.config.DatastoreConfiguration;
@@ -492,6 +494,22 @@ public class TestFieldSearchSQLImpl {
                     return 1;
                 }
             };
+        }
+        
+        @Override
+        public PreparedStatement prepareStatement(String sql) throws SQLException {
+        	return new MockPreparedStatement(sql) {
+                @Override
+                public int executeUpdate() throws SQLException {
+                    if (getSql().trim().toLowerCase().startsWith("insert")) {
+                        insertCalls++;
+                    }
+                    if (getSql().trim().toLowerCase().startsWith("delete")) {
+                        deleteCalls++;
+                    }
+                    return 1;
+                }
+        	};
         }
 
         public void checkExpectations(int expectedDeletes, int expectedInserts) {

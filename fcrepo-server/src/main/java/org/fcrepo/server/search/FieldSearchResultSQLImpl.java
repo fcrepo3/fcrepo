@@ -5,9 +5,9 @@
 package org.fcrepo.server.search;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import java.text.ParseException;
 
@@ -80,7 +80,7 @@ public class FieldSearchResultSQLImpl
     private long m_startMillis;
 
     /* internal state */
-    private Statement m_statement;
+    private PreparedStatement m_statement;
 
     private ResultSet m_resultSet;
 
@@ -127,11 +127,10 @@ public class FieldSearchResultSQLImpl
         m_conn = m_cPool.getReadOnlyConnection();
         boolean success = false;
         try {
-            m_statement = m_conn.createStatement();
+            m_statement = m_conn.prepareStatement(logAndGetQueryText(query,
+                    m_resultFields));
             m_resultSet =
-                    m_statement
-                            .executeQuery(logAndGetQueryText(query,
-                                                             m_resultFields)); //2004.05.02 wdn5e
+                    m_statement.executeQuery(); //2004.05.02 wdn5e
             success = true;
         } finally {
             if (!success) {

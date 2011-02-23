@@ -15,6 +15,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -59,15 +60,16 @@ public class DBPathRegistry
             LowlevelStorageInconsistencyException, LowlevelStorageException {
         String path = null;
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet rs = null;
         try {
             int paths = 0;
             connection = connectionPool.getReadOnlyConnection();
-            statement = connection.createStatement();
+            String query = "SELECT path FROM " + getRegistryName() + " WHERE token=?";
+            statement = connection.prepareStatement(query);
+            statement.setString(1,pid);
             rs =
-                    statement.executeQuery("SELECT path FROM "
-                            + getRegistryName() + " WHERE token='" + pid + "'");
+                    statement.executeQuery();
             for (; rs.next(); paths++) {
                 path = rs.getString(1);
             }
@@ -107,7 +109,24 @@ public class DBPathRegistry
         }
         return path;
     }
-
+    
+    private void ensureSingleUpdate(Statement statement)
+        throws ObjectNotInLowlevelStorageException,
+        LowlevelStorageInconsistencyException, LowlevelStorageException {
+    	try{
+    		int updateCount = statement.getUpdateCount();
+    		if (updateCount == 0) {
+    			throw new ObjectNotInLowlevelStorageException("-no- rows updated in db registry");
+    		}
+    		if (updateCount > 1) {
+    			throw new LowlevelStorageInconsistencyException("-multiple- rows updated in db registry");
+    		}
+        } catch (SQLException e1) {
+            throw new LowlevelStorageException(true, "sql failurex (exec)", e1);
+        }
+    }
+    
+    @Deprecated
     public void executeSql(String sql)
             throws ObjectNotInLowlevelStorageException,
             LowlevelStorageInconsistencyException, LowlevelStorageException {
@@ -120,13 +139,7 @@ public class DBPathRegistry
                 throw new LowlevelStorageException(true,
                                                    "sql returned query results for a nonquery");
             }
-            int updateCount = statement.getUpdateCount();
-            if (updateCount == 0) {
-                throw new ObjectNotInLowlevelStorageException("-no- rows updated in db registry");
-            }
-            if (updateCount > 1) {
-                throw new LowlevelStorageInconsistencyException("-multiple- rows updated in db registry");
-            }
+            ensureSingleUpdate(statement);
         } catch (SQLException e1) {
             throw new LowlevelStorageException(true, "sql failurex (exec)", e1);
         } finally {
@@ -146,7 +159,41 @@ public class DBPathRegistry
             }
         }
     }
-
+    private void executeUpdate(String sql, String pid)
+        throws ObjectNotInLowlevelStorageException,
+        LowlevelStorageInconsistencyException, LowlevelStorageException {
+    	Connection connection = null;
+    	PreparedStatement statement = null;
+    	try {
+    		connection = connectionPool.getReadWriteConnection();
+    		statement = connection.prepareStatement(sql);
+    		if (pid != null){
+    			statement.setString(1,pid);
+    		}
+    		if (statement.execute()) {
+    			throw new LowlevelStorageException(true,
+    			"sql returned query results for a nonquery");
+    		}
+    		ensureSingleUpdate(statement);
+    	} catch (SQLException e1) {
+    		throw new LowlevelStorageException(true, "sql failurex (exec)", e1);
+    	} finally {
+    		try {
+    			if (statement != null) {
+    				statement.close();
+    			}
+    			if (connection != null) {
+    				connectionPool.free(connection);
+    			}
+    		} catch (Exception e2) { // purposely general to include uninstantiated statement, connection
+    			throw new LowlevelStorageException(true,
+    					"sql failure closing statement, connection, pool (exec)",
+    					e2);
+    		} finally {
+    			statement = null;
+    		}
+    	}
+    }
     @Override
     public void put(String pid, String path)
             throws ObjectNotInLowlevelStorageException,
@@ -186,8 +233,10 @@ public class DBPathRegistry
     public void remove(String pid) throws ObjectNotInLowlevelStorageException,
             LowlevelStorageInconsistencyException, LowlevelStorageException {
         try {
-            executeSql("DELETE FROM " + getRegistryName() + " WHERE "
-                    + getRegistryName() + ".token='" + pid + "'");
+            String query = "DELETE FROM " + getRegistryName() + " WHERE "
+            + getRegistryName() + ".token=?";
+            executeUpdate(query, pid);
+            
         } catch (ObjectNotInLowlevelStorageException e1) {
             throw new ObjectNotInLowlevelStorageException("[" + pid
                     + "] not in db registry to delete", e1);
@@ -201,7 +250,7 @@ public class DBPathRegistry
     public void rebuild() throws LowlevelStorageException {
         int report = FULL_REPORT;
         try {
-            executeSql("DELETE FROM " + getRegistryName());
+        	executeUpdate("DELETE FROM " + getRegistryName(), null);
         } catch (ObjectNotInLowlevelStorageException e1) {
         } catch (LowlevelStorageInconsistencyException e2) {
         }
