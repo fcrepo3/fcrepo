@@ -122,6 +122,22 @@
     <extension>oth</extension>
   </mime-mapping>
   <mime-mapping>
+    <mime-type>application/vnd.openxmlformats-officedocument.wordprocessingml.document</mime-type>
+    <extension>docx</extension>
+  </mime-mapping>
+  <mime-mapping>
+    <mime-type>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</mime-type>
+    <extension>xlsx</extension>
+  </mime-mapping>
+  <mime-mapping>
+    <mime-type>application/vnd.openxmlformats-officedocument.presentationml.presentation</mime-type>
+    <extension>pptx</extension>
+  </mime-mapping>
+  <mime-mapping>
+    <mime-type>application/vnd.openxmlformats-officedocument.presentationml.slideshow</mime-type>
+    <extension>ppsx</extension>
+  </mime-mapping>
+  <mime-mapping>
     <mime-type>application/vnd.rn-realmedia</mime-type>
     <extension>rm</extension>
   </mime-mapping>
