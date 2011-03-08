@@ -1360,7 +1360,7 @@ public class DefaultDOManager
                             "SELECT systemVersion FROM doRegistry WHERE doPID=?";
                     s = conn.prepareStatement(query);
                     s.setString(1,obj.getPid());
-                    results = s.executeQuery(query);
+                    results = s.executeQuery();
                     if (!results.next()) {
                         throw new ObjectNotFoundException("Error creating replication job: The requested object doesn't exist in the registry.");
                     }

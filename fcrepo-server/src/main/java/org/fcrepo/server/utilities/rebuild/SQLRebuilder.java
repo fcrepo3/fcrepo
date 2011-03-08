@@ -14,6 +14,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -194,12 +195,12 @@ public class SQLRebuilder
      */
     private void blankExistingTables() {
         Connection connection = null;
-        PreparedStatement s = null;
+        Statement s = null;
         try {
             connection = getDefaultConnection();
             List<String> existingTables = getExistingTables(connection);
             List<String> fedoraTables = getFedoraTables();
-            s = connection.prepareStatement("DELETE FROM ?");
+            s = connection.createStatement();
             for (int i = 0; i < existingTables.size(); i++) {
                 String origTableName = existingTables.get(i);
                 String tableName = origTableName.toUpperCase();
@@ -207,8 +208,7 @@ public class SQLRebuilder
                         && !tableName.startsWith("RI")) {
                     System.out.println("Cleaning up table: " + origTableName);
                     try {
-                    	s.setString(1, origTableName);
-                        s.executeUpdate();
+                        s.executeUpdate("DELETE FROM " + origTableName);
                     } catch (Exception lle) {
                         System.err.println(lle.getMessage());
                         System.err.flush();

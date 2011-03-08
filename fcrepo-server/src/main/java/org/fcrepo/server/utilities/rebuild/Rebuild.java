@@ -159,6 +159,7 @@ implements Constants, Runnable {
         catch (Exception e){
             System.err.println("Rebuild failed:");
             System.err.println(e.toString());
+            e.printStackTrace(System.err);
         }
     }
 
