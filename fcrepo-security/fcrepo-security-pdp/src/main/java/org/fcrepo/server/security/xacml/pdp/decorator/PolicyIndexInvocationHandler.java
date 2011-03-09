@@ -350,7 +350,7 @@ extends AbstractInvocationHandler {
             // make sure stream is closed - with Akubra on Windows this can leave the stream open
             // and leave the file locked (prevents a purge later)
             dsContent.close();
-            policyIndex.addPolicy(policy, pid);
+            policyIndex.addPolicy(pid, policy);
         } catch (IOException e) {
             throw new GeneralException("Error adding policy " + pid + " to policy index: " + e.getMessage(), e);
         } catch (PolicyIndexException e) {

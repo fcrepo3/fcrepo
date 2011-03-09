@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sun.xacml.EvaluationCtx;
@@ -81,18 +80,12 @@ class DbXmlPolicyIndex
 
     private  Map<String, XmlQueryExpression> queries = null;
 
-    // FIXME: potentially not thread-safe, however only currently used in the deprecated findPolicies method
-    private  XmlQueryExpression[] searchQueries = null;
-
 
     protected DbXmlPolicyIndex()
             throws PolicyStoreException {
         init();
 
         queries = new ConcurrentHashMap<String, XmlQueryExpression>();
-
-        searchQueries = new XmlQueryExpression[10];
-
     }
 
     private void init() throws PolicyStoreException {
@@ -111,6 +104,7 @@ class DbXmlPolicyIndex
      * @seemelcoe.xacml.pdp.data.PolicyDataManager#getPolicies(com.sun.xacml.
      * EvaluationCtx)
      */
+    @Override
     public Map<String, byte[]> getPolicies(EvaluationCtx eval)
             throws PolicyIndexException {
         long a = 0;
@@ -571,114 +565,6 @@ class DbXmlPolicyIndex
         return attributeMap;
     }
 
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.security.xacml.pdp.data.PolicyDataQuery#findPolicies
-     * (org.fcrepo.server.security.xacml.util .AttributeBean[])
-     */
-    // FIXME: never used (apart from an unused legacy Muradora class) - remove this.
-    // If this is ever used it will need to deal with write contention as per getPolicies
-    @Deprecated
-    @Override
-    public Map<String, byte[]> findPolicies(AttributeBean[] attributes)
-            throws PolicyIndexException {
-        log.error("findPolicies is deprecated");
-        if (attributes == null || attributes.length == 0) {
-            throw new PolicyIndexException("attribute array cannot be null or zero length");
-        }
-
-        long a, b, total = 0;
-        Map<String, byte[]> documents = new TreeMap<String, byte[]>();
-        try {
-            a = System.nanoTime();
-
-            XmlQueryContext context = dbXmlManager.manager.createQueryContext();
-            context.setDefaultCollection(dbXmlManager.CONTAINER);
-            context.setNamespace("p", XACML20_POLICY_NS);
-            context.setNamespace("m", METADATA_POLICY_NS);
-
-            for (int x = 0; attributes.length < 0; x++) {
-                context.setVariableValue("id" + x, new XmlValue(attributes[x]
-                                                                           .getId()));
-                // context.setVariableValue("type" + x, new
-                // XmlValue(attributes[x].getType()));
-                // context.setVariableValue("value" + x, new
-                // XmlValue(attributes[x].getValue()));
-            }
-
-            if (searchQueries[attributes.length] == null) {
-                StringBuilder sb = new StringBuilder();
-
-                sb.append("for $doc in ");
-                sb.append("collection('" + dbXmlManager.CONTAINER + "') ");
-                sb.append("let $value := $doc//p:AttributeValue ");
-                sb.append("let $id := $value/..//@AttributeId ");
-                sb.append("where 1 = 1 ");
-                for (int x = 0; x < attributes.length; x++) {
-                    sb.append("and $value = $value" + x + " ");
-                    sb.append("and $id = $id" + x + " ");
-                }
-                sb.append("return $doc");
-                searchQueries[attributes.length] = dbXmlManager.manager
-                .prepare(sb.toString(), context);
-
-
-            }
-
-            b = System.nanoTime();
-            total += b - a;
-            if (log.isDebugEnabled()) {
-                log.debug("Query prep. time: " + (b - a) + "ns");
-            }
-
-            a = System.nanoTime();
-            try {
-                XmlResults results = searchQueries[attributes.length].execute(context);
-
-                b = System.nanoTime();
-                total += b - a;
-                if (log.isDebugEnabled()) {
-                    log.debug("Search exec. time: " + (b - a) + "ns");
-                }
-
-                a = System.nanoTime();
-
-                while (results.hasNext()) {
-                    XmlValue value = results.next();
-                    if (log.isDebugEnabled()) {
-                        log.debug("Found search result: "
-                                  + value.asDocument().getName());
-                    }
-                    documents.put(value.asDocument().getName(), value.asDocument()
-                                  .getContent());
-                }
-                results.delete();
-            } catch (XmlException xe) {
-                if(xe.getDatabaseException() instanceof com.sleepycat.db.DeadlockException){
-                    log.error("Caught deadlock exception, findPolicies(execute)");
-                }
-                throw xe;
-            }
-
-            b = System.nanoTime();
-            total += b - a;
-            if (log.isDebugEnabled()) {
-                log.debug("Result proc. time: " + (b - a) + "ns");
-            }
-
-            log.info("Total time: " + total + "ns");
-        } catch (XmlException xe) {
-            log.error("Exception during findPolicies: " + xe.getMessage(), xe);
-            throw new PolicyIndexException("Exception during findPolicies: "
-                                           + xe.getMessage(),
-                                           xe);
-        }
-
-        return documents;
-    }
-
     private String[] makeComponents(String resourceId) {
         if (resourceId == null || resourceId.equals("")
                 || !resourceId.startsWith("/")) {
@@ -712,44 +598,10 @@ class DbXmlPolicyIndex
      * (non-Javadoc)
      * @see
      * org.fcrepo.server.security.xacml.pdp.data.PolicyDataManager#addPolicy
-     * (java.io.File)
-     */
-    public String addPolicy(File f) throws PolicyIndexException {
-        return addPolicy(f, null);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.security.xacml.pdp.data.PolicyDataManager#addPolicy
-     * (java.io.File, java.lang.String)
-     */
-    public String addPolicy(File f, String name)
-            throws PolicyIndexException {
-        try {
-            return addPolicy(utils.fileToString(f), name);
-        } catch (MelcoePDPException e) {
-            throw new PolicyIndexException(e);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.security.xacml.pdp.data.PolicyDataManager#addPolicy
-     * (java.lang.String)
-     */
-    public String addPolicy(String document) throws PolicyIndexException {
-        return addPolicy(document, null);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.security.xacml.pdp.data.PolicyDataManager#addPolicy
      * (java.lang.String, java.lang.String)
      */
-    public String addPolicy(String document, String name)
+    @Override
+    public String addPolicy(String name, String document)
             throws PolicyIndexException {
 
         String docName = null;
@@ -808,6 +660,7 @@ class DbXmlPolicyIndex
      * org.fcrepo.server.security.xacml.pdp.data.PolicyDataManager#deletePolicy
      * (java.lang.String)
      */
+    @Override
     public boolean deletePolicy(String name) throws PolicyIndexException {
         log.debug("Deleting document: " + name);
 
@@ -834,6 +687,7 @@ class DbXmlPolicyIndex
      * org.fcrepo.server.security.xacml.pdp.data.PolicyDataManager#updatePolicy
      * (java.lang.String, java.lang.String)
      */
+    @Override
     public boolean updatePolicy(String name, String newDocument)
             throws PolicyIndexException {
         log.debug("Updating document: " + name);
@@ -847,7 +701,7 @@ class DbXmlPolicyIndex
         // if method is used then there should be a single writeLock covering this whole transaction.
         // ("add" currently covers this functionality - it is currently a "safe put" that does a delete if necessary first)
         deletePolicy(name);
-        addPolicy(newDocument, name);
+        addPolicy(name, newDocument);
 
         // FIXME:  code below would also need updating for transactions, deadlocks, single thread updates...
 
@@ -888,6 +742,7 @@ class DbXmlPolicyIndex
      * org.fcrepo.server.security.xacml.pdp.data.PolicyDataManager#getPolicy
      * (java.lang.String)
      */
+    @Override
     public byte[] getPolicy(String name) throws PolicyIndexException {
         log.debug("Getting document: " + name);
         XmlDocument doc = null;
@@ -910,6 +765,7 @@ class DbXmlPolicyIndex
      *         policyName
      * @throws PolicyStoreException
      */
+    @Override
     public boolean contains(String policyName)
             throws PolicyIndexException {
         log.debug("Determining if document exists: " + policyName);
@@ -929,52 +785,6 @@ class DbXmlPolicyIndex
 
         return true;
     }
-
-    /**
-     * Check if the policy identified by policyName exists.
-     *
-     * @param policy
-     * @return true iff the policy store contains a policy with the same
-     *         PolicyId
-     * @throws PolicyStoreException
-     */
-    public boolean contains(File policy) throws PolicyIndexException {
-        try {
-            return contains(utils.getPolicyName(policy));
-        } catch (MelcoePDPException e) {
-            throw new PolicyIndexException(e);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.security.xacml.pdp.data.PolicyDataManager#listPolicies
-     * ()
-     */
-    public List<String> listPolicies() throws PolicyIndexException {
-        log.debug("Listing policies");
-        List<String> documents = new ArrayList<String>();
-
-        DbXmlManager.readLock.lock();
-        try {
-            XmlDocumentConfig docConf = new XmlDocumentConfig();
-            XmlResults results = dbXmlManager.container.getAllDocuments(docConf);
-            while (results.hasNext()) {
-                XmlValue value = results.next();
-                documents.add(value.asDocument().getName());
-            }
-            results.delete();
-        } catch (XmlException xe) {
-            throw new PolicyIndexException("Error listing policies. " + xe.getMessage(), xe);
-        } finally {
-            DbXmlManager.readLock.unlock();
-        }
-
-        return documents;
-    }
-
-
 
     /**
      * Creates an instance of an XmlDocument for storage in the database.

@@ -43,7 +43,7 @@ public class PolicyIndexRebuilder
             System.out.println("   Adding " + object.getPid() + " to index.");
             String policy = new String(IOUtils.toByteArray(policyDatastream.getContentStream()), "UTF-8");
             // TODO: PolicyIndex would benefit from methods that can accept streams
-            m_policyIndex.addPolicy(policy, object.getPid());
+            m_policyIndex.addPolicy(object.getPid(), policy);
         }
 
 
