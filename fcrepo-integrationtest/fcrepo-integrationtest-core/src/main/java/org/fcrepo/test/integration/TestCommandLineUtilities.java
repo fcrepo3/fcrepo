@@ -408,7 +408,7 @@ public class TestCommandLineUtilities
                 getHost() + ":" + getPort(),
                 getUsername(),
                 getPassword(),
-                "file://" + objectPurgeFile.getAbsolutePath(),
+                objectPurgeFile.getAbsoluteFile().toURI().toString(),
                 getProtocol(),
                 "because",
                 getFedoraAppServerContext());
