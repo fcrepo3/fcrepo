@@ -234,32 +234,6 @@
                             </includes>
                         </configuration>
                     </execution>
-                    
-                    <execution>
-                        <id>utilities-main</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-
-                        <configuration>
-
-                            <classifier>utilities-main</classifier>
-                            <archive>
-                                <manifest>
-                                    <mainClass>org.fcrepo.utilities.install.Installer</mainClass>
-                                </manifest>
-                            </archive>
-
-                            <includes>
-                                <include>org/fcrepo/utilities/**</include>
-                                <include>org/fcrepo/server/**</include>
-                                <include>**/fedorausers-mapping.xml</include>
-                                <include>**/webxml-mapping.xml</include>
-                            </includes>
-                        </configuration>
-                    </execution>
-                    
 
                     <execution>
                         <id>cli-loader-main</id>
@@ -287,7 +261,33 @@
                             </includes>
                         </configuration>
                     </execution>
+
+                    <execution>
+                        <id>utilities-main</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+
+                        <configuration>
+
+                            <classifier>utilities-main</classifier>
+                            <archive>
+                                <manifest>
+                                    <mainClass>org.fcrepo.utilities.install.Installer</mainClass>
+                                </manifest>
+                            </archive>
+
+                            <includes>
+                                <include>org/fcrepo/utilities/**</include>
+                                <include>org/fcrepo/server/**</include>
+                                <include>**/fedorausers-mapping.xml</include>
+                                <include>**/webxml-mapping.xml</include>
+                            </includes>
+                        </configuration>
+                    </execution>
                 </executions>
+                
             </plugin>
 
             <plugin>
@@ -367,37 +367,6 @@
                     </execution>
                 </executions>
 
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>utilities-main</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-
-                        <configuration>
-
-                            <classifier>utilities-main</classifier>
-                            <archive>
-                                <manifest>
-                                    <mainClass>org.fcrepo.utilities.install.Installer</mainClass>
-                                </manifest>
-                            </archive>
-
-                            <includes>
-                                <include>org/fcrepo/utilities/**</include>
-                                <include>org/fcrepo/server/**</include>
-                                <include>**/fedorausers-mapping.xml</include>
-                                <include>**/webxml-mapping.xml</include>
-                            </includes>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
         </plugins>
