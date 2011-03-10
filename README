@@ -68,7 +68,7 @@ as arguments to the installer jar file to simplify setting up test scenarios.
 In order to use an externally-run fedora instance, you must define the
 -Dfedora.home=${FEDORA_HOME} system property.  If that is set, maven will not
 attempt to install or run its own Fedora instance, and will assume that 
-a running and properrly configured instance is available.
+a running and properly configured instance is available.
 
 All applicable integration/system test suites will be run through any of the following:
 mvn verify

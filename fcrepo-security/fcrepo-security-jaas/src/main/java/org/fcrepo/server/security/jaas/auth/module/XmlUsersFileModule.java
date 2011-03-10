@@ -37,6 +37,7 @@ import javax.security.auth.spi.LoginModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.jaas.auth.UserPrincipal;
 import org.fcrepo.server.security.jaas.util.DataUtils;
 
@@ -83,9 +84,9 @@ public class XmlUsersFileModule
             debug = true;
         }
 
-        fedoraHome = System.getenv("FEDORA_HOME");
+        fedoraHome = Constants.FEDORA_HOME;
         if (fedoraHome == null || "".equals(fedoraHome)) {
-            logger.error("FEDORA_HOME environment variable not set");
+            logger.error("FEDORA_HOME constant is not set");
         } else {
             if (logger.isDebugEnabled()) {
                 logger.debug("using FEDORA_HOME: " + fedoraHome);
@@ -105,7 +106,7 @@ public class XmlUsersFileModule
         }
 
         if (fedoraHome == null || "".equals(fedoraHome.trim())) {
-            logger.error("FEDORA_HOME environment variable not set");
+            logger.error("FEDORA_HOME constant is not set");
             return false;
         }
 
