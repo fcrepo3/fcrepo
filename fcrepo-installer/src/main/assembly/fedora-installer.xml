@@ -162,6 +162,15 @@
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>/lib</outputDirectory>
     </dependencySet>
+    
+    <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
+      <includes>
+        <include>org.fcrepo:fcrepo-server:jar
+        </include>
+      </includes>
+      <outputDirectory>/lib</outputDirectory>
+    </dependencySet>
 
     <dependencySet>
       <useProjectArtifact>false</useProjectArtifact>
