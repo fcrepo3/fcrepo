@@ -7,8 +7,9 @@ package org.fcrepo.server.search;
 import java.io.InputStream;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
+
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -139,7 +140,7 @@ public class FieldSearchSQLImpl
         logger.debug("Entering update(DOReader)");
         String pid = reader.GetObjectPID();
         Connection conn = null;
-        Statement st = null;
+        PreparedStatement st = null;
         try {
             conn = m_cPool.getReadWriteConnection();
             String[] dbRowValues;
@@ -200,9 +201,9 @@ public class FieldSearchSQLImpl
                 dbRowValues[13] = getDbValue(dc.dates());
 
                 // delete any dc.dates that survive from earlier versions
-                st = conn.createStatement();
-                st.executeUpdate("DELETE FROM dcDates WHERE pid='" + pid
-                        + "'");
+                st = conn.prepareStatement("DELETE FROM dcDates WHERE pid=?");
+                st.setString(1, pid);
+                st.executeUpdate();
 
                 // get any dc.dates strings that are formed such that they
                 // can be treated as a timestamp
@@ -220,12 +221,12 @@ public class FieldSearchSQLImpl
                     // found at least one valid date, so add them.
                     for (int i = 0; i < wellFormedDates.size(); i++) {
                         Date dt = wellFormedDates.get(i);
-                        st
-                                .executeUpdate("INSERT INTO dcDates (pid, dcDate) "
-                                        + "values ('"
-                                        + pid
-                                        + "', "
-                                        + dt.getTime() + ")");
+                        String query = 
+                        	"INSERT INTO dcDates (pid, dcDate) values (?, ?)";
+                        st = conn.prepareStatement(query);
+                        st.setString(1, pid);
+                        st.setLong(2, dt.getTime());
+                        st.executeUpdate();
                     }
                 }
                 dbRowValues[14] = getDbValue(dc.types());
@@ -277,12 +278,15 @@ public class FieldSearchSQLImpl
     public boolean delete(String pid) throws ServerException {
         logger.debug("Entering delete(String)");
         Connection conn = null;
-        Statement st = null;
+        PreparedStatement st = null;
         try {
             conn = m_cPool.getReadWriteConnection();
-            st = conn.createStatement();
-            st.executeUpdate("DELETE FROM doFields WHERE pid='" + pid + "'");
-            st.executeUpdate("DELETE FROM dcDates WHERE pid='" + pid + "'");
+            st = conn.prepareStatement("DELETE FROM doFields WHERE pid=?");
+            st.setString(1, pid);
+            st.executeUpdate();
+            st = conn.prepareStatement("DELETE FROM dcDates WHERE pid=?");
+            st.setString(1, pid);
+            st.executeUpdate();
             return true;
         } catch (SQLException sqle) {
             throw new StorageDeviceException("Error attempting delete of "

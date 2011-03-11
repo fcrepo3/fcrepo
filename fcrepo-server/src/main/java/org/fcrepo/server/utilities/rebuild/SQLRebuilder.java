@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -48,7 +49,6 @@ import org.fcrepo.server.storage.ConnectionPool;
 import org.fcrepo.server.storage.ConnectionPoolManager;
 import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.DOReader;
-import org.fcrepo.server.storage.DOWriter;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
@@ -75,6 +75,7 @@ public class SQLRebuilder
     /**
      * Get a short phrase describing what the user can do with this rebuilder.
      */
+    @Override
     public String getAction() {
         return "Rebuild SQL database.";
     }
@@ -83,6 +84,7 @@ public class SQLRebuilder
      * Returns true is the server _must_ be shut down for this rebuilder to
      * safely operate.
      */
+    @Override
     public boolean shouldStopServer() {
         return true;
     }
@@ -92,18 +94,22 @@ public class SQLRebuilder
      *
      * @returns a map of option names to plaintext descriptions.
      */
+    @Override
     public void setServerConfiguration(ServerConfiguration serverConfig) {
         m_serverConfig = serverConfig;
     }
 
+    @Override
     public void setServerDir(File serverBaseDir) {
 
     }
 
+    @Override
     public void init() {
 
     }
 
+    @Override
     public Map<String, String> getOptions()
  {
         Map<String, String> m = new HashMap<String, String>();
@@ -113,6 +119,7 @@ public class SQLRebuilder
     /**
      * Validate the provided options and perform any necessary startup tasks.
      */
+    @Override
     public void start(Map<String, String> options) throws Exception {
         // This must be done before starting "RebuildServer"
         // rather than after, so any application caches
@@ -188,10 +195,12 @@ public class SQLRebuilder
      */
     private void blankExistingTables() {
         Connection connection = null;
+        Statement s = null;
         try {
             connection = getDefaultConnection();
             List<String> existingTables = getExistingTables(connection);
             List<String> fedoraTables = getFedoraTables();
+            s = connection.createStatement();
             for (int i = 0; i < existingTables.size(); i++) {
                 String origTableName = existingTables.get(i);
                 String tableName = origTableName.toUpperCase();
@@ -199,8 +208,8 @@ public class SQLRebuilder
                         && !tableName.startsWith("RI")) {
                     System.out.println("Cleaning up table: " + origTableName);
                     try {
-                        executeSql(connection, "DELETE FROM " + origTableName);
-                    } catch (LowlevelStorageException lle) {
+                        s.executeUpdate("DELETE FROM " + origTableName);
+                    } catch (Exception lle) {
                         System.err.println(lle.getMessage());
                         System.err.flush();
                     }
@@ -211,6 +220,10 @@ public class SQLRebuilder
                                        e);
         } finally {
             try {
+            	if (s != null) {
+            		s.close();
+            		s = null;
+            	}
                 connection.close();
             } catch (Exception e) {
             }
@@ -243,37 +256,10 @@ public class SQLRebuilder
         }
     }
 
-    public void executeSql(Connection connection, String sql)
-            throws LowlevelStorageException {
-        Statement statement = null;
-        try {
-            statement = connection.createStatement();
-            if (statement.execute(sql)) {
-                throw new LowlevelStorageException(true,
-                                                   "sql returned query results for a nonquery");
-            }
-            int updateCount = statement.getUpdateCount();
-        } catch (SQLException e1) {
-            throw new LowlevelStorageException(true, "sql failurex (exec)", e1);
-        } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-            } catch (Exception e2) { // purposely general to include
-                // uninstantiated statement, connection
-                throw new LowlevelStorageException(true,
-                                                   "sql failure closing statement, connection, pool (exec)",
-                                                   e2);
-            } finally {
-                statement = null;
-            }
-        }
-    }
-
     /**
      * Add the data of interest for the given object.
      */
+    @Override
     public void addObject(DigitalObject obj) {
         // CURRENT TIME:
         // Get the current time to use for created dates on object
@@ -335,14 +321,15 @@ public class SQLRebuilder
 
         // GET DIGITAL OBJECT WRITER:
         // get an object writer configured with the DEFAULT export format
-        logger.debug("INGEST: Instantiating a SimpleDOWriter...");
-        try {
-            DOWriter w =
-                    manager.getWriter(Server.USE_DEFINITIVE_STORE,
-                                      m_context,
-                                      obj.getPid());
-        } catch (ServerException se) {
-        }
+        // barmintor: this appears to be unused code, commenting out with intent to delete
+        //logger.debug("INGEST: Instantiating a SimpleDOWriter...");
+        //try {
+        //    DOWriter w =
+        //            manager.getWriter(Server.USE_DEFINITIVE_STORE,
+        //                              m_context,
+        //                              obj.getPid());
+        //} catch (ServerException se) {
+        //}
 
         // PID GENERATION:
         // have the system generate a PID if one was not provided
@@ -393,15 +380,16 @@ public class SQLRebuilder
         String label = "the label field is no longer used";
 
         Connection conn = null;
-        Statement s1 = null;
+        PreparedStatement s1 = null;
         try {
             String query =
-                    "INSERT INTO doRegistry (doPID, " + "ownerId, label) "
-                            + "VALUES ('" + pid + "', '" + userId + "', '"
-                            + label + "')";
+                    "INSERT INTO doRegistry (doPID, ownerId, label) VALUES (?, ?, ?)";
             conn = m_connectionPool.getReadWriteConnection();
-            s1 = conn.createStatement();
-            s1.executeUpdate(query);
+            s1 = conn.prepareStatement(query);
+            s1.setString(1,pid);
+            s1.setString(2,userId);
+            s1.setString(3, label);
+            s1.executeUpdate();
 
             if (obj.hasContentModel(Models.SERVICE_DEPLOYMENT_3_0)){
                 updateDeploymentMap(obj, conn);
@@ -422,24 +410,27 @@ public class SQLRebuilder
             }
         }
 
-        Statement s2 = null;
+        PreparedStatement s2 = null;
         ResultSet results = null;
         try {
             // REGISTRY:
             // update systemVersion in doRegistry (add one)
             logger.debug("COMMIT: Updating registry...");
             String query =
-                    "SELECT systemVersion " + "FROM doRegistry "
-                            + "WHERE doPID='" + pid + "'";
-            s2 = conn.createStatement();
-            results = s2.executeQuery(query);
+                    "SELECT systemVersion FROM doRegistry WHERE doPID=?";
+            s2 = conn.prepareStatement(query);
+            s2.setString(1, pid);
+            results = s2.executeQuery();
             if (!results.next()) {
                 throw new ObjectNotFoundException("Error creating replication job: The requested object doesn't exist in the registry.");
             }
             int systemVersion = results.getInt("systemVersion");
             systemVersion++;
-            s2.executeUpdate("UPDATE doRegistry SET systemVersion="
-                    + systemVersion + " " + "WHERE doPID='" + pid + "'");
+            query = "UPDATE doRegistry SET systemVersion=? WHERE doPID=?";
+            s2 = conn.prepareStatement(query);
+            s2.setInt(1, systemVersion);
+            s2.setString(2,pid);
+            s2.executeUpdate();
         } catch (SQLException sqle) {
             throw new StorageDeviceException("Error creating replication job: "
                     + sqle.getMessage());
@@ -470,6 +461,7 @@ public class SQLRebuilder
     /**
      * Free up any system resources associated with rebuilding.
      */
+    @Override
     public void finish() {
         // nothing to do
     }
@@ -536,17 +528,15 @@ public class SQLRebuilder
                                DigitalObject sDep,
                                Connection c) throws SQLException {
 
-        Statement s = c.createStatement();
+        String query =
+        	"INSERT INTO modelDeploymentMap (cModel, sDef, sDep) VALUES (?, ?, ?)";
+        PreparedStatement s = c.prepareStatement(query);
 
         try {
-            s
-                    .executeUpdate("INSERT INTO modelDeploymentMap (cModel, sDef, sDep) VALUES ('"
-                            + cModel
-                            + "' , '"
-                            + sDef
-                            + "', '"
-                            + sDep.getPid()
-                            + "')");
+            s.setString(1, cModel);
+            s.setString(2, sDef);
+            s.setString(3, sDep.getPid());
+            s.executeUpdate();
         } finally {
             if (s != null) {
                 s.close();

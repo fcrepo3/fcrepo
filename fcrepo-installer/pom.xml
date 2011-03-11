@@ -120,13 +120,6 @@
 
     <dependency>
       <groupId>org.fcrepo</groupId>
-      <artifactId>fcrepo-server</artifactId>
-      <classifier>cli-loader-main</classifier>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.fcrepo</groupId>
       <artifactId>apache-tomcat</artifactId>
       <version>6.0.29</version>
       <type>zip</type>
@@ -265,13 +258,6 @@
       <version>${project.version}</version>
       <classifier>fedora-messaging</classifier>
       <type>zip</type>
-    </dependency>
-
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>fcrepo-webapp-fedora</artifactId>
-      <type>war</type>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>

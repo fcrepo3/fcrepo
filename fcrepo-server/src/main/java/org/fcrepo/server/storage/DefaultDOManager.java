@@ -15,9 +15,9 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -396,17 +396,18 @@ public class DefaultDOManager
         logger.debug("Initializing content model deployment map");
 
         Connection c = null;
-        Statement s = null;
+        PreparedStatement s = null;
         ResultSet r = null;
         try {
             c = m_connectionPool.getReadOnlyConnection();
+            String query = "SELECT cModel, sDef, sDep, mDate "
+                + " FROM modelDeploymentMap, doFields "
+                + " WHERE doFields.pid = modelDeploymentMap.sDep";
             s =
-                    c.createStatement(ResultSet.TYPE_FORWARD_ONLY,
+                    c.prepareStatement(query, ResultSet.TYPE_FORWARD_ONLY,
                                       ResultSet.CONCUR_READ_ONLY);
             ResultSet results =
-                    s.executeQuery("SELECT cModel, sDef, sDep, mDate "
-                            + " FROM modelDeploymentMap, doFields "
-                            + " WHERE doFields.pid = modelDeploymentMap.sDep");
+                    s.executeQuery();
 
             while (results.next()) {
                 String cModel = results.getString(1);
@@ -496,16 +497,14 @@ public class DefaultDOManager
                                DigitalObject sDep,
                                Connection c) throws SQLException {
 
-        Statement s = c.createStatement();
+        String query = "INSERT INTO modelDeploymentMap (cModel, sDef, sDep) VALUES (?, ?, ?)";
+    	PreparedStatement s = c.prepareStatement(query);
 
         try {
-            s
-                    .executeUpdate("INSERT INTO modelDeploymentMap (cModel, sDef, sDep) VALUES ('"
-                            + context.cModel
-                            + "' , '"
-                            + context.sDef
-                            + "', '"
-                            + sDep.getPid() + "')");
+        	s.setString(1, context.cModel);
+        	s.setString(2, context.sDef);
+        	s.setString(3, sDep.getPid());
+            s.executeUpdate();
         } finally {
             if (s != null) {
                 s.close();
@@ -529,12 +528,15 @@ public class DefaultDOManager
     private void removeDeployment(ServiceContext context,
                                   DigitalObject sDep,
                                   Connection c) throws SQLException {
-        Statement s = c.createStatement();
+        String query = "DELETE FROM modelDeploymentMap "
+            + "WHERE cModel = ? AND sDef =? AND sDep = ?";
+    	PreparedStatement s = c.prepareStatement(query);
+    	s.setString(1, context.cModel);
+    	s.setString(2,context.sDef);
+    	s.setString(3,sDep.getPid());
 
         try {
-            s.executeUpdate("DELETE FROM modelDeploymentMap "
-                    + "WHERE cModel = '" + context.cModel + "' AND sDef ='"
-                    + context.sDef + "' AND sDep = '" + sDep.getPid() + "'");
+            s.executeUpdate();
         } finally {
             if (s != null) {
                 s.close();
@@ -1350,23 +1352,25 @@ public class DefaultDOManager
                  */
                 logger.debug("Updating registry");
                 Connection conn = null;
-                Statement s = null;
+                PreparedStatement s = null;
                 ResultSet results = null;
                 try {
                     conn = m_connectionPool.getReadWriteConnection();
                     String query =
-                            "SELECT systemVersion " + "FROM doRegistry "
-                                    + "WHERE doPID='" + obj.getPid() + "'";
-                    s = conn.createStatement();
-                    results = s.executeQuery(query);
+                            "SELECT systemVersion FROM doRegistry WHERE doPID=?";
+                    s = conn.prepareStatement(query);
+                    s.setString(1,obj.getPid());
+                    results = s.executeQuery();
                     if (!results.next()) {
                         throw new ObjectNotFoundException("Error creating replication job: The requested object doesn't exist in the registry.");
                     }
                     int systemVersion = results.getInt("systemVersion");
                     systemVersion++;
-                    s.executeUpdate("UPDATE doRegistry SET systemVersion="
-                            + systemVersion + " " + "WHERE doPID='"
-                            + obj.getPid() + "'");
+                    query = "UPDATE doRegistry SET systemVersion="
+                        + systemVersion + " WHERE doPID=?";
+                    s = conn.prepareStatement(query);
+                    s.setString(1,obj.getPid());
+                    s.executeUpdate();
 
                     //TODO hasModel
                     if (obj.hasContentModel(Models.SERVICE_DEPLOYMENT_3_0)) {
@@ -1507,15 +1511,15 @@ public class DefaultDOManager
     public boolean objectExists(String pid) throws StorageDeviceException {
         logger.debug("Checking if " + pid + " already exists");
         Connection conn = null;
-        Statement s = null;
+        PreparedStatement s = null;
         ResultSet results = null;
         try {
             String query =
-                    "SELECT doPID " + "FROM doRegistry " + "WHERE doPID='"
-                            + pid + "'";
+                    "SELECT doPID FROM doRegistry WHERE doPID=?";
             conn = m_connectionPool.getReadOnlyConnection();
-            s = conn.createStatement();
-            results = s.executeQuery(query);
+            s = conn.prepareStatement(query);
+            s.setString(1,pid);
+            results = s.executeQuery();
             return results.next(); // 'true' if match found, else 'false'
         } catch (SQLException sqle) {
             throw new StorageDeviceException("Unexpected error from SQL database: "
@@ -1551,15 +1555,16 @@ public class DefaultDOManager
         String pid = obj.getPid();
 
         Connection conn = null;
-        Statement st = null;
+        PreparedStatement st = null;
         try {
             String query =
-                    "INSERT INTO doRegistry (doPID,  " + "ownerId, label) "
-                            + "VALUES ('" + pid + "', '" + ownerID + "', '"
-                            + theLabel + "')";
+                    "INSERT INTO doRegistry (doPID, ownerId, label) VALUES (?, ?, ?)";
             conn = m_connectionPool.getReadWriteConnection();
-            st = conn.createStatement();
-            st.executeUpdate(query);
+            st = conn.prepareStatement(query);
+            st.setString(1,pid);
+            st.setString(2,ownerID);
+            st.setString(3,theLabel);
+            st.executeUpdate();
         } catch (SQLException sqle) {
             // clean up if the INSERT didn't succeeed
             try {
@@ -1593,13 +1598,13 @@ public class DefaultDOManager
             throws StorageDeviceException {
         String pid = obj.getPid();
         Connection conn = null;
-        Statement st = null;
+        PreparedStatement st = null;
         try {
             conn = m_connectionPool.getReadWriteConnection();
-            st = conn.createStatement();
-            st
-                    .executeUpdate("DELETE FROM doRegistry WHERE doPID='" + pid
-                            + "'");
+            String query = "DELETE FROM doRegistry WHERE doPID=?";
+            st = conn.prepareStatement(query);
+            st.setString(1,pid);
+            st.executeUpdate();
 
             //TODO hasModel
             if (obj.hasContentModel(Models.SERVICE_DEPLOYMENT_3_0)) {
@@ -1741,16 +1746,14 @@ public class DefaultDOManager
     private String[] getPIDs(String whereClause) throws StorageDeviceException {
         ArrayList<String> pidList = new ArrayList<String>();
         Connection conn = null;
-        Statement s = null;
+        PreparedStatement s = null;
         ResultSet results = null;
         try {
             conn = m_connectionPool.getReadOnlyConnection();
-            s = conn.createStatement();
-            StringBuffer query = new StringBuffer();
-            query.append("SELECT doPID FROM doRegistry ");
-            query.append(whereClause);
-            logger.debug("Executing db query: " + query.toString());
-            results = s.executeQuery(query.toString());
+            String query = "SELECT doPID FROM doRegistry " + whereClause;
+            s = conn.prepareStatement(query);
+            logger.debug("Executing db query: " + query);
+            results = s.executeQuery();
             while (results.next()) {
                 pidList.add(results.getString("doPID"));
             }
@@ -1864,7 +1867,7 @@ public class DefaultDOManager
             hash.append(getNumObjectsWithVersion(conn, 0));
             hash.append("|");
 
-            hash.append(getLatestModificationDate(conn, ""));
+            hash.append(getLatestModificationDate(conn));
 
             return hash.toString();
 
@@ -1886,15 +1889,15 @@ public class DefaultDOManager
     private int getNumObjectsWithVersion(Connection conn, int n)
             throws SQLException {
 
-        Statement st = null;
+        PreparedStatement st = null;
         try {
-            st = conn.createStatement();
             StringBuffer query = new StringBuffer();
             query.append("SELECT COUNT(*) FROM doRegistry");
             if (n > 0) {
                 query.append(" WHERE systemVersion = " + n);
             }
-            ResultSet results = st.executeQuery(query.toString());
+            st = conn.prepareStatement(query.toString());
+            ResultSet results = st.executeQuery();
             results.next();
             return results.getInt(1);
         } finally {
@@ -1904,14 +1907,13 @@ public class DefaultDOManager
         }
     }
 
-    private long getLatestModificationDate(Connection conn, String whereClause)
+    private long getLatestModificationDate(Connection conn)
             throws SQLException {
-        Statement st = null;
+        PreparedStatement st = null;
         try {
-            st = conn.createStatement();
+            st = conn.prepareStatement("SELECT MAX(mDate) " + "FROM doFields ");
             ResultSet results =
-                    st.executeQuery("SELECT MAX(mDate) " + "FROM doFields "
-                            + whereClause);
+                    st.executeQuery();
             if (results.next()) {
                 return results.getLong(1);
             } else {
