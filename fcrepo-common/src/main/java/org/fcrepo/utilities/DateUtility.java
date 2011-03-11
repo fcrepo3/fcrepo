@@ -2,7 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
-package org.fcrepo.server.utilities;
+package org.fcrepo.utilities;
 
 import java.text.DateFormat;
 import java.text.ParseException;

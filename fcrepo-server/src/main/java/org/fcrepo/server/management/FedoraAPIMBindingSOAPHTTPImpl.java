@@ -12,8 +12,8 @@ import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.ServerInitializationException;
 import org.fcrepo.server.errors.StorageDeviceException;
 import org.fcrepo.server.utilities.AxisUtility;
-import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.TypeUtility;
+import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

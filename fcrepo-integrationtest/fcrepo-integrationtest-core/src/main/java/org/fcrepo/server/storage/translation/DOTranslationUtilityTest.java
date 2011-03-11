@@ -14,8 +14,8 @@ import org.junit.Test;
 import org.fcrepo.server.storage.types.AuditRecord;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
-import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.test.FedoraTestCase;
+import org.fcrepo.utilities.DateUtility;
 
 
 

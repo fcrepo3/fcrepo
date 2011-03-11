@@ -23,7 +23,7 @@ import org.fcrepo.server.types.gen.Datastream;
 import org.fcrepo.server.types.gen.ListSession;
 import org.fcrepo.server.types.gen.RelationshipTuple;
 import org.fcrepo.server.utilities.DCField;
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
 
 
 

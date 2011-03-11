@@ -81,7 +81,7 @@ import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.server.storage.types.RelationshipTuple;
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

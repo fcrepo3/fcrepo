@@ -33,8 +33,8 @@ import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.DCFields;
-import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.SQLUtility;
+import org.fcrepo.utilities.DateUtility;
 
 /**
  * A FieldSearch implementation that uses a relational database as a backend.

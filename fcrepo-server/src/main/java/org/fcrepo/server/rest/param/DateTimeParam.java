@@ -9,7 +9,7 @@ import java.util.Date;
 
 import javax.ws.rs.WebApplicationException;
 
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
 
 /**
  * A JAX-RS parameter handler for ISO datetime Strings.

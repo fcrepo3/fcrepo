@@ -82,11 +82,11 @@ import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.storage.types.XMLDatastreamProcessor;
-import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationConstants;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.server.validation.ecm.EcmValidator;
+import org.fcrepo.utilities.DateUtility;
 
 /**
  * Implements API-M without regard to the transport/messaging protocol.

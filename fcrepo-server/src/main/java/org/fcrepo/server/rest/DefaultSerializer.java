@@ -12,7 +12,7 @@ import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.search.ObjectFields;
 import org.fcrepo.server.storage.types.*;
 import org.fcrepo.server.utilities.DCField;
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -23,7 +23,7 @@ import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

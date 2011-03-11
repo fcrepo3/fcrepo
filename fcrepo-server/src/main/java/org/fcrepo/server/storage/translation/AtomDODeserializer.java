@@ -65,9 +65,9 @@ import org.fcrepo.server.storage.types.DatastreamManagedContent;
 import org.fcrepo.server.storage.types.DatastreamReferencedContent;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
-import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.validation.ValidationUtility;
 
+import org.fcrepo.utilities.DateUtility;
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.NormalizedURI;
 

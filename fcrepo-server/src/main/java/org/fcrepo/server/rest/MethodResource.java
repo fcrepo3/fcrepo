@@ -21,7 +21,7 @@ import javax.ws.rs.core.UriInfo;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.Property;
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
 
 
 /**

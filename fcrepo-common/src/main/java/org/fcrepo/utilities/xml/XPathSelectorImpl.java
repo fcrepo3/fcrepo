@@ -1,9 +1,10 @@
 package org.fcrepo.utilities.xml;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
@@ -14,7 +15,7 @@ import javax.xml.xpath.*;
  */
 public class XPathSelectorImpl implements XPathSelector {
 
-    private static final Log log = LogFactory.getLog(XPathSelector.class);
+    private static final Logger log = LoggerFactory.getLogger(DOM.class);
 
     /**
      * Importatnt: All access to the xpathCompiler should be synchronized on it
@@ -23,8 +24,8 @@ public class XPathSelectorImpl implements XPathSelector {
     private static final XPath xpathCompiler =
             XPathFactory.newInstance().newXPath();
 
-    private LRUCache<String, XPathExpression> cache;
-    private NamespaceContext nsContext;
+    private final LRUCache<String, XPathExpression> cache;
+    private final NamespaceContext nsContext;
 
     public XPathSelectorImpl(NamespaceContext nsContext, int cacheSize) {
         this.nsContext = nsContext;

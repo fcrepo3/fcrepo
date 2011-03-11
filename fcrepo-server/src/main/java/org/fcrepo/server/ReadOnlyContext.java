@@ -16,7 +16,7 @@ import org.apache.axis.transport.http.HTTPConstants;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.servletfilters.ExtendedHttpServletRequest;
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
