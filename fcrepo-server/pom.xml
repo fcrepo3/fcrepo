@@ -262,30 +262,6 @@
                         </configuration>
                     </execution>
 
-                    <execution>
-                        <id>utilities-main</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-
-                        <configuration>
-
-                            <classifier>utilities-main</classifier>
-                            <archive>
-                                <manifest>
-                                    <mainClass>org.fcrepo.utilities.install.Installer</mainClass>
-                                </manifest>
-                            </archive>
-
-                            <includes>
-                                <include>org/fcrepo/utilities/**</include>
-                                <include>org/fcrepo/server/**</include>
-                                <include>**/fedorausers-mapping.xml</include>
-                                <include>**/webxml-mapping.xml</include>
-                            </includes>
-                        </configuration>
-                    </execution>
                 </executions>
                 
             </plugin>

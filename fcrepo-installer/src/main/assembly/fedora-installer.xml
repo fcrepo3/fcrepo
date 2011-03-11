@@ -174,7 +174,7 @@
 
     <dependencySet>
       <includes>
-        <include>org.fcrepo:fcrepo-server:jar:utilities-main:*</include>
+        <include>org.fcrepo:fcrepo-installer:jar:utilities-main:*</include>
       </includes>
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>/main</outputDirectory>
@@ -182,6 +182,7 @@
         Note: Output file is hard-coded here because it is also in java
         files. May want to consider refactoring both.
       -->
+      <useProjectAttachments>true</useProjectAttachments>
       <outputFileNameMapping>main.jar</outputFileNameMapping>
     </dependencySet>
 

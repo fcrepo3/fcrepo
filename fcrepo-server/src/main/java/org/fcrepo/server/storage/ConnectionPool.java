@@ -20,9 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.fcrepo.server.utilities.DDLConverter;
 import org.fcrepo.server.utilities.TableCreatingConnection;
 
-import org.fcrepo.utilities.install.InstallOptions;
-
-
 
 /**
  * Provides a dispenser for database Connection Pools.
@@ -400,8 +397,8 @@ public class ConnectionPool {
     }
 
     private boolean isEmbeddedDB() {
-        return InstallOptions.EMBEDDED_DATABASE_DRIVERCLASSNAME
-                .equals(dataSource.getDriverClassName());
+        /* FIXME: this has always been a hack, but now is even more so */
+        return dataSource.getDriverClassName().contains("Derby");
     }
 
     private void shutdownEmbeddedDB(String username, String password) {
