@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <pdm-file>
-	<directory name="/policy-db" />
-	<schemaConfig validation="false">
+  <database>
+    <directory name="/policy-db" />
+  </database>
+	<schemaConfig validation="true">
 			<schema
 				namespace="urn:oasis:names:tc:xacml:2.0:context:schema:os"
 				location="http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-context-schema-os.xsd"/>
@@ -9,6 +11,7 @@
 				namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
 				location="http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd"/>
 	</schemaConfig>
+  <!-- NB: there is actually no indexing currently -->
 	<indexMap>
 		<subjectAttributes>
 			<attribute name="urn:oasis:names:tc:xacml:1.0:subject:subject-id" type="http://www.w3.org/2001/XMLSchema#string"/>

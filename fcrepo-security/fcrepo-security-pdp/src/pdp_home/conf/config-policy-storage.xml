@@ -6,6 +6,11 @@
  -->
 <PolicyStorage>
 	<PolicyStore>org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore</PolicyStore>
+  <!-- a simple memory-cached filesystem policy index (which doesn't actually do any indexing) -->
+	<PolicyIndex>org.fcrepo.server.security.xacml.pdp.data.FilePolicyIndex</PolicyIndex>
+  <!-- Berkelely DB XML
 	<PolicyIndex>org.fcrepo.server.security.xacml.pdp.data.DbXmlPolicyIndex</PolicyIndex>
+  -->
+  <!-- TODO: Exist -->
 	<PolicyCombiningAlgorithm>org.fcrepo.server.security.xacml.pdp.HierarchicalLowestChildDenyOverridesPolicyAlg</PolicyCombiningAlgorithm>
 </PolicyStorage>

@@ -695,12 +695,8 @@ class DbXmlPolicyIndex
         // FIXME:  DBXML container.updateDocument is failing to update document metadata (this tested on DBXML ver 2.5.13)
         // specifically anySubject, anyResource metadata elements are not changing
         // if Subjects and Resources elements are added/deleted from document.
-        // So do a delete then an add
 
-        // Note - method is not currently used (pending a tidy-up as part of FCREPO-576)
-        // if method is used then there should be a single writeLock covering this whole transaction.
-        // ("add" currently covers this functionality - it is currently a "safe put" that does a delete if necessary first)
-        deletePolicy(name);
+        // add currently does a "safe add" - ie deletes if one exists already, so caters for both adds and updates
         addPolicy(name, newDocument);
 
         // FIXME:  code below would also need updating for transactions, deadlocks, single thread updates...

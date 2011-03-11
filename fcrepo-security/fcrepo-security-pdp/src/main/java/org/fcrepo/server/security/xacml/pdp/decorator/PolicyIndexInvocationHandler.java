@@ -350,7 +350,15 @@ extends AbstractInvocationHandler {
             // make sure stream is closed - with Akubra on Windows this can leave the stream open
             // and leave the file locked (prevents a purge later)
             dsContent.close();
-            policyIndex.addPolicy(pid, policy);
+            // FIXME: should be doing an explicit add or update based on the object modification, but currently
+            // validation is an issue - it can result in a datastream being saved but the policy not present in the index
+            // as the validation failed; so a subsequent update to the datastream needs to be an "add" to the index, as the policy
+            // doesn't exist.  Change this once the validation has been refactored to happen in this class rather than in the policy index
+            if (policyIndex.contains(pid)) {
+                policyIndex.updatePolicy(pid, policy);
+            } else {
+                policyIndex.addPolicy(pid, policy);
+            }
         } catch (IOException e) {
             throw new GeneralException("Error adding policy " + pid + " to policy index: " + e.getMessage(), e);
         } catch (PolicyIndexException e) {
