@@ -9,6 +9,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
 import java.net.URL;
@@ -19,6 +20,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.axis.types.NonNegativeInteger;
 
@@ -46,6 +50,12 @@ import org.custommonkey.xmlunit.XMLUnit;
 
 import org.junit.Test;
 
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
+
 import org.antlr.stringtemplate.StringTemplate;
 
 import junit.framework.TestSuite;
@@ -62,7 +72,6 @@ import org.fcrepo.server.types.gen.ObjectFields;
 
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
-import org.fcrepo.test.TemplatedResourceIterator;
 
 import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
 import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -519,7 +528,10 @@ public class TestRESTAPI
                                 pid.toString(),
                                 datetime);
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
-        response = get(true);
+        // FIXME: validation disabled
+        // response is currently not schema-valid, see fcrepo-866
+        // -> get(true) once fixed to enable validation
+        response = get(true, false);
         assertEquals(SC_OK, response.getStatusCode());
         responseXML = new String(response.responseBody, "UTF-8");
         assertTrue(responseXML.contains("<dsLabel>"));
@@ -618,7 +630,8 @@ public class TestRESTAPI
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
-        assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
+        // FIXME: findObjects should have a schema?  remove "false" to enable validation
+        assertEquals(SC_OK, get(getAuthAccess(), false).getStatusCode());
     }
 
     /**
@@ -638,7 +651,8 @@ public class TestRESTAPI
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
-        HttpResponse response = get(getAuthAccess());
+        // FIXME: resumeFindObjects should have a schema?  remove "false" to enable validdation
+        HttpResponse response = get(getAuthAccess(), false);
         assertEquals(SC_OK, response.getStatusCode());
 
         String responseXML = new String(response.responseBody, "UTF-8");
@@ -676,7 +690,9 @@ public class TestRESTAPI
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
-        assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
+        // FIXME: validation disabled; response currently has incorrect location for schema, see fcrepo-866
+        // when fixed, -> get(getAuthAccess()).getStatusCode() to enable validation
+        assertEquals(SC_OK, get(getAuthAccess(), false).getStatusCode());
     }
 
     private String extractPid(String source) {
@@ -840,7 +856,10 @@ public class TestRESTAPI
                 url =
                         String.format("/objects/%s/validate", URLEncoder
                                 .encode(pid.toString(), "UTF-8"));
-                HttpResponse getTrue = get(true);
+                // FIXME: fcrepo-866
+                // response does not specify schema
+                // remove "false" to enable validation
+                HttpResponse getTrue = get(true, false);
                 assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
                         .getStatusCode());
                 assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
@@ -1177,12 +1196,12 @@ public class TestRESTAPI
 
         // filename from RELS-INT, no lookup of extension; no download
         url = "/objects/demo:REST/datastreams/DS1/content";
-        HttpResponse response = get(getAuthAccess());
+        HttpResponse response = get(getAuthAccess(), false);
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "inline", TestRESTAPI.DS1RelsFilename);
         // again with download
         url = url + "?download=true";
-        response = get(getAuthAccess());
+        response = get(getAuthAccess(), false);
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "attachment", TestRESTAPI.DS1RelsFilename);
     }
@@ -1207,7 +1226,7 @@ public class TestRESTAPI
 
         // filename from label with illegal characters, known MIMETYPE
         url = "/objects/demo:REST/datastreams/DS4/content?download=true";
-        response = get(getAuthAccess());
+        response = get(getAuthAccess(), false);
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "attachment", TestRESTAPI.DS4LabelFilename
                 + ".xml"); // xml from mimetype mapping
@@ -1219,13 +1238,13 @@ public class TestRESTAPI
 
         // filename from id (no label present)
         url = "/objects/demo:REST/datastreams/DS5/content?download=true";
-        HttpResponse response = get(getAuthAccess());
+        HttpResponse response = get(getAuthAccess(), false);
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "attachment", TestRESTAPI.DS5ID + ".xml"); // xml from mimetype mapping
 
         // filename from id, id contains extension (no label present)
         url = "/objects/demo:REST/datastreams/DS6.xml/content?download=true";
-        response = get(getAuthAccess());
+        response = get(getAuthAccess(), false);
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "attachment", TestRESTAPI.DS6ID); // no extension, id contains it
 
@@ -1295,14 +1314,56 @@ public class TestRESTAPI
     }
 
     /**
-     * Issues an HTTP GET for the specified URL.
+     * Issues an HTTP GET for the specified URL, schema-validate the response
+     * (if it is XML)
      *
+     * If the response is intentionally XML with no schema, then use
+     * get(authenticate, false)
+     * then the response won't be validated.
      * @param authenticate
-     * @return HttpResponse
+     * @return
      * @throws Exception
      */
     protected HttpResponse get(boolean authenticate) throws Exception {
-        return getOrDelete("GET", authenticate);
+        return get(authenticate, true);
+    }
+
+    /**
+     * Issues an HTTP GET for the specified URL.  Optionally validate the response
+     * (if the response is XML)
+     *
+     * @param authenticate
+     * @param validate - validate the response against its schema
+     * @return HttpResponse
+     * @throws Exception
+     */
+    protected HttpResponse get(boolean authenticate, boolean validate) throws Exception {
+        HttpResponse res = getOrDelete("GET", authenticate);
+
+        if (validate) {
+            // if response was ok...
+            if (res.getStatusCode() >= 200 && res.getStatusCode() <= 299) {
+                // if response is xml
+
+                if (res.getResponseHeader("Content-Type") != null &&
+                        (res.getResponseHeader("Content-Type").getValue().contains("text/xml") ||
+                        res.getResponseHeader("Content-Type").getValue().contains("application/xml"))) {
+                    String xmlResponse = res.getResponseBodyString();
+                    // if a schema location is specified
+                    if (xmlResponse.contains(":schemaLocation=\"")) {
+                        // validate it
+                        validate(xmlResponse);
+                    } else {
+                        // for now, requiring a schema
+                        fail("No schema location specified in response - " + url);
+                    }
+                }
+
+            }
+        }
+
+
+        return res;
     }
 
     protected HttpResponse delete(boolean authenticate) throws Exception {
@@ -1417,6 +1478,49 @@ public class TestRESTAPI
                 httpMethod.releaseConnection();
             }
         }
+    }
+
+    private void validate(String xml) throws Exception {
+
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        factory.setValidating(true);
+        factory.setNamespaceAware(true);
+
+        SAXParser parser;
+        parser = factory.newSAXParser();
+        parser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaLanguage",
+        "http://www.w3.org/2001/XMLSchema");
+
+        StringBuilder errors = new StringBuilder();
+
+        XMLReader reader = parser.getXMLReader();
+        reader.setErrorHandler(new ValidatorErrorHandler(errors));
+        reader.parse(new InputSource(new StringReader(xml)));
+
+        assertTrue("Validation failed for " + url + ". Errors: " + errors.toString(), 0 == errors.length());
+
+    }
+
+    // error handler for validating parsing (see validate(String))
+    // collects errors and fatal errors in a stringBuilder
+    class ValidatorErrorHandler implements ErrorHandler {
+
+        private final StringBuilder m_errors;
+        ValidatorErrorHandler(StringBuilder errors) {
+            m_errors = errors;
+        }
+
+        public void warning(SAXParseException e) throws SAXException {
+        }
+
+        public void error(SAXParseException e) throws SAXException {
+            m_errors.append(e.getMessage());
+        }
+
+        public void fatalError(SAXParseException e) throws SAXException {
+            m_errors.append(e.getMessage());
+        }
+
     }
 
     // Supports legacy test runners
