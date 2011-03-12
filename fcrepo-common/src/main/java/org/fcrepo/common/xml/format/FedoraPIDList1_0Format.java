@@ -5,7 +5,7 @@
 
 package org.fcrepo.common.xml.format;
 
-import org.fcrepo.common.xml.namespace.FedoraAccessNamespace;
+import org.fcrepo.common.xml.namespace.FedoraManagementNamespace;
 
 /**
  * The Fedora PID List 1.0 XML format.
@@ -30,8 +30,8 @@ public class FedoraPIDList1_0Format
      */
     private FedoraPIDList1_0Format() {
         super("info:fedora/fedora-system:FedoraPIDList-1.0",
-              FedoraAccessNamespace.getInstance(),
-              "http://www.fedora.info/definitions/1/0/objectHistory.xsd");
+              FedoraManagementNamespace.getInstance(),
+              "http://www.fedora.info/definitions/1/0/getNextPIDInfo.xsd");
     }
 
     /**
