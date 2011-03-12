@@ -8,8 +8,6 @@ package org.fcrepo.server.security.xacml.pdp.data;
 import java.io.File;
 import java.io.FileInputStream;
 
-import java.net.URL;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -17,9 +15,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import com.sleepycat.db.Environment;
 import com.sleepycat.db.EnvironmentConfig;
@@ -69,8 +64,6 @@ public class DbXmlManager {
     public XmlContainer container = null;
 
     public Environment env = null;
-
-    public Validator validator = null;
 
     private static final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
     public static final Lock readLock = rwl.readLock();
@@ -299,38 +292,6 @@ public class DbXmlManager {
                                     attr.getAttributes().getNamedItem("type")
                                             .getNodeValue();
                             indexMap.get(node.getNodeName()).put(name, type);
-                        }
-                    }
-                }
-            }
-
-            // get validation information
-            Node schemaConfig =
-                    doc.getElementsByTagName("schemaConfig").item(0);
-            nodes = schemaConfig.getChildNodes();
-            if ("true".equals(schemaConfig.getAttributes()
-                    .getNamedItem("validation").getNodeValue())) {
-                log.info("Initialising validation");
-
-                for (int x = 0; x < nodes.getLength(); x++) {
-                    Node schemaNode = nodes.item(x);
-                    if (schemaNode.getNodeType() == Node.ELEMENT_NODE) {
-                        if (XACML20_POLICY_NS.equals(schemaNode.getAttributes()
-                                .getNamedItem("namespace").getNodeValue())) {
-                            if (log.isDebugEnabled()) {
-                                log
-                                        .debug("found valid schema. Creating validator");
-                            }
-                            String loc =
-                                    schemaNode.getAttributes()
-                                            .getNamedItem("location")
-                                            .getNodeValue();
-                            SchemaFactory schemaFactory =
-                                    SchemaFactory
-                                            .newInstance("http://www.w3.org/2001/XMLSchema");
-                            Schema schema =
-                                    schemaFactory.newSchema(new URL(loc));
-                            validator =schema.newValidator();
                         }
                     }
                 }

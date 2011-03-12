@@ -39,6 +39,9 @@ public abstract class ValidationUtility {
             LoggerFactory.getLogger(ValidationUtility.class);
 
     private static PolicyParser policyParser;
+    private static PolicyParser feslPolicyParser;
+    // FIXME: this to maintain backward compatibility, validation should be enforced
+    private static boolean validateFeslPolicy = false;
 
     /**
      * Validates the candidate URL. The result of the validation also depends on the
@@ -82,6 +85,13 @@ public abstract class ValidationUtility {
         policyParser = parser;
     }
 
+    public static void setFeslPolicyParser(PolicyParser parser) {
+        feslPolicyParser = parser;
+    }
+    public static void setValidateFeslPolicy(boolean validate) {
+        validateFeslPolicy = validate;
+    }
+
     /**
      * Validates the latest version of all reserved datastreams in the given
      * object.
@@ -120,8 +130,11 @@ public abstract class ValidationUtility {
 
         try {
         if ("POLICY".equals(dsId)) {
-                content = ds.getContentStream();
+            content = ds.getContentStream();
             validatePOLICY(content);
+        } else if ("FESLPOLICY".equals(dsId)) {
+            content = ds.getContentStream();
+            validateFESLPOLICY(content);
         } else if ("RELS-EXT".equals(dsId) || "RELS-INT".equals(dsId)) {
                 content = ds.getContentStream();
             validateRELS(pid, dsId, content);
@@ -145,6 +158,18 @@ public abstract class ValidationUtility {
         policyParser.copy().parse(content, true);
         logger.debug("POLICY datastream is valid");
     }
+
+    private static void validateFESLPOLICY(InputStream content)
+    throws ValidationException {
+        // if FeSL is not enabled, this won't be set
+        if (feslPolicyParser != null) {
+            logger.debug("Validating FESLPOLICY datastream");
+            // FIXME: maintaining backwards compatibility; policy validation should really be enforced
+            feslPolicyParser.copy().parse(content, validateFeslPolicy);
+            logger.debug("FESLPOLICY datastream is valid");
+        }
+    }
+
 
     /**
      * validate relationships datastream

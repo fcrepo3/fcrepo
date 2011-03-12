@@ -47,7 +47,6 @@ import com.sleepycat.dbxml.XmlValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.fcrepo.server.security.xacml.pdp.MelcoePDPException;
 import org.fcrepo.server.security.xacml.util.AttributeBean;
 
 /**
@@ -91,11 +90,7 @@ class DbXmlPolicyIndex
     private void init() throws PolicyStoreException {
         dbXmlManager = new DbXmlManager();
 
-        if (dbXmlManager.validator != null ) {
-            utils = new PolicyUtils(dbXmlManager.validator);
-        } else {
-            utils = new PolicyUtils();
-        }
+        utils = new PolicyUtils();
 
     }
 
@@ -607,31 +602,6 @@ class DbXmlPolicyIndex
         String docName = null;
         DbXmlManager.writeLock.lock();
         try {
-            // if it already exists, delete it, before adding new
-            // nb - do before validation, if new doc is invalid we don't want the old one left in place, to maintain sync with Fedora objects
-            // FIXME: review this strategy with FCREPO-576 and FCREPO-770
-            boolean exists = true;
-            try {
-                dbXmlManager.container.getDocument(name,
-                                                   new XmlDocumentConfig().setLazyDocs(true));
-            } catch (XmlException e) {
-                if (e.getErrorCode() == XmlException.DOCUMENT_NOT_FOUND) {
-                    exists = false;
-                } else {
-                    throw new PolicyIndexException("Error executing contains. " + e.getMessage(), e);
-                }
-            }
-
-            if (exists) {
-                dbXmlManager.container.deleteDocument(name);
-            }
-
-            // FIXME: better handled at a higher level, see FCREPO-770
-            try {
-                utils.validate(document, name);
-            } catch (MelcoePDPException e) {
-                throw new PolicyIndexException(e);
-            }
 
             XmlDocument doc = makeDocument(name, document);
             docName = doc.getName();
@@ -696,7 +666,10 @@ class DbXmlPolicyIndex
         // specifically anySubject, anyResource metadata elements are not changing
         // if Subjects and Resources elements are added/deleted from document.
 
-        // add currently does a "safe add" - ie deletes if one exists already, so caters for both adds and updates
+
+        // FIXME: this will acquire and release write locks for each operation
+        // should instead do this just once for an update
+        deletePolicy(name);
         addPolicy(name, newDocument);
 
         // FIXME:  code below would also need updating for transactions, deadlocks, single thread updates...

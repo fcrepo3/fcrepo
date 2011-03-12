@@ -26,7 +26,7 @@ public class PolicyIndexRebuilder
     public void addObject(DigitalObject object) throws Exception {
         // does it have a policy datastream?
 
-        Iterable<Datastream> policyDatastreams = object.datastreams(FedoraPolicyStore.POLICY_DATASTREAM);
+        Iterable<Datastream> policyDatastreams = object.datastreams(FedoraPolicyStore.FESL_POLICY_DATASTREAM);
 
         // try to get the latest policy datastream version
         Date latest = null;

@@ -111,6 +111,12 @@ extends AbstractInvocationHandler {
         PolicyObject policyBefore = null;
         PolicyObject policyAfter = null;
 
+        // validation note:
+        // validation is carried out as part of the API methods
+        // policy index update occurs after the management method has been invoked
+        // therefore if a validation error occurs the object will not have changed,
+        // and the resulting exception means the policy index won't be updated (and therefore remain in sync)
+
         switch (managementMethod.target) {
             case DIGITALOBJECT: // API methods operating on the object
                 switch (managementMethod.component) {
@@ -139,7 +145,7 @@ extends AbstractInvocationHandler {
                             // if the indexing status has changed, make appropriate changes to the policy cache/index
                             if (indexedBefore != policyAfter.isPolicyActive()) {
                                 if (policyAfter.isPolicyActive() ) {
-                                    addOrUpdatePolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
+                                    addPolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
                                 } else {
                                     deletePolicy(managementMethod.parameters.pid);
                                 }
@@ -162,7 +168,7 @@ extends AbstractInvocationHandler {
                                                                null);
                                 // add to the cache if required
                                 if (policyAfter.isPolicyActive()) {
-                                    addOrUpdatePolicy((String)returnValue, policyAfter.getDsContent());
+                                    addPolicy((String)returnValue, policyAfter.getDsContent());
                                 }
 
                                 break;
@@ -196,7 +202,7 @@ extends AbstractInvocationHandler {
 
             case DATASTREAM: // operations on datastreams
                 // note, DS ID can be null - server-assigned ID
-                if (managementMethod.parameters.dsID != null && managementMethod.parameters.dsID.equals(FedoraPolicyStore.POLICY_DATASTREAM)) {
+                if (managementMethod.parameters.dsID != null && managementMethod.parameters.dsID.equals(FedoraPolicyStore.FESL_POLICY_DATASTREAM)) {
                     switch (managementMethod.component) {
                         case STATE: // datastream state change
 
@@ -223,7 +229,7 @@ extends AbstractInvocationHandler {
                             // if indexing status has changed, update the cache/index
                             if (wasIndexed != policyAfter.isPolicyActive()) {
                                 if (policyAfter.isPolicyActive()) {
-                                    addOrUpdatePolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
+                                    addPolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
                                 } else {
                                     deletePolicy(managementMethod.parameters.pid);
                                 }
@@ -245,7 +251,7 @@ extends AbstractInvocationHandler {
                                                                    managementMethod.parameters.dsID,
                                                                    managementMethod.parameters.dsState);
                                     if (policyAfter.isPolicyActive())
-                                        addOrUpdatePolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
+                                        addPolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
 
                                     break;
                                 case DELETE:
@@ -271,7 +277,7 @@ extends AbstractInvocationHandler {
                                     if (wasIndexed) {
                                         //if policy is still active after, only a version was purged and the policy has changed.  Update
                                         if (policyAfter.isPolicyActive()) {
-                                            addOrUpdatePolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
+                                            updatePolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
 
                                             //policy is not active after, then it was deleted and needs to be removed from index.
                                         } else {
@@ -290,7 +296,7 @@ extends AbstractInvocationHandler {
                                                                    managementMethod.parameters.dsID,
                                                                    null);
                                     if (policyAfter.isPolicyActive())
-                                        addOrUpdatePolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
+                                        updatePolicy(managementMethod.parameters.pid, policyAfter.getDsContent());
 
                                     break;
 
@@ -332,43 +338,44 @@ extends AbstractInvocationHandler {
         return returnValue;
     }
 
-    /**
-     * Add/update policy to cache/index
-     * @param pid
-     * @param dsContent
-     * @throws PolicyIndexException
-     * @throws GeneralException
-     * @throws IOException
-     */
-    private void addOrUpdatePolicy(String pid, InputStream dsContent) throws GeneralException  {
-        LOG.debug("Adding/Updating policy " + pid);
+    // TODO: invalidate PEP cache on the following operations
+
+
+    private void addPolicy(String pid, InputStream dsContent) throws GeneralException {
+        LOG.debug("Adding policy " + pid);
 
         String policy;
 
         try {
             policy = IOUtils.toString(dsContent);
-            // make sure stream is closed - with Akubra on Windows this can leave the stream open
-            // and leave the file locked (prevents a purge later)
             dsContent.close();
-            // FIXME: should be doing an explicit add or update based on the object modification, but currently
-            // validation is an issue - it can result in a datastream being saved but the policy not present in the index
-            // as the validation failed; so a subsequent update to the datastream needs to be an "add" to the index, as the policy
-            // doesn't exist.  Change this once the validation has been refactored to happen in this class rather than in the policy index
-            if (policyIndex.contains(pid)) {
-                policyIndex.updatePolicy(pid, policy);
-            } else {
-                policyIndex.addPolicy(pid, policy);
-            }
+            policyIndex.addPolicy(pid, policy);
         } catch (IOException e) {
             throw new GeneralException("Error adding policy " + pid + " to policy index: " + e.getMessage(), e);
         } catch (PolicyIndexException e) {
             throw new GeneralException("Error adding policy " + pid + " to policy index: " + e.getMessage(), e);
         }
 
-        // TODO: invalidate PEP cache here? - or do in all policyIndex.addPolicy ?
-
 
     }
+    private void updatePolicy(String pid, InputStream dsContent) throws GeneralException {
+        LOG.debug("Updating policy " + pid);
+
+        String policy;
+
+        try {
+            policy = IOUtils.toString(dsContent);
+            dsContent.close();
+            policyIndex.updatePolicy(pid, policy);
+        } catch (IOException e) {
+            throw new GeneralException("Error adding policy " + pid + " to policy index: " + e.getMessage(), e);
+        } catch (PolicyIndexException e) {
+            throw new GeneralException("Error adding policy " + pid + " to policy index: " + e.getMessage(), e);
+        }
+
+    }
+
+
     /**
      * Remove the specified policy from the cache
      * @param pid

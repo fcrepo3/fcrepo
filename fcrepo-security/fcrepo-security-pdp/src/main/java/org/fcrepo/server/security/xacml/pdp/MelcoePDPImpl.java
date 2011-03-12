@@ -36,6 +36,9 @@ import com.sun.xacml.ctx.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.fcrepo.server.security.xacml.pdp.data.PolicyStore;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
+import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreFactory;
 import org.fcrepo.server.security.xacml.util.PopulatePolicyDatabase;
 
 /**
@@ -49,6 +52,8 @@ public class MelcoePDPImpl
 
     private static final Logger logger =
             LoggerFactory.getLogger(MelcoePDPImpl.class);
+
+    private static PolicyStore policyStore;
 
     private PDP pdp;
 
@@ -70,8 +75,9 @@ public class MelcoePDPImpl
             // Does not monitor the directory for changes, nor will
             // subsequently deleted policies be removed from the policy store
             try {
-            PopulatePolicyDatabase.addDocuments();
+                PopulatePolicyDatabase.addDocuments(getPolicyStore());
             } catch (Exception e) {
+                logger.error("Error loading bootstrap FeSL policies: " + e.getMessage(), e);
                 throw new MelcoePDPException("Error loading bootstrap FeSL policies", e);
             }
             //
@@ -81,7 +87,7 @@ public class MelcoePDPImpl
             f = new File(filename);
             if (!f.exists()) {
                 throw new MelcoePDPException("Could not locate config file: "
-                        + f.getAbsolutePath());
+                                             + f.getAbsolutePath());
             }
 
             logger.info("Loading config file: " + f.getAbsolutePath());
@@ -93,7 +99,7 @@ public class MelcoePDPImpl
         } catch (Exception e) {
             logger.error("Could not initialise PDP: " + e.getMessage(), e);
             throw new MelcoePDPException("Could not initialise PDP: "
-                    + e.getMessage(), e);
+                                         + e.getMessage(), e);
         }
     }
 
@@ -156,5 +162,16 @@ public class MelcoePDPImpl
         combinedResponse.encode(os, new Indenter());
 
         return os.toString();
+    }
+
+    // FIXME: once integrated with module architecture this init stuff will go away
+
+    private synchronized PolicyStore getPolicyStore() throws PolicyStoreException {
+        if (policyStore != null) {
+            return policyStore;
+        }
+        PolicyStoreFactory f = new PolicyStoreFactory();
+        policyStore = f.newPolicyStore();
+        return policyStore;
     }
 }

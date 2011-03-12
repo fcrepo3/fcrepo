@@ -10,15 +10,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import java.net.URL;
-
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import org.apache.commons.io.IOUtils;
 
@@ -41,12 +36,16 @@ import org.fcrepo.server.access.ObjectProfile;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.management.Management;
+import org.fcrepo.server.security.PolicyParser;
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 import org.fcrepo.server.security.xacml.pdp.MelcoePDPException;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.server.validation.ValidationUtility;
 
 /**
  * A PolicyStore for managing policies stored as Fedora digital objects.
+ *
+ * Mainly used by the initial load of the bootstrap policies and by the rebuilder.
  *
  * For searching for policies see PolicyIndex.java and its implementations.
  *
@@ -64,9 +63,9 @@ implements PolicyStore {
 
     private static final String CONFIG_FILE = "config-pdm-fedora.xml";
 
-    public static final String POLICY_DATASTREAM = "FESLPOLICY";
+    public static final String FESL_POLICY_DATASTREAM = "FESLPOLICY";
 
-    public static String BOOTSTRAP_POLICY_NAMESPACE = "fedora-policy";
+    public static String FESL_BOOTSTRAP_POLICY_NAMESPACE = "fedora-policy";
 
 
     // escaping to use for ":" in policy names
@@ -169,12 +168,6 @@ implements PolicyStore {
      */
     public String addPolicy(String document, String name)
     throws PolicyStoreException {
-
-        try {
-            utils.validate(document, name);
-        } catch (MelcoePDPException e1) {
-            throw new PolicyStoreException("Validation failed", e1);
-        }
 
         String policyName;
 
@@ -313,11 +306,6 @@ implements PolicyStore {
      */
     public boolean updatePolicy(String name, String newDocument)
     throws PolicyStoreException {
-        try {
-            utils.validate(newDocument, name);
-        } catch (MelcoePDPException e1) {
-            throw new PolicyStoreException(e1);
-        }
 
         String pid = this.getPID(name);
 
@@ -332,7 +320,7 @@ implements PolicyStore {
                 this.apiMService
                 .modifyDatastreamByValue(getContext(),
                                          pid,
-                                         POLICY_DATASTREAM,
+                                         FESL_POLICY_DATASTREAM,
                                          null,
                                          null,
                                          null,
@@ -366,7 +354,7 @@ implements PolicyStore {
             try {
                 apiMService.modifyDatastreamByReference(getContext(),
                                                         pid,
-                                                        POLICY_DATASTREAM,
+                                                        FESL_POLICY_DATASTREAM,
                                                         null,
                                                         null,
                                                         null,
@@ -410,7 +398,7 @@ implements PolicyStore {
             InputStream is =
                 apiAService.getDatastreamDissemination(getContext(),
                                                        pid,
-                                                       POLICY_DATASTREAM,
+                                                       FESL_POLICY_DATASTREAM,
                                                        null).getStream();
             return IOUtils.toByteArray(is);
         } catch (Exception e) {
@@ -506,7 +494,7 @@ implements PolicyStore {
 
         String pid;
         // only bootstrap policies specify the PID namespace, all others follow the config
-        if (name.startsWith(BOOTSTRAP_POLICY_NAMESPACE + ":")) {
+        if (name.startsWith(FESL_BOOTSTRAP_POLICY_NAMESPACE + ":")) {
             pid = name;
         } else {
             // TODO: would be nice to have the PID class contain a method for this
@@ -576,6 +564,9 @@ implements PolicyStore {
         }
 
         try {
+            utils = new PolicyUtils();
+
+
             String home = MelcoePDP.PDP_HOME.getAbsolutePath();
 
             String filename = home + "/conf/" + CONFIG_FILE;
@@ -629,41 +620,47 @@ implements PolicyStore {
             Node schemaConfig =
                 doc.getElementsByTagName("schemaConfig").item(0);
             nodes = schemaConfig.getChildNodes();
-            if ("true".equals(schemaConfig.getAttributes()
-                              .getNamedItem("validation").getNodeValue())) {
-                log.info("Initialising validation");
 
-                for (int x = 0; x < nodes.getLength(); x++) {
-                    Node schemaNode = nodes.item(x);
-                    if (schemaNode.getNodeType() == Node.ELEMENT_NODE) {
-                        if (XACML20_POLICY_NS.equals(schemaNode.getAttributes()
-                                                     .getNamedItem("namespace").getNodeValue())) {
-                            if (log.isDebugEnabled()) {
-                                log
-                                .debug("found valid schema. Creating validator");
-                            }
-                            String loc =
-                                schemaNode.getAttributes()
-                                .getNamedItem("location")
-                                .getNodeValue();
-                            SchemaFactory schemaFactory =
-                                SchemaFactory
-                                .newInstance("http://www.w3.org/2001/XMLSchema");
-                            Schema schema =
-                                schemaFactory.newSchema(new URL(loc));
-                            Validator validator = schema.newValidator();
-                            utils = new PolicyUtils(validator);
-                        }
+
+            log.info("Initialising validation");
+
+            // FIXME: at some point this config should be moved into the Spring module architecture
+            ValidationUtility.setValidateFeslPolicy("true".equals(schemaConfig.getAttributes()
+                                                                  .getNamedItem("validation").getNodeValue()));
+
+            boolean foundSchema = false;
+            for (int x = 0; x < nodes.getLength(); x++) {
+                Node schemaNode = nodes.item(x);
+                if (schemaNode.getNodeType() == Node.ELEMENT_NODE) {
+                    if (XACML20_POLICY_NS.equals(schemaNode.getAttributes()
+                                                 .getNamedItem("namespace").getNodeValue())) {
+                        String loc =
+                            schemaNode.getAttributes()
+                            .getNamedItem("location")
+                            .getNodeValue();
+                        Server fedoraServer = Server.getInstance(new File(Constants.FEDORA_HOME), false);
+                        String serverHome =
+                            fedoraServer.getHomeDir().getCanonicalPath() + File.separator;
+
+                        String schemaPath =
+                            ((loc)
+                                    .startsWith(File.separator) ? "" : serverHome)
+                                    + loc;
+                        FileInputStream in = new FileInputStream(schemaPath);
+                        PolicyParser policyParser = new PolicyParser(in);
+                        ValidationUtility.setFeslPolicyParser(policyParser);
+                        foundSchema = true;
                     }
                 }
-            } else {
-                utils = new PolicyUtils();
-
             }
+            if (!foundSchema) {
+                throw new PolicyStoreException("Configuration error - no policy schema specified");
+            }
+
         } catch (Exception e) {
             log.error("Could not initialise DBXML: " + e.getMessage(), e);
             throw new PolicyStoreException("Could not initialise DBXML: "
-                                                 + e.getMessage(), e);
+                                           + e.getMessage(), e);
         }
     }
 
@@ -702,7 +699,7 @@ implements PolicyStore {
 
         // RELS-EXT specifying content model - if present, collection relationship if present
         // but not for bootstrap policies
-        if (!pid.startsWith(BOOTSTRAP_POLICY_NAMESPACE + ":")) {
+        if (!pid.startsWith(FESL_BOOTSTRAP_POLICY_NAMESPACE + ":")) {
             if (!contentModel.equals("") || !collection.equals("")) {
                 foxml.append("<foxml:datastream ID=\"RELS-EXT\" CONTROL_GROUP=\"X\">");
                 foxml.append("<foxml:datastreamVersion FORMAT_URI=\"info:fedora/fedora-system:FedoraRELSExt-1.0\" ID=\"RELS-EXT.0\" MIMETYPE=\"application/rdf+xml\" LABEL=\"RDF Statements about this object\">");
@@ -726,7 +723,7 @@ implements PolicyStore {
             }
         }
         // the POLICY datastream
-        foxml.append("<foxml:datastream ID=\"" + POLICY_DATASTREAM
+        foxml.append("<foxml:datastream ID=\"" + FESL_POLICY_DATASTREAM
                      + "\" CONTROL_GROUP=\"" + controlGroup + "\">");
         foxml.append("<foxml:datastreamVersion ID=\"POLICY.0\" MIMETYPE=\"text/xml\" LABEL=\"XACML policy datastream\">");
         if (controlGroup.equals("M")) {

@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -33,7 +32,6 @@ import org.fcrepo.server.security.xacml.pdp.MelcoePDPException;
 import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyStore;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreFactory;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyUtils;
 
 /**
@@ -51,40 +49,20 @@ public class PopulatePolicyDatabase {
     private static final String POLICY_HOME =
             MelcoePDP.PDP_HOME.getAbsolutePath() + "/policies";
 
-    private static PolicyStore policyStore;
-
     private static Set<String> policyNames = new HashSet<String>();
 
-    static {
-        try {
-            PolicyStoreFactory f = new PolicyStoreFactory();
-            policyStore = f.newPolicyStore();
-        } catch (PolicyStoreException e) {
-            e.printStackTrace();
-        }
-    }
 
-    public static void main(String[] args) throws PolicyStoreException,
-            FileNotFoundException {
-        PolicyStoreFactory f = new PolicyStoreFactory();
-        policyStore = f.newPolicyStore();
-        logger.info("Adding");
-        add();
-        logger.info("Listing");
-        list();
-    }
-
-    public static void add() throws PolicyStoreException,
+    public static void add(PolicyStore policyStore) throws PolicyStoreException,
             FileNotFoundException {
         logger.info("Starting clock!");
         long time1 = System.nanoTime();
-        addDocuments();
+        addDocuments(policyStore);
         long time2 = System.nanoTime();
         logger.info("Stopping clock!");
         logger.info("Time taken: " + (time2 - time1));
     }
 
-    public static synchronized void addDocuments() throws PolicyStoreException,
+    public static synchronized void addDocuments(PolicyStore policyStore) throws PolicyStoreException,
     FileNotFoundException {
 
         if (policiesLoaded)
@@ -112,7 +90,7 @@ public class PopulatePolicyDatabase {
                     if (policyID.contains(":")) {
                         policyID = policyID.replace(":", "%3A");
                     }
-                    policyID = FedoraPolicyStore.BOOTSTRAP_POLICY_NAMESPACE + ":" + policyID;
+                    policyID = FedoraPolicyStore.FESL_BOOTSTRAP_POLICY_NAMESPACE + ":" + policyID;
                 }
 
                 if (policyStore.contains(policyID)) {
@@ -135,12 +113,6 @@ public class PopulatePolicyDatabase {
         policiesLoaded = true;
     }
 
-    public static void list() throws PolicyStoreException {
-        List<String> docNames = policyStore.listPolicies();
-        for (String s : docNames) {
-            logger.info("doc: " + s);
-        }
-    }
 
     public static File[] getPolicyFiles() {
         File policyHome = new File(POLICY_HOME);

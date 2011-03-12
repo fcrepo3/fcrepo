@@ -79,7 +79,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
 
     private PolicyIndexUtils policyIndexUtils = null;
 
-    private static String POLICY_DATASTREAM = FedoraPolicyStore.POLICY_DATASTREAM;
+    private static String POLICY_DATASTREAM = FedoraPolicyStore.FESL_POLICY_DATASTREAM;
 
     //private PolicyUtils policyUtils = null;
 
@@ -501,21 +501,16 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         // check policy A in force
         assertTrue(checkPolicyEnforcement("A"));
 
-        // FIXME: FCREPO-770
-        // when this issue is fixed, the logic here changes as a datastream update should fail
-        // currently an exception is thrown (xacml validation) but the datastream update succeeds.
-        // currently the policy will also be removed from the index (ie index correctly reflects the datastream)
-        // TODO: extend this to add invalid xacml policy datastream (as well as modify)
-
         // modify by value to invalid XACML, ignore errors
         try {
             apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null, "<not><valid/></not>".getBytes("UTF-8"), null, null, "modify to policy B", false);
+            Assert.fail("FeSL policy datastream validation failure - should have rejected update and thrown an exception");
         } catch (Exception e) {
             System.out.println("Expected error occurred from invalid XACML - " + e.getMessage());
         }
 
-        // check policy A not in force
-        assertFalse(checkPolicyEnforcement("A"));
+        // check policy A still in force
+        assertTrue(checkPolicyEnforcement("A"));
 
         // modify by value to policy B
         apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null,  PolicyIndexUtils.getPolicy("B").getBytes("UTF-8"), null, null, "modify to policy B", false);

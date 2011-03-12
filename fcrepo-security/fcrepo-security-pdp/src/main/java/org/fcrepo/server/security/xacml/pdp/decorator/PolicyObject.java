@@ -34,7 +34,7 @@ public class PolicyObject {
 
     private InputStream m_dsContent = null;
 
-    public static final String POLICY_DATASTREAM = FedoraPolicyStore.POLICY_DATASTREAM;
+    public static final String POLICY_DATASTREAM = FedoraPolicyStore.FESL_POLICY_DATASTREAM;
 
     private Boolean m_hasPolicyDatastream = null;
 
