@@ -308,10 +308,12 @@ public class GetNextPIDServlet
             if (pw != null) {
                 try {
                     pw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-                    pw.write("<pidList");
-                    pw.write(" xmlns:xsi=\"" + XSI.uri + "\"");
-                    pw.write(" xsi:schemaLocation=\"" + MANAGEMENT.uri);
-                    pw.write(" " + PID_LIST1_0.xsdLocation + "\">\n");
+                    pw.write("<pidList "
+                            + " xmlns=\"" + Constants.PID_LIST1_0.namespace.uri + "\" "
+                            + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+                            + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+                            + " xsi:schemaLocation=\"" + Constants.PID_LIST1_0.namespace.uri + " "
+                            + Constants.PID_LIST1_0.xsdLocation + ">");
 
                     // PID array serialization
                     for (String element : pidList) {

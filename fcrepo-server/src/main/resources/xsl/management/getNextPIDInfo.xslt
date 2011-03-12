@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xmlspysamplexml C:\mellon\src\xsl\access\getItemList.xml?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" 
+  xmlns:management="http://www.fedora.info/definitions/1/0/management/"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="management">
   <xsl:param name="fedora"/>
   <xsl:output method="html" indent="yes"/>
-  <xsl:template match="pidList">
+  <xsl:template match="management:pidList">
     <html>
       <head>
         <title>Repository Information HTML Presentation</title>
@@ -26,7 +28,7 @@
           <hr/>
           <font size="+1">
             <strong>Generated PID List for next: </strong>
-            <xsl:value-of select="count(//pid)"/>
+            <xsl:value-of select="count(//management:pid)"/>
             PID(s)
           </font>
           <hr/>
@@ -37,7 +39,7 @@
                 <strong>PID</strong>
               </td>
             </tr>
-            <xsl:for-each select="//pid">
+            <xsl:for-each select="//management:pid">
               <tr>
                 <td align="left">
                   <xsl:value-of select="."/>

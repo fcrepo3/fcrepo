@@ -55,13 +55,12 @@ public class DefaultSerializer {
         StringBuffer xml = new StringBuffer();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         xml.append("<pidList "
-                   + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
-                   + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                   + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/management/ "
-                   + enc(fedoraServerProtocol) + "://"
-                   + enc(fedoraServerHost) + ":"
-                   + enc(fedoraServerPort) + "/getNextPIDInfo.xsd\">\n");
-
+                + " xmlns=\"" + Constants.PID_LIST1_0.namespace.uri + "\" "
+                + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+                + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+                + " xsi:schemaLocation=\"" + Constants.PID_LIST1_0.namespace.uri + " "
+                + Constants.PID_LIST1_0.xsdLocation + "\">");
+        
         // PID array serialization
         for (int i = 0; i < pidList.length; i++) {
             xml.append("  <pid>" + pidList[i] + "</pid>\n");
