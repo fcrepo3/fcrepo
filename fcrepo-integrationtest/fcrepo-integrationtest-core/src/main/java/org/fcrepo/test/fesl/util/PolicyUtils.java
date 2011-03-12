@@ -78,7 +78,7 @@ public class PolicyUtils
         foxml.append("  </foxml:objectProperties>\n");
 
         foxml.append("<foxml:datastream ID=\""
-                + FedoraPolicyStore.POLICY_DATASTREAM
+                + FedoraPolicyStore.FESL_POLICY_DATASTREAM
                 + "\" CONTROL_GROUP=\"M\">");
         foxml
                 .append("<foxml:datastreamVersion ID=\"POLICY.0\" MIMETYPE=\"text/xml\" LABEL=\"XACML policy datastream\">");

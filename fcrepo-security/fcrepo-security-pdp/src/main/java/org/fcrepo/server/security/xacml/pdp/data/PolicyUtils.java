@@ -11,20 +11,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Validator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-
-import org.xml.sax.SAXException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,13 +37,7 @@ public class PolicyUtils {
     private static final Logger log =
             LoggerFactory.getLogger(PolicyUtils.class.getName());
 
-    private Validator validator = null;
-
     public PolicyUtils() {}
-
-    public PolicyUtils(Validator val) {
-        validator = val;
-    }
 
 
     /**
@@ -78,36 +67,6 @@ public class PolicyUtils {
         return out.toString();
 
     }
-
-    public void validate(String document, String name)
-            throws MelcoePDPException {
-
-        try {
-            validate(document.getBytes("UTF-8"), name);
-        } catch (UnsupportedEncodingException e) {
-            throw new MelcoePDPException(e.getMessage(), e);
-        }
-    }
-
-    public void validate(byte[] document, String name)
-    throws MelcoePDPException {
-        if (validator != null) {
-            log.debug("validating document: {}", name);
-            try {
-                // Validator is not thread-safe
-                synchronized (validator) {
-                    validator.validate(new StreamSource(new ByteArrayInputStream(document)));
-                }
-            } catch (SAXException e) {
-                // log error also for easier debugging of the actual validation error
-                log.error("Policy: " + name + " is invalid.  Validation error: \n" + e.getMessage());
-                throw new MelcoePDPException("Could not validate policy: " + name, e);
-            } catch (IOException e) {
-                throw new MelcoePDPException("Could not validate policy: " + name, e);
-            }
-        }
-    }
-
 
     public String getPolicyName(File policy) throws MelcoePDPException {
         InputStream is;

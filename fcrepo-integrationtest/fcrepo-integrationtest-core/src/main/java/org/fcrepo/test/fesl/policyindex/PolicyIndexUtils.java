@@ -85,7 +85,7 @@ public class PolicyIndexUtils implements Constants {
 
         // policy datastream, unless null/empty string specified
         if (datastreamState != null) {
-            foxml.append("<foxml:datastream ID=\"" + FedoraPolicyStore.POLICY_DATASTREAM + "\" STATE=\"" + datastreamState
+            foxml.append("<foxml:datastream ID=\"" + FedoraPolicyStore.FESL_POLICY_DATASTREAM + "\" STATE=\"" + datastreamState
                          + "\" CONTROL_GROUP=\"X\">");
             foxml.append("<foxml:datastreamVersion ID=\"POLICY.0\" MIMETYPE=\"text/xml\" LABEL=\"XACML policy datastream\">");
 

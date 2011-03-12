@@ -115,7 +115,7 @@ public class SetDatastreamVersionable
                         new StringAttribute(Constants.ACTION.APIM.getURI()
                                 .toASCIIString()));
             // modifying the FeSL policy datastream requires policy management permissions
-            if (dsID != null && dsID.equals(FedoraPolicyStore.POLICY_DATASTREAM)) {
+            if (dsID != null && dsID.equals(FedoraPolicyStore.FESL_POLICY_DATASTREAM)) {
                 actions.put(Constants.ACTION.ID.getURI(),
                             new StringAttribute(Constants.ACTION.MANAGE_POLICIES.getURI().toASCIIString()));
             }

@@ -168,7 +168,10 @@ public class DatastreamManagedContent
                     // If validation has succeeded, assume an external resource.
                     // Fetch it, store it locally, update DSLocation
                     if (ctx == null) {
-                        ctx = ReadOnlyContext.EMPTY;
+                        ctx = ReadOnlyContext.getContext(null, null, "", false);
+                        // changed from below, which sets noOp to true, seems to cause an AuthZ permitted exception
+                        // in PolicyEnforcementPoint.enforce(...)
+                        // ctx = ReadOnlyContext.EMPTY;
                     }
                    ContentManagerParams params = new ContentManagerParams(DSLocation);
                     params.setContext(ctx);
