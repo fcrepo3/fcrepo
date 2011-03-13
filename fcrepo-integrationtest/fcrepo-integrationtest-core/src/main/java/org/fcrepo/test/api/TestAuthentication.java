@@ -212,6 +212,7 @@ public class TestAuthentication
     @Override
     public void setUp() throws Exception {
         Map<String, String> nsMap = new HashMap<String, String>();
+        nsMap.put("management", "http://www.fedora.info/definitions/1/0/management/");
         nsMap.put("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
         NamespaceContext ctx = new SimpleNamespaceContext(nsMap);
         XMLUnit.setXpathNamespaceContext(ctx);
@@ -288,7 +289,7 @@ public class TestAuthentication
                 Document result =
                         getXMLQueryResult(client,
                                           "/management/getNextPID?xml=true");
-                assertXpathEvaluatesTo("1", "count(/pidList/pid)", result);
+                assertXpathEvaluatesTo("1", "count(//management:pid)", result);
             } catch (Exception e) {
                 failCount++;
             }
@@ -328,6 +329,8 @@ public class TestAuthentication
                         getXMLQueryResult(client, "/get/" + TEST_PID + "/DC");
                 assertXpathExists("/oai_dc:dc", result);
             } catch (Exception e) {
+                System.out.println(e.getMessage());
+
                 failCount++;
             }
         }

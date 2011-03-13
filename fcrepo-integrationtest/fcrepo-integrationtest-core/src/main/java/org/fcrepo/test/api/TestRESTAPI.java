@@ -1089,7 +1089,9 @@ public class TestRESTAPI
     public void testGetNextPID() throws Exception {
         url = "/objects/nextPID";
         assertEquals(SC_UNAUTHORIZED, post("", false).getStatusCode());
-        assertEquals(SC_OK, post("", true).getStatusCode());
+        // FIXME: not schema-validated, it should be
+        // fcrepo-808 - when schema is available online, post("", true, false) -> post("", true)
+        assertEquals(SC_OK, post("", true, false).getStatusCode());
     }
 
     public void testLifecycle() throws Exception {
@@ -1098,7 +1100,8 @@ public class TestRESTAPI
         // Get next PID
         url = "/objects/nextPID?format=xml";
         assertEquals(SC_UNAUTHORIZED, post("", false).getStatusCode());
-        response = post("", true);
+        // FIXME: fcrepo-808, validation disabled currently
+        response = post("", true, false);
         assertEquals(SC_OK, response.getStatusCode());
 
         String responseXML = new String(response.responseBody, "UTF-8");
@@ -1341,29 +1344,32 @@ public class TestRESTAPI
         HttpResponse res = getOrDelete("GET", authenticate);
 
         if (validate) {
-            // if response was ok...
-            if (res.getStatusCode() >= 200 && res.getStatusCode() <= 299) {
-                // if response is xml
-
-                if (res.getResponseHeader("Content-Type") != null &&
-                        (res.getResponseHeader("Content-Type").getValue().contains("text/xml") ||
-                        res.getResponseHeader("Content-Type").getValue().contains("application/xml"))) {
-                    String xmlResponse = res.getResponseBodyString();
-                    // if a schema location is specified
-                    if (xmlResponse.contains(":schemaLocation=\"")) {
-                        // validate it
-                        validate(xmlResponse);
-                    } else {
-                        // for now, requiring a schema
-                        fail("No schema location specified in response - " + url);
-                    }
-                }
-
-            }
+            validateResponse(res);
         }
 
 
         return res;
+    }
+
+    protected void validateResponse(HttpResponse res) throws Exception {
+        // if response was ok...
+        if (res.getStatusCode() >= 200 && res.getStatusCode() <= 299) {
+            // if response is xml
+
+            if (res.getResponseHeader("Content-Type") != null &&
+                    (res.getResponseHeader("Content-Type").getValue().contains("text/xml") ||
+                            res.getResponseHeader("Content-Type").getValue().contains("application/xml"))) {
+                String xmlResponse = res.getResponseBodyString();
+                // if a schema location is specified
+                if (xmlResponse.contains(":schemaLocation=\"")) {
+                    // validate it
+                    validate(xmlResponse);
+                } else {
+                    // for now, requiring a schema
+                    fail("No schema location specified in response - " + url);
+                }
+            }
+        }
     }
 
     protected HttpResponse delete(boolean authenticate) throws Exception {
@@ -1387,9 +1393,22 @@ public class TestRESTAPI
         return putOrPost("PUT", requestContent, authenticate);
     }
 
+    // FIXME: to cover getNextPid, actually all verbs should be validated
+    // for if/when they return xml responses
     protected HttpResponse post(String requestContent, boolean authenticate)
+    throws Exception {
+
+        return post(requestContent, authenticate, true);
+    }
+
+    protected HttpResponse post(String requestContent, boolean authenticate, boolean validate)
             throws Exception {
-        return putOrPost("POST", requestContent, authenticate);
+        HttpResponse res = putOrPost("POST", requestContent, authenticate);
+        if (validate) {
+            validateResponse(res);
+        }
+
+        return res;
     }
 
     protected HttpResponse put(File requestContent, boolean authenticate)
@@ -1480,6 +1499,12 @@ public class TestRESTAPI
         }
     }
 
+    /**
+     * Validate XML document supplied as a string.
+     * Validates against XML schema specified as schemaLocation in document
+     * @param xml
+     * @throws Exception
+     */
     private void validate(String xml) throws Exception {
 
         SAXParserFactory factory = SAXParserFactory.newInstance();

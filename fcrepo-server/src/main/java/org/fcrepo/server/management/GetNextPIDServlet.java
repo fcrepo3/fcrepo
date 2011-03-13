@@ -25,7 +25,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
@@ -36,9 +40,8 @@ import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.servletExceptionExtensions.InternalError500Exception;
 import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
+
 import org.fcrepo.utilities.XmlTransformUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implements the "getNextPID" functionality of the Fedora Management LITE
@@ -313,7 +316,7 @@ public class GetNextPIDServlet
                             + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
                             + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                             + " xsi:schemaLocation=\"" + Constants.PID_LIST1_0.namespace.uri + " "
-                            + Constants.PID_LIST1_0.xsdLocation + ">");
+                            + Constants.PID_LIST1_0.xsdLocation + "\">");
 
                     // PID array serialization
                     for (String element : pidList) {

@@ -14,12 +14,18 @@ installed and enter the following:
   mvn install
 
 This generates fcrepo-installer-VERSION.jar, which can be found in
-fcrepo-installer/target
+fcrepo-installer/target.
+
+This also runs all unit and integration tests.  If you wish to build the
+installer without running the integration tests see below.
 
 Running Unit Tests
 =====================
 
   mvn install -Dintegration.test.skip=true
+  
+This generates the installer jar as above, running the unit tests, 
+but without running the integration tests.
 
 Running System Tests
 ====================
@@ -100,7 +106,9 @@ To run individual integration/system tests, supply the name of the test
 as a value of the property 'it.test'
   
  mvn verify -Dit.test=org.fcrepo.test.api.TestManagedDatastreams
-
+ 
+This needs to be run from within the fcrepo-integrationtest directory in
+order to correctly resolve the class name of the test.
 
 There are some system tests that are not included in the system
 test suites due to the time required to execute the test,

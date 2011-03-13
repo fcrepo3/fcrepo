@@ -4,12 +4,21 @@
  */
 package org.fcrepo.test.api;
 
-import org.w3c.dom.Document;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.fcrepo.test.FedoraServerTestCase;
+import org.custommonkey.xmlunit.NamespaceContext;
+import org.custommonkey.xmlunit.SimpleNamespaceContext;
+import org.custommonkey.xmlunit.XMLUnit;
+
+import org.junit.After;
+
+import org.w3c.dom.Document;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import org.fcrepo.test.FedoraServerTestCase;
 
 
 /**
@@ -24,14 +33,29 @@ public class TestAPIMLite
         return suite;
     }
 
+    @Override
+    public void setUp() throws Exception {
+        Map<String, String> nsMap = new HashMap<String, String>();
+        nsMap.put("management", "http://www.fedora.info/definitions/1/0/management/");
+        NamespaceContext ctx = new SimpleNamespaceContext(nsMap);
+        XMLUnit.setXpathNamespaceContext(ctx);
+    }
+
+    @Override
+    @After
+    public void tearDown() {
+        XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
+    }
+
+
     public void testGetNextPID() throws Exception {
         Document result;
         result = getXMLQueryResult("/management/getNextPID?xml=true");
-        assertXpathEvaluatesTo("1", "count(/pidList/pid)", result);
+        assertXpathEvaluatesTo("1", "count(//management:pid)", result);
 
         result =
                 getXMLQueryResult("/management/getNextPID?numpids=10&namespace=demo&xml=true");
-        assertXpathEvaluatesTo("10", "count(/pidList/pid)", result);
+        assertXpathEvaluatesTo("10", "count(//management:pid)", result);
     }
 
     public static void main(String[] args) {

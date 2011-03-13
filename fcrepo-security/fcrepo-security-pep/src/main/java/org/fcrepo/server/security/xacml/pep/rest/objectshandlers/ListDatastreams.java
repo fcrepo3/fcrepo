@@ -63,15 +63,17 @@ import org.w3c.dom.NodeList;
 
 import org.w3c.tidy.Tidy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.pep.rest.filters.DataResponseWrapper;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.LogUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -327,8 +329,10 @@ public class ListDatastreams
         Document doc = null;
 
         try {
+            DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+            docBuilderFactory.setNamespaceAware(true);
             docBuilder =
-                    DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                    docBuilderFactory.newDocumentBuilder();
             doc =
                     docBuilder.parse(new ByteArrayInputStream(response
                             .getData()));
