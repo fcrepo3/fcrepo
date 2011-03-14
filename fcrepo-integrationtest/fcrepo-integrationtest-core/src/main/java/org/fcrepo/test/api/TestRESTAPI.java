@@ -690,9 +690,7 @@ public class TestRESTAPI
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
-        // FIXME: validation disabled; response currently has incorrect location for schema, see fcrepo-866
-        // when fixed, -> get(getAuthAccess()).getStatusCode() to enable validation
-        assertEquals(SC_OK, get(getAuthAccess(), false).getStatusCode());
+        assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
     }
 
     private String extractPid(String source) {
