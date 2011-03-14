@@ -31,7 +31,7 @@ public class FedoraObjectHistory1_0Format
     private FedoraObjectHistory1_0Format() {
         super("info:fedora/fedora-system:FedoraObjectHistory-1.0",
               FedoraAccessNamespace.getInstance(),
-              "http://www.fedora.info/definitions/1/0/objectHistory.xsd");
+              "http://www.fedora.info/definitions/1/0/fedoraObjectHistory.xsd");
     }
 
     /**
