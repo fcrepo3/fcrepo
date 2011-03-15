@@ -6,7 +6,7 @@
     <xs:element name="validation">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="asOfDateTime"/>
+                <xs:element ref="asOfDateTime" minOccurs="0" maxOccurs="1"/>
                 <xs:element ref="contentModels"/>
                 <xs:element ref="problems"/>
                 <xs:element ref="datastreamProblems"/>

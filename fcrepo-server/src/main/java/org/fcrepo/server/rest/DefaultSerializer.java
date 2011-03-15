@@ -652,16 +652,24 @@ public class DefaultSerializer {
         StringBuilder buffer = new StringBuilder();
         String pid = validation.getPid();
         Date date = validation.getAsOfDateTime();
-        String dateString = "";
+        String dateString = null;
         boolean valid = validation.isValid();
         if (date != null) {
             dateString = DateUtility.convertDateToString(date);
         }
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        
         buffer.append("<validation "
-                      + "pid=\"" + enc(pid) + "\" " +
-                      "valid=\"" + valid + "\">\n");
-        buffer.append("  <asOfDateTime>" + dateString + "</asOfDateTime>\n");
+                + " xmlns=\"" + Constants.OBJ_VALIDATION1_0.namespace.uri + "\""
+                + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+                + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+                + " xsi:schemaLocation=\"" + Constants.OBJ_VALIDATION1_0.namespace.uri
+                + " " + Constants.OBJ_VALIDATION1_0.xsdLocation + "\""
+                + " pid=\"" + enc(pid) + "\" "
+                + " valid=\"" + valid + "\">\n");
+        if (date != null) {
+        	buffer.append("  <asOfDateTime>" + dateString + "</asOfDateTime>\n");
+        }
         buffer.append("  <contentModels>\n");
         for (String model : validation.getContentModels()) {
             buffer.append("    <model>");

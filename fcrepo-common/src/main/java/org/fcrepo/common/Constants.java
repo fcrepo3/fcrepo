@@ -39,6 +39,7 @@ import org.fcrepo.common.xml.format.FedoraObjectHistory1_0Format;
 import org.fcrepo.common.xml.format.FedoraObjectItems1_0Format;
 import org.fcrepo.common.xml.format.FedoraObjectMethods1_0Format;
 import org.fcrepo.common.xml.format.FedoraObjectProfile1_0Format;
+import org.fcrepo.common.xml.format.FedoraObjectValidation1_0Format;
 import org.fcrepo.common.xml.format.FedoraPIDList1_0Format;
 import org.fcrepo.common.xml.format.FedoraRELSExt1_0Format;
 import org.fcrepo.common.xml.format.FedoraRELSInt1_0Format;
@@ -536,6 +537,13 @@ public interface Constants {
      */
     public static final FedoraObjectProfile1_0Format OBJ_PROFILE1_0 =
             FedoraObjectProfile1_0Format.getInstance();
+    
+    /**
+     * The Fedora Object Validation 1.0 XML format;
+     * <code>info:fedora/fedora-system:FedoraObjectValidation-1.0</code>
+     */
+    public static final FedoraObjectValidation1_0Format OBJ_VALIDATION1_0 =
+            FedoraObjectValidation1_0Format.getInstance();
 
     /**
      * The Fedora PID List 1.0 XML format;
