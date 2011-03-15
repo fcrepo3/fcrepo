@@ -18,6 +18,8 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +48,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.NamespaceContext;
+import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
 
 import org.junit.Test;
@@ -157,6 +161,12 @@ public class TestRESTAPI
 
     @Override
     public void setUp() throws Exception {
+        Map<String, String> nsMap = new HashMap<String, String>();
+        nsMap.put("management", "http://www.fedora.info/definitions/1/0/management/");
+        nsMap.put("access", "http://www.fedora.info/definitions/1/0/access/");
+        NamespaceContext ctx = new SimpleNamespaceContext(nsMap);
+        XMLUnit.setXpathNamespaceContext(ctx);
+
 
         DEMO_MIN =
                 FileUtils.readFileToString(new File(REST_RESOURCE_PATH
@@ -191,6 +201,8 @@ public class TestRESTAPI
 
     @Override
     public void tearDown() throws Exception {
+        XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
+
         apim.purgeObject(pid.toString(), "", false);
     }
 
@@ -529,7 +541,7 @@ public class TestRESTAPI
                                 datetime);
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         // FIXME: validation disabled
-        // response is currently not schema-valid, see fcrepo-866
+        // response is currently not schema-valid, see fcrepo-866, fcrepo-612
         // -> get(true) once fixed to enable validation
         response = get(true, false);
         assertEquals(SC_OK, response.getStatusCode());
@@ -848,13 +860,14 @@ public class TestRESTAPI
                     apia.findObjects(resultFields, maxResults, query);
 
             ObjectFields[] fields = result.getResultList();
+            String pid = "";
             for (ObjectFields objectFields : fields) {
-                String pid = objectFields.getPid();
+                pid = objectFields.getPid();
                 //System.out.println("validating object '" + pid.toString() + "'");
                 url =
                         String.format("/objects/%s/validate", URLEncoder
                                 .encode(pid.toString(), "UTF-8"));
-                // FIXME: fcrepo-866
+                // FIXME: fcrepo-876
                 // response does not specify schema
                 // remove "false" to enable validation
                 HttpResponse getTrue = get(true, false);
@@ -863,8 +876,24 @@ public class TestRESTAPI
                 assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
                 String responseXML = getTrue.getResponseBodyString();
                 //System.out.println(responseXML);
-                assertXpathExists("/validation[@valid='true']", responseXML);
+                // FIXME:  Schema specifies access namespace, but it is a management method
+                assertXpathExists("/access:validation[@valid='true']", responseXML);
             }
+            // test with asOfDateTime set (just on the last object validated above)
+
+            url =
+                String.format("/objects/%s/validate?asOfDateTime=%s", pid.toString(),datetime);
+            // FIXME: fcrepo-876
+            // response does not specify schema
+            // remove "false" to enable validation
+            HttpResponse getTrue = get(true, false);
+            assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
+                         .getStatusCode());
+            assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
+            String responseXML = getTrue.getResponseBodyString();
+            //System.out.println(responseXML);
+            // FIXME:  Schema specifies access namespace, but it is a management method
+            assertXpathExists("/access:validation[@valid='true']", responseXML);
         } finally {
             //purgeDemoObjects();
         }
