@@ -5,14 +5,14 @@
 
 package org.fcrepo.common.xml.format;
 
-import org.fcrepo.common.xml.namespace.FedoraAccessNamespace;
+import org.fcrepo.common.xml.namespace.FedoraManagementNamespace;
 
 /**
  * The Fedora Object Validation 1.0 XML format.
  * 
  * <pre>
  * Format URI        : info:fedora/fedora-system:FedoraObjectValidation-1.0
- * Primary Namespace : http://www.fedora.info/definitions/1/0/access/
+ * Primary Namespace : http://www.fedora.info/definitions/1/0/management/
  * XSD Schema URL    : http://www.fedora.info/definitions/1/0/validation.xsd
  * </pre>
  * 
@@ -30,7 +30,7 @@ public class FedoraObjectValidation1_0Format
      */
     private FedoraObjectValidation1_0Format() {
         super("info:fedora/fedora-system:FedoraObjectValidation-1.0",
-              FedoraAccessNamespace.getInstance(),
+              FedoraManagementNamespace.getInstance(),
               "http://www.fedora.info/definitions/1/0/validation.xsd");
     }
 
