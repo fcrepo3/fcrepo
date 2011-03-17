@@ -18,23 +18,14 @@ package org.fcrepo.server.security.xacml.pdp.data;
 
 import java.io.File;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeDesignator;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.BagAttribute;
-import com.sun.xacml.cond.EvaluationResult;
 
 import com.sleepycat.dbxml.XmlDocument;
 import com.sleepycat.dbxml.XmlDocumentConfig;
@@ -57,19 +48,12 @@ import org.fcrepo.server.security.xacml.util.AttributeBean;
  * @author Stephen Bayliss
  * @version $Id$
  */
-class DbXmlPolicyIndex
+public class DbXmlPolicyIndex
+        extends XPathPolicyIndex
         implements PolicyIndex {
 
     private static final Logger log =
             LoggerFactory.getLogger(DbXmlPolicyIndex.class.getName());
-
-    private static final String XACML20_POLICY_NS =
-            "urn:oasis:names:tc:xacml:2.0:policy:schema:os";
-
-    private static final String METADATA_POLICY_NS = "metadata";
-
-    private static final String XACML_RESOURCE_ID =
-            "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
 
     private DbXmlManager dbXmlManager = null;
 
@@ -81,14 +65,20 @@ class DbXmlPolicyIndex
 
 
     protected DbXmlPolicyIndex()
-            throws PolicyStoreException {
+            throws PolicyIndexException {
+        super();
         init();
 
         queries = new ConcurrentHashMap<String, XmlQueryExpression>();
     }
 
-    private void init() throws PolicyStoreException {
-        dbXmlManager = new DbXmlManager();
+    private void init() throws PolicyIndexException {
+        try {
+            dbXmlManager = new DbXmlManager();
+        } catch (PolicyStoreException e) {
+            throw new PolicyIndexException("Error initialising DbXmlManager - " + e.getMessage(), e);
+        }
+        dbXmlManager.indexMap = indexMap;
 
         utils = new PolicyUtils();
 
@@ -120,65 +110,19 @@ class DbXmlPolicyIndex
 
             context = dbXmlManager.manager.createQueryContext();
             context.setDefaultCollection(dbXmlManager.CONTAINER);
-            context.setNamespace("p", XACML20_POLICY_NS);
-            context.setNamespace("m", METADATA_POLICY_NS);
 
-            // Set all the bind variables in the query context
-            String[] types =
-                new String[] {"Subject", "Resource", "Action",
-            "Environment"};
+            for (String prefix : namespaces.keySet()) {
+                context.setNamespace(prefix, namespaces.get(prefix));
+            }
+
+
+            // not clear why this is needed.... but it is used in hashing the queries
             int resourceComponentCount = 0;
-
-            for (String t : types) {
-                int count = 0;
-                for (AttributeBean bean : attributeMap.get(t.toLowerCase()
-                                                           + "Attributes")) {
-                    if (bean.getId().equals(XACML_RESOURCE_ID)) {
-                        context.setVariableValue("XacmlResourceId",
-                                                 new XmlValue(bean.getId()));
-
-                        int c = 0;
-                        for (String value : bean.getValues()) {
-                            XmlValue component = new XmlValue(value);
-                            context
-                            .setVariableValue("XacmlResourceIdValue"
-                                              + c, component);
-
-                            if (log.isDebugEnabled()) {
-                                log
-                                .debug("XacmlResourceIdValue"
-                                       + resourceComponentCount + ": "
-                                       + value);
-                            }
-
-                            resourceComponentCount++;
-                            c++;
-                        }
-                    } else {
-                        context.setVariableValue(t + "Id" + count,
-                                                 new XmlValue(bean.getId()));
-
-                        if (log.isDebugEnabled()) {
-                            log.debug(t + "Id" + count + " = '" + bean.getId()
-                                      + "'");
-                        }
-
-                        int valueCount = 0;
-                        for (String value : bean.getValues()) {
-                            context.setVariableValue(t + "Id" + count
-                                                     + "-Value"
-                                                     + valueCount,
-                                                     new XmlValue(value));
-                            if (log.isDebugEnabled()) {
-                                log.debug(t + "Id" + count + "-Value"
-                                          + valueCount + " = '" + value + "'");
-                            }
-
-                            valueCount++;
-                        }
-
-                        count++;
-                    }
+            Map<String, String> variables = getXpathVariables(attributeMap);
+            for (String variable : variables.keySet()) {
+                context.setVariableValue(variable, new XmlValue(variables.get(variable)));
+                if (variable.equals(XACML_RESOURCE_ID)) {
+                    resourceComponentCount++;
                 }
             }
 
@@ -300,293 +244,9 @@ class DbXmlPolicyIndex
      * @return the query as a String
      */
     private String createQuery(Map<String, Set<AttributeBean>> attributeMap,
-                               int r) {
-        // The query contains these 4 sections.
-        String[] types =
-                new String[] {"Subject", "Resource", "Action", "Environment"};
+                                      int r) {
+        return "collection('" + dbXmlManager.CONTAINER + "')" + getXpath(attributeMap, r);
 
-        int sections = 0;
-        StringBuilder sb = new StringBuilder();
-        sb.append("collection('" + dbXmlManager.CONTAINER + "')/p:Policy/p:Target[");
-        for (String t : types) {
-            if (attributeMap.get(t.toLowerCase() + "Attributes").size() == 0) {
-                continue;
-            }
-
-            if (sections > 0) {
-                sb.append(" and ");
-            }
-
-            sections++;
-
-            sb.append("((exists(dbxml:metadata('m:any" + t + "')))");
-            // sb.append("((not('p:" + t + "s'))");
-
-            int count = 0;
-            for (AttributeBean bean : attributeMap.get(t.toLowerCase()
-                    + "Attributes")) {
-                sb.append(" or ");
-                sb.append("(");
-
-                if (bean.getId().equals(XACML_RESOURCE_ID) && r > 0) {
-                    sb.append("p:" + t + "s/p:" + t + "/p:" + t + "Match/");
-                    sb.append("p:" + t + "AttributeDesignator/@AttributeId = ");
-                    sb.append("$XacmlResourceId");
-                    sb.append(" and ");
-
-                    /*
-                     * sb.append("p:" + t + "s/p:" + t + "/p:" + t + "Match/");
-                     * sb.append("p:" + t + "AttributeDesignator/@DataType = ");
-                     * sb.append("$XacmlResourceType"); sb.append(" and ");
-                     */
-
-                    sb.append("(");
-                    for (int i = 0; i < bean.getValues().size(); i++) {
-                        if (i > 0) {
-                            sb.append(" or ");
-                        }
-
-                        sb.append("p:" + t + "s/p:" + t + "/p:" + t + "Match/");
-                        sb.append("p:AttributeValue = ");
-                        sb.append("$XacmlResourceIdValue" + i);
-                    }
-                    sb.append(")");
-                } else {
-                    sb.append("p:" + t + "s/p:" + t + "/p:" + t + "Match/");
-                    sb.append("p:" + t + "AttributeDesignator/@AttributeId = ");
-                    sb.append("$" + t + "Id" + count);
-                    sb.append(" and ");
-                    sb.append("(");
-                    /*
-                     * sb.append("p:" + t + "s/p:" + t + "/p:" + t + "Match/");
-                     * sb.append("p:" + t + "AttributeDesignator/@DataType = ");
-                     * sb.append("$" + t + "Type" + count); sb.append(" and ");
-                     */
-
-                    for (int valueCount = 0; valueCount < bean.getValues()
-                            .size(); valueCount++) {
-                        if (valueCount > 0) {
-                            sb.append(" or ");
-                        }
-
-                        sb.append("p:" + t + "s/p:" + t + "/p:" + t + "Match/");
-                        sb.append("p:AttributeValue = ");
-                        sb.append("$" + t + "Id" + count + "-Value"
-                                + valueCount);
-                    }
-                    sb.append(")");
-
-                    count++;
-                }
-                sb.append(")");
-            }
-            sb.append(")");
-        }
-        sb.append("]");
-
-        return sb.toString();
-    }
-
-    /**
-     * This method extracts the attributes listed in the indexMap from the given
-     * evaluation context.
-     *
-     * @param eval
-     *        the Evaluation Context from which to extract Attributes
-     * @return a Map of Attributes for each category (Subject, Resource, Action,
-     *         Environment)
-     * @throws URISyntaxException
-     */
-    @SuppressWarnings("unchecked")
-    private Map<String, Set<AttributeBean>> getAttributeMap(EvaluationCtx eval)
-            throws URISyntaxException {
-        URI defaultCategoryURI =
-                new URI(AttributeDesignator.SUBJECT_CATEGORY_DEFAULT);
-
-        Map<String, String> im = null;
-        Map<String, Set<AttributeBean>> attributeMap =
-                new HashMap<String, Set<AttributeBean>>();
-        Map<String, AttributeBean> attributeBeans = null;
-
-        im = dbXmlManager.indexMap.get("subjectAttributes");
-        attributeBeans = new HashMap<String, AttributeBean>();
-        for (String attributeId : im.keySet()) {
-            EvaluationResult result =
-                    eval.getSubjectAttribute(new URI(im.get(attributeId)),
-                                             new URI(attributeId),
-                                             defaultCategoryURI);
-            if (result.getStatus() == null && !result.indeterminate()) {
-                AttributeValue attr = result.getAttributeValue();
-                if (attr.returnsBag()) {
-                    Iterator<AttributeValue> i =
-                            ((BagAttribute) attr).iterator();
-                    if (i.hasNext()) {
-                        while (i.hasNext()) {
-                            AttributeValue value = i.next();
-                            String attributeType = im.get(attributeId);
-
-                            AttributeBean ab = attributeBeans.get(attributeId);
-                            if (ab == null) {
-                                ab = new AttributeBean();
-                                ab.setId(attributeId);
-                                ab.setType(attributeType);
-                                attributeBeans.put(attributeId, ab);
-                            }
-
-                            ab.addValue(value.encode());
-                        }
-                    }
-                }
-            }
-        }
-        attributeMap.put("subjectAttributes", new HashSet(attributeBeans
-                .values()));
-
-        im = dbXmlManager.indexMap.get("resourceAttributes");
-        attributeBeans = new HashMap<String, AttributeBean>();
-        for (String attributeId : im.keySet()) {
-            EvaluationResult result =
-                    eval.getResourceAttribute(new URI(im.get(attributeId)),
-                                              new URI(attributeId),
-                                              null);
-            if (result.getStatus() == null && !result.indeterminate()) {
-                AttributeValue attr = result.getAttributeValue();
-                if (attr.returnsBag()) {
-                    Iterator<AttributeValue> i =
-                            ((BagAttribute) attr).iterator();
-                    if (i.hasNext()) {
-                        while (i.hasNext()) {
-                            AttributeValue value = i.next();
-                            String attributeType = im.get(attributeId);
-
-                            AttributeBean ab = attributeBeans.get(attributeId);
-                            if (ab == null) {
-                                ab = new AttributeBean();
-                                ab.setId(attributeId);
-                                ab.setType(attributeType);
-                                attributeBeans.put(attributeId, ab);
-                            }
-
-                            if (attributeId.equals(XACML_RESOURCE_ID)
-                                    && value.encode().startsWith("/")) {
-                                String[] components =
-                                        makeComponents(value.encode());
-                                if (components != null && components.length > 0) {
-                                    for (String c : components) {
-                                        ab.addValue(c);
-                                    }
-                                } else {
-                                    ab.addValue(value.encode());
-                                }
-                            } else {
-                                ab.addValue(value.encode());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        attributeMap.put("resourceAttributes", new HashSet(attributeBeans
-                .values()));
-
-        im = dbXmlManager.indexMap.get("actionAttributes");
-        attributeBeans = new HashMap<String, AttributeBean>();
-        for (String attributeId : im.keySet()) {
-            EvaluationResult result =
-                    eval.getActionAttribute(new URI(im.get(attributeId)),
-                                            new URI(attributeId),
-                                            null);
-            if (result.getStatus() == null && !result.indeterminate()) {
-                AttributeValue attr = result.getAttributeValue();
-                if (attr.returnsBag()) {
-                    Iterator<AttributeValue> i =
-                            ((BagAttribute) attr).iterator();
-                    if (i.hasNext()) {
-                        while (i.hasNext()) {
-                            AttributeValue value = i.next();
-                            String attributeType = im.get(attributeId);
-
-                            AttributeBean ab = attributeBeans.get(attributeId);
-                            if (ab == null) {
-                                ab = new AttributeBean();
-                                ab.setId(attributeId);
-                                ab.setType(attributeType);
-                                attributeBeans.put(attributeId, ab);
-                            }
-
-                            ab.addValue(value.encode());
-                        }
-                    }
-                }
-            }
-        }
-        attributeMap.put("actionAttributes", new HashSet(attributeBeans
-                .values()));
-
-        im = dbXmlManager.indexMap.get("environmentAttributes");
-        attributeBeans = new HashMap<String, AttributeBean>();
-        for (String attributeId : im.keySet()) {
-            URI imAttrId = new URI(im.get(attributeId));
-            URI attrId = new URI(attributeId);
-            EvaluationResult result =
-                    eval.getEnvironmentAttribute(imAttrId, attrId, null);
-            if (result.getStatus() == null && !result.indeterminate()) {
-                AttributeValue attr = result.getAttributeValue();
-                if (attr.returnsBag()) {
-                    Iterator<AttributeValue> i =
-                            ((BagAttribute) attr).iterator();
-                    if (i.hasNext()) {
-                        while (i.hasNext()) {
-                            AttributeValue value = i.next();
-                            String attributeType = im.get(attributeId);
-
-                            AttributeBean ab = attributeBeans.get(attributeId);
-                            if (ab == null) {
-                                ab = new AttributeBean();
-                                ab.setId(attributeId);
-                                ab.setType(attributeType);
-                                attributeBeans.put(attributeId, ab);
-                            }
-
-                            ab.addValue(value.encode());
-                        }
-                    }
-                }
-            }
-        }
-        attributeMap.put("environmentAttributes", new HashSet(attributeBeans
-                .values()));
-
-        return attributeMap;
-    }
-
-    private String[] makeComponents(String resourceId) {
-        if (resourceId == null || resourceId.equals("")
-                || !resourceId.startsWith("/")) {
-            return null;
-        }
-
-        List<String> components = new ArrayList<String>();
-
-        String[] parts = resourceId.split("\\/");
-
-        for (int x = 1; x < parts.length; x++) {
-            StringBuilder sb = new StringBuilder();
-            for (int y = 0; y < x; y++) {
-                sb.append("/");
-                sb.append(parts[y + 1]);
-            }
-
-            components.add(sb.toString());
-
-            if (x != parts.length - 1) {
-                components.add(sb.toString() + "/.*");
-            } else {
-                components.add(sb.toString() + "$");
-            }
-        }
-
-        return components.toArray(new String[components.size()]);
     }
 
     /*
@@ -853,11 +513,7 @@ class DbXmlPolicyIndex
         res = deleteDirectory(dbDir);
 
         // and init will create a new database (by creating a new dbXmlManager)
-        try {
-            init();
-        } catch (PolicyStoreException e) {
-            throw new PolicyIndexException(e);
-        }
+        init();
         return res;
 
     }

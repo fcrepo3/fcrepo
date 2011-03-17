@@ -8,7 +8,6 @@ package org.fcrepo.server.security.xacml.pdp.data;
 import java.io.File;
 import java.io.FileInputStream;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -261,41 +260,6 @@ public class DbXmlManager {
                 }
             }
 
-            // get index map information
-            String[] indexMapElements =
-                    {"subjectAttributes", "resourceAttributes",
-                            "actionAttributes", "environmentAttributes"};
-
-            indexMap = new HashMap<String, Map<String, String>>();
-            for (String s : indexMapElements) {
-                indexMap.put(s, new HashMap<String, String>());
-            }
-
-            nodes =
-                    doc.getElementsByTagName("indexMap").item(0)
-                            .getChildNodes();
-            for (int x = 0; x < nodes.getLength(); x++) {
-                Node node = nodes.item(x);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Node name: " + node.getNodeName());
-                    }
-
-                    NodeList attrs = node.getChildNodes();
-                    for (int y = 0; y < attrs.getLength(); y++) {
-                        Node attr = attrs.item(y);
-                        if (attr.getNodeType() == Node.ELEMENT_NODE) {
-                            String name =
-                                    attr.getAttributes().getNamedItem("name")
-                                            .getNodeValue();
-                            String type =
-                                    attr.getAttributes().getNamedItem("type")
-                                            .getNodeValue();
-                            indexMap.get(node.getNodeName()).put(name, type);
-                        }
-                    }
-                }
-            }
         } catch (Exception e) {
             throw new PolicyStoreException("Could not initialise DBXML: "
                     + e.getMessage(), e);
