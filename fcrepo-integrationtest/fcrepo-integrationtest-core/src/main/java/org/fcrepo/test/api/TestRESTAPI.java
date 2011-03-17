@@ -5,18 +5,21 @@
 
 package org.fcrepo.test.api;
 
+import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
+import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
+import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
+import static org.apache.commons.httpclient.HttpStatus.SC_OK;
+import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
+
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-
 import java.net.URL;
 import java.net.URLEncoder;
-
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,8 +29,10 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.axis.types.NonNegativeInteger;
+import junit.framework.TestSuite;
 
+import org.antlr.stringtemplate.StringTemplate;
+import org.apache.axis.types.NonNegativeInteger;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -43,29 +48,13 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
-
-import org.junit.Test;
-
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
-
-import org.antlr.stringtemplate.StringTemplate;
-
-import junit.framework.TestSuite;
-
 import org.fcrepo.common.PID;
-
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.types.gen.Datastream;
@@ -73,15 +62,14 @@ import org.fcrepo.server.types.gen.FieldSearchQuery;
 import org.fcrepo.server.types.gen.FieldSearchResult;
 import org.fcrepo.server.types.gen.MIMETypedStream;
 import org.fcrepo.server.types.gen.ObjectFields;
-
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
-
-import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
-import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
-import static org.apache.commons.httpclient.HttpStatus.SC_OK;
-import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
+import org.junit.Test;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 
 /**
  * Tests of the REST API. Tests assume a running instance of Fedora with the
@@ -849,54 +837,36 @@ public class TestRESTAPI
     }
 
     public void testValidate() throws Exception {
+        String[] resultFields = {"pid"};
+        NonNegativeInteger maxResults = new NonNegativeInteger("" + 1000);
+        FieldSearchQuery query = new FieldSearchQuery(null, "*");
+        FieldSearchResult result =
+                apia.findObjects(resultFields, maxResults, query);
 
-        try {
-            //ingestDemoObjects();
-
-            String[] resultFields = {"pid"};
-            NonNegativeInteger maxResults = new NonNegativeInteger("" + 1000);
-            FieldSearchQuery query = new FieldSearchQuery(null, "*");
-            FieldSearchResult result =
-                    apia.findObjects(resultFields, maxResults, query);
-
-            ObjectFields[] fields = result.getResultList();
-            String pid = "";
-            for (ObjectFields objectFields : fields) {
-                pid = objectFields.getPid();
-                //System.out.println("validating object '" + pid.toString() + "'");
-                url =
-                        String.format("/objects/%s/validate", URLEncoder
-                                .encode(pid.toString(), "UTF-8"));
-                // FIXME: fcrepo-876
-                // response does not specify schema
-                // remove "false" to enable validation
-                HttpResponse getTrue = get(true, false);
-                assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
-                        .getStatusCode());
-                assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
-                String responseXML = getTrue.getResponseBodyString();
-                //System.out.println(responseXML);
-                // FIXME:  Schema specifies access namespace, but it is a management method
-                assertXpathExists("/access:validation[@valid='true']", responseXML);
-            }
-            // test with asOfDateTime set (just on the last object validated above)
-
+        ObjectFields[] fields = result.getResultList();
+        String pid = "";
+        for (ObjectFields objectFields : fields) {
+            pid = objectFields.getPid();
             url =
-                String.format("/objects/%s/validate?asOfDateTime=%s", pid.toString(),datetime);
-            // FIXME: fcrepo-876
-            // response does not specify schema
-            // remove "false" to enable validation
-            HttpResponse getTrue = get(true, false);
+                    String.format("/objects/%s/validate", URLEncoder
+                            .encode(pid.toString(), "UTF-8"));
+            HttpResponse getTrue = get(true);
             assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
-                         .getStatusCode());
+                    .getStatusCode());
             assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
             String responseXML = getTrue.getResponseBodyString();
-            //System.out.println(responseXML);
-            // FIXME:  Schema specifies access namespace, but it is a management method
-            assertXpathExists("/access:validation[@valid='true']", responseXML);
-        } finally {
-            //purgeDemoObjects();
+            assertXpathExists("/management:validation[@valid='true']", responseXML);
         }
+        // test with asOfDateTime set (just on the last object validated above)
+
+        url =
+            String.format("/objects/%s/validate?asOfDateTime=%s", pid.toString(),datetime);
+        HttpResponse getTrue = get(true);
+        assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
+                     .getStatusCode());
+        assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
+        String responseXML = getTrue.getResponseBodyString();
+        assertXpathExists("/management:validation[@valid='true']", responseXML);
     }
 
     public void testExportObject() throws Exception {
