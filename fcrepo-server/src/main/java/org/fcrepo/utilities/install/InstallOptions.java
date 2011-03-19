@@ -396,7 +396,7 @@ public class InstallOptions {
      * exist.
      */
     public String getValue(String name) {
-        return _map.get(name);
+        return System.getProperty(name, _map.get(name));
     }
 
     /**
