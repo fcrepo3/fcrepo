@@ -2,6 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.server.utilities.rebuild;
 
 import java.io.BufferedReader;
@@ -47,34 +48,44 @@ import org.slf4j.LoggerFactory;
  * @author Chris Wilper
  */
 public class Rebuild
-implements Constants, Runnable {
+        implements Constants, Runnable {
 
     private static Server server;
-    private static Logger logger = LoggerFactory.getLogger(Rebuild.class.getName());
-    private static final String llPackage = "org.fcrepo.server.storage.lowlevel";
-    private static final String llstoreInterface = llPackage + ".ILowlevelStorage";
-    private static final String llstoreConfig = llstoreInterface + "Configuration";
+
+    private static Logger logger = LoggerFactory.getLogger(Rebuild.class
+            .getName());
+
+    private static final String llPackage =
+            "org.fcrepo.server.storage.lowlevel";
+
+    private static final String llstoreInterface = llPackage
+            + ".ILowlevelStorage";
+
+    private static final String llstoreConfig = llstoreInterface
+            + "Configuration";
+
     private static final String listableInterface = llPackage + ".IListable";
 
     private final Rebuilder m_rebuilder;
+
     private final Map<String, String> m_options;
 
     public Rebuild(Rebuilder rebuilder,
                    Map<String, String> options,
                    Server server)
-    throws Exception {
+            throws Exception {
         // set these here so DOTranslationUtility doesn't try to get a Server
         // instance
-        System.setProperty("fedoraServerHost", server
-                           .getParameter("fedoraServerHost"));
-        System.setProperty("fedoraServerPort", server
-                           .getParameter("fedoraServerPort"));
-        System.setProperty("fedoraAppServerContext", server
-                           .getParameter("fedoraAppServerContext"));
+        System.setProperty("fedoraServerHost",
+                           server.getParameter("fedoraServerHost"));
+        System.setProperty("fedoraServerPort",
+                           server.getParameter("fedoraServerPort"));
+        System.setProperty("fedoraAppServerContext",
+                           server.getParameter("fedoraAppServerContext"));
         boolean serverIsRunning = ServerUtility.pingServer("http", null, null);
         if (serverIsRunning && rebuilder.shouldStopServer()) {
             throw new Exception("The Fedora server appears to be running."
-                                + "  It must be stopped before the rebuilder can run.");
+                    + "  It must be stopped before the rebuilder can run.");
         }
         m_options = options;
         m_rebuilder = rebuilder;
@@ -83,7 +94,7 @@ implements Constants, Runnable {
                 // ensure rebuilds are possible before trying anything,
                 // as rebuilder.start() may be destructive!
                 ModuleConfiguration mcfg =
-                    server.getBean(llstoreConfig,ModuleConfiguration.class);
+                        server.getBean(llstoreConfig, ModuleConfiguration.class);
                 Class<?> clazz = Class.forName(mcfg.getClassName());
                 boolean isListable = false;
                 for (Class<?> iface : clazz.getInterfaces()) {
@@ -93,17 +104,15 @@ implements Constants, Runnable {
                 }
                 if (!isListable) {
                     throw new Exception("ERROR: Rebuilds are not supported"
-                                        + " by " + clazz.getName()
-                                        + " because it does not implement the"
-                                        + " org.fcrepo.server.storage.lowlevel.IListable"
-                                        + " interface.");
+                            + " by " + clazz.getName()
+                            + " because it does not implement the"
+                            + " org.fcrepo.server.storage.lowlevel.IListable"
+                            + " interface.");
                 }
-
 
             } finally {
             }
-        }
-        else {
+        } else {
             logger.warn("Null options for " + getClass().getName());
         }
     }
@@ -118,13 +127,15 @@ implements Constants, Runnable {
                     m_rebuilder.start(m_options);
 
                     // add each object in llstore
-                    ILowlevelStorage llstore = (ILowlevelStorage)
-                    getServer().getModule(llstoreInterface);
-                    if (llstore == null){
-                        logger.error("No module/bean definition for " + llstoreInterface);
-                    }
-                    else {
-                        logger.info("Loaded bean/module " + llstoreInterface + " with impl " + llstore.getClass().getName());
+                    ILowlevelStorage llstore =
+                            (ILowlevelStorage) getServer()
+                                    .getModule(llstoreInterface);
+                    if (llstore == null) {
+                        logger.error("No module/bean definition for "
+                                + llstoreInterface);
+                    } else {
+                        logger.info("Loaded bean/module " + llstoreInterface
+                                + " with impl " + llstore.getClass().getName());
                     }
                     Iterator<String> pids = ((IListable) llstore).listObjects();
                     int total = 0;
@@ -134,15 +145,19 @@ implements Constants, Runnable {
                     while (pids.hasNext()) {
                         total++;
                         String pid = pids.next();
-                        System.out.println("Adding object #" + total + ": " + pid);
+                        System.out.println("Adding object #" + total + ": "
+                                + pid);
                         if (!addObject(m_rebuilder, llstore, deser, pid)) {
                             errors++;
                         }
                     }
                     if (errors == 0) {
-                        System.out.println("SUCCESS: " + total + " objects rebuilt.");
+                        System.out.println("SUCCESS: " + total
+                                + " objects rebuilt.");
                     } else {
-                        System.out.println("WARNING: " + errors + " of " + total + " objects failed to rebuild due to errors.");
+                        System.out.println("WARNING: " + errors + " of "
+                                + total
+                                + " objects failed to rebuild due to errors.");
                     }
                 } finally {
                     m_rebuilder.finish();
@@ -155,8 +170,7 @@ implements Constants, Runnable {
                 }
                 return;
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             System.err.println("Rebuild failed:");
             System.err.println(e.toString());
             e.printStackTrace(System.err);
@@ -178,33 +192,39 @@ implements Constants, Runnable {
             rebuilder.addObject(obj);
             return true;
         } catch (Exception e) {
-            System.out.println("WARNING: Skipped " + pid + " due to exception: ");
+            System.out.println("WARNING: Skipped " + pid
+                    + " due to exception: ");
             e.printStackTrace();
             return false;
         } finally {
             if (in != null) {
-                try { in.close(); } catch (IOException e) { }
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
             }
         }
     }
 
     /**
-     * Gets the instance of the server appropriate for rebuilding.
-     * If no such instance has been initialized yet, initialize one.
+     * Gets the instance of the server appropriate for rebuilding. If no such
+     * instance has been initialized yet, initialize one.
      *
      * @return the server instance.
-     * @throws InitializationException if initialization fails.
+     * @throws InitializationException
+     *         if initialization fails.
      */
     public static Server getServer() throws InitializationException {
         if (server == null) {
-            server = RebuildServer.getRebuildInstance(
-                                                      new File(Constants.FEDORA_HOME));
+            server =
+                    RebuildServer
+                            .getRebuildInstance(new File(Constants.FEDORA_HOME));
         }
         return server;
     }
 
     private static Map<String, String> getOptions(Map<String, String> descs)
-    throws IOException {
+            throws IOException {
         Map<String, String> options = new HashMap<String, String>();
         Iterator<String> iter = descs.keySet().iterator();
         while (iter.hasNext()) {
@@ -212,11 +232,18 @@ implements Constants, Runnable {
             String desc = descs.get(name);
             options.put(name, getOptionValue(name, desc));
         }
-        int c =
-            getChoice("Start rebuilding with the above options?",
-                      new String[] {"Yes",
-                    "No, let me re-enter the options.",
-            "No, exit."});
+        int c = 1;
+
+        if (System.getProperty("rebuilder") == null) {
+            c =
+                getChoice("Start rebuilding with the above options?",
+                          new String[] {"Yes",
+                                  "No, let me re-enter the options.",
+                                  "No, exit."});
+        } else {
+            return options;
+        }
+
         if (c == 0) {
             return options;
         }
@@ -228,39 +255,48 @@ implements Constants, Runnable {
     }
 
     private static String getOptionValue(String name, String desc)
-    throws IOException {
+            throws IOException {
         System.err.println("[" + name + "]");
         System.err.println(desc);
         System.err.println();
         System.err.print("Enter a value --> ");
         String val =
-            new BufferedReader(new InputStreamReader(System.in)).readLine();
+                new BufferedReader(new InputStreamReader(System.in)).readLine();
         System.err.println();
         return val;
     }
 
     private static Rebuilder getRebuilder() throws Exception {
         Server server = getServer();
-        String [] rebuilders = server.getBeanNamesForType(Rebuilder.class);
+        String[] rebuilders = server.getBeanNamesForType(Rebuilder.class);
         String[] labels = new String[rebuilders.length + 1];
         int i = 0;
         for (i = 0; i < rebuilders.length; i++) {
-            Rebuilder r =
-                server.getBean(rebuilders[i],Rebuilder.class);
+            Rebuilder r = server.getBean(rebuilders[i], Rebuilder.class);
 
             labels[i] = r.getAction();
         }
         labels[i] = "Exit";
-        int choiceNum = getChoice("What do you want to do?", labels);
+        int choiceNum = i;
+        System.out.println("Getting rebuulder... " + System.getProperty("rebuilder"));
+        if (System.getProperty("rebuilder") == null) {
+            choiceNum = getChoice("What do you want to do?", labels);
+        } else {
+            for (int j = 0; j < rebuilders.length; j++) {
+                if (rebuilders[j].equals(System.getProperty("rebuilder"))) {
+                    choiceNum = j;
+                }
+            }
+        }
         if (choiceNum == i) {
             return null;
         } else {
-            return server.getBean(rebuilders[choiceNum],Rebuilder.class);
+            return server.getBean(rebuilders[choiceNum], Rebuilder.class);
         }
     }
 
     private static int getChoice(String title, String[] labels)
-    throws IOException {
+            throws IOException {
         boolean validChoice = false;
         int choiceIndex = -1;
         System.err.println(title);
@@ -272,7 +308,7 @@ implements Constants, Runnable {
         while (!validChoice) {
             System.err.print("Enter (1-" + labels.length + ") --> ");
             BufferedReader in =
-                new BufferedReader(new InputStreamReader(System.in));
+                    new BufferedReader(new InputStreamReader(System.in));
             String line = in.readLine();
             try {
                 int choiceNum = Integer.parseInt(line);
@@ -288,21 +324,21 @@ implements Constants, Runnable {
 
     private static ServerConfiguration getServerConfig(File serverDir,
                                                        String profile)
-    throws IOException {
+            throws IOException {
         ServerConfigurationParser parser =
-            new ServerConfigurationParser(new FileInputStream(new File(serverDir,
-                                                                       "config/fedora.fcfg")));
+                new ServerConfigurationParser(new FileInputStream(new File(serverDir,
+                                                                           "config/fedora.fcfg")));
         ServerConfiguration serverConfig = parser.parse();
         // set all the values according to the profile, if specified
         if (profile != null) {
             int c = setValuesForProfile(serverConfig, profile);
 
             c +=
-                setValuesForProfile(serverConfig.getModuleConfigurations(),
-                                    profile);
+                    setValuesForProfile(serverConfig.getModuleConfigurations(),
+                                        profile);
             c +=
-                setValuesForProfile(serverConfig.getDatastoreConfigurations(),
-                                    profile);
+                    setValuesForProfile(serverConfig.getDatastoreConfigurations(),
+                                        profile);
             if (c == 0) {
                 throw new IOException("Unrecognized server-profile: " + profile);
             }
@@ -312,7 +348,8 @@ implements Constants, Runnable {
 
     private static int setValuesForProfile(Configuration config, String profile) {
         int c = 0;
-        Iterator<Parameter> iter = config.getParameters(Parameter.class).iterator();
+        Iterator<Parameter> iter =
+                config.getParameters(Parameter.class).iterator();
         while (iter.hasNext()) {
             Parameter param = iter.next();
             String profileValue = param.getProfileValues().get(profile);
@@ -337,7 +374,7 @@ implements Constants, Runnable {
     private static Map<String, String> getUserInput(Rebuilder rebuilder,
                                                     File serverDir,
                                                     ServerConfiguration serverConfig)
-                                                    throws Exception {
+            throws Exception {
         if (rebuilder != null) {
             System.err.println();
             System.err.println(rebuilder.getAction());
@@ -346,8 +383,7 @@ implements Constants, Runnable {
             rebuilder.setServerConfiguration(serverConfig);
             rebuilder.setServerDir(serverDir);
             rebuilder.init();
-            Map<String, String> options =
-                getOptions(rebuilder.getOptions());
+            Map<String, String> options = getOptions(rebuilder.getOptions());
             return options;
         } else {
             return new HashMap<String, String>();
@@ -361,11 +397,11 @@ implements Constants, Runnable {
             System.err.println("Usage: fedora-rebuild [server-profile]");
             System.err.println();
             System.err
-            .println("server-profile : the argument you start Fedora with, such as 'mckoi'");
+                    .println("server-profile : the argument you start Fedora with, such as 'mckoi'");
             System.err
-            .println("                 or 'oracle'.  If you start fedora with 'fedora-start'");
+                    .println("                 or 'oracle'.  If you start fedora with 'fedora-start'");
             System.err
-            .println("                 (without arguments), don't specify a server-profile here either.");
+                    .println("                 (without arguments), don't specify a server-profile here either.");
             System.err.println();
         }
         if (exit) {
@@ -388,12 +424,12 @@ implements Constants, Runnable {
             System.setProperty("fedora.home", Constants.FEDORA_HOME);
             System.setProperty("logfile.extension", "-rebuild.log");
             LogConfig.initFromFile(new File(fedoraHomeDir,
-            "server/config/logback.xml"));
+                                            "server/config/logback.xml"));
 
             // Replace java.util.logging's default handlers with one that
             // redirects everything to SLF4J
             java.util.logging.Logger rootLogger =
-                java.util.logging.LogManager.getLogManager().getLogger("");
+                    java.util.logging.LogManager.getLogManager().getLogger("");
             java.util.logging.Handler[] handlers = rootLogger.getHandlers();
             for (int i = 0; i < handlers.length; i++) {
                 rootLogger.removeHandler(handlers[i]);
@@ -402,16 +438,16 @@ implements Constants, Runnable {
 
             File serverDir = new File(fedoraHomeDir, "server");
             ServerConfiguration serverConfig =
-                getServerConfig(serverDir, profile);
+                    getServerConfig(serverDir, profile);
             System.err.println();
             System.err.println("                       Fedora Rebuild Utility");
             System.err
-            .println("                     ..........................");
+                    .println("                     ..........................");
             System.err.println();
             System.err
-            .println("WARNING: Live rebuilds are not currently supported.");
+                    .println("WARNING: Live rebuilds are not currently supported.");
             System.err
-            .println("         Make sure your server is stopped before continuing.");
+                    .println("         Make sure your server is stopped before continuing.");
             System.err.println();
             System.err.println("Server directory is " + serverDir.toString());
             if (profile != null) {
@@ -419,11 +455,11 @@ implements Constants, Runnable {
             }
             System.err.println();
             System.err
-            .println("---------------------------------------------------------------------");
+                    .println("---------------------------------------------------------------------");
             System.err.println();
             Rebuilder rebuilder = getRebuilder();
             Map<String, String> options =
-                getUserInput(rebuilder, serverDir, serverConfig);
+                    getUserInput(rebuilder, serverDir, serverConfig);
             new Rebuild(rebuilder, options, getServer()).run();
             return;
         } catch (Throwable th) {
@@ -433,9 +469,9 @@ implements Constants, Runnable {
             }
             fail(msg, false, false);
             th.printStackTrace();
-            try{
+            try {
                 getServer().shutdown(null);
-            } catch (Throwable t){
+            } catch (Throwable t) {
                 System.err.println("Server shutdown error: " + t.toString());
             }
         }

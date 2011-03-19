@@ -108,6 +108,10 @@
                     <ant
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
                       target="install" inheritrefs="true" />
+                    <echo>Clearing SQL database</echo>
+                    <ant 
+                      antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
+                      target="clearSQL" inheritrefs="true" />
                     <echo>Starting Fedora</echo>
                     <ant
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml"

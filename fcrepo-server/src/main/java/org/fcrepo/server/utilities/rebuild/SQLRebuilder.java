@@ -193,7 +193,7 @@ public class SQLRebuilder
      * Delete all rows from all Fedora-related tables (except the resource index
      * ones) that exist in the database.
      */
-    private void blankExistingTables() {
+    public void blankExistingTables() {
         Connection connection = null;
         Statement s = null;
         try {
