@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.fcrepo.utilities.FileUtils;
@@ -241,15 +242,12 @@ public class Installer {
 
             if (args.length == 0) {
                 opts = new InstallOptions(dist);
-            } else if (args.length == 1) {
-                Map<String, String> props =
-                        FileUtils.loadMap(new File(args[0]));
-                opts = new InstallOptions(dist, props);
             } else {
-                System.err.println("ERROR: Too many arguments.");
-                System.err
-                        .println("Usage: java -jar fedora-install.jar [options-file]");
-                System.exit(1);
+                Map<String, String> props = new HashMap<String, String>();
+                for (String file : args) {
+                    props.putAll(FileUtils.loadMap(new File(file)));
+                }
+                opts = new InstallOptions(dist, props);
             }
 
             // set fedora.home
