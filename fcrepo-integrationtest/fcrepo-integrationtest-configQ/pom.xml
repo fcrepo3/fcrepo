@@ -63,6 +63,7 @@
         <fedora.home>${project.build.directory}/fcrepo-${project.version}</fedora.home>
         <fedora.install.properties>${project.build.directory}/test-classes/config/ConfigQ.properties</fedora.install.properties>
         <fedora.install.version>${project.version}</fedora.install.version>
+        <maven.opts>${env.MAVEN_OPTS}</maven.opts>
       </properties>
 
       <build>
