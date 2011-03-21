@@ -1,6 +1,7 @@
 <project name="tomcat-run">
 
   <target name="tomcat-start">
+    <echo>Starting Fedora</echo>
     <parallel>
       <java jar="${tomcat.home}/bin/bootstrap.jar" fork="yes" dir="${tomcat.home}" spawn="true">
         <jvmarg value="-Djava.io.tmpdir=${tomcat.home}/temp" />

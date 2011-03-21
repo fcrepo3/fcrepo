@@ -51,6 +51,18 @@
         <integration.test.skip>false</integration.test.skip>
       </properties>
     </profile>
+    
+    <profile>
+      <id>db-specified</id>
+      <activation>
+        <property>
+          <name>db</name>
+        </property>
+      </activation>
+      <properties>
+        <fedora.install.properties.extra>${project.build.directory}/config/db.${db}.properties</fedora.install.properties.extra>
+      </properties>
+    </profile>
 
     <profile>
       <id>fedora.home-not-defined</id>
@@ -59,15 +71,46 @@
           <name>!fedora.home</name>
         </property>
       </activation>
+        
       <properties>
         <fedora.home>${project.build.directory}/fcrepo-${project.version}</fedora.home>
-        <fedora.install.properties>${project.build.directory}/test-classes/config/ConfigQ.properties</fedora.install.properties>
+        <fedora.install.properties>${project.build.directory}/config/ConfigQ.properties</fedora.install.properties>
         <fedora.install.version>${project.version}</fedora.install.version>
-        <maven.opts>${env.MAVEN_OPTS}</maven.opts>
+        <maven.env.opts>${env.MAVEN_OPTS}</maven.env.opts>
       </properties>
 
       <build>
+    
         <plugins>
+          
+          <!-- Copy and filter config properties -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>2.5</version>
+            <executions>
+              <execution>
+                <id>filter-test-configs</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                 <outputDirectory>${project.build.directory}/config</outputDirectory>
+                 <resources>
+                   <resource>
+                   <directory>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes/config</directory>
+                     <includes>
+                       <include>*.properties</include>
+                     </includes>
+                     <filtering>true</filtering>
+                   </resource>      
+                 </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          
           <!-- Execute installer and run/stop tomcat -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -79,15 +122,12 @@
                 <phase>pre-integration-test</phase>
                 <configuration>
                   <target unless="${integration.test.skip}">
-                    <echo>Installing Fedora</echo>
                     <ant
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
                       target="install" inheritrefs="true" />
-                    <echo>Clearing SQL database</echo>
                     <ant 
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
                       target="clearSQL" inheritrefs="true" />
-                    <echo>Starting Fedora</echo>
                     <ant
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml"
                       target="tomcat-start" inheritrefs="true" />
