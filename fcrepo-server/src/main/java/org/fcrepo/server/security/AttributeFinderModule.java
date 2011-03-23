@@ -39,7 +39,7 @@ abstract class AttributeFinderModule
 
     private ServletContext servletContext = null;
 
-    protected void setServletContext(ServletContext servletContext) {
+    public void setServletContext(ServletContext servletContext) {
         if (this.servletContext == null) {
             this.servletContext = servletContext;
         }
@@ -61,7 +61,7 @@ abstract class AttributeFinderModule
 
     private Boolean instantiatedOk = null;
 
-    protected final void setInstantiatedOk(boolean value) {
+    public final void setInstantiatedOk(boolean value) {
         logger.debug("setInstantiatedOk() " + value);
         if (instantiatedOk == null) {
             instantiatedOk = new Boolean(value);

@@ -110,6 +110,7 @@
       <includes>
         <include>README.txt</include>
         <include>triple-generator.xml</include>
+        <include>policy-enforcement.xml</include>
       </includes>
     </fileSet>
 

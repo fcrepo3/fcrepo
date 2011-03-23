@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+        <bean id="org.fcrepo.server.security.ContextAttributeFinderModule"
+              class="org.fcrepo.server.security.ContextAttributeFinderModule"
+              factory-method="getInstance" autowire-candidate="true">
+        </bean>
+        <bean id="org.fcrepo.server.security.ResourceAttributeFinderModule"
+              class="org.fcrepo.server.security.ResourceAttributeFinderModule"
+              factory-method="getInstance" autowire-candidate="true">
+              <property name="ownerIdSeparator" value="," />
+              <property name="DOManager" ref="org.fcrepo.server.storage.DOManager" />
+        </bean>
+        <bean id="org.fcrepo.server.security.PolicyEnforcementPoint"
+              class="org.fcrepo.server.security.PolicyEnforcementPoint"
+              factory-method="getInstance" autowire-candidate="true">
+              <property name="attributeFinderModules">
+                  <list>
+                      <ref bean="org.fcrepo.server.security.ResourceAttributeFinderModule" />
+                      <ref bean="org.fcrepo.server.security.ContextAttributeFinderModule" />
+                  </list>
+              </property>
+        </bean>
+</beans>

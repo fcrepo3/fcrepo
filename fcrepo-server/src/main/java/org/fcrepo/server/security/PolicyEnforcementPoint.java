@@ -35,6 +35,7 @@ import org.fcrepo.server.errors.authorization.AuthzPermittedException;
 import org.fcrepo.server.storage.DOManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Bill Niebel
@@ -144,36 +145,21 @@ public class PolicyEnforcementPoint {
      */
     private ServletContext servletContext = null;
 
-    private ContextAttributeFinderModule contextAttributeFinder;
+    private List<AttributeFinderModule> m_attrFinderModules = new ArrayList<AttributeFinderModule>(0);
+    
+    public void setAttributeFinderModules(List<AttributeFinderModule> attrFinderModules){
+        this.m_attrFinderModules.clear();
+        this.m_attrFinderModules.addAll(attrFinderModules);
+    }
 
     public final void newPdp() throws Exception {
         AttributeFinder attrFinder = new AttributeFinder();
-        List<AttributeFinderModule> attrModules =
-                new ArrayList<AttributeFinderModule>();
 
-        ResourceAttributeFinderModule resourceAttributeFinder =
-                ResourceAttributeFinderModule.getInstance();
-        resourceAttributeFinder.setServletContext(servletContext);
-        resourceAttributeFinder.setDOManager(manager);
-        resourceAttributeFinder.setOwnerIdSeparator(ownerIdSeparator);
-        attrModules.add(resourceAttributeFinder);
-        try {
-            logger.debug("about to set contextAttributeFinder in original");
-            contextAttributeFinder = ContextAttributeFinderModule.getInstance();
-        } catch (Throwable t) {
-            enforceMode = ENFORCE_MODE_DENY_ALL_REQUESTS;
-            logger.error("Error in newPdp", t);
-            if (t instanceof Exception) {
-                throw (Exception) t;
-            }
-            throw new Exception("wrapped", t);
+        for (AttributeFinderModule m:m_attrFinderModules){
+            m.setServletContext(servletContext);
         }
 
-        logger.debug("just set contextAttributeFinder=" + contextAttributeFinder);
-        contextAttributeFinder.setServletContext(servletContext);
-        attrModules.add(contextAttributeFinder);
-
-        attrFinder.setModules(attrModules);
+        attrFinder.setModules(m_attrFinderModules);
         logger.debug("before building policy finder");
 
         PolicyFinder policyFinder = new PolicyFinder();
@@ -397,11 +383,13 @@ public class PolicyEnforcementPoint {
                         logger.debug("request action has " + tempobj.getId() + "="
                                 + tempobj.getValue().toString());
                     }
-                    logger.debug("about to ref contextAttributeFinder="
-                            + contextAttributeFinder);
-                    contextAttributeFinder.registerContext(contextIndex,
-                                                           context);
-
+                    for (AttributeFinderModule m:m_attrFinderModules){
+                        if (m instanceof ContextAttributeFinderModule){
+                            ContextAttributeFinderModule c = (ContextAttributeFinderModule)m;
+                            logger.debug("about to ref contextAttributeFinder=" + c);
+                            c.registerContext(contextIndex, context);
+                        }
+                    }
                     long st = System.currentTimeMillis();
                     try {
                         response = pdp.evaluate(request);
@@ -415,7 +403,12 @@ public class PolicyEnforcementPoint {
                     logger.error("Error evaluating policy", t);
                     throw new AuthzOperationalException("");
                 } finally {
-                    contextAttributeFinder.unregisterContext(contextIndex);
+                    for (AttributeFinderModule m:m_attrFinderModules){
+                        if (m instanceof ContextAttributeFinderModule){
+                            ContextAttributeFinderModule c = (ContextAttributeFinderModule)m;
+                            c.unregisterContext(contextIndex);
+                        }
+                    }
                 }
                 logger.debug("in pep, before denyBiasedAuthz() called");
                 if (!denyBiasedAuthz(response.getResults())) {
