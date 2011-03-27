@@ -123,30 +123,28 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
     @Override
     public String addPolicy(String name, String document) throws PolicyIndexException {
         String Id = nameToId(name);
+        XMLResource res;
         try {
-            XMLResource res;
-            try {
-                writeLock.lock();
-                // check it doesn't already exist
-                res = (XMLResource) m_collection.getResource(Id);
-                if (res != null ) {
-                    throw new PolicyIndexException("Tried to add an already-existing resource " + name);
-                }
-
-                // create the new resource
-                res = (XMLResource) m_collection.createResource(Id, XMLResource.RESOURCE_TYPE);
-
-                // set the resource content
-                res.setContentAsDOM(createDocument(document));
-
-                // add it
-                m_collection.storeResource(res);
-            } finally {
-                writeLock.unlock();
+            writeLock.lock();
+            // check it doesn't already exist
+            res = (XMLResource) m_collection.getResource(Id);
+            if (res != null ) {
+                throw new PolicyIndexException("Tried to add an already-existing resource " + name);
             }
+
+            // create the new resource
+            res = (XMLResource) m_collection.createResource(Id, XMLResource.RESOURCE_TYPE);
+
+            // set the resource content
+            res.setContentAsDOM(createDocument(document));
+
+            // add it
+            m_collection.storeResource(res);
         } catch (XMLDBException e) {
             log.error("Error adding resource " + name + " " + e.getMessage(), e);
             throw new PolicyIndexException("Error adding resource " + name + " " + e.getMessage(), e);
+        } finally {
+            writeLock.unlock();
         }
         return name;
     }
@@ -166,36 +164,32 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
     @Override
     public boolean contains(String policyName) throws PolicyIndexException {
         try {
-            try {
-                readLock.lock();
-                return (m_collection.getResource(nameToId(policyName)) != null);
-            } finally {
-                readLock.unlock();
-            }
+            readLock.lock();
+            return (m_collection.getResource(nameToId(policyName)) != null);
         } catch (XMLDBException e) {
             log.error("Error determining if db contains " + policyName + " - " + e.getMessage(), e);
             throw new PolicyIndexException("Error determining if db contains " + policyName + " - " + e.getMessage(), e);
+        } finally {
+            readLock.unlock();
         }
     }
 
     @Override
     public boolean deletePolicy(String name) throws PolicyIndexException {
+        String Id = nameToId(name);
         try {
-            String Id = nameToId(name);
-            try {
-                writeLock.lock();
-                Resource res = m_collection.getResource(Id);
-                if (res == null) {
-                    log.warn("Attempted to delete non-existing resource " + name);
-                    return false;
-                }
-                m_collection.removeResource(res);
-            } finally {
-                writeLock.unlock();
+            writeLock.lock();
+            Resource res = m_collection.getResource(Id);
+            if (res == null) {
+                log.warn("Attempted to delete non-existing resource " + name);
+                return false;
             }
+            m_collection.removeResource(res);
         } catch (XMLDBException e) {
             log.error("Error deleting resource " + name + " " + e.getMessage(), e);
             throw new PolicyIndexException("Error deleting resource " + name + " " + e.getMessage(), e);
+        } finally {
+            writeLock.unlock();
         }
         return true;
     }
@@ -255,52 +249,48 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
     @Override
     public byte[] getPolicy(String name) throws PolicyIndexException {
         try {
-            try {
-                readLock.lock();
-                XMLResource resource = (XMLResource) m_collection.getResource(nameToId(name));
-                if (resource == null) {
-                    log.error("Attempting to get non-existant resource " + name);
-                    throw new PolicyIndexException("Attempting to get non-existant resource " + name);
-                }
-                return ((String)resource.getContent()).getBytes("UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                // Should never happen
-                throw new RuntimeException("Unsupported encoding " + e.getMessage(), e);
-            } finally {
-                readLock.unlock();
+            readLock.lock();
+            XMLResource resource = (XMLResource) m_collection.getResource(nameToId(name));
+            if (resource == null) {
+                log.error("Attempting to get non-existant resource " + name);
+                throw new PolicyIndexException("Attempting to get non-existant resource " + name);
             }
+            return ((String)resource.getContent()).getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // Should never happen
+            throw new RuntimeException("Unsupported encoding " + e.getMessage(), e);
         } catch (XMLDBException e) {
             log.error("Error getting policy " + name + " " + e.getMessage(), e);
             throw new PolicyIndexException("Error getting policy " + name + " " + e.getMessage(), e);
+        } finally {
+            readLock.unlock();
         }
     }
 
     @Override
     public boolean updatePolicy(String name, String newDocument) throws PolicyIndexException {
+        String Id = nameToId(name);
         try {
-            String Id = nameToId(name);
-            try {
-                writeLock.lock();
-                // get the resource
-                XMLResource res = (XMLResource) m_collection.getResource(Id);
-                if (res == null ) {
-                    log.error("Tried to update non-existing resource " + name);
-                    throw new PolicyIndexException("Tried to update non-existing resource " + name);
-                }
-
-                // set the resource content
-                res.setContentAsDOM(createDocument(newDocument));
-
-                // update it
-                m_collection.storeResource(res);
-            } finally {
-                writeLock.unlock();
+            writeLock.lock();
+            // get the resource
+            XMLResource res = (XMLResource) m_collection.getResource(Id);
+            if (res == null ) {
+                log.error("Tried to update non-existing resource " + name);
+                throw new PolicyIndexException("Tried to update non-existing resource " + name);
             }
-            return true;
+
+            // set the resource content
+            res.setContentAsDOM(createDocument(newDocument));
+
+            // update it
+            m_collection.storeResource(res);
         } catch (XMLDBException e) {
             log.error("Error updating resource " + name + " " + e.getMessage(), e);
             throw new PolicyIndexException("Error updating resource " + name + " " + e.getMessage(), e);
+        } finally {
+            writeLock.unlock();
         }
+        return true;
 
     }
 
@@ -475,7 +465,7 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
         File f = new File(filename);
         if (!f.exists()) {
             throw new PolicyIndexException("Could not locate eXist config file: "
-                    + f.getAbsolutePath());
+                                           + f.getAbsolutePath());
         }
 
         log.info("Loading config file: " + f.getAbsolutePath());
@@ -500,7 +490,7 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
 
         // get database information
         nodes = doc.getElementsByTagName("database").item(0)
-                        .getChildNodes();
+        .getChildNodes();
 
         for (int x = 0; x < nodes.getLength(); x++) {
             Node node = nodes.item(x);
