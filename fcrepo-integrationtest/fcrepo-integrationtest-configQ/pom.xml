@@ -338,6 +338,7 @@
           <environmentVariables>
             <FEDORA_HOME>${fedora.home}</FEDORA_HOME>
             <WEBAPP_NAME>${fedora.appServerContext}</WEBAPP_NAME>
+            <CATALINA_HOME>${tomcat.home}</CATALINA_HOME>
           </environmentVariables>
 
         </configuration>
