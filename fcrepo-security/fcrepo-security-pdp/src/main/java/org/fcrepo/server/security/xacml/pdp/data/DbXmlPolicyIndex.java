@@ -217,7 +217,7 @@ public class DbXmlPolicyIndex
         }
 
         // We do not have a query of those dimensions. We must make one.
-        String query = createQuery(attributeMap, r);
+        String query = createQuery(attributeMap);
 
         if (log.isDebugEnabled()) {
             log.debug("Query [" + hash + "]:\n" + query);
@@ -243,9 +243,8 @@ public class DbXmlPolicyIndex
      *        the number of components in the resource id
      * @return the query as a String
      */
-    private String createQuery(Map<String, Set<AttributeBean>> attributeMap,
-                                      int r) {
-        return "collection('" + dbXmlManager.CONTAINER + "')" + getXpath(attributeMap, r);
+    private String createQuery(Map<String, Set<AttributeBean>> attributeMap) {
+        return "collection('" + dbXmlManager.CONTAINER + "')" + getXpath(attributeMap);
 
     }
 
@@ -447,6 +446,9 @@ public class DbXmlPolicyIndex
         doc.setContent(document);
         doc.setName(docName);
 
+        // FIXME:
+        // this is probably redundant as the xpath queries now directly query the policy
+        // for the "any" scenarios
         String item = null;
         item = metadata.get("anySubject");
         if (item != null) {

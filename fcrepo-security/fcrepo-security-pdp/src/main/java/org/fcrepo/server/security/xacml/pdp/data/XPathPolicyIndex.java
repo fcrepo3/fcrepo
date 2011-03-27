@@ -29,6 +29,15 @@ public abstract class XPathPolicyIndex
         LoggerFactory.getLogger(XPathPolicyIndex.class.getName());
 
 
+    // specifies the XACML policy targest
+    // the attribute map uses these in the format
+    // lowerCase(target) + "Attributes"
+    // and the names are used in the generation of the xpath
+    // eg target + "s" for the target element, target for each individual element beneath that, etc
+    private static String[] targets =
+            new String[] {"Subject", "Resource", "Action", "Environment"};
+
+
     protected XPathPolicyIndex() throws PolicyIndexException {
         super();
     }
@@ -42,13 +51,10 @@ public abstract class XPathPolicyIndex
     // FIXME: public for some external testing. -> protected
     public static Map<String, String> getXpathVariables(Map<String, Set<AttributeBean>> attributeMap) {
         // Set all the bind variables in the query context
-        String[] types =
-            new String[] {"Subject", "Resource", "Action",
-        "Environment"};
 
         Map<String, String> variables = new HashMap<String, String>();
 
-        for (String t : types) {
+        for (String t : targets) {
             int count = 0;
             for (AttributeBean bean : attributeMap.get(t.toLowerCase()
                                                        + "Attributes")) {
@@ -102,15 +108,28 @@ public abstract class XPathPolicyIndex
      * @return
      */
     // FIXME: public for some external testing
-    public static String getXpath(Map<String, Set<AttributeBean>> attributeMap, int r) {
-        // The query contains these 4 sections.
-        String[] types =
-                new String[] {"Subject", "Resource", "Action", "Environment"};
+    public static String getXpath(Map<String, Set<AttributeBean>> attributeMap) {
 
         int sections = 0;
         StringBuilder sb = new StringBuilder();
+
+        // FIXME:
+        // this from the original dbxml implementation
+        // "r" is the count of resource values where the attribute ID is xacml resource-id
+        // not clear why this is actually needed but the query generator tests for a zero value
+        int resourceValueCount = 0;
+        for (AttributeBean b : attributeMap.get("resourceAttributes")) {
+            if (b.getId().equals(XACML_RESOURCE_ID)) {
+                resourceValueCount = resourceValueCount + b.getValues().size();
+            }
+
+        }
+
+
+
+        // FIXME: will not work with policy sets
         sb.append("/p:Policy/p:Target[");
-        for (String t : types) {
+        for (String t : targets) {
             if (attributeMap.get(t.toLowerCase() + "Attributes").size() == 0) {
                 continue;
             }
@@ -132,22 +151,12 @@ public abstract class XPathPolicyIndex
             // instead...
             sb.append("(");
             // true if no resouces targets found in policy
-            sb.append("not(//p:Policy/p:Target/p:" + t+ ")");
+            sb.append("not(p:" + t+ "s)");
             sb.append(" or ");
             // matches the legacy 1.0 "AnyResource etc - should not be required
-            sb.append("//p:Policy/p:Target/p:Resources/p:Any" + t);
+            sb.append("p:" + t + "s/p:Any" + t);
 
             sb.append(")");
-
-
-            // count(//p:Policy/p:Target[count(p:Resources) = 0)
-            // not(//p:Policy/p:Target/p:Resources)
-
-            // or
-            // //p:Policy/p:Target/p:Resources/p:AnyResource
-
-
-            // sb.append("((not('p:" + t + "s'))");
 
             int count = 0;
             for (AttributeBean bean : attributeMap.get(t.toLowerCase()
@@ -157,8 +166,7 @@ public abstract class XPathPolicyIndex
 
                 // FIXME: r > 0 seems to cater for a case where there is/are resource attributeBeans, but
                 // no attribute values are specified - could this actually happen?
-                // TODO: remove dependency on r, or calculate here?
-                if (bean.getId().equals(XACML_RESOURCE_ID) && r > 0) {
+                if (bean.getId().equals(XACML_RESOURCE_ID) && resourceValueCount > 0) {
                     sb.append("p:" + t + "s/p:" + t + "/p:" + t + "Match/");
                     sb.append("p:" + t + "AttributeDesignator/@AttributeId = ");
                     sb.append("$XacmlResourceId");
