@@ -6,11 +6,8 @@ package org.fcrepo.server.security.xacml.util;
 
 import java.io.File;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,17 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
-import org.fcrepo.common.MalformedPIDException;
-import org.fcrepo.common.PID;
 
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
-import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.management.Management;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pdp.MelcoePDPException;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 
 
@@ -38,161 +31,33 @@ import org.fcrepo.server.storage.types.RelationshipTuple;
  *
  * @author Edwin Shin
  */
-public class RelationshipResolverImpl
+public class RelationshipResolverImpl extends RelationshipResolverBase
         implements RelationshipResolver {
 
-    private static final Logger logger =
+    static final Logger logger =
             LoggerFactory.getLogger(RelationshipResolverImpl.class);
-
-    /**
-     * Designates the repository itself. Policies can apply to the repository,
-     * but it is a special case, as it is not represented by a PID, and by
-     * definition, has no parents.
-     */
-    private final static String REPOSITORY = "FedoraRepository";
-
-    private static String DEFAULT_RELATIONSHIP =
-            "info:fedora/fedora-system:def/relations-external#isMemberOf";
-
-    private final List<String> relationships;
 
     private Management apim;
 
     private Context fedoraCtx;
 
+
     public RelationshipResolverImpl() {
-        this(new HashMap<String, String>());
+        super();
     }
 
-    /**
-     * Constructor that takes a map of parent-child predicates (relationships).
-     * {@link ContextHandlerImpl} builds the map from the relationship-resolver
-     * section of config-melcoe-pep.xml (in WEB-INF/classes).
-     *
-     * @param options
-     * @throws MelcoePDPException
-     */
     public RelationshipResolverImpl(Map<String, String> options) {
-        relationships = new ArrayList<String>();
-        // FIXME:  should add default relationship if no parent-child-relationship option is present, instead of options being empty
-        if (options.isEmpty()) {
-            relationships.add(DEFAULT_RELATIONSHIP);
-        } else {
-            List<String> keys = new ArrayList<String>(options.keySet());
-            Collections.sort(keys);
-            for (String s : keys) {
-                if (s.startsWith("parent-child-relationship")) {
-                    relationships.add(options.get(s));
-                }
-            }
-        }
+        super(options);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.security.xacml.pdp.finder.support.RelationshipResolver#buildRESTParentHierarchy
-     * (java.lang.String)
-     */
-    public String buildRESTParentHierarchy(String pid)
-            throws MelcoeXacmlException {
-        Set<String> parents = getParents(pid);
-        if (parents == null || parents.size() == 0) {
-            return "/" + pid;
-        }
-
-        String[] parentArray = parents.toArray(new String[parents.size()]);
-
-        return buildRESTParentHierarchy(parentArray[0]) + "/" + pid;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.security.xacml.pdp.finder.support.RelationshipResolver#getParents(java.
-     * lang.String)
-     */
-    public Set<String> getParents(String pid) throws MelcoeXacmlException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Obtaining parents for: " + pid);
-        }
-
-        Set<String> parentPIDs = new HashSet<String>();
-        if (pid.equalsIgnoreCase(REPOSITORY)) {
-            return parentPIDs;
-        }
-
-        query: for (String relationship : relationships) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("relationship query: " + pid + ", " + relationship);
-            }
-
-            Map<String, Set<String>> mapping;
-            try {
-                mapping = getRelationships(pid, relationship);
-            } catch (MelcoeXacmlException e) {
-                Throwable t = e.getCause();
-                // An object X, may legitimately declare a parent relation to
-                // another object, Y which does not exist. Therefore, we don't
-                // want to continue querying for Y's parents.
-                if (t != null && t instanceof ObjectNotInLowlevelStorageException) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Parent, " + pid + ", not found.");
-                        }
-                        break query;
-                } else {
-                // Unexpected error, so we throw back the original
-                throw e;
-            }
-            }
-
-            Set<String> parents = mapping.get(relationship);
-            if (parents != null) {
-                for (String parent : parents) {
-                    PID parentPID = PID.getInstance(parent);
-                    // we want the parents in demo:123 form, not info:fedora/demo:123
-                    parentPIDs.add(parentPID.toString());
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("added parent " + parentPID.toString());
-                    }
-                }
-            }
-        }
-        return parentPIDs;
-    }
-
-    public Map<String, Set<String>> getRelationships(String subject)
-            throws MelcoeXacmlException {
-        return getRelationships(subject, null);
-    }
-
-    private Map<String, Set<String>> getRelationships(String subject,
+    @Override
+    public Map<String, Set<String>> getRelationships(String subject,
                                                       String relationship)
             throws MelcoeXacmlException {
 
-        // strip off info URI part if present
-        String strippedSubject;
-        if (subject.startsWith(Constants.FEDORA.uri)) {
-            strippedSubject = subject.substring(Constants.FEDORA.uri.length());
-        } else {
-            strippedSubject = subject;
-        }
-        // split into pid + datastream (if present), validate PID and then recombine datastream back in using URI form of PID
-        String parts[] = strippedSubject.split("/");
-        PID pid;
-        try {
-            pid = new PID(parts[0]);
-        } catch (MalformedPIDException e1) {
-            logger.warn("Invalid subject argumet for getRelationships: " + subject + ". PID part of URI is malformed");
-            return new HashMap<String, Set<String>>();
-        }
 
         String subjectURI;
-        if (parts.length == 1) {
-            subjectURI = pid.toURI();
-        } else if (parts.length == 2) {
-            subjectURI = pid.toURI() + "/" + parts[1]; // add datastream
-        } else {
+        if ((subjectURI = getFedoraResourceURI(subject)) == null) {
             logger.warn("Invalid subject argumet for getRelationships: " + subject + ". Should be pid or datastream (URI form optional");
             return new HashMap<String, Set<String>>();
         }
@@ -259,22 +124,9 @@ public class RelationshipResolverImpl
         return fedoraCtx;
     }
 
-    /**
-     * Returns a PID object for the requested String. This method will return a
-     * PID for a variety of pid permutations, e.g. demo:1, info:fedora/demo:1,
-     * demo:1/DS1, info:fedora/demo:1/sdef:foo/sdep:bar/methodBaz.
-     *
-     * @param pid
-     * @return a PID object
-     */
-    // FIXME: does not appear to be used anywhere
-    protected PID getNormalizedPID(String pid) {
-        // strip the leading "info:fedora/" if any
-        if (pid.startsWith(Constants.FEDORA.uri)) {
-            pid = pid.substring(Constants.FEDORA.uri.length());
-        }
-        // should be left with "demo:foo" or "demo:foo/demo:bar"
-
-        return PID.getInstance(pid.split("\\/")[0]);
+    @Override
+    public Map<String, Set<String>> getRelationships(String subject)
+            throws MelcoeXacmlException {
+        return getRelationships(subject, null);
     }
 }

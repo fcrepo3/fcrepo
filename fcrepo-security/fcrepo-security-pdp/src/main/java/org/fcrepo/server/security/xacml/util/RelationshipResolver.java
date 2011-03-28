@@ -22,6 +22,10 @@ public interface RelationshipResolver {
     public Map<String, Set<String>> getRelationships(String subject)
             throws MelcoeXacmlException;
 
+
+    public Map<String, Set<String>> getRelationships(String subject,
+                                                      String relationship) throws MelcoeXacmlException;
+
     /**
      * Obtains a list of parents for the given pid.
      *
@@ -30,7 +34,8 @@ public interface RelationshipResolver {
      * @return a Set containing the parents of the pid
      * @throws PEPException
      */
-    public Set<String> getParents(String pid) throws MelcoeXacmlException;
+    // FIXME: not used?
+    //public Set<String> getParents(String pid) throws MelcoeXacmlException;
 
     /**
      * Generates a REST based representation of an object and its parents. For

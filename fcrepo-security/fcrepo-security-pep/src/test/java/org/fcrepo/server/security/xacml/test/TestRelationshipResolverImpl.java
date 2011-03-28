@@ -4,12 +4,13 @@ package org.fcrepo.server.security.xacml.test;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.fcrepo.server.security.xacml.util.RelationshipResolverBase;
 import org.fcrepo.server.security.xacml.util.RelationshipResolverImpl;
 
 
 public class TestRelationshipResolverImpl {
 
-    private RelationshipResolverImpl rels = null;
+    private RelationshipResolverBase rels = null;
 
     /**
      * @param args

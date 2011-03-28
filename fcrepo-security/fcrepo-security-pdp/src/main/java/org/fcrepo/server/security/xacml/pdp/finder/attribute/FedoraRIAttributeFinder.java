@@ -174,7 +174,7 @@ public class FedoraRIAttributeFinder
     /**
      *
      * @param resourceID - the hierarchical XACML resource ID
-     * @param attribute - attribute to get
+     * @param attribute - attribute to get - this is a URI and is the same as the Fedora relationship from the object/datastream
      * @param type
      * @return
      * @throws AttributeFinderException
@@ -205,20 +205,21 @@ public class FedoraRIAttributeFinder
 
 
         Map<String, Set<String>> relationships;
-        // FIXME: this is querying for all relationships, and then filtering the one we want
-        // better to query directly on the one we want (but currently no public method on relationship resolver to do this)
+
         try {
             logger.debug("Getting relationships for " + subject);
-            relationships = relationshipResolver.getRelationships(subject);
+            relationships = relationshipResolver.getRelationships(subject, attribute);
         } catch (MelcoeXacmlException e) {
             throw new AttributeFinderException(e.getMessage(), e);
         }
 
-        Set<String> results = relationships.get(attribute);
-        if (results == null || results.size() == 0) {
+        if (relationships == null || relationships.isEmpty()) {
             return new EvaluationResult(BagAttribute.createEmptyBag(type));
+
         }
 
+        // there will only be results for one attribute, this will get all the values
+        Set<String> results = relationships.get(attribute);
         Set<AttributeValue> bagValues = new HashSet<AttributeValue>();
         for (String s : results) {
             AttributeValue attributeValue = null;
