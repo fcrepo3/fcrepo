@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://www.fedora.info/definitions/1/0/access/"
-           xmlns="http://www.fedora.info/definitions/1/0/access/"
+<xs:schema targetNamespace="http://www.fedora.info/definitions/1/0/management/"
+           xmlns="http://www.fedora.info/definitions/1/0/management/"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            elementFormDefault="qualified">
     <xs:element name="validation">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="asOfDateTime"/>
+                <xs:element ref="asOfDateTime" minOccurs="0" maxOccurs="1"/>
                 <xs:element ref="contentModels"/>
                 <xs:element ref="problems"/>
                 <xs:element ref="datastreamProblems"/>
