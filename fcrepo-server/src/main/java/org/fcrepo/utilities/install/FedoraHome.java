@@ -142,9 +142,6 @@ public class FedoraHome {
                 || database.equals(InstallOptions.INCLUDED)) {
             dbPoolName = "localDerbyPool";
             backslashIsEscape = "false";
-        } else if (database.equals(InstallOptions.MCKOI)) {
-            dbPoolName = "localMcKoiPool";
-            backslashIsEscape = "false";
         } else if (database.equals(InstallOptions.MYSQL)) {
             dbPoolName = "localMySQLPool";
         } else if (database.equals(InstallOptions.ORACLE)) {

@@ -360,13 +360,6 @@ implements Constants, Runnable {
         if (showUsage) {
             System.err.println("Usage: fedora-rebuild [server-profile]");
             System.err.println();
-            System.err
-            .println("server-profile : the argument you start Fedora with, such as 'mckoi'");
-            System.err
-            .println("                 or 'oracle'.  If you start fedora with 'fedora-start'");
-            System.err
-            .println("                 (without arguments), don't specify a server-profile here either.");
-            System.err.println();
         }
         if (exit) {
             System.exit(1);
