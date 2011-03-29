@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.fcrepo.client.FedoraClient;
+
 import junit.framework.JUnit4TestAdapter;
 
 import org.fcrepo.common.Constants;
@@ -118,7 +120,9 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
             // nb, uses getBaseURL(), ie http not https (ssl not required for ConfigC/API-A)
             httpUtils = new HttpUtils(getBaseURL(), "testuser", "testuser");
 
-            apim = getFedoraClient().getAPIM();
+            FedoraClient client = getFedoraClient();
+            assertNotNull("FedoraTestCase.getFedoraClient() returned NULL", client); 
+            apim = client.getAPIM();
 
             policyIndexUtils = new PolicyIndexUtils(apim);
 
@@ -262,38 +266,38 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         pid = policyIndexUtils.addPolicyObject("X", "A", null);
 
         // check policies not in force
-        assertFalse(checkPolicyEnforcement("A"));
-        assertFalse(checkPolicyEnforcement("B"));
+        assertFalse("authorization \"A\" PERMITTED, expected DENIED",checkPolicyEnforcement("A"));
+        assertFalse("authorization \"B\" PERMITTED, expected DENIED",checkPolicyEnforcement("B"));
 
         // add policy objects
         pidA =  policyIndexUtils.addPolicyObject("A", "A", "A");
         pidB =  policyIndexUtils.addPolicyObject("B", "A", "A");
 
         // check policies in force
-        assertTrue(checkPolicyEnforcement("A"));
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // purge non-policy object
         apim.purgeObject(pid, "", false);
 
         // check policies in force
-        assertTrue(checkPolicyEnforcement("A"));
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // purge policy A object
         apim.purgeObject(pidA, "", false);
 
         // check policy A not in force
-        assertFalse(checkPolicyEnforcement("A"));
+        assertFalse("authorization \"A\" PERMITTED, expected DENIED",checkPolicyEnforcement("A"));
 
         // check policy B in force
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // purge policy B object
         apim.purgeObject(pidB, "", false);
 
         // check policies not in force
-        assertFalse(checkPolicyEnforcement("B"));
+        assertFalse("authorization \"B\" PERMITTED, expected DENIED",checkPolicyEnforcement("B"));
 
     }
 
@@ -395,9 +399,9 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         apim.modifyObject(pidA, "A", null, null, "set active");
 
         // check policy A in force
-        assertTrue(checkPolicyEnforcement("A"));
+        assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
         // and B still in force
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // purge A
         apim.purgeObject(pidA, "purging A", false);
@@ -406,25 +410,25 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         pidA =  policyIndexUtils.addPolicyObject("A", "I", "I");
 
         // check policy A not in force
-        assertFalse(checkPolicyEnforcement("A"));
+        assertFalse("authorization \"A\" PERMITTED, expected DENIED",checkPolicyEnforcement("A"));
         // and B still in force
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // set object state active
         apim.modifyObject(pidA, "A", null, null, "set active");
 
         // check policy A not in force (datastream still inactive)
-        assertFalse(checkPolicyEnforcement("A"));
+        assertFalse("authorization \"A\" PERMITTED, expected DENIED",checkPolicyEnforcement("A"));
         // and B still in force
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // set datastream state active
         apim.setDatastreamState(pidA, POLICY_DATASTREAM, "A", "datastream active");
 
         // check policy A in force
-        assertTrue(checkPolicyEnforcement("A"));
+        assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
         // and B still in force
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // set datastream state inactive
         apim.setDatastreamState(pidA, POLICY_DATASTREAM, "I", "datastream inactive");
@@ -432,7 +436,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         // check policy A not in force
         assertFalse(checkPolicyEnforcement("A"));
         // and B still in force
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // set datastream state deleted
         apim.setDatastreamState(pidA, POLICY_DATASTREAM, "D", "datastream deleted");
@@ -440,15 +444,15 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         // check policy A not in force
         assertFalse(checkPolicyEnforcement("A"));
         // and B still in force
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // set datastream state active
         apim.setDatastreamState(pidA, POLICY_DATASTREAM, "A", "datastream active");
 
         // check policy A in force
-        assertTrue(checkPolicyEnforcement("A"));
+        assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
         // and B still in force
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // set datastream state deleted
         apim.setDatastreamState(pidA, POLICY_DATASTREAM, "D", "datastream deleted");
@@ -456,7 +460,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         // check policy A not in force
         assertFalse(checkPolicyEnforcement("A"));
         // and B still in force
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // set object state deleted
         apim.modifyObject(pidA, "D", null, null, "set inactive");
@@ -464,7 +468,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         // check policy A not in force
         assertFalse(checkPolicyEnforcement("A"));
         // and B still in force
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // set datastream state active
         apim.setDatastreamState(pidA, POLICY_DATASTREAM, "A", "datastream active");
@@ -472,15 +476,15 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         // check policy A not in force
         assertFalse(checkPolicyEnforcement("A"));
         // and B still in force
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // set object state active
         apim.modifyObject(pidA, "A", null, null, "set inactive");
 
         // check policy A in force
-        assertTrue(checkPolicyEnforcement("A"));
+        assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
         // and B still in force
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // purge both
         apim.purgeObject(pidA, "", false);
@@ -510,13 +514,13 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         }
 
         // check policy A still in force
-        assertTrue(checkPolicyEnforcement("A"));
+        assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
 
         // modify by value to policy B
         apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null,  PolicyIndexUtils.getPolicy("B").getBytes("UTF-8"), null, null, "modify to policy B", false);
 
         // check policy B in force
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // check policy A not in force
         assertFalse(checkPolicyEnforcement("A"));
@@ -524,7 +528,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         // modify by value to policy A (needed for version purge test, or will revert back to the invalid version pending FCREPO-770)
         apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null,  PolicyIndexUtils.getPolicy("A").getBytes("UTF-8"), null, null, "modify to policy B", false);
         // check
-        assertTrue(checkPolicyEnforcement("A"));
+        assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
         assertFalse(checkPolicyEnforcement("B"));
 
         // purge latest datastream version
@@ -532,7 +536,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         apim.purgeDatastream(pid, POLICY_DATASTREAM, ds.getCreateDate(), ds.getCreateDate(), "purging latest version", false);
 
         // check reverted back to B in force, A not in force (ie prior version)
-        assertTrue(checkPolicyEnforcement("B"));
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
         assertFalse(checkPolicyEnforcement("A"));
 
         // purge datastream
@@ -553,23 +557,23 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         // set datastream active
         apim.setDatastreamState(pid, POLICY_DATASTREAM, "A", "FESLPOLICY set to active");
 
-        // check policy in force
-        assertTrue(checkPolicyEnforcement("A"));
+        // check policy A in force
+        assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
 
-        // check policy in force
-        assertTrue(checkPolicyEnforcement("A"));
+        // check policy B in force
+        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
 
         // add unrelated datastream
         apim.addDatastream(pid, "UNRELATED", null, "some datastream", true, "text/xml", null, fedoraUrl+ "/objects/test:1000001/datastreams/DC/content", "M", "A", null, null, "adding UNRELATED");
 
-        // check policy in force
-        assertTrue(checkPolicyEnforcement("A"));
+        // check policy A in force
+        assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
 
         // purge unrelated datastream (FCREPO-820)
         apim.purgeDatastream(pid, "UNRELATED", null, null, "purge UNRELATED", false);
 
-        // check policy in force
-        assertTrue(checkPolicyEnforcement("A"));
+        // check policy A in force
+        assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
 
         // purge datastream
         apim.purgeDatastream(pid, POLICY_DATASTREAM,null, null, "purge FESLPOLICY", false);
@@ -586,7 +590,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         apim.purgeObject(pidTemp, "removing temp object", false);
 
         // check policy A in force
-        assertTrue(checkPolicyEnforcement("A"));
+        assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
 
         // modify datastream by reference to policy B (as above, by reference from a temp object created then purged afterwards)
         pidTemp =  policyIndexUtils.addPolicyObject("B", "A", "A");

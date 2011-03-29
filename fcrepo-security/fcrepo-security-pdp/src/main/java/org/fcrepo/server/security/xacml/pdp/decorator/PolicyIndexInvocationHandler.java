@@ -342,7 +342,7 @@ extends AbstractInvocationHandler {
 
 
     private void addPolicy(String pid, InputStream dsContent) throws GeneralException {
-        LOG.debug("Adding policy " + pid);
+        LOG.info("Adding policy " + pid);
 
         String policy;
 
@@ -359,7 +359,7 @@ extends AbstractInvocationHandler {
 
     }
     private void updatePolicy(String pid, InputStream dsContent) throws GeneralException {
-        LOG.debug("Updating policy " + pid);
+        LOG.info("Updating policy " + pid);
 
         String policy;
 

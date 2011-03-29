@@ -30,7 +30,7 @@ public class FedoraRIAttributeFinder
     private static final Logger logger =
             LoggerFactory.getLogger(FedoraRIAttributeFinder.class);
 
-    private AttributeFactory attributeFactory = null;
+    private AttributeFactory attributeFactory = StandardAttributeFactory.getFactory();
 
     private RelationshipResolver relationshipResolver = null;
 
@@ -53,19 +53,9 @@ public class FedoraRIAttributeFinder
                 }
             }
 
-            Map<String, String> resolverConfig =
-                    AttributeFinderConfigUtil.getResolverConfig(this.getClass()
-                            .getName());
-            if (logger.isDebugEnabled()) {
-                for (String s : resolverConfig.keySet()) {
-                    logger.debug(s + ": " + resolverConfig.get(s));
-                }
-            }
-
             relationshipResolver =
                     ContextUtil.getInstance().getRelationshipResolver();
 
-            attributeFactory = StandardAttributeFactory.getFactory();
         } catch (AttributeFinderException afe) {
             logger.error("Attribute finder not initialised:"
                     + this.getClass().getName(), afe);
