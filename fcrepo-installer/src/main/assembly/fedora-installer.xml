@@ -42,7 +42,6 @@
         <include>org.apache.derby:derbyclient:jar:*</include>
         <include>org.apache.derby:derby:jar:*</include>
         <include>org.fcrepo:mulgara-core:jar:*</include>
-        <include>mckoi:mckoi:jar:*</include>
         <include>mysql:mysql-connector-java:jar:*</include>
         <include>postgresql:postgresql:jar:*</include>
       </includes>

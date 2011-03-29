@@ -187,10 +187,6 @@ public class Installer {
                     is = dist.get(Distribution.JDBC_DERBY_NETWORK);
                     driver = new File(destDir, Distribution.JDBC_DERBY_NETWORK);
                     success = FileUtils.copy(is, new FileOutputStream(driver));
-                } else if (database.equals(InstallOptions.MCKOI)) {
-                    is = dist.get(Distribution.JDBC_MCKOI);
-                    driver = new File(destDir, Distribution.JDBC_MCKOI);
-                    success = FileUtils.copy(is, new FileOutputStream(driver));
                 } else if (database.equals(InstallOptions.MYSQL)) {
                     is = dist.get(Distribution.JDBC_MYSQL);
                     driver = new File(destDir, Distribution.JDBC_MYSQL);

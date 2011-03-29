@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.fcrepo.server.utilities.McKoiDDLConverter;
 import org.fcrepo.server.utilities.TableCreatingConnection;
 import org.fcrepo.server.utilities.TableSpec;
 import org.fcrepo.utilities.DriverShim;
@@ -53,13 +52,7 @@ public class Database {
 
     /**
      * Fedora 2.2 renamed the 'do' table to 'dobj' (because 'do' is reserved in
-     * Postgresql, which is supported as of Fedora 2.2). McKoi unfortunately
-     * doesn't support renaming tables, so we create the new dobj table, copy,
-     * and then delete. For reference, the CREATE TABLE command for McKoi should
-     * be: CREATE TABLE dobj ( doDbID int(11) default UNIQUEKEY('dobj') NOT
-     * NULL, doPID varchar(64) default '' NOT NULL, doLabel varchar(255) default
-     * '', doState varchar(1) default 'I' NOT NULL, PRIMARY KEY (doDbID), UNIQUE
-     * (doPID) )
+     * Postgresql, which is supported as of Fedora 2.2). 
      *
      * @throws InstallationFailedException
      */
@@ -73,37 +66,10 @@ public class Database {
             ResultSet rs = dmd.getTables(null, null, "%", null);
             while (rs.next()) {
                 if (rs.getString("TABLE_NAME").equals("do")) {
-                    // McKoi doesn't support RENAME TABLE
-                    if (_db.equals(InstallOptions.MCKOI)) {
-                        // create table using DDL
-                        List<TableSpec> specs =
-                                TableSpec.getTableSpecs(_dist
-                                        .get(Distribution.DBSPEC));
-                        for (TableSpec spec : specs) {
-                            if (spec.getName().equals("dobj")) {
-                                TableCreatingConnection tcc =
-                                        new TableCreatingConnection(conn,
-                                                                    new McKoiDDLConverter());
-                                tcc.createTable(spec);
-                                Statement stmt = conn.createStatement();
-
-                                // copy all from do to dobj
-                                stmt
-                                        .execute("INSERT INTO dobj SELECT * FROM do;");
-
-                                // delete old table
-                                stmt.execute("DROP TABLE do");
-                                stmt.close();
-                                break;
-                            }
-                        }
-                    } else {
-                        Statement stmt = conn.createStatement();
-                        stmt.execute("ALTER TABLE do RENAME TO dobj");
-                        System.out.println("Renamed table 'do' to 'dobj'.");
-                        stmt.close();
-                    }
-                    break;
+                    Statement stmt = conn.createStatement();
+                    stmt.execute("ALTER TABLE do RENAME TO dobj");
+                    System.out.println("Renamed table 'do' to 'dobj'.");
+                    stmt.close();
                 }
             }
             rs.close();
@@ -131,12 +97,6 @@ public class Database {
                 driver =
                         new File(System.getProperty("java.io.tmpdir"),
                                  Distribution.JDBC_DERBY_NETWORK);
-                success = FileUtils.copy(is, new FileOutputStream(driver));
-            } else if (_db.equals(InstallOptions.MCKOI)) {
-                is = _dist.get(Distribution.JDBC_MCKOI);
-                driver =
-                        new File(System.getProperty("java.io.tmpdir"),
-                                 Distribution.JDBC_MCKOI);
                 success = FileUtils.copy(is, new FileOutputStream(driver));
             } else if (_db.equals(InstallOptions.MYSQL)) {
                 is = _dist.get(Distribution.JDBC_MYSQL);
@@ -223,21 +183,4 @@ public class Database {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put(InstallOptions.DATABASE, InstallOptions.MCKOI);
-        map.put(InstallOptions.DATABASE_DRIVER, InstallOptions.INCLUDED);
-        map
-                .put(InstallOptions.DATABASE_JDBCURL,
-                     "jdbc:mckoi://localhost:9157/");
-        map.put(InstallOptions.DATABASE_DRIVERCLASS, "com.mckoi.JDBCDriver");
-        map.put(InstallOptions.DATABASE_USERNAME, "fedoraAdmin");
-        map.put(InstallOptions.DATABASE_PASSWORD, "fedoraAdmin");
-
-        Distribution dist = new ClassLoaderDistribution();
-        InstallOptions opts = new InstallOptions(dist, map);
-        Database db = new Database(dist, opts);
-        db.test();
-        db.close();
-    }
 }
