@@ -1,19 +1,20 @@
 <project name="tomcat-run">
 
   <target name="tomcat-start">
+    <echo>Starting Fedora</echo>
     <parallel>
-      <java jar="${tomcat.home}/bin/bootstrap.jar" fork="yes" dir="${tomcat.home}" spawn="true">
-        <jvmarg value="-Djava.io.tmpdir=${tomcat.home}/temp" />
+      <java jar="${mvn.tomcat.home}/bin/bootstrap.jar" fork="yes" dir="${mvn.tomcat.home}" spawn="true">
+        <jvmarg value="-Djava.io.tmpdir=${mvn.tomcat.home}/temp" />
         <jvmarg value="-XX:MaxPermSize=512M" />
         <jvmarg value="-Xmx512M" />
-        <env key="FEDORA_HOME" value="${fedora.home}" />
+        <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
         <arg line="start" />
       </java>
       <sequential>
         <waitfor maxwait="60" maxwaitunit="second" checkevery="2" timeoutproperty="timeout">
-          <socket server="127.0.0.1" port="${fedora.port}"/>
+          <socket server="127.0.0.1" port="${mvn.fedora.port}"/>
         </waitfor>
-        <fail if="timeout">Tomcat did not start in time</fail>
+        <fail if="timeout">Fedora did not start in time</fail>
         <echo>Fedora started</echo>
       </sequential>
     </parallel>
@@ -21,15 +22,15 @@
 
   <target name="tomcat-stop">
     <parallel>
-    <java jar="${tomcat.home}/bin/bootstrap.jar" fork="yes" dir="${tomcat.home}" spawn="true">
-      <jvmarg value="-Djava.io.tmpdir=${tomcat.home}/temp" />
-      <env key="FEDORA_HOME" value="${fedora.home}" />
+    <java jar="${mvn.tomcat.home}/bin/bootstrap.jar" fork="yes" dir="${mvn.tomcat.home}" spawn="true">
+      <jvmarg value="-Djava.io.tmpdir=${mvn.tomcat.home}/temp" />
+      <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
       <arg line="stop" />
     </java>
     <sequential>
       <waitfor maxwait="60" maxwaitunit="second" checkevery="2" timeoutproperty="timeout">
         <not>
-          <socket server="127.0.0.1" port="${fedora.port}"/>
+          <socket server="127.0.0.1" port="${mvn.fedora.port}"/>
         </not>
       </waitfor>
     </sequential>
