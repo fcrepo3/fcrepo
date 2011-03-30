@@ -1,14 +1,14 @@
 <project name="installer-run">
 
   <target name="install">
-    <delete dir="${fedora.home}" failonerror="false" />
-    <mkdir dir="${fedora.home}" />
+    <delete dir="${mvn.fedora.home}" failonerror="false" />
+    <mkdir dir="${mvn.fedora.home}" />
     
-    <condition property="maven.opts" value="${maven.env.opts}" else=" ">
+    <condition property="mvn.opts" value="${mvn.env.opts}" else=" ">
       <and>
-        <isset property="maven.env.opts"/>
+        <isset property="mvn.env.opts"/>
         <not>
-          <equals arg1="${maven.env.opts}" arg2="${env.MAVEN_OPTS}"/>
+          <equals arg1="${mvn.env.opts}" arg2="${env.MAVEN_OPTS}"/>
         </not>
       </and>
     </condition>
@@ -26,20 +26,20 @@
     <java
       jar="${basedir}/target/ext/fcrepo-installer/fcrepo-installer-${fedora.install.version}.jar"
       fork="true" spawn="false" failonerror="true">
-      <jvmarg line="${maven.opts}"/>
+      <jvmarg line="${mvn.opts}"/>
       <arg line="${fedora.install.properties} ${fedora.install.properties.extra}" />
-      <env key="FEDORA_HOME" value="${fedora.home}" />
-      <env key="CATALINA_HOME" value="${tomcat.home}" />
+      <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
+      <env key="CATALINA_HOME" value="${mvn.tomcat.home}" />
     </java>
   </target>
   
   <target name="clearSQL">
     <echo>Clearing SQL database</echo>
- 	<java classpath="${fedora.home}/server/bin/fcrepo-server-${fedora.install.version}-cli-loader-main.jar"
+ 	<java classpath="${mvn.fedora.home}/server/bin/fcrepo-server-${fedora.install.version}-cli-loader-main.jar"
           classname="org.fcrepo.server.utilities.rebuild.cli.CLILoader" fork="true" spawn="false" failonerror="true">
  	  <arg line="org.fcrepo.server.test.ClearSQLDatabase" />
- 	  <env key="FEDORA_HOME" value="${fedora.home}" />
- 	  <sysproperty key="fedora.web.inf.lib" value="${fedora.home}/install/fedorawar/WEB-INF/lib"/>
+ 	  <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
+ 	  <sysproperty key="fedora.web.inf.lib" value="${mvn.fedora.home}/install/fedorawar/WEB-INF/lib"/>
  	</java>
   </target>
 

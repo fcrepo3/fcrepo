@@ -13,6 +13,27 @@
   <packaging>jar</packaging>
   <name>Fedora Integration Test - Configuration B</name>
 
+  <!-- Defaults -->
+  <properties>
+    <javax.net.ssl.trustStore>${fedora.home}/server/truststore</javax.net.ssl.trustStore>
+    <fedora.username>fedoraAdmin</fedora.username>
+    <fedora.password>fedoraAdmin</fedora.password>
+
+    <fedora.hostname>localhost</fedora.hostname>
+    <fedora.port>8080</fedora.port>
+    <fedora.appServerContext>fedora</fedora.appServerContext>
+    <fedora.baseURL>http://localhost:${fedora.port}/${fedora.appServerContext}</fedora.baseURL>
+
+    <tomcat.home>${fedora.home}/tomcat</tomcat.home>
+    <tomcat.url>${fedora.baseURL}</tomcat.url>
+    <tomcat.port.ssl>8443</tomcat.port.ssl>
+    <tomcat.port.shutdown>8005</tomcat.port.shutdown>
+
+    <org.apache.activemq.default.directory.prefix>${project.build.directory}</org.apache.activemq.default.directory.prefix>
+
+    <test.report.directory>${project.build.directory}/failsafe-reports/configA</test.report.directory>
+  </properties>
+
   <profiles>
     <profile>
       <id>explicitly-disabled</id>
@@ -51,7 +72,7 @@
         <integration.test.skip>false</integration.test.skip>
       </properties>
     </profile>
-    
+
     <profile>
       <id>db-specified</id>
       <activation>
@@ -71,16 +92,24 @@
           <name>!fedora.home</name>
         </property>
       </activation>
-        
+
       <properties>
         <fedora.home>${project.build.directory}/fcrepo-${project.version}</fedora.home>
         <fedora.install.properties>${project.build.directory}/config/ConfigB.properties</fedora.install.properties>
         <fedora.install.version>${project.version}</fedora.install.version>
-        <maven.env.opts>${env.MAVEN_OPTS}</maven.env.opts>
+
+        <!-- antrun ant task does not handle properties sanely. System properties 
+          do not override default values. Re-defining the potentially overriden maven 
+          properties is a workaround -->
+        <mvn.env.opts>${env.MAVEN_OPTS}</mvn.env.opts>
+        <mvn.fedora.home>${fedora.home}</mvn.fedora.home>
+        <mvn.fedora.port>${fedora.port}</mvn.fedora.port>
+        <mvn.fedora.appServerContext>${fedora.appServerContext}</mvn.fedora.appServerContext>
+        <mvn.tomcat.home>${tomcat.home}</mvn.tomcat.home>
       </properties>
 
       <build>
-    
+
         <plugins>
           
           <!-- Copy and filter config properties -->
@@ -96,21 +125,21 @@
                   <goal>copy-resources</goal>
                 </goals>
                 <configuration>
-                 <outputDirectory>${project.build.directory}/config</outputDirectory>
-                 <resources>
-                   <resource>
-                   <directory>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes/config</directory>
-                     <includes>
-                       <include>*.properties</include>
-                     </includes>
-                     <filtering>true</filtering>
-                   </resource>      
-                 </resources>
+                  <outputDirectory>${project.build.directory}/config</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes/config</directory>
+                      <includes>
+                        <include>*.properties</include>
+                      </includes>
+                      <filtering>true</filtering>
+                    </resource>
+                  </resources>
                 </configuration>
               </execution>
             </executions>
           </plugin>
-          
+
           <!-- Execute installer and run/stop tomcat -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -125,7 +154,7 @@
                     <ant
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
                       target="install" inheritrefs="true" />
-                    <ant 
+                    <ant
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
                       target="clearSQL" inheritrefs="true" />
                     <ant
@@ -173,26 +202,6 @@
     </profile>
 
   </profiles>
-
-  <properties>
-    <javax.net.ssl.trustStore>${fedora.home}/server/truststore</javax.net.ssl.trustStore>
-    <fedora.username>fedoraAdmin</fedora.username>
-    <fedora.password>fedoraAdmin</fedora.password>
-
-    <fedora.hostname>localhost</fedora.hostname>
-    <fedora.port>8080</fedora.port>
-    <fedora.appServerContext>fedora</fedora.appServerContext>
-    <fedora.baseURL>http://localhost:${fedora.port}/${fedora.appServerContext}</fedora.baseURL>
-
-    <tomcat.home>${fedora.home}/tomcat</tomcat.home>
-    <tomcat.url>${fedora.baseURL}</tomcat.url>
-    <tomcat.port.ssl>8443</tomcat.port.ssl>
-    <tomcat.port.shutdown>8005</tomcat.port.shutdown>
-
-    <org.apache.activemq.default.directory.prefix>${project.build.directory}</org.apache.activemq.default.directory.prefix>
-
-    <test.report.directory>${project.build.directory}/failsafe-reports/configB</test.report.directory>
-  </properties>
 
   <build>
 
