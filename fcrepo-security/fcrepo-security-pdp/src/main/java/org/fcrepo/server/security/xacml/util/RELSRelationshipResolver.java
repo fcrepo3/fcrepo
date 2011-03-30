@@ -31,22 +31,22 @@ import org.fcrepo.server.storage.types.RelationshipTuple;
  *
  * @author Edwin Shin
  */
-public class RelationshipResolverImpl extends RelationshipResolverBase
+public class RELSRelationshipResolver extends RelationshipResolverBase
         implements RelationshipResolver {
 
     static final Logger logger =
-            LoggerFactory.getLogger(RelationshipResolverImpl.class);
+            LoggerFactory.getLogger(RELSRelationshipResolver.class);
 
     private Management apim;
 
     private Context fedoraCtx;
 
 
-    public RelationshipResolverImpl() {
-        super();
+    public RELSRelationshipResolver() {
+        this(new HashMap<String, String>()) ;
     }
 
-    public RelationshipResolverImpl(Map<String, String> options) {
+    public RELSRelationshipResolver(Map<String, String> options) {
         super(options);
     }
 

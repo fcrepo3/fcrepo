@@ -37,14 +37,16 @@ import com.sun.xacml.ctx.Status;
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.RPCParam;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.types.gen.FieldSearchResult;
 import org.fcrepo.server.types.gen.ObjectFields;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -59,7 +61,7 @@ public class FieldSearchResultHandler
     private static final Logger logger =
             LoggerFactory.getLogger(FieldSearchResultHandler.class);
 
-    private final ContextUtil contextUtil = new ContextUtil();
+    private final ContextUtil contextUtil = ContextUtil.getInstance();
 
     /**
      * Default constructor.

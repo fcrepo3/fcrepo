@@ -64,13 +64,15 @@ import org.w3c.dom.NodeList;
 
 import org.w3c.tidy.Tidy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.LogUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -99,7 +101,7 @@ public class SearchFilter
             throws PEPException {
         super();
 
-        contextUtil = new ContextUtil();
+        contextUtil = ContextUtil.getInstance();
 
         try {
             TransformerFactory xFactory = TransformerFactory.newInstance();

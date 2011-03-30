@@ -40,7 +40,7 @@ public class EvaluationEngineImpl
     private static final Logger logger =
             LoggerFactory.getLogger(EvaluationEngineImpl.class);
 
-    private final ContextUtil contextUtil = new ContextUtil();
+    private final ContextUtil contextUtil = ContextUtil.getInstance();
 
     private PDPClient client = null;
 

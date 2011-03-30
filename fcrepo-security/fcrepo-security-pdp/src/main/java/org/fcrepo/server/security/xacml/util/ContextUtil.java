@@ -57,10 +57,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 
 
 /**
@@ -87,34 +89,23 @@ public class ContextUtil {
     private static final Map<String, String> actionValueMap =
             new ConcurrentHashMap<String, String>();
 
-    private static RelationshipResolver DEFAULT_RELATIONSHIP_RESOLVER;
+    private RelationshipResolver relationshipResolver = null;
 
-    private final RelationshipResolver relationshipResolver;
+    private static ContextUtil instance = null;
 
-    /**
-     * We only read and parse the config files once.
-     */
-    static {
+    protected ContextUtil() {
         initMappings();
-        initRelationshipResolver();
-    }
 
-    public ContextUtil() {
-        this(DEFAULT_RELATIONSHIP_RESOLVER);
-    }
-
-    public ContextUtil(RelationshipResolver relationshipResolver) {
-        if (relationshipResolver == null) {
-            relationshipResolver = DEFAULT_RELATIONSHIP_RESOLVER;
-        }
-        this.relationshipResolver = relationshipResolver;
     }
 
     public static ContextUtil getInstance() {
-        return new ContextUtil();
+        if (instance == null) {
+            instance = new ContextUtil();
+        }
+        return instance;
     }
 
-    private static void initMappings() {
+    private void initMappings() {
         // get the mapping information
         // get the PEP configuration
         File configPEPFile =
@@ -183,8 +174,9 @@ public class ContextUtil {
         }
     }
 
-    private static void initRelationshipResolver() {
+    private RelationshipResolver initRelationshipResolver() {
         RelationshipResolver rr;
+        String className = null;
         try {
             // get the PEP configuration
             File configPEPFile =
@@ -205,7 +197,6 @@ public class ContextUtil {
             NodeList nodes = null;
 
             Map<String, String> options = new HashMap<String, String>();
-            String className = null;
             Constructor<?> c = null;
             nodes = doc.getElementsByTagName("relationship-resolver");
             if (nodes.getLength() != 1) {
@@ -254,15 +245,18 @@ public class ContextUtil {
                                 .newInstance(new Object[] {options});
             }
         } catch (Exception e) {
-            logger.info("Failed to get configured RelationshipResolver, will try "
-                    + "fallback.");
+            logger.error("Failed to get configured RelationshipResolver " + className + ", will try "
+                    + "fallback. " + e.getMessage());
             logger.debug(e.getMessage());
-            rr = new RelationshipResolverImpl();
+            rr = new RELSRelationshipResolver();
         }
-        DEFAULT_RELATIONSHIP_RESOLVER = rr;
+        return rr;
     }
 
     public RelationshipResolver getRelationshipResolver() {
+        if (relationshipResolver == null) {
+            relationshipResolver = initRelationshipResolver();
+        }
         return relationshipResolver;
     }
 
@@ -322,7 +316,7 @@ public class ContextUtil {
             AttributeValue pidAttr = res.get(XACML_RESOURCE_ID);
             if (pidAttr != null) {
                 pid = pidAttr.encode();
-                pid = relationshipResolver.buildRESTParentHierarchy(pid);
+                pid = getRelationshipResolver().buildRESTParentHierarchy(pid);
 
                 String dsid = null;
                 AttributeValue dsidAttr =
@@ -429,10 +423,6 @@ public class ContextUtil {
             throws MelcoeXacmlException {
         if (logger.isDebugEnabled()) {
             logger.debug("Building request!");
-        }
-
-        if (relationshipResolver == null) {
-            throw new MelcoeXacmlException("Valid relationship resolver not found.");
         }
 
         RequestCtx request = null;

@@ -103,7 +103,7 @@ public class FindObjects
             throws PEPException {
         super();
 
-        contextUtil = new ContextUtil();
+        contextUtil = ContextUtil.getInstance();
 
         try {
             TransformerFactory xFactory = TransformerFactory.newInstance();

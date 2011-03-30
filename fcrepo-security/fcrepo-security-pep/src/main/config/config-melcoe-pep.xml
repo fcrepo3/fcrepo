@@ -27,26 +27,30 @@
 	
 	<!--
 		This class handles the identification of relationships between objects. It currently
-		just resolves parents. It makes use of the ResourceIndexModule of Fedora.
+		just resolves parents.
+-->
+  <!--
+    Relationship resolver based on the the object's RELS-* datastreams, which
+    limits relationships to those originating from the object.
 	-->
-	<relationship-resolver class="org.fcrepo.server.security.xacml.util.RelationshipResolverImpl">
+  <!--
+	<relationship-resolver class="org.fcrepo.server.security.xacml.util.RELSRelationshipResolver">
+		<option name="parent-child-relationship-1">info:fedora/fedora-system:def/relations-external#isMemberOf</option>
+		<option name="parent-child-relationship-2">info:fedora/fedora-system:def/relations-external#isMemberOfCollection</option>
+		<option name="parent-child-relationship-3">info:fedora/fedora-system:def/relations-external#isPartOf</option>
+	</relationship-resolver>
+  -->
+	<!--
+    Relationship resolver based on the resource index.  Note that if the resource index is unavailable the
+    RELSRelationshipResolver will be used instead.
+	-->
+	<relationship-resolver class="org.fcrepo.server.security.xacml.util.RIRelationshipResolver">
 		<option name="parent-child-relationship-1">info:fedora/fedora-system:def/relations-external#isMemberOf</option>
 		<option name="parent-child-relationship-2">info:fedora/fedora-system:def/relations-external#isMemberOfCollection</option>
 		<option name="parent-child-relationship-3">info:fedora/fedora-system:def/relations-external#isPartOf</option>
 	</relationship-resolver>
 
-	<!-- Relationship module that works via HTTP... sloooowwwer -->
-	<!--
-	<relationship-resolver class="org.fcrepo.server.security.xacml.pep.RelationshipResolverHttpImpl">
-		<option name="url">http://localhost:8080/fedora/risearch</option>
-		<option name="username">admin</option>
-		<option name="password">test</option>
-		<option name="parent-child-relationship-1">info:fedora/fedora-system:def/relations-external#isMemberOf</option>
-		<option name="parent-child-relationship-2">info:fedora/fedora-system:def/relations-external#isMemberOfCollection</option>
-		<option name="parent-child-relationship-3">info:fedora/fedora-system:def/relations-external#isPartOf</option>
-	</relationship-resolver>
-	-->
-	
+
 	<!-- 
 		This is the class used to handle the evaluation of requests. This implementation does
 		this in a hierarchical fashion. It first checks for all policies pertaining to an object.

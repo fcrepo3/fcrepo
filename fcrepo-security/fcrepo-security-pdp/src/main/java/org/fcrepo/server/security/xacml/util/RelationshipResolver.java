@@ -9,6 +9,7 @@ import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 
 public interface RelationshipResolver {
 
+
     /**
      * Retrieves the relationships for this PID. Values for each relationship
      * are placed in a set.

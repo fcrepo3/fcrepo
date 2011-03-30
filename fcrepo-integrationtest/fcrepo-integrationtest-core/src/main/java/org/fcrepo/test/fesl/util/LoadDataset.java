@@ -41,5 +41,15 @@ public class LoadDataset {
             //    logger.error(e.getMessage(), e);
             //}
         }
+        // need to ensure resource index is up-to-date
+        // spo query, flush=true, querying on a non-existent subject, limit=1
+        String riSearchFlush = "/fedora/risearch?type=triples&flush=true&lang=spo&format=Turtle&limit=1&query=%3cinfo%3afedora%2fdoes%3anotexist%3e%20*%20*";
+        try {
+            client.get(riSearchFlush);
+        } catch (Exception e) {
+            // ignore exceptions, resource index might not be enabled
+            System.out.println("Exception on flushing resource index (loading test fesl objects) " + e.getMessage());
+        }
+
     }
 }

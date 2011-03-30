@@ -2,7 +2,6 @@ package org.fcrepo.server.security.xacml.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,9 +36,6 @@ public abstract class RelationshipResolverBase
     protected static String DEFAULT_RELATIONSHIP = "info:fedora/fedora-system:def/relations-external#isMemberOf";
     protected final List<String> relationships;
 
-    public RelationshipResolverBase() {
-        this(new HashMap<String, String>());
-    }
 
     /**
      * Constructor that takes a map of parent-child predicates (relationships).
@@ -79,6 +75,10 @@ public abstract class RelationshipResolverBase
                 return buildRESTParentHierarchy(parentArray[0]) + "/" + pid;
             }
 
+    // FIXME: if RI enabled can do this more efficiently than separate queries on each relationship
+    // FIXME: and if RI not enabled it may be more efficient to get all rels in one go and filter
+    // (at the moment each relationship is queried for separately, so we probably have a number
+    // of parses of the RELS datastream)
     protected Set<String> getParents(String pid) throws MelcoeXacmlException {
         if (logger.isDebugEnabled()) {
             logger.debug("Obtaining parents for: " + pid);
@@ -89,6 +89,8 @@ public abstract class RelationshipResolverBase
             return parentPIDs;
         }
 
+        // FIXME: instead provide a getRelationships(pid, relationships[]) - get all in one go and filter
+        // will be more efficient than single calls
         query: for (String relationship : relationships) {
             if (logger.isDebugEnabled()) {
                 logger.debug("relationship query: " + pid + ", " + relationship);
