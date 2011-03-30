@@ -18,7 +18,8 @@
         </bean>
         
         <bean id="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder"
-              class="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder">
+              class="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder"
+              init-method="init">
               <property name="resourceAttributes">
                 <set>
                   <value>info:fedora/fedora-system:def/view#mimeType</value>
@@ -29,6 +30,17 @@
                   <value>http://www.w3.org/1999/02/22-rdf-syntax-ns#type</value>
                   <value>http://muradora.ramp.org.au/sf#isSmartFolder</value>
                 </set>
+              </property>
+              <property name="relationshipResolver">
+                <bean class="org.fcrepo.server.security.xacml.util.RelationshipResolverImpl">
+                  <constructor-arg>
+                    <map>
+                      <entry key="parent-child-relationship-1" value="info:fedora/fedora-system:def/relations-external#isMemberOf" />
+                      <entry key="parent-child-relationship-2" value="info:fedora/fedora-system:def/relations-external#isMemberOfCollection" />
+                      <entry key="parent-child-relationship-3" value="info:fedora/fedora-system:def/relations-external#isPartOf" />
+                    </map>
+                  </constructor-arg>
+                </bean>
               </property>
         </bean>
         
