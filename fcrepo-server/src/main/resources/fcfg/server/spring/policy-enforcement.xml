@@ -16,6 +16,22 @@
               <property name="ownerIdSeparator" value="," />
               <property name="DOManager" ref="org.fcrepo.server.storage.DOManager" />
         </bean>
+        
+        <bean id="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder"
+              class="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder">
+              <property name="resourceAttributes">
+                <set>
+                  <value>info:fedora/fedora-system:def/view#mimeType</value>
+                  <value>info:fedora/fedora-system:def/model#ownerId</value>
+                  <value>info:fedora/fedora-system:def/model#state</value>
+                  <value>info:fedora/fedora-system:def/model#createdDate</value>
+                  <value>info:fedora/fedora-system:def/model#label</value>
+                  <value>http://www.w3.org/1999/02/22-rdf-syntax-ns#type</value>
+                  <value>http://muradora.ramp.org.au/sf#isSmartFolder</value>
+                </set>
+              </property>
+        </bean>
+        
         <bean id="org.fcrepo.server.security.PolicyEnforcementPoint"
               class="org.fcrepo.server.security.PolicyEnforcementPoint"
               factory-method="getInstance" autowire-candidate="true">
@@ -23,6 +39,7 @@
                   <list>
                       <ref bean="org.fcrepo.server.security.ResourceAttributeFinderModule" />
                       <ref bean="org.fcrepo.server.security.ContextAttributeFinderModule" />
+                      <ref bean="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder" />
                   </list>
               </property>
         </bean>

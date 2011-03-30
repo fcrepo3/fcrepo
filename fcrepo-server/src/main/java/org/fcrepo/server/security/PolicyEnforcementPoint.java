@@ -145,9 +145,9 @@ public class PolicyEnforcementPoint {
      */
     private ServletContext servletContext = null;
 
-    private List<AttributeFinderModule> m_attrFinderModules = new ArrayList<AttributeFinderModule>(0);
+    private List<com.sun.xacml.finder.AttributeFinderModule> m_attrFinderModules = new ArrayList<com.sun.xacml.finder.AttributeFinderModule>(0);
     
-    public void setAttributeFinderModules(List<AttributeFinderModule> attrFinderModules){
+    public void setAttributeFinderModules(List<com.sun.xacml.finder.AttributeFinderModule> attrFinderModules){
         this.m_attrFinderModules.clear();
         this.m_attrFinderModules.addAll(attrFinderModules);
     }
@@ -155,8 +155,10 @@ public class PolicyEnforcementPoint {
     public final void newPdp() throws Exception {
         AttributeFinder attrFinder = new AttributeFinder();
 
-        for (AttributeFinderModule m:m_attrFinderModules){
-            m.setServletContext(servletContext);
+        for (com.sun.xacml.finder.AttributeFinderModule m:m_attrFinderModules){
+            if (m instanceof org.fcrepo.server.security.AttributeFinderModule){
+                ((org.fcrepo.server.security.AttributeFinderModule)m).setServletContext(servletContext);
+            }
         }
 
         attrFinder.setModules(m_attrFinderModules);
@@ -383,7 +385,7 @@ public class PolicyEnforcementPoint {
                         logger.debug("request action has " + tempobj.getId() + "="
                                 + tempobj.getValue().toString());
                     }
-                    for (AttributeFinderModule m:m_attrFinderModules){
+                    for (com.sun.xacml.finder.AttributeFinderModule m:m_attrFinderModules){
                         if (m instanceof ContextAttributeFinderModule){
                             ContextAttributeFinderModule c = (ContextAttributeFinderModule)m;
                             logger.debug("about to ref contextAttributeFinder=" + c);
@@ -403,7 +405,7 @@ public class PolicyEnforcementPoint {
                     logger.error("Error evaluating policy", t);
                     throw new AuthzOperationalException("");
                 } finally {
-                    for (AttributeFinderModule m:m_attrFinderModules){
+                    for (com.sun.xacml.finder.AttributeFinderModule m:m_attrFinderModules){
                         if (m instanceof ContextAttributeFinderModule){
                             ContextAttributeFinderModule c = (ContextAttributeFinderModule)m;
                             c.unregisterContext(contextIndex);

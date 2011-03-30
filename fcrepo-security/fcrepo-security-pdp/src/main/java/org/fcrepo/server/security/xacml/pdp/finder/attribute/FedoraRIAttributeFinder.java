@@ -3,11 +3,14 @@ package org.fcrepo.server.security.xacml.pdp.finder.attribute;
 
 import java.net.URI;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import com.sun.xacml.EvaluationCtx;
+import com.sun.xacml.attr.AttributeDesignator;
 import com.sun.xacml.attr.AttributeFactory;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.BagAttribute;
@@ -30,36 +33,70 @@ public class FedoraRIAttributeFinder
     private static final Logger logger =
             LoggerFactory.getLogger(FedoraRIAttributeFinder.class);
 
-    private AttributeFactory attributeFactory = StandardAttributeFactory.getFactory();
+    private AttributeFactory m_attributeFactory = StandardAttributeFactory.getFactory();
 
-    private RelationshipResolver relationshipResolver = null;
+    private RelationshipResolver m_relationshipResolver = null;
 
-    private Map<Integer, Set<String>> attributes = null;
+    private Map<Integer, Set<String>> m_attributes = null;
 
     public FedoraRIAttributeFinder() {
-        try {
-            attributes =
-                    AttributeFinderConfigUtil.getAttributeFinderConfig(this
-                            .getClass().getName());
-            logger.info("Initialised AttributeFinder:"
-                            + this.getClass().getName());
+        Set<String> empty = Collections.emptySet();
+        m_attributes = new HashMap<Integer,Set<String>>(4);
+        m_attributes.put(AttributeDesignator.ACTION_TARGET, empty);
+        m_attributes.put(AttributeDesignator.ENVIRONMENT_TARGET, empty);
+        m_attributes.put(AttributeDesignator.RESOURCE_TARGET, empty);
+        m_attributes.put(AttributeDesignator.SUBJECT_TARGET, empty);
+    }
+    
+    public void setRelationshipResolver(RelationshipResolver relationshipResolver) {
+        m_relationshipResolver = relationshipResolver;
+    }
+    
+    public void setActionAttributes(Set<String> attributes){
+        m_attributes.put(AttributeDesignator.ACTION_TARGET, attributes);
+    }
+    
+    public void setEnvironmentAttributes(Set<String> attributes){
+        m_attributes.put(AttributeDesignator.ENVIRONMENT_TARGET, attributes);
+    }
+    
+    public void setResourceAttributes(Set<String> attributes){
+        m_attributes.put(AttributeDesignator.RESOURCE_TARGET, attributes);
+    }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("registering the following attributes: ");
-                for (Integer k : attributes.keySet()) {
-                    for (String l : attributes.get(k)) {
-                        logger.debug(k + ": " + l);
-                    }
+    public void setSubjectAttributes(Set<String> attributes){
+        m_attributes.put(AttributeDesignator.SUBJECT_TARGET, attributes);
+    }
+
+    private boolean emptyAttributeMap() {
+        boolean result = true;
+        result &= m_attributes.get(AttributeDesignator.ACTION_TARGET).size() == 0;
+        result &= m_attributes.get(AttributeDesignator.ENVIRONMENT_TARGET).size() == 0;
+        result &= m_attributes.get(AttributeDesignator.RESOURCE_TARGET).size() == 0;
+        result &= m_attributes.get(AttributeDesignator.SUBJECT_TARGET).size() == 0;
+        return result;
+    }
+
+    public void init() throws AttributeFinderException {
+        if (emptyAttributeMap()) {
+            m_attributes =
+                AttributeFinderConfigUtil.getAttributeFinderConfig(this
+                        .getClass().getName());
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("registering the following attributes: ");
+            for (Integer k : m_attributes.keySet()) {
+                for (String l : m_attributes.get(k)) {
+                    logger.debug(k + ": " + l);
                 }
             }
-
-            relationshipResolver =
-                    ContextUtil.getInstance().getRelationshipResolver();
-
-        } catch (AttributeFinderException afe) {
-            logger.error("Attribute finder not initialised:"
-                    + this.getClass().getName(), afe);
         }
+        if (m_relationshipResolver == null) {
+            m_relationshipResolver =
+                ContextUtil.getInstance().getRelationshipResolver();
+        }
+        logger.info("Initialised AttributeFinder:"
+                    + this.getClass().getName());
     }
 
     /**
@@ -81,7 +118,7 @@ public class FedoraRIAttributeFinder
      */
     @Override
     public Set<Integer> getSupportedDesignatorTypes() {
-        return attributes.keySet();
+        return m_attributes.keySet();
     }
 
     /**
@@ -130,7 +167,7 @@ public class FedoraRIAttributeFinder
         String attrName = attributeId.toString();
 
         // we only know about registered attributes from config file
-        if (!attributes.keySet().contains(new Integer(designatorType))) {
+        if (!m_attributes.keySet().contains(new Integer(designatorType))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Does not know about designatorType: "
                         + designatorType);
@@ -140,7 +177,7 @@ public class FedoraRIAttributeFinder
         }
 
         Set<String> allowedAttributes =
-                attributes.get(new Integer(designatorType));
+                m_attributes.get(new Integer(designatorType));
         if (!allowedAttributes.contains(attrName)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Does not know about attribute: " + attrName);
@@ -199,7 +236,7 @@ public class FedoraRIAttributeFinder
         // better to query directly on the one we want (but currently no public method on relationship resolver to do this)
         try {
             logger.debug("Getting relationships for " + subject);
-            relationships = relationshipResolver.getRelationships(subject);
+            relationships = m_relationshipResolver.getRelationships(subject);
         } catch (MelcoeXacmlException e) {
             throw new AttributeFinderException(e.getMessage(), e);
         }
@@ -213,7 +250,7 @@ public class FedoraRIAttributeFinder
         for (String s : results) {
             AttributeValue attributeValue = null;
             try {
-                attributeValue = attributeFactory.createValue(type, s);
+                attributeValue = m_attributeFactory.createValue(type, s);
             } catch (Exception e) {
                 logger.error("Error creating attribute: " + e.getMessage(), e);
                 continue;

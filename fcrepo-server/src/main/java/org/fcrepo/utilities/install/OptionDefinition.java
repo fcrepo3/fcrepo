@@ -259,20 +259,16 @@ public class OptionDefinition {
                     	File db_jar = new File(lib, "db.jar");
                     	File dbxml_jar = new File(lib, "dbxml.jar");
                     	if (!db_jar.exists()) {
-                    		throw new OptionValidationException(db_jar.getAbsolutePath() + " is missing.",
-                    				_id);
+                    	    System.out.println("WARNING:" + db_jar.getAbsolutePath() + " is missing. " + _id);
                     	}
                     	if (!dbxml_jar.exists()) {
-                    		throw new OptionValidationException(dbxml_jar.getAbsolutePath() + " is missing.",
-                    				_id);
+                    	    System.out.println("WARNING:" + dbxml_jar.getAbsolutePath() + " is missing." + _id);
                     	}
                     } else {
-                    	throw new OptionValidationException(lib.getAbsolutePath() + " is missing.",
-                				_id);
+                        System.out.println("WARNING:" + lib.getAbsolutePath() + " is missing." + _id);
                     }
                 } else {
-                	throw new OptionValidationException(dir.getAbsolutePath() + " is missing.",
-            				_id);
+                    System.out.println("WARNING:" + dir.getAbsolutePath() + " is missing." + _id);
                 }
             }
         }
