@@ -8,6 +8,7 @@
         <jvmarg value="-XX:MaxPermSize=512M" />
         <jvmarg value="-Xmx512M" />
         <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
+        <env key="PEP_NOCACHE" value="true"/>
         <arg line="start" />
       </java>
       <sequential>
