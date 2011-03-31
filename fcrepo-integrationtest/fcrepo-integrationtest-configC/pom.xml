@@ -16,31 +16,6 @@
   <profiles>
 
     <profile>
-      <id>dbxml-property-not-defined</id>
-      <activation>
-        <property>
-          <name>!dbxml.home</name>
-        </property>
-      </activation>
-      <properties>
-        <integration.test.skip>true</integration.test.skip>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>DBXML_HOME-is-defined</id>
-      <activation>
-        <property>
-          <name>env.DBXML_HOME</name>
-        </property>
-      </activation>
-      <properties>
-        <dbxml.home>${env.DBXML_HOME}</dbxml.home>
-        <integration.test.skip>false</integration.test.skip>
-      </properties>
-    </profile>
-
-    <profile>
       <id>explicitly-disabled</id>
       <activation>
         <property>
