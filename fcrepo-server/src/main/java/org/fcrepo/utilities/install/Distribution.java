@@ -39,8 +39,6 @@ public abstract class Distribution {
 
     public static final String JDBC_MYSQL;
 
-    public static final String JDBC_MCKOI;
-
     public static final String JDBC_DERBY;
 
     public static final String JDBC_DERBY_NETWORK;
@@ -71,7 +69,6 @@ public abstract class Distribution {
             System.exit(1);
         }
         TOMCAT = PROPS.getProperty("install.tomcat");
-        JDBC_MCKOI = PROPS.getProperty("install.jdbc.mckoi");
         JDBC_DERBY = PROPS.getProperty("install.jdbc.derby");
         JDBC_DERBY_NETWORK = PROPS.getProperty("install.jdbc.derbynetworkclient");
         JDBC_MYSQL = PROPS.getProperty("install.jdbc.mysql");
