@@ -96,8 +96,6 @@ public class InstallOptions {
 
     public static final String INCLUDED = "included";
 
-    public static final String MCKOI = "mckoi";
-
     public static final String DERBY = "derby";
 
     public static final String MYSQL = "mysql";
@@ -393,7 +391,7 @@ public class InstallOptions {
      * exist.
      */
     public String getValue(String name) {
-        return _map.get(name);
+        return System.getProperty(name, _map.get(name));
     }
 
     /**

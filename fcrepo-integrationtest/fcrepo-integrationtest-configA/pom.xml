@@ -13,6 +13,27 @@
   <packaging>jar</packaging>
   <name>Fedora Integration Test - Configuration A</name>
 
+  <!-- Defaults -->
+  <properties>
+    <javax.net.ssl.trustStore>${fedora.home}/server/truststore</javax.net.ssl.trustStore>
+    <fedora.username>fedoraAdmin</fedora.username>
+    <fedora.password>fedoraAdmin</fedora.password>
+
+    <fedora.hostname>localhost</fedora.hostname>
+    <fedora.port>8080</fedora.port>
+    <fedora.appServerContext>fedora</fedora.appServerContext>
+    <fedora.baseURL>http://localhost:${fedora.port}/${fedora.appServerContext}</fedora.baseURL>
+
+    <tomcat.home>${fedora.home}/tomcat</tomcat.home>
+    <tomcat.url>${fedora.baseURL}</tomcat.url>
+    <tomcat.port.ssl>8443</tomcat.port.ssl>
+    <tomcat.port.shutdown>8005</tomcat.port.shutdown>
+
+    <org.apache.activemq.default.directory.prefix>${project.build.directory}</org.apache.activemq.default.directory.prefix>
+
+    <test.report.directory>${project.build.directory}/failsafe-reports/configA</test.report.directory>
+  </properties>
+
   <profiles>
     <profile>
       <id>explicitly-disabled</id>
@@ -53,20 +74,72 @@
     </profile>
 
     <profile>
+      <id>db-specified</id>
+      <activation>
+        <property>
+          <name>db</name>
+        </property>
+      </activation>
+      <properties>
+        <fedora.install.properties.extra>${project.build.directory}/config/db.${db}.properties</fedora.install.properties.extra>
+      </properties>
+    </profile>
+
+    <profile>
       <id>fedora.home-not-defined</id>
       <activation>
         <property>
           <name>!fedora.home</name>
         </property>
       </activation>
+
       <properties>
         <fedora.home>${project.build.directory}/fcrepo-${project.version}</fedora.home>
-        <fedora.install.properties>${project.build.directory}/test-classes/config/ConfigA.properties</fedora.install.properties>
+        <fedora.install.properties>${project.build.directory}/config/ConfigA.properties</fedora.install.properties>
         <fedora.install.version>${project.version}</fedora.install.version>
+
+        <!-- antrun ant task does not handle properties sanely. System properties 
+          do not override default values. Re-defining the potentially overriden maven 
+          properties is a workaround -->
+        <mvn.env.opts>${env.MAVEN_OPTS}</mvn.env.opts>
+        <mvn.fedora.home>${fedora.home}</mvn.fedora.home>
+        <mvn.fedora.port>${fedora.port}</mvn.fedora.port>
+        <mvn.fedora.appServerContext>${fedora.appServerContext}</mvn.fedora.appServerContext>
+        <mvn.tomcat.home>${tomcat.home}</mvn.tomcat.home>
       </properties>
 
       <build>
+
         <plugins>
+          
+          <!-- Copy and filter config properties -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>2.5</version>
+            <executions>
+              <execution>
+                <id>filter-test-configs</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/config</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes/config</directory>
+                      <includes>
+                        <include>*.properties</include>
+                      </includes>
+                      <filtering>true</filtering>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
           <!-- Execute installer and run/stop tomcat -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -78,11 +151,12 @@
                 <phase>pre-integration-test</phase>
                 <configuration>
                   <target unless="${integration.test.skip}">
-                    <echo>Installing Fedora</echo>
                     <ant
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
                       target="install" inheritrefs="true" />
-                    <echo>Starting Fedora</echo>
+                    <ant
+                      antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
+                      target="clearSQL" inheritrefs="true" />
                     <ant
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml"
                       target="tomcat-start" inheritrefs="true" />
@@ -128,26 +202,6 @@
     </profile>
 
   </profiles>
-
-  <properties>
-    <javax.net.ssl.trustStore>${fedora.home}/server/truststore</javax.net.ssl.trustStore>
-    <fedora.username>fedoraAdmin</fedora.username>
-    <fedora.password>fedoraAdmin</fedora.password>
-
-    <fedora.hostname>localhost</fedora.hostname>
-    <fedora.port>8080</fedora.port>
-    <fedora.appServerContext>fedora</fedora.appServerContext>
-    <fedora.baseURL>http://localhost:${fedora.port}/${fedora.appServerContext}</fedora.baseURL>
-
-    <tomcat.home>${fedora.home}/tomcat</tomcat.home>
-    <tomcat.url>${fedora.baseURL}</tomcat.url>
-    <tomcat.port.ssl>8443</tomcat.port.ssl>
-    <tomcat.port.shutdown>8005</tomcat.port.shutdown>
-
-    <org.apache.activemq.default.directory.prefix>${project.build.directory}</org.apache.activemq.default.directory.prefix>
-
-    <test.report.directory>${project.build.directory}/failsafe-reports/configA</test.report.directory>
-  </properties>
 
   <build>
 
@@ -256,6 +310,8 @@
 
               <includes>
 
+                <include>**/NotificationInvocationHandlerTest.class</include>
+
                 <!--
                   Has bug in source-code
                   <include>**/SimpleDeploymentTests.class</include>
@@ -285,10 +341,7 @@
                 <include>**/ContentModelDSInputTest.class</include>
                 <include>**/TestAdminAPI.class</include>
 
-                <!--
-                  Disabled until FCREPO-798 is public
-                  <include>**/TestAPIM2.class</include>
-                -->
+                <!-- Disabled until FCREPO-798 is public <include>**/TestAPIM2.class</include> -->
 
               </includes>
 
@@ -327,6 +380,8 @@
 
           <skip>${integration.test.skip}</skip>
 
+          <encoding>UTF-8</encoding>
+
           <systemPropertyVariables>
             <fedora.authorize.access>false</fedora.authorize.access>
             <logback.configurationFile>src/test/resources/logback.xml</logback.configurationFile>
@@ -342,7 +397,7 @@
             <org.apache.activemq.default.directory.prefix>${org.apache.activemq.default.directory.prefix}</org.apache.activemq.default.directory.prefix>
             <fcrepo-integrationtest-core.classes>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes/</fcrepo-integrationtest-core.classes>
           </systemPropertyVariables>
-          
+
           <environmentVariables>
             <FEDORA_HOME>${fedora.home}</FEDORA_HOME>
             <WEBAPP_NAME>${fedora.appServerContext}</WEBAPP_NAME>

@@ -152,7 +152,7 @@
 			registry tables) is the backslash character. This is needed to 
 			correctly store and retrieve filepaths from the registry 
 			tables, if running under Windows/DOS. (Set to true for MySQL and 
-			Postgresql, false for Derby, Oracle and McKoi.</comment>
+			Postgresql, false for Derby and Oracle)</comment>
 		</param>
 	</module>
 	<module role="org.fcrepo.server.security.Authorization" class="org.fcrepo.server.security.DefaultAuthorization">
@@ -622,80 +622,6 @@
 				2 (grow i.e., increase the size of the pool).</comment>
 		</param>
 	</datastore>
-	<datastore id="localMcKoiPool">
-    	<comment>McKoi database on localhost running on port 9157 Each
-            connection pool instance has several configuration parameter that
-            can be used to tune the options for the connection pool. It is
-            recommended that you not change the default values unless you are
-            trying to address a specific performance issue. For additional
-            information regarding connection pool options, refer to the Apache
-            Commons Pool API documentation at
-            http://jakarta.apache.org/commons/pool/apidocs/index.html.</comment>    
-		<param name="dbUsername" value="fedoraAdmin">
-			<comment>The database user name.</comment>
-		</param>
-		<param name="dbPassword" value="fedoraAdmin">
-			<comment>The database password.</comment>
-		</param>
-		<param name="jdbcURL" value="jdbc:mckoi://localhost:9157/">
-			<comment>The JDBC connection URL.</comment>
-		</param>
-		<param name="jdbcDriverClass" value="com.mckoi.JDBCDriver">
-			<comment>The JDBC driver class name.</comment>
-		</param>
-		<param name="ddlConverter" value="org.fcrepo.server.utilities.McKoiDDLConverter"/>
-		<param name="maxActive" value="100">
-			<comment>The maximum number of active instances in pool.</comment>
-		</param>
-		<param name="maxIdle" value="10">
-			<comment>The maximum number of idle instances in pool.</comment>
-		</param>
-		<param name="maxWait" value="-1">
-			<comment>The maximum amount of time in milliseconds the 
-			borrowObject() method should wait before throwing an Exception when 
-            whenExhaustedAction is set to WHEN_EXHAUSTED_BLOCK. A value less 
-            than zero indicates block indefinitely.</comment>
-        </param>
-		<param name="minIdle" value="0">
-			<comment>The minimum of idle instances in pool. </comment>
-		</param>
-		<param name="minEvictableIdleTimeMillis" value="1800000">
-			<comment>The minimum amount of time in milliseconds an object can be 
-			idle in pool before eligible for eviction (if applicable). A value 
-            less than zero indicates no object will be evicted due to idle time 
-            alone.</comment>
-		</param>
-		<param name="numTestsPerEvictionRun" value="3">
-			<comment>The number of objects to be examined on each run of idle 
-			evictor thread (if applicable). A value less than zero indicates 
-			that ceil(numIdle)/abs(numTestsPerEvictionRun) will be run.</comment>
-		</param>
-		<param name="timeBetweenEvictionRunsMillis" value="-1">
-			<comment>The time in milliseconds to sleep between runs of the idle 
-			object evictor thread. A value less than zero indicates no idle 
-			evictor thread is run.</comment>
-		</param>
-		<param name="testOnBorrow" value="true">
-			<comment>When true objects are validated before borrowed from the 
-			pool.</comment>
-		</param> 
-		<param name="testOnReturn" value="true">
-			<comment>When true, objects are validated before returned to the 
-			pool.</comment>
-		</param>
-		<param name="testWhileIdle" value="true">
-			<comment>When true, objects are validated by the idle object evictor 
-			thread.</comment>
-		</param>
-		<param name="whenExhaustedAction" value="1">
-			<comment>Action to take when a new object is requested and the the pool has
-            reached maximum number of active objects. Valid values are:
-				0 (fail i.e., throw Exception) 
-				1 (block i.e., wait until pool resources are freed) 
-				2 (grow i.e., increase the size of the pool).</comment>
-		</param>
-	</datastore>
-	
 	<datastore id="localDerbyPool">
         <comment>Derby database on localhost running on port 1527 Each
             connection pool instance has several configuration parameter that
@@ -769,11 +695,6 @@
                 2 (grow i.e., increase the size of the pool).</comment>
         </param>
     </datastore>
-	
-	
-	
-	
-	
 	<datastore id="localOraclePool">
     	<comment>Oracle database on localhost with SID=fedora3 Each
             connection pool instance has several configuration parameter that

@@ -60,12 +60,10 @@
       <artifactId>sunxacml</artifactId>
       <classifier>melcoe</classifier>
     </dependency>
-    <!-- currently needs installing in local repo from eXist distribution -->
-    <!-- this is from the eXist software distribution (but covered by the XML:DB licence) -->
     <dependency>
-      <groupId>xmldb</groupId>
-      <artifactId>xmldb-api</artifactId>
-      <version>1.4</version>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>xmldb-exist</artifactId>
+      <version>1.4.2</version>
     </dependency>
   </dependencies>
 </project>
