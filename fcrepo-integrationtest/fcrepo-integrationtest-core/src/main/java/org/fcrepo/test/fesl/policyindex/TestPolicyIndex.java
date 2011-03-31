@@ -560,8 +560,8 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         // check policy A in force
         assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
 
-        // check policy B in force
-        assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
+        // check policy B not in force
+        assertFalse("authorization \"B\" PERMITTED, expected DENIED",checkPolicyEnforcement("B"));
 
         // add unrelated datastream
         apim.addDatastream(pid, "UNRELATED", null, "some datastream", true, "text/xml", null, fedoraUrl+ "/objects/test:1000001/datastreams/DC/content", "M", "A", null, null, "adding UNRELATED");
