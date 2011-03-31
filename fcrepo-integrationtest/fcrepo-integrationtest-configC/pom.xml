@@ -36,31 +36,6 @@
   <profiles>
 
     <profile>
-      <id>dbxml-property-not-defined</id>
-      <activation>
-        <property>
-          <name>!dbxml.home</name>
-        </property>
-      </activation>
-      <properties>
-        <integration.test.skip>true</integration.test.skip>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>DBXML_HOME-is-defined</id>
-      <activation>
-        <property>
-          <name>env.DBXML_HOME</name>
-        </property>
-      </activation>
-      <properties>
-        <dbxml.home>${env.DBXML_HOME}</dbxml.home>
-        <integration.test.skip>false</integration.test.skip>
-      </properties>
-    </profile>
-
-    <profile>
       <id>explicitly-disabled</id>
       <activation>
         <property>
@@ -436,6 +411,7 @@
             <FEDORA_HOME>${fedora.home}</FEDORA_HOME>
             <WEBAPP_NAME>${fedora.appServerContext}</WEBAPP_NAME>
             <CATALINA_HOME>${tomcat.home}</CATALINA_HOME>
+            <!-- disables FeSL xacml result caching, tests won't pass without this -->
             <PEP_NOCACHE>true</PEP_NOCACHE>
           </environmentVariables>
 

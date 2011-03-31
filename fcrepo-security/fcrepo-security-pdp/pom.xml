@@ -60,5 +60,10 @@
       <artifactId>sunxacml</artifactId>
       <classifier>melcoe</classifier>
     </dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>xmldb-exist</artifactId>
+      <version>1.4.2</version>
+    </dependency>
   </dependencies>
 </project>

@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import java.util.Properties;
 
 public class OptionDefinition {
@@ -94,14 +95,6 @@ public class OptionDefinition {
                 defaultValue =
                         options.getValue(InstallOptions.FEDORA_HOME)
                                 + File.separator + "tomcat";
-            }
-        }
-
-        // USE DBXML_HOME as the default, if defined
-        if (id.equals(InstallOptions.FESL_DBXML_HOME)) {
-            String eDH = System.getenv("DBXML_HOME");
-            if (eDH != null && eDH.length() != 0) {
-                defaultValue = eDH;
             }
         }
 
@@ -241,34 +234,6 @@ public class OptionDefinition {
                     && _id.endsWith(".driver")) {
                 if (!value.equals(InstallOptions.INCLUDED)) {
                     validateExistingFile(value);
-                }
-            } else if (_id.equals(InstallOptions.FESL_DBXML_HOME)) {
-            	printEnvWarning("DBXML_HOME", value);
-                File dir = new File(value);
-                if (dir.exists()) {
-                    File lib;
-                    String osName = System.getProperty("os.name").toLowerCase();
-                    if (osName.indexOf("win") != -1) {
-                        // Windows systems use DBXML_HOME/jar
-                        lib = new File(dir, "jar");
-                    } else {
-                        // *nix flavors use DBXML_HOME/lib
-                        lib = new File(dir, "lib");
-                    }
-                    if (lib.exists()) {
-                    	File db_jar = new File(lib, "db.jar");
-                    	File dbxml_jar = new File(lib, "dbxml.jar");
-                    	if (!db_jar.exists()) {
-                    	    System.out.println("WARNING:" + db_jar.getAbsolutePath() + " is missing. " + _id);
-                    	}
-                    	if (!dbxml_jar.exists()) {
-                    	    System.out.println("WARNING:" + dbxml_jar.getAbsolutePath() + " is missing." + _id);
-                    	}
-                    } else {
-                        System.out.println("WARNING:" + lib.getAbsolutePath() + " is missing." + _id);
-                    }
-                } else {
-                    System.out.println("WARNING:" + dir.getAbsolutePath() + " is missing." + _id);
                 }
             }
         }

@@ -50,6 +50,7 @@ import org.fcrepo.server.security.xacml.util.DataFileUtils;
  * @author nishen@melcoe.mq.edu.au
  */
 class FilePolicyIndex
+extends PolicyIndexBase
 implements PolicyIndex {
 
     private static final Logger log =
@@ -67,9 +68,10 @@ implements PolicyIndex {
     public static final Lock readLock = rwl.readLock();
     public static final Lock writeLock = rwl.writeLock();
 
-
     protected FilePolicyIndex()
     throws PolicyIndexException {
+        super();
+        indexed = false; // this implementation returns all policies when queried - no indexing/filtering
 
         log.info("Starting FilePolicyIndex");
 

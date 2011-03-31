@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * This utility class provides a container for the basic information of an
  * Attribute.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public class AttributeBean {
@@ -46,13 +46,13 @@ public class AttributeBean {
     /**
      * The parameterised constructor that creates a n object with values
      * initialised.
-     * 
+     *
      * @param id
-     *        the id of the Attribute
+     *        the XACML id of the Attribute
      * @param type
-     *        the type of the Attribute
+     *        the XML schema type of the Attribute
      * @param values
-     *        the value of the Attribute
+     *        the values of the Attribute
      */
     public AttributeBean(String id, String type, Set<String> values) {
         this.id = id;
@@ -107,7 +107,7 @@ public class AttributeBean {
 
     /**
      * Adds a value for this attribute.
-     * 
+     *
      * @param value
      */
     public void addValue(String value) {

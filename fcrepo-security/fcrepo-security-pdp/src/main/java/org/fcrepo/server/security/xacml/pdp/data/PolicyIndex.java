@@ -31,6 +31,9 @@ import com.sun.xacml.EvaluationCtx;
 
 public interface PolicyIndex {
 
+    public static final String XACML20_POLICY_NS = "urn:oasis:names:tc:xacml:2.0:policy:schema:os";
+    public static final String XACML_RESOURCE_ID = "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
+
     /**
      * Extracts a list of policies from the Policy Index that are relevant to
      * the given Evaluation Context. Note that this returns a set that still has
