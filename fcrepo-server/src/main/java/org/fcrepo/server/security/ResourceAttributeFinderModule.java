@@ -95,7 +95,7 @@ class ResourceAttributeFinderModule
 
     private DOManager doManager = null;
 
-    public void setDOManager(DOManager doManager) {
+    public void setDigitalObjectManager(DOManager doManager) {
         if (this.doManager == null) {
             this.doManager = doManager;
         }
