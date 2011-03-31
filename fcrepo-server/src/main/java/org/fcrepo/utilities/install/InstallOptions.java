@@ -74,8 +74,6 @@ public class InstallOptions {
 
     public static final String FESL_AUTHZ_ENABLED = "fesl.authz.enabled";
 
-    public static final String FESL_DBXML_HOME = "fesl.dbxml.home";
-
     public static final String LLSTORE_TYPE = "llstore.type";
 
     public static final String RI_ENABLED = "ri.enabled";
@@ -263,7 +261,6 @@ public class InstallOptions {
         inputOption(FESL_AUTHN_ENABLED);
         inputOption(FESL_AUTHZ_ENABLED);
         if (getValue(FESL_AUTHZ_ENABLED).equals(Boolean.toString(true))) {
-            inputOption(FESL_DBXML_HOME);
             // Disable legacy authz if FeSL is enabled
             _map.put(XACML_ENABLED, Boolean.toString(false));
         } else {
