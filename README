@@ -47,14 +47,12 @@ plausible system test configuration.
     Resource Index, REST api, and Messaging modules enabled.
     
   [configC]
-   When running this suite, the server shall be configured
+    When running this suite, the server shall be configured
     with API-A authentication turned ON, with the
-    Resource Index, REST api, and fesl authZ enabled.
-    By default, this suite will be skipped unless (a) test are being
-    run against an externally-deployed Fedora or (b) DBXML_HOME 
-    system property is set.  This is necessary for authZ to work, as are
-    the system properties PEP_NOCACHE=true and perhaps LD_LIBRARY_PATH.
-    See fesl documentation.
+    Resource Index, REST api, and fesl authZ enabled.  If tests are
+    being run against an externally-deployed Fedora it is necessary
+    to set the environment variable PEP_NOCACHE=true before starting
+    the Fedora instance, or some tests will fail.
     
   [configQ]
     When running this suite, the server shall be configured

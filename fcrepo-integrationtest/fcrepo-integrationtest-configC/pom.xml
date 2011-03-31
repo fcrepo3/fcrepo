@@ -411,6 +411,8 @@
             <FEDORA_HOME>${fedora.home}</FEDORA_HOME>
             <WEBAPP_NAME>${fedora.appServerContext}</WEBAPP_NAME>
             <CATALINA_HOME>${tomcat.home}</CATALINA_HOME>
+            <!-- disables FeSL xacml result caching, tests won't pass without this -->
+            <PEP_NOCACHE>true</PEP_NOCACHE>
           </environmentVariables>
 
         </configuration>
