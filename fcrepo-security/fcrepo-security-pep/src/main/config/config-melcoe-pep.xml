@@ -33,6 +33,11 @@
     Relationship resolver based on the the object's RELS-* datastreams, which
     limits relationships to those originating from the object.
 	-->
+  
+  <!-- FIXME: don't have separate config regions as below, just separate one-liners specifing the class
+  (the options would be common to all implementations) 
+  and possibly specify the fallback class in that (rather than defaulting to RELS)
+  
   <!--
 	<relationship-resolver class="org.fcrepo.server.security.xacml.util.RELSRelationshipResolver">
 		<option name="parent-child-relationship-1">info:fedora/fedora-system:def/relations-external#isMemberOf</option>
@@ -44,10 +49,15 @@
     Relationship resolver based on the resource index.  Note that if the resource index is unavailable the
     RELSRelationshipResolver will be used instead.
 	-->
+  
 	<relationship-resolver class="org.fcrepo.server.security.xacml.util.RIRelationshipResolver">
+  <!-- xacml-parent-relationship? -->
 		<option name="parent-child-relationship-1">info:fedora/fedora-system:def/relations-external#isMemberOf</option>
+    <!-- #hasMember -->
 		<option name="parent-child-relationship-2">info:fedora/fedora-system:def/relations-external#isMemberOfCollection</option>
+    <!-- #hasCollectionMember -->
 		<option name="parent-child-relationship-3">info:fedora/fedora-system:def/relations-external#isPartOf</option>
+    <!-- #hasPart -->
 	</relationship-resolver>
 
 
