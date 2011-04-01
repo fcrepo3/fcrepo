@@ -14,7 +14,7 @@
               class="org.fcrepo.server.security.ResourceAttributeFinderModule"
               factory-method="getInstance" autowire-candidate="true">
               <property name="ownerIdSeparator" value="," />
-              <property name="digitalObjectManager">
+              <property name="DOManager">
                   <ref bean="org.fcrepo.server.storage.DOManager" />
               </property>
         </bean>

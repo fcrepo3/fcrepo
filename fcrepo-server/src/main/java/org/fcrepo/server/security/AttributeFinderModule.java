@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Bill Niebel
  */
-abstract class AttributeFinderModule
+public abstract class AttributeFinderModule
         extends com.sun.xacml.finder.AttributeFinderModule {
 
     private static final Logger logger =

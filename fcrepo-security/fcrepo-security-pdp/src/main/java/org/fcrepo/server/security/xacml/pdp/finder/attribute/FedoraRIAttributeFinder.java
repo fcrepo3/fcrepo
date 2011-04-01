@@ -16,11 +16,12 @@ import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.BagAttribute;
 import com.sun.xacml.attr.StandardAttributeFactory;
 import com.sun.xacml.cond.EvaluationResult;
-import com.sun.xacml.finder.AttributeFinderModule;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.fcrepo.server.security.AttributeFinderModule;
+import org.fcrepo.server.security.PolicyFinderModule;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderConfigUtil;
 import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderException;
@@ -153,6 +154,12 @@ public class FedoraRIAttributeFinder
                                           int designatorType) {
 
         String resourceId = context.getResourceId().encode();
+        if (resourceId == null || resourceId.equals("")) {
+            String pid = PolicyFinderModule.getPid(context);
+            if (pid != null) {
+                resourceId = "info:fedora/" + pid;
+            }
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("RIAttributeFinder: [" + attributeType.toString() + "] "
                     + attributeId + ", rid=" + resourceId);
@@ -267,5 +274,23 @@ public class FedoraRIAttributeFinder
         BagAttribute bag = new BagAttribute(type, bagValues);
 
         return new EvaluationResult(bag);
+    }
+
+    @Override
+    protected boolean canHandleAdhoc() {
+                return false;
+    }
+
+    /**
+     * Will not be called in this implementation, since findAttribute is overridden
+     * {@inheritDoc}
+     */
+    @Override
+    protected Object getAttributeLocally(int designatorType,
+                                         String attributeId,
+                                         URI resourceCategory,
+                                         EvaluationCtx context) {
+                return null;
+            
     }
 }
