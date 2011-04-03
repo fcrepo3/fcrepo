@@ -34,6 +34,8 @@ public class FilterSetup
 
     protected boolean inited = false;
 
+    private FilterConfig providedConfig;
+
     public static final String getFilterNameAbbrev(String filterName) {
         LoggerFactory.getLogger(FilterSetup.class).debug(">>>>>>>>>>>>>>>>>>"
                 + filterName);
@@ -50,6 +52,14 @@ public class FilterSetup
             rc = "G";
         }
         return rc;
+    }
+
+    public void setConfig(FilterConfig config) {
+        providedConfig = config;
+    }
+
+    public void init() {
+        init(providedConfig);
     }
 
     public void init(FilterConfig filterConfig) {
