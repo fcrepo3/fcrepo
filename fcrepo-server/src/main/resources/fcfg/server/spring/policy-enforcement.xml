@@ -56,7 +56,10 @@
                   <list>
                       <ref bean="org.fcrepo.server.security.ResourceAttributeFinderModule" />
                       <ref bean="org.fcrepo.server.security.ContextAttributeFinderModule" />
+        <!-- Uncomment the bean below to enable the use of relationship index triples in XACML policies -->
+        <!--
                       <ref bean="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder" />
+        -->              
                   </list>
               </property>
         </bean>
