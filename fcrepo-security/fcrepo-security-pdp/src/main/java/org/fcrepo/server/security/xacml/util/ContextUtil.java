@@ -177,6 +177,8 @@ public class ContextUtil {
     private RelationshipResolver initRelationshipResolver() {
         RelationshipResolver rr;
         String className = null;
+        Map<String, String> options = null;
+
         try {
             // get the PEP configuration
             File configPEPFile =
@@ -194,37 +196,18 @@ public class ContextUtil {
             docBuilder = factory.newDocumentBuilder();
             doc = docBuilder.parse(is);
 
-            NodeList nodes = null;
-
-            Map<String, String> options = new HashMap<String, String>();
-            Constructor<?> c = null;
-            nodes = doc.getElementsByTagName("relationship-resolver");
+            NodeList nodes = doc.getElementsByTagName("relationship-resolver");
             if (nodes.getLength() != 1) {
                 throw new MelcoeXacmlException("Config file needs to contain exactly 1 'relationship-resolver' section.");
             }
 
             Element relationshipResolverElement = (Element) nodes.item(0);
-            className =
-                    relationshipResolverElement.getAttributes()
-                            .getNamedItem("class").getNodeValue();
+            className = relationshipResolverElement.getAttributes().getNamedItem("class").getNodeValue();
 
             NodeList optionList =
                     relationshipResolverElement.getElementsByTagName("option");
 
-            if (optionList == null || optionList.getLength() == 0) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("creating relationship resolver WITHOUT options");
-                }
-
-                rr =
-                        (RelationshipResolver) Class.forName(className)
-                                .newInstance();
-
-            } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("creating relationship resolver WITH options");
-                }
-
+            if (optionList != null && optionList.getLength() > 0) {
                 options = new HashMap<String, String>();
                 for (int x = 0; x < optionList.getLength(); x++) {
                     Node n = optionList.item(x);
@@ -237,9 +220,21 @@ public class ContextUtil {
                         logger.debug("Node [name]: " + key + ": " + value);
                     }
                 }
-                c =
-                        Class.forName(className)
-                                .getConstructor(new Class[] {Map.class});
+            }
+
+            if (options == null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("creating relationship resolver WITHOUT options");
+                }
+                    rr = (RelationshipResolver) Class.forName(className).newInstance();
+
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("creating relationship resolver WITH options");
+                }
+
+                Constructor<?> c = Class.forName(className)
+                        .getConstructor(new Class[] {Map.class});
                 rr =
                         (RelationshipResolver) c
                                 .newInstance(new Object[] {options});
@@ -248,7 +243,11 @@ public class ContextUtil {
             logger.error("Failed to get configured RelationshipResolver " + className + ", will try "
                     + "fallback. " + e.getMessage());
             logger.debug(e.getMessage());
-            rr = new RELSRelationshipResolver();
+            if (options == null) {
+                rr = new RELSRelationshipResolver();
+            } else {
+                rr = new RELSRelationshipResolver(options);
+            }
         }
         return rr;
     }

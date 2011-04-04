@@ -11,10 +11,10 @@ public interface RelationshipResolver {
 
 
     /**
-     * Retrieves the relationships for this PID. Values for each relationship
-     * are placed in a set.
+     * Retrieves the relationships for this subject. Values for each relationship
+     * are placed in a map.  Return empty map if none found
      *
-     * @param pid
+     * @param subject
      *        the subject to return relationships for - either ns:pid,
      *        ns:pid/datastream or the info:fedora/ forms
      * @return The map of relationships and values.
@@ -24,6 +24,16 @@ public interface RelationshipResolver {
             throws MelcoeXacmlException;
 
 
+    /**
+     * Retrieves relationships for this subject, relationship and object.  Return
+     * empty map if none found.  Null means any.
+     *
+     * @param subject
+     * @param relationship
+     * @param object
+     * @return
+     * @throws MelcoeXacmlException
+     */
     public Map<String, Set<String>> getRelationships(String subject,
                                                       String relationship) throws MelcoeXacmlException;
 

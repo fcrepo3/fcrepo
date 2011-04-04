@@ -26,38 +26,31 @@
 	</response-cache>
 	
 	<!--
-		This class handles the identification of relationships between objects. It currently
-		just resolves parents.
--->
-  <!--
-    Relationship resolver based on the the object's RELS-* datastreams, which
-    limits relationships to those originating from the object.
-	-->
-  
-  <!-- FIXME: don't have separate config regions as below, just separate one-liners specifing the class
-  (the options would be common to all implementations) 
-  and possibly specify the fallback class in that (rather than defaulting to RELS)
-  
-  <!--
-	<relationship-resolver class="org.fcrepo.server.security.xacml.util.RELSRelationshipResolver">
-		<option name="parent-child-relationship-1">info:fedora/fedora-system:def/relations-external#isMemberOf</option>
-		<option name="parent-child-relationship-2">info:fedora/fedora-system:def/relations-external#isMemberOfCollection</option>
-		<option name="parent-child-relationship-3">info:fedora/fedora-system:def/relations-external#isPartOf</option>
-	</relationship-resolver>
-  -->
-	<!--
-    Relationship resolver based on the resource index.  Note that if the resource index is unavailable the
-    RELSRelationshipResolver will be used instead.
+		This class handles the identification of relationships between objects.
+    
+    These relationships are used in forming a resource's XACML hierarchical, path-based
+    resource-id identifier attribute, which can be used to apply XACML policies to objects
+    based on collection memberships.
+    
+    The supplied configuration is to use the RIRelationshipResolver, which makes use of
+    the resource index.  This allows the use of both relationships to parents, and relationships from
+    from parents to the object.
+    
+    If the resource index is not available, the RELSRelationshipResolver will be used instead
+    (and if the resource index is not available the configuration should be modified to use this
+    to prevent warning messages).
 	-->
   
 	<relationship-resolver class="org.fcrepo.server.security.xacml.util.RIRelationshipResolver">
-  <!-- xacml-parent-relationship? -->
-		<option name="parent-child-relationship-1">info:fedora/fedora-system:def/relations-external#isMemberOf</option>
-    <!-- #hasMember -->
-		<option name="parent-child-relationship-2">info:fedora/fedora-system:def/relations-external#isMemberOfCollection</option>
-    <!-- #hasCollectionMember -->
-		<option name="parent-child-relationship-3">info:fedora/fedora-system:def/relations-external#isPartOf</option>
-    <!-- #hasPart -->
+    <!-- relationships from object to its parent -->
+    <option name="xacml-parent-relationship-1">info:fedora/fedora-system:def/relations-external#isMemberOf</option>
+    <option name="xacml-parent-relationship-2">info:fedora/fedora-system:def/relations-external#isMemberOfCollection</option>
+    <option name="xacml-parent-relationship-3">info:fedora/fedora-system:def/relations-external#isPartOf</option>
+    <!-- relationships from parent object to its child -->
+    <!-- NB need to use RIRelationshipResolver to use these -->
+    <option name="xacml-child-relationship-1">info:fedora/fedora-system:def/relations-external#hasMember</option>
+    <option name="xacml-child-relationship-2">info:fedora/fedora-system:def/relations-external#hasCollectionMember</option>
+    <option name="xacml-child-relationship-3">info:fedora/fedora-system:def/relations-external#hasPart</option>
 	</relationship-resolver>
 
 

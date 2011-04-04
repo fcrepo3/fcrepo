@@ -21,7 +21,7 @@ public class LoadDataset {
 
     private static HttpUtils client = null;
 
-    public static void load(String fedoraUrl, String username, String password) throws Exception {
+    public static void load(String subdirectory, String fedoraUrl, String username, String password) throws Exception {
 
         try {
             client = new HttpUtils(fedoraUrl, username, password);
@@ -30,7 +30,8 @@ public class LoadDataset {
             return;
         }
 
-        File dataDir = new File(RESOURCEBASE + "/fesl");
+        // subdir was "fesl", now a parameter
+        File dataDir = new File(RESOURCEBASE + "/" + subdirectory);
         File[] files = dataDir.listFiles(new XmlFilenameFilter());
 
         for (File f : files) {
