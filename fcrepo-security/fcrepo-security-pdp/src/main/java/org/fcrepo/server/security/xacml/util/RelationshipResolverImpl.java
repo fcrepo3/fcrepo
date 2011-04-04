@@ -160,6 +160,28 @@ public class RelationshipResolverImpl
         }
         return parentPIDs;
     }
+    
+    protected String getSubjectURI(String subject) throws MalformedPIDException {
+        String strippedSubject;
+        if (subject.startsWith(Constants.FEDORA.uri)) {
+            strippedSubject = subject.substring(Constants.FEDORA.uri.length());
+        } else {
+            strippedSubject = subject;
+        }
+        String parts[] = strippedSubject.split("/");
+        PID pid = new PID(parts[0]);
+        String subjectURI;
+        if (parts.length == 1) {
+            subjectURI = pid.toURI();
+        } else if (parts.length == 2) {
+            subjectURI = pid.toURI() + "/" + parts[1]; // add datastream
+        } else {
+            logger.warn("Invalid subject argumet for getRelationships: " + subject + ". Should be pid or datastream (URI form optional");
+            subjectURI = null;
+        }
+        
+        return subjectURI;
+    }
 
     public Map<String, Set<String>> getRelationships(String subject)
             throws MelcoeXacmlException {
@@ -170,32 +192,17 @@ public class RelationshipResolverImpl
                                                       String relationship)
             throws MelcoeXacmlException {
 
-        // strip off info URI part if present
-        String strippedSubject;
-        if (subject.startsWith(Constants.FEDORA.uri)) {
-            strippedSubject = subject.substring(Constants.FEDORA.uri.length());
-        } else {
-            strippedSubject = subject;
-        }
-        // split into pid + datastream (if present), validate PID and then recombine datastream back in using URI form of PID
-        String parts[] = strippedSubject.split("/");
-        PID pid;
+        String subjectURI;
         try {
-            pid = new PID(parts[0]);
+            subjectURI = getSubjectURI(subject);
+            if (subjectURI == null) {
+                return new HashMap<String, Set<String>>();
+            }
         } catch (MalformedPIDException e1) {
-            logger.warn("Invalid subject argumet for getRelationships: " + subject + ". PID part of URI is malformed");
+            logger.warn("Invalid subject argument for getRelationships: " + subject + ". PID part of URI is malformed");
             return new HashMap<String, Set<String>>();
         }
 
-        String subjectURI;
-        if (parts.length == 1) {
-            subjectURI = pid.toURI();
-        } else if (parts.length == 2) {
-            subjectURI = pid.toURI() + "/" + parts[1]; // add datastream
-        } else {
-            logger.warn("Invalid subject argumet for getRelationships: " + subject + ". Should be pid or datastream (URI form optional");
-            return new HashMap<String, Set<String>>();
-        }
 
         RelationshipTuple[] tuples;
         try {

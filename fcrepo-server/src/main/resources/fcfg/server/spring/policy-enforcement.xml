@@ -23,7 +23,7 @@
               class="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder"
               init-method="init">
               <property name="relationshipResolver">
-                <bean class="org.fcrepo.server.security.xacml.util.RelationshipResolverImpl">
+                <bean class="org.fcrepo.server.security.xacml.util.ResourceIndexRelationshipResolver">
                   <constructor-arg>
                     <map>
                       <entry key="parent-child-relationship-1"><value type="java.lang.String">info:fedora/fedora-system:def/relations-external#isMemberOf</value></entry>
@@ -31,8 +31,10 @@
                       <entry key="parent-child-relationship-3"><value type="java.lang.String">info:fedora/fedora-system:def/relations-external#isPartOf</value></entry>
                     </map>
                   </constructor-arg>
-                </bean>
-              </property>
+                  <property name="resourceIndex">
+                      <ref bean="org.fcrepo.server.resourceIndex.ResourceIndex" />
+                  </property>
+                </bean>              </property>
               <property name="resourceAttributes">
                 <set>
                   <value type="java.lang.String">info:fedora/fedora-system:def/view#mimeType</value>
