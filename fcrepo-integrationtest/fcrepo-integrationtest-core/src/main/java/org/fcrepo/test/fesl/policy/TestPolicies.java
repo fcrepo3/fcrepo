@@ -73,7 +73,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
             // FIXME: redundant, bootstrap policies will allow this
             String policyId = policyUtils.addPolicy("test-access-admin.xml");
 
-            LoadDataset.load(fedoraUrl, username, password);
+            LoadDataset.load("fesl", fedoraUrl, username, password);
 
             // httpUtils.get("/fedora/risearch?flush=true");
 
@@ -106,7 +106,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
             // Load the admin policy to give us rights to remove objects
             String policyId = policyUtils.addPolicy("test-access-admin.xml");
 
-            RemoveDataset.remove(fedoraUrl, username, password);
+            RemoveDataset.remove("fesl", fedoraUrl, username, password);
 
             // Now that objects are loaded, remove the policy
             policyUtils.delPolicy(policyId);

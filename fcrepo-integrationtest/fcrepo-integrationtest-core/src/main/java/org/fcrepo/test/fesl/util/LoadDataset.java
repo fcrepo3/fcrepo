@@ -21,7 +21,7 @@ public class LoadDataset {
 
     private static HttpUtils client = null;
 
-    public static void load(String fedoraUrl, String username, String password) throws Exception {
+    public static void load(String subdirectory, String fedoraUrl, String username, String password) throws Exception {
 
         try {
             client = new HttpUtils(fedoraUrl, username, password);
@@ -30,7 +30,8 @@ public class LoadDataset {
             return;
         }
 
-        File dataDir = new File(RESOURCEBASE + "/fesl");
+        // subdir was "fesl", now a parameter
+        File dataDir = new File(RESOURCEBASE + "/" + subdirectory);
         File[] files = dataDir.listFiles(new XmlFilenameFilter());
 
         for (File f : files) {
@@ -41,5 +42,15 @@ public class LoadDataset {
             //    logger.error(e.getMessage(), e);
             //}
         }
+        // need to ensure resource index is up-to-date
+        // spo query, flush=true, querying on a non-existent subject, limit=1
+        String riSearchFlush = "/fedora/risearch?type=triples&flush=true&lang=spo&format=Turtle&limit=1&query=%3cinfo%3afedora%2fdoes%3anotexist%3e%20*%20*";
+        try {
+            client.get(riSearchFlush);
+        } catch (Exception e) {
+            // ignore exceptions, resource index might not be enabled
+            System.out.println("Exception on flushing resource index (loading test fesl objects) " + e.getMessage());
+        }
+
     }
 }

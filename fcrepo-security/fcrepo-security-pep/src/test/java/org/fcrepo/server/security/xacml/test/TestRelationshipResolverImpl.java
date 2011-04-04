@@ -4,12 +4,13 @@ package org.fcrepo.server.security.xacml.test;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.fcrepo.server.security.xacml.util.RelationshipResolverImpl;
+import org.fcrepo.server.security.xacml.util.RelationshipResolverBase;
+import org.fcrepo.server.security.xacml.util.RELSRelationshipResolver;
 
 
 public class TestRelationshipResolverImpl {
 
-    private RelationshipResolverImpl rels = null;
+    private RelationshipResolverBase rels = null;
 
     /**
      * @param args
@@ -30,7 +31,7 @@ public class TestRelationshipResolverImpl {
         options.put("url", "http://localhost:8080/fedora/melcoerisearch");
         options.put("username", "");
         options.put("password", "");
-        rels = new RelationshipResolverImpl(options);
+        rels = new RELSRelationshipResolver(options);
     }
 
     public void test01() throws Exception {

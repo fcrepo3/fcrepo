@@ -23,7 +23,7 @@ public class RemoveDataset {
 
     private static HttpUtils client = null;
 
-    public static void remove(String fedoraUrl, String username, String password)
+    public static void remove(String subdir, String fedoraUrl, String username, String password)
             throws Exception {
 
         try {
@@ -33,7 +33,7 @@ public class RemoveDataset {
             return;
         }
 
-        File dataDir = new File(RESOURCEBASE + "/fesl");
+        File dataDir = new File(RESOURCEBASE + "/" + subdir);
         File[] files = dataDir.listFiles(new XmlFilenameFilter());
 
         for (File f : files) {

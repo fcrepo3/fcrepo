@@ -63,7 +63,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
 
             httpUtils = new HttpUtils(getBaseURL(), username, password);
 
-            LoadDataset.load(fedoraUrl, username, password);
+            LoadDataset.load("fesl", fedoraUrl, username, password);
         } catch (Exception e) {
             logger.error(e.getMessage());
             Assert.fail(e.getMessage());
@@ -84,7 +84,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
                 logger.debug("Tearing down...");
             }
 
-            RemoveDataset.remove(fedoraUrl, username, password);
+            RemoveDataset.remove("fesl", fedoraUrl, username, password);
         } catch (Exception e) {
             logger.error(e.getMessage());
             Assert.fail(e.getMessage());

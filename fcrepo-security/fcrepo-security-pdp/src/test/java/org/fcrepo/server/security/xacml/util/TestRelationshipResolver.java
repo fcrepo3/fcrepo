@@ -1,22 +1,13 @@
 
 package org.fcrepo.server.security.xacml.util;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
-
-import org.fcrepo.server.security.xacml.util.RelationshipResolverImpl;
 
 public class TestRelationshipResolver {
 
     @Test
     public void testPidNormalization() throws Exception {
-        RelationshipResolverImpl rr = new RelationshipResolverImpl();
-        String[] demo1_uris =
-                {"demo:1", "info:fedora/demo:1", "info:fedora/demo:1/DS1",
-                        "demo:1/DS1", "info:fedora/demo:1/sdef:a/sdep:b/method"};
-        for (String candidate : demo1_uris) {
-            assertEquals("demo:1", rr.getNormalizedPID(candidate).toString());
-        }
+        // method being tested has been removed (was not used)
+        // FIXME: would be good to introduce some other tests
     }
 }

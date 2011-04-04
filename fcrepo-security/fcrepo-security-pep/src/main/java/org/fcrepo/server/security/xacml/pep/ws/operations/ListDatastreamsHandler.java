@@ -39,14 +39,16 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.RPCParam;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.fcrepo.server.types.gen.DatastreamDef;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -58,7 +60,7 @@ public class ListDatastreamsHandler
     private static final Logger logger =
             LoggerFactory.getLogger(ListDatastreamsHandler.class);
 
-    private final ContextUtil contextUtil = new ContextUtil();
+    private final ContextUtil contextUtil = ContextUtil.getInstance();
 
     public ListDatastreamsHandler()
             throws PEPException {

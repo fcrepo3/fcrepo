@@ -350,6 +350,7 @@
                 <include>**/TestMisplacedNamespace.class</include>
                 <include>**/TestREST.class</include>
                 <include>**/TestPolicies.class</include>
+                <include>**/TestHierarchy.class</include>
                 <include>**/TestPolicyIndex.class</include>
 
               </includes>

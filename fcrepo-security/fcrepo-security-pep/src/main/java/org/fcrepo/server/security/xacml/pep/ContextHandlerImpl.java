@@ -41,11 +41,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -275,7 +277,7 @@ public class ContextHandlerImpl
                 logger.debug("Instantiated EvaluationEngine: " + className);
             }
 
-            contextUtil = new ContextUtil();
+            contextUtil = ContextUtil.getInstance();
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Instantiated ContextUtil.");

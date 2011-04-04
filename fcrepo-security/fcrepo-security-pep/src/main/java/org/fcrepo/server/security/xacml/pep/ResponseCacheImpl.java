@@ -48,7 +48,7 @@ public class ResponseCacheImpl
     private static final Logger logger =
             LoggerFactory.getLogger(ResponseCacheImpl.class);
 
-    private final ContextUtil contextUtil = new ContextUtil();
+    private final ContextUtil contextUtil = ContextUtil.getInstance();
 
     private static final int DEFAULT_CACHE_SIZE = 1000;
 

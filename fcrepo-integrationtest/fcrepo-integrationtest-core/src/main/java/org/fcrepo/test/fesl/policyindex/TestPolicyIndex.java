@@ -126,7 +126,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
 
             policyIndexUtils = new PolicyIndexUtils(apim);
 
-            LoadDataset.load(fedoraUrl, username, password);
+            LoadDataset.load("fesl", fedoraUrl, username, password);
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -146,7 +146,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
             // restore the fedora users original from backup
             restoreFedoraUsersFile();
 
-            RemoveDataset.remove(fedoraUrl, username, password);
+            RemoveDataset.remove("fesl", fedoraUrl, username, password);
 
             // policies are in demo namespace
             purgeDemoObjects();

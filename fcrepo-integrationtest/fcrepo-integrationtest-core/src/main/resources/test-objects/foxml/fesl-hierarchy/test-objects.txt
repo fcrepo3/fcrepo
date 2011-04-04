@@ -1,0 +1,12 @@
+﻿Test objects
+
+Represents a hierarchy of objects as follows:
+(for testing XACML hierarchical resource profile - path-based resource-id attribute)
+
+relationship attribute finding must be enabled, using the resourceIndex
+
+test:1000000 - collection - hasMember test:1000001
+  test:1000001 - collection - 
+    test:1000002 - collection isPartOf test:1000001, hasCollectionMember test:1000003
+      test:1000003 -
+        test:1000004 - isMemberOfCollection test:1000003
