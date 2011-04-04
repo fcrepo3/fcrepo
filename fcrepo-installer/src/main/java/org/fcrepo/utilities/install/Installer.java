@@ -4,15 +4,12 @@
  */
 package org.fcrepo.utilities.install;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Writer;
 
 import java.util.Map;
 
@@ -21,7 +18,6 @@ import org.fcrepo.utilities.LogConfig;
 import org.fcrepo.utilities.Zip;
 import org.fcrepo.utilities.install.container.Container;
 import org.fcrepo.utilities.install.container.ContainerFactory;
-import org.fcrepo.utilities.install.container.FedoraWebXML;
 
 
 public class Installer {
@@ -110,16 +106,6 @@ public class Installer {
             File warStage = new File(installDir, "fedorawar" + File.separator);
             warStage.mkdirs();
             Zip.unzip(_dist.get(Distribution.FEDORA_WAR), warStage);
-
-            // modify web.xml
-            System.out.println("Processing web.xml");
-            File distWebXML = new File(warStage, "WEB-INF/web.xml");
-            FedoraWebXML webXML =
-                    new FedoraWebXML(distWebXML.getAbsolutePath(), _opts);
-            Writer outputWriter =
-                    new BufferedWriter(new FileWriter(distWebXML));
-            webXML.write(outputWriter);
-            outputWriter.close();
 
             // Remove commons-collections, commons-dbcp, and commons-pool
             // from fedora.war if using Tomcat 5.0
