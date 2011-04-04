@@ -18,7 +18,8 @@
                   <ref bean="org.fcrepo.server.storage.DOManager" />
               </property>
         </bean>
-        
+        <!-- Uncomment the bean below to enable the use of relationship index triples in XACML policies -->
+        <!--
         <bean id="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder"
               class="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder"
               init-method="init">
@@ -47,7 +48,7 @@
                 </set>
               </property>
         </bean>
-        
+         -->
         <bean id="org.fcrepo.server.security.PolicyEnforcementPoint"
               class="org.fcrepo.server.security.PolicyEnforcementPoint"
               factory-method="getInstance" autowire-candidate="true">
