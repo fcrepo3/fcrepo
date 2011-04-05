@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderConfigUtil;
 import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderException;
+import org.fcrepo.server.security.xacml.util.AttributeFinderConfig;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.RelationshipResolver;
 
@@ -34,7 +35,7 @@ public class FedoraRIAttributeFinder
 
     private RelationshipResolver relationshipResolver = null;
 
-    private Map<Integer, Set<String>> attributes = null;
+    private AttributeFinderConfig attributes = null;
 
     public FedoraRIAttributeFinder() {
         try {
@@ -46,9 +47,9 @@ public class FedoraRIAttributeFinder
 
             if (logger.isDebugEnabled()) {
                 logger.debug("registering the following attributes: ");
-                for (Integer k : attributes.keySet()) {
-                    for (String l : attributes.get(k)) {
-                        logger.debug(k + ": " + l);
+                for (int desNum : attributes.getDesignatorIds()) {
+                    for (String attrName : attributes.get(desNum).getAttributeNames()) {
+                        logger.debug(desNum + ": " + attrName);
                     }
                 }
             }
@@ -91,7 +92,7 @@ public class FedoraRIAttributeFinder
      */
     @Override
     public Set<Integer> getSupportedDesignatorTypes() {
-        return attributes.keySet();
+        return attributes.getDesignatorIds();
     }
 
     /**
@@ -140,7 +141,7 @@ public class FedoraRIAttributeFinder
         String attrName = attributeId.toString();
 
         // we only know about registered attributes from config file
-        if (!attributes.keySet().contains(new Integer(designatorType))) {
+        if (!attributes.getDesignatorIds().contains(new Integer(designatorType))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Does not know about designatorType: "
                         + designatorType);
@@ -150,7 +151,7 @@ public class FedoraRIAttributeFinder
         }
 
         Set<String> allowedAttributes =
-                attributes.get(new Integer(designatorType));
+                attributes.get(designatorType).getAttributeNames();
         if (!allowedAttributes.contains(attrName)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Does not know about attribute: " + attrName);
