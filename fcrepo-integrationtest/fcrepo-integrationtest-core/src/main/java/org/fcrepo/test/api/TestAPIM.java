@@ -1599,6 +1599,9 @@ public class TestAPIM
                 xmlIn);
         assertXpathExists("foxml:digitalObject/foxml:datastream[@ID='NEWDS2'][//dc:identifier='Identifier 5']",
                           xmlIn);
+        // this dc:identifier value is not in the submitted data; it is added by Fedora
+        assertXpathExists("foxml:digitalObject/foxml:datastream[@ID='NEWDS2'][//dc:identifier='demo:14']",
+                          xmlIn);
         assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['modifyDatastreamByValue']",
                           xmlIn);
         assertXpathEvaluatesTo("8",
