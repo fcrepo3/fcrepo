@@ -100,6 +100,7 @@ public class FedoraHome {
         if (_usingAkubra) {
             configureAkubra();
         }
+        configureSpringProperties();
         configureFedoraUsers();
         configureBeSecurity();
     }
@@ -277,6 +278,47 @@ public class FedoraHome {
             IOUtils.closeQuietly(writer);
             throw new InstallationFailedException(e.getClass().getName()
                     + ":" + e.getMessage());
+        }
+    }
+
+    private void configureSpringProperties() throws InstallationFailedException {
+        Properties springProps = new Properties();
+
+        springProps.put("fedora.port",
+                        _opts.getValue(InstallOptions.TOMCAT_HTTP_PORT, "8080"));
+        if (_opts.getBooleanValue(InstallOptions.SSL_AVAILABLE, false)) {
+            springProps.put("fedora.port.secure",
+                            _opts.getValue(InstallOptions.TOMCAT_SSL_PORT, "8443"));
+        } else {
+            springProps.put("fedora.port.secure",
+                            _opts.getValue(InstallOptions.TOMCAT_HTTP_PORT, "8080"));
+        }
+
+        springProps
+                .put("security.ssl.api.access", _opts
+                        .getBooleanValue(InstallOptions.APIA_SSL_REQUIRED,
+                                         false) ? "REQUIRES_SECURE_CHANNEL"
+                        : "ANY_CHANNEL");
+        springProps
+                .put("security.ssl.api.management", _opts
+                        .getBooleanValue(InstallOptions.APIM_SSL_REQUIRED,
+                                         false) ? "REQUIRES_SECURE_CHANNEL"
+                        : "ANY_CHANNEL");
+        springProps.put("security.ssl.api.default", "ANY_CHANNEL");
+
+        springProps.put("security.fesl.authN.jaas.apia.enabled", _opts
+                .getValue(InstallOptions.APIA_AUTH_REQUIRED, "false"));
+
+        FileOutputStream out = null;
+        try {
+            out =
+                    new FileOutputStream(new File(_installDir,
+                                                  "server/config/spring/web/web.properties"));
+            springProps.store(out, "Spring override properties");
+        } catch (IOException e) {
+            throw new InstallationFailedException(e.getMessage(), e);
+        } finally {
+            IOUtils.closeQuietly(out);
         }
     }
 

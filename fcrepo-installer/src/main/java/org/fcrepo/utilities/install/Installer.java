@@ -103,10 +103,12 @@ public class Installer {
         System.out.println("Preparing " + fedoraWarName + ".war...");
         // build a staging area in FEDORA_HOME
         try {
+
             File warStage = new File(installDir, "fedorawar" + File.separator);
             warStage.mkdirs();
             Zip.unzip(_dist.get(Distribution.FEDORA_WAR), warStage);
 
+            /* REMOVE
             // Remove commons-collections, commons-dbcp, and commons-pool
             // from fedora.war if using Tomcat 5.0
             String container = _opts.getValue(InstallOptions.SERVLET_ENGINE);
@@ -133,8 +135,10 @@ public class Installer {
             } else {
                 installJDBCDriver(_dist, _opts, webinfLib);
             }
+            */
 
             // FeSL AuthZ configuration
+            /* REMOVE
             if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
             	File originalWsdd = new File(warStage, "WEB-INF/server-config.wsdd");
             	originalWsdd.renameTo(new File(warStage, "WEB-INF/server-config.wsdd.backup.original"));
@@ -142,6 +146,7 @@ public class Installer {
             	File feslWsdd = new File(warStage, "WEB-INF/melcoe-pep-server-config.wsdd");
             	feslWsdd.renameTo(new File(warStage, "WEB-INF/server-config.wsdd"));
             }
+            */
 
             File fedoraWar = new File(installDir, fedoraWarName + ".war");
             Zip.zip(fedoraWar, warStage.listFiles());
@@ -154,6 +159,7 @@ public class Installer {
 		}
     }
 
+    /* REMOVE
     public static void installJDBCDriver(Distribution dist,
                                          InstallOptions opts,
                                          File destDir)
@@ -201,6 +207,7 @@ public class Installer {
             throw new InstallationFailedException(e.getMessage(), e);
         }
     }
+    */
 
     private void deployLocalService(Container container, String filename)
             throws InstallationFailedException {

@@ -1,10 +1,13 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.utilities.install.container;
 
 import java.io.File;
+import java.io.FileOutputStream;
+
+import org.apache.commons.io.IOUtils;
 
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.install.Distribution;
@@ -54,7 +57,39 @@ public abstract class Tomcat
     public void install() throws InstallationFailedException {
         installTomcat();
         installServerXML();
+        installFedoraContext();
         installIncludedKeystore();
+    }
+
+    protected void installFedoraContext() throws InstallationFailedException {
+        File contextDir =
+            new File(getConf().getPath() + File.separator + "Catalina"
+                    + File.separator + "localhost");
+        contextDir.mkdirs();
+
+        try {
+            String content =
+                    IOUtils.toString(this.getClass()
+                            .getResourceAsStream("/resources/context.xml"))
+                            .replace("::", File.separator)
+                            .replace("_FEDORA_HOME_",
+                                     getOptions()
+                                             .getValue(InstallOptions.FEDORA_HOME));
+
+            String name =
+                    getOptions()
+                            .getValue(InstallOptions.FEDORA_APP_SERVER_CONTEXT)
+                            + ".xml";
+
+            FileOutputStream out =
+                    new FileOutputStream(new File(contextDir, name));
+
+            out.write(content.getBytes());
+            out.close();
+        } catch (Exception e) {
+            throw new InstallationFailedException(e.getMessage(), e);
+        }
+
     }
 
     protected abstract void installTomcat() throws InstallationFailedException;
@@ -64,9 +99,9 @@ public abstract class Tomcat
 
     protected abstract void installIncludedKeystore()
             throws InstallationFailedException;
-    
+
     protected abstract void setCommonLib();
-    
+
     protected abstract File getCommonLib();
 
     protected final File getTomcatHome() {
@@ -84,6 +119,6 @@ public abstract class Tomcat
     protected final File getIncludedKeystore() {
         return includedKeystore;
     }
-    
-    
+
+
 }

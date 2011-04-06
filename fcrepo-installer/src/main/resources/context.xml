@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+
+   <!-- Spring config location -->
+   <Parameter 
+	name="contextConfigLocation" 
+	value="/WEB-INF/applicationContext.xml,file://_FEDORA_HOME_::server::config::spring::web::*.xml" />
+
+   <Parameter 
+        name="propertyConfigLocation"
+        value="file://_FEDORA_HOME_::server::config::spring::web::web.properties" />
+
+   <Parameter 
+        name="fedora.home"
+        value="_FEDORA_HOME_" />
+        
+</Context>
