@@ -13,41 +13,41 @@
 
   <context:annotation-config />
 
-  <!-- AuthN security. Right now, this simply decides when to apply a servlet 
-    filter which will actually implement authn policy. AithFilterJAAS = FeSL, 
-    EnforceAuthnFilter = classic. This differs from the approach advocated by 
-    Spring Security. If anybody wishes to experiment with spring security (as 
-    opposed to the traditional auth filter approach), this section can be replaced 
-    with <security:http> namespace configuration, which ultimately produces a 
-    bean with the same name as this one: "springSecurityFilterChain" -->
   <bean id="springSecurityFilterChain" class="org.springframework.security.web.FilterChainProxy">
     <security:filter-chain-map path-type="ant">
 
-      <!-- Begin FeSL JAAS AuthN -->
 
+      <!-- Backend. -->
       <security:filter-chain pattern="/getDSAuth*"
-        filters="ChannelFilter,AuthFilterJAAS" />
+        filters="ChannelFilter,${security.auth.filters}" />
       <security:filter-chain pattern="/getDS*"
         filters="ChannelFilter" />
-      <security:filter-chain pattern="/get*/**"
-        filters="ChannelFilter,AuthFilterJAAS" />
-      <security:filter-chain pattern="/search*"
-        filters="ChannelFilter,AuthFilterJAAS" />
+
+      <!-- Services -->
       <security:filter-chain pattern="/risearch*"
-        filters="ChannelFilter,AuthFilterJAAS" />
-      <security:filter-chain pattern="/list*/**"
-        filters="ChannelFilter,AuthFilterJAAS" />
-      <security:filter-chain pattern="/describe*"
-        filters="ChannelFilter,AuthFilterJAAS" />
-      <security:filter-chain pattern="/upload*"
-        filters="ChannelFilter,AuthFilterJAAS" />
-      <security:filter-chain pattern="/services*/**"
-        filters="ChannelFilter,AuthFilterJAAS" />
-      <security:filter-chain pattern="/management*/**"
-        filters="ChannelFilter,AuthFilterJAAS" />
+        filters="ChannelFilter,${security.auth.filters}" />
+
+      <!-- REST API -->
       <security:filter-chain pattern="/objects*/**"
-        filters="ChannelFilter,AuthFilterJAAS" />
-      <!-- End FeSL JAAS AuthN -->
+        filters="ChannelFilter,${security.auth.filters}" />
+
+      <!-- Lite APIs -->
+      <security:filter-chain pattern="/get*/**"
+        filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/search*"
+        filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/describe*"
+        filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/list*/**"
+        filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/management/*/**"
+        filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/upload*"
+        filters="ChannelFilter,${security.auth.filters}" />
+
+      <!-- SOAP APIs -->
+      <security:filter-chain pattern="/services*/**"
+        filters="ChannelFilter,${security.auth.filters}" />
 
       <security:filter-chain pattern="/**"
         filters="ChannelFilter" />
@@ -217,6 +217,6 @@
 
   <!-- FeSL Authz bean -->
   <bean id="PEPFilter" class="org.fcrepo.server.security.xacml.pep.rest.PEP"
-    lazy-init="true" />
+    lazy-init="true" init-method="init"/>
 
 </beans>

@@ -71,8 +71,6 @@ public final class PEP
     private static final Logger logger =
             LoggerFactory.getLogger(PEP.class);
 
-    private FilterConfig filterConfig = null;
-
     private Map<String, RESTFilter> filters = null;
 
     private ContextHandler ctxHandler = null;
@@ -186,7 +184,7 @@ public final class PEP
      * (non-Javadoc)
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
      */
-    public void init(FilterConfig filterCfg) throws ServletException {
+    public void init() throws ServletException {
         try {
             ctxHandler = ContextHandlerImpl.getInstance();
         } catch (PEPException pe) {
@@ -195,16 +193,14 @@ public final class PEP
         }
 
         logger.info("Initialising Servlet Filter: " + PEP.class);
-        filterConfig = filterCfg;
-
-        // exit if no config. Should always have a config.
-        if (filterConfig == null) {
-            logger.error("No config found!");
-            throw new ServletException("No config found for filter (filterConfig)");
-        }
 
         loadFilters();
     }
+
+    public void init(FilterConfig cfg) throws ServletException {
+        init();
+    }
+
 
     /*
      * (non-Javadoc)
@@ -212,7 +208,6 @@ public final class PEP
      */
     public void destroy() {
         logger.info("Destroying Servlet Filter: " + PEP.class);
-        filterConfig = null;
         filters = null;
         ctxHandler = null;
     }

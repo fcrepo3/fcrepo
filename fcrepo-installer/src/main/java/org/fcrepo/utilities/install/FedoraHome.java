@@ -101,6 +101,7 @@ public class FedoraHome {
             configureAkubra();
         }
         configureSpringProperties();
+        configureSpringAuth();
         configureFedoraUsers();
         configureBeSecurity();
     }
@@ -284,6 +285,7 @@ public class FedoraHome {
     private void configureSpringProperties() throws InstallationFailedException {
         Properties springProps = new Properties();
 
+        /* Set up ssl configuration */
         springProps.put("fedora.port",
                         _opts.getValue(InstallOptions.TOMCAT_HTTP_PORT, "8080"));
         if (_opts.getBooleanValue(InstallOptions.SSL_AVAILABLE, false)) {
@@ -309,6 +311,22 @@ public class FedoraHome {
         springProps.put("security.fesl.authN.jaas.apia.enabled", _opts
                 .getValue(InstallOptions.APIA_AUTH_REQUIRED, "false"));
 
+
+        /* Set up authN, authZ filter configuration */
+        StringBuilder filters = new StringBuilder();
+        if (_opts.getBooleanValue(InstallOptions.FESL_AUTHN_ENABLED, false)) {
+            filters.append("AuthFilterJAAS");
+        } else {
+            filters.append("SetupFilter,XmlUserfileFilter,EnforceAuthnFilter,FinalizeFilter");
+        }
+
+        if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
+            filters.append(",PEPFilter");
+        }
+
+        springProps.put("security.auth.filters", filters.toString());
+
+
         FileOutputStream out = null;
         try {
             out =
@@ -319,6 +337,41 @@ public class FedoraHome {
             throw new InstallationFailedException(e.getMessage(), e);
         } finally {
             IOUtils.closeQuietly(out);
+        }
+    }
+
+    private void configureSpringAuth() throws InstallationFailedException {
+        String PATTERN = "${security.auth.filters}";
+
+        StringBuilder filters = new StringBuilder();
+
+        if (_opts.getBooleanValue(InstallOptions.FESL_AUTHN_ENABLED, false)) {
+            filters.append("AuthFilterJAAS");
+        } else {
+            filters.append("SetupFilter,XmlUserfileFilter,EnforceAuthnFilter,FinalizeFilter");
+        }
+
+        if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
+            filters.append(",PEPFilter");
+        }
+
+        FileInputStream springConfig = null;
+        PrintWriter writer = null;
+        try {
+        File xmlFile = new File(_installDir, "server/config/spring/web/security.xml");
+        springConfig = new FileInputStream(xmlFile);
+        String content = IOUtils.toString(springConfig).replace(PATTERN, filters);
+        springConfig.close();
+
+
+        writer = new PrintWriter(new OutputStreamWriter(
+                                                        new FileOutputStream(xmlFile), "UTF-8"));
+                                                writer.print(content);
+                                                writer.close();
+        } catch (Exception e) {
+            IOUtils.closeQuietly(springConfig);
+            IOUtils.closeQuietly(writer);
+            throw new InstallationFailedException(e.getMessage(), e);
         }
     }
 
