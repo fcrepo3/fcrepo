@@ -344,11 +344,13 @@ public class FedoraHome {
         String PATTERN = "${security.auth.filters}";
 
         StringBuilder filters = new StringBuilder();
+        boolean needsbugFix = false;
 
         if (_opts.getBooleanValue(InstallOptions.FESL_AUTHN_ENABLED, false)) {
             filters.append("AuthFilterJAAS");
         } else {
             filters.append("SetupFilter,XmlUserfileFilter,EnforceAuthnFilter,FinalizeFilter");
+            needsbugFix = true;
         }
 
         if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
@@ -358,16 +360,25 @@ public class FedoraHome {
         FileInputStream springConfig = null;
         PrintWriter writer = null;
         try {
-        File xmlFile = new File(_installDir, "server/config/spring/web/security.xml");
-        springConfig = new FileInputStream(xmlFile);
-        String content = IOUtils.toString(springConfig).replace(PATTERN, filters);
-        springConfig.close();
+            File xmlFile =
+                    new File(_installDir,
+                             "server/config/spring/web/security.xml");
+            springConfig = new FileInputStream(xmlFile);
+            String content =
+                    IOUtils.toString(springConfig).replace(PATTERN, filters);
 
+            if (!needsbugFix) {
+                /* Delete classic authN bugfix when not applicable */
+                content = content.replaceFirst("(?s)<!-- BUG.+?/BUG -->", "");
+            }
 
-        writer = new PrintWriter(new OutputStreamWriter(
-                                                        new FileOutputStream(xmlFile), "UTF-8"));
-                                                writer.print(content);
-                                                writer.close();
+            springConfig.close();
+
+            writer =
+                    new PrintWriter(new OutputStreamWriter(new FileOutputStream(xmlFile),
+                                                           "UTF-8"));
+            writer.print(content);
+            writer.close();
         } catch (Exception e) {
             IOUtils.closeQuietly(springConfig);
             IOUtils.closeQuietly(writer);

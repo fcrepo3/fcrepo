@@ -17,19 +17,29 @@
     <security:filter-chain-map path-type="ant">
 
 
-      <!-- Backend. -->
+      <!-- Backend - getDSAuthenticated gets auth filters, getDS does not -->
       <security:filter-chain pattern="/getDSAuth*"
         filters="ChannelFilter,${security.auth.filters}" />
       <security:filter-chain pattern="/getDS*"
         filters="ChannelFilter" />
 
-      <!-- Services -->
+      <!-- RISearch service gets auth protection -->
       <security:filter-chain pattern="/risearch*"
         filters="ChannelFilter,${security.auth.filters}" />
 
       <!-- REST API -->
       <security:filter-chain pattern="/objects*/**"
         filters="ChannelFilter,${security.auth.filters}" />
+
+      <!-- User servlet -->
+      <security:filter-chain pattern="/user*"
+        filters="ChannelFilter,${security.auth.filters}" />
+
+      <!-- BUG There is a bug in classic authN for disseminators, auth needs 
+        to be off to emulate its behaviour -->
+      <security:filter-chain pattern="/get/*/*/**"
+        filters="ChannelFilter" />
+      <!-- /BUG -->
 
       <!-- Lite APIs -->
       <security:filter-chain pattern="/get*/**"
@@ -123,6 +133,10 @@
         <security:intercept-url pattern="/objects/*/datastreams/*/versions*"
           access="${security.ssl.api.management}" />
 
+        <!-- User Servlet -->
+        <security:intercept-url pattern="/user*"
+          access="${security.ssl.api.management}" />
+
         <!-- REST API access -->
         <security:intercept-url pattern="/objects*/**"
           access="${security.ssl.api.access}" />
@@ -194,20 +208,47 @@
 
   <!-- Classic authn beans -->
   <bean id="SetupFilter" class="org.fcrepo.server.security.servletfilters.FilterSetup"
-    lazy-init="true" />
+    lazy-init="true" init-method="init">
+    <property name="config">
+      <bean class="org.fcrepo.common.http.FilterConfigBean">
+        <property name="filterName" value="SetupFilter" />
+      </bean>
+    </property>
+  </bean>
+
   <bean id="XmlUserfileFilter"
     class="org.fcrepo.server.security.servletfilters.xmluserfile.FilterXmlUserfile"
-    lazy-init="true" />
+    lazy-init="true" init-method="init">
+    <property name="config">
+      <bean class="org.fcrepo.common.http.FilterConfigBean">
+        <property name="filterName" value="XmlUserfileFilter" />
+      </bean>
+    </property>
+  </bean>
+
   <bean id="EnforceAuthnFilter"
     class="org.fcrepo.server.security.servletfilters.FilterEnforceAuthn"
-    lazy-init="true" />
+    lazy-init="true" init-method="init">
+    <property name="config">
+      <bean class="org.fcrepo.common.http.FilterConfigBean">
+        <property name="filterName" value="EnforceAuthnFilter" />
+      </bean>
+    </property>
+  </bean>
+
   <bean id="FinalizeFilter"
     class="org.fcrepo.server.security.servletfilters.FilterFinalize"
-    lazy-init="true" />
+    lazy-init="true" init-method="init">
+    <property name="config">
+      <bean class="org.fcrepo.common.http.FilterConfigBean">
+        <property name="filterName" value="FinalizeFilte" />
+      </bean>
+    </property>
+  </bean>
 
   <bean id="RestApiAuthnFilter"
     class="org.fcrepo.server.security.servletfilters.FilterRestApiAuthn"
-    lazy-init="true">
+    lazy-init="true" init-method="init">
     <property name="config">
       <bean class="org.fcrepo.common.http.FilterConfigBean">
         <property name="filterName" value="FilterRestApiAuthn" />
@@ -217,6 +258,6 @@
 
   <!-- FeSL Authz bean -->
   <bean id="PEPFilter" class="org.fcrepo.server.security.xacml.pep.rest.PEP"
-    lazy-init="true" init-method="init"/>
+    lazy-init="true" init-method="init" />
 
 </beans>

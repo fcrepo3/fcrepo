@@ -1438,7 +1438,6 @@ public class TestRESTAPI
             HttpResponse response = new HttpResponse(httpMethod);
 
             if (response.getStatusCode() == SC_MOVED_TEMPORARILY) {
-                System.out.print("Redirect! -> ");
                 String redir =
                         response.getResponseHeader("Location").getValue();
                 if (redir != url) {
