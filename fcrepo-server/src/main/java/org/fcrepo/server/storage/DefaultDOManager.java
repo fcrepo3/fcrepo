@@ -1025,19 +1025,10 @@ public class DefaultDOManager
             // note: context may be required to get through authz as content could be filesystem file (or URL)
             dcf = new DCFields(new ByteArrayInputStream(dcxml.getXMLContent(ctx)));
         }
-        // ensure one of the dc:identifiers is the pid
-        boolean sawPid = false;
-        for (DCField dcField : dcf.identifiers()) {
-            if (dcField.getValue().equals(obj.getPid())) {
-                sawPid = true;
-            }
-        }
-        if (!sawPid) {
-            dcf.identifiers().add(new DCField(obj.getPid()));
-        }
         // set the value of the dc datastream according to what's in the DCFields object
+        // ensure one of the dc:identifiers is the pid
         try {
-            dcxml.setXMLContent(dcf.getAsXML().getBytes("UTF-8"));
+            dcxml.setXMLContent(dcf.getAsXML(obj.getPid()).getBytes("UTF-8"));
         } catch (UnsupportedEncodingException uee) {
             // safely ignore... we know UTF-8 works
         }
