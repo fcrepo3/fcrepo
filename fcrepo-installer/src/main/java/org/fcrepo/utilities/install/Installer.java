@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.LogConfig;
-import org.fcrepo.utilities.Zip;
 import org.fcrepo.utilities.install.container.Container;
 import org.fcrepo.utilities.install.container.ContainerFactory;
 
@@ -103,52 +102,10 @@ public class Installer {
         // build a staging area in FEDORA_HOME
         try {
 
-            File warStage = new File(installDir, "fedorawar" + File.separator);
-            warStage.mkdirs();
-            Zip.unzip(_dist.get(Distribution.FEDORA_WAR), warStage);
-
-            /* REMOVE
-            // Remove commons-collections, commons-dbcp, and commons-pool
-            // from fedora.war if using Tomcat 5.0
-            String container = _opts.getValue(InstallOptions.SERVLET_ENGINE);
-            File webinfLib = new File(warStage, "WEB-INF/lib/");
-            if (container.equals(InstallOptions.INCLUDED)
-                    || container.equals(InstallOptions.EXISTING_TOMCAT)) {
-                File tomcatHome =
-                        new File(_opts.getValue(InstallOptions.TOMCAT_HOME));
-                File dbcp55 =
-                        new File(tomcatHome,
-                                 "common/lib/naming-factory-dbcp.jar");
-                File dbcp6 = new File(tomcatHome, "lib/tomcat-dbcp.jar");
-
-                if (!dbcp55.exists() && !dbcp6.exists()) {
-                    new File(webinfLib, Distribution.COMMONS_COLLECTIONS)
-                            .delete();
-                    new File(webinfLib, Distribution.COMMONS_DBCP).delete();
-                    new File(webinfLib, Distribution.COMMONS_POOL).delete();
-                    // JDBC driver installation into common/lib for Tomcat 5.0 is
-                    // handled by ExistingTomcat50
-                } else {
-                    installJDBCDriver(_dist, _opts, webinfLib);
-                }
-            } else {
-                installJDBCDriver(_dist, _opts, webinfLib);
-            }
-            */
-
-            // FeSL AuthZ configuration
-            /* REMOVE
-            if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
-            	File originalWsdd = new File(warStage, "WEB-INF/server-config.wsdd");
-            	originalWsdd.renameTo(new File(warStage, "WEB-INF/server-config.wsdd.backup.original"));
-
-            	File feslWsdd = new File(warStage, "WEB-INF/melcoe-pep-server-config.wsdd");
-            	feslWsdd.renameTo(new File(warStage, "WEB-INF/server-config.wsdd"));
-            }
-            */
-
             File fedoraWar = new File(installDir, fedoraWarName + ".war");
-            Zip.zip(fedoraWar, warStage.listFiles());
+            FileOutputStream out = new FileOutputStream(fedoraWar);
+
+            FileUtils.copy(_dist.get(Distribution.FEDORA_WAR), out);
             return fedoraWar;
 
         } catch (FileNotFoundException e) {
@@ -157,56 +114,6 @@ public class Installer {
             throw new InstallationFailedException(e.getMessage(), e);
 		}
     }
-
-    /* REMOVE
-    public static void installJDBCDriver(Distribution dist,
-                                         InstallOptions opts,
-                                         File destDir)
-            throws InstallationFailedException {
-        String databaseDriver = opts.getValue(InstallOptions.DATABASE_DRIVER);
-        String database = opts.getValue(InstallOptions.DATABASE);
-        InputStream is;
-        File driver = null;
-        boolean success = true;
-        try {
-            if (databaseDriver.equals(InstallOptions.INCLUDED)) {
-                if (database.equals(InstallOptions.INCLUDED)) {
-                    is = dist.get(Distribution.JDBC_DERBY);
-                    driver = new File(destDir, Distribution.JDBC_DERBY);
-                    success = FileUtils.copy(is, new FileOutputStream(driver));
-                } else if (database.equals(InstallOptions.DERBY)) {
-                    is = dist.get(Distribution.JDBC_DERBY_NETWORK);
-                    driver = new File(destDir, Distribution.JDBC_DERBY_NETWORK);
-                    success = FileUtils.copy(is, new FileOutputStream(driver));
-                } else if (database.equals(InstallOptions.MCKOI)) {
-                    is = dist.get(Distribution.JDBC_MCKOI);
-                    driver = new File(destDir, Distribution.JDBC_MCKOI);
-                    success = FileUtils.copy(is, new FileOutputStream(driver));
-                } else if (database.equals(InstallOptions.MYSQL)) {
-                    is = dist.get(Distribution.JDBC_MYSQL);
-                    driver = new File(destDir, Distribution.JDBC_MYSQL);
-                    success = FileUtils.copy(is, new FileOutputStream(driver));
-                } else if (database.equals(InstallOptions.POSTGRESQL)) {
-                    is = dist.get(Distribution.JDBC_POSTGRESQL);
-                    driver = new File(destDir, Distribution.JDBC_POSTGRESQL);
-                    success = FileUtils.copy(is, new FileOutputStream(driver));
-                }
-            } else {
-                File f =
-                        new File(opts.getValue(InstallOptions.DATABASE_DRIVER));
-                driver = new File(destDir, f.getName());
-                success = FileUtils.copy(f, driver);
-            }
-
-            if (!success) {
-                throw new InstallationFailedException("Copy to "
-                        + driver.getAbsolutePath() + " failed.");
-            }
-        } catch (IOException e) {
-            throw new InstallationFailedException(e.getMessage(), e);
-        }
-    }
-    */
 
     private void deployLocalService(Container container, String filename)
             throws InstallationFailedException {
