@@ -131,7 +131,7 @@ implements PolicyIndex {
             if (!policyFile.getName().endsWith(".xml"))
                 throw new PolicyIndexException("Invalid policy file name.  Policy files must end in .xml - " + policyFile.getName());
 
-            return PID.fromFilename(policyFile.getName().substring(0, policyFile.getName().lastIndexOf(".xml") - 1)).toString();
+            return PID.fromFilename(policyFile.getName().substring(0, policyFile.getName().lastIndexOf(".xml"))).toString();
         } catch (MalformedPIDException e) {
             throw new PolicyIndexException("Invalid policy file name.  Filename cannot be converted to a valid PID - " + policyFile.getName());
         }
