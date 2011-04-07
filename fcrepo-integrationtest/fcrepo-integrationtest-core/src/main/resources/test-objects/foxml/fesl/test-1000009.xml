@@ -4,7 +4,7 @@
   xmlns:foxml="info:fedora/fedora-system:def/foxml#"
   xmlns:tv="http://nish.person.org/tv#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <foxml:objectProperties>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="D"/>
     <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="It&amp;#x27;s Alive!"/>
   </foxml:objectProperties>
   <foxml:datastream CONTROL_GROUP="X"
@@ -25,7 +25,7 @@
     </foxml:datastreamVersion>
   </foxml:datastream>
   <foxml:datastream CONTROL_GROUP="X"
-    FEDORA_URI="info:fedora/test:1000009/DC" ID="DC" STATE="A" VERSIONABLE="true">
+    FEDORA_URI="info:fedora/test:1000009/DC" ID="DC" STATE="D" VERSIONABLE="true">
     <foxml:datastreamVersion
       FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.0"
       LABEL="Dublin Core" MIMETYPE="text/xml">
@@ -37,6 +37,7 @@
           <dc:type>video</dc:type>
           <dc:description>It is now 38 days since Dexter saved his sister and executed the Ice Truck Killer. Since that time however, Sgt. Doakes has spent all of his free time following Dexter sure in his belief that something about him is wrong. Dexter very much wants to kill someone and when the opportunity finally arrives, finds that he is unable to follow through. His sister Debra, apparently recovered from her ordeal, returns to work but Lt. Laguerta isn't so sure. Rita is happy with her relationship with Dexter, but her husband keeps pressuring her to help him with his defense. The police discover Dexter's burial ground.</dc:description>
           <dc:source>http://www.imdb.com/title/tt1013977/</dc:source>
+          <dc:subject/>
         </oai_dc:dc>
       </foxml:xmlContent>
     </foxml:datastreamVersion>

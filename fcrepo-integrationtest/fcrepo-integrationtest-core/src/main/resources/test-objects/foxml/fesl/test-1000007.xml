@@ -4,7 +4,7 @@
   xmlns:foxml="info:fedora/fedora-system:def/foxml#"
   xmlns:tv="http://nish.person.org/tv#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <foxml:objectProperties>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="D"/>
     <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Dexter"/>
   </foxml:objectProperties>
   <foxml:datastream CONTROL_GROUP="X"

@@ -37,6 +37,8 @@
           <dc:type>video</dc:type>
           <dc:description>Chuck is a computer geek who gets a computer full of information zapped into his brain...information that contains secrets that the federal government desperately needs to keep in Chuck's head...and keep Chuck, himself, intact. In the opener Chuck meets a woman who agrees to go on a date with him, but she's one of the government agents who's interested more in his head than his body.</dc:description>
           <dc:source>http://www.imdb.com/title/tt1035912/</dc:source>
+          <dc:subject>divisible-by-two</dc:subject>
+          <dc:subject>divisible-by-three</dc:subject>
         </oai_dc:dc>
       </foxml:xmlContent>
     </foxml:datastreamVersion>

@@ -25,7 +25,7 @@
     </foxml:datastreamVersion>
   </foxml:datastream>
   <foxml:datastream CONTROL_GROUP="X"
-    FEDORA_URI="info:fedora/test:1000011/DC" ID="DC" STATE="A" VERSIONABLE="true">
+    FEDORA_URI="info:fedora/test:1000011/DC" ID="DC" STATE="D" VERSIONABLE="true">
     <foxml:datastreamVersion
       FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.0"
       LABEL="Dublin Core" MIMETYPE="text/xml">
@@ -37,6 +37,7 @@
           <dc:type>video</dc:type>
           <dc:description>Dexter begins to question his blind loyalty to his father's memory. In an act of spontaneity, he wonders whether The Code of Harry is a necessity anymore.</dc:description>
           <dc:source>http://www.imdb.com/title/tt1242111/</dc:source>
+          <dc:subject>divisible-by-three</dc:subject>
         </oai_dc:dc>
       </foxml:xmlContent>
     </foxml:datastreamVersion>

@@ -53,7 +53,7 @@ class FilePolicyIndex
 extends PolicyIndexBase
 implements PolicyIndex {
 
-    private static final Logger log =
+    private static final Logger logger =
         LoggerFactory.getLogger(FilePolicyIndex.class.getName());
 
 
@@ -73,7 +73,7 @@ implements PolicyIndex {
         super();
         indexed = false; // this implementation returns all policies when queried - no indexing/filtering
 
-        log.info("Starting FilePolicyIndex");
+        logger.info("Starting FilePolicyIndex");
 
         dbFactory = DocumentBuilderFactory.newInstance();
         dbFactory.setNamespaceAware(true);
@@ -148,6 +148,7 @@ implements PolicyIndex {
     throws PolicyIndexException {
         writeLock.lock();
         try {
+            logger.debug("Adding policy named: " + name);
             return doAdd(name, document);
         } finally {
             writeLock.unlock();
@@ -164,6 +165,7 @@ implements PolicyIndex {
 
         writeLock.lock();
         try {
+            logger.debug("Deleting policy named: " + name);
             return doDelete(name);
         } finally {
             writeLock.unlock();
@@ -182,6 +184,7 @@ implements PolicyIndex {
 
         writeLock.lock();
         try {
+            logger.debug("Updating policy named: " + name);
             if (doDelete(name)) {
                 doAdd(name, newDocument);
                 return true;
@@ -205,6 +208,7 @@ implements PolicyIndex {
         }
 
         try {
+            logger.debug("Saving policy file in index: " + filename);
             DataFileUtils.saveDocument(filename, document.getBytes());
         } catch (Exception e) {
             throw new PolicyIndexException("Failed to save policy file " + filename);
@@ -221,13 +225,15 @@ implements PolicyIndex {
 
         File policy = nameToFile(name);
 
+        logger.debug("Removing policy file from index: " + policy);
+
         if (!policy.exists()) {
-            log.error("Policy " + name + " removed from cache, but no corresponding file found in policy cache directory");
+            logger.error("Policy " + name + " removed from cache, but no corresponding file found in policy cache directory");
         } else {
             // delete the file
             if (!policy.delete()) {
                 policy.deleteOnExit(); // just in case
-                log.error("Failed to delete policy file " + policy.getName() + ".  Marked for deletion on VM exit");
+                logger.error("Failed to delete policy file " + policy.getName() + ".  Marked for deletion on VM exit");
             }
         }
 
@@ -244,6 +250,7 @@ implements PolicyIndex {
     public byte[] getPolicy(String name) throws PolicyIndexException {
         readLock.lock();
         try {
+            logger.debug("Getting policy named: " + name);
             if (policies.containsKey(name)) {
                 return policies.get(name);
             } else {
@@ -271,6 +278,7 @@ implements PolicyIndex {
         writeLock.lock();
         try {
 
+            logger.debug("Clearing file policy index");
             // remove the policy files
             File policyDir = new File(DB_HOME);
             for (File policyFile :  policyDir.listFiles()) {
@@ -296,11 +304,11 @@ implements PolicyIndex {
      * @throws PolicyStoreException
      */
     private void initConfig() throws PolicyIndexException {
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             Runtime runtime = Runtime.getRuntime();
-            log.debug("Total memory: " + runtime.totalMemory() / 1024);
-            log.debug("Free memory: " + runtime.freeMemory() / 1024);
-            log.debug("Max memory: " + runtime.maxMemory() / 1024);
+            logger.debug("Total memory: " + runtime.totalMemory() / 1024);
+            logger.debug("Free memory: " + runtime.freeMemory() / 1024);
+            logger.debug("Max memory: " + runtime.maxMemory() / 1024);
         }
 
         try {
@@ -313,7 +321,7 @@ implements PolicyIndex {
                                                + f.getAbsolutePath());
             }
 
-            log.info("Loading config file: " + f.getAbsolutePath());
+            logger.info("Loading config file: " + f.getAbsolutePath());
 
             DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
             Document doc = docBuilder.parse(new FileInputStream(f));
@@ -339,8 +347,8 @@ implements PolicyIndex {
                         }
                     }
 
-                    if (log.isDebugEnabled()) {
-                        log.debug("[config] " + node.getNodeName() + ": "
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("[config] " + node.getNodeName() + ": "
                                   + db_home.getAbsolutePath());
                     }
                 }
@@ -350,7 +358,7 @@ implements PolicyIndex {
             }
 
         } catch (Exception e) {
-            log.error("Could not initialise FilePolicyIndex: " + e.getMessage(), e);
+            logger.error("Could not initialise FilePolicyIndex: " + e.getMessage(), e);
             throw new PolicyIndexException("Could not initialise FilePolicyIndex: "
                                            + e.getMessage(), e);
         }
@@ -364,7 +372,7 @@ implements PolicyIndex {
 
             if (policies == null) {
 
-                log.info("Populating FeSL File policy index cache");
+                logger.info("Populating FeSL File policy index cache");
 
                 policies = new ConcurrentHashMap<String, byte[]>();
 
@@ -382,17 +390,18 @@ implements PolicyIndex {
                     }
 
                     try {
-                        log.info("Loading FeSL policy from cache directory: " + f.getAbsolutePath());
+                        logger.info("Loading FeSL policy from cache directory: " + f.getAbsolutePath());
                         byte[] doc = DataFileUtils.loadFile(f);
 
                         String policyName = fileToName(f);
+                        logger.debug("Adding policy file to cache, policy name: " + policyName);
                         policies.put(policyName, doc);
                     } catch (Exception e) {
-                        log.error("Error loading document: " + f.getName(), e);
+                        logger.error("Error loading document: " + f.getName(), e);
                         throw new PolicyIndexException("Error loading document: " + f.getName(),e);
                     }
                 }
-                log.info("Populated cache with " + pf.length + " files");
+                logger.info("Populated cache with " + pf.length + " files");
             }
         } finally {
             writeLock.unlock();

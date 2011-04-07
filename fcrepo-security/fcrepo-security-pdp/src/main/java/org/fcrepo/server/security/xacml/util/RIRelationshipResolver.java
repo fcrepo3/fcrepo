@@ -184,6 +184,84 @@ public class RIRelationshipResolver
 
     }
 
+    @Override
+    public Set<String> getAttributesFromQuery(String query,
+                                              String queryLang,
+                                              String variable)
+            throws MelcoeXacmlException {
+
+        Set<String> res = new HashSet<String>();
+
+        // support tql = itql for the language
+        if (queryLang.equals("tql"))
+                queryLang = ITQL;
+
+        // tuple queries
+        if (queryLang.equals(ITQL) || queryLang.equals(SPARQL)) {
+            // check lang supported
+            if (!tupleLanguages.contains(queryLang)) {
+                logger.warn("RI query language " + queryLang + " is not supported");
+                return res;
+            }
+            // FIXME: should we limit?
+            try {
+                TupleIterator tuples = RI.findTuples(queryLang, query, 0, true);
+                if (tuples != null) {
+                    while (tuples.hasNext()) {
+                        Map<String, Node> tuple = tuples.next();
+                        Node variableValue = tuple.get("variable");
+                        if (variableValue != null) {
+                            res.add(variableValue.stringValue());
+                        } else {
+                            logger.error("Attribute query does not contain a result variable " + variable);
+                            return res;
+                        }
+                    }
+                }
+            } catch (TrippiException e) {
+                logger.error("Error running " + queryLang + " query " + query + " : " + e.getMessage(), e);
+            }
+
+
+        } else if (queryLang.equals("SPO")) {
+            // triple query
+            // check lang supported
+            if (!tripleLanguages.contains(queryLang)) {
+                logger.warn("RI query language " + queryLang + " is not supported");
+                return res;
+            }
+            // check variable is s, p, o
+            if (variable.length() == 1 && "spo".contains(variable)) {
+                try {
+                    TripleIterator triples = RI.findTriples(queryLang, query, 0, true);
+                    if (triples != null ) {
+                        while (triples.hasNext()) {
+                            Triple triple = triples.next();
+                            switch(variable.charAt(0)) {
+                                case 's':
+                                    res.add(triple.getSubject().stringValue());
+                                    break;
+                                case 'p':
+                                    res.add(triple.getSubject().stringValue());
+                                    break;
+                                case 'o':
+                                    res.add(triple.getSubject().stringValue());
+                                    break;
+                            }
+                        }
+                    }
+                } catch (TrippiException e) {
+                    logger.error("Error running " + queryLang + " query " + query + " : " + e.getMessage(), e);
+                }
+            } else {
+                logger.error("spo query must specify s, p or o as output variable binding");
+            }
+        } else {
+            logger.error("Query language not supported: " + queryLang);
+        }
+        return res;
+    }
+
 
     @Override
     public String buildRESTParentHierarchy(String pid)
@@ -384,5 +462,6 @@ public class RIRelationshipResolver
 
         return parentPIDs;
     }
+
 
 }

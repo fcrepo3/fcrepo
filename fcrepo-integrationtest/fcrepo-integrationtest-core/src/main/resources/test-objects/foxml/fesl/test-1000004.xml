@@ -4,7 +4,7 @@
   xmlns:foxml="info:fedora/fedora-system:def/foxml#"
   xmlns:tv="http://nish.person.org/tv#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <foxml:objectProperties>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="D"/>
     <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Chuck Versus the First Date"/>
   </foxml:objectProperties>
   <foxml:datastream CONTROL_GROUP="X"
@@ -37,6 +37,7 @@
           <dc:type>video</dc:type>
           <dc:description>Team Chuck recovers some equipment. They're told it's the last component for the new Intersect, which will be brought on line. Chuck is relieved at the prospect of returning to a normal life and asks Sarah out. Meanwhile Casey receives orders that cause some inner conflict.</dc:description>
           <dc:source>http://www.imdb.com/title/tt1185867/</dc:source>
+          <dc:subject>divisible-by-two</dc:subject>
         </oai_dc:dc>
       </foxml:xmlContent>
     </foxml:datastreamVersion>

@@ -25,7 +25,7 @@
     </foxml:datastreamVersion>
   </foxml:datastream>
   <foxml:datastream CONTROL_GROUP="X"
-    FEDORA_URI="info:fedora/test:1000012/DC" ID="DC" STATE="A" VERSIONABLE="true">
+    FEDORA_URI="info:fedora/test:1000012/DC" ID="DC" STATE="D" VERSIONABLE="true">
     <foxml:datastreamVersion
       FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.0"
       LABEL="Dublin Core" MIMETYPE="text/xml">
@@ -37,6 +37,7 @@
           <dc:type>video</dc:type>
           <dc:description>Dexter is desperate to find Freebo, the man he had intended to kill in the first place. He wants to find the man before his sister does or before ADA Miguel Prado, who has revenge on his mind. Debra tries to identify someone she believes is Freebo's latest victim and uses a fellow officer's confidential informant to get information. Prado isn't satisfied with the police investigation and is using telephone records to try and trace the man. Rita's pregnancy in confirmed and she and Dexter have to decide on the next steps. He has visions of producing someone like himself.</dc:description>
           <dc:source>http://www.imdb.com/title/tt1242115/</dc:source>
+          <dc:subject>divisible-by-two</dc:subject>
         </oai_dc:dc>
       </foxml:xmlContent>
     </foxml:datastreamVersion>

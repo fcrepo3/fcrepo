@@ -37,6 +37,7 @@
           <dc:format>video/x-msvideo</dc:format>
           <dc:type>video</dc:type>
           <dc:source>http://www.imdb.com/title/tt0934814</dc:source>
+          <dc:subject>dummy</dc:subject>
         </oai_dc:dc>
       </foxml:xmlContent>
     </foxml:datastreamVersion>

@@ -137,6 +137,11 @@ public class FedoraRIAttributeFinder
                     .createEmptyBag(attributeType));
         }
 
+        if (resourceId.equals("/FedoraRepository")) {
+            return new EvaluationResult(BagAttribute
+                                        .createEmptyBag(attributeType));
+        }
+
         // figure out which attribute we're looking for
         String attrName = attributeId.toString();
 
@@ -162,7 +167,7 @@ public class FedoraRIAttributeFinder
 
         EvaluationResult result = null;
         try {
-            result = getEvaluationResult(resourceId, attrName, attributeType);
+            result = getEvaluationResult(resourceId, attrName, designatorType, attributeType);
         } catch (Exception e) {
             logger.error("Error finding attribute: " + e.getMessage(), e);
             return new EvaluationResult(BagAttribute
@@ -175,18 +180,20 @@ public class FedoraRIAttributeFinder
     /**
      *
      * @param resourceID - the hierarchical XACML resource ID
-     * @param attribute - attribute to get - this is a URI and is the same as the Fedora relationship from the object/datastream
+     * @param attribute - attribute to get - this is a URI that maps to a Fedora relationship name
      * @param type
      * @return
      * @throws AttributeFinderException
      */
     private EvaluationResult getEvaluationResult(String resourceID,
                                                  String attribute,
+                                                 int designatorType,
                                                  URI type)
             throws AttributeFinderException {
 
         // split up the path of the hierarchical resource id
         String resourceParts[] = resourceID.split("/");
+        Set<String> results;
 
         // either the last part is the pid, or the last-but one is the pid and the last is the datastream
         // if we have a pid, we query on that, if we have a datastream we query on the datastream
@@ -204,24 +211,56 @@ public class FedoraRIAttributeFinder
             return new EvaluationResult(BagAttribute.createEmptyBag(type));
         }
 
+        logger.debug("Getting attribute for resource " + subject);
 
-        Map<String, Set<String>> relationships;
+        // the different types of RI attribute specification...
+        // if there is no "query" option for the attribute
+        String query = attributes.get(designatorType).get(attribute).get("query");
+        if (query == null) {
+            // it's a simple relationship lookup
+            // see if a relationship is specified, otherwise default to the attribute name URI
+            String relationship = attributes.get(designatorType).get(attribute).get("relationship");
+            if (relationship == null) {
+                relationship = attribute; // default to use attribute URI as relationship if none specified
+            }
+            Map<String, Set<String>> relationships;
 
-        try {
-            logger.debug("Getting relationships for " + subject);
-            relationships = relationshipResolver.getRelationships(subject, attribute);
-        } catch (MelcoeXacmlException e) {
-            throw new AttributeFinderException(e.getMessage(), e);
+            try {
+                logger.debug("Getting attribute using relationship " + relationship);
+                relationships = relationshipResolver.getRelationships(subject, relationship);
+            } catch (MelcoeXacmlException e) {
+                throw new AttributeFinderException(e.getMessage(), e);
+            }
+
+            if (relationships == null || relationships.isEmpty()) {
+                return new EvaluationResult(BagAttribute.createEmptyBag(type));
+            }
+
+            // there will only be results for one attribute, this will get all the values
+            results = relationships.get(relationship);
+
+        } else {
+            // get the language and query output variable
+            String queryLang = attributes.get(designatorType).get(attribute).get("queryLang");
+            String variable =  attributes.get(designatorType).get(attribute).get("variable");
+            String resource =  attributes.get(designatorType).get(attribute).get("resource");
+
+            String subjectURI = "info:fedora/" + subject;
+
+            // replace the resource marker in the query with the subject
+            query = query.replace(resource, subjectURI);
+
+            // run it
+            try {
+                logger.debug("Using a " + queryLang + " query to get attribute " + attribute);
+                results = relationshipResolver.getAttributesFromQuery(query, queryLang, variable);
+            } catch (MelcoeXacmlException e) {
+                throw new AttributeFinderException(e.getMessage(), e);
+            }
         }
 
-        if (relationships == null || relationships.isEmpty()) {
-            return new EvaluationResult(BagAttribute.createEmptyBag(type));
-
-        }
-
-        // there will only be results for one attribute, this will get all the values
-        Set<String> results = relationships.get(attribute);
         Set<AttributeValue> bagValues = new HashSet<AttributeValue>();
+        logger.debug("Attribute values found: " + results.size());
         for (String s : results) {
             AttributeValue attributeValue = null;
             try {
@@ -235,12 +274,13 @@ public class FedoraRIAttributeFinder
 
             if (logger.isDebugEnabled()) {
                 logger.debug("AttributeValue found: [" + type.toASCIIString()
-                        + "] " + s);
+                             + "] " + s);
             }
+
         }
 
         BagAttribute bag = new BagAttribute(type, bagValues);
-
         return new EvaluationResult(bag);
+
     }
 }
