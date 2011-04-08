@@ -13,6 +13,7 @@
 		<attribute designator="resource" name="info:fedora/fedora-system:def/model#createdDate" />
 		<attribute designator="resource" name="info:fedora/fedora-system:def/model#label" />
 		<attribute designator="resource" name="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" />
+    <attribute designator="resource" name="http://purl.org/dc/elements/1.1/subject" />
     
     <!-- example attributes using simple object and datastream relationships with a specified xacml attribute id -->
     <attribute designator="resource" name="http://www.example.org/fedora/xacml/attributes/resource#rel-subject">
@@ -38,13 +39,13 @@
     
     <!-- example SPARQL query-based attributes -->
     <attribute designator="resource" name="http://www.example.org/fedora/xacml/attributes/resource#sparql-subject">
-      <config name="queryLang" value="itql"/>
+      <config name="queryLang" value="sparql"/>
       <config name="resource" value="##resource##"/>
       <config name="value" value="output"/>
       <config name="query" value="SELECT ?output FROM &lt;#ri&gt; WHERE { &lt;##resource##&gt; &lt;http://purl.org/dc/elements/1.1/subject&gt; ?output . }"/>
     </attribute>
     <attribute designator="resource" name="http://www.example.org/fedora/xacml/attributes/resource#sparql-state">
-      <config name="queryLang" value="itql"/>
+      <config name="queryLang" value="sparql"/>
       <config name="resource" value="##resource##"/>
       <config name="value" value="output"/>
       <config name="query" value="SELECT ?output FROM &lt;#ri&gt; WHERE { &lt;##resource##&gt; &lt;info:fedora/fedora-system:def/model#state&gt; ?output . }"/>
@@ -52,14 +53,14 @@
     
     <!-- example SPO query-based attributes -->
     <attribute designator="resource" name="http://www.example.org/fedora/xacml/attributes/resource#spo-subject">
-      <config name="queryLang" value="itql"/>
+      <config name="queryLang" value="spo"/>
       <config name="resource" value="##resource##"/>
       <config name="value" value="o"/> <!-- the object of the spo triple query -->
       <config name="query" value="&lt;##resource##&gt; &lt;http://purl.org/dc/elements/1.1/subject&gt; *"/>
       <config name="relationship" value="http://purl.org/dc/elements/1.1/subject"/>
     </attribute>
     <attribute designator="resource" name="http://www.example.org/fedora/xacml/attributes/resource#spo-state">
-      <config name="queryLang" value="itql"/>
+      <config name="queryLang" value="spo"/>
       <config name="resource" value="##resource##"/>
       <config name="value" value="o"/>
       <config name="query" value="&lt;##resource##&gt; &lt;info:fedora/fedora-system:def/model#state&gt; *"/>

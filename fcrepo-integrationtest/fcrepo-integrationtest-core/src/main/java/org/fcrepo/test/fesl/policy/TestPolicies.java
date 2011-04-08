@@ -1,6 +1,9 @@
 
 package org.fcrepo.test.fesl.policy;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
@@ -168,74 +171,234 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
             policyUtils.delPolicy(policyId);
         }
     }
-/* --> see PolicyUtils
-    private static String getPolicyId(byte[] data) throws Exception {
-        Document doc = DataUtils.getDocumentFromBytes(data);
-        String pid = doc.getDocumentElement().getAttribute("PolicyId");
 
-        return pid;
+    /*
+     * Tests based on resource attributes sourced via the resource index.
+     * Note the attributes must be defined in the pdp/config/config-attribute-finder.xml.
+     *
+     * Attributes tested for are
+     * - dc:subject
+     * - object/datastream state
+     *
+     * See the test-objects.txt in the same directory as the test objects to see which
+     * objects have which attributes.
+     *
+     * Each pair of policies tested in the individual tests implement the same access conditions,
+     * but do so through different implementations; ie using different xacml resource attributes
+     * declared in the FedoraRIattribute finder configuration file.
+     *
+     * The different xacml resource id attribute declarations exercise sourcing attributes using:
+     * - simple Fedora relationships
+     * - TQL queries
+     * - SPARQL queries
+     * - SPO queries
+     *
+     */
+
+    @Test
+    public void testRIAttributesRels1() throws Exception {
+        doAttributesTest("test-policy-state-rel1.xml", "test-policy-subject-rel1.xml");
     }
 
-    private String addPolicy(String policyName) throws Exception {
-        byte[] policy =
-                DataUtils.loadFile(RESOURCEBASE + "/xacml/" + policyName);
+    @Test
+    public void testRIAttributesRels2() throws Exception {
+        doAttributesTest("test-policy-state-rel2.xml", "test-policy-subject-rel2.xml");
+    }
 
-        String policyId = getPolicyId(policy);
+    @Test
+    public void testRIAttributesTQL() throws Exception {
+        doAttributesTest("test-policy-state-itql.xml", "test-policy-subject-itql.xml");
+    }
 
-        String policyFile = "file:///" + (new File(RESOURCEBASE + "/xacml/" + policyName)).getAbsolutePath();
+    @Test
+    public void testRIAttributesSPARQL() throws Exception {
+        doAttributesTest("test-policy-state-sparql.xml", "test-policy-subject-sparql.xml");
+    }
 
-        // escape any pid namespace character
-        if (policyId.contains(":")) {
-            policyId = policyId.replace(":", "%3A");
+    @Test
+    public void testRIAttributesSPO() throws Exception {
+        doAttributesTest("test-policy-state-spo.xml", "test-policy-subject-spo.xml");
+    }
+
+    private void doAttributesTest(String statePolicy, String subjectPolicy) throws Exception {
+
+        String[] pidList;
+
+        // A. object/datastream state
+
+        // check permissions before adding policy
+        PermissionTest perms = new PermissionTest(1000000, 1000012, "test", "DC");
+        assertEquals("Allowed objects count (no policies)", perms.pidCount(), perms.object().allowed().size());
+        assertEquals("Allowed DC datastreams count (no policies)", perms.pidCount(), perms.datastream().allowed().size());
+
+        // load policy
+        String policyId = policyUtils.addPolicy(statePolicy);
+        try {
+            perms = new PermissionTest(1000000, 1000012, "test", "DC");
+            // objects that should be denied access
+            pidList = new String[]{
+                    "test:1000004",
+                    "test:1000005",
+                    "test:1000006",
+                    "test:1000007",
+                    "test:1000008",
+                    "test:1000009"
+            };
+            assertEquals(statePolicy + ": Access denied for objects", "", perms.object().denied().mismatch(pidList));
+            // datastreams that should be denied access
+            pidList = new String[]{
+                    "test:1000008",
+                    "test:1000009",
+                    "test:1000010",
+                    "test:1000011",
+                    "test:1000012"
+            };
+            assertEquals(statePolicy + ": Access denied for datastreams", "", perms.datastream().denied().mismatch(pidList));
+        } finally {
+            policyUtils.delPolicy(policyId);
         }
 
-        String pid = "demo:" + policyId;
+        // B. dc:subject attributes
 
-        StringBuilder foxml = new StringBuilder();
+        // check permissions before adding policy
+        perms = new PermissionTest(1000000, 1000012, "test", "DC");
+        assertEquals("Allowed objects count (no policies)", perms.pidCount(), perms.object().allowed().size());
+        assertEquals("Allowed DC datastreams count (no policies)", perms.pidCount(), perms.datastream().allowed().size());
 
-        // basic empty object
-
-        foxml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        foxml.append("<foxml:digitalObject VERSION=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
-        foxml.append("    xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\"\n");
-        foxml.append("           xsi:schemaLocation=\"" + Constants.FOXML.uri
-                     + " " + Constants.FOXML1_1.xsdLocation + "\"");
-        foxml.append("\n           PID=\"" + StreamUtility.enc(pid)
-                         + "\">\n");
-        foxml.append("  <foxml:objectProperties>\n");
-        foxml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>\n");
-        foxml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\""
-                + StreamUtility.enc("test policy object") + "\"/>\n");
-        foxml.append("  </foxml:objectProperties>\n");
-
-        foxml.append("<foxml:datastream ID=\"" + FedoraPolicyStore.POLICY_DATASTREAM
-                     + "\" CONTROL_GROUP=\"M\">");
-        foxml.append("<foxml:datastreamVersion ID=\"POLICY.0\" MIMETYPE=\"text/xml\" LABEL=\"XACML policy datastream\">");
-
-        foxml.append("  <foxml:contentLocation REF=\"" + policyFile
-                     + "\" TYPE=\"URL\"/>");
-
-
-        //foxml.append("  <foxml:xmlContent>");
-        //foxml.append(policy);
-        //foxml.append("    </foxml:xmlContent>");
-
-        foxml.append("  </foxml:datastreamVersion>");
-        foxml.append("</foxml:datastream>");
-
-
-        foxml.append("</foxml:digitalObject>");
-
-        apim.ingest(foxml.toString().getBytes("UTF-8"), FOXML1_1.uri,
-                    "ingesting new foxml object");
-
-        return policyId;
+        // load policy
+        policyId = policyUtils.addPolicy(subjectPolicy);
+        try {
+            perms = new PermissionTest(1000000, 1000012, "test", "");
+            // objects that should be allowed access (deny=if pid divisible by two and/or three by using dc:subject attrs that indicate this)
+            pidList = new String[]{
+                    "test:1000001",
+                    "test:1000003",
+                    "test:1000007",
+                    "test:1000009"
+            };
+            assertEquals(subjectPolicy + ": Access denied for objects", "", perms.object().allowed().mismatch(pidList));
+        } finally {
+            policyUtils.delPolicy(policyId);
+        }
     }
 
-    private void delPolicy(String policyId) throws Exception {
-        String pid = "demo:" + policyId;
-        apim.purgeObject(pid, "removing test policy object", false);
 
+    // utility class for performing object and datastream access tests on a range of pids
+    // representing the results in an [object | datastream] / [allowed | denied] / set of matching pids
+    // structure
+    class PermissionTest {
+        private final EntityPerms m_object = new EntityPerms();
+        private final EntityPerms m_datastream = new EntityPerms();
+        private final int m_first;
+        private final int m_last;
+        private final String m_pidns;
+        private final String m_dsid;
+
+        PermissionTest(int first, int last, String pidNamespace, String dsid) throws Exception {
+            m_first = first;
+            m_last = last;
+            m_pidns = pidNamespace;
+            m_dsid = dsid;
+            for (int i = m_first; i <= m_last; i++) {
+                String pid = m_pidns + ":" + i;
+
+                // test object access
+                String url = "/fedora/objects/" + pid + "?format=xml";
+                try {
+                    String response = httpUtils.get(url);
+                    // if we got here, it was allowed, so...
+                    m_object.allowed().add(pid);
+                } catch (AuthorizationDeniedException e) {
+                    // access was denied
+                    m_object.denied().add(pid);
+                }
+                // test datastream access
+                if (!m_dsid.equals("")) {
+                    url = "/fedora/objects/" + pid + "/datastreams/" + m_dsid + "?format=xml";
+                    try {
+                        String response = httpUtils.get(url);
+                        // if we got here, it was allowed, so...
+                        m_datastream.allowed().add(pid);
+                    } catch (AuthorizationDeniedException e) {
+                        // access was denied
+                        m_datastream.denied().add(pid);
+                    }
+                }
+            }
+            // sanity check - allowed + denied = number of objects tested
+            if (m_object.allowed().size() + m_object.denied().size() != pidCount()) {
+                fail("Error in checking permissions - total of allowed and denied objects does not equal number of objects tested");
+                throw new RuntimeException("Should not happen");
+            }
+            if (!m_dsid.equals("")) {
+                if (m_datastream.allowed().size() + m_datastream.denied().size() != pidCount()) {
+                    fail("Error in checking permissions - total of allowed and denied datastreams does not equal number of object datastreams tested");
+                    throw new RuntimeException("Also should not happen");
+                }
+            }
+        }
+
+        public EntityPerms object() {
+            return m_object;
+        }
+        public EntityPerms datastream() {
+            return m_datastream;
+        }
+        public int pidCount() {
+            return m_last - m_first + 1;
+        }
+
+        // holds two sets of pids, one for objects for which access was allowed, one for denied
+        class EntityPerms {
+            private final Perms m_allowed = new Perms();
+            private final Perms m_denied = new Perms();
+
+            public Perms allowed() {
+                return m_allowed;
+            }
+            public Perms denied() {
+                return m_denied;
+            }
+
+            // holds a set of pids with utility method for comparing to string array
+            class Perms extends HashSet<String>{
+                private static final long serialVersionUID =
+                        3747931619024146008L;
+
+                public boolean containsAll(String[] items) {
+                    return this.containsAll(Arrays.asList(items));
+                }
+                public boolean containsOnly(String[] items) {
+                    return ((this.size() == items.length) && containsAll(items));
+                }
+                /*
+                 * returns a string representation of difference between the set members and the supplied array.
+                 * Return empty string "" if items match
+                 */
+                public String mismatch(String[] items) {
+                    String res = "";
+                    if (containsOnly(items))
+                        return res; // they match
+
+                    // expected items not present in this set
+                    res += "Expected permission not found for: [ ";
+                    for (String item : items) {
+                        if (!contains(item))
+                            res += item + " ";
+                    }
+                    res += "]. ";
+
+                    // items in set not present in supplied array
+                    res += "Permission found but not expected for: [ ";
+                    List<String> asList = Arrays.asList(items);
+                    for (String item : this) {
+                        if (!asList.contains(item))
+                            res += item + " ";
+                    }
+                    res += "].";
+                    return res;
+                }
+            }
+        }
     }
-    */
 }

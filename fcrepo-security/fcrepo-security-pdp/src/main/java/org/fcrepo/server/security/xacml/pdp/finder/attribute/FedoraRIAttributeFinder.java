@@ -242,7 +242,7 @@ public class FedoraRIAttributeFinder
         } else {
             // get the language and query output variable
             String queryLang = attributes.get(designatorType).get(attribute).get("queryLang");
-            String variable =  attributes.get(designatorType).get(attribute).get("variable");
+            String variable =  attributes.get(designatorType).get(attribute).get("value");
             String resource =  attributes.get(designatorType).get(attribute).get("resource");
 
             String subjectURI = "info:fedora/" + subject;

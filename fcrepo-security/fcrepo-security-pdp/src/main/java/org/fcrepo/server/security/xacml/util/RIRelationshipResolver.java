@@ -209,7 +209,7 @@ public class RIRelationshipResolver
                 if (tuples != null) {
                     while (tuples.hasNext()) {
                         Map<String, Node> tuple = tuples.next();
-                        Node variableValue = tuple.get("variable");
+                        Node variableValue = tuple.get(variable);
                         if (variableValue != null) {
                             res.add(variableValue.stringValue());
                         } else {
@@ -223,7 +223,7 @@ public class RIRelationshipResolver
             }
 
 
-        } else if (queryLang.equals("SPO")) {
+        } else if (queryLang.equals(SPO)) {
             // triple query
             // check lang supported
             if (!tripleLanguages.contains(queryLang)) {
@@ -242,10 +242,10 @@ public class RIRelationshipResolver
                                     res.add(triple.getSubject().stringValue());
                                     break;
                                 case 'p':
-                                    res.add(triple.getSubject().stringValue());
+                                    res.add(triple.getPredicate().stringValue());
                                     break;
                                 case 'o':
-                                    res.add(triple.getSubject().stringValue());
+                                    res.add(triple.getObject().stringValue());
                                     break;
                             }
                         }

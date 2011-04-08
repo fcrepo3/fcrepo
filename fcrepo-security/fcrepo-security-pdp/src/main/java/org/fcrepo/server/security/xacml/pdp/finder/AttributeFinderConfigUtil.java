@@ -63,12 +63,15 @@ public class AttributeFinderConfigUtil {
                             des.get(attributeName);
                     if (attr == null) {
                         attr = des.put(attributeName);
+                    } else {
+                        logger.warn("Duplicate attribute definition for " + designatorName + " : " + attributeName);
                     }
+                    logger.debug("Added attribute " + designatorName + " : " + attributeName);
                     // do each child config element
                     NodeList attributeConfigs = attribute.getChildNodes();
                     for (int z = 0; z < attributeConfigs.getLength(); z++) {
                         Node attributeConfig = attributeConfigs.item(z);
-                        if (attributeConfig.getNodeType() == Node.ELEMENT_NODE && attribute.getNodeName().equals("config")) {
+                        if (attributeConfig.getNodeType() == Node.ELEMENT_NODE && attributeConfig.getNodeName().equals("config")) {
                             String configName = attributeConfig.getAttributes().getNamedItem("name").getNodeValue();
                             if (configName == null)
                                 throw new AttributeFinderException("Missing name attribute on config element");
@@ -77,6 +80,7 @@ public class AttributeFinderConfigUtil {
                                 throw new AttributeFinderException("Missing value attribute on config element");
                             }
                             attr.put(configName, configValue);
+                            logger.debug("Added attribute config " + configName + " : " + configValue);
                         }
                     }
                 }
