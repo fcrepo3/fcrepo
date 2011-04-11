@@ -25,7 +25,7 @@
     </foxml:datastreamVersion>
   </foxml:datastream>
   <foxml:datastream CONTROL_GROUP="X"
-    FEDORA_URI="info:fedora/test:1000010/DC" ID="DC" STATE="A" VERSIONABLE="true">
+    FEDORA_URI="info:fedora/test:1000010/DC" ID="DC" STATE="D" VERSIONABLE="true">
     <foxml:datastreamVersion
       FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.0"
       LABEL="Dublin Core" MIMETYPE="text/xml">
@@ -37,6 +37,7 @@
           <dc:type>video</dc:type>
           <dc:description>Dexter's failure to dispose of Little Chino results in the tragic death of a witness against him. He's determined to get it right the next time, but Sgt. Doakes is still following him in his off hours. With the discovery of Dexter's burial ground, a special joint task force with the FBI is established. Doakes hopes to join but is rebuffed. Debra Morgan clearly has not recovered fully from her ordeal with the Ice Truck Killer but her use of excessive force results in a major drug bust. Rita is having trouble coming to grips with the death of her husband and she now realizes that Dexter set him up. In order to explain however, Dexter embellishes his story somewhat.</dc:description>
           <dc:source>http://www.imdb.com/title/tt1013981/</dc:source>
+          <dc:subject>divisible-by-two</dc:subject>
         </oai_dc:dc>
       </foxml:xmlContent>
     </foxml:datastreamVersion>

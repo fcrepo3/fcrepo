@@ -4,7 +4,7 @@
   xmlns:foxml="info:fedora/fedora-system:def/foxml#"
   xmlns:tv="http://nish.person.org/tv#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <foxml:objectProperties>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="D"/>
     <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Dexter"/>
   </foxml:objectProperties>
   <foxml:datastream CONTROL_GROUP="X"
@@ -38,6 +38,8 @@
           <dc:type>video</dc:type>
           <dc:description>During the day, Dexter Morgan is a jovial employee in the Miami Metropolitan Police Department's crime lab, but his meticulously crafted life masks his true nature. In reality Dexter is a disciplined and murderous psychopath (a self-admitted "monster"), and he slakes his blood lust at night by carefully killing the serial killers he tracks down during the day. Based on the novels (Darkly Dreaming Dexter, Dearly Devoted Dexter and Dexter in the Dark) by Jeff Lindsay.</dc:description>
           <dc:source>http://www.imdb.com/title/tt0773262</dc:source>
+          <dc:subject>divisible-by-two</dc:subject>
+          <dc:subject>dummy</dc:subject>
         </oai_dc:dc>
       </foxml:xmlContent>
     </foxml:datastreamVersion>

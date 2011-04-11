@@ -60,4 +60,19 @@ public interface RelationshipResolver {
      */
     public String buildRESTParentHierarchy(String pid)
             throws MelcoeXacmlException;
+
+    /**
+     * Get attributes defined by a query.
+     *
+     * The values returned are defined by the variable defined in the query
+     *
+     * Only distinct values are returned.
+     *
+     * @param query The query to run
+     * @param queryLang Language of the query - itql, sparql, spo
+     * @param variable - the output variable to return (for spo, specify "s", "p" or "o")
+     * @return
+     * @throws MelcoeXacmlException
+     */
+    public Set<String> getAttributesFromQuery(String query, String queryLang, String variable) throws MelcoeXacmlException;
 }

@@ -82,6 +82,7 @@ import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.storage.types.XMLDatastreamProcessor;
+import org.fcrepo.server.utilities.DCFields;
 import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationConstants;
@@ -900,6 +901,14 @@ public class DefaultManagement
                 checksumType = orig.DSChecksumType;
             } else {
                 checksumType = Datastream.validateChecksumType(checksumType);
+            }
+            if ("DC".equals(datastreamId)){
+                DCFields audited = new DCFields(dsContent);
+                try {
+                    dsContent = new ByteArrayInputStream(audited.getAsXML(pid).getBytes("UTF-8"));
+                } catch (UnsupportedEncodingException uee) {
+                    // safely ignore... we know UTF-8 works
+                }
             }
 
             // create new datastream (version) based on existing one

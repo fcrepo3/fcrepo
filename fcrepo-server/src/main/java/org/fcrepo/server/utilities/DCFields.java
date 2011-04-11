@@ -239,6 +239,23 @@ public class DCFields
      * the oai_dc schema.... but without the xml declaration.
      */
     public String getAsXML() {
+        return getAsXML(null);
+    }
+    
+    /**
+     * Ensure the dc:identifiers include the pid of the target object
+            * @param targetPid
+            * @return
+     */
+    public String getAsXML(String targetPid) {
+        boolean addPid = (targetPid != null);
+        if (addPid) {
+        for (DCField dcField : identifiers()) {
+            if (dcField.getValue().equals(targetPid)) {
+                addPid = false;
+            }
+        }
+        }
         StringBuffer out = new StringBuffer();
         out.append("<" + OAI_DC.prefix + ":dc" + " xmlns:" + OAI_DC.prefix
                 + "=\"" + OAI_DC.uri + "\"" + "\nxmlns:" + DC.prefix + "=\""
@@ -254,6 +271,9 @@ public class DCFields
         appendXML(dates(), "date", out);
         appendXML(types(), "type", out);
         appendXML(formats(), "format", out);
+        if (addPid) {
+            appendXML(new DCField(targetPid), "identifier", out);
+        }
         appendXML(identifiers(), "identifier", out);
         appendXML(sources(), "source", out);
         appendXML(languages(), "language", out);
@@ -261,18 +281,20 @@ public class DCFields
         appendXML(coverages(), "coverage", out);
         appendXML(rights(), "rights", out);
         out.append("</oai_dc:dc>\n");
-        return out.toString();
-    }
+        return out.toString();    }
 
     private void appendXML(List<DCField> values, String name, StringBuffer out) {
-        for (DCField field : values) {
-            out.append("  <dc:" + name);
-            if (field.getLang() != null) {
-                out.append(" xml:lang=\"" + field.getLang() + "\"");
-            }
-            out.append(">");
-            out.append(StreamUtility.enc(field.getValue()));
-            out.append("</dc:" + name + ">\n");
+        for (DCField value : values) {
+            appendXML(value, name, out);
         }
+    }
+    private void appendXML(DCField value, String name, StringBuffer out) {
+        out.append("  <dc:" + name);
+        if (value.getLang() != null) {
+            out.append(" xml:lang=\"" + value.getLang() + "\"");
+        }
+        out.append(">");
+        out.append(StreamUtility.enc(value.getValue()));
+        out.append("</dc:" + name + ">\n");
     }
 }

@@ -61,10 +61,20 @@ public abstract class XPathPolicyIndex
                 if (bean.getId().equals(XACML_RESOURCE_ID)) {
                     variables.put("XacmlResourceId", bean.getId());
 
+                    if (log.isDebugEnabled()) {
+                        log.debug("XacmlResourceId = '" + bean.getId()
+                                  + "'");
+                    }
+
+
                     int c = 0;
                     for (String value : bean.getValues()) {
                         variables.put("XacmlResourceIdValue"
                                           + c, value);
+                        if (log.isDebugEnabled()) {
+                            log.debug("XacmlResourceIdValue"
+                                      + c + " = '" + value + "'");
+                        }
 
 
                         c++;
@@ -107,8 +117,7 @@ public abstract class XPathPolicyIndex
      * @param r number of resource-id values
      * @return
      */
-    // FIXME: public for some external testing
-    public static String getXpath(Map<String, Set<AttributeBean>> attributeMap) {
+    protected static String getXpath(Map<String, Set<AttributeBean>> attributeMap) {
 
         int sections = 0;
         StringBuilder sb = new StringBuilder();
@@ -140,15 +149,12 @@ public abstract class XPathPolicyIndex
 
             sections++;
 
-            // start of Target
+            // Target:Start
             sb.append("(");
 
 
+            // TargetNotSpecified:Start
             // selects policies which do not specify resources/subjects etc
-            // old DBXML version - relies on dbxml metadata
-            // sb.append("(exists(dbxml:metadata('m:any" + t + "')))");
-
-            // instead...
             sb.append("(");
             // true if no resouces targets found in policy
             sb.append("not(p:" + t+ "s)");
@@ -156,16 +162,46 @@ public abstract class XPathPolicyIndex
             // matches the legacy 1.0 "AnyResource etc - should not be required
             sb.append("p:" + t + "s/p:Any" + t);
 
-            sb.append(")");
+            sb.append(")");  // TargetNotSpecified:End
 
             int count = 0;
+
+            // test for a policy attribute id not specified in the request
+            // (as the request doesn't (yet) know about the attribute, there should be a match; eg custom RI attribute)
+            sb.append(" or (");
+            sb.append("p:" + t + "s" + "/p:" + t + "/p:" + t + "Match/p:" + t + "AttributeDesignator/@AttributeId[" );
+            // do each attribute ID
+            boolean firstBean = true;
+            for (AttributeBean bean : attributeMap.get(t.toLowerCase() + "Attributes")) {
+
+                if (!firstBean) {
+                    sb.append(" and ");
+                }
+
+                // special case for XACML_RESOURCE_ID (but see FIXME note below...)
+                if (bean.getId().equals(XACML_RESOURCE_ID) && resourceValueCount > 0) {
+                    // tests that policy attribute id is not the request attribute id
+                    sb.append(". != $XacmlResourceId");
+                    firstBean = false;
+                } else {
+                    // same for non XACML_RESOURCE_ID
+                    sb.append("$" + t + "Id" + count);
+                    firstBean = false;
+                }
+            }
+
+            sb.append("]");
+            sb.append(")");
+
+            // Do each target attribute id
             for (AttributeBean bean : attributeMap.get(t.toLowerCase()
                     + "Attributes")) {
                 sb.append(" or ");
                 sb.append("(");
 
-                // FIXME: r > 0 seems to cater for a case where there is/are resource attributeBeans, but
+                // FIXME: r = 0 seems to cater for a case where there is/are resource attributeBeans, but
                 // no attribute values are specified - could this actually happen?
+
                 if (bean.getId().equals(XACML_RESOURCE_ID) && resourceValueCount > 0) {
                     sb.append("p:" + t + "s/p:" + t + "/p:" + t + "Match/");
                     sb.append("p:" + t + "AttributeDesignator/@AttributeId = ");
@@ -218,7 +254,7 @@ public abstract class XPathPolicyIndex
                 }
                 sb.append(")");
             }
-            sb.append(")"); // end of Target
+            sb.append(")"); // Target:End
         }
         sb.append("]");
 

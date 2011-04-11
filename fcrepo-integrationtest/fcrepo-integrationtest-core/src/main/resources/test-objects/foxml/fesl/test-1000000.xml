@@ -19,6 +19,7 @@
           <dc:format>text/xml</dc:format>
           <dc:type>collection</dc:type>
           <dc:description>Favourite TV Series</dc:description>
+          <dc:subject>divisible-by-two</dc:subject>
         </oai_dc:dc>
       </foxml:xmlContent>
     </foxml:datastreamVersion>

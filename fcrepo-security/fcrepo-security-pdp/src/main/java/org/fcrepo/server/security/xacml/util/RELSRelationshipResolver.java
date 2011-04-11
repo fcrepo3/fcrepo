@@ -202,4 +202,14 @@ public class RELSRelationshipResolver extends RelationshipResolverBase
         }
         return parentPIDs;
     }
+
+    @Override
+    public Set<String> getAttributesFromQuery(String query,
+                                              String queryLang,
+                                              String variable)
+            throws MelcoeXacmlException {
+        // can't run queries for a RELS relationship resolver
+        logger.warn("RELS relationship resolver does not support retrieving attributes with an RI query");
+        return new HashSet<String>();
+    }
 }

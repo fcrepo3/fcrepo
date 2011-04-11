@@ -25,8 +25,10 @@ import org.fcrepo.server.security.PolicyFinderModule;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderConfigUtil;
 import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderException;
+import org.fcrepo.server.security.xacml.util.AttributeFinderConfig;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.RelationshipResolver;
+import org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator;
 
 public class FedoraRIAttributeFinder
         extends AttributeFinderModule {
@@ -38,43 +40,44 @@ public class FedoraRIAttributeFinder
 
     private RelationshipResolver m_relationshipResolver = null;
 
-    private Map<Integer, Set<String>> m_attributes = null;
+    private AttributeFinderConfig m_attributes = new AttributeFinderConfig();
 
     public FedoraRIAttributeFinder() {
-        Set<String> empty = Collections.emptySet();
-        m_attributes = new HashMap<Integer,Set<String>>(4);
-        m_attributes.put(AttributeDesignator.ACTION_TARGET, empty);
-        m_attributes.put(AttributeDesignator.ENVIRONMENT_TARGET, empty);
-        m_attributes.put(AttributeDesignator.RESOURCE_TARGET, empty);
-        m_attributes.put(AttributeDesignator.SUBJECT_TARGET, empty);
     }
     
     public void setRelationshipResolver(RelationshipResolver relationshipResolver) {
         m_relationshipResolver = relationshipResolver;
     }
     
+    protected void setAttributes(int designator, Set<String> attributes){
+        Designator d = m_attributes.get(designator);
+        for (String att:attributes){
+            d.put(att);
+        }
+    }
+    
     public void setActionAttributes(Set<String> attributes){
-        m_attributes.put(AttributeDesignator.ACTION_TARGET, attributes);
+        setAttributes(AttributeDesignator.ACTION_TARGET,attributes);
     }
     
     public void setEnvironmentAttributes(Set<String> attributes){
-        m_attributes.put(AttributeDesignator.ENVIRONMENT_TARGET, attributes);
+        setAttributes(AttributeDesignator.ENVIRONMENT_TARGET,attributes);
     }
     
     public void setResourceAttributes(Set<String> attributes){
-        m_attributes.put(AttributeDesignator.RESOURCE_TARGET, attributes);
+        setAttributes(AttributeDesignator.RESOURCE_TARGET,attributes);
     }
 
     public void setSubjectAttributes(Set<String> attributes){
-        m_attributes.put(AttributeDesignator.SUBJECT_TARGET, attributes);
+        setAttributes(AttributeDesignator.SUBJECT_TARGET,attributes);
     }
 
     private boolean emptyAttributeMap() {
         boolean result = true;
-        result &= m_attributes.get(AttributeDesignator.ACTION_TARGET).size() == 0;
-        result &= m_attributes.get(AttributeDesignator.ENVIRONMENT_TARGET).size() == 0;
-        result &= m_attributes.get(AttributeDesignator.RESOURCE_TARGET).size() == 0;
-        result &= m_attributes.get(AttributeDesignator.SUBJECT_TARGET).size() == 0;
+        result &= m_attributes.get(AttributeDesignator.ACTION_TARGET).getAttributeNames().size() == 0;
+        result &= m_attributes.get(AttributeDesignator.ENVIRONMENT_TARGET).getAttributeNames().size() == 0;
+        result &= m_attributes.get(AttributeDesignator.RESOURCE_TARGET).getAttributeNames().size() == 0;
+        result &= m_attributes.get(AttributeDesignator.SUBJECT_TARGET).getAttributeNames().size() == 0;
         return result;
     }
 
@@ -86,9 +89,9 @@ public class FedoraRIAttributeFinder
         }
         if (logger.isDebugEnabled()) {
             logger.debug("registering the following attributes: ");
-            for (Integer k : m_attributes.keySet()) {
-                for (String l : m_attributes.get(k)) {
-                    logger.debug(k + ": " + l);
+            for (int desNum : m_attributes.getDesignatorIds()) {
+                for (String attrName : m_attributes.get(desNum).getAttributeNames()) {
+                    logger.debug(desNum + ": " + attrName);
                 }
             }
         }
@@ -119,7 +122,7 @@ public class FedoraRIAttributeFinder
      */
     @Override
     public Set<Integer> getSupportedDesignatorTypes() {
-        return m_attributes.keySet();
+        return m_attributes.getDesignatorIds();
     }
 
     /**
@@ -170,11 +173,16 @@ public class FedoraRIAttributeFinder
                     .createEmptyBag(attributeType));
         }
 
+        if (resourceId.equals("/FedoraRepository")) {
+            return new EvaluationResult(BagAttribute
+                                        .createEmptyBag(attributeType));
+        }
+
         // figure out which attribute we're looking for
         String attrName = attributeId.toString();
 
         // we only know about registered attributes from config file
-        if (!m_attributes.keySet().contains(new Integer(designatorType))) {
+        if (!m_attributes.getDesignatorIds().contains(new Integer(designatorType))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Does not know about designatorType: "
                         + designatorType);
@@ -184,7 +192,7 @@ public class FedoraRIAttributeFinder
         }
 
         Set<String> allowedAttributes =
-                m_attributes.get(new Integer(designatorType));
+            m_attributes.get(designatorType).getAttributeNames();
         if (!allowedAttributes.contains(attrName)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Does not know about attribute: " + attrName);
@@ -195,7 +203,7 @@ public class FedoraRIAttributeFinder
 
         EvaluationResult result = null;
         try {
-            result = getEvaluationResult(resourceId, attrName, attributeType);
+            result = getEvaluationResult(resourceId, attrName, designatorType, attributeType);
         } catch (Exception e) {
             logger.error("Error finding attribute: " + e.getMessage(), e);
             return new EvaluationResult(BagAttribute
@@ -208,18 +216,20 @@ public class FedoraRIAttributeFinder
     /**
      *
      * @param resourceID - the hierarchical XACML resource ID
-     * @param attribute - attribute to get - this is a URI and is the same as the Fedora relationship from the object/datastream
+     * @param attribute - attribute to get - this is a URI that maps to a Fedora relationship name
      * @param type
      * @return
      * @throws AttributeFinderException
      */
     private EvaluationResult getEvaluationResult(String resourceID,
                                                  String attribute,
+                                                 int designatorType,
                                                  URI type)
             throws AttributeFinderException {
 
         // split up the path of the hierarchical resource id
         String resourceParts[] = resourceID.split("/");
+        Set<String> results;
 
         // either the last part is the pid, or the last-but one is the pid and the last is the datastream
         // if we have a pid, we query on that, if we have a datastream we query on the datastream
@@ -237,24 +247,56 @@ public class FedoraRIAttributeFinder
             return new EvaluationResult(BagAttribute.createEmptyBag(type));
         }
 
+        logger.debug("Getting attribute for resource " + subject);
 
-        Map<String, Set<String>> relationships;
+        // the different types of RI attribute specification...
+        // if there is no "query" option for the attribute
+        String query = m_attributes.get(designatorType).get(attribute).get("query");
+        if (query == null) {
+            // it's a simple relationship lookup
+            // see if a relationship is specified, otherwise default to the attribute name URI
+            String relationship = m_attributes.get(designatorType).get(attribute).get("relationship");
+            if (relationship == null) {
+                relationship = attribute; // default to use attribute URI as relationship if none specified
+            }
+            Map<String, Set<String>> relationships;
 
-        try {
-            logger.debug("Getting relationships for " + subject);
-            relationships = m_relationshipResolver.getRelationships(subject);
-        } catch (MelcoeXacmlException e) {
-            throw new AttributeFinderException(e.getMessage(), e);
+            try {
+                logger.debug("Getting attribute using relationship " + relationship);
+                relationships = m_relationshipResolver.getRelationships(subject, relationship);
+            } catch (MelcoeXacmlException e) {
+                throw new AttributeFinderException(e.getMessage(), e);
+            }
+
+            if (relationships == null || relationships.isEmpty()) {
+                return new EvaluationResult(BagAttribute.createEmptyBag(type));
+            }
+
+            // there will only be results for one attribute, this will get all the values
+            results = relationships.get(relationship);
+
+        } else {
+            // get the language and query output variable
+            String queryLang = m_attributes.get(designatorType).get(attribute).get("queryLang");
+            String variable =  m_attributes.get(designatorType).get(attribute).get("value");
+            String resource =  m_attributes.get(designatorType).get(attribute).get("resource");
+
+            String subjectURI = "info:fedora/" + subject;
+
+            // replace the resource marker in the query with the subject
+            query = query.replace(resource, subjectURI);
+
+            // run it
+            try {
+                logger.debug("Using a " + queryLang + " query to get attribute " + attribute);
+                results = m_relationshipResolver.getAttributesFromQuery(query, queryLang, variable);
+            } catch (MelcoeXacmlException e) {
+                throw new AttributeFinderException(e.getMessage(), e);
+            }
         }
 
-        if (relationships == null || relationships.isEmpty()) {
-            return new EvaluationResult(BagAttribute.createEmptyBag(type));
-
-        }
-
-        // there will only be results for one attribute, this will get all the values
-        Set<String> results = relationships.get(attribute);
         Set<AttributeValue> bagValues = new HashSet<AttributeValue>();
+        logger.debug("Attribute values found: " + results.size());
         for (String s : results) {
             AttributeValue attributeValue = null;
             try {
@@ -268,13 +310,14 @@ public class FedoraRIAttributeFinder
 
             if (logger.isDebugEnabled()) {
                 logger.debug("AttributeValue found: [" + type.toASCIIString()
-                        + "] " + s);
+                             + "] " + s);
             }
+
         }
 
         BagAttribute bag = new BagAttribute(type, bagValues);
-
         return new EvaluationResult(bag);
+
     }
 
     @Override
