@@ -176,7 +176,7 @@ public class RelationshipResolverImpl
         } else if (parts.length == 2) {
             subjectURI = pid.toURI() + "/" + parts[1]; // add datastream
         } else {
-            logger.warn("Invalid subject argumet for getRelationships: " + subject + ". Should be pid or datastream (URI form optional");
+            logger.warn("Invalid subject argument for getRelationships: " + subject + ". Should be pid or datastream (URI form optional");
             subjectURI = null;
         }
         
@@ -188,7 +188,7 @@ public class RelationshipResolverImpl
         return getRelationships(subject, null);
     }
 
-    private Map<String, Set<String>> getRelationships(String subject,
+    public Map<String, Set<String>> getRelationships(String subject,
                                                       String relationship)
             throws MelcoeXacmlException {
 
@@ -283,5 +283,15 @@ public class RelationshipResolverImpl
         // should be left with "demo:foo" or "demo:foo/demo:bar"
 
         return PID.getInstance(pid.split("\\/")[0]);
+    }
+
+    @Override
+    public Set<String> getAttributesFromQuery(String query,
+                                              String queryLang,
+                                              String variable)
+            throws MelcoeXacmlException {
+        // can't run queries for a RELS relationship resolver
+        logger.warn("RELS relationship resolver does not support retrieving attributes with an RI query");
+        return Collections.emptySet();
     }
 }

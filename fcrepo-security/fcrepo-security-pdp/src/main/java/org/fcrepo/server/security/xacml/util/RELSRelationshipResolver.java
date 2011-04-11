@@ -6,6 +6,7 @@ package org.fcrepo.server.security.xacml.util;
 
 import java.io.File;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -210,6 +211,6 @@ public class RELSRelationshipResolver extends RelationshipResolverBase
             throws MelcoeXacmlException {
         // can't run queries for a RELS relationship resolver
         logger.warn("RELS relationship resolver does not support retrieving attributes with an RI query");
-        return new HashSet<String>();
+        return Collections.emptySet();
     }
 }
