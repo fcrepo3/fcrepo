@@ -20,22 +20,12 @@
         </bean>
         <!-- Uncomment the bean below to enable the use of relationship index triples in XACML policies -->
         <!--
-        <bean id="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder"
-              class="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder"
+        <bean id="org.fcrepo.server.security.xacml.pdp.finder.attribute.RITriplesAttributeFinder"
+              class="org.fcrepo.server.security.xacml.pdp.finder.attribute.RITriplesAttributeFinder"
               init-method="init">
-              <property name="relationshipResolver">
-                <bean class="org.fcrepo.server.security.xacml.util.ResourceIndexRelationshipResolver">
-                  <constructor-arg>
-                    <map>
-                      <entry key="parent-child-relationship-1"><value type="java.lang.String">info:fedora/fedora-system:def/relations-external#isMemberOf</value></entry>
-                      <entry key="parent-child-relationship-2"><value type="java.lang.String">info:fedora/fedora-system:def/relations-external#isMemberOfCollection</value></entry>
-                      <entry key="parent-child-relationship-3"><value type="java.lang.String">info:fedora/fedora-system:def/relations-external#isPartOf</value></entry>
-                    </map>
-                  </constructor-arg>
-                  <property name="resourceIndex">
-                      <ref bean="org.fcrepo.server.resourceIndex.ResourceIndex" />
-                  </property>
-                </bean>              </property>
+              <constructor-arg>
+                  <ref bean="org.fcrepo.server.resourceIndex.ResourceIndex" />
+              </constructor-arg>
               <property name="resourceAttributes">
                 <set>
                   <value type="java.lang.String">info:fedora/fedora-system:def/view#mimeType</value>
@@ -58,7 +48,7 @@
                       <ref bean="org.fcrepo.server.security.ContextAttributeFinderModule" />
         <!-- Uncomment the bean below to enable the use of relationship index triples in XACML policies -->
         <!--
-                      <ref bean="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder" />
+                      <ref bean="org.fcrepo.server.security.xacml.pdp.finder.attribute.RITriplesAttributeFinder" />
         -->              
                   </list>
               </property>
