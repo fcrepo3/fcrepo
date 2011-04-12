@@ -111,7 +111,6 @@
         <include>README.txt</include>
         <include>triple-generator.xml</include>
         <include>policy-enforcement.xml</include>
-        <include>policy-enforcement.xml.fesl</include>
       </includes>
     </fileSet>
 

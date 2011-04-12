@@ -84,14 +84,6 @@ public class FedoraHome {
                 FileUtils.delete(serverDir);
             } else {
                 setScriptsExecutable(new File(serverDir, "bin"));
-                if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
-                    File springDir = new File(serverDir, "config" + File.separator + "spring");
-                    File originalWsdd = new File(springDir, "policy-enforcement.xml");
-                    originalWsdd.renameTo(new File(springDir, "policy-enforcement.xml.backup.original"));
-
-                    File feslWsdd = new File(springDir, "policy-enforcement.xml.fesl");
-                    feslWsdd.renameTo(new File(springDir, "policy-enforcement.xml"));
-                }
             }
         } catch (IOException e) {
             throw new InstallationFailedException(e.getMessage(), e);
