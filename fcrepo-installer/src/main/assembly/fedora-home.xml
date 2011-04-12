@@ -116,9 +116,6 @@
     <fileSet>
       <directory>src/main/resources/config/spring/web</directory>
       <outputDirectory>/server/config/spring/web</outputDirectory>
-      <includes>
-        <include>*.xml</include>
-      </includes>
     </fileSet>
 
     <fileSet>

@@ -75,36 +75,83 @@
       <security:filter-invocation-definition-source
         path-type="ant">
 
-        <security:intercept-url pattern="/management/upload"
-          access="${security.ssl.api.management}" />
-        <security:intercept-url pattern="/services/management"
-          access="${security.ssl.api.management}" />
-        <security:intercept-url pattern="/management/getNextPID"
-          access="${security.ssl.api.management}" />
-        <security:intercept-url pattern="/getDSAuthenticated*/**"
-          access="${security.ssl.api.management}" />
-        <security:intercept-url pattern="/**.jws"
-          access="${security.ssl.api.management}" />
-
-
+        <!-- API-A-Lite -->
         <security:intercept-url pattern="/get*/**"
           access="${security.ssl.api.access}" />
-        <security:intercept-url pattern="/describe*/**"
+        <security:intercept-url pattern="/search*"
           access="${security.ssl.api.access}" />
         <security:intercept-url pattern="/list*/**"
           access="${security.ssl.api.access}" />
+        <security:intercept-url pattern="/describe*"
+          access="${security.ssl.api.access}" />
+
+        <!-- API-M-Lite -->
+        <security:intercept-url pattern="/management/upload*"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/management/getNextPID*"
+          access="${security.ssl.api.management}" />
+
+        <!-- API-A -->
+        <security:intercept-url pattern="/services/access"
+          access="${security.ssl.api.access}" />
+
+        <!-- API-M -->
+        <security:intercept-url pattern="/index.html"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/services/management"
+          access="${security.ssl.api.management}" />
+
+        <!-- REST API management -->
+        <security:intercept-url pattern="/upload*"
+          method="POST" access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects*/**"
+          method="POST" access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects*/**"
+          method="PUT" access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects*/**"
+          method="DELETE" access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/export**"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/versions*"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/validate*"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/objectXML*"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/datastreams/*"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/relationships*"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/datastreams/*/versions*"
+          access="${security.ssl.api.management}" />
+
+        <!-- User Servlet -->
+        <security:intercept-url pattern="/user*"
+          access="${security.ssl.api.management}" />
+
+        <!-- REST API access -->
+        <security:intercept-url pattern="/objects*/**"
+          access="${security.ssl.api.access}" />
+
+        <!-- Backend Services -->
+        <security:intercept-url pattern="/getDSAuthenticated*/**"
+          access="${security.ssl.api.management}" />
+
+        <!-- Misc. Services -->          
         <security:intercept-url pattern="/oai*"
           access="${security.ssl.api.access}" />
         <security:intercept-url pattern="/risearch*"
           access="${security.ssl.api.access}" />
-        <security:intercept-url pattern="/search*"
-          access="${security.ssl.api.access}" />
-        <security:intercept-url pattern="/services/access"
-          access="${security.ssl.api.access}" />
+          
+        <!-- Misc. Files -->
         <security:intercept-url pattern="/wsdl*"
           access="${security.ssl.api.access}" />
         <security:intercept-url pattern="**.jsp"
           access="${security.ssl.api.access}" />
+
+        <!-- Anything not mentioned gets caught by default -->
+        <security:intercept-url pattern="/**"
+          access="${security.ssl.api.default}" />
 
       </security:filter-invocation-definition-source>
     </property>
