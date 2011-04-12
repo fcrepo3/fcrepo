@@ -431,15 +431,20 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
             // iterate each and create as necessary
             Collection nextCollection = rootCollection;
             for (String collectionName : collections ) {
-                if (nextCollection.getChildCollection(collectionName) != null) {
+                Collection childCollection = nextCollection.getChildCollection(collectionName);
+                if (childCollection != null) {
                     // child exists
-                    nextCollection = nextCollection.getChildCollection(collectionName);
+                    childCollection = nextCollection.getChildCollection(collectionName);
                 } else {
                     // does not exist, create it
                     CollectionManagementService mgtService = (CollectionManagementService) nextCollection.getService("CollectionManagementService", "1.0");
-                    nextCollection = mgtService.createCollection(collectionName);
+                    childCollection = mgtService.createCollection(collectionName);
                     log.debug("Created collection " + collectionName);
                 }
+                if (nextCollection.isOpen()) {
+                    nextCollection.close();
+                }
+                nextCollection = childCollection;
             }
             return nextCollection;
         } catch (XMLDBException e) {
@@ -546,6 +551,8 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
                     log.debug("creating index collection");
                     indexCollection = createCollectionPath(m_indexCollectionPath, rootCol);
                 }
+                if (rootCol.isOpen())
+                    rootCol.close();
                 XMLResource ixd = (XMLResource) indexCollection.getResource(m_indexDocumentName);
                 // get an already-existing index config document; or create if it doesn't exist
                 if (ixd == null ) {
@@ -571,6 +578,7 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
                 log.debug("Storing index document");
                 ixd.setContentAsDOM(config);
                 indexCollection.storeResource(ixd);
+                indexCollection.close();
 
                 // create the collection
                 log.debug("Creating policy collection");
@@ -621,5 +629,15 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
         } catch (IOException e) {
             throw new PolicyIndexException(e);
         }
+    }
+
+    // FIXME: better to have an explicit close - implement when Spring-ified?
+    @Override
+    public void finalize() {
+            try {
+                m_collection.close();
+            } catch (XMLDBException e) {
+                log.warn("Error closing connection " + e.getMessage(), e);
+            }
     }
 }
