@@ -390,7 +390,7 @@ public class DefaultAuthorization
                     .append(ServerState.STARTING,
                             "Initializing XACML Authorization Module");
             setupActivePolicyDirectories();
-            xacmlPep = PolicyEnforcementPoint.getInstance();
+            xacmlPep = getServer().getBean(PolicyEnforcementPoint.class);
             String fedoraHome =
                     ((Module) this).getServer().getHomeDir().getAbsolutePath();
             xacmlPep.initPep(enforceMode,

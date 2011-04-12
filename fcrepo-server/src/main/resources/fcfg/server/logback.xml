@@ -35,7 +35,7 @@
       <MaxFileSize>20MB</MaxFileSize>
     </triggeringPolicy>
   </appender>
-  <logger name="org.fcrepo.server.security.jass" additivity="false" level="DEBUG">
+  <logger name="org.fcrepo.server.security.jaas" additivity="false" level="DEBUG">
     <appender-ref ref="FESL"/>
   </logger>
   <logger name="org.fcrepo.server.security.xacml" additivity="false" level="DEBUG">

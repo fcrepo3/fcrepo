@@ -95,7 +95,7 @@ class ResourceAttributeFinderModule
 
     private DOManager doManager = null;
 
-    protected void setDOManager(DOManager doManager) {
+    public void setDOManager(DOManager doManager) {
         if (this.doManager == null) {
             this.doManager = doManager;
         }
@@ -168,7 +168,7 @@ class ResourceAttributeFinderModule
         long getAttributeStartTime = System.currentTimeMillis();
 
         try {
-            String pid = getPid(context);
+            String pid = PolicyFinderModule.getPid(context);
             if ("".equals(pid)) {
                 logger.debug("no pid");
                 return null;
@@ -337,42 +337,4 @@ class ResourceAttributeFinderModule
         }
     }
 
-    private final String getPid(EvaluationCtx context) {
-        URI resourceIdType = null;
-        URI resourceIdId = null;
-        try {
-            resourceIdType = new URI(StringAttribute.identifier);
-            resourceIdId = new URI(Constants.OBJECT.PID.uri);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        EvaluationResult attribute =
-                context
-                        .getResourceAttribute(resourceIdType,
-                                              resourceIdId,
-                                              null);
-        Object element = getAttributeFromEvaluationResult(attribute);
-        if (element == null) {
-            logger.debug("PolicyFinderModule:getPid" + " exit on "
-                    + "can't get contextId on request callback");
-            return null;
-        }
-
-        if (!(element instanceof StringAttribute)) {
-            logger.debug("PolicyFinderModule:getPid" + " exit on "
-                    + "couldn't get contextId from xacml request "
-                    + "non-string returned");
-            return null;
-        }
-
-        String pid = ((StringAttribute) element).getValue();
-
-        if (pid == null) {
-            logger.debug("PolicyFinderModule:getPid" + " exit on "
-                    + "null contextId");
-            return null;
-        }
-
-        return pid;
-    }
 }

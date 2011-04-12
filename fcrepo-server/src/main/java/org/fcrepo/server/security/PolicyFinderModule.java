@@ -177,7 +177,7 @@ public class PolicyFinderModule
     }
 
     // get the pid from the context, or null if unable
-    private static String getPid(EvaluationCtx context) {
+    public static String getPid(EvaluationCtx context) {
         URI resourceIdType = null;
         URI resourceIdId = null;
         try {
