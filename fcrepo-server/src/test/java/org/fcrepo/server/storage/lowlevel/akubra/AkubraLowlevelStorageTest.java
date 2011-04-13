@@ -20,13 +20,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.akubraproject.mem.MemBlobStore;
+
 import org.fcrepo.common.FaultException;
+
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.ObjectAlreadyInLowlevelStorageException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
-import org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorage;
-
-
 
 import static org.junit.Assert.assertEquals;
 
@@ -261,6 +260,20 @@ public class AkubraLowlevelStorageTest {
         list = toList(instance.listObjects());
         assertEquals(0, list.size());
     }
+
+    /**
+     * getDatastreamSize should retrieve size of added datastream
+     */
+    @Test
+    public void testGetDatastreamSize() throws Exception {
+        instance.addDatastream(DS_KEY, toStream(DS_CONTENT));
+
+        assertEquals(DS_CONTENT.getBytes("UTF-8").length,
+                     instance.getDatastreamSize(DS_KEY));
+
+
+    }
+
 
     private static AkubraLowlevelStorage getInstance(
             boolean forceSafeObjectOverwrites,

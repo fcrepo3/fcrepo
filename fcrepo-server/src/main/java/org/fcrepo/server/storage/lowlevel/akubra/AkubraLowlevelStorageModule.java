@@ -24,6 +24,7 @@ import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.storage.lowlevel.IListable;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
+import org.fcrepo.server.storage.lowlevel.ISizable;
 
 
 
@@ -44,7 +45,7 @@ import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
  */
 public class AkubraLowlevelStorageModule
         extends Module
-        implements ILowlevelStorage, IListable {
+        implements ILowlevelStorage, IListable, ISizable {
 
     private ILowlevelStorage impl;
 
@@ -131,5 +132,11 @@ public class AkubraLowlevelStorageModule
 
     public Iterator<String> listDatastreams() {
         return ((IListable) impl).listDatastreams();
+    }
+
+    // ISizable methods
+
+    public long getDatastreamSize(String dsKey) throws LowlevelStorageException {
+        return ((ISizable) impl).getDatastreamSize(dsKey);
     }
 }

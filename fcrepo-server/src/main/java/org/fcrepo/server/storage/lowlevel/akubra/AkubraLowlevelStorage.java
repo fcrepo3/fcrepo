@@ -38,6 +38,7 @@ import org.fcrepo.server.errors.ObjectAlreadyInLowlevelStorageException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.storage.lowlevel.IListable;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
+import org.fcrepo.server.storage.lowlevel.ISizable;
 
 
 
@@ -50,7 +51,7 @@ import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
  * @author Chris Wilper
  */
 public class AkubraLowlevelStorage
-        implements ILowlevelStorage, IListable {
+        implements ILowlevelStorage, IListable, ISizable {
 
     private static final Logger logger =
             LoggerFactory.getLogger(AkubraLowlevelStorage.class);
@@ -170,6 +171,15 @@ public class AkubraLowlevelStorage
 
     public Iterator<String> listObjects() {
         return list(objectStore);
+    }
+
+
+    //
+    // ISizable methods
+    //
+    @Override
+    public long getDatastreamSize(String dsKey) throws LowlevelStorageException {
+        return getSize(datastreamStore, dsKey);
     }
 
     //
@@ -388,6 +398,28 @@ public class AkubraLowlevelStorage
             }
         }
     }
+
+    private static long getSize(BlobStore store,
+                                        String key)
+            throws ObjectNotInLowlevelStorageException {
+        BlobStoreConnection connection = null;
+        boolean successful = false;
+        try {
+            URI blobId = getBlobId(key);
+            connection = getConnection(store);
+            Blob blob = getBlob(connection, blobId, null);
+            return blob.getSize();
+        } catch (MissingBlobException e) {
+            throw new ObjectNotInLowlevelStorageException(key);
+        } catch (IOException e) { // should never happen
+            throw new RuntimeException("Error reading blob size: " +e.getMessage(), e);
+        } finally {
+            if (!successful) {
+                closeConnection(connection);
+            }
+        }
+    }
+
 
     private static BlobStoreConnection getConnection(BlobStore store) {
         try {
@@ -635,5 +667,6 @@ public class AkubraLowlevelStorage
         }
 
     }
+
 
 }

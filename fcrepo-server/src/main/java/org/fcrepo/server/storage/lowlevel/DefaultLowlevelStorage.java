@@ -26,7 +26,7 @@ import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
  * @author Bill Niebel
  */
 public class DefaultLowlevelStorage
-        implements ILowlevelStorage, IListable {
+        implements ILowlevelStorage, IListable, ISizable {
 
     public static final String REGISTRY_NAME = "registryName";
 
@@ -130,6 +130,10 @@ public class DefaultLowlevelStorage
     public Iterator<String> listDatastreams() {
         return datastreamStore.list();
     }
+    public long getDatastreamSize(String dsKey) throws LowlevelStorageException {
+        return datastreamStore.getSize(dsKey);
+    }
+
 
     class Store {
 
@@ -323,6 +327,40 @@ public class DefaultLowlevelStorage
 
             return fileSystem.read(file);
         }
+
+        /** get size of datastream  */
+        public final long getSize(String pid) throws LowlevelStorageException {
+            String filePath;
+            File file;
+
+            try {
+                filePath = pathRegistry.get(pid);
+            } catch (ObjectNotInLowlevelStorageException eReg) {
+                throw eReg;
+            }
+
+            if (filePath == null || filePath.equals("")) { //guard against registry implementation
+                LowlevelStorageException nullPath =
+                        new LowlevelStorageException(true,
+                                                     "null path from registry for pid "
+                                                             + pid);
+                throw nullPath;
+            }
+
+            try {
+                file = new File(filePath);
+            } catch (Exception eFile) { //purposefully general catch-all
+                LowlevelStorageException newFile =
+                        new LowlevelStorageException(true,
+                                                     "couldn't make File for "
+                                                             + filePath,
+                                                     eFile);
+                throw newFile;
+            }
+            return file.length();
+
+        }
+
 
         /** remove Fedora object from low-level store */
         public final void remove(String pid) throws LowlevelStorageException {
