@@ -38,8 +38,8 @@ import org.fcrepo.server.errors.servletExceptionExtensions.InternalError500Excep
 import org.fcrepo.server.errors.servletExceptionExtensions.NotFound404Exception;
 import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
 import org.fcrepo.server.storage.types.DatastreamDef;
-import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.utilities.DateUtility;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -21,7 +21,7 @@ import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.errors.UnrecognizedFieldException;
 import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.DCFields;
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
 
 
 /**

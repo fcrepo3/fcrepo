@@ -232,11 +232,16 @@ public class HttpUtils {
 
     private String process(HttpRequest request) throws IOException,
             AuthorizationDeniedException, ClientProtocolException {
+        return process(request, httpHost);
+    }
+
+    private String process(HttpRequest request, HttpHost host) throws IOException,
+            AuthorizationDeniedException, ClientProtocolException {
         if (logger.isDebugEnabled()) {
             logger.debug("request line: " + request.getRequestLine());
         }
 
-        HttpResponse response = client.execute(httpHost, request, httpContext);
+        HttpResponse response = client.execute(host, request, httpContext);
         int sc = response.getStatusLine().getStatusCode();
 
         String phrase = response.getStatusLine().getReasonPhrase();
@@ -263,6 +268,15 @@ public class HttpUtils {
         if (sc < 200 || sc >= 400) {
             throw new ClientProtocolException("Error [Status Code = " + sc
                     + "]" + ": " + phrase);
+        }
+
+        if (sc == 302) {
+            URL redir = new URL(response.getHeaders("Location")[0].getValue());
+
+            // XXX: assume we're just changing the host, port, and/or protocol
+            return process(request,
+                           new HttpHost(redir.getHost(), redir.getPort(), redir
+                                   .getProtocol()));
         }
 
         return body;

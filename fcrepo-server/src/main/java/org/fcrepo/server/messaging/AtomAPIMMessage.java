@@ -36,7 +36,7 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.server.errors.MessagingException;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.storage.types.TupleArrayTripleIterator;
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

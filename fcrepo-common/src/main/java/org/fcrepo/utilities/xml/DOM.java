@@ -1,13 +1,14 @@
 package org.fcrepo.utilities.xml;
 
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,7 +29,9 @@ import java.io.StringWriter;
  * Ported from the State and University Library  project sbutils.
  */
 public class DOM {
-    private static Log log = LogFactory.getLog(DOM.class);
+
+    private static final Logger log = LoggerFactory.getLogger(DOM.class);
+
 
     public static final String XML_HEADER =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";

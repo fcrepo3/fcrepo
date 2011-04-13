@@ -31,8 +31,8 @@ import org.fcrepo.server.storage.ConnectionPool;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.MD5Utility;
+import org.fcrepo.utilities.DateUtility;
 
 
 /**

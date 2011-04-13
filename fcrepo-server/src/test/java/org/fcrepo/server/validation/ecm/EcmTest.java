@@ -4,7 +4,8 @@ import junit.framework.TestCase;
 import org.fcrepo.server.storage.MockRepositoryReader;
 import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.Validation;
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

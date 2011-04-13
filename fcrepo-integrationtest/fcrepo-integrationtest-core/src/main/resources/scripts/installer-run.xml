@@ -35,6 +35,7 @@
   
   <target name="clearSQL">
     <echo>Clearing SQL database</echo>
+    <unzip src="${mvn.fedora.home}/install/${mvn.fedora.appServerContext}.war" dest="${mvn.fedora.home}/install/fedorawar" />
  	<java classpath="${mvn.fedora.home}/server/bin/fcrepo-server-${fedora.install.version}-cli-loader-main.jar"
           classname="org.fcrepo.server.utilities.rebuild.cli.CLILoader" fork="true" spawn="false" failonerror="true">
  	  <arg line="org.fcrepo.server.test.ClearSQLDatabase" />

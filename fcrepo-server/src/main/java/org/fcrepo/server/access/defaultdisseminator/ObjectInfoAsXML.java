@@ -18,8 +18,8 @@ import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.utilities.DCFields;
-import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.utilities.DateUtility;
 
 
 

@@ -42,7 +42,8 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
+
 import org.jrdf.graph.Literal;
 import org.jrdf.graph.Node;
 import org.slf4j.Logger;

@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:security="http://www.springframework.org/schema/security"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+                         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                         http://www.springframework.org/schema/context
+                         http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                         http://www.springframework.org/schema/security
+                         http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+
+  <context:annotation-config />
+
+  <bean id="springSecurityFilterChain" class="org.springframework.security.web.FilterChainProxy">
+    <security:filter-chain-map path-type="ant">
+
+
+      <!-- Backend - getDSAuthenticated gets auth filters, getDS does not -->
+      <security:filter-chain pattern="/getDSAuth*"
+        filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/getDS*"
+        filters="ChannelFilter" />
+
+      <!-- RISearch service gets auth protection -->
+      <security:filter-chain pattern="/risearch*"
+        filters="ChannelFilter,${security.auth.filters}" />
+
+      <!-- REST API -->
+      <security:filter-chain pattern="/objects*/**"
+        filters="ChannelFilter,${security.auth.filters}" />
+
+      <!-- User servlet -->
+      <security:filter-chain pattern="/user*"
+        filters="ChannelFilter,${security.auth.filters}" />
+
+      <!-- BUG There is a bug in classic authN for disseminators, auth needs 
+        to be off to emulate its behaviour -->
+      <security:filter-chain pattern="/get/*/*/**"
+        filters="ChannelFilter" />
+      <!-- /BUG -->
+
+      <!-- Lite APIs -->
+      <security:filter-chain pattern="/get*/**"
+        filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/search*"
+        filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/describe*"
+        filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/list*/**"
+        filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/management/*/**"
+        filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/upload*"
+        filters="ChannelFilter,${security.auth.filters}" />
+
+      <!-- SOAP APIs -->
+      <security:filter-chain pattern="/services*/**"
+        filters="ChannelFilter,${security.auth.filters}" />
+
+      <security:filter-chain pattern="/**"
+        filters="ChannelFilter" />
+
+      <!-- Uncomment to enable Classic AuthN <security:filter-chain pattern="/**" 
+        filters="ChannelFilter,SetupFilter,XmlUserfileFilter,EnforceAuthnFilter.FinalizeFilter" 
+        /> End Classic AuthN -->
+    </security:filter-chain-map>
+  </bean>
+
+  <bean id="ChannelFilter"
+    class="org.springframework.security.web.access.channel.ChannelProcessingFilter">
+    <property name="channelDecisionManager" ref="channelDecisionManager" />
+    <property name="securityMetadataSource">
+      <security:filter-invocation-definition-source
+        path-type="ant">
+
+        <!-- API-A-Lite -->
+        <security:intercept-url pattern="/get*/**"
+          access="${security.ssl.api.access}" />
+        <security:intercept-url pattern="/search*"
+          access="${security.ssl.api.access}" />
+        <security:intercept-url pattern="/list*/**"
+          access="${security.ssl.api.access}" />
+        <security:intercept-url pattern="/describe*"
+          access="${security.ssl.api.access}" />
+
+        <!-- API-M-Lite -->
+        <security:intercept-url pattern="/management/upload*"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/management/getNextPID*"
+          access="${security.ssl.api.management}" />
+
+        <!-- API-A -->
+        <security:intercept-url pattern="/services/access"
+          access="${security.ssl.api.access}" />
+
+        <!-- API-M -->
+        <security:intercept-url pattern="/index.html"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/services/management"
+          access="${security.ssl.api.management}" />
+
+        <!-- REST API management -->
+        <security:intercept-url pattern="/upload*"
+          method="POST" access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects*/**"
+          method="POST" access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects*/**"
+          method="PUT" access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects*/**"
+          method="DELETE" access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/export**"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/versions*"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/validate*"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/objectXML*"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/datastreams/*"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/relationships*"
+          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/objects/*/datastreams/*/versions*"
+          access="${security.ssl.api.management}" />
+
+        <!-- User Servlet -->
+        <security:intercept-url pattern="/user*"
+          access="${security.ssl.api.management}" />
+
+        <!-- REST API access -->
+        <security:intercept-url pattern="/objects*/**"
+          access="${security.ssl.api.access}" />
+
+        <!-- Backend Services -->
+        <security:intercept-url pattern="/getDSAuthenticated*/**"
+          access="${security.ssl.api.management}" />
+
+        <!-- Misc. Services -->          
+        <security:intercept-url pattern="/oai*"
+          access="${security.ssl.api.access}" />
+        <security:intercept-url pattern="/risearch*"
+          access="${security.ssl.api.access}" />
+          
+        <!-- Misc. Files -->
+        <security:intercept-url pattern="/wsdl*"
+          access="${security.ssl.api.access}" />
+        <security:intercept-url pattern="**.jsp"
+          access="${security.ssl.api.access}" />
+
+        <!-- Anything not mentioned gets caught by default -->
+        <security:intercept-url pattern="/**"
+          access="${security.ssl.api.default}" />
+
+      </security:filter-invocation-definition-source>
+    </property>
+  </bean>
+
+  <bean id="channelDecisionManager"
+    class="org.springframework.security.web.access.channel.ChannelDecisionManagerImpl"
+    lazy-init="true">
+    <property name="channelProcessors">
+      <list>
+        <ref bean="secureChannelProcessor" />
+        <ref bean="insecureChannelProcessor" />
+      </list>
+    </property>
+  </bean>
+
+  <bean id="insecureChannelProcessor"
+    class="org.springframework.security.web.access.channel.InsecureChannelProcessor"
+    lazy-init="true" />
+
+  <bean id="secureChannelProcessor"
+    class="org.springframework.security.web.access.channel.SecureChannelProcessor"
+    lazy-init="true">
+    <property name="entryPoint" ref="HTTPS" />
+  </bean>
+
+  <bean id="HTTPS"
+    class="org.springframework.security.web.access.channel.RetryWithHttpsEntryPoint"
+    lazy-init="true">
+    <property name="portMapper" ref="portMapper" />
+    <property name="portResolver" ref="portResolver" />
+  </bean>
+
+  <bean id="portMapper" class="org.springframework.security.web.PortMapperImpl">
+    <property name="portMappings">
+      <map>
+        <entry key="${fedora.port}" value="${fedora.port.secure}" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="portResolver" class="org.springframework.security.web.PortResolverImpl">
+    <property name="portMapper" ref="portMapper" />
+  </bean>
+
+  <!-- FeSL JAAS Authn bean -->
+  <bean id="AuthFilterJAAS" class="org.fcrepo.server.security.jaas.AuthFilterJAAS"
+    init-method="init" lazy-init="true">
+    <!-- OPTIONAL. A comma separated list of class names for user principals. 
+      First one that is found is effective only. -->
+    <property name="userClassNames"
+      value="org.fcrepo.server.security.jaas.auth.UserPrincipal" />
+
+    <!-- True iff API-A requests via the REST API require authentication. 
+      If not specified, defaults to true. -->
+    <property name="authnAPIA" value="${security.fesl.authN.jaas.apia.enabled}" />
+  </bean>
+
+  <!-- Classic authn beans -->
+  <bean id="SetupFilter" class="org.fcrepo.server.security.servletfilters.FilterSetup"
+    lazy-init="true" init-method="init">
+    <property name="config">
+      <bean class="org.fcrepo.common.http.FilterConfigBean">
+        <property name="filterName" value="SetupFilter" />
+      </bean>
+    </property>
+  </bean>
+
+  <bean id="XmlUserfileFilter"
+    class="org.fcrepo.server.security.servletfilters.xmluserfile.FilterXmlUserfile"
+    lazy-init="true" init-method="init">
+    <property name="config">
+      <bean class="org.fcrepo.common.http.FilterConfigBean">
+        <property name="filterName" value="XmlUserfileFilter" />
+      </bean>
+    </property>
+  </bean>
+
+  <bean id="EnforceAuthnFilter"
+    class="org.fcrepo.server.security.servletfilters.FilterEnforceAuthn"
+    lazy-init="true" init-method="init">
+    <property name="config">
+      <bean class="org.fcrepo.common.http.FilterConfigBean">
+        <property name="filterName" value="EnforceAuthnFilter" />
+      </bean>
+    </property>
+  </bean>
+
+  <bean id="FinalizeFilter"
+    class="org.fcrepo.server.security.servletfilters.FilterFinalize"
+    lazy-init="true" init-method="init">
+    <property name="config">
+      <bean class="org.fcrepo.common.http.FilterConfigBean">
+        <property name="filterName" value="FinalizeFilte" />
+      </bean>
+    </property>
+  </bean>
+
+  <bean id="RestApiAuthnFilter"
+    class="org.fcrepo.server.security.servletfilters.FilterRestApiAuthn"
+    lazy-init="true" init-method="init">
+    <property name="config">
+      <bean class="org.fcrepo.common.http.FilterConfigBean">
+        <property name="filterName" value="FilterRestApiAuthn" />
+      </bean>
+    </property>
+  </bean>
+
+  <!-- FeSL Authz bean -->
+  <bean id="PEPFilter" class="org.fcrepo.server.security.xacml.pep.rest.PEP"
+    lazy-init="true" init-method="init" />
+
+</beans>

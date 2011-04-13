@@ -15,7 +15,7 @@ import org.fcrepo.common.rdf.RDFName;
 import org.fcrepo.common.rdf.SimpleLiteral;
 import org.fcrepo.common.rdf.SimpleTriple;
 import org.fcrepo.server.errors.ResourceIndexException;
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
 
 import static org.fcrepo.common.Constants.MODEL;
 import static org.fcrepo.common.Constants.RDF_XSD;

@@ -38,7 +38,7 @@ import org.fcrepo.server.rest.param.DateTimeParam;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamDef;
 import org.fcrepo.server.storage.types.MIMETypedStream;
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
 
 /**
  * A rest controller to handle CRUD operations for the Fedora datastream API

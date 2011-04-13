@@ -100,6 +100,8 @@ public class FedoraHome {
         if (_usingAkubra) {
             configureAkubra();
         }
+        configureSpringProperties();
+        configureSpringAuth();
         configureFedoraUsers();
         configureBeSecurity();
     }
@@ -274,6 +276,110 @@ public class FedoraHome {
             IOUtils.closeQuietly(writer);
             throw new InstallationFailedException(e.getClass().getName()
                     + ":" + e.getMessage());
+        }
+    }
+
+    private void configureSpringProperties() throws InstallationFailedException {
+        Properties springProps = new Properties();
+
+        /* Set up ssl configuration */
+        springProps.put("fedora.port",
+                        _opts.getValue(InstallOptions.TOMCAT_HTTP_PORT, "8080"));
+        if (_opts.getBooleanValue(InstallOptions.SSL_AVAILABLE, false)) {
+            springProps.put("fedora.port.secure",
+                            _opts.getValue(InstallOptions.TOMCAT_SSL_PORT, "8443"));
+        } else {
+            springProps.put("fedora.port.secure",
+                            _opts.getValue(InstallOptions.TOMCAT_HTTP_PORT, "8080"));
+        }
+
+        springProps
+                .put("security.ssl.api.access", _opts
+                        .getBooleanValue(InstallOptions.APIA_SSL_REQUIRED,
+                                         false) ? "REQUIRES_SECURE_CHANNEL"
+                        : "ANY_CHANNEL");
+        springProps
+                .put("security.ssl.api.management", _opts
+                        .getBooleanValue(InstallOptions.APIM_SSL_REQUIRED,
+                                         false) ? "REQUIRES_SECURE_CHANNEL"
+                        : "ANY_CHANNEL");
+        springProps.put("security.ssl.api.default", "ANY_CHANNEL");
+
+        springProps.put("security.fesl.authN.jaas.apia.enabled", _opts
+                .getValue(InstallOptions.APIA_AUTH_REQUIRED, "false"));
+
+
+        /* Set up authN, authZ filter configuration */
+        StringBuilder filters = new StringBuilder();
+        if (_opts.getBooleanValue(InstallOptions.FESL_AUTHN_ENABLED, false)) {
+            filters.append("AuthFilterJAAS");
+        } else {
+            filters.append("SetupFilter,XmlUserfileFilter,EnforceAuthnFilter,FinalizeFilter");
+        }
+
+        if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
+            filters.append(",PEPFilter");
+        }
+
+        springProps.put("security.auth.filters", filters.toString());
+
+
+        FileOutputStream out = null;
+        try {
+            out =
+                    new FileOutputStream(new File(_installDir,
+                                                  "server/config/spring/web/web.properties"));
+            springProps.store(out, "Spring override properties");
+        } catch (IOException e) {
+            throw new InstallationFailedException(e.getMessage(), e);
+        } finally {
+            IOUtils.closeQuietly(out);
+        }
+    }
+
+    private void configureSpringAuth() throws InstallationFailedException {
+        String PATTERN = "${security.auth.filters}";
+
+        StringBuilder filters = new StringBuilder();
+        boolean needsbugFix = false;
+
+        if (_opts.getBooleanValue(InstallOptions.FESL_AUTHN_ENABLED, false)) {
+            filters.append("AuthFilterJAAS");
+        } else {
+            filters.append("SetupFilter,XmlUserfileFilter,EnforceAuthnFilter,FinalizeFilter");
+            needsbugFix = true;
+        }
+
+        if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
+            filters.append(",PEPFilter");
+        }
+
+        FileInputStream springConfig = null;
+        PrintWriter writer = null;
+        try {
+            File xmlFile =
+                    new File(_installDir,
+                             "server/config/spring/web/security.xml");
+            springConfig = new FileInputStream(xmlFile);
+            String content =
+                    IOUtils.toString(springConfig).replace(PATTERN, filters);
+
+            if (!needsbugFix) {
+                /* Delete classic authN bugfix when not applicable */
+                content = content.replaceFirst("(?s)<!-- BUG.+?/BUG -->", "");
+            }
+
+            springConfig.close();
+
+            writer =
+                    new PrintWriter(new OutputStreamWriter(new FileOutputStream(xmlFile),
+                                                           "UTF-8"));
+            writer.print(content);
+            writer.close();
+        } catch (Exception e) {
+            IOUtils.closeQuietly(springConfig);
+            IOUtils.closeQuietly(writer);
+            throw new InstallationFailedException(e.getMessage(), e);
         }
     }
 

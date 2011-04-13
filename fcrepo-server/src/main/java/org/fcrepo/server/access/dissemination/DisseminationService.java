@@ -41,8 +41,8 @@ import org.fcrepo.server.storage.types.DeploymentDSBindSpec;
 import org.fcrepo.server.storage.types.DisseminationBindingInfo;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.MethodParmDef;
-import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.ServerUtility;
+import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

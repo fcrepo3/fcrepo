@@ -11,6 +11,8 @@ import java.util.Date;
 
 import org.junit.Test;
 
+import org.fcrepo.utilities.DateUtility;
+
 /**
  * @author Edwin Shin
  */

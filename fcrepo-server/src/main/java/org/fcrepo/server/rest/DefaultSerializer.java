@@ -30,7 +30,7 @@ import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.utilities.DCField;
-import org.fcrepo.server.utilities.DateUtility;
+import org.fcrepo.utilities.DateUtility;
 
 import static org.fcrepo.server.utilities.StreamUtility.enc;
 

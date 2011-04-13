@@ -18,8 +18,8 @@ import org.fcrepo.server.errors.ServerInitializationException;
 import org.fcrepo.server.types.gen.FieldSearchQuery;
 import org.fcrepo.server.types.gen.FieldSearchResult;
 import org.fcrepo.server.utilities.AxisUtility;
-import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.TypeUtility;
+import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

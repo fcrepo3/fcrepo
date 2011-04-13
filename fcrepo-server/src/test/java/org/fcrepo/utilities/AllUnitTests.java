@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses( {org.fcrepo.utilities.install.container.AllUnitTests.class,
+@Suite.SuiteClasses( {
     TestBase64.class,
     TestFileUtils.class,
     TestZip.class,
@@ -21,7 +21,6 @@ public class AllUnitTests {
         junit.framework.TestSuite suite =
                 new junit.framework.TestSuite(AllUnitTests.class.getName());
 
-        suite.addTest(org.fcrepo.utilities.install.container.AllUnitTests.suite());
         suite.addTestSuite(TestBase64.class);
         suite.addTestSuite(TestFileUtils.class);
         suite.addTestSuite(TestZip.class);

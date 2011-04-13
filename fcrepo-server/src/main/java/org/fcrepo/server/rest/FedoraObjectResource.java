@@ -10,8 +10,8 @@ import org.fcrepo.server.access.ObjectProfile;
 import org.fcrepo.server.rest.RestUtil.RequestContent;
 import org.fcrepo.server.rest.param.DateTimeParam;
 import org.fcrepo.server.storage.types.Validation;
-import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

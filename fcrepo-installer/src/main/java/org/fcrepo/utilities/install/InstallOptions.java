@@ -394,6 +394,18 @@ public class InstallOptions {
         return System.getProperty(name, _map.get(name));
     }
 
+    public String getValue(String name, String defaultVal) {
+        String value = getValue(name);
+
+
+        if (value == null) {
+            return defaultVal;
+        } else {
+            return value;
+        }
+
+    }
+
     /**
      * Get the value of the given option as an integer, or the given default
      * value if unspecified.

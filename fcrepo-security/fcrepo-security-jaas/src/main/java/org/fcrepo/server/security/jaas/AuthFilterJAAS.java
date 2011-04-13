@@ -48,12 +48,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
+import org.fcrepo.common.http.FilterConfigBean;
 
 import org.fcrepo.server.security.jaas.auth.AuthHttpServletRequestWrapper;
 import org.fcrepo.server.security.jaas.auth.handler.UsernamePasswordCallbackHandler;
 import org.fcrepo.server.security.jaas.util.Base64;
 import org.fcrepo.server.security.jaas.util.SubjectUtils;
-
 
 /**
  * A Servlet Filter for protecting resources. This filter uses JAAS for
@@ -85,8 +85,8 @@ import org.fcrepo.server.security.jaas.util.SubjectUtils;
 public class AuthFilterJAAS
         implements Filter {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(AuthFilterJAAS.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(AuthFilterJAAS.class);
 
     private static final String SESSION_SUBJECT_KEY =
             "javax.security.auth.subject";
@@ -105,7 +105,9 @@ public class AuthFilterJAAS
 
     private String jaasConfigName = null;
 
-    private FilterConfig filterConfig = null;
+    private final FilterConfigBean filterConfigBean = new FilterConfigBean();
+
+    private FilterConfig filterConfig = filterConfigBean;
 
     private Set<String> userClassNames = null;
 
@@ -115,17 +117,45 @@ public class AuthFilterJAAS
 
     private boolean authnAPIA = true;
 
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void setUserClassNames(String names) {
+        filterConfigBean.addInitParameter("userClassNames", names);
+    }
+
+    public void setAuthnAPIA(String a) {
+        filterConfigBean.addInitParameter("authnAPIA", a);
+    }
+
+    public void setJaasConfigLocation(String location) {
+        filterConfigBean.addInitParameter("jaas.config.location", location);
+    }
+
+    public void setJaasConfigName(String name) {
+        filterConfigBean.addInitParameter("jaas.config.name", name);
+    }
+
+    public void setRoleClassNames(String names) {
+        filterConfigBean.addInitParameter("roleClassNames", names);
+    }
+
+    public void setRoleAttributeNames(String names) {
+        filterConfigBean.addInitParameter("roleAttributeNames", names);
+    }
+
+    public void init(FilterConfig config) throws ServletException {
+        this.filterConfig = config;
+        if (this.filterConfig == null) {
+            logger.info("No configuration for: " + this.getClass().getName());
+        }
+
+        init();
+    }
+
+    public void init() throws ServletException {
         // get FEDORA_HOME. This being set is mandatory.
         String fedoraHome = Constants.FEDORA_HOME;
         if (fedoraHome == null || "".equals(fedoraHome)) {
             String msg = "FEDORA_HOME environment variable not set";
             throw new ServletException(msg);
-        }
-
-        this.filterConfig = filterConfig;
-        if (this.filterConfig == null) {
-            logger.info("No configuration for: " + this.getClass().getName());
         }
 
         logger.info("using FEDORA_HOME: " + fedoraHome);
@@ -231,26 +261,31 @@ public class AuthFilterJAAS
         // test path for API-A methods, maybe regex to make it explicit)
         boolean doChallenge = true;
         if (!authnAPIA) {
-            if(req.getMethod().equals("GET")) {
+            if (req.getMethod().equals("GET")) {
                 String requestPath = req.getPathInfo();
-                if (requestPath == null)
-                    requestPath = ""; // null is returned eg for /fedora/objects? - API-A, so we still want to do the below...
+                if (requestPath == null) requestPath = ""; // null is returned eg for /fedora/objects? - API-A, so we still want to do the below...
                 String fullPath = req.getRequestURI();
                 // API-M methods
                 // potentially extra String evals, but aiming for clarity
                 boolean isExport = requestPath.endsWith("/export");
                 boolean isObjectXML = requestPath.endsWith("/objectXML");
-                boolean isGetDatastream = requestPath.contains("/datastreams/") &&
-                        !requestPath.endsWith("/content");
-                boolean isGetRelationships = requestPath.endsWith("/relationships");
+                boolean isGetDatastream =
+                        requestPath.contains("/datastreams/")
+                                && !requestPath.endsWith("/content");
+                boolean isGetRelationships =
+                        requestPath.endsWith("/relationships");
                 boolean isValidate = requestPath.endsWith("/validate");
                 // management get methods (LITE API, control)
-                boolean isManagement = fullPath.endsWith("/management/control") || fullPath.endsWith("/management/getNextPID");
+                boolean isManagement =
+                        fullPath.endsWith("/management/control")
+                                || fullPath.endsWith("/management/getNextPID");
                 // user servlet
                 boolean isUserServlet = fullPath.endsWith("/user");
                 // challenge if API-M or one of the above other services (otherwise we assume it is API-A)
-                doChallenge = isExport || isObjectXML || isGetDatastream
-                || isGetRelationships || isValidate || isManagement || isUserServlet;
+                doChallenge =
+                        isExport || isObjectXML || isGetDatastream
+                                || isGetRelationships || isValidate
+                                || isManagement || isUserServlet;
             }
         }
 
@@ -315,12 +350,12 @@ public class AuthFilterJAAS
         response.reset();
         response.addHeader("WWW-Authenticate",
                            "Basic realm=\"!!Fedora Repository Server\"");
-		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		OutputStream out = response.getOutputStream();
-		out.write("Fedora: 401 ".getBytes());
-		out.flush();
-		out.close();
-	}
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        OutputStream out = response.getOutputStream();
+        out.write("Fedora: 401 ".getBytes());
+        out.flush();
+        out.close();
+    }
 
     /**
      * Performs the authentication. Once a Subject is obtained, it is stored in
@@ -500,9 +535,9 @@ public class AuthFilterJAAS
     }
 
     /**
-     * Add roles and other subject attributes where Fedora expects them -
-     * a Map called FEDORA_AUX_SUBJECT_ATTRIBUTES.  Roles will be put in
-     * "fedoraRole" and others will be named as-is.
+     * Add roles and other subject attributes where Fedora expects them - a Map
+     * called FEDORA_AUX_SUBJECT_ATTRIBUTES. Roles will be put in "fedoraRole"
+     * and others will be named as-is.
      *
      * @param subject
      *        the subject from authentication.

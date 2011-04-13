@@ -37,9 +37,9 @@ import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
-import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 
+import org.fcrepo.utilities.DateUtility;
 import org.fcrepo.utilities.MimeTypeUtils;
 
 /**

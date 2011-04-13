@@ -52,8 +52,8 @@ import org.fcrepo.server.types.gen.ObjectMethodsDef;
 import org.fcrepo.server.types.gen.ObjectProfile;
 import org.fcrepo.server.types.gen.Property;
 import org.fcrepo.server.types.gen.RepositoryInfo;
-import org.fcrepo.server.utilities.DateUtility;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.utilities.DateUtility;
 import org.fcrepo.utilities.XmlTransformUtility;
 
 
