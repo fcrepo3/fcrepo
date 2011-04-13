@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses( {TestFedoraWebXML.class, TestTomcat6ServerXML.class})
+@Suite.SuiteClasses( {TestTomcat6ServerXML.class})
 public class AllUnitTests {
 
     // Supports legacy tests runners
@@ -16,8 +16,6 @@ public class AllUnitTests {
 
         junit.framework.TestSuite suite =
                 new junit.framework.TestSuite(AllUnitTests.class.getName());
-
-        suite.addTest(TestFedoraWebXML.suite());
         suite.addTest(TestTomcat6ServerXML.suite());
 
         return suite;
