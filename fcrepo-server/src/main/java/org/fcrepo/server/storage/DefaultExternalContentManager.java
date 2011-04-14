@@ -313,7 +313,7 @@ public class DefaultExternalContentManager
                     new Boolean(beHash.get("callSSL"))
                             .booleanValue();
             if (backendSSL) {
-                if (params.getProtocol().equals("http:")) {
+                if (params.getProtocol().equals("http")) {
                     url = url.replaceFirst("http:", "https:");
                 }
                 url =
