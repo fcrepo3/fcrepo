@@ -596,6 +596,11 @@ public class TestRESTAPI
         }
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
+        Header length = response.getResponseHeader("content-length");
+        assertNotNull(length);
+        assertNotNull(length.getValue());
+        long lengthlong = Long.parseLong(length.getValue());
+        assertTrue(lengthlong > 0);
         String responseXML = new String(response.responseBody, "UTF-8");
         assertTrue(responseXML.contains("rdf:Description"));
 
@@ -609,6 +614,12 @@ public class TestRESTAPI
         }
         response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
+        length = response.getResponseHeader("content-length");
+        assertNotNull(length);
+        assertNotNull(length.getValue());
+        lengthlong = Long.parseLong(length.getValue());
+        assertTrue(lengthlong > 0);
+
         responseXML = new String(response.responseBody, "UTF-8");
         assertTrue(responseXML.contains("rdf:Description"));
 

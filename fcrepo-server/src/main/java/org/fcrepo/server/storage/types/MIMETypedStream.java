@@ -26,6 +26,7 @@ public class MIMETypedStream {
     private InputStream stream;
 
     public Property[] header;
+    private long size = -1;
 
     private boolean gotStream = false;
 
@@ -44,6 +45,25 @@ public class MIMETypedStream {
         this.header = header;
         setStream(stream);
     }
+
+    /**
+     * Constructs a MIMETypedStream.
+     *
+     * @param MIMEType
+     *        The MIME type of the byte stream.
+     * @param stream
+     *        The byte stream.
+     */
+    public MIMETypedStream(String MIMEType,
+                           InputStream stream,
+                           Property[] header,
+                           long size) {
+        this.MIMEType = MIMEType;
+        this.header = header;
+        this.size = size;
+        setStream(stream);
+    }
+
 
     /**
      * Retrieves the underlying stream.
@@ -93,4 +113,7 @@ public class MIMETypedStream {
         }
     }
 
+    public long getSize() {
+        return size;
+    }
 }
