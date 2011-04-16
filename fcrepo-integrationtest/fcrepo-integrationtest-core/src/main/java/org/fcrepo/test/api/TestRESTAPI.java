@@ -391,7 +391,7 @@ public class TestRESTAPI
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         assertEquals(1486, response.getResponseBody().length);
-        assertEquals(1486, response.getResponseHeader("Content-Length").getValue());
+        assertEquals("1486", response.getResponseHeader("Content-Length").getValue());
         assertEquals("image/jpeg", response.getResponseHeader("Content-Type")
                 .getValue());
     }
@@ -406,7 +406,7 @@ public class TestRESTAPI
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         assertEquals(1486, response.getResponseBody().length);
-        assertEquals(1486, response.getResponseHeader("Content-Length").getValue());
+        assertEquals("1486", response.getResponseHeader("Content-Length").getValue());
         assertEquals("image/jpeg", response.getResponseHeader("Content-Type")
                 .getValue());
     }
