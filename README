@@ -121,7 +121,7 @@ the following tests fall into that category:
     run without external internet access.
   
     
-    mvn verify -Dconfig=[A|Q] -Dtest=org.fcrepo.test.integration.TestLargeDatastreams
+    mvn verify -Dconfig=[A|Q] -Dit.test=org.fcrepo.test.integration.TestLargeDatastreams
 
 Running system tests with an alternate host or webapp context
 =============================================================
