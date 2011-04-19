@@ -26,22 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-import java.net.InetAddress;
-import java.net.URLDecoder;
-import java.net.UnknownHostException;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 
@@ -49,14 +33,7 @@ import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.access.dissemination.DisseminationService;
-import org.fcrepo.server.errors.DatastreamNotFoundException;
-import org.fcrepo.server.errors.DisseminationException;
-import org.fcrepo.server.errors.DisseminatorNotFoundException;
-import org.fcrepo.server.errors.GeneralException;
-import org.fcrepo.server.errors.InvalidUserParmException;
-import org.fcrepo.server.errors.MethodNotFoundException;
-import org.fcrepo.server.errors.ModuleInitializationException;
-import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.errors.*;
 import org.fcrepo.server.search.FieldSearchQuery;
 import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.security.Authorization;
@@ -162,7 +139,7 @@ public class DefaultAccess
                         .getModule("org.fcrepo.server.storage.DOManager");
         if (m_manager == null) {
             throw new ModuleInitializationException("Can't get a DOManager "
-                    + "from Server.getModule", getRole());
+                                                    + "from Server.getModule", getRole());
         }
         // get ref to DynamicAccess module
         m_dynamicAccess =
@@ -178,14 +155,14 @@ public class DefaultAccess
         Module oaiProvider = getServer().getModule("org.fcrepo.oai.OAIProvider");
         if (oaiProvider == null) {
             throw new ModuleInitializationException("DefaultAccess module requires that the server "
-                                                            + "has an OAIProvider module configured so that it can get the repositoryDomainName parameter.",
+                                                    + "has an OAIProvider module configured so that it can get the repositoryDomainName parameter.",
                                                     getRole());
         }
         m_repositoryDomainName =
                 oaiProvider.getParameter("repositoryDomainName");
         if (m_repositoryDomainName == null) {
             throw new ModuleInitializationException("DefaultAccess module requires that the OAIProvider "
-                                                            + "module has the repositoryDomainName parameter specified.",
+                                                    + "module has the repositoryDomainName parameter specified.",
                                                     getRole());
         }
 
@@ -270,7 +247,7 @@ public class DefaultAccess
             stopTime = new Date().getTime();
             interval = stopTime - startTime;
             logger.debug("Roundtrip DynamicDisseminator: " + interval
-                    + " milliseconds.");
+                         + " milliseconds.");
             return retVal;
         }
 
@@ -293,22 +270,22 @@ public class DefaultAccess
 
             if (foundDeploymentPID != null) {
                 if (serviceDeploymentPID != null
-                        && !foundDeploymentPID.equals(serviceDeploymentPID)) {
+                    && !foundDeploymentPID.equals(serviceDeploymentPID)) {
                     throw new DisseminationException("More than one deployment ("
-                            + foundDeploymentPID
-                            + ", "
-                            + serviceDeploymentPID
-                            + ") found for service "
-                            + sDefPID
-                            + " in model "
-                            + cModelPID);
+                                                     + foundDeploymentPID
+                                                     + ", "
+                                                     + serviceDeploymentPID
+                                                     + ") found for service "
+                                                     + sDefPID
+                                                     + " in model "
+                                                     + cModelPID);
 
                 }
 
                 serviceDeploymentPID = foundDeploymentPID;
             } else {
                 logger.debug("No deployment for (" + cModelPID + ", " + sDefPID
-                        + ")");
+                             + ")");
             }
         }
 
@@ -370,13 +347,13 @@ public class DefaultAccess
             if (suitableModelFound) {
                 message =
                         "Unable to find deployment for service " + sDefPID
-                                + " on " + reader.GetObjectPID() + " in model "
-                                + cModelPID;
+                        + " on " + reader.GetObjectPID() + " in model "
+                        + cModelPID;
             } else {
                 message =
                         reader.GetObjectPID()
-                                + " does not have a model with service "
-                                + sDefPID;
+                        + " does not have a model with service "
+                        + sDefPID;
             }
             throw new DisseminatorNotFoundException(message);
         }
@@ -423,7 +400,7 @@ public class DefaultAccess
         stopTime = new Date().getTime();
         interval = stopTime - startTime;
         logger.debug("Roundtrip Get/Validate User Parms: " + interval
-                + " milliseconds.");
+                     + " milliseconds.");
 
         startTime = new Date().getTime();
         // SDP: GET INFO FROM DEPLOYMENT READER:
@@ -436,7 +413,7 @@ public class DefaultAccess
                     .equals(MethodParmDef.DATASTREAM_INPUT)) {
                 if (!h_userParms.containsKey(defaultMethodParms[i].parmName)) {
                     logger.debug("addedDefaultName: "
-                            + defaultMethodParms[i].parmName);
+                                 + defaultMethodParms[i].parmName);
                     String pdv = defaultMethodParms[i].parmDefaultValue;
                     try {
                         // here we make sure the PID is decoded so that encoding
@@ -446,7 +423,7 @@ public class DefaultAccess
                         } else if (pdv.equalsIgnoreCase("$objuri")) {
                             pdv =
                                     "info:fedora/"
-                                            + URLDecoder.decode(PID, "UTF-8");
+                                    + URLDecoder.decode(PID, "UTF-8");
                         }
                     } catch (UnsupportedEncodingException uee) {
                     }
@@ -459,7 +436,7 @@ public class DefaultAccess
         stopTime = new Date().getTime();
         interval = stopTime - startTime;
         logger.debug("Roundtrip Get Deployment Parms: " + interval
-                + " milliseconds.");
+                     + " milliseconds.");
 
         startTime = new Date().getTime();
         DisseminationBindingInfo[] dissBindInfo;
@@ -484,7 +461,7 @@ public class DefaultAccess
         stopTime = new Date().getTime();
         interval = stopTime - startTime;
         logger.debug("Roundtrip Assemble Dissemination: " + interval
-                + " milliseconds.");
+                     + " milliseconds.");
 
         stopTime = new Date().getTime();
         interval = stopTime - initStartTime;
@@ -520,15 +497,15 @@ public class DefaultAccess
         }
         if (!foundMethod) {
             throw new MethodNotFoundException("Method " + methodName
-                    + " was not found in " + bmReader.GetObjectPID()
-                    + "'s operation " + " binding.");
+                                              + " was not found in " + bmReader.GetObjectPID()
+                                              + "'s operation " + " binding.");
         }
 
         DeploymentDSBindSpec dsBindSpec =
                 bmReader.getServiceDSInputSpec(versDateTime);
         DeploymentDSBindRule[] dsBindRules =
                 dsBindSpec.dsBindRules == null ? new DeploymentDSBindRule[0]
-                        : dsBindSpec.dsBindRules;
+                                               : dsBindSpec.dsBindRules;
 
         // Results will be returned in this list, one item per *existing*
         // datastream. If a datastream mentioned in the dsBindRules is not
@@ -542,7 +519,7 @@ public class DefaultAccess
             DeploymentDSBindRule dsBindRule = dsBindRules[i];
             String dsPid =
                     dsBindRule.pid == null ? dObj.GetObjectPID()
-                            : dsBindRule.pid;
+                                           : dsBindRule.pid;
             String dsId = dsBindRule.bindingKeyName;
 
             DOReader reader = m_manager.getReader(false, context, dsPid);
@@ -557,8 +534,8 @@ public class DefaultAccess
                 bindingInfo.dsID = ds.DatastreamID;
                 bindingInfo.dsVersionID = ds.DSVersionID;
                 bindingInfo.dsState = ds.DSState;
-                  bindingInfo.dsCreateDT = ds.DSCreateDT;
-                   // these will be the same for all elements of the array
+                bindingInfo.dsCreateDT = ds.DSCreateDT;
+                // these will be the same for all elements of the array
                 bindingInfo.methodParms = methodParms;
                 bindingInfo.AddressLocation = addressLocation;
                 bindingInfo.OperationLocation = operationLocation;
@@ -587,7 +564,7 @@ public class DefaultAccess
         // DYNAMIC!! Grab any dynamic method definitions and merge them with
         // the statically bound method definitions
         ObjectMethodsDef[] dynamicMethodDefs =
-        //m_dynamicAccess.getObjectMethods(context, PID, asOfDateTime);
+                //m_dynamicAccess.getObjectMethods(context, PID, asOfDateTime);
                 m_dynamicAccess.listMethods(context, PID, asOfDateTime);
         ArrayList<ObjectMethodsDef> methodList =
                 new ArrayList<ObjectMethodsDef>();
@@ -657,27 +634,27 @@ public class DefaultAccess
 */
         // "bootstrap" context won't have the uri to determine security
         String securityUri = context
-        .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri);
+                .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri);
 
         if (securityUri != null) {
-        String reposBaseURL =
-                getReposBaseURL(securityUri
-                                        .equals(Constants.HTTP_REQUEST.SECURE.uri) ? "https"
-                                        : "http",
-                                context
-                                        .getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.uri));
-        profile.dissIndexViewURL =
-                getDissIndexViewURL(reposBaseURL,
+            String reposBaseURL =
+                    getReposBaseURL(securityUri
+                                            .equals(Constants.HTTP_REQUEST.SECURE.uri) ? "https"
+                                                                                       : "http",
                                     context
-                                            .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME),
-                                    reader.GetObjectPID(),
-                                    versDateTime);
-        profile.itemIndexViewURL =
-                getItemIndexViewURL(reposBaseURL,
-                                    context
-                                            .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME),
-                                    reader.GetObjectPID(),
-                                    versDateTime);
+                                            .getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.uri));
+            profile.dissIndexViewURL =
+                    getDissIndexViewURL(reposBaseURL,
+                                        context
+                                                .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME),
+                                        reader.GetObjectPID(),
+                                        versDateTime);
+            profile.itemIndexViewURL =
+                    getItemIndexViewURL(reposBaseURL,
+                                        context
+                                                .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME),
+                                        reader.GetObjectPID(),
+                                        versDateTime);
         }
         return profile;
     }
@@ -750,7 +727,7 @@ public class DefaultAccess
                 getReposBaseURL(context
                                         .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri)
                                         .equals(Constants.HTTP_REQUEST.SECURE.uri) ? "https"
-                                        : "http",
+                                                                                   : "http",
                                 context
                                         .getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.uri));
         repositoryInfo.repositoryBaseURL =
@@ -768,7 +745,7 @@ public class DefaultAccess
                 repositoryInfo.repositoryPIDNamespace + ":100";
         repositoryInfo.sampleOAIIdentifer =
                 "oai:" + repositoryInfo.OAINamespace + ":"
-                        + repositoryInfo.samplePID;
+                + repositoryInfo.samplePID;
         repositoryInfo.sampleSearchURL =
                 repositoryInfo.repositoryBaseURL + "/objects";
         repositoryInfo.sampleAccessURL =
@@ -819,8 +796,8 @@ public class DefaultAccess
     private String[] getRetainPIDs() {
         String retainPIDsCSV =
                 convertToCSV(getServer()
-                        .getModule("org.fcrepo.server.storage.DOManager")
-                        .getParameter("retainPIDs"));
+                                     .getModule("org.fcrepo.server.storage.DOManager")
+                                     .getParameter("retainPIDs"));
         Vector<Object> retainPIDs = new Vector<Object>();
         StringTokenizer st = new StringTokenizer(retainPIDsCSV, ",");
         while (st.hasMoreElements()) {
@@ -922,11 +899,11 @@ public class DefaultAccess
                 h_validParms.put(methodParm.parmName, methodParm);
                 if (logger.isDebugEnabled()) {
                     logger.debug("methodParms[" + i + "]: "
-                            + methodParms[i].parmName + "\nlabel: "
-                            + methodParms[i].parmLabel + "\ndefault: "
-                            + methodParms[i].parmDefaultValue + "\nrequired: "
-                            + methodParms[i].parmRequired + "\ntype: "
-                            + methodParms[i].parmType);
+                                 + methodParms[i].parmName + "\nlabel: "
+                                 + methodParms[i].parmLabel + "\ndefault: "
+                                 + methodParms[i].parmDefaultValue + "\nrequired: "
+                                 + methodParms[i].parmRequired + "\ntype: "
+                                 + methodParms[i].parmType);
                     for (String element : methodParms[i].parmDomainValues) {
                         logger.debug("domainValue: " + element);
                     }
@@ -944,10 +921,10 @@ public class DefaultAccess
                     // This is a fatal error. A required method parameter does not
                     // appear in the list of user supplied parameters.
                     sb.append("The required parameter \"" + validName
-                            + "\" was not found in the "
-                            + "user-supplied parameter list.");
+                              + "\" was not found in the "
+                              + "user-supplied parameter list.");
                     throw new InvalidUserParmException("[Invalid User Parameters] "
-                            + sb.toString());
+                                                       + sb.toString());
                 }
             }
 
@@ -973,11 +950,11 @@ public class DefaultAccess
                             // the parameter. The value of the empty string will be used
                             // as the value of the parameter.
                             logger.warn("The method parameter \""
-                                    + methodParm.parmName
-                                    + "\" has no default value and no "
-                                    + "value was specified by the user.  "
-                                    + "The value of the empty string has "
-                                    + "been assigned to this parameter.");
+                                        + methodParm.parmName
+                                        + "\" has no default value and no "
+                                        + "value was specified by the user.  "
+                                        + "The value of the empty string has "
+                                        + "been assigned to this parameter.");
                         }
                     } else {
                         // Value of user-supplied parameter contains a value.
@@ -990,7 +967,7 @@ public class DefaultAccess
                                         h_userParms.get(methodParm.parmName);
                                 for (String element : parmDomainValues) {
                                     if (userValue.equalsIgnoreCase(element)
-                                            || element.equalsIgnoreCase("null")) {
+                                        || element.equalsIgnoreCase("null")) {
                                         isValidValue = true;
                                     }
                                 }
@@ -1000,7 +977,7 @@ public class DefaultAccess
                                             sb.append(parmDomainValues[i]);
                                         } else {
                                             sb.append(parmDomainValues[i]
-                                                    + ", ");
+                                                      + ", ");
                                         }
                                     }
                                     sb
@@ -1008,7 +985,7 @@ public class DefaultAccess
                                                     + methodParm.parmName
                                                     + "\" with a value of \""
                                                     + h_userParms
-                                                            .get(methodParm.parmName)
+                                                    .get(methodParm.parmName)
                                                     + "\" is not allowed for the method \""
                                                     + methodName
                                                     + "\". Allowed values for this "
@@ -1023,8 +1000,8 @@ public class DefaultAccess
                     // This is a fatal error. A user-supplied parameter name does
                     // not match any valid parameter names for this method.
                     sb.append("The method parameter \"" + parmName
-                            + "\" is not valid for the method \"" + methodName
-                            + "\".");
+                              + "\" is not valid for the method \"" + methodName
+                              + "\".");
                     isValid = false;
                 }
             }
@@ -1037,17 +1014,17 @@ public class DefaultAccess
                 Enumeration<String> e = h_userParms.keys();
                 while (e.hasMoreElements()) {
                     sb.append("The method parameter \"" + e.nextElement()
-                            + "\" is not valid for the method \"" + methodName
-                            + "\"." + "The method \"" + methodName
-                            + "\" defines no method parameters.");
+                              + "\" is not valid for the method \"" + methodName
+                              + "\"." + "The method \"" + methodName
+                              + "\" defines no method parameters.");
                 }
                 throw new InvalidUserParmException("[Invalid User Parameters] "
-                        + sb.toString());
+                                                   + sb.toString());
             }
         }
         if (!isValid) {
             throw new InvalidUserParmException("[Invalid User Parameter] "
-                    + sb.toString());
+                                               + sb.toString());
         }
         return;
     }
@@ -1062,12 +1039,12 @@ public class DefaultAccess
             if (versDateTime == null) {
                 dissIndexURL =
                         reposBaseURL + "/" + fedoraContext + "/objects/" + URLEncoder.encode(PID, "UTF-8")
-                                + "/methods/" + URLEncoder.encode("fedora-system:3", "UTF-8") + "/viewMethodIndex";
+                        + "/methods/" + URLEncoder.encode("fedora-system:3", "UTF-8") + "/viewMethodIndex";
             } else {
                 dissIndexURL =
                         reposBaseURL + "/" + fedoraContext + "/objects/" + URLEncoder.encode(PID, "UTF-8")
-                                + "/methods" + URLEncoder.encode("fedora-system:3", "UTF-8") + "/viewMethodIndex?asOfDateTime="
-                                + DateUtility.convertDateToString(versDateTime);
+                        + "/methods" + URLEncoder.encode("fedora-system:3", "UTF-8") + "/viewMethodIndex?asOfDateTime="
+                        + DateUtility.convertDateToString(versDateTime);
             }
         } catch (UnsupportedEncodingException e) {
             // should never happen...
@@ -1083,17 +1060,17 @@ public class DefaultAccess
                                        String PID,
                                        Date versDateTime) {
         String itemIndexURL = null;
-        
+
         try {
             if (versDateTime == null) {
                 itemIndexURL =
                         reposBaseURL + "/" + fedoraContext + "/objects/" + URLEncoder.encode(PID, "UTF-8")
-                                + "/methods/" + URLEncoder.encode("fedora-system:3", "UTF-8") + "/viewItemIndex";
+                        + "/methods/" + URLEncoder.encode("fedora-system:3", "UTF-8") + "/viewItemIndex";
             } else {
                 itemIndexURL =
                         reposBaseURL + "/" + fedoraContext + "/objects/" + URLEncoder.encode(PID, "UTF-8")
-                                + "/methods/" + URLEncoder.encode("fedora-system:3", "UTF-8") + "/viewItemIndex?asOfDateTime="
-                                + DateUtility.convertDateToString(versDateTime);
+                        + "/methods/" + URLEncoder.encode("fedora-system:3", "UTF-8") + "/viewItemIndex?asOfDateTime="
+                        + DateUtility.convertDateToString(versDateTime);
             }
         } catch (UnsupportedEncodingException e) {
             // should never happen...
@@ -1138,15 +1115,15 @@ public class DefaultAccess
         if (ds == null) {
             String message =
                     "[DefaulAccess] No datastream could be returned. "
-                            + "Either there is no datastream for the digital "
-                            + "object \""
-                            + PID
-                            + "\" with datastream ID of \""
-                            + dsID
-                            + " \"  OR  there are no datastreams that match the specified "
-                            + "date/time value of \""
-                            + DateUtility.convertDateToString(asOfDateTime)
-                            + " \"  .";
+                    + "Either there is no datastream for the digital "
+                    + "object \""
+                    + PID
+                    + "\" with datastream ID of \""
+                    + dsID
+                    + " \"  OR  there are no datastreams that match the specified "
+                    + "date/time value of \""
+                    + DateUtility.convertDateToString(asOfDateTime)
+                    + " \"  .";
             throw new DatastreamNotFoundException(message);
         }
 
@@ -1155,21 +1132,20 @@ public class DefaultAccess
                     (DatastreamReferencedContent) reader
                             .GetDatastream(dsID, asOfDateTime);
             ContentManagerParams params = new ContentManagerParams(drc.DSLocation,
-                    drc.DSMIME, null, null);
+                                                                   drc.DSMIME, null, null);
             params.setContext(context);
             mimeTypedStream = m_externalContentManager.getExternalContent(params);
         } else if (ds.DSControlGrp.equalsIgnoreCase("M")) {
             DatastreamManagedContent dmc =
                     (DatastreamManagedContent) reader
                             .GetDatastream(dsID, asOfDateTime);
-            mimeTypedStream =
-                    new MIMETypedStream(ds.DSMIME, dmc.getContentStream(), null);
+
+            mimeTypedStream = new MIMETypedStream(ds.DSMIME, dmc.getContentStream(), null,ds.DSSize);
         } else if (ds.DSControlGrp.equalsIgnoreCase("X")) {
             DatastreamXMLMetadata dxm =
                     (DatastreamXMLMetadata) reader.GetDatastream(dsID,
                                                                  asOfDateTime);
-            mimeTypedStream =
-                    new MIMETypedStream(ds.DSMIME, dxm.getContentStream(), null);
+            mimeTypedStream = new MIMETypedStream(ds.DSMIME, dxm.getContentStream(), null, ds.DSSize);
         } else if (ds.DSControlGrp.equalsIgnoreCase("R")) {
             DatastreamReferencedContent drc =
                     (DatastreamReferencedContent) reader
@@ -1186,7 +1162,7 @@ public class DefaultAccess
             try {
                 InputStream inStream =
                         new ByteArrayInputStream(drc.DSLocation
-                                .getBytes("UTF-8"));
+                                                         .getBytes("UTF-8"));
                 mimeTypedStream =
                         new MIMETypedStream("application/fedora-redirect",
                                             inStream,
@@ -1194,11 +1170,11 @@ public class DefaultAccess
             } catch (UnsupportedEncodingException uee) {
                 String message =
                         "[DefaultAccess] An error has occurred. "
-                                + "The error was a \""
-                                + uee.getClass().getName() + "\"  . The "
-                                + "Reason was \"" + uee.getMessage()
-                                + "\"  . String value: " + drc.DSLocation
-                                + "  . ";
+                        + "The error was a \""
+                        + uee.getClass().getName() + "\"  . The "
+                        + "Reason was \"" + uee.getMessage()
+                        + "\"  . String value: " + drc.DSLocation
+                        + "  . ";
                 logger.error(message);
                 throw new GeneralException(message);
             }
@@ -1206,7 +1182,8 @@ public class DefaultAccess
         long stopTime = new Date().getTime();
         long interval = stopTime - startTime;
         logger.debug("Roundtrip getDatastreamDissemination: " + interval
-                + " milliseconds.");
+                     + " milliseconds.");
         return mimeTypedStream;
     }
+
 }

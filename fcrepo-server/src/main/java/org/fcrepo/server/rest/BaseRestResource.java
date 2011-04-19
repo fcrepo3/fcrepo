@@ -134,10 +134,14 @@ public class BaseRestResource {
                 for (Property header : result.header) {
                     if (header.name != null
                             && !(header.name.equalsIgnoreCase("transfer-encoding"))
+                            && !(header.name.equalsIgnoreCase("content-length"))
                             && !(header.name.equalsIgnoreCase("content-type"))) {
                         builder.header(header.name, header.value);
                     }
                 }
+            }
+            if (result.getSize() != -1L){
+                builder.header("content-length",result.getSize());
             }
 
             if (!result.MIMEType.equals("")){

@@ -173,12 +173,13 @@ public class DefaultExternalContentManager
             String mimeType =
                     response.getResponseHeaderValue("Content-Type",
                                                     knownMimeType);
+            long length = Long.parseLong(response.getResponseHeaderValue("Content-Length","-1"));
             Property[] headerArray =
                     toPropertyArray(response.getResponseHeaders());
             if (mimeType == null || mimeType.equals("")) {
                 mimeType = DEFAULT_MIMETYPE;
             }
-            return new MIMETypedStream(mimeType, response, headerArray);
+            return new MIMETypedStream(mimeType, response, headerArray, length);
         } catch (Exception e) {
             throw new GeneralException("Error getting " + url, e);
         }
@@ -199,7 +200,7 @@ public class DefaultExternalContentManager
         return props;
     }
 
-    /**
+   /* *//**
      * Creates a property array out of the MIME type and the length of the
      * provided file.
      *
@@ -207,7 +208,7 @@ public class DefaultExternalContentManager
      *            the file containing the content.
      * @return an array of properties containing content-length and
      *         content-type.
-     */
+     *//*
     private static Property[] getPropertyArray(File file, String mimeType) {
          Property[] props = new Property[2];
          Property clen = new Property("Content-Length",Long.toString(file.length()));
@@ -215,7 +216,7 @@ public class DefaultExternalContentManager
          props[0] = clen;
          props[1] = ctype;
          return props;
-    }
+    }*/
 
     /**
      * Get a MIMETypedStream for the given URL. If user or password are
@@ -250,7 +251,7 @@ public class DefaultExternalContentManager
             if (mimeType == null || mimeType.equalsIgnoreCase("")){
                 mimeType = determineMimeType(cFile);
             }
-            return new MIMETypedStream(mimeType,fileUrl.openStream(),getPropertyArray(cFile,mimeType));
+            return new MIMETypedStream(mimeType,fileUrl.openStream(),null,cFile.length());
         }
         catch(AuthzException ae){
             logger.error(ae.getMessage(),ae);
@@ -275,13 +276,6 @@ public class DefaultExternalContentManager
     /**
      * Retrieves external content via http or https.
      *
-     * @param url
-     *            The url pointing to the content.
-     * @param context
-     *            The Map containing parameters.
-     * @param mimeType
-     *            The default MIME type to be used in case no MIME type can be
-     *            detected.
      * @return A MIMETypedStream
      * @throws ModuleInitializationException
      * @throws GeneralException

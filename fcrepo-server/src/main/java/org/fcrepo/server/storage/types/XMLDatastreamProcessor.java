@@ -203,7 +203,7 @@ public class XMLDatastreamProcessor {
             ((DatastreamXMLMetadata)m_ds).xmlContent = xmlContent;
         } else if (m_dsType == DS_TYPE.MANAGED) {
             ByteArrayInputStream bais = new ByteArrayInputStream(xmlContent);
-            MIMETypedStream s = new MIMETypedStream("text/xml", bais, null);
+            MIMETypedStream s = new MIMETypedStream("text/xml", bais, null,xmlContent.length);
             try {
                 ((DatastreamManagedContent)m_ds).putContentStream(s);
             } catch (StreamIOException e) {

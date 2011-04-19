@@ -2045,7 +2045,7 @@ public class DefaultManagement
                     }
 
                     // add the content stream
-                    MIMETypedStream content = new MIMETypedStream(null, new ByteArrayInputStream(byteContent), null);
+                    MIMETypedStream content = new MIMETypedStream(null, new ByteArrayInputStream(byteContent), null, byteContent.length);
                     newDS.putContentStream(content);
 
                     // checksum only needs recalc if we added a header

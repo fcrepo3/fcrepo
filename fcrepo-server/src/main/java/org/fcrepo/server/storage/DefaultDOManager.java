@@ -1165,7 +1165,8 @@ public class DefaultDOManager
                                     mimeTypedStream =
                                             new MIMETypedStream(null,
                                                                 m_management.getTempStream(dmc.DSLocation),
-                                                                null);
+                                                                null,
+                                                                dmc.DSSize);
                                     logger.info("Getting managed datastream from internal uploaded "
                                             + "location: " + dmc.DSLocation);
                                 } else if (dmc.DSLocation.startsWith(DatastreamManagedContent.COPY_SCHEME)) {
@@ -1175,7 +1176,8 @@ public class DefaultDOManager
                                                                 m_permanentStore
                                                                         .retrieveDatastream(dmc.DSLocation
                                                                                 .substring(7)),
-                                                                null);
+                                                                null,
+                                                                dmc.DSSize);
                                 } else if (dmc.DSLocation.startsWith(DatastreamManagedContent.TEMP_SCHEME)) {
                                     File file =
                                             new File(dmc.DSLocation
@@ -1187,7 +1189,8 @@ public class DefaultDOManager
                                         mimeTypedStream =
                                                 new MIMETypedStream(dmc.DSMIME,
                                                                     str,
-                                                                    null);
+                                                                    null,
+                                                                    file.length());
                                     } catch (FileNotFoundException fnfe) {
                                         logger.warn("Unable to read temp file created for datastream from archive",
                                                       fnfe);

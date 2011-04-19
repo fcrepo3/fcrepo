@@ -158,15 +158,15 @@ public class TestRESTAPI
 
         DEMO_MIN =
                 FileUtils.readFileToString(new File(REST_RESOURCE_PATH
-                        + "/demo_min.xml"), "UTF-8");
+                                                    + "/demo_min.xml"), "UTF-8");
         DEMO_MIN_PID =
                 FileUtils.readFileToString(new File(REST_RESOURCE_PATH
-                        + "/demo_min_pid.xml"), "UTF-8");
+                                                    + "/demo_min_pid.xml"), "UTF-8");
 
         StringTemplate tpl =
-                new StringTemplate(FileUtils.readFileToString(new File(REST_RESOURCE_PATH
-                                                                      + "/demo_rest.xml"),
-                                                              "UTF-8"));
+                new StringTemplate(FileUtils
+                                           .readFileToString(new File(REST_RESOURCE_PATH
+                                                                      + "/demo_rest.xml"), "UTF-8"));
         tpl.setAttribute("MODEL_DOWNLOAD_FILENAME",
                          MODEL.DOWNLOAD_FILENAME.localName);
         tpl.setAttribute("DS1_RELS_FILENAME", DS1RelsFilename);
@@ -205,10 +205,10 @@ public class TestRESTAPI
                 authorizeAccess = false;
             } else {
                 assertTrue("Failed to determine whether to perform authorization on Access requests from: "
-                                   + authAccessProperty,
+                           + authAccessProperty,
                            false);
                 throw new RuntimeException("Failed to determine whether to perform authorization on Access requests from: "
-                        + authAccessProperty);
+                                           + authAccessProperty);
             }
 
         }
@@ -388,6 +388,7 @@ public class TestRESTAPI
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         assertEquals(1486, response.getResponseBody().length);
+        assertEquals("1486", response.getResponseHeader("Content-Length").getValue());
         assertEquals("image/jpeg", response.getResponseHeader("Content-Type")
                 .getValue());
     }
@@ -395,13 +396,14 @@ public class TestRESTAPI
     public void testGETMethodCustomGoodUserArgGoodDate() throws Exception {
         url =
                 "/objects/demo:29/methods/demo:27/resizeImage?width=50&asOfDateTime="
-                        + datetime;
+                + datetime;
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         assertEquals(1486, response.getResponseBody().length);
+        assertEquals("1486", response.getResponseHeader("Content-Length").getValue());
         assertEquals("image/jpeg", response.getResponseHeader("Content-Type")
                 .getValue());
     }
@@ -427,7 +429,7 @@ public class TestRESTAPI
     public void testGETMethodCustomGoodDate() throws Exception {
         url =
                 "/objects/demo:14/methods/demo:12/getDocumentStyle1?asOfDateTime="
-                        + datetime;
+                + datetime;
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -564,7 +566,7 @@ public class TestRESTAPI
                         + "/datastreamHistory.xml"), "UTF-8");
         StringTemplate tpl = new StringTemplate(control);
         tpl.setAttribute("FEDORA_BASE_URL", getProtocol() + "://" + getHost()
-                + ":" + getPort());
+                                            + ":" + getPort());
 
         // Diff must be identical
         XMLUnit.setIgnoreWhitespace(true);
@@ -591,6 +593,11 @@ public class TestRESTAPI
         }
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
+        Header length = response.getResponseHeader("content-length");
+        assertNotNull(length);
+        assertNotNull(length.getValue());
+        long lengthlong = Long.parseLong(length.getValue());
+        assertTrue(lengthlong > 0);
         String responseXML = new String(response.responseBody, "UTF-8");
         assertTrue(responseXML.contains("rdf:Description"));
 
@@ -603,6 +610,12 @@ public class TestRESTAPI
         }
         response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
+        length = response.getResponseHeader("content-length");
+        assertNotNull(length);
+        assertNotNull(length.getValue());
+        lengthlong = Long.parseLong(length.getValue());
+        assertTrue(lengthlong > 0);
+
         responseXML = new String(response.responseBody, "UTF-8");
         assertTrue(responseXML.contains("rdf:Description"));
 
@@ -749,7 +762,7 @@ public class TestRESTAPI
         Header locationHeader = response.getResponseHeader("location");
         assertNotNull(locationHeader);
         assertTrue(locationHeader.getValue().contains(URLEncoder.encode(pid
-                .toString(), "UTF-8")));
+                                                                                .toString(), "UTF-8")));
         responseBody = new String(response.getResponseBody(), "UTF-8");
         assertTrue(responseBody.equals(pid.toString()));
 
@@ -852,10 +865,10 @@ public class TestRESTAPI
         // test with asOfDateTime set (just on the last object validated above)
 
         url =
-            String.format("/objects/%s/validate?asOfDateTime=%s", pid.toString(),datetime);
+                String.format("/objects/%s/validate?asOfDateTime=%s", pid.toString(),datetime);
         HttpResponse getTrue = get(true);
         assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
-                     .getStatusCode());
+                .getStatusCode());
         assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
         String responseXML = getTrue.getResponseBodyString();
         assertXpathExists("/management:validation[@valid='true']", responseXML);
@@ -978,7 +991,7 @@ public class TestRESTAPI
         // Update the location of the EXTDS datastream (E type datastream)
         String newLocation =
                 "http://" + getHost() + ":" + getPort() + "/"
-                        + getFedoraAppServerContext() + "/get/demo:REST/DC";
+                + getFedoraAppServerContext() + "/get/demo:REST/DC";
         url =
                 String.format("/objects/%s/datastreams/EXTDS?dsLocation=%s",
                               pid.toString(),
@@ -1210,21 +1223,21 @@ public class TestRESTAPI
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "attachment", TestRESTAPI.DS2LabelFilename
-                + ".jpg"); // jpg should be from MIMETYPE mapping
+                                              + ".jpg"); // jpg should be from MIMETYPE mapping
 
         // filename from label, unknown MIMETYPE
         url = "/objects/demo:REST/datastreams/DS3/content?download=true";
         response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "attachment", TestRESTAPI.DS3LabelFilename
-                + ".bin"); // default extension from config
+                                              + ".bin"); // default extension from config
 
         // filename from label with illegal characters, known MIMETYPE
         url = "/objects/demo:REST/datastreams/DS4/content?download=true";
         response = get(getAuthAccess(), false);
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "attachment", TestRESTAPI.DS4LabelFilename
-                + ".xml"); // xml from mimetype mapping
+                                              + ".xml"); // xml from mimetype mapping
     }
 
     @Test
@@ -1298,7 +1311,7 @@ public class TestRESTAPI
             }
         }
         assertEquals(expectedType + "; " + "filename=\"" + expectedFilename
-                + "\"", contentDisposition);
+                     + "\"", contentDisposition);
     }
 
     // helper methods
@@ -1365,8 +1378,8 @@ public class TestRESTAPI
             // if response is xml
 
             if (res.getResponseHeader("Content-Type") != null &&
-                    (res.getResponseHeader("Content-Type").getValue().contains("text/xml") ||
-                            res.getResponseHeader("Content-Type").getValue().contains("application/xml"))) {
+                (res.getResponseHeader("Content-Type").getValue().contains("text/xml") ||
+                 res.getResponseHeader("Content-Type").getValue().contains("application/xml"))) {
                 String xmlResponse = res.getResponseBodyString();
                 // if a schema location is specified
                 if (xmlResponse.contains(":schemaLocation=\"")) {
@@ -1404,7 +1417,7 @@ public class TestRESTAPI
     // FIXME: to cover getNextPid, actually all verbs should be validated
     // for if/when they return xml responses
     protected HttpResponse post(String requestContent, boolean authenticate)
-    throws Exception {
+            throws Exception {
 
         return post(requestContent, authenticate, true);
     }
@@ -1546,7 +1559,7 @@ public class TestRESTAPI
         SAXParser parser;
         parser = factory.newSAXParser();
         parser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaLanguage",
-        "http://www.w3.org/2001/XMLSchema");
+                           "http://www.w3.org/2001/XMLSchema");
 
         StringBuilder errors = new StringBuilder();
 
