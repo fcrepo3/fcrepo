@@ -126,21 +126,58 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
 
         String policyId = policyUtils.addPolicy("test-policy-00.xml");
 
+        // NOTE: PEP_NOCACHE environment variable MUST be set to true to disable policy evaluation results caching
+
         try {
-            String url = "/fedora/objects/test:1000007?format=xml";
-            String response = httpUtils.get(url);
-            if (logger.isDebugEnabled()) {
+            // object
+            try {
+                String url = "/fedora/objects/test:1000007?format=xml";
+                String response = httpUtils.get(url);
                 logger.debug("http response:\n" + response);
-            }
+                Assert.fail("Access was permitted when it should have been denied:  " + url);
+            } catch (AuthorizationDeniedException e) { } // expected
+            // list datastreams
+            try {
+                String url = "/fedora/objects/test:1000007/datastreams";
+                String response = httpUtils.get(url);
+                logger.debug("http response:\n" + response);
+                Assert.fail("Access was permitted when it should have been denied:  " + url);
+            } catch (AuthorizationDeniedException e) { } // expected
 
-            // If we get here, we fail... should have thrown exception
-            // PEP caching must be disabled (previously cached results will invalidate test)
-            Assert.fail("Access was permitted when it should have been denied.  (Check that PEP_NOCACHE env variable is set to true)");
-        } catch (AuthorizationDeniedException e) {
-            // expected
+            // datastream profile
+            try {
+                String url = "/fedora/objects/test:1000007/datastreams/DC";
+                String response = httpUtils.get(url);
+                logger.debug("http response:\n" + response);
+                Assert.fail("Access was permitted when it should have been denied:  " + url);
+            } catch (AuthorizationDeniedException e) { } // expected
 
-        } catch (Exception e) {
-            throw e;
+            // datastream content
+            try {
+                String url = "/fedora/objects/test:1000007/datastreams/DC/content";
+                String response = httpUtils.get(url);
+                logger.debug("http response:\n" + response);
+                Assert.fail("Access was permitted when it should have been denied:  " + url);
+            } catch (AuthorizationDeniedException e) { } // expected
+
+            // list methods
+            try {
+                String url = "/fedora/objects/test:1000007/methods";
+                String response = httpUtils.get(url);
+                logger.debug("http response:\n" + response);
+                Assert.fail("Access was permitted when it should have been denied:  " + url);
+            } catch (AuthorizationDeniedException e) { } // expected
+
+            // get method content
+            try {
+                String url = "/fedora/objects/test:1000007/methods/fedora-system:3/viewDublinCore";
+                String response = httpUtils.get(url);
+                logger.debug("http response:\n" + response);
+                Assert.fail("Access was permitted when it should have been denied:  " + url);
+            } catch (AuthorizationDeniedException e) { } // expected
+
+            // TODO: extend for all REST methods
+
         } finally {
             policyUtils.delPolicy(policyId);
         }
