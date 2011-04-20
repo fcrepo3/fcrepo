@@ -155,6 +155,7 @@ public class ObjectsFilter
         }
 
         String handlerName = null;
+        // - /objects
         // ascertain the correct handler based on uri pattern.
         if (parts.length == 1) {
             if (request.getParameterMap().containsKey("sessionToken")) {
@@ -163,6 +164,7 @@ public class ObjectsFilter
                     || request.getParameterMap().containsKey("query")) {
                 handlerName = Handlers.FINDOBJECTS;
             }
+        // - /objects/[pid]
         } else if (parts.length == 2
                 && (isPID(parts[1]) || "new".equals(parts[1]))) {
             if ("GET".equals(method)) {
@@ -174,8 +176,11 @@ public class ObjectsFilter
             } else if ("POST".equals(method) && "new".equals(parts[1])) {
                 handlerName = Handlers.INGEST;
             }
-        } else if (parts.length == 2 && parts[1].equals("nextPID")) {
+        // - /objects/nextPID --> /nextPID
+        // FIXME: based on the fixup changing the path at the start of this method (is that really needed?)
+        } else if (parts.length == 1 && parts[0].equals("nextPID")) {
             handlerName = Handlers.GETNEXTPID;
+        // - /objects/[pid]/...
         } else if (parts.length == 3 && isPID(parts[1]) && "GET".equals(method)) {
             if ("datastreams".equals(parts[2])) {
                 handlerName = Handlers.LISTDATASTREAMS;
@@ -188,6 +193,9 @@ public class ObjectsFilter
             } else if ("versions".equals(parts[2])) {
                 handlerName = Handlers.GETOBJECTHISTORY;
             }
+            // TODO: - /objects/[pid]/objectXML
+
+        // - /objects/[pid]/datastreams/[dsid]
         } else if (parts.length == 4 && isPID(parts[1])
                 && "datastreams".equals(parts[2]) && isDatastream(parts[3])) {
             if ("PUT".equals(method)
@@ -205,18 +213,25 @@ public class ObjectsFilter
             } else if ("DELETE".equals(method)) {
                 handlerName = Handlers.PURGEDATASTREAM;
             }
+        // - /objects/[pid]/datastreams/[dsid]/content
         } else if (parts.length == 5 && isPID(parts[1])
                 && "datastreams".equals(parts[2]) && isDatastream(parts[3])
                 && "content".equals(parts[4])) {
             handlerName = Handlers.GETDATASTREAMDISSEMINATION;
+        } else if (parts.length == 5 && isPID(parts[1])
+                && "methods".equals(parts[2]) && isPID(parts[3])) {
+            handlerName = Handlers.GETDISSEMINATION;
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("activating handler: " + handlerName);
-        }
+        // TODO:
+        // - /objects/[pid]/methods/[sdef]
+        // - /objects/[pid/relationships[/...]
 
         RESTFilter handler = objectsHandlers.get(handlerName);
         if (handler != null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("activating handler: " + handlerName);
+            }
             return handler;
         } else {
             // there must always be a handler

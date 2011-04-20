@@ -78,15 +78,16 @@
 		<handler operation="/search" class="org.fcrepo.server.security.xacml.pep.rest.filters.SearchFilter" />
 		<handler operation="/management/getNextPID" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetNextPIDFilter" />
     <!-- Noops - no authorisation -->
+    <handler operation="/risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
+		<!-- 
+        Filters risearch results, but with a significant performance penalty. 
+        <handler operation="risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.RISearchFilter" />
+		-->
     <!-- WSDL -->
     <handler operation="/services" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
     <!-- WADL -->
     <handler operation="/application.wadl" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
     
-		<!-- 
-        Filters risearch results, but with a significant performance penalty. 
-        <handler operation="risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.RISearchFilter" />
-		-->
         <handler operation="/objects" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsFilter" />
 	</handlers-rest>
 	
@@ -98,6 +99,7 @@
 		<handler operation="findObjects" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects" />
 		<handler operation="resumeFindObjects" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects" />
 		<handler operation="getDatastreamDissemination" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastreamDissemination" />
+		<handler operation="getDissemination" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDissemination" />
 		<handler operation="getObjectHistory" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectHistory" />
 		<handler operation="getObjectProfile" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectProfile" />
 		<handler operation="listDatastreams" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ListDatastreams" />
