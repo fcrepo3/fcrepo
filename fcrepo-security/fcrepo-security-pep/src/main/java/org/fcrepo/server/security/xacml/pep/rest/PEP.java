@@ -48,7 +48,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.security.xacml.pep.AuthzDeniedException;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
@@ -56,8 +60,6 @@ import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.rest.filters.DataResponseWrapper;
 import org.fcrepo.server.security.xacml.pep.rest.filters.ParameterRequestWrapper;
 import org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -151,8 +153,9 @@ public final class PEP
                 // pass the request along to the next chain...
                 chain.doFilter(req, res);
             } else {
-                // no filter, just use the original request/response...
-                chain.doFilter(request, response);
+                // there must always be a filter, even if it is a NOOP
+                logger.error("No FeSL REST filter found for " + servletPath);
+                throw new PEPException("No FeSL REST filter found for " + servletPath);
             }
 
             // handle the response if we have a filter

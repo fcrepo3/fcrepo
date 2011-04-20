@@ -77,6 +77,12 @@
 		<handler operation="/listMethods" class="org.fcrepo.server.security.xacml.pep.rest.filters.ListMethodsFilter" />
 		<handler operation="/search" class="org.fcrepo.server.security.xacml.pep.rest.filters.SearchFilter" />
 		<handler operation="/management/getNextPID" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetNextPIDFilter" />
+    <!-- Noops - no authorisation -->
+    <!-- WSDL -->
+    <handler operation="/services" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
+    <!-- WADL -->
+    <handler operation="/application.wadl" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
+    
 		<!-- 
         Filters risearch results, but with a significant performance penalty. 
         <handler operation="risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.RISearchFilter" />

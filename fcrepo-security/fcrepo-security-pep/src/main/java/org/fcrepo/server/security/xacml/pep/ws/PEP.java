@@ -44,15 +44,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.security.xacml.pep.AuthzDeniedException;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandler;
 import org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandlerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -118,9 +120,11 @@ public class PEP
         OperationHandler operationHandler =
                 getHandler(service.getName(), operation.getName());
 
-        // If we found no handler just exit
+        // there must always be a handler.
         if (operationHandler == null) {
-            return;
+            logger.error("Missing handler for service/operation: " + service.getName() + "/" + operation.getName());
+            throw AxisFault
+                    .makeFault(new PEPException("Missing handler for service/operation: " + service.getName() + "/" + operation.getName()));
         }
 
         RequestCtx reqCtx = null;

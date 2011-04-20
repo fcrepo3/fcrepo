@@ -39,11 +39,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Handlers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Handlers;
 
 /**
  * Handles the get operations.
@@ -109,7 +111,7 @@ public class ObjectsFilter
         return objectsHandler.handleResponse(request, response);
     }
 
-    public RESTFilter getObjectsHandler(HttpServletRequest request)
+    protected RESTFilter getObjectsHandler(HttpServletRequest request)
             throws ServletException {
         String uri = request.getRequestURI();
         String path = request.getPathInfo();
@@ -213,7 +215,14 @@ public class ObjectsFilter
             logger.debug("activating handler: " + handlerName);
         }
 
-        return objectsHandlers.get(handlerName);
+        RESTFilter handler = objectsHandlers.get(handlerName);
+        if (handler != null) {
+            return handler;
+        } else {
+            // there must always be a handler
+            throw new ServletException("No REST handler defined for method " + method + " path=" + path);
+        }
+
     }
 
     private void loadObjectsHandlers() throws ServletException {
