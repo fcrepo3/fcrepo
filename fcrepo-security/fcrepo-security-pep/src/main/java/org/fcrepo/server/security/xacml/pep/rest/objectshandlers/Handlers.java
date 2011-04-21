@@ -59,4 +59,5 @@ public class Handlers {
 
     public static final String SETDATASTREAMVERSIONABLE =
             "setDatastreamVersionable";
+    public static final String VALIDATE = "validate";
 }

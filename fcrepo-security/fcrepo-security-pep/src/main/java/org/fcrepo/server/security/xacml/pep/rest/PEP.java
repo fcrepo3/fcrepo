@@ -120,6 +120,15 @@ public final class PEP
             logger.debug("Incoming servletPath: " + servletPath);
         }
 
+        // Fix-up for direct web.xml servlet mappings for:
+        // /objects/nextPID and /objects/nextPID.xml
+        // (so servlet path will be different in these cases)
+        // FIXME: we don't support .xml any more? but included as the servlet mapping is still specified
+        if (uri.endsWith("/nextPID") || uri.endsWith("/nextPID.xml")) {
+            servletPath = "/objects";
+        }
+
+
         // get the filter (or null if no filter)
         RESTFilter filter = getFilter(servletPath);
         try {

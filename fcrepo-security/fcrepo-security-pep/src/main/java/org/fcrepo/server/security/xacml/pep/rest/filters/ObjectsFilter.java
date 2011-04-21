@@ -113,10 +113,20 @@ public class ObjectsFilter
 
     protected RESTFilter getObjectsHandler(HttpServletRequest request)
             throws ServletException {
+
+        // IMPORTANT:
+        // Do not return null unless you are sure that the endpoint
+        // requires no authorisation.  The only current case for this
+        // is returning the WADL.  All other REST endpoints MUST have handlers.
+
+
         String uri = request.getRequestURI();
         String path = request.getPathInfo();
-        // need to handle this special case due to the way the RestServlet is mapped.
-        if (uri.endsWith("nextPID")) {
+
+
+        // need to handle this special case due to the way the RestServlet is mapped
+        // directly to /objects/nextPID and /objects/nextPID.xml
+        if (uri.endsWith("/nextPID")) {
             path = "/nextPID";
         } else if (path == null) {
             path = "";
@@ -154,33 +164,49 @@ public class ObjectsFilter
             throw new ServletException("Not enough components on the URI.");
         }
 
+        // IMPORTANT:
+        // this is the only case we return null.  No authz on the WADL.
+        // Every other endpoint MUST have a handler.
+        if (parts.length == 2 && "application.wadl".equals(parts[1])) {
+            return null;
+        }
+
+        // FIXME: tests below could do with tidying up
+        // particularly wrt checking for valid pid and ds IDs.
+        // if the tests are done in the correct order this should not be necessary
+        // (and the REST API mappings/annotations do not use this form of syntax checking,
+        // so they will allow pass-through of invalid PIDs and DSIDs, which will be checked later in the code -
+        // the stuff below will actually result in not finding a handler if a bogus PID/DSID is found)
+
         String handlerName = null;
         // - /objects
         // ascertain the correct handler based on uri pattern.
         if (parts.length == 1) {
-            if (request.getParameterMap().containsKey("sessionToken")) {
-                handlerName = Handlers.RESUMEFINDOBJECTS;
-            } else if (request.getParameterMap().containsKey("terms")
-                    || request.getParameterMap().containsKey("query")) {
-                handlerName = Handlers.FINDOBJECTS;
+            if ("GET".equals(method)) {
+                if (request.getParameterMap().containsKey("sessionToken")) {
+                    handlerName = Handlers.RESUMEFINDOBJECTS;
+                } else if (request.getParameterMap().containsKey("terms")
+                        || request.getParameterMap().containsKey("query")) {
+                    handlerName = Handlers.FINDOBJECTS;
+                }
+            } else if ("POST".equals(method)) {
+                handlerName = Handlers.INGEST;
             }
-        // - /objects/[pid]
-        } else if (parts.length == 2
-                && (isPID(parts[1]) || "new".equals(parts[1]))) {
+            // - /objects/nextPID
+        } else if (parts.length == 2 && parts[1].equals("nextPID")) {
+            handlerName = Handlers.GETNEXTPID;
+            // - /objects/[pid]
+        } else if (parts.length == 2) {
             if ("GET".equals(method)) {
                 handlerName = Handlers.GETOBJECTPROFILE;
             } else if ("PUT".equals(method)) {
                 handlerName = Handlers.MODIFYOBJECT;
             } else if ("DELETE".equals(method)) {
                 handlerName = Handlers.PURGEOBJECT;
-            } else if ("POST".equals(method) && "new".equals(parts[1])) {
+            } else if ("POST".equals(method)) {
                 handlerName = Handlers.INGEST;
             }
-        // - /objects/nextPID --> /nextPID
-        // FIXME: based on the fixup changing the path at the start of this method (is that really needed?)
-        } else if (parts.length == 1 && parts[0].equals("nextPID")) {
-            handlerName = Handlers.GETNEXTPID;
-        // - /objects/[pid]/...
+            // - /objects/[pid]/...
         } else if (parts.length == 3 && isPID(parts[1]) && "GET".equals(method)) {
             if ("datastreams".equals(parts[2])) {
                 handlerName = Handlers.LISTDATASTREAMS;
@@ -192,8 +218,9 @@ public class ObjectsFilter
                 handlerName = Handlers.GETOBJECTXML;
             } else if ("versions".equals(parts[2])) {
                 handlerName = Handlers.GETOBJECTHISTORY;
+            } else if ("validate".equals(parts[2])) {
+                handlerName = Handlers.VALIDATE;
             }
-            // TODO: - /objects/[pid]/objectXML
 
         // - /objects/[pid]/datastreams/[dsid]
         } else if (parts.length == 4 && isPID(parts[1])
@@ -218,13 +245,22 @@ public class ObjectsFilter
                 && "datastreams".equals(parts[2]) && isDatastream(parts[3])
                 && "content".equals(parts[4])) {
             handlerName = Handlers.GETDATASTREAMDISSEMINATION;
+
+        // - /objects/[pid]/datastreams/[dsid]/history
+        } else if (parts.length == 5 && isPID(parts[1]) && "datastreams".equals(parts[2]) && isDatastream(parts[3]) && "history".equals(parts[4])) {
+            handlerName = Handlers.GETDATASTREAMHISTORY;
+
+        // - /objects/[pid]/methods/[sdef]/method
         } else if (parts.length == 5 && isPID(parts[1])
-                && "methods".equals(parts[2]) && isPID(parts[3])) {
+                && "methods".equals(parts[2]) && isPID(parts[3]) && "GET".equals(method)) {
             handlerName = Handlers.GETDISSEMINATION;
+
+        // - /objects/[pid]/methods/[sdef]
+        } else if (parts.length == 4 && isPID(parts[1]) && "GET".equals(method) && "methods".equals(parts[2]) && isPID(parts[3])) {
+            handlerName = Handlers.LISTMETHODS;
         }
 
         // TODO:
-        // - /objects/[pid]/methods/[sdef]
         // - /objects/[pid/relationships[/...]
 
         RESTFilter handler = objectsHandlers.get(handlerName);

@@ -47,5 +47,6 @@
 		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-getRelationships" to="read" />
 		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-addRelationship" to="create" />
 		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-purgeRelationship" to="delete" />
+		<actionAttributeValue from="urn:fedora:names:fedora:2.1:action:id-validate" to="read" />
 	</actionAttributes>
 </mapping>

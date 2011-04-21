@@ -1,21 +1,3 @@
-/*
- * File: ListMethods.java
- *
- * Copyright 2009 2DC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.fcrepo.server.security.xacml.pep.rest.objectshandlers;
 
 import java.io.IOException;
@@ -31,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.DateTimeAttribute;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
 
@@ -45,33 +26,18 @@ import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 
 
-/**
- * Handles the ListMethods operation.
- *
- * @author nish.naidoo@gmail.com
- */
-public class ListMethods
-        extends AbstractFilter {
+public class GetDatastreamHistory
+extends AbstractFilter {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(ListMethods.class);
-
-    /**
-     * Default constructor.
-     *
-     * @throws PEPException
-     */
-    public ListMethods()
+    public GetDatastreamHistory()
             throws PEPException {
         super();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter#handleRequest(javax.servlet
-     * .http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-     */
+    private static final Logger logger =
+            LoggerFactory.getLogger(GetDatastreamHistory.class);
+
+    @Override
     public RequestCtx handleRequest(HttpServletRequest request,
                                     HttpServletResponse response)
             throws IOException, ServletException {
@@ -79,24 +45,11 @@ public class ListMethods
             logger.debug(this.getClass().getName() + "/handleRequest!");
         }
 
-        // -/objects/[pid]/methods and
-        // -/objects/[pid]/methods/[sdefPid]
-
         String path = request.getPathInfo();
         String[] parts = path.split("/");
 
-        String sDefPid = null;
         String pid = parts[1];
-        if (parts.length > 3) {
-            sDefPid = parts[3];
-        }
-
-
-
-        String asOfDateTime = request.getParameter("asOfDateTime");
-        if (!isDate(asOfDateTime)) {
-            asOfDateTime = null;
-        }
+        String dsid = parts[3].replaceAll(".xml", "");
 
         RequestCtx req = null;
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
@@ -110,20 +63,16 @@ public class ListMethods
                 resAttr.put(new URI(XACML_RESOURCE_ID),
                             new AnyURIAttribute(new URI(pid)));
             }
-            if (sDefPid != null && !"".equals(sDefPid)) {
-                resAttr.put(Constants.SDEF.PID.getURI(),
-                            new StringAttribute(sDefPid));
-            }
-            if (asOfDateTime != null && !"".equals(asOfDateTime)) {
-                resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
-                            DateTimeAttribute.getInstance(asOfDateTime));
+            if (dsid != null && !"".equals(dsid)) {
+                resAttr.put(Constants.DATASTREAM.ID.getURI(),
+                            new StringAttribute(dsid));
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.LIST_METHODS
+                        new StringAttribute(Constants.ACTION.GET_DATASTREAM_HISTORY
                                 .getURI().toASCIIString()));
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIA.getURI()
+                        new StringAttribute(Constants.ACTION.APIM.getURI()
                                 .toASCIIString()));
 
             req =
@@ -133,10 +82,10 @@ public class ListMethods
                                                      getEnvironment(request));
 
             LogUtil.statLog(request.getRemoteUser(),
-                            Constants.ACTION.LIST_METHODS.getURI()
+                            Constants.ACTION.GET_DATASTREAM_HISTORY.getURI()
                                     .toASCIIString(),
                             pid,
-                            null);
+                            dsid);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new ServletException(e.getMessage(), e);
@@ -145,15 +94,13 @@ public class ListMethods
         return req;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter#handleResponse(javax.servlet
-     * .http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-     */
+    @Override
     public RequestCtx handleResponse(HttpServletRequest request,
                                      HttpServletResponse response)
             throws IOException, ServletException {
+        // TODO Auto-generated method stub
         return null;
     }
+
+
 }

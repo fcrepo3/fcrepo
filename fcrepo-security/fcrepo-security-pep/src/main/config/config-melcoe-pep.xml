@@ -77,18 +77,19 @@
 		<handler operation="/listMethods" class="org.fcrepo.server.security.xacml.pep.rest.filters.ListMethodsFilter" />
 		<handler operation="/search" class="org.fcrepo.server.security.xacml.pep.rest.filters.SearchFilter" />
 		<handler operation="/management/getNextPID" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetNextPIDFilter" />
+    <!-- handler for REST API - each individual API operation is mapped below in handlers-objects -->
+    <handler operation="/objects" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsFilter" />
     <!-- Noops - no authorisation -->
     <handler operation="/risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
 		<!-- 
         Filters risearch results, but with a significant performance penalty. 
         <handler operation="risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.RISearchFilter" />
 		-->
+    <handler operation="/upload" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
+
     <!-- WSDL -->
     <handler operation="/services" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
-    <!-- WADL -->
-    <handler operation="/application.wadl" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
     
-        <handler operation="/objects" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsFilter" />
 	</handlers-rest>
 	
 	<!--
@@ -116,6 +117,8 @@
 		<handler operation="purgeObject" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeObject" />
 		<handler operation="setDatastreamState" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.SetDatastreamState" />
 		<handler operation="setDatastreamVersionable" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.SetDatastreamVersionable" />
+    <handler operation="validate" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Validate" />
+    <handler operation="getDatastreamHistory" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastreamHistory" />
 	</handlers-objects>
 	
 	<!--
