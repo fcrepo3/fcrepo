@@ -79,21 +79,23 @@
 		<handler operation="/management/getNextPID" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetNextPIDFilter" />
     <!-- handler for REST API - each individual API operation is mapped below in handlers-objects -->
     <handler operation="/objects" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsFilter" />
-    <!-- Noops - no authorisation TODO: fix these, add auth! -->
-    <handler operation="/risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
+    <!-- this does no results filtering, but does check for the appropriate xacml action attribute; but note this is currently also mapped to "read" -->
+    <handler operation="/risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.BasicRISearchFilter" />
 		<!-- 
         Filters risearch results, but with a significant performance penalty. 
         <handler operation="risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.RISearchFilter" />
 		-->
-    <!-- nb, two endpoints, different servlets, but same security -->
-    <handler operation="/upload" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
-    <handler operation="/management/upload" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
 
-    <!-- WSDL -->
-    <handler operation="/services" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
+    <!-- nb, two endpoints, different servlets, but same security -->
+    <handler operation="/upload" class="org.fcrepo.server.security.xacml.pep.rest.filters.UploadFilter" />
+    <handler operation="/management/upload" class="org.fcrepo.server.security.xacml.pep.rest.filters.UploadFilter" />
+
     
     <!-- Management control servlet -->
     <handler operation="/management/control"  class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
+
+    <!-- WSDL - currently no authz -->
+    <handler operation="/services" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
     
 	</handlers-rest>
 	
