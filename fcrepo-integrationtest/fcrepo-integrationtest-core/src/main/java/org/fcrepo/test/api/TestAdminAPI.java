@@ -7,6 +7,7 @@ package org.fcrepo.test.api;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import java.net.URLEncoder;
@@ -31,6 +32,8 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+
+import org.apache.commons.io.IOUtils;
 
 import org.junit.Test;
 
@@ -264,12 +267,12 @@ public class TestAdminAPI
         url = this.modifyDatastreamControlGroupUrl("file:///" + objectsListFile.getAbsolutePath(), "DC", "M", false, false, false);
         HttpResponse res = get(true);
 
-        String modified = res.getResponseBodyString();
         assertEquals(SC_OK, res.getStatusCode());
+        String modified = res.getResponseBodyString();
 
         // object and datastream count message expected
         String logExpected = "Updated " + (objects.size() - managedObjects) + " objects and " + (objects.size() - managedObjects) + " datastreams";
-        assertTrue("Wrong number of objects/datastreams updated", modified.contains(logExpected));
+        assertTrue("Wrong number of objects/datastreams updated.  Expected " + logExpected + "\n" + "Log file shows:" + "\n" + modified, modified.contains(logExpected));
 
         // do again, this time we expect no modifications (already modified, so should be ingored)
         res = get(true);
@@ -513,7 +516,10 @@ public class TestAdminAPI
         HttpResponse(HttpMethod method)
                 throws IOException {
             statusCode = method.getStatusCode();
-            responseBody = method.getResponseBody();
+            //responseBody = method.getResponseBody();
+            InputStream is = method.getResponseBodyAsStream();
+            responseBody = IOUtils.toByteArray(is);
+            IOUtils.closeQuietly(is);
             responseHeaders = method.getResponseHeaders();
             responseFooters = method.getResponseFooters();
         }

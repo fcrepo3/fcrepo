@@ -19,7 +19,6 @@
 package org.fcrepo.server.security.xacml.pep.rest.filters;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ import org.fcrepo.server.security.servletfilters.ExtendedHttpServletRequestWrapp
 
 /**
  * Request wrapper that forces the addition of specified parameters.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 
@@ -49,11 +48,11 @@ public class ParameterRequestWrapper
 
     private List<String> localParams = null;
 
-    private String[] format = null;
+    private final String[] format = null;
 
     /**
      * Default constructor that duplicates a request.
-     * 
+     *
      * @param request
      *        the request to duplicate
      */
@@ -76,7 +75,14 @@ public class ParameterRequestWrapper
                 params.put("pid", new String[] {"true"});
                 localParams.add("pid");
             }
-        } else if (request.getRequestURI() != null
+        }
+
+        // this was handling format parameter rewriting to force RDF/XML output, which is then
+        // parsed in RISearchFilter, which subsequently transforms to the actual format requested
+        // RISearchFilter is currently disabled, so this removed as it also prevents "count" reponses being processed correctly.
+        // See: FCREPO-600
+
+        /*else if (request.getRequestURI() != null
                 && request.getRequestURI().endsWith("/risearch")) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Entered format check");
@@ -99,7 +105,7 @@ public class ParameterRequestWrapper
 
                 params.put("format", new String[] {"RDF/XML"});
             }
-        }
+        } */
     }
 
     /*

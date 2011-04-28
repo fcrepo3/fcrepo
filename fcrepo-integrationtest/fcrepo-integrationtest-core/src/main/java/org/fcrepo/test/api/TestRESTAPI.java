@@ -11,9 +11,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+
 import java.net.URL;
 import java.net.URLEncoder;
+
 import java.text.SimpleDateFormat;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,10 +26,8 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import junit.framework.TestSuite;
-
-import org.antlr.stringtemplate.StringTemplate;
 import org.apache.axis.types.NonNegativeInteger;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -42,13 +43,29 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
+
+import org.junit.Test;
+
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
+
+import org.antlr.stringtemplate.StringTemplate;
+
+import junit.framework.TestSuite;
+
 import org.fcrepo.common.PID;
+
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.types.gen.Datastream;
@@ -56,14 +73,9 @@ import org.fcrepo.server.types.gen.FieldSearchQuery;
 import org.fcrepo.server.types.gen.FieldSearchResult;
 import org.fcrepo.server.types.gen.MIMETypedStream;
 import org.fcrepo.server.types.gen.ObjectFields;
+
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
-import org.junit.Test;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
 
 import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
 import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -387,8 +399,9 @@ public class TestRESTAPI
         }
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
-        assertEquals(1486, response.getResponseBody().length);
-        assertEquals("1486", response.getResponseHeader("Content-Length").getValue());
+        // imageManip service does not return content length
+        //assertEquals(1486, response.getResponseBody().length);
+        //assertEquals("1486", response.getResponseHeader("Content-Length").getValue());
         assertEquals("image/jpeg", response.getResponseHeader("Content-Type")
                 .getValue());
     }
@@ -402,8 +415,9 @@ public class TestRESTAPI
         }
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
-        assertEquals(1486, response.getResponseBody().length);
-        assertEquals("1486", response.getResponseHeader("Content-Length").getValue());
+        // imageManip service does not return content length
+        //assertEquals(1486, response.getResponseBody().length);
+        //assertEquals("1486", response.getResponseHeader("Content-Length").getValue());
         assertEquals("image/jpeg", response.getResponseHeader("Content-Type")
                 .getValue());
     }

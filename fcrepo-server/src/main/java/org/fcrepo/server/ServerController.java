@@ -336,6 +336,7 @@ public class ServerController
 
                 ser.finish();
             }
+            pw.flush();
 
 
         } catch (ObjectNotFoundException e) {
