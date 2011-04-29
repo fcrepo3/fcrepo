@@ -92,7 +92,7 @@
 
     
     <!-- Management control servlet -->
-    <handler operation="/management/control"  class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
+    <handler operation="/management/control"  class="org.fcrepo.server.security.xacml.pep.rest.filters.ControlFilter" />
 
     <!-- WSDL - currently no authz -->
     <handler operation="/services" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />

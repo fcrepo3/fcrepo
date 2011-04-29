@@ -1,3 +1,7 @@
+/* The contents of this file are subject to the license and copyright terms
+ * detailed in the license directory at the root of the source tree (also
+ * available online at http://fedora-commons.org/license/).
+ */
 package org.fcrepo.server.security.xacml.pep.rest.filters;
 
 import java.io.IOException;
@@ -24,7 +28,14 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 
-
+/**
+* Filter for resource index search operations
+*
+* Does not filter the response
+*
+* @author Stephen Bayliss
+* @version $$Id$$
+*/
 public class BasicRISearchFilter
 extends AbstractFilter {
 
