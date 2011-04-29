@@ -118,7 +118,7 @@
     <timestamp>${maven.build.timestamp}</timestamp>
     <abdera.version>1.1</abdera.version>
     <axiom.version>1.2.8</axiom.version>
-    <derby.version>10.5.3.0_1</derby.version>
+    <derby.version>10.7.1.1</derby.version>
     <jersey.version>1.0.3.1</jersey.version>
     <spring.version>3.0.5.RELEASE</spring.version>
   </properties>
