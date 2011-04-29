@@ -1347,7 +1347,7 @@ public class TestRESTAPI
 
         // add relationship
         url =
-            "/objects/" + pid + "/relationships" +
+            "/objects/" + pid + "/relationships/new" +
             "?subject=" + URLEncoder.encode(s, "UTF-8") +
             "&predicate=" + URLEncoder.encode(p, "UTF-8") +
             "&object=" + URLEncoder.encode(o, "UTF-8") +
@@ -1374,7 +1374,7 @@ public class TestRESTAPI
 
         // add relationship
         url =
-            "/objects/" + pid + "/relationships" +
+            "/objects/" + pid + "/relationships/new" +
             "?subject=" + URLEncoder.encode(s, "UTF-8") +
             "&predicate=" + URLEncoder.encode(p, "UTF-8") +
             "&object=" + URLEncoder.encode(o, "UTF-8") +
