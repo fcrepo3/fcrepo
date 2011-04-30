@@ -183,6 +183,7 @@
       <outputDirectory>/server/config</outputDirectory>
       <includes>
         <include>logback.xml</include>
+        <include>activemq.xml</include>
         <include>akubra-llstore.xml</include>
         <include>mime-to-extensions.xml</include>
       </includes>
