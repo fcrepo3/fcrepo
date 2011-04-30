@@ -111,6 +111,22 @@
               <classpathScope>runtime</classpathScope>
             </configuration>
           </execution>
+          
+          <execution>
+            <id>gen-vocab</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <mainClass>org.fcrepo.common.policy.Release2_1Namespace</mainClass>
+              <arguments>
+                <argument>${project.build.directory}/vocabulary.txt</argument>
+              </arguments>
+              <!-- Note: this execution has the following dependencies: openrdf-sesame-2.2.1-onejar.jar 
+                mulgara-core-2.1.4.jar fedora-common.jar -->
+            </configuration>
+          </execution>
         </executions>
       </plugin>
 
@@ -120,7 +136,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.4.2</version>
 
         <configuration>
           <!--<forkMode>never</forkMode> -->
@@ -260,7 +275,6 @@
 
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2-beta-4</version>
 
         <executions>
           <execution>
@@ -304,31 +318,6 @@
             </configuration>
           </execution>
 
-        </executions>
-
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.1.1</version>
-        <executions>
-
-          <execution>
-            <id>gen-vocab</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>java</goal>
-            </goals>
-            <configuration>
-              <mainClass>org.fcrepo.common.policy.Release2_1Namespace</mainClass>
-              <arguments>
-                <argument>${project.build.directory}/vocabulary.txt</argument>
-              </arguments>
-              <!-- Note: this execution has the following dependencies: openrdf-sesame-2.2.1-onejar.jar 
-                mulgara-core-2.1.4.jar fedora-common.jar -->
-            </configuration>
-          </execution>
         </executions>
 
       </plugin>
