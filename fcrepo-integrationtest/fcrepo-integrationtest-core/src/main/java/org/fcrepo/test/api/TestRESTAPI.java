@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -162,9 +163,15 @@ public class TestRESTAPI
 
     protected String url;
 
+    // note: since we are explicitly formatting the date as "Z" (literal), need to ensure the formatter operates in GMT/UTC
+    static SimpleDateFormat df;
+    static {
+        df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
+
     private static final String datetime =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                    .format(new Date());
+            df.format(new Date());
 
     private boolean chunked = false;
 
@@ -1328,7 +1335,7 @@ public class TestRESTAPI
         assertEquals(SC_OK, response.getStatusCode());
 
         // check Fedora object CModel found
-        assertTrue("Relationship not found: [ " + s + ", " + p + ", " + o + ", ]",checkRelationshipExists(response.getResponseBody(), s, p, o, false));
+       checkRelationship(response.getResponseBody(), s, p, o, true);
 
     }
     @Test
@@ -1343,7 +1350,7 @@ public class TestRESTAPI
             "&predicate=" + URLEncoder.encode(p, "UTF-8");
         HttpResponse response = get(getAuthAccess(), false);
         assertEquals(SC_OK, response.getStatusCode());
-        assertFalse("Relationship found but was not expected: [ " + s + ", " + p + ", " + o + ", ]",checkRelationshipExists(response.getResponseBody(), s, p, o, true));
+        checkRelationship(response.getResponseBody(), s, p, o, false);
 
         // add relationship
         url =
@@ -1352,17 +1359,17 @@ public class TestRESTAPI
             "&predicate=" + URLEncoder.encode(p, "UTF-8") +
             "&object=" + URLEncoder.encode(o, "UTF-8") +
             "&isLiteral=true";
-        response = post("", true);
+        response = putOrPost("POST", null, true);
         assertEquals(SC_OK, response.getStatusCode());
 
         // check relationship present
         url =
-            "/objects/" + pid + "/relationships" +
-            "?subject=" + URLEncoder.encode(s, "UTF-8") +
-            "&predicate=" + URLEncoder.encode(p, "UTF-8");
+            "/objects/" + pid + "/relationships";// +
+            //"?subject=" + URLEncoder.encode(s, "UTF-8") +
+            //"&predicate=" + URLEncoder.encode(p, "UTF-8");
         response = get(getAuthAccess(), false);
         assertEquals(SC_OK, response.getStatusCode());
-        assertTrue("Relationship not found: [ " + s + ", " + p + ", " + o + ", ]",checkRelationshipExists(response.getResponseBody(), s, p, o, true));
+        checkRelationship(response.getResponseBody(), s, p, o, true);
 
 
     }
@@ -1379,7 +1386,7 @@ public class TestRESTAPI
             "&predicate=" + URLEncoder.encode(p, "UTF-8") +
             "&object=" + URLEncoder.encode(o, "UTF-8") +
             "&isLiteral=true";
-        HttpResponse response = post("", true);
+        HttpResponse response = putOrPost("POST", null, true);
         assertEquals(SC_OK, response.getStatusCode());
 
         // check present
@@ -1389,7 +1396,7 @@ public class TestRESTAPI
             "&predicate=" + URLEncoder.encode(p, "UTF-8");
         response = get(getAuthAccess(), false);
         assertEquals(SC_OK, response.getStatusCode());
-        assertTrue("Relationship not found: [ " + s + ", " + p + ", " + o + ", ]",checkRelationshipExists(response.getResponseBody(), s, p, o, true));
+        checkRelationship(response.getResponseBody(), s, p, o, true);
 
         // purge it
         url =
@@ -1409,7 +1416,7 @@ public class TestRESTAPI
             "&predicate=" + URLEncoder.encode(p, "UTF-8");
         response = get(getAuthAccess(), false);
         assertEquals(SC_OK, response.getStatusCode());
-        assertFalse("Relationship found but was not expected: [ " + s + ", " + p + ", " + o + ", ]",checkRelationshipExists(response.getResponseBody(), s, p, o, true));
+        checkRelationship(response.getResponseBody(), s, p, o, false);
 
         // purge again
         url =
@@ -1685,25 +1692,38 @@ public class TestRESTAPI
         }
     }
 
-    private boolean checkRelationshipExists(byte[] rdf, String s, String p, String o, boolean isLiteral) throws TrippiException {
+    private void checkRelationship(byte[] rdf, String s, String p, String o, boolean exists) throws TrippiException, UnsupportedEncodingException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("RDF: " + new String(rdf, "UTF-8"));
         TripleIterator it = TripleIterator.fromStream(
                                                       new ByteArrayInputStream(rdf),
                                                       null,
+
                                                       RDFFormat.RDF_XML);
+
+
         boolean found = false;
         while (it.hasNext()) {
             Triple t = it.next();
+
+            sb.append(t.getSubject().stringValue() + ", ");
+            sb.append(t.getPredicate().stringValue() + ", ");
+            sb.append(t.getObject().stringValue() + "\n");
+
+
+            sb.append("matching: " + s + " " + t.getSubject().stringValue() + " " + (s.equals(t.getSubject().stringValue())) + "\n") ;
+            sb.append("matching: " + p + " " + t.getPredicate().stringValue() + " " + (p.equals(t.getPredicate().stringValue())) + "\n");
+            sb.append("matching: " + o + " " + t.getObject().stringValue() + " " + (o.equals(t.getObject().stringValue())) + "\n");
+
             if (s.equals(t.getSubject().stringValue()) &&
                     p.equals(t.getPredicate().stringValue()) &&
-                    t.getObject().isLiteral() == isLiteral &&
                     o.equals(t.getObject().stringValue())) {
-
+                sb.append("Matched\n");
                 found = true;
-                break;
             }
         }
-        return found;
 
+        assertTrue("Testing if relationship present: " + exists + " [ " + s + ", " + p + ", " + o + " ] \n " + sb.toString(), exists == found);
     }
 
     /**
