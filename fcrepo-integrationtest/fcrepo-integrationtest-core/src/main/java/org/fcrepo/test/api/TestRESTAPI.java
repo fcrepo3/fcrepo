@@ -1331,7 +1331,7 @@ public class TestRESTAPI
         url = "/objects/" + pid + "/relationships" +
             "?subject=" + URLEncoder.encode(s, "UTF-8") +
             "&predicate=" + URLEncoder.encode(p, "UTF-8");
-        HttpResponse response = get(getAuthAccess(), false);
+        HttpResponse response = get(true, false);
         assertEquals(SC_OK, response.getStatusCode());
 
         // check Fedora object CModel found
@@ -1348,7 +1348,7 @@ public class TestRESTAPI
             "/objects/" + pid + "/relationships" +
             "?subject=" + URLEncoder.encode(s, "UTF-8") +
             "&predicate=" + URLEncoder.encode(p, "UTF-8");
-        HttpResponse response = get(getAuthAccess(), false);
+        HttpResponse response = get(true, false);
         assertEquals(SC_OK, response.getStatusCode());
         checkRelationship(response.getResponseBody(), s, p, o, false);
 
@@ -1367,7 +1367,7 @@ public class TestRESTAPI
             "/objects/" + pid + "/relationships";// +
             //"?subject=" + URLEncoder.encode(s, "UTF-8") +
             //"&predicate=" + URLEncoder.encode(p, "UTF-8");
-        response = get(getAuthAccess(), false);
+        response = get(true, false);
         assertEquals(SC_OK, response.getStatusCode());
         checkRelationship(response.getResponseBody(), s, p, o, true);
 
@@ -1394,7 +1394,7 @@ public class TestRESTAPI
             "/objects/" + pid + "/relationships" +
             "?subject=" + URLEncoder.encode(s, "UTF-8") +
             "&predicate=" + URLEncoder.encode(p, "UTF-8");
-        response = get(getAuthAccess(), false);
+        response = get(true, false);
         assertEquals(SC_OK, response.getStatusCode());
         checkRelationship(response.getResponseBody(), s, p, o, true);
 
@@ -1414,7 +1414,7 @@ public class TestRESTAPI
             "/objects/" + pid + "/relationships" +
             "?subject=" + URLEncoder.encode(s, "UTF-8") +
             "&predicate=" + URLEncoder.encode(p, "UTF-8");
-        response = get(getAuthAccess(), false);
+        response = get(true, false);
         assertEquals(SC_OK, response.getStatusCode());
         checkRelationship(response.getResponseBody(), s, p, o, false);
 
