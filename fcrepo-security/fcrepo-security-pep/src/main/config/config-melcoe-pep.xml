@@ -77,12 +77,11 @@
 		<handler operation="/listMethods" class="org.fcrepo.server.security.xacml.pep.rest.filters.ListMethodsFilter" />
 		<handler operation="/search" class="org.fcrepo.server.security.xacml.pep.rest.filters.SearchFilter" />
 		<handler operation="/management/getNextPID" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetNextPIDFilter" />
-    <!-- handler for REST API - each individual API operation is mapped below in handlers-objects -->
-    <handler operation="/objects" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsFilter" />
+    <handler operation="/management/control"  class="org.fcrepo.server.security.xacml.pep.rest.filters.ControlFilter" />
     <!-- this does no results filtering, but does check for the appropriate xacml action attribute; but note this is currently also mapped to "read" -->
     <handler operation="/risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.BasicRISearchFilter" />
 		<!-- 
-        Filters risearch results, but with a significant performance penalty. 
+        Filters risearch results, but with a significant performance penalty (and currently not fully tested). 
         <handler operation="risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.RISearchFilter" />
 		-->
 
@@ -90,13 +89,11 @@
     <handler operation="/upload" class="org.fcrepo.server.security.xacml.pep.rest.filters.UploadFilter" />
     <handler operation="/management/upload" class="org.fcrepo.server.security.xacml.pep.rest.filters.UploadFilter" />
 
-    
-    <!-- Management control servlet -->
-    <handler operation="/management/control"  class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
-
     <!-- WSDL - currently no authz -->
     <handler operation="/services" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
-    
+
+    <!-- handler for REST API - each individual API operation is mapped below in handlers-objects -->
+    <handler operation="/objects" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsFilter" />
 	</handlers-rest>
 	
 	<!--
@@ -126,6 +123,9 @@
 		<handler operation="setDatastreamVersionable" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.SetDatastreamVersionable" />
     <handler operation="validate" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Validate" />
     <handler operation="getDatastreamHistory" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastreamHistory" />
+    <handler operation="getRelationships" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetRelationships" />
+    <handler operation="addRelationship" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.AddRelationship" />
+    <handler operation="purgeRelationship" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeRelationship" />
 	</handlers-objects>
 	
 	<!--

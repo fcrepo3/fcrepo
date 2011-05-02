@@ -1,7 +1,3 @@
-/* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also
- * available online at http://fedora-commons.org/license/).
- */
 package org.fcrepo.server.security.xacml.pep.rest.objectshandlers;
 
 import java.io.IOException;
@@ -29,24 +25,29 @@ import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 
-/**
-* Handles REST API method getDatastreamHistory
-*
-* @author Stephen Bayliss
-* @version $$Id$$
-*/
-public class GetDatastreamHistory
-extends AbstractFilter {
 
-    public GetDatastreamHistory()
-            throws PEPException {
+/**
+ * Handles REST API method addRelationship
+ *
+ * @author Stephen Bayliss
+ * @version $Id$
+ */
+public class AddRelationship
+        extends AbstractFilter {
+    private static final Logger logger =
+        LoggerFactory.getLogger(AddRelationship.class);
+
+    public AddRelationship()
+    throws PEPException {
         super();
     }
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(GetDatastreamHistory.class);
-
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see
+     * org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter#handleRequest(javax.servlet
+     * .http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     public RequestCtx handleRequest(HttpServletRequest request,
                                     HttpServletResponse response)
             throws IOException, ServletException {
@@ -58,7 +59,6 @@ extends AbstractFilter {
         String[] parts = path.split("/");
 
         String pid = parts[1];
-        String dsid = parts[3].replaceAll(".xml", "");
 
         RequestCtx req = null;
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
@@ -72,13 +72,9 @@ extends AbstractFilter {
                 resAttr.put(new URI(XACML_RESOURCE_ID),
                             new AnyURIAttribute(new URI(pid)));
             }
-            if (dsid != null && !"".equals(dsid)) {
-                resAttr.put(Constants.DATASTREAM.ID.getURI(),
-                            new StringAttribute(dsid));
-            }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.GET_DATASTREAM_HISTORY
+                        new StringAttribute(Constants.ACTION.ADD_RELATIONSHIP
                                 .getURI().toASCIIString()));
             actions.put(Constants.ACTION.API.getURI(),
                         new StringAttribute(Constants.ACTION.APIM.getURI()
@@ -91,10 +87,10 @@ extends AbstractFilter {
                                                      getEnvironment(request));
 
             LogUtil.statLog(request.getRemoteUser(),
-                            Constants.ACTION.GET_DATASTREAM_HISTORY.getURI()
+                            Constants.ACTION.ADD_RELATIONSHIP.getURI()
                                     .toASCIIString(),
                             pid,
-                            dsid);
+                            null);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new ServletException(e.getMessage(), e);
@@ -107,7 +103,6 @@ extends AbstractFilter {
     public RequestCtx handleResponse(HttpServletRequest request,
                                      HttpServletResponse response)
             throws IOException, ServletException {
-        // TODO Auto-generated method stub
         return null;
     }
 

@@ -5,6 +5,7 @@
 
 package org.fcrepo.test.api;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,7 +54,13 @@ import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
 
+import org.jrdf.graph.Triple;
+
 import org.junit.Test;
+
+import org.trippi.RDFFormat;
+import org.trippi.TripleIterator;
+import org.trippi.TrippiException;
 
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
@@ -64,6 +72,8 @@ import org.antlr.stringtemplate.StringTemplate;
 
 import junit.framework.TestSuite;
 
+import org.fcrepo.common.Constants;
+import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
 
 import org.fcrepo.server.access.FedoraAPIA;
@@ -153,9 +163,15 @@ public class TestRESTAPI
 
     protected String url;
 
+    // note: since we are explicitly formatting the date as "Z" (literal), need to ensure the formatter operates in GMT/UTC
+    static SimpleDateFormat df;
+    static {
+        df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
+
     private static final String datetime =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                    .format(new Date());
+            df.format(new Date());
 
     private boolean chunked = false;
 
@@ -206,8 +222,11 @@ public class TestRESTAPI
         apim.purgeObject(pid.toString(), "", false);
     }
 
-    // determine if test config specifies that Access requests should be authorized
 
+    /**
+     * Do Access requests require auth based on current test configuration?
+     * @return true if auth is required for API-requests
+     */
     private boolean getAuthAccess() {
         if (authorizeAccess == null) {
             String property = System.getProperty(authAccessProperty);
@@ -1298,6 +1317,121 @@ public class TestRESTAPI
         assertEquals(500, response.getStatusCode());
     }
 
+    /////////////////////////////////////////////////
+    // Relationships methods
+    /////////////////////////////////////////////////
+
+    @Test
+    public void testGetRelationships() throws Exception {
+        String s = "info:fedora/" + pid;
+        String p = Constants.MODEL.HAS_MODEL.uri;
+        String o = Models.FEDORA_OBJECT_CURRENT.uri;
+
+        // get all CModel relationships
+        url = "/objects/" + pid + "/relationships" +
+            "?subject=" + URLEncoder.encode(s, "UTF-8") +
+            "&predicate=" + URLEncoder.encode(p, "UTF-8");
+        HttpResponse response = get(getAuthAccess(), false);
+        assertEquals(SC_OK, response.getStatusCode());
+
+        // check Fedora object CModel found
+       checkRelationship(response.getResponseBody(), s, p, o, true);
+
+    }
+    @Test
+    public void testAddRelationship() throws Exception {
+        String s = "info:fedora/" + pid;
+        String p = "http://www.example.org/test#relationship";
+        String o = "foo";
+        // check relationship not present
+        url =
+            "/objects/" + pid + "/relationships" +
+            "?subject=" + URLEncoder.encode(s, "UTF-8") +
+            "&predicate=" + URLEncoder.encode(p, "UTF-8");
+        HttpResponse response = get(getAuthAccess(), false);
+        assertEquals(SC_OK, response.getStatusCode());
+        checkRelationship(response.getResponseBody(), s, p, o, false);
+
+        // add relationship
+        url =
+            "/objects/" + pid + "/relationships/new" +
+            "?subject=" + URLEncoder.encode(s, "UTF-8") +
+            "&predicate=" + URLEncoder.encode(p, "UTF-8") +
+            "&object=" + URLEncoder.encode(o, "UTF-8") +
+            "&isLiteral=true";
+        response = putOrPost("POST", null, true);
+        assertEquals(SC_OK, response.getStatusCode());
+
+        // check relationship present
+        url =
+            "/objects/" + pid + "/relationships";// +
+            //"?subject=" + URLEncoder.encode(s, "UTF-8") +
+            //"&predicate=" + URLEncoder.encode(p, "UTF-8");
+        response = get(getAuthAccess(), false);
+        assertEquals(SC_OK, response.getStatusCode());
+        checkRelationship(response.getResponseBody(), s, p, o, true);
+
+
+    }
+    @Test
+    public void testPurgeRelationship() throws Exception {
+        String s = "info:fedora/" + pid;
+        String p = "http://www.example.org/test#relationship";
+        String o = "foo";
+
+        // add relationship
+        url =
+            "/objects/" + pid + "/relationships/new" +
+            "?subject=" + URLEncoder.encode(s, "UTF-8") +
+            "&predicate=" + URLEncoder.encode(p, "UTF-8") +
+            "&object=" + URLEncoder.encode(o, "UTF-8") +
+            "&isLiteral=true";
+        HttpResponse response = putOrPost("POST", null, true);
+        assertEquals(SC_OK, response.getStatusCode());
+
+        // check present
+        url =
+            "/objects/" + pid + "/relationships" +
+            "?subject=" + URLEncoder.encode(s, "UTF-8") +
+            "&predicate=" + URLEncoder.encode(p, "UTF-8");
+        response = get(getAuthAccess(), false);
+        assertEquals(SC_OK, response.getStatusCode());
+        checkRelationship(response.getResponseBody(), s, p, o, true);
+
+        // purge it
+        url =
+            "/objects/" + pid + "/relationships" +
+            "?subject=" + URLEncoder.encode(s, "UTF-8") +
+            "&predicate=" + URLEncoder.encode(p, "UTF-8") +
+            "&object=" + URLEncoder.encode(o, "UTF-8") +
+            "&isLiteral=true";
+        response = delete(true);
+        assertEquals(SC_OK, response.getStatusCode());
+        assertEquals("Purge relationship", "true", response.getResponseBodyString());
+
+        // check not present
+        url =
+            "/objects/" + pid + "/relationships" +
+            "?subject=" + URLEncoder.encode(s, "UTF-8") +
+            "&predicate=" + URLEncoder.encode(p, "UTF-8");
+        response = get(getAuthAccess(), false);
+        assertEquals(SC_OK, response.getStatusCode());
+        checkRelationship(response.getResponseBody(), s, p, o, false);
+
+        // purge again
+        url =
+            "/objects/" + pid + "/relationships" +
+            "?subject=" + URLEncoder.encode(s, "UTF-8") +
+            "&predicate=" + URLEncoder.encode(p, "UTF-8") +
+            "&object=" + URLEncoder.encode(o, "UTF-8") +
+            "&isLiteral=true";
+        response = delete(true);
+        assertEquals(SC_OK, response.getStatusCode());
+        assertEquals("Purge relationship", "false", response.getResponseBodyString());
+
+    }
+
+
     private HttpResponse _doUploadPost(String path) throws Exception {
         PostMethod post = new PostMethod(path);
         File temp = File.createTempFile("test.txt", null);
@@ -1556,6 +1690,40 @@ public class TestRESTAPI
                 httpMethod.releaseConnection();
             }
         }
+    }
+
+    private void checkRelationship(byte[] rdf, String s, String p, String o, boolean exists) throws TrippiException, UnsupportedEncodingException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("RDF: " + new String(rdf, "UTF-8"));
+        TripleIterator it = TripleIterator.fromStream(
+                                                      new ByteArrayInputStream(rdf),
+                                                      null,
+
+                                                      RDFFormat.RDF_XML);
+
+
+        boolean found = false;
+        while (it.hasNext()) {
+            Triple t = it.next();
+
+            sb.append(t.getSubject().stringValue() + ", ");
+            sb.append(t.getPredicate().stringValue() + ", ");
+            sb.append(t.getObject().stringValue() + "\n");
+
+
+            sb.append("matching: " + s + " " + t.getSubject().stringValue() + " " + (s.equals(t.getSubject().stringValue())) + "\n") ;
+            sb.append("matching: " + p + " " + t.getPredicate().stringValue() + " " + (p.equals(t.getPredicate().stringValue())) + "\n");
+            sb.append("matching: " + o + " " + t.getObject().stringValue() + " " + (o.equals(t.getObject().stringValue())) + "\n");
+
+            if (s.equals(t.getSubject().stringValue()) &&
+                    p.equals(t.getPredicate().stringValue()) &&
+                    o.equals(t.getObject().stringValue())) {
+                sb.append("Matched\n");
+                found = true;
+            }
+        }
+
+        assertTrue("Testing if relationship present: " + exists + " [ " + s + ", " + p + ", " + o + " ] \n " + sb.toString(), exists == found);
     }
 
     /**

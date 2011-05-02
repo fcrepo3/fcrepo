@@ -323,6 +323,7 @@
                 <include>**/TestAPIA.class</include>
                 <include>**/TestAPIALite.class</include>
                 <include>**/TestAPIM.class</include>
+                <include>**/TestRelationships.class</include>
                 <include>**/TestAPIMLite.class</include>
                 <include>**/TestAuthentication.class</include>
                 <include>**/TestHTTPStatusCodesConfigC.class</include>

@@ -178,7 +178,7 @@ public class ObjectsFilter
         // so they will allow pass-through of invalid PIDs and DSIDs, which will be checked later in the code -
         // the stuff below will actually result in not finding a handler if a bogus PID/DSID is found)
 
-        String handlerName = null;
+        String handlerName = "no-handler-name-determined-from-request-path";
         // - /objects
         // ascertain the correct handler based on uri pattern.
         if (parts.length == 1) {
@@ -206,8 +206,8 @@ public class ObjectsFilter
             } else if ("POST".equals(method)) {
                 handlerName = Handlers.INGEST;
             }
-            // - /objects/[pid]/...
-        } else if (parts.length == 3 && isPID(parts[1]) && "GET".equals(method)) {
+            // - /objects/[pid]/...  (except relationships - handled later)
+        } else if (parts.length == 3 && isPID(parts[1]) && "GET".equals(method)  && !"relationships".equals(parts[2])) {
             if ("datastreams".equals(parts[2])) {
                 handlerName = Handlers.LISTDATASTREAMS;
             } else if ("export".equals(parts[2])) {
@@ -222,7 +222,7 @@ public class ObjectsFilter
                 handlerName = Handlers.VALIDATE;
             }
 
-        // - /objects/[pid]/datastreams/[dsid]
+            // - /objects/[pid]/datastreams/[dsid]
         } else if (parts.length == 4 && isPID(parts[1])
                 && "datastreams".equals(parts[2]) && isDatastream(parts[3])) {
             if ("PUT".equals(method)
@@ -240,28 +240,39 @@ public class ObjectsFilter
             } else if ("DELETE".equals(method)) {
                 handlerName = Handlers.PURGEDATASTREAM;
             }
-        // - /objects/[pid]/datastreams/[dsid]/content
+            // - /objects/[pid]/datastreams/[dsid]/content
         } else if (parts.length == 5 && isPID(parts[1])
                 && "datastreams".equals(parts[2]) && isDatastream(parts[3])
                 && "content".equals(parts[4])) {
             handlerName = Handlers.GETDATASTREAMDISSEMINATION;
 
-        // - /objects/[pid]/datastreams/[dsid]/history
+            // - /objects/[pid]/datastreams/[dsid]/history
         } else if (parts.length == 5 && isPID(parts[1]) && "datastreams".equals(parts[2]) && isDatastream(parts[3]) && "history".equals(parts[4])) {
             handlerName = Handlers.GETDATASTREAMHISTORY;
 
-        // - /objects/[pid]/methods/[sdef]/method
+            // - /objects/[pid]/methods/[sdef]/method
         } else if (parts.length == 5 && isPID(parts[1])
                 && "methods".equals(parts[2]) && isPID(parts[3]) && "GET".equals(method)) {
             handlerName = Handlers.GETDISSEMINATION;
 
-        // - /objects/[pid]/methods/[sdef]
+            // - /objects/[pid]/methods/[sdef]
         } else if (parts.length == 4 && isPID(parts[1]) && "GET".equals(method) && "methods".equals(parts[2]) && isPID(parts[3])) {
             handlerName = Handlers.LISTMETHODS;
+
+            // - /objects/[pid/relationships[/...]
+        } else if (isPID(parts[1]) && "relationships".equals(parts[2])) {
+            // add
+            if ("POST".equals(method)) {
+                handlerName = Handlers.ADDRELATIONSHIP;
+                // get
+            } else if ("GET".equals(method)) {
+                handlerName = Handlers.GETRELATIONSHIPS;
+                // purge
+            } else if ("DELETE".equals(method)) {
+                handlerName = Handlers.PURGERELATIONSHIP;
+            }
         }
 
-        // TODO:
-        // - /objects/[pid/relationships[/...]
 
         RESTFilter handler = objectsHandlers.get(handlerName);
         if (handler != null) {
@@ -271,7 +282,7 @@ public class ObjectsFilter
             return handler;
         } else {
             // there must always be a handler
-            throw new ServletException("No REST handler defined for method " + method + " path=" + path);
+            throw new ServletException("No REST handler defined for method " + method + "(handler name: " + handlerName + ") path=" + path);
         }
 
     }

@@ -29,23 +29,24 @@ import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 
 /**
-* Filter for Upload
+* Filter for ServerController operations
 *
 * @author Stephen Bayliss
 * @version $$Id$$
 */
-public class UploadFilter
+public class ControlFilter
         extends AbstractFilter {
 
+
     private static final Logger logger =
-        LoggerFactory.getLogger(UploadFilter.class);
+        LoggerFactory.getLogger(ControlFilter.class);
 
     /**
      * Default constructor.
      *
      * @throws PEPException
      */
-    public UploadFilter()
+    public ControlFilter()
     throws PEPException {
         super();
     }
@@ -61,6 +62,13 @@ public class UploadFilter
     throws IOException, ServletException {
 
         RequestCtx req = null;
+
+        String action = request.getParameter("action");
+
+        if (action == null) {
+            throw new ServletException("Invalid request, action parameter must be specified.");
+        }
+
 
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
@@ -81,9 +89,21 @@ public class UploadFilter
                         new StringAttribute(Constants.ACTION.APIA.getURI()
                                             .toASCIIString()));
             */
-            actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.UPLOAD
-                                            .getURI().toASCIIString()));
+
+            if (action.equals("status")) {
+                actions.put(Constants.ACTION.ID.getURI(),
+                    new StringAttribute(Constants.ACTION.SERVER_STATUS.getURI().toASCIIString()));
+            } else if (action.equals("reloadPolicies")) {
+                actions.put(Constants.ACTION.ID.getURI(),
+                            new StringAttribute(Constants.ACTION.RELOAD_POLICIES.getURI().toASCIIString()));
+            } else if (action.equals("modifyDatastreamControlGroup")) {
+                // FCREPO-765, no specific URI defined for this operation
+                actions.put(Constants.ACTION.ID.getURI(),
+                            new StringAttribute(Constants.ACTION.RELOAD_POLICIES.getURI().toASCIIString()));
+            } else {
+                throw new ServletException("Invalid request, invalid action parameter specified:" + action);
+            }
+
 
             req =
                 getContextHandler().buildRequest(getSubjects(request),
@@ -115,5 +135,6 @@ public class UploadFilter
     throws IOException, ServletException {
         return null;
     }
+
 
 }
