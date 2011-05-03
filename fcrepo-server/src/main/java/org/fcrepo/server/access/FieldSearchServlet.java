@@ -8,9 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-
-import java.net.URLEncoder;
 
 import java.text.SimpleDateFormat;
 
@@ -24,7 +21,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
@@ -39,8 +40,6 @@ import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.search.ObjectFields;
 import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.StreamUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 
@@ -411,12 +410,7 @@ public class FieldSearchServlet
                             html.append("<td valign=\"top\">");
                             if (l.equalsIgnoreCase("pid")) {
                                 html.append("<a href=\"objects/");
-                                try {
-                                    html.append(URLEncoder.encode(f.getPid(), "UTF-8"));
-                                } catch (UnsupportedEncodingException e) {
-                                    // should never happen (UTF-8)
-                                    throw new RuntimeException(e);
-                                }
+                                html.append(f.getPid().replace("%", "%25"));
                                 html.append("\">");
                                 html.append(f.getPid());
                                 html.append("</a>");

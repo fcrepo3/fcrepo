@@ -43,7 +43,7 @@
                     <p />
                     <xsl:variable name="history-url">
                         <xsl:text>objects/</xsl:text>
-                        <xsl:value-of select="encode-for-uri(@pid)" />
+                        <xsl:value-of select="replace(@pid, '%', '%25')" />
                         <xsl:text>/datastreams/</xsl:text>
                         <xsl:value-of select="@dsID" />
                         <xsl:text>/history</xsl:text>
@@ -51,7 +51,7 @@
                     
                     <xsl:variable name="content-url">
                         <xsl:text>objects/</xsl:text>
-                        <xsl:value-of select="encode-for-uri(@pid)" />
+                        <xsl:value-of select="replace(@pid, '%', '%25')" />
                         <xsl:text>/datastreams/</xsl:text>
                         <xsl:value-of select="@dsID" />
                         <xsl:text>/content</xsl:text>
