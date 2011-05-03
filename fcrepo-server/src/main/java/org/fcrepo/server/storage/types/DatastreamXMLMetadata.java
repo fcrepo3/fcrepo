@@ -19,6 +19,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
+import org.fcrepo.server.Context;
+
 import org.w3c.dom.Document;
 
 import org.xml.sax.SAXException;
@@ -85,6 +87,11 @@ public class DatastreamXMLMetadata
 
     @Override
     public InputStream getContentStream() {
+        return new ByteArrayInputStream(xmlContent);
+    }
+
+    @Override
+    public InputStream getContentStream(Context context) {
         return new ByteArrayInputStream(xmlContent);
     }
 

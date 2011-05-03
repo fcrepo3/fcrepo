@@ -399,7 +399,7 @@ public class OwlValidator {
         if (dscompmodelDS == null) {//NO ds composite model, thats okay, continue to next content model
             return names;
         }
-        DsCompositeModel dscompobject = JAXB.unmarshal(dscompmodelDS.getContentStream(), DsCompositeModel.class);
+        DsCompositeModel dscompobject = JAXB.unmarshal(dscompmodelDS.getContentStream(context), DsCompositeModel.class);
 
         for (DsTypeModel typeModel : dscompobject.getDsTypeModel()) {
             names.add(typeModel.getID());

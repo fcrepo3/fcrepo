@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.InputStream;
 
 import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.Context;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.StreamIOException;
@@ -27,7 +29,6 @@ public class DatastreamReferencedContent
         extends Datastream {
 
     private static ExternalContentManager s_ecm;
-
 
     public DatastreamReferencedContent() {
     }
@@ -82,10 +83,14 @@ public class DatastreamReferencedContent
      * @see org.fcrepo.server.storage.types.Datastream#getContentStream()
      */
     @Override
-    public InputStream getContentStream() throws StreamIOException {
+    public InputStream getContentStream(Context context) throws StreamIOException {
         try {
+            ContentManagerParams params = new ContentManagerParams(DSLocation);
+            if (context != null ) {
+                params.setContext(context);
+            }
             MIMETypedStream stream = getExternalContentManager()
-                    .getExternalContent(new ContentManagerParams(DSLocation));
+                    .getExternalContent(params);
             DSSize = getContentLength(stream);
             return stream.getStream();
         } catch (Exception ex) {

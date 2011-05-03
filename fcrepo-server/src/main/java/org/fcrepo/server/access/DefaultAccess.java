@@ -1140,12 +1140,12 @@ public class DefaultAccess
                     (DatastreamManagedContent) reader
                             .GetDatastream(dsID, asOfDateTime);
 
-            mimeTypedStream = new MIMETypedStream(ds.DSMIME, dmc.getContentStream(), null,ds.DSSize);
+            mimeTypedStream = new MIMETypedStream(ds.DSMIME, dmc.getContentStream(context), null,ds.DSSize);
         } else if (ds.DSControlGrp.equalsIgnoreCase("X")) {
             DatastreamXMLMetadata dxm =
                     (DatastreamXMLMetadata) reader.GetDatastream(dsID,
                                                                  asOfDateTime);
-            mimeTypedStream = new MIMETypedStream(ds.DSMIME, dxm.getContentStream(), null, ds.DSSize);
+            mimeTypedStream = new MIMETypedStream(ds.DSMIME, dxm.getContentStream(context), null, ds.DSSize);
         } else if (ds.DSControlGrp.equalsIgnoreCase("R")) {
             DatastreamReferencedContent drc =
                     (DatastreamReferencedContent) reader

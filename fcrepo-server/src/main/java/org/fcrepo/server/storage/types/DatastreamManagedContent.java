@@ -124,12 +124,7 @@ public class DatastreamManagedContent
         return s_ecm;
     }
 
-    @Override
-    public InputStream getContentStream() throws StreamIOException {
-        return getContentStream(null);
-    }
-
-    // Note: might seem strage to pass through the Context, but DatastreamManagedContent looks after
+    // Note: might seem strange to pass through the Context, but DatastreamManagedContent looks after
     // datastreams before they have been ingested, ie while location is still external (file, URL), so without
     // Context authz will fail
     public InputStream getContentStream(Context ctx) throws StreamIOException {

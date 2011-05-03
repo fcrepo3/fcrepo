@@ -172,9 +172,9 @@ public class XMLDatastreamProcessor {
         else if (m_dsType == DS_TYPE.MANAGED)
             try {
                 if (ctx == null) {
-                    return IOUtils.toByteArray(((DatastreamManagedContent)m_ds).getContentStream());
+                    return IOUtils.toByteArray(m_ds.getContentStream());
                 } else {
-                    return IOUtils.toByteArray(((DatastreamManagedContent)m_ds).getContentStream(ctx));
+                    return IOUtils.toByteArray(m_ds.getContentStream(ctx));
                 }
             } catch (IOException e) {
                 throw new RuntimeException("Unable to read managed stream contents", e);

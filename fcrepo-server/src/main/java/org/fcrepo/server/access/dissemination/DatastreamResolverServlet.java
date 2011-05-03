@@ -501,7 +501,7 @@ public class DatastreamResolverServlet
                 Datastream d =
                         doReader.getDatastream(dsID, dsVersionID);
                 logger.debug("Got datastream: " + d.DatastreamID);
-                InputStream is = d.getContentStream();
+                InputStream is = d.getContentStream(context);
                 int bytestream = 0;
                 response.setContentType(d.DSMIME);
                 outStream = response.getOutputStream();

@@ -15,6 +15,8 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.fcrepo.server.Context;
+import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.utilities.StringUtility;
@@ -37,7 +39,7 @@ public class Datastream {
     public final static String CHECKSUM_IOEXCEPTION = "ExceptionReadingStream";
 
     public boolean isNew = false;
-
+    
     public String DatastreamID;
 
     public String[] DatastreamAltIDs = new String[0];
@@ -108,6 +110,17 @@ public class Datastream {
     }
 
     public InputStream getContentStream() throws StreamIOException {
+        Context context = null;
+        try {
+            context = ReadOnlyContext.getContext(null, null, "", false);
+        }
+        catch (Throwable t){
+            context = null;
+        }
+        return getContentStream(context);
+    }
+
+    public InputStream getContentStream(Context context) throws StreamIOException {
         return null;
     }
 
