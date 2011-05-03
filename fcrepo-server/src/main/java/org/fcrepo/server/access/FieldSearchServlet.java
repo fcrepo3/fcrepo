@@ -410,7 +410,7 @@ public class FieldSearchServlet
                             if (l.equalsIgnoreCase("pid")) {
                                 html.append("<a href=\"objects/");
                                 try {
-                                    html.append(f.getPid().replace("%", "%25");
+                                    html.append(f.getPid().replace("%", "%25"));
                                 } catch (UnsupportedEncodingException e) {
                                     // should never happen (UTF-8)
                                     throw new RuntimeException(e);
