@@ -10,8 +10,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
-import java.net.URLEncoder;
-
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
@@ -412,7 +410,7 @@ public class FieldSearchServlet
                             if (l.equalsIgnoreCase("pid")) {
                                 html.append("<a href=\"objects/");
                                 try {
-                                    html.append(URLEncoder.encode(f.getPid(), "UTF-8"));
+                                    html.append(f.getPid().replace("%", "%25");
                                 } catch (UnsupportedEncodingException e) {
                                     // should never happen (UTF-8)
                                     throw new RuntimeException(e);

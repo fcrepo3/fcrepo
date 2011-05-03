@@ -43,28 +43,28 @@
           <p />
           <xsl:variable name="datastreams-url">
             <xsl:text>objects/</xsl:text>
-            <xsl:value-of select="encode-for-uri(@pid)" />
+            <xsl:value-of select="replace(@pid, '%', '%25')" />
             <xsl:text>/datastreams</xsl:text>
           </xsl:variable>
           <a href="/{$fedora}/{$datastreams-url}">View the Datastreams List for this Object</a>
           <p />
           <xsl:variable name="methods-url">
             <xsl:text>objects/</xsl:text>
-            <xsl:value-of select="encode-for-uri(@pid)" />
+            <xsl:value-of select="replace(@pid, '%', '%25')" />
             <xsl:text>/methods</xsl:text>
           </xsl:variable>
           <a href="/{$fedora}/{$methods-url}">View the Methods List for this Object</a>
           <p />
           <xsl:variable name="history-url">
             <xsl:text>objects/</xsl:text>
-            <xsl:value-of select="encode-for-uri(@pid)" />
+            <xsl:value-of select="replace(@pid, '%', '%25')" />
             <xsl:text>/versions</xsl:text>
           </xsl:variable>
           <a href="/{$fedora}/{$history-url}">View the Version History for this Object</a>
           <p />
           <xsl:variable name="objectxml-url">
             <xsl:text>objects/</xsl:text>
-            <xsl:value-of select="encode-for-uri(@pid)" />
+            <xsl:value-of select="replace(@pid, '%', '%25')" />
             <xsl:text>/objectXML</xsl:text>
           </xsl:variable>
           <a href="/{$fedora}/{$objectxml-url}">View the XML Representation of this Object</a>          
