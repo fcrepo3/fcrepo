@@ -84,6 +84,8 @@ public class InstallOptions {
 
     public static final String DEPLOY_LOCAL_SERVICES = "deploy.local.services";
 
+    public static final String TEST_SPRING_CONFIGS = "test.spring.configs";
+
     public static final String UNATTENDED = "unattended";
 
     public static final String DATABASE_UPDATE = "database.update";

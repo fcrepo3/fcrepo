@@ -115,7 +115,7 @@ public class ResourceIndexModule
                     getServer().getBean(TriplestoreConnector.class.getName(),TriplestoreConnector.class);
             }
             TripleGenerator generator =
-                getServer().getBean(ModelBasedTripleGenerator.class.getName(), ModelBasedTripleGenerator.class);
+                getServer().getBean(TripleGenerator.class.getName(), TripleGenerator.class);
 
             _ri = new ResourceIndexImpl(connector,
                                         generator,

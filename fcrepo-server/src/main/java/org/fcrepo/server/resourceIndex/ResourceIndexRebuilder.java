@@ -106,7 +106,7 @@ public class ResourceIndexRebuilder
         return m;
     }
 
-    @Resource(name = "org.fcrepo.server.resourceIndex.ModelBasedTripleGenerator")
+    @Resource(name = "org.fcrepo.server.resourceIndex.TripleGenerator")
     public void setTripleGenerator(TripleGenerator generator) {
         m_generator = generator;
     }

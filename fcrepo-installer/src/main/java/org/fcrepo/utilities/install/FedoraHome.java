@@ -104,6 +104,7 @@ public class FedoraHome {
         configureSpringAuth();
         configureFedoraUsers();
         configureBeSecurity();
+        configureSpringTestConfigs();
     }
 
     private void configureFCFG() throws InstallationFailedException {
@@ -380,6 +381,35 @@ public class FedoraHome {
             IOUtils.closeQuietly(springConfig);
             IOUtils.closeQuietly(writer);
             throw new InstallationFailedException(e.getMessage(), e);
+        }
+    }
+
+    private void configureSpringTestConfigs() throws InstallationFailedException {
+        if (_opts.getBooleanValue(InstallOptions.TEST_SPRING_CONFIGS, false)) {
+            FileInputStream springConfig = null;
+            PrintWriter writer = null;
+            try {
+                File springDir = new File(_installDir,
+                "server/config/spring");
+                for (File file:springDir.listFiles()){
+                    if (file.isFile()){
+                        springConfig = new FileInputStream(file);
+                        String content = IOUtils.toString(springConfig);
+                        content = content.replaceAll("(?s)<!-- TESTONLY(.+?)/TESTONLY -->", "$1");
+                        springConfig.close();
+
+                        writer =
+                            new PrintWriter(new OutputStreamWriter(new FileOutputStream(file),
+                            "UTF-8"));
+                        writer.print(content);
+                        writer.close();
+                    }
+                }
+            } catch (Exception e) {
+                IOUtils.closeQuietly(springConfig);
+                IOUtils.closeQuietly(writer);
+                throw new InstallationFailedException(e.getMessage(), e);
+            }
         }
     }
 

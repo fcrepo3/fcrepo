@@ -13,6 +13,8 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
 
+import org.fcrepo.server.resourceIndex.UvaStdImgTripleGenerator_1;
+
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 
@@ -80,5 +82,16 @@ extends FedoraServerTestCase {
                         + " \"320\"";
             checkSPOCount(client, query, 1);
         }
+    }
+    
+    /**
+     * Test that Spring-configured triple generators are working
+     */
+    public void testSpringTripleGenerators() throws Exception {
+        FedoraClient client = getFedoraClient();
+        String query = "<info:fedora/demo:5>"
+        + " <" + UvaStdImgTripleGenerator_1.TEST_PREDICATE + ">"
+        + " \"true\"";
+        checkSPOCount(client, query, 1);
     }
 }
