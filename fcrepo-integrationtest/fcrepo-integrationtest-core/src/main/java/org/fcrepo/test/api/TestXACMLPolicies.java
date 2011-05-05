@@ -287,6 +287,7 @@ public class TestXACMLPolicies
             Object getDissParms[] = {"demo:5", "demo:1", "getHigh", null, null};
             Object getDissParms2[] =
                     {"demo:29", "demo:27", "grayscaleImage", null, null};
+            Object getDissParms3[] = {"demo:5", "demo:1", "getVeryHigh", null, null};
             Class modObjArgs[] =
                     {String.class, String.class, String.class, String.class,
                             String.class};
@@ -331,6 +332,15 @@ public class TestXACMLPolicies
                               "getDissemination",
                               getDissArgs,
                               getDissParms2);
+
+            // APIA access by user with access- should succeed
+            // testuserroleC does have permission to access demo:5 datastreams,
+            // but custom AttributeFinderModule makes deny-custom-spring-apia policy relevant
+            invokeAPIAFailure(testuserroleC,
+                              "testuserroleC",
+                              "getDissemination",
+                              getDissArgs,
+                              getDissParms3);
 
             // APIA access by user without access- should fail
             // testuser1 does not have permission to access demo:29 datastreams, so this should fail

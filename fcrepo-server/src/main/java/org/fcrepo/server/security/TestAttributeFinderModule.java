@@ -28,6 +28,7 @@ class TestAttributeFinderModule
     private static final Logger logger =
             LoggerFactory.getLogger(TestAttributeFinderModule.class);
     public static final String ATTRIBUTE_ID = Constants.ENVIRONMENT.uri + ":springConfigured";
+    public static final String ATTRIBUTE_VALUE = "demo:5";
     @Override
     protected boolean canHandleAdhoc() {
         return true;
@@ -73,7 +74,7 @@ class TestAttributeFinderModule
         logger.debug("designatorType" + designatorType);
         if (designatorType == AttributeDesignator.ENVIRONMENT_TARGET) {
             if (ATTRIBUTE_ID.equals(attributeId)) {
-                values = Boolean.TRUE.toString();
+                values = ATTRIBUTE_VALUE;
             } else {
                 values = null;
             }
