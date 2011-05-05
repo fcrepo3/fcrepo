@@ -179,14 +179,14 @@ public class ObjectsFilter
         // the stuff below will actually result in not finding a handler if a bogus PID/DSID is found)
 
         String handlerName = "no-handler-name-determined-from-request-path";
-        // - /objects
         // ascertain the correct handler based on uri pattern.
-        if (parts.length == 1) {
+
+        // - /objects
+        if (parts.length < 2) {
             if ("GET".equals(method)) {
                 if (request.getParameterMap().containsKey("sessionToken")) {
                     handlerName = Handlers.RESUMEFINDOBJECTS;
-                } else if (request.getParameterMap().containsKey("terms")
-                        || request.getParameterMap().containsKey("query")) {
+                } else {
                     handlerName = Handlers.FINDOBJECTS;
                 }
             } else if ("POST".equals(method)) {
