@@ -1431,6 +1431,16 @@ public class TestRESTAPI
 
     }
 
+    @Test
+    public void testDisseminationContentLengthWhenKnown() throws Exception {
+        url = "/objects/demo:SmileyBeerGlass/methods/demo:DualResolution/mediumSize";
+        if (this.getAuthAccess()) {
+            assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
+        HttpResponse response = get(getAuthAccess());
+        assertEquals(SC_OK, response.getStatusCode());
+        assertEquals("17109", response.getResponseHeader("Content-Length").getValue());
+    }
 
     private HttpResponse _doUploadPost(String path) throws Exception {
         PostMethod post = new PostMethod(path);
