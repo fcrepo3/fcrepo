@@ -108,7 +108,7 @@ public class DefaultDisseminatorImpl
             InputStream in = null;
             try {
                 in =
-                        new ByteArrayInputStream(new ObjectInfoAsXML()
+                        new ByteArrayInputStream(new ObjectInfoAsXML(context)
                                 .getObjectProfile(reposBaseURL,
                                                   profile,
                                                   asOfDateTime)
@@ -170,7 +170,7 @@ public class DefaultDisseminatorImpl
         InputStream in = null;
         try {
             in =
-                    new ByteArrayInputStream(new ObjectInfoAsXML()
+                    new ByteArrayInputStream(new ObjectInfoAsXML(context)
                             .getMethodIndex(reposBaseURL,
                                             reader.GetObjectPID(),
                                             methods,
@@ -222,7 +222,7 @@ public class DefaultDisseminatorImpl
         InputStream in = null;
         try {
             in =
-                    new ByteArrayInputStream(new ObjectInfoAsXML()
+                    new ByteArrayInputStream(new ObjectInfoAsXML(context)
                             .getItemIndex(reposBaseURL,
                                           context
                                                   .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME),
@@ -274,7 +274,7 @@ public class DefaultDisseminatorImpl
                     reader.GetDatastream("DC",
                                                                  asOfDateTime);
             in =
-                    new ByteArrayInputStream(new ObjectInfoAsXML()
+                    new ByteArrayInputStream(new ObjectInfoAsXML(context)
                             .getOAIDublinCore(dcmd).getBytes("UTF-8"));
         } catch (ClassCastException cce) {
             throw new ObjectIntegrityException("Object "

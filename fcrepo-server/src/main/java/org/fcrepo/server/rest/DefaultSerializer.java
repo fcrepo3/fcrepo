@@ -4,7 +4,6 @@
  */
 package org.fcrepo.server.rest;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import java.net.URLEncoder;
@@ -30,6 +29,7 @@ import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.utilities.DCField;
+
 import org.fcrepo.utilities.DateUtility;
 
 import static org.fcrepo.server.utilities.StreamUtility.enc;
@@ -45,7 +45,7 @@ public class DefaultSerializer {
     String fedoraServerProtocol;
     String fedoraAppServerContext;
 
-    protected DefaultSerializer(String fedoraServerHost, Context context) {
+    public DefaultSerializer(String fedoraServerHost, Context context) {
         this.fedoraServerHost = fedoraServerHost;
         this.fedoraServerPort = context.getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.uri);
         this.fedoraAppServerContext = context.getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME);
@@ -68,7 +68,7 @@ public class DefaultSerializer {
                 + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                 + " xsi:schemaLocation=\"" + Constants.PID_LIST1_0.namespace.uri + " "
                 + Constants.PID_LIST1_0.xsdLocation + "\">");
-        
+
         // PID array serialization
         for (int i = 0; i < pidList.length; i++) {
             xml.append("  <pid>" + pidList[i] + "</pid>\n");
@@ -77,9 +77,9 @@ public class DefaultSerializer {
         return xml.toString();
     }
 
-    String objectProfileToXML(
+    public String objectProfileToXML(
             ObjectProfile objProfile,
-            Date versDateTime) throws IOException {
+            Date versDateTime)  {
         StringBuilder buffer = new StringBuilder();
 
         String pid = objProfile.PID;
@@ -162,8 +162,7 @@ public class DefaultSerializer {
     }
 
     String datastreamProfileToXML(String pid, String dsID, Datastream dsProfile, Date versDateTime,
-                                  boolean validateChecksum)
-            throws IOException {
+                                  boolean validateChecksum) {
         StringBuffer buffer = new StringBuffer();
 
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -191,7 +190,7 @@ public class DefaultSerializer {
 
     String objectHistoryToXml(
             String[] objectHistory,
-            String pid) throws IOException {
+            String pid)  {
         StringBuilder buffer = new StringBuilder();
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         buffer.append("<fedoraObjectHistory "
@@ -236,7 +235,7 @@ public class DefaultSerializer {
 
     }
 
-    String objectMethodsToXml(
+    public String objectMethodsToXml(
             ObjectMethodsDef[] methodDefs,
             String pid,
             String sDef,
@@ -658,7 +657,7 @@ public class DefaultSerializer {
             dateString = DateUtility.convertDateToString(date);
         }
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        
+
         buffer.append("<validation "
                 + " xmlns=\"" + Constants.OBJ_VALIDATION1_0.namespace.uri + "\""
                 + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""

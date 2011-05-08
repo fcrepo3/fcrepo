@@ -4,21 +4,25 @@
  */
 package org.fcrepo.server.access.defaultdisseminator;
 
+import java.io.File;
 import java.io.InputStream;
 
 import java.util.Date;
 
 import org.fcrepo.common.Constants;
 
+import org.fcrepo.server.Context;
+import org.fcrepo.server.Server;
 import org.fcrepo.server.access.ObjectProfile;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.rest.DefaultSerializer;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.utilities.DCFields;
 import org.fcrepo.server.utilities.StreamUtility;
+
 import org.fcrepo.utilities.DateUtility;
 
 
@@ -32,43 +36,21 @@ import org.fcrepo.utilities.DateUtility;
 public class ObjectInfoAsXML
         implements Constants {
 
-    public ObjectInfoAsXML() {
+    private final Context m_context;
+
+    public ObjectInfoAsXML(Context context) {
+        m_context = context;
     }
 
     public String getObjectProfile(String reposBaseURL,
                                    ObjectProfile objProfile,
                                    Date versDateTime) throws ServerException {
-        StringBuffer out = new StringBuffer();
-        out.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        out.append("<objectProfile");
-        out.append(" pid=\"" + objProfile.PID + "\"");
-        if (versDateTime != null) {
-            out.append(" dateTime=\"");
-            out.append(DateUtility.convertDateToString(versDateTime));
-            out.append("\"");
-        }
-        out.append(" xmlns:xsi=\"" + XSI.uri + "\"");
-        out.append(" xsi:schemaLocation=\"" + ACCESS.uri + " ");
-        out.append(OBJ_PROFILE1_0.xsdLocation + "\">");
 
-        // PROFILE FIELDS SERIALIZATION
-        out.append("<objLabel>" + StreamUtility.enc(objProfile.objectLabel)
-                + "</objLabel>");
-
-        String cDate =
-                DateUtility.convertDateToString(objProfile.objectCreateDate);
-        out.append("<objCreateDate>" + cDate + "</objCreateDate>");
-        String mDate =
-                DateUtility.convertDateToString(objProfile.objectLastModDate);
-        out.append("<objLastModDate>" + mDate + "</objLastModDate>");
-        out.append("<objDissIndexViewURL>"
-                + StreamUtility.enc(objProfile.dissIndexViewURL)
-                + "</objDissIndexViewURL>");
-        out.append("<objItemIndexViewURL>"
-                + StreamUtility.enc(objProfile.itemIndexViewURL)
-                + "</objItemIndexViewURL>");
-        out.append("</objectProfile>");
-        return out.toString();
+        // use REST serializer
+        Server fedoraServer = Server.getInstance(new File(Constants.FEDORA_HOME), false);
+        String fedoraServerHost = fedoraServer.getParameter("fedoraServerHost");
+        DefaultSerializer ser = new DefaultSerializer(fedoraServerHost, m_context);
+        return ser.objectProfileToXML(objProfile, versDateTime);
     }
 
     public String getItemIndex(String reposBaseURL,
@@ -127,64 +109,13 @@ public class ObjectInfoAsXML
                                  String PID,
                                  ObjectMethodsDef[] methods,
                                  Date versDateTime) throws ServerException {
-        StringBuffer out = new StringBuffer();
 
-        out.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        out.append("<objectMethods");
-        out.append(" pid=\"" + PID + "\"");
-        if (versDateTime != null) {
-            out.append(" dateTime=\"");
-            out.append(DateUtility.convertDateToString(versDateTime));
-            out.append("\"");
-        }
-        out.append(" xmlns:xsi=\"" + XSI.uri + "\"");
-        out.append(" xsi:schemaLocation=\"" + ACCESS.uri + " ");
-        out.append(OBJ_METHODS1_0.xsdLocation + "\">");
+        // use REST serializer
+        Server fedoraServer = Server.getInstance(new File(Constants.FEDORA_HOME), false);
+        String fedoraServerHost = fedoraServer.getParameter("fedoraServerHost");
+        DefaultSerializer ser = new DefaultSerializer(fedoraServerHost, m_context);
+        return ser.objectMethodsToXml(methods, PID, null, versDateTime);
 
-        String nextSdef = "null";
-        String currentSdef = "";
-        for (int i = 0; i < methods.length; i++) {
-            currentSdef = methods[i].sDefPID;
-            if (!currentSdef.equalsIgnoreCase(nextSdef)) {
-                if (i != 0) {
-                    out.append("</sdef>");
-                }
-                out.append("<sdef pid=\""
-                        + StreamUtility.enc(methods[i].sDefPID) + "\" >");
-            }
-            String versDate =
-                    DateUtility.convertDateToString(methods[i].asOfDate);
-            out.append("<method name=\""
-                    + StreamUtility.enc(methods[i].methodName)
-                    + "\" asOfDateTime=\"" + versDate + "\" >");
-            MethodParmDef[] methodParms = methods[i].methodParmDefs;
-            for (MethodParmDef element : methodParms) {
-                out.append("<parm parmName=\""
-                        + StreamUtility.enc(element.parmName)
-                        + "\" parmDefaultValue=\""
-                        + StreamUtility.enc(element.parmDefaultValue)
-                        + "\" parmRequired=\"" + element.parmRequired
-                        + "\" parmType=\""
-                        + StreamUtility.enc(element.parmType)
-                        + "\" parmLabel=\""
-                        + StreamUtility.enc(element.parmLabel) + "\" >");
-                if (element.parmDomainValues.length > 0) {
-                    out.append("<parmDomainValues>");
-                    for (String element2 : element.parmDomainValues) {
-                        out.append("<value>" + StreamUtility.enc(element2)
-                                + "</value>");
-                    }
-                    out.append("</parmDomainValues>");
-                }
-                out.append("</parm>");
-            }
-
-            out.append("</method>");
-            nextSdef = currentSdef;
-        }
-        out.append("</sdef>");
-        out.append("</objectMethods>");
-        return out.toString();
     }
 
     public String getOAIDublinCore(Datastream dublinCore)
