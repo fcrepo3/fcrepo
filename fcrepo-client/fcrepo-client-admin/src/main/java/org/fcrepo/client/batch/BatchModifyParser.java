@@ -5,7 +5,9 @@
 package org.fcrepo.client.batch;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -137,11 +139,19 @@ public class BatchModifyParser
         BatchModifyParser.APIA = APIA;
         BatchModifyParser.UPLOADER = UPLOADER;
         XMLReader xmlReader = null;
+        boolean schemaValidate = true;
+
+        if ("true".equals(System.getenv("OFFLINE"))
+                || "true".equals(System.getProperty("offline"))
+                || "false".equals(System.getProperty("online"))
+                || "false".equals(System.getenv("ONLINE"))) {
+                System.out.println("NOT validating");
+                schemaValidate = false;
+        }
 
         // Configure the SAX parser.
         try {
             SAXParserFactory saxfactory = SAXParserFactory.newInstance();
-            saxfactory.setValidating(true);
             SAXParser parser = saxfactory.newSAXParser();
             xmlReader = parser.getXMLReader();
             xmlReader.setContentHandler(this);
@@ -152,7 +162,7 @@ public class BatchModifyParser
                                 true);
             xmlReader
                     .setFeature("http://apache.org/xml/features/validation/schema",
-                                true);
+                                schemaValidate);
             xmlReader.setErrorHandler(new BatchModifyXMLErrorHandler());
         } catch (Exception e) {
             // An Exception indicates a fatal error and parsing was halted. Set
