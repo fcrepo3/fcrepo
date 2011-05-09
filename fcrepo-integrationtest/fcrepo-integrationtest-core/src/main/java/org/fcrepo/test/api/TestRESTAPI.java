@@ -8,6 +8,7 @@ package org.fcrepo.test.api;
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -18,8 +19,10 @@ import java.net.URLEncoder;
 
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -27,6 +30,11 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.apache.axis.types.NonNegativeInteger;
 
@@ -1541,8 +1549,22 @@ public class TestRESTAPI
                 String xmlResponse = res.getResponseBodyString();
                 // if a schema location is specified
                 if (xmlResponse.contains(":schemaLocation=\"")) {
-                    // validate it
-                    validate(xmlResponse);
+
+                    //Validate online if we can
+                    String offline = System.getProperty("offline");
+                    String online = System.getProperty("online");
+                    if (!"false".equals(online) && (offline == null || !"true".equals(offline))) {
+                        onlineValidate(xmlResponse);
+                    }
+
+                    // Also validate offline unless explicitly disabled
+                    if (!"false".equals(offline)) {
+                        /*
+                         * Offline schema validation does not work due to bug in
+                         * xerces:  https://issues.apache.org/jira/browse/XERCESJ-1130
+                         */
+                        //offlineValidate(xmlResponse, getSchemaFiles(xmlResponse, null));
+                    }
                 } else {
                     // for now, requiring a schema
                     fail("No schema location specified in response - " + url);
@@ -1736,13 +1758,111 @@ public class TestRESTAPI
         assertTrue("Testing if relationship present: " + exists + " [ " + s + ", " + p + ", " + o + " ] \n " + sb.toString(), exists == found);
     }
 
+    /** Get all local filenames that correspond to declared schemas.
+     *
+     * Validation does not work with a "union of all schemata" schema.  This was
+     * an attempt create the most minimal set of schema by traversing schemaLocation
+     * and <include> within the xsd files.  Ultimately, this was a dead end, because
+     * of a bug in Xerces:
+     * https://issues.apache.org/jira/browse/XERCESJ-1130
+     *
+     * schemaLocation typically points to some http resource.  For offline tests,
+     * we want to use the local copy of that resource (since we know we have them).
+     * Thus, for all declared and included schemas, produce a list of
+     * local filenames.
+     *
+     * @param xml blob of xml that may contain schemaLocation
+     * @return List of all local files corresponding to declared schemas
+     * @throws Exception
+     */
+    private List<File> getSchemaFiles(String xml, List<File> state) throws Exception {
+
+        File schemaDir =
+            new File(Constants.FEDORA_HOME, "server" + File.separator
+                    + "xsd");
+
+        /* Get local copies of any declared schema */
+        ArrayList<File> result = new ArrayList<File>();
+        Pattern p = Pattern.compile("schemaLocation=\"(.+?)\"");
+        Matcher m = p.matcher(xml);
+        while (m.find()) {
+            String[] content = m.group(1).split("\\s+");
+            for (String frag : content) {
+                if (frag.contains(".xsd")) {
+                    String[] paths = frag.split("/");
+                    File newSchema = new File(schemaDir, paths[paths.length -1]);
+                    if (state == null || !state.contains(newSchema)) {
+                        result.add(newSchema);
+                    }
+                }
+            }
+        }
+
+
+        /* For each declared schema, and get any <include> schemas from them */
+        ArrayList<File> included = new ArrayList<File>();
+        for (File f : result) {
+            xml = IOUtils.toString(new FileInputStream(f));
+            included.addAll(getSchemaFiles(xml, result));
+        }
+
+        result.addAll(included);
+
+        return result;
+    }
+
+    /**
+     * Validate XML document supplied as a string.
+     * <p>
+     * Validates against the local copy of the XML schema specified as
+     * schemaLocation in document
+     *</p>
+     *
+     * @param xml
+     * @throws Exception
+     */
+    private void offlineValidate(String xml, List<File> schemas) throws Exception {
+
+        SchemaFactory sf =
+                SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+
+        System.out.println(sf.getClass().getName());
+
+        ArrayList<Source> schemata = new ArrayList<Source>();
+
+        for (File schemaFile : schemas) {
+            schemata.add(new StreamSource(schemaFile));
+        }
+
+        Schema schema;
+
+        try {
+            schema = sf.newSchema(schemata.toArray(new Source[0]));
+        } catch (SAXException e) {
+
+            throw new RuntimeException("Could not parse schema " + schemas.toString(), e);
+        }
+        Validator v = schema.newValidator();
+
+        StringBuilder errors = new StringBuilder();
+
+        v.setErrorHandler(new ValidatorErrorHandler(errors));
+
+        v.validate(new StreamSource(new StringReader(xml)));
+
+        assertTrue("Offline validation failed for " + url + ". Errors: "
+                           + errors.toString() + "\n xml:\n" + xml,
+                   0 == errors.length());
+
+    }
+
     /**
      * Validate XML document supplied as a string.
      * Validates against XML schema specified as schemaLocation in document
      * @param xml
      * @throws Exception
      */
-    private void validate(String xml) throws Exception {
+    private void onlineValidate(String xml) throws Exception {
 
         SAXParserFactory factory = SAXParserFactory.newInstance();
         factory.setValidating(true);
@@ -1759,7 +1879,7 @@ public class TestRESTAPI
         reader.setErrorHandler(new ValidatorErrorHandler(errors));
         reader.parse(new InputSource(new StringReader(xml)));
 
-        assertTrue("Validation failed for " + url + ". Errors: " + errors.toString(), 0 == errors.length());
+        assertTrue("Online Validation failed for " + url + ". Errors: " + errors.toString(), 0 == errors.length());
 
     }
 
