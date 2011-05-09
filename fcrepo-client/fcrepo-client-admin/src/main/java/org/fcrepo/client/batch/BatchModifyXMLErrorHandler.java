@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.client.batch;
@@ -24,15 +24,20 @@ public class BatchModifyXMLErrorHandler
     }
 
     public void error(SAXParseException e) throws SAXException {
+
+
         System.err
-                .print("BatchModifyXMLErrorHandler detected SAX ERROR.  Re-throwing SAXException.");
-        throw new SAXException(formatParseExceptionMsg(e));
+                .print("BatchModifyXMLErrorHandler detected SAX ERROR: " + e.getMessage() + ".  Re-throwing SAXException.");
+
+        e.printStackTrace(System.out);
+        throw new SAXException(formatParseExceptionMsg(e), e);
     }
 
     public void fatalError(SAXParseException e) throws SAXException {
         System.err
-                .print("BatchModifyXMLErrorHandler detected SAX FATAL ERROR.  Re-throwing SAXException.");
-        throw new SAXException(formatParseExceptionMsg(e));
+                .print("BatchModifyXMLErrorHandler detected SAX FATAL ERROR: " + e.getMessage() + ".  Re-throwing SAXException.");
+        e.printStackTrace(System.out);
+        throw new SAXException(formatParseExceptionMsg(e), e);
     }
 
     private void printPubID(SAXParseException e) {
