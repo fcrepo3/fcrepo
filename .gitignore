@@ -7,3 +7,4 @@ fcrepo-server/test
 .classpath
 .project
 .settings/
+.DS_Store
