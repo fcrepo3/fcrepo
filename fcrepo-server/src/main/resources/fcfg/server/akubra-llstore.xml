@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-  <bean name="org.fcrepo.server.storage.lowlevel.ILowlevelStorage"
+
+  <bean name="org.fcrepo.server.storage.lowlevel.ILowlevelStorage" 
+        class="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorageModule">
+        <constructor-arg index="0">
+          <map />
+        </constructor-arg>
+        <constructor-arg index="1"  ref="org.fcrepo.server.Server" />
+        <constructor-arg index="2" type="java.lang.String" value="org.fcrepo.server.storage.lowlevel.ILowlevelStorage" />
+        <property name="impl" ref="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorage" />
+  </bean>
+  
+  <bean name="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorage"
         class="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorage"
         singleton="true">
     <constructor-arg>

@@ -227,9 +227,7 @@ public class FedoraHome {
             if (llStoreType == null || llStoreType.equals("akubra-fs")) {
                 ModuleConfiguration mConfig = config.getModuleConfiguration(
                     "org.fcrepo.server.storage.lowlevel.ILowlevelStorage");
-                mConfig.setClassName(
-                    "org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorageModule");
-                mConfig.getParameters().clear();
+                config.getModuleConfigurations().remove(mConfig);
                 _usingAkubra = true;
             }
 
@@ -247,7 +245,7 @@ public class FedoraHome {
         PrintWriter writer = null;
         try {
             File file = new File(_installDir,
-                    "server/config/akubra-llstore.xml");
+                    "server/config/spring/akubra-llstore.xml");
             reader = new BufferedReader(new InputStreamReader(
                     new FileInputStream(file), "UTF-8"));
 

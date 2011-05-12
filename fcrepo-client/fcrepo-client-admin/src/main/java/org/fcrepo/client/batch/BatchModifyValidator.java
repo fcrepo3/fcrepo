@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.client.batch;
@@ -22,15 +22,15 @@ import org.fcrepo.server.utilities.StreamUtility;
 /**
  * A class for parsing the xml modify directives in the Batch Modify input
  * file.
- * 
+ *
  * The parsing is configured to parse directives in the file sequentially.
  * Logs are written for each successful and failed directive that is processed.
  * Recoverable(non-fatal) errors are written to the log file and processing
  * continues. Catastrophic errors will cause parsing to halt and set the count
- * of failed directives to -1 indicating that parsing was halted prior to 
- * the end of the file. In this case the logs will contain all directives 
+ * of failed directives to -1 indicating that parsing was halted prior to
+ * the end of the file. In this case the logs will contain all directives
  * processed up to the point of failure.
- * 
+ *
  * @author Ross Wayland
  */
 public class BatchModifyValidator
@@ -45,7 +45,7 @@ public class BatchModifyValidator
 
     /**
      * Constructor allows this class to initiate the parsing.
-     * 
+     *
      * @param in
      *        An input stream containing the xml to be parsed.
      * @param out
@@ -60,12 +60,20 @@ public class BatchModifyValidator
         BatchModifyValidator.errorCount = 0;
         XMLReader xmlReader = null;
 
+        boolean schemaValidate = true;
+
+        if ("true".equals(System.getenv("OFFLINE"))
+                || "true".equals(System.getProperty("offline"))
+                || "false".equals(System.getProperty("online"))
+                || "false".equals(System.getenv("ONLINE"))) {
+            schemaValidate = false;
+        }
+
         // Configure the SAX parser.
         BatchModifyValidatorErrorHandler errorHandler =
                 new BatchModifyValidatorErrorHandler(out);
         try {
             SAXParserFactory saxfactory = SAXParserFactory.newInstance();
-            saxfactory.setValidating(true);
             SAXParser parser = saxfactory.newSAXParser();
             xmlReader = parser.getXMLReader();
             xmlReader.setContentHandler(this);
@@ -76,7 +84,7 @@ public class BatchModifyValidator
                                 true);
             xmlReader
                     .setFeature("http://apache.org/xml/features/validation/schema",
-                                true);
+                                schemaValidate);
             xmlReader
                     .setFeature("http://apache.org/xml/features/continue-after-fatal-error",
                                 true);

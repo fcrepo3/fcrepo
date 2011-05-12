@@ -4,19 +4,10 @@
  */
 package org.fcrepo.server.storage.lowlevel.akubra;
 
-import java.io.File;
 import java.io.InputStream;
 
 import java.util.Iterator;
 import java.util.Map;
-
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-
-import org.fcrepo.common.Constants;
 
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -25,6 +16,7 @@ import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.storage.lowlevel.IListable;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
 import org.fcrepo.server.storage.lowlevel.ISizable;
+import org.springframework.beans.factory.annotation.Required;
 
 
 
@@ -49,25 +41,16 @@ public class AkubraLowlevelStorageModule
 
     private ILowlevelStorage impl;
 
+    @Required
+    public void setImpl(ILowlevelStorage store) {
+        impl = store;
+    }
+
     public AkubraLowlevelStorageModule(Map<String, String> moduleParameters,
                                        Server server,
                                        String role)
             throws ModuleInitializationException {
         super(moduleParameters, server, role);
-    }
-
-    @Override
-    public void postInitModule() throws ModuleInitializationException {
-        File beanFile = new File(new File(Constants.FEDORA_HOME),
-                                 "server/config/akubra-llstore.xml");
-        try {
-            Resource beanResource = new FileSystemResource(beanFile);
-            BeanFactory factory = new XmlBeanFactory(beanResource);
-            impl = (ILowlevelStorage) factory.getBean(getRole());
-        } catch (BeansException e) {
-            throw new ModuleInitializationException("Error initializing "
-                    + "from " + beanFile.getPath(), getRole(), e);
-        }
     }
 
     public void addObject(String pid, InputStream content)

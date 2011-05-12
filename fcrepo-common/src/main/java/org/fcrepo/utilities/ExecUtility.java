@@ -218,6 +218,14 @@ public class ExecUtility {
                     + File.separator + "tomcat");
         }
 
+        if (System.getProperty("online") != null) {
+            env.put("ONLINE", System.getProperty("online"));
+        }
+
+        if (System.getProperty("offline") != null) {
+            env.put("OFFLINE", System.getProperty("offline"));
+        }
+
         for (String envName : env.keySet()) {
             fixedEnv.add(String.format("%s=%s", envName, env.get(envName)));
         }

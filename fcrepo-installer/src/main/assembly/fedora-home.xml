@@ -184,10 +184,17 @@
       <includes>
         <include>logback.xml</include>
         <include>activemq.xml</include>
-        <include>akubra-llstore.xml</include>
         <include>mime-to-extensions.xml</include>
       </includes>
     </fileSet>  
+    
+    <fileSet>
+      <directory>../fcrepo-server/src/main/resources/fcfg/server</directory>
+      <outputDirectory>/server/config/spring</outputDirectory>
+      <includes>
+        <include>akubra-llstore.xml</include>
+      </includes>
+    </fileSet> 
 
     <fileSet>
       <directory>../fcrepo-server/src/main/resources/demo/demo-objects/foxml</directory>
