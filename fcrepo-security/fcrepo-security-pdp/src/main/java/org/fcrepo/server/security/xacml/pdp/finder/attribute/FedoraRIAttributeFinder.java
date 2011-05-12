@@ -196,12 +196,14 @@ public class FedoraRIAttributeFinder
 
         // either the last part is the pid, or the last-but one is the pid and the last is the datastream
         // if we have a pid, we query on that, if we have a datastream we query on the datastream
-        String subject;
+        String subject; // the full subject, ie pid or pid/ds
+        String pid;
         if (resourceParts.length > 1) {
             if (resourceParts[resourceParts.length - 1].contains(":")) { // ends with a pid, we have pid only
                 subject = resourceParts[resourceParts.length - 1];
+                pid = subject;
             } else { // datastream
-                String pid = resourceParts[resourceParts.length - 2];
+                pid = resourceParts[resourceParts.length - 2];
                 subject = pid + "/" + resourceParts[resourceParts.length - 1];
             }
         } else {
@@ -222,11 +224,21 @@ public class FedoraRIAttributeFinder
             if (relationship == null) {
                 relationship = attribute; // default to use attribute URI as relationship if none specified
             }
+
+            // see if we are querying based on the resource (object, datstream etc) or just on the object (pid)
+            String target = attributes.get(designatorType).get(attribute).get("target");
+            String queryTarget;
+            if (target != null && target.equals("object")) {
+                queryTarget = pid;
+            } else {
+                queryTarget = subject;
+            }
+
             Map<String, Set<String>> relationships;
 
             try {
                 logger.debug("Getting attribute using relationship " + relationship);
-                relationships = relationshipResolver.getRelationships(subject, relationship);
+                relationships = relationshipResolver.getRelationships(queryTarget, relationship);
             } catch (MelcoeXacmlException e) {
                 throw new AttributeFinderException(e.getMessage(), e);
             }
@@ -240,14 +252,22 @@ public class FedoraRIAttributeFinder
 
         } else {
             // get the language and query output variable
-            String queryLang = attributes.get(designatorType).get(attribute).get("queryLang");
-            String variable =  attributes.get(designatorType).get(attribute).get("value");
-            String resource =  attributes.get(designatorType).get(attribute).get("resource");
+            String queryLang = attributes.get(designatorType).get(attribute).get("queryLang"); // language
+            String variable =  attributes.get(designatorType).get(attribute).get("value"); // query text
+            String resource =  attributes.get(designatorType).get(attribute).get("resource"); // resource marker in query
+            String object = attributes.get(designatorType).get(attribute).get("object"); // object/pid marker in query
 
             String subjectURI = "info:fedora/" + subject;
+            String pidURI  = "info:fedora/" + pid;
 
             // replace the resource marker in the query with the subject
-            query = query.replace(resource, subjectURI);
+            if (resource != null) {
+                query = query.replace(resource, subjectURI);
+            }
+            // and the pid/object marker
+            if (object != null) {
+                query = query.replace(object, pidURI);
+            }
 
             // run it
             try {

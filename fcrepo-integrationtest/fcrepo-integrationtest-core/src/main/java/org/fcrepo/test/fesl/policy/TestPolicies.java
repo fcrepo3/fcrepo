@@ -305,7 +305,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
         // load policy
         policyId = policyUtils.addPolicy(subjectPolicy);
         try {
-            perms = new PermissionTest(1000000, 1000012, "test", "");
+            perms = new PermissionTest(1000000, 1000012, "test", "DC");
             // objects that should be allowed access (deny=if pid divisible by two and/or three by using dc:subject attrs that indicate this)
             pidList = new String[]{
                     "test:1000001",
@@ -313,7 +313,15 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
                     "test:1000007",
                     "test:1000009"
             };
-            assertEquals(subjectPolicy + ": Access denied for objects", "", perms.object().allowed().mismatch(pidList));
+            assertEquals(subjectPolicy + ": Access allowed for objects", "", perms.object().allowed().mismatch(pidList));
+            // same for datastream access, as subject attribute is retrieved for the object, not for the datastream
+            pidList = new String[]{
+                    "test:1000001",
+                    "test:1000003",
+                    "test:1000007",
+                    "test:1000009"
+            };
+            assertEquals(subjectPolicy + ": Access allowed for objects", "", perms.datastream().allowed().mismatch(pidList));
         } finally {
             policyUtils.delPolicy(policyId);
         }
