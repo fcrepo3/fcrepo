@@ -4,11 +4,11 @@
    <!-- Spring config location -->
    <Parameter 
 	name="contextConfigLocation" 
-	value="/WEB-INF/applicationContext.xml,file:///_FEDORA_HOME_::server::config::spring::web::*.xml" />
+	value="/WEB-INF/applicationContext.xml,_FEDORA_HOME_URI_server/config/spring/web/*.xml" />
 
    <Parameter 
         name="propertyConfigLocation"
-        value="file:///_FEDORA_HOME_::server::config::spring::web::web.properties" />
+        value="_FEDORA_HOME_URI_server/config/spring/web/web.properties" />
 
    <Parameter 
         name="fedora.home"
