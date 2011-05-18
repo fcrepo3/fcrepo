@@ -8,6 +8,7 @@ package org.fcrepo.test.api;
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -62,6 +63,7 @@ import org.trippi.RDFFormat;
 import org.trippi.TripleIterator;
 import org.trippi.TrippiException;
 
+import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -130,17 +132,6 @@ public class TestRESTAPI
             System.getProperty("fcrepo-integrationtest-core.classes") != null ? System
                     .getProperty("fcrepo-integrationtest-core.classes")
                     + "rest" : "src/test/resources/rest";
-
-    // various download filenames used in test object for content-disposition header test
-    // datastreams in test object (using these) are:
-    // DS1 with label; also has relationship in RELS-INT specifying filename
-    // DS2 with label - MIMETYPE maps to an extension
-    // DS3 with label - unknown MIMETYPE
-    // DS4 with label containing illegal filename characters
-    // DS5 with no label
-    // DS6.xml with no label; datastream ID contains extension
-    //
-    // all datastreams text/xml apart from DS2 which is image/jpeg
 
     private static String DS1RelsFilename =
             "Datastream 1 filename from rels.extension";
@@ -1746,6 +1737,7 @@ public class TestRESTAPI
         StringBuilder errors = new StringBuilder();
 
         XMLReader reader = parser.getXMLReader();
+        reader.setEntityResolver(new ValidatorEntityResolver());
         reader.setErrorHandler(new ValidatorErrorHandler(errors));
         reader.parse(new InputSource(new StringReader(xml)));
 
