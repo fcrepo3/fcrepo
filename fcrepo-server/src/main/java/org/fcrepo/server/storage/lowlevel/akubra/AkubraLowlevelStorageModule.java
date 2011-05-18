@@ -47,7 +47,7 @@ public class AkubraLowlevelStorageModule
         extends Module
         implements ILowlevelStorage, IListable, ISizable {
 
-    private ILowlevelStorage impl;
+    private ILowlevelStorage m_impl;
 
     public AkubraLowlevelStorageModule(Map<String, String> moduleParameters,
                                        Server server,
@@ -55,88 +55,86 @@ public class AkubraLowlevelStorageModule
             throws ModuleInitializationException {
         super(moduleParameters, server, role);
     }
+    
+    public void setLLStoreImpl(ILowlevelStorage impl) {
+    	m_impl = impl;
+    }
 
     @Override
     public void postInitModule() throws ModuleInitializationException {
-        File beanFile = new File(new File(Constants.FEDORA_HOME),
-                                 "server/config/akubra-llstore.xml");
-        try {
-            Resource beanResource = new FileSystemResource(beanFile);
-            BeanFactory factory = new XmlBeanFactory(beanResource);
-            impl = (ILowlevelStorage) factory.getBean(getRole());
-        } catch (BeansException e) {
-            throw new ModuleInitializationException("Error initializing "
-                    + "from " + beanFile.getPath(), getRole(), e);
+        if (m_impl == null) {
+            throw new ModuleInitializationException("Error initializing: "
+                    + "no ILowlevelStorage impl ", getRole());
         }
     }
 
     public void addObject(String pid, InputStream content)
             throws LowlevelStorageException {
-        impl.addObject(pid, content);
+        m_impl.addObject(pid, content);
     }
 
     public void replaceObject(String pid, InputStream content)
             throws LowlevelStorageException {
-        impl.replaceObject(pid, content);
+        m_impl.replaceObject(pid, content);
     }
 
     public InputStream retrieveObject(String pid)
             throws LowlevelStorageException {
-        return impl.retrieveObject(pid);
+        return m_impl.retrieveObject(pid);
     }
 
     public void removeObject(String pid) throws LowlevelStorageException {
-        impl.removeObject(pid);
+        m_impl.removeObject(pid);
     }
 
     public void rebuildObject() throws LowlevelStorageException {
-        impl.rebuildObject();
+        m_impl.rebuildObject();
     }
 
     public void auditObject() throws LowlevelStorageException {
-        impl.auditObject();
+        m_impl.auditObject();
     }
 
     public long addDatastream(String pid, InputStream content)
             throws LowlevelStorageException {
-        return impl.addDatastream(pid, content);
+        return m_impl.addDatastream(pid, content);
     }
 
     public long replaceDatastream(String pid, InputStream content)
             throws LowlevelStorageException {
-        return impl.replaceDatastream(pid, content);
+        return m_impl.replaceDatastream(pid, content);
     }
 
     public InputStream retrieveDatastream(String pid)
             throws LowlevelStorageException {
-        return impl.retrieveDatastream(pid);
+        return m_impl.retrieveDatastream(pid);
     }
 
     public void removeDatastream(String pid) throws LowlevelStorageException {
-        impl.removeDatastream(pid);
+        m_impl.removeDatastream(pid);
     }
 
     public void rebuildDatastream() throws LowlevelStorageException {
-        impl.rebuildDatastream();
+        m_impl.rebuildDatastream();
     }
 
     public void auditDatastream() throws LowlevelStorageException {
-        impl.auditDatastream();
+        m_impl.auditDatastream();
     }
 
     // IListable methods
 
     public Iterator<String> listObjects() {
-        return ((IListable) impl).listObjects();
+        return ((IListable) m_impl).listObjects();
     }
 
     public Iterator<String> listDatastreams() {
-        return ((IListable) impl).listDatastreams();
+        return ((IListable) m_impl).listDatastreams();
     }
 
     // ISizable methods
 
     public long getDatastreamSize(String dsKey) throws LowlevelStorageException {
-        return ((ISizable) impl).getDatastreamSize(dsKey);
+        return ((ISizable) m_impl).getDatastreamSize(dsKey);
     }
 }

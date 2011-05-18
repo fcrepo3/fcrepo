@@ -1,7 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
+<bean id="org.fcrepo.server.storage.lowlevel.ILowlevelConfiguration"
+ name="org.fcrepo.server.storage.lowlevel.ILowlevelConfiguration"
+ class="org.fcrepo.server.config.ModuleConfiguration"
+ >
+<constructor-arg index="0">
+<list>
+<bean class="org.fcrepo.server.config.Parameter">
+<constructor-arg type="java.lang.String" value="namePlaceholder" />
+<property name="value" value="valPlaceholder" />
+</bean>
+</list>
+</constructor-arg>
+<constructor-arg index="1" type="java.lang.String" value="org.fcrepo.server.storage.lowlevel.ILowlevelStorage" />
+<constructor-arg index="2" type="java.lang.String" value="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorageModule" />
+<constructor-arg index="3" type="java.lang.String" value="The interface to the low-level storage subsystem." />
+</bean>
   <bean name="org.fcrepo.server.storage.lowlevel.ILowlevelStorage"
+        class="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorageModule"
+        singleton="true">
+    <constructor-arg index="0">
+      <bean factory-bean="org.fcrepo.server.storage.lowlevel.ILowlevelConfiguration" factory-method="getParameters" />
+    </constructor-arg>
+    <constructor-arg index="1" ref="org.fcrepo.server.Server" />
+    <constructor-arg index="2">
+      <bean factory-bean="org.fcrepo.server.storage.lowlevel.ILowlevelConfiguration" factory-method="getRole" />
+    </constructor-arg>
+    <property name="LLStoreImpl" ref="org.fcrepo.server.storage.lowlevel.ILowlevelStorage.impl" />
+  </bean>
+  <bean name="org.fcrepo.server.storage.lowlevel.ILowlevelStorage.impl"
         class="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorage"
         singleton="true">
     <constructor-arg>

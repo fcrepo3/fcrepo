@@ -237,11 +237,14 @@ public class FedoraHome {
         BufferedReader reader = null;
         PrintWriter writer = null;
         try {
-            File file =
+            File infile =
                     new File(_installDir,
-                             "server/config/spring/akubra-llstore.xml");
+                             "server/config/akubra-llstore.xml");
+            File outfile =
+                new File(_installDir,
+                         "server/config/spring/akubra-llstore.xml");
             reader =
-                    new BufferedReader(new InputStreamReader(new FileInputStream(file),
+                    new BufferedReader(new InputStreamReader(new FileInputStream(infile),
                                                              "UTF-8"));
 
             File dataDir = new File(_installDir, "data");
@@ -263,7 +266,7 @@ public class FedoraHome {
             reader.close();
 
             writer =
-                    new PrintWriter(new OutputStreamWriter(new FileOutputStream(file),
+                    new PrintWriter(new OutputStreamWriter(new FileOutputStream(outfile),
                                                            "UTF-8"));
             writer.print(xml.toString());
             writer.close();
