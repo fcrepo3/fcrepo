@@ -638,6 +638,12 @@
       <version>2.0.5</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>mptstore</artifactId>
+      <version>0.9.4</version>
+    </dependency>
+
     <!-- This is needed only to trigger the rmi-journal-rcv.jar assembly. -->
     <dependency>
       <groupId>org.fcrepo</groupId>
@@ -660,19 +666,19 @@
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>trippi-core</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.1</version>
     </dependency>
 
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>trippi-mptstore</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.1</version>
     </dependency>
 
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>trippi-mulgara</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.1</version>
     </dependency>
 
     <!--Fix of the FCREPO-819 Bug -->
@@ -718,6 +724,12 @@
       <groupId>org.fcrepo</groupId>
       <artifactId>sunxacml</artifactId>
       <classifier>melcoe</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>openrdf-sesame-onejar</artifactId>
+      <version>2.2.1</version>
     </dependency>
 
     <dependency>

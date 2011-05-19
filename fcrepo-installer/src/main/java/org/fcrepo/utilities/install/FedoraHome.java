@@ -2,6 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.utilities.install;
 
 import java.io.*;
@@ -24,8 +25,6 @@ import org.fcrepo.server.security.servletfilters.xmluserfile.User;
 import org.fcrepo.utilities.ExecUtility;
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.Zip;
-
-
 
 public class FedoraHome {
 
@@ -116,27 +115,26 @@ public class FedoraHome {
 
         Properties props = new Properties();
         if (_opts.getValue(InstallOptions.TOMCAT_HTTP_PORT) != null) {
-            props.put("server:fedoraServerPort", _opts
-                    .getValue(InstallOptions.TOMCAT_HTTP_PORT));
+            props.put("server:fedoraServerPort",
+                      _opts.getValue(InstallOptions.TOMCAT_HTTP_PORT));
         }
         if (_opts.getValue(InstallOptions.TOMCAT_SHUTDOWN_PORT) != null) {
-            props.put("server:fedoraShutdownPort", _opts
-                    .getValue(InstallOptions.TOMCAT_SHUTDOWN_PORT));
+            props.put("server:fedoraShutdownPort",
+                      _opts.getValue(InstallOptions.TOMCAT_SHUTDOWN_PORT));
         }
         if (_opts.getValue(InstallOptions.TOMCAT_SSL_PORT) != null) {
-            props.put("server:fedoraRedirectPort", _opts
-                    .getValue(InstallOptions.TOMCAT_SSL_PORT));
+            props.put("server:fedoraRedirectPort",
+                      _opts.getValue(InstallOptions.TOMCAT_SSL_PORT));
         }
         if (_opts.getValue(InstallOptions.FEDORA_SERVERHOST) != null) {
-            props.put("server:fedoraServerHost", _opts
-                    .getValue(InstallOptions.FEDORA_SERVERHOST));
+            props.put("server:fedoraServerHost",
+                      _opts.getValue(InstallOptions.FEDORA_SERVERHOST));
         }
 
         if (_opts.getValue(InstallOptions.FEDORA_APP_SERVER_CONTEXT) != null) {
-            props.put("server:fedoraAppServerContext", _opts
-                    .getValue(InstallOptions.FEDORA_APP_SERVER_CONTEXT));
+            props.put("server:fedoraAppServerContext",
+                      _opts.getValue(InstallOptions.FEDORA_APP_SERVER_CONTEXT));
         }
-
 
         String database = _opts.getValue(InstallOptions.DATABASE);
         String dbPoolName = "";
@@ -160,32 +158,27 @@ public class FedoraHome {
                   dbPoolName);
         props.put("module.org.fcrepo.server.search.FieldSearch:connectionPool",
                   dbPoolName);
-        props
-                .put("module.org.fcrepo.server.storage.ConnectionPoolManager:poolNames",
-                     dbPoolName);
-        props
-                .put("module.org.fcrepo.server.storage.ConnectionPoolManager:defaultPoolName",
-                     dbPoolName);
-        props
-                .put("module.org.fcrepo.server.storage.lowlevel.ILowlevelStorage:backslash_is_escape",
-                     backslashIsEscape);
-        props.put("datastore." + dbPoolName + ":jdbcURL", _opts
-                .getValue(InstallOptions.DATABASE_JDBCURL));
-        props.put("datastore." + dbPoolName + ":dbUsername", _opts
-                .getValue(InstallOptions.DATABASE_USERNAME));
-        props.put("datastore." + dbPoolName + ":dbPassword", _opts
-                .getValue(InstallOptions.DATABASE_PASSWORD));
-        props.put("datastore." + dbPoolName + ":jdbcDriverClass", _opts
-                .getValue(InstallOptions.DATABASE_DRIVERCLASS));
+        props.put("module.org.fcrepo.server.storage.ConnectionPoolManager:poolNames",
+                  dbPoolName);
+        props.put("module.org.fcrepo.server.storage.ConnectionPoolManager:defaultPoolName",
+                  dbPoolName);
+        props.put("module.org.fcrepo.server.storage.lowlevel.ILowlevelStorage:backslash_is_escape",
+                  backslashIsEscape);
+        props.put("datastore." + dbPoolName + ":jdbcURL",
+                  _opts.getValue(InstallOptions.DATABASE_JDBCURL));
+        props.put("datastore." + dbPoolName + ":dbUsername",
+                  _opts.getValue(InstallOptions.DATABASE_USERNAME));
+        props.put("datastore." + dbPoolName + ":dbPassword",
+                  _opts.getValue(InstallOptions.DATABASE_PASSWORD));
+        props.put("datastore." + dbPoolName + ":jdbcDriverClass",
+                  _opts.getValue(InstallOptions.DATABASE_DRIVERCLASS));
 
         if (_opts.getBooleanValue(InstallOptions.XACML_ENABLED, true)) {
-            props
-                    .put("module.org.fcrepo.server.security.Authorization:ENFORCE-MODE",
-                         "enforce-policies");
+            props.put("module.org.fcrepo.server.security.Authorization:ENFORCE-MODE",
+                      "enforce-policies");
         } else {
-            props
-                    .put("module.org.fcrepo.server.security.Authorization:ENFORCE-MODE",
-                         "permit-all-requests");
+            props.put("module.org.fcrepo.server.security.Authorization:ENFORCE-MODE",
+                      "permit-all-requests");
         }
 
         if (_opts.getBooleanValue(InstallOptions.RI_ENABLED, true)) {
@@ -199,9 +192,8 @@ public class FedoraHome {
         if (_opts.getBooleanValue(InstallOptions.MESSAGING_ENABLED, false)) {
             props.put("module.org.fcrepo.server.messaging.Messaging:enabled",
                       String.valueOf(true));
-            props
-                    .put("module.org.fcrepo.server.messaging.Messaging:java.naming.provider.url",
-                         _opts.getValue(InstallOptions.MESSAGING_URI));
+            props.put("module.org.fcrepo.server.messaging.Messaging:java.naming.provider.url",
+                      _opts.getValue(InstallOptions.MESSAGING_URI));
         } else {
             props.put("module.org.fcrepo.server.messaging.Messaging:enabled",
                       String.valueOf(false));
@@ -213,7 +205,8 @@ public class FedoraHome {
         // FeSL AuthZ needs a management decorator for syncing the policy cache with policies in objects
         if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
             // NOTE: assumes messaging decorator only is present in fedora-base.fcfg as decorator1
-            props.put("module.org.fcrepo.server.management.Management:decorator2", "org.fcrepo.server.security.xacml.pdp.decorator.PolicyIndexInvocationHandler");
+            props.put("module.org.fcrepo.server.management.Management:decorator2",
+                      "org.fcrepo.server.security.xacml.pdp.decorator.PolicyIndexInvocationHandler");
         }
 
         try {
@@ -251,7 +244,8 @@ public class FedoraHome {
 
             File dataDir = new File(_installDir, "data");
             String oPath = dataDir.getPath() + File.separator + "objectStore";
-            String dPath = dataDir.getPath() + File.separator + "datastreamStore";
+            String dPath =
+                    dataDir.getPath() + File.separator + "datastreamStore";
             StringBuilder xml = new StringBuilder();
 
             String line = reader.readLine();
@@ -266,15 +260,16 @@ public class FedoraHome {
             }
             reader.close();
 
-            writer = new PrintWriter(new OutputStreamWriter(
-                    new FileOutputStream(file), "UTF-8"));
+            writer =
+                    new PrintWriter(new OutputStreamWriter(new FileOutputStream(file),
+                                                           "UTF-8"));
             writer.print(xml.toString());
             writer.close();
         } catch (IOException e) {
             IOUtils.closeQuietly(reader);
             IOUtils.closeQuietly(writer);
-            throw new InstallationFailedException(e.getClass().getName()
-                    + ":" + e.getMessage());
+            throw new InstallationFailedException(e.getClass().getName() + ":"
+                    + e.getMessage());
         }
     }
 
@@ -282,14 +277,15 @@ public class FedoraHome {
         Properties springProps = new Properties();
 
         /* Set up ssl configuration */
-        springProps.put("fedora.port",
-                        _opts.getValue(InstallOptions.TOMCAT_HTTP_PORT, "8080"));
+        springProps
+                .put("fedora.port",
+                     _opts.getValue(InstallOptions.TOMCAT_HTTP_PORT, "8080"));
         if (_opts.getBooleanValue(InstallOptions.SSL_AVAILABLE, false)) {
-            springProps.put("fedora.port.secure",
-                            _opts.getValue(InstallOptions.TOMCAT_SSL_PORT, "8443"));
+            springProps.put("fedora.port.secure", _opts
+                    .getValue(InstallOptions.TOMCAT_SSL_PORT, "8443"));
         } else {
-            springProps.put("fedora.port.secure",
-                            _opts.getValue(InstallOptions.TOMCAT_HTTP_PORT, "8080"));
+            springProps.put("fedora.port.secure", _opts
+                    .getValue(InstallOptions.TOMCAT_HTTP_PORT, "8080"));
         }
 
         springProps
@@ -305,8 +301,7 @@ public class FedoraHome {
         springProps.put("security.ssl.api.default", "ANY_CHANNEL");
 
         springProps.put("security.fesl.authN.jaas.apia.enabled", _opts
-                .getValue(InstallOptions.APIA_AUTH_REQUIRED, "false"));
-
+                        .getValue(InstallOptions.APIA_AUTH_REQUIRED, "false"));
 
         /* Set up authN, authZ filter configuration */
         StringBuilder filters = new StringBuilder();
@@ -322,7 +317,6 @@ public class FedoraHome {
 
         springProps.put("security.auth.filters", filters.toString());
 
-
         FileOutputStream out = null;
         try {
             out =
@@ -336,10 +330,18 @@ public class FedoraHome {
         }
     }
 
+    /*
+     * This is an ugly workaround for the fact that spring security namespace
+     * config does not support property substitution into lists of beans. It is
+     * also ugly because
+     */
     private void configureSpringAuth() throws InstallationFailedException {
         String PATTERN = "${security.auth.filters}";
+        String PATTERN_APIA = "${security.auth.filters.apia}";
 
         StringBuilder filters = new StringBuilder();
+        StringBuilder filters_apia = null;
+
         boolean needsbugFix = false;
 
         if (_opts.getBooleanValue(InstallOptions.FESL_AUTHN_ENABLED, false)) {
@@ -349,8 +351,15 @@ public class FedoraHome {
             needsbugFix = true;
         }
 
+        if (_opts.getBooleanValue(InstallOptions.APIA_AUTH_REQUIRED, false)) {
+            filters_apia = new StringBuilder(filters.toString());
+        } else {
+            filters_apia = new StringBuilder();
+        }
+
         if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
             filters.append(",PEPFilter");
+            filters_apia.append(",PEPFilter");
         }
 
         FileInputStream springConfig = null;
@@ -361,7 +370,8 @@ public class FedoraHome {
                              "server/config/spring/web/security.xml");
             springConfig = new FileInputStream(xmlFile);
             String content =
-                    IOUtils.toString(springConfig).replace(PATTERN, filters);
+                    IOUtils.toString(springConfig).replace(PATTERN, filters)
+                            .replace(PATTERN_APIA, filters_apia);
 
             if (!needsbugFix) {
                 /* Delete classic authN bugfix when not applicable */
@@ -382,23 +392,25 @@ public class FedoraHome {
         }
     }
 
-    private void configureSpringTestConfigs() throws InstallationFailedException {
+    private void configureSpringTestConfigs()
+            throws InstallationFailedException {
         if (_opts.getBooleanValue(InstallOptions.TEST_SPRING_CONFIGS, false)) {
             FileInputStream springConfig = null;
             PrintWriter writer = null;
             try {
-                File springDir = new File(_installDir,
-                "server/config/spring");
-                for (File file:springDir.listFiles()){
-                    if (file.isFile()){
+                File springDir = new File(_installDir, "server/config/spring");
+                for (File file : springDir.listFiles()) {
+                    if (file.isFile()) {
                         springConfig = new FileInputStream(file);
                         String content = IOUtils.toString(springConfig);
-                        content = content.replaceAll("(?s)<!-- TESTONLY(.+?)/TESTONLY -->", "$1");
+                        content =
+                                content.replaceAll("(?s)<!-- TESTONLY(.+?)/TESTONLY -->",
+                                                   "$1");
                         springConfig.close();
 
                         writer =
-                            new PrintWriter(new OutputStreamWriter(new FileOutputStream(file),
-                            "UTF-8"));
+                                new PrintWriter(new OutputStreamWriter(new FileOutputStream(file),
+                                                                       "UTF-8"));
                         writer.print(content);
                         writer.close();
                     }

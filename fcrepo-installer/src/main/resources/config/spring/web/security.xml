@@ -25,7 +25,7 @@
 
       <!-- RISearch service gets auth protection -->
       <security:filter-chain pattern="/risearch*"
-        filters="ChannelFilter,${security.auth.filters}" />
+        filters="ChannelFilter,${security.auth.filters.apia}" />
 
       <!-- REST API -->
       <security:filter-chain pattern="/objects*/**"
@@ -43,21 +43,25 @@
 
       <!-- Lite APIs -->
       <security:filter-chain pattern="/get*/**"
-        filters="ChannelFilter,${security.auth.filters}" />
+        filters="ChannelFilter,${security.auth.filters.apia}" />
       <security:filter-chain pattern="/search*"
-        filters="ChannelFilter,${security.auth.filters}" />
+        filters="ChannelFilter,${security.auth.filters.apia}" />
       <security:filter-chain pattern="/describe*"
-        filters="ChannelFilter,${security.auth.filters}" />
+        filters="ChannelFilter,${security.auth.filters.apia}" />
       <security:filter-chain pattern="/list*/**"
-        filters="ChannelFilter,${security.auth.filters}" />
+        filters="ChannelFilter,${security.auth.filters.apia}" />
+
       <security:filter-chain pattern="/management/*/**"
         filters="ChannelFilter,${security.auth.filters}" />
       <security:filter-chain pattern="/upload*"
         filters="ChannelFilter,${security.auth.filters}" />
 
       <!-- SOAP APIs -->
-      <security:filter-chain pattern="/services*/**"
+      <security:filter-chain pattern="/services/access"
+        filters="ChannelFilter,${security.auth.filters.apia}" />
+      <security:filter-chain pattern="/services/management"
         filters="ChannelFilter,${security.auth.filters}" />
+
 
       <security:filter-chain pattern="/**"
         filters="ChannelFilter" />
