@@ -338,28 +338,40 @@ public class FedoraHome {
     private void configureSpringAuth() throws InstallationFailedException {
         String PATTERN = "${security.auth.filters}";
         String PATTERN_APIA = "${security.auth.filters.apia}";
+        String PATTERN_REST = "${security.auth.filters.rest}";
+
+        boolean fesl_authn_enabled = _opts.getBooleanValue(InstallOptions.FESL_AUTHN_ENABLED, false);
+        boolean apia_auth_required = _opts.getBooleanValue(InstallOptions.APIA_AUTH_REQUIRED, false);
 
         StringBuilder filters = new StringBuilder();
-        StringBuilder filters_apia = null;
+        StringBuilder filters_apia = new StringBuilder();
+        StringBuilder filters_rest = new StringBuilder();
+
 
         boolean needsbugFix = false;
 
-        if (_opts.getBooleanValue(InstallOptions.FESL_AUTHN_ENABLED, false)) {
+        if (fesl_authn_enabled) {
             filters.append("AuthFilterJAAS");
+            filters_apia.append("AuthFilterJAAS");
+            filters_rest.append("AuthFilterJAAS");
         } else {
-            filters.append("SetupFilter,XmlUserfileFilter,EnforceAuthnFilter,FinalizeFilter");
-            needsbugFix = true;
-        }
 
-        if (_opts.getBooleanValue(InstallOptions.APIA_AUTH_REQUIRED, false)) {
-            filters_apia = new StringBuilder(filters.toString());
-        } else {
-            filters_apia = new StringBuilder();
+            filters.append("SetupFilter,XmlUserfileFilter,EnforceAuthnFilter,FinalizeFilter");
+            if (apia_auth_required) {
+                filters_apia.append("SetupFilter,XmlUserfileFilter,EnforceAuthnFilter,FinalizeFilter");
+                filters_rest.append("SetupFilter,XmlUserfileFilter,EnforceAuthnFilter,FinalizeFilter");
+            } else {
+                filters_apia.append("");
+                filters_rest.append("SetupFilter,XmlUserfileFilter,RestApiAuthnFilter,FinalizeFilter");
+            }
+
+            needsbugFix = true;
         }
 
         if (_opts.getBooleanValue(InstallOptions.FESL_AUTHZ_ENABLED, false)) {
             filters.append(",PEPFilter");
             filters_apia.append(",PEPFilter");
+            filters_rest.append(",PEPFilter");
         }
 
         FileInputStream springConfig = null;
@@ -371,7 +383,7 @@ public class FedoraHome {
             springConfig = new FileInputStream(xmlFile);
             String content =
                     IOUtils.toString(springConfig).replace(PATTERN, filters)
-                            .replace(PATTERN_APIA, filters_apia);
+                            .replace(PATTERN_APIA, filters_apia).replace(PATTERN_REST, filters_rest);
 
             if (!needsbugFix) {
                 /* Delete classic authN bugfix when not applicable */

@@ -29,7 +29,7 @@
 
       <!-- REST API -->
       <security:filter-chain pattern="/objects*/**"
-        filters="ChannelFilter,${security.auth.filters}" />
+        filters="ChannelFilter,${security.auth.filters.rest}" />
 
       <!-- User servlet -->
       <security:filter-chain pattern="/user*"
