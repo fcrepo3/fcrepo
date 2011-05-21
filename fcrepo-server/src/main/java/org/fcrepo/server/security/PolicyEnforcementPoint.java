@@ -13,8 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
-
 import com.sun.xacml.PDP;
 import com.sun.xacml.PDPConfig;
 import com.sun.xacml.attr.StringAttribute;
@@ -35,7 +33,6 @@ import org.fcrepo.server.errors.authorization.AuthzPermittedException;
 import org.fcrepo.server.storage.DOManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Bill Niebel
@@ -143,10 +140,9 @@ public class PolicyEnforcementPoint {
     /**
      * available during init(); keep as logging hook
      */
-    private ServletContext servletContext = null;
 
-    private List<com.sun.xacml.finder.AttributeFinderModule> m_attrFinderModules = new ArrayList<com.sun.xacml.finder.AttributeFinderModule>(0);
-    
+    private final List<com.sun.xacml.finder.AttributeFinderModule> m_attrFinderModules = new ArrayList<com.sun.xacml.finder.AttributeFinderModule>(0);
+
     public void setAttributeFinderModules(List<com.sun.xacml.finder.AttributeFinderModule> attrFinderModules){
         this.m_attrFinderModules.clear();
         this.m_attrFinderModules.addAll(attrFinderModules);
@@ -154,12 +150,6 @@ public class PolicyEnforcementPoint {
 
     public final void newPdp() throws Exception {
         AttributeFinder attrFinder = new AttributeFinder();
-
-        for (com.sun.xacml.finder.AttributeFinderModule m:m_attrFinderModules){
-            if (m instanceof org.fcrepo.server.security.AttributeFinderModule){
-                ((org.fcrepo.server.security.AttributeFinderModule)m).setServletContext(servletContext);
-            }
-        }
 
         attrFinder.setModules(m_attrFinderModules);
         logger.debug("before building policy finder");
@@ -248,7 +238,6 @@ public class PolicyEnforcementPoint {
     }
 
     public void destroy() {
-        servletContext = null;
         pdp = null;
     }
 

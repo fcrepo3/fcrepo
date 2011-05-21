@@ -12,8 +12,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
-
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.BagAttribute;
@@ -36,14 +34,6 @@ public abstract class AttributeFinderModule
 
     private static final Logger logger =
             LoggerFactory.getLogger(AttributeFinderModule.class);
-
-    private ServletContext servletContext = null;
-
-    public void setServletContext(ServletContext servletContext) {
-        if (this.servletContext == null) {
-            this.servletContext = servletContext;
-        }
-    }
 
     protected AttributeFinderModule() {
 
