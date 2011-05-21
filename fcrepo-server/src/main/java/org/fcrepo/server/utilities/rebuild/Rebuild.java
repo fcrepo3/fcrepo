@@ -21,9 +21,9 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import org.fcrepo.common.Constants;
 
+import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.config.Configuration;
-import org.fcrepo.server.config.ModuleConfiguration;
 import org.fcrepo.server.config.Parameter;
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.config.ServerConfigurationParser;
@@ -55,16 +55,9 @@ public class Rebuild
     private static Logger logger = LoggerFactory.getLogger(Rebuild.class
             .getName());
 
-    private static final String llPackage =
-            "org.fcrepo.server.storage.lowlevel";
+    private static final String llstoreInterface = ILowlevelStorage.class.getName();
 
-    private static final String llstoreInterface = llPackage
-            + ".ILowlevelStorage";
-
-    private static final String llstoreConfig = llstoreInterface
-            + "Configuration";
-
-    private static final String listableInterface = llPackage + ".IListable";
+    private static final String listableInterface = IListable.class.getName();
 
     private final Rebuilder m_rebuilder;
 
@@ -93,9 +86,9 @@ public class Rebuild
             try {
                 // ensure rebuilds are possible before trying anything,
                 // as rebuilder.start() may be destructive!
-                ModuleConfiguration mcfg =
-                        server.getBean(llstoreConfig, ModuleConfiguration.class);
-                Class<?> clazz = Class.forName(mcfg.getClassName());
+                Module mod =
+                        server.getBean(llstoreInterface, Module.class);
+                Class<?> clazz = mod.getClass();
                 boolean isListable = false;
                 for (Class<?> iface : clazz.getInterfaces()) {
                     if (iface.getName().equals(listableInterface)) {
