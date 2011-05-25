@@ -70,7 +70,6 @@ import org.trippi.RDFFormat;
 import org.trippi.TripleIterator;
 import org.trippi.TrippiException;
 
-import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -138,7 +137,8 @@ public class TestRESTAPI
     private static final String REST_RESOURCE_PATH =
             System.getProperty("fcrepo-integrationtest-core.classes") != null ? System
                     .getProperty("fcrepo-integrationtest-core.classes")
-                    + "rest" : "src/test/resources/rest";
+                    + "rest"
+                    : "src/test/resources/rest";
 
     private static String DS1RelsFilename =
             "Datastream 1 filename from rels.extension";
@@ -149,8 +149,8 @@ public class TestRESTAPI
 
     private static String DodgyChars = "\\/*?&lt;&gt;:|";
 
-    private static String DS4LabelFilenameOriginal = "Datastream 4 filename "
-            + DodgyChars + "from label";
+    private static String DS4LabelFilenameOriginal =
+            "Datastream 4 filename " + DodgyChars + "from label";
 
     // this one in foxml
     private static String DS4LabelFilename = "Datastream 4 filename from label"; // this should be the cleaned version
@@ -168,31 +168,38 @@ public class TestRESTAPI
         df.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    private static final String datetime =
-            df.format(new Date());
+    private static final Date now = new Date();
+
+    private static final String datetime = df.format(now);
+
+    // date/time strings 1 second earlier/later than now
+    private static final String laterDateTime =
+            df.format(new Date(now.getTime() + (1000 * 600))); // + 10 min
+    private static final String earlierDateTime =
+            df.format(new Date(now.getTime() - (1000 * 600))); // - 10 min
 
     private boolean chunked = false;
 
     @Override
     public void setUp() throws Exception {
         Map<String, String> nsMap = new HashMap<String, String>();
-        nsMap.put("management", "http://www.fedora.info/definitions/1/0/management/");
+        nsMap.put("management",
+                  "http://www.fedora.info/definitions/1/0/management/");
         nsMap.put("access", "http://www.fedora.info/definitions/1/0/access/");
         NamespaceContext ctx = new SimpleNamespaceContext(nsMap);
         XMLUnit.setXpathNamespaceContext(ctx);
 
-
         DEMO_MIN =
                 FileUtils.readFileToString(new File(REST_RESOURCE_PATH
-                                                    + "/demo_min.xml"), "UTF-8");
+                        + "/demo_min.xml"), "UTF-8");
         DEMO_MIN_PID =
                 FileUtils.readFileToString(new File(REST_RESOURCE_PATH
-                                                    + "/demo_min_pid.xml"), "UTF-8");
+                        + "/demo_min_pid.xml"), "UTF-8");
 
         StringTemplate tpl =
                 new StringTemplate(FileUtils
-                                           .readFileToString(new File(REST_RESOURCE_PATH
-                                                                      + "/demo_rest.xml"), "UTF-8"));
+                        .readFileToString(new File(REST_RESOURCE_PATH
+                                + "/demo_rest.xml"), "UTF-8"));
         tpl.setAttribute("MODEL_DOWNLOAD_FILENAME",
                          MODEL.DOWNLOAD_FILENAME.localName);
         tpl.setAttribute("DS1_RELS_FILENAME", DS1RelsFilename);
@@ -220,9 +227,9 @@ public class TestRESTAPI
         apim.purgeObject(pid.toString(), "", false);
     }
 
-
     /**
      * Do Access requests require auth based on current test configuration?
+     *
      * @return true if auth is required for API-requests
      */
     private boolean getAuthAccess() {
@@ -234,10 +241,10 @@ public class TestRESTAPI
                 authorizeAccess = false;
             } else {
                 assertTrue("Failed to determine whether to perform authorization on Access requests from: "
-                           + authAccessProperty,
+                                   + authAccessProperty,
                            false);
                 throw new RuntimeException("Failed to determine whether to perform authorization on Access requests from: "
-                                           + authAccessProperty);
+                        + authAccessProperty);
             }
 
         }
@@ -313,9 +320,8 @@ public class TestRESTAPI
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
 
         url =
-                String.format("/objects/%s/methods?asOfDateTime=%s",
-                              pid.toString(),
-                              datetime);
+                String.format("/objects/%s/methods?asOfDateTime=%s", pid
+                        .toString(), datetime);
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -324,8 +330,8 @@ public class TestRESTAPI
 
     public void testListMethodsForSDep() throws Exception {
         url =
-                String.format("/objects/%s/methods/fedora-system:3",
-                              pid.toString());
+                String.format("/objects/%s/methods/fedora-system:3", pid
+                        .toString());
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -343,9 +349,10 @@ public class TestRESTAPI
         assertTrue(responseXML.contains("sDef=\"fedora-system:3\""));
 
         url =
-                String.format("/objects/%s/methods/fedora-system:3?asOfDateTime=%s",
-                              pid.toString(),
-                              datetime);
+                String
+                        .format("/objects/%s/methods/fedora-system:3?asOfDateTime=%s",
+                                pid.toString(),
+                                datetime);
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -358,8 +365,9 @@ public class TestRESTAPI
 
     public void testGETMethodBuiltInBadMethod() throws Exception {
         url =
-                String.format("/objects/%s/methods/fedora-system:3/noSuchMethod",
-                              pid.toString());
+                String
+                        .format("/objects/%s/methods/fedora-system:3/noSuchMethod",
+                                pid.toString());
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -368,15 +376,17 @@ public class TestRESTAPI
 
     public void testGETMethodBuiltInBadUserArg() throws Exception {
         url =
-                String.format("/objects/%s/methods/fedora-system:3/viewMethodIndex?noSuchArg=foo",
-                              pid.toString());
+                String
+                        .format("/objects/%s/methods/fedora-system:3/viewMethodIndex?noSuchArg=foo",
+                                pid.toString());
         assertFalse(SC_OK == get(getAuthAccess()).getStatusCode());
     }
 
     public void testGETMethodBuiltInNoArg() throws Exception {
         url =
-                String.format("/objects/%s/methods/fedora-system:3/viewMethodIndex",
-                              pid.toString());
+                String
+                        .format("/objects/%s/methods/fedora-system:3/viewMethodIndex",
+                                pid.toString());
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -426,7 +436,7 @@ public class TestRESTAPI
     public void testGETMethodCustomGoodUserArgGoodDate() throws Exception {
         url =
                 "/objects/demo:29/methods/demo:27/resizeImage?width=50&asOfDateTime="
-                + datetime;
+                        + datetime;
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -460,7 +470,7 @@ public class TestRESTAPI
     public void testGETMethodCustomGoodDate() throws Exception {
         url =
                 "/objects/demo:14/methods/demo:12/getDocumentStyle1?asOfDateTime="
-                + datetime;
+                        + datetime;
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -493,17 +503,16 @@ public class TestRESTAPI
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
 
         url =
-                String.format("/objects/%s/datastreams?format=xml",
-                              pid.toString());
+                String.format("/objects/%s/datastreams?format=xml", pid
+                        .toString());
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
 
         url =
-                String.format("/objects/%s/datastreams?asOfDateTime=%s",
-                              pid.toString(),
-                              datetime);
+                String.format("/objects/%s/datastreams?asOfDateTime=%s", pid
+                        .toString(), datetime);
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -554,9 +563,10 @@ public class TestRESTAPI
 
         // Datastream profile as of the current date-time (XML format)
         url =
-                String.format("/objects/%s/datastreams/RELS-EXT?asOfDateTime=%s&format=xml",
-                              pid.toString(),
-                              datetime);
+                String
+                        .format("/objects/%s/datastreams/RELS-EXT?asOfDateTime=%s&format=xml",
+                                pid.toString(),
+                                datetime);
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         // FIXME: validation disabled
         // response is currently not schema-valid, see fcrepo-866, fcrepo-612
@@ -568,8 +578,8 @@ public class TestRESTAPI
 
         // sanity check
         url =
-                String.format("/objects/%s/datastreams/BOGUS_DSID",
-                              pid.toString());
+                String.format("/objects/%s/datastreams/BOGUS_DSID", pid
+                        .toString());
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         assertEquals(SC_NOT_FOUND, get(true).getStatusCode());
     }
@@ -584,7 +594,8 @@ public class TestRESTAPI
 
         // Get history in XML format
         url =
-                String.format("/objects/demo:1234/datastreams/DS1/history?format=xml");
+                String
+                        .format("/objects/demo:1234/datastreams/DS1/history?format=xml");
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -597,7 +608,7 @@ public class TestRESTAPI
                         + "/datastreamHistory.xml"), "UTF-8");
         StringTemplate tpl = new StringTemplate(control);
         tpl.setAttribute("FEDORA_BASE_URL", getProtocol() + "://" + getHost()
-                                            + ":" + getPort());
+                + ":" + getPort());
 
         // Diff must be identical
         XMLUnit.setIgnoreWhitespace(true);
@@ -617,8 +628,8 @@ public class TestRESTAPI
 
     public void testGetDatastreamDissemination() throws Exception {
         url =
-                String.format("/objects/%s/datastreams/RELS-EXT/content",
-                              pid.toString());
+                String.format("/objects/%s/datastreams/RELS-EXT/content", pid
+                        .toString());
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -633,9 +644,10 @@ public class TestRESTAPI
         assertTrue(responseXML.contains("rdf:Description"));
 
         url =
-                String.format("/objects/%s/datastreams/RELS-EXT/content?asOfDateTime=%s",
-                              pid.toString(),
-                              datetime);
+                String
+                        .format("/objects/%s/datastreams/RELS-EXT/content?asOfDateTime=%s",
+                                pid.toString(),
+                                datetime);
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -652,8 +664,8 @@ public class TestRESTAPI
 
         // sanity check
         url =
-                String.format("/objects/%s/datastreams/BOGUS_DSID/content",
-                              pid.toString());
+                String.format("/objects/%s/datastreams/BOGUS_DSID/content", pid
+                        .toString());
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -662,8 +674,9 @@ public class TestRESTAPI
 
     public void testFindObjects() throws Exception {
         url =
-                String.format("/objects?pid=true&terms=%s&query=&resultFormat=xml",
-                              pid.toString());
+                String
+                        .format("/objects?pid=true&terms=%s&query=&resultFormat=xml",
+                                pid.toString());
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -698,8 +711,9 @@ public class TestRESTAPI
                                       responseXML.indexOf("</token>"));
 
         url =
-                String.format("/objects?pid=true&query=&format=xml&sessionToken=%s",
-                              sessionToken);
+                String
+                        .format("/objects?pid=true&query=&format=xml&sessionToken=%s",
+                                sessionToken);
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
@@ -793,7 +807,7 @@ public class TestRESTAPI
         Header locationHeader = response.getResponseHeader("location");
         assertNotNull(locationHeader);
         assertTrue(locationHeader.getValue().contains(URLEncoder.encode(pid
-                                                                                .toString(), "UTF-8")));
+                .toString(), "UTF-8")));
         responseBody = new String(response.getResponseBody(), "UTF-8");
         assertTrue(responseBody.equals(pid.toString()));
 
@@ -880,29 +894,67 @@ public class TestRESTAPI
                 apia.findObjects(resultFields, maxResults, query);
 
         ObjectFields[] fields = result.getResultList();
-        String pid = "";
+        String thispid = "";
         for (ObjectFields objectFields : fields) {
-            pid = objectFields.getPid();
+            thispid = objectFields.getPid();
             url =
-                    String.format("/objects/%s/validate", URLEncoder
-                            .encode(pid.toString(), "UTF-8"));
+                    String.format("/objects/%s/validate", URLEncoder.encode(thispid
+                            .toString(), "UTF-8"));
             HttpResponse getTrue = get(true);
-            assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
+            assertEquals(thispid.toString(), SC_UNAUTHORIZED, get(false)
                     .getStatusCode());
-            assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
+            assertEquals(thispid.toString(), SC_OK, getTrue.getStatusCode());
             String responseXML = getTrue.getResponseBodyString();
-            assertXpathExists("/management:validation[@valid='true']", responseXML);
+            assertXpathExists("/management:validation[@valid='true']",
+                              responseXML);
         }
         // test with asOfDateTime set (just on the last object validated above)
 
+        // fcrepo-947 - explicitly test demo:REST (pid) - was re-using last pid from above, which may change if test objects change
+        // and demo:REST was the one that was failing
+        // demo:REST has its datastream date/time values set to now (new Date()).
+
+        // after ingest time - should pass
         url =
-                String.format("/objects/%s/validate?asOfDateTime=%s", pid.toString(),datetime);
+                String.format("/objects/%s/validate?asOfDateTime=%s", pid
+                              .toString(), laterDateTime);
         HttpResponse getTrue = get(true);
         assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
-                .getStatusCode());
+                     .getStatusCode());
         assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
         String responseXML = getTrue.getResponseBodyString();
         assertXpathExists("/management:validation[@valid='true']", responseXML);
+
+
+        // date/time tests
+
+
+        // before ingest time - should fail
+        // (DC datastream version won't exist for example)
+        url =
+            String.format("/objects/%s/validate?asOfDateTime=%s", pid
+                          .toString(), earlierDateTime);
+        getTrue = get(true);
+        assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
+                     .getStatusCode());
+        assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
+        responseXML = getTrue.getResponseBodyString();
+        assertXpathExists("/management:validation[@valid='false']", responseXML);
+
+        // original - testing at exact ingets time - fails under postgres
+        // see fcrepo-947
+        /*
+        url =
+            String.format("/objects/%s/validate?asOfDateTime=%s", pid
+                          .toString(), datetime);
+        getTrue = get(true);
+        assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
+                     .getStatusCode());
+        assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
+        responseXML = getTrue.getResponseBodyString();
+        assertXpathExists("/management:validation[@valid='true']", responseXML);
+        */
+
     }
 
     public void testExportObject() throws Exception {
@@ -911,8 +963,8 @@ public class TestRESTAPI
         assertEquals(SC_OK, get(true).getStatusCode());
 
         url =
-                String.format("/objects/%s/export?context=public",
-                              pid.toString());
+                String.format("/objects/%s/export?context=public", pid
+                        .toString());
         assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         assertEquals(SC_OK, get(true).getStatusCode());
     }
@@ -971,8 +1023,9 @@ public class TestRESTAPI
     public void testModifyDatastreamByReference() throws Exception {
         // Create BAR datastream
         url =
-                String.format("/objects/%s/datastreams/BAR?controlGroup=M&dsLabel=bar",
-                              pid.toString());
+                String
+                        .format("/objects/%s/datastreams/BAR?controlGroup=M&dsLabel=bar",
+                                pid.toString());
         File temp = File.createTempFile("test", null);
         DataOutputStream os = new DataOutputStream(new FileOutputStream(temp));
         os.write(42);
@@ -1011,9 +1064,8 @@ public class TestRESTAPI
         // Update the label of the BAR datastream
         String newLabel = "tikibar";
         url =
-                String.format("/objects/%s/datastreams/BAR?dsLabel=%s",
-                              pid.toString(),
-                              newLabel);
+                String.format("/objects/%s/datastreams/BAR?dsLabel=%s", pid
+                        .toString(), newLabel);
         assertEquals(SC_UNAUTHORIZED, put(false).getStatusCode());
         assertEquals(SC_OK, put(true).getStatusCode());
         assertEquals(newLabel, apim.getDatastream(pid.toString(), "BAR", null)
@@ -1022,7 +1074,7 @@ public class TestRESTAPI
         // Update the location of the EXTDS datastream (E type datastream)
         String newLocation =
                 "http://" + getHost() + ":" + getPort() + "/"
-                + getFedoraAppServerContext() + "/get/demo:REST/DC";
+                        + getFedoraAppServerContext() + "/get/demo:REST/DC";
         url =
                 String.format("/objects/%s/datastreams/EXTDS?dsLocation=%s",
                               pid.toString(),
@@ -1030,9 +1082,9 @@ public class TestRESTAPI
         assertEquals(SC_UNAUTHORIZED, put(false).getStatusCode());
         assertEquals(SC_OK, put(true).getStatusCode());
 
-        assertEquals(newLocation,
-                     apim.getDatastream(pid.toString(), "EXTDS", null)
-                             .getLocation());
+        assertEquals(newLocation, apim.getDatastream(pid.toString(),
+                                                     "EXTDS",
+                                                     null).getLocation());
         String dcDS =
                 new String(apia.getDatastreamDissemination(pid.toString(),
                                                            "DC",
@@ -1058,9 +1110,8 @@ public class TestRESTAPI
         // Update DS1 by reference (X type datastream) - Success expected
         newLocation = getBaseURL() + "/ri/index.xsl";
         url =
-                String.format("/objects/%s/datastreams/DS1?dsLocation=%s",
-                              pid.toString(),
-                              newLocation);
+                String.format("/objects/%s/datastreams/DS1?dsLocation=%s", pid
+                        .toString(), newLocation);
         assertEquals(SC_UNAUTHORIZED, put(false).getStatusCode());
         assertEquals(SC_OK, put(true).getStatusCode());
     }
@@ -1080,9 +1131,8 @@ public class TestRESTAPI
     public void testModifyDatastreamNoContent() throws Exception {
         String label = "Label";
         url =
-                String.format("/objects/%s/datastreams/DS1?dsLabel=%s",
-                              pid.toString(),
-                              label);
+                String.format("/objects/%s/datastreams/DS1?dsLabel=%s", pid
+                        .toString(), label);
 
         assertEquals(SC_UNAUTHORIZED, put("", false).getStatusCode());
         assertEquals(SC_OK, put("", true).getStatusCode());
@@ -1094,9 +1144,8 @@ public class TestRESTAPI
     public void testSetDatastreamState() throws Exception {
         String state = "D";
         url =
-                String.format("/objects/%s/datastreams/DS1?dsState=%s",
-                              pid.toString(),
-                              state);
+                String.format("/objects/%s/datastreams/DS1?dsState=%s", pid
+                        .toString(), state);
         assertEquals(SC_UNAUTHORIZED, put("", false).getStatusCode());
         assertEquals(SC_OK, put("", true).getStatusCode());
 
@@ -1107,9 +1156,8 @@ public class TestRESTAPI
     public void testSetDatastreamVersionable() throws Exception {
         boolean versionable = false;
         url =
-                String.format("/objects/%s/datastreams/DS1?versionable=%s",
-                              pid.toString(),
-                              versionable);
+                String.format("/objects/%s/datastreams/DS1?versionable=%s", pid
+                        .toString(), versionable);
         assertEquals(SC_UNAUTHORIZED, put("", false).getStatusCode());
         assertEquals(SC_OK, put("", true).getStatusCode());
 
@@ -1155,8 +1203,9 @@ public class TestRESTAPI
         // Add datastream
         String datastreamData = "<test>Test Datastream</test>";
         url =
-                String.format("/objects/%s/datastreams/TESTDS?controlGroup=X&dsLabel=Test",
-                              pid.toString());
+                String
+                        .format("/objects/%s/datastreams/TESTDS?controlGroup=X&dsLabel=Test",
+                                pid.toString());
         assertEquals(SC_UNAUTHORIZED, post(datastreamData, false)
                 .getStatusCode());
         assertEquals(SC_CREATED, post(datastreamData, true).getStatusCode());
@@ -1254,21 +1303,21 @@ public class TestRESTAPI
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "attachment", TestRESTAPI.DS2LabelFilename
-                                              + ".jpg"); // jpg should be from MIMETYPE mapping
+                + ".jpg"); // jpg should be from MIMETYPE mapping
 
         // filename from label, unknown MIMETYPE
         url = "/objects/demo:REST/datastreams/DS3/content?download=true";
         response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "attachment", TestRESTAPI.DS3LabelFilename
-                                              + ".bin"); // default extension from config
+                + ".bin"); // default extension from config
 
         // filename from label with illegal characters, known MIMETYPE
         url = "/objects/demo:REST/datastreams/DS4/content?download=true";
         response = get(getAuthAccess(), false);
         assertEquals(SC_OK, response.getStatusCode());
         CheckCDHeader(response, "attachment", TestRESTAPI.DS4LabelFilename
-                                              + ".xml"); // xml from mimetype mapping
+                + ".xml"); // xml from mimetype mapping
     }
 
     @Test
@@ -1306,7 +1355,8 @@ public class TestRESTAPI
 
         // Test content not supplied
         PostMethod post = new PostMethod(url);
-        MultipartRequestEntity entity = new MultipartRequestEntity(new Part[] {}, post.getParams());
+        MultipartRequestEntity entity =
+                new MultipartRequestEntity(new Part[] {}, post.getParams());
 
         post.setRequestEntity(entity);
         getClient(true).executeMethod(post);
@@ -1326,16 +1376,18 @@ public class TestRESTAPI
         String o = Models.FEDORA_OBJECT_CURRENT.uri;
 
         // get all CModel relationships
-        url = "/objects/" + pid + "/relationships" +
-            "?subject=" + URLEncoder.encode(s, "UTF-8") +
-            "&predicate=" + URLEncoder.encode(p, "UTF-8");
+        url =
+                "/objects/" + pid + "/relationships" + "?subject="
+                        + URLEncoder.encode(s, "UTF-8") + "&predicate="
+                        + URLEncoder.encode(p, "UTF-8");
         HttpResponse response = get(true, false);
         assertEquals(SC_OK, response.getStatusCode());
 
         // check Fedora object CModel found
-       checkRelationship(response.getResponseBody(), s, p, o, true);
+        checkRelationship(response.getResponseBody(), s, p, o, true);
 
     }
+
     @Test
     public void testAddRelationship() throws Exception {
         String s = "info:fedora/" + pid;
@@ -1343,34 +1395,32 @@ public class TestRESTAPI
         String o = "foo";
         // check relationship not present
         url =
-            "/objects/" + pid + "/relationships" +
-            "?subject=" + URLEncoder.encode(s, "UTF-8") +
-            "&predicate=" + URLEncoder.encode(p, "UTF-8");
+                "/objects/" + pid + "/relationships" + "?subject="
+                        + URLEncoder.encode(s, "UTF-8") + "&predicate="
+                        + URLEncoder.encode(p, "UTF-8");
         HttpResponse response = get(true, false);
         assertEquals(SC_OK, response.getStatusCode());
         checkRelationship(response.getResponseBody(), s, p, o, false);
 
         // add relationship
         url =
-            "/objects/" + pid + "/relationships/new" +
-            "?subject=" + URLEncoder.encode(s, "UTF-8") +
-            "&predicate=" + URLEncoder.encode(p, "UTF-8") +
-            "&object=" + URLEncoder.encode(o, "UTF-8") +
-            "&isLiteral=true";
+                "/objects/" + pid + "/relationships/new" + "?subject="
+                        + URLEncoder.encode(s, "UTF-8") + "&predicate="
+                        + URLEncoder.encode(p, "UTF-8") + "&object="
+                        + URLEncoder.encode(o, "UTF-8") + "&isLiteral=true";
         response = putOrPost("POST", null, true);
         assertEquals(SC_OK, response.getStatusCode());
 
         // check relationship present
-        url =
-            "/objects/" + pid + "/relationships";// +
-            //"?subject=" + URLEncoder.encode(s, "UTF-8") +
-            //"&predicate=" + URLEncoder.encode(p, "UTF-8");
+        url = "/objects/" + pid + "/relationships";// +
+        //"?subject=" + URLEncoder.encode(s, "UTF-8") +
+        //"&predicate=" + URLEncoder.encode(p, "UTF-8");
         response = get(true, false);
         assertEquals(SC_OK, response.getStatusCode());
         checkRelationship(response.getResponseBody(), s, p, o, true);
 
-
     }
+
     @Test
     public void testPurgeRelationship() throws Exception {
         String s = "info:fedora/" + pid;
@@ -1379,65 +1429,66 @@ public class TestRESTAPI
 
         // add relationship
         url =
-            "/objects/" + pid + "/relationships/new" +
-            "?subject=" + URLEncoder.encode(s, "UTF-8") +
-            "&predicate=" + URLEncoder.encode(p, "UTF-8") +
-            "&object=" + URLEncoder.encode(o, "UTF-8") +
-            "&isLiteral=true";
+                "/objects/" + pid + "/relationships/new" + "?subject="
+                        + URLEncoder.encode(s, "UTF-8") + "&predicate="
+                        + URLEncoder.encode(p, "UTF-8") + "&object="
+                        + URLEncoder.encode(o, "UTF-8") + "&isLiteral=true";
         HttpResponse response = putOrPost("POST", null, true);
         assertEquals(SC_OK, response.getStatusCode());
 
         // check present
         url =
-            "/objects/" + pid + "/relationships" +
-            "?subject=" + URLEncoder.encode(s, "UTF-8") +
-            "&predicate=" + URLEncoder.encode(p, "UTF-8");
+                "/objects/" + pid + "/relationships" + "?subject="
+                        + URLEncoder.encode(s, "UTF-8") + "&predicate="
+                        + URLEncoder.encode(p, "UTF-8");
         response = get(true, false);
         assertEquals(SC_OK, response.getStatusCode());
         checkRelationship(response.getResponseBody(), s, p, o, true);
 
         // purge it
         url =
-            "/objects/" + pid + "/relationships" +
-            "?subject=" + URLEncoder.encode(s, "UTF-8") +
-            "&predicate=" + URLEncoder.encode(p, "UTF-8") +
-            "&object=" + URLEncoder.encode(o, "UTF-8") +
-            "&isLiteral=true";
+                "/objects/" + pid + "/relationships" + "?subject="
+                        + URLEncoder.encode(s, "UTF-8") + "&predicate="
+                        + URLEncoder.encode(p, "UTF-8") + "&object="
+                        + URLEncoder.encode(o, "UTF-8") + "&isLiteral=true";
         response = delete(true);
         assertEquals(SC_OK, response.getStatusCode());
-        assertEquals("Purge relationship", "true", response.getResponseBodyString());
+        assertEquals("Purge relationship", "true", response
+                .getResponseBodyString());
 
         // check not present
         url =
-            "/objects/" + pid + "/relationships" +
-            "?subject=" + URLEncoder.encode(s, "UTF-8") +
-            "&predicate=" + URLEncoder.encode(p, "UTF-8");
+                "/objects/" + pid + "/relationships" + "?subject="
+                        + URLEncoder.encode(s, "UTF-8") + "&predicate="
+                        + URLEncoder.encode(p, "UTF-8");
         response = get(true, false);
         assertEquals(SC_OK, response.getStatusCode());
         checkRelationship(response.getResponseBody(), s, p, o, false);
 
         // purge again
         url =
-            "/objects/" + pid + "/relationships" +
-            "?subject=" + URLEncoder.encode(s, "UTF-8") +
-            "&predicate=" + URLEncoder.encode(p, "UTF-8") +
-            "&object=" + URLEncoder.encode(o, "UTF-8") +
-            "&isLiteral=true";
+                "/objects/" + pid + "/relationships" + "?subject="
+                        + URLEncoder.encode(s, "UTF-8") + "&predicate="
+                        + URLEncoder.encode(p, "UTF-8") + "&object="
+                        + URLEncoder.encode(o, "UTF-8") + "&isLiteral=true";
         response = delete(true);
         assertEquals(SC_OK, response.getStatusCode());
-        assertEquals("Purge relationship", "false", response.getResponseBodyString());
+        assertEquals("Purge relationship", "false", response
+                .getResponseBodyString());
 
     }
 
     @Test
     public void testDisseminationContentLengthWhenKnown() throws Exception {
-        url = "/objects/demo:SmileyBeerGlass/methods/demo:DualResolution/mediumSize";
+        url =
+                "/objects/demo:SmileyBeerGlass/methods/demo:DualResolution/mediumSize";
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
         HttpResponse response = get(getAuthAccess());
         assertEquals(SC_OK, response.getStatusCode());
-        assertEquals("17109", response.getResponseHeader("Content-Length").getValue());
+        assertEquals("17109", response.getResponseHeader("Content-Length")
+                .getValue());
     }
 
     private HttpResponse _doUploadPost(String path) throws Exception {
@@ -1467,7 +1518,7 @@ public class TestRESTAPI
             }
         }
         assertEquals(expectedType + "; " + "filename=\"" + expectedFilename
-                     + "\"", contentDisposition);
+                + "\"", contentDisposition);
     }
 
     // helper methods
@@ -1476,10 +1527,10 @@ public class TestRESTAPI
         HttpClient client = new HttpClient();
         client.getParams().setAuthenticationPreemptive(auth);
         if (auth) {
-            client.getState()
-                    .setCredentials(new AuthScope(getHost(),
-                                                  Integer.valueOf(_getPort()),
-                                                  "realm"),
+            client
+                    .getState()
+                    .setCredentials(new AuthScope(getHost(), Integer
+                                            .valueOf(_getPort()), "realm"),
                                     new UsernamePasswordCredentials(getUsername(),
                                                                     getPassword()));
         }
@@ -1495,11 +1546,9 @@ public class TestRESTAPI
 
     /**
      * Issues an HTTP GET for the specified URL, schema-validate the response
-     * (if it is XML)
+     * (if it is XML) If the response is intentionally XML with no schema, then
+     * use get(authenticate, false) then the response won't be validated.
      *
-     * If the response is intentionally XML with no schema, then use
-     * get(authenticate, false)
-     * then the response won't be validated.
      * @param authenticate
      * @return
      * @throws Exception
@@ -1509,21 +1558,22 @@ public class TestRESTAPI
     }
 
     /**
-     * Issues an HTTP GET for the specified URL.  Optionally validate the response
-     * (if the response is XML)
+     * Issues an HTTP GET for the specified URL. Optionally validate the
+     * response (if the response is XML)
      *
      * @param authenticate
-     * @param validate - validate the response against its schema
+     * @param validate
+     *        - validate the response against its schema
      * @return HttpResponse
      * @throws Exception
      */
-    protected HttpResponse get(boolean authenticate, boolean validate) throws Exception {
+    protected HttpResponse get(boolean authenticate, boolean validate)
+            throws Exception {
         HttpResponse res = getOrDelete("GET", authenticate);
 
         if (validate) {
             validateResponse(res);
         }
-
 
         return res;
     }
@@ -1533,9 +1583,11 @@ public class TestRESTAPI
         if (res.getStatusCode() >= 200 && res.getStatusCode() <= 299) {
             // if response is xml
 
-            if (res.getResponseHeader("Content-Type") != null &&
-                (res.getResponseHeader("Content-Type").getValue().contains("text/xml") ||
-                 res.getResponseHeader("Content-Type").getValue().contains("application/xml"))) {
+            if (res.getResponseHeader("Content-Type") != null
+                    && (res.getResponseHeader("Content-Type").getValue()
+                            .contains("text/xml") || res
+                            .getResponseHeader("Content-Type").getValue()
+                            .contains("application/xml"))) {
                 String xmlResponse = res.getResponseBodyString();
                 // if a schema location is specified
                 if (xmlResponse.contains(":schemaLocation=\"")) {
@@ -1543,7 +1595,8 @@ public class TestRESTAPI
                     //Validate online if we can
                     String offline = System.getProperty("offline");
                     String online = System.getProperty("online");
-                    if (!"false".equals(online) && (offline == null || !"true".equals(offline))) {
+                    if (!"false".equals(online)
+                            && (offline == null || !"true".equals(offline))) {
                         onlineValidate(xmlResponse);
                     }
 
@@ -1551,7 +1604,8 @@ public class TestRESTAPI
                     if (!"false".equals(offline)) {
                         /*
                          * Offline schema validation does not work due to bug in
-                         * xerces:  https://issues.apache.org/jira/browse/XERCESJ-1130
+                         * xerces:
+                         * https://issues.apache.org/jira/browse/XERCESJ-1130
                          */
                         //offlineValidate(xmlResponse, getSchemaFiles(xmlResponse, null));
                     }
@@ -1592,8 +1646,9 @@ public class TestRESTAPI
         return post(requestContent, authenticate, true);
     }
 
-    protected HttpResponse post(String requestContent, boolean authenticate, boolean validate)
-            throws Exception {
+    protected HttpResponse post(String requestContent,
+                                boolean authenticate,
+                                boolean validate) throws Exception {
         HttpResponse res = putOrPost("POST", requestContent, authenticate);
         if (validate) {
             validateResponse(res);
@@ -1683,8 +1738,8 @@ public class TestRESTAPI
                     Part[] parts =
                             {
                                     new StringPart("param_name", "value"),
-                                    new FilePart(((File) requestContent).getName(),
-                                                 (File) requestContent)};
+                                    new FilePart(((File) requestContent)
+                                            .getName(), (File) requestContent)};
                     httpMethod
                             .setRequestEntity(new MultipartRequestEntity(parts,
                                                                          httpMethod
@@ -1714,15 +1769,18 @@ public class TestRESTAPI
         }
     }
 
-    private void checkRelationship(byte[] rdf, String s, String p, String o, boolean exists) throws TrippiException, UnsupportedEncodingException {
+    private void checkRelationship(byte[] rdf,
+                                   String s,
+                                   String p,
+                                   String o,
+                                   boolean exists) throws TrippiException,
+            UnsupportedEncodingException {
         StringBuilder sb = new StringBuilder();
         sb.append("RDF: " + new String(rdf, "UTF-8"));
-        TripleIterator it = TripleIterator.fromStream(
-                                                      new ByteArrayInputStream(rdf),
-                                                      null,
+        TripleIterator it =
+                TripleIterator.fromStream(new ByteArrayInputStream(rdf), null,
 
-                                                      RDFFormat.RDF_XML);
-
+                RDFFormat.RDF_XML);
 
         boolean found = false;
         while (it.hasNext()) {
@@ -1732,44 +1790,48 @@ public class TestRESTAPI
             sb.append(t.getPredicate().stringValue() + ", ");
             sb.append(t.getObject().stringValue() + "\n");
 
+            sb.append("matching: " + s + " " + t.getSubject().stringValue()
+                    + " " + (s.equals(t.getSubject().stringValue())) + "\n");
+            sb.append("matching: " + p + " " + t.getPredicate().stringValue()
+                    + " " + (p.equals(t.getPredicate().stringValue())) + "\n");
+            sb.append("matching: " + o + " " + t.getObject().stringValue()
+                    + " " + (o.equals(t.getObject().stringValue())) + "\n");
 
-            sb.append("matching: " + s + " " + t.getSubject().stringValue() + " " + (s.equals(t.getSubject().stringValue())) + "\n") ;
-            sb.append("matching: " + p + " " + t.getPredicate().stringValue() + " " + (p.equals(t.getPredicate().stringValue())) + "\n");
-            sb.append("matching: " + o + " " + t.getObject().stringValue() + " " + (o.equals(t.getObject().stringValue())) + "\n");
-
-            if (s.equals(t.getSubject().stringValue()) &&
-                    p.equals(t.getPredicate().stringValue()) &&
-                    o.equals(t.getObject().stringValue())) {
+            if (s.equals(t.getSubject().stringValue())
+                    && p.equals(t.getPredicate().stringValue())
+                    && o.equals(t.getObject().stringValue())) {
                 sb.append("Matched\n");
                 found = true;
             }
         }
 
-        assertTrue("Testing if relationship present: " + exists + " [ " + s + ", " + p + ", " + o + " ] \n " + sb.toString(), exists == found);
+        assertTrue("Testing if relationship present: " + exists + " [ " + s
+                           + ", " + p + ", " + o + " ] \n " + sb.toString(),
+                   exists == found);
     }
 
-    /** Get all local filenames that correspond to declared schemas.
-     *
-     * Validation does not work with a "union of all schemata" schema.  This was
-     * an attempt create the most minimal set of schema by traversing schemaLocation
-     * and <include> within the xsd files.  Ultimately, this was a dead end, because
-     * of a bug in Xerces:
-     * https://issues.apache.org/jira/browse/XERCESJ-1130
-     *
-     * schemaLocation typically points to some http resource.  For offline tests,
-     * we want to use the local copy of that resource (since we know we have them).
-     * Thus, for all declared and included schemas, produce a list of
+    /**
+     * Get all local filenames that correspond to declared schemas. Validation
+     * does not work with a "union of all schemata" schema. This was an attempt
+     * create the most minimal set of schema by traversing schemaLocation and
+     * <include> within the xsd files. Ultimately, this was a dead end, because
+     * of a bug in Xerces: https://issues.apache.org/jira/browse/XERCESJ-1130
+     * schemaLocation typically points to some http resource. For offline tests,
+     * we want to use the local copy of that resource (since we know we have
+     * them). Thus, for all declared and included schemas, produce a list of
      * local filenames.
      *
-     * @param xml blob of xml that may contain schemaLocation
+     * @param xml
+     *        blob of xml that may contain schemaLocation
      * @return List of all local files corresponding to declared schemas
      * @throws Exception
      */
-    private List<File> getSchemaFiles(String xml, List<File> state) throws Exception {
+    private List<File> getSchemaFiles(String xml, List<File> state)
+            throws Exception {
 
         File schemaDir =
-            new File(Constants.FEDORA_HOME, "server" + File.separator
-                    + "xsd");
+                new File(Constants.FEDORA_HOME, "server" + File.separator
+                        + "xsd");
 
         /* Get local copies of any declared schema */
         ArrayList<File> result = new ArrayList<File>();
@@ -1780,14 +1842,14 @@ public class TestRESTAPI
             for (String frag : content) {
                 if (frag.contains(".xsd")) {
                     String[] paths = frag.split("/");
-                    File newSchema = new File(schemaDir, paths[paths.length -1]);
+                    File newSchema =
+                            new File(schemaDir, paths[paths.length - 1]);
                     if (state == null || !state.contains(newSchema)) {
                         result.add(newSchema);
                     }
                 }
             }
         }
-
 
         /* For each declared schema, and get any <include> schemas from them */
         ArrayList<File> included = new ArrayList<File>();
@@ -1811,7 +1873,8 @@ public class TestRESTAPI
      * @param xml
      * @throws Exception
      */
-    private void offlineValidate(String xml, List<File> schemas) throws Exception {
+    private void offlineValidate(String xml, List<File> schemas)
+            throws Exception {
 
         SchemaFactory sf =
                 SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
@@ -1830,7 +1893,8 @@ public class TestRESTAPI
             schema = sf.newSchema(schemata.toArray(new Source[0]));
         } catch (SAXException e) {
 
-            throw new RuntimeException("Could not parse schema " + schemas.toString(), e);
+            throw new RuntimeException("Could not parse schema "
+                    + schemas.toString(), e);
         }
         Validator v = schema.newValidator();
 
@@ -1841,14 +1905,14 @@ public class TestRESTAPI
         v.validate(new StreamSource(new StringReader(xml)));
 
         assertTrue("Offline validation failed for " + url + ". Errors: "
-                           + errors.toString() + "\n xml:\n" + xml,
-                   0 == errors.length());
+                + errors.toString() + "\n xml:\n" + xml, 0 == errors.length());
 
     }
 
     /**
-     * Validate XML document supplied as a string.
-     * Validates against XML schema specified as schemaLocation in document
+     * Validate XML document supplied as a string. Validates against XML schema
+     * specified as schemaLocation in document
+     *
      * @param xml
      * @throws Exception
      */
@@ -1860,8 +1924,9 @@ public class TestRESTAPI
 
         SAXParser parser;
         parser = factory.newSAXParser();
-        parser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaLanguage",
-                           "http://www.w3.org/2001/XMLSchema");
+        parser
+                .setProperty("http://java.sun.com/xml/jaxp/properties/schemaLanguage",
+                             "http://www.w3.org/2001/XMLSchema");
 
         StringBuilder errors = new StringBuilder();
 
@@ -1870,15 +1935,18 @@ public class TestRESTAPI
         reader.setErrorHandler(new ValidatorErrorHandler(errors));
         reader.parse(new InputSource(new StringReader(xml)));
 
-        assertTrue("Online Validation failed for " + url + ". Errors: " + errors.toString(), 0 == errors.length());
+        assertTrue("Online Validation failed for " + url + ". Errors: "
+                + errors.toString(), 0 == errors.length());
 
     }
 
     // error handler for validating parsing (see validate(String))
     // collects errors and fatal errors in a stringBuilder
-    class ValidatorErrorHandler implements ErrorHandler {
+    class ValidatorErrorHandler
+            implements ErrorHandler {
 
         private final StringBuilder m_errors;
+
         ValidatorErrorHandler(StringBuilder errors) {
             m_errors = errors;
         }
