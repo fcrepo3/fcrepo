@@ -463,7 +463,7 @@ public class SQLRebuilder
      */
     @Override
     public void finish() {
-        // nothing to do
+        m_connectionPool.close();
     }
 
     /**

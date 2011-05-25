@@ -1373,6 +1373,8 @@ public abstract class Server
         if (1 == 2) {
             throw new ServerInitializationException(null);
         }
+        m_serverContext.registerShutdownHook();
+        m_moduleContext.registerShutdownHook();
     }
 
     /**
@@ -1416,6 +1418,8 @@ public abstract class Server
         try{
             m_moduleContext.close();
             m_moduleContext.destroy();
+            m_serverContext.close();
+            m_serverContext.destroy();
         }
         catch(Throwable e){
             logger.error("Shutdown error: " + e.toString(),e);
