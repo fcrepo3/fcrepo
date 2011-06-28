@@ -219,30 +219,43 @@ public class Rebuild
     private static Map<String, String> getOptions(Map<String, String> descs)
             throws IOException {
         Map<String, String> options = new HashMap<String, String>();
-        Iterator<String> iter = descs.keySet().iterator();
-        while (iter.hasNext()) {
-            String name = iter.next();
-            String desc = descs.get(name);
-            options.put(name, getOptionValue(name, desc));
+        if (descs != null){
+            Iterator<String> iter = descs.keySet().iterator();
+            while (iter.hasNext()) {
+                String name = iter.next();
+                String desc = descs.get(name);
+                options.put(name, getOptionValue(name, desc));
+            }
         }
         int c = 1;
 
         if (System.getProperty("rebuilder") == null) {
-            c =
-                getChoice("Start rebuilding with the above options?",
-                          new String[] {"Yes",
-                                  "No, let me re-enter the options.",
-                                  "No, exit."});
+            if (options.size() > 0) {
+                c =
+                    getChoice("Start rebuilding with the above options?",
+                              new String[] {"Yes",
+                            "No, let me re-enter the options.",
+                    "No, exit."});
+
+                if (c == 0) {
+                    return options;
+                }
+                if (c == 1) {
+                    System.err.println();
+                    return getOptions(descs);
+                }
+            }
+            else {
+                c =
+                    getChoice("No options to set. Start rebuilding?",
+                              new String[] {"Yes",
+                    "No, exit."});
+                if (c == 0) {
+                    return options;
+                }
+            }
         } else {
             return options;
-        }
-
-        if (c == 0) {
-            return options;
-        }
-        if (c == 1) {
-            System.err.println();
-            return getOptions(descs);
         }
         return null;
     }
