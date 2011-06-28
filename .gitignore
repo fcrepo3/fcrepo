@@ -8,3 +8,5 @@ fcrepo-server/test
 .project
 .settings/
 .DS_Store
+*.iml
+.idea
