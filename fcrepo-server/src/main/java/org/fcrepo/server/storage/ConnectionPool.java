@@ -4,21 +4,18 @@
  */
 package org.fcrepo.server.storage;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
-
+import org.fcrepo.server.utilities.DDLConverter;
+import org.fcrepo.server.utilities.TableCreatingConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.fcrepo.server.utilities.DDLConverter;
-import org.fcrepo.server.utilities.TableCreatingConnection;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.Properties;
 
 
 /**
@@ -397,8 +394,8 @@ public class ConnectionPool {
     }
 
     private boolean isEmbeddedDB() {
-        /* FIXME: this has always been a hack, but now is even more so */
-        return dataSource.getDriverClassName().contains("Derby");
+        return dataSource.getDriverClassName().equals(
+                org.apache.derby.jdbc.EmbeddedDriver.class.getName());
     }
 
     private void shutdownEmbeddedDB(String username, String password) {

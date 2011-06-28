@@ -4,11 +4,6 @@
  */
 package org.fcrepo.server.utilities.rebuild;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import java.util.Map;
-
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ConnectionPoolNotFoundException;
 import org.fcrepo.server.errors.ModuleInitializationException;
@@ -21,6 +16,10 @@ import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
 import org.fcrepo.server.storage.translation.DOTranslator;
 import org.fcrepo.server.utilities.SQLUtility;
 import org.fcrepo.server.validation.DOValidator;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 
 /**
@@ -125,13 +124,8 @@ public class RebuildDOManager
             }
             SQLUtility.createNonExistingTables(m_connectionPool, specIn);
         } catch (Exception e) {
-            throw new ModuleInitializationException("Error while attempting to "
-                                                            + "check for and create non-existing table(s): "
-                                                            + e.getClass()
-                                                                    .getName()
-                                                            + ": "
-                                                            + e.getMessage(),
-                                                    getRole());
+            throw new ModuleInitializationException("Error checking for and "
+                    + "creating non-existing tables", getRole(), e);
         }
 
         // get ref to lowlevelstorage module
