@@ -47,7 +47,7 @@ public class DerbyDDLConverterIntegrationTest {
 
     private final String DO_REGISTRY_TABLE_SPEC =
             "CREATE TABLE doRegistry (\n  " + "doPID VARCHAR(64) NOT NULL,\n  "
-            + "systemVersion SMALLINT NOT NULL DEFAULT 0,\n  "
+            + "systemVersion INT NOT NULL DEFAULT 0,\n  "
             + "ownerId VARCHAR(64),\n  "
             + "objectState VARCHAR(1) NOT NULL DEFAULT 'A',\n  "
             + "label VARCHAR(255) DEFAULT '',\n  "

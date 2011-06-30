@@ -28,7 +28,7 @@
 		<column name="doPID" type="varchar(64)" notNull="true" binary="true">
 			<comment>The PID of the object</comment>
 		</column>
-		<column name="systemVersion" type="smallint(6)" notNull="true" default="0">
+		<column name="systemVersion" type="int(11)" notNull="true" default="0">
 			<comment>The system version of the object.  This starts at zero on
                initial creation or import, and is subsequently incremented by
                one each time a change is committed to the definitive store.

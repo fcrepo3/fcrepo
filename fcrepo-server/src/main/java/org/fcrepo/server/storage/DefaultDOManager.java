@@ -1372,7 +1372,7 @@ public class DefaultDOManager
                     }
                 } catch (SQLException sqle) {
                     throw new StorageDeviceException("Error creating replication job: "
-                            + sqle.getMessage());
+                            + sqle.getMessage(), sqle);
                 } finally {
                     try {
                         if (results != null) {
@@ -1386,7 +1386,7 @@ public class DefaultDOManager
                         }
                     } catch (SQLException sqle) {
                         throw new StorageDeviceException("Unexpected error from SQL database: "
-                                + sqle.getMessage());
+                                + sqle.getMessage(), sqle);
                     } finally {
                         results = null;
                         s = null;
@@ -1517,7 +1517,7 @@ public class DefaultDOManager
             return results.next(); // 'true' if match found, else 'false'
         } catch (SQLException sqle) {
             throw new StorageDeviceException("Unexpected error from SQL database: "
-                    + sqle.getMessage());
+                    + sqle.getMessage(), sqle);
         } finally {
             try {
                 if (results != null) {
@@ -1531,7 +1531,7 @@ public class DefaultDOManager
                 }
             } catch (SQLException sqle) {
                 throw new StorageDeviceException("Unexpected error from SQL database: "
-                        + sqle.getMessage());
+                        + sqle.getMessage(), sqle);
             } finally {
                 results = null;
                 s = null;
@@ -1567,7 +1567,7 @@ public class DefaultDOManager
             }
             // ...then notify the caller with the original exception
             throw new StorageDeviceException("Unexpected error from SQL database while registering object: "
-                    + sqle.getMessage());
+                    + sqle.getMessage(), sqle);
         } finally {
             try {
                 if (st != null) {
@@ -1578,7 +1578,7 @@ public class DefaultDOManager
                 }
             } catch (Exception sqle) {
                 throw new StorageDeviceException("Unexpected error from SQL database while registering object: "
-                        + sqle.getMessage());
+                        + sqle.getMessage(), sqle);
             } finally {
                 st = null;
             }
@@ -1606,7 +1606,7 @@ public class DefaultDOManager
             }
         } catch (SQLException sqle) {
             throw new StorageDeviceException("Unexpected error from SQL database while unregistering object: "
-                    + sqle.getMessage());
+                    + sqle.getMessage(), sqle);
         } finally {
             try {
                 if (st != null) {
@@ -1617,7 +1617,7 @@ public class DefaultDOManager
                 }
             } catch (Exception sqle) {
                 throw new StorageDeviceException("Unexpected error from SQL database while unregistering object: "
-                        + sqle.getMessage());
+                        + sqle.getMessage(), sqle);
             } finally {
                 st = null;
             }
@@ -1760,7 +1760,7 @@ public class DefaultDOManager
             return ret;
         } catch (SQLException sqle) {
             throw new StorageDeviceException("Unexpected error from SQL database: "
-                    + sqle.getMessage());
+                    + sqle.getMessage(), sqle);
 
         } finally {
             try {
@@ -1775,7 +1775,7 @@ public class DefaultDOManager
                 }
             } catch (SQLException sqle) {
                 throw new StorageDeviceException("Unexpected error from SQL database: "
-                        + sqle.getMessage());
+                        + sqle.getMessage(), sqle);
             } finally {
                 results = null;
                 s = null;
