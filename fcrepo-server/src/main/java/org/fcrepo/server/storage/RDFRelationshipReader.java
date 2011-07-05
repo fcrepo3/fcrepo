@@ -18,6 +18,7 @@ import org.jrdf.graph.Triple;
 import org.trippi.RDFFormat;
 import org.trippi.TripleIterator;
 import org.trippi.TrippiException;
+import org.trippi.io.TripleIteratorFactory;
 
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ServerException;
@@ -47,7 +48,7 @@ public abstract class RDFRelationshipReader {
 
         TripleIterator iter = null;
         try {
-            iter = TripleIterator.fromStream(dsContent, RDFFormat.RDF_XML);
+            iter = TripleIteratorFactory.defaultInstance().fromStream(dsContent, RDFFormat.RDF_XML);
             Triple triple;
             ObjectNode objectNode;
             boolean isLiteral;

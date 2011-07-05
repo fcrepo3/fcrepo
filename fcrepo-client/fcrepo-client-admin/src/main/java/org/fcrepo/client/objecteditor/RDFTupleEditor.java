@@ -10,6 +10,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -52,6 +54,7 @@ import org.jrdf.graph.Triple;
 
 import org.trippi.RDFFormat;
 import org.trippi.TripleIterator;
+import org.trippi.io.TripleIteratorFactory;
 import org.trippi.TrippiException;
 
 import org.fcrepo.client.Administrator;
@@ -70,7 +73,7 @@ import static org.fcrepo.common.Constants.MODEL;
  */
 public class RDFTupleEditor
         extends ContentEditor
-        implements DocumentListener, ActionListener, PropertyChangeListener {
+        implements DocumentListener, ActionListener, PropertyChangeListener, WindowListener {
 
     /** This class handles the RDF MIME type. */
     public static String[] s_types = new String[] {"application/rdf+xml"};
@@ -102,6 +105,8 @@ public class RDFTupleEditor
     protected String dsid; // not used
 
     protected HashMap<String, String> m_map;
+    
+    protected TripleIteratorFactory m_factory;
 
     private static boolean s_registered = false;
 
@@ -110,6 +115,7 @@ public class RDFTupleEditor
             ContentHandlerFactory.register(this);
             s_registered = true;
         }
+        m_factory = new TripleIteratorFactory();
     }
 
     @Override
@@ -266,7 +272,7 @@ public class RDFTupleEditor
         public RDFDataModel(InputStream data) {
             TripleIterator iter;
             try {
-                iter = TripleIterator.fromStream(data, RDFFormat.RDF_XML);
+                iter = m_factory.fromStream(data, RDFFormat.RDF_XML);
                 entries = new ArrayList<RelationshipTuple>();
                 for (int i = 0; iter.hasNext(); i++) {
                     Triple triple = iter.next();
@@ -692,6 +698,35 @@ public class RDFTupleEditor
             return m_subject.getText();
         }
 
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+        m_factory.shutdown();
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+    }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
     }
 
 }

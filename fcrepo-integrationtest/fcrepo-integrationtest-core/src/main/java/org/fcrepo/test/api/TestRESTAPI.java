@@ -69,6 +69,7 @@ import org.junit.Test;
 import org.trippi.RDFFormat;
 import org.trippi.TripleIterator;
 import org.trippi.TrippiException;
+import org.trippi.io.TripleIteratorFactory;
 
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
@@ -1778,7 +1779,7 @@ public class TestRESTAPI
         StringBuilder sb = new StringBuilder();
         sb.append("RDF: " + new String(rdf, "UTF-8"));
         TripleIterator it =
-                TripleIterator.fromStream(new ByteArrayInputStream(rdf), null,
+                TripleIteratorFactory.defaultInstance().fromStream(new ByteArrayInputStream(rdf), null,
 
                 RDFFormat.RDF_XML);
 

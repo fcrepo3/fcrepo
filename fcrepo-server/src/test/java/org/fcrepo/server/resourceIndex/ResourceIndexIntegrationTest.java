@@ -25,11 +25,13 @@ import org.jrdf.graph.Triple;
 import org.jrdf.graph.URIReference;
 
 import org.junit.After;
+import org.junit.Before;
 
 import org.trippi.RDFFormat;
 import org.trippi.RDFUtil;
 import org.trippi.TripleIterator;
 import org.trippi.TriplestoreConnector;
+import org.trippi.io.TripleIteratorFactory;
 
 import org.fcrepo.common.Models;
 import org.fcrepo.server.resourceIndex.ModelBasedTripleGenerator;
@@ -82,6 +84,11 @@ public abstract class ResourceIndexIntegrationTest {
      * The <code>ResourceIndexImpl</code> instance we'll be using.
      */
     private ResourceIndex _ri;
+    
+    /**
+     * The <code>org.trippi.io.TripleIteratorFactory</code> used to parse RDF
+     */
+    private TripleIteratorFactory _factory;
 
     /**
      * The flusher instance we'll use.
@@ -135,6 +142,12 @@ public abstract class ResourceIndexIntegrationTest {
         return TriplestoreConnector.init("org.trippi.impl.mpt.MPTConnector",
                                          config);
     }
+    
+    // Test setup
+    @Before
+    public void setupTest() throws Exception {
+        _factory = new TripleIteratorFactory();
+    }
 
     // Test tearDown
 
@@ -143,6 +156,7 @@ public abstract class ResourceIndexIntegrationTest {
         if (_ri != null) {
             tearDownTriplestore();
         }
+        _factory.shutdown();
     }
 
     private void tearDownTriplestore() throws Exception {
@@ -163,7 +177,7 @@ public abstract class ResourceIndexIntegrationTest {
 
             // load all from temp file
             triples =
-                    TripleIterator.fromStream(new FileInputStream(dump),
+                    _factory.fromStream(new FileInputStream(dump),
                                               RDFFormat.TURTLE);
             _ri.delete(triples, true);
         } finally {

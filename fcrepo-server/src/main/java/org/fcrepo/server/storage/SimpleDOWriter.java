@@ -21,6 +21,7 @@ import org.jrdf.graph.Triple;
 import org.trippi.RDFFormat;
 import org.trippi.TripleIterator;
 import org.trippi.TrippiException;
+import org.trippi.io.TripleIteratorFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
@@ -329,7 +330,7 @@ public class SimpleDOWriter
             try {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 TripleIterator iter =
-                        TripleIterator.fromStream(relsDatastream.getContentStream(),
+                        TripleIteratorFactory.defaultInstance().fromStream(relsDatastream.getContentStream(),
                                                   RDFFormat.RDF_XML);
                 newIter = new FilteredTripleIterator(iter, toAdd, true);
                 newIter.toStream(out, RDFFormat.RDF_XML, false);
@@ -416,7 +417,7 @@ public class SimpleDOWriter
             TripleIterator iter = null;
             FilteredTripleIterator newIter = null;
             try {
-                iter = TripleIterator.fromStream(relsDatastreamIS, RDFFormat.RDF_XML);
+                iter = TripleIteratorFactory.defaultInstance().fromStream(relsDatastreamIS, RDFFormat.RDF_XML);
 
                 newIter = new FilteredTripleIterator(iter, toPurge, false);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
