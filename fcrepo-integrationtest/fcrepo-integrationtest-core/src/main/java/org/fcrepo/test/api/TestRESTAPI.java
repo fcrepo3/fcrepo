@@ -125,6 +125,8 @@ public class TestRESTAPI
 
     protected Boolean authorizeAccess = null;
 
+    private static String DEMO_OWNERID = "nondefaultOwner";
+
     private static String DEMO_REST;
 
     private static byte[] DEMO_REST_FOXML;
@@ -800,12 +802,33 @@ public class TestRESTAPI
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
         assertEquals(SC_OK, delete(true).getStatusCode());
 
+        // Create a new empty demo:REST object with parameterized ownerId
+        url = String.format("/objects/%s?ownerId=%s", pid.toString(), DEMO_OWNERID);
+        assertEquals(SC_UNAUTHORIZED, post((String)null, false).getStatusCode());
+        response = post((String)null, true);
+        assertEquals(SC_CREATED, response.getStatusCode());
+        Header locationHeader = response.getResponseHeader("location");
+        assertNotNull(locationHeader);
+        assertTrue(locationHeader.getValue().contains(URLEncoder.encode(pid
+                .toString(), "UTF-8")));
+        responseBody = new String(response.getResponseBody(), "UTF-8");
+        assertTrue(responseBody.equals(pid.toString()));
+        // verify ownerId
+        response = get(true);
+        responseBody = new String(response.getResponseBody(), "UTF-8");
+        assertTrue(responseBody.indexOf(DEMO_OWNERID) > 0);
+        
+        // Delete the demo:REST object (ingested as part of setup)
+        url = String.format("/objects/%s", pid.toString());
+        assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
+        assertEquals(SC_OK, delete(true).getStatusCode());
+
         // Ingest the demo:REST object
         url = String.format("/objects/%s", pid.toString());
         assertEquals(SC_UNAUTHORIZED, post(DEMO_REST, false).getStatusCode());
         response = post(DEMO_REST, true);
         assertEquals(SC_CREATED, response.getStatusCode());
-        Header locationHeader = response.getResponseHeader("location");
+        locationHeader = response.getResponseHeader("location");
         assertNotNull(locationHeader);
         assertTrue(locationHeader.getValue().contains(URLEncoder.encode(pid
                 .toString(), "UTF-8")));

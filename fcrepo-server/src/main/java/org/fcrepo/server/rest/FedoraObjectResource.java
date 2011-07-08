@@ -279,7 +279,9 @@ public class FedoraObjectResource extends BaseRestResource {
                     pid = apiMService.getNextPID(context, 1, namespace)[0];
                 }
 
-                ownerID = context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri);
+                if (ownerID == null || "".equals(ownerID.trim())) {
+                    ownerID = context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri);
+                }
                 is = new ByteArrayInputStream(getFOXMLTemplate(pid, label, ownerID, encoding).getBytes());
             } else {
 
