@@ -1,5 +1,11 @@
+/**
+ * Please modify this class to meet your needs
+ * This class is not complete
+ */
+
 package org.fcrepo.server.management2;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -10,12 +16,17 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.activation.DataHandler;
 import javax.annotation.Resource;
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+import javax.jws.WebResult;
+import javax.jws.WebService;
 import javax.mail.util.ByteArrayDataSource;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.ws.RequestWrapper;
+import javax.xml.ws.ResponseWrapper;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.soap.MTOM;
 
 import org.apache.axis.types.NonNegativeInteger;
 import org.fcrepo.common.Constants;
@@ -25,6 +36,8 @@ import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.ServerInitializationException;
 import org.fcrepo.server.errors.StorageDeviceException;
 import org.fcrepo.server.management.Management;
+import org.fcrepo.server.types2.gen.ArrayOfString;
+import org.fcrepo.server.types2.gen.Datastream;
 import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
@@ -34,12 +47,18 @@ import org.slf4j.LoggerFactory;
  * @author Jiri Kremser
  */
 
-// @MTOM
-// @StreamingAttachment(parseEagerly = true, memoryThreshold = 40000L)
-public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
+// @javax.jws.WebService(
+// serviceName = "Fedora-API-M-Service",
+// portName = "Fedora-API-M-Port-SOAPHTTPS",
+// targetNamespace = "http://www.fedora.info/definitions/1/0/api/",
+// /*wsdlLocation =
+// "file:/home/freon/workspace/fcrepo/fcrepo-common/../resources/wsdl/Fedora-API-M.wsdl",*/
+// endpointInterface = "org.fcrepo.server.management2.FedoraAPIM")
+//
+public class FedoraAPIMImpl implements FedoraAPIM {
 
 	private static final Logger LOG = LoggerFactory
-			.getLogger(FedoraAPIMMTOMImpl.class);
+			.getLogger(FedoraAPIMImpl.class);
 
 	@Resource
 	private WebServiceContext context;
@@ -90,19 +109,15 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 	 * org.fcrepo.server.management2.FedoraAPIMMTOM#ingest(javax.activation.
 	 * DataHandler objectXML ,)String format ,)String logMessage )*
 	 */
-	public String ingest(DataHandler objectXML, String format, String logMessage) {
+	public String ingest(byte[] objectXML, String format, String logMessage) {
 		LOG.debug("start: ingest");
 		assertInitialized();
 		try {
 			// always gens pid, unless pid in stream starts with "test:" "demo:"
 			// or other prefix that is configured in the retainPIDs parameter of
 			// fedora.fcfg
-			InputStream byteStream = null;
-			if (objectXML != null) {
-				byteStream = objectXML.getInputStream();
-			}
 			return s_management.ingest(ReadOnlyContext.getSoapContext(),
-					byteStream, logMessage, format, "UTF-8", "new");
+					new ByteArrayInputStream(objectXML), logMessage, format, "UTF-8", "new");
 		} catch (Throwable th) {
 			LOG.error("Error ingesting", th);
 			// throw AxisUtility.getFault(th);
@@ -142,7 +157,7 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 	 * @see org.fcrepo.server.management2.FedoraAPIMMTOM#getObjectXML(String pid
 	 * )*
 	 */
-	public DataHandler getObjectXML(String pid) {
+	public byte[] getObjectXML(String pid) {
 		assertInitialized();
 		try {
 			MessageContext ctx = context.getMessageContext();
@@ -150,8 +165,7 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 					ReadOnlyContext.getSoapContext(ctx), pid, "UTF-8");
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			pipeStream(in, out);
-			return new DataHandler(new ByteArrayDataSource(out.toByteArray(),
-					"text/xml"));
+			return out.toByteArray();
 		} catch (Throwable th) {
 			LOG.error("Error getting object XML", th);
 			// throw AxisUtility.getFault(th);
@@ -165,18 +179,17 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 	 * @see org.fcrepo.server.management2.FedoraAPIMMTOM#export(String pid
 	 * ,)String format ,)String context )*
 	 */
-	public DataHandler export(String pid, String format, String context) {
+	public byte[] export(String pid, String format, String context) {
 		assertInitialized();
 		try {
-			MessageContext ctx = FedoraAPIMMTOMImpl.this.context
+			MessageContext ctx = FedoraAPIMImpl.this.context
 					.getMessageContext();
 			InputStream in = s_management.export(
 					ReadOnlyContext.getSoapContext(ctx), pid, format, context,
 					"UTF-8");
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			pipeStream(in, out);
-			return new DataHandler(new ByteArrayDataSource(out.toByteArray(),
-					"text/xml"));
+			return out.toByteArray();
 		} catch (Throwable th) {
 			LOG.error("Error exporting object", th);
 			// throw AxisUtility.getFault(th);
@@ -210,13 +223,13 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.fcrepo.server.management2.FedoraAPIMMTOM#addDatastream( String
-	 * pid ,)String dsID ,)org.fcrepo.server.types2.mtom.gen.ArrayOfString
+	 * pid ,)String dsID ,)org.fcrepo.server.types2.gen.ArrayOfString
 	 * altIDs ,)String dsLabel ,)boolean versionable ,)String mimeType ,)String
 	 * formatURI ,)String dsLocation ,)String controlGroup ,)String dsState
 	 * ,)String checksumType ,)String checksum ,)String logMessage )*
 	 */
 	public String addDatastream(String pid, String dsID,
-			org.fcrepo.server.types2.mtom.gen.ArrayOfString altIDs,
+			org.fcrepo.server.types2.gen.ArrayOfString altIDs,
 			String dsLabel, boolean versionable, String mimeType,
 			String formatURI, String dsLocation, String controlGroup,
 			String dsState, String checksumType, String checksum,
@@ -246,12 +259,12 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 	 * @see
 	 * org.fcrepo.server.management2.FedoraAPIMMTOM#modifyDatastreamByReference
 	 * (String pid ,)String dsID
-	 * ,)org.fcrepo.server.types2.mtom.gen.ArrayOfString altIDs ,)String dsLabel
+	 * ,)org.fcrepo.server.types2.gen.ArrayOfString altIDs ,)String dsLabel
 	 * ,)String mimeType ,)String formatURI ,)String dsLocation ,)String
 	 * checksumType ,)String checksum ,)String logMessage ,)boolean force )*
 	 */
 	public String modifyDatastreamByReference(String pid, String dsID,
-			org.fcrepo.server.types2.mtom.gen.ArrayOfString altIDs,
+			org.fcrepo.server.types2.gen.ArrayOfString altIDs,
 			String dsLabel, String mimeType, String formatURI,
 			String dsLocation, String checksumType, String checksum,
 			String logMessage, boolean force) {
@@ -281,30 +294,26 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 	 * @see
 	 * org.fcrepo.server.management2.FedoraAPIMMTOM#modifyDatastreamByValue(
 	 * String pid ,)String dsID
-	 * ,)org.fcrepo.server.types2.mtom.gen.ArrayOfString altIDs ,)String dsLabel
+	 * ,)org.fcrepo.server.types2.gen.ArrayOfString altIDs ,)String dsLabel
 	 * ,)String mimeType ,)String formatURI ,)javax.activation.DataHandler
 	 * dsContent ,)String checksumType ,)String checksum ,)String logMessage
 	 * ,)boolean force )*
 	 */
 	public String modifyDatastreamByValue(String pid, String dsID,
-			org.fcrepo.server.types2.mtom.gen.ArrayOfString altIDs,
+			org.fcrepo.server.types2.gen.ArrayOfString altIDs,
 			String dsLabel, String mimeType, String formatURI,
-			DataHandler dsContent, String checksumType, String checksum,
+			byte[] dsContent, String checksumType, String checksum,
 			String logMessage, boolean force) {
 		LOG.debug("start: modifyDatastreamByValue, " + pid + ", " + dsID);
 		assertInitialized();
 		try {
 			MessageContext ctx = context.getMessageContext();
-			InputStream byteStream = null;
-			if (dsContent != null) {
-				byteStream = dsContent.getInputStream();
-			}
 			String[] altIDsArray = altIDs.getItem().toArray(new String[0]);
 			return DateUtility.convertDateToString(s_management
 					.modifyDatastreamByValue(
 							ReadOnlyContext.getSoapContext(ctx), pid, dsID,
 							altIDsArray, dsLabel, mimeType, formatURI,
-							byteStream, checksumType, checksum, logMessage,
+							new ByteArrayInputStream(dsContent), checksumType, checksum, logMessage,
 							null));
 		} catch (Throwable th) {
 			LOG.error("Error modifying datastream by value", th);
@@ -390,7 +399,7 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 	 * @see org.fcrepo.server.management2.FedoraAPIMMTOM#getDatastream( String
 	 * pid ,)String dsID ,)String asOfDateTime )*
 	 */
-	public org.fcrepo.server.types2.mtom.gen.Datastream getDatastream(
+	public org.fcrepo.server.types2.gen.Datastream getDatastream(
 			String pid, String dsID, String asOfDateTime) {
 		assertInitialized();
 		try {
@@ -398,7 +407,7 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 			org.fcrepo.server.storage.types.Datastream ds = s_management
 					.getDatastream(ReadOnlyContext.getSoapContext(ctx), pid,
 							dsID, DateUtility.parseDateOrNull(asOfDateTime));
-			return TypeUtility.convertDatastreamToGenDatastream2(ds);
+			return TypeUtility.convertDatastreamToGenDatastream3(ds);
 		} catch (Throwable th) {
 			LOG.error("Error getting datastream", th);
 			// throw AxisUtility.getFault(th);
@@ -413,7 +422,7 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 	 * org.fcrepo.server.management2.FedoraAPIMMTOM#getDatastreams(java.lang
 	 * .String pid ,)String asOfDateTime ,)String dsState )*
 	 */
-	public List<org.fcrepo.server.types2.mtom.gen.Datastream> getDatastreams(
+	public List<org.fcrepo.server.types2.gen.Datastream> getDatastreams(
 			String pid, String asOfDateTime, String dsState) {
 		assertInitialized();
 		try {
@@ -436,7 +445,7 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 	 * org.fcrepo.server.management2.FedoraAPIMMTOM#getDatastreamHistory(java
 	 * .lang.String pid ,)String dsID )*
 	 */
-	public List<org.fcrepo.server.types2.mtom.gen.Datastream> getDatastreamHistory(
+	public List<org.fcrepo.server.types2.gen.Datastream> getDatastreamHistory(
 			String pid, String dsID) {
 		assertInitialized();
 		try {
@@ -518,7 +527,7 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 	 * org.fcrepo.server.management2.FedoraAPIMMTOM#getRelationships(java.lang
 	 * .String pid ,)String relationship )*
 	 */
-	public List<org.fcrepo.server.types2.mtom.gen.RelationshipTuple> getRelationships(
+	public List<org.fcrepo.server.types2.gen.RelationshipTuple> getRelationships(
 			String pid, String relationship) {
 		LOG.debug("start: getRelationships");
 		assertInitialized();
@@ -595,12 +604,12 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 	 * @see org.fcrepo.server.management2.FedoraAPIMMTOM#validate(String pid
 	 * ,)String asOfDateTime )*
 	 */
-	public org.fcrepo.server.types2.mtom.gen.Validation validate(String pid,
+	public org.fcrepo.server.types2.gen.Validation validate(String pid,
 			String asOfDateTime) {
 		assertInitialized();
 		try {
 			MessageContext ctx = context.getMessageContext();
-			return TypeUtility.convertValidationToGenValidation2(s_management
+			return TypeUtility.convertValidationToGenValidation3(s_management
 					.validate(ReadOnlyContext.getSoapContext(ctx), pid,
 							DateUtility.parseDateOrNull(asOfDateTime)));
 		} catch (Throwable th) {
@@ -638,13 +647,13 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 		}
 	}
 
-	private List<org.fcrepo.server.types2.mtom.gen.RelationshipTuple> getGenRelsTuples(
+	private List<org.fcrepo.server.types2.gen.RelationshipTuple> getGenRelsTuples(
 			org.fcrepo.server.storage.types.RelationshipTuple[] intRelsTuples) {
-		List<org.fcrepo.server.types2.mtom.gen.RelationshipTuple> genRelsTuples = new ArrayList<org.fcrepo.server.types2.mtom.gen.RelationshipTuple>(
+		List<org.fcrepo.server.types2.gen.RelationshipTuple> genRelsTuples = new ArrayList<org.fcrepo.server.types2.gen.RelationshipTuple>(
 				intRelsTuples.length);
 		for (org.fcrepo.server.storage.types.RelationshipTuple tuple : intRelsTuples) {
 			genRelsTuples.add(TypeUtility
-					.convertRelsTupleToGenRelsTuple2(tuple));
+					.convertRelsTupleToGenRelsTuple3(tuple));
 		}
 		return genRelsTuples;
 	}
@@ -657,14 +666,15 @@ public class FedoraAPIMMTOMImpl implements FedoraAPIMMTOM {
 		return out;
 	}
 
-	private List<org.fcrepo.server.types2.mtom.gen.Datastream> getGenDatastreams(
+	private List<org.fcrepo.server.types2.gen.Datastream> getGenDatastreams(
 			org.fcrepo.server.storage.types.Datastream[] intDatastreams) {
-		List<org.fcrepo.server.types2.mtom.gen.Datastream> genDatastreams = new ArrayList<org.fcrepo.server.types2.mtom.gen.Datastream>(
+		List<org.fcrepo.server.types2.gen.Datastream> genDatastreams = new ArrayList<org.fcrepo.server.types2.gen.Datastream>(
 				intDatastreams.length);
 		for (org.fcrepo.server.storage.types.Datastream datastream : intDatastreams) {
 			genDatastreams.add(TypeUtility
-					.convertDatastreamToGenDatastream2(datastream));
+					.convertDatastreamToGenDatastream3(datastream));
 		}
 		return genDatastreams;
 	}
+
 }

@@ -60,7 +60,35 @@ public abstract class TypeUtility {
         return out;
     }
     
-    public static org.fcrepo.server.types2.gen.Datastream convertDatastreamToGenDatastream2(
+    public static org.fcrepo.server.types2.mtom.gen.Datastream convertDatastreamToGenDatastream2(
+            org.fcrepo.server.storage.types.Datastream in) {
+        org.fcrepo.server.types2.mtom.gen.Datastream out =
+                new org.fcrepo.server.types2.mtom.gen.Datastream();
+        String group = in.DSControlGrp;
+        out.setControlGroup(org.fcrepo.server.types2.mtom.gen.DatastreamControlGroup
+                .fromValue(group));
+        if ("R".equals(group) || "E".equals(group)) {
+            // only given location if it's a redirect or external datastream
+            out.setLocation(in.DSLocation);
+        }
+        out.setCreateDate(DateUtility.convertDateToString(in.DSCreateDT));
+        out.setID(in.DatastreamID);
+        org.fcrepo.server.types2.mtom.gen.ArrayOfString altIDs = new org.fcrepo.server.types2.mtom.gen.ArrayOfString();
+        if (in.DatastreamAltIDs != null) altIDs.getItem().addAll(Arrays.asList(in.DatastreamAltIDs));
+        out.setAltIDs(altIDs);
+        out.setLabel(in.DSLabel);
+        out.setVersionable(in.DSVersionable);
+        out.setMIMEType(in.DSMIME);
+        out.setFormatURI(in.DSFormatURI);
+        out.setSize(in.DSSize);
+        out.setState(in.DSState);
+        out.setVersionID(in.DSVersionID);
+        out.setChecksum(in.DSChecksum);
+        out.setChecksumType(in.DSChecksumType);
+        return out;
+    }
+    
+    public static org.fcrepo.server.types2.gen.Datastream convertDatastreamToGenDatastream3(
             org.fcrepo.server.storage.types.Datastream in) {
         org.fcrepo.server.types2.gen.Datastream out =
                 new org.fcrepo.server.types2.gen.Datastream();
@@ -885,7 +913,22 @@ public abstract class TypeUtility {
         return out;
     }
     
-    public static org.fcrepo.server.types2.gen.RelationshipTuple convertRelsTupleToGenRelsTuple2(
+    public static org.fcrepo.server.types2.mtom.gen.RelationshipTuple convertRelsTupleToGenRelsTuple2(
+            org.fcrepo.server.storage.types.RelationshipTuple in) {
+        if (in == null) {
+            return null;
+        }
+        org.fcrepo.server.types2.mtom.gen.RelationshipTuple out =
+                new org.fcrepo.server.types2.mtom.gen.RelationshipTuple();
+        out.setSubject(in.subject);
+        out.setPredicate(in.predicate);
+        out.setObject(in.object);
+        out.setIsLiteral(in.isLiteral);
+        out.setDatatype(in.datatype);
+        return out;
+    }
+    
+    public static org.fcrepo.server.types2.gen.RelationshipTuple convertRelsTupleToGenRelsTuple3(
             org.fcrepo.server.storage.types.RelationshipTuple in) {
         if (in == null) {
             return null;
@@ -1058,7 +1101,35 @@ public abstract class TypeUtility {
         return genvalid;
     }
     
-    public static org.fcrepo.server.types2.gen.Validation convertValidationToGenValidation2(
+    public static org.fcrepo.server.types2.mtom.gen.Validation convertValidationToGenValidation2(
+            org.fcrepo.server.storage.types.Validation validation) {
+
+        if (validation == null) {
+            return null;
+        }
+        org.fcrepo.server.types2.mtom.gen.Validation genvalid = new org.fcrepo.server.types2.mtom.gen.Validation();
+        genvalid.setValid(validation.isValid());
+        genvalid.setPid(validation.getPid());
+        org.fcrepo.server.types2.mtom.gen.Validation.ObjModels objModels = new org.fcrepo.server.types2.mtom.gen.Validation.ObjModels();
+        objModels.getModel().addAll(validation.getContentModels());
+        genvalid.setObjModels(objModels);
+        org.fcrepo.server.types2.mtom.gen.Validation.ObjProblems objProblems = new org.fcrepo.server.types2.mtom.gen.Validation.ObjProblems();
+        objProblems.getProblem().addAll(validation.getObjectProblems());
+        genvalid.setObjProblems(objProblems);
+
+        Map<String, List<String>> dsprobs = validation.getDatastreamProblems();
+        org.fcrepo.server.types2.mtom.gen.Validation.DatastreamProblems problems = new org.fcrepo.server.types2.mtom.gen.Validation.DatastreamProblems();
+        for (String key : dsprobs.keySet()) {
+        	org.fcrepo.server.types2.mtom.gen.DatastreamProblem dsProblem = new org.fcrepo.server.types2.mtom.gen.DatastreamProblem();
+        	dsProblem.setDatastreamID(key);
+        	dsProblem.getProblem().addAll(dsprobs.get(key));
+        	problems.getDatastream().add(dsProblem);
+        }
+        genvalid.setDatastreamProblems(problems);
+        return genvalid;
+    }
+    
+    public static org.fcrepo.server.types2.gen.Validation convertValidationToGenValidation3(
             org.fcrepo.server.storage.types.Validation validation) {
 
         if (validation == null) {

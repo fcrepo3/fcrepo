@@ -2,9 +2,9 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
     version="1.0">
-    <jxb:bindings schemaLocation="../fedora-types.xsd" node="/xsd:schema">
+    <jxb:bindings schemaLocation="../fedora-types-mtom.xsd" node="/xsd:schema">
         <jxb:schemaBindings>
-            <jxb:package name="org.fcrepo.server.types2.gen"/>
+            <jxb:package name="org.fcrepo.server.types2.mtom.gen"/>
         </jxb:schemaBindings>
     </jxb:bindings>
 </jxb:bindings>
