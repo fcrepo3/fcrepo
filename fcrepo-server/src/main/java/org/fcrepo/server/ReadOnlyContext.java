@@ -14,11 +14,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
 
+import org.eclipse.jetty.util.log.Log;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.servletfilters.ExtendedHttpServletRequest;
 import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
+
 
 
 
@@ -265,6 +268,11 @@ public class ReadOnlyContext
         HttpServletRequest req =
                 (HttpServletRequest) MessageContext.getCurrentContext()
                         .getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+        return ReadOnlyContext.getContext(Constants.HTTP_REQUEST.SOAP.uri, req);
+    }
+    
+    public static Context getSoapContext(javax.xml.ws.handler.MessageContext ctx) {
+    	HttpServletRequest req = (HttpServletRequest) ctx.get(AbstractHTTPDestination.HTTP_REQUEST);
         return ReadOnlyContext.getContext(Constants.HTTP_REQUEST.SOAP.uri, req);
     }
 
