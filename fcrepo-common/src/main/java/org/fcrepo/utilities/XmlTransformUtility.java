@@ -6,7 +6,6 @@ package org.fcrepo.utilities;
 
 import javax.xml.transform.TransformerFactory;
 
-import net.sf.saxon.FeatureKeys;
 
 /**
  *
@@ -28,7 +27,7 @@ public class XmlTransformUtility {
     public static TransformerFactory getTransformerFactory() {
         TransformerFactory factory = TransformerFactory.newInstance();
         if (factory.getClass().getName().equals("net.sf.saxon.TransformerFactoryImpl")) {
-            factory.setAttribute(FeatureKeys.VERSION_WARNING, Boolean.FALSE);
+            factory.setAttribute("http://saxon.sf.net/feature/version-warning", Boolean.FALSE);
         }
         return factory;
     }

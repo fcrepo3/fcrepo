@@ -128,7 +128,7 @@ public class ParameterRequestWrapper
      * @see javax.servlet.ServletRequestWrapper#getParameterMap()
      */
     @Override
-    public Map<?, ?> getParameterMap() {
+    public Map<String, String[]> getParameterMap() {
         return Collections.unmodifiableMap(params);
     }
 
@@ -137,7 +137,7 @@ public class ParameterRequestWrapper
      * @see javax.servlet.ServletRequestWrapper#getParameterNames()
      */
     @Override
-    public Enumeration<?> getParameterNames() {
+    public Enumeration<String> getParameterNames() {
         return Collections.enumeration(params.keySet());
     }
 
