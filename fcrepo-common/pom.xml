@@ -103,213 +103,284 @@
 								<wsdlFile>
 									Fedora-API-A.wsdl 
                 </wsdlFile>
-			</wsdlFiles>
+		              </wsdlFiles>
 
-							<mappings>
-								<mapping>
-									<namespace>http://www.fedora.info/definitions/1/0/api/</namespace>
-									<targetPackage>org.fcrepo.server.access</targetPackage>
-								</mapping>
-								<mapping>
-									<namespace>http://www.fedora.info/definitions/1/0/types/</namespace>
-									<targetPackage>org.fcrepo.server.types.gen</targetPackage>
-								</mapping>
-							</mappings>
+		              <mappings>
+		                <mapping>
+		                  <namespace>http://www.fedora.info/definitions/1/0/api/</namespace>
+		                  <targetPackage>org.fcrepo.server.management</targetPackage>
+		                </mapping>
+		                <mapping>
+		                  <namespace>http://www.fedora.info/definitions/1/0/auditing/</namespace>
+		                  <targetPackage>org.fcrepo.server.types.gen</targetPackage>
+		                </mapping>
+		                <mapping>
+		                  <namespace>http://www.fedora.info/definitions/1/0/binding/</namespace>
+		                  <targetPackage>org.fcrepo.server.types.gen</targetPackage>
+		                </mapping>
+		                <mapping>
+		                  <namespace>http://www.fedora.info/definitions/1/0/types/</namespace>
+		                  <targetPackage>org.fcrepo.server.types.gen</targetPackage>
+		                </mapping>
+		              </mappings>
 
-						</configuration>
+		            </configuration>
 
-					</execution>
+		          </execution>
+		          <execution>
+		            <id>api-a</id>
+		            <goals>
+		              <goal>wsdl2java</goal>
+		            </goals>
 
-				</executions>
+		            <configuration>
+		              <wsdlFiles>
+		                <wsdlFile>
+		                  Fedora-API-A.wsdl 
+		                </wsdlFile>
+		              </wsdlFiles>
 
-			</plugin>
+		              <mappings>
+		                <mapping>
+		                  <namespace>http://www.fedora.info/definitions/1/0/api/</namespace>
+		                  <targetPackage>org.fcrepo.server.access</targetPackage>
+		                </mapping>
+		                <mapping>
+		                  <namespace>http://www.fedora.info/definitions/1/0/types/</namespace>
+		                  <targetPackage>org.fcrepo.server.types.gen</targetPackage>
+		                </mapping>
+		              </mappings>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-				<executions>
-					<execution>
-						<configuration>
-							<excludeDefaultDirectories>true</excludeDefaultDirectories>
-						</configuration>
-						<id>wsdl-clean</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>${project.build.directory}</directory>
-							<includes>
-								<include>**/FedoraAPIMBindingSOAPHTTPImpl*</include>
-								<include>**/FedoraAPIMServiceLocator*</include>
-								<include>**/FedoraAPIABindingSOAPHTTPImpl*</include>
-								<include>**/FedoraAPIAServiceLocator*</include>
-							</includes>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
+		            </configuration>
 
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.1.1</version>
-				<executions>
+		          </execution>
 
-					<execution>
-						<id>api-m</id>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>java</goal>
-						</goals>
-						<configuration>
-							<mainClass>org.fcrepo.generate.BuildAxisStubWrapper</mainClass>
-							<arguments>
-								<argument>${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/FedoraAPIMBindingSOAPHTTPStub.java</argument>
-								<argument>${project.build.sourceDirectory}/org/fcrepo/common/generate/FedoraStubWrapper.template</argument>
-								<argument>org.fcrepo.client</argument>
-								<argument>APIMStubWrapper</argument>
-								<argument>${basedir}/../fcrepo-client/fcrepo-client-admin/stubwrappers/org/fcrepo/client/APIMStubWrapper.java</argument>
-							</arguments>
-						</configuration>
-					</execution>
+		        </executions>
 
-					<execution>
-						<id>api-a</id>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>java</goal>
-						</goals>
-						<configuration>
-							<mainClass>org.fcrepo.generate.BuildAxisStubWrapper</mainClass>
-							<arguments>
-								<argument>${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/FedoraAPIABindingSOAPHTTPStub.java</argument>
-								<argument>${project.build.sourceDirectory}/org/fcrepo/common/generate/FedoraStubWrapper.template</argument>
-								<argument>org.fcrepo.client</argument>
-								<argument>APIAStubWrapper</argument>
-								<argument>${basedir}/../fcrepo-client/fcrepo-client-admin/stubwrappers/org/fcrepo/client/APIAStubWrapper.java</argument>
-							</arguments>
-						</configuration>
-					</execution>
+		      </plugin>
 
-				</executions>
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-clean-plugin</artifactId>
+		        <executions>
+		          <execution>
+		            <configuration>
+		              <excludeDefaultDirectories>true</excludeDefaultDirectories>
+		            </configuration>
+		            <id>wsdl-clean</id>
+		            <phase>process-classes</phase>
+		            <goals>
+		              <goal>clean</goal>
+		            </goals>
+		          </execution>
+		        </executions>
+		        <configuration>
+		          <filesets>
+		            <fileset>
+		              <directory>${project.build.directory}</directory>
+		              <includes>
+		                <include>**/FedoraAPIMBindingSOAPHTTPImpl*</include>
+		                <include>**/FedoraAPIMServiceLocator*</include>
+		                <include>**/FedoraAPIABindingSOAPHTTPImpl*</include>
+		                <include>**/FedoraAPIAServiceLocator*</include>
+		              </includes>
+		            </fileset>
+		          </filesets>
+		        </configuration>
+		      </plugin>
 
-			</plugin>
+		      <plugin>
+		        <groupId>org.codehaus.mojo</groupId>
+		        <artifactId>exec-maven-plugin</artifactId>
+		        <version>1.1.1</version>
+		        <executions>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<executions>
+		          <execution>
+		            <id>api-m</id>
+		            <phase>process-sources</phase>
+		            <goals>
+		              <goal>java</goal>
+		            </goals>
+		            <configuration>
+		              <mainClass>org.fcrepo.generate.BuildAxisStubWrapper</mainClass>
+		              <arguments>
+		                <argument>${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/FedoraAPIMBindingSOAPHTTPStub.java</argument>
+		                <argument>${project.build.sourceDirectory}/org/fcrepo/common/generate/FedoraStubWrapper.template</argument>
+		                <argument>org.fcrepo.client</argument>
+		                <argument>APIMStubWrapper</argument>
+		                <argument>${basedir}/../fcrepo-client/fcrepo-client-admin/stubwrappers/org/fcrepo/client/APIMStubWrapper.java</argument>
+		              </arguments>
+		            </configuration>
+		          </execution>
 
-					<execution>
-						<id>clean-wsdl</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<forceCreation>true</forceCreation>
-							<excludes>
-								<exclude>**/FedoraAPIABindingSOAPHTTPImpl.class</exclude>
-								<exclude>**/FedoraAPIMBindingSOAPHTTPImpl.class</exclude>
-								<exclude>**/FedoraAPIAServiceLocator.class</exclude>
-								<exclude>**/FedoraAPIMServiceLocator.class</exclude>
-							</excludes>
-						</configuration>
-					</execution>
+		          <execution>
+		            <id>api-a</id>
+		            <phase>process-sources</phase>
+		            <goals>
+		              <goal>java</goal>
+		            </goals>
+		            <configuration>
+		              <mainClass>org.fcrepo.generate.BuildAxisStubWrapper</mainClass>
+		              <arguments>
+		                <argument>${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/FedoraAPIABindingSOAPHTTPStub.java</argument>
+		                <argument>${project.build.sourceDirectory}/org/fcrepo/common/generate/FedoraStubWrapper.template</argument>
+		                <argument>org.fcrepo.client</argument>
+		                <argument>APIAStubWrapper</argument>
+		                <argument>${basedir}/../fcrepo-client/fcrepo-client-admin/stubwrappers/org/fcrepo/client/APIAStubWrapper.java</argument>
+		              </arguments>
+		            </configuration>
+		          </execution>
 
-					<execution>
-						<id>jar-tests</id>
-						<phase>package</phase>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
+		        </executions>
 
-				</executions>
-			</plugin>
+		      </plugin>
 
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>ant-replace-wsdd</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-jar-plugin</artifactId>
+		        <executions>
 
-						<configuration>
-							<tasks>
-								<replace
-									file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/deploy.wsdd"
-									token="Fedora-API-M-Port-SOAPHTTP" value="management" />
-								<replace
-									file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/deploy.wsdd"
-									token="*&quot;/&gt;"
-									value="*&quot;/&gt;&lt;parameter name=&quot;scope&quot; value=&quot;application&quot;/&gt;" />
-								<replace
-									file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/deploy.wsdd"
-									token="Fedora-API-A-Port-SOAPHTTP" value="access" />
-								<replace
-									file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/undeploy.wsdd"
-									token="Fedora-API-M-Port-SOAPHTTP" value="management" />
-								<replace
-									file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/undeploy.wsdd"
-									token="Fedora-API-A-Port-SOAPHTTP" value="access" />
-							</tasks>
-						</configuration>
+		          <execution>
+		            <id>clean-wsdl</id>
+		            <phase>package</phase>
+		            <goals>
+		              <goal>jar</goal>
+		            </goals>
+		            <configuration>
+		              <forceCreation>true</forceCreation>
+		              <excludes>
+		                <exclude>**/FedoraAPIABindingSOAPHTTPImpl.class
+		                </exclude>
+		                <exclude>**/FedoraAPIMBindingSOAPHTTPImpl.class
+		                </exclude>
+		                <exclude>**/FedoraAPIAServiceLocator.class</exclude>
+		                <exclude>**/FedoraAPIMServiceLocator.class</exclude>
+		              </excludes>
+		            </configuration>
+		          </execution>
 
-					</execution>
-				</executions>
-			</plugin>
+		          <execution>
+		            <id>jar-tests</id>
+		            <phase>package</phase>
+		            <goals>
+		              <goal>test-jar</goal>
+		            </goals>
+		          </execution>
 
-			<plugin>
-				<groupId>org.apache.cxf</groupId>
-				<artifactId>cxf-codegen-plugin</artifactId>
-				<version>${cxf.version}</version>
-				<executions>
-					<execution>
-						<id>generate-sources</id>
-						<phase>generate-sources</phase>
-						<configuration>
-							<sourceRoot>
-								${project.build.directory}/generated-sources/cxf
-							</sourceRoot>
-							<!--<defaultOptions> <noAddressBinding>true</noAddressBinding> </defaultOptions> -->
-							<useCompileClasspath>true</useCompileClasspath>
-							<wsdlOptions>
-								<!-- <wsdlOption> <wsdl>${basedir}/../resources/wsdl/Fedora-API-M.wsdl</wsdl> 
-									<bindingFiles> <bindingFile>${basedir}/src/main/resources/wsdl/async_binding.xml</bindingFile> 
-									</bindingFiles> </wsdlOption> -->
-								<wsdlOption>
-									<wsdl>${basedir}/../resources/wsdl/Fedora-API-M-MTOM.wsdl</wsdl>
-									<extraargs>
-										 <!--<extraarg>-impl</extraarg><extraarg>-verbose</extraarg> -->
-									</extraargs>
-									<bindingFiles>
-										<bindingFile>${basedir}/../resources/wsdl/bindings/JAXWSbindings.xml</bindingFile>
-										<bindingFile>${basedir}/../resources/wsdl/bindings/JAXBbindings.xml</bindingFile>
-									</bindingFiles>
+		        </executions>
+		      </plugin>
 
+		      <plugin>
+		        <artifactId>maven-antrun-plugin</artifactId>
+		        <executions>
+		          <execution>
+		            <id>ant-replace-wsdd</id>
+		            <phase>process-classes</phase>
+		            <goals>
+		              <goal>run</goal>
+		            </goals>
 
-								</wsdlOption>
-							</wsdlOptions>
-						</configuration>
-						<goals>
-							<goal>wsdl2java</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+		            <configuration>
+		              <tasks>
+		                <replace
+		                  file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/deploy.wsdd"
+		                  token="Fedora-API-M-Port-SOAPHTTP" value="management" />
+		                <replace
+		                  file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/deploy.wsdd"
+		                  token="*&quot;/&gt;"
+		                  value="*&quot;/&gt;&lt;parameter name=&quot;scope&quot; value=&quot;application&quot;/&gt;" />
+		                <replace
+		                  file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/deploy.wsdd"
+		                  token="Fedora-API-A-Port-SOAPHTTP" value="access" />
+		                <replace
+		                  file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/undeploy.wsdd"
+		                  token="Fedora-API-M-Port-SOAPHTTP" value="management" />
+		                <replace
+		                  file="${project.build.directory}/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/undeploy.wsdd"
+		                  token="Fedora-API-A-Port-SOAPHTTP" value="access" />
+		              </tasks>
+		            </configuration>
 
-		</plugins>
+		          </execution>
+		        </executions>
+		      </plugin>
 
-	</build>
+		      <plugin>
+		        <groupId>org.apache.cxf</groupId>
+		        <artifactId>cxf-codegen-plugin</artifactId>
+		        <version>${cxf.version}</version>
+		        <executions>
+		          <execution>
+		            <id>generate-sources</id>
+		            <phase>generate-sources</phase>
+		            <configuration>
+		              <sourceRoot>
+		                ${project.build.directory}/generated-sources/cxf
+		              </sourceRoot>
+		              <!--<defaultOptions> <noAddressBinding>true</noAddressBinding> 
+		                </defaultOptions> -->
+		              <useCompileClasspath>true</useCompileClasspath>
+		              <wsdlOptions>
+		                <!-- API-M -->
+		                <wsdlOption>
+		                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-M.wsdl
+		                  </wsdl>
+		                  <!--<extraargs>
+		                    <extraarg>-impl</extraarg><extraarg>-verbose</extraarg><extraarg>-validate</extraarg>
+		                  </extraargs>-->
+		                  <bindingFiles>
+		                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-M-Bindings.xml
+		                    </bindingFile>
+		                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-Bindings.xml
+		                    </bindingFile>
+		                  </bindingFiles>
+		                </wsdlOption>
+		                <!-- API-M MTOM -->
+		                <wsdlOption>
+		                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-M-MTOM.wsdl
+		                  </wsdl>
+		                  <bindingFiles>
+		                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-M-BindingsMTOM.xml
+		                    </bindingFile>
+		                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-BindingsMTOM.xml
+		                    </bindingFile>
+		                  </bindingFiles>
+		                </wsdlOption>
+		                <!-- API-A -->
+		                <wsdlOption>
+		                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-A.wsdl
+		                  </wsdl>
+		                  <bindingFiles>
+		                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-A-Bindings.xml
+		                    </bindingFile>
+		                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-Bindings.xml
+		                    </bindingFile>
+		                  </bindingFiles>
+		                </wsdlOption>
+		                <!-- API-A MTOM -->
+		                <wsdlOption>
+		                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-A-MTOM.wsdl
+		                  </wsdl>
+		                  <bindingFiles>
+		                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-A-BindingsMTOM.xml
+		                    </bindingFile>
+		                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-BindingsMTOM.xml
+		                    </bindingFile>
+		                  </bindingFiles>
+		                </wsdlOption>
+
+		              </wsdlOptions>
+		            </configuration>
+		            <goals>
+		              <goal>wsdl2java</goal>
+		            </goals>
+		          </execution>
+		        </executions>
+		      </plugin>
+
+		    </plugins>
+
+		  </build>
 
 	<dependencies>
 
@@ -392,4 +463,5 @@
 	    </dependency>
 
 	</dependencies>
+
 </project>

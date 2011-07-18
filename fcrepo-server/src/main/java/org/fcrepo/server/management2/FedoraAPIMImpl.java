@@ -407,7 +407,7 @@ public class FedoraAPIMImpl implements FedoraAPIM {
 			org.fcrepo.server.storage.types.Datastream ds = s_management
 					.getDatastream(ReadOnlyContext.getSoapContext(ctx), pid,
 							dsID, DateUtility.parseDateOrNull(asOfDateTime));
-			return TypeUtility.convertDatastreamToGenDatastream3(ds);
+			return TypeUtility.convertDatastreamToGenDatastreamMTOM(ds);
 		} catch (Throwable th) {
 			LOG.error("Error getting datastream", th);
 			// throw AxisUtility.getFault(th);
@@ -609,7 +609,7 @@ public class FedoraAPIMImpl implements FedoraAPIM {
 		assertInitialized();
 		try {
 			MessageContext ctx = context.getMessageContext();
-			return TypeUtility.convertValidationToGenValidation3(s_management
+			return TypeUtility.convertValidationToGenValidationMTOM(s_management
 					.validate(ReadOnlyContext.getSoapContext(ctx), pid,
 							DateUtility.parseDateOrNull(asOfDateTime)));
 		} catch (Throwable th) {
@@ -653,7 +653,7 @@ public class FedoraAPIMImpl implements FedoraAPIM {
 				intRelsTuples.length);
 		for (org.fcrepo.server.storage.types.RelationshipTuple tuple : intRelsTuples) {
 			genRelsTuples.add(TypeUtility
-					.convertRelsTupleToGenRelsTuple3(tuple));
+					.convertRelsTupleToGenRelsTupleMTOM(tuple));
 		}
 		return genRelsTuples;
 	}
@@ -672,7 +672,7 @@ public class FedoraAPIMImpl implements FedoraAPIM {
 				intDatastreams.length);
 		for (org.fcrepo.server.storage.types.Datastream datastream : intDatastreams) {
 			genDatastreams.add(TypeUtility
-					.convertDatastreamToGenDatastream3(datastream));
+					.convertDatastreamToGenDatastreamMTOM(datastream));
 		}
 		return genDatastreams;
 	}

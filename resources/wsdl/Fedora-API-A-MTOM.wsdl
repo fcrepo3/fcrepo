@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:fedora-api="http://fedora-commons.org/2011/07/definitions/api/"
+             xmlns:fedora-types="http://fedora-commons.org/2011/07/definitions/types/"
+             targetNamespace="http://fedora-commons.org/2011/07/definitions/api/"
+             name="Fedora-API-A-MTOM-WSDL">
+
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema"
+                targetNamespace="http://fedora-commons.org/2011/07/definitions/types/">
+            <include schemaLocation="fedora-types-mtom.xsd"/>
+        </schema>
+    </types>
+
+<message name="describeRepositoryRequest">
+    <part name="parameters" element="fedora-types:describeRepository"/>
+  </message>
+  <message name="describeRepositoryResponse">
+    <part name="parameters" element="fedora-types:describeRepositoryResponse"/>
+  </message>
+
+  <message name="getObjectProfileRequest">
+    <part name="parameters" element="fedora-types:getObjectProfile"/>
+  </message>
+  <message name="getObjectProfileResponse">
+    <part name="parameters" element="fedora-types:getObjectProfileResponse"/>
+  </message>
+
+  <message name="listMethodsRequest">
+    <part name="parameters" element="fedora-types:listMethods"/>
+  </message>
+  <message name="listMethodsResponse">
+    <part name="parameters" element="fedora-types:listMethodsResponse"/>
+  </message>
+
+  <message name="listDatastreamsRequest">
+    <part name="parameters" element="fedora-types:listDatastreams"/>
+  </message>
+  <message name="listDatastreamsResponse">
+    <part name="parameters" element="fedora-types:listDatastreamsResponse"/>
+  </message>
+
+  <message name="getDatastreamDisseminationRequest">
+    <part name="parameters" element="fedora-types:getDatastreamDissemination"/>
+  </message>
+  <message name="getDatastreamDisseminationResponse">
+    <part name="parameters" element="fedora-types:getDatastreamDisseminationResponse"/>
+  </message>
+
+  <message name="getDisseminationRequest">
+    <part name="parameters" element="fedora-types:getDissemination"/>
+  </message>
+  <message name="getDisseminationResponse">
+    <part name="parameters" element="fedora-types:getDisseminationResponse"/>
+  </message>
+
+  <message name="findObjectsRequest">
+    <part name="parameters" element="fedora-types:findObjects"/>
+  </message>
+  <message name="findObjectsResponse">
+    <part name="parameters" element="fedora-types:findObjectsResponse"/>
+  </message>
+
+  <message name="resumeFindObjectsRequest">
+    <part name="parameters" element="fedora-types:resumeFindObjects"/>
+  </message>
+  <message name="resumeFindObjectsResponse">
+    <part name="parameters" element="fedora-types:resumeFindObjectsResponse"/>
+  </message>
+
+  <message name="getObjectHistoryRequest">
+    <part name="parameters" element="fedora-types:getObjectHistory"/>
+  </message>
+  <message name="getObjectHistoryResponse">
+    <part name="parameters" element="fedora-types:getObjectHistoryResponse"/>
+  </message>
+
+
+  <portType name="Fedora-API-A-MTOM">
+    <operation name="describeRepository">
+      <input message="fedora-api:describeRepositoryRequest"/>
+      <output message="fedora-api:describeRepositoryResponse"/>
+    </operation>
+    <operation name="getObjectProfile">
+      <input message="fedora-api:getObjectProfileRequest"/>
+      <output message="fedora-api:getObjectProfileResponse"/>
+    </operation>
+    <operation name="listMethods">
+      <input message="fedora-api:listMethodsRequest"/>
+      <output message="fedora-api:listMethodsResponse"/>
+    </operation>
+    <operation name="listDatastreams">
+      <input message="fedora-api:listDatastreamsRequest"/>
+      <output message="fedora-api:listDatastreamsResponse"/>
+    </operation>
+    <operation name="getDatastreamDissemination">
+      <input message="fedora-api:getDatastreamDisseminationRequest"/>
+      <output message="fedora-api:getDatastreamDisseminationResponse"/>
+    </operation>
+    <operation name="getDissemination">
+      <input message="fedora-api:getDisseminationRequest"/>
+      <output message="fedora-api:getDisseminationResponse"/>
+    </operation>
+    <operation name="findObjects">
+      <input message="fedora-api:findObjectsRequest"/>
+      <output message="fedora-api:findObjectsResponse"/>
+    </operation>
+    <operation name="resumeFindObjects">
+      <input message="fedora-api:resumeFindObjectsRequest"/>
+      <output message="fedora-api:resumeFindObjectsResponse"/>
+    </operation>
+    <operation name="getObjectHistory">
+      <input message="fedora-api:getObjectHistoryRequest"/>
+      <output message="fedora-api:getObjectHistoryResponse"/>
+    </operation>
+  </portType>
+
+
+  <binding name="Fedora-API-A-MTOM-Binding-SOAPHTTP" type="fedora-api:Fedora-API-A-MTOM">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="describeRepository">
+      <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#describeRepository"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="getObjectProfile">
+      <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#getObjectProfile"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="listMethods">
+      <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#listMethods"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="listDatastreams">
+      <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#listDatastreams"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="getDatastreamDissemination">
+      <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#getDatastreamDissemination"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="getDissemination">
+      <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#getDissemination"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="findObjects">
+      <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#findObjects"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="resumeFindObjects">
+      <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#resumeFindObjects"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="getObjectHistory">
+      <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#getObjectHistory"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+
+  <service name="Fedora-API-A-MTOM-Service">
+    <port name="Fedora-API-A-MTOM-Port-SOAPHTTP" binding="fedora-api:Fedora-API-A-MTOM-Binding-SOAPHTTP">
+      <soap:address location="http://localhost:8080/fedora/cxf/accessMTOM"/>
+    </port>
+    <port name="Fedora-API-A-MTOM-Port-SOAPHTTPS" binding="fedora-api:Fedora-API-A-MTOM-Binding-SOAPHTTP">
+      <soap:address location="https://localhost:8443/fedora/cxf/accessMTOM"/>
+    </port>
+  </service>
+
+</definitions>
