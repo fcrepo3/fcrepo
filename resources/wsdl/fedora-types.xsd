@@ -167,7 +167,7 @@
     <element name="ingest">
         <complexType>
             <sequence>
-                <element name="objectXML" type="xsd:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
+                <element name="objectXML" type="xsd:base64Binary"/>
                 <element name="format" type="xsd:string"/>
                 <element name="logMessage" type="xsd:string"/>
             </sequence>
@@ -210,7 +210,7 @@
     <element name="getObjectXMLResponse">
         <complexType>
             <sequence>
-                <element name="objectXML" type="xsd:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
+                <element name="objectXML" type="xsd:base64Binary"/>
             </sequence>
         </complexType>
     </element>
@@ -227,7 +227,7 @@
     <element name="exportResponse">
         <complexType>
             <sequence>
-                <element name="objectXML" type="xsd:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
+                <element name="objectXML" type="xsd:base64Binary"/>
             </sequence>
         </complexType>
     </element>
@@ -310,7 +310,7 @@
                 <element name="dsLabel" type="xsd:string"/>
                 <element name="MIMEType" type="xsd:string"/>
                 <element name="formatURI" type="xsd:string"/>
-                <element name="dsContent" type="xsd:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
+                <element name="dsContent" type="xsd:base64Binary"/>
                 <element name="checksumType" type="xsd:string"/>
                 <element name="checksum" type="xsd:string"/>
                 <element name="logMessage" type="xsd:string"/>
@@ -702,7 +702,7 @@
     <complexType name="MIMETypedStream">
         <sequence>
             <element name="MIMEType" nillable="true" type="xsd:string"/>
-            <element name="stream" nillable="true" type="xsd:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
+            <element name="stream" nillable="true" type="xsd:base64Binary"/>
             <element name="header" nillable="true">
                 <complexType>
                     <sequence>
