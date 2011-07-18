@@ -123,8 +123,8 @@ the following tests fall into that category:
     
     mvn verify -Dconfig=[A|Q] -Dit.test=org.fcrepo.test.integration.TestLargeDatastreams
 
-Running system tests with an alternate host or webapp context
-=============================================================
+Running system tests with an alternate host, database, or webapp context
+========================================================================
 By default, integration tests assume Fedora is running at
 http://localhost:8080/fedora/.  A different server port may be
 chosen with no consequence.
@@ -138,3 +138,16 @@ Additionally, if your test instance of Fedora is not on the same
 host from which you are running the tests, you must manually 
 edit or remove the deny-apim-if-not-localhost.xml policy before
 testing.
+
+By default, integration tests are run against a Fedora instance configured
+to use the built-in Derby database.  If you wish to run the integration
+tests against an external database, you can specify this with the db property:
+
+-Ddb postgres
+
+Properties files used to configure Fedora during installation for the various 
+database configurations are in the folder:
+
+fcrepo-integrationtest\fcrepo-integrationtest-core\src\main\resources\config
+ 
+These properties files are named db.[database name].properties
