@@ -10,6 +10,14 @@
     <listener>
       <listener-class>org.fcrepo.server.utilities.CleanupContextListener</listener-class>
     </listener>
+    <context-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>/WEB-INF/applicationContext.xml,file:${fedora.home}/server/config/spring/web/*.xml</param-value>
+    </context-param>
+    <context-param>
+      <param-name>propertyConfigLocation</param-name>
+      <param-value>file:${fedora.home}/server/config/spring/web/web.properties</param-value>
+    </context-param>
     <servlet>
       <display-name>Apache-Axis Servlet</display-name>
       <servlet-name>AxisServlet</servlet-name>
@@ -26,10 +34,6 @@
       status)</display-name>
       <servlet-name>ControlServlet</servlet-name>
       <servlet-class>org.fcrepo.server.ServerController</servlet-class>
-      <init-param>
-        <param-name>fedora.home</param-name>
-        <param-value>/tmp/fcrepo</param-value>
-      </init-param>
       <load-on-startup>2</load-on-startup>
     </servlet>
     <servlet>
