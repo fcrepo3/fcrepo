@@ -34,7 +34,7 @@
 
   <jaxws:endpoint id="accessMTOM"
     implementor="org.fcrepo.server.access2.FedoraAPIAMTOMImpl"
-    serviceName="fedora-api-mtom:Fedora-API-A-Service" endpointName="fedora-api-mtom:Fedora-API-A-Port-SOAPHTTP"
+    serviceName="fedora-api-mtom:Fedora-API-A-MTOM-Service" endpointName="fedora-api-mtom:Fedora-API-A-MTOM-Port-SOAPHTTP"
     wsdlLocation="${fedora.home}/server/access/Fedora-API-A-MTOM.wsdl"
     address="/accessMTOM">
     <jaxws:properties>
