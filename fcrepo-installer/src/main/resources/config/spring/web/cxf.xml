@@ -5,14 +5,20 @@
   xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:fedora-types-mtom="http://fedora-commons.org/2011/07/definitions/types/"
   xmlns:fedora-types="http://www.fedora.info/definitions/1/0/types/"
+  xmlns:fedora-api-mtom="http://fedora-commons.org/2011/07/definitions/api/"
+  xmlns:fedora-api="http://www.fedora.info/definitions/1/0/api/"
   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
   xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
            ">
+  <context:annotation-config />
+
 
   <jaxws:endpoint id="managementMTOM"
     implementor="org.fcrepo.server.management2.FedoraAPIMMTOMImpl"
-    serviceName="fedora-types-mtom:Fedora-API-M-MTOM" endpointName="managementMTOM"
+    serviceName="fedora-api-mtom:Fedora-API-M-MTOM-Service"
+    endpointName="fedora-api-mtom:Fedora-API-M-MTOM-Port-SOAPHTTP"
+    wsdlLocation="${fedora.home}/server/management/Fedora-API-M-MTOM.wsdl"
     address="/managementMTOM">
     <jaxws:properties>
       <entry key="mtom-enabled" value="true" />
@@ -21,13 +27,15 @@
 
   <jaxws:endpoint id="management"
     implementor="org.fcrepo.server.management2.FedoraAPIMImpl"
-    serviceName="fedora-types:Fedora-API-M" endpointName="management"
+    serviceName="fedora-api:Fedora-API-M-Service" endpointName="fedora-api:Fedora-API-M-Port-SOAPHTTP"
+    wsdlLocation="${fedora.home}/server/management/Fedora-API-M.wsdl"
     address="/management">
   </jaxws:endpoint>
 
   <jaxws:endpoint id="accessMTOM"
     implementor="org.fcrepo.server.access2.FedoraAPIAMTOMImpl"
-    serviceName="fedora-types-mtom:Fedora-API-A-MTOM" endpointName="accessMTOM"
+    serviceName="fedora-api-mtom:Fedora-API-A-Service" endpointName="fedora-api-mtom:Fedora-API-A-Port-SOAPHTTP"
+    wsdlLocation="${fedora.home}/server/access/Fedora-API-A-MTOM.wsdl"
     address="/accessMTOM">
     <jaxws:properties>
       <entry key="mtom-enabled" value="true" />
@@ -35,11 +43,10 @@
   </jaxws:endpoint>
 
   <jaxws:endpoint id="access"
-    implementor="org.fcrepo.server.access2.FedoraAPIAImpl" serviceName="fedora-types:Fedora-API-A"
-    endpointName="access" address="/access">
+    implementor="org.fcrepo.server.access2.FedoraAPIAImpl" serviceName="fedora-api:Fedora-API-A-Service"
+    endpointName="fedora-api:Fedora-API-A-Port-SOAPHTTP" wsdlLocation="${fedora.home}/server/access/Fedora-API-A.wsdl"
+    address="/access">
   </jaxws:endpoint>
-
-
 
 
   <!-- <jaxws:endpoint id="managementMTOMS" implementor="org.fcrepo.server.management2.FedoraAPIMMTOMImpl" 
