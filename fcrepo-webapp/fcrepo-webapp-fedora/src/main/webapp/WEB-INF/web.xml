@@ -24,7 +24,7 @@
     <display-name>CXF Servlet</display-name>
     <servlet-name>CXFServlet</servlet-name>
     <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
+    <load-on-startup>3</load-on-startup>
   </servlet>
   <servlet>
     <display-name>Apache-Axis Servlet</display-name>
@@ -144,11 +144,11 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>CXFServlet</servlet-name>
-    <url-pattern>/cxf/*</url-pattern>
+    <url-pattern>/services/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>AxisServlet</servlet-name>
-    <url-pattern>/services/*</url-pattern>
+    <url-pattern>/axis/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>AccessServlet</servlet-name>
@@ -229,10 +229,6 @@
   <servlet-mapping>
     <servlet-name>AxisServlet</servlet-name>
     <url-pattern>*.jws</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>AxisServlet</servlet-name>
-    <url-pattern>/services/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>WSDLServlet</servlet-name>
