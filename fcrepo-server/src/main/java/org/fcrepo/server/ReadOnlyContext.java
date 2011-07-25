@@ -11,16 +11,16 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.axis.MessageContext;
-import org.apache.axis.transport.http.HTTPConstants;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
-import org.eclipse.jetty.util.log.Log;
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.servletfilters.ExtendedHttpServletRequest;
-import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.security.servletfilters.ExtendedHttpServletRequest;
+
+import org.fcrepo.utilities.DateUtility;
 
 
 
@@ -48,6 +48,7 @@ public class ReadOnlyContext
 
     private MultiValueMap m_environmentAttributes;
 
+    @Override
     public final MultiValueMap getEnvironmentAttributes() {
         return m_environmentAttributes;
     }
@@ -111,26 +112,32 @@ public class ReadOnlyContext
         }
     }
 
+    @Override
     public Iterator environmentAttributes() {
         return m_environmentAttributes.names();
     }
 
+    @Override
     public int nEnvironmentValues(String name) {
         return m_environmentAttributes.length(name);
     }
 
+    @Override
     public String getEnvironmentValue(String name) {
         return m_environmentAttributes.getString(name);
     }
 
+    @Override
     public String[] getEnvironmentValues(String name) {
         return m_environmentAttributes.getStringArray(name);
     }
 
+    @Override
     public Iterator subjectAttributes() {
         return m_subjectAttributes.names();
     }
 
+    @Override
     public int nSubjectValues(String name) {
         int n = m_subjectAttributes.length(name);
         logger.debug("N SUBJECT VALUES without == " + n);
@@ -142,6 +149,7 @@ public class ReadOnlyContext
         return n;
     }
 
+    @Override
     public String getSubjectValue(String name) {
         String value = null;
         if (m_subjectAttributes.length(name) == 1) {
@@ -155,6 +163,7 @@ public class ReadOnlyContext
         return value;
     }
 
+    @Override
     public String[] getSubjectValues(String name) {
         int n = m_subjectAttributes.length(name);
         if (extendedHttpServletRequest != null
@@ -184,6 +193,7 @@ public class ReadOnlyContext
         return values;
     }
 
+    @Override
     public void setActionAttributes(MultiValueMap actionAttributes) {
         m_actionAttributes = actionAttributes;
         if (m_actionAttributes == null) {
@@ -192,26 +202,32 @@ public class ReadOnlyContext
         m_actionAttributes.lock();
     }
 
+    @Override
     public Iterator actionAttributes() {
         return m_actionAttributes.names();
     }
 
+    @Override
     public int nActionValues(String name) {
         return m_actionAttributes.length(name);
     }
 
+    @Override
     public String getActionValue(String name) {
         return m_actionAttributes.getString(name);
     }
 
+    @Override
     public String[] getActionValues(String name) {
         return m_actionAttributes.getStringArray(name);
     }
 
+    @Override
     public Iterator resourceAttributes() {
         return m_resourceAttributes.names();
     }
 
+    @Override
     public void setResourceAttributes(MultiValueMap resourceAttributes) {
         m_resourceAttributes = resourceAttributes;
         if (m_resourceAttributes == null) {
@@ -220,14 +236,17 @@ public class ReadOnlyContext
         m_resourceAttributes.lock();
     }
 
+    @Override
     public int nResourceValues(String name) {
         return m_resourceAttributes.length(name);
     }
 
+    @Override
     public String getResourceValue(String name) {
         return m_resourceAttributes.getString(name);
     }
 
+    @Override
     public String[] getResourceValues(String name) {
         return m_resourceAttributes.getStringArray(name);
     }
@@ -244,6 +263,7 @@ public class ReadOnlyContext
         return buffer.toString();
     }
 
+    @Override
     public Date now() {
         return now;
     }
@@ -264,13 +284,13 @@ public class ReadOnlyContext
     }
 
     //will need fixup for noOp
-    public static Context getSoapContext() {
-        HttpServletRequest req =
-                (HttpServletRequest) MessageContext.getCurrentContext()
-                        .getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
-        return ReadOnlyContext.getContext(Constants.HTTP_REQUEST.SOAP.uri, req);
-    }
-    
+//    public static Context getSoapContext() {
+//        HttpServletRequest req =
+//                (HttpServletRequest) MessageContext.getCurrentContext()
+//                        .getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+//        return ReadOnlyContext.getContext(Constants.HTTP_REQUEST.SOAP.uri, req);
+//    }
+
     public static Context getSoapContext(javax.xml.ws.handler.MessageContext ctx) {
     	HttpServletRequest req = (HttpServletRequest) ctx.get(AbstractHTTPDestination.HTTP_REQUEST);
         return ReadOnlyContext.getContext(Constants.HTTP_REQUEST.SOAP.uri, req);
@@ -533,10 +553,12 @@ public class ReadOnlyContext
         auxSubjectRoles, noOp);
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
 
+    @Override
     public boolean getNoOp() {
         return noOp;
     }

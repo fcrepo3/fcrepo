@@ -15,19 +15,22 @@
 
   <build>
     <plugins>
+    <!-- axis
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
 
-          <execution>
+          <execution>-->
             <!-- update axis' configuration file (server-config.wsdd) requires 
               that the java files are compiled thus, perform this task in the "process-classes" 
               phase -->
+              <!-- axis
             <id>Update server-config.wsdd</id>
             <phase>process-classes</phase>
             <configuration>
-              <tasks>
+              <tasks>-->
                 <!-- update src/main/webapp/WEB-INF/server-config.wsdd -->
+                <!-- axis
                 <java classname="org.apache.axis.utils.Admin" fork="true"
                   classpathref="maven.compile.classpath" dir="${project.build.outputDirectory}">
                   <arg value="server" />
@@ -47,7 +50,7 @@
 
         </executions>
       </plugin>
-
+-->
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

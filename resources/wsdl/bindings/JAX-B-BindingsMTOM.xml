@@ -4,7 +4,7 @@
     version="1.0">
     <jxb:bindings schemaLocation="../fedora-types-mtom.xsd" node="/xsd:schema">
         <jxb:schemaBindings>
-            <jxb:package name="org.fcrepo.server.types2.mtom.gen"/>
+            <jxb:package name="org.fcrepo.server.types.mtom.gen"/>
         </jxb:schemaBindings>
     </jxb:bindings>
 </jxb:bindings>

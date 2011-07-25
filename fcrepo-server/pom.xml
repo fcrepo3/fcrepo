@@ -605,12 +605,12 @@
       <artifactId>akubra-mem</artifactId>
       <version>0.3</version>
     </dependency>
-
+<!-- 
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>axis</artifactId>
     </dependency>
-
+-->
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>GroboTestingJUnit-core</artifactId>

@@ -338,6 +338,7 @@
         <version>1.2</version>
         <classifier>melcoe</classifier>
       </dependency>
+      <!--
       <dependency>
         <groupId>org.fcrepo</groupId>
         <artifactId>axis</artifactId>
@@ -353,6 +354,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+      -->
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>

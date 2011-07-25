@@ -15,7 +15,7 @@
 
 
   <jaxws:endpoint id="managementMTOM"
-    implementor="org.fcrepo.server.management2.FedoraAPIMMTOMImpl"
+    implementor="org.fcrepo.server.management.FedoraAPIMMTOMImpl"
     serviceName="fedora-api-mtom:Fedora-API-M-MTOM-Service"
     endpointName="fedora-api-mtom:Fedora-API-M-MTOM-Port-SOAPHTTP"
     wsdlLocation="${fedora.home}/server/management/Fedora-API-M-MTOM.wsdl"
@@ -26,15 +26,16 @@
   </jaxws:endpoint>
 
   <jaxws:endpoint id="management"
-    implementor="org.fcrepo.server.management2.FedoraAPIMImpl"
+    implementor="org.fcrepo.server.management.FedoraAPIMImpl"
     serviceName="fedora-api:Fedora-API-M-Service" endpointName="fedora-api:Fedora-API-M-Port-SOAPHTTP"
     wsdlLocation="${fedora.home}/server/management/Fedora-API-M.wsdl"
     address="/management">
   </jaxws:endpoint>
 
   <jaxws:endpoint id="accessMTOM"
-    implementor="org.fcrepo.server.access2.FedoraAPIAMTOMImpl"
-    serviceName="fedora-api-mtom:Fedora-API-A-MTOM-Service" endpointName="fedora-api-mtom:Fedora-API-A-MTOM-Port-SOAPHTTP"
+    implementor="org.fcrepo.server.access.FedoraAPIAMTOMImpl"
+    serviceName="fedora-api-mtom:Fedora-API-A-MTOM-Service"
+    endpointName="fedora-api-mtom:Fedora-API-A-MTOM-Port-SOAPHTTP"
     wsdlLocation="${fedora.home}/server/access/Fedora-API-A-MTOM.wsdl"
     address="/accessMTOM">
     <jaxws:properties>
@@ -43,7 +44,7 @@
   </jaxws:endpoint>
 
   <jaxws:endpoint id="access"
-    implementor="org.fcrepo.server.access2.FedoraAPIAImpl" serviceName="fedora-api:Fedora-API-A-Service"
+    implementor="org.fcrepo.server.access.FedoraAPIAImpl" serviceName="fedora-api:Fedora-API-A-Service"
     endpointName="fedora-api:Fedora-API-A-Port-SOAPHTTP" wsdlLocation="${fedora.home}/server/access/Fedora-API-A.wsdl"
     address="/access">
   </jaxws:endpoint>

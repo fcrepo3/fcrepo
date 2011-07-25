@@ -3,7 +3,7 @@
  * available online at http://fedora-commons.org/license/).
  */
 
-package org.fcrepo.server.access2;
+package org.fcrepo.server.access;
 
 import java.io.File;
 
@@ -23,7 +23,6 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
-import org.fcrepo.server.access.Access;
 import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.ServerInitializationException;
 import org.fcrepo.server.utilities.TypeUtility;
@@ -89,14 +88,14 @@ public class FedoraAPIAImpl
      * (non-Javadoc)
      * @see org.fcrepo.server.access2.FedoraAPIA#getDissemination(String pid
      * ,)String serviceDefinitionPid ,)String methodName
-     * ,)org.fcrepo.server.types2.gen.GetDissemination.Parameters parameters
+     * ,)org.fcrepo.server.types.gen.GetDissemination.Parameters parameters
      * ,)String asOfDateTime )*
      */
     @Override
-    public org.fcrepo.server.types2.gen.MIMETypedStream getDissemination(String pid,
+    public org.fcrepo.server.types.gen.MIMETypedStream getDissemination(String pid,
                                                                          String serviceDefinitionPid,
                                                                          String methodName,
-                                                                         org.fcrepo.server.types2.gen.GetDissemination.Parameters parameters,
+                                                                         org.fcrepo.server.types.gen.GetDissemination.Parameters parameters,
                                                                          String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
@@ -104,7 +103,7 @@ public class FedoraAPIAImpl
         try {
             org.fcrepo.server.storage.types.Property[] properties =
                     TypeUtility
-                            .convertGenPropertyArrayToPropertyArray2(parameters);
+                            .convertGenPropertyArrayToPropertyArray(parameters);
             org.fcrepo.server.storage.types.MIMETypedStream mimeTypedStream =
                     s_access.getDissemination(context,
                                               pid,
@@ -113,7 +112,7 @@ public class FedoraAPIAImpl
                                               properties,
                                               DateUtility
                                                       .parseDateOrNull(asOfDateTime));
-            org.fcrepo.server.types2.gen.MIMETypedStream genMIMETypedStream =
+            org.fcrepo.server.types.gen.MIMETypedStream genMIMETypedStream =
                     TypeUtility
                             .convertMIMETypedStreamToGenMIMETypedStream2(mimeTypedStream);
             return genMIMETypedStream;
@@ -130,7 +129,7 @@ public class FedoraAPIAImpl
      * ,)String asOfDateTime )*
      */
     @Override
-    public org.fcrepo.server.types2.gen.ObjectProfile getObjectProfile(String pid,
+    public org.fcrepo.server.types.gen.ObjectProfile getObjectProfile(String pid,
                                                                        String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
@@ -139,9 +138,9 @@ public class FedoraAPIAImpl
             org.fcrepo.server.access.ObjectProfile objectProfile =
                     s_access.getObjectProfile(context, pid, DateUtility
                             .parseDateOrNull(asOfDateTime));
-            org.fcrepo.server.types2.gen.ObjectProfile genObjectProfile =
+            org.fcrepo.server.types.gen.ObjectProfile genObjectProfile =
                     TypeUtility
-                            .convertObjectProfileToGenObjectProfile2(objectProfile);
+                            .convertObjectProfileToGenObjectProfile(objectProfile);
             return genObjectProfile;
         } catch (Throwable th) {
             LOG.error("Error getting object profile", th);
@@ -153,14 +152,14 @@ public class FedoraAPIAImpl
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.access2.FedoraAPIA#findObjects(org.fcrepo.server.types2
+     * org.fcrepo.server.access2.FedoraAPIA#findObjects(org.fcrepo.server.types
      * .gen.ArrayOfString resultFields ,)java.math.BigInteger maxResults
-     * ,)org.fcrepo.server.types2.gen.FieldSearchQuery query )*
+     * ,)org.fcrepo.server.types.gen.FieldSearchQuery query )*
      */
     @Override
-    public org.fcrepo.server.types2.gen.FieldSearchResult findObjects(org.fcrepo.server.types2.gen.ArrayOfString resultFields,
+    public org.fcrepo.server.types.gen.FieldSearchResult findObjects(org.fcrepo.server.types.gen.ArrayOfString resultFields,
                                                                       java.math.BigInteger maxResults,
-                                                                      org.fcrepo.server.types2.gen.FieldSearchQuery query) {
+                                                                      org.fcrepo.server.types.gen.FieldSearchQuery query) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
@@ -173,9 +172,9 @@ public class FedoraAPIAImpl
                                          resultFieldsArray,
                                          maxResults.intValue(),
                                          TypeUtility
-                                                 .convertGenFieldSearchQueryToFieldSearchQuery2(query));
+                                                 .convertGenFieldSearchQueryToFieldSearchQuery(query));
             return TypeUtility
-                    .convertFieldSearchResultToGenFieldSearchResult2(result);
+                    .convertFieldSearchResultToGenFieldSearchResult(result);
         } catch (Throwable th) {
             LOG.error("Error finding objects", th);
             // throw AxisUtility.getFault(th);
@@ -214,7 +213,7 @@ public class FedoraAPIAImpl
      * pid ,)String dsID ,)String asOfDateTime )*
      */
     @Override
-    public org.fcrepo.server.types2.gen.MIMETypedStream getDatastreamDissemination(String pid,
+    public org.fcrepo.server.types.gen.MIMETypedStream getDatastreamDissemination(String pid,
                                                                                    String dsID,
                                                                                    String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
@@ -227,7 +226,7 @@ public class FedoraAPIAImpl
                                                         dsID,
                                                         DateUtility
                                                                 .parseDateOrNull(asOfDateTime));
-            org.fcrepo.server.types2.gen.MIMETypedStream genMIMETypedStream =
+            org.fcrepo.server.types.gen.MIMETypedStream genMIMETypedStream =
                     TypeUtility
                             .convertMIMETypedStreamToGenMIMETypedStream2(mimeTypedStream);
             return genMIMETypedStream;
@@ -257,15 +256,15 @@ public class FedoraAPIAImpl
      * @see org.fcrepo.server.access2.FedoraAPIA#describeRepository(*
      */
     @Override
-    public org.fcrepo.server.types2.gen.RepositoryInfo describeRepository() {
+    public org.fcrepo.server.types.gen.RepositoryInfo describeRepository() {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
         try {
             org.fcrepo.server.access.RepositoryInfo repositoryInfo =
                     s_access.describeRepository(context);
-            org.fcrepo.server.types2.gen.RepositoryInfo genRepositoryInfo =
-                    TypeUtility.convertReposInfoToGenReposInfo2(repositoryInfo);
+            org.fcrepo.server.types.gen.RepositoryInfo genRepositoryInfo =
+                    TypeUtility.convertReposInfoToGenReposInfo(repositoryInfo);
             return genRepositoryInfo;
         } catch (Throwable th) {
             LOG.error("Error describing repository", th);
@@ -280,7 +279,7 @@ public class FedoraAPIAImpl
      * asOfDateTime )*
      */
     @Override
-    public List<org.fcrepo.server.types2.gen.ObjectMethodsDef> listMethods(String pid,
+    public List<org.fcrepo.server.types.gen.ObjectMethodsDef> listMethods(String pid,
                                                                            String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
@@ -304,7 +303,7 @@ public class FedoraAPIAImpl
      * sessionToken )*
      */
     @Override
-    public org.fcrepo.server.types2.gen.FieldSearchResult resumeFindObjects(String sessionToken) {
+    public org.fcrepo.server.types.gen.FieldSearchResult resumeFindObjects(String sessionToken) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
@@ -312,7 +311,7 @@ public class FedoraAPIAImpl
             org.fcrepo.server.search.FieldSearchResult result =
                     s_access.resumeFindObjects(context, sessionToken);
             return TypeUtility
-                    .convertFieldSearchResultToGenFieldSearchResult2(result);
+                    .convertFieldSearchResultToGenFieldSearchResult(result);
         } catch (Throwable th) {
             LOG.error("Error resuming finding objects", th);
             // throw AxisUtility.getFault(th);
@@ -326,7 +325,7 @@ public class FedoraAPIAImpl
      * ,)String asOfDateTime )*
      */
     @Override
-    public List<org.fcrepo.server.types2.gen.DatastreamDef> listDatastreams(String pid,
+    public List<org.fcrepo.server.types.gen.DatastreamDef> listDatastreams(String pid,
                                                                             String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);

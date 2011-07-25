@@ -15,9 +15,9 @@
   
   <modules>
     <module>fcrepo-integrationtest-core</module>
-    <module>fcrepo-integrationtest-configA</module>
-    <module>fcrepo-integrationtest-configB</module>
-    <module>fcrepo-integrationtest-configC</module>
+    <!--  <module>fcrepo-integrationtest-configA</module>-->
+   <!-- <module>fcrepo-integrationtest-configB</module>-->
+    <!--<module>fcrepo-integrationtest-configC</module>-->
     <module>fcrepo-integrationtest-configQ</module>
   </modules>
 </project>

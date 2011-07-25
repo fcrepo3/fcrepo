@@ -3,13 +3,13 @@
              xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
              xmlns:xsd="http://www.w3.org/2001/XMLSchema"
              xmlns:fedora-api="http://fedora-commons.org/2011/07/definitions/api/"
-             xmlns:fedora-types="http://fedora-commons.org/2011/07/definitions/types/"
+             xmlns:fedora-types="http://fedora-commons.org/2011/07/definitions/api/"
              targetNamespace="http://fedora-commons.org/2011/07/definitions/api/"
              name="Fedora-API-A-MTOM-WSDL">
 
     <types>
         <schema xmlns="http://www.w3.org/2001/XMLSchema"
-                targetNamespace="http://fedora-commons.org/2011/07/definitions/types/">
+                targetNamespace="http://fedora-commons.org/2011/07/definitions/api/">
             <include schemaLocation="fedora-types-mtom.xsd"/>
         </schema>
     </types>

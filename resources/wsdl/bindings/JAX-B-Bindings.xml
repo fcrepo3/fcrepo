@@ -4,7 +4,7 @@
     version="1.0">
     <jxb:bindings schemaLocation="../fedora-types.xsd" node="/xsd:schema">
         <jxb:schemaBindings>
-            <jxb:package name="org.fcrepo.server.types2.gen"/>
+            <jxb:package name="org.fcrepo.server.types.gen"/>
         </jxb:schemaBindings>
     </jxb:bindings>
 </jxb:bindings>

@@ -17,18 +17,20 @@ import java.util.TimeZone;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.axis.types.NCName;
+import org.apache.xml.utils.XMLChar;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.FaultException;
 import org.fcrepo.common.PID;
+
 import org.fcrepo.server.errors.ValidationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 
@@ -403,7 +405,7 @@ public class RelsValidator
             String dsId = aboutURI.replace(m_doURI + "/", "");
             // datastream ID must be an XML NCName, implemented using axis NCName class
             if (dsId.length() > ValidationConstants.DATASTREAM_ID_MAXLEN
-                    || dsId.length() < 1 || !NCName.isValid(dsId)) {
+                    || dsId.length() < 1 || !isValid(dsId)) {
                 throw new SAXException("RelsExtValidator:"
                         + " The RELS-INT datastream refers to"
                         + " an improper URI in the 'about' attribute of the"
@@ -411,8 +413,28 @@ public class RelsValidator
                         + " is not a valid datastream ID");
 
             }
-
         }
+    }
+
+    /**
+     * validate the value against the xsd definition
+     * <p/>
+     * NCName ::=  (Letter | '_') (NCNameChar)* NCNameChar ::=  Letter | Digit | '.' | '-' | '_' |
+     * CombiningChar | Extender
+     */
+    private static boolean isValid(String stValue) {
+        int scan;
+        boolean bValid = true;
+
+        for (scan = 0; scan < stValue.length(); scan++) {
+            if (scan == 0)
+                bValid = XMLChar.isNCNameStart(stValue.charAt(scan));
+            else
+                bValid = XMLChar.isNCName(stValue.charAt(scan));
+            if (!bValid)
+                break;
+        }
+        return bValid;
     }
 
     /**

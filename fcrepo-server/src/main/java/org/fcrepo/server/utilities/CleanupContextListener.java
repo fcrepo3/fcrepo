@@ -6,8 +6,10 @@ package org.fcrepo.server.utilities;
 
 import java.net.URL;
 import java.net.URLConnection;
+
 import java.sql.Driver;
 import java.sql.DriverManager;
+
 import java.util.Enumeration;
 
 import javax.servlet.ServletContextEvent;
@@ -15,18 +17,19 @@ import javax.servlet.ServletContextListener;
 
 /**
  * Cleanup listener for general resource handling
- * 
+ *
  * @version $Id$
  */
 public class CleanupContextListener implements ServletContextListener {
 
     /*
      * Initialize any resources required by the application
-     * 
+     *
      * @see
      * javax.servlet.ServletContextListener#contextInitialized(javax.servlet
      * .ServletContextEvent)
      */
+    @Override
     public void contextInitialized(ServletContextEvent event) {
         // On Windows, URL caches can cause problems, particularly with
         // undeployment
@@ -48,10 +51,11 @@ public class CleanupContextListener implements ServletContextListener {
 
     /**
      * Clean up resources used by the application when stopped
-     * 
+     *
      * @seejavax.servlet.ServletContextListener#contextDestroyed(javax.servlet
      * .ServletContextEvent)
      */
+    @Override
     public void contextDestroyed(ServletContextEvent event) {
         // deregister database drivers
         try {
@@ -68,6 +72,6 @@ public class CleanupContextListener implements ServletContextListener {
             // the normal execution of the application, so we ignore them
         }
         // Clean the axis method cache, see FCREPO-496
-        org.apache.axis.utils.cache.MethodCache.getInstance().clearCache();
+//        org.apache.axis.utils.cache.MethodCache.getInstance().clearCache();
     }
 }

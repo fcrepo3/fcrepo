@@ -170,11 +170,12 @@
       <artifactId>saaj-api</artifactId>
       <version>1.3</version>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>axis</artifactId>
       <version>1.3-PATCHED</version>
     </dependency>
+    -->
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>jai_codec</artifactId>

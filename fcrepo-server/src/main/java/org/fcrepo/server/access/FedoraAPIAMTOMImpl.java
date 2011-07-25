@@ -3,7 +3,7 @@
  * available online at http://fedora-commons.org/license/).
  */
 
-package org.fcrepo.server.access2;
+package org.fcrepo.server.access;
 
 import java.io.File;
 
@@ -23,7 +23,6 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
-import org.fcrepo.server.access.Access;
 import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.ServerInitializationException;
 import org.fcrepo.server.utilities.TypeUtility;
@@ -93,7 +92,7 @@ public class FedoraAPIAMTOMImpl
      * )*
      */
     @Override
-    public org.fcrepo.server.types2.mtom.gen.MIMETypedStream getDatastreamDissemination(java.lang.String pid,
+    public org.fcrepo.server.types.mtom.gen.MIMETypedStream getDatastreamDissemination(java.lang.String pid,
                                                                                         java.lang.String dsID,
                                                                                         java.lang.String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
@@ -106,7 +105,7 @@ public class FedoraAPIAMTOMImpl
                                                         dsID,
                                                         DateUtility
                                                                 .parseDateOrNull(asOfDateTime));
-            org.fcrepo.server.types2.mtom.gen.MIMETypedStream genMIMETypedStream =
+            org.fcrepo.server.types.mtom.gen.MIMETypedStream genMIMETypedStream =
                     TypeUtility
                             .convertMIMETypedStreamToGenMIMETypedStreamMTOM(mimeTypedStream);
             return genMIMETypedStream;
@@ -135,14 +134,14 @@ public class FedoraAPIAMTOMImpl
      * (non-Javadoc)
      * @see org.fcrepo.server.access2.FedoraAPIA#getDissemination(String pid
      * ,)String serviceDefinitionPid ,)String methodName
-     * ,)org.fcrepo.server.types2.gen.GetDissemination.Parameters parameters
+     * ,)org.fcrepo.server.types.gen.GetDissemination.Parameters parameters
      * ,)String asOfDateTime )*
      */
     @Override
-    public org.fcrepo.server.types2.mtom.gen.MIMETypedStream getDissemination(String pid,
+    public org.fcrepo.server.types.mtom.gen.MIMETypedStream getDissemination(String pid,
                                                                               String serviceDefinitionPid,
                                                                               String methodName,
-                                                                              org.fcrepo.server.types2.mtom.gen.GetDissemination.Parameters parameters,
+                                                                              org.fcrepo.server.types.mtom.gen.GetDissemination.Parameters parameters,
                                                                               String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
@@ -159,7 +158,7 @@ public class FedoraAPIAMTOMImpl
                                               properties,
                                               DateUtility
                                                       .parseDateOrNull(asOfDateTime));
-            org.fcrepo.server.types2.mtom.gen.MIMETypedStream genMIMETypedStream =
+            org.fcrepo.server.types.mtom.gen.MIMETypedStream genMIMETypedStream =
                     TypeUtility
                             .convertMIMETypedStreamToGenMIMETypedStreamMTOM(mimeTypedStream);
             return genMIMETypedStream;
@@ -176,7 +175,7 @@ public class FedoraAPIAMTOMImpl
      * ,)String asOfDateTime )*
      */
     @Override
-    public org.fcrepo.server.types2.mtom.gen.ObjectProfile getObjectProfile(String pid,
+    public org.fcrepo.server.types.mtom.gen.ObjectProfile getObjectProfile(String pid,
                                                                             String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
@@ -185,7 +184,7 @@ public class FedoraAPIAMTOMImpl
             org.fcrepo.server.access.ObjectProfile objectProfile =
                     s_access.getObjectProfile(context, pid, DateUtility
                             .parseDateOrNull(asOfDateTime));
-            org.fcrepo.server.types2.mtom.gen.ObjectProfile genObjectProfile =
+            org.fcrepo.server.types.mtom.gen.ObjectProfile genObjectProfile =
                     TypeUtility
                             .convertObjectProfileToGenObjectProfileMTOM(objectProfile);
             return genObjectProfile;
@@ -199,14 +198,14 @@ public class FedoraAPIAMTOMImpl
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.access2.FedoraAPIA#findObjects(org.fcrepo.server.types2
+     * org.fcrepo.server.access2.FedoraAPIA#findObjects(org.fcrepo.server.types
      * .gen.ArrayOfString resultFields ,)java.math.BigInteger maxResults
-     * ,)org.fcrepo.server.types2.gen.FieldSearchQuery query )*
+     * ,)org.fcrepo.server.types.gen.FieldSearchQuery query )*
      */
     @Override
-    public org.fcrepo.server.types2.mtom.gen.FieldSearchResult findObjects(org.fcrepo.server.types2.mtom.gen.ArrayOfString resultFields,
+    public org.fcrepo.server.types.mtom.gen.FieldSearchResult findObjects(org.fcrepo.server.types.mtom.gen.ArrayOfString resultFields,
                                                                            java.math.BigInteger maxResults,
-                                                                           org.fcrepo.server.types2.mtom.gen.FieldSearchQuery query) {
+                                                                           org.fcrepo.server.types.mtom.gen.FieldSearchQuery query) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
@@ -258,14 +257,14 @@ public class FedoraAPIAMTOMImpl
      * @see org.fcrepo.server.access2.FedoraAPIA#describeRepository(*
      */
     @Override
-    public org.fcrepo.server.types2.mtom.gen.RepositoryInfo describeRepository() {
+    public org.fcrepo.server.types.mtom.gen.RepositoryInfo describeRepository() {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
         try {
             org.fcrepo.server.access.RepositoryInfo repositoryInfo =
                     s_access.describeRepository(context);
-            org.fcrepo.server.types2.mtom.gen.RepositoryInfo genRepositoryInfo =
+            org.fcrepo.server.types.mtom.gen.RepositoryInfo genRepositoryInfo =
                     TypeUtility
                             .convertReposInfoToGenReposInfoMTOM(repositoryInfo);
             return genRepositoryInfo;
@@ -282,7 +281,7 @@ public class FedoraAPIAMTOMImpl
      * asOfDateTime )*
      */
     @Override
-    public List<org.fcrepo.server.types2.mtom.gen.ObjectMethodsDef> listMethods(String pid,
+    public List<org.fcrepo.server.types.mtom.gen.ObjectMethodsDef> listMethods(String pid,
                                                                                 String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
@@ -306,7 +305,7 @@ public class FedoraAPIAMTOMImpl
      * sessionToken )*
      */
     @Override
-    public org.fcrepo.server.types2.mtom.gen.FieldSearchResult resumeFindObjects(String sessionToken) {
+    public org.fcrepo.server.types.mtom.gen.FieldSearchResult resumeFindObjects(String sessionToken) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
@@ -328,7 +327,7 @@ public class FedoraAPIAMTOMImpl
      * ,)String asOfDateTime )*
      */
     @Override
-    public List<org.fcrepo.server.types2.mtom.gen.DatastreamDef> listDatastreams(String pid,
+    public List<org.fcrepo.server.types.mtom.gen.DatastreamDef> listDatastreams(String pid,
                                                                                  String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
