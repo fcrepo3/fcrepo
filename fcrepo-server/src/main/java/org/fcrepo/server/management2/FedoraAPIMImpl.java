@@ -22,8 +22,6 @@ import javax.xml.ws.handler.MessageContext;
 
 import javax.annotation.Resource;
 
-import org.apache.axis.types.NonNegativeInteger;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -525,9 +523,10 @@ public class FedoraAPIMImpl
                                                                               String dsID) {
         assertInitialized();
         try {
+            MessageContext ctx = context.getMessageContext();
             org.fcrepo.server.storage.types.Datastream[] intDatastreams =
                     s_management.getDatastreamHistory(ReadOnlyContext
-                            .getSoapContext(), pid, dsID);
+                            .getSoapContext(ctx), pid, dsID);
             return getGenDatastreams(intDatastreams);
         } catch (Throwable th) {
             LOG.error("Error getting datastream history", th);
@@ -581,7 +580,7 @@ public class FedoraAPIMImpl
         try {
             MessageContext ctx = context.getMessageContext();
             if (numPIDs == null) {
-                numPIDs = new NonNegativeInteger("1");
+                numPIDs = new java.math.BigInteger("1");
             }
             String[] aux =
                     s_management

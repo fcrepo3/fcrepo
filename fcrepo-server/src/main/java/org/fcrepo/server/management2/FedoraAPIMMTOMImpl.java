@@ -23,8 +23,6 @@ import javax.activation.DataHandler;
 import javax.annotation.Resource;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.apache.axis.types.NonNegativeInteger;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,11 +107,12 @@ public class FedoraAPIMMTOMImpl
             // always gens pid, unless pid in stream starts with "test:" "demo:"
             // or other prefix that is configured in the retainPIDs parameter of
             // fedora.fcfg
+            MessageContext ctx = context.getMessageContext();
             InputStream byteStream = null;
             if (objectXML != null) {
                 byteStream = objectXML.getInputStream();
             }
-            return s_management.ingest(ReadOnlyContext.getSoapContext(),
+            return s_management.ingest(ReadOnlyContext.getSoapContext(ctx),
                                        byteStream,
                                        logMessage,
                                        format,
@@ -530,9 +529,10 @@ public class FedoraAPIMMTOMImpl
                                                                                    String dsID) {
         assertInitialized();
         try {
+            MessageContext ctx = context.getMessageContext();
             org.fcrepo.server.storage.types.Datastream[] intDatastreams =
                     s_management.getDatastreamHistory(ReadOnlyContext
-                            .getSoapContext(), pid, dsID);
+                            .getSoapContext(ctx), pid, dsID);
             return getGenDatastreams(intDatastreams);
         } catch (Throwable th) {
             LOG.error("Error getting datastream history", th);
@@ -586,7 +586,7 @@ public class FedoraAPIMMTOMImpl
         try {
             MessageContext ctx = context.getMessageContext();
             if (numPIDs == null) {
-                numPIDs = new NonNegativeInteger("1");
+                numPIDs = new java.math.BigInteger("1");
             }
             String[] aux =
                     s_management
