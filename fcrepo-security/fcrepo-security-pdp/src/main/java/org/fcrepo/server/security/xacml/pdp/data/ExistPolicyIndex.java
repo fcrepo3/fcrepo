@@ -154,6 +154,7 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
         try {
             writeLock.lock();
             deleteCollection();
+            initCollection();
         } finally {
             writeLock.unlock();
         }
