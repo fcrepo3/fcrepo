@@ -20,6 +20,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
+import org.apache.commons.io.IOUtils;
+
 import org.w3c.dom.Document;
 
 import org.slf4j.Logger;
@@ -62,6 +64,8 @@ public class DataFileUtils {
         while ((len = fis.read(buf)) >= 0) {
             data.write(buf, 0, len);
         }
+
+        IOUtils.closeQuietly(fis);
 
         return data.toByteArray();
     }
