@@ -187,6 +187,30 @@ public class DbXmlManager {
         }
     }
 
+    public void deleteDatabase() {
+        readLock.lock();
+        try {
+            try {
+                //XmlIndexSpecification is = container.getIndexSpecification();
+                //container.setIndexSpecification(is);
+
+                container.close();
+
+                container = null;
+            } catch (XmlException e) {
+                log.warn("Error closing container " + e.getMessage());
+            }
+            //container.delete();
+            try {
+                manager.removeContainer(CONTAINER);
+            } catch (XmlException e) {
+                log.warn("Error removing container " + e.getMessage());
+            }
+        } finally {
+            readLock.unlock();
+        }
+    }
+
 
 
     /**

@@ -503,20 +503,13 @@ public class DbXmlPolicyIndex
     @Override
     public boolean clear() throws PolicyIndexException {
 
-        boolean res = false;
-
-        // get database location
-        String dbDir = dbXmlManager.DB_HOME;
-        // close the existing manager
+        dbXmlManager.deleteDatabase();
         dbXmlManager.close();
         dbXmlManager = null;
 
-        // clear database dir
-        res = deleteDirectory(dbDir);
-
         // and init will create a new database (by creating a new dbXmlManager)
         init();
-        return res;
+        return true;
 
     }
 
