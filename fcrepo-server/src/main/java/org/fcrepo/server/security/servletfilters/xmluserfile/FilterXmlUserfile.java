@@ -21,7 +21,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
+ * @deprecated
  */
+@Deprecated
 public class FilterXmlUserfile
         extends BaseCaching
         implements Constants {

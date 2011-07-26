@@ -61,6 +61,11 @@ public abstract class Tomcat
         installIncludedKeystore();
     }
 
+    /**
+     * Creates a Tomcat context for Fedora in
+     * $CATALINA_HOME/conf/Catalina/localhost which sets the fedora.home system
+     * property to the installer-provided value.
+     */
     protected void installFedoraContext() throws InstallationFailedException {
         File contextDir =
             new File(getConf().getPath() + File.separator + "Catalina"
@@ -73,8 +78,6 @@ public abstract class Tomcat
             String content =
                     IOUtils.toString(this.getClass()
                             .getResourceAsStream("/resources/context.xml"))
-                            .replace("_FEDORA_HOME_URI_",
-                                     fhome.toURI().toString())
                             .replace("_FEDORA_HOME_",
                                      getOptions().getValue(InstallOptions.FEDORA_HOME));
 

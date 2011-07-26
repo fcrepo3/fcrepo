@@ -23,7 +23,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
+ * @deprecated
  */
+@Deprecated
 public class FilterPubcookie
         extends BaseCaching {
 

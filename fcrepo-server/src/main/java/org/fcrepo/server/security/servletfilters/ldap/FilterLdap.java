@@ -31,7 +31,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
+ * @deprecated
  */
+@Deprecated
 public class FilterLdap
         extends BaseCaching {
 

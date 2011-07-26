@@ -11,7 +11,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Branan
+ * @deprecated
  */
+@Deprecated
 public class FilterRestApiAuthn
         extends FilterEnforceAuthn {
 
