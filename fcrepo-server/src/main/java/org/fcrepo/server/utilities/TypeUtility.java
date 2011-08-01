@@ -39,7 +39,7 @@ public abstract class TypeUtility {
     private static final Logger logger = LoggerFactory
             .getLogger(TypeUtility.class);
 
-    public static org.fcrepo.server.types.mtom.gen.Datastream convertDatastreamToGenDatastream2(org.fcrepo.server.storage.types.Datastream in) {
+    public static org.fcrepo.server.types.mtom.gen.Datastream convertDatastreamToGenDatastreamMTOM(org.fcrepo.server.storage.types.Datastream in) {
         org.fcrepo.server.types.mtom.gen.Datastream out =
                 new org.fcrepo.server.types.mtom.gen.Datastream();
         String group = in.DSControlGrp;
@@ -443,7 +443,7 @@ public abstract class TypeUtility {
         }
     }
 
-    public static org.fcrepo.server.types.gen.MIMETypedStream convertMIMETypedStreamToGenMIMETypedStream2(org.fcrepo.server.storage.types.MIMETypedStream mimeTypedStream) {
+    public static org.fcrepo.server.types.gen.MIMETypedStream convertMIMETypedStreamToGenMIMETypedStream(org.fcrepo.server.storage.types.MIMETypedStream mimeTypedStream) {
         if (mimeTypedStream != null) {
             org.fcrepo.server.types.gen.MIMETypedStream genMIMETypedStream =
                     new org.fcrepo.server.types.gen.MIMETypedStream();
