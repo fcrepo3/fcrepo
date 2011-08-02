@@ -15,6 +15,8 @@ import javax.xml.ws.handler.MessageContext;
 
 import javax.annotation.Resource;
 
+import org.apache.cxf.binding.soap.SoapFault;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,7 @@ import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.ServerInitializationException;
+import org.fcrepo.server.utilities.CXFUtility;
 import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.utilities.DateUtility;
@@ -87,14 +90,14 @@ public class FedoraAPIAMTOMImpl
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.access2.FedoraAPIAMTOM#getDatastreamDissemination(java
+     * org.fcrepo.server.access.FedoraAPIAMTOM#getDatastreamDissemination(java
      * .lang.String pid ,)java.lang.String dsID ,)java.lang.String asOfDateTime
      * )*
      */
     @Override
     public org.fcrepo.server.types.mtom.gen.MIMETypedStream getDatastreamDissemination(java.lang.String pid,
-                                                                                        java.lang.String dsID,
-                                                                                        java.lang.String asOfDateTime) {
+                                                                                       java.lang.String dsID,
+                                                                                       java.lang.String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
@@ -120,29 +123,26 @@ public class FedoraAPIAMTOMImpl
             String restURL =
                     describeRepository().getRepositoryBaseURL() + "/get/" + pid
                             + "/" + dsID;
-            // throw AxisFault.makeFault(new Exception(exceptionText +
-            // restURL));
-            return null;
+            throw CXFUtility.getFault(new Exception(exceptionText + restURL));
         } catch (Throwable th) {
             LOG.error("Error getting datastream dissemination", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.access2.FedoraAPIA#getDissemination(String pid
+     * @see org.fcrepo.server.access.FedoraAPIA#getDissemination(String pid
      * ,)String serviceDefinitionPid ,)String methodName
      * ,)org.fcrepo.server.types.gen.GetDissemination.Parameters parameters
      * ,)String asOfDateTime )*
      */
     @Override
     public org.fcrepo.server.types.mtom.gen.MIMETypedStream getDissemination(String pid,
-                                                                              String serviceDefinitionPid,
-                                                                              String methodName,
-                                                                              org.fcrepo.server.types.mtom.gen.GetDissemination.Parameters parameters,
-                                                                              String asOfDateTime) {
+                                                                             String serviceDefinitionPid,
+                                                                             String methodName,
+                                                                             org.fcrepo.server.types.mtom.gen.GetDissemination.Parameters parameters,
+                                                                             String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
@@ -164,19 +164,18 @@ public class FedoraAPIAMTOMImpl
             return genMIMETypedStream;
         } catch (Throwable th) {
             LOG.error("Error getting dissemination", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.access2.FedoraAPIA#getObjectProfile(String pid
+     * @see org.fcrepo.server.access.FedoraAPIA#getObjectProfile(String pid
      * ,)String asOfDateTime )*
      */
     @Override
     public org.fcrepo.server.types.mtom.gen.ObjectProfile getObjectProfile(String pid,
-                                                                            String asOfDateTime) {
+                                                                           String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
@@ -190,22 +189,21 @@ public class FedoraAPIAMTOMImpl
             return genObjectProfile;
         } catch (Throwable th) {
             LOG.error("Error getting object profile", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.access2.FedoraAPIA#findObjects(org.fcrepo.server.types
+     * org.fcrepo.server.access.FedoraAPIA#findObjects(org.fcrepo.server.types
      * .gen.ArrayOfString resultFields ,)java.math.BigInteger maxResults
      * ,)org.fcrepo.server.types.gen.FieldSearchQuery query )*
      */
     @Override
     public org.fcrepo.server.types.mtom.gen.FieldSearchResult findObjects(org.fcrepo.server.types.mtom.gen.ArrayOfString resultFields,
-                                                                           java.math.BigInteger maxResults,
-                                                                           org.fcrepo.server.types.mtom.gen.FieldSearchQuery query) {
+                                                                          java.math.BigInteger maxResults,
+                                                                          org.fcrepo.server.types.mtom.gen.FieldSearchQuery query) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
@@ -223,14 +221,13 @@ public class FedoraAPIAMTOMImpl
                     .convertFieldSearchResultToGenFieldSearchResultMTOM(result);
         } catch (Throwable th) {
             LOG.error("Error finding objects", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.access2.FedoraAPIA#getObjectHistory(String pid )*
+     * @see org.fcrepo.server.access.FedoraAPIA#getObjectHistory(String pid )*
      */
     @Override
     public List<String> getObjectHistory(String pid) {
@@ -247,14 +244,13 @@ public class FedoraAPIAMTOMImpl
             return sDefs == null ? null : Arrays.asList(new String[0]);
         } catch (Throwable th) {
             LOG.error("Error getting object history", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.access2.FedoraAPIA#describeRepository(*
+     * @see org.fcrepo.server.access.FedoraAPIA#describeRepository(*
      */
     @Override
     public org.fcrepo.server.types.mtom.gen.RepositoryInfo describeRepository() {
@@ -270,19 +266,18 @@ public class FedoraAPIAMTOMImpl
             return genRepositoryInfo;
         } catch (Throwable th) {
             LOG.error("Error describing repository", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.access2.FedoraAPIA#listMethods(String pid ,)String
+     * @see org.fcrepo.server.access.FedoraAPIA#listMethods(String pid ,)String
      * asOfDateTime )*
      */
     @Override
     public List<org.fcrepo.server.types.mtom.gen.ObjectMethodsDef> listMethods(String pid,
-                                                                                String asOfDateTime) {
+                                                                               String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
@@ -294,14 +289,13 @@ public class FedoraAPIAMTOMImpl
                     .convertObjectMethodsDefArrayToGenObjectMethodsDefListMTOM(objectMethodDefs);
         } catch (Throwable th) {
             LOG.error("Error listing methods", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.access2.FedoraAPIA#resumeFindObjects(String
+     * @see org.fcrepo.server.access.FedoraAPIA#resumeFindObjects(String
      * sessionToken )*
      */
     @Override
@@ -316,19 +310,18 @@ public class FedoraAPIAMTOMImpl
                     .convertFieldSearchResultToGenFieldSearchResultMTOM(result);
         } catch (Throwable th) {
             LOG.error("Error resuming finding objects", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.access2.FedoraAPIA#listDatastreams(String pid
+     * @see org.fcrepo.server.access.FedoraAPIA#listDatastreams(String pid
      * ,)String asOfDateTime )*
      */
     @Override
     public List<org.fcrepo.server.types.mtom.gen.DatastreamDef> listDatastreams(String pid,
-                                                                                 String asOfDateTime) {
+                                                                                String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
@@ -340,14 +333,13 @@ public class FedoraAPIAMTOMImpl
                     .convertDatastreamDefArrayToGenDatastreamDefListMTOM(datastreamDefs);
         } catch (Throwable th) {
             LOG.error("Error listing datastreams", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
-    private void assertInitialized()/* throws java.rmi.RemoteException */{
+    private void assertInitialized() throws SoapFault {
         if (!s_initialized) {
-            // AxisUtility.throwFault(s_initException);
+            CXFUtility.throwFault(s_initException);
         }
     }
 }

@@ -23,6 +23,8 @@ import javax.activation.DataHandler;
 import javax.annotation.Resource;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.apache.cxf.binding.soap.SoapFault;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,7 @@ import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.ServerInitializationException;
 import org.fcrepo.server.errors.StorageDeviceException;
+import org.fcrepo.server.utilities.CXFUtility;
 import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.utilities.DateUtility;
@@ -94,8 +97,7 @@ public class FedoraAPIMMTOMImpl
 
     /*
      * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.management2.FedoraAPIMMTOM#ingest(javax.activation.
+     * @see org.fcrepo.server.management.FedoraAPIMMTOM#ingest(javax.activation.
      * DataHandler objectXML ,)String format ,)String logMessage )*
      */
     @Override
@@ -119,8 +121,7 @@ public class FedoraAPIMMTOMImpl
                                        "new");
         } catch (Throwable th) {
             LOG.error("Error ingesting", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         } finally {
             LOG.debug("end: ingest");
         }
@@ -128,7 +129,7 @@ public class FedoraAPIMMTOMImpl
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.management2.FedoraAPIMMTOM#modifyObject(String pid
+     * @see org.fcrepo.server.management.FedoraAPIMMTOM#modifyObject(String pid
      * ,)String state ,)String label ,)String ownerId ,)String logMessage )*
      */
     @Override
@@ -151,8 +152,7 @@ public class FedoraAPIMMTOMImpl
                                   null));
         } catch (Throwable th) {
             LOG.error("Error modifying object", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         } finally {
             LOG.debug("end: modifyObject, " + pid);
         }
@@ -160,7 +160,7 @@ public class FedoraAPIMMTOMImpl
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.management2.FedoraAPIMMTOM#getObjectXML(String pid
+     * @see org.fcrepo.server.management.FedoraAPIMMTOM#getObjectXML(String pid
      * )*
      */
     @Override
@@ -177,14 +177,13 @@ public class FedoraAPIMMTOMImpl
                                                            "text/xml"));
         } catch (Throwable th) {
             LOG.error("Error getting object XML", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.management2.FedoraAPIMMTOM#export(String pid
+     * @see org.fcrepo.server.management.FedoraAPIMMTOM#export(String pid
      * ,)String format ,)String context )*
      */
     @Override
@@ -205,14 +204,13 @@ public class FedoraAPIMMTOMImpl
                                                            "text/xml"));
         } catch (Throwable th) {
             LOG.error("Error exporting object", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.management2.FedoraAPIMMTOM#purgeObject(String pid
+     * @see org.fcrepo.server.management.FedoraAPIMMTOM#purgeObject(String pid
      * ,)String logMessage ,)boolean force )*
      */
     @Override
@@ -227,8 +225,7 @@ public class FedoraAPIMMTOMImpl
                                  logMessage));
         } catch (Throwable th) {
             LOG.error("Error purging object", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         } finally {
             LOG.debug("end: purgeObject, " + pid);
         }
@@ -236,9 +233,9 @@ public class FedoraAPIMMTOMImpl
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.management2.FedoraAPIMMTOM#addDatastream( String
-     * pid ,)String dsID ,)org.fcrepo.server.types.mtom.gen.ArrayOfString
-     * altIDs ,)String dsLabel ,)boolean versionable ,)String mimeType ,)String
+     * @see org.fcrepo.server.management.FedoraAPIMMTOM#addDatastream( String
+     * pid ,)String dsID ,)org.fcrepo.server.types.mtom.gen.ArrayOfString altIDs
+     * ,)String dsLabel ,)boolean versionable ,)String mimeType ,)String
      * formatURI ,)String dsLocation ,)String controlGroup ,)String dsState
      * ,)String checksumType ,)String checksum ,)String logMessage )*
      */
@@ -278,8 +275,7 @@ public class FedoraAPIMMTOMImpl
                                               logMessage);
         } catch (Throwable th) {
             LOG.error("Error adding datastream", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         } finally {
             LOG.debug("end: addDatastream, " + pid + ", " + dsID);
         }
@@ -288,7 +284,7 @@ public class FedoraAPIMMTOMImpl
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.management2.FedoraAPIMMTOM#modifyDatastreamByReference
+     * org.fcrepo.server.management.FedoraAPIMMTOM#modifyDatastreamByReference
      * (String pid ,)String dsID
      * ,)org.fcrepo.server.types.mtom.gen.ArrayOfString altIDs ,)String dsLabel
      * ,)String mimeType ,)String formatURI ,)String dsLocation ,)String
@@ -327,8 +323,7 @@ public class FedoraAPIMMTOMImpl
                                                  null));
         } catch (Throwable th) {
             LOG.error("Error modifying datastream by reference", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         } finally {
             LOG.debug("end: modifyDatastreamByReference, " + pid + ", " + dsID);
         }
@@ -336,13 +331,11 @@ public class FedoraAPIMMTOMImpl
 
     /*
      * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.management2.FedoraAPIMMTOM#modifyDatastreamByValue(
-     * String pid ,)String dsID
-     * ,)org.fcrepo.server.types.mtom.gen.ArrayOfString altIDs ,)String dsLabel
-     * ,)String mimeType ,)String formatURI ,)javax.activation.DataHandler
-     * dsContent ,)String checksumType ,)String checksum ,)String logMessage
-     * ,)boolean force )*
+     * @see org.fcrepo.server.management.FedoraAPIMMTOM#modifyDatastreamByValue(
+     * String pid ,)String dsID ,)org.fcrepo.server.types.mtom.gen.ArrayOfString
+     * altIDs ,)String dsLabel ,)String mimeType ,)String formatURI
+     * ,)javax.activation.DataHandler dsContent ,)String checksumType ,)String
+     * checksum ,)String logMessage ,)boolean force )*
      */
     @Override
     public String modifyDatastreamByValue(String pid,
@@ -381,8 +374,7 @@ public class FedoraAPIMMTOMImpl
                                              null));
         } catch (Throwable th) {
             LOG.error("Error modifying datastream by value", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         } finally {
             LOG.debug("end: modifyDatastreamByValue, " + pid + ", " + dsID);
         }
@@ -390,8 +382,7 @@ public class FedoraAPIMMTOMImpl
 
     /*
      * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.management2.FedoraAPIMMTOM#setDatastreamState(java.
+     * @see org.fcrepo.server.management.FedoraAPIMMTOM#setDatastreamState(java.
      * lang.String pid ,)String dsID ,)String dsState ,)String logMessage )*
      */
     @Override
@@ -411,15 +402,13 @@ public class FedoraAPIMMTOMImpl
                                         logMessage));
         } catch (Throwable th) {
             LOG.error("Error setting datastream state", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.management2.FedoraAPIMMTOM#setDatastreamVersionable
+     * @see org.fcrepo.server.management.FedoraAPIMMTOM#setDatastreamVersionable
      * (String pid ,)String dsID ,)boolean versionable ,)String logMessage )*
      */
     @Override
@@ -440,15 +429,14 @@ public class FedoraAPIMMTOMImpl
                                               logMessage));
         } catch (Throwable th) {
             LOG.error("Error setting datastream state", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.management2.FedoraAPIMMTOM#compareDatastreamChecksum
+     * org.fcrepo.server.management.FedoraAPIMMTOM#compareDatastreamChecksum
      * (String pid ,)String dsID ,)String versionDate )*
      */
     @Override
@@ -463,20 +451,19 @@ public class FedoraAPIMMTOMImpl
                     .parseDateOrNull(versionDate));
         } catch (Throwable th) {
             LOG.error("Error comparing datastream checksum", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.management2.FedoraAPIMMTOM#getDatastream( String
+     * @see org.fcrepo.server.management.FedoraAPIMMTOM#getDatastream( String
      * pid ,)String dsID ,)String asOfDateTime )*
      */
     @Override
     public org.fcrepo.server.types.mtom.gen.Datastream getDatastream(String pid,
-                                                                      String dsID,
-                                                                      String asOfDateTime) {
+                                                                     String dsID,
+                                                                     String asOfDateTime) {
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
@@ -484,24 +471,22 @@ public class FedoraAPIMMTOMImpl
                     s_management.getDatastream(ReadOnlyContext
                             .getSoapContext(ctx), pid, dsID, DateUtility
                             .parseDateOrNull(asOfDateTime));
-            return TypeUtility.convertDatastreamToGenDatastream2(ds);
+            return TypeUtility.convertDatastreamToGenDatastreamMTOM(ds);
         } catch (Throwable th) {
             LOG.error("Error getting datastream", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.management2.FedoraAPIMMTOM#getDatastreams(java.lang
+     * @see org.fcrepo.server.management.FedoraAPIMMTOM#getDatastreams(java.lang
      * .String pid ,)String asOfDateTime ,)String dsState )*
      */
     @Override
     public List<org.fcrepo.server.types.mtom.gen.Datastream> getDatastreams(String pid,
-                                                                             String asOfDateTime,
-                                                                             String dsState) {
+                                                                            String asOfDateTime,
+                                                                            String dsState) {
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
@@ -512,20 +497,19 @@ public class FedoraAPIMMTOMImpl
             return getGenDatastreams(intDatastreams);
         } catch (Throwable th) {
             LOG.error("Error getting datastreams", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.management2.FedoraAPIMMTOM#getDatastreamHistory(java
+     * org.fcrepo.server.management.FedoraAPIMMTOM#getDatastreamHistory(java
      * .lang.String pid ,)String dsID )*
      */
     @Override
     public List<org.fcrepo.server.types.mtom.gen.Datastream> getDatastreamHistory(String pid,
-                                                                                   String dsID) {
+                                                                                  String dsID) {
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
@@ -535,15 +519,14 @@ public class FedoraAPIMMTOMImpl
             return getGenDatastreams(intDatastreams);
         } catch (Throwable th) {
             LOG.error("Error getting datastream history", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         }
     }
 
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.management2.FedoraAPIMMTOM#purgeDatastream(java.lang
+     * org.fcrepo.server.management.FedoraAPIMMTOM#purgeDatastream(java.lang
      * .String pid ,)String dsID ,)String startDT ,)String endDT ,)String
      * logMessage ,)boolean force )*
      */
@@ -564,8 +547,7 @@ public class FedoraAPIMMTOMImpl
                     .parseDateOrNull(endDT), logMessage));
         } catch (Throwable th) {
             LOG.error("Error purging datastream", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         } finally {
             LOG.debug("end: purgeDatastream, " + pid + ", " + dsID);
         }
@@ -574,7 +556,7 @@ public class FedoraAPIMMTOMImpl
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.management2.FedoraAPIMMTOM#getNextPID(java.math.BigInteger
+     * org.fcrepo.server.management.FedoraAPIMMTOM#getNextPID(java.math.BigInteger
      * numPIDs ,)String pidNamespace )*
      */
     @Override
@@ -599,8 +581,7 @@ public class FedoraAPIMMTOMImpl
             return auxList;
         } catch (Throwable th) {
             LOG.error("Error getting next PID", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         } finally {
             LOG.debug("end: getNextPID");
         }
@@ -609,12 +590,12 @@ public class FedoraAPIMMTOMImpl
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.management2.FedoraAPIMMTOM#getRelationships(java.lang
+     * org.fcrepo.server.management.FedoraAPIMMTOM#getRelationships(java.lang
      * .String pid ,)String relationship )*
      */
     @Override
     public List<org.fcrepo.server.types.mtom.gen.RelationshipTuple> getRelationships(String pid,
-                                                                                      String relationship) {
+                                                                                     String relationship) {
         LOG.debug("start: getRelationships");
         assertInitialized();
         try {
@@ -627,8 +608,7 @@ public class FedoraAPIMMTOMImpl
             return getGenRelsTuples(intRelationshipTuples);
         } catch (Throwable th) {
             LOG.error("Error getting relationships", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         } finally {
             LOG.debug("end: getRelationships");
         }
@@ -637,7 +617,7 @@ public class FedoraAPIMMTOMImpl
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.management2.FedoraAPIMMTOM#addRelationship(java.lang
+     * org.fcrepo.server.management.FedoraAPIMMTOM#addRelationship(java.lang
      * .String pid ,)String relationship ,)String object ,)boolean isLiteral
      * ,)String datatype )*
      */
@@ -660,8 +640,7 @@ public class FedoraAPIMMTOMImpl
                                                 datatype);
         } catch (Throwable th) {
             LOG.error("Error adding relationships", th);
-            // throw AxisUtility.getFault(th);
-            return false;
+            throw CXFUtility.getFault(th);
         } finally {
             LOG.debug("end: addRelationship");
         }
@@ -669,9 +648,8 @@ public class FedoraAPIMMTOMImpl
 
     /*
      * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.management2.FedoraAPIMMTOM#purgeRelationship(String pid
-     * ,)String relationship ,)String object ,)boolean isLiteral ,)String
+     * @see org.fcrepo.server.management.FedoraAPIMMTOM#purgeRelationship(String
+     * pid ,)String relationship ,)String object ,)boolean isLiteral ,)String
      * datatype )*
      */
     @Override
@@ -693,8 +671,7 @@ public class FedoraAPIMMTOMImpl
                                                   datatype);
         } catch (Throwable th) {
             LOG.error("Error purging relationships", th);
-            // throw AxisUtility.getFault(th);
-            return false;
+            throw CXFUtility.getFault(th);
         } finally {
             LOG.debug("end: purgeRelationship");
         }
@@ -702,12 +679,12 @@ public class FedoraAPIMMTOMImpl
 
     /*
      * (non-Javadoc)
-     * @see org.fcrepo.server.management2.FedoraAPIMMTOM#validate(String pid
+     * @see org.fcrepo.server.management.FedoraAPIMMTOM#validate(String pid
      * ,)String asOfDateTime )*
      */
     @Override
     public org.fcrepo.server.types.mtom.gen.Validation validate(String pid,
-                                                                 String asOfDateTime) {
+                                                                String asOfDateTime) {
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
@@ -717,16 +694,15 @@ public class FedoraAPIMMTOMImpl
                               DateUtility.parseDateOrNull(asOfDateTime)));
         } catch (Throwable th) {
             LOG.error("Error purging relationships", th);
-            // throw AxisUtility.getFault(th);
-            return null;
+            throw CXFUtility.getFault(th);
         } finally {
             LOG.debug("end: purgeRelationship");
         }
     }
 
-    private void assertInitialized() /* throws java.rmi.RemoteException */{
+    private void assertInitialized() throws SoapFault {
         if (!s_initialized) {
-            // AxisUtility.throwFault(s_initException);
+            CXFUtility.throwFault(s_initException);
         }
     }
 
@@ -754,8 +730,8 @@ public class FedoraAPIMMTOMImpl
         List<org.fcrepo.server.types.mtom.gen.RelationshipTuple> genRelsTuples =
                 new ArrayList<org.fcrepo.server.types.mtom.gen.RelationshipTuple>(intRelsTuples.length);
         for (org.fcrepo.server.storage.types.RelationshipTuple tuple : intRelsTuples) {
-            genRelsTuples.add(TypeUtility
-                    .convertRelsTupleToGenRelsTuple(tuple));
+            genRelsTuples
+                    .add(TypeUtility.convertRelsTupleToGenRelsTuple(tuple));
         }
         return genRelsTuples;
     }
@@ -773,7 +749,7 @@ public class FedoraAPIMMTOMImpl
                 new ArrayList<org.fcrepo.server.types.mtom.gen.Datastream>(intDatastreams.length);
         for (org.fcrepo.server.storage.types.Datastream datastream : intDatastreams) {
             genDatastreams.add(TypeUtility
-                    .convertDatastreamToGenDatastream2(datastream));
+                    .convertDatastreamToGenDatastreamMTOM(datastream));
         }
         return genDatastreams;
     }
