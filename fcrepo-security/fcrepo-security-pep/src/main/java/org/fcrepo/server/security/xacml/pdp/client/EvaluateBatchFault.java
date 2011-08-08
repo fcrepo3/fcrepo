@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="return" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="evaluateBatchFault" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -29,36 +29,36 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "_return"
+    "evaluateBatchFault"
 })
-@XmlRootElement(name = "evaluateResponse")
-public class EvaluateResponse {
+@XmlRootElement(name = "evaluateBatchFault")
+public class EvaluateBatchFault {
 
-    @XmlElement(name = "return", required = true, nillable = true)
-    protected String _return;
+    @XmlElement(required = true)
+    protected Object evaluateBatchFault;
 
     /**
-     * Gets the value of the return property.
+     * Gets the value of the evaluateBatchFault property.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link Object }
      *     
      */
-    public String getReturn() {
-        return _return;
+    public Object getEvaluateBatchFault() {
+        return evaluateBatchFault;
     }
 
     /**
-     * Sets the value of the return property.
+     * Sets the value of the evaluateBatchFault property.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link Object }
      *     
      */
-    public void setReturn(String value) {
-        this._return = value;
+    public void setEvaluateBatchFault(Object value) {
+        this.evaluateBatchFault = value;
     }
 
 }

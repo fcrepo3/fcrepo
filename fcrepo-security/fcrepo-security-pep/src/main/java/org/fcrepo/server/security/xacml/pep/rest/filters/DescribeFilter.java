@@ -19,7 +19,9 @@
 package org.fcrepo.server.security.xacml.pep.rest.filters;
 
 import java.io.IOException;
+
 import java.net.URI;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,24 +29,23 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
-import org.apache.axis.AxisFault;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.LogUtil;
-
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+
 
 /**
  * This class handles the describe operation.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public class DescribeFilter
@@ -55,7 +56,7 @@ public class DescribeFilter
 
     /**
      * Default constructor.
-     * 
+     *
      * @throws PEPException
      */
     public DescribeFilter()
@@ -69,6 +70,7 @@ public class DescribeFilter
      * org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter#handleRequest(javax.servlet
      * .http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
+    @Override
     public RequestCtx handleRequest(HttpServletRequest request,
                                     HttpServletResponse response)
             throws IOException, ServletException {
@@ -105,7 +107,7 @@ public class DescribeFilter
                             null);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            throw AxisFault.makeFault(e);
+//            throw AxisFault.makeFault(e);
         }
 
         return req;
@@ -117,6 +119,7 @@ public class DescribeFilter
      * org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter#handleResponse(javax.servlet
      * .http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
+    @Override
     public RequestCtx handleResponse(HttpServletRequest request,
                                      HttpServletResponse response)
             throws IOException, ServletException {

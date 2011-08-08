@@ -18,6 +18,7 @@
 
 package org.fcrepo.server.security.xacml.pep;
 
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -64,6 +65,7 @@ public class DirectPDPClient
      * (non-Javadoc)
      * @see org.fcrepo.server.security.xacml.pep.PEPClient#evaluate(java.lang.String)
      */
+    @Override
     public String evaluate(String request) throws PEPException {
         if (logger.isDebugEnabled()) {
             logger.debug("Resolving String request:\n" + request);
@@ -84,15 +86,19 @@ public class DirectPDPClient
      * (non-Javadoc)
      * @see org.fcrepo.server.security.xacml.pep.PEPClient#evaluateBatch(java.lang.String[])
      */
-    public String evaluateBatch(String[] request) throws PEPException {
+    @Override
+    public String evaluateBatch(List<String> request) throws PEPException {
+        if (request == null) {
+            throw new NullPointerException("evaluateBatch(request=null)");
+        }
         if (logger.isDebugEnabled()) {
-            logger.debug("Resolving request batch (" + request.length
+            logger.debug("Resolving request batch (" + request.size()
                     + " requests)");
         }
 
         String response = null;
         try {
-            response = getClient().evaluateBatch(request);
+            response = getClient().evaluateBatch(request.toArray(new String[]{}));
         } catch (Exception e) {
             logger.error("Error evaluating request.", e);
             throw new PEPException("Error evaluating request", e);

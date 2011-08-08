@@ -31,8 +31,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
     "_return"
 })
-@XmlRootElement(name = "evaluateResponse")
-public class EvaluateResponse {
+@XmlRootElement(name = "evaluateBatchResponse")
+public class EvaluateBatchResponse {
 
     @XmlElement(name = "return", required = true, nillable = true)
     protected String _return;

@@ -34,12 +34,6 @@ import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 
-import org.apache.axis.AxisFault;
-import org.apache.axis.MessageContext;
-import org.apache.axis.description.OperationDesc;
-import org.apache.axis.description.ServiceDesc;
-import org.apache.axis.handlers.BasicHandler;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -49,12 +43,12 @@ import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 
-import org.fcrepo.server.security.xacml.pep.AuthzDeniedException;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandler;
 import org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandlerException;
+import org.fcrepo.server.utilities.CXFUtility;
 
 
 /**
@@ -106,7 +100,7 @@ public class PEP
      * (non-Javadoc)
      * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
      */
-    public void invoke(MessageContext context) throws AxisFault {
+    public void invoke(MessageContext context) {
         if (logger.isDebugEnabled()) {
             logger.debug("AuthHandler executed: " + context.getTargetService()
                     + "/" + context.getOperation().getName() + " [" + ts + "]");
@@ -123,8 +117,7 @@ public class PEP
         // there must always be a handler.
         if (operationHandler == null) {
             logger.error("Missing handler for service/operation: " + service.getName() + "/" + operation.getName());
-            throw AxisFault
-                    .makeFault(new PEPException("Missing handler for service/operation: " + service.getName() + "/" + operation.getName()));
+            throw CXFUtility.getFault(new PEPException("Missing handler for service/operation: " + service.getName() + "/" + operation.getName()));
         }
 
         RequestCtx reqCtx = null;
@@ -139,8 +132,7 @@ public class PEP
             }
         } catch (OperationHandlerException ohe) {
             logger.error("Error handling operation: " + operation.getName(), ohe);
-            throw AxisFault
-                    .makeFault(new PEPException("Error handling operation: "
+            throw CXFUtility.getFault(new PEPException("Error handling operation: "
                             + operation.getName(), ohe));
         }
 
@@ -158,8 +150,7 @@ public class PEP
             resCtx = ctxHandler.evaluate(reqCtx);
         } catch (PEPException pe) {
             logger.error("Error evaluating request", pe);
-            throw AxisFault
-                    .makeFault(new PEPException("Error evaluating request (operation: "
+            throw CXFUtility.getFault(new PEPException("Error evaluating request (operation: "
                                                         + operation.getName()
                                                         + ")",
                                                 pe));
@@ -334,7 +325,7 @@ public class PEP
      *        the ResponseCtx
      * @throws AxisFault
      */
-    private void enforce(ResponseCtx res) throws AxisFault {
+    private void enforce(ResponseCtx res)/* throws AxisFault */{
         @SuppressWarnings("unchecked")
         Set<Result> results = res.getResults();
         for (Result r : results) {
@@ -344,14 +335,14 @@ public class PEP
                 }
                 switch (r.getDecision()) {
                     case Result.DECISION_DENY:
-                        throw AxisFault
-                                .makeFault(new AuthzDeniedException("Deny"));
+//                        throw AxisFault
+//                                .makeFault(new AuthzDeniedException("Deny"));
                     case Result.DECISION_INDETERMINATE:
-                        throw AxisFault
-                                .makeFault(new AuthzDeniedException("Indeterminate"));
+//                        throw AxisFault
+//                                .makeFault(new AuthzDeniedException("Indeterminate"));
                     case Result.DECISION_NOT_APPLICABLE:
-                        throw AxisFault
-                                .makeFault(new AuthzDeniedException("NotApplicable"));
+//                        throw AxisFault
+//                                .makeFault(new AuthzDeniedException("NotApplicable"));
                     default:
                 }
             }

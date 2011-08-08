@@ -46,6 +46,38 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-codegen-plugin</artifactId>
+        <version>${cxf.version}</version>
+        <executions>
+          <execution>
+            <id>generate-sources</id>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sourceRoot>
+                ${project.build.directory}/generated-sources/cxf
+              </sourceRoot>
+              <useCompileClasspath>true</useCompileClasspath>
+              <wsdlOptions>
+                <wsdlOption>
+                  <wsdl>${basedir}/base/melcoe-pdp.wsdl
+                  </wsdl>
+                  <!--<extraargs> <extraarg>-impl</extraarg><extraarg>-verbose</extraarg><extraarg>-validate</extraarg> 
+                    </extraargs> -->
+                  <bindingFiles>
+                    <bindingFile>${basedir}/base/JAX-WS-Bindings.xml
+                    </bindingFile>
+                  </bindingFiles>
+                </wsdlOption>
+              </wsdlOptions>
+            </configuration>
+            <goals>
+              <goal>wsdl2java</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
