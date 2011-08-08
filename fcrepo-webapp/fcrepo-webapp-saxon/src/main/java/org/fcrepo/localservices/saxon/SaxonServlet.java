@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.localservices.saxon;
@@ -22,10 +22,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -43,7 +45,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
  * stylesheet, with stylesheet caching. Adapted from the SaxonServlet.java
  * example file contained in the source distribution of "The SAXON XSLT
  * Processor from Michael Kay".
- * 
+ *
  * <pre>
  * -----------------------------------------------------------------------------
  * The original code is Copyright &copy; 2001 by Michael Kay. All rights
@@ -55,7 +57,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
  * University. All rights reserved.
  * -----------------------------------------------------------------------------
  * </pre>
- * 
+ *
  * @author Michael Kay
  * @author Ross Wayland
  * @author Chris Wilper
@@ -125,7 +127,7 @@ public class SaxonServlet
      * <li>clear-stylesheet-cache - if set to yes, empties the cache before
      * running.
      * </ul>
-     * 
+     *
      * @param req
      *        The HTTP request
      * @param res
@@ -214,6 +216,7 @@ public class SaxonServlet
             // Transform
             StreamSource ss = new StreamSource(sourceStream);
             ss.setSystemId(source);
+            transformer.setURIResolver(new AuthenticatingURIResolver());
             transformer.transform(ss, new StreamResult(res.getOutputStream()));
 
         } finally {
@@ -231,7 +234,7 @@ public class SaxonServlet
      * Maintain prepared stylesheets in memory for reuse
      */
     private Templates tryCache(String url) throws Exception {
-        Templates x = (Templates) m_cache.get(url);
+        Templates x = m_cache.get(url);
         if (x == null) {
             synchronized (m_cache) {
                 if (!m_cache.containsKey(url)) {
@@ -277,6 +280,7 @@ public class SaxonServlet
         }
     }
 
+
     /**
      * Return the credentials for the realmPath that most closely matches the
      * given url, or null if none found.
@@ -290,13 +294,13 @@ public class SaxonServlet
 
         Iterator<String> iter = m_creds.keySet().iterator();
         while (iter.hasNext()) {
-            String realmPath = (String) iter.next();
+            String realmPath = iter.next();
             if (url.startsWith(realmPath)) {
                 int matchLength = realmPath.length();
                 if (matchLength > longestMatchLength) {
                     longestMatchLength = matchLength;
                     longestMatch =
-                            (UsernamePasswordCredentials) m_creds
+                            m_creds
                                     .get(realmPath);
                 }
             }
@@ -317,6 +321,27 @@ public class SaxonServlet
         } else {
             return urlString;
         }
+    }
+
+    /**
+     * URI resolver - so that other inputs passed in as URLs can use the same user/password mechanism as for source and stylesheet
+     */
+
+    private class AuthenticatingURIResolver implements URIResolver {
+
+
+        @Override
+        public Source resolve(String href, String base)
+                throws TransformerException {
+            InputStream is;
+            try {
+                is = SaxonServlet.this.getInputStream(href);
+            } catch (Exception e) {
+                throw new TransformerException(e);
+            }
+            return new StreamSource(is);
+        }
+
     }
 
 }
