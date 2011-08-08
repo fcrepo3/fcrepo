@@ -19,15 +19,17 @@
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 
-import org.apache.axis.MessageContext;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+
+import com.sun.xacml.ctx.RequestCtx;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.LogUtil;
-
-import com.sun.xacml.ctx.RequestCtx;
 
 
 /**
@@ -47,7 +49,8 @@ public class ResumeFindObjectsHandler
         resultHandler = new FieldSearchResultHandler();
     }
 
-    public RequestCtx handleResponse(MessageContext context)
+    @Override
+    public RequestCtx handleResponse(SOAPMessageContext context)
             throws OperationHandlerException {
         if (logger.isDebugEnabled()) {
             logger.debug("ResumeFindObjectsHandler/handleResponse!");
@@ -55,13 +58,14 @@ public class ResumeFindObjectsHandler
         return resultHandler.handleResponse(context);
     }
 
-    public RequestCtx handleRequest(MessageContext context)
+    @Override
+    public RequestCtx handleRequest(SOAPMessageContext context)
             throws OperationHandlerException {
         if (logger.isDebugEnabled()) {
             logger.debug("ResumeFindObjectsHandler/handleRequest!");
         }
 
-        LogUtil.statLog(context.getUsername(), Constants.ACTION.FIND_OBJECTS
+        LogUtil.statLog(getUser(context), Constants.ACTION.FIND_OBJECTS
                 .getURI().toASCIIString(), "FedoraRepository", null);
 
         return resultHandler.handleRequest(context);

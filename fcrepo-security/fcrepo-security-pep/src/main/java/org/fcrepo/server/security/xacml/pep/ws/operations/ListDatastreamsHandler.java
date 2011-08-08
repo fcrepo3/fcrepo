@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.DateTimeAttribute;
@@ -35,9 +37,7 @@ import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Status;
 
-import org.apache.axis.AxisFault;
-import org.apache.axis.MessageContext;
-import org.apache.axis.message.RPCParam;
+import org.apache.cxf.binding.soap.SoapFault;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,8 @@ public class ListDatastreamsHandler
         super();
     }
 
-    public RequestCtx handleResponse(MessageContext context)
+    @Override
+    public RequestCtx handleResponse(SOAPMessageContext context)
             throws OperationHandlerException {
         if (logger.isDebugEnabled()) {
             logger.debug("ListDatastreamsHandler/handleResponse!");
@@ -75,7 +76,7 @@ public class ListDatastreamsHandler
 
         try {
             DatastreamDef[] dsDefs =
-                    (DatastreamDef[]) getSOAPResponseObject(context);
+                    (DatastreamDef[]) getSOAPResponseObject(context, DatastreamDef.class);
             if (dsDefs == null || dsDefs.length == 0) {
                 return null;
             }
@@ -88,15 +89,15 @@ public class ListDatastreamsHandler
             String pid = (String) oMap.get(0);
 
             dsDefs = filter(context, dsDefs, pid);
-
-            RPCParam[] params = new RPCParam[dsDefs.length];
-            for (int x = 0; x < dsDefs.length; x++) {
-                params[x] =
-                        new RPCParam(context.getOperation().getReturnQName(),
-                                     dsDefs[x]);
-            }
-
-            setSOAPResponseObject(context, params);
+//  todo: fix
+//            RPCParam[] params = new RPCParam[dsDefs.length];
+//            for (int x = 0; x < dsDefs.length; x++) {
+//                params[x] =
+//                        new RPCParam(context.getOperation().getReturnQName(),
+//                                     dsDefs[x]);
+//            }
+//
+//            setSOAPResponseObject(context, params);
         } catch (Exception e) {
             logger.error("Error filtering datastreams", e);
             throw new OperationHandlerException("Error filtering datastreams");
@@ -105,7 +106,8 @@ public class ListDatastreamsHandler
         return null;
     }
 
-    public RequestCtx handleRequest(MessageContext context)
+    @Override
+    public RequestCtx handleRequest(SOAPMessageContext context)
             throws OperationHandlerException {
         if (logger.isDebugEnabled()) {
             logger.debug("ListDatastreamsHandler/handleRequest!");
@@ -120,7 +122,7 @@ public class ListDatastreamsHandler
         try {
             oMap = getSOAPRequestObjects(context);
             logger.debug("Retrieved SOAP Request Objects");
-        } catch (AxisFault af) {
+        } catch (SoapFault af) {
             logger.error("Error obtaining SOAP Request Objects", af);
             throw new OperationHandlerException("Error obtaining SOAP Request Objects",
                                                 af);
@@ -167,7 +169,7 @@ public class ListDatastreamsHandler
                                                      resAttr,
                                                      getEnvironment(context));
 
-            LogUtil.statLog(context.getUsername(),
+            LogUtil.statLog(getUser(context),
                             Constants.ACTION.LIST_DATASTREAMS.getURI()
                                     .toASCIIString(),
                             pid,
@@ -180,7 +182,7 @@ public class ListDatastreamsHandler
         return req;
     }
 
-    public DatastreamDef[] filter(MessageContext context,
+    public DatastreamDef[] filter(SOAPMessageContext context,
                                   DatastreamDef[] dsDefs,
                                   String pid) throws OperationHandlerException,
             PEPException {

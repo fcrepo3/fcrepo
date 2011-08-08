@@ -23,11 +23,19 @@ import java.net.URISyntaxException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
@@ -51,8 +59,8 @@ import org.fcrepo.server.utilities.CXFUtility;
 public abstract class AbstractOperationHandler
         implements OperationHandler {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(AbstractOperationHandler.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(AbstractOperationHandler.class);
 
     protected static final String XACML_RESOURCE_ID =
             "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
@@ -83,47 +91,53 @@ public abstract class AbstractOperationHandler
      * @return list of Objects
      * @throws AxisFault
      */
-    protected List<Object> getSOAPRequestObjects(MessageContext context) {
+    protected List<Object> getSOAPRequestObjects(SOAPMessageContext context) {
         // return result
         List<Object> result = new ArrayList<Object>();
 
         // Obtain the operation details and message type
-        OperationDesc operation = context.getOperation();
+        QName operation =
+                (QName) context.get(SOAPMessageContext.WSDL_OPERATION);
 
         // Extract the SOAP Message
-        Message message = context.getRequestMessage();
+        SOAPMessage message = context.getMessage();
 
         // Extract the SOAP Envelope from the Message
-        SOAPEnvelope envelope = message.getSOAPEnvelope();
+        SOAPBody body;
+        try {
+            body = message.getSOAPBody();
+        } catch (SOAPException e) {
+            throw CXFUtility.getFault(e);
+        }
 
-        // Get the envelope body
-        SOAPBodyElement body = envelope.getFirstBody();
+        //        // Get the envelope body
+        //        SOAPBodyElement body = envelope.getFirstBody();
 
         // Make sure that the body element is an RPCElement.
-        if (body instanceof RPCElement) {
-            // Get all the parameters from the Body Element.
-            List params = null;
-            try {
-                params = ((RPCElement) body).getParams();
-                logger.debug("Number of params: " + params.size());
-            } catch (Exception e) {
-                logger.error("Problem obtaining params", e);
-                throw CXFUtility.getFault(e);
+        //        if (body instanceof RPCElement) {
+        // Get all the parameters from the Body Element.
+        Iterator params = null;
+        try {
+            params = ((SOAPElement) body).getChildElements();
+        } catch (Exception e) {
+            logger.error("Problem obtaining params", e);
+            throw CXFUtility.getFault(e);
+        }
+        int i = 0;
+        if (params != null && params.hasNext()) {
+            logger.info("Operation: " + operation.getNamespaceURI() + " "
+                    + operation.getLocalPart());
+            while (params.hasNext()) {
+                SOAPElement param = (SOAPElement) params.next();
+                result.add(param.getValue());
+                logger.info("Obtained object: (" + i++ + ") "
+                        + param.getElementQName().toString());
             }
-
-            if (params.size() > 0) {
-                logger.info("Operation returnType: "
-                        + operation.getReturnType().getNamespaceURI() + " "
-                        + operation.getReturnType().getLocalPart());
-
-                for (int x = 0; x < params.size(); x++) {
-                    RPCParam param = (RPCParam) params.get(x);
-                    result.add(param.getObjectValue());
-                    logger.info("Obtained object: (" + x + ") "
-                            + param.getQName().toString());
-                }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Number of params: " + i);
             }
         }
+        //        }
 
         return result;
     }
@@ -136,56 +150,58 @@ public abstract class AbstractOperationHandler
      * @return the return object for the message.
      * @throws AxisFault
      */
-    protected Object getSOAPResponseObject(MessageContext context){
+    protected Object getSOAPResponseObject(SOAPMessageContext context, Class clazz) {
         // return result
         Object result = null;
 
         // Obtain the operation details and message type
-        OperationDesc operation = context.getOperation();
+        QName operation =
+                (QName) context.get(SOAPMessageContext.WSDL_OPERATION);
 
         // Extract the SOAP Message
-        Message message =
-                context.getPastPivot() ? context.getResponseMessage() : context
-                        .getRequestMessage();
-
-        // Extract the SOAP Envelope from the Message
-        SOAPEnvelope envelope = message.getSOAPEnvelope();
+        SOAPMessage message = context.getMessage();
 
         // Get the envelope body
-        SOAPBodyElement body = envelope.getFirstBody();
+        SOAPBody body;
+        try {
+            body = message.getSOAPBody();
+        } catch (SOAPException e) {
+            throw CXFUtility.getFault(e);
+        }
 
         // Make sure that the body element is an RPCElement.
-        if (body instanceof RPCElement) {
-            // Get all the parameters from the Body Element.
-            List params = null;
-            try {
-                params = ((RPCElement) body).getParams();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Number of params: " + params.size());
-                }
-            } catch (Exception e) {
-                logger.error("Problem obtaining params", e);
-                throw CXFUtility.getFault(e)
-            }
+        //        if (body instanceof RPCElement) {
+        // Get all the parameters from the Body Element.
+        Iterator params = null;
+        try {
+            params = ((SOAPElement) body).getChildElements();
+        } catch (Exception e) {
+            logger.error("Problem obtaining params", e);
+            throw CXFUtility.getFault(e);
+        }
 
-            if (params != null && params.size() > 0) {
-                logger.info("Operation returnType: "
-                        + operation.getReturnType().getNamespaceURI() + " "
-                        + operation.getReturnType().getLocalPart());
+        int i = 0;
+        if (params != null && params.hasNext()) {
+            logger.info("Operation: " + operation.getNamespaceURI() + " "
+                    + operation.getLocalPart());
 
-                for (int x = 0; result == null && x < params.size(); x++) {
-                    RPCParam param = (RPCParam) params.get(x);
-                    if (param.getQName().equals(operation.getReturnQName())) {
-                        logger.info("Obtained object: (" + x + ") "
-                                + param.getQName().toString());
-                        result = param.getObjectValue();
-                    }
+            while (params.hasNext() && result == null) {
+                SOAPElement param = (SOAPElement) params.next();
+                if (clazz.getName().equals(param.getElementQName().getLocalPart())) {
+                    logger.info("Obtained object: (" + param + ") "
+                            + param.getElementQName().toString());
+                    result = param.getValue();
                 }
             }
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Number of params: " + i);
+        }
+        //        }
 
         if (result == null) {
-            throw CXFUtility.getFault(new Exception("Could not obtain Object from SOAP Response"));
+            throw CXFUtility
+                    .getFault(new Exception("Could not obtain Object from SOAP Response"));
         }
 
         return result;
@@ -200,23 +216,23 @@ public abstract class AbstractOperationHandler
      *        list of parameters to set in order
      * @throws AxisFault
      */
-    protected void setSOAPRequestObjects(MessageContext context,
-                                         List<RPCParam> params){
+    protected void setSOAPRequestObjects(SOAPMessageContext context,
+                                         List<SOAPElement> params) {
         // Extract the SOAP Message
-        Message message =
-                context.getPastPivot() ? context.getResponseMessage() : context
-                        .getRequestMessage();
-
-        // Extract the SOAP Envelope from the Message
-        SOAPEnvelope envelope = message.getSOAPEnvelope();
+        SOAPMessage message = context.getMessage();
 
         // Get the envelope body
-        SOAPBodyElement body = envelope.getFirstBody();
+        SOAPBody body;
+        try {
+            body = message.getSOAPBody();
+        } catch (SOAPException e) {
+            throw CXFUtility.getFault(e);
+        }
 
         try {
             body.removeContents();
-            for (RPCParam p : params) {
-                body.addChild(p);
+            for (SOAPElement p : params) {
+                body.addChildElement(p);
             }
         } catch (Exception e) {
             logger.error("Problem changing SOAP message contents", e);
@@ -233,21 +249,22 @@ public abstract class AbstractOperationHandler
      *        the object to set as the return object
      * @throws AxisFault
      */
-    protected void setSOAPResponseObject(MessageContext context, RPCParam param){
+    protected void setSOAPResponseObject(SOAPMessageContext context,
+                                         SOAPElement param) {
         // Extract the SOAP Message
-        Message message =
-                context.getPastPivot() ? context.getResponseMessage() : context
-                        .getRequestMessage();
-
-        // Extract the SOAP Envelope from the Message
-        SOAPEnvelope envelope = message.getSOAPEnvelope();
+        SOAPMessage message = context.getMessage();
 
         // Get the envelope body
-        SOAPBodyElement body = envelope.getFirstBody();
+        SOAPBody body;
+        try {
+            body = message.getSOAPBody();
+        } catch (SOAPException e) {
+            throw CXFUtility.getFault(e);
+        }
 
         try {
             body.removeContents();
-            body.addChild(param);
+            body.addChildElement(param);
         } catch (Exception e) {
             logger.error("Problem changing SOAP message contents", e);
             throw CXFUtility.getFault(e);
@@ -263,24 +280,24 @@ public abstract class AbstractOperationHandler
      *        the object to set as the return object
      * @throws AxisFault
      */
-    protected void setSOAPResponseObject(MessageContext context,
-                                         RPCParam[] params) {
+    protected void setSOAPResponseObject(SOAPMessageContext context,
+                                         SOAPElement[] params) {
         // Extract the SOAP Message
-        Message message =
-                context.getPastPivot() ? context.getResponseMessage() : context
-                        .getRequestMessage();
-
-        // Extract the SOAP Envelope from the Message
-        SOAPEnvelope envelope = message.getSOAPEnvelope();
+        SOAPMessage message = context.getMessage();
 
         // Get the envelope body
-        SOAPBodyElement body = envelope.getFirstBody();
+        SOAPBody body;
+        try {
+            body = message.getSOAPBody();
+        } catch (SOAPException e) {
+            throw CXFUtility.getFault(e);
+        }
 
         try {
             body.removeContents();
             if (params != null) {
-                for (RPCParam param : params) {
-                    body.addChild(param);
+                for (SOAPElement param : params) {
+                    body.addChildElement(param);
                 }
             }
         } catch (Exception e) {
@@ -297,13 +314,13 @@ public abstract class AbstractOperationHandler
      * @return a list of Subjects
      * @throws AxisFault
      */
-    protected List<Map<URI, List<AttributeValue>>> getSubjects(MessageContext context) {
+    protected List<Map<URI, List<AttributeValue>>> getSubjects(SOAPMessageContext context) {
         // setup the id and value for the requesting subject
         List<Map<URI, List<AttributeValue>>> subjects =
                 new ArrayList<Map<URI, List<AttributeValue>>>();
 
-        if (context.getUsername() == null
-                || "".equals(context.getUsername().trim())) {
+        if (getUser(context) == null
+                || "".equals(getUser(context).trim())) {
             return subjects;
         }
 
@@ -314,7 +331,7 @@ public abstract class AbstractOperationHandler
         try {
             subAttr = new HashMap<URI, List<AttributeValue>>();
             attrList = new ArrayList<AttributeValue>();
-            attrList.add(new StringAttribute(context.getUsername()));
+            attrList.add(new StringAttribute(getUser(context)));
             subAttr.put(Constants.SUBJECT.LOGIN_ID.getURI(), attrList);
             if (fedoraRole != null && fedoraRole.length > 0) {
                 attrList = new ArrayList<AttributeValue>();
@@ -327,7 +344,7 @@ public abstract class AbstractOperationHandler
 
             subAttr = new HashMap<URI, List<AttributeValue>>();
             attrList = new ArrayList<AttributeValue>();
-            attrList.add(new StringAttribute(context.getUsername()));
+            attrList.add(new StringAttribute(getUser(context)));
             subAttr.put(Constants.SUBJECT.USER_REPRESENTED.getURI(), attrList);
             if (fedoraRole != null && fedoraRole.length > 0) {
                 attrList = new ArrayList<AttributeValue>();
@@ -340,7 +357,7 @@ public abstract class AbstractOperationHandler
 
             subAttr = new HashMap<URI, List<AttributeValue>>();
             attrList = new ArrayList<AttributeValue>();
-            attrList.add(new StringAttribute(context.getUsername()));
+            attrList.add(new StringAttribute(getUser(context)));
             subAttr.put(new URI(SUBJECT_ID), attrList);
             if (fedoraRole != null && fedoraRole.length > 0) {
                 attrList = new ArrayList<AttributeValue>();
@@ -365,10 +382,13 @@ public abstract class AbstractOperationHandler
      *        the message context
      * @return list of environment Attributes
      */
-    protected Map<URI, AttributeValue> getEnvironment(MessageContext context) {
+    protected Map<URI, AttributeValue> getEnvironment(SOAPMessageContext context) {
         Map<URI, AttributeValue> envAttr = new HashMap<URI, AttributeValue>();
 
-        String ip = (String) context.getProperty("remoteaddr");
+        HttpServletRequest request =
+                (HttpServletRequest) context
+                        .get(SOAPMessageContext.SERVLET_REQUEST);
+        String ip = request.getRemoteAddr();
 
         if (ip != null && !"".equals(ip)) {
             envAttr.put(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.getURI(),
@@ -393,10 +413,10 @@ public abstract class AbstractOperationHandler
      * @return a String array of roles
      */
     @SuppressWarnings("unchecked")
-    protected String[] getUserRoles(MessageContext context) {
+    protected String[] getUserRoles(SOAPMessageContext context) {
         HttpServletRequest request =
                 (HttpServletRequest) context
-                        .getProperty("transport.http.servletRequest");
+                        .get(SOAPMessageContext.SERVLET_REQUEST);
 
         Map<String, Set<String>> reqAttr = null;
         reqAttr =
@@ -416,5 +436,13 @@ public abstract class AbstractOperationHandler
                 fedoraRoles.toArray(new String[fedoraRoles.size()]);
 
         return fedoraRole;
+    }
+
+    protected String getUser(SOAPMessageContext context){
+//        String username = (String) context.get("Username");
+        HttpServletRequest request =
+            (HttpServletRequest) context
+                    .get(SOAPMessageContext.SERVLET_REQUEST);
+        return request.getRemoteUser();
     }
 }

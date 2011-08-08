@@ -24,13 +24,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
 
-import org.apache.axis.AxisFault;
-import org.apache.axis.MessageContext;
+import org.apache.cxf.binding.soap.SoapFault;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,27 +42,28 @@ import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 
-
 /**
  * @author nishen@melcoe.mq.edu.au
  */
 public class AddDatastreamHandler
         extends AbstractOperationHandler {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(AddDatastreamHandler.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(AddDatastreamHandler.class);
 
     public AddDatastreamHandler()
             throws PEPException {
         super();
     }
 
-    public RequestCtx handleResponse(MessageContext context)
+    @Override
+    public RequestCtx handleResponse(SOAPMessageContext context)
             throws OperationHandlerException {
         return null;
     }
 
-    public RequestCtx handleRequest(MessageContext context)
+    @Override
+    public RequestCtx handleRequest(SOAPMessageContext context)
             throws OperationHandlerException {
         logger.debug("AddDatastreamHandler/handleRequest!");
 
@@ -85,10 +87,10 @@ public class AddDatastreamHandler
         try {
             oMap = getSOAPRequestObjects(context);
             logger.debug("Retrieved SOAP Request Objects");
-        } catch (AxisFault af) {
-            logger.error("Error obtaining SOAP Request Objects", af);
+        } catch (SoapFault sf) {
+            logger.error("Error obtaining SOAP Request Objects", sf);
             throw new OperationHandlerException("Error obtaining SOAP Request Objects",
-                                                af);
+                                                sf);
         }
 
         try {
@@ -165,12 +167,13 @@ public class AddDatastreamHandler
                         new StringAttribute(Constants.ACTION.APIM.getURI()
                                 .toASCIIString()));
             // modifying the FeSL policy datastream requires policy management permissions
-            if (dsID != null && dsID.equals(FedoraPolicyStore.FESL_POLICY_DATASTREAM)) {
+            if (dsID != null
+                    && dsID.equals(FedoraPolicyStore.FESL_POLICY_DATASTREAM)) {
                 actions.put(Constants.ACTION.ID.getURI(),
-                            new StringAttribute(Constants.ACTION.MANAGE_POLICIES.getURI().toASCIIString()));
+                            new StringAttribute(Constants.ACTION.MANAGE_POLICIES
+                                    .getURI().toASCIIString()));
 
             }
-
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),
@@ -178,11 +181,8 @@ public class AddDatastreamHandler
                                                      resAttr,
                                                      getEnvironment(context));
 
-            LogUtil.statLog(context.getUsername(),
-                            Constants.ACTION.ADD_DATASTREAM.getURI()
-                                    .toASCIIString(),
-                            pid,
-                            dsID);
+            LogUtil.statLog(getUser(context), Constants.ACTION.ADD_DATASTREAM.getURI()
+                    .toASCIIString(), pid, dsID);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new OperationHandlerException(e.getMessage(), e);

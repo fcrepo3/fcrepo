@@ -18,7 +18,7 @@
 
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
-import org.apache.axis.MessageContext;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import com.sun.xacml.ctx.RequestCtx;
 
@@ -26,23 +26,23 @@ public interface OperationHandler {
 
     /**
      * Method to handle requests.
-     * 
+     *
      * @param context
      *        the message context
      * @return a RequestCtx if necessary or else null
      * @throws OperationHandlerException
      */
-    public RequestCtx handleRequest(MessageContext context)
+    public RequestCtx handleRequest(SOAPMessageContext context)
             throws OperationHandlerException;
 
     /**
      * Method to handle responses.
-     * 
+     *
      * @param context
      *        the message context
      * @return a RequestCtx if necessary or else null
      * @throws OperationHandlerException
      */
-    public RequestCtx handleResponse(MessageContext context)
+    public RequestCtx handleResponse(SOAPMessageContext context)
             throws OperationHandlerException;
 }

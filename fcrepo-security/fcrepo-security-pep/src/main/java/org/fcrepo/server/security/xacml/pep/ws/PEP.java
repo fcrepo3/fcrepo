@@ -27,8 +27,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
@@ -43,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 
+import org.fcrepo.server.security.xacml.pep.AuthzDeniedException;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -50,21 +54,19 @@ import org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandler;
 import org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandlerException;
 import org.fcrepo.server.utilities.CXFUtility;
 
-
 /**
- * This class is an Apache Axis handler. It is used as a handler on both the
+ * This class is an JAX-WS handler. It is used as a handler on both the
  * request and response. The handler examines the operation for the request and
  * retrieves an appropriate handler to manage the request.
  *
  * @author nishen@melcoe.mq.edu.au
  */
 public class PEP
-        extends BasicHandler {
+        implements javax.xml.ws.handler.soap.SOAPHandler<SOAPMessageContext> {
 
     private static final long serialVersionUID = -3435060948149239989L;
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(PEP.class);
+    private static final Logger logger = LoggerFactory.getLogger(PEP.class);
 
     /**
      * A list of instantiated handlers. As operations are invoked, handlers for
@@ -98,48 +100,57 @@ public class PEP
 
     /*
      * (non-Javadoc)
-     * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
      */
-    public void invoke(MessageContext context) {
+    @Override
+    public boolean handleMessage(SOAPMessageContext context) {
+        String service =
+                ((QName) context.get(SOAPMessageContext.WSDL_SERVICE)).getLocalPart();
+        String operation =
+                ((QName) context.get(SOAPMessageContext.WSDL_OPERATION)).getLocalPart();
         if (logger.isDebugEnabled()) {
-            logger.debug("AuthHandler executed: " + context.getTargetService()
-                    + "/" + context.getOperation().getName() + " [" + ts + "]");
+            logger.debug("AuthHandler executed: " + service + "/" + operation
+                    + " [" + ts + "]");
         }
 
-        // Obtain the service details
-        ServiceDesc service = context.getService().getServiceDescription();
-        // Obtain the operation details and message type
-        OperationDesc operation = context.getOperation();
+        //        // Obtain the service details
+        //        ServiceDesc service = context.getService().getServiceDescription();
+        //        // Obtain the operation details and message type
+        //        OperationDesc operation = context.getOperation();
         // Obtain a class to handle our request
-        OperationHandler operationHandler =
-                getHandler(service.getName(), operation.getName());
+        OperationHandler operationHandler = getHandler(service, operation);
 
         // there must always be a handler.
         if (operationHandler == null) {
-            logger.error("Missing handler for service/operation: " + service.getName() + "/" + operation.getName());
-            throw CXFUtility.getFault(new PEPException("Missing handler for service/operation: " + service.getName() + "/" + operation.getName()));
+            logger.error("Missing handler for service/operation: " + service
+                    + "/" + operation);
+            throw CXFUtility
+                    .getFault(new PEPException("Missing handler for service/operation: "
+                            + service + "/" + operation));
         }
 
         RequestCtx reqCtx = null;
 
-        // if we are on the request pathway, getPastPivot() == false. True on
+        // if we are on the request pathway, outboundProperty == false. True on
         // response pathway
+        Boolean outboundProperty =
+                (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
         try {
-            if (context.getPastPivot()) {
+            if (outboundProperty) {
                 reqCtx = operationHandler.handleResponse(context);
             } else {
                 reqCtx = operationHandler.handleRequest(context);
             }
         } catch (OperationHandlerException ohe) {
-            logger.error("Error handling operation: " + operation.getName(), ohe);
-            throw CXFUtility.getFault(new PEPException("Error handling operation: "
-                            + operation.getName(), ohe));
+            logger.error("Error handling operation: " + operation, ohe);
+            throw CXFUtility
+                    .getFault(new PEPException("Error handling operation: "
+                            + operation, ohe));
         }
 
         // if handler returns null, then there is no work to do (would have
         // thrown exception if things went wrong).
         if (reqCtx == null) {
-            return;
+            return false;
         }
 
         // if we have received a requestContext, we need to hand it over to the
@@ -150,10 +161,10 @@ public class PEP
             resCtx = ctxHandler.evaluate(reqCtx);
         } catch (PEPException pe) {
             logger.error("Error evaluating request", pe);
-            throw CXFUtility.getFault(new PEPException("Error evaluating request (operation: "
-                                                        + operation.getName()
-                                                        + ")",
-                                                pe));
+            throw CXFUtility
+                    .getFault(new PEPException("Error evaluating request (operation: "
+                                                       + operation + ")",
+                                               pe));
         }
 
         // TODO: set obligations
@@ -168,6 +179,7 @@ public class PEP
 
         // TODO: enforce will need to ensure that obligations are met.
         enforce(resCtx);
+        return true;
     }
 
     /**
@@ -277,7 +289,6 @@ public class PEP
      * @param opName
      *        the name of the operation
      * @return OperationHandler to handle the operation
-     * @throws AxisFault
      */
     private OperationHandler getHandler(String serviceName, String operationName) {
         if (serviceName == null) {
@@ -319,13 +330,12 @@ public class PEP
 
     /**
      * Method to check a response and enforce any denial. This is achieved by
-     * throwing an AxisFault.
+     * throwing an SoapFault.
      *
      * @param res
      *        the ResponseCtx
-     * @throws AxisFault
      */
-    private void enforce(ResponseCtx res)/* throws AxisFault */{
+    private void enforce(ResponseCtx res) {
         @SuppressWarnings("unchecked")
         Set<Result> results = res.getResults();
         for (Result r : results) {
@@ -335,14 +345,15 @@ public class PEP
                 }
                 switch (r.getDecision()) {
                     case Result.DECISION_DENY:
-//                        throw AxisFault
-//                                .makeFault(new AuthzDeniedException("Deny"));
+                        throw CXFUtility
+                                .getFault(new AuthzDeniedException("Deny"));
+
                     case Result.DECISION_INDETERMINATE:
-//                        throw AxisFault
-//                                .makeFault(new AuthzDeniedException("Indeterminate"));
+                        throw CXFUtility
+                                .getFault(new AuthzDeniedException("Indeterminate"));
                     case Result.DECISION_NOT_APPLICABLE:
-//                        throw AxisFault
-//                                .makeFault(new AuthzDeniedException("NotApplicable"));
+                        throw CXFUtility
+                                .getFault(new AuthzDeniedException("NotApplicable"));
                     default:
                 }
             }
@@ -350,5 +361,32 @@ public class PEP
         if (logger.isDebugEnabled()) {
             logger.debug("Permitting access!");
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+
+    @Override
+    public void close(MessageContext arg0) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+
+    @Override
+    public boolean handleFault(SOAPMessageContext arg0) {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+
+    @Override
+    public Set<QName> getHeaders() {
+        return null;
+
     }
 }

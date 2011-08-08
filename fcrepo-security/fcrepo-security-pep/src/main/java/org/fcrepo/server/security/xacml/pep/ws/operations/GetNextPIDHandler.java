@@ -19,26 +19,30 @@
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 import java.net.URI;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.math.BigInteger;
 
-import org.apache.axis.AxisFault;
-import org.apache.axis.MessageContext;
-import org.apache.axis.types.NonNegativeInteger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.LogUtil;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.IntegerAttribute;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
+
+import org.apache.cxf.binding.soap.SoapFault;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.LogUtil;
 
 
 /**
@@ -55,32 +59,34 @@ public class GetNextPIDHandler
         super();
     }
 
-    public RequestCtx handleResponse(MessageContext context)
+    @Override
+    public RequestCtx handleResponse(SOAPMessageContext context)
             throws OperationHandlerException {
         return null;
     }
 
-    public RequestCtx handleRequest(MessageContext context)
+    @Override
+    public RequestCtx handleRequest(SOAPMessageContext context)
             throws OperationHandlerException {
         logger.debug("GetNextPIDHandler/handleRequest!");
 
         RequestCtx req = null;
         List<Object> oMap = null;
 
-        NonNegativeInteger numPids = null;
+        BigInteger numPids = null;
         String pidNamespace = null;
 
         try {
             oMap = getSOAPRequestObjects(context);
             logger.debug("Retrieved SOAP Request Objects");
-        } catch (AxisFault af) {
+        } catch (SoapFault af) {
             logger.error("Error obtaining SOAP Request Objects", af);
             throw new OperationHandlerException("Error obtaining SOAP Request Objects",
                                                 af);
         }
 
         try {
-            numPids = (NonNegativeInteger) oMap.get(0);
+            numPids = (BigInteger) oMap.get(0);
             pidNamespace = (String) oMap.get(1);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
@@ -120,7 +126,7 @@ public class GetNextPIDHandler
                                                      resAttr,
                                                      getEnvironment(context));
 
-            LogUtil.statLog(context.getUsername(),
+            LogUtil.statLog(getUser(context),
                             Constants.ACTION.GET_NEXT_PID.getURI()
                                     .toASCIIString(),
                             "FedoraRepository",

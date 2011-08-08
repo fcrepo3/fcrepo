@@ -20,22 +20,22 @@ package org.fcrepo.server.security.xacml.test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-import org.apache.axis.AxisFault;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.pep.ContextHandler;
-import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
-
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.security.xacml.pep.ContextHandler;
+import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
+import org.fcrepo.server.utilities.CXFUtility;
 
 
 /**
@@ -158,8 +158,7 @@ public class ContextHandlerTest {
         return actions;
     }
 
-    private static List<Map<URI, List<AttributeValue>>> getSubjects(String uid)
-            throws AxisFault {
+    private static List<Map<URI, List<AttributeValue>>> getSubjects(String uid){
         // setup the id and value for the requesting subject
         Map<URI, List<AttributeValue>> subAttr =
                 new HashMap<URI, List<AttributeValue>>();
@@ -175,7 +174,7 @@ public class ContextHandlerTest {
                     .put(new URI("urn:oasis:names:tc:xacml:1.0:subject:subject-id"),
                          attrList);
         } catch (URISyntaxException use) {
-            throw AxisFault.makeFault(use);
+            throw CXFUtility.getFault(use);
         }
 
         List<Map<URI, List<AttributeValue>>> subjects =

@@ -19,22 +19,24 @@
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 import java.net.URI;
+
 import java.util.HashMap;
 import java.util.Map;
 
-
-import org.apache.axis.MessageContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.LogUtil;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.LogUtil;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -42,20 +44,22 @@ import com.sun.xacml.ctx.RequestCtx;
 public class DescribeRepositoryHandler
         extends AbstractOperationHandler {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(DescribeRepositoryHandler.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(DescribeRepositoryHandler.class);
 
     public DescribeRepositoryHandler()
             throws PEPException {
         super();
     }
 
-    public RequestCtx handleResponse(MessageContext context)
+    @Override
+    public RequestCtx handleResponse(SOAPMessageContext context)
             throws OperationHandlerException {
         return null;
     }
 
-    public RequestCtx handleRequest(MessageContext context)
+    @Override
+    public RequestCtx handleRequest(SOAPMessageContext context)
             throws OperationHandlerException {
         logger.debug("DescribeRepositoryHandler/handleRequest!");
 
@@ -70,10 +74,9 @@ public class DescribeRepositoryHandler
             resAttr.put(new URI(XACML_RESOURCE_ID),
                         new AnyURIAttribute(new URI("FedoraRepository")));
 
-            actions
-                    .put(Constants.ACTION.ID.getURI(),
-                         new StringAttribute(Constants.ACTION.DESCRIBE_REPOSITORY
-                                 .getURI().toASCIIString()));
+            actions.put(Constants.ACTION.ID.getURI(),
+                        new StringAttribute(Constants.ACTION.DESCRIBE_REPOSITORY
+                                .getURI().toASCIIString()));
             actions.put(Constants.ACTION.API.getURI(),
                         new StringAttribute(Constants.ACTION.APIA.getURI()
                                 .toASCIIString()));
@@ -84,11 +87,8 @@ public class DescribeRepositoryHandler
                                                      resAttr,
                                                      getEnvironment(context));
 
-            LogUtil.statLog(context.getUsername(),
-                            Constants.ACTION.DESCRIBE_REPOSITORY.getURI()
-                                    .toASCIIString(),
-                            "FedoraRepository",
-                            null);
+            LogUtil.statLog(getUser(context), Constants.ACTION.DESCRIBE_REPOSITORY
+                    .getURI().toASCIIString(), "FedoraRepository", null);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new OperationHandlerException(e.getMessage(), e);
