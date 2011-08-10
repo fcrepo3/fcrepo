@@ -25,10 +25,12 @@ import javax.swing.JTextField;
 
 import org.fcrepo.client.Administrator;
 import org.fcrepo.client.FedoraClient;
+
 import org.fcrepo.common.Constants;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.RepositoryInfo;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.types.mtom.gen.RepositoryInfo;
 
 
 
@@ -54,9 +56,9 @@ public class SourceRepoDialog
 
     private final JPasswordField m_passwordField;
 
-    private FedoraAPIA m_apia;
+    private FedoraAPIAMTOM m_apia;
 
-    private FedoraAPIM m_apim;
+    private FedoraAPIMMTOM m_apim;
 
     private RepositoryInfo m_repositoryInfo;
 
@@ -130,6 +132,7 @@ public class SourceRepoDialog
 
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 // construct apia and apim after doing some field validation
                 if (m_passwordField.getPassword().length == 0
@@ -273,6 +276,7 @@ public class SourceRepoDialog
 
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 dispose();
             }
@@ -292,7 +296,7 @@ public class SourceRepoDialog
         setVisible(true);
     }
 
-    public FedoraAPIA getAPIA() {
+    public FedoraAPIAMTOM getAPIA() {
         return m_apia;
     }
 
@@ -308,7 +312,7 @@ public class SourceRepoDialog
         return m_port;
     }
 
-    public FedoraAPIM getAPIM() {
+    public FedoraAPIMMTOM getAPIM() {
         return m_apim;
     }
 

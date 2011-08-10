@@ -2,6 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.client.objecteditor;
 
 import java.awt.BorderLayout;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -51,9 +53,10 @@ import org.slf4j.LoggerFactory;
 
 import org.fcrepo.client.Administrator;
 
-import org.fcrepo.server.types.gen.Datastream;
+import org.fcrepo.server.types.mtom.gen.ArrayOfString;
+import org.fcrepo.server.types.mtom.gen.Datastream;
 import org.fcrepo.server.utilities.StreamUtility;
-
+import org.fcrepo.server.utilities.TypeUtility;
 
 /**
  * Displays a datastream's attributes, allowing the editing of its state, and
@@ -67,8 +70,8 @@ public class DatastreamPane
         extends EditingPane
         implements ChangeListener {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(DatastreamPane.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(DatastreamPane.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -113,13 +116,13 @@ public class DatastreamPane
      */
     public DatastreamPane(ObjectEditorFrame gramps,
                           String pid,
-                          Datastream[] versions,
+                          List<Datastream> versions,
                           DatastreamsPane owner)
             throws Exception {
-        super(gramps, owner, versions[0].getID());
+        super(gramps, owner, versions.get(0).getID());
         m_pid = pid;
-        m_versions = versions;
-        Datastream mostRecent = versions[0];
+        m_versions = versions.toArray(new Datastream[]{});
+        Datastream mostRecent = versions.get(0);
         m_mostRecent = mostRecent;
         m_owner = owner;
         m_labelDims = new JLabel("Control Group").getPreferredSize();
@@ -137,8 +140,8 @@ public class DatastreamPane
         JLabel versionableLabel = new JLabel("Versionable");
         JLabel controlGroupLabel = new JLabel("Control Group");
         JLabel[] leftCommonLabels =
-                new JLabel[]{idLabel, controlGroupLabel, stateLabel,
-                             versionableLabel};
+                new JLabel[] {idLabel, controlGroupLabel, stateLabel,
+                        versionableLabel};
 
         // RIGHT: values
 
@@ -158,6 +161,7 @@ public class DatastreamPane
         m_stateComboBox.addActionListener(dataChangeListener);
         m_stateComboBox.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 String curState;
                 if (m_stateComboBox.getSelectedIndex() == 1) {
@@ -176,12 +180,12 @@ public class DatastreamPane
 
         String[] comboBoxStrings2 =
                 {"Updates will create new version",
-                 "Updates will replace most recent version"};
+                        "Updates will replace most recent version"};
         m_versionableComboBox = new JComboBox(comboBoxStrings2);
         Administrator.constrainHeight(m_versionableComboBox);
         m_versionableComboBox
                 .setSelectedIndex(mostRecent.isVersionable() ? NEW_VERSION_ON_UPDATE
-                                                             : REPLACE_ON_UPDATE);
+                        : REPLACE_ON_UPDATE);
         m_versionableComboBox.addActionListener(dataChangeListener);
 
         JTextArea controlGroupValueLabel =
@@ -190,9 +194,9 @@ public class DatastreamPane
         controlGroupValueLabel.setBackground(Administrator.BACKGROUND_COLOR);
         controlGroupValueLabel.setEditable(false);
         JComponent[] leftCommonValues =
-                new JComponent[]{new JLabel(mostRecent.getID()),
-                                 controlGroupValueLabel, m_stateComboBox,
-                                 m_versionableComboBox};
+                new JComponent[] {new JLabel(mostRecent.getID()),
+                        controlGroupValueLabel, m_stateComboBox,
+                        m_versionableComboBox};
 
         JPanel leftCommonPane = new JPanel();
         GridBagLayout leftCommonGridBag = new GridBagLayout();
@@ -212,9 +216,9 @@ public class DatastreamPane
         m_purgeButtonListener = new PurgeButtonListener(versions);
 
         // do the slider if needed
-        if (versions.length > 1) {
+        if (versions.size() > 1) {
             m_versionSlider =
-                    new JSlider(JSlider.HORIZONTAL, 0, versions.length - 1, 0);
+                    new JSlider(JSlider.HORIZONTAL, 0, versions.size() - 1, 0);
             m_versionSlider.addChangeListener(this);
             m_versionSlider.setMajorTickSpacing(1);
             m_versionSlider.setSnapToTicks(true);
@@ -226,7 +230,7 @@ public class DatastreamPane
         m_valuePane = new JPanel();
         m_versionCardLayout = new CardLayout();
         m_valuePane.setLayout(m_versionCardLayout);
-        JPanel[] valuePanes = new JPanel[versions.length];
+        JPanel[] valuePanes = new JPanel[versions.size()];
 
         // CARD: valuePanes[0](versionValuePane, versionActionPane)
 
@@ -237,15 +241,15 @@ public class DatastreamPane
 
         // CARD: valuePanes[1 to i](versionValuePane, versionActionPane)
 
-        for (int i = 1; i < versions.length; i++) {
-            valuePanes[i] = new PriorVersionPane(versions[i]);
+        for (int i = 1; i < versions.size(); i++) {
+            valuePanes[i] = new PriorVersionPane(versions.get(i));
 
             m_valuePane.add(valuePanes[i], "" + i);
         }
 
         JPanel versionPane = new JPanel();
         versionPane.setLayout(new BorderLayout());
-        if (versions.length > 1) {
+        if (versions.size() > 1) {
             // Add a panel to versionPane.NORTH
             // FlowLayout(SwingConstants.LEFT)
             // Created   Date   m_versionSlider
@@ -255,7 +259,7 @@ public class DatastreamPane
             createdLabel.setPreferredSize(m_labelDims);
             m_dateLabelAndValue.add(createdLabel);
             m_dateLabelAndValue.add(Box.createHorizontalStrut(0));
-            m_dtLabel = new JTextArea(versions[0].getCreateDate() + " ");
+            m_dtLabel = new JTextArea(versions.get(0).getCreateDate() + " ");
             m_dtLabel.setBackground(Administrator.BACKGROUND_COLOR);
             m_dtLabel.setEditable(false);
             m_dateLabelAndValue.add(m_dtLabel);
@@ -273,6 +277,7 @@ public class DatastreamPane
         mainPane.add(versionPane, BorderLayout.CENTER);
     }
 
+    @Override
     public void stateChanged(ChangeEvent e) {
         JSlider source = (JSlider) e.getSource();
         if (!source.getValueIsAdjusting()) {
@@ -281,6 +286,7 @@ public class DatastreamPane
         }
     }
 
+    @Override
     public boolean isDirty() {
         if (m_done) {
             return false;
@@ -297,7 +303,7 @@ public class DatastreamPane
         }
         int versionableIndex =
                 m_mostRecent.isVersionable() ? NEW_VERSION_ON_UPDATE
-                                             : REPLACE_ON_UPDATE;
+                        : REPLACE_ON_UPDATE;
         if (versionableIndex != m_versionableComboBox.getSelectedIndex()) {
             return true;
         }
@@ -321,7 +327,7 @@ public class DatastreamPane
 
     public static String getFormattedChecksumTypeAndChecksum(Datastream m_ds) {
         if (m_ds.getChecksumType() == null || m_ds.getChecksumType().equals("")
-            || m_ds.getChecksumType().equals("none")) {
+                || m_ds.getChecksumType().equals("none")) {
             return "";
         }
         if (m_ds.getChecksumType().equals("DISABLED")) {
@@ -342,13 +348,15 @@ public class DatastreamPane
                                                   logMessage);
         }
         if ((m_mostRecent.isVersionable() ? NEW_VERSION_ON_UPDATE
-                                          : REPLACE_ON_UPDATE) != m_versionableComboBox
+                : REPLACE_ON_UPDATE) != m_versionableComboBox
                 .getSelectedIndex()) {
             boolean newVersionableSetting =
                     m_versionableComboBox.getSelectedIndex() == NEW_VERSION_ON_UPDATE ? true
-                                                                                      : false;
-            Administrator.APIM.setDatastreamVersionable(m_pid, m_mostRecent
-                    .getID(), newVersionableSetting, logMessage);
+                            : false;
+            Administrator.APIM.setDatastreamVersionable(m_pid,
+                                                        m_mostRecent.getID(),
+                                                        newVersionableSetting,
+                                                        logMessage);
         }
         if (m_currentVersionPane.isDirty()) {
             // defer to the currentVersionPane if anything else changed
@@ -356,7 +364,7 @@ public class DatastreamPane
                 m_currentVersionPane.saveChanges(logMessage, false);
             } catch (Exception e) {
                 if (e.getMessage() == null
-                    || e.getMessage().indexOf(" would invalidate ") == -1) {
+                        || e.getMessage().indexOf(" would invalidate ") == -1) {
                     throw e;
                 }
                 // ask if they want to force it.
@@ -365,7 +373,7 @@ public class DatastreamPane
                         JOptionPane
                                 .showOptionDialog(null,
                                                   e.getMessage()
-                                                  + "\n\nForce it?",
+                                                          + "\n\nForce it?",
                                                   "Warning",
                                                   JOptionPane.DEFAULT_OPTION,
                                                   JOptionPane.WARNING_MESSAGE,
@@ -398,11 +406,11 @@ public class DatastreamPane
             m_stateComboBox.setBackground(Administrator.DELETED_COLOR);
         }
         if ((m_mostRecent.isVersionable() ? NEW_VERSION_ON_UPDATE
-                                          : REPLACE_ON_UPDATE) != m_versionableComboBox
+                : REPLACE_ON_UPDATE) != m_versionableComboBox
                 .getSelectedIndex()) {
             m_versionableComboBox
                     .setSelectedIndex(m_mostRecent.isVersionable() ? NEW_VERSION_ON_UPDATE
-                                                                   : REPLACE_ON_UPDATE);
+                            : REPLACE_ON_UPDATE);
         }
         m_owner.colorTabForState(m_mostRecent.getID(), m_mostRecent.getState());
         m_currentVersionPane.undoChanges();
@@ -593,30 +601,30 @@ public class DatastreamPane
                 locationLabel.setPreferredSize(m_labelDims);
                 if (m_versionSlider != null) {
                     labels =
-                            new JLabel[]{labelLabel, MIMELabel,
-                                         formatURILabel, altIDsLabel, locationLabel,
-                                         urlLabel, checksumLabel};
+                            new JLabel[] {labelLabel, MIMELabel,
+                                    formatURILabel, altIDsLabel, locationLabel,
+                                    urlLabel, checksumLabel};
                 } else {
                     labels =
-                            new JLabel[]{new JLabel("Created"), labelLabel,
-                                         MIMELabel, formatURILabel, altIDsLabel,
-                                         locationLabel, urlLabel, checksumLabel};
+                            new JLabel[] {new JLabel("Created"), labelLabel,
+                                    MIMELabel, formatURILabel, altIDsLabel,
+                                    locationLabel, urlLabel, checksumLabel};
                 }
             } else {
                 if (m_versionSlider != null) {
                     labels =
-                            new JLabel[]{labelLabel, MIMELabel,
-                                         formatURILabel, altIDsLabel, urlLabel,
-                                         checksumLabel};
+                            new JLabel[] {labelLabel, MIMELabel,
+                                    formatURILabel, altIDsLabel, urlLabel,
+                                    checksumLabel};
                 } else if (m_ds.getCreateDate() == null) {
                     labels =
-                            new JLabel[]{labelLabel, MIMELabel,
-                                         formatURILabel, altIDsLabel, checksumLabel};
+                            new JLabel[] {labelLabel, MIMELabel,
+                                    formatURILabel, altIDsLabel, checksumLabel};
                 } else {
                     labels =
-                            new JLabel[]{new JLabel("Created"), labelLabel,
-                                         MIMELabel, formatURILabel, altIDsLabel,
-                                         urlLabel, checksumLabel};
+                            new JLabel[] {new JLabel("Created"), labelLabel,
+                                    MIMELabel, formatURILabel, altIDsLabel,
+                                    urlLabel, checksumLabel};
                 }
             }
             // set up text fields for ds attributes at version level
@@ -650,10 +658,10 @@ public class DatastreamPane
             urlTextField.setEditable(false); // so they can copy, but not modify
             // Datastream checksum field
             m_checksumTypeComboBox =
-                    new JComboBox(new String[]{"DISABLED", "MD5", "SHA-1",
-                                               "SHA-256", "SHA-384", "SHA-512"});
-            setSelectedChecksumType(m_checksumTypeComboBox, ds
-                    .getChecksumType());
+                    new JComboBox(new String[] {"DISABLED", "MD5", "SHA-1",
+                            "SHA-256", "SHA-384", "SHA-512"});
+            setSelectedChecksumType(m_checksumTypeComboBox,
+                                    ds.getChecksumType());
             m_checksumTextField = new JTextField(m_ds.getChecksum());
             m_checksumTextField.setEditable(false);
             m_checksumPanel = new JPanel();
@@ -662,12 +670,13 @@ public class DatastreamPane
             m_checksumPanel.add(m_checksumTextField, BorderLayout.CENTER);
             m_checksumTypeComboBox.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     String csType =
                             m_checksumTypeComboBox.getSelectedItem().toString();
                     dataChangeListener.dataChanged();
                     if (csType.equals("DISABLED")
-                        || !csType.equals(m_ds.getChecksumType())) {
+                            || !csType.equals(m_ds.getChecksumType())) {
                         if (m_checksumTextField != null) {
                             m_checksumPanel.remove(m_checksumTextField);
                             m_checksumTextField = null;
@@ -701,10 +710,10 @@ public class DatastreamPane
                 }
                 if (m_versionSlider != null) {
                     values =
-                            new JComponent[]{m_labelTextField,
-                                             m_MIMETextField, m_formatURITextField,
-                                             m_altIDsTextField, m_locationTextField,
-                                             urlTextField, m_checksumPanel};
+                            new JComponent[] {m_labelTextField,
+                                    m_MIMETextField, m_formatURITextField,
+                                    m_altIDsTextField, m_locationTextField,
+                                    urlTextField, m_checksumPanel};
 
                 } else {
                     JTextArea cDateTextArea =
@@ -712,33 +721,33 @@ public class DatastreamPane
                     cDateTextArea.setBackground(Administrator.BACKGROUND_COLOR);
                     cDateTextArea.setEditable(false);
                     values =
-                            new JComponent[]{cDateTextArea, m_labelTextField,
-                                             m_MIMETextField, m_formatURITextField,
-                                             m_altIDsTextField, m_locationTextField,
-                                             urlTextField, m_checksumPanel};
+                            new JComponent[] {cDateTextArea, m_labelTextField,
+                                    m_MIMETextField, m_formatURITextField,
+                                    m_altIDsTextField, m_locationTextField,
+                                    urlTextField, m_checksumPanel};
                 }
             } else {
                 if (m_versionSlider != null) {
                     values =
-                            new JComponent[]{m_labelTextField,
-                                             m_MIMETextField, m_formatURITextField,
-                                             m_altIDsTextField, urlTextField,
-                                             m_checksumPanel};
+                            new JComponent[] {m_labelTextField,
+                                    m_MIMETextField, m_formatURITextField,
+                                    m_altIDsTextField, urlTextField,
+                                    m_checksumPanel};
                 } else if (m_ds.getCreateDate() == null) {
                     values =
-                            new JComponent[]{m_labelTextField,
-                                             m_MIMETextField, m_formatURITextField,
-                                             m_altIDsTextField, m_checksumPanel};
+                            new JComponent[] {m_labelTextField,
+                                    m_MIMETextField, m_formatURITextField,
+                                    m_altIDsTextField, m_checksumPanel};
                 } else {
                     JTextArea cDateTextArea =
                             new JTextArea(m_ds.getCreateDate());
                     cDateTextArea.setBackground(Administrator.BACKGROUND_COLOR);
                     cDateTextArea.setEditable(false);
                     values =
-                            new JComponent[]{cDateTextArea, m_labelTextField,
-                                             m_MIMETextField, m_formatURITextField,
-                                             m_altIDsTextField, urlTextField,
-                                             m_checksumPanel};
+                            new JComponent[] {cDateTextArea, m_labelTextField,
+                                    m_MIMETextField, m_formatURITextField,
+                                    m_altIDsTextField, urlTextField,
+                                    m_checksumPanel};
                 }
             }
 
@@ -755,6 +764,7 @@ public class DatastreamPane
                 if (m_hasCustomEditor) {
                     m_editCustomButton.addActionListener(new ActionListener() {
 
+                        @Override
                         public void actionPerformed(ActionEvent evt) {
                             // add the editor, and disable the button
                             try {
@@ -772,6 +782,7 @@ public class DatastreamPane
                 // we know it's editable... add a button
                 m_editButton.addActionListener(new ActionListener() {
 
+                    @Override
                     public void actionPerformed(ActionEvent evt) {
                         // add the editor, and disable the button
                         try {
@@ -791,6 +802,7 @@ public class DatastreamPane
                     m_separateViewButton
                             .addActionListener(new ActionListener() {
 
+                                @Override
                                 public void actionPerformed(ActionEvent evt) {
                                     // open a separate viewing window, using the content
                                     // from the *server* if the text is "View", and the
@@ -798,12 +810,11 @@ public class DatastreamPane
                                     try {
                                         startSeparateViewer();
                                     } catch (Exception e) {
-                                        Administrator
-                                                .showErrorDialog(Administrator
-                                                        .getDesktop(),
-                                                                 "Content View Error",
-                                                                 e.getMessage(),
-                                                                 e);
+                                        Administrator.showErrorDialog(Administrator
+                                                                              .getDesktop(),
+                                                                      "Content View Error",
+                                                                      e.getMessage(),
+                                                                      e);
                                     }
                                 }
                             });
@@ -813,6 +824,7 @@ public class DatastreamPane
                 if (m_hasCustomEditor) {
                     m_viewCustomButton.addActionListener(new ActionListener() {
 
+                        @Override
                         public void actionPerformed(ActionEvent evt) {
                             // add the editor, and disable the button
                             try {
@@ -830,6 +842,7 @@ public class DatastreamPane
                 // it's not editable, but it's VIEWable... add a button
                 m_viewButton.addActionListener(new ActionListener() {
 
+                    @Override
                     public void actionPerformed(ActionEvent evt) {
                         // add the viewer, and disable the view button
                         try {
@@ -848,6 +861,7 @@ public class DatastreamPane
                 m_actionPane.add(m_importButton);
                 m_importButton.addActionListener(new ActionListener() {
 
+                    @Override
                     public void actionPerformed(ActionEvent evt) {
                         // remember what we did so we can back out if needed
                         boolean startedEditor = false;
@@ -870,8 +884,7 @@ public class DatastreamPane
                                         startedEditor = true;
                                     }
                                     // set content of existing edit widget
-                                    m_editor
-                                            .setContent(new FileInputStream(file));
+                                    m_editor.setContent(new FileInputStream(file));
                                     // if that went ok, then remember the file
                                     m_importFile = file;
                                     // and send the signal
@@ -886,8 +899,7 @@ public class DatastreamPane
                                         startedViewer = true;
                                     }
                                     // set the content of the existing viewer widget
-                                    m_viewer
-                                            .setContent(new FileInputStream(file));
+                                    m_viewer.setContent(new FileInputStream(file));
                                     // if that went ok, then remember the file
                                     m_importFile = file;
                                     // and send the signal
@@ -900,7 +912,7 @@ public class DatastreamPane
                                     } else {
                                         m_importLabel =
                                                 new JLabel("Will import "
-                                                           + file.getPath());
+                                                        + file.getPath());
                                     }
                                     add(m_importLabel, BorderLayout.CENTER);
                                     validate();
@@ -944,13 +956,13 @@ public class DatastreamPane
 
         private String getAltIdsString() {
             String altIDStr = "";
-            String[] altIDs = m_ds.getAltIDs();
-            if (altIDs != null) {
-                for (int z = 0; z < altIDs.length; z++) {
+            ArrayOfString altIDs = m_ds.getAltIDs();
+            if (altIDs != null && altIDs.getItem() != null) {
+                for (int z = 0; z < altIDs.getItem().size(); z++) {
                     if (z > 0) {
                         altIDStr += " ";
                     }
-                    altIDStr += altIDs[z];
+                    altIDStr += altIDs.getItem().get(z);
                 }
             }
             return altIDStr;
@@ -984,8 +996,9 @@ public class DatastreamPane
                 m_editor = null;
             }
             InputStream origContent =
-                    getDatastreamContent(m_pid, m_ds.getID(), m_ds
-                            .getCreateDate());
+                    getDatastreamContent(m_pid,
+                                         m_ds.getID(),
+                                         m_ds.getCreateDate());
             m_editor =
                     ContentHandlerFactory.getEditor(m_ds.getMIMEType(),
                                                     origContent);
@@ -1011,8 +1024,7 @@ public class DatastreamPane
                             .getViewer(m_ds.getMIMEType(),
                                        getDatastreamContent(m_pid,
                                                             m_ds.getID(),
-                                                            m_ds
-                                                                    .getCreateDate()));
+                                                            m_ds.getCreateDate()));
             add(m_viewer.getComponent(), BorderLayout.CENTER);
             m_viewButton.setEnabled(false);
             m_viewCustomButton.setEnabled(true);
@@ -1033,8 +1045,9 @@ public class DatastreamPane
                 m_editor = null;
             }
             InputStream origContent =
-                    getDatastreamContent(m_pid, m_ds.getID(), m_ds
-                            .getCreateDate());
+                    getDatastreamContent(m_pid,
+                                         m_ds.getID(),
+                                         m_ds.getCreateDate());
             m_editor =
                     ContentHandlerFactory.getEditor(getCustomMimeType(m_ds),
                                                     origContent);
@@ -1059,8 +1072,7 @@ public class DatastreamPane
                             .getViewer(getCustomMimeType(m_ds),
                                        getDatastreamContent(m_pid,
                                                             m_ds.getID(),
-                                                            m_ds
-                                                                    .getCreateDate()));
+                                                            m_ds.getCreateDate()));
             add(m_viewer.getComponent(), BorderLayout.CENTER);
             m_viewCustomButton.setEnabled(false);
             m_viewButton.setEnabled(true);
@@ -1075,8 +1087,9 @@ public class DatastreamPane
             } else {
                 // the server will provide the content
                 contentStream =
-                        getDatastreamContent(m_pid, m_ds.getID(), m_ds
-                                .getCreateDate());
+                        getDatastreamContent(m_pid,
+                                             m_ds.getID(),
+                                             m_ds.getCreateDate());
             }
             ContentViewer separateViewer =
                     ContentHandlerFactory.getViewer(getCustomMimeType(m_ds),
@@ -1085,9 +1098,9 @@ public class DatastreamPane
             // in it.
             JInternalFrame viewFrame =
                     new JInternalFrame(m_separateViewButton.getText() + "ing "
-                                       + m_ds.getID()
-                                       + " datastream from object "
-                                       + m_pid,
+                                               + m_ds.getID()
+                                               + " datastream from object "
+                                               + m_pid,
                                        true,
                                        true,
                                        true,
@@ -1122,17 +1135,20 @@ public class DatastreamPane
                     StreamUtility.pipeStream(in, out, 4096);
                     content = out.toByteArray();
                 }
-                Administrator.APIM.modifyDatastreamByValue(m_pid,
-                                                           m_ds.getID(),
-                                                           altIDs,
-                                                           label,
-                                                           mimeType,
-                                                           formatURI,
-                                                           content,
-                                                           checksumType,
-                                                           null, // checksum
-                                                           logMessage,
-                                                           false);
+                Administrator.APIM
+                        .modifyDatastreamByValue(m_pid,
+                                                 m_ds.getID(),
+                                                 TypeUtility
+                                                         .convertStringtoAOS(altIDs),
+                                                 label,
+                                                 mimeType,
+                                                 formatURI,
+                                                 TypeUtility
+                                                 .convertBytesToDataHandler(content),
+                                                 checksumType,
+                                                 null, // checksum
+                                                 logMessage,
+                                                 false);
             } else if (M) {
                 String loc = null; // if not set, server will not change content
                 if (m_importFile != null) {
@@ -1145,7 +1161,8 @@ public class DatastreamPane
                 }
                 Administrator.APIM.modifyDatastreamByReference(m_pid,
                                                                m_ds.getID(),
-                                                               altIDs,
+                                                               TypeUtility
+                                                               .convertStringtoAOS(altIDs),
                                                                label,
                                                                mimeType,
                                                                formatURI,
@@ -1159,7 +1176,8 @@ public class DatastreamPane
                 Administrator.APIM
                         .modifyDatastreamByReference(m_pid,
                                                      m_ds.getID(),
-                                                     altIDs,
+                                                     TypeUtility
+                                                     .convertStringtoAOS(altIDs),
                                                      label,
                                                      mimeType,
                                                      formatURI,
@@ -1172,6 +1190,7 @@ public class DatastreamPane
             }
         }
 
+        @Override
         public boolean isDirty() {
             if (m_editor != null) {
                 if (m_editor.isDirty()) {
@@ -1204,8 +1223,8 @@ public class DatastreamPane
                 return true;
             }
             if (m_locationTextField != null
-                && !m_locationTextField.getText()
-                    .equals(m_ds.getLocation())) {
+                    && !m_locationTextField.getText()
+                            .equals(m_ds.getLocation())) {
                 return true;
             }
             if (!m_checksumTypeComboBox.getSelectedItem().toString()
@@ -1229,8 +1248,8 @@ public class DatastreamPane
             if (m_editor != null) {
                 m_editor.undoChanges();
             }
-            setSelectedChecksumType(m_checksumTypeComboBox, m_ds
-                    .getChecksumType());
+            setSelectedChecksumType(m_checksumTypeComboBox,
+                                    m_ds.getChecksumType());
             if (m_importFile != null) {
                 m_importFile = null;
                 // and remove the viewer if it's up, and re-enable the view
@@ -1297,13 +1316,13 @@ public class DatastreamPane
             }
             // create a string from alt ids array
             m_priorAltIDs = "";
-            String[] altIDs = m_ds.getAltIDs();
-            if (altIDs != null) {
-                for (int z = 0; z < altIDs.length; z++) {
+            ArrayOfString altIDs = m_ds.getAltIDs();
+            if (altIDs != null && altIDs.getItem() != null) {
+                for (int z = 0; z < altIDs.getItem().size(); z++) {
                     if (z > 0) {
                         m_priorAltIDs += " ";
                     }
-                    m_priorAltIDs += altIDs[z];
+                    m_priorAltIDs += altIDs.getItem().get(z);
                 }
             }
 
@@ -1359,24 +1378,24 @@ public class DatastreamPane
             JComponent[] values;
             if (E || R) {
                 labels =
-                        new JLabel[]{labelLabel, MIMELabel, formatURILabel,
-                                     altIDsLabel, new JLabel("Location"), urlLabel,
-                                     checksumLabel};
+                        new JLabel[] {labelLabel, MIMELabel, formatURILabel,
+                                altIDsLabel, new JLabel("Location"), urlLabel,
+                                checksumLabel};
                 JTextField refValue = new JTextField();
                 refValue.setText(ds.getLocation());
                 refValue.setEditable(false);
                 values =
-                        new JComponent[]{labelValue, MIMEValue,
-                                         formatURIValue, altIDsValue, refValue,
-                                         urlTextField, checksumTextField};
+                        new JComponent[] {labelValue, MIMEValue,
+                                formatURIValue, altIDsValue, refValue,
+                                urlTextField, checksumTextField};
             } else {
                 labels =
-                        new JLabel[]{labelLabel, MIMELabel, formatURILabel,
-                                     altIDsLabel, urlLabel, checksumLabel};
+                        new JLabel[] {labelLabel, MIMELabel, formatURILabel,
+                                altIDsLabel, urlLabel, checksumLabel};
                 values =
-                        new JComponent[]{labelValue, MIMEValue,
-                                         formatURIValue, altIDsValue, urlTextField,
-                                         checksumTextField};
+                        new JComponent[] {labelValue, MIMEValue,
+                                formatURIValue, altIDsValue, urlTextField,
+                                checksumTextField};
             }
 
             JPanel fieldPanel = new JPanel();
@@ -1396,6 +1415,7 @@ public class DatastreamPane
                     // CENTER: populated on view
                     m_viewButton.addActionListener(new ActionListener() {
 
+                        @Override
                         public void actionPerformed(ActionEvent evt) {
                             JButton btn = (JButton) evt.getSource();
                             try {
@@ -1404,21 +1424,18 @@ public class DatastreamPane
                                                 .getViewer(getCustomMimeType(m_ds),
                                                            Administrator.DOWNLOADER
                                                                    .getDatastreamContent(m_pid,
-                                                                                         m_ds
-                                                                                                 .getID(),
-                                                                                         m_ds
-                                                                                                 .getCreateDate()));
+                                                                                         m_ds.getID(),
+                                                                                         m_ds.getCreateDate()));
                                 add(v.getComponent(), BorderLayout.CENTER);
                                 btn.setEnabled(false);
                                 m_viewTextButton.setEnabled(true);
                                 validate();
                             } catch (Exception e) {
-                                Administrator
-                                        .showErrorDialog(Administrator
-                                                .getDesktop(),
-                                                         "Content View Failure",
-                                                         e.getMessage(),
-                                                         e);
+                                Administrator.showErrorDialog(Administrator
+                                                                      .getDesktop(),
+                                                              "Content View Failure",
+                                                              e.getMessage(),
+                                                              e);
                             }
                         }
                     });
@@ -1428,29 +1445,26 @@ public class DatastreamPane
                     // CENTER: populated on view
                     m_viewTextButton.addActionListener(new ActionListener() {
 
+                        @Override
                         public void actionPerformed(ActionEvent evt) {
                             JButton btn = (JButton) evt.getSource();
                             try {
                                 ContentViewer v =
-                                        ContentHandlerFactory
-                                                .getViewer(m_ds.getMIMEType(),
-                                                           Administrator.DOWNLOADER
-                                                                   .getDatastreamContent(m_pid,
-                                                                                         m_ds
-                                                                                                 .getID(),
-                                                                                         m_ds
-                                                                                                 .getCreateDate()));
+                                        ContentHandlerFactory.getViewer(m_ds.getMIMEType(),
+                                                                        Administrator.DOWNLOADER
+                                                                                .getDatastreamContent(m_pid,
+                                                                                                      m_ds.getID(),
+                                                                                                      m_ds.getCreateDate()));
                                 add(v.getComponent(), BorderLayout.CENTER);
                                 btn.setEnabled(false);
                                 m_viewButton.setEnabled(true);
                                 validate();
                             } catch (Exception e) {
-                                Administrator
-                                        .showErrorDialog(Administrator
-                                                .getDesktop(),
-                                                         "Content View Failure",
-                                                         e.getMessage(),
-                                                         e);
+                                Administrator.showErrorDialog(Administrator
+                                                                      .getDesktop(),
+                                                              "Content View Failure",
+                                                              e.getMessage(),
+                                                              e);
                             }
                         }
                     });
@@ -1464,6 +1478,7 @@ public class DatastreamPane
                     // CENTER: populated on view
                     m_viewButton.addActionListener(new ActionListener() {
 
+                        @Override
                         public void actionPerformed(ActionEvent evt) {
                             JButton btn = (JButton) evt.getSource();
                             try {
@@ -1472,20 +1487,17 @@ public class DatastreamPane
                                                 .getViewer(getCustomMimeType(m_ds),
                                                            Administrator.DOWNLOADER
                                                                    .getDatastreamContent(m_pid,
-                                                                                         m_ds
-                                                                                                 .getID(),
-                                                                                         m_ds
-                                                                                                 .getCreateDate()));
+                                                                                         m_ds.getID(),
+                                                                                         m_ds.getCreateDate()));
                                 add(v.getComponent(), BorderLayout.CENTER);
                                 btn.setEnabled(false);
                                 validate();
                             } catch (Exception e) {
-                                Administrator
-                                        .showErrorDialog(Administrator
-                                                .getDesktop(),
-                                                         "Content View Failure",
-                                                         e.getMessage(),
-                                                         e);
+                                Administrator.showErrorDialog(Administrator
+                                                                      .getDesktop(),
+                                                              "Content View Failure",
+                                                              e.getMessage(),
+                                                              e);
                             }
                         }
                     });
@@ -1520,16 +1532,17 @@ public class DatastreamPane
 
         HashMap<String, Integer> m_dsIndex;
 
-        public PurgeButtonListener(Datastream[] versions) {
-            m_versions = versions;
-            m_dateStrings = new Object[versions.length];
+        public PurgeButtonListener(List<Datastream> versions) {
+            m_versions = versions.toArray(new Datastream[]{});
+            m_dateStrings = new Object[versions.size()];
             m_dsIndex = new HashMap<String, Integer>();
-            for (int i = 0; i < versions.length; i++) {
-                m_dateStrings[i] = versions[i].getCreateDate();
-                m_dsIndex.put(versions[i].getCreateDate(), new Integer(i));
+            for (int i = 0; i < versions.size(); i++) {
+                m_dateStrings[i] = versions.get(i).getCreateDate();
+                m_dsIndex.put(versions.get(i).getCreateDate(), new Integer(i));
             }
         }
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
             int sIndex1 = 0;
             int sIndex2 = 0;
@@ -1569,14 +1582,14 @@ public class DatastreamPane
                         JOptionPane
                                 .showOptionDialog(Administrator.getDesktop(),
                                                   "This will permanently remove "
-                                                  + detail
-                                                  + "\n"
-                                                  + "Are you sure you want to do this?",
+                                                          + detail
+                                                          + "\n"
+                                                          + "Are you sure you want to do this?",
                                                   "Confirmation",
                                                   JOptionPane.YES_NO_OPTION,
                                                   JOptionPane.WARNING_MESSAGE,
                                                   null, //don't use a custom Icon
-                                                  new Object[]{"Yes", "No"}, //the titles of buttons
+                                                  new Object[] {"Yes", "No"}, //the titles of buttons
                                                   "Yes"); //default button title
                 if (n == 0) {
                     try {
@@ -1588,8 +1601,7 @@ public class DatastreamPane
                                                  m_versions[sIndex1]
                                                          .getCreateDate(),
                                                  "DatastreamPane generated this logMessage.", // DEFAULT_LOGMESSAGE
-                                                 false
-                                );
+                                                 false);
                         if (removeAll) {
                             m_owner.remove(m_versions[0].getID());
                             m_done = true;
@@ -1628,18 +1640,14 @@ public class DatastreamPane
             super(parent, "Purge Datastream", true);
             JLabel label =
                     new JLabel("Choose versions of datastream "
-                               + datastreamName + " to purge:");
+                            + datastreamName + " to purge:");
             getContentPane().add(label, BorderLayout.NORTH);
             label.setBorder(new EmptyBorder(10, 10, 0, 10));
             list = new JList(dateStrings);
             list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
             JScrollPane scroll = new JScrollPane(list);
-            scroll
-                    .setBorder(new CompoundBorder(new EmptyBorder(10,
-                                                                  10,
-                                                                  10,
-                                                                  10),
-                                                  new LineBorder(Color.BLACK)));
+            scroll.setBorder(new CompoundBorder(new EmptyBorder(10, 10, 10, 10),
+                                                new LineBorder(Color.BLACK)));
             getContentPane().add(scroll, BorderLayout.CENTER);
             for (int i = 0; i < dateStrings.length; i++) {
                 if (dateStrings[i].toString().equals(defaultVal)) {
@@ -1662,6 +1670,7 @@ public class DatastreamPane
             setVisible(true);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getActionCommand() == "Purge") {
                 canceled = false;
@@ -1698,6 +1707,7 @@ public class DatastreamPane
             m_ds = ds;
         }
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
             try {
                 FileDialog dlg =
@@ -1710,8 +1720,8 @@ public class DatastreamPane
                 dlg.setVisible(true);
                 if (dlg.getFile() != null) {
                     File file =
-                            new File(new File(dlg.getDirectory()), dlg
-                                    .getFile());
+                            new File(new File(dlg.getDirectory()),
+                                     dlg.getFile());
                     logger.debug("Exporting to " + file.getPath());
                     Administrator.setLastDir(file.getParentFile()); // remember the dir for next time
                     Administrator.DOWNLOADER

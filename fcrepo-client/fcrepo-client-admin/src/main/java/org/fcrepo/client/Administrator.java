@@ -2,6 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.client;
 
 import java.awt.BorderLayout;
@@ -43,10 +44,12 @@ import javax.swing.JTextField;
 import javax.swing.JWindow;
 import javax.swing.KeyStroke;
 
-import org.apache.axis.AxisFault;
+import org.apache.cxf.binding.soap.SoapFault;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.fcrepo.swing.mdi.MDIDesktopPane;
+import org.fcrepo.swing.mdi.WindowMenu;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.fcrepo.client.actions.Login;
 import org.fcrepo.client.actions.PurgeObject;
@@ -60,24 +63,23 @@ import org.fcrepo.client.export.ExportDialog;
 import org.fcrepo.client.ingest.IngestDialog;
 import org.fcrepo.client.search.Search;
 import org.fcrepo.client.utility.ingest.XMLBuilder.OBJECT_TYPE;
+
 import org.fcrepo.common.Constants;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.swing.mdi.MDIDesktopPane;
-import org.fcrepo.swing.mdi.WindowMenu;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 
 /**
  * Fedora Administrator GUI.
  *
  * @author Chris Wilper
  */
+
 public class Administrator
         extends JFrame {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(Administrator.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(Administrator.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -131,16 +133,16 @@ public class Administrator
 
     public static Color BACKGROUND_COLOR;
 
-    public static FedoraAPIA APIA = null;
+    public static FedoraAPIAMTOM APIA = null;
 
-    public static FedoraAPIM APIM = null;
+    public static FedoraAPIMMTOM APIM = null;
 
     public static File BASE_DIR;
 
     public static Administrator INSTANCE = null;
 
-    private static ResourceBundle s_const =
-            ResourceBundle.getBundle("org.fcrepo.client.resources.Client");
+    private static ResourceBundle s_const = ResourceBundle
+            .getBundle("org.fcrepo.client.resources.Client");
 
     public static String VERSION = s_const.getString("version");
 
@@ -150,24 +152,24 @@ public class Administrator
                                              String title,
                                              String explanation,
                                              Exception e) {
-        if (e instanceof AxisFault) {
-            StringBuffer authzDetail = new StringBuffer("");
-            org.w3c.dom.Element[] getFaultDetails =
-                    ((AxisFault) e).getFaultDetails();
-            if (getFaultDetails != null) {
-                for (Element detail : getFaultDetails) {
-                    if ("Authz".equals(detail.getLocalName())
-                            && detail.hasChildNodes()) {
-                        NodeList nodeList = detail.getChildNodes();
-                        for (int j = 0; j < nodeList.getLength(); j++) {
-                            authzDetail.append(nodeList.item(j).getNodeValue());
-                        }
-                    }
-                }
-            }
-            if (authzDetail.length() > 0) {
-                explanation = authzDetail.toString();
-            }
+        if (e instanceof SoapFault) {
+            //            StringBuffer authzDetail = new StringBuffer("");
+            //            org.w3c.dom.Element[] getFaultDetails =
+            //                    ((SoapFault) e).getFaultDetails();
+            //            if (getFaultDetails != null) {
+            //                for (Element detail : getFaultDetails) {
+            //                    if ("Authz".equals(detail.getLocalName())
+            //                            && detail.hasChildNodes()) {
+            //                        NodeList nodeList = detail.getChildNodes();
+            //                        for (int j = 0; j < nodeList.getLength(); j++) {
+            //                            authzDetail.append(nodeList.item(j).getNodeValue());
+            //                        }
+            //                    }
+            //                }
+            //            }
+            //            if (authzDetail.length() > 0) {
+            //                explanation = authzDetail.toString();
+            //            }
         }
         JOptionPane.showMessageDialog(parent,
                                       explanation,
@@ -221,7 +223,7 @@ public class Administrator
         }
 
         ImageIcon aboutIcon =
-            new ImageIcon(ClassLoader.getSystemResource("images/client/fedora/aboutadmin.gif"));
+                new ImageIcon(ClassLoader.getSystemResource("images/client/fedora/aboutadmin.gif"));
         m_aboutPic = new JLabel(aboutIcon);
         m_aboutText =
                 new JLabel("<html>"
@@ -238,8 +240,12 @@ public class Administrator
                         + "<p>basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.</p>"
                         + "<p>See the License for the specific language governing rights and</p>"
                         + "<p>limitations under the License.</p><p></p>"
-                        + "<p><b>Version: </b>" + VERSION + "</p>"
-                        + "<p><b>Build Date: </b>" + BUILD_DATE + "</p>"
+                        + "<p><b>Version: </b>"
+                        + VERSION
+                        + "</p>"
+                        + "<p><b>Build Date: </b>"
+                        + BUILD_DATE
+                        + "</p>"
                         + "<p></p>"
                         + "<p>See http://fedora-commons.org/ for more information.</p></html>");
 
@@ -262,7 +268,7 @@ public class Administrator
         splashScreen.setVisible(true);
 
         ImageIcon fedoraIcon =
-            new ImageIcon(ClassLoader.getSystemResource("images/client/fedora/fedora-icon16.gif"));
+                new ImageIcon(ClassLoader.getSystemResource("images/client/fedora/fedora-icon16.gif"));
         setIconImage(fedoraIcon.getImage());
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
@@ -370,6 +376,7 @@ public class Administrator
                 .getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
         fileNewObject.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 new NewObjectDialog(OBJECT_TYPE.dataObject, "New Object");
             }
@@ -378,6 +385,7 @@ public class Administrator
         JMenuItem fileNewCModel = new JMenuItem("Content Model", KeyEvent.VK_C);
         fileNewCModel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 new NewObjectDialog(OBJECT_TYPE.contentModel,
                                     "New Content Model");
@@ -388,6 +396,7 @@ public class Administrator
                 new JMenuItem("Service Definition", KeyEvent.VK_D);
         fileNewSDef.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 new NewObjectDialog(OBJECT_TYPE.serviceDefinition,
                                     "New Service Definition");
@@ -398,6 +407,7 @@ public class Administrator
                 new JMenuItem("Service Deployment", KeyEvent.VK_M);
         fileNewSDep.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 new NewObjectDialog(OBJECT_TYPE.serviceDeployment,
                                     "New Service Deployment");
@@ -412,8 +422,7 @@ public class Administrator
         //   [O]pen
         JMenuItem fileOpen = new JMenuItem(new ViewObject());
         fileOpen.setMnemonic(KeyEvent.VK_O);
-        fileOpen
-                .setToolTipText("Launches a viewer/editor for an object and it's components.");
+        fileOpen.setToolTipText("Launches a viewer/editor for an object and it's components.");
         fileOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
                                                        ActionEvent.CTRL_MASK));
 
@@ -426,6 +435,7 @@ public class Administrator
                 new JMenuItem("From File...", KeyEvent.VK_F);
         fileIngestOneFromFile.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 new IngestDialog(IngestDialog.ONE_FROM_FILE);
             }
@@ -436,6 +446,7 @@ public class Administrator
                 .getKeyStroke(KeyEvent.VK_I, ActionEvent.CTRL_MASK));
         fileIngestOneFromRepository.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 new IngestDialog(IngestDialog.ONE_FROM_REPOS);
             }
@@ -448,6 +459,7 @@ public class Administrator
                 new JMenuItem("From Directory...", KeyEvent.VK_D);
         fileIngestMultipleFromFile.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 new IngestDialog(IngestDialog.MULTI_FROM_DIR);
             }
@@ -457,6 +469,7 @@ public class Administrator
         fileIngestMultipleFromRepository
                 .addActionListener(new ActionListener() {
 
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         new IngestDialog(IngestDialog.MULTI_FROM_REPOS);
                     }
@@ -479,6 +492,7 @@ public class Administrator
                 .setToolTipText("Exports a serialized Digitial Object to disk.");
         fileExportObject.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 new ExportDialog(ExportDialog.ONE);
             }
@@ -490,6 +504,7 @@ public class Administrator
                 .setToolTipText("Exports multiple serialized Digitial Objects to disk.");
         fileExportMultiple.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 new ExportDialog(ExportDialog.MULTI);
             }
@@ -524,6 +539,7 @@ public class Administrator
         fileExit.setToolTipText("Exits the application");
         fileExit.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
                 System.exit(0);
@@ -553,6 +569,7 @@ public class Administrator
                 .getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         toolsSearch.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 createSearchRepository();
             }
@@ -567,6 +584,7 @@ public class Administrator
                                                                 */);
         toolsBatchBuild.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 createBatchBuildConsole();
             }
@@ -579,6 +597,7 @@ public class Administrator
                                                        */);
         toolsBatchBuildIngest.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 createBatchBuildIngestConsole();
             }
@@ -591,6 +610,7 @@ public class Administrator
                                                                   */);
         toolsBatchIngest.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 createBatchIngestConsole();
             }
@@ -606,6 +626,7 @@ public class Administrator
         executeBatchModify.setToolTipText("Run the Batch Modify Utility.");
         executeBatchModify.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 new BatchModify();
             }
@@ -618,6 +639,7 @@ public class Administrator
                 .setToolTipText("Validate the modify directives file against the batchModify XML Schema.");
         validateBatchModify.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 new BatchModifyValidate();
             }
@@ -633,6 +655,7 @@ public class Administrator
         JMenuItem toolsAccess = new JMenuItem("Access API", KeyEvent.VK_A);
         toolsAccess.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 createAccessConsole();
             }
@@ -642,6 +665,7 @@ public class Administrator
                 new JMenuItem("Management API", KeyEvent.VK_M);
         toolsManagement.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 createManagementConsole();
             }
@@ -670,6 +694,7 @@ public class Administrator
 
         helpContents.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String documentationURL = "https://wiki.duraspace.org/display/FEDORA/All+Documentation";
                 JOptionPane.showMessageDialog(getDesktop(),
@@ -700,6 +725,7 @@ public class Administrator
         m_aboutDialog.getContentPane().add(infoAndButton, BorderLayout.SOUTH);
         aboutClose.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 m_aboutDialog.setVisible(false);
             }
@@ -711,6 +737,7 @@ public class Administrator
         helpAbout.setToolTipText("Gives brief information this application");
         helpAbout.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 m_aboutDialog.setLocation(getCenteredPos(m_aboutDialog
                         .getWidth(), m_aboutDialog.getHeight()));

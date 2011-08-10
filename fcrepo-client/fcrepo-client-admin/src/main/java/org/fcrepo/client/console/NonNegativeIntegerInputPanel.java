@@ -1,18 +1,18 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.client.console;
 
 import java.awt.BorderLayout;
 
+import java.math.BigInteger;
+
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-
-import org.apache.axis.types.NonNegativeInteger;
 
 /**
  * @author Chris Wilper
@@ -56,7 +56,7 @@ public class NonNegativeIntegerInputPanel
         if (m_nullRadioButton.isSelected()) {
             return null;
         } else {
-            return new NonNegativeInteger(m_textField.getText());
+            return new BigInteger(m_textField.getText());
         }
     }
 

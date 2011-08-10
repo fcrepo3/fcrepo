@@ -17,9 +17,11 @@ import javax.xml.rpc.ServiceException;
 
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.Uploader;
+
 import org.fcrepo.common.Constants;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.utilities.StreamUtility;
 
 
@@ -51,15 +53,15 @@ public class AutoModify {
 
     private static PrintStream s_log = null;
 
-    private static FedoraAPIM s_APIM = null;
+    private static FedoraAPIMMTOM s_APIM = null;
 
-    private static FedoraAPIA s_APIA = null;
+    private static FedoraAPIAMTOM s_APIA = null;
 
     private static Uploader s_UPLOADER = null;
 
-    public static FedoraAPIA APIA = null;
+    public static FedoraAPIAMTOM APIA = null;
 
-    public static FedoraAPIM APIM = null;
+    public static FedoraAPIMMTOM APIM = null;
 
     //public AutoModify(String protocol, String host, int port, String user, String pass)
     //    throws MalformedURLException, ServiceException, IOException
@@ -94,8 +96,8 @@ public class AutoModify {
      * @throws IOException -
      *         If an error occurs in creating an instance of the Uploader.
      */
-    public AutoModify(FedoraAPIA apia,
-                      FedoraAPIM apim,
+    public AutoModify(FedoraAPIAMTOM apia,
+                      FedoraAPIMMTOM apim,
                       String protocol,
                       String host,
                       int port,
@@ -155,9 +157,9 @@ public class AutoModify {
      *        Boolean flag; true indicates validate only; false indicates
      *        process the directives file.
      */
-    public static void modify(FedoraAPIM APIM,
+    public static void modify(FedoraAPIMMTOM APIM,
                               Uploader UPLOADER,
-                              FedoraAPIA APIA,
+                              FedoraAPIAMTOM APIA,
                               String directivesFilePath,
                               String logFilePath,
                               boolean isValidateOnly) {

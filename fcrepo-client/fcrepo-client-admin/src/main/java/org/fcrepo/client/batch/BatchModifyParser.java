@@ -2,6 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.client.batch;
 
 import java.io.ByteArrayInputStream;
@@ -14,13 +15,15 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import java.math.BigInteger;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
-import org.apache.axis.types.NonNegativeInteger;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -36,15 +39,17 @@ import org.fcrepo.client.utility.ingest.AutoIngestor;
 
 import org.fcrepo.common.Constants;
 
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.ComparisonOperator;
-import org.fcrepo.server.types.gen.Condition;
-import org.fcrepo.server.types.gen.FieldSearchQuery;
-import org.fcrepo.server.types.gen.FieldSearchResult;
-import org.fcrepo.server.types.gen.ObjectFields;
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.types.mtom.gen.ComparisonOperator;
+import org.fcrepo.server.types.mtom.gen.Condition;
+import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
+import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
+import org.fcrepo.server.types.mtom.gen.FieldSearchResult.ResultList;
+import org.fcrepo.server.types.mtom.gen.ObjectFactory;
+import org.fcrepo.server.types.mtom.gen.ObjectFields;
 import org.fcrepo.server.utilities.StreamUtility;
-
+import org.fcrepo.server.utilities.TypeUtility;
 
 /**
  * Parses a stream of batch modify directives and makes appropriate calls to the
@@ -70,9 +75,9 @@ public class BatchModifyParser
     /**
      * Instance of FedoraAPIM
      */
-    private static FedoraAPIM APIM;
+    private static FedoraAPIMMTOM APIM;
 
-    private static FedoraAPIA APIA;
+    private static FedoraAPIAMTOM APIA;
 
     /**
      * Log file print stream.
@@ -123,15 +128,20 @@ public class BatchModifyParser
      * Constructor allows this class to initiate the parsing.
      * </p>
      *
-     * @param UPLOADER - An instance of Uploader.
-     * @param APIM     - An instance of FedoraAPIM.
-     * @param APIA     - An instance of Fedora APIA.
-     * @param in       - An input stream containing the xml to be parsed.
-     * @param out      - A print stream used for writing log info.
+     * @param UPLOADER
+     *        - An instance of Uploader.
+     * @param APIM
+     *        - An instance of FedoraAPIM.
+     * @param APIA
+     *        - An instance of Fedora APIA.
+     * @param in
+     *        - An input stream containing the xml to be parsed.
+     * @param out
+     *        - A print stream used for writing log info.
      */
     public BatchModifyParser(Uploader UPLOADER,
-                             FedoraAPIM APIM,
-                             FedoraAPIA APIA,
+                             FedoraAPIMMTOM APIM,
+                             FedoraAPIAMTOM APIA,
                              InputStream in,
                              PrintStream out) {
         BatchModifyParser.out = out;
@@ -231,7 +241,7 @@ public class BatchModifyParser
         out.append("<" + qName);
         for (int i = 0; i < a.getLength(); i++) {
             out.append(" " + a.getQName(i) + "=\""
-                       + StreamUtility.enc(a.getValue(i)) + "\"");
+                    + StreamUtility.enc(a.getValue(i)) + "\"");
         }
         out.append(">");
     }
@@ -254,7 +264,7 @@ public class BatchModifyParser
                              Attributes attrs) throws SAXException {
 
         if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-            && localName.equalsIgnoreCase("addObject")) {
+                && localName.equalsIgnoreCase("addObject")) {
             addObject = false;
             m_obj = new DigitalObject();
 
@@ -289,7 +299,7 @@ public class BatchModifyParser
                 logFailedDirective(m_obj.pid, localName, e, "");
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("modifyObject")) {
+                && localName.equalsIgnoreCase("modifyObject")) {
             modifyObject = false;
             m_obj = new DigitalObject();
 
@@ -332,7 +342,7 @@ public class BatchModifyParser
                 logFailedDirective(m_obj.pid, localName, e, "");
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("purgeObject")) {
+                && localName.equalsIgnoreCase("purgeObject")) {
             purgeObject = false;
             m_obj = new DigitalObject();
 
@@ -366,7 +376,7 @@ public class BatchModifyParser
                 logFailedDirective(m_obj.pid, localName, e, "");
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("addDatastream")) {
+                && localName.equalsIgnoreCase("addDatastream")) {
             try {
                 addDatastream = false;
                 m_ds = new Datastream();
@@ -381,35 +391,35 @@ public class BatchModifyParser
 
                 // Check for optional attributes
                 if (attrs.getValue("dsID") != null
-                    && !attrs.getValue("dsID").equals("")) {
+                        && !attrs.getValue("dsID").equals("")) {
                     m_ds.dsID = attrs.getValue("dsID");
                 } else {
                     m_ds.dsID = null;
                 }
                 if (attrs.getValue("dsLocation") != null
-                    && !attrs.getValue("dsLocation").equals("")) {
+                        && !attrs.getValue("dsLocation").equals("")) {
                     m_ds.dsLocation = attrs.getValue("dsLocation");
                 }
                 if (attrs.getValue("formatURI") != null
-                    && !attrs.getValue("formatURI").equals("")) {
+                        && !attrs.getValue("formatURI").equals("")) {
                     m_ds.formatURI = attrs.getValue("formatURI");
                 }
                 if (attrs.getValue("versionable") != null
-                    && !attrs.getValue("versionable").equals("")) {
+                        && !attrs.getValue("versionable").equals("")) {
                     m_ds.versionable =
                             new Boolean(attrs.getValue("versionable"))
                                     .booleanValue();
                 }
                 if (attrs.getValue("altIDs") != null
-                    && !attrs.getValue("altIDs").equals("")) {
+                        && !attrs.getValue("altIDs").equals("")) {
                     m_ds.altIDs = attrs.getValue("altIDs").split(" ");
                 }
                 if (attrs.getValue("checksumType") != null
-                    && !attrs.getValue("checksumType").equals("")) {
+                        && !attrs.getValue("checksumType").equals("")) {
                     m_ds.checksumType = attrs.getValue("checksumType");
                 }
                 if (attrs.getValue("checksum") != null
-                    && !attrs.getValue("checksum").equals("")) {
+                        && !attrs.getValue("checksum").equals("")) {
                     m_ds.checksum = attrs.getValue("checksum");
                 }
 
@@ -422,7 +432,7 @@ public class BatchModifyParser
                 return;
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("purgeDatastream")) {
+                && localName.equalsIgnoreCase("purgeDatastream")) {
 
             try {
                 purgeDatastream = false;
@@ -437,15 +447,15 @@ public class BatchModifyParser
                 // or empty its value is null and indicates that all versions
                 // of the datastream are to be purged.
                 if (attrs.getValue("asOfDate") != null
-                    && !attrs.getValue("asOfDate").equals("")) {
+                        && !attrs.getValue("asOfDate").equals("")) {
                     m_ds.asOfDate = attrs.getValue("asOfDate");
                 }
                 if (attrs.getValue("endDate") != null
-                    && !attrs.getValue("endDate").equals("")) {
+                        && !attrs.getValue("endDate").equals("")) {
                     m_ds.endDate = attrs.getValue("endDate");
                 }
                 if (attrs.getValue("force") != null
-                    && !attrs.getValue("force").equals("")) {
+                        && !attrs.getValue("force").equals("")) {
                     m_ds.force =
                             new Boolean(attrs.getValue("force")).booleanValue();
                 }
@@ -457,10 +467,10 @@ public class BatchModifyParser
                 logFailedDirective(m_ds.objectPID, localName, e, "");
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("modifyDatastream")) {
+                && localName.equalsIgnoreCase("modifyDatastream")) {
 
             try {
-                org.fcrepo.server.types.gen.Datastream dsOrig = null;
+                org.fcrepo.server.types.mtom.gen.Datastream dsOrig = null;
                 modifyDatastream = false;
 
                 // Get required attributes
@@ -479,11 +489,11 @@ public class BatchModifyParser
                                        localName,
                                        null,
                                        "Datastream ID: " + m_ds.dsID
-                                       + " does not exist"
-                                       + " in the object: "
-                                       + m_ds.objectPID
-                                       + " .\n    Unable to modify"
-                                       + "datastream.");
+                                               + " does not exist"
+                                               + " in the object: "
+                                               + m_ds.objectPID
+                                               + " .\n    Unable to modify"
+                                               + "datastream.");
                     return;
                 }
 
@@ -491,7 +501,7 @@ public class BatchModifyParser
                 // original datastream being modified. This would get caught
                 // later by the server, but may as well detect this now and
                 // flag as an error in directives file.
-                if (dsOrig.getControlGroup().getValue()
+                if (dsOrig.getControlGroup().value()
                         .equalsIgnoreCase(m_ds.dsControlGrp)) {
 
                     // Check for optional atributes. Missing attributes (null) indicate
@@ -524,7 +534,9 @@ public class BatchModifyParser
                     if (attrs.getValue("altIDs") != null) {
                         m_ds.altIDs = attrs.getValue("altIDs").split(" ");
                     } else {
-                        m_ds.altIDs = dsOrig.getAltIDs();
+                        m_ds.altIDs =
+                                dsOrig.getAltIDs().getItem()
+                                        .toArray(new String[] {});
                     }
                     if (attrs.getValue("formatURI") != null) {
                         m_ds.formatURI = attrs.getValue("formatURI");
@@ -546,18 +558,18 @@ public class BatchModifyParser
                                        localName,
                                        null,
                                        " Datastream Control Group Type of: "
-                                       + m_ds.dsControlGrp
-                                       + " in directives file does not match control group"
-                                       + " type in original datastream: "
-                                       + dsOrig.getControlGroup()
-                                               .getValue());
+                                               + m_ds.dsControlGrp
+                                               + " in directives file does not match control group"
+                                               + " type in original datastream: "
+                                               + dsOrig.getControlGroup()
+                                                       .value());
                 }
             } catch (Exception e) {
                 failedCount++;
                 logFailedDirective(m_ds.objectPID, localName, e, "");
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("setDatastreamState")) {
+                && localName.equalsIgnoreCase("setDatastreamState")) {
 
             try {
                 m_ds = new Datastream();
@@ -575,7 +587,7 @@ public class BatchModifyParser
                 logFailedDirective(m_ds.objectPID, localName, e, "");
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("setDatastreamVersionable")) {
+                && localName.equalsIgnoreCase("setDatastreamVersionable")) {
 
             try {
                 m_ds = new Datastream();
@@ -595,7 +607,7 @@ public class BatchModifyParser
                 logFailedDirective(m_ds.objectPID, localName, e, "");
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("compareDatastreamChecksum")) {
+                && localName.equalsIgnoreCase("compareDatastreamChecksum")) {
 
             try {
                 m_ds = new Datastream();
@@ -607,7 +619,7 @@ public class BatchModifyParser
 
                 // Get optional attributes
                 if (attrs.getValue("asOfDate") != null
-                    && !attrs.getValue("asOfDate").equals("")) {
+                        && !attrs.getValue("asOfDate").equals("")) {
                     m_ds.asOfDate = attrs.getValue("asOfDate");
                 }
 
@@ -618,7 +630,7 @@ public class BatchModifyParser
                 logFailedDirective(m_ds.objectPID, localName, e, "");
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("xmlData")) {
+                && localName.equalsIgnoreCase("xmlData")) {
             m_inXMLMetadata = true;
             m_dsXMLBuffer = new StringBuffer();
         } else {
@@ -638,7 +650,7 @@ public class BatchModifyParser
 
         if (m_inXMLMetadata) {
             if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                && localName.equals("xmlData")) {
+                    && localName.equals("xmlData")) {
                 try {
                     m_ds.xmlContent =
                             m_dsXMLBuffer.toString().getBytes("UTF-8");
@@ -653,7 +665,7 @@ public class BatchModifyParser
                 m_dsXMLBuffer.append(">");
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("addObject")) {
+                && localName.equalsIgnoreCase("addObject")) {
             try {
                 if (addObject) {
                     StringBuffer xml = new StringBuffer();
@@ -690,7 +702,7 @@ public class BatchModifyParser
                     logSucceededDirective(newPID,
                                           localName,
                                           " Added new object with PID: "
-                                          + newPID);
+                                                  + newPID);
                 }
             } catch (Exception e) {
                 if (addObject) {
@@ -701,7 +713,7 @@ public class BatchModifyParser
                 addObject = false;
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("modifyObject")) {
+                && localName.equalsIgnoreCase("modifyObject")) {
 
             try {
 
@@ -715,7 +727,7 @@ public class BatchModifyParser
                 }
                 succeededCount++;
                 logSucceededDirective(m_obj.pid, localName, "Object PID: "
-                                                            + m_obj.pid + " modified");
+                        + m_obj.pid + " modified");
 
             } catch (Exception e) {
                 if (modifyObject) {
@@ -726,7 +738,7 @@ public class BatchModifyParser
                 modifyObject = false;
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("purgeObject")) {
+                && localName.equalsIgnoreCase("purgeObject")) {
 
             try {
 
@@ -734,9 +746,7 @@ public class BatchModifyParser
                 if (purgeObject) {
                     String purgedPid = null;
                     purgedPid =
-                            APIM.purgeObject(m_obj.pid,
-                                             "PurgeObject",
-                                             false);
+                            APIM.purgeObject(m_obj.pid, "PurgeObject", false);
                     if (purgedPid != null) {
                         succeededCount++;
                         logSucceededDirective(m_obj.pid,
@@ -748,7 +758,7 @@ public class BatchModifyParser
                                            localName,
                                            null,
                                            "Unable to purge object with PID: "
-                                           + m_obj.pid);
+                                                   + m_obj.pid);
                     }
                 }
             } catch (Exception e) {
@@ -761,7 +771,7 @@ public class BatchModifyParser
                 purgeObject = false;
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("addDatastream")) {
+                && localName.equalsIgnoreCase("addDatastream")) {
             try {
 
                 // Process addDatastream only if no previous errors encountered
@@ -774,7 +784,8 @@ public class BatchModifyParser
                         datastreamID =
                                 APIM.addDatastream(m_ds.objectPID,
                                                    m_ds.dsID,
-                                                   m_ds.altIDs,
+                                                   TypeUtility
+                                                           .convertStringtoAOS(m_ds.altIDs),
                                                    m_ds.dsLabel,
                                                    m_ds.versionable,
                                                    m_ds.dsMIME,
@@ -786,12 +797,13 @@ public class BatchModifyParser
                                                    m_ds.checksum,
                                                    m_ds.logMessage);
                     } else if (m_ds.dsControlGrp.equalsIgnoreCase("E")
-                               || m_ds.dsControlGrp.equalsIgnoreCase("M")
-                               || m_ds.dsControlGrp.equalsIgnoreCase("R")) {
+                            || m_ds.dsControlGrp.equalsIgnoreCase("M")
+                            || m_ds.dsControlGrp.equalsIgnoreCase("R")) {
                         datastreamID =
                                 APIM.addDatastream(m_ds.objectPID,
                                                    m_ds.dsID,
-                                                   m_ds.altIDs,
+                                                   TypeUtility
+                                                           .convertStringtoAOS(m_ds.altIDs),
                                                    m_ds.dsLabel,
                                                    m_ds.versionable,
                                                    m_ds.dsMIME,
@@ -808,7 +820,7 @@ public class BatchModifyParser
                         logSucceededDirective(m_ds.objectPID,
                                               localName,
                                               "datastreamID: " + datastreamID
-                                              + " added");
+                                                      + " added");
                     } else {
                         failedCount++;
                         logFailedDirective(m_ds.objectPID,
@@ -827,13 +839,13 @@ public class BatchModifyParser
                 addDatastream = false;
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("purgeDatastream")) {
+                && localName.equalsIgnoreCase("purgeDatastream")) {
 
             try {
 
                 // Process purgeDatastream only if no previous errors encountered
                 if (purgeDatastream) {
-                    String[] versionsPurged = null;
+                    List<String> versionsPurged = null;
                     versionsPurged =
                             APIM.purgeDatastream(m_ds.objectPID,
                                                  m_ds.dsID,
@@ -841,48 +853,52 @@ public class BatchModifyParser
                                                  m_ds.endDate,
                                                  m_ds.logMessage,
                                                  false);
-                    if (versionsPurged.length > 0) {
+                    if (versionsPurged.size() > 0) {
                         succeededCount++;
                         if (m_ds.asOfDate != null && m_ds.endDate != null) {
                             logSucceededDirective(m_ds.objectPID,
                                                   localName,
                                                   "datastreamID: "
-                                                  + m_ds.dsID
-                                                  + "\n    Purged all versions from: "
-                                                  + m_ds.asOfDate
-                                                  + " to "
-                                                  + m_ds.endDate
-                                                  + "\n    Versions purged: "
-                                                  + versionsPurged.length);
+                                                          + m_ds.dsID
+                                                          + "\n    Purged all versions from: "
+                                                          + m_ds.asOfDate
+                                                          + " to "
+                                                          + m_ds.endDate
+                                                          + "\n    Versions purged: "
+                                                          + versionsPurged
+                                                                  .size());
                         } else if (m_ds.asOfDate == null
-                                   && m_ds.endDate == null) {
+                                && m_ds.endDate == null) {
                             logSucceededDirective(m_ds.objectPID,
                                                   localName,
                                                   "datastreamID: "
-                                                  + m_ds.dsID
-                                                  + "\n    Purged all versions. "
-                                                  + "\n    Versions purged: "
-                                                  + versionsPurged.length);
+                                                          + m_ds.dsID
+                                                          + "\n    Purged all versions. "
+                                                          + "\n    Versions purged: "
+                                                          + versionsPurged
+                                                                  .size());
                         } else if (m_ds.asOfDate != null
-                                   && m_ds.endDate == null) {
+                                && m_ds.endDate == null) {
                             logSucceededDirective(m_ds.objectPID,
                                                   localName,
                                                   "datastreamID: "
-                                                  + m_ds.dsID
-                                                  + "\n    Purged all versions after : "
-                                                  + m_ds.asOfDate
-                                                  + "\n    Versions purged: "
-                                                  + versionsPurged.length);
+                                                          + m_ds.dsID
+                                                          + "\n    Purged all versions after : "
+                                                          + m_ds.asOfDate
+                                                          + "\n    Versions purged: "
+                                                          + versionsPurged
+                                                                  .size());
                         } else if (m_ds.asOfDate == null
-                                   && m_ds.endDate != null) {
+                                && m_ds.endDate != null) {
                             logSucceededDirective(m_ds.objectPID,
                                                   localName,
                                                   "datastreamID: "
-                                                  + m_ds.dsID
-                                                  + "\n    Purged all versions prior to : "
-                                                  + m_ds.endDate
-                                                  + "\n    Versions purged: "
-                                                  + versionsPurged.length);
+                                                          + m_ds.dsID
+                                                          + "\n    Purged all versions prior to : "
+                                                          + m_ds.endDate
+                                                          + "\n    Versions purged: "
+                                                          + versionsPurged
+                                                                  .size());
                         }
                     } else {
                         failedCount++;
@@ -901,7 +917,7 @@ public class BatchModifyParser
                 purgeDatastream = false;
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("modifyDatastream")) {
+                && localName.equalsIgnoreCase("modifyDatastream")) {
 
             try {
 
@@ -910,21 +926,24 @@ public class BatchModifyParser
                     if (m_ds.dsControlGrp.equalsIgnoreCase("X")) {
                         APIM.modifyDatastreamByValue(m_ds.objectPID,
                                                      m_ds.dsID,
-                                                     m_ds.altIDs,
+                                                     TypeUtility
+                                                             .convertStringtoAOS(m_ds.altIDs),
                                                      m_ds.dsLabel,
                                                      m_ds.dsMIME,
                                                      m_ds.formatURI,
-                                                     m_ds.xmlContent,
+                                                     TypeUtility
+                                                             .convertBytesToDataHandler(m_ds.xmlContent),
                                                      m_ds.checksumType,
                                                      m_ds.checksum,
                                                      m_ds.logMessage,
                                                      false);
                     } else if (m_ds.dsControlGrp.equalsIgnoreCase("E")
-                               || m_ds.dsControlGrp.equalsIgnoreCase("M")
-                               || m_ds.dsControlGrp.equalsIgnoreCase("R")) {
+                            || m_ds.dsControlGrp.equalsIgnoreCase("M")
+                            || m_ds.dsControlGrp.equalsIgnoreCase("R")) {
                         APIM.modifyDatastreamByReference(m_ds.objectPID,
                                                          m_ds.dsID,
-                                                         m_ds.altIDs,
+                                                         TypeUtility
+                                                                 .convertStringtoAOS(m_ds.altIDs),
                                                          m_ds.dsLabel,
                                                          m_ds.dsMIME,
                                                          m_ds.formatURI,
@@ -938,7 +957,7 @@ public class BatchModifyParser
                     logSucceededDirective(m_ds.objectPID,
                                           localName,
                                           "DatastreamID: " + m_ds.dsID
-                                          + " modified");
+                                                  + " modified");
                 }
 
             } catch (Exception e) {
@@ -950,7 +969,7 @@ public class BatchModifyParser
                 modifyDatastream = false;
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("setDatastreamState")) {
+                && localName.equalsIgnoreCase("setDatastreamState")) {
 
             try {
 
@@ -964,8 +983,8 @@ public class BatchModifyParser
                     logSucceededDirective(m_ds.objectPID,
                                           localName,
                                           "datastream: " + m_ds.dsID
-                                          + "\n    Set dsState: "
-                                          + m_ds.dsState);
+                                                  + "\n    Set dsState: "
+                                                  + m_ds.dsState);
                 }
 
             } catch (Exception e) {
@@ -977,7 +996,7 @@ public class BatchModifyParser
                 setDatastreamState = false;
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("setDatastreamVersionable")) {
+                && localName.equalsIgnoreCase("setDatastreamVersionable")) {
 
             try {
 
@@ -991,8 +1010,8 @@ public class BatchModifyParser
                     logSucceededDirective(m_ds.objectPID,
                                           localName,
                                           "datastream: " + m_ds.dsID
-                                          + "\n    Set dsVersionable: "
-                                          + m_ds.versionable);
+                                                  + "\n    Set dsVersionable: "
+                                                  + m_ds.versionable);
                 }
 
             } catch (Exception e) {
@@ -1004,7 +1023,7 @@ public class BatchModifyParser
                 setDatastreamVersionable = false;
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("compareDatastreamChecksum")) {
+                && localName.equalsIgnoreCase("compareDatastreamChecksum")) {
 
             try {
 
@@ -1020,9 +1039,9 @@ public class BatchModifyParser
                         logSucceededDirective(m_ds.objectPID,
                                               localName,
                                               "datastream: "
-                                              + m_ds.dsID
-                                              + "\n    compareDatastreamChecksum: "
-                                              + msg);
+                                                      + m_ds.dsID
+                                                      + "\n    compareDatastreamChecksum: "
+                                                      + msg);
                     } else {
                         throw new Exception("Checksum validation error");
                     }
@@ -1037,10 +1056,10 @@ public class BatchModifyParser
                 compareDatastreamChecksum = false;
             }
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("addDatastreamBinding")) {
+                && localName.equalsIgnoreCase("addDatastreamBinding")) {
 
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
-                   && localName.equalsIgnoreCase("removeDatastreamBinding")) {
+                && localName.equalsIgnoreCase("removeDatastreamBinding")) {
 
         }
     }
@@ -1059,17 +1078,21 @@ public class BatchModifyParser
      * Write a log of what happened when a directive fails.
      * <p/>
      *
-     * @param sourcePID - The PID of the object being processed.
-     * @param directive - The name of the directive being processed.
-     * @param e         - The Exception that was thrown.
-     * @param msg       - A message providing additional info if no Exception was thrown.
+     * @param sourcePID
+     *        - The PID of the object being processed.
+     * @param directive
+     *        - The name of the directive being processed.
+     * @param e
+     *        - The Exception that was thrown.
+     * @param msg
+     *        - A message providing additional info if no Exception was thrown.
      */
     private static void logFailedDirective(String sourcePID,
                                            String directive,
                                            Exception e,
                                            String msg) {
         out.println("  <failed directive=\"" + directive + "\" sourcePID=\""
-                    + sourcePID + "\">");
+                + sourcePID + "\">");
         if (e != null) {
             String message = e.getMessage();
             if (message == null) {
@@ -1087,8 +1110,10 @@ public class BatchModifyParser
      * Write a log of what happened when there is a parsing error.
      * </p>
      *
-     * @param e   - The Exception that was thrown.
-     * @param msg - A message indicating additional info if no Exception was thrown.
+     * @param e
+     *        - The Exception that was thrown.
+     * @param msg
+     *        - A message indicating additional info if no Exception was thrown.
      */
     private static void logParserError(Exception e, String msg) {
         out.println("  <parserError>");
@@ -1109,15 +1134,18 @@ public class BatchModifyParser
      * Write a log when a directive is successfully processed.
      * </p>
      *
-     * @param sourcePID - The PID of the object processed.
-     * @param directive - The name of the directive processed.
-     * @param msg       - A message.
+     * @param sourcePID
+     *        - The PID of the object processed.
+     * @param directive
+     *        - The name of the directive processed.
+     * @param msg
+     *        - A message.
      */
     private static void logSucceededDirective(String sourcePID,
                                               String directive,
                                               String msg) {
         out.println("  <succeeded directive=\"" + directive + "\" sourcePID=\""
-                    + sourcePID + "\">");
+                + sourcePID + "\">");
         out.println("    " + StreamUtility.enc(msg));
         out.println("  </succeeded>");
     }
@@ -1126,13 +1154,17 @@ public class BatchModifyParser
         try {
             HashMap<String, String> labelMap = new HashMap<String, String>();
             FieldSearchQuery query = new FieldSearchQuery();
-            Condition[] conditions = new Condition[1];
-            conditions[0] = new Condition();
-            conditions[0].setProperty("fType");
-            conditions[0].setOperator(ComparisonOperator.fromValue("eq"));
-            conditions[0].setValue("D");
-            query.setConditions(conditions);
-            String[] fields = new String[]{"pid", "label"};
+            FieldSearchQuery.Conditions conds =
+                    new FieldSearchQuery.Conditions();
+            Condition condition = new Condition();
+            condition = new Condition();
+            condition.setProperty("fType");
+            condition.setOperator(ComparisonOperator.fromValue("eq"));
+            condition.setValue("D");
+            conds.getCondition().add(condition);
+            ObjectFactory factory = new ObjectFactory();
+            query.setConditions(factory.createFieldSearchQueryConditions(conds));
+            String[] fields = new String[] {"pid", "label"};
 
             if (true) {
                 /* FIXME: find some other way to do this */
@@ -1140,18 +1172,21 @@ public class BatchModifyParser
             }
 
             FieldSearchResult result =
-                    APIA.findObjects(fields,
-                                     new NonNegativeInteger("50"),
+                    APIA.findObjects(TypeUtility.convertStringtoAOS(fields),
+                                     new BigInteger("50"),
                                      query);
             while (result != null) {
-                ObjectFields[] resultList = result.getResultList();
-                for (ObjectFields element : resultList) {
-                    labelMap.put(element.getPid(), element.getLabel());
+                ResultList resultList = result.getResultList();
+                if (result.getResultList() != null) {
+                    for (ObjectFields element : resultList.getObjectFields()) {
+                        labelMap.put(element.getPid().getValue(), element
+                                .getLabel().getValue());
+                    }
                 }
                 if (result.getListSession() != null) {
                     result =
                             APIA.resumeFindObjects(result.getListSession()
-                                    .getToken());
+                                    .getValue().getToken());
                 } else {
                     result = null;
                 }
@@ -1166,9 +1201,11 @@ public class BatchModifyParser
      * Get a map of pid-to-label of service deployments that implement the
      * service defined by the indicated definition.
      *
-     * @param sDefPID PID of the associated service defintion object.
+     * @param sDefPID
+     *        PID of the associated service defintion object.
      * @return A list of the service deployment labels.
-     * @throws IOException If an error occurs in retrieving the list of labels.
+     * @throws IOException
+     *         If an error occurs in retrieving the list of labels.
      */
     public static Map getDeploymentLabelMap(String sDefPID) throws IOException {
         try {
@@ -1183,8 +1220,11 @@ public class BatchModifyParser
             conditions[1].setProperty("bDef");
             conditions[1].setOperator(ComparisonOperator.fromValue("has"));
             conditions[1].setValue(sDefPID);
-            query.setConditions(conditions);
-            String[] fields = new String[]{"pid", "label"};
+            FieldSearchQuery.Conditions conds = new FieldSearchQuery.Conditions();
+            conds.getCondition().addAll(Arrays.asList(conditions));
+            ObjectFactory factory = new ObjectFactory();
+            query.setConditions(factory.createFieldSearchQueryConditions(conds));
+            String[] fields = new String[] {"pid", "label"};
 
             if (true) {
                 /*
@@ -1195,17 +1235,19 @@ public class BatchModifyParser
                 throw new UnsupportedOperationException("This operation uses obsolete field search semantics");
             }
             FieldSearchResult result =
-                    APIA.findObjects(fields,
-                                     new NonNegativeInteger("50"),
+                    APIA.findObjects(TypeUtility.convertStringtoAOS(fields),
+                                     new BigInteger("50"),
                                      query);
             while (result != null) {
-                ObjectFields[] resultList = result.getResultList();
-                for (ObjectFields element : resultList) {
-                    labelMap.put(element.getPid(), element.getLabel());
+                ResultList resultList = result.getResultList();
+                if (resultList != null) {
+                    for (ObjectFields element : resultList.getObjectFields()) {
+                        labelMap.put(element.getPid().getValue(), element.getLabel().getValue());
+                    }
                 }
                 if (result.getListSession() != null) {
                     result =
-                            APIA.resumeFindObjects(result.getListSession()
+                            APIA.resumeFindObjects(result.getListSession().getValue()
                                     .getToken());
                 } else {
                     result = null;
@@ -1222,8 +1264,9 @@ public class BatchModifyParser
      * Main method for testing only.
      * </p>
      *
-     * @param args Array of input parms consisting of hostname, port, username,
-     *             password, protocol, directives, log.
+     * @param args
+     *        Array of input parms consisting of hostname, port, username,
+     *        password, protocol, directives, log.
      */
     public static void main(String[] args) {
 
@@ -1240,8 +1283,8 @@ public class BatchModifyParser
             }
 
             PrintStream logFile;
-            FedoraAPIM APIM;
-            FedoraAPIA APIA;
+            FedoraAPIMMTOM APIM;
+            FedoraAPIAMTOM APIA;
 
             try {
                 UPLOADER = new Uploader(host, port, context, user, pass);
@@ -1260,8 +1303,7 @@ public class BatchModifyParser
                 //*******************************************
 
                 InputStream file =
-                        new FileInputStream(
-                                "c:\\fedora\\mellon\\dist\\client\\demo\\batch-demo\\modify-batch-directives-valid.xml");
+                        new FileInputStream("c:\\fedora\\mellon\\dist\\client\\demo\\batch-demo\\modify-batch-directives-valid.xml");
                 BatchModifyParser bmp =
                         new BatchModifyParser(UPLOADER,
                                               APIM,
@@ -1272,10 +1314,10 @@ public class BatchModifyParser
                 logFile.close();
             } catch (Exception e) {
                 System.out.println("ERROR: "
-                                   + e.getClass().getName()
-                                   + " - "
-                                   + (e.getMessage() == null ? "(no detail provided)" : e
-                        .getMessage()));
+                        + e.getClass().getName()
+                        + " - "
+                        + (e.getMessage() == null ? "(no detail provided)" : e
+                                .getMessage()));
             }
         } else {
             System.out.println("Enter args for: host port user pass protocol");

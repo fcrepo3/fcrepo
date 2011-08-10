@@ -7,8 +7,6 @@ package org.fcrepo.client.utility.validate.remote;
 
 import java.io.IOException;
 
-import java.rmi.RemoteException;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -26,16 +24,16 @@ import org.fcrepo.client.utility.validate.types.DatastreamInfo;
 import org.fcrepo.client.utility.validate.types.DsCompositeModelDoc;
 import org.fcrepo.client.utility.validate.types.ObjectInfo;
 import org.fcrepo.client.utility.validate.types.RelationshipInfo;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.search.FieldSearchQuery;
-import org.fcrepo.server.types.gen.Datastream;
-import org.fcrepo.server.types.gen.MIMETypedStream;
+import org.fcrepo.server.types.mtom.gen.Datastream;
+import org.fcrepo.server.types.mtom.gen.MIMETypedStream;
+import org.fcrepo.server.types.mtom.gen.RelationshipTuple;
 
 import static org.fcrepo.client.utility.validate.types.ContentModelInfo.DS_COMPOSITE_MODEL;
 import static org.fcrepo.client.utility.validate.types.ContentModelInfo.DS_COMPOSITE_MODEL_FORMAT;
-
-
 
 /**
  * An {@link ObjectSource} that is based on a {@link FedoraClient} link to a
@@ -46,15 +44,16 @@ import static org.fcrepo.client.utility.validate.types.ContentModelInfo.DS_COMPO
 public class RemoteObjectSource
         implements ObjectSource {
 
-    private final FedoraAPIA apia;
+    private final FedoraAPIAMTOM apia;
 
-    private final FedoraAPIM apim;
+    private final FedoraAPIMMTOM apim;
 
     public RemoteObjectSource(ServiceInfo serviceInfo)
             throws ServiceException, IOException {
         FedoraClient fc =
-                new FedoraClient(serviceInfo.getBaseUrlString(), serviceInfo
-                        .getUsername(), serviceInfo.getPassword());
+                new FedoraClient(serviceInfo.getBaseUrlString(),
+                                 serviceInfo.getUsername(),
+                                 serviceInfo.getPassword());
         apia = fc.getAPIA();
         apim = fc.getAPIM();
     }
@@ -71,6 +70,7 @@ public class RemoteObjectSource
     /**
      * {@inheritDoc}
      */
+    @Override
     public ObjectInfo getValidationObject(String pid)
             throws ObjectSourceException {
         List<RelationshipInfo> relations = getRelationships(pid);
@@ -81,10 +81,10 @@ public class RemoteObjectSource
     private Set<DatastreamInfo> getDatastreams(String pid)
             throws ObjectSourceException {
         try {
-            Datastream[] datastreams = apim.getDatastreams(pid, null, null);
+            List<Datastream> datastreams = apim.getDatastreams(pid, null, null);
             return TypeUtility
-                    .convertGenDatastreamArrayToDatastreamInfoSet(datastreams);
-        } catch (RemoteException e) {
+                    .convertGenDatastreamArrayToDatastreamInfoSet(datastreams.toArray(new Datastream[]{}));
+        } catch (Exception e) {
             throw new ObjectSourceException(e);
         }
     }
@@ -92,11 +92,12 @@ public class RemoteObjectSource
     private List<RelationshipInfo> getRelationships(String pid)
             throws ObjectSourceException {
         try {
-            org.fcrepo.server.types.gen.RelationshipTuple[] tuples =
-                    apim.getRelationships(pid, null);
+            RelationshipTuple[] tuples =
+                    apim.getRelationships(pid, null)
+                            .toArray(new RelationshipTuple[0]);
             return TypeUtility
                     .convertGenRelsTupleArrayToRelationshipInfoList(tuples);
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             throw new ObjectSourceException(e);
         }
     }
@@ -105,6 +106,7 @@ public class RemoteObjectSource
      * A content model must exist as an object. If must have a (@link
      * DS_COMPOSITE_MODEL} datastream.
      */
+    @Override
     public ContentModelInfo getContentModelInfo(String pid)
             throws ObjectSourceException, InvalidContentModelException {
         try {
@@ -133,9 +135,12 @@ public class RemoteObjectSource
                                                     DS_COMPOSITE_MODEL,
                                                     null);
             DsCompositeModelDoc model =
-                    new DsCompositeModelDoc(pid, ds.getStream());
+                    new DsCompositeModelDoc(pid,
+                                            org.fcrepo.server.utilities.TypeUtility
+                                                    .convertDataHandlerToBytes(ds
+                                                            .getStream()));
             return new BasicContentModelInfo(object, model.getTypeModels());
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             throw new ObjectSourceException("Problem fetching '"
                                                     + DS_COMPOSITE_MODEL
                                                     + "' datastream for pid='"

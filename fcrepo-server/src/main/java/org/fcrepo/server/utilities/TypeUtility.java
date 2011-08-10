@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.search.Condition;
+import org.fcrepo.server.types.mtom.gen.ArrayOfString;
 
 import org.fcrepo.utilities.DateUtility;
 
@@ -38,6 +39,10 @@ public abstract class TypeUtility {
 
     private static final Logger logger = LoggerFactory
             .getLogger(TypeUtility.class);
+
+    private static final int INITIAL_SIZE = 1024 * 1024;
+
+    private static final int BUFFER_SIZE = 1024;
 
     public static org.fcrepo.server.types.mtom.gen.Datastream convertDatastreamToGenDatastreamMTOM(org.fcrepo.server.storage.types.Datastream in) {
         org.fcrepo.server.types.mtom.gen.Datastream out =
@@ -179,7 +184,7 @@ public abstract class TypeUtility {
             throws org.fcrepo.server.errors.InvalidOperatorException,
             org.fcrepo.server.errors.QueryParseException {
         ArrayList<Condition> list = new ArrayList<Condition>();
-        if (genConditions != null) {
+        if (genConditions != null && genConditions.getCondition() != null) {
             for (org.fcrepo.server.types.gen.Condition c : genConditions
                     .getCondition()) {
                 list.add(new org.fcrepo.server.search.Condition(c.getProperty(),
@@ -195,7 +200,7 @@ public abstract class TypeUtility {
             throws org.fcrepo.server.errors.InvalidOperatorException,
             org.fcrepo.server.errors.QueryParseException {
         ArrayList<Condition> list = new ArrayList<Condition>();
-        if (genConditions != null) {
+        if (genConditions != null && genConditions.getCondition() != null) {
             for (org.fcrepo.server.types.mtom.gen.Condition c : genConditions
                     .getCondition()) {
                 list.add(new org.fcrepo.server.search.Condition(c.getProperty(),
@@ -213,8 +218,7 @@ public abstract class TypeUtility {
         for (int i = 0; i < sfList.size(); i++) {
             org.fcrepo.server.types.gen.ObjectFields gf =
                     new org.fcrepo.server.types.gen.ObjectFields();
-            org.fcrepo.server.search.ObjectFields sf =
-                    sfList.get(i);
+            org.fcrepo.server.search.ObjectFields sf = sfList.get(i);
             org.fcrepo.server.types.gen.ObjectFactory factory =
                     new org.fcrepo.server.types.gen.ObjectFactory();
             // Repository key fields
@@ -299,8 +303,7 @@ public abstract class TypeUtility {
         for (int i = 0; i < sfList.size(); i++) {
             org.fcrepo.server.types.mtom.gen.ObjectFields gf =
                     new org.fcrepo.server.types.mtom.gen.ObjectFields();
-            org.fcrepo.server.search.ObjectFields sf =
-                    sfList.get(i);
+            org.fcrepo.server.search.ObjectFields sf = sfList.get(i);
             org.fcrepo.server.types.gen.ObjectFactory factory =
                     new org.fcrepo.server.types.gen.ObjectFactory();
             // Repository key fields
@@ -452,8 +455,11 @@ public abstract class TypeUtility {
                     mimeTypedStream.header;
             org.fcrepo.server.types.gen.MIMETypedStream.Header head =
                     new org.fcrepo.server.types.gen.MIMETypedStream.Header();
-            for (org.fcrepo.server.storage.types.Property property : header) {
-                head.getProperty().add(convertPropertyToGenProperty(property));
+            if (header != null) {
+                for (org.fcrepo.server.storage.types.Property property : header) {
+                    head.getProperty()
+                            .add(convertPropertyToGenProperty(property));
+                }
             }
             genMIMETypedStream.setHeader(head);
 
@@ -488,9 +494,11 @@ public abstract class TypeUtility {
                     mimeTypedStream.header;
             org.fcrepo.server.types.mtom.gen.MIMETypedStream.Header head =
                     new org.fcrepo.server.types.mtom.gen.MIMETypedStream.Header();
-            for (org.fcrepo.server.storage.types.Property property : header) {
-                head.getProperty()
-                        .add(convertPropertyToGenPropertyMTOM(property));
+            if (header != null) {
+                for (org.fcrepo.server.storage.types.Property property : header) {
+                    head.getProperty()
+                            .add(convertPropertyToGenPropertyMTOM(property));
+                }
             }
             genMIMETypedStream.setHeader(head);
 
@@ -720,6 +728,7 @@ public abstract class TypeUtility {
         if (genProperties != null) {
             org.fcrepo.server.storage.types.Property[] properties =
                     new org.fcrepo.server.storage.types.Property[genProperties
+                            .getParameter() == null ? 0 : genProperties
                             .getParameter().size()];
             int i = 0;
             for (org.fcrepo.server.types.gen.Property prop : genProperties
@@ -740,6 +749,7 @@ public abstract class TypeUtility {
         if (genProperties != null) {
             org.fcrepo.server.storage.types.Property[] properties =
                     new org.fcrepo.server.storage.types.Property[genProperties
+                            .getParameter() == null ? 0 : genProperties
                             .getParameter().size()];
             int i = 0;
             for (org.fcrepo.server.types.mtom.gen.Property prop : genProperties
@@ -897,12 +907,14 @@ public abstract class TypeUtility {
         Map<String, List<String>> dsprobs = validation.getDatastreamProblems();
         org.fcrepo.server.types.mtom.gen.Validation.DatastreamProblems problems =
                 new org.fcrepo.server.types.mtom.gen.Validation.DatastreamProblems();
-        for (String key : dsprobs.keySet()) {
-            org.fcrepo.server.types.mtom.gen.DatastreamProblem dsProblem =
-                    new org.fcrepo.server.types.mtom.gen.DatastreamProblem();
-            dsProblem.setDatastreamID(key);
-            dsProblem.getProblem().addAll(dsprobs.get(key));
-            problems.getDatastream().add(dsProblem);
+        if (dsprobs != null) {
+            for (String key : dsprobs.keySet()) {
+                org.fcrepo.server.types.mtom.gen.DatastreamProblem dsProblem =
+                        new org.fcrepo.server.types.mtom.gen.DatastreamProblem();
+                dsProblem.setDatastreamID(key);
+                dsProblem.getProblem().addAll(dsprobs.get(key));
+                problems.getDatastream().add(dsProblem);
+            }
         }
         genvalid.setDatastreamProblems(problems);
         return genvalid;
@@ -929,15 +941,52 @@ public abstract class TypeUtility {
         Map<String, List<String>> dsprobs = validation.getDatastreamProblems();
         org.fcrepo.server.types.gen.Validation.DatastreamProblems problems =
                 new org.fcrepo.server.types.gen.Validation.DatastreamProblems();
-        for (String key : dsprobs.keySet()) {
-            org.fcrepo.server.types.gen.DatastreamProblem dsProblem =
-                    new org.fcrepo.server.types.gen.DatastreamProblem();
-            dsProblem.setDatastreamID(key);
-            dsProblem.getProblem().addAll(dsprobs.get(key));
-            problems.getDatastream().add(dsProblem);
+        if (dsprobs != null) {
+            for (String key : dsprobs.keySet()) {
+                org.fcrepo.server.types.gen.DatastreamProblem dsProblem =
+                        new org.fcrepo.server.types.gen.DatastreamProblem();
+                dsProblem.setDatastreamID(key);
+                dsProblem.getProblem().addAll(dsprobs.get(key));
+                problems.getDatastream().add(dsProblem);
+            }
         }
         genvalid.setDatastreamProblems(problems);
         return genvalid;
+    }
+
+    public static byte[] convertDataHandlerToBytes(DataHandler dh) {
+        if (dh != null) {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(INITIAL_SIZE);
+            InputStream in;
+            try {
+                in = dh.getInputStream();
+                byte[] buffer = new byte[BUFFER_SIZE];
+                int bytesRead;
+                while ((bytesRead = in.read(buffer)) >= 0) {
+                    bos.write(buffer, 0, bytesRead);
+                }
+                return bos.toByteArray();
+            } catch (IOException e) {
+                return null;
+            }
+        } else
+            return null;
+    }
+
+    public static DataHandler convertBytesToDataHandler(byte[] content) {
+        if (content != null) {
+            return new DataHandler(new ByteArrayDataSource(content, "text/xml"));
+        } else
+            return null;
+    }
+
+    public static ArrayOfString convertStringtoAOS(String[] arr) {
+        if (arr != null) {
+            ArrayOfString arofs = new ArrayOfString();
+            arofs.getItem().addAll(Arrays.asList(arr));
+            return arofs;
+        } else
+            return null;
     }
 
 }

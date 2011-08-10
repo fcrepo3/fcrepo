@@ -2,6 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.client.console.management;
 
 import java.awt.BorderLayout;
@@ -12,7 +13,6 @@ import java.awt.Font;
 import java.lang.reflect.InvocationTargetException;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -28,14 +28,12 @@ import javax.swing.ScrollPaneConstants;
 
 import javax.xml.rpc.ServiceException;
 
+import org.fcrepo.client.APIMStubFactory;
 import org.fcrepo.client.Administrator;
 import org.fcrepo.client.console.Console;
 import org.fcrepo.client.console.ConsoleCommand;
 import org.fcrepo.client.console.ConsoleSendButtonListener;
 import org.fcrepo.client.console.ServiceConsoleCommandFactory;
-import org.fcrepo.server.management.FedoraAPIMServiceLocator;
-
-
 
 /**
  * @author Chris Wilper
@@ -48,8 +46,6 @@ public class ManagementConsole
     private static final long serialVersionUID = 1L;
 
     private final Administrator m_mainFrame;
-
-    private final FedoraAPIMServiceLocator m_locator;
 
     private final JTextArea m_outputArea;
 
@@ -67,10 +63,6 @@ public class ManagementConsole
               true, //maximizable
               true);//iconifiable
         m_mainFrame = mainFrame;
-        m_locator =
-                new FedoraAPIMServiceLocator(Administrator.getUser(),
-                                             Administrator.getPass());
-
         m_outputArea = new JTextArea();
         m_outputArea.setFont(new Font("Serif", Font.PLAIN, 16));
         m_outputArea.setEditable(false);
@@ -100,14 +92,12 @@ public class ManagementConsole
                                4);
         portPanel.add(m_portTextField, BorderLayout.EAST);
 
-
         JPanel contextPanel = new JPanel();
         contextPanel.setLayout(new BorderLayout());
         contextPanel.add(new JLabel("  Context : "), BorderLayout.WEST);
         m_contextTextField =
-                new JTextField(Administrator.getAppServContext(),10);
+                new JTextField(Administrator.getAppServContext(), 10);
         contextPanel.add(m_contextTextField, BorderLayout.EAST);
-
 
         hostPortPanel.add(hostPanel, BorderLayout.WEST);
         hostPortPanel.add(contextPanel, BorderLayout.CENTER);
@@ -120,8 +110,7 @@ public class ManagementConsole
         try {
             commands =
                     ServiceConsoleCommandFactory
-                            .getConsoleCommands(Class
-                                                        .forName("org.fcrepo.server.management.FedoraAPIM"),
+                            .getConsoleCommands(Class.forName("org.fcrepo.server.management.FedoraAPIM"),
                                                 null);
         } catch (ClassNotFoundException cnfe) {
             System.out
@@ -150,8 +139,7 @@ public class ManagementConsole
         getContentPane().add(outputScrollPane);
 
         ImageIcon hostIcon =
-            new ImageIcon(ClassLoader.
-                          getSystemResource("images/client/standard/development/Host16.gif"));
+                new ImageIcon(ClassLoader.getSystemResource("images/client/standard/development/Host16.gif"));
         setFrameIcon(hostIcon);
 
         pack();
@@ -167,6 +155,7 @@ public class ManagementConsole
         m_isBusy = false;
     }
 
+    @Override
     public void setBusy(boolean b) {
         m_isBusy = b;
         if (b) {
@@ -176,34 +165,23 @@ public class ManagementConsole
         }
     }
 
+    @Override
     public boolean isBusy() {
         return m_isBusy;
     }
 
+    @Override
     public Object getInvocationTarget(ConsoleCommand cmd)
             throws InvocationTargetException {
-        String hostString = m_hostTextField.getText();
-        String portString = m_portTextField.getText();
-        String contextString = m_contextTextField.getText();
-
         try {
-            URL ourl = new URL(m_locator.getFedoraAPIMPortSOAPHTTPAddress());
-            StringBuffer nurl = new StringBuffer();
-            nurl.append(Administrator.getProtocol() + "://");
-            nurl.append(hostString);
-            nurl.append(':');
-            nurl.append(portString);
-            nurl.append(ourl.getPath().replaceFirst("^/fedora",  "/" + contextString));
-            if (ourl.getQuery() != null && !ourl.getQuery().equals("")) {
-                nurl.append('?');
-                nurl.append(ourl.getQuery());
-            }
-            if (ourl.getRef() != null && !ourl.getRef().equals("")) {
-                nurl.append('#');
-                nurl.append(ourl.getRef());
-            }
-            return m_locator
-                    .getFedoraAPIMPortSOAPHTTP(new URL(nurl.toString()));
+            return APIMStubFactory.getStub(Administrator.getProtocol(),
+                                           m_hostTextField.getText(),
+                                           Integer.parseInt(m_portTextField
+                                                   .getText()),
+                                           Administrator.getUser(),
+                                           Administrator.getPass());
+        } catch (NumberFormatException nfe) {
+            throw new InvocationTargetException(nfe, "Badly formed port");
         } catch (MalformedURLException murle) {
             throw new InvocationTargetException(murle, "Badly formed URL");
         } catch (ServiceException se) {
@@ -211,10 +189,12 @@ public class ManagementConsole
         }
     }
 
+    @Override
     public void print(String output) {
         m_outputArea.append(output);
     }
 
+    @Override
     public void clear() {
         m_outputArea.setText("");
     }

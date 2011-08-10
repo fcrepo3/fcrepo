@@ -7,8 +7,10 @@ package org.fcrepo.client.utility.ingest;
 import java.rmi.RemoteException;
 
 import org.fcrepo.client.Administrator;
+
 import org.fcrepo.common.Constants;
-import org.fcrepo.server.management.FedoraAPIM;
+
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.utilities.StreamUtility;
 
 
@@ -21,13 +23,13 @@ import org.fcrepo.server.utilities.StreamUtility;
  */
 public class XMLBuilder {
 
-    private FedoraAPIM apim = null;
+    private FedoraAPIMMTOM apim = null;
 
     public static enum OBJECT_TYPE {
         dataObject, contentModel, serviceDefinition, serviceDeployment
     };
 
-    public XMLBuilder(FedoraAPIM fedoraAPIM) {
+    public XMLBuilder(FedoraAPIMMTOM fedoraAPIM) {
         apim = fedoraAPIM;
     }
 
@@ -182,7 +184,7 @@ public class XMLBuilder {
 
     private String encodePid(String pid) throws RemoteException {
         if(pid == null || pid.equals("")) {
-            pid = apim.getNextPID(null, null)[0];
+            pid = apim.getNextPID(null, null).get(0);
         }
         return StreamUtility.enc(pid);
     }

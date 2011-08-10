@@ -16,8 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import java.math.BigDecimal;
-
-import org.apache.axis.types.NonNegativeInteger;
+import java.math.BigInteger;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -29,8 +28,9 @@ import org.fcrepo.client.FedoraClient;
 
 import org.fcrepo.common.Constants;
 
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.utilities.TypeUtility;
 
 
 /**
@@ -42,8 +42,8 @@ import org.fcrepo.server.management.FedoraAPIM;
 public class PerformanceTests
         implements Constants {
 
-    private FedoraAPIM apim;
-    private FedoraAPIA apia;
+    private FedoraAPIMMTOM apim;
+    private FedoraAPIAMTOM apia;
 
     private static int iterations = 10;
     private static int threads = 10;
@@ -167,7 +167,7 @@ public class PerformanceTests
         apim = fedoraClient.getAPIM();
         apia = fedoraClient.getAPIA();
 
-        PIDS = apim.getNextPID(new NonNegativeInteger(Integer.valueOf(iterations).toString()), "demo");
+        PIDS = apim.getNextPID(new BigInteger(Integer.valueOf(iterations).toString()), "demo").toArray(new String[]{});
         FOXML = new byte[iterations][];
         for (int i = 0; i < iterations; i++) {
             FOXML[i] = DEMO_FOXML_TEXT.replaceAll(pid, PIDS[i]).getBytes("UTF-8");
@@ -175,7 +175,7 @@ public class PerformanceTests
     }
 
     private void runIngest(byte[] foxml) throws Exception {
-        apim.ingest(foxml, FOXML1_1.uri, "Ingest Test");
+        apim.ingest(TypeUtility.convertBytesToDataHandler(foxml), FOXML1_1.uri, "Ingest Test");
     }
 
     private void runAddDatastream(String pid, String dsId) throws Exception {
@@ -216,7 +216,7 @@ public class PerformanceTests
                                      "New Label",
                                      "text/xml",
                                      null,
-                                     dsContent.getBytes(),
+                                     TypeUtility.convertBytesToDataHandler(dsContent.getBytes()),
                                      null,
                                      null,
                                      "Modify Datastream Test",
@@ -634,6 +634,7 @@ public class PerformanceTests
             this.index = index;
         }
 
+        @Override
         public Boolean call() throws Exception {
             if (methodType.equals(MethodType.INGEST)) {
                 runIngest(FOXML[index]);

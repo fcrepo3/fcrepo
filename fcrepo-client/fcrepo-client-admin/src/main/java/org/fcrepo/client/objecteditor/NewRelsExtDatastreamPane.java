@@ -9,10 +9,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.Arrays;
+
 import org.fcrepo.client.Administrator;
+
 import org.fcrepo.common.Constants;
-import org.fcrepo.server.types.gen.Datastream;
-import org.fcrepo.server.types.gen.DatastreamControlGroup;
+
+import org.fcrepo.server.types.mtom.gen.Datastream;
+import org.fcrepo.server.types.mtom.gen.DatastreamControlGroup;
+import org.fcrepo.server.utilities.TypeUtility;
 
 
 
@@ -31,7 +36,7 @@ class NewRelsExtDatastreamPane
                                     String pid,
                                     DatastreamsPane owner)
             throws Exception {
-        super(gramps, pid, MakeBlankRelsExtDatastream(), owner);
+        super(gramps, pid, Arrays.asList(MakeBlankRelsExtDatastream()), owner);
         m_undoButton.setVisible(false);
         m_saveButton.setEnabled(true);
         m_saveButton.setText("Save Datastream");
@@ -49,21 +54,16 @@ class NewRelsExtDatastreamPane
 
     private static Datastream[] MakeBlankRelsExtDatastream() {
         Datastream[] ds = new Datastream[1];
-        ds[0] =
-                new Datastream(DatastreamControlGroup.fromValue("X"),
-                               s_dsid,
-                               "RELS-EXT.0",
-                               null,
-                               "RDF Statements about this object",
-                               true,
-                               "application/rdf+xml",
-                               Constants.RELS_EXT1_0.uri,
-                               null,
-                               0,
-                               "A",
-                               null,
-                               null,
-                               null);
+        ds[0] = new Datastream();
+        ds[0].setControlGroup(DatastreamControlGroup.fromValue("X"));
+        ds[0].setID("s_dsid");
+        ds[0].setVersionID("RELS-EXT.0");
+        ds[0].setLabel("RDF Statements about this object");
+        ds[0].setVersionable(true);
+        ds[0].setMIMEType("application/rdf+xml");
+        ds[0].setFormatURI(Constants.RELS_EXT1_0.uri);
+        ds[0].setSize(0L);
+        ds[0].setState("A");
         return ds;
     }
 
@@ -122,7 +122,7 @@ class NewRelsExtDatastreamPane
                 String newID =
                         Administrator.APIM.addDatastream(m_pid,
                                                          s_dsid,
-                                                         altIDs,
+                                                         TypeUtility.convertStringtoAOS(altIDs),
                                                          label,
                                                          versionable, // DEFAULT_VERSIONABLE
                                                          mimeType,

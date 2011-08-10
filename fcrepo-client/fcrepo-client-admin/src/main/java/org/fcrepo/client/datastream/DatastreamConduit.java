@@ -8,14 +8,18 @@ import java.net.MalformedURLException;
 
 import java.rmi.RemoteException;
 
+import java.util.List;
+
 import javax.xml.rpc.ServiceException;
 
 import org.fcrepo.client.FedoraClient;
 
 import org.fcrepo.common.Constants;
 
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.Datastream;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.types.mtom.gen.ArrayOfString;
+import org.fcrepo.server.types.mtom.gen.Datastream;
+import org.fcrepo.server.utilities.TypeUtility;
 
 
 /**
@@ -24,41 +28,38 @@ import org.fcrepo.server.types.gen.Datastream;
  */
 public class DatastreamConduit {
 
-    private final FedoraAPIM m_apim;
+    private final FedoraAPIMMTOM m_apim;
 
-    public DatastreamConduit(FedoraAPIM apim)
+    public DatastreamConduit(FedoraAPIMMTOM apim)
             throws MalformedURLException, ServiceException {
         m_apim = apim;
     }
 
-    public static Datastream getDatastream(FedoraAPIM skeleton,
+    public static Datastream getDatastream(FedoraAPIMMTOM skeleton,
                                            String pid,
                                            String dsId,
-                                           String asOfDateTime)
-            throws RemoteException {
+                                           String asOfDateTime){
         return skeleton.getDatastream(pid, dsId, asOfDateTime);
     }
 
-    public Datastream getDatastream(String pid, String dsId, String asOfDateTime)
-            throws RemoteException {
+    public Datastream getDatastream(String pid, String dsId, String asOfDateTime){
         return getDatastream(m_apim, pid, dsId, asOfDateTime);
     }
 
-    public static Datastream[] getDatastreams(FedoraAPIM skeleton,
+    public static List<Datastream> getDatastreams(FedoraAPIMMTOM skeleton,
                                               String pid,
                                               String asOfDateTime,
-                                              String state)
-            throws RemoteException {
+                                              String state){
         return skeleton.getDatastreams(pid, asOfDateTime, state);
     }
 
-    public Datastream[] getDatastreams(String pid,
+    public List<Datastream> getDatastreams(String pid,
                                        String asOfDateTime,
                                        String state) throws RemoteException {
         return getDatastreams(m_apim, pid, asOfDateTime, state);
     }
 
-    public static void modifyDatastreamByReference(FedoraAPIM skeleton,
+    public static void modifyDatastreamByReference(FedoraAPIMMTOM skeleton,
                                                    String pid,
                                                    String dsId,
                                                    String[] altIDs,
@@ -69,10 +70,10 @@ public class DatastreamConduit {
                                                    String checksumType,
                                                    String checksum,
                                                    String logMessage)
-            throws RemoteException {
+    {
         skeleton.modifyDatastreamByReference(pid,
                                              dsId,
-                                             altIDs,
+                                             TypeUtility.convertStringtoAOS(altIDs),
                                              dsLabel,
                                              mimeType,
                                              formatURI,
@@ -92,8 +93,7 @@ public class DatastreamConduit {
                                             String location,
                                             String checksumType,
                                             String checksum,
-                                            String logMessage)
-            throws RemoteException {
+                                            String logMessage){
         modifyDatastreamByReference(m_apim,
                                     pid,
                                     dsId,
@@ -107,7 +107,7 @@ public class DatastreamConduit {
                                     logMessage);
     }
 
-    public static void modifyDatastreamByValue(FedoraAPIM skeleton,
+    public static void modifyDatastreamByValue(FedoraAPIMMTOM skeleton,
                                                String pid,
                                                String dsId,
                                                String[] altIDs,
@@ -117,15 +117,14 @@ public class DatastreamConduit {
                                                byte[] content,
                                                String checksumType,
                                                String checksum,
-                                               String logMessage)
-            throws RemoteException {
+                                               String logMessage){
         skeleton.modifyDatastreamByValue(pid,
                                          dsId,
-                                         altIDs,
+                                         TypeUtility.convertStringtoAOS(altIDs),
                                          dsLabel,
                                          mimeType,
                                          formatURI,
-                                         content,
+                                         TypeUtility.convertBytesToDataHandler(content),
                                          checksumType,
                                          checksum,
                                          logMessage,
@@ -157,13 +156,12 @@ public class DatastreamConduit {
                                 logMessage);
     }
 
-    public static String[] purgeDatastream(FedoraAPIM skeleton,
+    public static List<String> purgeDatastream(FedoraAPIMMTOM skeleton,
                                            String pid,
                                            String dsId,
                                            String startDT,
                                            String endDT,
-                                           String logMessage)
-            throws RemoteException {
+                                           String logMessage){
         return skeleton.purgeDatastream(pid,
                                         dsId,
                                         startDT,
@@ -172,7 +170,7 @@ public class DatastreamConduit {
                                         false);
     }
 
-    public String[] purgeDatastream(String pid,
+    public List<String> purgeDatastream(String pid,
                                     String dsId,
                                     String startDT,
                                     String endDT,
@@ -185,15 +183,13 @@ public class DatastreamConduit {
                                logMessage);
     }
 
-    public static Datastream[] getDatastreamHistory(FedoraAPIM skeleton,
+    public static List<Datastream> getDatastreamHistory(FedoraAPIMMTOM skeleton,
                                                     String pid,
-                                                    String dsId)
-            throws RemoteException {
+                                                    String dsId){
         return skeleton.getDatastreamHistory(pid, dsId);
     }
 
-    public Datastream[] getDatastreamHistory(String pid, String dsId)
-            throws RemoteException {
+    public List<Datastream> getDatastreamHistory(String pid, String dsId){
         return getDatastreamHistory(m_apim, pid, dsId);
     }
 
@@ -230,11 +226,11 @@ public class DatastreamConduit {
                         protocol + "://" + hostName + ":" + portNum + "/"
                         + context;
                 FedoraClient fc = new FedoraClient(baseURL, username, password);
-                FedoraAPIM sourceRepoAPIM = fc.getAPIM();
+                FedoraAPIMMTOM sourceRepoAPIM = fc.getAPIM();
                 //*******************************************
                 DatastreamConduit c = new DatastreamConduit(sourceRepoAPIM);
 
-                Datastream[] datastreams = c.getDatastreams(pid, null, null);
+                List<Datastream> datastreams = c.getDatastreams(pid, null, null);
                 for (Datastream ds : datastreams) {
                     System.out.println("   Datastream : " + ds.getID());
                     System.out.println("Control Group : "
@@ -242,15 +238,15 @@ public class DatastreamConduit {
                     System.out.println("  Versionable : " + ds.isVersionable());
                     System.out.println("    Mime Type : " + ds.getMIMEType());
                     System.out.println("   Format URI : " + ds.getFormatURI());
-                    String[] altIDs = ds.getAltIDs();
-                    if (altIDs != null) {
-                        for (String element : altIDs) {
+                    ArrayOfString altIDs = ds.getAltIDs();
+                    if (altIDs != null && altIDs.getItem() != null) {
+                        for (String element : altIDs.getItem()) {
                             System.out.println(" Alternate ID : " + element);
                         }
                     }
                     System.out.println("        State : " + ds.getState());
                     // print version id, create date, and label for each version
-                    Datastream[] versions =
+                    List<Datastream> versions =
                             c.getDatastreamHistory(pid, ds.getID());
                     for (Datastream ver : versions) {
                         System.out.println("      VERSION : "

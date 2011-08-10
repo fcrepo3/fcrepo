@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -38,10 +39,13 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import org.fcrepo.client.Administrator;
-import org.fcrepo.server.types.gen.Datastream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.fcrepo.client.Administrator;
+
+import org.fcrepo.server.types.mtom.gen.Datastream;
+import org.fcrepo.server.utilities.TypeUtility;
 
 /**
  * Shows a tabbed pane, one for each datastream in the object, and one special
@@ -101,23 +105,23 @@ public class DatastreamsPane
                     .getSystemResource("images/client/standard/general/New16.gif"));
         
         m_tabbedPane = new JTabbedPane(SwingConstants.LEFT);
-        Datastream currentVersions[] =
+        List<Datastream> currentVersions =
                 Administrator.APIM.getDatastreams(pid, null, null);
-        m_datastreamPanes = new DatastreamPane[currentVersions.length];
-        for (int i = 0; i < currentVersions.length; i++) {
-            m_currentVersionMap.put(currentVersions[i].getID(),
-                                    currentVersions[i]);
+        m_datastreamPanes = new DatastreamPane[currentVersions.size()];
+        for (int i = 0; i < currentVersions.size(); i++) {
+            m_currentVersionMap.put(currentVersions.get(i).getID(),
+                                    currentVersions.get(i));
             m_datastreamPanes[i] =
                     new DatastreamPane(owner, pid, Administrator.APIM
-                            .getDatastreamHistory(pid, currentVersions[i]
+                            .getDatastreamHistory(pid, currentVersions.get(i)
                                     .getID()), this);
             StringBuffer tabLabel = new StringBuffer();
-            tabLabel.append(currentVersions[i].getID());
+            tabLabel.append(currentVersions.get(i).getID());
             m_tabbedPane.add(tabLabel.toString(), m_datastreamPanes[i]);
-            m_tabbedPane.setToolTipTextAt(i, currentVersions[i].getMIMEType()
-                    + " - " + currentVersions[i].getLabel() + " ("
-                    + currentVersions[i].getControlGroup().toString() + ")");
-            colorTabForState(currentVersions[i].getID(), currentVersions[i]
+            m_tabbedPane.setToolTipTextAt(i, currentVersions.get(i).getMIMEType()
+                    + " - " + currentVersions.get(i).getLabel() + " ("
+                    + currentVersions.get(i).getControlGroup().toString() + ")");
+            colorTabForState(currentVersions.get(i).getID(), currentVersions.get(i)
                     .getState());
         }
         m_tabbedPane.add("New...", new JPanel());
@@ -139,6 +143,7 @@ public class DatastreamsPane
         return m_currentVersionMap;
     }
 
+    @Override
     public void colorTabForState(String id, String s) {
         int i = getTabIndex(id);
         if (s.equals("I")) {
@@ -215,6 +220,7 @@ public class DatastreamsPane
         return index;
     }
 
+    @Override
     public void setDirty(String id, boolean isDirty) {
         int i = getTabIndex(id);
         if (isDirty) {
@@ -231,18 +237,18 @@ public class DatastreamsPane
     protected void refresh(String dsID) {
         int i = getTabIndex(dsID);
         try {
-            Datastream[] versions =
+            List<Datastream> versions =
                     Administrator.APIM.getDatastreamHistory(m_pid, dsID);
-            m_currentVersionMap.put(dsID, versions[0]);
-            logger.debug("New create date is: " + versions[0].getCreateDate());
+            m_currentVersionMap.put(dsID, versions.get(i));
+            logger.debug("New create date is: " + versions.get(i).getCreateDate());
             DatastreamPane replacement =
                     new DatastreamPane(m_owner, m_pid, versions, this);
             m_datastreamPanes[i] = replacement;
             m_tabbedPane.setComponentAt(i, replacement);
-            m_tabbedPane.setToolTipTextAt(i, versions[0].getMIMEType() + " - "
-                    + versions[0].getLabel() + " ("
-                    + versions[0].getControlGroup().toString() + ")");
-            colorTabForState(dsID, versions[0].getState());
+            m_tabbedPane.setToolTipTextAt(i, versions.get(i).getMIMEType() + " - "
+                    + versions.get(i).getLabel() + " ("
+                    + versions.get(i).getControlGroup().toString() + ")");
+            colorTabForState(dsID, versions.get(i).getState());
             setDirty(dsID, false);
         } catch (Exception e) {
             Administrator
@@ -264,9 +270,9 @@ public class DatastreamsPane
         for (int i = 0; i < m_datastreamPanes.length; i++) {
             newArray[i] = m_datastreamPanes[i];
         }
-        Datastream[] versions =
+        List<Datastream> versions =
                 Administrator.APIM.getDatastreamHistory(m_pid, dsID);
-        m_currentVersionMap.put(dsID, versions[0]);
+        m_currentVersionMap.put(dsID, versions.get(0));
         newArray[m_datastreamPanes.length] =
                 new DatastreamPane(m_owner, m_pid, versions, this);
         // swap the arrays
@@ -275,10 +281,10 @@ public class DatastreamsPane
         m_tabbedPane.add(m_datastreamPanes[m_datastreamPanes.length - 1],
                          newIndex);
         m_tabbedPane.setTitleAt(newIndex, dsID);
-        m_tabbedPane.setToolTipTextAt(newIndex, versions[0].getMIMEType()
-                + " - " + versions[0].getLabel() + " ("
-                + versions[0].getControlGroup().toString() + ")");
-        colorTabForState(dsID, versions[0].getState());
+        m_tabbedPane.setToolTipTextAt(newIndex, versions.get(0).getMIMEType()
+                + " - " + versions.get(0).getLabel() + " ("
+                + versions.get(0).getControlGroup().toString() + ")");
+        colorTabForState(dsID, versions.get(0).getState());
         if (reInitNewPanel) {
             doNew(XML_MIMETYPE, false);
         }
@@ -316,6 +322,7 @@ public class DatastreamsPane
         }
     }
 
+    @Override
     public boolean isDirty() {
         for (DatastreamPane element : m_datastreamPanes) {
             if (element.isDirty()) {
@@ -451,6 +458,7 @@ public class DatastreamsPane
             Administrator.constrainHeight(m_stateComboBox);
             m_stateComboBox.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     m_initialState =
                             ((String) m_stateComboBox.getSelectedItem())
@@ -530,6 +538,7 @@ public class DatastreamsPane
             m_checksumPanel.add(m_checksumTypeComboBox, BorderLayout.WEST);
             m_checksumTypeComboBox.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     String csType =
                             m_checksumTypeComboBox.getSelectedItem().toString();
@@ -567,6 +576,7 @@ public class DatastreamsPane
             m_lastSelectedMimeType = (String) m_mimeComboBox.getSelectedItem();
             m_mimeComboBox.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     String cur = (String) m_mimeComboBox.getSelectedItem();
                     if (!cur.equals(m_lastSelectedMimeType)) {
@@ -612,6 +622,7 @@ public class DatastreamsPane
             Administrator.constrainHeight(xImportButton);
             xImportButton.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     ImportDialog imp = new ImportDialog();
                     if (imp.file != null) {
@@ -644,6 +655,7 @@ public class DatastreamsPane
             Administrator.constrainHeight(mImportButton);
             mImportButton.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     ImportDialog imp = new ImportDialog();
                     if (imp.file != null) {
@@ -708,6 +720,7 @@ public class DatastreamsPane
             Administrator.constrainHeight(m_erViewButton);
             m_erViewButton.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     // get a viewer and put it in the middle of m_erPane
                     // we assume we can get a viewer here because
@@ -769,6 +782,7 @@ public class DatastreamsPane
             add(buttonPane, BorderLayout.SOUTH);
         }
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
             String cmd = evt.getActionCommand();
             if (cmd.equals("X")) {
@@ -857,7 +871,7 @@ public class DatastreamsPane
                             Administrator.APIM
                                     .addDatastream(pid,
                                                    dsID,
-                                                   altIDs,
+                                                   TypeUtility.convertStringtoAOS(altIDs),
                                                    label,
                                                    versionable, // DEFAULT_VERSIONABLE
                                                    mimeType,

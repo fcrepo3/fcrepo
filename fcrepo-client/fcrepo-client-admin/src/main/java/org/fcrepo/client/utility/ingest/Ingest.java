@@ -2,6 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.client.utility.ingest;
 
 import java.io.ByteArrayInputStream;
@@ -12,25 +13,25 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.utility.AutoFinder;
 import org.fcrepo.client.utility.export.AutoExporter;
+
 import org.fcrepo.common.Constants;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.ComparisonOperator;
-import org.fcrepo.server.types.gen.Condition;
-import org.fcrepo.server.types.gen.FieldSearchQuery;
-import org.fcrepo.server.types.gen.FieldSearchResult;
-import org.fcrepo.server.types.gen.ObjectFields;
-import org.fcrepo.server.types.gen.RepositoryInfo;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.types.mtom.gen.ArrayOfString;
+import org.fcrepo.server.types.mtom.gen.ComparisonOperator;
+import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
+import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
+import org.fcrepo.server.types.mtom.gen.ObjectFields;
+import org.fcrepo.server.types.mtom.gen.RepositoryInfo;
+
 import org.fcrepo.utilities.FileComparator;
-
-
-
-
 
 /**
  * Initiates ingest of one or more objects. This class provides static utility
@@ -48,8 +49,8 @@ public class Ingest
     // if logMessage is null, will use original path in logMessage
     public static String oneFromFile(File file,
                                      String ingestFormat,
-                                     FedoraAPIA targetRepoAPIA,
-                                     FedoraAPIM targetRepoAPIM,
+                                     FedoraAPIAMTOM targetRepoAPIA,
+                                     FedoraAPIMMTOM targetRepoAPIM,
                                      String logMessage) throws Exception {
         LAST_PATH = file.getPath();
         String pid =
@@ -67,8 +68,8 @@ public class Ingest
 
     public static void multiFromDirectory(File dir,
                                           String ingestFormat,
-                                          FedoraAPIA targetRepoAPIA,
-                                          FedoraAPIM targetRepoAPIM,
+                                          FedoraAPIAMTOM targetRepoAPIA,
+                                          FedoraAPIMMTOM targetRepoAPIM,
                                           String logMessage,
                                           PrintStream log,
                                           IngestCounter c) throws Exception {
@@ -114,12 +115,12 @@ public class Ingest
      **************************************************************************/
 
     // if logMessage is null, will make informative one up
-    public static String oneFromRepository(FedoraAPIA sourceRepoAPIA,
-                                           FedoraAPIM sourceRepoAPIM,
+    public static String oneFromRepository(FedoraAPIAMTOM sourceRepoAPIA,
+                                           FedoraAPIMMTOM sourceRepoAPIM,
                                            String sourceExportFormat,
                                            String pid,
-                                           FedoraAPIA targetRepoAPIA,
-                                           FedoraAPIM targetRepoAPIM,
+                                           FedoraAPIAMTOM targetRepoAPIA,
+                                           FedoraAPIMMTOM targetRepoAPIM,
                                            String logMessage) throws Exception {
 
         // EXPORT from source repository
@@ -160,39 +161,41 @@ public class Ingest
     public static void multiFromRepository(String sourceProtocol,
                                            String sourceHost,
                                            int sourcePort,
-                                           FedoraAPIA sourceRepoAPIA,
-                                           FedoraAPIM sourceRepoAPIM,
+                                           FedoraAPIAMTOM sourceRepoAPIA,
+                                           FedoraAPIMMTOM sourceRepoAPIM,
                                            String sourceExportFormat,
-                                           FedoraAPIA targetRepoAPIA,
-                                           FedoraAPIM targetRepoAPIM,
+                                           FedoraAPIAMTOM targetRepoAPIA,
+                                           FedoraAPIMMTOM targetRepoAPIM,
                                            String logMessage,
                                            PrintStream log,
                                            IngestCounter c) throws Exception {
         // prepare the FieldSearch query
         FieldSearchQuery query = new FieldSearchQuery();
-        Condition cond = new Condition();
+        FieldSearchQuery.Conditions condi = new FieldSearchQuery.Conditions();
+        org.fcrepo.server.types.mtom.gen.Condition cond =
+                new org.fcrepo.server.types.mtom.gen.Condition();
         cond.setProperty("pid");
         cond.setOperator(ComparisonOperator.fromValue("has"));
-        Condition[] conditions = new Condition[1];
-        conditions[0] = cond;
-        query.setConditions(conditions);
+        condi.getCondition().add(cond);
+        org.fcrepo.server.types.mtom.gen.ObjectFactory factory =
+                new org.fcrepo.server.types.mtom.gen.ObjectFactory();
+        query.setConditions(factory.createFieldSearchQueryConditions(condi));
         query.setTerms(null);
-
-        String[] resultFields = new String[1];
-        resultFields[0] = "pid";
+        ArrayOfString resultFields = new ArrayOfString();
+        resultFields.getItem().add("pid");
 
         // get the first chunk of search results
         FieldSearchResult result =
                 AutoFinder
                         .findObjects(sourceRepoAPIA, resultFields, 100, query);
 
-        while (result != null) {
+        while (result != null && result.getResultList() != null) {
 
-            ObjectFields[] ofs = result.getResultList();
+            List<ObjectFields> ofs = result.getResultList().getObjectFields();
 
             // ingest all objects from this chunk of search results
             for (ObjectFields element : ofs) {
-                String pid = element.getPid();
+                String pid = element.getPid().getValue();
                 try {
                     String newPID =
                             oneFromRepository(sourceRepoAPIA,
@@ -214,7 +217,7 @@ public class Ingest
             // get the next chunk of search results, if any
             String token = null;
             try {
-                token = result.getListSession().getToken();
+                token = result.getListSession().getValue().getToken();
             } catch (Throwable th) {
             }
 
@@ -294,70 +297,115 @@ public class Ingest
     public static void badArgs(String msg) {
         System.err.println("Command: fedora-ingest");
         System.err.println();
-        System.err.println("Summary: Ingests one or more objects into a Fedora repository, from either");
-        System.err.println("         the local filesystem or another Fedora repository.");
+        System.err
+                .println("Summary: Ingests one or more objects into a Fedora repository, from either");
+        System.err
+                .println("         the local filesystem or another Fedora repository.");
         System.err.println();
         System.err.println("Syntax:");
-        System.err.println("  fedora-ingest f[ile] path format targetHost:targetPort targetUser targetPassword targetProtocol [log] [context]");
-        System.err.println("  fedora-ingest d[ir]  path format targetHost:targetPort targetUser targetPassword targetProtocol [log] [context]");
-        System.err.println("  fedora-ingest r[epos] sourceHost:sourcePort sourceUser sourcePassword pid|* targetHost:targetPort targetUser targetPassword sourceProtocol targetProtocol [log] [context]");
+        System.err
+                .println("  fedora-ingest f[ile] path format targetHost:targetPort targetUser targetPassword targetProtocol [log] [context]");
+        System.err
+                .println("  fedora-ingest d[ir]  path format targetHost:targetPort targetUser targetPassword targetProtocol [log] [context]");
+        System.err
+                .println("  fedora-ingest r[epos] sourceHost:sourcePort sourceUser sourcePassword pid|* targetHost:targetPort targetUser targetPassword sourceProtocol targetProtocol [log] [context]");
         System.err.println();
         System.err.println("Where:");
-        System.err.println("  path                           is the local file or directory name that is ingest source.");
-        System.err.println("  format                         is a string value which indicates the XML format of the ingest file(s)");
-        System.err.println("                                 ('" + FOXML1_1.uri + "',");
-        System.err.println("                                 '" + FOXML1_0.uri + "',");
-        System.err.println("                                 '" + METS_EXT1_1.uri + "',");
-        System.err.println("                                 '" + METS_EXT1_0.uri + "',");
-        System.err.println("                                 '" + ATOM1_1.uri + "',");
-        System.err.println("                                 or '" + ATOM_ZIP1_1.uri + "')");
-        System.err.println("  pid | *                        is the id of the object to ingest from the source repository OR * in case of all objects from the source repository.");
-        System.err.println("  sourceHost/targetHost          is the source or target repository's hostname.");
-        System.err.println("  sourcePort/targetPort          is the source or target repository's port number.");
-        System.err.println("  sourceUser/targetUser          is the id of the source or target repository user.");
-        System.err.println("  sourcePassword/targetPassword  is the password of the source or target repository user.");
-        System.err.println("  sourceProtocol                 is the protocol to communicate with source repository (http or https)");
-        System.err.println("  targetProtocol                 is the protocol to communicate with target repository (http or https)");
-        System.err.println("  log                            is the optional log message.  If unspecified, the log message");
-        System.err.println("                                 will indicate the source filename or repository of the object(s).");
-        System.err.println("  context                        is the optional parameter for specifying the context name under which ");
-        System.err.println("                                 the Fedora server is deployed. The default is fedora.");
+        System.err
+                .println("  path                           is the local file or directory name that is ingest source.");
+        System.err
+                .println("  format                         is a string value which indicates the XML format of the ingest file(s)");
+        System.err.println("                                 ('" + FOXML1_1.uri
+                + "',");
+        System.err.println("                                 '" + FOXML1_0.uri
+                + "',");
+        System.err.println("                                 '"
+                + METS_EXT1_1.uri + "',");
+        System.err.println("                                 '"
+                + METS_EXT1_0.uri + "',");
+        System.err.println("                                 '" + ATOM1_1.uri
+                + "',");
+        System.err.println("                                 or '"
+                + ATOM_ZIP1_1.uri + "')");
+        System.err
+                .println("  pid | *                        is the id of the object to ingest from the source repository OR * in case of all objects from the source repository.");
+        System.err
+                .println("  sourceHost/targetHost          is the source or target repository's hostname.");
+        System.err
+                .println("  sourcePort/targetPort          is the source or target repository's port number.");
+        System.err
+                .println("  sourceUser/targetUser          is the id of the source or target repository user.");
+        System.err
+                .println("  sourcePassword/targetPassword  is the password of the source or target repository user.");
+        System.err
+                .println("  sourceProtocol                 is the protocol to communicate with source repository (http or https)");
+        System.err
+                .println("  targetProtocol                 is the protocol to communicate with target repository (http or https)");
+        System.err
+                .println("  log                            is the optional log message.  If unspecified, the log message");
+        System.err
+                .println("                                 will indicate the source filename or repository of the object(s).");
+        System.err
+                .println("  context                        is the optional parameter for specifying the context name under which ");
+        System.err
+                .println("                                 the Fedora server is deployed. The default is fedora.");
         System.err.println();
         System.err.println("Examples:");
-        System.err.println("fedora-ingest f obj1.xml " + FOXML1_1.uri + " myrepo.com:8443 jane jpw https");
+        System.err.println("fedora-ingest f obj1.xml " + FOXML1_1.uri
+                + " myrepo.com:8443 jane jpw https");
         System.err.println();
-        System.err.println("  Ingests obj1.xml (encoded in FOXML 1.1 format) from the");
-        System.err.println("  current directory into the repository at myrepo.com:80");
-        System.err.println("  as user 'jane' with password 'jpw' using the secure https protocol (SSL).");
-        System.err.println("  The logmessage will be system-generated, indicating");
+        System.err
+                .println("  Ingests obj1.xml (encoded in FOXML 1.1 format) from the");
+        System.err
+                .println("  current directory into the repository at myrepo.com:80");
+        System.err
+                .println("  as user 'jane' with password 'jpw' using the secure https protocol (SSL).");
+        System.err
+                .println("  The logmessage will be system-generated, indicating");
         System.err.println("  the source path+filename.");
         System.err.println();
-        System.err.println("fedora-ingest d c:\\archive " + FOXML1_1.uri + " myrepo.com:80 jane janepw http \"\"");
+        System.err.println("fedora-ingest d c:\\archive " + FOXML1_1.uri
+                + " myrepo.com:80 jane janepw http \"\"");
         System.err.println();
-        System.err.println("  Traverses entire directory structure of c:\\archive, and ingests any file.");
-        System.err.println("  It assumes all files will be in the FOXML 1.1 format");
-        System.err.println("  and will fail on ingests of files that are not of this format.");
+        System.err
+                .println("  Traverses entire directory structure of c:\\archive, and ingests any file.");
+        System.err
+                .println("  It assumes all files will be in the FOXML 1.1 format");
+        System.err
+                .println("  and will fail on ingests of files that are not of this format.");
         System.err.println("  All log messages will be the quoted string.");
         System.err.println();
-        System.err.println("fedora-ingest d c:\\archive " + FOXML1_1.uri + " myrepo.com:80 jane janepw http \"\" my-fedora");
-        System.err.println("  Traverses entire directory structure of c:\\archive, and ingests any file.");
-        System.err.println("  It assumes all files will be in the FOXML 1.1 format");
-        System.err.println("  and will fail on ingests of files that are not of this format.");
+        System.err.println("fedora-ingest d c:\\archive " + FOXML1_1.uri
+                + " myrepo.com:80 jane janepw http \"\" my-fedora");
+        System.err
+                .println("  Traverses entire directory structure of c:\\archive, and ingests any file.");
+        System.err
+                .println("  It assumes all files will be in the FOXML 1.1 format");
+        System.err
+                .println("  and will fail on ingests of files that are not of this format.");
         System.err.println("  All log messages will be the quoted string.");
-        System.err.println("  Additionally the Fedora server is assumed to be running under the context name ");
-        System.err.println("  http://myrepo:80/my-fedora instead of http://myrepo:80/fedora ");
+        System.err
+                .println("  Additionally the Fedora server is assumed to be running under the context name ");
+        System.err
+                .println("  http://myrepo:80/my-fedora instead of http://myrepo:80/fedora ");
         System.err.println();
-        System.err.println("fedora-ingest r jrepo.com:8081 mike mpw demo:1 myrepo.com:8443 jane jpw http https \"\"");
+        System.err
+                .println("fedora-ingest r jrepo.com:8081 mike mpw demo:1 myrepo.com:8443 jane jpw http https \"\"");
         System.err.println();
-        System.err.println("  Ingests the object whose pid is 'demo:1' from the source repository");
-        System.err.println("  'srcrepo.com:8081' into the target repository 'myrepo.com:80'.");
-        System.err.println("  The object will be exported from the source repository in the default");
+        System.err
+                .println("  Ingests the object whose pid is 'demo:1' from the source repository");
+        System.err
+                .println("  'srcrepo.com:8081' into the target repository 'myrepo.com:80'.");
+        System.err
+                .println("  The object will be exported from the source repository in the default");
         System.err.println("  export format configured at the source.");
         System.err.println("  All log messages will be empty.");
         System.err.println();
-        System.err.println("fedora-ingest r jrepo.com:8081 mike mpw O myrepo.com:8443 jane jpw http https \"\"");
+        System.err
+                .println("fedora-ingest r jrepo.com:8081 mike mpw O myrepo.com:8443 jane jpw http https \"\"");
         System.err.println();
-        System.err.println("  Same as above, but ingests all data objects (type O).");
+        System.err
+                .println("  Same as above, but ingests all data objects (type O).");
         System.err.println();
         System.err.println("ERROR  : " + msg);
         System.exit(1);
@@ -394,8 +442,7 @@ public class Ingest
             if (kind == 'f') {
                 // USAGE: fedora-ingest f[ile] path format targetHost:targetProtocol targetUser targetPassword targetProtocol [log] [context]
                 if (args.length < 7 || args.length > 9) {
-                    Ingest
-                            .badArgs("Wrong number of arguments for file ingest.");
+                    Ingest.badArgs("Wrong number of arguments for file ingest.");
                     System.out
                             .println("USAGE: fedora-ingest f[ile] path format targetHost:targetProtocol targetUser targetPassword targetProtocol [log] [context]");
                 }
@@ -403,7 +450,7 @@ public class Ingest
                 String ingestFormat = args[2];
                 String logMessage = null;
 
-                if (args.length == 8){
+                if (args.length == 8) {
                     logMessage = args[7];
                 }
 
@@ -420,8 +467,8 @@ public class Ingest
                         protocol + "://" + hp[0] + ":"
                                 + Integer.parseInt(hp[1]) + "/" + context;
                 FedoraClient fc = new FedoraClient(baseURL, args[4], args[5]);
-                FedoraAPIA targetRepoAPIA = fc.getAPIA();
-                FedoraAPIM targetRepoAPIM = fc.getAPIM();
+                FedoraAPIAMTOM targetRepoAPIA = fc.getAPIA();
+                FedoraAPIMMTOM targetRepoAPIM = fc.getAPIM();
                 //*******************************************
 
                 String pid =
@@ -448,7 +495,7 @@ public class Ingest
                 String ingestFormat = args[2];
                 String logMessage = null;
 
-                if (args.length == 8){
+                if (args.length == 8) {
                     logMessage = args[7];
                 }
 
@@ -465,8 +512,8 @@ public class Ingest
                         protocol + "://" + hp[0] + ":"
                                 + Integer.parseInt(hp[1]) + "/" + context;
                 FedoraClient fc = new FedoraClient(baseURL, args[4], args[5]);
-                FedoraAPIA targetRepoAPIA = fc.getAPIA();
-                FedoraAPIM targetRepoAPIM = fc.getAPIM();
+                FedoraAPIAMTOM targetRepoAPIA = fc.getAPIA();
+                FedoraAPIMMTOM targetRepoAPIM = fc.getAPIM();
                 //*******************************************
 
                 logRootName = "ingest-from-dir";
@@ -488,15 +535,14 @@ public class Ingest
             } else if (kind == 'r') {
                 // USAGE: fedora-ingest r[epos] sourceHost:sourcePort sourceUser sourcePassword pid|* targetHost:targetPort targetUser targetPassword sourceProtocol targetProtocol [log] [context]
                 if (args.length < 10 || args.length > 12) {
-                    Ingest
-                            .badArgs("Wrong number of arguments for repository ingest.");
+                    Ingest.badArgs("Wrong number of arguments for repository ingest.");
                 }
                 String logMessage = null;
-                if (args.length == 11){
-                    logMessage=args[10];
+                if (args.length == 11) {
+                    logMessage = args[10];
                 }
 
-                if (args.length == 12 && !args[11].equals("")){
+                if (args.length == 12 && !args[11].equals("")) {
                     context = args[11];
                 }
                 //Source repository
@@ -516,8 +562,8 @@ public class Ingest
                         new FedoraClient(sourceBaseURL,
                                          source_user,
                                          source_password);
-                FedoraAPIA sourceRepoAPIA = sfc.getAPIA();
-                FedoraAPIM sourceRepoAPIM = sfc.getAPIM();
+                FedoraAPIAMTOM sourceRepoAPIA = sfc.getAPIA();
+                FedoraAPIMMTOM sourceRepoAPIM = sfc.getAPIM();
                 //*******************************************
 
                 //Target repository
@@ -537,8 +583,8 @@ public class Ingest
                         new FedoraClient(targetBaseURL,
                                          target_user,
                                          target_password);
-                FedoraAPIA targetRepoAPIA = tfc.getAPIA();
-                FedoraAPIM targetRepoAPIM = tfc.getAPIM();
+                FedoraAPIAMTOM targetRepoAPIA = tfc.getAPIA();
+                FedoraAPIMMTOM targetRepoAPIM = tfc.getAPIM();
                 //*******************************************
 
                 // Determine export format

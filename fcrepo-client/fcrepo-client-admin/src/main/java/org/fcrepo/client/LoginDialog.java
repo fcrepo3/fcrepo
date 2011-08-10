@@ -38,11 +38,13 @@ import javax.swing.JPasswordField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.fcrepo.common.Constants;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 
 /**
  * Launch a dialog for logging into a Fedora repository.
@@ -141,6 +143,7 @@ public class LoginDialog
 
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 dispose();
             }
@@ -419,14 +422,17 @@ public class LoginDialog
             m_passField = pf;
         }
 
+        @Override
         public void changedUpdate(DocumentEvent e) {
             dataChanged();
         }
 
+        @Override
         public void insertUpdate(DocumentEvent e) {
             dataChanged();
         }
 
+        @Override
         public void removeUpdate(DocumentEvent e) {
             dataChanged();
         }
@@ -459,10 +465,11 @@ public class LoginDialog
             m_button = button;
         }
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
             if (m_button.isEnabled()) {
-                FedoraAPIA oldAPIA = Administrator.APIA;
-                FedoraAPIM oldAPIM = Administrator.APIM;
+                FedoraAPIAMTOM oldAPIA = Administrator.APIA;
+                FedoraAPIMMTOM oldAPIM = Administrator.APIM;
                 try {
                     // pull out values and do a quick syntax check
                     String hostPort =

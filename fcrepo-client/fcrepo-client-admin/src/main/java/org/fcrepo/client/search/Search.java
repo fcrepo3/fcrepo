@@ -32,9 +32,11 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import org.fcrepo.client.Administrator;
-import org.fcrepo.server.types.gen.ComparisonOperator;
-import org.fcrepo.server.types.gen.Condition;
-import org.fcrepo.server.types.gen.FieldSearchQuery;
+
+import org.fcrepo.server.types.mtom.gen.ComparisonOperator;
+import org.fcrepo.server.types.mtom.gen.Condition;
+import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
+import org.fcrepo.server.types.mtom.gen.ObjectFactory;
 
 
 
@@ -251,6 +253,7 @@ public class Search
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 doDefaultCloseAction();
             }
@@ -297,6 +300,7 @@ public class Search
             updateButtons();
         }
 
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             //Ignore extra messages.
             if (e.getValueIsAdjusting()) {
@@ -462,6 +466,7 @@ public class Search
             JButton okButton = new JButton("OK");
             okButton.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     updateSelectedFields();
                     setVisible(false);
@@ -471,6 +476,7 @@ public class Search
             JButton cancelButton = new JButton("Cancel");
             cancelButton.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     setVisible(false);
                 }
@@ -576,6 +582,7 @@ public class Search
             m_model = model;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             ModConditionDialog dialog = new ModConditionDialog(m_model, -1);
             dialog.setVisible(true);
@@ -595,6 +602,7 @@ public class Search
             m_sListener = sListener;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             // will only be invoked if an existing row is selected
             ModConditionDialog dialog =
@@ -617,6 +625,7 @@ public class Search
             m_sListener = sListener;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             // will only be invoked if an existing row is selected
             int r = m_sListener.getSelectedRow();
@@ -673,6 +682,7 @@ public class Search
             JButton okButton = new JButton("OK");
             okButton.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     updateModelAndNotify();
                     setVisible(false);
@@ -682,6 +692,7 @@ public class Search
             JButton cancelButton = new JButton("Cancel");
             cancelButton.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     setVisible(false);
                 }
@@ -748,22 +759,26 @@ public class Search
             m_model = model;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             List fields = m_fieldSelector.getFieldList();
             String[] displayFields = new String[fields.size()];
+            ObjectFactory factory = new ObjectFactory();
             for (int i = 0; i < fields.size(); i++) {
                 displayFields[i] = (String) fields.get(i);
             }
             FieldSearchQuery query = new FieldSearchQuery();
             if (m_tabbedPane.getSelectedIndex() == 0) {
-                query.setTerms(m_simpleQueryField.getText());
+                query.setTerms(factory.createFieldSearchQueryTerms(m_simpleQueryField.getText()));
             } else {
-                List conditions = m_model.getConditions();
+                List<Condition> conditions = m_model.getConditions();
                 Condition[] cond = new Condition[conditions.size()];
                 for (int i = 0; i < conditions.size(); i++) {
-                    cond[i] = (Condition) conditions.get(i);
+                    cond[i] = conditions.get(i);
                 }
-                query.setConditions(cond);
+                FieldSearchQuery.Conditions conds = new FieldSearchQuery.Conditions();
+                conds.getCondition().addAll(conditions);
+                query.setConditions(factory.createFieldSearchQueryConditions(conds));
             }
             ResultFrame frame =
                     new ResultFrame("Search Results", displayFields, 100, query);
@@ -788,6 +803,7 @@ public class Search
             m_fieldList = fieldList;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             // launch an editor for the fields to search on,
             // and put the values in
@@ -850,10 +866,12 @@ public class Search
             }
         }
 
+        @Override
         public int getRowCount() {
             return m_conditions.size();
         }
 
+        @Override
         public int getColumnCount() {
             return 3;
         }
@@ -863,6 +881,7 @@ public class Search
             return getValueAt(0, c).getClass();
         }
 
+        @Override
         public Object getValueAt(int row, int col) {
             Condition cond = m_conditions.get(row);
             if (col == 0) {

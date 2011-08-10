@@ -13,9 +13,11 @@ import java.util.Vector;
 
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.utility.ingest.AutoIngestor;
+
 import org.fcrepo.common.Constants;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 
 
 
@@ -40,9 +42,9 @@ class BatchIngest
 
     String context = "fedora";
 
-    FedoraAPIA APIA;
+    FedoraAPIAMTOM APIA;
 
-    FedoraAPIM APIM;
+    FedoraAPIMMTOM APIM;
 
     //set by arguments to constructor
     String objectsPath = null;

@@ -7,17 +7,21 @@ package org.fcrepo.client.utility.export;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.utility.AutoFinder;
+
 import org.fcrepo.common.Constants;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.FieldSearchQuery;
-import org.fcrepo.server.types.gen.FieldSearchResult;
-import org.fcrepo.server.types.gen.ObjectFields;
-import org.fcrepo.server.types.gen.RepositoryInfo;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.types.mtom.gen.ArrayOfString;
+import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
+import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
+import org.fcrepo.server.types.mtom.gen.ObjectFields;
+import org.fcrepo.server.types.mtom.gen.RepositoryInfo;
 
 
 
@@ -67,8 +71,8 @@ public class Export
         return out.toString();
     }
 
-    public static void one(FedoraAPIA apia,
-                           FedoraAPIM apim,
+    public static void one(FedoraAPIAMTOM apia,
+                           FedoraAPIMMTOM apim,
                            String pid,
                            String format,
                            String exportContext,
@@ -90,8 +94,8 @@ public class Export
                             new FileOutputStream(file));
     }
 
-    public static int multi(FedoraAPIA apia,
-                            FedoraAPIM apim,
+    public static int multi(FedoraAPIAMTOM apia,
+                            FedoraAPIMMTOM apim,
                             String format,
                             String exportContext,
                             File dir) throws Exception {
@@ -101,21 +105,21 @@ public class Export
         FieldSearchQuery query = new FieldSearchQuery();
         query.setTerms(null);
 
-        String[] resultFields = new String[1];
-        resultFields[0] = "pid";
+        ArrayOfString resultFields = new ArrayOfString();
+        resultFields.getItem().add("pid");
 
         // get the first chunk of search results
 
         FieldSearchResult result =
                 AutoFinder.findObjects(apia, resultFields, 100, query);
 
-        while (result != null) {
+        while (result != null && result.getResultList() != null) {
 
-            ObjectFields[] ofs = result.getResultList();
+            List<ObjectFields> ofs = result.getResultList().getObjectFields();
 
             // export all objects from this chunk of search results
             for (ObjectFields element : ofs) {
-                String pid = element.getPid();
+                String pid = element.getPid().getValue();
                 one(apia, apim, pid, format, exportContext, dir);
                 count++;
             }
@@ -123,7 +127,7 @@ public class Export
             // get the next chunk of search results, if any
             String token = null;
             try {
-                token = result.getListSession().getToken();
+                token = result.getListSession().getValue().getToken();
             } catch (Throwable th) {
             }
 
@@ -225,8 +229,8 @@ public class Export
                     protocol + "://" + hp[0] + ":" + Integer.parseInt(hp[1])
                             + "/" + context;
             FedoraClient fc = new FedoraClient(baseURL, args[1], args[2]);
-            FedoraAPIA sourceRepoAPIA = fc.getAPIA();
-            FedoraAPIM sourceRepoAPIM = fc.getAPIM();
+            FedoraAPIAMTOM sourceRepoAPIA = fc.getAPIA();
+            FedoraAPIMMTOM sourceRepoAPIM = fc.getAPIM();
             //*******************************************
 
             String exportFormat = args[4];

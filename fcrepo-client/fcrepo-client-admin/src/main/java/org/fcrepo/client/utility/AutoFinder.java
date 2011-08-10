@@ -8,17 +8,21 @@ import java.net.MalformedURLException;
 
 import java.rmi.RemoteException;
 
+import java.util.Arrays;
+
+import java.math.BigInteger;
+
 import javax.xml.rpc.ServiceException;
 
-import org.apache.axis.types.NonNegativeInteger;
-
 import org.fcrepo.client.FedoraClient;
+
 import org.fcrepo.common.Constants;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.types.gen.FieldSearchQuery;
-import org.fcrepo.server.types.gen.FieldSearchResult;
-import org.fcrepo.server.types.gen.ListSession;
-import org.fcrepo.server.types.gen.ObjectFields;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.types.mtom.gen.ArrayOfString;
+import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
+import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
+import org.fcrepo.server.types.mtom.gen.ObjectFields;
 
 
 
@@ -29,14 +33,14 @@ import org.fcrepo.server.types.gen.ObjectFields;
  */
 public class AutoFinder {
 
-    private final FedoraAPIA m_apia;
+    private final FedoraAPIAMTOM m_apia;
 
-    public AutoFinder(FedoraAPIA apia)
+    public AutoFinder(FedoraAPIAMTOM apia)
             throws MalformedURLException, ServiceException {
         m_apia = apia;
     }
 
-    public FieldSearchResult findObjects(String[] resultFields,
+    public FieldSearchResult findObjects(ArrayOfString resultFields,
                                          int maxResults,
                                          FieldSearchQuery query)
             throws RemoteException {
@@ -48,16 +52,16 @@ public class AutoFinder {
         return resumeFindObjects(m_apia, sessionToken);
     }
 
-    public static FieldSearchResult findObjects(FedoraAPIA skeleton,
-                                                String[] resultFields,
+    public static FieldSearchResult findObjects(FedoraAPIAMTOM skeleton,
+                                                ArrayOfString resultFields,
                                                 int maxResults,
                                                 FieldSearchQuery query)
             throws RemoteException {
-        return skeleton.findObjects(resultFields, new NonNegativeInteger(""
+        return skeleton.findObjects(resultFields, new BigInteger(""
                 + maxResults), query);
     }
 
-    public static FieldSearchResult resumeFindObjects(FedoraAPIA skeleton,
+    public static FieldSearchResult resumeFindObjects(FedoraAPIAMTOM skeleton,
                                                       String sessionToken)
             throws RemoteException {
         return skeleton.resumeFindObjects(sessionToken);
@@ -120,41 +124,45 @@ public class AutoFinder {
             AutoFinder finder = new AutoFinder(fc.getAPIA());
 
             FieldSearchQuery query = new FieldSearchQuery();
-            query.setTerms(phrase);
+            org.fcrepo.server.types.mtom.gen.ObjectFactory factory =
+                new org.fcrepo.server.types.mtom.gen.ObjectFactory();
+            query.setTerms(factory.createFieldSearchQueryTerms(phrase));
+            String[] arrayS = fields.split(" ");
+            ArrayOfString aux = new ArrayOfString();
+            aux.getItem().addAll(Arrays.asList(arrayS));
             FieldSearchResult result =
-                    finder.findObjects(fields.split(" "), 20, query);
+                    finder.findObjects(aux, 20, query);
             int matchNum = 0;
             while (result != null) {
-                for (int i = 0; i < result.getResultList().length; i++) {
-                    ObjectFields o = result.getResultList()[i];
+                for (int i = 0; i < result.getResultList().getObjectFields().size(); i++) {
+                    ObjectFields o = result.getResultList().getObjectFields().get(i);
                     matchNum++;
                     System.out.println("#" + matchNum);
-                    AutoFinder.printValue("pid              ", o.getPid());
-                    AutoFinder.printValue("state            ", o.getState());
-                    AutoFinder.printValue("ownerId          ", o.getOwnerId());
-                    AutoFinder.printValue("cDate            ", o.getCDate());
-                    AutoFinder.printValue("mDate            ", o.getMDate());
-                    AutoFinder.printValue("dcmDate          ", o.getDcmDate());
-                    AutoFinder.printValue("title            ", o.getTitle());
-                    AutoFinder.printValue("creator          ", o.getCreator());
-                    AutoFinder.printValue("subject          ", o.getSubject());
-                    AutoFinder.printValue("description      ", o.getDescription());
-                    AutoFinder.printValue("publisher        ", o.getPublisher());
-                    AutoFinder.printValue("contributor      ", o.getContributor());
-                    AutoFinder.printValue("date             ", o.getDate());
-                    AutoFinder.printValue("type             ", o.getType());
-                    AutoFinder.printValue("format           ", o.getFormat());
-                    AutoFinder.printValue("identifier       ", o.getIdentifier());
-                    AutoFinder.printValue("source           ", o.getSource());
-                    AutoFinder.printValue("language         ", o.getLanguage());
-                    AutoFinder.printValue("relation         ", o.getRelation());
-                    AutoFinder.printValue("coverage         ", o.getCoverage());
-                    AutoFinder.printValue("rights           ", o.getRights());
+                    AutoFinder.printValue("pid              ", o.getPid().getValue());
+                    AutoFinder.printValue("state            ", o.getState().getValue());
+                    AutoFinder.printValue("ownerId          ", o.getOwnerId().getValue());
+                    AutoFinder.printValue("cDate            ", o.getCDate().getValue());
+                    AutoFinder.printValue("mDate            ", o.getMDate().getValue());
+                    AutoFinder.printValue("dcmDate          ", o.getDcmDate().getValue());
+                    AutoFinder.printValue("title            ", o.getTitle().toString());
+                    AutoFinder.printValue("creator          ", o.getCreator().toString());
+                    AutoFinder.printValue("subject          ", o.getSubject().toString());
+                    AutoFinder.printValue("description      ", o.getDescription().toString());
+                    AutoFinder.printValue("publisher        ", o.getPublisher().toString());
+                    AutoFinder.printValue("contributor      ", o.getContributor().toString());
+                    AutoFinder.printValue("date             ", o.getDate().toString());
+                    AutoFinder.printValue("type             ", o.getType().toString());
+                    AutoFinder.printValue("format           ", o.getFormat().toString());
+                    AutoFinder.printValue("identifier       ", o.getIdentifier().toString());
+                    AutoFinder.printValue("source           ", o.getSource().toString());
+                    AutoFinder.printValue("language         ", o.getLanguage().toString());
+                    AutoFinder.printValue("relation         ", o.getRelation().toString());
+                    AutoFinder.printValue("coverage         ", o.getCoverage().toString());
+                    AutoFinder.printValue("rights           ", o.getRights().toString());
                     System.out.println("");
                 }
-                ListSession sess = result.getListSession();
-                if (sess != null) {
-                    result = finder.resumeFindObjects(sess.getToken());
+                if (result.getListSession() != null && result.getListSession().getValue() != null) {
+                    result = finder.resumeFindObjects(result.getListSession().getValue().getToken());
                 } else {
                     result = null;
                 }

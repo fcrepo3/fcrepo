@@ -7,8 +7,11 @@ package org.fcrepo.client.utility.export;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
 import java.net.MalformedURLException;
+
 import java.rmi.RemoteException;
+
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
@@ -18,12 +21,16 @@ import javax.xml.rpc.ServiceException;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+
 import org.w3c.dom.Document;
 
 import org.fcrepo.common.Constants;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.RepositoryInfo;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.types.mtom.gen.RepositoryInfo;
+import org.fcrepo.server.utilities.TypeUtility;
+
 import org.fcrepo.utilities.FileUtils;
 
 
@@ -36,14 +43,14 @@ import org.fcrepo.utilities.FileUtils;
 public class AutoExporter
         implements Constants {
 
-    private final FedoraAPIM m_apim;
+    private final FedoraAPIMMTOM m_apim;
 
-    private final FedoraAPIA m_apia;
+    private final FedoraAPIAMTOM m_apia;
 
-    private static HashMap<FedoraAPIA, RepositoryInfo> s_repoInfo =
-            new HashMap<FedoraAPIA, RepositoryInfo>();
+    private static HashMap<FedoraAPIAMTOM, RepositoryInfo> s_repoInfo =
+            new HashMap<FedoraAPIAMTOM, RepositoryInfo>();
 
-    public AutoExporter(FedoraAPIA apia, FedoraAPIM apim)
+    public AutoExporter(FedoraAPIAMTOM apia, FedoraAPIMMTOM apim)
             throws MalformedURLException, ServiceException {
         m_apia = apia;
         m_apim = apim;
@@ -57,8 +64,8 @@ public class AutoExporter
         export(m_apia, m_apim, pid, format, exportContext, outStream);
     }
 
-    public static void export(FedoraAPIA apia,
-                              FedoraAPIM apim,
+    public static void export(FedoraAPIAMTOM apia,
+                              FedoraAPIMMTOM apim,
                               String pid,
                               String format,
                               String exportContext,
@@ -90,7 +97,7 @@ public class AutoExporter
                     System.out.println("WARNING: Repository does not support METS Fedora " +
                                        "Extension 1.1; exporting older format (v1.0) instead");
                 }
-                bytes = apim.export(pid, METS_EXT1_0_LEGACY, exportContext);
+                bytes = TypeUtility.convertDataHandlerToBytes(apim.export(pid, METS_EXT1_0_LEGACY, exportContext));
             } else {
                 throw new IOException("You are connected to a pre-2.0 Fedora repository "
                         + "which will only export the XML format \"metslikefedora1\".");
@@ -125,12 +132,12 @@ public class AutoExporter
                 }
                 validateFormat(format);
             }
-            bytes = apim.export(pid, format, exportContext);
+            bytes = TypeUtility.convertDataHandlerToBytes(apim.export(pid, format, exportContext));
         }
         try {
             // TODO This export method has assumed the output is always XML,
-            // but with ATOM_ZIP (and in the future, IMS CP/SCORM) this is no 
-            // longer the case. Perhaps we move pretty printing into the 
+            // but with ATOM_ZIP (and in the future, IMS CP/SCORM) this is no
+            // longer the case. Perhaps we move pretty printing into the
             // serializers themselves.
             if (format.equals(ATOM_ZIP1_1.uri)) {
                 FileUtils.copy(new ByteArrayInputStream(bytes), outStream);
@@ -161,8 +168,8 @@ public class AutoExporter
         getObjectXML(m_apia, m_apim, pid, outStream);
     }
 
-    public static void getObjectXML(FedoraAPIA apia,
-                                    FedoraAPIM apim,
+    public static void getObjectXML(FedoraAPIAMTOM apia,
+                                    FedoraAPIMMTOM apim,
                                     String pid,
                                     OutputStream outStream)
             throws RemoteException, IOException {
@@ -176,7 +183,7 @@ public class AutoExporter
         }
         // get the object XML as it exists in the repository's
         // persitent storage area.
-        byte[] bytes = apim.getObjectXML(pid);
+        byte[] bytes = TypeUtility.convertDataHandlerToBytes(apim.getObjectXML(pid));
         try {
             // use xerces to pretty print the xml, assuming it's well formed
             OutputFormat fmt = new OutputFormat("XML", "UTF-8", true);

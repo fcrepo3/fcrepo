@@ -11,10 +11,13 @@ import java.io.FileReader;
 
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.utility.ingest.AutoIngestor;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.oai.sample.RandomDCMetadataFactory;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 
 
 
@@ -26,9 +29,9 @@ import org.fcrepo.server.management.FedoraAPIM;
  */
 public class MassIngest {
 
-    public static FedoraAPIA APIA = null;
+    public static FedoraAPIAMTOM APIA = null;
 
-    public static FedoraAPIM APIM = null;
+    public static FedoraAPIMMTOM APIM = null;
 
     public MassIngest(AutoIngestor ingestor,
                       File templateFile,

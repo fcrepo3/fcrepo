@@ -20,8 +20,9 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import org.fcrepo.client.Administrator;
-import org.fcrepo.server.types.gen.Datastream;
-import org.fcrepo.server.types.gen.ObjectFields;
+
+import org.fcrepo.server.types.mtom.gen.Datastream;
+import org.fcrepo.server.types.mtom.gen.ObjectFields;
 
 
 
@@ -70,11 +71,11 @@ public class ObjectEditorFrame
         ObjectFields o =
                 Util.getObjectFields(pid, new String[] {"pid", "state",
                         "label", "cDate", "mDate", "ownerId"});
-        String state = o.getState();
-        String label = o.getLabel();
-        String cDate = o.getCDate();
-        String mDate = o.getMDate();
-        String ownerId = o.getOwnerId();
+        String state = o.getState().getValue();
+        String label = o.getLabel().getValue();
+        String cDate = o.getCDate().getValue();
+        String mDate = o.getMDate().getValue();
+        String ownerId = o.getOwnerId().getValue();
 
         doTitle(false);
 
@@ -162,6 +163,7 @@ public class ObjectEditorFrame
         setTitle("Object - " + m_pid + d);
     }
 
+    @Override
     public boolean isDirty() {
         return m_objectPane.isDirty() || m_datastreamsPane.isDirty();
     }
