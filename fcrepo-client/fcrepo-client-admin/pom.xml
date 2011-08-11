@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -27,17 +28,13 @@
 
     <plugins>
 
-      <!-- 
-      To be re-evaluated when ANT is no longer supported.
-      TestMessagingClient does not work in ANT or Maven2 
-      -->
+      <!-- To be re-evaluated when ANT is no longer supported. TestMessagingClient 
+        does not work in ANT or Maven2 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <!-- 
-        All unit tests in 'client' begin with 'Test*' 
-        (that is reserved for integration-tests) 
-        -->
+        <!-- All unit tests in 'client' begin with 'Test*' (that is reserved 
+          for integration-tests) -->
         <configuration>
           <includes>
             <include>**/*Test*</include>
@@ -63,7 +60,7 @@
             <configuration>
               <sources>
                 <source>${basedir}/stubwrappers</source>
-             </sources>
+              </sources>
             </configuration>
           </execution>
         </executions>
@@ -119,14 +116,14 @@
       <version>1.6-1</version>
     </dependency>
     <dependency>
-      <groupId>ch.qos.logback</groupId>                                                           
+      <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
-	  <artifactId>commons-codec</artifactId>
-	  <version>1.3</version>
-	</dependency>
+      <artifactId>commons-codec</artifactId>
+      <version>1.3</version>
+    </dependency>
     <dependency>
       <groupId>commons-discovery</groupId>
       <artifactId>commons-discovery</artifactId>
@@ -170,12 +167,17 @@
       <artifactId>saaj-api</artifactId>
       <version>1.3</version>
     </dependency>
-    <!--<dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>axis</artifactId>
-      <version>1.3-PATCHED</version>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-bundle</artifactId>
+      <version>${cxf.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
-    -->
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>jai_codec</artifactId>
@@ -235,6 +237,6 @@
       <version>1.1.3.4.O</version>
       <scope>runtime</scope>
     </dependency>
-	
+
   </dependencies>
 </project>

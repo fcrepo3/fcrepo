@@ -246,10 +246,19 @@
       <type>war</type>
       <version>${project.version}</version>
     </dependency>
-    <!-- <dependency> <groupId>org.fcrepo</groupId> <artifactId>fcrepo-client-admin</artifactId> 
-      <version>${project.version}</version> </dependency> <dependency> <groupId>org.fcrepo</groupId> 
-      <artifactId>client</artifactId> <classifier>fedora</classifier> <version>1.0.0</version> 
-      </dependency> -->
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-client-admin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!--
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>client</artifactId>
+      <classifier>fedora</classifier>
+      <version>1.0.0</version>
+    </dependency>
+    -->
 
     <dependency>
       <groupId>org.fcrepo</groupId>
@@ -270,8 +279,6 @@
       <artifactId>one-jar-boot</artifactId>
       <version>0.96</version>
     </dependency>
-    <!-- temporarily, once the fcrepo-client-admin project is enabled, this 
-      should be removed -->
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>openrdf-sesame-onejar</artifactId>

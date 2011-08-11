@@ -383,7 +383,22 @@
         <include>javax.xml:jaxrpc-api:jar:*</include>
         <include>com.sun.woodstock.dependlibs:jhbasic:jar:*</include>
         <include>javax.xml.soap:saaj-api:jar:*</include>
-  <!-- axis <include>org.fcrepo:axis:jar:*</include> -->
+
+        <include>org.springframework:spring-context:jar:*</include>
+        <include>org.springframework:spring-beans:jar:*</include>
+        <include>org.springframework:spring-core:jar:*</include>
+        <include>org.apache.geronimo.specs:geronimo-jaxws_2.2_spec:jar:*</include>
+        <include>org.apache.ws.xmlschema:xmlschema-core:jar:*</include>
+        <include>javax.xml.bind:jaxb-api:jar:*</include>
+        <include>com.sun.xml.bind:jaxb-impl:jar:*</include>
+        <include>org.apache.neethi:neethi:jar:*</include>
+        <include>com.sun.xml.messaging.saaj:saaj-impl:jar:*</include>
+        <include>org.codehaus.woodstox:woodstox-core-asl:jar:*</include>
+        <include>org.apache.geronimo.specs:geronimo-annotation_1.0_spec:jar:*</include>
+        <include>org.codehaus.woodstox:stax2-api:jar:*</include>
+        
+        
+        
         <include>org.fcrepo:jai_codec:jar:*</include>
         <include>org.fcrepo:jai_core:jar:*</include>
         <include>org.fcrepo:mulgara-core:jar:*</include>
@@ -407,8 +422,8 @@
     <dependencySet>
       <useProjectArtifact>false</useProjectArtifact>
       <includes>
-        <include>org.fcrepo:fcrepo-client-admin:jar:${project.version}
-        </include>
+        <include>org.fcrepo:fcrepo-client-admin:jar:${project.version}</include>
+        <include>org.apache.cxf:cxf-bundle:jar:*</include>
       </includes>
       <outputDirectory>/client</outputDirectory>
     </dependencySet>
