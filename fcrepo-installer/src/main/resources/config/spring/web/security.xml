@@ -221,4 +221,7 @@
   <bean id="PEPFilter" class="org.fcrepo.server.security.xacml.pep.rest.PEP"
     lazy-init="true" init-method="init" />
 
+  <bean id="PEP" class="org.fcrepo.server.security.xacml.pep.ws.PEP"
+    lazy-init="true" />
+
 </beans>
