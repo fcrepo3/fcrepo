@@ -2,9 +2,9 @@
 <definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
              xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
              xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-             xmlns:fedora-api="http://www.fedora.info/definitions/1/0/api/"
+             xmlns:fedora-api="http://www.fedora.info/definitions/1/0/types/"
              xmlns:fedora-types="http://www.fedora.info/definitions/1/0/types/"
-             targetNamespace="http://www.fedora.info/definitions/1/0/api/"
+             targetNamespace="http://www.fedora.info/definitions/1/0/types/"
              name="Fedora-API-A-WSDL">
 
   <types>
