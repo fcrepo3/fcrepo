@@ -141,14 +141,10 @@ public class InstallOptions {
         System.out.println("***********************");
         checkJavaVersion();
         System.out.println();
-        System.out
-                .println("To install Fedora, please answer the following questions.");
-        System.out
-                .println("Enter CANCEL at any time to abort the installation.");
-        System.out
-                .println("Detailed installation instructions are available online:");
-        System.out.println("\thttp://www.fedora-commons.org/confluence/display/FCR30/");
-        System.out.println();
+        System.out.println("To install Fedora, please answer the following questions.");
+        System.out.println("Enter CANCEL at any time to abort the installation.");
+        System.out.println("Detailed installation instructions are available online:\n");
+        System.out.println("            https://wiki.duraspace.org/display/FEDORA/All+Documentation\n");
 
         inputOption(INSTALL_TYPE);
         inputOption(FEDORA_HOME);

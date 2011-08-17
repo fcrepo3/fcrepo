@@ -225,7 +225,7 @@ public class Administrator
         m_aboutPic = new JLabel(aboutIcon);
         m_aboutText =
                 new JLabel("<html>"
-                        + "<p>Copyright 2009, DuraSpace</p>"
+                        + "<p>Copyright 2009-2011, DuraSpace</p>"
                         + "<p>Copyright 2008-2009, Fedora Commons, Inc.</p>"
                         + "<p>Copyright 2002-2007, The Rector and Visitors of the</p>"
                         + "<p>University of Virginia and Cornell University.</p><p></p>"
@@ -671,7 +671,7 @@ public class Administrator
         helpContents.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                String documentationURL = "http://fedora-commons.org/go/fcr30";
+                String documentationURL = "https://wiki.duraspace.org/display/FEDORA/All+Documentation";
                 JOptionPane.showMessageDialog(getDesktop(),
                                               "For Fedora documentation, see "
                                                       + documentationURL,
