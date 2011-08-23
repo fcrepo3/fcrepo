@@ -301,7 +301,10 @@ public class FedoraHome {
         springProps.put("security.ssl.api.default", "ANY_CHANNEL");
 
         springProps.put("security.fesl.authN.jaas.apia.enabled", _opts
-                        .getValue(InstallOptions.APIA_AUTH_REQUIRED, "false"));
+                .getValue(InstallOptions.APIA_AUTH_REQUIRED, "false"));
+        
+        springProps.put("security.fesl.authZ.enabled", _opts
+                        .getValue(InstallOptions.FESL_AUTHZ_ENABLED, "false"));
 
         /* Set up authN, authZ filter configuration */
         StringBuilder filters = new StringBuilder();

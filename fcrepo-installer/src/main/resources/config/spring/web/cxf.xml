@@ -21,8 +21,7 @@
     wsdlLocation="${fedora.home}/server/management/Fedora-API-M-MTOM.wsdl"
     address="/managementMTOM">
     <jaxws:handlers>
-      <!--<ref bean=""/> -->
-      
+      <ref bean="PEP"/>
     </jaxws:handlers>
     <jaxws:properties>
       <entry key="mtom-enabled" value="true" />
@@ -36,7 +35,7 @@
     wsdlLocation="${fedora.home}/server/management/Fedora-API-M.wsdl"
     address="/management">
     <jaxws:handlers>
-      
+      <ref bean="PEP"/>
     </jaxws:handlers>
     <jaxws:properties>
       <entry key="schema-validation-enabled" value="${ws.soap.validation}" />
@@ -50,7 +49,7 @@
     wsdlLocation="${fedora.home}/server/access/Fedora-API-A-MTOM.wsdl"
     address="/accessMTOM">
     <jaxws:handlers>
-     
+     <ref bean="PEP"/>
     </jaxws:handlers>
     <jaxws:properties>
       <entry key="mtom-enabled" value="true" />
@@ -63,7 +62,7 @@
     endpointName="fedora-types:Fedora-API-A-Port-SOAPHTTP" wsdlLocation="${fedora.home}/server/access/Fedora-API-A.wsdl"
     address="/access">
     <jaxws:handlers>
-      
+      <ref bean="PEP"/>
     </jaxws:handlers>
     <jaxws:properties>
       <entry key="schema-validation-enabled" value="${ws.soap.validation}" />

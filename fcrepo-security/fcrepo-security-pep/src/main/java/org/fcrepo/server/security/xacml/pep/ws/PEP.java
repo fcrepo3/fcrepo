@@ -55,16 +55,15 @@ import org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandlerExcept
 import org.fcrepo.server.utilities.CXFUtility;
 
 /**
- * This class is an JAX-WS handler. It is used as a handler on both the
- * request and response. The handler examines the operation for the request and
+ * This class is an JAX-WS handler. It is used as a handler on both the request
+ * and response. The handler examines the operation for the request and
  * retrieves an appropriate handler to manage the request.
  *
- * @author nishen@melcoe.mq.edu.au
+ * @author Jiri Kremser
  */
 public class PEP
         implements javax.xml.ws.handler.soap.SOAPHandler<SOAPMessageContext> {
 
-    private static final long serialVersionUID = -3435060948149239989L;
 
     private static final Logger logger = LoggerFactory.getLogger(PEP.class);
 
@@ -78,6 +77,12 @@ public class PEP
      * The XACML context handler.
      */
     ContextHandler ctxHandler = null;
+
+    private boolean feslAuthZ;
+
+    public void setFeslAuthZ(boolean feslAuthZ) {
+        this.feslAuthZ = feslAuthZ;
+    }
 
     /**
      * A time stamp to note the time this AuthHandler was instantiated.
@@ -93,9 +98,11 @@ public class PEP
     public PEP()
             throws PEPException {
         super();
-        loadHandlers();
-        ctxHandler = ContextHandlerImpl.getInstance();
-        ts = new Date();
+        if (feslAuthZ) {
+            loadHandlers();
+            ctxHandler = ContextHandlerImpl.getInstance();
+            ts = new Date();
+        }
     }
 
     /*
@@ -103,10 +110,15 @@ public class PEP
      */
     @Override
     public boolean handleMessage(SOAPMessageContext context) {
+        if (!feslAuthZ) {
+            return true;
+        }
         String service =
-                ((QName) context.get(SOAPMessageContext.WSDL_SERVICE)).getLocalPart();
+                ((QName) context.get(SOAPMessageContext.WSDL_SERVICE))
+                        .getLocalPart();
         String operation =
-                ((QName) context.get(SOAPMessageContext.WSDL_OPERATION)).getLocalPart();
+                ((QName) context.get(SOAPMessageContext.WSDL_OPERATION))
+                        .getLocalPart();
         if (logger.isDebugEnabled()) {
             logger.debug("AuthHandler executed: " + service + "/" + operation
                     + " [" + ts + "]");
