@@ -4,7 +4,26 @@
  */
 package org.fcrepo.server.security;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.MultiValueMap;
@@ -15,23 +34,9 @@ import org.fcrepo.server.errors.authorization.AuthzOperationalException;
 import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.utilities.status.ServerState;
 import org.fcrepo.server.validation.ValidationUtility;
+
 import org.fcrepo.utilities.DateUtility;
 import org.fcrepo.utilities.XmlTransformUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
 
 
 /**
@@ -67,10 +72,10 @@ import java.util.Map;
  * <ul>
  * <li>==
  * urn:fedora:names:fedora:2.1:environment:httpRequest:messageProtocol-soap(i.e.,
- * request is over SOAP/Axis)</li>
+ * request is over SOAP/CXF)</li>
  * <li>==
  * urn:fedora:names:fedora:2.1:environment:httpRequest:messageProtocol-rest(i.e.,
- * request is over non-SOAP/Axis ("REST") HTTP call)</li>
+ * request is over non-SOAP/CXF ("REST") HTTP call)</li>
  * </ul>
  * </li>
  * </ul>
@@ -411,6 +416,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void reloadPolicies(Context context) throws Exception {
         enforceReloadPolicies(context);
         generateBackendPolicies();
@@ -465,6 +471,7 @@ public class DefaultAuthorization
      * </ul>
      * </p>
      */
+    @Override
     public final void enforceAddDatastream(Context context,
                                            String pid,
                                            String dsId,
@@ -528,6 +535,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforceExport(Context context,
                                     String pid,
                                     String format,
@@ -570,6 +578,7 @@ public class DefaultAuthorization
     /**
      * @deprecated in Fedora 3.0, use enforceExport() instead
      */
+    @Override
     @Deprecated
     public final void enforceExportObject(Context context,
                                           String pid,
@@ -580,6 +589,7 @@ public class DefaultAuthorization
         enforceExport(context, pid, format, exportContext, exportEncoding);
     }
 
+    @Override
     public final void enforceGetNextPid(Context context,
                                         String namespace,
                                         int nNewPids) throws AuthzException {
@@ -612,6 +622,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforceGetDatastream(Context context,
                                            String pid,
                                            String datastreamId,
@@ -647,6 +658,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforceGetDatastreamHistory(Context context,
                                                   String pid,
                                                   String datastreamId)
@@ -693,6 +705,7 @@ public class DefaultAuthorization
         return dateAsString;
     }
 
+    @Override
     public final void enforceGetDatastreams(Context context,
                                             String pid,
                                             Date asOfDate,
@@ -730,6 +743,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforceGetObjectXML(Context context,
                                           String pid,
                                           String objectXmlEncoding)
@@ -761,6 +775,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforceIngest(Context context,
                                     String pid,
                                     String format,
@@ -801,6 +816,7 @@ public class DefaultAuthorization
     /**
      * @deprecated in Fedora 3.0, use enforceIngest() instead
      */
+    @Override
     @Deprecated
     public final void enforceIngestObject(Context context,
                                           String pid,
@@ -810,6 +826,7 @@ public class DefaultAuthorization
         enforceIngest(context, pid, format, ingestEncoding);
     }
 
+    @Override
     public final void enforceListObjectInFieldSearchResults(Context context,
                                                             String pid)
             throws AuthzException {
@@ -834,6 +851,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforceListObjectInResourceIndexResults(Context context,
                                                               String pid)
             throws AuthzException {
@@ -856,6 +874,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforceModifyDatastreamByReference(Context context,
                                                          String pid,
                                                          String datastreamId,
@@ -911,6 +930,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforceModifyDatastreamByValue(Context context,
                                                      String pid,
                                                      String datastreamId,
@@ -962,6 +982,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforceModifyObject(Context context,
                                           String pid,
                                           String objectNewState,
@@ -999,6 +1020,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforcePurgeDatastream(Context context,
                                              String pid,
                                              String datastreamId,
@@ -1034,6 +1056,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforcePurgeObject(Context context, String pid)
             throws AuthzException {
         try {
@@ -1052,6 +1075,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforceSetDatastreamState(Context context,
                                                 String pid,
                                                 String datastreamId,
@@ -1087,6 +1111,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforceSetDatastreamVersionable(Context context,
                                                       String pid,
                                                       String datastreamId,
@@ -1123,6 +1148,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public final void enforceCompareDatastreamChecksum(Context context,
                                                        String pid,
                                                        String datastreamId,
@@ -1159,6 +1185,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceDescribeRepository(Context context)
             throws AuthzException {
         try {
@@ -1177,6 +1204,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceFindObjects(Context context) throws AuthzException {
         try {
             logger.debug("Entered enforceFindObjects");
@@ -1194,6 +1222,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceRIFindObjects(Context context) throws AuthzException {
         try {
             logger.debug("Entered enforceRIFindObjects");
@@ -1211,6 +1240,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceGetDatastreamDissemination(Context context,
                                                   String pid,
                                                   String datastreamId,
@@ -1246,6 +1276,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceGetDissemination(Context context,
                                         String pid,
                                         String sDefPid,
@@ -1306,6 +1337,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceGetObjectHistory(Context context, String pid)
             throws AuthzException {
         try {
@@ -1324,6 +1356,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceGetObjectProfile(Context context,
                                         String pid,
                                         Date asOfDate) throws AuthzException {
@@ -1354,6 +1387,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceListDatastreams(Context context,
                                        String pid,
                                        Date asOfDate) throws AuthzException {
@@ -1384,6 +1418,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceListMethods(Context context, String pid, Date asOfDate)
             throws AuthzException {
         try {
@@ -1413,6 +1448,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceServerStatus(Context context) throws AuthzException {
         try {
             logger.debug("Entered enforceServerStatus");
@@ -1430,6 +1466,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceOAIRespond(Context context) throws AuthzException {
         try {
             logger.debug("Entered enforceOAIRespond");
@@ -1447,6 +1484,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceUpload(Context context) throws AuthzException {
         try {
             logger.debug("Entered enforceUpload");
@@ -1464,6 +1502,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforce_Internal_DSState(Context context,
                                          String id,
                                          String state) throws AuthzException {
@@ -1496,6 +1535,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceResolveDatastream(Context context,
                                          Date ticketIssuedDateTime)
             throws AuthzException {
@@ -1528,6 +1568,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceReloadPolicies(Context context) throws AuthzException {
         try {
             logger.debug("Entered enforceReloadPolicies");
@@ -1549,6 +1590,7 @@ public class DefaultAuthorization
         return DateUtility.convertDateToString(date, false);
     }
 
+    @Override
     public void enforceGetRelationships(Context context,
                                         String pid,
                                         String predicate) throws AuthzException {
@@ -1578,6 +1620,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceAddRelationship(Context context,
                                        String pid,
                                        String predicate,
@@ -1610,6 +1653,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforcePurgeRelationship(Context context,
                                          String pid,
                                          String predicate,
@@ -1642,6 +1686,7 @@ public class DefaultAuthorization
         }
     }
 
+    @Override
     public void enforceRetrieveFile(Context context, String fileURI) throws AuthzException {
         try {
             logger.debug("Entered enforceRetrieveFile");

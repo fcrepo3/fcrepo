@@ -403,7 +403,7 @@ public class RelsValidator
 
             }
             String dsId = aboutURI.replace(m_doURI + "/", "");
-            // datastream ID must be an XML NCName, implemented using axis NCName class
+            // datastream ID must be an XML NCName, implemented using NCName class
             if (dsId.length() > ValidationConstants.DATASTREAM_ID_MAXLEN
                     || dsId.length() < 1 || !isValid(dsId)) {
                 throw new SAXException("RelsExtValidator:"

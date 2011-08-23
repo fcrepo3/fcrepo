@@ -89,7 +89,7 @@ public abstract class AbstractOperationHandler
      * @param context
      *        the message context.
      * @return list of Objects
-     * @throws AxisFault
+     * @throws SoapFault
      */
     protected List<Object> getSOAPRequestObjects(SOAPMessageContext context) {
         // return result
@@ -148,7 +148,7 @@ public abstract class AbstractOperationHandler
      * @param context
      *        the message context.
      * @return the return object for the message.
-     * @throws AxisFault
+     * @throws SoapFault
      */
     protected Object getSOAPResponseObject(SOAPMessageContext context, Class clazz) {
         // return result
@@ -214,7 +214,7 @@ public abstract class AbstractOperationHandler
      *        the message context
      * @param params
      *        list of parameters to set in order
-     * @throws AxisFault
+     * @throws SoapFault
      */
     protected void setSOAPRequestObjects(SOAPMessageContext context,
                                          List<SOAPElement> params) {
@@ -247,7 +247,7 @@ public abstract class AbstractOperationHandler
      *        the message context
      * @param param
      *        the object to set as the return object
-     * @throws AxisFault
+     * @throws SoapFault
      */
     protected void setSOAPResponseObject(SOAPMessageContext context,
                                          SOAPElement param) {
@@ -278,7 +278,7 @@ public abstract class AbstractOperationHandler
      *        the message context
      * @param param
      *        the object to set as the return object
-     * @throws AxisFault
+     * @throws SoapFault
      */
     protected void setSOAPResponseObject(SOAPMessageContext context,
                                          SOAPElement[] params) {
@@ -312,7 +312,7 @@ public abstract class AbstractOperationHandler
      * @param context
      *        the message context
      * @return a list of Subjects
-     * @throws AxisFault
+     * @throws SoapFault
      */
     protected List<Map<URI, List<AttributeValue>>> getSubjects(SOAPMessageContext context) {
         // setup the id and value for the requesting subject

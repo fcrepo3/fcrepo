@@ -321,19 +321,6 @@
       <lineEnding>dos</lineEnding>
       <filtered>true</filtered>
     </fileSet>
-
-    <!-- axis Common entries 
-    <fileSet>
-      <directory>../fcrepo-common/target/generated-sources/axistools/wsdl2java/org/fcrepo/server/management
-      </directory>
-      <outputDirectory>/server/fedora-internal-use/deploy
-      </outputDirectory>
-      <includes>
-        <include>deploy.wsdd</include>
-        <include>undeploy.wsdd</include>
-      </includes>
-    </fileSet>
--->
   </fileSets>
 
   <!-- A few files that needed to be renamed -->
@@ -345,22 +332,6 @@
       <outputDirectory>/server/config</outputDirectory>
       <destName>beSecurity.xml</destName>
     </file>
-<!-- axis
-    <file>
-      <source>../fcrepo-common/target/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/deploy.wsdd
-      </source>
-      <outputDirectory>/server/fedora-internal-use/deploy
-      </outputDirectory>
-      <destName>deployAPI-A.wsdd</destName>
-    </file>
-    <file>
-      <source>../fcrepo-common/target/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/undeploy.wsdd
-      </source>
-      <outputDirectory>/server/fedora-internal-use/deploy
-      </outputDirectory>
-      <destName>undeployAPI-A.wsdd</destName>
-    </file>
- -->
   </files>
 
   <dependencySets>

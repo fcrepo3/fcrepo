@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.server.utilities;
@@ -8,7 +8,7 @@ import java.util.StringTokenizer;
 
 /**
  * A utility class for common string operations.
- * 
+ *
  * @author Ross Wayland
  */
 public class StringUtility {
@@ -19,13 +19,13 @@ public class StringUtility {
     /**
      * Method that attempts to break a string up into lines no longer than the
      * specified line length.
-     * 
+     *
      * <p>The string is assumed to consist of tokens separated by a delimeter.
-     * The default delimiter is a space. If the last token to be added to a 
+     * The default delimiter is a space. If the last token to be added to a
      * line exceeds the specified line length, it is written on the next line
-     * so actual line length is approximate given the specified line length 
+     * so actual line length is approximate given the specified line length
      * and the length of tokens in the string.
-     * 
+     *
      * @param in
      *        The input string to be split into lines.
      * @param lineLength
@@ -63,10 +63,10 @@ public class StringUtility {
     /**
      * Method that attempts to break a string up into lines no longer than the
      * specified line length.
-     * 
+     *
      * <p>The string is assumed to a large chunk of undifferentiated text such
      * as base 64 encoded binary data.
-     * 
+     *
      * @param str
      *        The input string to be split into lines.
      * @param indent
@@ -131,7 +131,7 @@ public class StringUtility {
         new StringUtility();
         String pid = "demo:1";
         String in =
-                "org.apache.axis.AxisFault: The digital object \""
+                "org.apache.cxf.binding.soap.SoapFault: The digital object \""
                         + pid
                         + "\" is used by one or more other objects "
                         + "in the repository. All related objects must be removed "

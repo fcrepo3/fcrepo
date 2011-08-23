@@ -26,14 +26,6 @@
     <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
     <load-on-startup>3</load-on-startup>
   </servlet>
-  <!-- axis 
-  <servlet>
-    <display-name>Apache-Axis Servlet</display-name>
-    <servlet-name>AxisServlet</servlet-name>
-    <servlet-class>org.apache.axis.transport.http.AxisServlet</servlet-class>
-    <load-on-startup>3</load-on-startup>
-  </servlet>
-  -->
   <servlet>
     <display-name>Fedora Access Servlet</display-name>
     <servlet-name>AccessServlet</servlet-name>
@@ -148,8 +140,6 @@
     <servlet-name>CXFServlet</servlet-name>
     <url-pattern>/services/*</url-pattern>
   </servlet-mapping>
-  <!-- axis <servlet-mapping> <servlet-name>AxisServlet</servlet-name> <url-pattern>/axis/*</url-pattern> 
-    </servlet-mapping> -->
   <servlet-mapping>
     <servlet-name>AccessServlet</servlet-name>
     <url-pattern>/get/*</url-pattern>
@@ -222,17 +212,6 @@
     <servlet-name>UploadServlet</servlet-name>
     <url-pattern>/management/upload</url-pattern>
   </servlet-mapping>
-  <!-- axis
-  <servlet-mapping>
-    <servlet-name>AxisServlet</servlet-name>
-    <url-pattern>/servlet/AxisServlet</url-pattern>
-  </servlet-mapping>
-   
-  <servlet-mapping>
-    <servlet-name>AxisServlet</servlet-name>
-    <url-pattern>*.jws</url-pattern>
-  </servlet-mapping>
-  -->
   <servlet-mapping>
     <servlet-name>WSDLServlet</servlet-name>
     <url-pattern>/wsdl</url-pattern>

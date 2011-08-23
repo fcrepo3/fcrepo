@@ -182,8 +182,7 @@ public class FieldSearchResultHandler
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandler#handleRequest(org.apache
-     * .axis.MessageContext)
+     * org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandler#handleRequest(SOAPMessageContext)
      */
     @Override
     public RequestCtx handleRequest(SOAPMessageContext context)
@@ -222,8 +221,7 @@ public class FieldSearchResultHandler
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandler#handleResponse(org.apache
-     * .axis.MessageContext)
+     * org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandler#handleResponse(SOAPMessageContext)
      */
     @Override
     public RequestCtx handleResponse(SOAPMessageContext context)

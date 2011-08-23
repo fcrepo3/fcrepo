@@ -13,12 +13,10 @@
 	
 	<!-- Servlets for SOAP-based web service interfaces to the Fedora Repository Server-->
 	<servlet>
-		<display-name>Apache-Axis Servlet</display-name>
-		<servlet-name>AxisServlet</servlet-name>
-		<servlet-class>
-			org.apache.axis.transport.http.AxisServlet
-		</servlet-class>
-		<load-on-startup>3</load-on-startup>
+    <display-name>CXF Servlet</display-name>
+    <servlet-name>CXFServlet</servlet-name>
+    <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+    <load-on-startup>3</load-on-startup>
 	</servlet>
 
 	<!-- Servlets for REST-based interfaces to the Fedora Repository Server-->
@@ -124,12 +122,8 @@
     </servlet>
 
 	<servlet-mapping>
-		<servlet-name>AxisServlet</servlet-name>
+		<servlet-name>CXFServlet</servlet-name>
 		<url-pattern>/services/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>AxisServlet</servlet-name>
-		<url-pattern>*.jws</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>AccessServlet</servlet-name>
@@ -195,18 +189,6 @@
 		<servlet-name>UploadServlet</servlet-name>
 		<url-pattern>/management/upload</url-pattern>
 	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>AxisServlet</servlet-name>
-		<url-pattern>/servlet/AxisServlet</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>AxisServlet</servlet-name>
-		<url-pattern>*.jws</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>AxisServlet</servlet-name>
-		<url-pattern>/services/*</url-pattern>
-	</servlet-mapping>
     <servlet-mapping>
 		<servlet-name>WSDLServlet</servlet-name>
 		<url-pattern>/wsdl</url-pattern>
@@ -247,10 +229,6 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
   <!-- authn always required -->
-	<filter-mapping>
-		<filter-name>EnforceAuthnFilter</filter-name>
-		<servlet-name>AxisServlet</servlet-name>
-	</filter-mapping>
 	<filter-mapping>
 		<filter-name>EnforceAuthnFilter</filter-name>
 		<servlet-name>ControlServlet</servlet-name>

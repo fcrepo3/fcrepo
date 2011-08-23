@@ -41,6 +41,7 @@ import org.fcrepo.common.Constants;
 
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.fcrepo.server.utilities.CXFUtility;
 
 
 /**
@@ -107,7 +108,7 @@ public class DescribeFilter
                             null);
         } catch (Exception e) {
             logger.error(e.getMessage());
-//            throw AxisFault.makeFault(e);
+            CXFUtility.getFault(e);
         }
 
         return req;

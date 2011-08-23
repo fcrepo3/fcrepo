@@ -71,6 +71,7 @@ import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.fcrepo.server.utilities.CXFUtility;
 
 
 /**
@@ -155,7 +156,7 @@ public class SearchFilter
                             null);
         } catch (Exception e) {
             logger.error(e.getMessage());
-//            throw AxisFault.makeFault(e);
+            CXFUtility.getFault(e);
         }
 
         return req;

@@ -15,43 +15,6 @@
 
   <build>
     <plugins>
-    <!-- axis
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-
-          <execution>-->
-            <!-- update axis' configuration file (server-config.wsdd) requires 
-              that the java files are compiled thus, perform this task in the "process-classes" 
-              phase -->
-              <!-- axis
-            <id>Update server-config.wsdd</id>
-            <phase>process-classes</phase>
-            <configuration>
-              <tasks>-->
-                <!-- update src/main/webapp/WEB-INF/server-config.wsdd -->
-                <!-- axis
-                <java classname="org.apache.axis.utils.Admin" fork="true"
-                  classpathref="maven.compile.classpath" dir="${project.build.outputDirectory}">
-                  <arg value="server" />
-                  <arg
-                    value="${basedir}/../../fcrepo-common/target/generated-sources/axistools/wsdl2java/org/fcrepo/server/management/deploy.wsdd" />
-                  <arg
-                    value="${basedir}/../../fcrepo-common/target/generated-sources/axistools/wsdl2java/org/fcrepo/server/access/deploy.wsdd" />
-                  <sysproperty key="logback.configurationFile"
-                    value="${basedir}/src/test/resources/logback.xml" />
-                </java>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-
-        </executions>
-      </plugin>
--->
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
@@ -61,27 +24,12 @@
               <directory>${basedir}/src/main/resources</directory>
             </resource>
             <resource>
-              <directory>${project.build.outputDirectory}</directory>
-              <targetPath>WEB-INF</targetPath>
-              <includes>
-                <include>server-config.wsdd</include>
-              </includes>
-            </resource>
-            <resource>
               <!-- this is terrible. brittle. FIXME -->
               <directory>${project.basedir}/../../fcrepo-security/fcrepo-security-pep/src/main/resources</directory>
               <targetPath>WEB-INF/classes</targetPath>
               <includes>
                 <include>config-melcoe-pep.xml</include>
                 <include>config-melcoe-pep-mapping.xml</include>
-              </includes>
-            </resource>
-            <resource>
-              <!-- this is terrible. brittle. FIXME -->
-              <directory>${project.basedir}/../../fcrepo-security/fcrepo-security-pep/src/main/resources</directory>
-              <targetPath>WEB-INF</targetPath>
-              <includes>
-                <include>melcoe-pep-server-config.wsdd</include>
               </includes>
             </resource>
           </webResources>

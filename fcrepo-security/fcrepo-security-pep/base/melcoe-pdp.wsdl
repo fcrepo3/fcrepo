@@ -113,30 +113,9 @@
       </wsdl:fault>
     </wsdl:operation>
   </wsdl:binding>
-  <!-- <wsdl:binding name="MelcoePDPSOAP12Binding" type="axis2:MelcoePDPPortType"> 
-    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" 
-    /> <wsdl:operation name="evaluateBatch"> <soap12:operation soapAction="urn:evaluateBatch" 
-    style="document" /> <wsdl:input> <soap12:body use="literal" /> </wsdl:input> 
-    <wsdl:output> <soap12:body use="literal" /> </wsdl:output> <wsdl:fault name="evaluateBatchFault"> 
-    <soap12:fault use="literal" name="evaluateBatchFault" /> </wsdl:fault> </wsdl:operation> 
-    <wsdl:operation name="evaluate"> <soap12:operation soapAction="urn:evaluate" 
-    style="document" /> <wsdl:input> <soap12:body use="literal" /> </wsdl:input> 
-    <wsdl:output> <soap12:body use="literal" /> </wsdl:output> <wsdl:fault name="evaluateFault"> 
-    <soap12:fault use="literal" name="evaluateFault" /> </wsdl:fault> </wsdl:operation> 
-    </wsdl:binding> <wsdl:binding name="MelcoePDPHttpBinding" type="axis2:MelcoePDPPortType"> 
-    <http:binding verb="POST" /> <wsdl:operation name="evaluateBatch"> <http:operation 
-    location="evaluateBatch" /> <wsdl:input> <mime:content type="text/xml" /> 
-    </wsdl:input> <wsdl:output> <mime:content type="text/xml" /> </wsdl:output> 
-    </wsdl:operation> <wsdl:operation name="evaluate"> <http:operation location="evaluate" 
-    /> <wsdl:input> <mime:content type="text/xml" /> </wsdl:input> <wsdl:output> 
-    <mime:content type="text/xml" /> </wsdl:output> </wsdl:operation> </wsdl:binding> -->
   <wsdl:service name="MelcoePDP">
     <wsdl:port name="MelcoePDPSOAP11port_http" binding="cxf:MelcoePDPSOAP11Binding">
       <soap:address location="http://localhost:8080/cxf/services/MelcoePDP" />
     </wsdl:port>
-    <!-- <wsdl:port name="MelcoePDPSOAP12port_http" binding="axis2:MelcoePDPSOAP12Binding"> 
-      <soap12:address location="http://localhost:8080/axis2/services/MelcoePDP" 
-      /> </wsdl:port> <wsdl:port name="MelcoePDPHttpport1" binding="axis2:MelcoePDPHttpBinding"> 
-      <http:address location="http://localhost:8080/axis2/rest/MelcoePDP" /> </wsdl:port> -->
   </wsdl:service>
 </wsdl:definitions>

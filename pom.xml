@@ -103,7 +103,6 @@
   </developers>
 
   <modules>
-    <module>fcrepo-generate</module>
     <module>fcrepo-common</module>
     <module>fcrepo-server</module>
     <module>fcrepo-client</module>
