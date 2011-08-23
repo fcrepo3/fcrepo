@@ -7,8 +7,6 @@ import java.io.InputStreamReader;
 
 import java.rmi.RemoteException;
 
-import org.apache.axis.types.NonNegativeInteger;
-
 import org.fcrepo.common.Constants;
 
 import org.fcrepo.server.management.FedoraAPIM;
@@ -38,7 +36,7 @@ public class PolicyIndexUtils implements Constants {
 
     public String[] getNextPids(int pidCount) throws RemoteException {
 
-        return m_apim.getNextPID(new NonNegativeInteger(Integer.toString(pidCount)), "demo");
+        return m_apim.getNextPID(new java.math.BigInteger(Integer.toString(pidCount)), "demo");
 
     }
 

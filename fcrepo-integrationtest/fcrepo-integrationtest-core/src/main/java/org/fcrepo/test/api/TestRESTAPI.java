@@ -36,8 +36,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.axis.types.NonNegativeInteger;
-
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -913,7 +911,7 @@ public class TestRESTAPI
 
     public void testValidate() throws Exception {
         String[] resultFields = {"pid"};
-        NonNegativeInteger maxResults = new NonNegativeInteger("" + 1000);
+        java.math.BigInteger maxResults = new java.math.BigInteger("" + 1000);
         FieldSearchQuery query = new FieldSearchQuery(null, "*");
         FieldSearchResult result =
                 apia.findObjects(resultFields, maxResults, query);

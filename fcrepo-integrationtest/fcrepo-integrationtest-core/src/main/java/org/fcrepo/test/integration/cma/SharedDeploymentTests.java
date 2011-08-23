@@ -4,7 +4,7 @@
  */
 package org.fcrepo.test.integration.cma;
 
-import org.apache.axis.AxisFault;
+import org.apache.cxf.binding.soap.SoapFault;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -195,21 +195,21 @@ public class SharedDeploymentTests {
         try {
             getDissemination(OBJECT_1_PID, SDEF_1_PID, SDEF_2_METHOD);
             fail("Was able to call wrong method on SDef1");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
 
         try {
             getDissemination(OBJECT_1_PID, SDEF_2_PID, SDEF_2_METHOD);
             fail("Was able use the wrong SDef!");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
 
         try {
             getDissemination(OBJECT_1_PID, SDEF_2_PID, SDEF_1_METHOD);
             fail("Was able use the wrong SDef and method!");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
     }
@@ -224,21 +224,21 @@ public class SharedDeploymentTests {
         try {
             getDissemination(OBJECT_2_PID, SDEF_2_PID, SDEF_1_METHOD);
             fail("Was able to call wrong method on SDef2");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
 
         try {
             getDissemination(OBJECT_2_PID, SDEF_1_PID, SDEF_1_METHOD);
             fail("Was able use the wrong SDef!");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
 
         try {
             getDissemination(OBJECT_2_PID, SDEF_1_PID, SDEF_2_METHOD);
             fail("Was able use the wrong SDef and method!");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
     }
@@ -256,14 +256,14 @@ public class SharedDeploymentTests {
         try {
             getDissemination(OBJECT_1_2_PID, SDEF_1_PID, SDEF_2_METHOD);
             fail("Was able to call wrong method on SDef1");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
 
         try {
             getDissemination(OBJECT_1_2_PID, SDEF_2_PID, SDEF_1_METHOD);
             fail("Was able use the wrong method on SDef2!");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
     }
@@ -281,14 +281,14 @@ public class SharedDeploymentTests {
         try {
             getDissemination(OBJECT_3_PID, SDEF_1_PID, SDEF_2_METHOD);
             fail("Was able to call wrong method on SDef1");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
 
         try {
             getDissemination(OBJECT_3_PID, SDEF_2_PID, SDEF_1_METHOD);
             fail("Was able use the wrong method on SDef2!");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
     }
@@ -311,42 +311,42 @@ public class SharedDeploymentTests {
         try {
             getDissemination(OBJECT_4_PID, SDEF_1_PID, SDEF_2_METHOD);
             fail("Was able to call wrong method on SDef1");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
 
         try {
             getDissemination(OBJECT_4_PID, SDEF_1_PID, SDEF_4_METHOD);
             fail("Was able to call wrong method on SDef1");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
 
         try {
             getDissemination(OBJECT_4_PID, SDEF_2_PID, SDEF_1_METHOD);
             fail("Was able use the wrong method on SDef2!");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
 
         try {
             getDissemination(OBJECT_4_PID, SDEF_2_PID, SDEF_4_METHOD);
             fail("Was able use the wrong method on SDef2!");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
 
         try {
             getDissemination(OBJECT_4_PID, SDEF_4_PID, SDEF_1_METHOD);
             fail("Was able use the wrong method on SDef4!");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
 
         try {
             getDissemination(OBJECT_4_PID, SDEF_4_PID, SDEF_2_METHOD);
             fail("Was able use the wrong method on SDef4!");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
 

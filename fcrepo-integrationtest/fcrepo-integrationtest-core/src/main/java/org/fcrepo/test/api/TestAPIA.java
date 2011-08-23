@@ -7,8 +7,6 @@ package org.fcrepo.test.api;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.axis.types.NonNegativeInteger;
-
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -66,7 +64,7 @@ public class TestAPIA
     public void testFindObjects() throws Exception {
         // Test that a search for pid=demo:5 returns one result; demo:5
         String[] resultFields = {"pid"};
-        NonNegativeInteger maxResults = new NonNegativeInteger("" + 100);
+        java.math.BigInteger maxResults = new java.math.BigInteger("" + 100);
         Condition[] condition =
                 {new Condition("pid", ComparisonOperator.eq, "demo:5")};
         FieldSearchQuery query = new FieldSearchQuery(condition, null);

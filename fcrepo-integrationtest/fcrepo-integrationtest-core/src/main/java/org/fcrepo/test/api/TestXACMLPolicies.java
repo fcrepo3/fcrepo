@@ -447,9 +447,9 @@ public class TestXACMLPolicies
             fail("Illegal access allowed");
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
-            if (cause instanceof org.apache.axis.AxisFault) {
-                org.apache.axis.AxisFault af =
-                        (org.apache.axis.AxisFault) cause;
+            if (cause instanceof org.apache.cxf.binding.soap.SoapFault) {
+                org.apache.cxf.binding.soap.SoapFault af =
+                        (org.apache.cxf.binding.soap.SoapFault) cause;
                 System.out.println("    Reason = "
                         + af.getFaultReason().substring(af.getFaultReason()
                                 .lastIndexOf(".") + 1));
@@ -516,9 +516,9 @@ public class TestXACMLPolicies
             return result;
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
-            if (cause instanceof org.apache.axis.AxisFault) {
-                org.apache.axis.AxisFault af =
-                        (org.apache.axis.AxisFault) cause;
+            if (cause instanceof org.apache.cxf.binding.soap.SoapFault) {
+                org.apache.cxf.binding.soap.SoapFault af =
+                        (org.apache.cxf.binding.soap.SoapFault) cause;
                 System.out.println("Got exception: " + af.getClass().getName());
                 System.out.println("Reason = " + af.getFaultReason());
                 System.out.println("Message = " + af.getMessage());
@@ -552,9 +552,9 @@ public class TestXACMLPolicies
             fail("Illegal access allowed");
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
-            if (cause instanceof org.apache.axis.AxisFault) {
-                org.apache.axis.AxisFault af =
-                        (org.apache.axis.AxisFault) cause;
+            if (cause instanceof org.apache.cxf.binding.soap.SoapFault) {
+                org.apache.cxf.binding.soap.SoapFault af =
+                        (org.apache.cxf.binding.soap.SoapFault) cause;
                 System.out.println("    Reason = "
                         + af.getFaultReason().substring(af.getFaultReason()
                                 .lastIndexOf(".") + 1));
@@ -597,9 +597,9 @@ public class TestXACMLPolicies
             return result;
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
-            if (cause instanceof org.apache.axis.AxisFault) {
-                org.apache.axis.AxisFault af =
-                        (org.apache.axis.AxisFault) cause;
+            if (cause instanceof org.apache.cxf.binding.soap.SoapFault) {
+                org.apache.cxf.binding.soap.SoapFault af =
+                        (org.apache.cxf.binding.soap.SoapFault) cause;
                 System.out.println("Got exception: " + af.getClass().getName());
                 System.out.println("Reason = " + af.getFaultReason());
                 System.out.println("Message = " + af.getMessage());

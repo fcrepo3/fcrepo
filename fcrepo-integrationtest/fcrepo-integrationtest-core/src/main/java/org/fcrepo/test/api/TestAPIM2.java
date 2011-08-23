@@ -11,8 +11,6 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.axis.types.NonNegativeInteger;
-
 import org.apache.commons.io.FileUtils;
 
 import org.custommonkey.xmlunit.NamespaceContext;
@@ -138,7 +136,7 @@ public class TestAPIM2
         }
 
         String[] resultFields = {"pid", "title"};
-        NonNegativeInteger maxResults = new NonNegativeInteger("100");
+        java.math.BigInteger maxResults = new java.math.BigInteger("100");
 
 
         String termsTemplate = "$value$";

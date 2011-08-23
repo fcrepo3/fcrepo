@@ -4,7 +4,7 @@
  */
 package org.fcrepo.test.integration.cma;
 
-import org.apache.axis.AxisFault;
+import org.apache.cxf.binding.soap.SoapFault;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -116,14 +116,14 @@ public class SimpleDeploymentTests {
         try {
             getDissemination(OBJECT_1_PID, SDEF_1_PID, SDEF_2_METHOD);
             fail("Should not have been able to disseminate");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
 
         try {
             getDissemination(OBJECT_1_PID, SDEF_2_PID, SDEF_1_METHOD);
             fail("Should not have been able to disseminate");
-        } catch (AxisFault e) {
+        } catch (SoapFault e) {
             /* Expected */
         }
     }

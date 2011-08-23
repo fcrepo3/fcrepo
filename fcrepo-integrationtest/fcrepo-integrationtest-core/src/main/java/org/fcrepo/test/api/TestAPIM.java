@@ -7,8 +7,6 @@ package org.fcrepo.test.api;
 import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import org.apache.axis.AxisFault;
-import org.apache.axis.types.NonNegativeInteger;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -20,6 +18,7 @@ import org.fcrepo.server.types.gen.*;
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.junit.After;
+import org.apache.cxf.binding.soap.SoapFault;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -1200,8 +1199,8 @@ public class TestAPIM
                                "adding new datastream");
             // fail if datastream was added
             Assert.fail();
-        } catch (AxisFault af) {
-            assertTrue(af.getFaultString()
+        } catch (SoapFault af) {
+            assertTrue(af.getMessage()
                     .contains("Unknown checksum algorithm specified:"));
         }
         // test adding M type datastream with unimplemented checksum type and no altIDs, should fail throwing exception
@@ -1221,8 +1220,8 @@ public class TestAPIM
                                "adding new datastream");
             // fail if datastream was added
             Assert.fail();
-        } catch (AxisFault af) {
-            assertTrue(af.getFaultString()
+        } catch (SoapFault af) {
+            assertTrue(af.getMessage()
                     .contains("Checksum algorithm not yet implemented:"));
         }
         // test adding M type datastream
@@ -1821,8 +1820,8 @@ public class TestAPIM
                                                  false);
             // fail if datastream was modified
             Assert.fail();
-        } catch (AxisFault af) {
-            assertTrue(af.getFaultString()
+        } catch (SoapFault af) {
+            assertTrue(af.getMessage()
                     .contains("Unknown checksum algorithm specified:"));
         }
         // test modifyDatastreamByValue X type datastream with unimplemented checksum type and no altIDs, should fail throwing exception
@@ -1841,8 +1840,8 @@ public class TestAPIM
                                                  false);
             // fail if datastream was modified
             Assert.fail();
-        } catch (AxisFault af) {
-            assertTrue(af.getFaultString()
+        } catch (SoapFault af) {
+            assertTrue(af.getMessage()
                     .contains("Checksum algorithm not yet implemented:"));
         }
         datastreamId =
@@ -1942,8 +1941,8 @@ public class TestAPIM
                                        "creating datastream with checksum");
             // fail if datastream was modified
             Assert.fail();
-        } catch (AxisFault af) {
-            assertTrue(af.getFaultString()
+        } catch (SoapFault af) {
+            assertTrue(af.getMessage()
                     .contains("Checksum Mismatch"));
         }
 
@@ -1963,8 +1962,8 @@ public class TestAPIM
                                                      false);
             // fail if datastream was modified
             Assert.fail();
-        } catch (AxisFault af) {
-            assertTrue(af.getFaultString()
+        } catch (SoapFault af) {
+            assertTrue(af.getMessage()
                     .contains("Checksum Mismatch"));
         }
 
@@ -2372,14 +2371,14 @@ public class TestAPIM
         assertTrue(pids[0].startsWith("dummy:"));
 
         // test null for namespace argument
-        pids = apim.getNextPID(new NonNegativeInteger("1"), null);
+        pids = apim.getNextPID(new java.math.BigInteger("1"), null);
         assertTrue(pids.length > 0);
         //System.out.println("***** Testcase: TestAPIM.testGetNextPID  nextPid(1, null): "+pids[0]);
         assertEquals(pids.length, 1);
         assertTrue(pids[0].startsWith("changeme"));
 
         // test both arguments non-null
-        pids = apim.getNextPID(new NonNegativeInteger("2"), "namespace");
+        pids = apim.getNextPID(new java.math.BigInteger("2"), "namespace");
         assertTrue(pids.length > 0);
         //System.out.println("***** Testcase: TestAPIM.testGetNextPID  nextPid(2, \"namespace\"): "+pids[0]+" , "+pids[1]);
         assertEquals(pids.length, 2);
@@ -2480,7 +2479,7 @@ public class TestAPIM
         FedoraAPIA apia = client.getAPIA();
 
         String[] resultFields = {"pid"};
-        NonNegativeInteger maxResults = new NonNegativeInteger("" + 1000);
+        java.math.BigInteger maxResults = new java.math.BigInteger("" + 1000);
         FieldSearchQuery query = new FieldSearchQuery(null, "*");
         FieldSearchResult result =
                 apia.findObjects(resultFields, maxResults, query);
