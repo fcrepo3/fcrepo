@@ -39,9 +39,10 @@ import org.junit.Test;
 
 import junit.framework.TestSuite;
 
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.Datastream;
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.types.mtom.gen.Datastream;
+import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
@@ -63,9 +64,9 @@ import static org.apache.commons.httpclient.HttpStatus.SC_OK;
 public class TestAdminAPI
         extends FedoraServerTestCase {
 
-    private FedoraAPIA apia;
+    private FedoraAPIAMTOM apia;
 
-    private FedoraAPIM apim;
+    private FedoraAPIMMTOM apim;
 
     // used for determining test configuration
     private static String authAccessProperty = "fedora.authorize.access";
@@ -200,7 +201,7 @@ public class TestAdminAPI
 
 
         // datastream contents before modification
-        byte[] before = apia.getDatastreamDissemination(pid, "DC", null).getStream();
+        byte[] before = TypeUtility.convertDataHandlerToBytes(apia.getDatastreamDissemination(pid, "DC", null).getStream());
 
         url = this.modifyDatastreamControlGroupUrl(pid, "DC", "M", false, false, false);
         res = get(true);
@@ -209,11 +210,11 @@ public class TestAdminAPI
 
         // check control group modified
         Datastream ds = apim.getDatastream(pid, "DC", null);
-        assertEquals("ControlGroup", "M", ds.getControlGroup().getValue());
+        assertEquals("ControlGroup", "M", ds.getControlGroup().value());
 
 
         // datastream contents after modification
-        byte[] after = apia.getDatastreamDissemination(pid, "DC", null).getStream();
+        byte[] after = TypeUtility.convertDataHandlerToBytes(apia.getDatastreamDissemination(pid, "DC", null).getStream());
 
         // check they are the same
         // (comparing as strings as the assertEquals is a lot easier to read...)
@@ -244,10 +245,10 @@ public class TestAdminAPI
 
         // check control groups actually modified
         ds = apim.getDatastream(pid1, "DC", null);
-        assertEquals("ControlGroup", "M", ds.getControlGroup().getValue());
+        assertEquals("ControlGroup", "M", ds.getControlGroup().value());
 
         ds = apim.getDatastream(pid2, "DC", null);
-        assertEquals("ControlGroup", "M", ds.getControlGroup().getValue());
+        assertEquals("ControlGroup", "M", ds.getControlGroup().value());
     }
 
 

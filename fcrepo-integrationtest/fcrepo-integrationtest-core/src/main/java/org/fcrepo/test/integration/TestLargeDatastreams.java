@@ -28,9 +28,10 @@ import junit.framework.JUnit4TestAdapter;
 
 import org.fcrepo.client.FedoraClient;
 
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.MIMETypedStream;
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.types.mtom.gen.MIMETypedStream;
+import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.test.FedoraTestCase;
 
@@ -50,9 +51,9 @@ public class TestLargeDatastreams
 
     private FedoraClient fedoraClient;
 
-    private FedoraAPIM apim;
+    private FedoraAPIMMTOM apim;
 
-    private FedoraAPIA apia;
+    private FedoraAPIAMTOM apia;
 
     private static final String pid = "demo:LargeDatastreams";
 
@@ -96,7 +97,7 @@ public class TestLargeDatastreams
         System.out.println("  Uploading a file of size " + fileSize + " bytes...");
         String uploadId = upload();
         System.out.println("  Creating data object...");
-        apim.ingest(DEMO_FOXML, FOXML1_1.uri, "new foxml object");
+        apim.ingest(TypeUtility.convertBytesToDataHandler(DEMO_FOXML), FOXML1_1.uri, "new foxml object");
         System.out.println("  Adding uploaded file as a datastream...");
         apim.addDatastream(pid,
                            "DS1",
@@ -197,7 +198,7 @@ public class TestLargeDatastreams
             }
         }
 
-        return fileStream.getStream().length;
+        return TypeUtility.convertDataHandlerToBytes(fileStream.getStream()).length;
     }
 
     /**
@@ -213,14 +214,17 @@ public class TestLargeDatastreams
 
     private class SizedPartSource implements PartSource {
 
+        @Override
         public InputStream createInputStream() throws IOException {
             return new SizedInputStream();
         }
 
+        @Override
         public String getFileName() {
             return "file";
         }
 
+        @Override
         public long getLength() {
             return fileSize;
         }

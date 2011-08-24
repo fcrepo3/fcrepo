@@ -24,8 +24,9 @@ import junit.framework.TestSuite;
 
 import org.fcrepo.client.FedoraClient;
 
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.test.FedoraServerTestCase;
 
@@ -79,7 +80,7 @@ public class TestOAIService
     }
 
     public void testListRecords() throws Exception {
-        FedoraAPIM apim = client.getAPIM();
+        FedoraAPIMMTOM apim = client.getAPIM();
         FileInputStream in =
                 new FileInputStream(FEDORA_HOME
                                     + "/client/demo/foxml/local-server-demos/simple-document-demo/obj_demo_31.xml");
@@ -87,7 +88,7 @@ public class TestOAIService
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         StreamUtility.pipeStream(in, out, 4096);
 
-        apim.ingest(out.toByteArray(), FOXML1_1.uri, "for testing");
+        apim.ingest(TypeUtility.convertBytesToDataHandler(out.toByteArray()), FOXML1_1.uri, "for testing");
 
         String request = "/oai?verb=ListRecords&metadataPrefix=oai_dc";
         Document result = getXMLQueryResult(request);

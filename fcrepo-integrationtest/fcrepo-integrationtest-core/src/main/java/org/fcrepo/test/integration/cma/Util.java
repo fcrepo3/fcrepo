@@ -13,7 +13,10 @@ import java.util.ArrayList;
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.utility.ingest.Ingest;
 import org.fcrepo.client.utility.ingest.IngestCounter;
+
 import org.fcrepo.server.types.gen.ObjectMethodsDef;
+import org.fcrepo.server.utilities.TypeUtility;
+
 import org.fcrepo.test.FedoraTestCase;
 
 import static org.fcrepo.common.Constants.FOXML1_1;
@@ -40,12 +43,9 @@ public abstract class Util {
                                           String pid,
                                           String sDef,
                                           String method) throws Exception {
-        return new String(client.getAPIA().getDissemination(pid,
-                                                            sDef,
-                                                            method,
-                                                            null,
-                                                            null).getStream(),
-                          "UTF-8");
+        return new String(TypeUtility.convertDataHandlerToBytes(client
+                .getAPIA().getDissemination(pid, sDef, method, null, null)
+                .getStream()), "UTF-8");
 
     }
 

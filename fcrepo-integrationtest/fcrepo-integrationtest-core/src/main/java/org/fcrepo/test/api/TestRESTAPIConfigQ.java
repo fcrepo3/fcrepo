@@ -6,7 +6,7 @@ package org.fcrepo.test.api;
 
 import org.fcrepo.common.PID;
 
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 
 import org.fcrepo.test.FedoraServerTestCase;
 
@@ -28,7 +28,7 @@ import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
 public class TestRESTAPIConfigQ
         extends FedoraServerTestCase {
 
-    private FedoraAPIM apim;
+    private FedoraAPIMMTOM apim;
 
     private static String DEMO_FOXML;
 

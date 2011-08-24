@@ -11,18 +11,18 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.fcrepo.client.FedoraClient;
-import org.fcrepo.server.access.FedoraAPIA;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.types.gen.ObjectMethodsDef;
+
 import org.fcrepo.test.FedoraServerTestCase;
-
-
-
-import static org.fcrepo.test.integration.cma.Util.filterMethods;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
+
+import static org.fcrepo.test.integration.cma.Util.filterMethods;
 
 
 public class SimpleDeploymentTests {
@@ -68,10 +68,10 @@ public class SimpleDeploymentTests {
     /* Assure that listMethods works as advertised */
     @Test
     public void testListMethods() throws Exception {
-        FedoraAPIA apia = m_client.getAPIA();
+        FedoraAPIAMTOM apia = m_client.getAPIA();
         ObjectMethodsDef[] methods;
 
-        methods = filterMethods(apia.listMethods(OBJECT_1_PID, null));
+        methods = filterMethods(apia.listMethods(OBJECT_1_PID, null).toArray(new ObjectMethodsDef[0]));
 
         assertEquals("Wrong number of methods", 2, methods.length);
         assertNotSame("SDeps are not distinct", methods[0]

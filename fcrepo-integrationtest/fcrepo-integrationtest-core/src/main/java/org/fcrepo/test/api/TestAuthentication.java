@@ -20,8 +20,8 @@ import junit.framework.TestSuite;
 
 import org.fcrepo.client.FedoraClient;
 
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 
 import org.fcrepo.test.FedoraServerTestCase;
 import org.fcrepo.test.OneEmptyObjectTestSetup;
@@ -264,7 +264,7 @@ public class TestAuthentication
         System.out.println("Modifying object label via API-M SOAP " + numTimes
                 + " times...");
         int failCount = 0;
-        FedoraAPIM apim = null;
+        FedoraAPIMMTOM apim = null;
         for (int i = 0; i < numTimes; i++) {
             try {
                 if (apim == null) {
@@ -303,7 +303,7 @@ public class TestAuthentication
         System.out.println("Listing object datastreams via API-A SOAP "
                 + numTimes + " times...");
         int failCount = 0;
-        FedoraAPIA apia = null;
+        FedoraAPIAMTOM apia = null;
         for (int i = 0; i < numTimes; i++) {
             try {
                 if (apia == null) {

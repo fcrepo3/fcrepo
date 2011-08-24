@@ -5,15 +5,19 @@
 
 package org.fcrepo.test.api;
 
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.types.gen.MIMETypedStream;
-import org.fcrepo.server.types.gen.Property;
-import org.fcrepo.test.DemoObjectTestSetup;
-import org.fcrepo.test.FedoraServerTestCase;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import org.fcrepo.client.FedoraClient;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.types.mtom.gen.GetDissemination.Parameters;
+import org.fcrepo.server.types.mtom.gen.MIMETypedStream;
+import org.fcrepo.server.types.mtom.gen.Property;
+import org.fcrepo.server.utilities.TypeUtility;
+
+import org.fcrepo.test.DemoObjectTestSetup;
+import org.fcrepo.test.FedoraServerTestCase;
 
 
 
@@ -26,7 +30,7 @@ import junit.framework.TestSuite;
 public class TestAPIAConfigA
         extends FedoraServerTestCase {
 
-    private FedoraAPIA apia;
+    private FedoraAPIAMTOM apia;
 
     public static Test suite() {
         TestSuite suite = new TestSuite("APIAConfigA TestSuite");
@@ -38,14 +42,16 @@ public class TestAPIAConfigA
         // test chained dissemination using local services
         // The object contains an E datastream that is a dissemination of the local SAXON service.
         // This datastream is input to another dissemination that uses the local FOP service.
+        Parameters params = new Parameters();
+        params.getParameter().add(new Property());
         MIMETypedStream diss =
                 apia.getDissemination("demo:26",
                                       "demo:19",
                                       "getPDF",
-                                      new Property[0],
+                                      params,
                                       null);
         assertEquals(diss.getMIMEType(), "application/pdf");
-        assertTrue(diss.getStream().length > 0);
+        assertTrue(TypeUtility.convertDataHandlerToBytes(diss.getStream()).length > 0);
     }
 
     @Override

@@ -98,6 +98,7 @@ public class PEP
     public PEP()
             throws PEPException {
         super();
+        logger.warn("feslAuthZ = " + feslAuthZ);
         if (feslAuthZ) {
             loadHandlers();
             ctxHandler = ContextHandlerImpl.getInstance();

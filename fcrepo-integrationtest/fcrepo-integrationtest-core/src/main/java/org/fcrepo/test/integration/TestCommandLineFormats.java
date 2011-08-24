@@ -35,7 +35,8 @@ import org.fcrepo.client.utility.ingest.Ingest;
 
 import org.fcrepo.common.PID;
 
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.test.FedoraTestCase;
 import org.fcrepo.test.api.TestAPIM;
@@ -51,7 +52,7 @@ import org.fcrepo.utilities.FileUtils;
 public class TestCommandLineFormats
         extends FedoraTestCase {
 
-    private FedoraAPIM apim;
+    private FedoraAPIMMTOM apim;
 
     @Override
     public void setUp() throws Exception {
@@ -87,7 +88,7 @@ public class TestCommandLineFormats
         foxml10.delete();
 
         try {
-            byte[] objectXML = apim.getObjectXML("demo:997");
+            byte[] objectXML = TypeUtility.convertDataHandlerToBytes(apim.getObjectXML("demo:997"));
             assertTrue(objectXML.length > 0);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:997']", xmlIn);
@@ -121,7 +122,7 @@ public class TestCommandLineFormats
         foxml11.delete();
 
         try {
-            byte[] objectXML = apim.getObjectXML("demo:998");
+            byte[] objectXML = TypeUtility.convertDataHandlerToBytes(apim.getObjectXML("demo:998"));
             assertTrue(objectXML.length > 0);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:998']", xmlIn);
@@ -155,7 +156,7 @@ public class TestCommandLineFormats
         mets.delete();
 
         try {
-            byte[] objectXML = apim.getObjectXML("demo:999");
+            byte[] objectXML = TypeUtility.convertDataHandlerToBytes(apim.getObjectXML("demo:999"));
             assertTrue(objectXML.length > 0);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:999']", xmlIn);
@@ -189,7 +190,7 @@ public class TestCommandLineFormats
         mets.delete();
 
         try {
-            byte[] objectXML = apim.getObjectXML("demo:999b");
+            byte[] objectXML = TypeUtility.convertDataHandlerToBytes(apim.getObjectXML("demo:999b"));
             assertTrue(objectXML.length > 0);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:999b']", xmlIn);
@@ -223,7 +224,7 @@ public class TestCommandLineFormats
         atom.delete();
 
         try {
-            byte[] objectXML = apim.getObjectXML("demo:1000");
+            byte[] objectXML = TypeUtility.convertDataHandlerToBytes(apim.getObjectXML("demo:1000"));
             assertTrue(objectXML.length > 0);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:1000']", xmlIn);
@@ -257,7 +258,7 @@ public class TestCommandLineFormats
         atom.delete();
 
         try {
-            byte[] objectXML = apim.getObjectXML("demo:1001");
+            byte[] objectXML = TypeUtility.convertDataHandlerToBytes(apim.getObjectXML("demo:1001"));
             assertTrue(objectXML.length > 0);
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:1001']", xmlIn);
@@ -277,7 +278,7 @@ public class TestCommandLineFormats
     @Test
     public void testExportFOXML10() throws Exception {
         System.out.println("Testing Export in FOXML 1.0 format");
-        apim.ingest(TestAPIM.demo998FOXMLObjectXML, FOXML1_1.uri, "Ingest for test");
+        apim.ingest(TypeUtility.convertBytesToDataHandler(TestAPIM.demo998FOXMLObjectXML), FOXML1_1.uri, "Ingest for test");
 
         try {
             File temp = File.createTempFile("temp", "");
@@ -312,7 +313,7 @@ public class TestCommandLineFormats
     @Test
     public void testExportFOXML11() throws Exception {
         System.out.println("Testing Export in FOXML 1.1 format");
-        apim.ingest(TestAPIM.demo998FOXMLObjectXML, FOXML1_1.uri, "Ingest for test");
+        apim.ingest(TypeUtility.convertBytesToDataHandler(TestAPIM.demo998FOXMLObjectXML), FOXML1_1.uri, "Ingest for test");
 
         try {
             File temp = File.createTempFile("temp", "");
@@ -347,7 +348,7 @@ public class TestCommandLineFormats
     @Test
     public void testExportMETS11() throws Exception {
         System.out.println("Testing Export in METS 1.1 format");
-        apim.ingest(TestAPIM.demo998FOXMLObjectXML, FOXML1_1.uri, "Ingest for test");
+        apim.ingest(TypeUtility.convertBytesToDataHandler(TestAPIM.demo998FOXMLObjectXML), FOXML1_1.uri, "Ingest for test");
 
         try {
             File temp = File.createTempFile("temp", "");
@@ -376,7 +377,7 @@ public class TestCommandLineFormats
     @Test
     public void testExportMETS10() throws Exception {
         System.out.println("Testing Export in METS 1.0 format");
-        apim.ingest(TestAPIM.demo998FOXMLObjectXML, FOXML1_1.uri, "Ingest for test");
+        apim.ingest(TypeUtility.convertBytesToDataHandler(TestAPIM.demo998FOXMLObjectXML), FOXML1_1.uri, "Ingest for test");
 
         try {
             File temp = File.createTempFile("temp", "");
@@ -405,7 +406,7 @@ public class TestCommandLineFormats
     @Test
     public void testExportATOM() throws Exception {
         System.out.println("Testing Export in ATOM format");
-        apim.ingest(TestAPIM.demo998FOXMLObjectXML, FOXML1_1.uri, "Ingest for test");
+        apim.ingest(TypeUtility.convertBytesToDataHandler(TestAPIM.demo998FOXMLObjectXML), FOXML1_1.uri, "Ingest for test");
 
         try {
             File temp = File.createTempFile("temp", "");
@@ -437,7 +438,7 @@ public class TestCommandLineFormats
 
     public void testExportATOM_ZIP() throws Exception {
         System.out.println("Testing Export in ATOM_ZIP format");
-        apim.ingest(TestAPIM.demo998FOXMLObjectXML, FOXML1_1.uri, "Ingest for test");
+        apim.ingest(TypeUtility.convertBytesToDataHandler(TestAPIM.demo998FOXMLObjectXML), FOXML1_1.uri, "Ingest for test");
 
         try {
             File temp = File.createTempFile("temp", "");

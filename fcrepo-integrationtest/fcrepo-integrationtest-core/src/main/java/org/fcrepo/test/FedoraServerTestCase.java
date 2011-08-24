@@ -24,7 +24,7 @@ import org.fcrepo.client.utility.ingest.IngestCounter;
 
 import org.fcrepo.common.Constants;
 
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 
 
 /**
@@ -163,7 +163,7 @@ public abstract class FedoraServerTestCase
 
     public static void purgeDemoObjects() throws Exception {
         FedoraClient client = getFedoraClient();
-        FedoraAPIM apim = client.getAPIM();
+        FedoraAPIMMTOM apim = client.getAPIM();
 
         for (String pid : getDemoObjects()) {
             AutoPurger.purge(apim, pid, null);

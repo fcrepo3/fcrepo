@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.fcrepo.client.FedoraClient;
 
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.test.FedoraTestCase;
 import org.fcrepo.test.api.RISearchUtil;
@@ -62,7 +63,7 @@ public class TestMisplacedNamespace
     public void testIngestAndPurge() throws Exception {
         try {
             /* Ingest of the offending foxml should fail */
-            m_client.getAPIM().ingest(getFoxml(OFFENDING_FOXML),
+            m_client.getAPIM().ingest(TypeUtility.convertBytesToDataHandler(getFoxml(OFFENDING_FOXML)),
                                       FOXML1_1.uri,
                                       "malformed foxml object");
             fail("Sould have failed initial ingest!");
@@ -73,7 +74,7 @@ public class TestMisplacedNamespace
         }
 
         /* Ingest the good object. Should succeed */
-        m_client.getAPIM().ingest(getFoxml(GOOD_FOXML),
+        m_client.getAPIM().ingest(TypeUtility.convertBytesToDataHandler(getFoxml(GOOD_FOXML)),
                                   FOXML1_1.uri,
                                   "non-malformed foxml object");
     }

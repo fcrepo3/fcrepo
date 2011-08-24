@@ -23,12 +23,13 @@ import junit.framework.TestSuite;
 
 import org.fcrepo.client.FedoraClient;
 
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
 import org.fcrepo.server.types.gen.Property;
 import org.fcrepo.server.utilities.ServerUtility;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
@@ -127,7 +128,7 @@ public class TestXACMLPolicies
     }
 
     private boolean canWrite(FedoraClient client, String pid) throws Exception {
-        FedoraAPIM apim = client.getAPIM();
+        FedoraAPIMMTOM apim = client.getAPIM();
         try {
             apim.modifyObject(pid, null, null, null, "log message");
             return true;
@@ -441,7 +442,7 @@ public class TestXACMLPolicies
             System.out.println("Testing " + functionToTest
                     + " from invalid user: " + username);
 
-            FedoraAPIM apim1 = user.getAPIM();
+            FedoraAPIMMTOM apim1 = user.getAPIM();
             Method func = apim1.getClass().getMethod(functionToTest, args);
             Object result = func.invoke(apim1, parms);
             fail("Illegal access allowed");
@@ -451,9 +452,9 @@ public class TestXACMLPolicies
                 org.apache.cxf.binding.soap.SoapFault af =
                         (org.apache.cxf.binding.soap.SoapFault) cause;
                 System.out.println("    Reason = "
-                        + af.getFaultReason().substring(af.getFaultReason()
+                        + af.getReason().substring(af.getReason()
                                 .lastIndexOf(".") + 1));
-                assertTrue(af.getFaultReason().contains("AuthzDeniedException"));
+                assertTrue(af.getMessage().contains("AuthzDeniedException"));
                 System.out.println("Access denied correctly");
             } else {
                 System.out.println("Got exception: "
@@ -509,7 +510,7 @@ public class TestXACMLPolicies
             // testuser1 does have permission to access demo:5 datastreams, so this should succeed
             System.out.println("Testing " + functionToTest
                     + " from valid user: " + username);
-            FedoraAPIM apim1 = user.getAPIM();
+            FedoraAPIMMTOM apim1 = user.getAPIM();
             Method func = apim1.getClass().getMethod(functionToTest, args);
             Object result = func.invoke(apim1, parms);
             assertTrue(result != null);
@@ -520,7 +521,7 @@ public class TestXACMLPolicies
                 org.apache.cxf.binding.soap.SoapFault af =
                         (org.apache.cxf.binding.soap.SoapFault) cause;
                 System.out.println("Got exception: " + af.getClass().getName());
-                System.out.println("Reason = " + af.getFaultReason());
+                System.out.println("Reason = " + af.getReason());
                 System.out.println("Message = " + af.getMessage());
                 fail("Legal access dis-allowed");
             } else {
@@ -546,7 +547,7 @@ public class TestXACMLPolicies
             System.out.println("Testing " + functionToTest
                     + " from invalid user: " + username);
 
-            FedoraAPIA apia1 = user.getAPIA();
+            FedoraAPIAMTOM apia1 = user.getAPIA();
             Method func = apia1.getClass().getMethod(functionToTest, args);
             Object result = func.invoke(apia1, parms);
             fail("Illegal access allowed");
@@ -556,9 +557,9 @@ public class TestXACMLPolicies
                 org.apache.cxf.binding.soap.SoapFault af =
                         (org.apache.cxf.binding.soap.SoapFault) cause;
                 System.out.println("    Reason = "
-                        + af.getFaultReason().substring(af.getFaultReason()
+                        + af.getReason().substring(af.getReason()
                                 .lastIndexOf(".") + 1));
-                assertTrue(af.getFaultReason().contains("AuthzDeniedException"));
+                assertTrue(af.getReason().contains("AuthzDeniedException"));
                 System.out.println("Access denied correctly");
             } else {
                 System.out.println("Got exception: "
@@ -589,7 +590,7 @@ public class TestXACMLPolicies
             // testuser1 does have permission to access demo:5 datastreams, so this should succeed
             System.out.println("Testing " + functionToTest
                     + " from valid user: " + username);
-            FedoraAPIA apia1 = user.getAPIA();
+            FedoraAPIAMTOM apia1 = user.getAPIA();
             Method func = apia1.getClass().getMethod(functionToTest, args);
             Object result = func.invoke(apia1, parms);
             assertTrue(result != null);
@@ -601,7 +602,7 @@ public class TestXACMLPolicies
                 org.apache.cxf.binding.soap.SoapFault af =
                         (org.apache.cxf.binding.soap.SoapFault) cause;
                 System.out.println("Got exception: " + af.getClass().getName());
-                System.out.println("Reason = " + af.getFaultReason());
+                System.out.println("Reason = " + af.getReason());
                 System.out.println("Message = " + af.getMessage());
                 fail("Legal access dis-allowed");
             } else {
@@ -680,6 +681,7 @@ public class TestXACMLPolicies
     private File[] getFilesInDir(File dir) {
         File srcFiles[] = dir.listFiles(new java.io.FilenameFilter() {
 
+            @Override
             public boolean accept(File dir, String name) {
                 if ((name.toLowerCase().startsWith("permit") || name
                         .toLowerCase().startsWith("deny"))
@@ -940,7 +942,7 @@ public class TestXACMLPolicies
             xml.append("    </foxml:datastreamVersion>");
             xml.append("  </foxml:datastream>");
             xml.append("</foxml:digitalObject>");
-            admin.getAPIM().ingest(xml.toString().getBytes("UTF-8"),
+            admin.getAPIM().ingest(TypeUtility.convertBytesToDataHandler(xml.toString().getBytes("UTF-8")),
                                    FOXML1_1.uri,
                                    "");
         } catch (Exception e) {
@@ -1004,7 +1006,7 @@ public class TestXACMLPolicies
                 xml.append("</foxml:datastream>");
             }
             xml.append("</foxml:digitalObject>");
-            admin.getAPIM().ingest(xml.toString().getBytes("UTF-8"),
+            admin.getAPIM().ingest(TypeUtility.convertBytesToDataHandler(xml.toString().getBytes("UTF-8")),
                                    FOXML1_1.uri,
                                    "");
         } catch (Exception e) {

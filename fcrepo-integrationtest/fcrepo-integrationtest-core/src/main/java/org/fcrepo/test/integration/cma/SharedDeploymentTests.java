@@ -12,18 +12,18 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import org.fcrepo.client.FedoraClient;
-import org.fcrepo.server.access.FedoraAPIA;
+
+import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.types.gen.ObjectMethodsDef;
+
 import org.fcrepo.test.FedoraServerTestCase;
-
-
-
-import static org.fcrepo.test.integration.cma.Util.filterMethods;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
+
+import static org.fcrepo.test.integration.cma.Util.filterMethods;
 
 
 /**
@@ -103,10 +103,10 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods1() throws Exception {
-        FedoraAPIA apia = m_client.getAPIA();
+        FedoraAPIAMTOM apia = m_client.getAPIA();
         ObjectMethodsDef[] methods;
 
-        methods = filterMethods(apia.listMethods(OBJECT_1_PID, null));
+        methods = filterMethods(apia.listMethods(OBJECT_1_PID, null).toArray(new ObjectMethodsDef[0]));
 
         assertEquals("Wrong number of methods", 1, methods.length);
         assertEquals("Wrong method SDep", SDEF_1_PID, methods[0]
@@ -116,10 +116,10 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods2() throws Exception {
-        FedoraAPIA apia = m_client.getAPIA();
+        FedoraAPIAMTOM apia = m_client.getAPIA();
         ObjectMethodsDef[] methods;
 
-        methods = filterMethods(apia.listMethods(OBJECT_2_PID, null));
+        methods = filterMethods(apia.listMethods(OBJECT_2_PID, null).toArray(new ObjectMethodsDef[0]));
 
         assertEquals("Wrong number of methods!", 1, methods.length);
         assertEquals("Wrong method SDef!", SDEF_2_PID, methods[0]
@@ -129,10 +129,10 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods1_2() throws Exception {
-        FedoraAPIA apia = m_client.getAPIA();
+        FedoraAPIAMTOM apia = m_client.getAPIA();
         ObjectMethodsDef[] methods;
 
-        methods = filterMethods(apia.listMethods(OBJECT_1_2_PID, null));
+        methods = filterMethods(apia.listMethods(OBJECT_1_2_PID, null).toArray(new ObjectMethodsDef[0]));
         assertEquals("Too many methods!", 2, methods.length);
         assertNotSame("SDefs are duplicated", methods[0]
                 .getServiceDefinitionPID(), methods[1]
@@ -144,10 +144,10 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods3() throws Exception {
-        FedoraAPIA apia = m_client.getAPIA();
+        FedoraAPIAMTOM apia = m_client.getAPIA();
         ObjectMethodsDef[] methods;
 
-        methods = filterMethods(apia.listMethods(OBJECT_3_PID, null));
+        methods = filterMethods(apia.listMethods(OBJECT_3_PID, null).toArray(new ObjectMethodsDef[0]));
         assertEquals("Too many methods!", 2, methods.length);
         assertNotSame("SDefs are duplicated", methods[0]
                 .getServiceDefinitionPID(), methods[1]
@@ -159,10 +159,10 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods4() throws Exception {
-        FedoraAPIA apia = m_client.getAPIA();
+        FedoraAPIAMTOM apia = m_client.getAPIA();
         ObjectMethodsDef[] methods;
 
-        methods = filterMethods(apia.listMethods(OBJECT_4_PID, null));
+        methods = filterMethods(apia.listMethods(OBJECT_4_PID, null).toArray(new ObjectMethodsDef[0]));
         assertEquals("Too many methods!", 3, methods.length);
         assertNotSame("SDefs are duplicated", methods[0]
                 .getServiceDefinitionPID(), methods[1]

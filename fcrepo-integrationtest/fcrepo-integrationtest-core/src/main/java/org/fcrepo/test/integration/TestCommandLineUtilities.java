@@ -15,7 +15,7 @@ import org.fcrepo.client.FedoraClient;
 
 import org.fcrepo.common.Constants;
 
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
@@ -288,6 +288,7 @@ public class TestCommandLineUtilities
         //      assertEquals(testDir.isDirectory(), true);
         File testFiles[] = testDir.listFiles(new java.io.FilenameFilter() {
 
+            @Override
             public boolean accept(File dir, String name) {
                 if ((name.toLowerCase().startsWith("permit") || name
                         .toLowerCase().startsWith("deny"))
@@ -346,13 +347,13 @@ public class TestCommandLineUtilities
     }
 
     private static void purgeFast(String[] pids) throws Exception {
-        FedoraAPIM apim = getAPIM();
+        FedoraAPIMMTOM apim = getAPIM();
         for (String element : pids) {
             apim.purgeObject(element, "because", false);
         }
     }
 
-    private static FedoraAPIM getAPIM() throws Exception {
+    private static FedoraAPIMMTOM getAPIM() throws Exception {
         String baseURL =
                 getProtocol() + "://" + getHost() + ":" + getPort() + "/"
                         + getFedoraAppServerContext();

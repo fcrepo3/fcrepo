@@ -12,9 +12,10 @@ import org.fcrepo.client.FedoraClient;
 
 import org.fcrepo.common.Constants;
 
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.server.utilities.TypeUtility;
 
 /**
  * Utilities for managing FeSL policies Used to add and delete policies
@@ -25,7 +26,7 @@ import org.fcrepo.server.utilities.StreamUtility;
 public class PolicyUtils
         implements Constants {
 
-    FedoraAPIM apim = null;
+    FedoraAPIMMTOM apim = null;
 
     private static final String RESOURCEBASE =
             System.getProperty("fcrepo-integrationtest-core.classes") != null ? System
@@ -95,7 +96,7 @@ public class PolicyUtils
 
         foxml.append("</foxml:digitalObject>");
 
-        apim.ingest(foxml.toString().getBytes("UTF-8"),
+        apim.ingest(TypeUtility.convertBytesToDataHandler(foxml.toString().getBytes("UTF-8")),
                     FOXML1_1.uri,
                     "ingesting new foxml object");
 

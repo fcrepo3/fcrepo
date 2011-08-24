@@ -7,6 +7,7 @@ package org.fcrepo.test.api;
 
 import java.io.UnsupportedEncodingException;
 
+import java.util.List;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -27,7 +28,8 @@ import junit.framework.TestSuite;
 
 import org.fcrepo.common.PID;
 
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
@@ -43,7 +45,7 @@ public class TestManagementNotifications
         extends FedoraServerTestCase
         implements MessageListener {
 
-    private FedoraAPIM apim;
+    private FedoraAPIMMTOM apim;
     private TextMessage currentMessage;
     private int messageCount = 0; // The number of messages that have been received
     private int messageNumber = 0; // The number of the next message to be processed
@@ -151,7 +153,7 @@ public class TestManagementNotifications
         // (1) test ingest
         System.out.println("Running TestManagementNotifications.testIngest...");
         String pid =
-                apim.ingest(demo998FOXMLObjectXML,
+                apim.ingest(TypeUtility.convertBytesToDataHandler(demo998FOXMLObjectXML),
                             FOXML1_1.uri,
                             "ingesting new foxml object");
         assertNotNull(pid);
@@ -284,7 +286,7 @@ public class TestManagementNotifications
         String datastreamId =
                 apim.addDatastream(pid,
                                    "NEWDS1",
-                                   altIds,
+                                   TypeUtility.convertStringtoAOS(altIds),
                                    "A New M-type Datastream",
                                    true,
                                    "text/xml",
@@ -305,7 +307,7 @@ public class TestManagementNotifications
         datastreamId =
                 apim.addDatastream(pid,
                                    "NEWDS2",
-                                   altIds,
+                                   TypeUtility.convertStringtoAOS(altIds),
                                    "A New X-type Datastream",
                                    true,
                                    "text/xml",
@@ -328,7 +330,7 @@ public class TestManagementNotifications
         String updateTimestamp =
                 apim.modifyDatastreamByReference(pid,
                                                  "NEWDS1",
-                                                 altIds,
+                                                 TypeUtility.convertStringtoAOS(altIds),
                                                  "Modified Datastream by Reference",
                                                  "text/xml",
                                                  "info:newMyFormatURI/Mtype/stuff#junk",
@@ -348,11 +350,11 @@ public class TestManagementNotifications
         updateTimestamp =
                 apim.modifyDatastreamByValue(pid,
                                              "NEWDS2",
-                                             altIds,
+                                             TypeUtility.convertStringtoAOS(altIds),
                                              "Modified Datastream by Value",
                                              "text/xml",
                                              "info:newMyFormatURI/Xtype/stuff#junk",
-                                             dsXML,
+                                             TypeUtility.convertBytesToDataHandler(dsXML),
                                              null,
                                              null,
                                              "modified datastream",
@@ -390,14 +392,14 @@ public class TestManagementNotifications
         // (5) test purgeDatastream
         System.out.println("Running TestManagementNotifications.testPurgeDatastream...");
 
-        String[] results =
+        List<String> results =
                 apim.purgeDatastream(pid,
                                      "NEWDS1",
                                      null,
                                      null,
                                      "purging datastream NEWDS1",
                                      false);
-        assertTrue(results.length > 0);
+        assertTrue(results.size() > 0);
 
         // Check on the notification produced by purgeDatastream
         checkNotification(pid, "purgeDatastream");
@@ -409,7 +411,7 @@ public class TestManagementNotifications
                                      null,
                                      "purging datastream NEWDS2",
                                      false);
-        assertTrue(results.length > 0);
+        assertTrue(results.size() > 0);
 
         // Check on the notification produced by purgeDatastream
         checkNotification(pid, "purgeDatastream");
@@ -425,7 +427,7 @@ public class TestManagementNotifications
 
         // Ingest - message should be delivered
         String pid =
-                apim.ingest(demo998FOXMLObjectXML,
+                apim.ingest(TypeUtility.convertBytesToDataHandler(demo998FOXMLObjectXML),
                             FOXML1_1.uri,
                             "ingesting new foxml object");
         assertNotNull(pid);
@@ -513,6 +515,7 @@ public class TestManagementNotifications
      * <p/>
      * {@inheritDoc}
      */
+    @Override
     public void onMessage(Message msg) {
         if (msg instanceof TextMessage) {
             currentMessage = (TextMessage) msg;

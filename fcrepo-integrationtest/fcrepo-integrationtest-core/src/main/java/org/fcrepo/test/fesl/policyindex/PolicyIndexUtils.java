@@ -9,16 +9,17 @@ import java.rmi.RemoteException;
 
 import org.fcrepo.common.Constants;
 
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.server.utilities.TypeUtility;
 
 
 public class PolicyIndexUtils implements Constants {
 
-    private FedoraAPIM m_apim = null;
+    private FedoraAPIMMTOM m_apim = null;
 
-    public PolicyIndexUtils(FedoraAPIM apim) {
+    public PolicyIndexUtils(FedoraAPIMMTOM apim) {
         m_apim = apim;
     }
 
@@ -28,7 +29,7 @@ public class PolicyIndexUtils implements Constants {
 
         byte[] object = getPolicyObject(policy, objectState, datastreamState, pid);
 
-        m_apim.ingest(object, FOXML1_1.uri,
+        m_apim.ingest(TypeUtility.convertBytesToDataHandler(object), FOXML1_1.uri,
                     "ingesting new foxml object");
 
         return pid;
@@ -36,7 +37,7 @@ public class PolicyIndexUtils implements Constants {
 
     public String[] getNextPids(int pidCount) throws RemoteException {
 
-        return m_apim.getNextPID(new java.math.BigInteger(Integer.toString(pidCount)), "demo");
+        return m_apim.getNextPID(new java.math.BigInteger(Integer.toString(pidCount)), "demo").toArray(new String[0]);
 
     }
 

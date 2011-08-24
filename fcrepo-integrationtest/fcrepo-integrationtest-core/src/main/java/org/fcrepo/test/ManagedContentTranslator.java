@@ -29,7 +29,8 @@ import org.w3c.dom.NodeList;
 
 import org.fcrepo.common.Constants;
 
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.utilities.Base64;
 import org.fcrepo.utilities.NamespaceContextImpl;
@@ -76,15 +77,15 @@ public class ManagedContentTranslator {
      * @param newPid - PID for new managed content object
      * @throws Exception
      */
-    public static void createManagedClone(FedoraAPIM apim, String pidToClone, String newPid) throws Exception {
+    public static void createManagedClone(FedoraAPIMMTOM apim, String pidToClone, String newPid) throws Exception {
         // get the existing object
-        ByteArrayInputStream existingFoxml = new ByteArrayInputStream(apim.export(pidToClone, Constants.FOXML1_1.uri, "archive"));
+        ByteArrayInputStream existingFoxml = new ByteArrayInputStream(TypeUtility.convertDataHandlerToBytes(apim.export(pidToClone, Constants.FOXML1_1.uri, "archive")));
 
         // do the translation
         byte[] newFoxml = translate(existingFoxml, newPid);
 
         // and ingest it
-        apim.ingest(newFoxml, Constants.FOXML1_1.uri, "Creating managed content version of " + pidToClone);
+        apim.ingest(TypeUtility.convertBytesToDataHandler(newFoxml), Constants.FOXML1_1.uri, "Creating managed content version of " + pidToClone);
     }
 
 

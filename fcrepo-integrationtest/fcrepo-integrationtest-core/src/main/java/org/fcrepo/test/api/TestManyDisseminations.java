@@ -21,7 +21,8 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
 
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.test.FedoraServerTestCase;
 
@@ -51,7 +52,7 @@ public class TestManyDisseminations
 
     private static final FedoraClient CLIENT;
 
-    private static final FedoraAPIM APIM;
+    private static final FedoraAPIMMTOM APIM;
 
     private static final String BASE_URL;
 
@@ -168,10 +169,10 @@ public class TestManyDisseminations
 
         @Override
         public void setUp() throws Exception {
-            APIM.ingest(getCModelObject(), FOXML_FORMAT, "");
-            APIM.ingest(getSDefObject(), FOXML_FORMAT, "");
-            APIM.ingest(getSDepObject(), FOXML_FORMAT, "");
-            APIM.ingest(getDataObject(), FOXML_FORMAT, "");
+            APIM.ingest(TypeUtility.convertBytesToDataHandler(getCModelObject()), FOXML_FORMAT, "");
+            APIM.ingest(TypeUtility.convertBytesToDataHandler(getSDefObject()), FOXML_FORMAT, "");
+            APIM.ingest(TypeUtility.convertBytesToDataHandler(getSDepObject()), FOXML_FORMAT, "");
+            APIM.ingest(TypeUtility.convertBytesToDataHandler(getDataObject()), FOXML_FORMAT, "");
         }
 
         @Override

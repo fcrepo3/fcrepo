@@ -23,17 +23,18 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.fcrepo.client.FedoraClient;
-
 import junit.framework.JUnit4TestAdapter;
+
+import org.fcrepo.client.FedoraClient;
 
 import org.fcrepo.common.Constants;
 
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
 import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
-import org.fcrepo.server.types.gen.Datastream;
+import org.fcrepo.server.types.mtom.gen.Datastream;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.test.FedoraServerTestCase;
 import org.fcrepo.test.fesl.util.AuthorizationDeniedException;
@@ -77,7 +78,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
     // nb, for testing access, don't initiate with fedora admin credentials
     private static HttpUtils httpUtils = null;
 
-    private FedoraAPIM apim = null;
+    private FedoraAPIMMTOM apim = null;
 
     private PolicyIndexUtils policyIndexUtils = null;
 
@@ -121,7 +122,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
             httpUtils = new HttpUtils(getBaseURL(), "testuser", "testuser");
 
             FedoraClient client = getFedoraClient();
-            assertNotNull("FedoraTestCase.getFedoraClient() returned NULL", client); 
+            assertNotNull("FedoraTestCase.getFedoraClient() returned NULL", client);
             apim = client.getAPIM();
 
             policyIndexUtils = new PolicyIndexUtils(apim);
@@ -507,7 +508,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
 
         // modify by value to invalid XACML, ignore errors
         try {
-            apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null, "<not><valid/></not>".getBytes("UTF-8"), null, null, "modify to policy B", false);
+            apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null, TypeUtility.convertBytesToDataHandler("<not><valid/></not>".getBytes("UTF-8")), null, null, "modify to policy B", false);
             Assert.fail("FeSL policy datastream validation failure - should have rejected update and thrown an exception");
         } catch (Exception e) {
             System.out.println("Expected error occurred from invalid XACML - " + e.getMessage());
@@ -517,7 +518,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
 
         // modify by value to policy B
-        apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null,  PolicyIndexUtils.getPolicy("B").getBytes("UTF-8"), null, null, "modify to policy B", false);
+        apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null,  TypeUtility.convertBytesToDataHandler(PolicyIndexUtils.getPolicy("B").getBytes("UTF-8")), null, null, "modify to policy B", false);
 
         // check policy B in force
         assertTrue("authorization \"B\" DENIED, expected PERMITTED",checkPolicyEnforcement("B"));
@@ -526,7 +527,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         assertFalse(checkPolicyEnforcement("A"));
 
         // modify by value to policy A (needed for version purge test, or will revert back to the invalid version pending FCREPO-770)
-        apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null,  PolicyIndexUtils.getPolicy("A").getBytes("UTF-8"), null, null, "modify to policy B", false);
+        apim.modifyDatastreamByValue(pid, POLICY_DATASTREAM, null, "policy datastream", "text/xml", null,  TypeUtility.convertBytesToDataHandler(PolicyIndexUtils.getPolicy("A").getBytes("UTF-8")), null, null, "modify to policy B", false);
         // check
         assertTrue("authorization \"A\" DENIED, expected PERMITTED",checkPolicyEnforcement("A"));
         assertFalse(checkPolicyEnforcement("B"));

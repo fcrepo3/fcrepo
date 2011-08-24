@@ -9,7 +9,8 @@ import junit.framework.Test;
 
 import org.fcrepo.common.Constants;
 
-import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.utilities.TypeUtility;
 
 
 public class OneEmptyObjectTestSetup
@@ -18,7 +19,7 @@ public class OneEmptyObjectTestSetup
 
     private final String m_pid;
 
-    private FedoraAPIM m_apim;
+    private FedoraAPIMMTOM m_apim;
 
     public OneEmptyObjectTestSetup(Test test, String pid) {
         super(test);
@@ -47,7 +48,7 @@ public class OneEmptyObjectTestSetup
     public void setUp() throws Exception {
         System.out.println("Ingesting test object: " + m_pid);
         m_apim = FedoraTestCase.getFedoraClient().getAPIM();
-        m_apim.ingest(getTestObjectBytes(m_pid), FOXML1_1.uri, "");
+        m_apim.ingest(TypeUtility.convertBytesToDataHandler(getTestObjectBytes(m_pid)), FOXML1_1.uri, "");
     }
 
     @Override
