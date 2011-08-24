@@ -190,15 +190,6 @@ public class BasicDigitalObject
     }
 
     private void add(Datastream d) {
-
-        /*
-         * We determine the most recent datastream version by its created date.
-         * If a created date has not been supplied, give it one.
-         */
-        if (d.DSCreateDT == null) {
-            d.DSCreateDT = new Date();
-        }
-
         String id = d.DatastreamID;
         if (!m_datastreams.containsKey(id)) {
             m_datastreams.put(id, new ArrayList<Datastream>());
@@ -451,6 +442,10 @@ public class BasicDigitalObject
         Datastream latestRels = relsDatastreamVersions.get(0);
 
         for (Datastream v : relsDatastreamVersions) {
+           	if (v.DSCreateDT == null){
+           		latestRels = v;
+           		break;
+           	}
             if (v.DSCreateDT.getTime() > latestRels.DSCreateDT.getTime()) {
                 latestRels = v;
             }
@@ -473,8 +468,8 @@ public class BasicDigitalObject
 
             List<Datastream> versions = m_datastreams.get(d.DatastreamID);
 
-            if (versions == null || versions.size() == 0) return true;
-
+            if (d.DSCreateDT == null || versions == null || versions.size() == 0) return true;
+            
             long created = d.DSCreateDT.getTime();
 
             for (Datastream v : versions) {
