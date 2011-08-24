@@ -340,8 +340,8 @@
                 <include>**/SharedDeploymentTests.class</include>
                 <include>**/ContentModelDSInputTest.class</include>
                 <include>**/TestAdminAPI.class</include>
-
-                <!-- Disabled until FCREPO-798 is public <include>**/TestAPIM2.class</include> -->
+                <include>**/TestObjectLastModDate.class</include>
+                 <!-- Disabled until FCREPO-798 is public <include>**/TestAPIM2.class</include> -->
 
               </includes>
 
