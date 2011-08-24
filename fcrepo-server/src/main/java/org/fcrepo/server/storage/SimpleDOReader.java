@@ -311,8 +311,7 @@ public class SimpleDOReader
         }
         for (Datastream ds : m_obj.datastreams(datastreamID)) {
             if (versDateTime == null) {
-                if (ds.DSCreateDT.getTime() > latestCreateTime) {
-                    latestCreateTime = ds.DSCreateDT.getTime();
+                if (ds.DSCreateDT == null || ds.DSCreateDT.getTime() > latestCreateTime) {
                     latestCreated = ds;
                 }
             } else {
