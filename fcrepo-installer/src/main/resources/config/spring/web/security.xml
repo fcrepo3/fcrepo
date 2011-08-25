@@ -222,9 +222,8 @@
     lazy-init="true" init-method="init" />
 
   <!-- FeSL Authz bean (SOAP) -->
-  <bean id="PEP" class="org.fcrepo.server.security.xacml.pep.ws.PEP"
-    lazy-init="true">
+  <bean id="PEP" class="org.fcrepo.server.security.xacml.pep.ws.PEP">
     <property name="feslAuthZ" value="${security.fesl.authZ.enabled}" />
   </bean>
-    
+
 </beans>

@@ -2,6 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.test.api;
 
 import java.util.HashMap;
@@ -43,10 +44,6 @@ import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 
-
-
-
-
 /**
  * Test of the Fedora Access Service (API-A). describeRepository findObjects
  * getDatastreamDissemination getDissemination getObjectHistory getObjectProfile
@@ -85,11 +82,13 @@ public class TestAPIA
         ObjectFactory factory = new ObjectFactory();
         query.setConditions(factory.createFieldSearchQueryConditions(conds));
         FieldSearchResult result =
-                apia.findObjects(TypeUtility.convertStringtoAOS(resultFields), maxResults, query);
+                apia.findObjects(TypeUtility.convertStringtoAOS(resultFields),
+                                 maxResults,
+                                 query);
         ResultList resultList = result.getResultList();
         List<ObjectFields> fields = resultList.getObjectFields();
         assertEquals(1, fields.size());
-        assertEquals("demo:5", fields.get(0).getPid());
+        assertEquals("demo:5", fields.get(0).getPid().getValue());
     }
 
     public void testGetDatastreamDissemination() throws Exception {
@@ -100,11 +99,16 @@ public class TestAPIA
         byte[] bytes = TypeUtility.convertDataHandlerToBytes(ds.getStream());
         String xml = new String(bytes, "UTF-8");
         assertXpathExists("/oai_dc:dc", xml);
-        assertXpathEvaluatesTo("demo:5", "/oai_dc:dc/dc:identifier/text( )", xml);
+        assertXpathEvaluatesTo("demo:5",
+                               "/oai_dc:dc/dc:identifier/text( )",
+                               xml);
         assertEquals(ds.getMIMEType(), "text/xml");
 
         // test for type E datastream
-        ds = apia.getDatastreamDissemination("demo:SmileyBeerGlass", "MEDIUM_SIZE", null);
+        ds =
+                apia.getDatastreamDissemination("demo:SmileyBeerGlass",
+                                                "MEDIUM_SIZE",
+                                                null);
         bytes = TypeUtility.convertDataHandlerToBytes(ds.getStream());
         assertEquals(ds.getMIMEType(), "image/jpeg");
         assertTrue(bytes.length > 0);
@@ -123,8 +127,8 @@ public class TestAPIA
     public void testGetDisseminationDefault() throws Exception {
         MIMETypedStream diss = null;
         Parameters params = new Parameters();
-        params.getParameter().add(new Property());
-        diss = apia.getDissemination("demo:5",
+        diss =
+                apia.getDissemination("demo:5",
                                       "fedora-system:3",
                                       "viewDublinCore",
                                       params,
@@ -133,19 +137,14 @@ public class TestAPIA
         assertTrue(TypeUtility.convertDataHandlerToBytes(diss.getStream()).length > 0);
     }
 
-// FIXME: This test intermittently fails. See FCREPO-457
-/*
-    public void testGetDisseminationChained() throws Exception {
-        MIMETypedStream diss = null;
-        diss = apia.getDissemination("demo:26",
-                                     "demo:19",
-                                     "getPDF",
-                                     new Property[0],
-                                     null);
-        assertEquals(diss.getMIMEType(), "application/pdf");
-        assertTrue(diss.getStream().length > 0);
-    }
-*/
+    // FIXME: This test intermittently fails. See FCREPO-457
+    /*
+     * public void testGetDisseminationChained() throws Exception {
+     * MIMETypedStream diss = null; diss = apia.getDissemination("demo:26",
+     * "demo:19", "getPDF", new Property[0], null);
+     * assertEquals(diss.getMIMEType(), "application/pdf");
+     * assertTrue(diss.getStream().length > 0); }
+     */
 
     public void testGetDisseminationUserInput() throws Exception {
         MIMETypedStream diss = null;
@@ -154,11 +153,12 @@ public class TestAPIA
         prop.setName("convertTo");
         prop.setValue("gif");
         params.getParameter().add(prop);
-        diss = apia.getDissemination("demo:29",
-                                     "demo:27",
-                                     "convertImage",
-                                     params,
-                                     null);
+        diss =
+                apia.getDissemination("demo:29",
+                                      "demo:27",
+                                      "convertImage",
+                                      params,
+                                      null);
         assertEquals(diss.getMIMEType(), "image/gif");
         assertTrue(TypeUtility.convertDataHandlerToBytes(diss.getStream()).length > 0);
     }
@@ -176,14 +176,16 @@ public class TestAPIA
     }
 
     public void testGetObjectProfileBasicCModel() throws Exception {
-        for (String pid : new String[] { "demo:SmileyPens",
-                                         "demo:SmileyGreetingCard" }) {
+        for (String pid : new String[] {"demo:SmileyPens",
+                "demo:SmileyGreetingCard"}) {
             ObjectProfile profile = apia.getObjectProfile(pid, null);
             boolean found = false;
             ObjModels objModels = profile.getObjModels();
-            for (String objModel : objModels.getModel()) {
-                if (objModel.equals(Models.FEDORA_OBJECT_CURRENT.uri)) {
-                    found = true;
+            if (objModels != null && objModels.getModel() != null) {
+                for (String objModel : objModels.getModel()) {
+                    if (objModel.equals(Models.FEDORA_OBJECT_CURRENT.uri)) {
+                        found = true;
+                    }
                 }
             }
             assertTrue(found);

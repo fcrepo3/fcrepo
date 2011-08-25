@@ -2,14 +2,14 @@
 <definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
              xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
              xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-             xmlns:fedora-api="http://fedora-commons.org/2011/07/definitions/api/"
-             xmlns:fedora-types="http://fedora-commons.org/2011/07/definitions/api/"
-             targetNamespace="http://fedora-commons.org/2011/07/definitions/api/"
+             xmlns:fedora-api="http://fedora-commons.org/2011/07/definitions/types/"
+             xmlns:fedora-types="http://fedora-commons.org/2011/07/definitions/types/"
+             targetNamespace="http://fedora-commons.org/2011/07/definitions/types/"
              name="Fedora-API-M-MTOM-WSDL">
 
     <types>
         <schema xmlns="http://www.w3.org/2001/XMLSchema"
-                targetNamespace="http://fedora-commons.org/2011/07/definitions/api/">
+                targetNamespace="http://fedora-commons.org/2011/07/definitions/types/">
             <include schemaLocation="fedora-types-mtom.xsd"/>
         </schema>
     </types>
@@ -241,7 +241,7 @@
     <binding name="Fedora-API-M-MTOM-Binding-SOAPHTTP" type="fedora-api:Fedora-API-M-MTOM">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <operation name="ingest">
-            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#ingest"/>
+            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/types/#ingest"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -250,7 +250,7 @@
             </output>
         </operation>
         <operation name="modifyObject">
-            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#modifyObject"/>
+            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/types/#modifyObject"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -259,7 +259,7 @@
             </output>
         </operation>
         <operation name="getObjectXML">
-            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#getObjectXML"/>
+            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/types/#getObjectXML"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -268,7 +268,7 @@
             </output>
         </operation>
         <operation name="export">
-            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#export"/>
+            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/types/#export"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -277,7 +277,7 @@
             </output>
         </operation>
         <operation name="purgeObject">
-            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#purgeObject"/>
+            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/types/#purgeObject"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -286,7 +286,7 @@
             </output>
         </operation>
         <operation name="addDatastream">
-            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#addDatastream"/>
+            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/types/#addDatastream"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -296,7 +296,7 @@
         </operation>
         <operation name="modifyDatastreamByReference">
             <soap:operation style="document"
-                            soapAction="http://fedora-commons.org/2011/07/definitions/api/#modifyDatastreamByReference"/>
+                            soapAction="http://fedora-commons.org/2011/07/definitions/types/#modifyDatastreamByReference"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -306,7 +306,7 @@
         </operation>
         <operation name="modifyDatastreamByValue">
             <soap:operation style="document"
-                            soapAction="http://fedora-commons.org/2011/07/definitions/api/#modifyDatastreamByValue"/>
+                            soapAction="http://fedora-commons.org/2011/07/definitions/types/#modifyDatastreamByValue"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -316,7 +316,7 @@
         </operation>
         <operation name="setDatastreamState">
             <soap:operation style="document"
-                            soapAction="http://fedora-commons.org/2011/07/definitions/api/#setDatastreamState"/>
+                            soapAction="http://fedora-commons.org/2011/07/definitions/types/#setDatastreamState"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -326,7 +326,7 @@
         </operation>
         <operation name="setDatastreamVersionable">
             <soap:operation style="document"
-                            soapAction="http://fedora-commons.org/2011/07/definitions/api/#setDatastreamVersionable"/>
+                            soapAction="http://fedora-commons.org/2011/07/definitions/types/#setDatastreamVersionable"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -336,7 +336,7 @@
         </operation>
         <operation name="compareDatastreamChecksum">
             <soap:operation style="document"
-                            soapAction="http://fedora-commons.org/2011/07/definitions/api/#compareDatastreamChecksum"/>
+                            soapAction="http://fedora-commons.org/2011/07/definitions/types/#compareDatastreamChecksum"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -345,7 +345,7 @@
             </output>
         </operation>
         <operation name="getDatastream">
-            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#getDatastream"/>
+            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/types/#getDatastream"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -354,7 +354,7 @@
             </output>
         </operation>
         <operation name="getDatastreams">
-            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#getDatastreams"/>
+            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/types/#getDatastreams"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -364,7 +364,7 @@
         </operation>
         <operation name="getDatastreamHistory">
             <soap:operation style="document"
-                            soapAction="http://fedora-commons.org/2011/07/definitions/api/#getDatastreamHistory"/>
+                            soapAction="http://fedora-commons.org/2011/07/definitions/types/#getDatastreamHistory"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -373,7 +373,7 @@
             </output>
         </operation>
         <operation name="purgeDatastream">
-            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#purgeDatastream"/>
+            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/types/#purgeDatastream"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -382,7 +382,7 @@
             </output>
         </operation>
         <operation name="getNextPID">
-            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#getNextPID"/>
+            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/types/#getNextPID"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -391,7 +391,7 @@
             </output>
         </operation>
         <operation name="getRelationships">
-            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#getRelationships"/>
+            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/types/#getRelationships"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -400,7 +400,7 @@
             </output>
         </operation>
         <operation name="addRelationship">
-            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/api/#addRelationship"/>
+            <soap:operation style="document" soapAction="http://fedora-commons.org/2011/07/definitions/types/#addRelationship"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -410,7 +410,7 @@
         </operation>
         <operation name="purgeRelationship">
             <soap:operation style="document"
-                            soapAction="http://fedora-commons.org/2011/07/definitions/api/#purgeRelationship"/>
+                            soapAction="http://fedora-commons.org/2011/07/definitions/types/#purgeRelationship"/>
             <input>
                 <soap:body use="literal"/>
             </input>
@@ -420,7 +420,7 @@
         </operation>
         <operation name="validate">
             <soap:operation style="document"
-                            soapAction="http://fedora-commons.org/2011/07/definitions/api/#validate"/>
+                            soapAction="http://fedora-commons.org/2011/07/definitions/types/#validate"/>
             <input>
                 <soap:body use="literal"/>
             </input>

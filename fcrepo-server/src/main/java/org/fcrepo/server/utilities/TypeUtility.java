@@ -189,7 +189,7 @@ public abstract class TypeUtility {
                     .getCondition()) {
                 list.add(new org.fcrepo.server.search.Condition(c.getProperty(),
                                                                 c.getOperator()
-                                                                        .toString(),
+                                                                        .value(),
                                                                 c.getValue()));
             }
         }
@@ -205,7 +205,7 @@ public abstract class TypeUtility {
                     .getCondition()) {
                 list.add(new org.fcrepo.server.search.Condition(c.getProperty(),
                                                                 c.getOperator()
-                                                                        .toString(),
+                                                                        .value(),
                                                                 c.getValue()));
             }
         }
@@ -515,7 +515,7 @@ public abstract class TypeUtility {
             }
             genMIMETypedStream
                     .setStream(new DataHandler(new ByteArrayDataSource(baos
-                            .toByteArray(), "text/xml")));
+                            .toByteArray(), "text/html")));
             mimeTypedStream.close();
             mimeTypedStream.setStream(new ByteArrayInputStream(baos
                     .toByteArray()));

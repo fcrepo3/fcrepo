@@ -163,6 +163,7 @@ public class FedoraAPIAMTOMImpl
                             .convertMIMETypedStreamToGenMIMETypedStreamMTOM(mimeTypedStream);
             return genMIMETypedStream;
         } catch (Throwable th) {
+            th.printStackTrace();
             LOG.error("Error getting dissemination", th);
             throw CXFUtility.getFault(th);
         }
@@ -241,7 +242,7 @@ public class FedoraAPIAMTOMImpl
                     LOG.debug("sDef[" + i + "] = " + sDefs[i]);
                 }
             }
-            return sDefs == null ? null : Arrays.asList(new String[0]);
+            return sDefs == null ? null : Arrays.asList(sDefs);
         } catch (Throwable th) {
             LOG.error("Error getting object history", th);
             throw CXFUtility.getFault(th);
