@@ -257,7 +257,10 @@ public class FedoraAPIMMTOMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            String[] altIDsArray = altIDs.getItem().toArray(new String[0]);
+            String[] altIDsArray = null;
+            if (altIDs != null && altIDs.getItem() != null) {
+                altIDsArray = altIDs.getItem().toArray(new String[0]);
+            }
             return s_management.addDatastream(ReadOnlyContext
                                                       .getSoapContext(ctx),
                                               pid,
@@ -274,6 +277,7 @@ public class FedoraAPIMMTOMImpl
                                               checksum,
                                               logMessage);
         } catch (Throwable th) {
+            th.printStackTrace();
             LOG.error("Error adding datastream", th);
             throw CXFUtility.getFault(th);
         } finally {
@@ -306,7 +310,10 @@ public class FedoraAPIMMTOMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            String[] altIDsArray = altIDs.getItem().toArray(new String[0]);
+            String[] altIDsArray = null;
+            if (altIDs != null && altIDs.getItem() != null) {
+                altIDsArray = altIDs.getItem().toArray(new String[0]);
+            }
             return DateUtility.convertDateToString(s_management
                     .modifyDatastreamByReference(ReadOnlyContext
                                                          .getSoapContext(ctx),
@@ -357,7 +364,10 @@ public class FedoraAPIMMTOMImpl
             if (dsContent != null) {
                 byteStream = dsContent.getInputStream();
             }
-            String[] altIDsArray = altIDs.getItem().toArray(new String[0]);
+            String[] altIDsArray = null;
+            if (altIDs != null && altIDs.getItem() != null) {
+                altIDsArray = altIDs.getItem().toArray(new String[0]);
+            }
             return DateUtility.convertDateToString(s_management
                     .modifyDatastreamByValue(ReadOnlyContext
                                                      .getSoapContext(ctx),

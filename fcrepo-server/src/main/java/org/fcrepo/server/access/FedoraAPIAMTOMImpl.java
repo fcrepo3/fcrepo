@@ -163,7 +163,6 @@ public class FedoraAPIAMTOMImpl
                             .convertMIMETypedStreamToGenMIMETypedStreamMTOM(mimeTypedStream);
             return genMIMETypedStream;
         } catch (Throwable th) {
-            th.printStackTrace();
             LOG.error("Error getting dissemination", th);
             throw CXFUtility.getFault(th);
         }
@@ -209,8 +208,10 @@ public class FedoraAPIAMTOMImpl
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
         try {
-            String[] resultFieldsArray =
-                    resultFields.getItem().toArray(new String[0]);
+            String[] resultFieldsArray = null;
+            if (resultFields != null && resultFields.getItem() != null) {
+                resultFieldsArray = resultFields.getItem().toArray(new String[0]);
+            }
 
             org.fcrepo.server.search.FieldSearchResult result =
                     s_access.findObjects(context,

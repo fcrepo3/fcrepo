@@ -256,7 +256,10 @@ public class FedoraAPIMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            String[] altIDsArray = altIDs.getItem().toArray(new String[0]);
+            String[] altIDsArray = null;
+            if (altIDs != null && altIDs.getItem() != null) {
+                altIDsArray = altIDs.getItem().toArray(new String[0]);
+            }
             return s_management.addDatastream(ReadOnlyContext
                                                       .getSoapContext(ctx),
                                               pid,
@@ -305,7 +308,10 @@ public class FedoraAPIMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            String[] altIDsArray = altIDs.getItem().toArray(new String[0]);
+            String[] altIDsArray = null;
+            if (altIDs != null && altIDs.getItem() != null) {
+                altIDsArray = altIDs.getItem().toArray(new String[0]);
+            }
             return DateUtility.convertDateToString(s_management
                     .modifyDatastreamByReference(ReadOnlyContext
                                                          .getSoapContext(ctx),
@@ -352,7 +358,10 @@ public class FedoraAPIMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            String[] altIDsArray = altIDs.getItem().toArray(new String[0]);
+            String[] altIDsArray = null;
+            if (altIDs != null && altIDs.getItem() != null) {
+                altIDsArray = altIDs.getItem().toArray(new String[0]);
+            }
             return DateUtility
                     .convertDateToString(s_management.modifyDatastreamByValue(ReadOnlyContext
                                                                                       .getSoapContext(ctx),
