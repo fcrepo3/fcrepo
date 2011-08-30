@@ -623,11 +623,12 @@ public abstract class TypeUtility {
             genObjectProfile.setPid(objectProfile.PID);
             genObjectProfile.setObjLabel(objectProfile.objectLabel);
 
-            org.fcrepo.server.types.gen.ObjectProfile.ObjModels objModels =
-                    new org.fcrepo.server.types.gen.ObjectProfile.ObjModels();
+            org.fcrepo.server.types.mtom.gen.ObjectProfile.ObjModels objModels =
+                    new org.fcrepo.server.types.mtom.gen.ObjectProfile.ObjModels();
             if (objectProfile.objectModels != null) {
                 objModels.getModel().addAll(objectProfile.objectModels);
             }
+            genObjectProfile.setObjModels(objModels);
             genObjectProfile.setObjCreateDate(DateUtility
                     .convertDateToString(objectProfile.objectCreateDate));
             genObjectProfile.setObjLastModDate(DateUtility
