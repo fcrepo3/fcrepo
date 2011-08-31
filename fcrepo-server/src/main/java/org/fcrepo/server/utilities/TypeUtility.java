@@ -45,6 +45,9 @@ public abstract class TypeUtility {
     private static final int BUFFER_SIZE = 1024;
 
     public static org.fcrepo.server.types.mtom.gen.Datastream convertDatastreamToGenDatastreamMTOM(org.fcrepo.server.storage.types.Datastream in) {
+        if (in == null) {
+            return null;
+        }
         org.fcrepo.server.types.mtom.gen.Datastream out =
                 new org.fcrepo.server.types.mtom.gen.Datastream();
         String group = in.DSControlGrp;
@@ -74,6 +77,9 @@ public abstract class TypeUtility {
     }
 
     public static org.fcrepo.server.types.gen.Datastream convertDatastreamToGenDatastream(org.fcrepo.server.storage.types.Datastream in) {
+        if (in == null) {
+            return null;
+        }
         org.fcrepo.server.types.gen.Datastream out =
                 new org.fcrepo.server.types.gen.Datastream();
         String group = in.DSControlGrp;
@@ -103,6 +109,9 @@ public abstract class TypeUtility {
     }
 
     public static org.fcrepo.server.types.gen.FieldSearchResult convertFieldSearchResultToGenFieldSearchResult(org.fcrepo.server.search.FieldSearchResult result) {
+        if (result == null) {
+            return null;
+        }
         org.fcrepo.server.types.gen.FieldSearchResult ret =
                 new org.fcrepo.server.types.gen.FieldSearchResult();
         ret.setResultList(convertSearchObjectFieldsListToGenObjectFieldsArray(result
@@ -130,6 +139,9 @@ public abstract class TypeUtility {
     }
 
     public static org.fcrepo.server.types.mtom.gen.FieldSearchResult convertFieldSearchResultToGenFieldSearchResultMTOM(org.fcrepo.server.search.FieldSearchResult result) {
+        if (result == null) {
+            return null;
+        }
         org.fcrepo.server.types.mtom.gen.FieldSearchResult ret =
                 new org.fcrepo.server.types.mtom.gen.FieldSearchResult();
         ret.setResultList(convertSearchObjectFieldsListToGenObjectFieldsArrayMTOM(result
@@ -159,37 +171,52 @@ public abstract class TypeUtility {
     public static org.fcrepo.server.search.FieldSearchQuery convertGenFieldSearchQueryToFieldSearchQuery(org.fcrepo.server.types.gen.FieldSearchQuery gen)
             throws org.fcrepo.server.errors.InvalidOperatorException,
             org.fcrepo.server.errors.QueryParseException {
+        if (gen == null) {
+            return null;
+        }
         if (gen.getTerms() != null) {
             return new org.fcrepo.server.search.FieldSearchQuery(gen.getTerms()
                     .getValue());
-        } else {
+        } else if (gen.getConditions() != null) {
             return new org.fcrepo.server.search.FieldSearchQuery(convertGenConditionArrayToSearchConditionList(gen
                     .getConditions().getValue()));
+        } else {
+            return null;
         }
     }
 
     public static org.fcrepo.server.search.FieldSearchQuery convertGenFieldSearchQueryToFieldSearchQueryMTOM(org.fcrepo.server.types.mtom.gen.FieldSearchQuery gen)
             throws org.fcrepo.server.errors.InvalidOperatorException,
             org.fcrepo.server.errors.QueryParseException {
+        if (gen == null) {
+            return null;
+        }
         if (gen.getTerms() != null) {
             return new org.fcrepo.server.search.FieldSearchQuery(gen.getTerms()
                     .getValue());
-        } else {
+        } else if (gen.getConditions() != null) {
             return new org.fcrepo.server.search.FieldSearchQuery(convertGenConditionArrayToSearchConditionListMTOM(gen
                     .getConditions().getValue()));
+        } else {
+            return null;
         }
     }
 
     public static List<Condition> convertGenConditionArrayToSearchConditionList(org.fcrepo.server.types.gen.FieldSearchQuery.Conditions genConditions)
             throws org.fcrepo.server.errors.InvalidOperatorException,
             org.fcrepo.server.errors.QueryParseException {
+        if (genConditions == null) {
+            return null;
+        }
         ArrayList<Condition> list = new ArrayList<Condition>();
         if (genConditions != null && genConditions.getCondition() != null) {
             for (org.fcrepo.server.types.gen.Condition c : genConditions
                     .getCondition()) {
                 list.add(new org.fcrepo.server.search.Condition(c.getProperty(),
-                                                                c.getOperator()
-                                                                        .value(),
+                                                                c.getOperator() != null ? c
+                                                                        .getOperator()
+                                                                        .value()
+                                                                        : null,
                                                                 c.getValue()));
             }
         }
@@ -199,13 +226,18 @@ public abstract class TypeUtility {
     public static List<Condition> convertGenConditionArrayToSearchConditionListMTOM(org.fcrepo.server.types.mtom.gen.FieldSearchQuery.Conditions genConditions)
             throws org.fcrepo.server.errors.InvalidOperatorException,
             org.fcrepo.server.errors.QueryParseException {
+        if (genConditions == null) {
+            return null;
+        }
         ArrayList<Condition> list = new ArrayList<Condition>();
         if (genConditions != null && genConditions.getCondition() != null) {
             for (org.fcrepo.server.types.mtom.gen.Condition c : genConditions
                     .getCondition()) {
                 list.add(new org.fcrepo.server.search.Condition(c.getProperty(),
-                                                                c.getOperator()
-                                                                        .value(),
+                                                                c.getOperator() != null ? c
+                                                                        .getOperator()
+                                                                        .value()
+                                                                        : null,
                                                                 c.getValue()));
             }
         }
@@ -213,6 +245,9 @@ public abstract class TypeUtility {
     }
 
     private static org.fcrepo.server.types.gen.FieldSearchResult.ResultList convertSearchObjectFieldsListToGenObjectFieldsArray(List<org.fcrepo.server.search.ObjectFields> sfList) {
+        if (sfList == null) {
+            return null;
+        }
         org.fcrepo.server.types.gen.FieldSearchResult.ResultList genFields =
                 new org.fcrepo.server.types.gen.FieldSearchResult.ResultList();
         for (int i = 0; i < sfList.size(); i++) {
@@ -298,6 +333,9 @@ public abstract class TypeUtility {
     }
 
     private static org.fcrepo.server.types.mtom.gen.FieldSearchResult.ResultList convertSearchObjectFieldsListToGenObjectFieldsArrayMTOM(List<org.fcrepo.server.search.ObjectFields> sfList) {
+        if (sfList == null) {
+            return null;
+        }
         org.fcrepo.server.types.mtom.gen.FieldSearchResult.ResultList genFields =
                 new org.fcrepo.server.types.mtom.gen.FieldSearchResult.ResultList();
         for (int i = 0; i < sfList.size(); i++) {
@@ -383,17 +421,23 @@ public abstract class TypeUtility {
     }
 
     public static String[] toStringArray(List<DCField> l) {
+        if (l == null) {
+            return null;
+        }
         String[] ret = new String[l.size()];
         for (int i = 0; i < l.size(); i++) {
-            ret[i] = l.get(i).getValue();
+            ret[i] = l.get(i) != null ? l.get(i).getValue() : null;
         }
         return ret;
     }
 
     private static List<String> toStringList(List<DCField> dcFields) {
+        if (dcFields == null) {
+            return null;
+        }
         List<String> ret = new ArrayList<String>(dcFields.size());
         for (DCField dcField : dcFields) {
-            ret.add(dcField.getValue());
+            ret.add(dcField != null ? dcField.getValue() : null);
         }
         return ret;
     }
@@ -836,6 +880,9 @@ public abstract class TypeUtility {
     }
 
     public static org.fcrepo.server.types.gen.DatastreamDef convertDatastreamDefToGenDatastreamDef(org.fcrepo.server.storage.types.DatastreamDef in) {
+        if (in == null) {
+            return null;
+        }
         org.fcrepo.server.types.gen.DatastreamDef out =
                 new org.fcrepo.server.types.gen.DatastreamDef();
         out.setID(in.dsID);
@@ -846,6 +893,9 @@ public abstract class TypeUtility {
     }
 
     public static org.fcrepo.server.types.mtom.gen.DatastreamDef convertDatastreamDefToGenDatastreamDefMTOM(org.fcrepo.server.storage.types.DatastreamDef in) {
+        if (in == null) {
+            return null;
+        }
         org.fcrepo.server.types.mtom.gen.DatastreamDef out =
                 new org.fcrepo.server.types.mtom.gen.DatastreamDef();
         out.setID(in.dsID);

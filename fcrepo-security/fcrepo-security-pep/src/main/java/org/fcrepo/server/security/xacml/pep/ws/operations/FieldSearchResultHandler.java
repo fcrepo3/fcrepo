@@ -86,13 +86,14 @@ public class FieldSearchResultHandler
     public FieldSearchResult filter(SOAPMessageContext context,
                                     FieldSearchResult result)
             throws PEPException {
+        if (result == null || result.getResultList() == null || result.getResultList().getObjectFields() == null || result.getResultList().getObjectFields().isEmpty()) {
+            return result;
+        }
         List<ObjectFields> objs = result.getResultList().getObjectFields();
         List<String> requests = new ArrayList<String>();
         Map<String, ObjectFields> objects = new HashMap<String, ObjectFields>();
 
-        if (objs.size() == 0) {
-            return result;
-        }
+
 
         for (ObjectFields o : objs) {
             if (logger.isDebugEnabled()) {
@@ -104,7 +105,7 @@ public class FieldSearchResultHandler
             Map<URI, AttributeValue> resAttr =
                     new HashMap<URI, AttributeValue>();
 
-            String pid = o.getPid().getValue();
+            String pid = o.getPid() != null ? o.getPid().getValue() : null;
             if (pid != null && !"".equals(pid)) {
                 objects.put(pid, o);
 
@@ -227,10 +228,11 @@ public class FieldSearchResultHandler
     public RequestCtx handleResponse(SOAPMessageContext context)
             throws OperationHandlerException {
         try {
+            // FieldSearchResult (mtom version or not) can be determined by the namespace
             FieldSearchResult result =
                     (FieldSearchResult) getSOAPResponseObject(context, FieldSearchResult.class);
             result = filter(context, result);
-            SOAPElement param = null; // FieldSearchResult -?-> SOAPElement
+            SOAPElement param = null; // TODO FieldSearchResult -?-> SOAPElement ?
             setSOAPResponseObject(context, param);
         } catch (Exception e) {
             logger.error("Error filtering Objects", e);

@@ -71,11 +71,11 @@ public class ObjectEditorFrame
         ObjectFields o =
                 Util.getObjectFields(pid, new String[] {"pid", "state",
                         "label", "cDate", "mDate", "ownerId"});
-        String state = o.getState().getValue();
-        String label = o.getLabel().getValue();
-        String cDate = o.getCDate().getValue();
-        String mDate = o.getMDate().getValue();
-        String ownerId = o.getOwnerId().getValue();
+        String state = o.getState() != null ? o.getState().getValue() : null;
+        String label = o.getLabel() != null ? o.getLabel().getValue() : null;
+        String cDate = o.getCDate() != null ? o.getCDate().getValue() : null;
+        String mDate = o.getMDate() != null ? o.getMDate().getValue() : null;
+        String ownerId = o.getOwnerId() != null ? o.getOwnerId().getValue() : null;
 
         doTitle(false);
 

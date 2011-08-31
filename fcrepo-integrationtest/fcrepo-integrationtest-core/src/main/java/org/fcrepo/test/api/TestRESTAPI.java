@@ -218,9 +218,8 @@ public class TestRESTAPI
         DEMO_REST = tpl.toString();
         apia = getFedoraClient().getAPIA();
         apim = getFedoraClient().getAPIM();
-        apim.ingest(TypeUtility.convertBytesToDataHandler(DEMO_REST.getBytes("UTF-8")),
-                    FOXML1_1.uri,
-                    "ingesting new foxml object");
+        apim.ingest(TypeUtility.convertBytesToDataHandler(DEMO_REST
+                .getBytes("UTF-8")), FOXML1_1.uri, "ingesting new foxml object");
 
     }
 
@@ -918,22 +917,26 @@ public class TestRESTAPI
         ObjectFactory factory = new ObjectFactory();
         query.setTerms(factory.createFieldSearchQueryTerms("*"));
         FieldSearchResult result =
-                apia.findObjects(TypeUtility.convertStringtoAOS(resultFields), maxResults, query);
+                apia.findObjects(TypeUtility.convertStringtoAOS(resultFields),
+                                 maxResults,
+                                 query);
 
         List<ObjectFields> fields = result.getResultList().getObjectFields();
         String pid = "";
         for (ObjectFields objectFields : fields) {
-            pid = objectFields.getPid().getValue();
-            url =
-                    String.format("/objects/%s/validate", URLEncoder.encode(thispid
-                            .toString(), "UTF-8"));
-            HttpResponse getTrue = get(true);
-            assertEquals(thispid.toString(), SC_UNAUTHORIZED, get(false)
-                    .getStatusCode());
-            assertEquals(thispid.toString(), SC_OK, getTrue.getStatusCode());
-            String responseXML = getTrue.getResponseBodyString();
-            assertXpathExists("/management:validation[@valid='true']",
-                              responseXML);
+            if (objectFields != null) {
+                pid = objectFields.getPid() != null ? objectFields.getPid().getValue() : "";
+                url =
+                        String.format("/objects/%s/validate", URLEncoder
+                                .encode(pid.toString(), "UTF-8"));
+                HttpResponse getTrue = get(true);
+                assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
+                        .getStatusCode());
+                assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
+                String responseXML = getTrue.getResponseBodyString();
+                assertXpathExists("/management:validation[@valid='true']",
+                                  responseXML);
+            }
         }
         // test with asOfDateTime set (just on the last object validated above)
 
@@ -943,8 +946,9 @@ public class TestRESTAPI
 
         // after ingest time - should pass
         url =
-                String.format("/objects/%s/validate?asOfDateTime=%s", pid
-                              .toString(), laterDateTime);
+                String.format("/objects/%s/validate?asOfDateTime=%s",
+                              pid.toString(),
+                              datetime);
         HttpResponse getTrue = get(true);
         assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
                      .getStatusCode());
@@ -1113,13 +1117,14 @@ public class TestRESTAPI
                                                      "EXTDS",
                                                      null).getLocation());
         String dcDS =
-                new String(TypeUtility.convertDataHandlerToBytes(apia.getDatastreamDissemination(pid.toString(),
-                                                           "DC",
-                                                           null).getStream()));
+                new String(TypeUtility.convertDataHandlerToBytes(apia
+                        .getDatastreamDissemination(pid.toString(), "DC", null)
+                        .getStream()));
         String extDS =
-                new String(TypeUtility.convertDataHandlerToBytes(apia.getDatastreamDissemination(pid.toString(),
-                                                           "EXTDS",
-                                                           null).getStream()));
+                new String(TypeUtility.convertDataHandlerToBytes(apia
+                        .getDatastreamDissemination(pid.toString(),
+                                                    "EXTDS",
+                                                    null).getStream()));
         assertEquals(dcDS, extDS);
 
         // Update DS1 by reference (X type datastream)
@@ -1152,7 +1157,9 @@ public class TestRESTAPI
 
         MIMETypedStream ds1 =
                 apia.getDatastreamDissemination(pid.toString(), "DS1", null);
-        assertXMLEqual(xmlData, new String(TypeUtility.convertDataHandlerToBytes(ds1.getStream()), "UTF-8"));
+        assertXMLEqual(xmlData,
+                       new String(TypeUtility.convertDataHandlerToBytes(ds1
+                               .getStream()), "UTF-8"));
     }
 
     public void testModifyDatastreamNoContent() throws Exception {
@@ -1480,8 +1487,9 @@ public class TestRESTAPI
                         + URLEncoder.encode(o, "UTF-8") + "&isLiteral=true";
         response = delete(true);
         assertEquals(SC_OK, response.getStatusCode());
-        assertEquals("Purge relationship", "true", response
-                .getResponseBodyString());
+        assertEquals("Purge relationship",
+                     "true",
+                     response.getResponseBodyString());
 
         // check not present
         url =
@@ -1806,7 +1814,6 @@ public class TestRESTAPI
         sb.append("RDF: " + new String(rdf, "UTF-8"));
         TripleIterator it =
                 TripleIteratorFactory.defaultInstance().fromStream(new ByteArrayInputStream(rdf), null,
-
                 RDFFormat.RDF_XML);
 
         boolean found = false;

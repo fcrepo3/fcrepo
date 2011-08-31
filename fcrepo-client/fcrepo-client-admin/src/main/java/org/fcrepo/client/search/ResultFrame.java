@@ -176,26 +176,29 @@ public class ResultFrame
     }
 
     public String getValue(ObjectFields o, String name) {
+        if (o == null || name == null) {
+            return null;
+        }
         if (name.equals("pid")) {
-            return o.getPid().getValue();
+            return o.getPid() != null ? o.getPid().getValue() : "";
         }
         if (name.equals("label")) {
-            return o.getLabel().getValue();
+            return o.getLabel() != null ? o.getLabel().getValue() : "";
         }
         if (name.equals("state")) {
-            return o.getState().getValue();
+            return o.getState() != null ? o.getState().getValue() : "";
         }
         if (name.equals("ownerId")) {
-            return o.getOwnerId().getValue();
+            return o.getOwnerId() != null ? o.getOwnerId().getValue() : "";
         }
         if (name.equals("cDate")) {
-            return o.getCDate().getValue();
+            return o.getCDate() != null ? o.getCDate().getValue() : "";
         }
         if (name.equals("mDate")) {
-            return o.getMDate().getValue();
+            return o.getMDate() != null ? o.getMDate().getValue() : "";
         }
         if (name.equals("dcmDate")) {
-            return o.getDcmDate().getValue();
+            return o.getDcmDate() != null ? o.getDcmDate().getValue() : "";
         }
         if (name.equals("title")) {
             return getList(o.getTitle());

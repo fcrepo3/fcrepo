@@ -18,8 +18,6 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.cxf.binding.soap.SoapFault;
-
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -1207,9 +1205,12 @@ public class TestAPIM
                                "adding new datastream");
             // fail if datastream was added
             Assert.fail();
-        } catch (SoapFault af) {
+        } catch (javax.xml.ws.soap.SOAPFaultException af) {
+            System.out.println(af.getMessage());
             assertTrue(af.getMessage()
                     .contains("Unknown checksum algorithm specified:"));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
         // test adding M type datastream with unimplemented checksum type and no altIDs, should fail throwing exception
         try {
@@ -1229,7 +1230,7 @@ public class TestAPIM
                                "adding new datastream");
             // fail if datastream was added
             Assert.fail();
-        } catch (SoapFault af) {
+        } catch (javax.xml.ws.soap.SOAPFaultException af) {
             assertTrue(af.getMessage()
                     .contains("Checksum algorithm not yet implemented:"));
         }
@@ -1860,7 +1861,7 @@ public class TestAPIM
                                                  false);
             // fail if datastream was modified
             Assert.fail();
-        } catch (SoapFault af) {
+        } catch (javax.xml.ws.soap.SOAPFaultException af) {
             assertTrue(af.getMessage()
                     .contains("Unknown checksum algorithm specified:"));
         }
@@ -1880,7 +1881,7 @@ public class TestAPIM
                                                  false);
             // fail if datastream was modified
             Assert.fail();
-        } catch (SoapFault af) {
+        } catch (javax.xml.ws.soap.SOAPFaultException af) {
             assertTrue(af.getMessage()
                     .contains("Checksum algorithm not yet implemented:"));
         }
@@ -1981,7 +1982,7 @@ public class TestAPIM
                                        "creating datastream with checksum");
             // fail if datastream was modified
             Assert.fail();
-        } catch (SoapFault af) {
+        } catch (javax.xml.ws.soap.SOAPFaultException af) {
             assertTrue(af.getMessage().contains("Checksum Mismatch"));
         }
 
@@ -2002,7 +2003,7 @@ public class TestAPIM
                                                      false);
             // fail if datastream was modified
             Assert.fail();
-        } catch (SoapFault af) {
+        } catch (javax.xml.ws.soap.SOAPFaultException af) {
             assertTrue(af.getMessage().contains("Checksum Mismatch"));
         }
 

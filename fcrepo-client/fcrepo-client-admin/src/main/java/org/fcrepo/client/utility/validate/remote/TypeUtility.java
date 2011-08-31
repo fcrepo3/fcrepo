@@ -143,14 +143,17 @@ public class TypeUtility {
      * local {@link ObjectFields} object.
      */
     public static ObjectFields convertGenObjectFieldsToObjectFields(org.fcrepo.server.types.mtom.gen.ObjectFields source) {
+        if (source == null) {
+            return null;
+        }
         ObjectFields result = new ObjectFields();
-        result.setPid(source.getPid().getValue());
-        result.setLabel(source.getLabel().getValue());
-        result.setState(source.getState().getValue());
-        result.setOwnerId(source.getOwnerId().getValue());
-        result.setCDate(DateUtility.convertStringToDate(source.getCDate().getValue()));
-        result.setMDate(DateUtility.convertStringToDate(source.getMDate().getValue()));
-        result.setDCMDate(DateUtility.convertStringToDate(source.getDcmDate().getValue()));
+        result.setPid(source.getPid() != null ? source.getPid().getValue() : null);
+        result.setLabel(source.getLabel() != null ? source.getLabel().getValue() : null);
+        result.setState(source.getState() != null ? source.getState().getValue() : null);
+        result.setOwnerId(source.getOwnerId() != null ? source.getOwnerId().getValue() : null);
+        result.setCDate(source.getCDate() != null ? DateUtility.convertStringToDate(source.getCDate().getValue()) : null);
+        result.setMDate(source.getMDate() != null ? DateUtility.convertStringToDate(source.getMDate().getValue()) : null);
+        result.setDCMDate(source.getDcmDate() != null ? DateUtility.convertStringToDate(source.getDcmDate().getValue()) : null);
         result.titles().addAll(convertStringArray(source.getTitle()));
         result.subjects().addAll(convertStringArray(source.getSubject()));
         result.descriptions()

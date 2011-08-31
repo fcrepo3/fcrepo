@@ -2,6 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.client;
 
 import java.io.BufferedReader;
@@ -89,10 +90,11 @@ public class FedoraClient
     /** Whether to automatically follow HTTP redirects. */
     public boolean FOLLOW_REDIRECTS = true;
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(FedoraClient.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(FedoraClient.class);
 
-    private final SOAPEndpoint m_accessEndpoint = new SOAPEndpoint("accessMTOM");
+    private final SOAPEndpoint m_accessEndpoint =
+            new SOAPEndpoint("accessMTOM");
 
     private final SOAPEndpoint m_managementEndpoint =
             new SOAPEndpoint("managementMTOM");
@@ -328,9 +330,8 @@ public class FedoraClient
             if (status != 200) {
                 if (followRedirects && 300 <= status && status <= 399) {
                     // Handle the redirect here !
-                    logger
-                            .debug("FedoraClient is handling redirect for HTTP STATUS="
-                                    + status);
+                    logger.debug("FedoraClient is handling redirect for HTTP STATUS="
+                            + status);
                     Header hLoc = in.getResponseHeader("location");
                     if (hLoc != null) {
                         logger.debug("FedoraClient is trying redirect location: "
@@ -485,10 +486,12 @@ public class FedoraClient
 
         if (endpoint == m_accessEndpoint) {
             APIAStubFactory.SOCKET_TIMEOUT_SECONDS = SOCKET_TIMEOUT_SECONDS;
-            return APIAStubFactory.getStub(protocol, host, port, m_user, m_pass);
+            return APIAStubFactory
+                    .getStub(protocol, host, port, m_user, m_pass);
         } else if (endpoint == m_managementEndpoint) {
             APIMStubFactory.SOCKET_TIMEOUT_SECONDS = SOCKET_TIMEOUT_SECONDS;
-            return APIMStubFactory.getStub(protocol, host, port, m_user, m_pass);
+            return APIMStubFactory
+                    .getStub(protocol, host, port, m_user, m_pass);
         } else {
             throw new IllegalArgumentException("Unrecognized endpoint: "
                     + endpoint.getName());
@@ -658,7 +661,9 @@ public class FedoraClient
      * <em>String</em> values for parameters that should be passed to the
      * service. Two parameters are required: 1) lang 2) query Two parameters to
      * the risearch service are implied: 1) type = tuples 2) format = sparql See
-     * http://www.fedora.info/download/2.0/userdocs/server/webservices/risearch/#app.tuples
+     * http
+     * ://www.fedora.info/download/2.0/userdocs/server/webservices/risearch/#
+     * app.tuples
      */
     public TupleIterator getTuples(Map<String, String> params)
             throws IOException {
@@ -738,9 +743,9 @@ public class FedoraClient
      * name and a URL. The endpoint name is provided to the constructor. The URL
      * is determined automatically, once, based on:
      * <ul>
-     * <li> The baseURL provided to the FedoraClient instance.</li>
-     * <li> The server version.</li>
-     * <li> Whether the server automatically redirects non-SSL SOAP requests to
+     * <li>The baseURL provided to the FedoraClient instance.</li>
+     * <li>The server version.</li>
+     * <li>Whether the server automatically redirects non-SSL SOAP requests to
      * an SSL endpoint.</li>
      * </ul>
      */
@@ -759,33 +764,8 @@ public class FedoraClient
         }
 
         public URL getURL() throws IOException {
-            // only do this once -- future invocations will use the saved value.
             if (m_url == null) {
-                // The endpoint URL has not been determined yet.
-                // It will be determined in the following manner:
-                //
-                // If the Fedora server version is 2.0:
-                //   url = (baseURL)/(endpointName)/soap
-                // Otherwise, the Fedora server version must be 2.1+:
-                //   If (baseURL) specifies "http":
-                //     Hit (baseURL)/services/(endpointName).
-                //     If it redirects:
-                //       url = (redirectURL)
-                //     Otherwise:
-                //       url = (baseURL)/services/(endpointName)
-                //   Otherwise:
-                //       url = (baseURL)/services/(endpointName)
-                //
-                if (getServerVersion().equals("2.0")) {
-                    m_url = new URL(m_baseURL + m_name + "/soap");
-                } else {
-                    if (m_baseURL.startsWith("http:")) {
-                        m_url = getRedirectURL("/services/" + m_name);
-                    }
-                    if (m_url == null) {
-                        m_url = new URL(m_baseURL + "services/" + m_name);
-                    }
-                }
+                m_url = new URL(m_baseURL + "services/" + m_name);
             }
             return m_url;
         }

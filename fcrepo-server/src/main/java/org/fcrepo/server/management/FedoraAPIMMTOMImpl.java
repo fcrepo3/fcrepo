@@ -277,7 +277,6 @@ public class FedoraAPIMMTOMImpl
                                               checksum,
                                               logMessage);
         } catch (Throwable th) {
-            th.printStackTrace();
             LOG.error("Error adding datastream", th);
             throw CXFUtility.getFault(th);
         } finally {
