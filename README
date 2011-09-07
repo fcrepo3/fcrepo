@@ -1,10 +1,12 @@
 -------------------------------------------------------------------
-                 Fedora 3.5-SNAPSHOT - Unreleased
+                  Fedora 3.6-SNAPSHOT
 -------------------------------------------------------------------
 This is a full source code release of Fedora.  Before using this
 software, you must read and agree to the license, found under
 resources/doc/license/license.html.  Documentation can be found for
-online browsing or download at http://fedora-commons.org/go/fcr30
+online browsing or download at the following URL:
+
+   https://wiki.duraspace.org/display/FEDORA/All+Documentation
 
 Building Fedora
 ===============
