@@ -9,4 +9,6 @@ fcrepo-server/test
 .settings/
 .DS_Store
 *.iml
+*.ipr
+*.iws
 .idea
