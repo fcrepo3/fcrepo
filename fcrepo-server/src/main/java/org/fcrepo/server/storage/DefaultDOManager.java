@@ -385,20 +385,13 @@ public class DefaultDOManager extends Module implements DOManager {
         }
         // get ref to FedoraStorageHintProvider
         m_hintProvider = null;
+        String hintProviderClass = this.getParameter("fedoraStorageHintProvider");
         try {
-            Module module = getServer().getModule("org.fcrepo.server.storage.lowlevel.ILowlevelStorage");
-            String hinterProviderName = module.getParameter("storage_hints_provider");
-            m_hintProvider = (FedoraStorageHintProvider) Class.forName(hinterProviderName).newInstance();            
+            m_hintProvider = (FedoraStorageHintProvider) Class.forName(hintProviderClass).newInstance();
         }
-        catch (Throwable t) { 
-            //ignore all exception and set the provider to be the default Null implemetion
-            logger.warn("Storage hints provider not loaded correct, fall back to the default no-op implementation");
+        catch (Throwable t) {
+            logger.warn("Could not load the specified hint provider class ("+hintProviderClass+"), using default nullprovider");
             m_hintProvider = new NullStorageHintsProvider();
-        }
-        if (m_permanentStore == null) {
-            logger.error("LowlevelStorage not loaded");
-            throw new ModuleInitializationException("LowlevelStorage not loaded",
-                                                    getRole());
         }
 
         /* Load the service deployment cache from the registry */
