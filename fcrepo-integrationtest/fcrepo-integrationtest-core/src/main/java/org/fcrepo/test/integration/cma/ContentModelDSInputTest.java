@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.fcrepo.client.FedoraClient;
 
 import org.fcrepo.server.access.FedoraAPIAMTOM;
-import org.fcrepo.server.types.gen.ObjectMethodsDef;
+import org.fcrepo.server.types.mtom.gen.ObjectMethodsDef;
 
 import org.fcrepo.test.FedoraServerTestCase;
 

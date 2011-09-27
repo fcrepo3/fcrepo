@@ -14,7 +14,7 @@ import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.utility.ingest.Ingest;
 import org.fcrepo.client.utility.ingest.IngestCounter;
 
-import org.fcrepo.server.types.gen.ObjectMethodsDef;
+import org.fcrepo.server.types.mtom.gen.ObjectMethodsDef;
 import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.test.FedoraTestCase;

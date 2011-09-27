@@ -12,11 +12,12 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import java.rmi.RemoteException;
-
 import java.security.MessageDigest;
 
 import java.util.Date;
+import java.util.Locale;
+
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.ext.thread.ThreadHelper;
@@ -28,6 +29,7 @@ import org.apache.abdera.model.Link;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.remoting.soap.SoapFaultException;
 
 import junit.framework.JUnit4TestAdapter;
 
@@ -99,13 +101,13 @@ public class TestManagedDatastreams
             try {
                 apim.ingest(TypeUtility.convertBytesToDataHandler(getAtomObject(pid, contentLocation)), ATOM1_1.uri, null);
                 fail("ingest should have failed with " + contentLocation);
-            } catch (RemoteException e) {
+            } catch (SOAPFaultException e) {
                 assertTrue(e.getMessage().contains("ValidationException"));
             }
             try {
                 apim.ingest(TypeUtility.convertBytesToDataHandler(getFoxmlObject(pid, contentLocation)), FOXML1_1.uri, null);
                 fail("ingest should have failed with " + contentLocation);
-            } catch (RemoteException e) {
+            } catch (SoapFaultException e) {
                 assertTrue(e.getMessage().contains("ObjectIntegrityException"));
             }
         }
@@ -114,13 +116,13 @@ public class TestManagedDatastreams
             try {
                 apim.ingest(TypeUtility.convertBytesToDataHandler(getAtomObject(pid, contentLocation)), ATOM1_1.uri, null);
                 fail("ingest should have failed with " + contentLocation);
-            } catch (RemoteException e) {
+            } catch (SoapFaultException e) {
                 assertTrue(e.getMessage().contains("StreamReadException"));
             }
             try {
                 apim.ingest(TypeUtility.convertBytesToDataHandler(getFoxmlObject(pid, contentLocation)), FOXML1_1.uri, null);
                 fail("ingest should have failed with " + contentLocation);
-            } catch (RemoteException e) {
+            } catch (SoapFaultException e) {
                 assertTrue(e.getMessage().contains("StreamReadException"));
             }
         }
@@ -138,7 +140,7 @@ public class TestManagedDatastreams
                     addDatastream(pid, contentLocation);
                     fail("addDatastream should have failed with "
                          + contentLocation);
-                } catch (RemoteException e) {
+                } catch (SoapFaultException e) {
                     assertTrue(e.getMessage().contains("ValidationException"));
                 }
             }
@@ -148,7 +150,7 @@ public class TestManagedDatastreams
                     addDatastream(pid, contentLocation);
                     fail("addDatastream should have failed with "
                          + contentLocation);
-                } catch (RemoteException e) {
+                } catch (SoapFaultException e) {
                     assertTrue(e.getMessage().contains("StreamReadException"));
                 }
             }
@@ -169,7 +171,7 @@ public class TestManagedDatastreams
                 try {
                     modifyDatastreamByReference(pid, contentLocation);
                     fail("modifyDatastreamByReference should have failed with " + contentLocation);
-                } catch (RemoteException e) {
+                } catch (SoapFaultException e) {
                     assertTrue(e.getMessage().contains("ValidationException"));
                 }
             }
@@ -178,7 +180,7 @@ public class TestManagedDatastreams
                 try {
                     modifyDatastreamByReference(pid, contentLocation);
                     fail("modifyDatastreamByReference should have failed with " + contentLocation);
-                } catch (RemoteException e) {
+                } catch (SoapFaultException e) {
                     assertTrue(e.getMessage().contains("StreamReadException"));
                 }
             }
@@ -211,7 +213,7 @@ public class TestManagedDatastreams
             try {
                 addDatastream(pid, contentLocation, checksumType, checksum);
                 fail("Adding datastream with bogus checksum should have failed.");
-            } catch (RemoteException e) {
+            } catch (SoapFaultException e) {
                 assertTrue(e.getMessage().contains("Checksum Mismatch"));
             }
         } finally {
@@ -247,7 +249,7 @@ public class TestManagedDatastreams
             try {
                 modifyDatastreamByReference(pid, contentLocation, checksumType, checksum);
                 fail("Modifying datastream with bogus checksum should have failed.");
-            } catch (RemoteException e) {
+            } catch (SoapFaultException e) {
                 assertTrue(e.getMessage().contains("Checksum Mismatch"));
             }
         } finally {
