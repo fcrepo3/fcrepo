@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,9 +66,7 @@ public class DatastreamsPane
 
     private final ObjectEditorFrame m_owner;
 
-    private final ArrayList m_dsListeners;
-
-    private final Map m_currentVersionMap;
+    private final Map<String, Datastream> m_currentVersionMap;
 
     public String[] ALL_KNOWN_MIMETYPES =
             new String[] {"text/xml", "text/plain", "text/html",
@@ -90,10 +87,6 @@ public class DatastreamsPane
 
     ImageIcon newIcon = null;
 
-    //static ImageIcon newIcon =
-    //        new ImageIcon(Administrator.cl
-    //                .getResource("images/standard/general/New16.gif"));
-
     /**
      * Build the pane.
      */
@@ -101,16 +94,12 @@ public class DatastreamsPane
             throws Exception {
         m_pid = pid;
         m_owner = owner;
-        m_currentVersionMap = new HashMap();
-        // this(m_tabbedPane)
-        m_dsListeners = new ArrayList();
+        m_currentVersionMap = new HashMap<String, Datastream>();
 
-        newIcon =
-            new ImageIcon(this.getClass().getClassLoader().getSystemClassLoader()
+		newIcon =
+            new ImageIcon(ClassLoader
                     .getSystemResource("images/client/standard/general/New16.gif"));
-
-        // m_tabbedPane(DatastreamPane[])
-
+        
         m_tabbedPane = new JTabbedPane(SwingConstants.LEFT);
         Datastream currentVersions[] =
                 Administrator.APIM.getDatastreams(pid, null, null);
@@ -146,7 +135,7 @@ public class DatastreamsPane
         return false;
     }
 
-    public Map getCurrentVersionMap() {
+    public Map<String, Datastream> getCurrentVersionMap() {
         return m_currentVersionMap;
     }
 
