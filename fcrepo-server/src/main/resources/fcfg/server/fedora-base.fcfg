@@ -237,14 +237,14 @@
             required if GSearchDOManager is used, and the service requires 
             authentication.</comment>
         </param>
-		<param name="fedoraStorageHintProvider" value="org.fcrepo.server.storage.NullStorageHintsProvider">
-			<comment>Hints are gathered and passed to the underline storage systems (only Akubra for now).
-			These are meta data or contextual information about object or datastream to be added or updated.
-			The default implementation is NullStorageHintsProvider; it provides no hints. You you can implement
-			your own FedoraStorageHintProvider and drop your implementation to the $CATALINA_HOME/webapps/fedora/WEB_INF/classes
-			directory (unpackaged), or the $CATALINA_HOME/webapps/fedora/WEB_INF/lib director (packaged).
-			</comment>
-		</param>
+        <param name="fedoraStorageHintProvider" value="org.fcrepo.server.storage.NullStorageHintsProvider">
+            <comment>Hints are gathered and passed to the underline storage systems (only Akubra for now).
+		    These are meta data or contextual information about object or datastream to be added or updated.
+            The default implementation is NullStorageHintsProvider; it provides no hints. You you can implement
+            your own FedoraStorageHintProvider and drop your implementation to the $CATALINA_HOME/webapps/fedora/WEB_INF/classes
+            directory (unpackaged), or the $CATALINA_HOME/webapps/fedora/WEB_INF/lib director (packaged).
+            </comment>
+            </param>
 	</module>
 	<module role="org.fcrepo.server.management.Management" class="org.fcrepo.server.management.ManagementModule">
 		<comment>The management subsystem. This implements the methods necessary 
