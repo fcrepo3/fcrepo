@@ -21,6 +21,7 @@ import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
 
+import java.util.concurrent.Executor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -317,5 +318,30 @@ public class MockConnection
     public <T> T unwrap(Class<T> iface) throws SQLException {
         throw new UnsupportedOperationException(
         "Java 1.6 JDBC methods are not supported");
+    }
+
+    public void setSchema(String schema) {                                          
+        throw new UnsupportedOperationException(                                    
+                "Java 1.7 Connection methods are not supported");                   
+    }                                                                               
+                                                                                    
+    public String getSchema() {                                                     
+        throw new UnsupportedOperationException(                                    
+                "Java 1.7 Connection methods are not supported");                   
+    }                                                                               
+
+    public void abort(Executor executor) {
+        throw new UnsupportedOperationException(
+                "Java 1.7 Connection methods are not supported");
+    }                                                                               
+
+    public void setNetworkTimeout(Executor executor, int milliseconds) {
+        throw new UnsupportedOperationException(
+                "Java 1.7 Connection methods are not supported");
+    }                                                                               
+                                                                                    
+    public int getNetworkTimeout() {                                                
+        throw new UnsupportedOperationException(                                    
+                "Java 1.7 Connection methods are not supported");                   
     }
 }

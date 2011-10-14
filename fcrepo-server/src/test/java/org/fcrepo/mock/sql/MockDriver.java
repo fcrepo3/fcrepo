@@ -10,6 +10,7 @@ import java.sql.Driver;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 
+import java.util.logging.Logger;
 import java.util.Properties;
 
 /**
@@ -60,4 +61,7 @@ public class MockDriver
         throw new RuntimeException("MockDriver.jdbcCompliant not implemented");
     }
 
+    public Logger getParentLogger() {                                               
+        throw new RuntimeException("MockDriver.getParentLogger not implemented");
+    }
 }

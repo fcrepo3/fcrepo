@@ -19,6 +19,7 @@ import java.sql.SQLWarning;
 import java.sql.Savepoint;
 import java.sql.Statement;
 
+import java.util.concurrent.Executor;
 import java.util.Map;
 
 /**
@@ -34,6 +35,31 @@ public abstract class ConnectionWrapper
 
     public ConnectionWrapper(Connection wrapped) {
         m_wrappedConnection = wrapped;
+    }
+
+    public void setSchema(String schema) {
+        throw new UnsupportedOperationException(
+                "Java 1.7 Connection methods are not supported");
+    }
+
+    public String getSchema() {
+        throw new UnsupportedOperationException(
+                "Java 1.7 Connection methods are not supported");
+    }
+
+    public void abort(Executor executor) {
+        throw new UnsupportedOperationException(
+                "Java 1.7 Connection methods are not supported");
+    }
+
+    public void setNetworkTimeout(Executor executor, int milliseconds) {
+        throw new UnsupportedOperationException(
+                "Java 1.7 Connection methods are not supported");
+    }
+
+    public int getNetworkTimeout() {
+        throw new UnsupportedOperationException(
+                "Java 1.7 Connection methods are not supported");
     }
     
     public boolean isWrapperFor(Class<?> iface) {

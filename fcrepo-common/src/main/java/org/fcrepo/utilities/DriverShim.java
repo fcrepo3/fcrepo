@@ -16,7 +16,9 @@ import java.sql.DriverPropertyInfo;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 
+import java.util.logging.Logger;
 import java.util.Properties;
 
 /**
@@ -110,6 +112,11 @@ public class DriverShim
      */
     public boolean jdbcCompliant() {
         return _driver.jdbcCompliant();
+    }
+
+    public Logger getParentLogger() {
+        throw new UnsupportedOperationException(
+                "Java 1.7 Driver methods are not supported");
     }
 
     /**

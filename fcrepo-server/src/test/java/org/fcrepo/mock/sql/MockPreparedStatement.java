@@ -568,4 +568,14 @@ public class MockPreparedStatement
         throw new UnsupportedOperationException(
         "Java 1.6 JDBC methods are not supported");
     }
+
+    public void closeOnCompletion() {                                                               
+        throw new UnsupportedOperationException(                                    
+            "Java 1.7 JDBC methods are not supported");                             
+    }                                                                               
+                                                                                    
+    public boolean isCloseOnCompletion() {                                          
+        throw new UnsupportedOperationException(                                    
+            "Java 1.7 JDBC methods are not supported");                             
+    }
 }
