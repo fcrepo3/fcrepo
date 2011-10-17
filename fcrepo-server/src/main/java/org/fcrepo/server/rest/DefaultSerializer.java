@@ -161,6 +161,20 @@ public class DefaultSerializer {
         return buffer.toString();
     }
 
+    String datastreamProfilesToXML(String pid, Datastream[] dsProfiles, Date versDateTime,
+                                  boolean validateChecksum){
+    	StringBuilder builder=new StringBuilder();
+    	builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+    		.append("<objectDatastreams>");
+    	for (Datastream ds:dsProfiles){
+    		String profile=datastreamProfileToXML(pid, ds.DatastreamID, ds, versDateTime, validateChecksum);
+    		profile=profile.substring(profile.indexOf("?>") + 2);
+    		builder.append(profile);
+    	}
+    	builder.append("</objectDatastreams>");
+    	return builder.toString();
+    }
+    
     String datastreamProfileToXML(String pid, String dsID, Datastream dsProfile, Date versDateTime,
                                   boolean validateChecksum) {
         StringBuffer buffer = new StringBuffer();
