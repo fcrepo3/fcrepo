@@ -105,7 +105,7 @@ public class DatastreamResource
                     output = writer.toString();
                 }
             }
-            return Response.ok(output,mime).build();
+            return Response.ok(output, mime).build();
         } catch (Exception ex) {
             return handleException(ex);
         }
