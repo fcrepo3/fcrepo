@@ -165,11 +165,16 @@ public class DefaultSerializer {
                                   boolean validateChecksum){
     	StringBuilder builder=new StringBuilder();
     	builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-    		.append("<objectDatastreams>");
+    		.append("<objectDatastreams xmlns=\"" + Constants.MANAGEMENT.uri + "\" ")
+    		.append("xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" ")
+    		.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ")
+    		.append("xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/management/ http://www.fedora.info/definitions/1/0/datastreamProfiles.xsd\">");
     	for (Datastream ds:dsProfiles){
-    		String profile=datastreamProfileToXML(pid, ds.DatastreamID, ds, versDateTime, validateChecksum);
-    		profile=profile.substring(profile.indexOf("?>") + 2);
-    		builder.append(profile);
+    	    StringBuilder profileBuilder=new StringBuilder();
+    	    profileBuilder.append("<datastreamProfile>");
+    	    profileBuilder.append(datastreamFieldSerialization(ds, validateChecksum));
+    	    profileBuilder.append("</datastreamProfile>");
+    		builder.append(profileBuilder.toString());
     	}
     	builder.append("</objectDatastreams>");
     	return builder.toString();

@@ -43,4 +43,5 @@ public interface RestParam {
     String IS_LITERAL = "isLiteral";
     String DATATYPE = "datatype";
     String LAST_MODIFIED_DATE = "lastModifiedDate";
+    String PROFILES ="profiles";
 }
