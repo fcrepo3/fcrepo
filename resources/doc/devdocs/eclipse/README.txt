@@ -1,2 +1,2 @@
-For instructions on setting up your Fedora development environment
-with Eclipse, please see: https://wiki.duraspace.org/x/ToFzAQ
+If you use Eclipse as your IDE, these files can be imported to apply
+this project's coding conventions to your workspace.
