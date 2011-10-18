@@ -190,16 +190,6 @@ public class BasicDigitalObject
     }
 
     private void add(Datastream d) {
-
-        /*
-         * We determine the most recent datastream version by its created date.
-         * If a created date has not been supplied, give it one.
-         */
-    	// !! No we DONT! that's what caused FCREPO-238 !!
-//        if (d.DSCreateDT == null) {
-//            d.DSCreateDT = new Date();
-//        }
-
         String id = d.DatastreamID;
         if (!m_datastreams.containsKey(id)) {
             m_datastreams.put(id, new ArrayList<Datastream>());
