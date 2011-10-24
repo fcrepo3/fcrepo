@@ -107,12 +107,4 @@ extends AbstractFilter {
         return req;
     }
 
-    @Override
-    public RequestCtx handleResponse(HttpServletRequest request,
-                                     HttpServletResponse response)
-            throws IOException, ServletException {
-        return null;
-    }
-
-
 }

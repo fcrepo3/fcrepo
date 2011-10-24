@@ -81,7 +81,7 @@ import org.fcrepo.server.security.xacml.util.LogUtil;
  * @author nishen@melcoe.mq.edu.au
  */
 public class SearchFilter
-        extends AbstractFilter {
+        extends AbstractFilter implements ResponseHandlingRESTFilter {
 
     private static final Logger logger =
             LoggerFactory.getLogger(SearchFilter.class);
