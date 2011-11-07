@@ -36,6 +36,11 @@ public class TestBase64 extends junit.framework.TestCase {
         assertEquals(FOO_STRING_ENCODED,
                      Base64.encodeToString(FOO_BYTES));
     }
+    
+    @Test
+    public void testEncodeToStreamInputStream(){
+        
+    }
 
     @Test
     public void testEncodeToStringInputStream() {

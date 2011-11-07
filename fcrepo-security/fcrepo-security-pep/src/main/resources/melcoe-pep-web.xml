@@ -386,16 +386,16 @@
     </error-page>
     <security-constraint>
         <web-resource-collection>
-            <description>Fedora-generated security-constraint</description>
             <web-resource-name>Fedora Repository Server</web-resource-name>
+            <description>Fedora-generated security-constraint</description>
             <url-pattern>/getDS</url-pattern>
             <url-pattern>/management/control</url-pattern>
         </web-resource-collection>
     </security-constraint>
     <security-constraint>
         <web-resource-collection>
-            <description>Fedora-generated security-constraint</description>
             <web-resource-name>Fedora Repository Server</web-resource-name>
+            <description>Fedora-generated security-constraint</description>
             <url-pattern>/index.html</url-pattern>
             <url-pattern>/getDSAuthenticated</url-pattern>
             <url-pattern>/management/getNextPID</url-pattern>
@@ -406,8 +406,8 @@
     </security-constraint>
     <security-constraint>
         <web-resource-collection>
-            <description>Fedora-generated security-constraint</description>
             <web-resource-name>Fedora Repository Server</web-resource-name>
+            <description>Fedora-generated security-constraint</description>
             <url-pattern>/</url-pattern>
             <url-pattern>/describe</url-pattern>
             <url-pattern>/get/*</url-pattern>
