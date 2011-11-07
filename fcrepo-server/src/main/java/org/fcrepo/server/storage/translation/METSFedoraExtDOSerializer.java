@@ -5,9 +5,13 @@
 
 package org.fcrepo.server.storage.translation;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
 import java.util.Date;
@@ -54,6 +58,8 @@ public class METSFedoraExtDOSerializer
     private static final Logger logger =
             LoggerFactory.getLogger(METSFedoraExtDOSerializer.class);
 
+    private static final char [] DS_INDENT = "              ".toCharArray();
+    
     /** The format this serializer writes. */
     private final XMLFormat m_format;
 
@@ -558,10 +564,19 @@ public class METSFedoraExtDOSerializer
                         writer.print("<");
                         writer.print(METS.prefix);
                         writer.print(":FContent> \n");
-                        String encoded = Base64.encodeToString(dsc.getContentStream());
-                        writer.print(StringUtility.splitAndIndent(encoded,
-                                                                  14,
-                                                                  80));
+                        Reader encoded = new InputStreamReader(Base64.encodeToStream(dsc.getContentStream()));
+                        char [] buffer = new char[80];
+                        int len = 0;           
+                        
+                        try{
+                            while ((len = encoded.read(buffer)) > -1){
+                                writer.write(DS_INDENT);
+                                writer.write(buffer,0,len);
+                                writer.write('\n');
+                            }
+                        } catch (IOException ioe) {
+                           throw new StreamIOException(ioe.getMessage()); 
+                        }
                         writer.print("</");
                         writer.print(METS.prefix);
                         writer.print(":FContent>\n");
