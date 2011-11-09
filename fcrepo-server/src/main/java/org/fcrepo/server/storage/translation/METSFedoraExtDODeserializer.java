@@ -559,11 +559,13 @@ public class METSFedoraExtDODeserializer
                     if (m_obj.isNew()) {
                         try {
                             ValidationUtility.validateURL(dsLocation, m_dsControlGrp);
+                            m_dsLocationType = Datastream.DS_LOCATION_TYPE_URL;
                         } catch (ValidationException ve) {
                             throw new SAXException(ve.getMessage());
                         }
+                    } else {
+                        m_dsLocationType = Datastream.DS_LOCATION_TYPE_INTERNAL;
                     }
-                    m_dsLocationType = Datastream.DS_LOCATION_TYPE_INTERNAL;
                     m_dsInfoType = "DATA";
                     m_dsLocation = dsLocation;
                     instantiateDatastream(new DatastreamManagedContent());
