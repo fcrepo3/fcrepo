@@ -437,7 +437,7 @@ public class FOXMLDODeserializer
                         throw new SAXException(ve.getMessage());
                     }
                     // system will set dsLocationType for E and R datastreams...
-                    m_dsLocationType = "URL";
+                    m_dsLocationType = Datastream.DS_LOCATION_TYPE_URL;
                     m_dsLocation = dsLocation;
                     instantiateDatastream(new DatastreamReferencedContent());
                     // check if datastream is ManagedContent
@@ -453,7 +453,9 @@ public class FOXMLDODeserializer
                             throw new SAXException(ve.getMessage());
                         }
                     }
-                    m_dsLocationType = "INTERNAL_ID";
+                    else {
+                        m_dsLocationType = Datastream.DS_LOCATION_TYPE_INTERNAL;
+                    }
                     m_dsLocation = dsLocation;
                     instantiateDatastream(new DatastreamManagedContent());
                 }
@@ -618,7 +620,7 @@ public class FOXMLDODeserializer
                     byte elementBytes[] = Base64.decode(elementStr);
                     os.write(elementBytes);
                     os.close();
-                    m_dsLocationType = "INTERNAL_ID";
+                    m_dsLocationType = Datastream.DS_LOCATION_TYPE_INTERNAL;
                     m_dsLocation =
                         DatastreamManagedContent.TEMP_SCHEME
                                     + m_binaryContentTempFile.getAbsolutePath();

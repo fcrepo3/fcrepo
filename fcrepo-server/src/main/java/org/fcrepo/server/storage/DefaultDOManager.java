@@ -1231,6 +1231,7 @@ public class DefaultDOManager
                                 }
                                 // Reset dsLocation in object to new internal location.
                                 dmc.DSLocation = internalId;
+                                dmc.DSLocationType = Datastream.DS_LOCATION_TYPE_INTERNAL;
                                 logger.info("Replaced managed datastream location with internal id: " + internalId);
                                 }
                             } else if (!internalId.equals(dmc.DSLocation)) {

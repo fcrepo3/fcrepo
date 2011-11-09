@@ -547,7 +547,7 @@ public class METSFedoraExtDODeserializer
                         throw new SAXException(ve.getMessage());
                     }
                     // system will set dsLocationType for E and R datastreams...
-                    m_dsLocationType = "URL";
+                    m_dsLocationType = Datastream.DS_LOCATION_TYPE_URL;
                     m_dsInfoType = "DATA";
                     m_dsLocation = dsLocation;
                     instantiateDatastream(new DatastreamReferencedContent());
@@ -563,7 +563,7 @@ public class METSFedoraExtDODeserializer
                             throw new SAXException(ve.getMessage());
                         }
                     }
-                    m_dsLocationType = "INTERNAL_ID";
+                    m_dsLocationType = Datastream.DS_LOCATION_TYPE_INTERNAL;
                     m_dsInfoType = "DATA";
                     m_dsLocation = dsLocation;
                     instantiateDatastream(new DatastreamManagedContent());
@@ -727,7 +727,7 @@ public class METSFedoraExtDODeserializer
                             byte elementBytes[] = Base64.decode(elementStr);
                             os.write(elementBytes);
                             os.close();
-                            m_dsLocationType = "INTERNAL_ID";
+                            m_dsLocationType = Datastream.DS_LOCATION_TYPE_INTERNAL;
                             m_dsLocation =
                                 DatastreamManagedContent.TEMP_SCHEME
                                             + m_binaryContentTempFile
@@ -1186,7 +1186,7 @@ public class METSFedoraExtDODeserializer
         ds.DSState = "A";
         ds.DSLocation =
                 m_obj.getPid() + "+" + ds.DatastreamID + "+" + ds.DSVersionID;
-        ds.DSLocationType = "INTERNAL_ID";
+        ds.DSLocationType = Datastream.DS_LOCATION_TYPE_INTERNAL;
         ds.DSInfoType = "DATA";
         ds.DSMDClass = DatastreamXMLMetadata.TECHNICAL;
 

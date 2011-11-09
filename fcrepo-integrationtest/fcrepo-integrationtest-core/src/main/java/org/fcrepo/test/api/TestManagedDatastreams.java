@@ -222,7 +222,7 @@ public class TestManagedDatastreams
 
     @Test
     public void testModifyDatastreamByReferenceWithChecksum() throws Exception {
-        String pid = "demo:m_ds_test_add";
+        String pid = "file:m_ds_test_add"; // file pid namespace should work as well as demo
         String checksumType = "MD5";
         apim.ingest(getAtomObject(pid, null), ATOM1_1.uri, null);
         File temp = null;
@@ -371,7 +371,7 @@ public class TestManagedDatastreams
             String dsv = "DS1.0";
             doc.addDatastream(ds, State.A, ControlGroup.M, true);
             doc.addDatastreamVersion(ds, dsv, "text/plain", "label", 1, date);
-            doc.setContentLocation(dsv, contentLocation, "URL");
+            doc.setContentLocation(dsv, contentLocation, org.fcrepo.server.storage.types.Datastream.DS_LOCATION_TYPE_URL);
         }
         return doc;
     }

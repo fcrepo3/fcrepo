@@ -352,8 +352,8 @@ public class FOXMLDOSerializer
                     writer.print("<");
                     writer.print(FOXML.prefix);
                     writer.print(":contentLocation TYPE=\"");
-                    writer.print("URL\"");
-                    writer.print(" REF=\"");
+                    writer.print(Datastream.DS_LOCATION_TYPE_URL);
+                    writer.print("\" REF=\"");
                     String urls = DOTranslationUtility.normalizeDSLocationURLs(
                             obj.getPid(),
                             vds,
@@ -377,7 +377,8 @@ public class FOXMLDOSerializer
                         writer.print("<");
                         writer.print(FOXML.prefix);
                         writer.print(":contentLocation TYPE=\"");
-                        writer.print("INTERNAL_ID\" REF=\"");
+                        writer.print(Datastream.DS_LOCATION_TYPE_INTERNAL);
+                        writer.print("\" REF=\"");
                         String urls = DOTranslationUtility.normalizeDSLocationURLs(
                                 obj.getPid(),
                                 vds,

@@ -27,6 +27,7 @@ import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationUtility;
+import org.fcrepo.server.validation.ecm.jaxb.DsTypeModel;
 
 
 
@@ -154,44 +155,38 @@ public class DatastreamManagedContent
                 } else {
                     throw new StreamIOException("Temp file " + DSLocation + " no longer exists.");
                 }
-
-            } else {
-                try {
-                    // validation precludes internal DSLocations, which
-                    // have the form pid+dsid+dsvid, e.g. demo:foo+DS1+DS1.0
-                    ValidationUtility.validateURL(DSLocation, this.DSControlGrp);
-                    // If validation has succeeded, assume an external resource.
-                    // Fetch it, store it locally, update DSLocation
-                    if (ctx == null) {
-                        ctx = ReadOnlyContext.getContext(null, null, "", false);
-                        // changed from below, which sets noOp to true, seems to cause an AuthZ permitted exception
-                        // in PolicyEnforcementPoint.enforce(...)
-                        // ctx = ReadOnlyContext.EMPTY;
-                    }
-                   ContentManagerParams params = new ContentManagerParams(DSLocation);
-                    params.setContext(ctx);
-                    MIMETypedStream stream = getExternalContentManager()
-                            .getExternalContent(params);
-
-                    // TODO: refactor temp file management - see FCREPO-718; for now create temp file and write to it
-                    // note - don't use temp upload directory, use (container's) temp dir (upload dir is for uploads)
-                    File tempFile = File.createTempFile("managedcontentupdate", null);
-                    OutputStream os = new FileOutputStream(tempFile);
-                    StreamUtility.pipeStream(stream.getStream(), os, 32768);
-                    DSLocation = TEMP_SCHEME + tempFile.getAbsolutePath();
-                    return new FileInputStream(new File(tempFile.getAbsolutePath()));
-
-                } catch(ValidationException e) {
-                    // At this point, assume it's an internal id
-                    // (e.g. demo:foo+DS1+DS1.0)
-                    return getLLStore().retrieveDatastream(DSLocation);
+            } else if (Datastream.DS_LOCATION_TYPE_INTERNAL.equals(DSLocationType)) {
+                return getLLStore().retrieveDatastream(DSLocation);
+            } else if (Datastream.DS_LOCATION_TYPE_URL.equals(DSLocationType)) {
+                // Managed content can have URL dsLocation on ingest
+                ValidationUtility.validateURL(DSLocation, this.DSControlGrp);
+                // If validation has succeeded, assume an external resource.
+                // Fetch it, store it locally, update DSLocation
+                if (ctx == null) {
+                    ctx = ReadOnlyContext.getContext(null, null, "", false);
+                    // changed from below, which sets noOp to true, seems to cause an AuthZ permitted exception
+                    // in PolicyEnforcementPoint.enforce(...)
+                    // ctx = ReadOnlyContext.EMPTY;
                 }
+               ContentManagerParams params = new ContentManagerParams(DSLocation);
+                params.setContext(ctx);
+                MIMETypedStream stream = getExternalContentManager()
+                        .getExternalContent(params);
+
+                // TODO: refactor temp file management - see FCREPO-718; for now create temp file and write to it
+                // note - don't use temp upload directory, use (container's) temp dir (upload dir is for uploads)
+                File tempFile = File.createTempFile("managedcontentupdate", null);
+                OutputStream os = new FileOutputStream(tempFile);
+                StreamUtility.pipeStream(stream.getStream(), os, 32768);
+                DSLocation = TEMP_SCHEME + tempFile.getAbsolutePath();
+                return new FileInputStream(new File(tempFile.getAbsolutePath()));
             }
         } catch (Throwable th) {
             throw new StreamIOException("[DatastreamManagedContent] returned "
                     + " the error: \"" + th.getClass().getName()
                     + "\". Reason: " + th.getMessage(), th);
         }
+        throw new StreamIOException("[DatastreamManagedContent] could not resolve dsLocation " + DSLocation + " dsLocationType " + DSLocationType);
     }
 
     /**

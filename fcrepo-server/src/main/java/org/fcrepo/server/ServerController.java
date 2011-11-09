@@ -376,7 +376,7 @@ public class ServerController
                                            new String[0]);
 
         } catch (ServerException e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(),e);
             throw new InternalError500Exception(request,
                                                 actionLabel,
                                                 "Unexpected error: " + e.getMessage(),

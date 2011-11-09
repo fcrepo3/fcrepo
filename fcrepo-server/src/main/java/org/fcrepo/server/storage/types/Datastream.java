@@ -37,6 +37,10 @@ public class Datastream {
     public final static String CHECKSUM_NONE = "none";
 
     public final static String CHECKSUM_IOEXCEPTION = "ExceptionReadingStream";
+    
+    public static final String DS_LOCATION_TYPE_INTERNAL = "INTERNAL_ID";
+
+    public static final String DS_LOCATION_TYPE_URL = "URL";
 
     public boolean isNew = false;
     

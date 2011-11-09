@@ -292,7 +292,7 @@ public class AtomDODeserializer
                 (DOTranslationUtility.normalizeDSLocationURLs(m_obj.getPid(),
                                                               ds,
                                                               m_transContext)).DSLocation;
-        ds.DSLocationType = "URL";
+        ds.DSLocationType = Datastream.DS_LOCATION_TYPE_URL;
         ds.DSMIME = entry.getContentMimeType().toString();
 
         return ds;
@@ -302,7 +302,7 @@ public class AtomDODeserializer
             throws StreamIOException, ObjectIntegrityException {
         Datastream ds = new DatastreamManagedContent();
         setDSCommonProperties(ds, entry);
-        ds.DSLocationType = "INTERNAL_ID";
+        ds.DSLocationType = Datastream.DS_LOCATION_TYPE_INTERNAL;
 
         ds.DSMIME = getDSMimeType(entry);
 

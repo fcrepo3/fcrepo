@@ -27,7 +27,7 @@ public abstract class ObjectBuilder {
         ds.DSControlGrp = "E";
         ds.DSMIME = "text/plain";
         ds.DSLocation = "http://www.example.org/e.txt";
-        ds.DSLocationType = "URL";
+        ds.DSLocationType = Datastream.DS_LOCATION_TYPE_URL;
         ds.DSSize = 1;
         addDatastream(obj, id, ds);
     }
@@ -37,7 +37,7 @@ public abstract class ObjectBuilder {
         ds.DSControlGrp = "E";
         ds.DSMIME = mime;
         ds.DSLocation = url;
-        ds.DSLocationType = "URL";
+        ds.DSLocationType = Datastream.DS_LOCATION_TYPE_URL;
         ds.DSSize = 1;
         addDatastream(obj, id, ds);
     }
@@ -48,7 +48,7 @@ public abstract class ObjectBuilder {
         ds.DSControlGrp = "R";
         ds.DSMIME = "text/plain";
         ds.DSLocation = "http://www.example.org/r.txt";
-        ds.DSLocationType = "URL";
+        ds.DSLocationType = Datastream.DS_LOCATION_TYPE_URL;
         ds.DSSize = 2;
         addDatastream(obj, id, ds);
     }
@@ -89,7 +89,7 @@ public abstract class ObjectBuilder {
         ds.DSControlGrp = "M";
         ds.DSMIME = "image/jpeg";
         ds.DSLocation = "bogusLocation";
-        ds.DSLocationType = "INTERNAL";
+        ds.DSLocationType = Datastream.DS_LOCATION_TYPE_INTERNAL;
         ds.DSSize = 4;
         addDatastream(obj, id, ds);
     }

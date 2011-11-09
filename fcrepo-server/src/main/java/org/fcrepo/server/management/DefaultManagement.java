@@ -493,9 +493,11 @@ public class DefaultManagement
             } else if (controlGroup.equals("M")) {
                 ds = new DatastreamManagedContent();
                 ds.DSInfoType = "DATA";
+                ds.DSLocationType = Datastream.DS_LOCATION_TYPE_URL;
             } else if (controlGroup.equals("R") || controlGroup.equals("E")) {
                 ds = new DatastreamReferencedContent();
                 ds.DSInfoType = "DATA";
+                ds.DSLocationType = Datastream.DS_LOCATION_TYPE_URL;
             } else {
                 throw new GeneralException("Invalid control group: "
                                            + controlGroup);
@@ -746,6 +748,7 @@ public class DefaultManagement
             newds.DSCreateDT = nowUTC;
             // newds.DSSize will be computed later
             newds.DSLocation = dsLocation;
+            newds.DSLocationType = Datastream.DS_LOCATION_TYPE_URL;
             newds.DSChecksumType = checksumType;
 
             // validate reserved datastreams (type M and X)

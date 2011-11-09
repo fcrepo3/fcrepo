@@ -728,7 +728,7 @@ implements PolicyStore {
         foxml.append("<foxml:datastreamVersion ID=\"POLICY.0\" MIMETYPE=\"text/xml\" LABEL=\"XACML policy datastream\">");
         if (controlGroup.equals("M")) {
             foxml.append("  <foxml:contentLocation REF=\"" + policyOrLocation
-                         + "\" TYPE=\"URL\"/>");
+                         + "\" TYPE=\"" + org.fcrepo.server.storage.types.Datastream.DS_LOCATION_TYPE_URL + "\"/>");
 
         } else if (controlGroup.equals("X")) {
             foxml.append("  <foxml:xmlContent>");

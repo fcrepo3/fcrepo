@@ -219,7 +219,7 @@ public class ResourceIndexRebuilderTest {
             String dsv = "DS1.0";
             doc.addDatastream(ds, State.A, ControlGroup.E, true);
             doc.addDatastreamVersion(ds, dsv, "text/html", "label", 1, date);
-            doc.setContentLocation(dsv, contentLocation, "URL");
+            doc.setContentLocation(dsv, contentLocation, org.fcrepo.server.storage.types.Datastream.DS_LOCATION_TYPE_URL);
         }
         return doc;
     }
