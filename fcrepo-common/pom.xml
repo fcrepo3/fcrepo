@@ -286,6 +286,12 @@
       <version>1.1</version>
     </dependency>
 
+    <!-- previously provided by trippi/mulgara in 2.1.4? -->
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+    </dependency>
+    
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>axis</artifactId>
@@ -295,6 +301,13 @@
       <groupId>org.fcrepo</groupId>
       <artifactId>mulgara-core</artifactId>
     </dependency>
+    
+    <!-- previously provided by trippi/mulgara in 2.1.4? -->
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>openrdf-sesame-onejar</artifactId>
+    </dependency>
+    
 
     <dependency>
       <groupId>org.fcrepo</groupId>

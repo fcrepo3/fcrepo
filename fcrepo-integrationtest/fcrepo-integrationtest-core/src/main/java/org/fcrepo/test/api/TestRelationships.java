@@ -13,6 +13,8 @@ import java.rmi.RemoteException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
@@ -49,6 +51,9 @@ public class TestRelationships
         implements Constants {
 
     private FedoraAPIM apim;
+    
+    // probably 1 thread would be fine...
+    private ExecutorService exec = Executors.newFixedThreadPool(4);
 
     private static final String RISEARCH_QUERY =
             "/risearch?type=triples&lang=spo&format=NTriples&stream=on&"
@@ -202,6 +207,8 @@ public class TestRelationships
         apim.purgeObject("demo:777m", "", false);
         apim.purgeObject("demo:888m", "", false);
         XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
+        
+    	exec.shutdown();
     }
 
     public void testAddRelationship() throws Exception {
@@ -488,7 +495,8 @@ public class TestRelationships
                 client.get(RISEARCH_QUERY + URLEncoder.encode(query, "UTF-8"), true);
         return new RIOTripleIterator(results,
                                      new NTriplesParser(),
-                                     "info/fedora");
+                                     "info/fedora",
+                                     exec);
 
     }
 
