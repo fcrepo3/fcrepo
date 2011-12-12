@@ -5,6 +5,12 @@
 
 package org.fcrepo.server.storage.translation;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,9 +28,12 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import org.fcrepo.server.storage.translation.DOSerializer;
+import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamReferencedContent;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
+
+import org.fcrepo.utilities.TestBase64;
 
 import static org.fcrepo.common.Constants.METS;
 import static org.fcrepo.common.Constants.XLINK;
@@ -44,6 +53,9 @@ public abstract class TestMETSFedoraExtDOSerializer
 
     protected static final String AMDSEC_PATH =
             ROOT_PATH + "/" + METS.AMD_SEC.qName;
+    
+    protected static final String SERIALIZED_DS_CONTENT =
+        "<" + METS.prefix + ":FContent> \n" + TestBase64.FOO_STRING_ENCODED + "\n</" + METS.prefix + ":FContent> \n";
 
     TestMETSFedoraExtDOSerializer(DOSerializer serializer) {
         super(serializer);
@@ -122,6 +134,26 @@ public abstract class TestMETSFedoraExtDOSerializer
         Document xml = doSerializeOrFail(obj);
         /* ds1, ds2 + rels-ext */
         assertXpathEvaluatesTo("3", "count(" + AMDSEC_PATH + ")", xml);
+    }
+    
+    @Test
+    public void testDatastreamContentSerialization()
+        throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Datastream dsc = createMDatastream("DS1", TestBase64.FOO_BYTES);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        PrintWriter pw = new PrintWriter(bos);
+        Method testMethod = METSFedoraExtDOSerializer.class.getDeclaredMethod("serializeDatastreamContent", Datastream.class, PrintWriter.class);
+        boolean accessible = testMethod.isAccessible();
+        if ( !accessible ) testMethod.setAccessible(true);
+        try{
+            testMethod.invoke(this.m_serializer, dsc, pw);
+        }
+        finally {
+            if ( !accessible ) testMethod.setAccessible( accessible );
+        }
+        pw.flush();
+        String actual = bos.toString();
+        assertEquals(SERIALIZED_DS_CONTENT, actual);
     }
 
     //---

@@ -5,6 +5,9 @@
 package org.fcrepo.utilities;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.junit.Test;
 
@@ -15,10 +18,10 @@ import org.fcrepo.utilities.Base64;
  */
 public class TestBase64 extends junit.framework.TestCase {
 
-    private static final byte[] FOO_BYTES = new byte[] { 0x66, 0x6f, 0x6f };
-    private static final byte[] FOO_BYTES_ENCODED = new byte[] { 0x5a, 0x6d, 0x39, 0x76 };
-    private static final String FOO_STRING = "foo";
-    private static final String FOO_STRING_ENCODED = "Zm9v";
+    public static final byte[] FOO_BYTES = new byte[] { 0x66, 0x6f, 0x6f };
+    public static final byte[] FOO_BYTES_ENCODED = new byte[] { 0x5a, 0x6d, 0x39, 0x76 };
+    public static final String FOO_STRING = "foo";
+    public static final String FOO_STRING_ENCODED = "Zm9v";
 
     @Test
     public void testEncodeByteArray() {
@@ -38,8 +41,16 @@ public class TestBase64 extends junit.framework.TestCase {
     }
     
     @Test
-    public void testEncodeToStreamInputStream(){
-        
+    public void testEncodeToStreamInputStream() throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ByteArrayInputStream bis = new ByteArrayInputStream(FOO_BYTES);
+        InputStream encoded = Base64.encodeToStream(bis);
+        int read = -1;
+        while ((read = encoded.read()) > -1){
+            bos.write(read);
+        }
+        byte [] actual = bos.toByteArray();
+        assertSameBytes(FOO_BYTES_ENCODED, actual);
     }
 
     @Test
@@ -72,6 +83,24 @@ public class TestBase64 extends junit.framework.TestCase {
             }
         }
         return true;
+    }
+    
+    private static final void assertSameBytes(byte [] a, byte [] b) {
+        if (a.length != b.length) fail("Bytes not equal\nE: " + inspectBytes(a) + "\nA: " + inspectBytes(b));
+        for (int i = 0; i < a.length; i++) {
+            if (a[i] != b[i]) {
+                fail("Bytes not equal at position " + Integer.toString(i) + "\nE: " + inspectBytes(a) + "\nA: " + inspectBytes(b));
+            }
+        }
+    }
+    
+    private static String inspectBytes(byte [] a) {
+        StringBuilder builder = new StringBuilder(a.length * 3);
+        for (byte b: a){
+            builder.append(Integer.toHexString(b));
+            builder.append(' ');
+        }
+        return builder.toString();
     }
 
 }
