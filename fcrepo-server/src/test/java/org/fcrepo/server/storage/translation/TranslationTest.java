@@ -5,6 +5,9 @@
 
 package org.fcrepo.server.storage.translation;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import java.util.Date;
 
 import org.custommonkey.xmlunit.XMLTestCase;
@@ -15,9 +18,13 @@ import org.junit.Before;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
+
+import org.fcrepo.server.Context;
+import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.DSBinding;
 import org.fcrepo.server.storage.types.DSBindingMap;
+import org.fcrepo.server.storage.types.DatastreamManagedContent;
 import org.fcrepo.server.storage.types.DatastreamReferencedContent;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
@@ -99,6 +106,18 @@ public abstract class TranslationTest
         ds.DSControlGrp = "R";
         ds.DSLocation = url;
         return ds;
+    }
+    
+    protected static DatastreamManagedContent createMDatastream(String id, final byte [] content) {
+        DatastreamManagedContent dmc = new DatastreamManagedContent(){
+            public InputStream getContentStream(Context ctx) throws StreamIOException {
+                return new ByteArrayInputStream(content);
+            }
+        };
+        dmc.DatastreamID = id;
+        dmc.DSVersionID = id + ".0";
+        dmc.DSControlGrp = "M";
+        return dmc;
     }
 
     protected static Disseminator createDisseminator(String id, int numBindings) {

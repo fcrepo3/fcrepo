@@ -57,7 +57,7 @@ public abstract class Base64 {
     }
     
     public static InputStream encodeToStream(InputStream in) {
-        return new org.apache.commons.codec.binary.Base64InputStream(in, true);
+        return new org.apache.commons.codec.binary.Base64InputStream(in, true, -1, null);
     }
 
     /**
