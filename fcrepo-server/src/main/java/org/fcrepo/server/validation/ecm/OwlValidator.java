@@ -16,6 +16,8 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.util.OWLClassExpressionVisitorAdapter;
 import org.semanticweb.owlapi.util.OWLOntologyMerger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -35,12 +37,8 @@ import java.util.*;
 public class OwlValidator {
     private RepositoryReader doMgr;
 
-
-    XPathSelector xpathselector = DOM.createXPathSelector("fedora-model", "info:fedora/fedora-system:def/model#",
-                                                          "rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                                                          "owl", "http://www.w3.org/2002/07/owl#",
-                                                          "rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-
+    private static final Logger logger =
+            LoggerFactory.getLogger(OwlValidator.class);
 
     public OwlValidator(RepositoryReader doMgr) {
         //To change body of created methods use File | Settings | File Templates.
@@ -95,8 +93,7 @@ public class OwlValidator {
             try {
                 owlManager.loadOntologyFromOntologyDocument(ontologyStream);
             } catch (OWLOntologyCreationException e) {
-                //TODO
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                logger.debug("Failed to load ontology for object " + currentObjectReader.GetObjectPID(), e);
             }
         }
         OWLOntologyMerger merger = new OWLOntologyMerger(owlManager);
@@ -105,8 +102,7 @@ public class OwlValidator {
         try {
             mergedOntology = merger.createMergedOntology(owlManager, mergedOntologyIRI);
         } catch (OWLOntologyCreationException e) {
-            //TODO
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.debug("Failed to load ontology for object " + currentObjectReader.GetObjectPID(), e);
         }
 
 
@@ -204,7 +200,7 @@ public class OwlValidator {
                             break;
                         }
                     }
-                    if (found == false) {
+                    if (!found) {
                         validation.setValid(false);
                         validation.getObjectProblems().add(Errors.allValuesFromViolation(subject, ontologyrelation,requiredTarget));
 
@@ -234,8 +230,15 @@ public class OwlValidator {
         } else { //target is an object
             targetPid = target;
         }
-        DOReader targetReader = doMgr.getReader(false, context, targetPid);
-        List<String> targetContentModels = targetReader.getContentModels();
+        List<String> targetContentModels;
+        try {
+            DOReader targetReader = doMgr.getReader(false, context, targetPid);
+            targetContentModels = targetReader.getContentModels();
+        } catch (ServerException e){
+            logger.debug("Failed to retrieve object: '"+targetPid+"'",e);
+            targetContentModels = new ArrayList<String>(0);
+        }
+
         for (String targetContentModel : targetContentModels) {
             targetContentModel = targetContentModel+"#" +dsname+"class";
             classes.add(targetContentModel);
@@ -277,14 +280,13 @@ public class OwlValidator {
                             break;
                         }
                     }
-                    if (found == false) {
+                    if (!found) {
                         validation.setValid(false);
                         validation.getObjectProblems().add(
                                 Errors.someValuesFromViolationWrongClassOfTarget(subject,
                                                                                  ontologyrelation,
                                                                                  requiredTarget));
-                    }
-                    if (found) {
+                    } else {
                         break;
                     }
                 }

@@ -6,6 +6,8 @@ import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.Validation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
@@ -23,11 +25,11 @@ public class EcmValidator {
     private RepositoryReader doMgr;
     private ExternalContentManager m_exExternalContentManager;
 
-    private static final XPath xpathCompiler =
-            XPathFactory.newInstance().newXPath();
 
     private OwlValidator relsExtValidator;
 
+    private static final Logger logger =
+            LoggerFactory.getLogger(EcmValidator.class);
 
     private DatastreamValidator datastreamValidator;
 

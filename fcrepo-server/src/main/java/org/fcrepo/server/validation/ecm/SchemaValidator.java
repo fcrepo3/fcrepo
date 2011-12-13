@@ -12,6 +12,8 @@ import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.validation.ecm.jaxb.DsTypeModel;
 import org.fcrepo.server.validation.ecm.jaxb.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
@@ -40,6 +42,9 @@ import java.util.*;
  */
 public class SchemaValidator {
     private RepositoryReader doMgr;
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(SchemaValidator.class);
 
     public SchemaValidator(RepositoryReader doMgr) {
 

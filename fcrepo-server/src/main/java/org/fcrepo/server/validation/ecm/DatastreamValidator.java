@@ -9,6 +9,8 @@ import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.validation.ecm.jaxb.DsCompositeModel;
 import org.fcrepo.server.validation.ecm.jaxb.DsTypeModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXB;
 import java.util.ArrayList;
@@ -28,7 +30,8 @@ public class DatastreamValidator {
 
     private FormValidator formValidator;
     private RepositoryReader doMgr;
-
+    private static final Logger logger =
+            LoggerFactory.getLogger(DatastreamValidator.class);
 
     public DatastreamValidator(RepositoryReader doMgr) {
         this.doMgr = doMgr;
