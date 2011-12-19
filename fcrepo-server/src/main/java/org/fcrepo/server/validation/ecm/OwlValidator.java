@@ -10,20 +10,14 @@ import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.validation.ecm.jaxb.DsCompositeModel;
 import org.fcrepo.server.validation.ecm.jaxb.DsTypeModel;
-import org.fcrepo.utilities.xml.DOM;
-import org.fcrepo.utilities.xml.XPathSelector;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.util.OWLClassExpressionVisitorAdapter;
 import org.semanticweb.owlapi.util.OWLOntologyMerger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import javax.xml.bind.JAXB;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.*;
 
@@ -192,7 +186,16 @@ public class OwlValidator {
                 if (objectRelationName.equals(ontologyrelation)) {//This is one of the restricted relations
 
                     String target = relation.object;
-                    List<String> classes = getClassesOfTarget(target, context);
+                    List<String> classes;
+                    try {
+                        classes = getClassesOfTarget(target, context);
+                    } catch (ServerException e){
+                        validation.setValid(false);
+                        validation.getObjectProblems().add(Errors.missingObjectViolation(subject,objectRelationName,requiredTarget, target));
+                        continue;
+                    }
+
+
                     boolean found = false;
                     for (String aClass : classes) {
                         if (aClass.equals(requiredclass.getIRI().toString())){
@@ -231,13 +234,9 @@ public class OwlValidator {
             targetPid = target;
         }
         List<String> targetContentModels;
-        try {
-            DOReader targetReader = doMgr.getReader(false, context, targetPid);
-            targetContentModels = targetReader.getContentModels();
-        } catch (ServerException e){
-            logger.debug("Failed to retrieve object: '"+targetPid+"'",e);
-            targetContentModels = new ArrayList<String>(0);
-        }
+
+        DOReader targetReader = doMgr.getReader(false, context, targetPid);
+        targetContentModels = targetReader.getContentModels();
 
         for (String targetContentModel : targetContentModels) {
             targetContentModel = targetContentModel+"#" +dsname+"class";
@@ -272,7 +271,13 @@ public class OwlValidator {
                 if (objectRelationName.equals(ontologyrelation)) {//This is one of the restricted relations
 
                     String target = relation.object;
-                    List<String> classes = getClassesOfTarget(target, context);
+                    List<String> classes;
+                    try {
+                        classes = getClassesOfTarget(target, context);
+                    } catch (ServerException e){
+                        //object not found. So, continue to next
+                        continue;
+                    }
 
                     for (String aClass : classes) {
                         if (aClass.equals(requiredclass.getIRI().toString())){
@@ -280,16 +285,16 @@ public class OwlValidator {
                             break;
                         }
                     }
-                    if (!found) {
-                        validation.setValid(false);
-                        validation.getObjectProblems().add(
-                                Errors.someValuesFromViolationWrongClassOfTarget(subject,
-                                                                                 ontologyrelation,
-                                                                                 requiredTarget));
-                    } else {
-                        break;
-                    }
+                } else {
+                    continue;
                 }
+            }
+            if (!found) {
+                validation.setValid(false);
+                validation.getObjectProblems().add(
+                        Errors.someValuesFromViolationWrongClassOfTarget(subject,
+                                                                         ontologyrelation,
+                                                                         requiredTarget));
             }
         }
 

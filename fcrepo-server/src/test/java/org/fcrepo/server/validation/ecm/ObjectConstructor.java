@@ -90,6 +90,17 @@ public class ObjectConstructor {
         return object;
     }
 
+
+    public static DigitalObject produceContentModel3()
+            throws FileNotFoundException, ObjectIntegrityException, StreamIOException, UnsupportedEncodingException {
+        FOXML1_1DODeserializer deserialiser = new FOXML1_1DODeserializer();
+        BasicDigitalObject object = new BasicDigitalObject();
+        FileInputStream in = new FileInputStream("src/test/resources/ecm/contentmodel3.xml");
+        deserialiser.deserialize(in, object, "UTF-8", DOTranslationUtility.AS_IS);
+        return object;
+    }
+
+
     public static DigitalObject produceDataObject1()
             throws FileNotFoundException, ObjectIntegrityException, StreamIOException, UnsupportedEncodingException {
         FOXML1_1DODeserializer deserialiser = new FOXML1_1DODeserializer();
@@ -144,5 +155,15 @@ public class ObjectConstructor {
         deserialiser.deserialize(in, object, "UTF-8", DOTranslationUtility.AS_IS);
         return object;
     }
+
+    public static DigitalObject produceDataObject8()
+            throws FileNotFoundException, ObjectIntegrityException, StreamIOException, UnsupportedEncodingException {
+        FOXML1_1DODeserializer deserialiser = new FOXML1_1DODeserializer();
+        BasicDigitalObject object = new BasicDigitalObject();
+        FileInputStream in = new FileInputStream("src/test/resources/ecm/dataobject8.xml");
+        deserialiser.deserialize(in, object, "UTF-8", DOTranslationUtility.AS_IS);
+        return object;
+    }
+
 
 }

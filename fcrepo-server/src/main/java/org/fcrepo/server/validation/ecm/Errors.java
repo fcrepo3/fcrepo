@@ -75,6 +75,12 @@ public class Errors {
                "class '" + requiredTarget + "'";
     }
 
+    public static String missingObjectViolation(String subject, String relation, String requiredTarget, String target) {
+           return "The relation '" + relation + "' in '"+subject+"'  is restricted to values from " +
+                  "class '" + requiredTarget + "', but refers to object '"+target+"' which does not exist";
+       }
+
+
     public static String someValuesFromViolationNoSuchRelation(String subject, String ontologyrelation,
                                                                String requiredTarget) {
         return "The relation '" + ontologyrelation + "' in '"+subject+"'  should have at least one" +

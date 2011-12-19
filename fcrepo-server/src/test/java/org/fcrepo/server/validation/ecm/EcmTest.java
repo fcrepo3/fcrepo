@@ -29,6 +29,7 @@ public class EcmTest extends TestCase {
         MockRepositoryReader mockRepositoryReader = new MockRepositoryReader();
         mockRepositoryReader.putObject(ObjectConstructor.produceContentModel1());
         mockRepositoryReader.putObject(ObjectConstructor.produceContentModel2());
+        mockRepositoryReader.putObject(ObjectConstructor.produceContentModel3());
         mockRepositoryReader.putObject(ObjectConstructor.produceContentModel30());
         mockRepositoryReader.putObject(ObjectConstructor.producefedoraObject30());
         mockRepositoryReader.putObject(ObjectConstructor.produceDataObject1());
@@ -38,6 +39,7 @@ public class EcmTest extends TestCase {
         mockRepositoryReader.putObject(ObjectConstructor.produceDataObject5());
         mockRepositoryReader.putObject(ObjectConstructor.produceDataObject6());
         mockRepositoryReader.putObject(ObjectConstructor.produceDataObject7());
+        mockRepositoryReader.putObject(ObjectConstructor.produceDataObject8());
         reader = mockRepositoryReader;
     }
 
@@ -112,6 +114,16 @@ public class EcmTest extends TestCase {
         assertFalse("DataObject7 succeeded validation: " + objectValidationToXml(validation3), validation3.isValid());
 
     }
+
+    @Test
+    public void testEcm8() throws Exception {
+        EcmValidator ecm = new EcmValidator(reader,null);
+
+        Validation validation3 = ecm.validate(null, "demo:dataObject3", null);
+        assertFalse("DataObject7 succeeded validation: " + objectValidationToXml(validation3), validation3.isValid());
+
+    }
+
 
 
     public String objectValidationToXml(Validation validation) {
