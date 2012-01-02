@@ -5,9 +5,12 @@
 
 package org.fcrepo.server.storage.translation;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
 import java.util.Date;
@@ -23,7 +26,6 @@ import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.Disseminator;
 import org.fcrepo.server.utilities.StreamUtility;
-import org.fcrepo.server.utilities.StringUtility;
 import org.fcrepo.utilities.Base64;
 import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
@@ -54,6 +56,8 @@ public class METSFedoraExtDOSerializer
     private static final Logger logger =
             LoggerFactory.getLogger(METSFedoraExtDOSerializer.class);
 
+    private static final char [] DS_INDENT = "              ".toCharArray();
+    
     /** The format this serializer writes. */
     private final XMLFormat m_format;
 
@@ -555,16 +559,7 @@ public class METSFedoraExtDOSerializer
                     writer.print("\">\n");
                     if (m_transContext == DOTranslationUtility.SERIALIZE_EXPORT_ARCHIVE
                             && dsc.DSControlGrp.equalsIgnoreCase("M")) {
-                        writer.print("<");
-                        writer.print(METS.prefix);
-                        writer.print(":FContent> \n");
-                        String encoded = Base64.encodeToString(dsc.getContentStream());
-                        writer.print(StringUtility.splitAndIndent(encoded,
-                                                                  14,
-                                                                  80));
-                        writer.print("</");
-                        writer.print(METS.prefix);
-                        writer.print(":FContent>\n");
+                        serializeDatastreamContent(dsc, writer);
                     } else {
                         writer.print("<");
                         writer.print(METS.prefix);
@@ -603,6 +598,29 @@ public class METSFedoraExtDOSerializer
             writer.print(METS.prefix);
             writer.print(":fileSec>\n");
         }
+    }
+    
+    protected void serializeDatastreamContent(Datastream dsc, PrintWriter writer)
+            throws StreamIOException {
+        writer.print("<");
+        writer.print(METS.prefix);
+        writer.print(":FContent> \n");
+        Reader encoded = new InputStreamReader(Base64.encodeToStream(dsc.getContentStream()));
+        char [] buffer = new char[80];
+        int len = 0;           
+        
+        try{
+            while ((len = encoded.read(buffer)) > -1){
+                writer.write(DS_INDENT);
+                writer.write(buffer,0,len);
+                writer.write('\n');
+            }
+        } catch (IOException ioe) {
+           throw new StreamIOException(ioe.getMessage()); 
+        }
+        writer.print("</");
+        writer.print(METS.prefix);
+        writer.print(":FContent>\n");
     }
 
     private void appendStructMaps(DigitalObject obj, PrintWriter writer)
