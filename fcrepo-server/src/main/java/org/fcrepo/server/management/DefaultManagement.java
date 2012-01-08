@@ -751,11 +751,13 @@ public class DefaultManagement
             newds.DSLocationType = Datastream.DS_LOCATION_TYPE_URL;
             newds.DSChecksumType = checksumType;
 
-            // validate reserved datastreams (type M and X)
-            ValidationUtility.validateReservedDatastream(PID.getInstance(pid),
+            // validate reserved datastreams (type M and X) unless unchanged:
+            if (!newds.DSLocation.startsWith(DatastreamManagedContent.COPY_SCHEME) &&
+            		!newds.DSLocation.equals(orig.DSLocation)) {
+            	ValidationUtility.validateReservedDatastream(PID.getInstance(pid),
                                                          datastreamId,
                                                          newds);
-
+            }
 
             // next, add the datastream via the object writer
             w.addDatastream(newds, orig.DSVersionable);
