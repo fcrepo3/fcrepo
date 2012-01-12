@@ -62,7 +62,6 @@ public class MockDriver
         throw new RuntimeException("MockDriver.jdbcCompliant not implemented");
     }
 
-	@Override
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         throw new UnsupportedOperationException(
         "Java 1.7 JDBC methods are not supported");

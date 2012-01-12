@@ -221,13 +221,11 @@ public class MockStatement
             "Java 1.6 JDBC methods are not supported");
     }
 
-	@Override
 	public void closeOnCompletion() throws SQLException {
         throw new UnsupportedOperationException(
         "Java 1.7 JDBC methods are not supported");
 	}
 
-	@Override
 	public boolean isCloseOnCompletion() throws SQLException {
         throw new UnsupportedOperationException(
         "Java 1.7 JDBC methods are not supported");
