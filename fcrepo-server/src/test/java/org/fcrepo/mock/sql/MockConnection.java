@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 /**
  * A partial implementation of {@link Connection} for use in unit tests. Add
@@ -318,4 +319,34 @@ public class MockConnection
         throw new UnsupportedOperationException(
         "Java 1.6 JDBC methods are not supported");
     }
+
+	@Override
+	public void abort(Executor arg0) throws SQLException {
+        throw new UnsupportedOperationException(
+        "Java 1.7 JDBC methods are not supported");
+	}
+
+	@Override
+	public int getNetworkTimeout() throws SQLException {
+        throw new UnsupportedOperationException(
+        "Java 1.7 JDBC methods are not supported");
+	}
+
+	@Override
+	public String getSchema() throws SQLException {
+        throw new UnsupportedOperationException(
+        "Java 1.7 JDBC methods are not supported");
+	}
+
+	@Override
+	public void setNetworkTimeout(Executor arg0, int arg1) throws SQLException {
+        throw new UnsupportedOperationException(
+        "Java 1.7 JDBC methods are not supported");
+	}
+
+	@Override
+	public void setSchema(String arg0) throws SQLException {
+        throw new UnsupportedOperationException(
+        "Java 1.7 JDBC methods are not supported");
+	}
 }

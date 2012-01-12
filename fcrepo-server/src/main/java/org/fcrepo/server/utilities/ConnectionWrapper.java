@@ -20,6 +20,7 @@ import java.sql.Savepoint;
 import java.sql.Statement;
 
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 /**
  * A wrapper around a java.sql.Connection that calls the wrapped Connection's
@@ -100,6 +101,31 @@ public abstract class ConnectionWrapper
         throw new UnsupportedOperationException(
                 "Java 1.6 Connection methods are not supported");
     }
+    
+	public void abort(Executor executor) throws SQLException {
+        throw new UnsupportedOperationException(
+        		"Java 1.7 JDBC methods are not supported");
+	}
+
+	public int getNetworkTimeout() throws SQLException {
+        throw new UnsupportedOperationException(
+        		"Java 1.7 JDBC methods are not supported");
+	}
+
+	public String getSchema() throws SQLException {
+        throw new UnsupportedOperationException(
+        		"Java 1.7 JDBC methods are not supported");
+	}
+
+	public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+        throw new UnsupportedOperationException(
+        		"Java 1.7 JDBC methods are not supported");
+	}
+
+	public void setSchema(String schema) throws SQLException {
+        throw new UnsupportedOperationException(
+        		"Java 1.7 JDBC methods are not supported");
+	}
 
     public Statement createStatement() throws SQLException {
         return m_wrappedConnection.createStatement();

@@ -9,8 +9,10 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * A partial implementation of {@link Driver} for use in unit tests. Add more
@@ -59,5 +61,11 @@ public class MockDriver
     public boolean jdbcCompliant() {
         throw new RuntimeException("MockDriver.jdbcCompliant not implemented");
     }
+
+	@Override
+	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        throw new UnsupportedOperationException(
+        "Java 1.7 JDBC methods are not supported");
+	}
 
 }
