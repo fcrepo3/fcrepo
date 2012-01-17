@@ -194,6 +194,25 @@
         </executions>
 
       </plugin>
+      
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>addStubWrapperSourceFolder</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-sources/axistools</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -264,7 +283,6 @@
       </plugin>
 
     </plugins>
-
   </build>
 
   <dependencies>
@@ -291,7 +309,7 @@
       <artifactId>jaxrpc-api</artifactId>
       <version>1.1</version>
     </dependency>
-
+    
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>axis</artifactId>
