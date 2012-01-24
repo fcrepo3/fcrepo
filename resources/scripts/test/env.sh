@@ -7,7 +7,7 @@
 #
 
 # Comfortable memory settings for Tomcat and Maven
-JAVA_OPTS="-Xms384m -Xmx384m -XX:PermSize=192m -XX:MaxPermSize=192m"
+JAVA_OPTS="-Xms384m -Xmx384m -XX:PermSize=192m -XX:MaxPermSize=192m -Dfedora.fesl.pep_nocache=true"
 MAVEN_OPTS="$JAVA_OPTS"
 
 # Where is JDK 1.6 installed?
@@ -30,9 +30,6 @@ HTTP_PORT=9080
 
 # What hostname will the Fedora webapp be accessable on?
 FEDORA_HOSTNAME=localhost
-
-# Special test case situation where PEP caching needs to be disabled.
-PEP_NOCACHE=true
 
 #
 # DON'T CHANGE BELOW THIS LINE

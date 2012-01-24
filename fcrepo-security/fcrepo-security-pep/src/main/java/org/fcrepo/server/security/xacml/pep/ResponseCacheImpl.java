@@ -88,14 +88,9 @@ public class ResponseCacheImpl
      */
     public ResponseCacheImpl(Integer size, Long ttl)
             throws PEPException {
-        String noCache = System.getenv("PEP_NOCACHE");
-        if (noCache != null && noCache.toLowerCase().startsWith("t")) {
-            TTL = 0;
-            logger.info("PEP_NOCACHE: TTL on responseCache set to 0");
-        } else {
-            TTL = ttl.longValue();
-        }
 
+        TTL = ttl.longValue();
+        
         CACHE_SIZE = size.intValue();
 
         // Note - HashMap, ArrayList are not thread-safe

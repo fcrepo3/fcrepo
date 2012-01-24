@@ -53,8 +53,9 @@ plausible system test configuration.
     with API-A authentication turned ON, with the
     Resource Index, REST api, and fesl authZ enabled.  If tests are
     being run against an externally-deployed Fedora it is necessary
-    to set the environment variable PEP_NOCACHE=true before starting
-    the Fedora instance, or some tests will fail.
+    to set the system property fedora.fesl.pep_nocache=true before starting
+    the Fedora instance, or some tests will fail.  This can be done by
+    adding -Dfedora.fesl.pep_nocache to CATALINA_OPTS.
     
   [configQ]
     When running this suite, the server shall be configured

@@ -126,7 +126,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
 
         String policyId = policyUtils.addPolicy("test-policy-00.xml");
 
-        // NOTE: PEP_NOCACHE environment variable MUST be set to true to disable policy evaluation results caching
+        // NOTE: system property fedora.fesl.pep_nocachevariable MUST be set to true to disable policy evaluation results caching
 
         try {
             // object
@@ -201,7 +201,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
             Assert.assertTrue("Expected object data not found", check);
         } catch (AuthorizationDeniedException e) {
             // PEP caching must be disabled (previously cached results will invalidate test)
-            Assert.fail("Authorization denied.  (Check that PEP_NOCACHE env variable is set to true)");
+            Assert.fail("Authorization denied.  (Check that system property fedora.fesl.pep_nocache is set to true)");
         } catch (Exception e) {
             throw e;
         } finally {

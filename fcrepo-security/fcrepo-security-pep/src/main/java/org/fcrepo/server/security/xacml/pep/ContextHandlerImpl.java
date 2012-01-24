@@ -250,13 +250,30 @@ public class ContextHandlerImpl
                 c =
                         Class.forName(className).getConstructor(new Class[] {
                                 Integer.class, Long.class});
+                
+                // disable caching through system property or env variable
+                // system property takes precedence (env variable to be deprecated)
+                String noCache = System.getenv("PEP_NOCACHE");
+                String noCacheProp = System.getProperty("fedora.fesl.pep_nocache");
+
+                // if system property is set, use that
+                if (noCacheProp != null && noCacheProp.toLowerCase().startsWith("t")) {
+                	cacheTTL = 0;
+                } else {
+                	// if system property is not set ..
+                	if (noCacheProp == null || noCacheProp.length() == 0) {
+                		// use env variable if set
+    		            if (noCache != null && noCache.toLowerCase().startsWith("t")) {
+    		            	cacheTTL = 0;
+    		            }
+		            }
+                }
+                
                 responseCache =
                         (ResponseCache) c.newInstance(new Object[] {
                                 new Integer(cacheSize), new Long(cacheTTL)});
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Instantiated ResponseCache: " + className);
-                }
+                logger.info("Instantiated ResponseCache with TTL " + cacheTTL + " " + className);
             }
 
             // Get the evaluation engine
