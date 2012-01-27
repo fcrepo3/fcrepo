@@ -71,6 +71,9 @@ public class DOReaderCache extends TimerTask{
 		}
 	}
 	
+	/**
+	 * used to remove the oldest entry in the Hashmap to keep size under maxSize
+	 */
 	private void removeOldest() {
 		String oldestEntryPid=null;
 		long oldestTimestamp=Long.MAX_VALUE;
