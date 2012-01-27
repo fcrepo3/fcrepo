@@ -1,11 +1,15 @@
 package org.fcrepo.server.validation.ecm;
 
 import org.fcrepo.server.Context;
+import org.fcrepo.server.errors.ObjectValidityException;
 import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.rest.DefaultSerializer;
+import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.Validation;
+import org.fcrepo.server.validation.DOObjectValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +25,7 @@ import java.util.List;
  * Time: 10:01:20 AM
  * To change this template use File | Settings | File Templates.
  */
-public class EcmValidator {
+public class EcmValidator implements DOObjectValidator {
     private RepositoryReader doMgr;
     private ExternalContentManager m_exExternalContentManager;
 
@@ -39,7 +43,7 @@ public class EcmValidator {
         this.m_exExternalContentManager = m_exExternalContentManager;
         relsExtValidator = new OwlValidator(doMgr);
 
-                datastreamValidator = new DatastreamValidator(doMgr);
+        datastreamValidator = new DatastreamValidator(doMgr);
     }
 
     public Validation validate(Context context, String pid, Date asOfDateTime)
@@ -49,14 +53,50 @@ public class EcmValidator {
         DOReader currentObjectReader = doMgr.getReader(false, context, pid);
 
         List<String> contentmodels = currentObjectReader.getContentModels();
-        Validation validation = new Validation(pid);
+
+        return doValidate(context, currentObjectReader, asOfDateTime, contentmodels);
+        
+    }
+	@Override
+	public void validate(Context context, DOReader reader)
+			throws ServerException {
+
+		DOReader currentObjectReader = reader;
+
+		List<String> contentmodels = currentObjectReader.getContentModels();
+		
+		// don't validate self-referential content model objects - this would
+		// effectively be validating a new (uncommitted) version of the object 
+		// against the previous (committed) version, which doesn't make sense
+		// (and prevents the server ingesting the initial system content model object)
+		String pid = currentObjectReader.GetObjectPID();
+		String objectUri = "info:fedora/" + pid;
+		if (!contentmodels.contains(objectUri)) {
+		
+		Validation validation = doValidate(context, currentObjectReader, null, contentmodels);
+	
+			if (!validation.isValid()) {
+				// FIXME: review msg output for exception
+				DefaultSerializer serializer = new DefaultSerializer("n/a", context);
+				String errors = serializer.objectValidationToXml(validation);
+				throw new ObjectValidityException(errors);
+	
+			}
+		}
+		
+	}
+    
+    
+    protected  Validation doValidate(Context context, DOReader reader, Date asOfDateTime, List<String> contentModels) throws ServerException {
+
+    	Validation validation = new Validation(reader.GetObjectPID());
         validation.setAsOfDateTime(asOfDateTime);
-        validation.setContentModels(contentmodels);
+        validation.setContentModels(contentModels);
 
-        relsExtValidator.validate(context, asOfDateTime, currentObjectReader, validation);
+        relsExtValidator.validate(context, asOfDateTime, reader, validation);
 
-        datastreamValidator.validate(context, currentObjectReader, asOfDateTime, validation, m_exExternalContentManager);
-
+        datastreamValidator.validate(context, reader, asOfDateTime, validation, m_exExternalContentManager);
+    	
         return validation;
     }
 

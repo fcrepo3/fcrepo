@@ -16,6 +16,17 @@ import org.fcrepo.server.errors.ServerException;
  * @author Sandy Payette
  */
 public interface DOValidator {
+	
+	// validation levels
+	public static int VALIDATE_ALL = 0;
+	public static int VALIDATE_XML_SCHEMA = 1;
+	public static int VALIDATE_SCHEMATRON = 2;
+	public static int VALIDATE_NONE = -1;
+	
+	// validation phases
+	public static String PHASE_INGEST = "ingest";
+	public static String PHASE_STORE = "store";
+	
 
     /**
      * Validates a digital object.
@@ -27,7 +38,7 @@ public interface DOValidator {
      *        an integer from 0-2 with the following meanings: 0 = VALIDATE_ALL
      *        (do all validation levels) 1 = VALIDATE_XML_SCHEMA (perform only
      *        XML Schema validation) 2 = VALIDATE_SCHEMATRON (perform only
-     *        Schematron Rules validation)
+     *        Schematron Rules validation) -1 = VALIDATE_NONE (no validation)
      * @param phase
      *        The stage in the work flow for which the validation should be
      *        contextualized. "ingest" = the object is in the submission format

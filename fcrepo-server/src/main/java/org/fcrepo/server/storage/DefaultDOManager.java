@@ -76,7 +76,6 @@ import org.fcrepo.server.utilities.SQLUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.DOObjectValidator;
 import org.fcrepo.server.validation.DOValidator;
-import org.fcrepo.server.validation.DOValidatorImpl;
 import org.fcrepo.server.validation.ValidationUtility;
 
 /**
@@ -133,6 +132,8 @@ public class DefaultDOManager extends Module implements DOManager {
 	protected Connection m_connection;
 
 	private ModelDeploymentMap m_cModelDeploymentMap;
+
+	private int m_ingestValidationLevel;
 
 	/**
 	 * Creates a new DefaultDOManager.
@@ -251,6 +252,21 @@ public class DefaultDOManager extends Module implements DOManager {
 		if (readerCacheSize > 0) {
 			m_readerCache = new DOReaderCache(readerCacheSize,
 					readerCacheSeconds);
+		}
+		
+		// configuration of ingest validation
+		String ingestValidationLevel = getParameter("ingestValidationLevel");
+		if (ingestValidationLevel == null) {
+			logger.debug("Ingest validation level not specified, using default of all");
+			m_ingestValidationLevel = DOValidator.VALIDATE_ALL;
+		} else {
+			m_ingestValidationLevel = Integer.parseInt(ingestValidationLevel);
+			// check the values.  better to declare the levels as enums, but this
+			// would require DOValidator interface change
+			if (m_ingestValidationLevel < -1 || m_ingestValidationLevel > 2) {
+				throw new ModuleInitializationException(
+						"Bad value for ingestValidationLevel", getRole());
+			}
 		}
 	}
 
@@ -757,7 +773,7 @@ public class DefaultDOManager extends Module implements DOManager {
 				// perform initial validation of the ingest submission file
 				logger.debug("Validation (ingest phase)");
 				m_validator.validate(tempFile, format,
-						DOValidatorImpl.VALIDATE_ALL, "ingest");
+						m_ingestValidationLevel, DOValidator.PHASE_INGEST);
 
 				// DESERIALIZE:
 				// deserialize the ingest input stream into a digital object
@@ -1270,7 +1286,7 @@ public class DefaultDOManager extends Module implements DOManager {
 							out.toByteArray());
 					logger.debug("Final Validation (storage phase)");
 					m_validator.validate(inV, m_defaultStorageFormat,
-							DOValidatorImpl.VALIDATE_ALL, "store");
+							DOValidator.VALIDATE_ALL, DOValidator.PHASE_STORE);
 				}
 				/* Verify that we can deserialize our object. */
 				m_translator.deserialize(

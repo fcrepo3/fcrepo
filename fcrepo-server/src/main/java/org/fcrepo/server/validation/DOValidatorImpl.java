@@ -61,12 +61,6 @@ public class DOValidatorImpl
 
     protected static boolean debug = true;
 
-    public static final int VALIDATE_ALL = 0;
-
-    public static final int VALIDATE_XML_SCHEMA = 1;
-
-    public static final int VALIDATE_SCHEMATRON = 2;
-
     /** Configuration variable: tempdir is a working area for validation */
     protected static String tempDir = null;
 
@@ -178,6 +172,7 @@ public class DOValidatorImpl
                          String format,
                          int validationType,
                          String phase) throws ObjectValidityException {
+        if (validationType == VALIDATE_NONE) return;
         checkFormat(format);
         // FIXME We need to use the object Inputstream twice, once for XML
         // Schema validation and once for Schematron validation.
@@ -226,6 +221,7 @@ public class DOValidatorImpl
         logger.debug("Validation phase=" + phase + " format=" + format);
         logger.debug("VALIDATE: Initiating validation: " + " phase=" + phase
                 + " format=" + format);
+        if (validationType == VALIDATE_NONE) return;
         checkFormat(format);
 
         if (format.equals(Constants.ATOM_ZIP1_1.uri)) {

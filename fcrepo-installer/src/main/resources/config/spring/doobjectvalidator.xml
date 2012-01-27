@@ -7,7 +7,8 @@
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-        <!-- the digital object validator module, validates the Java digital object -->
+  <!-- The digital object validator module, validates the Java digital object 
+       before any modifications are committed.  -->
   <bean name="org.fcrepo.server.validation.DOObjectValidator"
     class="org.fcrepo.server.validation.DOObjectValidatorModule">
     <constructor-arg index="0">
@@ -18,8 +19,10 @@
       value="org.fcrepo.server.storage.lowlevel.ILowlevelStorage" />
       
     <property name="validators">
+        <!-- Map of validators.  Each validator is executed in sequence.  A validation error in any
+             validator will result in the API operation being failed. -->
         <map>
-            <!-- uncomment this, and the bean definition below, to enable ECM validation on object modifications
+            <!-- Uncomment this map entry, and the bean definition below, to enable ECM validation on object modifications 
             <entry key="ecm-validator" value-ref="ECM-Object-Validator" />
             -->
         </map>
@@ -28,15 +31,12 @@
       
   </bean>
 
-  <!-- ECM validator bean (should we scope prototype or singleton?  Current ECM validate API method constructs a new
-       validator each time, so currently we do the same -->
-       <!-- uncomment this, and the map entry in the DObjValidator bean, to enable ECM validation on object modifications
+  <!-- ECM validator bean  -->
+       <!-- Uncomment this, and the map entry in the DObjValidator bean above, to enable ECM validation on object modifications 
         <bean id="ECM-Object-Validator"
-              class="org.fcrepo.server.validation.ecm.EcmObjectValidator"
+              class="org.fcrepo.server.validation.ecm.EcmValidator"
               scope="prototype">
-              
               <constructor-arg index="0" ref="org.fcrepo.server.storage.DOManager"/>
-              
               <constructor-arg index="1" ref="org.fcrepo.server.storage.ExternalContentManager"/>
         </bean>
         -->
