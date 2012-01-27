@@ -9,137 +9,150 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class DOReaderCache
-        extends Thread {
+import org.fcrepo.server.errors.ServerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    private final int m_maxReaders;
+// This class is a rewrite of the original DOReaderCache using a java.util.concurrent.ConcurrentHashMap
 
-    private final int m_maxCachedSeconds;
-
-    private final Map m_readers;
-
-    private final List m_pidList;
-
-    private boolean m_stopRequested;
-
-    public DOReaderCache(int maxReaders, int maxCachedSeconds) {
-
-        m_maxReaders = maxReaders;
-        m_maxCachedSeconds = maxCachedSeconds;
-
-        m_readers = new HashMap();
-        m_pidList = new ArrayList();
-
-        m_stopRequested = false;
-        start();
-    }
-
-    /**
-     * Until closed, check for and remove any expired entries every second.
-     */
-    @Override
-    public void run() {
-        while (!m_stopRequested) {
-            removeExpired();
-            if (!m_stopRequested) {
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                }
-            }
-        }
-    }
-
-    private void removeExpired() {
-        long cutoffTime =
-                System.currentTimeMillis() - 1000 * m_maxCachedSeconds;
-        synchronized (m_readers) {
-            if (m_pidList.size() > 0) {
-                boolean done = false;
-                List expiredList = new ArrayList();
-                Iterator pids = m_pidList.iterator();
-                while (pids.hasNext() && !done) {
-                    String pid = (String) pids.next();
-                    List l = (List) m_readers.get(pid);
-                    long cachedTime = ((Long) l.get(1)).longValue();
-                    if (cachedTime < cutoffTime) {
-                        expiredList.add(pid);
-                    } else {
-                        done = true;
-                    }
-                }
-                pids = expiredList.iterator();
-                while (pids.hasNext()) {
-                    remove((String) pids.next());
-                }
-            }
-        }
-    }
-
-    /**
-     * Remove a DOReader from the cache. If it doesn't exist in the cache, do
-     * nothing.
-     */
-    public void remove(String pid) {
-        synchronized (m_readers) {
-            if (m_readers.remove(pid) != null) {
-                m_pidList.remove(pid);
-            }
-        }
-    }
-
-    /**
-     * Add a DOReader to the cache. If it already exists in the cache, refresh
-     * the DOReader in the cache.
-     */
-    public void put(DOReader reader) {
-        String pid = null;
-        try {
-            pid = reader.GetObjectPID();
-        } catch (Exception e) {
-        }
-        Long time = new Long(System.currentTimeMillis());
-        List l = new ArrayList();
-        l.add(reader);
-        l.add(time);
-        synchronized (m_readers) {
-            m_readers.put(pid, l);
-            if (m_pidList.contains(pid)) {
-                // ensure it only appears in the list once, at the end
-                m_pidList.remove(pid);
-            }
-            m_pidList.add(pid);
-            if (m_readers.size() > m_maxReaders) {
-                Object overflowPid = m_pidList.remove(0);
-                m_readers.remove(overflowPid);
-            }
-        }
-    }
-
-    /**
-     * Get a DOReader from the cache. If it doesn't exist in the cache, return
-     * null. If it does exist, set its time to the current time and return it.
-     */
-    public DOReader get(String pid) {
-        DOReader reader = null;
-        synchronized (m_readers) {
-            List l = (List) m_readers.get(pid);
-            if (l != null) {
-                reader = (DOReader) l.get(0);
-                l.remove(1);
-                l.add(new Long(System.currentTimeMillis()));
-                // move it to the end of the list so the list stays sorted
-                m_pidList.remove(pid);
-                m_pidList.add(pid);
-            }
-        }
-        return reader;
-    }
-
-    public void close() {
-        // make sure the thread finishes
-        m_stopRequested = true;
-    }
-
+/**
+ * DOReader Cache to be used by DOManager to make object retrieval more efficient
+ * @author frank asseg
+ *
+ */
+public class DOReaderCache extends TimerTask{
+	
+	private static final Logger LOG=LoggerFactory.getLogger(DOReaderCache.class);
+	
+	private int maxSeconds;
+	private int maxEntries;
+	private final Map<String,CacheEntry> cacheMap = new ConcurrentHashMap<String, DOReaderCache.CacheEntry>(); 
+	
+	/**
+	 * create a new {@link DOReaderCache} instance
+	 */
+	public DOReaderCache() {
+		super();
+		LOG.debug(DOReaderCache.class.getName() + " initialized");
+	}
+	
+	/**
+	 * set the maximal time in seconds an object should live in the cache
+	 * @param maxSeconds the seconds objects will live in the cache before expiring
+	 */
+	public void setMaxSeconds(int maxSeconds) {
+		this.maxSeconds = maxSeconds;
+	}
+	
+	/**
+	 * set the max number of entries the cache can hold
+	 * @param maxEntries the number of entries
+	 */
+	public void setMaxEntries(int maxEntries) {
+		this.maxEntries = maxEntries;
+	}
+	
+	/**
+	 * add a new entry to the cache
+	 * @param reader the {@link DOReader} to be cached
+	 */
+	public final void put(final DOReader reader){
+		try{
+			String pid=reader.GetObjectPID();
+			LOG.debug("adding " + pid + " to cache");
+			synchronized (cacheMap) {
+				cacheMap.put(pid, new CacheEntry(System.currentTimeMillis(), reader));
+				if (cacheMap.size() > maxEntries){
+					removeOldest();
+				}
+			}
+		}catch(ServerException e){
+			throw new RuntimeException("Unable to retrieve PID from reader for caching");
+		}
+	}
+	
+	private void removeOldest() {
+		String oldestEntryPid=null;
+		long oldestTimestamp=Long.MAX_VALUE;
+		LOG.debug("evicting oldest entry");
+		synchronized (cacheMap) {
+			for (Map.Entry<String, CacheEntry> e:cacheMap.entrySet()){
+				if (e.getValue().timeStamp <= oldestTimestamp){
+					oldestTimestamp=e.getValue().timeStamp;
+					oldestEntryPid=e.getKey();
+				}
+			}
+			cacheMap.remove(oldestEntryPid);
+		}
+	}
+	
+	/**
+	 * remove an entry from the cache
+	 * @param pid the entry's pid
+	 */
+	public final void remove(final String pid){
+			cacheMap.remove(pid);
+	}
+	
+	/**
+	 * get an {@link DOReader} from the cache
+	 * @param pid the pid of the {@link DOReader}
+	 * @return th correpsondung {@link DOReader} or null if there is no applicable cache content
+	 */
+	public final DOReader get(final String pid){
+		if (cacheMap.containsKey(pid)){
+			CacheEntry e=cacheMap.get(pid).copy(System.currentTimeMillis());
+			cacheMap.put(pid, e);
+			LOG.debug("cache hit for " + pid);
+			return e.reader;
+		}
+		LOG.debug("cache miss for " + pid);
+		return null;
+	}
+	
+	/**
+	 * {@link TimerTask} implementation to be used a managed Thread by the spring framework
+	 */
+	@Override
+	public void run() {
+		this.removeExpired();
+	}
+	
+	/**
+	 * remove expired entries from the cache
+	 */
+	public final void removeExpired(){
+		synchronized (cacheMap) {
+			for (Iterator<String> it=cacheMap.keySet().iterator();it.hasNext();){
+				String pid=it.next();
+				CacheEntry e=cacheMap.get(pid);
+				long timeStamp=e.timeStamp;
+				long age=System.currentTimeMillis() - timeStamp;
+				if (age > (maxSeconds * 1000)){
+					it.remove();
+					LOG.debug("removing entry " + pid + " after " + ((double) age/1000d) + " seconds");
+				}
+	
+			}
+		}
+	}
+	
+	private class CacheEntry{
+		private final long timeStamp;
+		private final DOReader reader;
+		
+		private CacheEntry(final long timeStamp, final DOReader reader) {
+			super();
+			this.timeStamp = timeStamp;
+			this.reader = reader;
+		}
+		
+		private CacheEntry copy(final long timeStamp){
+			return new CacheEntry(timeStamp, this.reader);
+		}
+	
+	}
 }

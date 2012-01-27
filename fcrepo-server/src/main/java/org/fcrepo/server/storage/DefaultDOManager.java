@@ -251,11 +251,6 @@ public class DefaultDOManager
                                                             + e.getMessage(),
                                                     getRole());
         }
-
-        if (readerCacheSize > 0) {
-            m_readerCache =
-                    new DOReaderCache(readerCacheSize, readerCacheSeconds);
-        }
     }
 
     protected void initRetainPID() {
@@ -373,6 +368,7 @@ public class DefaultDOManager
         m_permanentStore =
                 (ILowlevelStorage) getServer()
                         .getModule("org.fcrepo.server.storage.lowlevel.ILowlevelStorage");
+        m_readerCache = (DOReaderCache) getServer().getBean("org.fcrepo.server.readerCache");
         if (m_permanentStore == null) {
             logger.error("LowlevelStorage not loaded");
             throw new ModuleInitializationException("LowlevelStorage not loaded",
@@ -548,9 +544,6 @@ public class DefaultDOManager
 
     @Override
     public void shutdownModule() {
-        if (m_readerCache != null) {
-            m_readerCache.close();
-        }
     }
 
     public void releaseWriter(DOWriter writer) {

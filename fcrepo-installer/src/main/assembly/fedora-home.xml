@@ -197,6 +197,14 @@
     </fileSet> 
 
     <fileSet>
+      <directory>../fcrepo-server/src/main/resources/fcfg/server</directory>
+      <outputDirectory>/server/config/spring</outputDirectory>
+      <includes>
+        <include>doreader-cache.xml</include>
+      </includes>
+    </fileSet> 
+
+    <fileSet>
       <directory>../fcrepo-server/src/main/resources/demo/demo-objects/foxml</directory>
       <outputDirectory>/client/demo/foxml</outputDirectory>
     </fileSet>  
