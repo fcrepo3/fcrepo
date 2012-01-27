@@ -101,7 +101,6 @@ public class FedoraHome {
         }
         configureSpringProperties();
         configureSpringAuth();
-        configureCacheBean();
         configureFedoraUsers();
         configureBeSecurity();
         configureSpringTestConfigs();
@@ -274,22 +273,6 @@ public class FedoraHome {
         }
     }
 
-    private void configureCacheBean() throws InstallationFailedException{
-//    	InputStream in=null;
-//    	OutputStream out=null;
-//    	try {
-//    		in=new FileInputStream(new File(_installDir,"server/config/spring/doreader-cache.xml"));
-//    		out=new FileOutputStream(new File(_installDir,"server/config/spring/doreader-cache.xml"));
-//			IOUtils.copy(in, out);
-//		} catch (IOException e) {
-//			System.err.println("error copying doreader bean confiuration");
-//			throw new InstallationFailedException(e.getMessage(), e);
-//		}finally{
-//			IOUtils.closeQuietly(in);
-//			IOUtils.closeQuietly(out);
-//		}
-    }
-    
     private void configureSpringProperties() throws InstallationFailedException {
         Properties springProps = new Properties();
 
