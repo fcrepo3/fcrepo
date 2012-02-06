@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="demo:2" VERSION="1.1"
+                     xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+    <foxml:objectProperties>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#label"
+                        VALUE="Service Deployment Object for Local Simple Image Demo"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-02T05:09:42.015Z"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-07-02T05:09:42.015Z"/>
+    </foxml:objectProperties>
+    <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.406Z"
+                                 FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0"
+                                 LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
+                           xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+                    <dc:title>Service Deployment Object for Local Simple Image Demo</dc:title>
+                    <dc:identifier>demo:2</dc:identifier>
+                </oai_dc:dc>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+    <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="true">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.406Z"
+                                 FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT1.0"
+                                 LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
+            <foxml:xmlContent>
+                <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                    <rdf:Description rdf:about="info:fedora/demo:2">
+                        <fedora-model:hasModel rdf:resource="info:fedora/fedora-system:ServiceDeployment-3.0"/>
+                        <fedora-model:isDeploymentOf rdf:resource="info:fedora/demo:1"/>
+                        <fedora-model:isContractorOf rdf:resource="info:fedora/demo:UVA_STD_IMAGE_1"/>
+                    </rdf:Description>
+                </rdf:RDF>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+    <foxml:datastream CONTROL_GROUP="X" ID="METHODMAP" STATE="A" VERSIONABLE="true">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.406Z"
+                                 FORMAT_URI="info:fedora/fedora-system:FedoraSDepMethodMap-1.1"
+                                 ID="METHODMAP1.0" LABEL="Deployment Method Map" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <fmm:MethodMap
+                        name="MethodMap - Fedora HTTP Image Getter BMech for UVA Simple Image BDEF"
+                        xmlns:fmm="http://fedora.comm.nsdlib.org/service/methodmap">
+                    <fmm:Method operationName="getThumbnail" wsdlMsgName="getThumbRequest"
+                                wsdlMsgOutput="image_response">
+                        <fmm:DatastreamInputParm parmName="THUMBRES_IMG" passBy="URL_REF" required="true"/>
+                        <fmm:MethodReturnType wsdlMsgName="image_response" wsdlMsgTOMIME="image/jpeg"/>
+                    </fmm:Method>
+                    <fmm:Method operationName="getMedium" wsdlMsgName="getMedRequest" wsdlMsgOutput="image_response">
+                        <fmm:DatastreamInputParm parmName="MEDRES_IMG" passBy="URL_REF" required="true"/>
+                        <fmm:MethodReturnType wsdlMsgName="image_response" wsdlMsgTOMIME="image/jpeg"/>
+                    </fmm:Method>
+                    <fmm:Method operationName="getHigh" wsdlMsgName="getHighRequest" wsdlMsgOutput="image_response">
+                        <fmm:DatastreamInputParm parmName="HIGHRES_IMG" passBy="URL_REF" required="true"/>
+                        <fmm:MethodReturnType wsdlMsgName="image_response" wsdlMsgTOMIME="image/jpeg"/>
+                    </fmm:Method>
+                    <fmm:Method operationName="getVeryHigh"
+                                wsdlMsgName="getVeryHighRequest" wsdlMsgOutput="image_response">
+                        <fmm:DatastreamInputParm parmName="VERYHIGHRES_IMG" passBy="URL_REF" required="true"/>
+                        <fmm:MethodReturnType wsdlMsgName="image_response" wsdlMsgTOMIME="image/jpeg"/>
+                    </fmm:Method>
+                </fmm:MethodMap>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+    <foxml:datastream CONTROL_GROUP="X" ID="DSINPUTSPEC" STATE="A" VERSIONABLE="true">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.406Z"
+                                 FORMAT_URI="info:fedora/fedora-system:FedoraDSInputSpec-1.1"
+                                 ID="DSINPUTSPEC1.0" LABEL="Datastream Input Specification" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <fbs:DSInputSpec
+                        label="Datastream Input Specification"
+                        xmlns:fbs="http://fedora.comm.nsdlib.org/service/bindspec">
+                    <fbs:DSInput DSMax="1" DSMin="1" DSOrdinality="false" wsdlMsgPartName="THUMBRES_IMG">
+                        <fbs:DSInputLabel>thumbnail image</fbs:DSInputLabel>
+                        <fbs:DSMIME>image/jpeg</fbs:DSMIME>
+                        <fbs:DSInputInstruction>image of type image/jpeg at 100 dpi</fbs:DSInputInstruction>
+                    </fbs:DSInput>
+                    <fbs:DSInput DSMax="1" DSMin="1" DSOrdinality="false" wsdlMsgPartName="MEDRES_IMG">
+                        <fbs:DSInputLabel>medium resolution image</fbs:DSInputLabel>
+                        <fbs:DSMIME>image/jpeg</fbs:DSMIME>
+                        <fbs:DSInputInstruction>image of type image/jpeg at 300 dpi</fbs:DSInputInstruction>
+                    </fbs:DSInput>
+                    <fbs:DSInput DSMax="1" DSMin="1" DSOrdinality="false" wsdlMsgPartName="HIGHRES_IMG">
+                        <fbs:DSInputLabel>high resolution image</fbs:DSInputLabel>
+                        <fbs:DSMIME>image/jpeg</fbs:DSMIME>
+                        <fbs:DSInputInstruction>image of type image/jpeg at 600 dpi</fbs:DSInputInstruction>
+                    </fbs:DSInput>
+                    <fbs:DSInput DSMax="1" DSMin="1" DSOrdinality="false" wsdlMsgPartName="VERYHIGHRES_IMG">
+                        <fbs:DSInputLabel>very high resolution image</fbs:DSInputLabel>
+                        <fbs:DSMIME>image/jpeg</fbs:DSMIME>
+                        <fbs:DSInputInstruction>image of type image/jpeg at 1200 dpi</fbs:DSInputInstruction>
+                    </fbs:DSInput>
+                </fbs:DSInputSpec>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+    <foxml:datastream CONTROL_GROUP="X" ID="WSDL" STATE="A" VERSIONABLE="true">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.406Z"
+                                 FORMAT_URI="http://schemas.xmlsoap.org/wsdl/" ID="WSDL1.0"
+                                 LABEL="WSDL Bindings" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <wsdl:definitions name="FedoraHTTPImageGetterService"
+                                  targetNamespace="imgget"
+                                  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+                                  xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+                                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap"
+                                  xmlns:soapenc="http://schemas.xmlsoap.org/wsdl/soap/encoding"
+                                  xmlns:this="imgget" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                                  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                    <wsdl:types>
+                        <xsd:schema targetNamespace="imgget">
+                            <xsd:simpleType name="imageURLType">
+                                <xsd:restriction base="xsd:string"/>
+                            </xsd:simpleType>
+                        </xsd:schema>
+                    </wsdl:types>
+                    <wsdl:message name="getThumbRequest">
+                        <wsdl:part name="THUMBRES_IMG" type="this:imageURLType"/>
+                    </wsdl:message>
+                    <wsdl:message name="getMedRequest">
+                        <wsdl:part name="MEDRES_IMG" type="this:imageURLType"/>
+                    </wsdl:message>
+                    <wsdl:message name="getHighRequest">
+                        <wsdl:part name="HIGHRES_IMG" type="this:imageURLType"/>
+                    </wsdl:message>
+                    <wsdl:message name="getVeryHighRequest">
+                        <wsdl:part name="VERYHIGHRES_IMG" type="this:imageURLType"/>
+                    </wsdl:message>
+                    <wsdl:message name="image_response">
+                        <wsdl:part name="image" type="xsd:base64Binary"/>
+                    </wsdl:message>
+                    <wsdl:portType name="GetImagePortType">
+                        <wsdl:operation name="getThumbnail">
+                            <wsdl:input message="this:getThumbRequest"/>
+                            <wsdl:output message="this:image_response"/>
+                        </wsdl:operation>
+                        <wsdl:operation name="getMedium">
+                            <wsdl:input message="this:getMedRequest"/>
+                            <wsdl:output message="this:image_response"/>
+                        </wsdl:operation>
+                        <wsdl:operation name="getHigh">
+                            <wsdl:input message="this:getHighRequest"/>
+                            <wsdl:output message="this:image_response"/>
+                        </wsdl:operation>
+                        <wsdl:operation name="getVeryHigh">
+                            <wsdl:input message="this:getVeryHighRequest"/>
+                            <wsdl:output message="this:image_response"/>
+                        </wsdl:operation>
+                    </wsdl:portType>
+                    <wsdl:service name="GetImage">
+                        <wsdl:port binding="this:GetImage_http" name="GetImage_port">
+                            <http:address location="LOCAL"/>
+                        </wsdl:port>
+                    </wsdl:service>
+                    <wsdl:binding name="GetImage_http" type="this:GetImagePortType">
+                        <http:binding verb="GET"/>
+                        <wsdl:operation name="getThumbnail">
+                            <http:operation location="(THUMBRES_IMG)"/>
+                            <wsdl:input>
+                                <http:urlReplacement/>
+                            </wsdl:input>
+                            <wsdl:output>
+                                <mime:content type="image/jpg"/>
+                            </wsdl:output>
+                        </wsdl:operation>
+                        <wsdl:operation name="getMedium">
+                            <http:operation location="(MEDRES_IMG)"/>
+                            <wsdl:input>
+                                <http:urlReplacement/>
+                            </wsdl:input>
+                            <wsdl:output>
+                                <mime:content type="image/jpg"/>
+                            </wsdl:output>
+                        </wsdl:operation>
+                        <wsdl:operation name="getHigh">
+                            <http:operation location="(HIGHRES_IMG)"/>
+                            <wsdl:input>
+                                <http:urlReplacement/>
+                            </wsdl:input>
+                            <wsdl:output>
+                                <mime:content type="image/jpg"/>
+                            </wsdl:output>
+                        </wsdl:operation>
+                        <wsdl:operation name="getVeryHigh">
+                            <http:operation location="(VERYHIGHRES_IMG)"/>
+                            <wsdl:input>
+                                <http:urlReplacement/>
+                            </wsdl:input>
+                            <wsdl:output>
+                                <mime:content type="image/jpg"/>
+                            </wsdl:output>
+                        </wsdl:operation>
+                    </wsdl:binding>
+                </wsdl:definitions>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+</foxml:digitalObject>

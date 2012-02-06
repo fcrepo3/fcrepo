@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ********************************************************************** -->
+<!-- This is a sample modify directives file that performs a variety of     -->
+<!-- modifications on the datastreams and disseminators of two new demo     -->
+<!-- objects (demo:32 and demo:33) that the script will create. In general, -->
+<!-- one should always validate a modify directives file against the        -->
+<!-- modifyBatch.xsd schema prior to processing to catch any syntax errors. -->
+<!-- Processing will halt if the directives file is invalid and a log file  -->
+<!-- is generated summarizing the results of the batch. Refer to the xml    -->
+<!-- schema file (modifyBatch.xsd) for details on the syntax of the modify  -->
+<!-- file.                                                                  -->
+<!--                                                                        -->
+<!-- This file uses behavior definition and behavior mechanism objects that -->
+<!-- are included in the set of demo objects. The set of demo objects MUST  -->
+<!-- be ingested into the repository PRIOR to processing this directives    -->
+<!-- file. If the demo objects are not loaded, the last several directives  -->
+<!-- involving disseminators that use the demo objects will fail.           -->
+<!-- ********************************************************************** -->
+<fbm:batchModify xmlns:fbm="http://www.fedora.info/definitions/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.fedora.info/definitions/ http://www.fedora-commons.org/definitions/1/0/api/batchModify-1.1.xsd">
+
+	<!-- ****************************************************************** -->
+	<!-- Add a new empty object to the repository that has no datastreams   -->
+	<!-- or disseminators with PID of demo:32.                              -->
+	<!--                                                                    -->
+	<!-- NOTE: By default each Fedora repository specifies several PID      -->
+	<!-- namespaces (e.g. "demo")that will be retained at ingest by the     -->
+	<!-- repository allowing ingested objects to retain the PID specified   -->
+	<!-- at ingest time. This list of PID namespaces is configurable in     -->
+	<!-- fedora.fcfg using the retainPids config parameter. In this example,-->
+	<!-- demo:32 is specified PID so the generated object will retain this  -->
+	<!-- PID value after ingestion. Leaving the pid attribute empty         -->
+	<!-- (i.e., "") will force the repository to assign a PID to the new    -->
+	<!-- object using the namespace specified by the PidNamespace parameter -->
+	<!-- in the fedora.fcfg config file.                                    -->
+	<!--                                                                    -->
+	<!-- Required attributes on directive:                                  -->
+	<!-- pid - PID of the object; leave blank if you want repository to     -->
+	<!--       assign the pid.                                              -->
+	<!-- label - label for the object                                       -->
+	<!-- contentModel - content model of the object                         -->
+	<!-- logMessage - message to be written in audit trail record           -->	
+	<!-- *******************************************************************-->
+	<fbm:addObject pid="demo:32" label="Sample Object Used With Batch Modify Utility" contentModel="Object" logMessage="BatchModify - addObject"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Add a second new empty object to the repository that has no        -->
+	<!-- datastreams or disseminators with a PID of demo:33.                -->
+	<!-- *******************************************************************-->
+	<fbm:addObject pid="demo:33" label="2nd Sample Object Used With Batch Modify Utility" contentModel="Object" logMessage="BatchModify - addObject"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Modify object demo:32 by changing the label on the object.         -->
+	<!--                                                                    -->
+	<!-- Required attributes on directive:                                  -->
+	<!-- pid - PID of the object                                            -->
+	<!-- logMessage - message to be written in audit trail record           -->		
+	<!--                                                                    -->
+	<!-- Optional attributes on directive:                                  -->
+	<!-- label - label for the object                                       -->
+	<!-- state - state of the object                                        -->
+	<!-- *******************************************************************-->
+	<fbm:modifyObject pid="demo:32" label="Object Label was changed" logMessage="BatchModify - modifyObject"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Modify object demo:32 by changing its ownerId to objectOwner       -->
+	<!-- *******************************************************************-->
+	<fbm:modifyObject pid="demo:32" ownerId="objectOwner" logMessage="BatchModify - modifyObject"/>	
+	
+	<!-- ****************************************************************** -->
+	<!-- Modify object demo:33 by changing its state to deleted.            -->
+	<!-- *******************************************************************-->
+	<fbm:modifyObject pid="demo:33" state="D" logMessage="BatchModify - modifyObject"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Purge object demo:33 that was just created and modified.           -->
+	<!--                                                                    -->
+	<!-- Required attributes on directive:                                  -->
+	<!-- pid - PID of the object to be purged                               -->
+	<!-- logMessage - message to be written in audit trail record           -->		
+	<!--                                                                    -->
+	<!-- Optional attributes on directive:                                  -->
+	<!-- force - boolean indicating whether to purge the object if any      -->
+	<!-- critical dependencies exist. A value of true will purge the object -->
+	<!-- regardless of any dependencies. A value of false will allow the    -->
+	<!-- purge only if no dependencies exist. This parameter is currently   -->
+	<!-- not implemented in the server.                                     -->
+	<!-- *******************************************************************-->
+	<fbm:purgeObject pid="demo:33" logMessage="BatchModify - purgeObject"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Add a new datastream to demo:32 object with ID of DS1.             -->
+	<!--                                                                    -->
+	<!-- Note: A dsID of DS1 is assigned by the server since no dsID is     -->
+	<!-- specified on the directive and this is the first datastream in     -->
+	<!-- this object.                                                       -->
+	<!--                                                                    -->
+	<!--                                                                    -->
+	<!-- Required attributes on directive:                                  -->
+	<!-- pid - PID of the object                                            -->
+	<!-- dsLabel - label for the datastream                                 -->
+	<!-- dsMIME - MIME type of the datastream                               -->
+	<!-- logMessage - message to be written in audit trail record           -->
+	<!-- dsState - state of the object                                      -->
+	<!-- dsControlGroupType - control group type of the datastream          -->
+	<!-- dsLocation - location of the datastream; for XMLMetadataDatastreams-->
+	<!--              dsLocation omit dsLocation or leave as blank. For all -->
+	<!--              other datastream types, it is required and must       -->
+	<!--              denote the remote location of the datastream.         -->
+	<!--                                                                    -->
+	<!-- Optional attributes on directive:                                  -->
+	<!-- dsID - ID of the datastream; omit or leave as blank if you want    -->
+	<!--        repository to assign datastream ID.                         -->
+	<!-- formatURI - URI identifying the format of the datastream           -->
+	<!-- versionable - boolean indicating whether datastream is versionable -->
+	<!-- altIDs - space delimited string of alternated identifiers for the  -->
+	<!--          datastream. This info is currently maintained in the      -->
+	<!--          object, but not acted on.                                 -->
+	<!-- checksumType - checksum algorithm (MD5,SHA-1,SHA-256,SHA-384,      -->
+	<!--                SHA-512); if omitted default value configured in    -->
+	<!--                fedora.fcfg is used.                                -->
+	<!-- checksum - checksum value to be used to validate datastream upon   -->
+	<!--            ingest; if specified the value of this checksum will be -->
+	<!--            used to validate the contents of the datastream at      -->
+	<!--            ingest time using the specified checksumType. The       -->
+	<!--            checksum value must be created using the same algorithm -->
+	<!--            that will be used at ingest time by the Fedora server   -->
+	<!--            or a checksum mismatch will occur.                      -->
+	<!-- ****************************************************************** -->
+	<fbm:addDatastream pid="demo:32" dsLabel="Thorny's Coliseum thumbnail jpg image" dsMIME="image/jpeg" dsLocation="http://local.fedora.server/fedora-demo/simple-image-demo/coliseum-thumb.jpg" dsControlGroupType="E" dsState="A" logMessage="BatchModify - addDatastream"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Add a 2nd datastream to demo:32 object. The new datastream will be -->
+	<!-- a medium resolution image and will be assigned a dsID of DS2 since -->
+	<!-- no dsID is specified and this is the second datastream for this    -->
+	<!-- object.                                                            -->
+	<!-- ****************************************************************** -->
+	<fbm:addDatastream pid="demo:32" dsLabel="Thorny's Coliseum medium jpg image" dsMIME="image/jpeg" dsLocation="http://local.fedora.server/fedora-demo/simple-image-demo/coliseum-medium.jpg" dsControlGroupType="E" dsState="A" logMessage="BatchModify - addDatastream"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Add a 3rd datastream to demo:32 object. The new datastream will be -->
+	<!-- a high resolution image and will be assigned a dsID of DS3 since   -->
+	<!-- no dsID is specified and this is the third datastream for this     -->
+	<!-- object.                                                            -->
+	<!-- ****************************************************************** -->
+	<fbm:addDatastream pid="demo:32" dsLabel="Thorny's Coliseum high jpg image" dsMIME="image/jpeg" dsLocation="http://local.fedora.server/fedora-demo/simple-image-demo/coliseum-high.jpg" dsControlGroupType="M" dsState="A" logMessage="BatchModify - addDatastream"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Add a 4th datastream to demo:32 object. The new datastream will be -->
+	<!-- a very high resolution image and will be assigned a dsID of DS4    -->
+	<!-- since no dsID is specified and this is the fourth datastream for   -->
+	<!-- this object. Change the checksumType to use the MD5 algorithm.     -->
+	<!-- ****************************************************************** -->
+	<fbm:addDatastream pid="demo:32" dsLabel="Thorny's Coliseum veryhigh jpg image" dsMIME="image/jpeg" dsLocation="http://local.fedora.server/fedora-demo/simple-image-demo/coliseum-veryhigh.jpg" dsControlGroupType="M" dsState="A" checksumType="MD5" logMessage="BatchModify - addDatastream"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Add a 5th datastream to demo:32 object. The new datastream will be -->
+	<!-- a screen size image and will have dsID of SCREEN. This datastream  -->
+	<!-- will also have values assigned for alternate IDs, formatURI, and   -->
+	<!-- is declared not to be versionable.                                 -->
+	<!-- ****************************************************************** -->
+	<fbm:addDatastream pid="demo:32" dsID="SCREEN" altIDs="AlternateID1 AlternateID2" formatURI="info:fedora/demo/content/JPEG#" versionable="false" dsLabel="Thorny's Coliseum screen size jpg image" dsMIME="image/jpeg" dsLocation="http://local.fedora.server/fedora-demo/simple-image-demo/coliseum-high.jpg" dsControlGroupType="E" dsState="A" logMessage="BatchModify - addDatastream"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Add a 6th datastream to demo:32 object. The new datastream will be -->
+	<!-- a user-defined inline descriptive metadata datastream and will     -->
+	<!-- have dsID of DESC. Change the checksumType to use the SHA-1        -->
+	<!-- algorithm.                                                         -->
+	<!-- ****************************************************************** -->
+	<fbm:addDatastream pid="demo:32" dsID="DESC" dsLabel="Descriptive metadata for Thorny's Coliseum screen size jpg image" dsMIME="text/xml" dsControlGroupType="X" dsState="A" checksumType="SHA-1" logMessage="BatchModify - addDatastream">
+		<fbm:xmlData>
+			<uvalibdesc:desc xmlns:uvalibdesc="http://dl.lib.virginia.edu/bin/dtd/descmeta/descmeta.dtd">
+				<uvalibdesc:time>
+					<uvalibdesc:date type="created" certainty="ca." era="bc">1st century</uvalibdesc:date>
+				</uvalibdesc:time>
+				<uvalibdesc:identifier scheme="URN">uva-lib:2</uvalibdesc:identifier>
+				<uvalibdesc:rights type="use">unrestricted</uvalibdesc:rights>
+				<uvalibdesc:subject scheme="other" othertype="keyword">Roman Empire</uvalibdesc:subject>
+				<uvalibdesc:subject scheme="other" othertype="keyword">Roman</uvalibdesc:subject>
+				<uvalibdesc:subject scheme="other" othertype="keyword">Vespaciano</uvalibdesc:subject>
+				<uvalibdesc:subject scheme="other" othertype="keyword">Amphitheatrum Flavium</uvalibdesc:subject>
+				<uvalibdesc:title type="main">Coliseum -- Rome, Italy</uvalibdesc:title>
+				<uvalibdesc:form>architecture</uvalibdesc:form>
+				<uvalibdesc:mediatype type="image">
+					<uvalibdesc:form>digital</uvalibdesc:form>
+				</uvalibdesc:mediatype>
+				<uvalibdesc:agent role="publisher">Alderman Library</uvalibdesc:agent>
+				<uvalibdesc:covspace>
+					<uvalibdesc:geometry>
+						<uvalibdesc:point>
+							<uvalibdesc:lat>41.54N</uvalibdesc:lat>
+							<uvalibdesc:long>12.27E</uvalibdesc:long>
+						</uvalibdesc:point>
+					</uvalibdesc:geometry>
+				</uvalibdesc:covspace>
+				<uvalibdesc:covtime>
+					<uvalibdesc:date era="bc">72</uvalibdesc:date>
+					<uvalibdesc:date era="bc">80</uvalibdesc:date>
+				</uvalibdesc:covtime>
+				<uvalibdesc:culture>Roman</uvalibdesc:culture>
+				<uvalibdesc:place type="original">
+					<uvalibdesc:geogname>Italy, Rome</uvalibdesc:geogname>
+				</uvalibdesc:place>
+			</uvalibdesc:desc>
+		</fbm:xmlData>
+	</fbm:addDatastream>
+	
+	<!-- ****************************************************************** -->
+	<!-- Add a 7th datastream to demo:32 object. The new datastream will be -->
+	<!-- duplicate of the screen size image that will be deleted later in   -->
+	<!-- this set of directives. It will have a dsID of SCREENDUP.          -->
+	<!-- ****************************************************************** -->
+	<fbm:addDatastream pid="demo:32" dsID="SCREENDUP" dsLabel="Thorny's Coliseum screen size jpg image" dsMIME="image/jpeg" dsLocation="http://local.fedora.server/fedora-demo/simple-image-demo/coliseum-high.jpg" dsControlGroupType="R" dsState="A" logMessage="BatchModify - addDatastream"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Add an 8th datastream to demo:32 object. The new datastream will   -->
+	<!-- be a user-defined inline datastream that uses a default xml        -->
+	<!-- namespace ad also has attributes on the root element.              -->
+	<!-- ****************************************************************** -->
+	<fbm:addDatastream pid="demo:32" dsID="RECORD-XML" dsLabel="test inline datastream using default namespace" dsMIME="text/xml" dsControlGroupType="X" dsState="A" logMessage="BatchModify - addDatastream">
+		<fbm:xmlData>
+			<election_record xmlns="http://dca.tufts.edu/aas"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" label="Missouri 1824 Election Returns for Congress" type="General" iteration="First Ballot" date="1824" election_id="MS115.002.MO.1824.00002">
+				<office name="U.S. House of Representatives" office_id="ON111" scope="Federal"/>
+			</election_record>
+		</fbm:xmlData>
+	</fbm:addDatastream>	
+	
+	<!-- ****************************************************************** -->
+	<!-- Modify datastream DS1 of demo:32 object by changing its label.     -->
+	<!--                                                                    -->
+	<!-- NOTE: Optional attributes that are omitted indicate that           -->
+	<!-- attribute is to remain unchanged and the original value of the     -->
+	<!-- datastream attribute in the object will be preserved. Optional     -->
+	<!-- attributes that are set to the empty string indicate that the      -->
+	<!-- attribute value will be blanked out in the datastream.             -->
+	<!-- In this example the datastream location and state attributes are   -->
+	<!-- not modified.                                                      -->
+	<!--                                                                    -->
+	<!-- Required attributes on directive:                                  -->
+	<!-- pid - PID of the object                                            -->
+	<!-- dsID - ID of the datastream                                        -->
+	<!-- dsControlGroupType - control group type of the datastream          -->
+	<!-- logMessage - message to be written in audit trail record           -->		
+	<!--                                                                    -->
+	<!-- Optional attributes on directive:                                  -->
+	<!-- dsLabel - label for the datastream                                 -->
+	<!-- dsState - state of the object                                      -->
+	<!-- dsLocation - location of the datastream                            -->
+	<!-- dsMIME - MIME type of the datastream                               -->
+	<!-- formatURI - URI identifying the format of the datastream           -->
+	<!-- versionable - boolean indicating whether datastream is versionable -->
+	<!-- altIDs - space delimited string of alternated identifiers for the  -->
+	<!--          datastream. This info is currently maintained in the      -->
+	<!--          object, but not acted on.                                 -->
+	<!-- force - boolean indicating whether to purge the object if any      -->
+	<!--         critical dependencies exist. A value of true will purge    -->
+	<!--         the object regardless of any dependencies. A value of      -->
+	<!--         false will allow the purge only if no dependencies exist.  -->
+	<!-- checksumType - checksum algorithm (MD5,SHA-1,SHA-256,SHA-384,      -->
+	<!--                SHA-512); if omitted default value configured in    -->
+	<!--                fedora.fcfg is used.                                -->
+	<!-- checksum - checksum value to be used to validate datastream upon   -->
+	<!--            ingest; if specified the value of this checksum will be -->
+	<!--            used to validate the contents of the datastream at      -->
+	<!--            ingest time using the specified checksumType. The       -->
+	<!--            checksum value must be created using the same algorithm -->
+	<!--            that will be used at ingest time by the Fedora server   -->
+	<!--            or a checksum mismatch will occur.                      -->
+	<!-- ****************************************************************** -->
+	<fbm:modifyDatastream pid="demo:32" dsID="DS1" dsControlGroupType="E" dsLabel="New label for datastream DS1" logMessage="BatchModify - modifyDatastream"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Modify datastream SCREEN of demo:32 object by changing its label   -->
+	<!-- and datastream location so that it points to the same content as   -->
+	<!-- that of datastream DS3 which is a high-res image. Change the       -->
+	<!-- checksum algorithm from its current value to sue the SHA-512       -->
+	<!-- algorithm.                                                         -->
+	<!--                                                                    -->
+	<!-- NOTE: Optional attributes that are omitted indicate that           -->
+	<!-- attribute is to remain unchanged and the original value of the     -->
+	<!-- datastream attribute in the object will be preserved. Optional     -->
+	<!-- attributes that are set to the empty string indicate that the      -->
+	<!-- attribute value will be blanked out in the datastream.             -->
+	<!-- ****************************************************************** -->
+	<fbm:modifyDatastream pid="demo:32" dsID="SCREEN" dsControlGroupType="E" dsLabel="Changed label for datastream SCREEN" dsLocation="http://local.fedora.server/fedora/get/demo:5/VERYHIGHRES_IMG" checksumType="SHA-512" logMessage="BatchModify - modifyDatastream"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Modify datastream DC of demo:32 object by changing its label and   -->
+	<!-- its xml content so that its content is replaced by the block of    -->
+	<!-- xml below. Change the checksum algorithm to use the MD5 algorithm. -->
+	<!-- ****************************************************************** -->
+	<fbm:modifyDatastream pid="demo:32" dsID="DC" dsControlGroupType="X" dsLabel="New label for DC datastream" checksumType="MD5" logMessage="BatchModify - modifyDatastream">
+		<fbm:xmlData>
+			<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:my="http//foo.bar.none">
+				<dc:title>Coliseum in Rome</dc:title>
+				<dc:creator>Thornton Staples</dc:creator>
+				<dc:subject>Architecture, Roman</dc:subject>
+				<dc:description>Image of Coliseum in Rome</dc:description>
+				<dc:publisher>University of Virginia Library</dc:publisher>
+				<dc:format>image/jpeg</dc:format>
+				<dc:identifier>demo:32</dc:identifier>
+				<my:this>some text</my:this>
+				<my:that>some more text</my:that>
+				<my:other>even more text</my:other>
+			</oai_dc:dc>
+		</fbm:xmlData>
+	</fbm:modifyDatastream>
+
+	<!-- ****************************************************************** -->
+	<!-- Modify datastream DESC of demo:32 object by changing its label.    -->
+	<!-- Also change its formatURI and set versionable to false.            -->
+	<!-- ****************************************************************** -->
+	<fbm:modifyDatastream pid="demo:32" dsID="DESC" dsControlGroupType="X" dsLabel="New label for DC datastream" formatURI="info:fedora/new/formatURI" versionable="false" logMessage="BatchModify - modifyDatastream"/>
+
+	<!-- ****************************************************************** -->
+	<!-- Modify datastream SCREENDUP of demo:32 object by changing its      -->
+	<!-- label.                                                             -->
+	<!-- ****************************************************************** -->
+	<fbm:modifyDatastream pid="demo:32" dsID="SCREENDUP" dsControlGroupType="R" dsLabel="Changed label for datastream SCREENDUP" logMessage="BatchModify - modifyDatastream"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Modify datastream RECORD-XML of demo:32 object by changing its     -->
+	<!-- label and its xml content so that its content is replaced by the   -->
+	<!-- block of xml below.                                                -->
+	<!-- ****************************************************************** -->
+	<fbm:modifyDatastream pid="demo:32" dsID="RECORD-XML" dsControlGroupType="X" dsLabel="New label for RECORD-XML datastream" logMessage="BatchModify - modifyDatastream">
+		<fbm:xmlData>
+			<election_record xmlns="http://dca.tufts.edu/aas"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" label="Missouri 1824 Election Returns for Congress" type="General" iteration="First Ballot" date="1824" election_id="MS115.002.MO.1824.00002">
+				<office name="U.S. House of Representatives" office_id="ON111" scope="Federal">
+					<role title="U.S. Congressman" scope="State">
+						<ballot>
+							<candidate name="John Scott" name_id="SJ0448" affiliation="null" affiliation_id="null" candidate_num="1"/>
+							<candidate name="George F. Strother" name_id="SG0055" affiliation="null" affiliation_id="null" candidate_num="2"/>
+							<candidate name="Robert Wash" name_id="WR0078" affiliation="null" affiliation_id="null" candidate_num="3"/>
+						</ballot>
+						<overview status="Version 1.0" modified="2007-02-05">
+							<candidate_summary candidate_ref="1" vote_total="5031" resp="Philip Lampi"/>
+							<candidate_summary candidate_ref="2" vote_total="4528" resp="Philip Lampi"/>
+							<candidate_summary candidate_ref="3" vote_total="1125" resp="Philip Lampi"/>
+							<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+						</overview>
+						<admin_unit type="State" name="Missouri" geog_id="null">
+							<sub_unit type="County" name="Boone" geog_id="null">
+								<result candidate_ref="1" vote="551" resp="Philip Lampi"/>
+								<result candidate_ref="2" vote="107" resp="Philip Lampi"/>
+								<result candidate_ref="3" vote="28" resp="Philip Lampi"/>
+								<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+								<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								<sub_unit type="Town" name="Columbia" geog_id="null">
+									<result candidate_ref="1" vote="169" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="57" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="8" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="Town" name="Cedar" geog_id="null">
+									<result candidate_ref="1" vote="68" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="8" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="1" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="Town" name="Missouri" geog_id="null">
+									<result candidate_ref="1" vote="167" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="26" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="10" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="Town" name="Perche" geog_id="null">
+									<result candidate_ref="1" vote="89" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="16" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="5" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="Town" name="Rockyfork" geog_id="null">
+									<result candidate_ref="1" vote="58" resp="Philip Lampi"/>
+									<result candidate_ref="2" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="4" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Callaway" geog_id="null">
+									<result candidate_ref="1" vote="190" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="102" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="46" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Cape Girardeau" geog_id="null">
+									<result candidate_ref="1" vote="499" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="38" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="263" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" resp="Philip Lampi" urn="tufts:central:dca:MS115:MS115.001.DO.11514"/>
+								</sub_unit>
+								<sub_unit type="County" name="Chariton" geog_id="null">
+									<result candidate_ref="1" vote="23" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="204" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="6" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Clay" geog_id="null">
+									<result candidate_ref="1" vote="42" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="280" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="7" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Cole" geog_id="null">
+									<result candidate_ref="1" vote="131" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="87" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="10" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Cooper" geog_id="null">
+									<result candidate_ref="1" vote="507" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="81" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="5" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" resp="Philip Lampi" urn="tufts:central:dca:MS115:MS115.001.DO.11511"/>
+								</sub_unit>
+								<sub_unit type="County" name="Franklin" geog_id="null">
+									<result candidate_ref="1" vote="111" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="139" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="22" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Gasconade" geog_id="null">
+									<result candidate_ref="1" vote="154" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="34" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="2" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Howard" geog_id="null">
+									<result candidate_ref="1" vote="539" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="451" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="58" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11513" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Jefferson" geog_id="null">
+									<result candidate_ref="1" vote="156" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="89" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="25" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Lillard" geog_id="null">
+									<result candidate_ref="1" vote="206" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="91" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="0" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Lincoln" geog_id="null">
+									<result candidate_ref="1" vote="123" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="196" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="28" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Madison" geog_id="null">
+									<result candidate_ref="1" vote="48" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="168" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="48" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Montgomery" geog_id="null">
+									<result candidate_ref="1" vote="72" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="150" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="104" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="New Madrid" geog_id="null">
+									<result candidate_ref="1" vote="189" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="2" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="23" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Perry" geog_id="null">
+									<result candidate_ref="1" vote="249" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="2" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="2" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Pike" geog_id="null">
+									<result candidate_ref="1" vote="46" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="387" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="58" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Ralls" geog_id="null">
+									<result candidate_ref="1" vote="44" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="280" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="8" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Ray" geog_id="null">
+									<result candidate_ref="1" vote="13" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="160" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="0" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Saint Charles" geog_id="null">
+									<result candidate_ref="1" vote="118" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="214" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="153" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Saint Francois" geog_id="null">
+									<result candidate_ref="1" vote="55" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="167" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="5" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Saint Genevieve" geog_id="null">
+									<result candidate_ref="1" vote="114" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="41" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="1" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Saint Louis" geog_id="null">
+									<result candidate_ref="1" vote="221" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="572" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="168" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11512" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11499" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+									<sub_unit type="Town" name="St. Louis" geog_id="null">
+										<result candidate_ref="1" vote="116" resp="Philip Lampi"/>
+										<result candidate_ref="2" vote="248" resp="Philip Lampi"/>
+										<result candidate_ref="3" vote="125" resp="Philip Lampi"/>
+										<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11512" resp="Philip Lampi"/>
+									</sub_unit>
+									<sub_unit type="Town" name="Bonhomme" geog_id="null">
+										<result candidate_ref="1" vote="54" resp="Philip Lampi"/>
+										<result candidate_ref="2" vote="101" resp="Philip Lampi"/>
+										<result candidate_ref="3" vote="13" resp="Philip Lampi"/>
+										<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11512" resp="Philip Lampi"/>
+									</sub_unit>
+									<sub_unit type="Town" name="St. Ferdinand" geog_id="null">
+										<result candidate_ref="1" vote="51" resp="Philip Lampi"/>
+										<result candidate_ref="2" vote="223" resp="Philip Lampi"/>
+										<result candidate_ref="3" vote="30" resp="Philip Lampi"/>
+										<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11512" resp="Philip Lampi"/>
+									</sub_unit>
+								</sub_unit>
+								<sub_unit type="County" name="Saline" geog_id="null">
+									<result candidate_ref="1" vote="108" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="12" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="8" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.11507" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Scott" geog_id="null">
+									<result candidate_ref="1" vote="123" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="12" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="1" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Washington" geog_id="null">
+									<result candidate_ref="1" vote="266" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="312" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="39" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+								</sub_unit>
+								<sub_unit type="County" name="Wayne" geog_id="null">
+									<result candidate_ref="1" vote="133" resp="Philip Lampi"/>
+									<result candidate_ref="2" vote="150" resp="Philip Lampi"/>
+									<result candidate_ref="3" vote="7" resp="Philip Lampi"/>
+									<reference type="page_image" urn="tufts:central:dca:MS115:MS115.001.DO.01134" resp="Philip Lampi"/>
+								</sub_unit>
+							</sub_unit>
+						</admin_unit>
+					</role>
+				</office>
+				<reference type="citation" resp="Philip Lampi" urn="tufts:central:dca:MS115:MS115.001.DO.01134">The Missouri Intelligencer (Franklin). September 4, 1824.</reference>
+				<reference type="citation" resp="Philip Lampi">History of Howard and Cooper Counties, Missouri, Written and Compiled from the Most Authentic Official and Private Sources, including a History of its Townships, Towns and Villages. National Historical Company, St. Louis, 1883. Page 742.</reference>
+				<reference type="citation" resp="Philip Lampi">Missouri and Missourians: Land of Contrasts and People of Achievements. Floyd Calvin Shoemaker. The Lewis Publishing Company, Chicago, 1943. Page 410.</reference>
+				<reference type="citation" resp="Philip Lampi">History of Boone County, Missouri, Written and Compiled from the Most Authentic Official and Private Sources; Inlcuding a History of its Townships, Towns and Villages.  Ramfre Press, Cape Girardeau, 1970. Page 149.</reference>
+				<reference type="citation" resp="Philip Lampi">History of Callaway County, Missouri, Written and Compiled from the Most Authentic Official and Private Sources, Including a History of its Townships, Towns and Villages. National Historic Company, St. Louis, 1884. Page 414.</reference>
+				<reference type="citation" resp="Philip Lampi" urn="tufts:central:dca:MS115:MS115.001.DO.11499">The Intelligencer (Lexington, VA). September 25, 1824.</reference>
+				<reference type="citation" resp="Philip Lampi" urn="tufts:central:dca:MS115:MS115.001.DO.11507">Missouri Intelligencer (Franklin). August 7, 14 and 21, 1824.</reference>
+				<reference type="citation" resp="Philip Lampi" urn="tufts:central:dca:MS115:MS115.001.DO.11511">Missouri Intelligencer (Franklin). August 7, 1824.</reference>
+				<reference type="citation" resp="Philip Lampi" urn="tufts:central:dca:MS115:MS115.001.DO.11512">Missouri Republican (St. Louis). August 9, 1824.</reference>
+				<reference type="citation" resp="Philip Lampi" urn="tufts:central:dca:MS115:MS115.001.DO.11513">Missouri Intelligencer (Franklin). August 7, 1824.</reference>
+				<reference type="citation" resp="Philip Lampi" urn="tufts:central:dca:MS115:MS115.001.DO.11514">Independent Patriot (Jackson). August 14, 1824.</reference>
+			</election_record>
+		</fbm:xmlData>
+	</fbm:modifyDatastream>	
+	
+	<!-- ****************************************************************** -->
+	<!-- Purge all versions of datastream SCREENDUP from object demo:32     -->
+	<!-- by specifying a start date in past and end date in the future.     -->
+	<!-- (This could also be accomplished by omitting both asOfDate and     -->
+	<!-- endDate.                                                           -->
+	<!--                                                                    -->
+	<!-- Required attributes on directive:                                  -->
+	<!-- pid - PID of the object to be purged                               -->
+	<!-- logMessage - message to be written in audit trail record           -->		
+	<!--                                                                    -->
+	<!-- Optional attributes on directive:                                  -->
+	<!--                                                                    -->
+	<!-- asOfDate - start timestamp to begin datastream version purge;      -->
+	<!--            if omitted, assumes earliest version.                   -->
+	<!-- endDate - end timestamp to end datastream version purge;           -->
+	<!--           if omitted, assumes latest version.                      -->
+	<!--         If both asOfDate and endDate are omitted, all datastream   -->
+	<!--         versions will be purged.                                   -->
+	<!-- force - boolean indicating whether to purge the object if any      -->
+	<!--         critical dependencies exist. A value of true will purge    -->
+	<!--         the object regardless of any dependencies. A value of      -->
+	<!--         false will allow the purge only if no dependencies exist.  -->
+	<!--         purge only if no dependencies exist. This parameter is     -->
+	<!--         currently not implemented in the server.                   -->	
+	<!-- ****************************************************************** -->
+	<fbm:purgeDatastream pid="demo:32" dsID="SCREENDUP" asOfDate="1900-01-01T00:00:00.000Z" endDate="2030-03-20T00:00:00.000Z" logMessage="BatchModify - purgeDatastream"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Change the state of datastream DS1 to deleted                      -->
+	<!--                                                                    -->
+	<!-- Required attributes on directive:                                  -->
+	<!-- pid - PID of the object                                            -->
+	<!-- dsID - ID of the datastream                                        -->
+	<!-- dsState - new value for state of the datastream                    -->
+	<!-- logMessage - message to be written in audit trail record           -->		
+	<!-- ****************************************************************** -->
+	<fbm:setDatastreamState pid="demo:32" dsID="DS1" dsState="D" logMessage="BatchModify - setDatastreamState"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Change the state of datastream DESC to inactive                    -->
+	<!-- ****************************************************************** -->
+	<fbm:setDatastreamState pid="demo:32" dsID="DESC" dsState="I" logMessage="BatchModify - setDatastreamState"/>
+	
+	<!-- ****************************************************************** -->
+	<!-- Change the versionable attribute of datastream DS2 to false        -->
+	<!--                                                                    -->
+	<!-- Required attributes on directive:                                  -->
+	<!-- pid - PID of the object                                            -->
+	<!-- dsID - ID of the datastream                                        -->
+	<!-- dsVersionable - new value for versionable                          -->
+	<!-- logMessage - message to be written in audit trail record           -->		
+	<!-- ****************************************************************** -->
+	<fbm:setDatastreamVersionable pid="demo:32" dsID="DS2" dsVersionable="false" logMessage="BatchModify - setDatastreamVersionable"/>	
+
+	<!-- ****************************************************************** -->
+	<!-- Compare the checksum for datastream DS1                            -->
+	<!--                                                                    -->
+	<!-- Required attributes on directive:                                  -->
+	<!-- pid - PID of the object                                            -->
+	<!-- dsID - ID of the datastream                                        -->
+	<!--                                                                    -->
+	<!-- optional attribute                                                 -->
+	<!--                                                                    -->
+	<!-- asOfDate - datetime stamp specifying version of datastream         -->	
+	<!-- ****************************************************************** -->
+	<fbm:compareDatastreamChecksum pid="demo:32" dsID="DS1"/>	
+	
+</fbm:batchModify>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="demo:dc2mods.sdep" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT">
+    <foxml:datastreamVersion ID="RELS-EXT1.0" 
+                             FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0"
+                             MIMETYPE="application/rdf+xml">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#" 
+                 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+          <rdf:Description rdf:about="info:fedora/demo:dc2mods.sdep">
+            <fedora-model:hasModel rdf:resource="info:fedora/fedora-system:ServiceDeployment-3.0"/>
+            <fedora-model:isDeploymentOf rdf:resource="info:fedora/demo:dc2mods.sdef"/>
+            <fedora-model:isContractorOf rdf:resource="info:fedora/demo:dc2mods.cmodel"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="METHODMAP">
+    <foxml:datastreamVersion ID="METHODMAP1.0" 
+                             FORMAT_URI="info:fedora/fedora-system:FedoraSDepMethodMap-1.1"
+                             MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <fmm:MethodMap name="MethodMap - Document Transform SDEF Methods" 
+                       xmlns:fmm="http://fedora.comm.nsdlib.org/service/methodmap">
+          <fmm:Method operationName="transform" 
+                      wsdlMsgName="transformRequest" 
+                      wsdlMsgOutput="transformResponse">
+            <fmm:DatastreamInputParm parmName="DC" passBy="URL_REF" 
+                                     required="true"/>
+            <fmm:DatastreamInputParm parmName="XSL" passBy="URL_REF" 
+                                     required="true"/>
+            <fmm:DefaultInputParm defaultValue="yes" parmName="CLEAR_CACHE"
+                                  passBy="VALUE" required="true"/>
+            <fmm:MethodReturnType wsdlMsgName="transformResponse" 
+                                  wsdlMsgTOMIME="text/xml"/>
+          
+          </fmm:Method>
+        </fmm:MethodMap>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="DSINPUTSPEC">
+    <foxml:datastreamVersion ID="DSINPUTSPEC1.0" 
+                             FORMAT_URI="info:fedora/fedora-system:FedoraDSInputSpec-1.1"
+                             MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <fbs:DSInputSpec xmlns:fbs="http://fedora.comm.nsdlib.org/service/bindspec"
+                         label="Datastream Inputs">
+          <fbs:DSInput DSMax="1" DSMin="1" DSOrdinality="false" 
+                       wsdlMsgPartName="DC">
+            <fbs:DSInputLabel>Dublin Core</fbs:DSInputLabel>
+            <fbs:DSMIME>text/xml</fbs:DSMIME>
+            <fbs:DSInputInstruction>XML source file to be transformed</fbs:DSInputInstruction>
+          </fbs:DSInput>
+          <fbs:DSInput DSMax="1" DSMin="1" DSOrdinality="false" 
+                       wsdlMsgPartName="XSL" pid="demo:dc2mods.cmodel">
+            <fbs:DSInputLabel>XSL</fbs:DSInputLabel>
+            <fbs:DSMIME>application/xml</fbs:DSMIME>
+            <fbs:DSInputInstruction>XSL for DC to MODS transformation</fbs:DSInputInstruction>
+          </fbs:DSInput>
+        </fbs:DSInputSpec>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="WSDL">
+    <foxml:datastreamVersion ID="WSDL1.0" 
+                             FORMAT_URI="http://schemas.xmlsoap.org/wsdl/"
+                             MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <wsdl:definitions name="DC2MODS"
+          targetNamespace="info:fedora/demo:dc2mods.sdep"
+          xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+          xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+          xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap"
+          xmlns:soapenc="http://schemas.xmlsoap.org/wsdl/soap/encoding" 
+          xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+          xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+          xmlns:tns="info:fedora/demo:dc2mods.sdep">
+          <wsdl:types>
+            <xsd:schema targetNamespace="info:fedora/demo:dc2mods.sdep">
+              <xsd:simpleType name="URLType">
+                <xsd:restriction base="xsd:string"/>
+              </xsd:simpleType>
+              <xsd:simpleType name="CLEAR_CACHEType">
+                <xsd:restriction base="xsd:string">
+                  <xsd:enumeration value="yes"/>
+                  <xsd:enumeration value="no"/>
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:schema>
+          </wsdl:types>
+          <wsdl:message name="transformRequest">
+            <wsdl:part name="DC" type="tns:URLType"/>
+            <wsdl:part name="XSL" type="tns:URLType"/>
+            <wsdl:part name="CLEAR_CACHE" type="tns:CLEAR_CACHEType"/>
+          </wsdl:message>
+          <wsdl:message name="transformResponse">
+            <wsdl:part name="exhibit" type="xsd:base64Binary"/>
+          </wsdl:message>
+          <wsdl:portType name="DC2MODSPortType">
+            <wsdl:operation name="transform">
+              <wsdl:input message="tns:transformRequest"/>
+              <wsdl:output message="tns:transformResponse"/>
+            </wsdl:operation>
+          </wsdl:portType>
+          <wsdl:service name="DC2MODSService">
+            <wsdl:port binding="tns:DC2MODS_http" name="DC2MODS_port">
+              <http:address location="http://local.fedora.server/saxon/"/>
+            </wsdl:port>
+          </wsdl:service>
+          <wsdl:binding name="DC2MODS_http" type="tns:DC2MODSPortType">
+            <http:binding verb="GET"/>
+            <wsdl:operation name="transform">
+              <http:operation location="SaxonServlet?source=(DC)&amp;style=(XSL)&amp;clear-stylesheet-cache=(CLEAR_CACHE)"/>
+              <wsdl:input>
+                <http:urlReplacement/>
+              </wsdl:input>
+              <wsdl:output>
+                <mime:content type="text/xml"/>
+              </wsdl:output>
+            </wsdl:operation>
+          </wsdl:binding>
+        </wsdl:definitions>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

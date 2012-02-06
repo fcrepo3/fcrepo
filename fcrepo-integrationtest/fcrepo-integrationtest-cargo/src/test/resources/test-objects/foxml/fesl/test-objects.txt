@@ -1,0 +1,42 @@
+﻿Test objects
+
+Represents hieararchies of objects and collections as follows:
+
+test:1000000 - collection
+  test:1000001 - collection
+    test:1000002
+    test:1000003
+    test:1000004
+    test:1000005
+  test:1000006 - collection
+    test:1000007
+    test:1000008
+    test:1000009
+    test:1000010
+    test:1000011
+    test:1000012
+    
+Objects are used in relationship-based resource attribute policies and tests for these.
+
+Objects have the following relationship-based attributes:
+
+DC Datastream state Active (A)
+  test:1000000 thru test:1000007
+DC Datstream state Deleted (D)
+  test:10000008 thru test:1000012
+
+Object state Active (A)
+  test:1000000 thru test:1000003 and test:1000010 thru test:1000012
+Object state Deleted (D)
+  test:1000004 thru test:1000009
+
+dc:subject values include;
+  "divisible-by-two" if the pid (excluding the namespace) is divisible by two
+  "divisible-by-three" if the pid (excluding the namespace) is divisible by three
+eg
+  test:1000000 has dc:subject divisible-by-two
+  test:1000002 has dc:subject divisble-by-two and dc:subject divisible-by-3
+  
+  Also test:1000001 and test:1000006 also have a dc:subject value of "dummy"
+  and test:1000009 has a blank dc:subject entry (eg <dc:subject/>
+  

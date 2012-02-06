@@ -19,5 +19,6 @@
     <module>fcrepo-integrationtest-configB</module>
     <module>fcrepo-integrationtest-configC</module>
     <module>fcrepo-integrationtest-configQ</module>
+    <module>fcrepo-integrationtest-cargo</module>
   </modules>
 </project>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+  <property name="FEDORA_LOG_PATH"
+            value="${fedora.home}/server/logs/fedora${logfile.extension:-.log}"/>
+  <appender name="FEDORA" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>${FEDORA_LOG_PATH}</File>
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <Pattern>%p %d{yyyy-MM-dd' 'HH:mm:ss.SSS} [%t] (%c{0}\\) %m%n</Pattern>
+    </layout>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <maxIndex>5</maxIndex>
+      <FileNamePattern>${FEDORA_LOG_PATH}.%i</FileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>20MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+  <logger name="org.fcrepo" additivity="false" level="INFO">
+    <appender-ref ref="FEDORA"/>
+  </logger>
+  
+  <!-- Remove the comments around this section to send FeSL debug messages to fesl.log
+  <property name="FEDORA_FESL_LOG_PATH"
+            value="${fedora.home}/server/logs/fesl${logfile.extension:-.log}"/>
+  <appender name="FESL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>${FEDORA_FESL_LOG_PATH}</File>
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <Pattern>%p %d{yyyy-MM-dd' 'HH:mm:ss.SSS} [%t] (%c{0}\\) %m%n</Pattern>
+    </layout>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <maxIndex>5</maxIndex>
+      <FileNamePattern>${FEDORA_FESL_LOG_PATH}.%i</FileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>20MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+  <logger name="org.fcrepo.server.security.jaas" additivity="false" level="DEBUG">
+    <appender-ref ref="FESL"/>
+  </logger>
+  <logger name="org.fcrepo.server.security.xacml" additivity="false" level="DEBUG">
+    <appender-ref ref="FESL"/>
+  </logger>
+  end FeSL logging -->
+  
+  
+  <root additivity="false" level="WARN">
+    <appender-ref ref="FEDORA"/>
+  </root>
+</configuration>

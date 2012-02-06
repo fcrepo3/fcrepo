@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        PolicyId="deny-policy-management-if-not-administrator"
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+  <Description>deny access to POLICY datastream unless subject has administrator role</Description>
+  <Target>
+    <Subjects>
+      <AnySubject/> 
+    </Subjects>
+    <Actions>
+      <AnyAction/>
+    </Actions>
+    <Resources>
+      <Resource>
+        <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+          <ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:datastream:id"
+            MustBePresent="false" 
+            DataType="http://www.w3.org/2001/XMLSchema#string"/>
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">POLICY</AttributeValue>
+        </ResourceMatch>
+      </Resource>
+    </Resources>
+  </Target>
+  <Rule RuleId="1" Effect="Deny">
+    <Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+      <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string"/>          
+        <SubjectAttributeDesignator AttributeId="administrator" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+      </Apply>    
+    </Condition>
+  </Rule>
+</Policy>

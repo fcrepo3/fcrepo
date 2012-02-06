@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--***********************************************************************-->
+<!-- TITLE       : Fedora Service Deployment Method Map 1.1 XSD Schema     -->
+<!-- DESCRIPTION : Extends the Service Definition schema by adding         -->
+<!--               deployment-related attributes and elements.             -->
+<!--***********************************************************************-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://fedora.comm.nsdlib.org/service/methodmap"
+            elementFormDefault="qualified">
+    <xsd:element name="MethodMap">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="Method" maxOccurs="unbounded">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="UserInputParm" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="ValidParmValues" minOccurs="0">
+                                            <xsd:complexType>
+                                                <xsd:sequence>
+                                                    <xsd:element name="ValidParm" maxOccurs="unbounded">
+                                                        <xsd:complexType>
+                                                            <xsd:attribute name="value" use="required">
+                                                                <xsd:simpleType>
+                                                                    <xsd:restriction base="xsd:string"/>
+                                                                </xsd:simpleType>
+                                                            </xsd:attribute>
+                                                        </xsd:complexType>
+                                                    </xsd:element>
+                                                </xsd:sequence>
+                                            </xsd:complexType>
+                                        </xsd:element>
+                                    </xsd:sequence>
+                                    <xsd:attribute name="parmName" type="xsd:string"/>
+                                    <xsd:attribute name="label" type="xsd:string" use="optional"/>
+                                    <xsd:attribute name="required" type="xsd:boolean"/>
+                                    <xsd:attribute name="defaultValue" type="xsd:string"/>
+                                    <xsd:attribute name="passBy">
+                                        <xsd:simpleType>
+                                            <xsd:restriction base="xsd:string">
+                                                <xsd:enumeration value="VALUE"/>
+                                                <xsd:enumeration value="URL_REF"/>
+                                            </xsd:restriction>
+                                        </xsd:simpleType>
+                                    </xsd:attribute>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="DatastreamInputParm" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+
+                                    <xsd:attribute name="parmName" type="xsd:string"/>
+                                    <xsd:attribute name="label" type="xsd:string" use="optional"/>
+                                    <xsd:attribute name="required" type="xsd:boolean"/>
+                                    <xsd:attribute name="defaultValue" type="xsd:string"/>
+                                    <xsd:attribute name="passBy">
+                                        <xsd:simpleType>
+                                            <xsd:restriction base="xsd:string">
+                                                <xsd:enumeration value="VALUE"/>
+                                                <xsd:enumeration value="URL_REF"/>
+                                            </xsd:restriction>
+                                        </xsd:simpleType>
+                                    </xsd:attribute>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="DefaultInputParm" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:attribute name="defaultValue" type="xsd:string"/>
+                                    <xsd:attribute name="parmName" type="xsd:string"/>
+                                    <xsd:attribute name="label" type="xsd:string" use="optional"/>
+                                    <xsd:attribute name="required" type="xsd:boolean"/>
+                                    <xsd:attribute name="passBy">
+                                        <xsd:simpleType>
+                                            <xsd:restriction base="xsd:string">
+                                                <xsd:enumeration value="VALUE"/>
+                                                <xsd:enumeration value="URL_REF"/>
+                                            </xsd:restriction>
+                                        </xsd:simpleType>
+                                    </xsd:attribute>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="MethodReturnType">
+                                <xsd:complexType>
+                                    <xsd:attribute name="wsdlMsgName" type="xsd:string"/>
+                                    <xsd:attribute name="wsdlMsgTOMIME" type="xsd:string"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                        <xsd:attribute name="operationName" type="xsd:string"/>
+                        <xsd:attribute name="operationLabel" type="xsd:string" use="optional"/>
+                        <xsd:attribute name="wsdlMsgName" type="xsd:string"/>
+                        <xsd:attribute name="wsdlMsgOutput" type="xsd:string"/>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

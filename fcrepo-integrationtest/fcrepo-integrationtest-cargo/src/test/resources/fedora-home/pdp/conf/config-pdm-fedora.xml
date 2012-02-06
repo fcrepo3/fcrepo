@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<pdm-fedora>
+  <object>
+    <pid-namespace name="policy"/>
+    <!-- content model (URI form) -->
+    <!--
+    <content-model name="info:fedora/policy:ContentModel"/>
+    -->
+    <datastream-control-group name="M"/>
+    <!-- optionally policies can be added as members of collections. will affect rebuilder and bootstrap policies
+    <collection name="info:fedora/changeme:1"/>
+    <collection-relationship name="isMemberOf"/>
+    -->
+  </object>
+  <schemaConfig validation="true">
+    <!-- don't think context validation takes place, this is probably unused -->
+    <schema
+      namespace="urn:oasis:names:tc:xacml:2.0:context:schema:os"
+      location="http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-context-schema-os.xsd"/>
+    <!-- schema location is filename in the server directory (should be in xsd) -->
+    <schema
+      namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+      location="xsd/cs-xacml-schema-policy-02.xsd"/>
+  </schemaConfig>
+</pdm-fedora>

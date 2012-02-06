@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.fedora.info/definitions/1/0/management/"
+           xmlns="http://www.fedora.info/definitions/1/0/management/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+    <xs:element name="validation">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="asOfDateTime" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="contentModels"/>
+                <xs:element ref="problems"/>
+                <xs:element ref="datastreamProblems"/>
+            </xs:sequence>
+            <xs:attribute name="pid" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string"/>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="valid" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:boolean"/>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="asOfDateTime">
+        <xs:simpleType>
+            <xs:restriction base="xs:dateTime"/>
+        </xs:simpleType>
+    </xs:element>
+    <xs:element name="contentModels">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="model" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="problems">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="problem" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="datastreamProblems">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="datastream" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="datastream">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="problem" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
+            </xs:sequence>
+            <xs:attribute name="datastreamID" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string"/>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

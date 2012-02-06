@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+  <bean name="org.fcrepo.server.storage.lowlevel.ILowlevelStorage"
+    class="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorageModule">
+    <constructor-arg index="0">
+      <map />
+    </constructor-arg>
+    <constructor-arg index="1" ref="org.fcrepo.server.Server" />
+    <constructor-arg index="2" type="java.lang.String"
+      value="org.fcrepo.server.storage.lowlevel.ILowlevelStorage" />
+    <property name="impl"
+      ref="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorage" />
+  </bean>
+
+  <bean
+    name="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorage"
+    class="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorage"
+    singleton="true">
+    <constructor-arg>
+      <description>The store of serialized Fedora objects</description>
+      <ref bean="objectStore" />
+    </constructor-arg>
+    <constructor-arg>
+      <description>The store of datastream content</description>
+      <ref bean="datastreamStore" />
+    </constructor-arg>
+    <constructor-arg value="true">
+      <description>if true, replaceObject calls will be done in a way
+        that
+        ensures the old content is not deleted until the new content is safely
+        written. If the objectStore already does this, this should be
+        given as
+        false</description>
+    </constructor-arg>
+    <constructor-arg value="true">
+      <description>save as above, but for datastreamStore</description>
+    </constructor-arg>
+  </bean>
+
+  <bean name="objectStore" class="org.akubraproject.map.IdMappingBlobStore"
+    singleton="true">
+    <constructor-arg value="urn:example.org:objectStore" />
+    <constructor-arg>
+      <ref bean="fsObjectStore" />
+    </constructor-arg>
+    <constructor-arg>
+      <ref bean="fsObjectStoreMapper" />
+    </constructor-arg>
+  </bean>
+
+  <bean name="fsObjectStore" class="org.akubraproject.fs.FSBlobStore"
+    singleton="true">
+    <constructor-arg value="urn:example.org:fsObjectStore" />
+    <constructor-arg value="/tmp/objectStore" />
+  </bean>
+
+  <bean name="fsObjectStoreMapper"
+    class="org.fcrepo.server.storage.lowlevel.akubra.HashPathIdMapper"
+    singleton="true">
+    <constructor-arg value="##" />
+  </bean>
+
+  <bean name="datastreamStore" class="org.akubraproject.map.IdMappingBlobStore"
+    singleton="true">
+    <constructor-arg value="urn:fedora:datastreamStore" />
+    <constructor-arg>
+      <ref bean="fsDatastreamStore" />
+    </constructor-arg>
+    <constructor-arg>
+      <ref bean="fsDatastreamStoreMapper" />
+    </constructor-arg>
+  </bean>
+
+  <bean name="fsDatastreamStore" class="org.akubraproject.fs.FSBlobStore"
+    singleton="true">
+    <constructor-arg value="urn:example.org:fsDatastreamStore" />
+    <constructor-arg value="/tmp/datastreamStore" />
+  </bean>
+
+  <bean name="fsDatastreamStoreMapper"
+    class="org.fcrepo.server.storage.lowlevel.akubra.HashPathIdMapper"
+    singleton="true">
+    <constructor-arg value="##" />
+  </bean>
+
+</beans>

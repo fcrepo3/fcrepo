@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  TODO:  RELS-INT relationship from MODEL, not text -->
+<!--  Test FOXML object with RELS-EXT datastream -->
+<foxml:digitalObject VERSION="1.1" PID="demo:REST" 
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="info:fedora/fedora-system:def/foxml# 
+  http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
+  </foxml:objectProperties>
+  <foxml:datastream ID="DC" CONTROL_GROUP="X" STATE="A">
+    <foxml:datastreamVersion FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0" MIMETYPE="text/xml" LABEL="Dublin Core Record for this object">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:title>Coliseum in Rome</dc:title>
+          <dc:creator>Thornton Staples</dc:creator>
+          <dc:subject>Architecture, Roman</dc:subject>
+          <dc:description>Image of Coliseum in Rome</dc:description>
+          <dc:publisher>University of Virginia Library</dc:publisher>
+          <dc:format>image/jpeg</dc:format>
+          <dc:identifier>demo:REST</dc:identifier>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="RELS-EXT" CONTROL_GROUP="X" STATE="A">
+    <foxml:datastreamVersion FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT.0" MIMETYPE="application/rdf+xml" LABEL="RDF Statements about this object" CREATED="$DATETIME$">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
+          <rdf:Description rdf:about="info:fedora/demo:REST">
+            <rel:hasFormalContentModel rdf:resource="info:fedora/demo:UVA_STD_IMAGE_1"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="DS1" CONTROL_GROUP="X" STATE="A">
+    <foxml:datastreamVersion ID="DS1.0" MIMETYPE="text/xml" LABEL="Datastream 1">
+      <foxml:xmlContent>
+        <foo>
+          <bar>baz</bar>
+        </foo>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="E" ID="EXTDS" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="EXTDS1.0" LABEL="External" MIMETYPE="text/xml">
+      <foxml:contentLocation REF="$FEDORA_BASE_URL$/get/demo:REST/DS1" TYPE="URL"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+<!--  datastreams for content-disposition header (get datastream filename) testing -->
+<!--  RELS-INT: specifies filename for DS1 -->
+  <foxml:datastream ID="RELS-INT" CONTROL_GROUP="X" STATE="A">
+    <foxml:datastreamVersion FORMAT_URI="info:fedora/fedora-system:FedoraRELSInt-1.0" ID="RELS-INT.0" MIMETYPE="application/rdf+xml" LABEL="RDF Statements about datastreams in this object" CREATED="$DATETIME$">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:fedora-model="$MODEL_URI$">
+          <rdf:Description rdf:about="info:fedora/demo:REST/DS1">
+            <fedora-model:$MODEL_DOWNLOAD_FILENAME$>$DS1_RELS_FILENAME$</fedora-model:$MODEL_DOWNLOAD_FILENAME$>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+
+<!--  DS2:  label is filename, known mimetype of image/jpeg so extension (jpg) should be determined by mappings file -->
+  <foxml:datastream ID="DS2" CONTROL_GROUP="M" STATE="A">
+    <foxml:datastreamVersion ID="DS2.0" MIMETYPE="image/jpeg" LABEL="$DS2_LABEL_FILENAME$">
+      <foxml:xmlContent>
+        <foo>
+          <bar>baz</bar>
+        </foo>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+
+<!--  DS3:  label is filename, mimetype unknown so extension should be default -->
+  <foxml:datastream ID="DS3" CONTROL_GROUP="X" STATE="A">
+    <foxml:datastreamVersion ID="DS3.0" MIMETYPE="unknown/mimetype" LABEL="$DS3_LABEL_FILENAME$">
+      <foxml:xmlContent>
+        <foo>
+          <bar>baz</bar>
+        </foo>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+
+<!--  DS4: label is filename, with illegal filename characters -->
+  <foxml:datastream ID="DS4" CONTROL_GROUP="X" STATE="A">
+    <foxml:datastreamVersion ID="DS4.0" MIMETYPE="text/xml" LABEL="$DS4_LABEL_FILENAME_ORIGINAL$">
+      <foxml:xmlContent>
+        <foo>
+          <bar>baz</bar>
+        </foo>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+
+<!-- DS5: no label, ID is filename -->
+  <foxml:datastream ID="DS5" CONTROL_GROUP="X" STATE="A">
+    <foxml:datastreamVersion ID="DS5.0" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <foo>
+          <bar>baz</bar>
+        </foo>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+
+<!--  DS6: no label, ID is filename plus extension -->
+  <foxml:datastream ID="DS6.xml" CONTROL_GROUP="X" STATE="A">
+    <foxml:datastreamVersion ID="DS6.0" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <foo>
+          <bar>baz</bar>
+        </foo>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>
+
+

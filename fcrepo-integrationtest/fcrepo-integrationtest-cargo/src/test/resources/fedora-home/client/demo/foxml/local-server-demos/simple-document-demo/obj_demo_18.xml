@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="demo:18" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Data Object (ECDL Paper) for Simple Document Demo"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-02T05:09:42.015Z"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-07-02T05:09:42.015Z"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.312Z"
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0"
+      LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:title>The Mellon Fedora Project: Digital Library Architecture Meets XML and Web Services</dc:title>
+          <dc:creator>Sandra Payette</dc:creator>
+          <dc:creator>Thornton Staples</dc:creator>
+          <dc:subject>Fedora</dc:subject>
+          <dc:subject>repository architecture</dc:subject>
+          <dc:subject>digital libraries</dc:subject>
+          <dc:subject>web service</dc:subject>
+          <dc:subject>open source software</dc:subject>
+          <dc:description>Paper on the Fedora project, presented at the European Digital Library Conference (ECDL) in 2002, Rome, Italy</dc:description>
+          <dc:publisher>Springer</dc:publisher>
+          <dc:date>2002-09-17</dc:date>
+          <dc:format>application/pdf</dc:format>
+          <dc:format>application/msword</dc:format>
+          <dc:format>application/ps</dc:format>
+          <dc:identifier>demo:18</dc:identifier>
+          <dc:relation>http://www.fedora.info</dc:relation>
+          <dc:rights>unrestricted</dc:rights>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="E" ID="DS1" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.312Z" ID="DS1.0"
+      LABEL="The Mellon Fedora Project: Digital Library Architecture Meets XML and Web Services (Formatted in MSWord)" MIMETYPE="application/msword">
+      <foxml:contentLocation
+        REF="http://local.fedora.server/fedora-demo/simple-document-demo/ecdl2002pay.doc" TYPE="INTERNAL_ID"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="E" ID="DS2" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.312Z" ID="DS2.0"
+      LABEL="The Mellon Fedora Project: Digital Library Architecture Meets XML and Web Services (Formatted in PDF)" MIMETYPE="application/pdf">
+      <foxml:contentLocation
+        REF="http://local.fedora.server/fedora-demo/simple-document-demo/ecdl2002pay.pdf" TYPE="INTERNAL_ID"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="E" ID="DS3" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.312Z" ID="DS3.0"
+      LABEL="The Mellon Fedora Project: Digital Library Architecture Meets XML and Web Services (Formatted in PS)" MIMETYPE="application/ps">
+      <foxml:contentLocation
+        REF="http://local.fedora.server/fedora-demo/simple-document-demo/ecdl2002pay.ps" TYPE="INTERNAL_ID"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

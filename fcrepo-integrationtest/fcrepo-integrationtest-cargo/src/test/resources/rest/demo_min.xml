@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject VERSION="1.1" 
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="info:fedora/fedora-system:def/foxml# 
+  http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
+  </foxml:objectProperties>
+  <foxml:datastream ID="DS1" CONTROL_GROUP="M" STATE="A">
+    <foxml:datastreamVersion ID="DS1.0" CREATED="2009-05-17T11:05:33.051Z" MIMETYPE="text/xml" LABEL="Datastream 1 v1">
+      <foxml:xmlContent>
+        <foo>
+          <bar>baz</bar>
+        </foo>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0"?>
+<!--
+  configuration for Berkeley DB XML-based policy index
+  
+  specifies location and name of database
+  
+-->
+<dbxml>
+  <database>
+    <directory name="/database"/>
+    <container name="policies.dbxml"/>
+  </database>
+</dbxml>

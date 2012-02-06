@@ -1,0 +1,381 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>fcrepo-integrationtest</artifactId>
+		<groupId>org.fcrepo</groupId>
+		<version>3.6-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+	<artifactId>fcrepo-integrationtest-cargo</artifactId>
+	<packaging>jar</packaging>
+	<name>Cargo-based implementation of Fedora integration tests.</name>
+
+	<contributors>
+		<contributor>
+			<email>ajs6f@virginia.edu</email>
+			<name>A. Soroka</name>
+			<roles>
+				<role>experimentator</role>
+			</roles>
+			<organization>the University of Virginia Library</organization>
+		</contributor>
+	</contributors>
+
+	<!-- default properties -->
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<fedora.home>${project.build.directory}/fedora-home</fedora.home>
+		<javax.net.ssl.trustStore>${fedora.home}/server/truststore</javax.net.ssl.trustStore>
+		<javax.net.ssl.trustStorePassword>tomcat</javax.net.ssl.trustStorePassword>
+		<fedora.username>fedoraAdmin</fedora.username>
+		<fedora.password>fedoraAdmin</fedora.password>
+		<fedora.hostname>localhost</fedora.hostname>
+		<fedora.port>8080</fedora.port>
+		<fedora.appServerContext>fedora</fedora.appServerContext>
+		<fedora.baseURL>http://${fedora.hostname}:${fedora.port}/${fedora.appServerContext}</fedora.baseURL>
+		<tomcat.home>${fedora.home}/tomcat</tomcat.home>
+		<tomcat.url>${fedora.baseURL}</tomcat.url>
+		<tomcat.port.ssl>8443</tomcat.port.ssl>
+		<tomcat.port.shutdown>8005</tomcat.port.shutdown>
+		<containerId>tomcat7x</containerId>
+		<zipUrlInstaller.url>
+			https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.25/bin/apache-tomcat-7.0.25.zip
+		</zipUrlInstaller.url>
+	</properties>
+
+	<build>
+
+		<testResources>
+			<!-- copy fedora home -->
+			<testResource>
+				<directory>${basedir}/src/test/resources/fedora-home</directory>
+				<targetPath>${project.build.directory}/fedora-home</targetPath>
+			</testResource>
+			<testResource>
+				<includes>
+					<include>logback-test.xml</include>
+				</includes>
+				<directory>${basedir}/src/test/resources</directory>
+				<targetPath>${project.build.testOutputDirectory}</targetPath>
+			</testResource>
+		</testResources>
+
+		<plugins>
+
+			<plugin>
+				<groupId>org.codehaus.cargo</groupId>
+				<artifactId>cargo-maven2-plugin</artifactId>
+				<version>1.2.0</version>
+				<configuration>
+					<container>
+						<containerId>${containerId}</containerId>
+						<zipUrlInstaller>
+							<url>${zipUrlInstaller.url}</url>
+						</zipUrlInstaller>
+						<log>${project.build.directory}/container.log</log>
+						<systemProperties>
+							<fedora.home>${fedora.home}</fedora.home>
+							<javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
+							<javax.net.ssl.trustStorePassword>${javax.net.ssl.trustStorePassword}</javax.net.ssl.trustStorePassword>
+						</systemProperties>
+					</container>
+					<configuration>
+						<configfiles>
+							<configfile>
+								<file>${project.basedir}/src/test/resources/tomcat/server.xml</file>
+								<todir>conf</todir>
+							</configfile>
+						</configfiles>
+						<deployables>
+							<deployable>
+								<artifactId>fcrepo-webapp-fedora</artifactId>
+								<groupId>org.fcrepo</groupId>
+								<type>war</type>
+								<properties>
+									<!-- put our test deployment in URL tree -->
+									<context>${fedora.appServerContext}</context>
+								</properties>
+							</deployable>
+							<deployable>
+								<artifactId>fcrepo-webapp-democontent</artifactId>
+								<groupId>org.fcrepo</groupId>
+								<type>war</type>
+								<properties>
+									<!-- put our test deployment in URL tree -->
+									<context>fedora-demo</context>
+								</properties>
+							</deployable>
+							<deployable>
+								<artifactId>fcrepo-webapp-imagemanip</artifactId>
+								<groupId>org.fcrepo</groupId>
+								<type>war</type>
+								<properties>
+									<!-- put our test deployment in URL tree -->
+									<context>imagemanip</context>
+								</properties>
+							</deployable>
+							<deployable>
+								<artifactId>fcrepo-webapp-saxon</artifactId>
+								<groupId>org.fcrepo</groupId>
+								<type>war</type>
+								<properties>
+									<!-- put our test deployment in URL tree -->
+									<context>saxon</context>
+								</properties>
+							</deployable>
+							<deployable>
+								<artifactId>fcrepo-webapp-fop</artifactId>
+								<groupId>org.fcrepo</groupId>
+								<type>war</type>
+								<properties>
+									<!-- put our test deployment in URL tree -->
+									<context>fop</context>
+								</properties>
+							</deployable>
+						</deployables>
+						<properties>
+							<cargo.jvmargs>-XX:MaxPermSize=512M -Xmx512M</cargo.jvmargs>
+						</properties>
+					</configuration>
+				</configuration>
+				<executions>
+					<!-- starting container prior to integration tests -->
+					<execution>
+						<id>start-container</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<!-- stopping container after integration tests -->
+					<execution>
+						<id>stop-container</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- no reason to run unit tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>copy-fedora-home</id>
+						<goals>
+							<goal>testResources</goal>
+						</goals>
+						<phase>process-test-resources</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<environmentVariables>
+						<WEBAPP_NAME>${fedora.appServerContext}</WEBAPP_NAME>
+						<CATALINA_HOME>${project.build.directory}/cargo/configurations/${containerId}</CATALINA_HOME>
+					</environmentVariables>
+					<systemPropertyVariables>
+						<fedora.authorize.access>false</fedora.authorize.access>
+						<fedora.home>${fedora.home}</fedora.home>
+						<fedora.baseURL>${fedora.baseURL}</fedora.baseURL>
+						<fedora.username>${fedora.username}</fedora.username>
+						<fedora.password>${fedora.username}</fedora.password>
+						<fedora.hostname>${fedora.hostname}</fedora.hostname>
+						<fedora.port>${fedora.port}</fedora.port>
+						<javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
+						<javax.net.ssl.trustStorePassword>${javax.net.ssl.trustStorePassword}</javax.net.ssl.trustStorePassword>
+					</systemPropertyVariables>
+					<includes>
+						<include>**/NotificationInvocationHandlerTest.java</include>
+						<!-- Has bug in source-code <include>**/SimpleDeploymentTests.java</include> -->
+						<include>**/AtomAPIMMessageTest.java</include>
+						<include>**/NotificationInvocationHandlerTest.java</include>
+						<include>**/DOTranslationUtilityTest.java</include>
+						<include>**/TestIngest.java</include>
+						<include>**/TestAPIA.java</include>
+						<include>**/TestAPIAConfigA.java</include>
+						<include>**/TestAPIALite.java</include>
+						<include>**/TestAPIALiteConfigA.java</include>
+						<include>**/TestAPIM.java</include>
+						<include>**/TestAPIMLite.java</include>
+						<include>**/TestRESTAPI.java</include>
+						<include>**/TestHTTPStatusCodes.java</include>
+						<include>**/TestHTTPStatusCodesConfigA.java</include>
+						<include>**/TestManagedDatastreams.java</include>
+						<include>**/TestManyDisseminations.java</include>
+						<include>**/TestCommandLineFormats.java</include>
+						<include>**/TestOAIService.java</include>
+						<include>**/TestServerConfiguration.java</include>
+						<include>**/ConflictingDeploymentTests.java</include>
+						<include>**/TestCommandLineUtilities.java</include>
+						<include>**/SharedDeploymentTests.java</include>
+						<include>**/ContentModelDSInputTest.java</include>
+						<include>**/TestAdminAPI.java</include>
+						<include>**/TestObjectLastModDate.java</include>
+						<!-- Disabled until FCREPO-798 is public <include>**/TestAPIM2.java</include> -->
+					</includes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- workaround for Maven resource plugin unable to maintain file attributes -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>process-test-resources</phase>
+						<configuration>
+							<tasks>
+								<echo message="Making Fedora scripts executable" />
+								<chmod perm="a+x">
+									<fileset dir="${fedora.home}" includes="client/bin/*,server/bin/*" />
+								</chmod>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+
+
+		<dependency>
+			<groupId>org.fcrepo</groupId>
+			<artifactId>fcrepo-server</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fcrepo</groupId>
+			<artifactId>fcrepo-common</artifactId>
+			<classifier>tests</classifier>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fcrepo</groupId>
+			<artifactId>fcrepo-server</artifactId>
+			<classifier>tests</classifier>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fcrepo</groupId>
+			<artifactId>fcrepo-client-admin</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>xmlunit</groupId>
+			<artifactId>xmlunit</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.0.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>4.0.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>net.jcip</groupId>
+			<artifactId>jcip-annotations</artifactId>
+			<version>1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fcrepo</groupId>
+			<artifactId>fcrepo-security-pdp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>stringtemplate</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fcrepo</groupId>
+			<artifactId>fcrepo-webapp-fedora</artifactId>
+			<version>3.6-SNAPSHOT</version>
+			<type>war</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fcrepo</groupId>
+			<artifactId>fcrepo-webapp-democontent</artifactId>
+			<version>3.6-SNAPSHOT</version>
+			<type>war</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fcrepo</groupId>
+			<artifactId>fcrepo-webapp-imagemanip</artifactId>
+			<version>3.6-SNAPSHOT</version>
+			<type>war</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fcrepo</groupId>
+			<artifactId>fcrepo-webapp-saxon</artifactId>
+			<version>3.6-SNAPSHOT</version>
+			<type>war</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fcrepo</groupId>
+			<artifactId>fcrepo-webapp-fop</artifactId>
+			<version>3.6-SNAPSHOT</version>
+			<type>war</type>
+		</dependency>
+	</dependencies>
+</project>

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<!--
+		The pdp-client class is responsible for the PEP communicating with a PDP. By substituting
+		in different classes for the client you can communicate with virtually any PDP.
+	-->
+	<pdp-client class="org.fcrepo.server.security.xacml.pep.DirectPDPClient" />
+	
+	<!--
+		The response cache, as its name suggests, caches XACML responses based on a hash of an
+		XACML request. Two identical requests produce the same hash and therefore can be used
+		as a cache key. The cache by default is set to store 1000 entries and each entry lives
+		for only 10 seconds.
+		
+		This can be changed to suit your needs, however if you want immediate
+		application of changed policies you are going to have to keep this number very small.
+		It is set to 10 seconds by default to handle multiple child/parent resolutions for a
+		request when doing searches.
+		
+		If an item is found in the cache, then a request is not	sent to the PDP. Instead the previously
+		calculated value is used.
+	-->
+	<response-cache class="org.fcrepo.server.security.xacml.pep.ResponseCacheImpl" active="true">
+		<cache-size>1000</cache-size>
+		<cache-item-ttl>60000</cache-item-ttl>
+	</response-cache>
+	
+	<!--
+		This class handles the identification of relationships between objects.
+    
+    These relationships are used in forming a resource's XACML hierarchical, path-based
+    resource-id identifier attribute, which can be used to apply XACML policies to objects
+    based on collection memberships.
+    
+    The supplied configuration is to use the RIRelationshipResolver, which makes use of
+    the resource index.  This allows the use of both relationships to parents, and relationships from
+    from parents to the object.
+    
+    If the resource index is not available, the RELSRelationshipResolver will be used instead
+    (and if the resource index is not available the configuration should be modified to use this
+    to prevent warning messages).
+	-->
+  
+	<relationship-resolver class="org.fcrepo.server.security.xacml.util.RIRelationshipResolver">
+    <!-- relationships from object to its parent -->
+    <option name="xacml-parent-relationship-1">info:fedora/fedora-system:def/relations-external#isMemberOf</option>
+    <option name="xacml-parent-relationship-2">info:fedora/fedora-system:def/relations-external#isMemberOfCollection</option>
+    <option name="xacml-parent-relationship-3">info:fedora/fedora-system:def/relations-external#isPartOf</option>
+    <!-- relationships from parent object to its child -->
+    <!-- NB need to use RIRelationshipResolver to use these -->
+    <option name="xacml-child-relationship-1">info:fedora/fedora-system:def/relations-external#hasMember</option>
+    <option name="xacml-child-relationship-2">info:fedora/fedora-system:def/relations-external#hasCollectionMember</option>
+    <option name="xacml-child-relationship-3">info:fedora/fedora-system:def/relations-external#hasPart</option>
+	</relationship-resolver>
+
+
+	<!-- 
+		This is the class used to handle the evaluation of requests. This implementation does
+		this in a hierarchical fashion. It first checks for all policies pertaining to an object.
+		Only if an object has no policies associated with it does it then check if the object has
+		any parents. If parents are found then the policies are searched for and used. If none are
+		found then it checks the parents of the parents until there are no more ancestors or a
+		permit is found.
+	-->
+	<evaluation-engine class="org.fcrepo.server.security.xacml.pep.EvaluationEngineImpl" />
+	
+	<!--
+		This section maps handlers for REST operations. When an operation is executed the appropriate
+		Handler is called and used to generate XACML requests or perform other tasks such as filtering 
+		in the case of 'search'.
+	-->
+	<handlers-rest>
+		<handler operation="/describe" class="org.fcrepo.server.security.xacml.pep.rest.filters.DescribeFilter" />
+		<handler operation="/get" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetFilter" />
+		<handler operation="/getObjectHistory" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetObjectHistoryFilter" />
+		<handler operation="/listDatastreams" class="org.fcrepo.server.security.xacml.pep.rest.filters.ListDatastreamsFilter" />
+		<handler operation="/listMethods" class="org.fcrepo.server.security.xacml.pep.rest.filters.ListMethodsFilter" />
+		<handler operation="/search" class="org.fcrepo.server.security.xacml.pep.rest.filters.SearchFilter" />
+		<handler operation="/management/getNextPID" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetNextPIDFilter" />
+    <handler operation="/management/control"  class="org.fcrepo.server.security.xacml.pep.rest.filters.ControlFilter" />
+    <!-- this does no results filtering, but does check for the appropriate xacml action attribute; but note this is currently also mapped to "read" -->
+    <handler operation="/risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.BasicRISearchFilter" />
+		<!-- 
+        Filters risearch results, but with a significant performance penalty (and currently not fully tested). 
+        <handler operation="risearch" class="org.fcrepo.server.security.xacml.pep.rest.filters.RISearchFilter" />
+		-->
+
+    <!-- nb, two endpoints, different servlets, but same security -->
+    <handler operation="/upload" class="org.fcrepo.server.security.xacml.pep.rest.filters.UploadFilter" />
+    <handler operation="/management/upload" class="org.fcrepo.server.security.xacml.pep.rest.filters.UploadFilter" />
+
+    <!-- WSDL - currently no authz -->
+    <handler operation="/services" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
+
+    <!-- handler for REST API - each individual API operation is mapped below in handlers-objects -->
+    <handler operation="/objects" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsFilter" />
+	</handlers-rest>
+	
+	<!--
+		This section maps handlers for the new REST API. This section is tied to the 'handlers-rest'
+		sections ObjectsFilter and these handlers are loaded through that interface.
+	-->
+	<handlers-objects>
+		<handler operation="findObjects" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects" />
+		<handler operation="resumeFindObjects" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects" />
+		<handler operation="getDatastreamDissemination" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastreamDissemination" />
+		<handler operation="getDissemination" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDissemination" />
+		<handler operation="getObjectHistory" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectHistory" />
+		<handler operation="getObjectProfile" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectProfile" />
+		<handler operation="listDatastreams" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ListDatastreams" />
+		<handler operation="listMethods" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ListMethods" />
+		<handler operation="addDatastream" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.AddDatastream" />
+		<handler operation="export" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Export" />
+		<handler operation="getDatastream" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastream" />
+		<handler operation="getNextPID" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetNextPID" />
+		<handler operation="getObjectXML" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectXML" />
+		<handler operation="ingest" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Ingest" />
+		<handler operation="modifyDatastream" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ModifyDatastream" />
+		<handler operation="modifyObject" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ModifyObject" />
+		<handler operation="purgeDatastream" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeDatastream" />
+		<handler operation="purgeObject" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeObject" />
+		<handler operation="setDatastreamState" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.SetDatastreamState" />
+		<handler operation="setDatastreamVersionable" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.SetDatastreamVersionable" />
+    <handler operation="validate" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Validate" />
+    <handler operation="getDatastreamHistory" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastreamHistory" />
+    <handler operation="getRelationships" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetRelationships" />
+    <handler operation="addRelationship" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.AddRelationship" />
+    <handler operation="purgeRelationship" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeRelationship" />
+	</handlers-objects>
+	
+	<!--
+		The next sections are WS based filters. Each service has a set of operations. Each operation is mapped to
+		a handler class. The handler class is responsible for generating XACML requests or performing other
+		tasks such as filtering for searches.
+	-->
+	<handlers-ws service="access">
+		<handler operation="describeRepository" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeRepositoryHandler" />
+		<handler operation="getObjectProfile" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectProfileHandler" />
+		<handler operation="listDatastreams" class="org.fcrepo.server.security.xacml.pep.ws.operations.ListDatastreamsHandler" />
+		<handler operation="listMethods" class="org.fcrepo.server.security.xacml.pep.ws.operations.ListMethodsHandler" />
+		<handler operation="getDatastreamDissemination" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamDisseminationHandler" />
+		<handler operation="getDissemination" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDisseminationHandler" />
+		<handler operation="findObjects" class="org.fcrepo.server.security.xacml.pep.ws.operations.FindObjectsHandler" />
+		<handler operation="resumeFindObjects" class="org.fcrepo.server.security.xacml.pep.ws.operations.ResumeFindObjectsHandler" />
+		<handler operation="getObjectHistory" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectHistoryHandler" />
+	</handlers-ws>
+	<handlers-ws service="accessS">
+		<handler operation="describeRepository" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeRepositoryHandler" />
+		<handler operation="getObjectProfile" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectProfileHandler" />
+		<handler operation="listDatastreams" class="org.fcrepo.server.security.xacml.pep.ws.operations.ListDatastreamsHandler" />
+		<handler operation="listMethods" class="org.fcrepo.server.security.xacml.pep.ws.operations.ListMethodsHandler" />
+		<handler operation="getDatastreamDissemination" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamDisseminationHandler" />
+		<handler operation="getDissemination" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDisseminationHandler" />
+		<handler operation="findObjects" class="org.fcrepo.server.security.xacml.pep.ws.operations.FindObjectsHandler" />
+		<handler operation="resumeFindObjects" class="org.fcrepo.server.security.xacml.pep.ws.operations.ResumeFindObjectsHandler" />
+		<handler operation="getObjectHistory" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectHistoryHandler" />
+	</handlers-ws>
+	<handlers-ws service="management">
+		<handler operation="addDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddDatastreamHandler" />
+		<handler operation="describeUser" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeUserHandler" />
+		<handler operation="export" class="org.fcrepo.server.security.xacml.pep.ws.operations.ExportHandler" />
+		<handler operation="getDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHandler" />
+		<handler operation="getDatastreamHistory" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHistoryHandler" />
+		<handler operation="getDatastreams" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamsHandler" />
+		<handler operation="getNextPID" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetNextPIDHandler" />
+		<handler operation="getObjectXML" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectXMLHandler" />
+		<handler operation="ingest" class="org.fcrepo.server.security.xacml.pep.ws.operations.IngestHandler" />
+		<handler operation="modifyDatastreamByReference" class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyDatastreamByReferenceHandler" />
+		<handler operation="modifyDatastreamByValue" class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyDatastreamByValueHandler" />
+		<handler operation="modifyObject" class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyObjectHandler" />
+		<handler operation="purgeDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeDatastreamHandler" />
+		<handler operation="purgeObject" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeObjectHandler" />
+		<handler operation="setDatastreamState" class="org.fcrepo.server.security.xacml.pep.ws.operations.SetDatastreamStateHandler" />
+		<handler operation="setDatastreamVersionable" class="org.fcrepo.server.security.xacml.pep.ws.operations.SetDatastreamVersionableHandler" />
+		<handler operation="addRelationship" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddRelationshipHandler" />
+		<handler operation="getRelationships" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetRelationshipsHandler" />
+		<handler operation="purgeRelationship" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeRelationshipHandler" />
+	</handlers-ws>
+	<handlers-ws service="managementS">
+		<handler operation="addDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddDatastreamHandler" />
+		<handler operation="describeUser" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeUserHandler" />
+		<handler operation="export" class="org.fcrepo.server.security.xacml.pep.ws.operations.ExportHandler" />
+		<handler operation="getDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHandler" />
+		<handler operation="getDatastreamHistory" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHistoryHandler" />
+		<handler operation="getDatastreams" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamsHandler" />
+		<handler operation="getNextPID" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetNextPIDHandler" />
+		<handler operation="getObjectXML" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectXMLHandler" />
+		<handler operation="ingest" class="org.fcrepo.server.security.xacml.pep.ws.operations.IngestHandler" />
+		<handler operation="modifyDatastreamByReference" class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyDatastreamByReferenceHandler" />
+		<handler operation="modifyDatastreamByValue" class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyDatastreamByValueHandler" />
+		<handler operation="modifyObject" class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyObjectHandler" />
+		<handler operation="purgeDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeDatastreamHandler" />
+		<handler operation="purgeObject" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeObjectHandler" />
+		<handler operation="setDatastreamState" class="org.fcrepo.server.security.xacml.pep.ws.operations.SetDatastreamStateHandler" />
+		<handler operation="setDatastreamVersionable" class="org.fcrepo.server.security.xacml.pep.ws.operations.SetDatastreamVersionableHandler" />
+		<handler operation="addRelationship" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddRelationshipHandler" />
+		<handler operation="getRelationships" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetRelationshipsHandler" />
+		<handler operation="purgeRelationship" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeRelationshipHandler" />
+	</handlers-ws>
+</config>

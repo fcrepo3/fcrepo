@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject
+	VERSION="1.1"
+	PID="demo:failObject"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+	<foxml:objectProperties>
+		<foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
+		<foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="fail object"/>
+	</foxml:objectProperties>
+	<foxml:datastream ID="BIB0" STATE="A" CONTROL_GROUP="X">
+		<foxml:datastreamVersion FORMAT_URI="http://www.loc.gov/mods/v3" ID="BIB0.0" MIMETYPE="text/xml" LABEL="MODS Record for this object">
+			<foxml:contentDigest TYPE="MD5"/>
+			<foxml:xmlContent>
+				<mods:mods
+					xmlns:mods="http://www.loc.gov/mods/v3">
+					<mods:titleInfo>
+						<mods:title>fail object</mods:title>
+					</mods:titleInfo>
+					<mods:typeOfResource>text</mods:typeOfResource>
+					<mods:genre>article</mods:genre>
+					<mods:originInfo>
+						<mods:dateIssued encoding="w3cdtf" keyDate="yes">1941-05</mods:dateIssued>
+					</mods:originInfo>
+					<mods:relatedItem displayLabel="Appears in" type="host" xlink:href="info:fedora/demo:testObject">
+						<mods:titleInfo>
+							<mods:title>test object</mods:title>
+						</mods:titleInfo>
+					</mods:relatedItem>
+				</mods:mods>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream ID="DC" STATE="A" CONTROL_GROUP="X">
+		<foxml:datastreamVersion FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.0" MIMETYPE="text/xml" LABEL="Dublin Core Record for this object">
+			<foxml:contentDigest TYPE="MD5"/>
+			<foxml:xmlContent>
+				<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+					<dc:title>fail object</dc:title>
+					<dc:identifier>demo:failObject</dc:identifier>
+				</oai_dc:dc>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+</foxml:digitalObject>

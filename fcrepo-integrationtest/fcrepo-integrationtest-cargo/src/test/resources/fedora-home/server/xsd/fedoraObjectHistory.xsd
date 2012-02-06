@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.fedora.info/definitions/1/0/access/"
+  targetNamespace="http://www.fedora.info/definitions/1/0/access/"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="fedoraObjectHistory">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="objectChangeDate" type="xs:string"
+          maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="pid" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string" />
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
