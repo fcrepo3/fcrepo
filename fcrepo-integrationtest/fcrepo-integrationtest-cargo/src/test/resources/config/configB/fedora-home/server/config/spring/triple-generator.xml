@@ -26,12 +26,12 @@
               class="org.fcrepo.server.resourceIndex.ServiceDeploymentTripleGenerator"
               scope="prototype">
         </bean>
-        <!-- TESTONLY
+        
         <bean id="UVA-1"
               class="org.fcrepo.server.resourceIndex.UvaStdImgTripleGenerator_1"
               scope="prototype">
         </bean>
-        /TESTONLY -->
+      
         <bean id="org.fcrepo.server.resourceIndex.TripleGenerator"
               class="org.fcrepo.server.resourceIndex.ModelBasedTripleGenerator"
               scope="prototype">
@@ -41,9 +41,9 @@
                       <entry key="info:fedora/fedora-system:ContentModel-3.0" value-ref="ContentModel-3.0" />
                       <entry key="info:fedora/fedora-system:ServiceDefinition-3.0" value-ref="ServiceDefinition-3.0" />
                       <entry key="info:fedora/fedora-system:ServiceDeployment-3.0" value-ref="ServiceDeployment-3.0" />
-                      <!-- TESTONLY
+                      
                       <entry key="info:fedora/demo:UVA_STD_IMAGE_1" value-ref="UVA-1" />
-                      /TESTONLY -->
+                      
                   </map>
               </property>
         </bean>

@@ -18,12 +18,12 @@
                   <ref bean="org.fcrepo.server.storage.DOManager" />
               </property>
         </bean>
-        <!-- TESTONLY
+      
         <bean id="org.fcrepo.server.security.TestAttributeFinderModule"
               class="org.fcrepo.server.security.TestAttributeFinderModule"
               factory-method="getInstance" autowire-candidate="true">
         </bean>
-        /TESTONLY -->
+        
         <!-- Uncomment the bean below to enable the use of relationship index triples in XACML policies -->
         <!--
         <bean id="org.fcrepo.server.security.xacml.pdp.finder.attribute.RITriplesAttributeFinder"
@@ -56,9 +56,9 @@
         <!--
                       <ref bean="org.fcrepo.server.security.xacml.pdp.finder.attribute.RITriplesAttributeFinder" />
         -->       
-        <!-- TESTONLY
+     
                       <ref bean="org.fcrepo.server.security.TestAttributeFinderModule" />
-        /TESTONLY -->       
+             
                   </list>
               </property>
         </bean>

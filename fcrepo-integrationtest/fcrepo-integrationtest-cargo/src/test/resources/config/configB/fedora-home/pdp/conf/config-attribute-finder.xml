@@ -72,7 +72,7 @@
     </attribute>
 
     </AttributeFinder>
-	<!--
+	
 	<AttributeFinder name="org.fcrepo.server.security.xacml.pdp.finder.attribute.LDAPAttributeFinder">
 		<option name="java.naming.factory.initial" value="com.sun.jndi.ldap.LdapCtxFactory" />
 		<option name="java.naming.provider.url" value="ldap://nish.ramp.org.au:389/" />
@@ -84,5 +84,5 @@
 		<option name="searchbase" value="dc=arcs,dc=org,dc=au" />
 		<attribute designator="subject" name="memberOf" />
 	</AttributeFinder>
-	-->
+	
 </AttributeFinders>

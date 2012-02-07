@@ -38,6 +38,22 @@
 	</properties>
 
 	<build>
+		<testResources>
+			<testResource>
+				<includes>
+					<include>rest/</include>
+					<include>schema/</include>
+					<include>wsdl/</include>
+					<include>test-objects/</include>
+					<include>XACMLTestPolicies</include>
+					<include>logback-test.xml</include>
+					<include>fedora.properties</include>
+				</includes>
+				<directory>${project.basedir}/src/test/resources</directory>
+				<targetPath>${project.build.testOutputDirectory}</targetPath>
+			</testResource>
+		</testResources>
+
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.cargo</groupId>
@@ -112,6 +128,7 @@
 							</deployable>
 						</deployables>
 						<properties>
+							<cargo.servlet.uriencoding>UTF-8</cargo.servlet.uriencoding>
 							<cargo.jvmargs>-XX:MaxPermSize=512M -Xmx512M</cargo.jvmargs>
 						</properties>
 					</configuration>
@@ -314,7 +331,7 @@
 				<zipUrlInstaller.url>
 					https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.25/bin/apache-tomcat-7.0.25.zip
 				</zipUrlInstaller.url>
-				<containerConfigFile>${project.basedir}/src/test/resources/container-configs/tomcat7x/server.xml</containerConfigFile>
+				<containerConfigFile>${project.basedir}/src/test/resources/config/containers/tomcat7x/server.xml</containerConfigFile>
 				<containerConfigDir>conf</containerConfigDir>
 			</properties>
 
@@ -326,7 +343,7 @@
 				<zipUrlInstaller.url>
 					http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.0.3.v20111011/jetty-distribution-8.0.3.v20111011.tar.gz
 				</zipUrlInstaller.url>
-				<containerConfigFile>${project.basedir}/src/test/resources/container-configs/jetty8x/jetty.xml</containerConfigFile>
+				<containerConfigFile>${project.basedir}/src/test/resources/config/containers/jetty8x/jetty.xml</containerConfigFile>
 				<containerConfigDir>etc</containerConfigDir>
 			</properties>
 		</profile>
@@ -336,15 +353,8 @@
 				<testResources>
 					<!-- copy fedora home -->
 					<testResource>
-						<directory>${basedir}/src/test/resources/configA/fedora-home</directory>
+						<directory>${basedir}/src/test/resources/config/configA/fedora-home</directory>
 						<targetPath>${project.build.directory}/fedora-home</targetPath>
-					</testResource>
-					<testResource>
-						<includes>
-							<include>logback-test.xml</include>
-						</includes>
-						<directory>${basedir}/src/test/resources/configA</directory>
-						<targetPath>${project.build.testOutputDirectory}</targetPath>
 					</testResource>
 				</testResources>
 				<plugins>
@@ -408,19 +418,8 @@
 				<testResources>
 					<!-- copy fedora home -->
 					<testResource>
-						<directory>${basedir}/src/test/resources/configB/fedora-home</directory>
+						<directory>${project.basedir}/src/test/resources/config/configB/fedora-home</directory>
 						<targetPath>${project.build.directory}/fedora-home</targetPath>
-					</testResource>
-					<testResource>
-						<directory>${basedir}/src/test/resources/test-objects</directory>
-						<targetPath>${project.build.testOutputDirectory}</targetPath>
-					</testResource>
-					<testResource>
-						<includes>
-							<include>logback-test.xml</include>
-						</includes>
-						<directory>${basedir}/src/test/resources/configB</directory>
-						<targetPath>${project.build.testOutputDirectory}</targetPath>
 					</testResource>
 				</testResources>
 				<plugins>
