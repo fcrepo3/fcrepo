@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        PolicyId="deny-inactive-or-deleted-objects-or-datastreams-if-not-administrator"
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+  <Description>deny any access to objects or datastreams, which are either inactive(I) or deleted(D),
+    unless subject has administrator role</Description>
+  <Target>
+    <Subjects>
+      <AnySubject/>
+    </Subjects>
+    <Resources>
+      <Resource>
+        <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">I</AttributeValue>        
+          <ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:state" 
+            DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"/>
+        </ResourceMatch>
+      </Resource>
+      <Resource>
+        <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">D</AttributeValue>        
+          <ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:object:state" 
+            DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"/>
+        </ResourceMatch>
+      </Resource>      
+      <Resource>
+        <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">I</AttributeValue>        
+          <ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:datastream:state" 
+            DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"/>
+        </ResourceMatch>
+      </Resource>
+      <Resource>
+        <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">D</AttributeValue>        
+          <ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:datastream:state" 
+            DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"/>
+        </ResourceMatch>
+      </Resource>
+    </Resources>
+    <Actions>
+      <AnyAction/>
+    </Actions>    
+  </Target>
+  <Rule RuleId="1" Effect="Deny">
+    <Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+      <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">administrator</AttributeValue>
+        <SubjectAttributeDesignator AttributeId="fedoraRole" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+      </Apply>
+    </Condition>
+  </Rule>
+</Policy>

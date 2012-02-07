@@ -1,0 +1,757 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--***********************************************************************-->
+<!-- TITLE       : METS Fedora Extension 1.1 XSD Schema                    -->
+<!-- DESCRIPTION : This document expresses the basic structure and         -->
+<!--               constraints for objects encoded in METS Fedora          -->
+<!--               Extension 1.1.  This schema, when combined with the     -->
+<!--               METS Fedora Extension 1.1 Schematron Rules, can be      -->
+<!--               used to fully validate a METS Fedora Extension 1.1      -->
+<!--               document.                                               -->
+<!-- CHANGELOG   : (1.0 to 1.1)                                            -->
+<!--               o Added a required EXT_VERSION attribute to the root    -->
+<!--                 element, which must have a value of "1.1".            -->
+<!--               o Removed disseminator-related elements (structMap,     -->
+<!--                 div, behaviorSec) due to the CMA.                     -->
+<!--               o Changed xlink namespace to published 1999 version,    -->
+<!--                 as this was done with METS after version 1.3.         -->
+<!--***********************************************************************-->
+<xsd:schema targetNamespace="http://www.loc.gov/METS/" xmlns="http://www.loc.gov/METS/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink-1999.xsd"/>
+	<xsd:element name="mets">
+		<xsd:annotation>
+			<xsd:documentation>METS: Metadata Encoding and Transmission Standard.
+			METS is intended to provide a standardized XML format for transmission
+			of complex digital library objects between systems.  As such, it can be seen
+			as filling a role similar to that defined for the Submission Information Package
+			(SIP), Archival Information Package (AIP) and Dissemination Information 
+			Package (DIP) in the Reference Model	for an Open Archival Information System.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="metsType"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="metsType">
+		<xsd:annotation>
+			<xsd:documentation>mets Complex Type.
+			A METS document consists of five possible subsidiary sections:
+			metsHdr (METS document header), dmdSec (descriptive metadata 
+			section), amdSec (administrative metadata section), fileGrp (file 
+			inventory group), and structMap (structural map).  It also has 
+			five possible attributes:
+			1. ID (an XML ID);
+			2. OBJID: a primary identifier assigned to the original source	document;
+			3. LABEL: a title/text string identifying the document for	users;
+			4. TYPE: a type for the object, e.g., book, journal, stereograph, etc.;
+			5. PROFILE: the registered profile to which  this METS document conforms.
+			METS registry information is available from the Library of Congress at
+			http://www.loc.gov/mets.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="metsHdr" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>metsHdr: METS Header. 
+					Like a TEI Header, the METS Header element records metadata 
+					about the METS document itself (not the digital library object 
+					that the METS document encodes).  It has two possible subsidiary
+					elements, agent (document agent) and altRecordID.
+					(alternative Record ID).  It also has the following four
+					attributes:
+					1. ID (an XML ID);
+					2. CREATEDATE: the date/time the METS document was created;
+					3. LASTMODDATE: the date/time the METS document was last modified;
+					4. RECORDSTATUS: a string indicating the status of the METS document,
+					to be used mainly for internal processing purposes.
+			</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="agent" minOccurs="0" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>agent: METS agent.
+								The agent element allows for various parties and their 
+								roles with respect to the METS document to be recorded.  
+								It has three attributes:
+								 1. ID (an XML ID);
+								  2. ROLE: one of 5 set roles with respect to the document, 
+								  CREATOR, EDITOR, ARCHIVIST, PRESERVATION, and DISSEMINATOR; and 
+								  3. TYPE: either INDIVIDUAL agent or ORGANIZATION.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="name" type="xsd:string"/>
+									<xsd:element name="note" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+								</xsd:sequence>
+								<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+								<xsd:attribute name="ROLE" use="required">
+									<xsd:simpleType>
+										<xsd:restriction base="xsd:string">
+											<xsd:enumeration value="CREATOR"/>
+											<xsd:enumeration value="EDITOR"/>
+											<xsd:enumeration value="ARCHIVIST"/>
+											<xsd:enumeration value="PRESERVATION"/>
+											<xsd:enumeration value="DISSEMINATOR"/>
+											<xsd:enumeration value="CUSTODIAN"/>
+											<xsd:enumeration value="IPOWNER"/>
+											<xsd:enumeration value="OTHER"/>
+										</xsd:restriction>
+									</xsd:simpleType>
+								</xsd:attribute>
+								<xsd:attribute name="OTHERROLE" type="xsd:string" use="optional"/>
+								<xsd:attribute name="TYPE" use="optional">
+									<xsd:simpleType>
+										<xsd:restriction base="xsd:string">
+											<xsd:enumeration value="INDIVIDUAL"/>
+											<xsd:enumeration value="ORGANIZATION"/>
+											<xsd:enumeration value="OTHER"/>
+										</xsd:restriction>
+									</xsd:simpleType>
+								</xsd:attribute>
+								<xsd:attribute name="OTHERTYPE" type="xsd:string" use="optional"/>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="altRecordID" minOccurs="0" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>altRecordID: Alternative Record ID.  
+								This element allows for documentation of alternative ID values for 
+								the METS document in addition to the primary ID stored in the 
+								OBJID attribute in the root METS element.  It has two attributes: 
+								1. ID: an XML ID, and 
+								2. TYPE: a description of the identifier type (e.g., OCLC #, LCCN, etc.).									</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:simpleContent>
+									<xsd:extension base="xsd:string">
+										<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+										<xsd:attribute name="TYPE" type="xsd:string" use="optional"/>
+									</xsd:extension>
+								</xsd:simpleContent>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+					<xsd:attribute name="CREATEDATE" type="xsd:dateTime" use="optional"/>
+					<xsd:attribute name="LASTMODDATE" type="xsd:dateTime" use="optional"/>
+					<xsd:attribute name="RECORDSTATUS" type="xsd:string" use="optional"/>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="dmdSec" type="mdSecType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>dmdSec: Description Metadata Section.
+					This section records all of the descriptive metadata for all items in the METS object
+					(including both structural map divs and descriptive metadata for data files).
+					Metadata can be either included in the METS hub document (mdWrap) or 
+					referenced via an identifier/locator (mdRef), a la Warwick Framework.  Multiple
+					dmdSec elements are allowed so that descriptive metadata
+					can be recorded for each separate item within the METS object.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="dmdSecFedora" type="dmdSecType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>dmdSecFedora: Fedora Description Metadata Section.
+					 The element dmdSecFedora is used to define a metadata container for descriptive metadata.  
+					 This provides for a descriptive metadata section that is parallel to the design of the amdSec. 
+					 The dmdSecFedora becomes a simple container, with one or more child descMD elements 
+					 (of type mdSecType), just like the amdSec contains techMD, rightsMD, etc..
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="amdSec" type="amdSecType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>amdSec: Administrative Metadata Section.
+					This section records all of the administrative metadata for all items in the METS object
+					(including both structural map divs and data files),
+					and is divided into four subsections: techMD (technical metadata), rightsMD
+					(intellectual property rights metadata), sourceMD (analog/digital source metadata), and 
+					digiprovMD (digital provenance metadata).
+					Each of these subsections follows the mdSecType model, so that they can 
+					either include metadata within the METS hub document (mdWrap) or 
+					reference it via an identifier/locator (mdRef).  Multiple
+					techMD, rightsMD, sourceMD and digiprovMD elements are allowed so that 
+					administrative metadata can be recorded for each separate item within the 
+					METS object.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="fileSec" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>fileSec: Content File Section. 
+					The content file section records information regarding all of the 
+					data files which comprise the digital library object.  
+					It has a single attribute, ID.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="fileGrp" type="fileGrpType" maxOccurs="unbounded"/>
+					</xsd:sequence>
+					<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- FEDORA EXTENSION ELEMENT: created dmdSecFedora (1-29-03) -->
+			<!-- FEDORA EXTENSION ELEMENT: re-defined behavior section (1-29-03) -->
+		</xsd:sequence>
+		<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+		<xsd:attribute name="OBJID" type="pidType" use="optional"/>
+		<xsd:attribute name="LABEL" type="xsd:string" use="optional"/>
+		<xsd:attribute name="TYPE" type="xsd:string" use="optional"/>
+		<xsd:attribute name="PROFILE" type="xsd:string" use="optional"/>
+		<xsd:attribute name="EXT_VERSION" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="1.1"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+        <!-- FEDORA EXTENSION: added anyAttribute so that things can be put there -->
+        <!-- without causing schema validation phase to file.  This is especially -->
+        <!-- important so that we can ignore any supplied xsi:schemaLocation by -->
+        <!-- just renaming it temporarily right before schema validation. -->
+	</xsd:complexType>
+	<!-- FEDORA EXTENSION: created new dmdSecType (1-29-03) -->
+	<!-- Created dmdSecType to define a metadata container for descriptive metadata.  This makes dmdSec-->
+	<!-- parallel to the design of the amdSec.  The dmdSec becomes a simple container, with one or more child descMD -->
+	<!-- elements (of type mdSecType),  just like the amdSec contains techMD, rightsMD, etc.. -->
+	<xsd:complexType name="dmdSecType">
+		<xsd:annotation>
+			<xsd:documentation>dmdSecType: Complex Type for Descriptive Metadata Section.
+			The descriptive metadata section is a container for descriptive metadata.  Each
+			instance of descriptive metadata is put in a descMD sub-section.
+			The dmdSecType has two attributes, ID (XML ID) and STATUS:
+			1. ID: XML ID for the descriptive metadata section
+			2. STATUS:  a string to define the current status (or state) of the descriptive metadata section.
+			The status indicator is system-defined.  Examples are "A for Active"
+			"D for marked for deletion" and "I for Inactive."  (FEDORA EXTENSION)
+			3. VERSIONABLE: a true/false indication as to whether the datastream should be versioned 
+			by the Fedora repository service.  In Fedora 2.0, all datastreams are set to
+			VERSIONABLE="true".  As of Fedora 2.2, selective datastream versioning is enabled 
+			and	this attribute can then be user-assigned. In Fedora 2.2, a value of "true" is
+			assigned if this attribute is omitted. (FEDORA EXTENSION)
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="descMD" type="mdSecType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>descMD: descriptive metadata.  
+						This is an alternative place for storing descriptive metadata instead of the dmdSec.
+						The descMD element provides a wrapper around a generic metadata section, 
+						which should contain descriptive metadata regarding a file or files.  It has a single 
+						attribute, ID, which file/fileGrp elements can use to reference the descriptive 
+						metadata that applies to them.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+		<xsd:attribute name="STATUS" type="xsd:string" use="optional"/>
+		<xsd:attribute name="VERSIONABLE" type="xsd:boolean" use="optional"/>
+		<!-- FEDORA EXTENSION:  add attribute STATUS to dmdSec -->
+		<!-- FEDORA EXTENSION: add new attribute VERSIONABLE to dmdSec (8-16-2006) -->
+	</xsd:complexType>
+	<xsd:complexType name="amdSecType">
+		<xsd:annotation>
+			<xsd:documentation>amdSecType: Complex Type for Administrative Metadata.
+			The administrative metadata section consists of four possible subsidiary
+			sections: techMD (technical metadata for text/image/audio/video files), 
+			rightsMD (intellectual property rights metadata), sourceMD (analog/digital source 
+			metadata), and digiprovMD (digital provenance metadata, that is, the
+			history of migrations/translations performed on a digital library object from
+			it's original digital capture/encoding).  amdSecType has a single attribute, ID (XML ID).
+			1. ID: XML ID for the administrative metadata section
+			2. STATUS:  a string to define the current status (or state) of the administrative metadata section.
+			The status indicator is system-defined.  Examples are "A for Active"
+			"D for marked for deletion" and "I for Inactive."  (FEDORA EXTENSION)			
+			3. VERSIONABLE: a true/false indication as to whether the datastream should be versioned 
+			by the Fedora repository service.  In Fedora 2.0, all datastreams are set to 
+			VERSIONABLE="true".  As of Fedora 2.2, selective datastream versioning is enabled 
+			and	this attribute can then be user-assigned. In Fedora 2.2, a value of "true" is
+			assigned if this attribute is omitted. (FEDORA EXTENSION)	
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="techMD" type="mdSecType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>techMD: technical metadata.  
+						The techMD element provides a wrapper around a generic metadata section, 
+						which should contain technical metadata regarding a file or files.  It has a single 
+						attribute, ID, which file/fileGrp elements can use to reference the technical 
+						metadata that applies to them.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="rightsMD" type="mdSecType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>rightsMD: intellectual property rights metadata.  
+						The rightsMD element provides a wrapper around a generic metadata section, 
+						which should contain IP rights metadata.  It has a single attribute, ID, which 
+						file/fileGrp/div elements can use to reference IP Rights metadata that applies to them.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="sourceMD" type="mdSecType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>sourceMD: source metadata.  
+						The sourceMD element provides a wrapper around a  generic metadata section 
+						which should contain information regarding the original source.  It has a single attribute, 
+						ID, which file/fileGrp elements can use to reference the source metadata which 
+						applies to them.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="digiprovMD" type="mdSecType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>digiprovMD: digital provenance metadata.
+						The digiprovMD element provides a wrapper around a generic metadata
+						section, which should contain information regarding the ultimate origin of a digital
+						object and the derivation of its current elements.  This includes recording 
+						master/derivative relationships between various files which currently represent
+						the object, as well recording any transformations or migrations undergone
+						by files composing the digital object subsequent to the initial digitization of
+						an item or, in the case of born digital materials, the files' creation.  In short,
+						digiprovMD should be used to record information to allow both archival/library
+						staff and scholars to understand what modifications have been performed to
+						a digital object during its life cycle in order to judge how those processes
+						might have altered or corrupted the object's ability to accurately represent
+						the original item.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+		<xsd:attribute name="STATUS" type="xsd:string" use="optional"/>
+		<xsd:attribute name="VERSIONABLE" type="xsd:boolean" use="optional"/>
+		<!-- FEDORA EXTENSION:  add attribute STATUS to amdSec -->
+		<!-- FEDORA EXTENSION: add new attribute VERSIONABLE to amdSec (8-16-2006) -->		
+	</xsd:complexType>
+	<xsd:complexType name="fileGrpType">
+		<xsd:annotation>
+			<xsd:documentation>fileGrp: File Group.
+					The file group is used to cluster all of the digital files composing a digital
+					library object in a hierarchical arrangement (fileGrp is recursively defined
+					to enable the creation of the hierarchy).  Any file group may contain zero or
+					more file elements.  File elements in turn can contain a FLocat element
+					(a pointer to a file containing content for this object) and/or a FContent 
+					element (the contents of the file Base64 encoded).  a fileGrp element
+					may have the following attributes:
+					1. ID: an XML ID for the element
+					2. VERSDATE: date this version/fileGrp of the digital object was created.
+					3. ADMID: IDREFs to administrative metadata sections in the METS document
+					that correspond with all files in this file group.
+					4. DMDID:  a set of IDREFs to descriptive metadata sections within this METS document
+					applicable to this fileGrp.  (FEDORA EXTENSION)
+					5. LABEL: a string to describe the nature of the fileGrp (FEDORA EXTENSION)
+					6. STATUS:  a string to define the current status (or state) of the fileGrp. 
+					This is used to mark the file group with an internal system status indicator. 
+					The status indicator is system-defined.  Examples are "A for Active"
+					"D for marked for deletion" and "I for Inactive."  (FEDORA EXTENSION) 
+					7. VERSIONABLE: a true/false indication as to whether the datastream should be versioned 
+					by the Fedora repository service.  In Fedora 2.0, all datastreams are set to 
+					VERSIONABLE="true".  As of Fedora 2.2, selective datastream versioning is enabled 
+					and	this attribute can then be user-assigned. In Fedora 2.2, a value of "true" is
+					assigned if this attribute is omitted. (FEDORA EXTENSION)
+				
+				</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element name="fileGrp" type="fileGrpType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="file" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>file: File element.
+							The file element provides access to content files for a METS document.
+							A file element may contain an FLocat element, which provides a pointer to
+							a content file, and/or an FContent element, which wraps an encoded version
+							of the file.  It has the following attributes:
+							1. ID: an XML ID for the element;
+							2. MIMETYPE: the MIME type for the file;
+							3. SEQ: an integer indicating the sequence of this file relative to the others in its 
+							file group;
+							4. SIZE: the size of the file in bytes; 
+							5. CREATED: the date of creation for the file; 
+							6. CHECKSUM: an MD5 digest value for the included file.
+							7. OWNERID: a primary identifier assigned to the file by its owner; 
+							8. ADMID: IDREFS to administrative metadata sections in the METS document 
+							that correspond with this file; and 
+							9. GROUPID: an identifier that establishes a correspondence between this file 
+							and files in other file groups.  Typically, this will be used to associate a master 
+							file in one file group with derivative files in other file groups.
+							10. DMDID:  a set of IDREFs to descriptive metadata sections within this METS document
+							applicable to this file.  (FEDORA EXTENSION)
+							11 STATUS:  a string to define the current status (or state) of the file. 
+							This is used to mark the file with an internal system status indicator. 
+							The status indicator is system-defined.  Examples are "A for active"
+							"D for marked for deletion" and "I for Inactive."  (FEDORA EXTENSION) 
+							12. ALT_IDS: a string that defines a user-assigned set of alternative identifiers 
+							for the datastream,	with the identifiers separated by spaces (FEDORA EXTENSION)
+							13. FORMAT_URI: a string that defines a user-assigned URI used to identify the media 
+							type of the bytestream referred to by the LOCATION attribute on the FLocat element 
+							that is more specific than MIME type. (FEDORA EXTENSION) 
+							14. CHECKSUMTYPE: an optional attribute specifying the checksum algorithm used to produce 
+							the value contained in the CHECKSUM attribute. CHECKSUMTYPE must contain one of the following values:
+							HAVAL, MD5, SHA-1, SHA-256, SHA-384, SHA-512, TIGER, WHIRLPOOL, DISABLED
+						</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:all>
+						<xsd:element name="FLocat" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>FLocat: File Location.  
+										The FLocat element provides a pointer to the location of a content file.  
+										It uses the XLink syntax to provide linking information indicating the
+										actual location of the content file, along with a few additional attributes
+										specifying additional linking information.  The full attribute set for
+										the FLocat element is as follows:
+										1. ID (an XML ID); 
+										2. LOCTYPE: the type of locator contained in the FLocat element; and
+										3. OTHERLOCTYPE: a string to indicate an alternative LOCTYPE if
+										the LOCTYPE attribute itself has a value of "OTHER";
+										4. xlink:href: see XLink standard (http://www.w3.org/TR/xlink)
+										5. xlink:role: ""
+										6. xlink:arcrole: "" 
+										7. xlink:title: ""
+										8. xlink:show: ""
+										9. xlink:actuate: ""
+										NOTE: FLocat is an empty element.  The location of the resource
+										pointed to MUST be stored in the xlink:href element.
+									</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+								<xsd:attributeGroup ref="LOCATION"/>
+								<xsd:attributeGroup ref="xlink:simpleLink"/>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="FContent" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>FContent: file content.  
+										The FContent element is used to deliver a content file for a METS 
+										document within the METS file itself.  The content file must be Base 64 
+										encoded, and contained within the FContent wrapper element.  The
+										FContent element has the following attribute:
+										1. ID (an XML ID)
+									</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:simpleContent>
+									<xsd:extension base="xsd:base64Binary">
+										<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+									</xsd:extension>
+								</xsd:simpleContent>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:all>
+					<xsd:attribute name="ID" type="xsd:ID" use="required"/>
+					<xsd:attribute name="MIMETYPE" type="xsd:string" use="optional"/>
+					<xsd:attribute name="SEQ" type="xsd:int" use="optional"/>
+					<xsd:attribute name="SIZE" type="xsd:long" use="optional"/>
+					<xsd:attribute name="CREATED" type="xsd:dateTime" use="optional"/>
+					<xsd:attribute name="CHECKSUM" type="xsd:string" use="optional"/>
+					<xsd:attribute name="OWNERID" type="xsd:string" use="optional"/>
+					<xsd:attribute name="ADMID" type="xsd:IDREFS" use="optional"/>
+					<xsd:attribute name="GROUPID" type="xsd:string" use="optional"/>
+					<xsd:attribute name="DMDID" type="xsd:IDREFS" use="optional"/>
+					<xsd:attribute name="STATUS" type="xsd:string" use="optional"/>
+					<xsd:attribute name="ALT_IDS" type="uriListType" use="optional"/>
+					<xsd:attribute name="FORMAT_URI" type="xsd:anyURI" use="optional"/>
+					<xsd:attribute name="CHECKSUMTYPE" use="optional">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="HAVAL"/>
+								<xsd:enumeration value="MD5"/>
+								<xsd:enumeration value="SHA-1"/>
+								<xsd:enumeration value="SHA-256"/>
+								<xsd:enumeration value="SHA-384"/>
+								<xsd:enumeration value="SHA-512"/>
+								<xsd:enumeration value="TIGER"/>
+								<xsd:enumeration value="WHIRLPOOL"/>
+								<xsd:enumeration value="DISABLED"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:attribute>					
+					<!-- FEDORA EXTENSION:  additional attributes DMDID and STATUS on file -->
+					<!-- FEDORA EXTENSION:  add new attributes ALT_IDS FORMAT_URI on file (8-16-2006) -->
+					<!-- FEDORA EXTENSION:  add new attribute CHECKSUMTYPE on file (11-02-2006) -->					
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:choice>
+		<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+		<xsd:attribute name="VERSDATE" type="xsd:dateTime" use="optional"/>
+		<xsd:attribute name="ADMID" type="xsd:IDREFS" use="optional"/>
+		<xsd:attribute name="DMDID" type="xsd:IDREFS" use="optional"/>
+		<xsd:attribute name="LABEL" type="xsd:string" use="optional"/>
+		<xsd:attribute name="STATUS" type="xsd:string" use="optional"/>
+		<xsd:attribute name="VERSIONABLE" type="xsd:boolean" use="optional"/>
+		<!-- FEDORA EXTENSION: additional attributes DMDID LABEL STATUS on fileGrp -->
+		<!-- FEDORA EXTENSION: add new attribute VERSIONABLE to fileGrp (8-16-2006) -->
+	</xsd:complexType>
+	<xsd:complexType name="areaType">
+		<xsd:annotation>
+			<xsd:documentation>areaType: Complex Type for Area linking.
+				The area element provides for more sophisticated linking between a div 
+				element and content files representing that div, be they text, image, 
+				audio, or video files.  An area element can link a div to a point 
+				within a file, to a one-dimension segment of a file (e.g., text segment, 
+				image line, audio/video clip), or a two-dimensional section of a file 
+				(e.g, subsection of an image, or a subsection of the  video display 
+				of a video file.  The area element has no content, and the following 
+				attributes: 
+				1. ID: an XML ID; 
+				2. FILEID: an IDREF to the file element being pointed to by the div; 
+				3. SHAPE: a text string defining the shape of a two-dimensional 
+				area being referenced in a link file; 
+				4. COORDS: a text string representing a set of visual coordinates 
+				within an image (still image or video frame).  The COORDS and 
+				SHAPE attributes should be used as in HTML 4; 
+				5. BEGIN: a beginning location in a referenced file; 
+				6. END: an ending location in a referenced file; 
+				7. BETYPE: the syntax used in specifying the BEGIN and END 
+				attributes (byte offset, IDREF value, SMPTE time code, SMIL
+				time value, MIDI time code, a simple time code of the form
+				HH:MM:SS, or a TCF time code); 
+				8. EXTENT: the duration of the segment; and 
+				9. EXTTYPE: the syntax used in specifying the extent (byte length 
+				or SMPTE time value);
+				10. ADMID: IDREFs for administrative metadata regarding this area.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+		<xsd:attribute name="FILEID" type="xsd:IDREF" use="required"/>
+		<xsd:attribute name="SHAPE" use="optional">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="RECT"/>
+					<xsd:enumeration value="CIRCLE"/>
+					<xsd:enumeration value="POLY"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="COORDS" type="xsd:string" use="optional"/>
+		<xsd:attribute name="BEGIN" type="xsd:string" use="optional"/>
+		<xsd:attribute name="END" type="xsd:string" use="optional"/>
+		<xsd:attribute name="BETYPE" use="optional">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="BYTE"/>
+					<xsd:enumeration value="IDREF"/>
+					<xsd:enumeration value="SMIL"/>
+					<xsd:enumeration value="MIDI"/>
+					<xsd:enumeration value="SMPTE-25"/>
+					<xsd:enumeration value="SMPTE-24"/>
+					<xsd:enumeration value="SMPTE-DF30"/>
+					<xsd:enumeration value="SMPTE-NDF30"/>
+					<xsd:enumeration value="SMPTE-DF29.97"/>
+					<xsd:enumeration value="SMPTE-NDF29.97"/>
+					<xsd:enumeration value="TIME"/>
+					<xsd:enumeration value="TCF"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="EXTENT" type="xsd:string" use="optional"/>
+		<xsd:attribute name="EXTTYPE" use="optional">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="BYTE"/>
+					<xsd:enumeration value="SMIL"/>
+					<xsd:enumeration value="MIDI"/>
+					<xsd:enumeration value="SMPTE-25"/>
+					<xsd:enumeration value="SMPTE-24"/>
+					<xsd:enumeration value="SMPTE-DF30"/>
+					<xsd:enumeration value="SMPTE-NDF30"/>
+					<xsd:enumeration value="SMPTE-DF29.97"/>
+					<xsd:enumeration value="SMPTE-NDF29.97"/>
+					<xsd:enumeration value="TIME"/>
+					<xsd:enumeration value="TCF"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="ADMID" type="xsd:IDREFS" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="objectType">
+		<xsd:annotation>
+			<xsd:documentation>objectType: An element of type objectType may have the following attributes:   
+			1. ID: an XML ID for the element  
+			2. LABEL: a description of the object that is being linked to.
+			3. LOCTYPE: the type of locator contained in the FLocat element; and  
+			4. OTHERLOCTYPE: a string to indicate an alternative LOCTYPE if  the LOCTYPE attribute itself has 
+			a value of "OTHER."     
+			5. xlink:href: see XLink standard (http://www.w3.org/TR/xlink) 	    
+			6. xlink:role: "" 	    
+			7. xlink:arcrole: ""  	    
+			8. xlink:title: "" 	    
+			9. xlink:show: "" 	    
+			10. xlink:actuate: "" 	    
+			NOTE: objectType is an empty element.  The location of the resource pointed to MUST be stored in the xlink:href element.     </xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+		<xsd:attribute name="LABEL" type="xsd:string" use="optional"/>
+		<xsd:attributeGroup ref="LOCATION"/>
+		<xsd:attributeGroup ref="xlink:simpleLink"/>
+	</xsd:complexType>
+	<xsd:complexType name="mdSecType">
+		<xsd:annotation>
+			<xsd:documentation>mdSec (metadata section) Complex Type
+			A generic framework for pointing to/including metadata within a METS document,
+			a la Warwick Framework.  An mdSec element may have the following attributes:
+			1. ID: an XML ID for this element.
+			2. CREATED: date this metadata section of the METS object was created.  (FEDORA EXTENSION)
+			3. GROUPID: an identifier that establishes a correspondence between this metadata section and other
+			metadata sections.  Typically, this will be used to facilitate versioning of metadata sections. (FEDORA EXTENSION)
+			4. STATUS:  a string to define the current status (or state) of the mdSecType. This is used to mark the metadata section 
+			with an internal system status indicator.	The status indicator is system-defined.  
+			Examples are "A for Active," "D for marked for deletion," and "I for Inactive."  (FEDORA EXTENSION)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="mdRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>mdRef: metadata reference.  
+						The mdRef element is a generic element used throughout the METS schema 
+						to provide a pointer to metadata which resides outside the METS document.  
+						It has the following attributes: 
+						1. ID: an XML ID; 
+						2. LOCTYPE: the type of locator contained in the body of the element; 
+						3. OTHERLOCTYPE: a string indicating an alternative LOCTYPE when the LOCTYPE
+						attribute value is set to "OTHER.";
+						4. xlink:href: see XLink standard (http://www.w3.org/TR/xlink)
+						5. xlink:role: ""
+						6. xlink:arcrole: "" 
+						7. xlink:title: ""
+						8. xlink:show: ""
+						9. xlink:actuate: ""
+						10. MIMETYPE: the MIME type for the metadata being pointed at; 
+						11. MDType: the type of metadata being pointed at (e.g., MARC, EAD, etc.); 
+						12. OTHERMDTYPE: a string indicating an alternative MDTYPE when the MDTYPE
+						attribute value is set to "OTHER.";
+						13. LABEL: a label to display to the viewer of the METS document identifying the metadata; and 
+						14. XPTR: an xptr to a location within the file pointed to by the mdRef element, if applicable.
+						NB: mdRef is an empty element.  The location of the metadata must be recorded in
+						the xlink:href attribute, supplemented by the XPTR attribute as needed.									</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+					<xsd:attributeGroup ref="LOCATION"/>
+					<xsd:attributeGroup ref="xlink:simpleLink"/>
+					<xsd:attributeGroup ref="METADATA"/>
+					<xsd:attribute name="MIMETYPE" type="xsd:string" use="optional"/>
+					<xsd:attribute name="LABEL" type="xsd:string" use="optional"/>
+					<xsd:attribute name="XPTR" type="xsd:string" use="optional"/>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="mdWrap" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>mdWrap: metadata wrapper.  
+						The mdWrap element is a generic element used throughout the METS schema  to allow 
+						the encoder to place arbitrary metadata conforming to other standards/schema within a 
+						METS document.  The included metadata can either be encoded in XML, in which case 
+						it may be placed directly within the mdWrap element, or it can be Base64 encoded, and 
+						placed within a subsidiary binData element.  The mdWrap element can have the following
+						attributes:
+						1. ID: an XML ID for this element;
+						2. MIMETYPE: the MIME type for the metadata contained in the element;
+						3. MDType: the type of metadata contained (e.g., MARC, EAD, etc.); 
+						4. OTHERMDTYPE: a string indicating an alternative MDTYPE when the MDTYPE
+						attribute value is set to "OTHER.";
+						5. LABEL: a label to display to the viewer of the METS document identifying the metadata.
+						6. ALT_IDS: a string that defines a user-assigned set of alternative identifiers 
+						for the datastream,	with the identifiers separated by spaces (FEDORA EXTENSION)
+						7. FORMAT_URI: a string that defines a user-assigned URI used to identify the media 
+						type of the bytestream referred to by the LOCATION attribute on the FLocat element 
+						that is more specific than MIME type. (FEDORA EXTENSION) 	
+						8. CHECKSUM: an MD5 digest value for the included file.
+						9. CHECKSUMTYPE: an optional attribute specifying the checksum algorithm used to produce 
+						the value contained in the CHECKSUM attribute. CHECKSUMTYPE must contain one of the following values:
+						HAVAL, MD5, SHA-1, SHA-256, SHA-384, SHA-512, TIGER, WHIRLPOOL, DISABLED						
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice>
+						<xsd:element name="binData" type="xsd:base64Binary" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>A wrapper to contain Base64 encoded metadata.											</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="xmlData" minOccurs="0">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:any namespace="##any" processContents="skip" maxOccurs="unbounded"/>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:choice>
+					<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+					<xsd:attribute name="MIMETYPE" type="xsd:string" use="optional"/>
+					<xsd:attributeGroup ref="METADATA"/>
+					<xsd:attribute name="LABEL" type="xsd:string" use="optional"/>
+					<xsd:attribute name="ALT_IDS" type="uriListType" use="optional"/>
+					<xsd:attribute name="FORMAT_URI" type="xsd:anyURI" use="optional"/>
+					<xsd:attribute name="CHECKSUM" type="xsd:string" use="optional"/>	
+					<xsd:attribute name="CHECKSUMTYPE" use="optional">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="HAVAL"/>
+								<xsd:enumeration value="MD5"/>
+								<xsd:enumeration value="SHA-1"/>
+								<xsd:enumeration value="SHA-256"/>
+								<xsd:enumeration value="SHA-384"/>
+								<xsd:enumeration value="SHA-512"/>
+								<xsd:enumeration value="TIGER"/>
+								<xsd:enumeration value="WHIRLPOOL"/>
+								<xsd:enumeration value="DISABLED"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:attribute>						
+					<!-- FEDORA EXTENSION:  add new attributes ALT_IDS FORMAT_URI on mdWrap (8-16-2006) -->
+					<!-- FEDORA EXTENSION:  add new attributes CHECKSUM and CHECKSUMTYPE on mdWrap (11-02-2006) -->						
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:all>
+		<xsd:attribute name="ID" type="xsd:ID" use="required"/>
+		<xsd:attribute name="CREATED" type="xsd:dateTime" use="optional"/>
+		<xsd:attribute name="GROUPID" type="xsd:string" use="optional"/>
+		<xsd:attribute name="STATUS" type="xsd:string" use="optional"/>
+		<!-- FEDORA EXTENSION:  additional attributes CREATED GROUPID STATUS on mdSecType -->
+	</xsd:complexType>
+	<xsd:attributeGroup name="METADATA">
+		<xsd:attribute name="MDTYPE" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="MARC"/>
+					<xsd:enumeration value="EAD"/>
+					<xsd:enumeration value="DC"/>
+					<xsd:enumeration value="NISOIMG"/>
+					<xsd:enumeration value="LC-AV"/>
+					<xsd:enumeration value="VRA"/>
+					<xsd:enumeration value="TEIHDR"/>
+					<xsd:enumeration value="DDI"/>
+					<xsd:enumeration value="FGDC"/>
+					<xsd:enumeration value="OTHER"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="OTHERMDTYPE" type="xsd:string" use="optional"/>
+	</xsd:attributeGroup>
+	<xsd:attributeGroup name="LOCATION">
+		<xsd:attribute name="LOCTYPE" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="URN"/>
+					<xsd:enumeration value="URL"/>
+					<xsd:enumeration value="PURL"/>
+					<xsd:enumeration value="HANDLE"/>
+					<xsd:enumeration value="DOI"/>
+					<xsd:enumeration value="OTHER"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="OTHERLOCTYPE" type="xsd:string" use="optional"/>
+	</xsd:attributeGroup>
+	<!-- See http://www.fedora.info/definitions/identifiers/ -->
+	<xsd:simpleType name="pidType">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="([A-Za-z0-9]|-|\.)+:(([A-Za-z0-9])|-|\.|~|_|(%[0-9A-F]{2}))+"/>
+			<xsd:maxLength value="64"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="uriListType">
+		<xsd:list itemType="xsd:anyURI"/>
+	</xsd:simpleType>	
+</xsd:schema>

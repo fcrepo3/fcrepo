@@ -171,6 +171,7 @@ public class TestRelationships
                     (byte) 0xE2, (byte) 0x80, (byte) 0x9D // right double quotes ”
             }, "UTF-8");
         } catch (UnsupportedEncodingException uee) {
+        	System.out.print("UnsupportedEncodingException: " + uee);
         }
 
 

@@ -1,0 +1,234 @@
+<?xml version="1.0"?>
+<!---************************************************************************-->
+<!-- SAMPLE FEDORA DIGITAL OBJECT ENCODED USING METS -->
+<!-- Note: Sample Template Object used with Batch Utility -->
+<!---************************************************************************-->
+<METS:mets EXT_VERSION="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:METS="http://www.loc.gov/METS/" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.loc.gov/standards/METS/ http://www.fedora.info/definitions/1/0/mets-fedora-ext1-1.xsd" OBJID="template:objectPid" TYPE="FedoraObject" LABEL="template: Object Label" PROFILE="UVA_STD_IMG">
+<METS:metsHdr>
+<METS:agent ROLE="IPOWNER">
+	<METS:name>fedoraAdmin</METS:name>
+</METS:agent>
+</METS:metsHdr>
+	<!-- Note: The value for createdDate is assigned dynamically by the Fedora server at ingest time if the CREATEDATE attribute on     -->
+	<!-- the METS:metsHdr element is not present in the object being ingested. Therefore, it is recommended that the METS:metsHdr      -->
+	<!-- element be omitted from the object template so this date will be assigned dynamically by the Fedora server. If included in the        -->
+	<!-- template file, this value will be carried through to the built objects and will result in the specified static date being used at ingest     -->
+	<!-- time by the Fedora server rather than dynamically assigning createdDate at ingest time.                                                                       -->
+	<!--                                                                                                                                                                                                                              -->
+	<!-- Uncomment the next line only if you want all objects built with this template to retain the specified creation date after ingest.            -->
+	<!-- <METS:metsHdr CREATEDATE="2005-03-15T12:57:07.241Z"/>                                                                                                           -->
+	<!---*******************************************************************************************************************************************-->
+	<!---User-Defined XML METADATA DATASTREAMS-->
+	<!---*******************************************************************************************************************************************-->
+	<METS:dmdSecFedora ID="DC" STATUS="A">
+		<!-- Note: The value for createdDate is assigned dynamically by the Fedora server at ingest time if the CREATED attribute is not        -->
+		<!-- present on the component in the object being ingested. Therefore, it is recommended that this attribute be omitted from the          -->
+		<!-- object template so this date will be assigned dynamically by the Fedora server. If included in the template file, this value will be    -->
+		<!-- carried through to the built objects and will result in the specified static date being used at ingest time by the Fedora server          -->
+		<!-- rather than dynamically assigning createdDate at ingest time.                                                                                                                   -->
+		<!--                                                                                                                                                                                                                             -->
+		<!-- Uncomment the the following line if you want the DC datastream for all abjects built with this template to retain the specified         -->
+		<!-- createdDate after ingest.                                                                                                                                                                                -->
+		<!-- <METS:descMD CREATED="2005-03-15T12:57:07.241Z" ID="DC.0">                                                                                              -->
+		<METS:descMD ID="DC.0">
+			<METS:mdWrap FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: Dublin Core Record for this object">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:descMD>
+	</METS:dmdSecFedora>
+	<METS:dmdSecFedora ID="DESC" STATUS="A">
+		<METS:descMD ID="DESC.0">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA descriptive metadata">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:descMD>
+	</METS:dmdSecFedora>
+	<METS:amdSec ID="TECH1">
+		<METS:techMD ID="TECH1.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA technical metadata for THUMBNAIL image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:techMD>
+	</METS:amdSec>
+	<METS:amdSec ID="TECH2">
+		<METS:techMD ID="TECH2.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA technical metadata for MED res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:techMD>
+	</METS:amdSec>
+	<METS:amdSec ID="TECH3">
+		<METS:techMD ID="TECH3.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA technical metadata for HIGH res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:techMD>
+	</METS:amdSec>
+	<METS:amdSec ID="TECH4">
+		<METS:techMD ID="TECH4.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA technical metadata for VERYHIGH res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:techMD>
+	</METS:amdSec>
+	<METS:amdSec ID="SOURCE1">
+		<METS:sourceMD ID="SOURCE1.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA source metadata for THUMBNAIL res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:sourceMD>
+	</METS:amdSec>
+	<METS:amdSec ID="SOURCE2">
+		<METS:sourceMD ID="SOURCE2.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA source metadata for MEDRES res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:sourceMD>
+	</METS:amdSec>
+	<METS:amdSec ID="SOURCE3">
+		<METS:sourceMD ID="SOURCE3.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA source metadata for HIGH res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:sourceMD>
+	</METS:amdSec>
+	<METS:amdSec ID="SOURCE4">
+		<METS:sourceMD ID="SOURCE4.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA source metadata for VERYHIGH res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:sourceMD>
+	</METS:amdSec>
+	<METS:amdSec ID="DIGIPROV1">
+		<METS:digiprovMD ID="DIGIPROV1.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA digiprov metadata for THUMBNAIL res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:digiprovMD>
+	</METS:amdSec>
+	<METS:amdSec ID="DIGIPROV2">
+		<METS:digiprovMD ID="DIGIPROV2.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA digiprov metadata for MEDRES res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:digiprovMD>
+	</METS:amdSec>
+	<METS:amdSec ID="DIGIPROV3">
+		<METS:digiprovMD ID="DIGIPROV3.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA digiprov metadata for HIGH res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:digiprovMD>
+	</METS:amdSec>
+	<METS:amdSec ID="DIGIPROV4">
+		<METS:digiprovMD ID="DIGIPROV4.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA digiprov metadata for VERYHIGH res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:digiprovMD>
+	</METS:amdSec>
+	<METS:amdSec ID="RIGHTS1">
+		<METS:rightsMD ID="RIGHTS1.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA access rights/policy metadata for THUMBNAIL res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:rightsMD>
+	</METS:amdSec>
+	<METS:amdSec ID="RIGHTS2">
+		<METS:rightsMD ID="RIGHTS2.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA access rights/policy metadata for MEDRES res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:rightsMD>
+	</METS:amdSec>
+	<METS:amdSec ID="RIGHTS3">
+		<METS:rightsMD ID="RIGHTS3.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA access rights/policy metadata for HIGHRES res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:rightsMD>
+	</METS:amdSec>
+	<METS:amdSec ID="RIGHTS4">
+		<METS:rightsMD ID="RIGHTS4.0" STATUS="A">
+			<METS:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" LABEL="template: UVA access rights/policy metadata for VERYHIGH res image">
+				<METS:xmlData>
+					<dummy/>
+				</METS:xmlData>
+			</METS:mdWrap>
+		</METS:rightsMD>
+	</METS:amdSec>
+	<!---*******************************************************************************************************************************************-->
+	<!--- DATASTREAMS:  EXTERNAL-REFERENCED CONTENT and REPOSITORY-MANAGED CONTENT-->
+	<!---*******************************************************************************************************************************************-->
+	<METS:fileSec>
+		<METS:fileGrp ID="DATASTREAMS">
+			<METS:fileGrp ID="DS1" STATUS="A">
+				<!-- Note: The value for createdDate is assigned dynamically by the Fedora server at ingest time if the CREATED attribute is not        -->
+				<!-- present on the component in the object being ingested. Therefore, it is recommended that this attribute be omitted from the          -->
+				<!-- object template so this date will be assigned dynamically by the Fedora server. If included in the template file, this value will be    -->
+				<!-- carried through to the built objects and will result in the specified static date being used at ingest time by the Fedora server          -->
+				<!-- rather than dynamically assigning createdDate at ingest time.                                                                                                                   -->
+				<!--                                                                                                                                                                                                                             -->
+				<!-- Uncomment the the following line if you want the DC datastream for all abjects built with this template to retain the specified         -->
+				<!-- createdDate after ingest.                                                                                                                                                                                -->
+				<!-- <METS:file CREATED="2005-03-15T12:57:07.241Z" ID="DS1.0" MIMETYPE="image/jpeg" ADMID="TECH1 DIGIPROV1 SOURCE1 RIGHTS1" OWNERID="E" STATUS="A"> -->
+				<!--This is the THUMBNAIL sized image -->
+				<METS:file ID="DS1.0" MIMETYPE="image/jpeg" ADMID="TECH1 DIGIPROV1 SOURCE1 RIGHTS1" OWNERID="E" STATUS="A">
+					<METS:FLocat LOCTYPE="URL" xlink:href="template: url of THUMBNAIL jpg image" xlink:title="template: THUMBNAIL jpg image"/>
+				</METS:file>
+			</METS:fileGrp>
+			<METS:fileGrp ID="DS2" STATUS="A">
+				<!-- This is the MEDIUM sized image -->
+				<METS:file ID="DS2.0" MIMETYPE="image/jpeg" ADMID="TECH2 DIGIPROV2 SOURCE2 RIGHTS2" OWNERID="E" STATUS="A">
+					<METS:FLocat LOCTYPE="URL" xlink:href="template: url of MEDIUM res jpg image" xlink:title="template: MEDIUM res jpg image"/>
+				</METS:file>
+			</METS:fileGrp>
+			<METS:fileGrp ID="DS3">
+				<!--This is the HIGH resolution image -->
+				<METS:file ID="DS3.0" MIMETYPE="image/jpeg" ADMID="TECH3 DIGIPROV3 SOURCE3 RIGHTS3" OWNERID="E" STATUS="A">
+					<METS:FLocat LOCTYPE="URL" xlink:href="template: url of HIGH res jpg image" xlink:title="template: HIGH res jpg image"/>
+				</METS:file>
+			</METS:fileGrp>
+			<METS:fileGrp ID="DS4">
+				<!--This is the very HIGH resolution image -->
+				<METS:file ID="DS4.0" MIMETYPE="image/jpeg" ADMID="TECH4 DIGIPROV4 SOURCE4 RIGHTS4" OWNERID="E" STATUS="A">
+					<METS:FLocat LOCTYPE="URL" xlink:href="template: url of VERYHIGH res jpg image" xlink:title="template: VERYHIGH res jpg image"/>
+				</METS:file>
+			</METS:fileGrp>
+		</METS:fileGrp>
+	</METS:fileSec>
+</METS:mets>

@@ -35,35 +35,10 @@
 		<fedora.port>8080</fedora.port>
 		<fedora.appServerContext>fedora</fedora.appServerContext>
 		<fedora.baseURL>http://${fedora.hostname}:${fedora.port}/${fedora.appServerContext}</fedora.baseURL>
-		<tomcat.home>${fedora.home}/tomcat</tomcat.home>
-		<tomcat.url>${fedora.baseURL}</tomcat.url>
-		<tomcat.port.ssl>8443</tomcat.port.ssl>
-		<tomcat.port.shutdown>8005</tomcat.port.shutdown>
-		<containerId>tomcat7x</containerId>
-		<zipUrlInstaller.url>
-			https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.25/bin/apache-tomcat-7.0.25.zip
-		</zipUrlInstaller.url>
 	</properties>
 
 	<build>
-
-		<testResources>
-			<!-- copy fedora home -->
-			<testResource>
-				<directory>${basedir}/src/test/resources/fedora-home</directory>
-				<targetPath>${project.build.directory}/fedora-home</targetPath>
-			</testResource>
-			<testResource>
-				<includes>
-					<include>logback-test.xml</include>
-				</includes>
-				<directory>${basedir}/src/test/resources</directory>
-				<targetPath>${project.build.testOutputDirectory}</targetPath>
-			</testResource>
-		</testResources>
-
 		<plugins>
-
 			<plugin>
 				<groupId>org.codehaus.cargo</groupId>
 				<artifactId>cargo-maven2-plugin</artifactId>
@@ -81,11 +56,12 @@
 							<javax.net.ssl.trustStorePassword>${javax.net.ssl.trustStorePassword}</javax.net.ssl.trustStorePassword>
 						</systemProperties>
 					</container>
+
 					<configuration>
 						<configfiles>
 							<configfile>
-								<file>${project.basedir}/src/test/resources/tomcat/server.xml</file>
-								<todir>conf</todir>
+								<file>${containerConfigFile}</file>
+								<todir>${containerConfigDir}</todir>
 							</configfile>
 						</configfiles>
 						<deployables>
@@ -175,7 +151,6 @@
 				<version>2.5</version>
 				<executions>
 					<execution>
-						<id>copy-fedora-home</id>
 						<goals>
 							<goal>testResources</goal>
 						</goals>
@@ -187,52 +162,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>2.9</version>
-				<configuration>
-					<environmentVariables>
-						<WEBAPP_NAME>${fedora.appServerContext}</WEBAPP_NAME>
-						<CATALINA_HOME>${project.build.directory}/cargo/configurations/${containerId}</CATALINA_HOME>
-					</environmentVariables>
-					<systemPropertyVariables>
-						<fedora.authorize.access>false</fedora.authorize.access>
-						<fedora.home>${fedora.home}</fedora.home>
-						<fedora.baseURL>${fedora.baseURL}</fedora.baseURL>
-						<fedora.username>${fedora.username}</fedora.username>
-						<fedora.password>${fedora.username}</fedora.password>
-						<fedora.hostname>${fedora.hostname}</fedora.hostname>
-						<fedora.port>${fedora.port}</fedora.port>
-						<javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
-						<javax.net.ssl.trustStorePassword>${javax.net.ssl.trustStorePassword}</javax.net.ssl.trustStorePassword>
-					</systemPropertyVariables>
-					<includes>
-						<include>**/NotificationInvocationHandlerTest.java</include>
-						<!-- Has bug in source-code <include>**/SimpleDeploymentTests.java</include> -->
-						<include>**/AtomAPIMMessageTest.java</include>
-						<include>**/NotificationInvocationHandlerTest.java</include>
-						<include>**/DOTranslationUtilityTest.java</include>
-						<include>**/TestIngest.java</include>
-						<include>**/TestAPIA.java</include>
-						<include>**/TestAPIAConfigA.java</include>
-						<include>**/TestAPIALite.java</include>
-						<include>**/TestAPIALiteConfigA.java</include>
-						<include>**/TestAPIM.java</include>
-						<include>**/TestAPIMLite.java</include>
-						<include>**/TestRESTAPI.java</include>
-						<include>**/TestHTTPStatusCodes.java</include>
-						<include>**/TestHTTPStatusCodesConfigA.java</include>
-						<include>**/TestManagedDatastreams.java</include>
-						<include>**/TestManyDisseminations.java</include>
-						<include>**/TestCommandLineFormats.java</include>
-						<include>**/TestOAIService.java</include>
-						<include>**/TestServerConfiguration.java</include>
-						<include>**/ConflictingDeploymentTests.java</include>
-						<include>**/TestCommandLineUtilities.java</include>
-						<include>**/SharedDeploymentTests.java</include>
-						<include>**/ContentModelDSInputTest.java</include>
-						<include>**/TestAdminAPI.java</include>
-						<include>**/TestObjectLastModDate.java</include>
-						<!-- Disabled until FCREPO-798 is public <include>**/TestAPIM2.java</include> -->
-					</includes>
-				</configuration>
 				<executions>
 					<execution>
 						<goals>
@@ -267,8 +196,6 @@
 	</build>
 
 	<dependencies>
-
-
 		<dependency>
 			<groupId>org.fcrepo</groupId>
 			<artifactId>fcrepo-server</artifactId>
@@ -378,4 +305,181 @@
 			<type>war</type>
 		</dependency>
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>tomcat7x</id>
+			<properties>
+				<containerId>tomcat7x</containerId>
+				<zipUrlInstaller.url>
+					https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.25/bin/apache-tomcat-7.0.25.zip
+				</zipUrlInstaller.url>
+				<containerConfigFile>${project.basedir}/src/test/resources/container-configs/tomcat7x/server.xml</containerConfigFile>
+				<containerConfigDir>conf</containerConfigDir>
+			</properties>
+
+		</profile>
+		<profile>
+			<id>jetty8x</id>
+			<properties>
+				<containerId>jetty8x</containerId>
+				<zipUrlInstaller.url>
+					http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.0.3.v20111011/jetty-distribution-8.0.3.v20111011.tar.gz
+				</zipUrlInstaller.url>
+				<containerConfigFile>${project.basedir}/src/test/resources/container-configs/jetty8x/jetty.xml</containerConfigFile>
+				<containerConfigDir>etc</containerConfigDir>
+			</properties>
+		</profile>
+		<profile>
+			<id>configA</id>
+			<build>
+				<testResources>
+					<!-- copy fedora home -->
+					<testResource>
+						<directory>${basedir}/src/test/resources/configA/fedora-home</directory>
+						<targetPath>${project.build.directory}/fedora-home</targetPath>
+					</testResource>
+					<testResource>
+						<includes>
+							<include>logback-test.xml</include>
+						</includes>
+						<directory>${basedir}/src/test/resources/configA</directory>
+						<targetPath>${project.build.testOutputDirectory}</targetPath>
+					</testResource>
+				</testResources>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<version>2.9</version>
+						<configuration>
+							<environmentVariables>
+								<WEBAPP_NAME>${fedora.appServerContext}</WEBAPP_NAME>
+								<CATALINA_HOME>${project.build.directory}/cargo/configurations/${containerId}</CATALINA_HOME>
+							</environmentVariables>
+							<systemPropertyVariables>
+								<fedora.authorize.access>false</fedora.authorize.access>
+								<fedora.home>${fedora.home}</fedora.home>
+								<fedora.baseURL>${fedora.baseURL}</fedora.baseURL>
+								<fedora.username>${fedora.username}</fedora.username>
+								<fedora.password>${fedora.username}</fedora.password>
+								<fedora.hostname>${fedora.hostname}</fedora.hostname>
+								<fedora.port>${fedora.port}</fedora.port>
+								<javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
+								<javax.net.ssl.trustStorePassword>${javax.net.ssl.trustStorePassword}</javax.net.ssl.trustStorePassword>
+							</systemPropertyVariables>
+							<includes>
+								<include>**/NotificationInvocationHandlerTest.java</include>
+								<!-- Has bug in source-code <include>**/SimpleDeploymentTests.java</include> -->
+								<include>**/AtomAPIMMessageTest.java</include>
+								<include>**/NotificationInvocationHandlerTest.java</include>
+								<include>**/DOTranslationUtilityTest.java</include>
+								<include>**/TestIngest.java</include>
+								<include>**/TestAPIA.java</include>
+								<include>**/TestAPIAConfigA.java</include>
+								<include>**/TestAPIALite.java</include>
+								<include>**/TestAPIALiteConfigA.java</include>
+								<include>**/TestAPIM.java</include>
+								<include>**/TestAPIMLite.java</include>
+								<include>**/TestRESTAPI.java</include>
+								<include>**/TestHTTPStatusCodes.java</include>
+								<include>**/TestHTTPStatusCodesConfigA.java</include>
+								<include>**/TestManagedDatastreams.java</include>
+								<include>**/TestManyDisseminations.java</include>
+								<include>**/TestCommandLineFormats.java</include>
+								<include>**/TestOAIService.java</include>
+								<include>**/TestServerConfiguration.java</include>
+								<include>**/ConflictingDeploymentTests.java</include>
+								<include>**/TestCommandLineUtilities.java</include>
+								<include>**/SharedDeploymentTests.java</include>
+								<include>**/ContentModelDSInputTest.java</include>
+								<include>**/TestAdminAPI.java</include>
+								<include>**/TestObjectLastModDate.java</include>
+								<!-- Disabled until FCREPO-798 is public <include>**/TestAPIM2.java</include> -->
+							</includes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>configB</id>
+			<build>
+				<testResources>
+					<!-- copy fedora home -->
+					<testResource>
+						<directory>${basedir}/src/test/resources/configB/fedora-home</directory>
+						<targetPath>${project.build.directory}/fedora-home</targetPath>
+					</testResource>
+					<testResource>
+						<directory>${basedir}/src/test/resources/test-objects</directory>
+						<targetPath>${project.build.testOutputDirectory}</targetPath>
+					</testResource>
+					<testResource>
+						<includes>
+							<include>logback-test.xml</include>
+						</includes>
+						<directory>${basedir}/src/test/resources/configB</directory>
+						<targetPath>${project.build.testOutputDirectory}</targetPath>
+					</testResource>
+				</testResources>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<version>2.9</version>
+						<configuration>
+							<environmentVariables>
+								<WEBAPP_NAME>${fedora.appServerContext}</WEBAPP_NAME>
+								<CATALINA_HOME>${project.build.directory}/cargo/configurations/${containerId}</CATALINA_HOME>
+							</environmentVariables>
+							<systemPropertyVariables>
+								<fedora.authorize.access>true</fedora.authorize.access>
+								<fedora.home>${fedora.home}</fedora.home>
+								<fedora.baseURL>${fedora.baseURL}</fedora.baseURL>
+								<fedora.username>${fedora.username}</fedora.username>
+								<fedora.password>${fedora.username}</fedora.password>
+								<fedora.hostname>${fedora.hostname}</fedora.hostname>
+								<fedora.port>${fedora.port}</fedora.port>
+								<javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
+								<javax.net.ssl.trustStorePassword>${javax.net.ssl.trustStorePassword}</javax.net.ssl.trustStorePassword>
+							</systemPropertyVariables>
+							<includes>
+								<include>**/NotificationInvocationHandlerTest.class</include>
+
+								<!-- Has bug in source-code <include>**/SimpleDeploymentTests.class</include> -->
+
+								<include>**/AtomAPIMMessageTest.class</include>
+								<include>**/DOTranslationUtilityTest.class</include>
+								<include>**/TestIngest.class</include>
+								<include>**/TestAPIA.class</include>
+								<include>**/TestAPIALite.class</include>
+								<include>**/TestAPIM.class</include>
+								<include>**/TestAPIMLite.class</include>
+								<include>**/TestAuthentication.class</include>
+								<include>**/TestHTTPStatusCodes.class</include>
+								<include>**/TestHTTPStatusCodesConfigB.class</include>
+								<include>**/TestManagedDatastreams.class</include>
+								<include>**/TestManagementNotifications.class</include>
+								<include>**/TestRelationships.class</include>
+								<include>**/TestRESTAPI.class</include>
+								<include>**/TestRISearch.class</include>
+								<include>**/TestOAIService.class</include>
+								<include>**/TestCommandLineFormats.class</include>
+								<include>**/TestServerConfiguration.class</include>
+								<include>**/ConflictingDeploymentTests.class</include>
+								<include>**/SharedDeploymentTests.class</include>
+								<include>**/TestXACMLPolicies.class</include>
+								<include>**/ContentModelDSInputTest.class</include>
+								<include>**/TestCommandLineUtilities.class</include>
+								<include>**/TestMisplacedNamespace.class</include>
+								<include>**/TestAdminAPI.class</include>
+							</includes>
+
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

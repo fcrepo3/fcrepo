@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.fedora.info/definitions/" xmlns="http://www.fedora.info/definitions/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xsd:element name="batchModify">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="addObject" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="modifyObject" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="purgeObject" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="addDatastream" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="modifyDatastream" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="purgeDatastream" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="setDatastreamState" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="setDatastreamVersionable" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="compareDatastreamChecksum" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="addObject">
+		<xsd:complexType>
+			<xsd:attribute name="pid" type="xsd:string" use="required"/>
+			<xsd:attribute name="label" type="xsd:string" use="required"/>
+			<xsd:attribute name="contentModel" type="xsd:string" use="required"/>
+			<xsd:attribute name="logMessage" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="modifyObject">
+		<xsd:complexType>
+			<xsd:attribute name="pid" type="xsd:string" use="required"/>
+			<xsd:attribute name="label" type="xsd:string" use="optional"/>
+			<xsd:attribute name="state" use="optional">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string"/>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="ownerId" type="xsd:string" use="optional"/>
+			<xsd:attribute name="logMessage" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="purgeObject">
+		<xsd:complexType>
+			<xsd:attribute name="pid" type="xsd:string" use="required"/>
+			<xsd:attribute name="force" type="xsd:boolean" use="optional"/>
+			<xsd:attribute name="logMessage" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="addDatastream">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="xmlData" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="pid" type="xsd:string" use="required"/>
+			<xsd:attribute name="dsID" type="xsd:string" use="optional"/>
+			<xsd:attribute name="dsLabel" type="xsd:string" use="required"/>
+			<xsd:attribute name="dsMIME" type="xsd:string" use="required"/>
+			<xsd:attribute name="formatURI" type="xsd:string" use="optional"/>
+			<xsd:attribute name="versionable" type="xsd:boolean" use="optional"/>
+			<xsd:attribute name="altIDs" type="xsd:string" use="optional"/>
+			<xsd:attribute name="dsLocation" type="xsd:anyURI" use="optional"/>
+			<xsd:attribute name="dsControlGroupType" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="E"/>
+						<xsd:enumeration value="M"/>
+						<xsd:enumeration value="X"/>
+						<xsd:enumeration value="R"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="dsState" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="A"/>
+						<xsd:enumeration value="D"/>
+						<xsd:enumeration value="I"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="checksumType" use="optional">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="MD5"/>
+						<xsd:enumeration value="SHA-1"/>
+						<xsd:enumeration value="SHA-256"/>
+						<xsd:enumeration value="SHA-384"/>
+						<xsd:enumeration value="SHA-512"/>
+						<xsd:enumeration value="DISABLED"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="checksum" type="xsd:string" use="optional"/>			
+			<xsd:attribute name="logMessage" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="purgeDatastream">
+		<xsd:complexType>
+			<xsd:attribute name="pid" type="xsd:string" use="required"/>
+			<xsd:attribute name="dsID" type="xsd:string" use="required"/>
+			<xsd:attribute name="asOfDate" type="xsd:dateTime" use="optional"/>
+			<xsd:attribute name="endDate" type="xsd:dateTime" use="optional"/>
+			<xsd:attribute name="force" type="xsd:boolean" use="optional"/>
+			<xsd:attribute name="logMessage" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="modifyDatastream">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="xmlData" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="pid" type="xsd:string" use="required"/>
+			<xsd:attribute name="dsID" type="xsd:string" use="required"/>
+			<xsd:attribute name="dsControlGroupType" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="E"/>
+						<xsd:enumeration value="M"/>
+						<xsd:enumeration value="X"/>
+						<xsd:enumeration value="R"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="dsLabel" type="xsd:string" use="optional"/>
+			<xsd:attribute name="dsState" use="optional">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="A"/>
+						<xsd:enumeration value="D"/>
+						<xsd:enumeration value="I"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="dsLocation" type="xsd:anyURI" use="optional"/>
+			<xsd:attribute name="dsMIME" type="xsd:string" use="optional"/>
+			<xsd:attribute name="formatURI" type="xsd:string" use="optional"/>
+			<xsd:attribute name="versionable" type="xsd:boolean" use="optional"/>			
+			<xsd:attribute name="altIDs" type="xsd:string" use="optional"/>
+			<xsd:attribute name="force" type="xsd:boolean" use="optional"/>
+			<xsd:attribute name="checksumType" use="optional">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="MD5"/>
+						<xsd:enumeration value="SHA-1"/>
+						<xsd:enumeration value="SHA-256"/>
+						<xsd:enumeration value="SHA-384"/>
+						<xsd:enumeration value="SHA-512"/>
+						<xsd:enumeration value="DISABLED"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="checksum" type="xsd:string" use="optional"/>			
+			<xsd:attribute name="logMessage" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="setDatastreamState">
+		<xsd:complexType>
+			<xsd:attribute name="pid" type="xsd:string" use="required"/>
+			<xsd:attribute name="dsID" type="xsd:string" use="required"/>
+			<xsd:attribute name="dsState" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="A"/>
+						<xsd:enumeration value="D"/>
+						<xsd:enumeration value="I"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="logMessage" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="xmlData">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:any namespace="##any" processContents="skip" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="setDatastreamVersionable">
+		<xsd:complexType>
+			<xsd:attribute name="pid" type="xsd:string" use="required"/>
+			<xsd:attribute name="dsID" type="xsd:string" use="required"/>
+			<xsd:attribute name="dsVersionable" type="xsd:boolean" use="required"/>
+			<xsd:attribute name="logMessage" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>	
+	<xsd:element name="compareDatastreamChecksum">
+		<xsd:complexType>
+			<xsd:attribute name="pid" type="xsd:string" use="required"/>
+			<xsd:attribute name="dsID" type="xsd:string" use="required"/>
+			<xsd:attribute name="asOfDate" type="xsd:dateTime" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>	
+</xsd:schema>

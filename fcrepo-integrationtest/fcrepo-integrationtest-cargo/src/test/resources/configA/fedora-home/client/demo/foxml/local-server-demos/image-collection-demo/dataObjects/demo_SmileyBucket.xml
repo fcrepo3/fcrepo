@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="demo:SmileyBucket" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Data Object (Smiley Bucket) for Image Collection Demo"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-02T05:09:42.015Z"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-07-02T05:09:42.015Z"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:42.937Z"
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.1"
+      LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:title>Smiley Bucket</dc:title>
+          <dc:description>This bucket can be used for sand, flour, sugar, dirt, paint, and water.</dc:description>
+          <dc:identifier>demo:SmileyBucket</dc:identifier>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:42.937Z"
+      FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT.0"
+      LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
+          <rdf:Description rdf:about="info:fedora/demo:SmileyBucket">
+            <rel:isMemberOf rdf:resource="info:fedora/demo:SmileyStuff"/>
+            <fedora-model:hasModel rdf:resource="info:fedora/demo:DualResImage"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="E" ID="MEDIUM_SIZE" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:42.937Z"
+      ID="MediumSize.jpg.0" LABEL="Medium-size image" MIMETYPE="image/jpeg">
+      <foxml:contentLocation
+        REF="http://local.fedora.server/fedora-demo/image-collection-demo/SmileyBucket-MediumSize.jpg" TYPE="URL"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="E" ID="FULL_SIZE" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:42.937Z"
+      ID="FullSize.jpg.0" LABEL="Full-size image" MIMETYPE="image/jpeg">
+      <foxml:contentLocation
+        REF="http://local.fedora.server/fedora-demo/image-collection-demo/SmileyBucket-FullSize.jpg" TYPE="URL"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

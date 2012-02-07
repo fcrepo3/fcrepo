@@ -1,0 +1,19 @@
+﻿<?xml version="1.0"?>
+<!--
+  configuration for Berkeley DB XML-based policy index
+  
+  specifies location and name of database
+  
+-->
+<exist>
+  <database>
+    <!-- URI of eXist.  The default is for eXist running as a server.  Consult eXist documentation for URIs for other configurations -->
+    <uri name="xmldb:exist://localhost:8088/xmlrpc"/>
+    <!-- the collection for storing policies -->
+    <!-- note this is within the root eXist collection eg /db -->
+    <collection name="fesl"/>
+    <!-- credentials for eXist.  User must be able to create collection and read/write to it -->
+    <user name="admin"/>
+    <password name=""/>
+  </database>
+</exist>
