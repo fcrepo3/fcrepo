@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -23,6 +25,7 @@ import org.xml.sax.XMLReader;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ObjectValidityException;
+import org.fcrepo.server.storage.types.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,7 +110,11 @@ public class DOValidatorXMLSchema
                             + "The underlying exception was a "
                             + e.getClass().getName() + ".\n"
                             + "The message was " + "\"" + e.getMessage() + "\"";
-            throw new ObjectValidityException(msg, e);
+            Validation validation = new Validation("unknown");
+            List<String> problems = new ArrayList<String>();
+            problems.add(msg);
+            validation.setObjectProblems(problems);
+            throw new ObjectValidityException(msg, validation, e);
         } catch (Exception e) {
             String msg =
                     "DOValidatorXMLSchema returned error.\n"

@@ -96,6 +96,7 @@ import org.fcrepo.server.types.gen.ObjectFields;
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 
+import static org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
 import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.commons.httpclient.HttpStatus.SC_MOVED_TEMPORARILY;
@@ -1287,7 +1288,7 @@ public class TestRESTAPI
     public void testResponseOverride() throws Exception {
         // Make request which returns error response
         url = String.format("/objects/%s", "BOGUS_PID");
-        assertEquals(SC_INTERNAL_SERVER_ERROR, post("", true).getStatusCode());
+        assertEquals(SC_BAD_REQUEST, post("", true).getStatusCode());
 
         // With flash=true parameter response should be 200
         url = String.format("/objects/%s?flash=true", "BOGUS_PID");
@@ -1603,8 +1604,8 @@ public class TestRESTAPI
     }
 
     protected void validateResponse(HttpResponse res) throws Exception {
-        // if response was ok...
-        if (res.getStatusCode() >= 200 && res.getStatusCode() <= 299) {
+        // if response was ok... (and not doing flash override of error response)
+        if (res.getStatusCode() >= 200 && res.getStatusCode() <= 299 && !url.contains("flash=true")) {
             // if response is xml
 
             if (res.getResponseHeader("Content-Type") != null

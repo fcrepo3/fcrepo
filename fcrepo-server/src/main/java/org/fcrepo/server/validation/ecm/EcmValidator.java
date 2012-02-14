@@ -76,10 +76,7 @@ public class EcmValidator implements DOObjectValidator {
 		Validation validation = doValidate(context, currentObjectReader, null, contentmodels);
 	
 			if (!validation.isValid()) {
-				// FIXME: review msg output for exception
-				DefaultSerializer serializer = new DefaultSerializer("n/a", context);
-				String errors = serializer.objectValidationToXml(validation);
-				throw new ObjectValidityException(errors);
+				throw new ObjectValidityException("ECM validation failure", validation);
 	
 			}
 		}

@@ -10,6 +10,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -18,6 +20,7 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ObjectValidityException;
 import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.utilities.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -269,7 +272,11 @@ public class DOValidatorImpl
 
     private void checkFormat(String format) throws ObjectValidityException {
         if (!m_xmlSchemaMap.containsKey(format)) {
-            throw new ObjectValidityException("Unsupported format: " + format);
+        	Validation validation = new Validation("unknown");
+        	List<String> probs = new ArrayList<String>();
+        	probs.add("Unsupported format: " + format);
+        	validation.setObjectProblems(probs);
+            throw new ObjectValidityException("Unsupported format: " + format, validation);
         }
     }
 
