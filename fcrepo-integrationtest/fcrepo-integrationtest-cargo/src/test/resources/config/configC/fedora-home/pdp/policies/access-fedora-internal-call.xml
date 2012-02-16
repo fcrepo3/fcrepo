@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy
+	xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+	xmlns:xacml-context="urn:oasis:names:tc:xacml:2.0:context:schema:os"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:oasis:names:tc:xacml:2.0:policy:schema:os http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd
+						urn:oasis:names:tc:xacml:2.0:context:schema:os http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-context-schema-os.xsd"
+	PolicyId="access-fedora-internal-call"
+	RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides">
+	<Description>A policy to provide complete access to internal fedora calls from localhost only.</Description>
+	<Target>
+		<Subjects>
+			<Subject>
+				<SubjectMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">fedoraInternalCall-1</AttributeValue>
+					<SubjectAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:subject:role" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</SubjectMatch>
+				<SubjectMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">fedoraInternalCall-2</AttributeValue>
+					<SubjectAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:subject:role" DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</SubjectMatch>
+			</Subject>
+		</Subjects>
+        <Environments>
+    		<Environment>
+    			<EnvironmentMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+    				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">127.0.0.1</AttributeValue>
+    				<EnvironmentAttributeDesignator
+    					AttributeId="urn:fedora:names:fedora:2.1:environment:httpRequest:clientIpAddress"
+    					DataType="http://www.w3.org/2001/XMLSchema#string" />
+    			</EnvironmentMatch>
+    		</Environment>
+    		<Environment>
+    			<EnvironmentMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+    				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">::1</AttributeValue>
+    				<EnvironmentAttributeDesignator
+    					AttributeId="urn:fedora:names:fedora:2.1:environment:httpRequest:clientIpAddress"
+    					DataType="http://www.w3.org/2001/XMLSchema#string" />
+    			</EnvironmentMatch>
+    		</Environment>
+        </Environments>
+	</Target>
+	<Rule Effect="Permit" RuleId="au:edu:mq:melcoe:ramp:fedora:xacml:2.0:rule:generic-permit" />
+</Policy>

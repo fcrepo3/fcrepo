@@ -1,0 +1,889 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.fedora.info/definitions/1/0/types/"
+        xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:fedora-types="http://www.fedora.info/definitions/1/0/types/"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://www.w3.org/2001/XMLSchema">
+
+    <!--                                   -->
+    <!-- API-A SOAP Request/Response Types -->
+    <!--                                   -->
+
+    <element name="describeRepository">
+        <complexType/>
+    </element>
+    <element name="describeRepositoryResponse">
+        <complexType>
+            <sequence>
+                <element name="repositoryInfo" type="fedora-types:RepositoryInfo"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="getObjectProfile">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="asOfDateTime" nillable="true" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="getObjectProfileResponse">
+        <complexType>
+            <sequence>
+                <element name="objectProfile" type="fedora-types:ObjectProfile"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="listMethods">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="asOfDateTime" nillable="true" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="listMethodsResponse">
+        <complexType>
+            <sequence>
+                <element name="objectMethod" minOccurs="0" maxOccurs="unbounded" type="fedora-types:ObjectMethodsDef"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="listDatastreams">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="asOfDateTime" nillable="true" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="listDatastreamsResponse">
+        <complexType>
+            <sequence>
+                <element name="datastreamDef" minOccurs="0" maxOccurs="unbounded" type="fedora-types:DatastreamDef"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="getDatastreamDissemination">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="dsID" type="xsd:string"/>
+                <element name="asOfDateTime" nillable="true" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="getDatastreamDisseminationResponse">
+        <complexType>
+            <sequence>
+                <element name="dissemination" type="fedora-types:MIMETypedStream"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="getDissemination">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="serviceDefinitionPid" type="xsd:string"/>
+                <element name="methodName" type="xsd:string"/>
+                <element name="parameters">
+                    <complexType>
+                        <sequence>
+                            <element name="parameter" minOccurs="0" maxOccurs="unbounded" type="fedora-types:Property"/>
+                        </sequence>
+                    </complexType>
+                </element>
+                <element name="asOfDateTime" nillable="true" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="getDisseminationResponse">
+        <complexType>
+            <sequence>
+                <element name="dissemination" type="fedora-types:MIMETypedStream"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="findObjects">
+        <complexType>
+            <sequence>
+                <element name="resultFields" type="fedora-types:ArrayOfString"/>
+                <element name="maxResults" type="xsd:nonNegativeInteger"/>
+                <element name="query" type="fedora-types:FieldSearchQuery"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="findObjectsResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="fedora-types:FieldSearchResult"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="resumeFindObjects">
+        <complexType>
+            <sequence>
+                <element name="sessionToken" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="resumeFindObjectsResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="fedora-types:FieldSearchResult"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="getObjectHistory">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="getObjectHistoryResponse">
+        <complexType>
+            <sequence>
+                <element name="modifiedDate" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+
+    <!--                                   -->
+    <!-- API-M SOAP Request/Response Types -->
+    <!--                                   -->
+
+    <element name="ingest">
+        <complexType>
+            <sequence>
+                <element name="objectXML" type="xsd:base64Binary"/>
+                <element name="format" type="xsd:string"/>
+                <element name="logMessage" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="ingestResponse">
+        <complexType>
+            <sequence>
+                <element name="objectPID" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="modifyObject">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="state" type="xsd:string"/>
+                <element name="label" type="xsd:string"/>
+                <element name="ownerId" type="xsd:string"/>
+                <element name="logMessage" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="modifyObjectResponse">
+        <complexType>
+            <sequence>
+                <element name="modifiedDate" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="getObjectXML">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="getObjectXMLResponse">
+        <complexType>
+            <sequence>
+                <element name="objectXML" type="xsd:base64Binary"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="export">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="format" type="xsd:string"/>
+                <element name="context" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="exportResponse">
+        <complexType>
+            <sequence>
+                <element name="objectXML" type="xsd:base64Binary"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="purgeObject">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="logMessage" type="xsd:string"/>
+                <element name="force" type="xsd:boolean"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="purgeObjectResponse">
+        <complexType>
+            <sequence>
+                <element name="purgedDate" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="addDatastream">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="dsID" nillable="true" type="xsd:string"/>
+                <element name="altIDs" type="fedora-types:ArrayOfString"/>
+                <element name="dsLabel" type="xsd:string"/>
+                <element name="versionable" type="xsd:boolean"/>
+                <element name="MIMEType" type="xsd:string"/>
+                <element name="formatURI" type="xsd:string"/>
+                <element name="dsLocation" type="xsd:string"/>
+                <element name="controlGroup" type="xsd:string"/>
+                <element name="dsState" type="xsd:string"/>
+                <element name="checksumType" type="xsd:string"/>
+                <element name="checksum" type="xsd:string"/>
+                <element name="logMessage" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="addDatastreamResponse">
+        <complexType>
+            <sequence>
+                <element name="datastreamID" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="modifyDatastreamByReference">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="dsID" type="xsd:string"/>
+                <element name="altIDs" type="fedora-types:ArrayOfString"/>
+                <element name="dsLabel" type="xsd:string"/>
+                <element name="MIMEType" type="xsd:string"/>
+                <element name="formatURI" type="xsd:string"/>
+                <element name="dsLocation" type="xsd:string"/>
+                <element name="checksumType" type="xsd:string"/>
+                <element name="checksum" type="xsd:string"/>
+                <element name="logMessage" type="xsd:string"/>
+                <element name="force" type="xsd:boolean"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="modifyDatastreamByReferenceResponse">
+        <complexType>
+            <sequence>
+                <element name="modifiedDate" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="modifyDatastreamByValue">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="dsID" type="xsd:string"/>
+                <element name="altIDs" type="fedora-types:ArrayOfString"/>
+                <element name="dsLabel" type="xsd:string"/>
+                <element name="MIMEType" type="xsd:string"/>
+                <element name="formatURI" type="xsd:string"/>
+                <element name="dsContent" type="xsd:base64Binary"/>
+                <element name="checksumType" type="xsd:string"/>
+                <element name="checksum" type="xsd:string"/>
+                <element name="logMessage" type="xsd:string"/>
+                <element name="force" type="xsd:boolean"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="modifyDatastreamByValueResponse">
+        <complexType>
+            <sequence>
+                <element name="modifiedDate" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+
+    <element name="setDatastreamState">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="dsID" type="xsd:string"/>
+                <element name="dsState" type="xsd:string"/>
+                <element name="logMessage" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="setDatastreamStateResponse">
+        <complexType>
+            <sequence>
+                <element name="modifiedDate" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="setDatastreamVersionable">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="dsID" type="xsd:string"/>
+                <element name="versionable" type="xsd:boolean"/>
+                <element name="logMessage" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="setDatastreamVersionableResponse">
+        <complexType>
+            <sequence>
+                <element name="modifiedDate" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="compareDatastreamChecksum">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="dsID" type="xsd:string"/>
+                <element name="versionDate" nillable="true" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="compareDatastreamChecksumResponse">
+        <complexType>
+            <sequence>
+                <element name="checksum" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="getDatastream">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="dsID" type="xsd:string"/>
+                <element name="asOfDateTime" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="getDatastreamResponse">
+        <complexType>
+            <sequence>
+                <element name="datastream" type="fedora-types:Datastream"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="getDatastreams">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="asOfDateTime" type="xsd:string"/>
+                <element name="dsState" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="getDatastreamsResponse">
+        <complexType>
+            <sequence>
+                <element name="datastream" minOccurs="0" maxOccurs="unbounded" type="fedora-types:Datastream"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="getDatastreamHistory">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="dsID" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="getDatastreamHistoryResponse">
+        <complexType>
+            <sequence>
+                <element name="datastream" minOccurs="0" maxOccurs="unbounded" type="fedora-types:Datastream"/>
+            </sequence>
+        </complexType>
+    </element>
+
+
+    <element name="purgeDatastream">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="dsID" type="xsd:string"/>
+                <element name="startDT" nillable="true" type="xsd:string"/>
+                <element name="endDT" nillable="true" type="xsd:string"/>
+                <element name="logMessage" nillable="true" type="xsd:string"/>
+                <element name="force" type="xsd:boolean"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="purgeDatastreamResponse">
+        <complexType>
+            <sequence>
+                <element name="purgedVersionDate" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+
+    <element name="getNextPID">
+        <complexType>
+            <sequence>
+                <element name="numPIDs" nillable="true" type="xsd:nonNegativeInteger"/>
+                <element name="pidNamespace" nillable="true" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="getNextPIDResponse">
+        <complexType>
+            <sequence>
+                <element name="pid" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="getRelationships">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="relationship" nillable="true" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="getRelationshipsResponse">
+        <complexType>
+            <sequence>
+                <element name="relationships" minOccurs="0" maxOccurs="unbounded"
+                         type="fedora-types:RelationshipTuple"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="addRelationship">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="relationship" type="xsd:string"/>
+                <element name="object" type="xsd:string"/>
+                <element name="isLiteral" type="xsd:boolean"/>
+                <element name="datatype" nillable="true" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="addRelationshipResponse">
+        <complexType>
+            <sequence>
+                <element name="added" type="xsd:boolean"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="purgeRelationship">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="relationship" type="xsd:string"/>
+                <element name="object" type="xsd:string"/>
+                <element name="isLiteral" type="xsd:boolean"/>
+                <element name="datatype" nillable="true" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="purgeRelationshipResponse">
+        <complexType>
+            <sequence>
+                <element name="purged" type="xsd:boolean"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="validate">
+        <complexType>
+            <sequence>
+                <element name="pid" type="xsd:string"/>
+                <element name="asOfDateTime" nillable="true" type="xsd:string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="validateResponse">
+        <complexType>
+            <sequence>
+                <element name="validation" type="fedora-types:Validation"/>
+            </sequence>
+        </complexType>
+    </element>
+
+
+    <!--             -->
+    <!-- Array Types -->
+    <!--             -->
+
+    <complexType name="ArrayOfString">
+        <sequence>
+            <element name="item" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+        </sequence>
+    </complexType>
+
+
+    <!--                    -->
+    <!-- Misc Complex Types -->
+    <!--                    -->
+
+    <simpleType name="ComparisonOperator">
+        <restriction base="xsd:string">
+            <enumeration value="has"/>
+            <enumeration value="eq"/>
+            <enumeration value="lt"/>
+            <enumeration value="le"/>
+            <enumeration value="gt"/>
+            <enumeration value="ge"/>
+        </restriction>
+    </simpleType>
+
+    <complexType name="Condition">
+        <sequence>
+            <element name="property" nillable="true" type="xsd:string"/>
+            <element name="operator" nillable="true" type="fedora-types:ComparisonOperator"/>
+            <element name="value" nillable="true" type="xsd:string"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="Datastream">
+        <annotation>
+            <documentation>content stream of a digital object</documentation>
+        </annotation>
+        <sequence>
+            <element name="controlGroup" type="fedora-types:DatastreamControlGroup"/>
+            <element name="ID" type="xsd:string"/>
+            <element name="versionID" type="xsd:string"/>
+            <element name="altIDs" nillable="true" type="fedora-types:ArrayOfString"/>
+            <element name="label" nillable="true" type="xsd:string"/>
+            <element name="versionable" type="xsd:boolean"/>
+            <element name="MIMEType" nillable="true" type="xsd:string"/>
+            <element name="formatURI" nillable="true" type="xsd:string"/>
+            <element name="createDate" type="xsd:string"/>
+            <element name="size" type="xsd:long"/>
+            <element name="state" type="xsd:string"/>
+            <element name="location" nillable="true" type="xsd:string"/>
+            <element name="checksumType" nillable="true" type="xsd:string"/>
+            <element name="checksum" nillable="true" type="xsd:string"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="DatastreamBindingMap">
+        <annotation>
+            <documentation>ordered list of datastream binding maps</documentation>
+        </annotation>
+        <sequence>
+            <element name="dsBindMapID" nillable="true" type="xsd:string"/>
+            <element name="dsBindMechanismPID" nillable="true" type="xsd:string"/>
+            <element name="dsBindMapLabel" nillable="true" type="xsd:string"/>
+            <element name="state" nillable="true" type="xsd:string"/>
+            <element name="dsBindings" nillable="true">
+                <complexType>
+                    <sequence>
+                        <element name="dsBinding" minOccurs="0" maxOccurs="unbounded"
+                                 type="fedora-types:DatastreamBinding"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="DatastreamBinding">
+        <annotation>
+            <documentation>binding key to datastream association</documentation>
+        </annotation>
+        <sequence>
+            <element name="bindKeyName" nillable="true" type="xsd:string"/>
+            <element name="bindLabel" nillable="true" type="xsd:string"/>
+            <element name="datastreamID" nillable="true" type="xsd:string"/>
+            <element name="seqNo" nillable="true" type="xsd:string"/>
+        </sequence>
+    </complexType>
+
+    <simpleType name="DatastreamControlGroup">
+        <restriction base="xsd:string">
+            <enumeration value="E"/>
+            <enumeration value="M"/>
+            <enumeration value="X"/>
+            <enumeration value="R"/>
+        </restriction>
+    </simpleType>
+
+    <complexType name="DatastreamDef">
+        <sequence>
+            <element name="ID" nillable="true" type="xsd:string"/>
+            <element name="label" nillable="true" type="xsd:string"/>
+            <element name="MIMEType" nillable="true" type="xsd:string"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="FieldSearchQuery">
+        <choice>
+            <element name="conditions" nillable="true">
+                <complexType>
+                    <sequence>
+                        <element name="condition" minOccurs="0" maxOccurs="unbounded" type="fedora-types:Condition"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="terms" nillable="true" type="xsd:string"/>
+        </choice>
+    </complexType>
+
+    <complexType name="FieldSearchResult">
+        <sequence>
+            <element name="listSession" nillable="true" type="fedora-types:ListSession" minOccurs="0"/>
+            <element name="resultList">
+                <complexType>
+                    <sequence>
+                        <element name="objectFields" minOccurs="0" maxOccurs="unbounded"
+                                 type="fedora-types:ObjectFields"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="ListSession">
+        <sequence>
+            <element name="token" nillable="true" type="xsd:string"/>
+            <element name="cursor" type="xsd:nonNegativeInteger" minOccurs="0"/>
+            <element name="completeListSize" type="xsd:nonNegativeInteger" minOccurs="0"/>
+            <element name="expirationDate" nillable="true" type="xsd:string" minOccurs="0"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="MethodParmDef">
+        <sequence>
+            <element name="parmName" nillable="true" type="xsd:string"/>
+            <element name="parmType" nillable="true" type="xsd:string"/>
+            <element name="parmDefaultValue" nillable="true" type="xsd:string"/>
+            <element name="parmDomainValues" nillable="true" type="fedora-types:ArrayOfString"/>
+            <element name="parmRequired" type="boolean"/>
+            <element name="parmLabel" nillable="true" type="xsd:string"/>
+            <element name="parmPassBy" nillable="true" type="xsd:string"/>
+            <element name="PASS_BY_REF" nillable="true" type="fedora-types:passByRef"/>
+            <element name="PASS_BY_VALUE" nillable="true" type="fedora-types:passByValue"/>
+            <element name="DATASTREAM_INPUT" nillable="true" type="fedora-types:datastreamInputType"/>
+            <element name="USER_INPUT" nillable="true" type="fedora-types:userInputType"/>
+            <element name="DEFAULT_INPUT" nillable="true" type="fedora-types:defaultInputType"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="MIMETypedStream">
+        <sequence>
+            <element name="MIMEType" nillable="true" type="xsd:string"/>
+            <element name="stream" nillable="true" type="xsd:base64Binary"/>
+            <element name="header" nillable="true">
+                <complexType>
+                    <sequence>
+                        <element name="property" minOccurs="0" maxOccurs="unbounded" type="fedora-types:Property"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="ObjectFields">
+        <sequence>
+            <element name="pid" nillable="true" type="string" minOccurs="0"/>
+            <element name="label" nillable="true" type="string" minOccurs="0"/>
+            <element name="state" nillable="true" type="string" minOccurs="0"/>
+            <element name="ownerId" nillable="true" type="string" minOccurs="0"/>
+            <element name="cDate" nillable="true" type="string" minOccurs="0"/>
+            <element name="mDate" nillable="true" type="string" minOccurs="0"/>
+            <element name="dcmDate" nillable="true" type="string" minOccurs="0"/>
+            <element name="title" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="creator" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="subject" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="description" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="publisher" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="contributor" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="date" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="type" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="format" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="identifier" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="source" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="language" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="relation" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="coverage" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="rights" nillable="true" type="string" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="ObjectMethodsDef">
+        <sequence>
+            <element name="PID" type="xsd:string"/>
+            <element name="serviceDefinitionPID" type="xsd:string"/>
+            <element name="methodName" type="xsd:string"/>
+            <element name="methodParmDefs">
+                <complexType>
+                    <sequence>
+                        <element name="methodParmDef" minOccurs="0" maxOccurs="unbounded"
+                                 type="fedora-types:MethodParmDef"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="asOfDate" nillable="true" type="xsd:string"/>
+        </sequence>
+    </complexType>
+
+
+    <complexType name="ObjectProfile">
+        <sequence>
+            <element name="pid" nillable="true" type="xsd:string"/>
+            <element name="objLabel" nillable="true" type="xsd:string"/>
+            <element name="objModels" nillable="true">
+                <complexType>
+                    <sequence>
+                        <element name="model" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="objCreateDate" nillable="true" type="xsd:string"/>
+            <element name="objLastModDate" nillable="true" type="xsd:string"/>
+            <element name="objDissIndexViewURL" nillable="true" type="xsd:string"/>
+            <element name="objItemIndexViewURL" nillable="true" type="xsd:string"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="Property">
+        <sequence>
+            <element name="name" type="xsd:string"/>
+            <element name="value" type="xsd:string"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="RelationshipTuple">
+        <sequence>
+            <element name="subject" type="xsd:string"/>
+            <element name="predicate" type="xsd:string"/>
+            <element name="object" type="xsd:string"/>
+            <element name="isLiteral" type="xsd:boolean"/>
+            <element name="datatype" nillable="true" type="xsd:string"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="RepositoryInfo">
+        <sequence>
+            <element name="repositoryName" nillable="true" type="xsd:string"/>
+            <element name="repositoryVersion" nillable="true" type="xsd:string"/>
+            <element name="repositoryBaseURL" nillable="true" type="xsd:string"/>
+            <element name="repositoryPIDNamespace" nillable="true" type="xsd:string"/>
+            <element name="defaultExportFormat" nillable="true" type="xsd:string"/>
+            <element name="OAINamespace" nillable="true" type="xsd:string"/>
+            <element name="adminEmailList" nillable="true" type="fedora-types:ArrayOfString"/>
+            <element name="samplePID" nillable="true" type="xsd:string"/>
+            <element name="sampleOAIIdentifier" nillable="true" type="xsd:string"/>
+            <element name="sampleSearchURL" nillable="true" type="xsd:string"/>
+            <element name="sampleAccessURL" nillable="true" type="xsd:string"/>
+            <element name="sampleOAIURL" nillable="true" type="xsd:string"/>
+            <element name="retainPIDs" nillable="true" type="fedora-types:ArrayOfString"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="Validation">
+        <sequence>
+            <element name="asOfDateTime" type="xsd:dateTime" nillable="true"/>
+            <element name="objModels" nillable="true">
+                <complexType>
+                    <sequence>
+                        <element name="model" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="objProblems" nillable="true">
+                <complexType>
+                    <sequence>
+                        <element name="problem" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="datastreamProblems" nillable="true">
+                <complexType>
+                    <sequence>
+                        <element name="datastream" minOccurs="0" maxOccurs="unbounded"
+                                 type="fedora-types:datastreamProblem"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </sequence>
+        <attribute name="pid" use="required" type="xsd:string"/>
+        <attribute name="valid" use="required" type="xsd:boolean"/>
+    </complexType>
+
+
+    <complexType name="datastreamProblem">
+        <sequence>
+            <element name="datastreamID" minOccurs="1" maxOccurs="1" type="xsd:string"/>
+            <element name="problem" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+        </sequence>
+
+    </complexType>
+
+
+    <!--                   -->
+    <!-- Misc Simple Types -->
+    <!--                   -->
+
+    <simpleType name="passByRef">
+        <restriction base="xsd:string">
+            <enumeration value="URL_REF"/>
+        </restriction>
+    </simpleType>
+
+
+    <simpleType name="passByValue">
+        <restriction base="xsd:string">
+            <enumeration value="VALUE"/>
+        </restriction>
+    </simpleType>
+
+
+    <simpleType name="datastreamInputType">
+        <restriction base="xsd:string">
+            <enumeration value="fedora:datastreamInputType"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="userInputType">
+        <restriction base="xsd:string">
+            <enumeration value="fedora:userInputType"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="defaultInputType">
+        <restriction base="xsd:string">
+            <enumeration value="fedora:defaultInputType"/>
+        </restriction>
+    </simpleType>
+
+</schema>

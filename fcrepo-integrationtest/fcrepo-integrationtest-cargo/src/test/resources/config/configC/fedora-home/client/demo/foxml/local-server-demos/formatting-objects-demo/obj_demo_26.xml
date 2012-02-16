@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="demo:26" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Data Object (TEI to PDF) for Formatting Objects Demo"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-02T05:09:42.015Z"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-07-02T05:09:42.015Z"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:42.765Z"
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0"
+      LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:title>The Purple Cow</dc:title>
+          <dc:creator>Frank Gelett Burgess</dc:creator>
+          <dc:identifier>demo:26</dc:identifier>
+          <dc:rights>unrestricted</dc:rights>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:42.765Z"
+      FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT1.0"
+      LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+          <rdf:Description rdf:about="info:fedora/demo:26">
+            <fedora-model:hasModel rdf:resource="info:fedora/demo:TEI_TO_PDFDOC"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="E" ID="XML_SOURCE" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:42.765Z"
+      ID="XML_SOURCE1.0" LABEL="FOP Dissemination as Datastream" MIMETYPE="text/xml">
+      <foxml:contentLocation
+        REF="http://local.fedora.server/fedora/get/demo:26/demo:22/getFO" TYPE="URL"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="TEI_SOURCE" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:42.765Z"
+      ID="TEI_SOURCE1.0" LABEL="TEI Source" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <TEI.2 xmlns="">
+          <teiHeader>
+            <fileDesc>
+              <titleStmt>
+                <title>The Purple Cow</title>
+                <author>Frank Gelett Burgess</author>
+              </titleStmt>
+              <publicationStmt>
+                <p>Text entry by <name>Walter Underwood</name>(wunder@infoseek.com) on
+      <date>1999-02-01</date>. This transcription is in the public domain.</p>
+              </publicationStmt>
+              <sourceDesc>
+                <p>From the <title>The Lark</title>, San Fransicsco, <date>1896</date>.</p>
+              </sourceDesc>
+            </fileDesc>
+          </teiHeader>
+          <text>
+            <body>
+              <div1 type="poem">
+                <head>The Purple Cow</head>
+                <lg>
+                  <l>I never saw a purple cow,</l>
+                  <l>I never hope to see one;</l>
+                  <l>But I can tell you, anyhow,</l>
+                  <l>I'd rather see than be one.</l>
+                </lg>
+              </div1>
+            </body>
+          </text>
+        </TEI.2>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

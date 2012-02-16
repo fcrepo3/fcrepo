@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<AttributeFinders>
+	<AttributeFinder name="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder">
+		<resolver url="http://localhost:5743/fedora/melcoerisearch" username="" password="" />
+		<!--  designator is: subject, action, resource, environment; this finder only knows about resources -->
+
+    <!-- attributes using simple object and datastream relationships, xacml attribute is the same as the relationship -->
+    
+    <!-- object and datastream properties -->
+		<attribute designator="resource" name="info:fedora/fedora-system:def/view#mimeType" />
+		<attribute designator="resource" name="info:fedora/fedora-system:def/model#ownerId" />
+		<attribute designator="resource" name="info:fedora/fedora-system:def/model#state" />
+		<attribute designator="resource" name="info:fedora/fedora-system:def/model#createdDate" />
+		<attribute designator="resource" name="info:fedora/fedora-system:def/model#label" />
+		<attribute designator="resource" name="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" />
+    <attribute designator="resource" name="http://purl.org/dc/elements/1.1/subject">
+      <!-- specify either "object" to retrieve attributes for the object as a whole (irrespective of datastream etc being accessed)
+      or specify "resource" to retrieve attributes based on the full URI of the resource.  Default is "resource" -->
+      <config name="target" value="object"/>
+    </attribute>
+    
+    <!-- example attributes using simple object and datastream relationships with a specified xacml attribute id -->
+    <attribute designator="resource" name="http://www.example.org/fedora/xacml/attributes/resource#rel-subject">
+      <config name="relationship" value="http://purl.org/dc/elements/1.1/subject"/>
+      <config name="target" value="object"/>
+    </attribute>
+    <attribute designator="resource" name="http://www.example.org/fedora/xacml/attributes/resource#rel-state">
+      <config name="relationship" value="info:fedora/fedora-system:def/model#state"/>
+    </attribute>
+    
+    <!-- example TQL query-based attributes -->
+    <attribute designator="resource" name="http://www.example.org/fedora/xacml/attributes/resource#itql-subject">
+      <config name="queryLang" value="itql"/>
+      <config name="object" value="##resource##"/>
+      <config name="value" value="output"/>
+      <config name="query" value="select $output from &lt;#ri&gt; where &lt;##resource##&gt; &lt;http://purl.org/dc/elements/1.1/subject&gt; $output"/>
+    </attribute>
+    <attribute designator="resource" name="http://www.example.org/fedora/xacml/attributes/resource#itql-state">
+      <config name="queryLang" value="itql"/>
+      <config name="resource" value="##resource##"/>
+      <config name="value" value="output"/>
+      <config name="query" value="select $output from &lt;#ri&gt; where &lt;##resource##&gt; &lt;info:fedora/fedora-system:def/model#state&gt; $output"/>
+    </attribute>
+    
+    <!-- example SPARQL query-based attributes -->
+    <attribute designator="resource" name="http://www.example.org/fedora/xacml/attributes/resource#sparql-subject">
+      <config name="queryLang" value="sparql"/>
+      <config name="object" value="##resource##"/>
+      <config name="value" value="output"/>
+      <config name="query" value="SELECT ?output FROM &lt;#ri&gt; WHERE { &lt;##resource##&gt; &lt;http://purl.org/dc/elements/1.1/subject&gt; ?output . }"/>
+    </attribute>
+    <attribute designator="resource" name="http://www.example.org/fedora/xacml/attributes/resource#sparql-state">
+      <config name="queryLang" value="sparql"/>
+      <config name="resource" value="##resource##"/>
+      <config name="value" value="output"/>
+      <config name="query" value="SELECT ?output FROM &lt;#ri&gt; WHERE { &lt;##resource##&gt; &lt;info:fedora/fedora-system:def/model#state&gt; ?output . }"/>
+    </attribute>
+    
+    <!-- example SPO query-based attributes -->
+    <attribute designator="resource" name="http://www.example.org/fedora/xacml/attributes/resource#spo-subject">
+      <config name="queryLang" value="spo"/>
+      <config name="object" value="##resource##"/>
+      <config name="value" value="o"/> <!-- the object of the spo triple query -->
+      <config name="query" value="&lt;##resource##&gt; &lt;http://purl.org/dc/elements/1.1/subject&gt; *"/>
+      <config name="relationship" value="http://purl.org/dc/elements/1.1/subject"/>
+    </attribute>
+    <attribute designator="resource" name="http://www.example.org/fedora/xacml/attributes/resource#spo-state">
+      <config name="queryLang" value="spo"/>
+      <config name="resource" value="##resource##"/>
+      <config name="value" value="o"/>
+      <config name="query" value="&lt;##resource##&gt; &lt;info:fedora/fedora-system:def/model#state&gt; *"/>
+    </attribute>
+
+    </AttributeFinder>
+	<!--
+	<AttributeFinder name="org.fcrepo.server.security.xacml.pdp.finder.attribute.LDAPAttributeFinder">
+		<option name="java.naming.factory.initial" value="com.sun.jndi.ldap.LdapCtxFactory" />
+		<option name="java.naming.provider.url" value="ldap://nish.ramp.org.au:389/" />
+		<option name="java.naming.security.authentication" value="simple" />
+		<option name="java.naming.referral" value="follow" />
+		<option name="java.naming.security.principal" value="cn=admin,dc=arcs,dc=org,dc=au" />
+		<option name="java.naming.security.credentials" value="arcs" />
+		<option name="id-attribute" value="uid" />
+		<option name="searchbase" value="dc=arcs,dc=org,dc=au" />
+		<attribute designator="subject" name="memberOf" />
+	</AttributeFinder>
+	-->
+</AttributeFinders>

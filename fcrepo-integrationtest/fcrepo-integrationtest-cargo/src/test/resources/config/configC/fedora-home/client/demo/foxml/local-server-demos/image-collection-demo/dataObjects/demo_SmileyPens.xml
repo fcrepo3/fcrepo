@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="demo:SmileyPens" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Data Object (Smiley Pens) for Image Collection Demo"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-02T05:09:42.015Z"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-07-02T05:09:42.015Z"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.031Z"
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.1"
+      LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:title>Smiley Pens</dc:title>
+          <dc:description>Yes, these actually write.  Well, I haven't tested them but I'm pretty sure.</dc:description>
+          <dc:identifier>demo:SmileyPens</dc:identifier>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.046Z"
+      FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT.0"
+      LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
+          <rdf:Description rdf:about="info:fedora/demo:SmileyPens">
+            <rel:isMemberOf rdf:resource="info:fedora/demo:SmileyStuff"/>
+            <fedora-model:hasModel rdf:resource="info:fedora/demo:DualResImage"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="RELS-INT" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2009-07-01T14:23:00.046Z"
+      FORMAT_URI="info:fedora/fedora-system:FedoraRELSInt-1.0" ID="RELS-INT.0"
+      LABEL="RDF Statements about this object's datastream(s)" MIMETYPE="application/rdf+xml">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:exif="http://ns.adobe.com/exif/1.0/">
+          <rdf:Description rdf:about="info:fedora/demo:SmileyPens/MEDIUM_SIZE">
+            <exif:PixelXDimension>320</exif:PixelXDimension>
+            <exif:PixelYDimension>240</exif:PixelYDimension>
+          </rdf:Description>
+          <rdf:Description rdf:about="info:fedora/demo:SmileyPens/FULL_SIZE">
+            <exif:PixelXDimension>800</exif:PixelXDimension>
+            <exif:PixelYDimension>600</exif:PixelYDimension>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="E" ID="MEDIUM_SIZE" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.046Z"
+      ID="MediumSize.jpg.0" LABEL="Medium-size image" MIMETYPE="image/jpeg">
+      <foxml:contentLocation
+        REF="http://local.fedora.server/fedora-demo/image-collection-demo/SmileyPens-MediumSize.jpg" TYPE="URL"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="E" ID="FULL_SIZE" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-02T05:09:43.046Z"
+      ID="FullSize.jpg.0" LABEL="Full-size image" MIMETYPE="image/jpeg">
+      <foxml:contentLocation
+        REF="http://local.fedora.server/fedora-demo/image-collection-demo/SmileyPens-FullSize.jpg" TYPE="URL"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

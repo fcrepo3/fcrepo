@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+ Configuration file for policy storage
+ Specifies instance of PolicyStore and PolicyIndex to be used for storing and indexing policies.  
+ Specifies policy combining algorithm to use
+ -->
+<PolicyStorage>
+  <PolicyStore>org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore</PolicyStore>
+  <!-- a simple memory-cached filesystem policy index (which doesn't actually do any indexing) -->
+  <PolicyIndex>org.fcrepo.server.security.xacml.pdp.data.FilePolicyIndex</PolicyIndex>
+  <!-- Policy Index backed by an eXist xml database 
+  <PolicyIndex>org.fcrepo.server.security.xacml.pdp.data.ExistPolicyIndex</PolicyIndex>
+  -->
+  <!-- Policy Index backed by a Berkelely DB XML database
+  <PolicyIndex>org.fcrepo.server.security.xacml.pdp.data.DbXmlPolicyIndex</PolicyIndex>
+  -->
+  <PolicyCombiningAlgorithm>org.fcrepo.server.security.xacml.pdp.HierarchicalLowestChildDenyOverridesPolicyAlg</PolicyCombiningAlgorithm>
+</PolicyStorage>
