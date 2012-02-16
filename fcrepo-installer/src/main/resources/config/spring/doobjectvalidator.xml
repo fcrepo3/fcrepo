@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <!-- The digital object validator module, validates the Java digital object 
+       before any modifications are committed.  -->
+  <bean name="org.fcrepo.server.validation.DOObjectValidator"
+    class="org.fcrepo.server.validation.DOObjectValidatorModule">
+    <constructor-arg index="0">
+      <map />
+    </constructor-arg>
+    <constructor-arg index="1" ref="org.fcrepo.server.Server" />
+    <constructor-arg index="2" type="java.lang.String"
+      value="org.fcrepo.server.storage.lowlevel.ILowlevelStorage" />
+      
+    <property name="validators">
+        <!-- Map of validators.  Each validator is executed in sequence.  A validation error in any
+             validator will result in the API operation being failed. -->
+        <map>
+            <!-- Uncomment this map entry, and the bean definition below, to enable ECM validation on object modifications 
+            <entry key="ecm-validator" value-ref="ECM-Object-Validator" />
+            -->
+        </map>
+    </property>
+      
+      
+  </bean>
+
+  <!-- ECM validator bean  -->
+       <!-- Uncomment this, and the map entry in the DObjValidator bean above, to enable ECM validation on object modifications 
+        <bean id="ECM-Object-Validator"
+              class="org.fcrepo.server.validation.ecm.EcmValidator"
+              scope="prototype">
+              <constructor-arg index="0" ref="org.fcrepo.server.storage.DOManager"/>
+              <constructor-arg index="1" ref="org.fcrepo.server.storage.ExternalContentManager"/>
+        </bean>
+        -->
+  
+  
+</beans>

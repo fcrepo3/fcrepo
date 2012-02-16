@@ -10,6 +10,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -18,6 +20,7 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ObjectValidityException;
 import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.utilities.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,12 +63,6 @@ public class DOValidatorImpl
             LoggerFactory.getLogger(DOValidatorImpl.class);
 
     protected static boolean debug = true;
-
-    public static final int VALIDATE_ALL = 0;
-
-    public static final int VALIDATE_XML_SCHEMA = 1;
-
-    public static final int VALIDATE_SCHEMATRON = 2;
 
     /** Configuration variable: tempdir is a working area for validation */
     protected static String tempDir = null;
@@ -178,6 +175,7 @@ public class DOValidatorImpl
                          String format,
                          int validationType,
                          String phase) throws ObjectValidityException {
+        if (validationType == VALIDATE_NONE) return;
         checkFormat(format);
         // FIXME We need to use the object Inputstream twice, once for XML
         // Schema validation and once for Schematron validation.
@@ -226,6 +224,7 @@ public class DOValidatorImpl
         logger.debug("Validation phase=" + phase + " format=" + format);
         logger.debug("VALIDATE: Initiating validation: " + " phase=" + phase
                 + " format=" + format);
+        if (validationType == VALIDATE_NONE) return;
         checkFormat(format);
 
         if (format.equals(Constants.ATOM_ZIP1_1.uri)) {
@@ -273,7 +272,11 @@ public class DOValidatorImpl
 
     private void checkFormat(String format) throws ObjectValidityException {
         if (!m_xmlSchemaMap.containsKey(format)) {
-            throw new ObjectValidityException("Unsupported format: " + format);
+        	Validation validation = new Validation("unknown");
+        	List<String> probs = new ArrayList<String>();
+        	probs.add("Unsupported format: " + format);
+        	validation.setObjectProblems(probs);
+            throw new ObjectValidityException("Unsupported format: " + format, validation);
         }
     }
 

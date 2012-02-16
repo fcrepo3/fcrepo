@@ -11,7 +11,9 @@ import java.io.InputStream;
 
 import java.net.URL;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.transform.Transformer;
@@ -23,6 +25,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.fcrepo.server.errors.ObjectValidityException;
 import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,8 +121,12 @@ public class DOValidatorSchematron {
             vtransformer.transform(objectSource, validationResult);
             result = new DOValidatorSchematronResult(validationResult);
         } catch (Exception e) {
+        	Validation validation = new Validation("unknown");
+        	List<String> probs = new ArrayList<String>();
+        	probs.add("Schematron validation failed:" + e.getMessage());
+        	validation.setObjectProblems(probs);
             logger.error("Schematron validation failed", e);
-            throw new ObjectValidityException(e.getMessage());
+            throw new ObjectValidityException(e.getMessage(), validation);
         }
 
         if (!result.isValid()) {
@@ -129,7 +136,14 @@ public class DOValidatorSchematron {
             } catch (Exception e) {
                 logger.warn("Error getting XML result of schematron validation failure", e);
             }
-            throw new ObjectValidityException(msg);
+        	Validation validation = new Validation("unknown");
+        	List<String> probs = new ArrayList<String>();
+        	if (msg != null) {
+        		probs.add(msg);
+        	} else {
+        		probs.add("Unknown schematron error.  Error getting XML results of schematron validation");
+        	}
+            throw new ObjectValidityException(msg, validation);
         }
     }
 

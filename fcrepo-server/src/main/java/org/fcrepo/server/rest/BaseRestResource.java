@@ -39,6 +39,7 @@ import org.fcrepo.server.errors.DatastreamLockedException;
 import org.fcrepo.server.errors.DatastreamNotFoundException;
 import org.fcrepo.server.errors.ObjectLockedException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
+import org.fcrepo.server.errors.ObjectValidityException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.management.Management;
 import org.fcrepo.server.storage.types.MIMETypedStream;
@@ -167,6 +168,16 @@ public class BaseRestResource {
                    ex instanceof DatastreamLockedException) {
             logger.warn("Lock exception; unable to fulfill REST API request", ex);
             return Response.status(Status.CONFLICT).entity(ex.getMessage()).type(MediaType.TEXT_PLAIN).build();
+        } else if (ex instanceof ObjectValidityException){
+            logger.warn("Validation exception; unable to fulfill REST API request", ex);
+			if (((ObjectValidityException) ex).getValidation() != null) {
+				DefaultSerializer serializer = new DefaultSerializer("n/a", getContext());
+				String errors = serializer.objectValidationToXml(((ObjectValidityException) ex).getValidation());
+	            return Response.status(Status.BAD_REQUEST).entity(errors).type(MediaType.TEXT_XML).build();
+			} else {
+	            return Response.status(Status.BAD_REQUEST).entity(ex.getMessage()).type(MediaType.TEXT_PLAIN).build();
+			}
+        	
         } else {
             logger.error("Unexpected error fulfilling REST API request", ex);
             throw new WebApplicationException(ex);
