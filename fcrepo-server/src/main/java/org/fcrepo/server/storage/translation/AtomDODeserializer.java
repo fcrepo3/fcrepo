@@ -317,7 +317,8 @@ public class AtomDODeserializer
             // a NEW ingest file because the URL is replaced with an internal identifier
             // once the repository has sucked in the content for storage.
 
-            if (m_obj.isNew()) {
+        	// AtomZIP files can have a simple filename (nb, not file: )for the content location, so don't validate that
+            if (m_obj.isNew() && !m_format.equals(ATOM_ZIP1_1)) {
                 ValidationUtility
                         .validateURL(contentLocation.toString(),ds.DSControlGrp);
             }
