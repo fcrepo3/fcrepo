@@ -4,20 +4,16 @@
  */
 package org.fcrepo.server.rest;
 
+import static org.fcrepo.server.utilities.StreamUtility.enc;
+
 import java.io.UnsupportedEncodingException;
-
 import java.net.URLEncoder;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.access.ObjectProfile;
 import org.fcrepo.server.management.DefaultManagement;
@@ -29,10 +25,9 @@ import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.utilities.DCField;
-
 import org.fcrepo.utilities.DateUtility;
-
-import static org.fcrepo.server.utilities.StreamUtility.enc;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class DefaultSerializer {
@@ -230,7 +225,7 @@ public class DefaultSerializer {
         }
 
         buffer.append("</datastreamHistory>");
-        logger.error(buffer.toString());
+        logger.debug(buffer.toString());
         return buffer.toString();
 
     }
