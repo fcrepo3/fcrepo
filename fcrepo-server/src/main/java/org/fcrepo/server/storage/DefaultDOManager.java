@@ -1022,85 +1022,12 @@ public class DefaultDOManager extends Module implements DOManager {
 	public void doCommit(boolean cachedObjectRequired, Context context,
 			DigitalObject obj, String logMessage, boolean remove)
 			throws ServerException {
+
+		String pid = obj.getPid();
+
 		// OBJECT REMOVAL...
 		if (remove) {
-
-			logger.info("Committing removal of " + obj.getPid());
-
-			// RESOURCE INDEX:
-			// remove digital object from the resourceIndex
-			// (nb: must happen before datastream storage removal - as
-			// relationships might be in managed datastreams)
-			if (m_resourceIndex.getIndexLevel() != ResourceIndex.INDEX_LEVEL_OFF) {
-				try {
-					logger.info("Deleting from ResourceIndex");
-					m_resourceIndex.deleteObject(new SimpleDOReader(null, null,
-							null, null, null, obj));
-					logger.debug("Finished deleting from ResourceIndex");
-				} catch (ServerException se) {
-					logger.warn("Object couldn't be removed from ResourceIndex ("
-							+ se.getMessage()
-							+ "), but that might be ok; continuing with purge");
-				}
-			}
-
-			// DATASTREAM STORAGE:
-			// remove any managed content datastreams associated with object
-			// from persistent storage.
-			Iterator<String> dsIDIter = obj.datastreamIdIterator();
-			while (dsIDIter.hasNext()) {
-				String dsID = dsIDIter.next();
-				String controlGroupType = obj.datastreams(dsID).iterator()
-						.next().DSControlGrp;
-				if (controlGroupType.equalsIgnoreCase("M")) {
-					// iterate over all versions of this dsID
-					for (Datastream dmc : obj.datastreams(dsID)) {
-						String id = obj.getPid() + "+" + dmc.DatastreamID + "+"
-								+ dmc.DSVersionID;
-						logger.info("Deleting managed datastream: " + id);
-						try {
-							m_permanentStore.removeDatastream(id);
-						} catch (LowlevelStorageException llse) {
-							logger.warn("Error attempting removal of managed "
-									+ "content datastream: ", llse);
-						}
-					}
-				}
-			}
-
-			// STORAGE:
-			// remove digital object from persistent storage
-			try {
-				m_permanentStore.removeObject(obj.getPid());
-			} catch (ObjectNotInLowlevelStorageException onilse) {
-				logger.warn("Object wasn't found in permanent low level "
-						+ "store, but that might be ok; continuing with purge");
-			}
-
-			// INVALIDATE DOREADER CACHE:
-			// now that the object xml is removed, make sure future requests
-			// for the object will not use a stale copy
-			if (m_readerCache != null) {
-				m_readerCache.remove(obj.getPid());
-			}
-
-			// REGISTRY:
-			// Remove digital object from the registry
-			try {
-				unregisterObject(obj);
-			} catch (ServerException se) {
-				logger.warn("Object couldn't be removed from registry, but that might be ok; continuing with purge");
-			}
-			// FIELD SEARCH INDEX:
-			// remove digital object from the default search index
-			try {
-				logger.info("Deleting from FieldSearch index");
-				m_fieldSearch.delete(obj.getPid());
-			} catch (ServerException se) {
-				logger.warn("Object couldn't be removed from FieldSearch index ("
-						+ se.getMessage()
-						+ "), but that might be ok; continuing with purge");
-			}
+			removeObject( obj, false);
 
 			// OBJECT INGEST (ADD) OR MODIFY...
 		} else {
@@ -1128,7 +1055,7 @@ public class DefaultDOManager extends Module implements DOManager {
 					if (controlGroupType.equalsIgnoreCase("M")) {
 						// iterate over all versions of this dsID
 						for (Datastream dmc : obj.datastreams(dsID)) {
-							String internalId = obj.getPid() + "+"
+							String internalId = pid + "+"
 									+ dmc.DatastreamID + "+" + dmc.DSVersionID;
 							// if it's a url, we need to grab content for this
 							// version
@@ -1142,7 +1069,7 @@ public class DefaultDOManager extends Module implements DOManager {
 													.getTempStream(dmc.DSLocation),
 											null, dmc.DSSize);
 									logger.info("Getting managed datastream from internal uploaded "
-											+ "location: " + dmc.DSLocation);
+											+ "location: " + dmc.DSLocation + " for " + pid);
 								} else if (dmc.DSLocation
 										.startsWith(DatastreamManagedContent.COPY_SCHEME)) {
 									// make a copy of the pre-existing content
@@ -1156,7 +1083,7 @@ public class DefaultDOManager extends Module implements DOManager {
 										.startsWith(DatastreamManagedContent.TEMP_SCHEME)) {
 									File file = new File(
 											dmc.DSLocation.substring(7));
-									logger.info("Getting base64 decoded datastream spooled from archive");
+									logger.info("Getting base64 decoded datastream spooled from archive for datastream " + dsID + " (" + pid + ")");
 									try {
 										InputStream str = new FileInputStream(
 												file);
@@ -1165,10 +1092,10 @@ public class DefaultDOManager extends Module implements DOManager {
 												file.length());
 									} catch (FileNotFoundException fnfe) {
 										logger.error(
-												"Unable to read temp file created for datastream from archive",
+												"Unable to read temp file created for datastream from archive for " + pid + " / " + dsID,
 												fnfe);
 										throw new StreamIOException(
-												"Error reading from temporary file created for binary content");
+												"Error reading from temporary file created for binary content for " + pid + " / " + dsID);
 									}
 								} else {
 									ContentManagerParams params = new ContentManagerParams(
@@ -1179,7 +1106,7 @@ public class DefaultDOManager extends Module implements DOManager {
 									mimeTypedStream = m_contentManager
 											.getExternalContent(params);
 									logger.info("Getting managed datastream from remote location: "
-											+ dmc.DSLocation);
+											+ dmc.DSLocation + " (" + pid + " / " + dsID + ")");
 								}
 								if (obj.isNew()) {
 									dmc.DSSize = m_permanentStore
@@ -1232,7 +1159,7 @@ public class DefaultDOManager extends Module implements DOManager {
 										+ dmc.DSLocation
 										+ "\" given for datastream "
 										+ dmc.DatastreamID + " of object "
-										+ obj.getPid());
+										+ pid);
 							}
 						}
 					}
@@ -1263,7 +1190,7 @@ public class DefaultDOManager extends Module implements DOManager {
 
 				// FINAL XML SERIALIZATION:
 				// serialize the object in its final form for persistent storage
-				logger.debug("Serializing digital object for persistent storage");
+				logger.debug("Serializing digital object for persistent storage " + pid);
 				m_translator.serialize(obj, out, m_defaultStorageFormat,
 						m_storageCharacterEncoding,
 						DOTranslationUtility.SERIALIZE_STORAGE_INTERNAL);
@@ -1309,17 +1236,17 @@ public class DefaultDOManager extends Module implements DOManager {
 										null, obj));
 
 					}
-					logger.debug("Finished adding to ResourceIndex.");
+					logger.debug("Finished adding " + pid + " to ResourceIndex.");
 				}
 
 				// STORAGE:
 				// write XML serialization of object to persistent storage
-				logger.debug("Storing digital object");
+				logger.debug("Storing digital object " + pid);
 				if (obj.isNew()) {
-					m_permanentStore.addObject(obj.getPid(),
+					m_permanentStore.addObject(pid,
 							new ByteArrayInputStream(out.toByteArray()));
 				} else {
-					m_permanentStore.replaceObject(obj.getPid(),
+					m_permanentStore.replaceObject(pid,
 							new ByteArrayInputStream(out.toByteArray()));
 				}
 
@@ -1327,7 +1254,7 @@ public class DefaultDOManager extends Module implements DOManager {
 				// now that the object xml is stored, make sure future DOReaders
 				// will get the latest copy
 				if (m_readerCache != null) {
-					m_readerCache.remove(obj.getPid());
+					m_readerCache.remove(pid);
 				}
 
 				// REGISTRY:
@@ -1335,7 +1262,7 @@ public class DefaultDOManager extends Module implements DOManager {
 				 * update systemVersion in doRegistry (add one), and update
 				 * deploymene maps if necesssary.
 				 */
-				logger.debug("Updating registry");
+				logger.debug("Updating registry for " + pid);
 				Connection conn = null;
 				PreparedStatement s = null;
 				ResultSet results = null;
@@ -1347,7 +1274,7 @@ public class DefaultDOManager extends Module implements DOManager {
 					results = s.executeQuery();
 					if (!results.next()) {
 						throw new ObjectNotFoundException(
-								"Error creating replication job: The requested object doesn't exist in the registry.");
+								"Error creating replication job: The requested object " + pid + " doesn't exist in the registry.");
 					}
 					int systemVersion = results.getInt("systemVersion");
 					systemVersion++;
@@ -1363,7 +1290,7 @@ public class DefaultDOManager extends Module implements DOManager {
 					}
 				} catch (SQLException sqle) {
 					throw new StorageDeviceException(
-							"Error creating replication job: "
+							"Error creating replication job for " + pid + ": "
 									+ sqle.getMessage(), sqle);
 				} finally {
 					try {
@@ -1378,7 +1305,7 @@ public class DefaultDOManager extends Module implements DOManager {
 						}
 					} catch (SQLException sqle) {
 						throw new StorageDeviceException(
-								"Unexpected error from SQL database: "
+								"Unexpected error from SQL database for " + pid + ": "
 										+ sqle.getMessage(), sqle);
 					} finally {
 						results = null;
@@ -1388,7 +1315,7 @@ public class DefaultDOManager extends Module implements DOManager {
 
 				// REPLICATE:
 				// add to replication jobs table and do replication to db
-				logger.info("Updating dissemination index");
+				logger.info("Updating dissemination index for " + pid);
 				String whichIndex = "FieldSearch";
 
 				try {
@@ -1400,10 +1327,10 @@ public class DefaultDOManager extends Module implements DOManager {
 					// successful
 					// removeReplicationJob(obj.getPid());
 				} catch (ServerException se) {
-					logger.error("Error updating " + whichIndex + " index", se);
+					logger.error("Error updating " + whichIndex + " index for " + pid, se);
 					throw se;
 				} catch (Throwable th) {
-					String msg = "Error updating " + whichIndex + " index";
+					String msg = "Error updating " + whichIndex + " index for " + pid;
 					logger.error(msg, th);
 					throw new GeneralException(msg, th);
 				}
@@ -1411,23 +1338,142 @@ public class DefaultDOManager extends Module implements DOManager {
 				if (obj.isNew()) {
 					// Clean up after a failed attempt to add
 					try {
-						doCommit(cachedObjectRequired, context, obj,
-								logMessage, true);
+						removeObject(obj, true);
 					} catch (Exception e) {
-						logger.warn("Error while cleaning up after failed add",
+						logger.warn("Error while cleaning up after failed add for " + pid,
 								e);
 					}
 				}
 				if (th instanceof ServerException) {
 					throw (ServerException) th;
 				} else {
-					throw new GeneralException("Unable to add or modify object"
+					throw new GeneralException("Unable to add or modify object " + pid
 							+ " (commit canceled)", th);
 				}
 			}
 		}
 	}
 
+	/*
+	 * Remove the object from permanent storage.  Currently this is used both for ingest failures
+	 * and for purging an object.  failSafe indicates failure in removal of an underlying artefact
+	 * is considered safe; ie part of a tidy-up operation where the artefact may not in fact exist.
+	 * On a purge failSafe should be false so errors are logged, as all artefacts should be present for deletion 
+	 */
+	private void removeObject(DigitalObject obj, boolean failSafe)
+			throws ServerException {
+		
+		String pid = obj.getPid();
+		logger.info("Committing removal of " + pid);
+
+		// RESOURCE INDEX:
+		// remove digital object from the resourceIndex
+		// (nb: must happen before datastream storage removal - as
+		// relationships might be in managed datastreams)
+		if (m_resourceIndex.getIndexLevel() != ResourceIndex.INDEX_LEVEL_OFF) {
+			try {
+				logger.info("Deleting " + pid + " from ResourceIndex");
+				m_resourceIndex.deleteObject(new SimpleDOReader(null, null,
+						null, null, null, obj));
+				logger.debug("Finished deleting " + pid + " from ResourceIndex");
+			} catch (ServerException se) {
+				if (failSafe) {
+				logger.warn("Object " + pid + " couldn't be removed from ResourceIndex ("
+						+ se.getMessage()
+						+ "), but that might be ok; continuing with purge");
+				} else {
+					logger.error("Object " + pid + " couldn't be removed from ResourceIndex ("
+							+ se.getMessage()
+							+ ")");
+					
+				}
+				
+			}
+		}
+
+		// DATASTREAM STORAGE:
+		// remove any managed content datastreams associated with object
+		// from persistent storage.
+		Iterator<String> dsIDIter = obj.datastreamIdIterator();
+		while (dsIDIter.hasNext()) {
+			String dsID = dsIDIter.next();
+			String controlGroupType = obj.datastreams(dsID).iterator()
+					.next().DSControlGrp;
+			if (controlGroupType.equalsIgnoreCase("M")) {
+				// iterate over all versions of this dsID
+				for (Datastream dmc : obj.datastreams(dsID)) {
+					String id = obj.getPid() + "+" + dmc.DatastreamID + "+"
+							+ dmc.DSVersionID;
+					logger.info("Deleting managed datastream: " + id + " for " + pid);
+					try {
+						m_permanentStore.removeDatastream(id);
+					} catch (LowlevelStorageException llse) {
+						if (failSafe) {
+							logger.warn("Error attempting removal of managed "
+								+ "content datastream " + id + " for " + pid + " (but that might be ok during a clean-up): ", llse);
+						} else {
+							logger.error("Error attempting removal of managed "
+									+ "content datastream " + id + " for " + pid + ": ", llse);
+						}
+					}
+				}
+			}
+		}
+
+		// STORAGE:
+		// remove digital object from persistent storage
+		try {
+			m_permanentStore.removeObject(obj.getPid());
+		} catch (ObjectNotInLowlevelStorageException onilse) {
+			if (failSafe) {
+				logger.warn("Object " + pid + " wasn't found in permanent low level "
+					+ "store, but that might be ok; continuing with purge");
+			} else {
+				logger.error("Object " + pid + " wasn't found in permanent low level "
+						+ "store");
+			}
+		}
+
+		// INVALIDATE DOREADER CACHE:
+		// now that the object xml is removed, make sure future requests
+		// for the object will not use a stale copy
+		if (m_readerCache != null) {
+			m_readerCache.remove(obj.getPid());
+		}
+
+		// REGISTRY:
+		// Remove digital object from the registry
+		try {
+			unregisterObject(obj);
+		} catch (ServerException se) {
+			if (failSafe) {
+				logger.warn("Object " + pid + " couldn't be removed from registry, but that might be ok; continuing with purge");
+			} else {
+				logger.error("Object " + pid + " couldn't be removed from registry");
+			}
+		}
+		// FIELD SEARCH INDEX:
+		// remove digital object from the default search index
+		try {
+			logger.info("Deleting " + pid + " from FieldSearch index");
+			m_fieldSearch.delete(obj.getPid());
+		} catch (ServerException se) {
+			if (failSafe) {
+				logger.warn("Object " + pid + " couldn't be removed from FieldSearch index ("
+					+ se.getMessage()
+					+ "), but that might be ok; continuing with purge");
+			} else {
+				logger.error("Object " + pid + " couldn't be removed from FieldSearch index ("
+						+ se.getMessage()
+						+ ")");
+			}
+		}
+		
+		
+	}
+	
+	
+	
 	private Set<Long> getDatastreamDates(Iterable<Datastream> ds) {
 		Set<Long> dates = new HashSet<Long>();
 		for (Datastream d : ds) {
