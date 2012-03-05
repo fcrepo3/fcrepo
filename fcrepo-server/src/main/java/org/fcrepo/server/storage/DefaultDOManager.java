@@ -1164,7 +1164,7 @@ public class DefaultDOManager extends Module implements DOManager {
 												dmc.DSMIME, str, null,
 												file.length());
 									} catch (FileNotFoundException fnfe) {
-										logger.warn(
+										logger.error(
 												"Unable to read temp file created for datastream from archive",
 												fnfe);
 										throw new StreamIOException(
@@ -1228,7 +1228,7 @@ public class DefaultDOManager extends Module implements DOManager {
 											+ internalId);
 								}
 							} else if (!internalId.equals(dmc.DSLocation)) {
-								logger.warn("Unrecognized DSLocation \""
+								logger.error("Unrecognized DSLocation \""
 										+ dmc.DSLocation
 										+ "\" given for datastream "
 										+ dmc.DatastreamID + " of object "
@@ -1470,7 +1470,7 @@ public class DefaultDOManager extends Module implements DOManager {
 										+ "from low level storage (token = "
 										+ token + ")");
 							} catch (Exception e) {
-								logger.warn("Error removing purged datastream "
+								logger.error("Error removing purged datastream "
 										+ "version from low level storage "
 										+ "(token = " + token + ")", e);
 							}
@@ -1480,7 +1480,7 @@ public class DefaultDOManager extends Module implements DOManager {
 				}
 			}
 		} catch (ServerException e) {
-			logger.warn(
+			logger.error(
 					"Error reading "
 							+ obj.getPid()
 							+ "; if any"
