@@ -7,11 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
-import org.fcrepo.server.access.FedoraAPIA;
-import org.fcrepo.server.management.FedoraAPIM;
-import org.fcrepo.server.types.gen.Datastream;
-import org.fcrepo.server.types.gen.DatastreamDef;
-import org.fcrepo.server.types.gen.ObjectProfile;
+import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,9 +15,9 @@ import org.junit.Test;
 public class TestObjectLastModDate
         extends FedoraServerTestCase {
 
-    private FedoraAPIA apia;
+    private org.fcrepo.server.access.FedoraAPIAMTOM apia;
 
-    private FedoraAPIM apim;
+    private org.fcrepo.server.management.FedoraAPIMMTOM apim;
 
     private static final String FOXMLPATH = "fcrepo238.xml";
 
@@ -44,14 +40,14 @@ public class TestObjectLastModDate
     @Test
     public void testFCREPO238() throws Exception {
         String pid =
-                apim.ingest(IOUtils.toByteArray(new FileInputStream(RESOURCEBASE
-                                    + "/" + FOXMLPATH)),
+                apim.ingest(TypeUtility.convertBytesToDataHandler(IOUtils.toByteArray(new FileInputStream(RESOURCEBASE
+                                    + "/" + FOXMLPATH))),
                             FOXML1_1.uri,
                             "testing fcrepo 238");
-        ObjectProfile profile = apia.getObjectProfile(pid, null);
+        org.fcrepo.server.types.mtom.gen.ObjectProfile profile = apia.getObjectProfile(pid, null);
         Date objDate = dateFormat.parse(profile.getObjLastModDate());
-        for (DatastreamDef dd : apia.listDatastreams(pid, null)) {
-            Datastream ds = apim.getDatastream(pid, dd.getID(), null);
+        for (org.fcrepo.server.types.mtom.gen.DatastreamDef dd : apia.listDatastreams(pid, null)) {
+            org.fcrepo.server.types.mtom.gen.Datastream ds = apim.getDatastream(pid, dd.getID(), null);
             Date dsDate = dateFormat.parse(ds.getCreateDate());
             System.out.print("object:" + dateFormat.format(objDate) + ", ");
             System.out.println("datastream: " + dateFormat.format(dsDate));

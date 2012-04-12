@@ -15,8 +15,45 @@
 
 	<build>
 	    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+	            <id>generate-sources</id>
+	            <phase>generate-sources</phase>
+            <configuration>
+              <target>
+                <property name="compile_classpath" refid="maven.compile.classpath"/>
+                <property name="runtime_classpath" refid="maven.runtime.classpath"/>
+                <property name="test_classpath" refid="maven.test.classpath"/>
+                <property name="plugin_classpath" refid="maven.plugin.classpath"/>
 
-	      <!-- Need to remove this plugin when ANT builds no longer supported -->
+                <echo message="compile classpath: ${compile_classpath}"/>
+                <echo message="runtime classpath: ${runtime_classpath}"/>
+                <echo message="test classpath:    ${test_classpath}"/>
+                <echo message="plugin classpath:  ${plugin_classpath}"/>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-jar-plugin</artifactId>
+       <executions>
+         <execution>
+           <goals>
+             <goal>test-jar</goal>
+           </goals>
+         </execution>
+       </executions>
+     </plugin>
+      	      <!-- Need to remove this plugin when ANT builds no longer supported -->
 	      <plugin>
 	        <groupId>org.apache.maven.plugins</groupId>
 	        <artifactId>maven-surefire-plugin</artifactId>
@@ -39,30 +76,22 @@
 	              <sourceRoot>
 	                ${project.build.directory}/generated-sources/cxf
 	              </sourceRoot>
-	              <!--<defaultOptions> <noAddressBinding>true</noAddressBinding> 
-	                </defaultOptions> -->
 	              <useCompileClasspath>true</useCompileClasspath>
 	              <wsdlOptions>
 	                <!-- API-M -->
 	                <wsdlOption>
-	                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-M.wsdl
-	                  </wsdl>
+	                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-M.wsdl</wsdl>
 	                  <bindingFiles>
-	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-M-Bindings.xml
-	                    </bindingFile>
-	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-Bindings.xml
-	                    </bindingFile>
+	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-M-Bindings.xml</bindingFile>
+	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-Bindings.xml</bindingFile>
 	                  </bindingFiles>
 	                </wsdlOption>
 	                <!-- API-M MTOM -->
 	                <wsdlOption>
-	                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-M-MTOM.wsdl
-	                  </wsdl>
+	                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-M-MTOM.wsdl</wsdl>
 	                  <bindingFiles>
-	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-M-BindingsMTOM.xml
-	                    </bindingFile>
-	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-BindingsMTOM.xml
-	                    </bindingFile>
+	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-M-BindingsMTOM.xml</bindingFile>
+	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-BindingsMTOM.xml</bindingFile>
 	                  </bindingFiles>
 	                </wsdlOption>
 	                <!-- API-A -->
@@ -70,21 +99,16 @@
 	                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-A.wsdl
 	                  </wsdl>
 	                  <bindingFiles>
-	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-A-Bindings.xml
-	                    </bindingFile>
-	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-Bindings.xml
-	                    </bindingFile>
+	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-A-Bindings.xml</bindingFile>
+	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-Bindings.xml</bindingFile>
 	                  </bindingFiles>
 	                </wsdlOption>
 	                <!-- API-A MTOM -->
 	                <wsdlOption>
-	                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-A-MTOM.wsdl
-	                  </wsdl>
+	                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-A-MTOM.wsdl</wsdl>
 	                  <bindingFiles>
-	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-A-BindingsMTOM.xml
-	                    </bindingFile>
-	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-BindingsMTOM.xml
-	                    </bindingFile>
+	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-A-BindingsMTOM.xml</bindingFile>
+	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-BindingsMTOM.xml</bindingFile>
 	                  </bindingFiles>
 	                </wsdlOption>
 
@@ -111,7 +135,6 @@
 	    <dependency>
 	      <groupId>commons-codec</groupId>
 	      <artifactId>commons-codec</artifactId>
-	      <version>1.5</version>
 	    </dependency>
 
 	    <dependency>
@@ -139,7 +162,7 @@
 	    <dependency>
 	      <groupId>wsdl4j</groupId>
 	      <artifactId>wsdl4j</artifactId>
-	      <version>1.5.1</version>
+	      <version>1.6.2</version>
 	    </dependency>
 
 	    <dependency>
@@ -167,6 +190,7 @@
 	      <groupId>org.fcrepo</groupId>
 	      <artifactId>saxon</artifactId>
 	      <version>9.0</version>
+	      <scope>import</scope>
 	    </dependency>
 
 	    <dependency>
