@@ -53,13 +53,19 @@
 
       <security:filter-chain pattern="/management/*/**"
         filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/access"
+        filters="ChannelFilter,${security.auth.filters.apia}" />
       <security:filter-chain pattern="/upload*"
         filters="ChannelFilter,${security.auth.filters}" />
 
       <!-- SOAP APIs -->
       <security:filter-chain pattern="/services/access"
         filters="ChannelFilter,${security.auth.filters.apia}" />
+      <security:filter-chain pattern="/services/accessMTOM"
+        filters="ChannelFilter,${security.auth.filters.apia}" />
       <security:filter-chain pattern="/services/management"
+        filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/services/managementMTOM"
         filters="ChannelFilter,${security.auth.filters}" />
 
 
