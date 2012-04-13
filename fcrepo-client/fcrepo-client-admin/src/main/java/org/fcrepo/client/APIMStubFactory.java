@@ -5,6 +5,8 @@
 
 package org.fcrepo.client;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.util.HashMap;
@@ -66,12 +68,11 @@ public abstract class APIMStubFactory {
 
         // temporarily turn off err stream, because initialization of service spams the stream
         PrintStream aux = System.err;
-//        System.setErr(new PrintStream(new OutputStream() {
-//
-//            @Override
-//            public void write(int arg0) throws IOException {
-//            }
-//        }));
+        System.setErr(new PrintStream(new OutputStream() {
+            @Override
+            public void write(int arg0) throws IOException {
+            }
+        }));
         FedoraAPIMMTOM service = (FedoraAPIMMTOM) clientFactory.create();
         System.setErr(aux);
 

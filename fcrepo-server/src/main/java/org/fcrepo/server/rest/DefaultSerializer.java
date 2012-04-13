@@ -653,8 +653,8 @@ public class DefaultSerializer {
         }
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-        buffer.append("<validation "
-                + " xmlns=\"" + Constants.OBJ_VALIDATION1_0.namespace.uri + "\""
+        buffer.append("<management:validation "
+                + " xmlns:management=\"" + Constants.OBJ_VALIDATION1_0.namespace.uri + "\""
                 + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
                 + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                 + " xsi:schemaLocation=\"" + Constants.OBJ_VALIDATION1_0.namespace.uri
@@ -662,41 +662,41 @@ public class DefaultSerializer {
                 + " pid=\"" + enc(pid) + "\" "
                 + " valid=\"" + valid + "\">\n");
         if (date != null) {
-        	buffer.append("  <asOfDateTime>" + dateString + "</asOfDateTime>\n");
+        	buffer.append("  <management:asOfDateTime>" + dateString + "</management:asOfDateTime>\n");
         }
-        buffer.append("  <contentModels>\n");
+        buffer.append("  <management:contentModels>\n");
         for (String model : validation.getContentModels()) {
-            buffer.append("    <model>");
+            buffer.append("    <management:model>");
             buffer.append(enc(model));
-            buffer.append("</model>\n");
+            buffer.append("</management:model>\n");
         }
-        buffer.append("  </contentModels>\n");
+        buffer.append("  </management:contentModels>\n");
 
-        buffer.append("  <problems>\n");
+        buffer.append("  <management:problems>\n");
         for (String problem : validation.getObjectProblems()) {
-            buffer.append("    <problem>");
+            buffer.append("    <management:problem>");
             buffer.append(problem);
-            buffer.append("</problem>\n");
+            buffer.append("</management:problem>\n");
         }
-        buffer.append("  </problems>\n");
+        buffer.append("  </management:problems>\n");
 
-        buffer.append("  <datastreamProblems>\n");
+        buffer.append("  <management:datastreamProblems>\n");
         Map<String, List<String>> dsprobs = validation.getDatastreamProblems();
         for (String ds : dsprobs.keySet()) {
             List<String> problems = dsprobs.get(ds);
-            buffer.append("    <datastream");
+            buffer.append("    <management:datastream");
             buffer.append(" datastreamID=\"");
             buffer.append(ds);
             buffer.append("\">\n");
             for (String problem : problems) {
-                buffer.append("      <problem>");
+                buffer.append("      <management:problem>");
                 buffer.append(problem);
-                buffer.append("</problem>\n");
+                buffer.append("</management:problem>\n");
             }
-            buffer.append("    </datastream>");
+            buffer.append("    </management:datastream>");
         }
-        buffer.append("  </datastreamProblems>\n");
-        buffer.append("</validation>");
+        buffer.append("  </management:datastreamProblems>\n");
+        buffer.append("</management:validation>");
         return buffer.toString();
     }
 

@@ -9,24 +9,20 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import java.math.BigInteger;
-
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.server.search.Condition;
 import org.fcrepo.server.types.mtom.gen.ArrayOfString;
-
 import org.fcrepo.utilities.DateUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A utility class for converting back and forth from the internal Fedora type
@@ -800,8 +796,7 @@ public abstract class TypeUtility {
             for (org.fcrepo.server.types.mtom.gen.Property prop : genProperties
                     .getParameter()) {
                 org.fcrepo.server.storage.types.Property property =
-                        new org.fcrepo.server.storage.types.Property();
-                property = convertGenPropertyToPropertyMTOM(prop);
+                        convertGenPropertyToPropertyMTOM(prop);
                 properties[i++] = property;
             }
             return properties;
@@ -826,6 +821,7 @@ public abstract class TypeUtility {
                 new org.fcrepo.server.storage.types.Property();
         if (genProperty != null) {
             property.name = genProperty.getName();
+            if (property.name == null) property.name = ""; // why are there null names?
             property.value = genProperty.getValue();
         }
         return property;

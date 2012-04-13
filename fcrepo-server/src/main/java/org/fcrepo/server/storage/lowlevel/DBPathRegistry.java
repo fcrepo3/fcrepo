@@ -13,25 +13,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.LowlevelStorageInconsistencyException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.storage.ConnectionPool;
 import org.fcrepo.server.utilities.SQLUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -109,14 +106,14 @@ public class DBPathRegistry
         }
         return path;
     }
-    
+
     private void ensureSingleUpdate(Statement statement)
         throws ObjectNotInLowlevelStorageException,
         LowlevelStorageInconsistencyException, LowlevelStorageException {
     	try{
     		int updateCount = statement.getUpdateCount();
     		if (updateCount == 0) {
-    			throw new ObjectNotInLowlevelStorageException("-no- rows updated in db registry");
+    			throw new ObjectNotInLowlevelStorageException("Object not found in low-level storage: -no- rows updated in db registry");
     		}
     		if (updateCount > 1) {
     			throw new LowlevelStorageInconsistencyException("-multiple- rows updated in db registry");
@@ -125,7 +122,7 @@ public class DBPathRegistry
             throw new LowlevelStorageException(true, "sql failurex (exec)", e1);
         }
     }
-    
+
     @Deprecated
     public void executeSql(String sql)
             throws ObjectNotInLowlevelStorageException,
@@ -236,7 +233,7 @@ public class DBPathRegistry
             String query = "DELETE FROM " + getRegistryName() + " WHERE "
             + getRegistryName() + ".token=?";
             executeUpdate(query, pid);
-            
+
         } catch (ObjectNotInLowlevelStorageException e1) {
             throw new ObjectNotInLowlevelStorageException("[" + pid
                     + "] not in db registry to delete", e1);
@@ -357,10 +354,12 @@ public class DBPathRegistry
             }
         }
 
+        @Override
         public boolean hasMoreElements() {
             return nextKey != null;
         }
 
+        @Override
         public String nextElement() {
             if (nextKey != null) {
                 try {

@@ -132,8 +132,8 @@ public class RelationshipResource extends BaseRestResource {
                 // assume the subject is the object as denoted by the pid
                 subject = PID.toURI(pid);
             }
-            apiMService.addRelationship(context, subject, predicate, object, isLiteral, datatype);
-            return Response.ok().build();
+            boolean result = apiMService.addRelationship(context, subject, predicate, object, isLiteral, datatype);
+            return Response.ok(Boolean.toString(result)).build(); // needs an entity to not be overridden with a 204
         } catch (ServerException e) {
             return handleException(e);
         }

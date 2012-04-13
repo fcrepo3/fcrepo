@@ -12,14 +12,10 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.fcrepo.client.FedoraClient;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
-
 import org.fcrepo.utilities.ExecUtility;
 
 /**
@@ -95,14 +91,9 @@ public class TestCommandLineUtilities
         batchIngest(buildDir,
                     new File(LOGDIR + "/junit_ingest.log"));
         err = sbErr.toString();
-        if (err.indexOf("10 objects successfully ingested into Fedora") == -1) {
-            System.out
-                    .println("Didn't find expected string in output:\n" + err);
-            assertEquals(true, false);
-        }
-        assertEquals(err
-                             .indexOf("10 objects successfully ingested into Fedora") != -1,
-                     true);
+        assertTrue("Response did not contain expected string re: objects successfully ingested: <reponse>"
+                + err + "</reponse>",
+                err.contains("10 objects successfully ingested into Fedora"));
         String batchObjs[] =
                 {"test:0001", "test:0002", "test:0003", "test:0004",
                  "test:0005", "test:0006", "test:0007", "test:0008",
@@ -122,16 +113,12 @@ public class TestCommandLineUtilities
                          new File(LOGDIR
                                   + "/junit_buildingest.log"));
         String err = sbErr.toString();
-        assertEquals("Response did not contain expected string re: FOXML XML documents: <reponse>"
+        assertTrue("Response did not contain expected string re: FOXML XML documents: <reponse>"
                              + err + "</response>",
-                     err
-                             .indexOf("10 Fedora FOXML XML documents successfully created") != -1,
-                     true);
-        assertEquals("Response did not contain expected string re: objects successfully ingested: <reponse>"
+                     err.contains("10 Fedora FOXML XML documents successfully created"));
+        assertTrue("Response did not contain expected string re: objects successfully ingested: <reponse>"
                              + err + "</reponse",
-                     err
-                             .indexOf("10 objects successfully ingested into Fedora") != -1,
-                     true);
+                     err.contains("10 objects successfully ingested into Fedora"));
         String batchObjs[] =
                 {"test:0001", "test:0002", "test:0003", "test:0004",
                  "test:0005", "test:0006", "test:0007", "test:0008",
@@ -186,30 +173,26 @@ public class TestCommandLineUtilities
         batchPurge(new File("/bogus/file"));
         String out = sbOut.toString();
         String err = sbErr.toString();
-        assertEquals("Response did not contain expected string re: java.io.FileNotFoundException: <reponse>"
+        assertTrue("Response did not contain expected string re: java.io.FileNotFoundException: <response>"
                      + err + "</response>",
-                     err.indexOf("java.io.FileNotFoundException") != -1,
-                     true);
+                     err.contains("java.io.FileNotFoundException"));
         /* try to purge the objects from the valid file */
         batchPurge(new File(base + "/test-objects/test-batch-purge-file.txt"));
         out = sbOut.toString();
         err = sbErr.toString();
-        assertEquals("Response did not contain expected string re: objects successfully purged: <reponse>"
+        assertTrue("Response did not contain expected string re: objects successfully purged: <response>"
                      + out + "</response>",
-                     out.indexOf("10 objects successfully purged.") != -1,
-                     true);
+                     out.contains("10 objects successfully purged."));
         /* make sure they're gone */
         batchPurge(new File(base + "/test-objects/test-batch-purge-file.txt"));
         out = sbOut.toString();
         err = sbErr.toString();
-        assertEquals("Response did not contain expected string re: ObjectNotInLowlevelStorageException: <reponse>"
+        assertTrue("Response did not contain expected string re: Object not found in low-level storage: <response>"
                      + err + "</response>",
-                     err.indexOf("ObjectNotInLowlevelStorageException") != -1,
-                     true);
-        assertEquals("Response did not contain expected string re: objects successfully purged: <reponse>"
+                     err.contains("Object not found in low-level storage"));
+        assertTrue("Response did not contain expected string re: objects successfully purged: <response>"
                      + out + "</response>",
-                     out.indexOf("0 objects successfully purged.") != -1,
-                     true);
+                     out.contains("0 objects successfully purged."));
         System.out.println("Batch purge test succeeded");
     }
 

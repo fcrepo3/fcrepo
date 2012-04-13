@@ -11,13 +11,12 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
-
 import java.security.MessageDigest;
-
 import java.util.Date;
-import java.util.Locale;
 
 import javax.xml.ws.soap.SOAPFaultException;
+
+import junit.framework.JUnit4TestAdapter;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.ext.thread.ThreadHelper;
@@ -25,27 +24,19 @@ import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.remoting.soap.SoapFaultException;
-
-import junit.framework.JUnit4TestAdapter;
-
 import org.fcrepo.common.PID;
-
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.types.mtom.gen.ArrayOfString;
 import org.fcrepo.server.utilities.StringUtility;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.test.FedoraServerTestCase;
-
 import org.fcrepo.utilities.Foxml11Document;
 import org.fcrepo.utilities.Foxml11Document.ControlGroup;
 import org.fcrepo.utilities.Foxml11Document.Property;
 import org.fcrepo.utilities.Foxml11Document.State;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
@@ -55,6 +46,10 @@ import org.fcrepo.utilities.Foxml11Document.State;
  */
 public class TestManagedDatastreams
         extends FedoraServerTestCase {
+
+    private static final String BAD_URL = "Malformed URL:";
+
+    private static final String NON_EXIST_UPLOAD = "does not match an existing file";
 
     private FedoraAPIMMTOM apim;
 
@@ -102,13 +97,13 @@ public class TestManagedDatastreams
                 apim.ingest(TypeUtility.convertBytesToDataHandler(getAtomObject(pid, contentLocation)), ATOM1_1.uri, null);
                 fail("ingest should have failed with " + contentLocation);
             } catch (SOAPFaultException e) {
-                assertTrue(e.getMessage().contains("ValidationException"));
+                assertTrue(e.getMessage(), e.getMessage().contains(BAD_URL));
             }
             try {
                 apim.ingest(TypeUtility.convertBytesToDataHandler(getFoxmlObject(pid, contentLocation)), FOXML1_1.uri, null);
                 fail("ingest should have failed with " + contentLocation);
-            } catch (SoapFaultException e) {
-                assertTrue(e.getMessage().contains("ObjectIntegrityException"));
+            } catch (SOAPFaultException e) {
+                assertTrue(e.getMessage(), e.getMessage().contains(BAD_URL));
             }
         }
 
@@ -116,14 +111,14 @@ public class TestManagedDatastreams
             try {
                 apim.ingest(TypeUtility.convertBytesToDataHandler(getAtomObject(pid, contentLocation)), ATOM1_1.uri, null);
                 fail("ingest should have failed with " + contentLocation);
-            } catch (SoapFaultException e) {
-                assertTrue(e.getMessage().contains("StreamReadException"));
+            } catch (SOAPFaultException e) {
+                assertTrue(e.getMessage(), e.getMessage().contains(NON_EXIST_UPLOAD));
             }
             try {
                 apim.ingest(TypeUtility.convertBytesToDataHandler(getFoxmlObject(pid, contentLocation)), FOXML1_1.uri, null);
                 fail("ingest should have failed with " + contentLocation);
-            } catch (SoapFaultException e) {
-                assertTrue(e.getMessage().contains("StreamReadException"));
+            } catch (SOAPFaultException e) {
+                assertTrue(e.getMessage(), e.getMessage().contains(NON_EXIST_UPLOAD));
             }
         }
     }
@@ -140,8 +135,8 @@ public class TestManagedDatastreams
                     addDatastream(pid, contentLocation);
                     fail("addDatastream should have failed with "
                          + contentLocation);
-                } catch (SoapFaultException e) {
-                    assertTrue(e.getMessage().contains("ValidationException"));
+                } catch (SOAPFaultException e) {
+                    assertTrue(e.getMessage(), e.getMessage().contains(BAD_URL));
                 }
             }
 
@@ -150,8 +145,8 @@ public class TestManagedDatastreams
                     addDatastream(pid, contentLocation);
                     fail("addDatastream should have failed with "
                          + contentLocation);
-                } catch (SoapFaultException e) {
-                    assertTrue(e.getMessage().contains("StreamReadException"));
+                } catch (SOAPFaultException e) {
+                    assertTrue(e.getMessage(), e.getMessage().contains(NON_EXIST_UPLOAD));
                 }
             }
 
@@ -171,8 +166,8 @@ public class TestManagedDatastreams
                 try {
                     modifyDatastreamByReference(pid, contentLocation);
                     fail("modifyDatastreamByReference should have failed with " + contentLocation);
-                } catch (SoapFaultException e) {
-                    assertTrue(e.getMessage().contains("ValidationException"));
+                } catch (SOAPFaultException e) {
+                    assertTrue(e.getMessage(), e.getMessage().contains(BAD_URL));
                 }
             }
 
@@ -180,8 +175,8 @@ public class TestManagedDatastreams
                 try {
                     modifyDatastreamByReference(pid, contentLocation);
                     fail("modifyDatastreamByReference should have failed with " + contentLocation);
-                } catch (SoapFaultException e) {
-                    assertTrue(e.getMessage().contains("StreamReadException"));
+                } catch (SOAPFaultException e) {
+                    assertTrue(e.getMessage(), e.getMessage().contains(NON_EXIST_UPLOAD));
                 }
             }
 
@@ -213,8 +208,8 @@ public class TestManagedDatastreams
             try {
                 addDatastream(pid, contentLocation, checksumType, checksum);
                 fail("Adding datastream with bogus checksum should have failed.");
-            } catch (SoapFaultException e) {
-                assertTrue(e.getMessage().contains("Checksum Mismatch"));
+            } catch (SOAPFaultException e) {
+                assertTrue(e.getMessage(), e.getMessage().contains("Checksum Mismatch"));
             }
         } finally {
             apim.purgeObject(pid, "test", false);
@@ -249,8 +244,8 @@ public class TestManagedDatastreams
             try {
                 modifyDatastreamByReference(pid, contentLocation, checksumType, checksum);
                 fail("Modifying datastream with bogus checksum should have failed.");
-            } catch (SoapFaultException e) {
-                assertTrue(e.getMessage().contains("Checksum Mismatch"));
+            } catch (SOAPFaultException e) {
+                assertTrue(e.getMessage(), e.getMessage().contains("Checksum Mismatch"));
             }
         } finally {
             apim.purgeObject(pid, "test", false);

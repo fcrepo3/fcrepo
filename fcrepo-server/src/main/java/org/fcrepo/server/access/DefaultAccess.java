@@ -7,12 +7,10 @@ package org.fcrepo.server.access;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-
 import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -25,15 +23,20 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.access.dissemination.DisseminationService;
-import org.fcrepo.server.errors.*;
+import org.fcrepo.server.errors.DatastreamNotFoundException;
+import org.fcrepo.server.errors.DisseminationException;
+import org.fcrepo.server.errors.DisseminatorNotFoundException;
+import org.fcrepo.server.errors.GeneralException;
+import org.fcrepo.server.errors.InvalidUserParmException;
+import org.fcrepo.server.errors.MethodNotFoundException;
+import org.fcrepo.server.errors.ModuleInitializationException;
+import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.search.FieldSearchQuery;
 import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.security.Authorization;
@@ -205,6 +208,7 @@ public class DefaultAccess
      * @throws ServerException
      *         If any type of error occurred fulfilling the request.
      */
+    @Override
     public MIMETypedStream getDissemination(Context context,
                                             String PID,
                                             String sDefPID,
@@ -546,6 +550,7 @@ public class DefaultAccess
         return bindingInfoList.toArray(new DisseminationBindingInfo[0]);
     }
 
+    @Override
     public ObjectMethodsDef[] listMethods(Context context,
                                           String PID,
                                           Date asOfDateTime)
@@ -577,6 +582,7 @@ public class DefaultAccess
         return methodList.toArray(new ObjectMethodsDef[0]);
     }
 
+    @Override
     public DatastreamDef[] listDatastreams(Context context,
                                            String PID,
                                            Date asOfDateTime)
@@ -603,6 +609,7 @@ public class DefaultAccess
         return dsDefs;
     }
 
+    @Override
     public ObjectProfile getObjectProfile(Context context,
                                           String PID,
                                           Date asOfDateTime)
@@ -676,6 +683,7 @@ public class DefaultAccess
      * @throws ServerException
      *         If any type of error occurred fulfilling the request.
      */
+    @Override
     public FieldSearchResult findObjects(Context context,
                                          String[] resultFields,
                                          int maxResults,
@@ -699,6 +707,7 @@ public class DefaultAccess
      * @throws ServerException
      *         If any type of error occurred fulfilling the request.
      */
+    @Override
     public FieldSearchResult resumeFindObjects(Context context,
                                                String sessionToken)
             throws ServerException {
@@ -717,6 +726,7 @@ public class DefaultAccess
      * @throws ServerException
      *         If any type of error occurred fulfilling the request.
      */
+    @Override
     public RepositoryInfo describeRepository(Context context)
             throws ServerException {
         m_authorizationModule.enforceDescribeRepository(context);
@@ -772,6 +782,7 @@ public class DefaultAccess
      * @throws ServerException
      *         If any type of error occurred fulfilling the request.
      */
+    @Override
     public String[] getObjectHistory(Context context, String PID)
             throws ServerException {
         PID = Server.getPID(PID).toString();
@@ -1096,6 +1107,7 @@ public class DefaultAccess
         return reposBaseURL;
     }
 
+    @Override
     public MIMETypedStream getDatastreamDissemination(Context context,
                                                       String PID,
                                                       String dsID,

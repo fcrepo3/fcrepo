@@ -5,8 +5,8 @@
 
 package org.fcrepo.client;
 
+import java.io.PrintStream;
 import java.net.MalformedURLException;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,9 +63,11 @@ public abstract class APIAStubFactory {
 //        LoggingOutInterceptor log2 = new LoggingOutInterceptor(new PrintWriter(System.out));
 //        clientFactory.getInInterceptors().add(log1);
 //        clientFactory.getInInterceptors().add(log2);
+        PrintStream syserr = System.err;
         System.setErr(System.out);
         FedoraAPIAMTOM service = (FedoraAPIAMTOM) clientFactory.create();
-        System.setErr(System.err);
+        System.setErr(syserr);
+        syserr = null;
 
         if (Administrator.INSTANCE == null) {
             // if running without Administrator, don't wrap it with the statusbar stuff

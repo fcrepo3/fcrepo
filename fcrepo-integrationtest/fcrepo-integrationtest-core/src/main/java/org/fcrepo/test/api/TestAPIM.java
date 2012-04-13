@@ -8,7 +8,6 @@ package org.fcrepo.test.api;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,20 +17,17 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.custommonkey.xmlunit.NamespaceContext;
-import org.custommonkey.xmlunit.SimpleNamespaceContext;
-import org.custommonkey.xmlunit.XMLUnit;
-
-import org.junit.After;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.custommonkey.xmlunit.NamespaceContext;
+import org.custommonkey.xmlunit.SimpleNamespaceContext;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.fcrepo.client.FedoraClient;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.types.mtom.gen.Datastream;
@@ -42,9 +38,9 @@ import org.fcrepo.server.types.mtom.gen.ObjectFactory;
 import org.fcrepo.server.types.mtom.gen.ObjectFields;
 import org.fcrepo.server.types.mtom.gen.Validation;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.After;
 
 public class TestAPIM
         extends FedoraServerTestCase
@@ -1174,18 +1170,8 @@ public class TestAPIM
         }
     }
 
-    public void testDatastreamMethods() throws Exception {
+    public void testAddDatastream() throws Exception {
 
-        // test datastream methods
-        // 1) addDatastream
-        // 2) modifyDatastreamByReference
-        // 3) modifyDatastreamByValue
-        // 4) purgeDatastream
-        // 5) getDatastream
-        // 6) getDatastreams
-        // 7) getDatastreamHistory
-
-        // (1) test addDatastream
         System.out.println("Running TestAPIM.testAddDatastream...");
         // test adding M type datastream with unknown checksum type and no altIDs, should fail throwing exception
         try {
@@ -1359,7 +1345,8 @@ public class TestAPIM
 
         for (String reservedDSID : new String[] {"RELS-EXT", "RELS-INT", "DC"}) {
             altIds[0] = "Datastream 2 Alternate ID";
-            datastreamId =
+            try {
+                datastreamId =
                     apim.addDatastream("demo:18",
                                        reservedDSID,
                                        TypeUtility.convertStringtoAOS(altIds),
@@ -1374,7 +1361,10 @@ public class TestAPIM
                                        null,
                                        null,
                                        "adding new invalid datastream");
-            fail(reservedDSID + " was not validated on addDatastream");
+                fail(reservedDSID + " was not validated on addDatastream");
+            } catch (SOAPFaultException se){
+
+            }
         }
 
         // same for RELS-EXT and RELS-INT as managed content datastreams using demo:SmileyBeerGlass_M (managed content version of SmileyBeerGlass)
@@ -1393,7 +1383,8 @@ public class TestAPIM
                    purgedDatastreams.length == 1);
         for (String reservedDSID : new String[] {"RELS-EXT", "RELS-INT"}) {
             altIds[0] = "Datastream 2 Alternate ID";
-            datastreamId =
+            try {
+                datastreamId =
                     apim.addDatastream(mcPID,
                                        reservedDSID,
                                        TypeUtility.convertStringtoAOS(altIds),
@@ -1408,7 +1399,10 @@ public class TestAPIM
                                        null,
                                        null,
                                        "adding new invalid datastream");
-            fail(reservedDSID + " was not validated on addDatastream (managed)");
+                 fail(reservedDSID + " was not validated on addDatastream (managed)");
+            } catch (SOAPFaultException se) {
+                assertTrue(se.getMessage(), se.getMessage().contains(reservedDSID + " validation failed"));
+            }
         }
 
         // add RELS-EXT, RELS-INT valid datastreams type M
@@ -1476,13 +1470,20 @@ public class TestAPIM
                               xmlIn);
 
         }
+    }
+
+    public void testModifyDatastreamByReference() throws Exception {
 
         // (2) test modifyDatastreamByReference
         System.out
                 .println("Running TestAPIM.testModifyDatastreamByReference...");
-        altIds = new String[1];
+        Datastream origManagedContent =
+                apim.getDatastream("fedora-system:ContentModel-3.0", "DC", null);
+        long managedContentSize = origManagedContent.getSize();
+
+        String [] altIds = new String[1];
         altIds[0] = "Datastream 1 Modified Alternate ID";
-        datastreamId =
+        String datastreamId =
                 apim.modifyDatastreamByReference("demo:14",
                                                  "NEWDS1",
                                                  TypeUtility
@@ -1498,11 +1499,11 @@ public class TestAPIM
                                                  false);
 
         // test that datastream was modified
-        objectXML =
+        byte [] objectXML =
                 TypeUtility.convertDataHandlerToBytes(apim
                         .getObjectXML("demo:14"));
         assertTrue(objectXML.length > 0);
-        xmlIn = new String(objectXML, "UTF-8");
+        String xmlIn = new String(objectXML, "UTF-8");
         //System.out.println("***** Testcase: TestAPIM.testModifyDatastreamByReference NEWDS1\n"+xmlIn);
         assertXpathExists("foxml:digitalObject[@PID='demo:14']", xmlIn);
         assertXpathExists("//foxml:datastream[@ID='NEWDS1' and @CONTROL_GROUP='M' and @STATE='A']",
@@ -1526,10 +1527,11 @@ public class TestAPIM
         // add RELS-EXT from some other object as that will be invalid for this object
         // using demo:SmileyBeerGlass_M (managed content version of SmileyBeerGlass)
         // TODO: DC also
-        mcPID = "demo:SmileyPens_M";
+        String mcPID = "demo:SmileyPens_M";
         for (String reservedDSID : new String[] {"RELS-EXT", "RELS-INT"}) {
             altIds[0] = "Datastream 2 Alternate ID";
-            datastreamId =
+            try {
+                datastreamId =
                     apim.modifyDatastreamByReference(mcPID,
                                                      reservedDSID,
                                                      TypeUtility
@@ -1543,8 +1545,11 @@ public class TestAPIM
                                                      null,
                                                      "modifying by reference invalid datastream",
                                                      false);
-            fail(reservedDSID
+                fail(reservedDSID
                     + " was not validated on modifyDatastreamByReference");
+            } catch (SOAPFaultException se) {
+                assertTrue(se.getMessage(), se.getMessage().contains(reservedDSID + " validation failed"));
+            }
         }
 
         // modifyDatastreamByReference RELS-EXT, RELS-INT with valid content
@@ -1601,12 +1606,15 @@ public class TestAPIM
                               xmlIn);
 
         }
+    }
+
+    public void testModifyDatastreamByValue() throws Exception {
 
         // (3) test modifyDatastreamByValue
         System.out.println("Running TestAPIM.testModifyDatastreamByValue...");
-        altIds = new String[1];
+        String [] altIds = new String[1];
         altIds[0] = "Datastream 2 Modified Alternate ID";
-        datastreamId =
+        String datastreamId =
                 apim.modifyDatastreamByValue("demo:14",
                                              "NEWDS2",
                                              TypeUtility
@@ -1622,11 +1630,11 @@ public class TestAPIM
                                              false);
 
         // test that datastream was modified
-        objectXML =
+        byte [] objectXML =
                 TypeUtility.convertDataHandlerToBytes(apim
                         .getObjectXML("demo:14"));
         assertTrue(objectXML.length > 0);
-        xmlIn = new String(objectXML, "UTF-8");
+        String xmlIn = new String(objectXML, "UTF-8");
         //System.out.println("***** Testcase: TestAPIM.testModifyDatastreamByValue NEWDS2\n"+xmlIn);
         assertXpathExists("foxml:digitalObject[@PID='demo:14']", xmlIn);
         assertXpathExists("//foxml:datastream[@ID='NEWDS2' and @CONTROL_GROUP='X' and @STATE='A']",
@@ -1686,18 +1694,19 @@ public class TestAPIM
         // test modifyDatastreamByValue triggers RELS-EXT and RELS-INT validation for type "X"
         // RELS datastream content is invalid as it's for a different object
         // FIXME: consider refactoring into a general validation test suite
-        for (String relsDsId : new String[] {"RELS-EXT", "RELS-INT"}) {
+        for (String reservedDSID : new String[] {"RELS-EXT", "RELS-INT"}) {
             altIds[0] = "Datastream 2 Alternate ID";
             String uri = null;
-            if (relsDsId.equals("RELS-EXT")) {
+            if (reservedDSID.equals("RELS-EXT")) {
                 uri = "info:fedora/fedora-system:FedoraRELSExt-1.0";
-            } else if (relsDsId.equals("RELS-INT")) {
+            } else if (reservedDSID.equals("RELS-INT")) {
                 uri = "info:fedora/fedora-system:FedoraRELSInt-1.0";
             }
 
-            datastreamId =
+            try{
+                datastreamId =
                     apim.modifyDatastreamByValue("demo:SmileyGreetingCard",
-                                                 relsDsId,
+                            reservedDSID,
                                                  TypeUtility
                                                          .convertStringtoAOS(altIds),
                                                  "Modified RELS Datastream",
@@ -1709,13 +1718,17 @@ public class TestAPIM
                                                  null,
                                                  "modifying datastream",
                                                  false);
-            fail(relsDsId + " was not validated on modifyDatastreamByValue");
+                fail(reservedDSID + " was not validated on modifyDatastreamByValue");
+            } catch (SOAPFaultException se) {
+                assertTrue(se.getMessage(), se.getMessage().contains(reservedDSID + " validation failed"));
+            }
+
         }
 
         // test modifyDatastreamByValue RELS-EXT, RELS-INT triggers validation for type "M"
         // using demo:SmileyPens_M (managed content version of demo:SmileyPens)
         // TODO: do for DC also
-        mcPID = "demo:SmileyPens_M";
+        String mcPID = "demo:SmileyPens_M";
         for (String reservedDSID : new String[] {"RELS-EXT", "RELS-INT"}) {
             altIds[0] = "Datastream 2 Alternate ID";
 
@@ -1726,7 +1739,8 @@ public class TestAPIM
                 uri = "info:fedora/fedora-system:FedoraRELSInt-1.0";
             }
 
-            datastreamId =
+            try {
+                datastreamId =
                     apim.modifyDatastreamByValue(mcPID,
                                                  reservedDSID,
                                                  TypeUtility
@@ -1741,8 +1755,12 @@ public class TestAPIM
                                                  null,
                                                  "modifying by value M type reserved datastream",
                                                  false);
-            fail(reservedDSID
+                fail(reservedDSID
                     + " was not validated on modifyDatastreamByReference");
+            } catch (SOAPFaultException se) {
+                assertTrue(se.getMessage(), se.getMessage().contains(reservedDSID + " validation failed"));
+            }
+
         }
 
         // modifyDatastreamByValue RELS-EXT, RELS-INT with valid content, type "M"
@@ -1843,9 +1861,12 @@ public class TestAPIM
                           xmlIn);
         assertXpathExists("//foxml:datastreamVersion[@ID='METHODMAP.1' and @MIMETYPE='text/xml' and @LABEL='Mapping of WSDL to Fedora Notion of Method Definitions']",
                           xmlIn);
+    }
 
+    public void compareDatastreamChecksum() throws Exception {
         // (4) test modifyDatastreamByValue for checksumming and compareDatastreamChecksum
         System.out.println("Running TestAPIM.compareDatastreamChecksum...");
+        String datastreamId = null;
         try {
             datastreamId =
                     apim.modifyDatastreamByValue("demo:14",
@@ -2026,8 +2047,9 @@ public class TestAPIM
         checksum4 =
                 apim.compareDatastreamChecksum("demo:14", "CHECKSUMDS", null);
         assertTrue(checksum3.equals(checksum3));
+    }
 
-        // (5) test purgeDatastream
+    public void testPurgeDatastream() throws Exception {
         System.out.println("Running TestAPIM.testPurgeDatastream...");
         // test specifying date-time for startDate and null for endDate
         String[] results =
@@ -2075,16 +2097,17 @@ public class TestAPIM
         assertTrue(results.length > 0);
 
         // test purgeDatastream audit
-        objectXML =
+        byte [] objectXML =
                 TypeUtility.convertDataHandlerToBytes(apim
                         .getObjectXML("demo:14"));
         assertTrue(objectXML.length > 0);
-        xmlIn = new String(objectXML, "UTF-8");
+        String xmlIn = new String(objectXML, "UTF-8");
         assertXpathExists("foxml:digitalObject[@PID='demo:14']", xmlIn);
         assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['purgeDatastream']",
                           xmlIn);
+    }
 
-        // (6) test getDatastream
+    public void testGetDatastream() throws Exception {
         System.out.println("Running TestAPIM.testGetDatastream...");
         // test getting datastream id XML_SOURCE for object demo:26 specifying null for datetime
         Datastream ds = apim.getDatastream("demo:26", "XML_SOURCE", null);
@@ -2132,11 +2155,12 @@ public class TestAPIM
                         "E",
                         -1,
                         new String[] {});
+    }
 
-        // (7) test getDatastreams
+    public void getDatastreams() throws Exception {
         System.out.println("Running TestAPIM.testGetDatastreams...");
         // test getting all datastreams for object demo:26 specifying null for datetime and state
-        dsArray =
+        Datastream[] dsArray =
                 apim.getDatastreams("demo:26", null, null)
                         .toArray(new Datastream[0]);
         assertEquals(dsArray.length, 4);
@@ -2260,11 +2284,13 @@ public class TestAPIM
                         "X",
                         -1,
                         new String[] {});
+    }
 
+    public void getDatastreamHistory() throws Exception {
         // (8) test getDatastreamHistory
         System.out.println("Running TestAPIM.testGetDatastreamHistory...");
         // test getting datastream history for datastream DC of object demo:5
-        dsArray =
+        Datastream[] dsArray =
                 apim.getDatastreamHistory("demo:5", "DC")
                         .toArray(new Datastream[0]);
         assertEquals(dsArray.length, 1);

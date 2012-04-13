@@ -9,13 +9,10 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.fcrepo.client.FedoraClient;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.types.mtom.gen.GetDissemination.Parameters;
 import org.fcrepo.server.types.mtom.gen.MIMETypedStream;
-import org.fcrepo.server.types.mtom.gen.Property;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 
@@ -43,7 +40,7 @@ public class TestAPIAConfigA
         // The object contains an E datastream that is a dissemination of the local SAXON service.
         // This datastream is input to another dissemination that uses the local FOP service.
         Parameters params = new Parameters();
-        params.getParameter().add(new Property());
+        //params.getParameter().add(new Property());
         MIMETypedStream diss =
                 apia.getDissemination("demo:26",
                                       "demo:19",

@@ -5,20 +5,26 @@
 
 package org.fcrepo.test.api;
 
+import static org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
+import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
+import static org.apache.commons.httpclient.HttpStatus.SC_MOVED_TEMPORARILY;
+import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
+import static org.apache.commons.httpclient.HttpStatus.SC_OK;
+import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
+
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-
 import java.net.URL;
 import java.net.URLEncoder;
-
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +42,9 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import junit.framework.TestSuite;
+
+import org.antlr.stringtemplate.StringTemplate;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -51,38 +60,15 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
-
-import org.jrdf.graph.Triple;
-
-import org.junit.Test;
-
-import org.trippi.RDFFormat;
-import org.trippi.TripleIterator;
-import org.trippi.TrippiException;
-import org.trippi.io.TripleIteratorFactory;
-
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
-
-import org.antlr.stringtemplate.StringTemplate;
-
-import junit.framework.TestSuite;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.types.mtom.gen.Datastream;
@@ -92,17 +78,19 @@ import org.fcrepo.server.types.mtom.gen.MIMETypedStream;
 import org.fcrepo.server.types.mtom.gen.ObjectFactory;
 import org.fcrepo.server.types.mtom.gen.ObjectFields;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
-
-import static org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST;
-import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
-import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.commons.httpclient.HttpStatus.SC_MOVED_TEMPORARILY;
-import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
-import static org.apache.commons.httpclient.HttpStatus.SC_OK;
-import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
+import org.jrdf.graph.Triple;
+import org.junit.Test;
+import org.trippi.RDFFormat;
+import org.trippi.TripleIterator;
+import org.trippi.TrippiException;
+import org.trippi.io.TripleIteratorFactory;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 
 /**
  * Tests of the REST API. Tests assume a running instance of Fedora with the
@@ -817,7 +805,7 @@ public class TestRESTAPI
         response = get(true);
         responseBody = new String(response.getResponseBody(), "UTF-8");
         assertTrue(responseBody.indexOf(DEMO_OWNERID) > 0);
-        
+
         // Delete the demo:REST object (ingested as part of setup)
         url = String.format("/objects/%s", pid.toString());
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
@@ -934,8 +922,7 @@ public class TestRESTAPI
                         .getStatusCode());
                 assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
                 String responseXML = getTrue.getResponseBodyString();
-                assertXpathExists("/management:validation[@valid='true']",
-                                  responseXML);
+                assertXpathExists("/management:validation[@valid='true']", responseXML);
             }
         }
         // test with asOfDateTime set (just on the last object validated above)
@@ -970,6 +957,7 @@ public class TestRESTAPI
                      .getStatusCode());
         assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
         responseXML = getTrue.getResponseBodyString();
+        System.out.println(responseXML);
         assertXpathExists("/management:validation[@valid='false']", responseXML);
 
         // original - testing at exact ingets time - fails under postgres
@@ -2029,9 +2017,8 @@ public class TestRESTAPI
         HttpResponse(HttpMethod method)
                 throws IOException {
             statusCode = method.getStatusCode();
-            //responseBody = method.getResponseBody();
-            responseBody =
-                    IOUtils.toByteArray(method.getResponseBodyAsStream());
+            InputStream response = method.getResponseBodyAsStream();
+            responseBody = (response == null) ? new byte[0] : IOUtils.toByteArray(response);
             responseHeaders = method.getResponseHeaders();
             responseFooters = method.getResponseFooters();
         }

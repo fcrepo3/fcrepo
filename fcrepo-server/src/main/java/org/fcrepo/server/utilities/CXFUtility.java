@@ -7,9 +7,7 @@ package org.fcrepo.server.utilities;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.SoapFault;
-
 import org.fcrepo.common.FaultException;
-
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.errors.authorization.AuthzDeniedException;
 import org.fcrepo.server.errors.authorization.AuthzException;
@@ -58,6 +56,8 @@ public abstract class CXFUtility {
             StringBuffer buf = new StringBuffer();
             for (String element : details) {
                 buf.append("<detail>");
+                buf.append(se.getClass().getName());
+                buf.append(": ");
                 buf.append(element);
                 buf.append("</detail>\n");
             }
