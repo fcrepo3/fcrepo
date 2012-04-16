@@ -12,23 +12,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.util.Date;
 import java.util.Iterator;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
-import org.w3c.dom.Document;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.utilities.LogConfig;
+import org.w3c.dom.Document;
+
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 
 
@@ -43,6 +40,19 @@ import org.fcrepo.utilities.LogConfig;
 public class ConvertObjectSerialization {
 
     private static final String ENCODING = "UTF-8";
+
+    private static final DocumentBuilderFactory factory =
+            DocumentBuilderFactory.newInstance();
+    static {
+        factory.setNamespaceAware(true);
+    }
+
+    private static final OutputFormat fmt = new OutputFormat("XML", ENCODING, true);
+    static {
+        fmt.setIndent(2);
+        fmt.setLineWidth(80);
+        fmt.setPreserveSpace(false);
+    }
 
     private final Date m_now = new Date();
 
@@ -106,16 +116,8 @@ public class ConvertObjectSerialization {
     private static void prettyPrint(InputStream source,
                                     OutputStream destination)
             throws Exception {
-        OutputFormat fmt = new OutputFormat("XML", ENCODING, true);
-        fmt.setIndent(2);
-        fmt.setLineWidth(80);
-        fmt.setPreserveSpace(false);
         XMLSerializer ser = new XMLSerializer(destination, fmt);
-        DocumentBuilderFactory factory =
-                DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(source);
+        Document doc = factory.newDocumentBuilder().parse(source);
         ser.serialize(doc);
         destination.close();
     }

@@ -6,15 +6,10 @@
 package org.fcrepo.test.api;
 
 import java.io.UnsupportedEncodingException;
-
 import java.util.List;
 import java.util.Properties;
-import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -25,15 +20,15 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.fcrepo.common.PID;
-
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 
@@ -49,7 +44,7 @@ public class TestManagementNotifications
         implements MessageListener {
 
     private FedoraAPIMMTOM apim;
-    private ArrayBlockingQueue<TextMessage> messages = new ArrayBlockingQueue<TextMessage>(10, true);
+    private final ArrayBlockingQueue<TextMessage> messages = new ArrayBlockingQueue<TextMessage>(10, true);
     private final int messageTimeout = 5000; // Maximum number of milliseconds to wait for a message
     private Connection jmsConnection;
     private Session jmsSession;

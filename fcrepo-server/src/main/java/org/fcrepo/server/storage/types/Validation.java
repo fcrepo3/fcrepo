@@ -1,6 +1,10 @@
 package org.fcrepo.server.storage.types;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class represents the result of one validation run on an object.
@@ -81,6 +85,7 @@ public class Validation {
     }
 
     public void setAsOfDateTime(Date asOfDateTime) {
+        if (asOfDateTime == null) asOfDateTime = new Date();
         this.asOfDateTime = asOfDateTime;
     }
 
