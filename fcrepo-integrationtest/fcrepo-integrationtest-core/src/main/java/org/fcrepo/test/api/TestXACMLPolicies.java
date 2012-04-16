@@ -30,7 +30,8 @@ import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
 import org.fcrepo.server.types.mtom.gen.ArrayOfString;
-import org.fcrepo.server.types.gen.Property;
+import org.fcrepo.server.types.mtom.gen.Property;
+import org.fcrepo.server.types.mtom.gen.GetDissemination.Parameters;
 import org.fcrepo.server.utilities.ServerUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.utilities.TypeUtility;
@@ -288,7 +289,7 @@ public class TestXACMLPolicies
 
             Class getDissArgs[] =
                     {String.class, String.class, String.class,
-                            Property[].class, String.class};
+                            Parameters.class, String.class};
             Object getDissParms[] = {"demo:5", "demo:1", "getHigh", null, null};
             Object getDissParms2[] =
                     {"demo:29", "demo:27", "grayscaleImage", null, null};
