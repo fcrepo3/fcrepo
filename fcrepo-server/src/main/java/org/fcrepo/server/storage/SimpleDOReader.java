@@ -303,7 +303,7 @@ public class SimpleDOReader
         // without going over
         Datastream closestWithoutGoingOver = null;
         Datastream latestCreated = null;
-        long bestTimeDifference = -1;
+        long bestTimeDifference = Long.MAX_VALUE;
         long latestCreateTime = -1;
         long vTime = -1;
         if (versDateTime != null) {
@@ -315,9 +315,10 @@ public class SimpleDOReader
                     latestCreated = ds;
                 }
             } else {
-                long diff = vTime - ds.DSCreateDT.getTime();
+                //TODO If none of the versions have a create date, what should behavior be?
+                long diff = (ds.DSCreateDT == null)? 0 : vTime - ds.DSCreateDT.getTime();
                 if (diff >= 0) {
-                    if (diff < bestTimeDifference || bestTimeDifference == -1) {
+                    if (diff < bestTimeDifference) {
                         bestTimeDifference = diff;
                         closestWithoutGoingOver = ds;
                     }

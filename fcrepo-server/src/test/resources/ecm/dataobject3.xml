@@ -6,6 +6,8 @@
 
     <foxml:objectProperties>
         <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-02T05:09:43.796Z"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-07-02T05:09:43.796Z"/>
     </foxml:objectProperties>
 
     <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="false">

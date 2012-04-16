@@ -18,6 +18,9 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import javax.xml.soap.SOAPFault;
+import javax.xml.ws.soap.SOAPFaultException;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -26,6 +29,7 @@ import org.fcrepo.client.FedoraClient;
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
+import org.fcrepo.server.types.mtom.gen.ArrayOfString;
 import org.fcrepo.server.types.gen.Property;
 import org.fcrepo.server.utilities.ServerUtility;
 import org.fcrepo.server.utilities.StreamUtility;
@@ -146,7 +150,7 @@ public class TestXACMLPolicies
         String URL2 = getDemoBaseURL() + "/simple-image-demo/col2.jpg";
         String URL3 = getDemoBaseURL() + "/simple-image-demo/col3.jpg";
         Class modDSArgs[] =
-                {String.class, String.class, String[].class, String.class,
+                {String.class, String.class, ArrayOfString.class, String.class,
                         String.class, String.class, String.class, String.class,
                         String.class, String.class, boolean.class};
         Object modDSParms1[] =
@@ -448,18 +452,19 @@ public class TestXACMLPolicies
             fail("Illegal access allowed");
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
-            if (cause instanceof org.apache.cxf.binding.soap.SoapFault) {
-                org.apache.cxf.binding.soap.SoapFault af =
-                        (org.apache.cxf.binding.soap.SoapFault) cause;
+            if (cause instanceof SOAPFaultException) {
+                SOAPFaultException af =
+                        (SOAPFaultException) cause;
                 System.out.println("    Reason = "
-                        + af.getReason().substring(af.getReason()
-                                .lastIndexOf(".") + 1));
-                assertTrue(af.getMessage().contains("AuthzDeniedException"));
+                        + af.getMessage());
+                assertTrue(af.getMessage(), 
+                           af.getMessage().contains("Authorization Denied"));
                 System.out.println("Access denied correctly");
             } else {
                 System.out.println("Got exception: "
                         + cause.getClass().getName());
-                fail("Illegal access dis-allowed for some other reason");
+                fail("Illegal access dis-allowed for some other reason: " +
+                     cause.getClass().getName());
             }
         } catch (IOException ioe) {
             System.out.println("    Reason = " + ioe.getMessage()/*
@@ -474,9 +479,9 @@ public class TestXACMLPolicies
             System.out.println("Access denied correctly");
             // exception was expected, all is A-OK
         } catch (Exception ae) {
-            System.out.println("Some other exception: "
-                    + ae.getClass().getName());
-            fail("Some other exception");
+            String message = "Some other exception: " + ae.toString();
+            System.out.println(message);
+            fail(message);
         }
     }
 
@@ -497,7 +502,7 @@ public class TestXACMLPolicies
                                                  Object parms[]) {
         Object result =
                 invokeAPIMSuccess(user, username, functionToTest, args, parms);
-        return (String[]) result;
+        return ((java.util.ArrayList<String>) result).toArray(new String[0]);
     }
 
     public Object invokeAPIMSuccess(FedoraClient user,
@@ -553,18 +558,19 @@ public class TestXACMLPolicies
             fail("Illegal access allowed");
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
-            if (cause instanceof org.apache.cxf.binding.soap.SoapFault) {
-                org.apache.cxf.binding.soap.SoapFault af =
-                        (org.apache.cxf.binding.soap.SoapFault) cause;
+            if (cause instanceof SOAPFaultException) {
+                SOAPFaultException sfe =
+                        (SOAPFaultException) cause;
                 System.out.println("    Reason = "
-                        + af.getReason().substring(af.getReason()
-                                .lastIndexOf(".") + 1));
-                assertTrue(af.getReason().contains("AuthzDeniedException"));
+                        + sfe.getMessage());
+                assertTrue(sfe.getMessage(),
+                           sfe.getMessage().contains("Authorization Denied"));
                 System.out.println("Access denied correctly");
             } else {
-                System.out.println("Got exception: "
-                        + cause.getClass().getName());
-                fail("Illegal access dis-allowed for some other reason");
+                String message = "Got exception: "
+                    + cause.getClass().getName();
+                System.out.println(message);
+                fail("Illegal access dis-allowed for some other reason: " + message);
             }
         } catch (IOException ioe) {
             System.out.println("    Reason = "
@@ -574,9 +580,10 @@ public class TestXACMLPolicies
             System.out.println("Access denied correctly");
             // exception was expected, all is A-OK
         } catch (Exception ae) {
-            System.out.println("Some other exception: "
-                    + ae.getClass().getName());
-            fail("Illegal access dis-allowed for some other reason");
+            String message = "Some other exception: "
+                + ae.toString();
+            System.out.println(message);
+            fail("Illegal access dis-allowed for some other reason: " + message);
         }
     }
 

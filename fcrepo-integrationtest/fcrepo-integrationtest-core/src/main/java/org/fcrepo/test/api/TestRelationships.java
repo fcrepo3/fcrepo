@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.xml.ws.soap.SOAPFaultException;
+
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -249,21 +251,36 @@ public class TestRelationships
 
             // DC rels only invalid for RELS-EXT...
             if (!s.endsWith("DS1") && !s.endsWith("DS2")) {
-                apim.addRelationship(s, p, o, true, null);
-                fail("Adding Dublin Core relationship should have failed - "
+                try {
+                    apim.addRelationship(s, p, o, true, null);
+                    fail("Adding Dublin Core relationship should have failed - "
                         + s);
+                } catch (SOAPFaultException se) {
+                    assertTrue(se.getMessage(),
+                               se.getMessage().contains("improper relationship assertion"));
+                }
             }
 
             p = "info:fedora/fedora-system:def/model#foo";
-            apim.addRelationship(s, p, o, true, null);
-            fail("Adding Fedora Model relationship should have failed - " + s);
+            try {
+                apim.addRelationship(s, p, o, true, null);
+                fail("Adding Fedora Model relationship should have failed - " + s);
+            } catch (SOAPFaultException se) {
+                assertTrue(se.getMessage(),
+                           se.getMessage().contains("Disallowed predicate"));
+            }
 
             p = "urn:bar" + relNum;
             // invalid dateTime literal
             o = "2009-10-05T16:02:26+0100";
-            apim.addRelationship(s, p, o, true, Constants.RDF_XSD.DATE_TIME.uri);
-            fail("Adding invalid date/time literal in relationship should have failed - "
+            try {
+                apim.addRelationship(s, p, o, true, Constants.RDF_XSD.DATE_TIME.uri);
+                fail("Adding invalid date/time literal in relationship should have failed - "
                     + s);
+            } catch (SOAPFaultException se) {
+                assertTrue(se.getMessage(),
+                           se.getMessage().contains("is not a valid 'dateTime' value"));
+            }
         }
     }
 
@@ -274,30 +291,38 @@ public class TestRelationships
         s = "info:fedora/does:notexist";
         p = "urn:foo";
         o = "urn:bar";
-        apim.addRelationship(s, p, o, false, null);
-        fail("Adding relationship with subject as a Fedora DO that does not exist should have failed");
+        try {
+            apim.addRelationship(s, p, o, false, null);
+            fail("Adding relationship with subject as a Fedora DO that does not exist should have failed");
+        } catch (SOAPFaultException se) {}
 
         // subject is a valid info:fedora/ uri for a datastream, but object does not exist
         s = "info:fedora/does:notexist/DS1";
         p = "urn:foo";
         o = "urn:baz";
-        apim.addRelationship(s, p, o, false, null);
-        fail("Adding relationship with subject as a Fedora object datastream where DO does not exist should have failed");
+        try {
+            apim.addRelationship(s, p, o, false, null);
+            fail("Adding relationship with subject as a Fedora object datastream where DO does not exist should have failed");
+        } catch (SOAPFaultException se) {}
 
         // subject is a valid uri, but not in info:fedora/ scheme
         s = "http://www.example.org/test";
         p = "urn:foo";
         o = "urn:quux";
-        apim.addRelationship(s, p, o, false, null);
-        fail("Adding relationship with subject uri not in the info:fedora scheme should have failed");
+        try {
+            apim.addRelationship(s, p, o, false, null);
+            fail("Adding relationship with subject uri not in the info:fedora scheme should have failed");
+        } catch (SOAPFaultException se) {}
 
         // Valid PID & datastream ID, but invalid subject URI
         // should be: info:fedora/demo:888/DS1
         s = "demo:888/DS1";
         p = "urn:foo";
         o = "urn:quux";
-        apim.addRelationship(s, p, o, false, null);
-        fail("Adding relationship with invalid short URI should have failed");
+        try {
+            apim.addRelationship(s, p, o, false, null);
+            fail("Adding relationship with invalid short URI should have failed");
+        } catch (SOAPFaultException se) {}
     }
 
     public void testGetRelationships() throws Exception {

@@ -74,6 +74,12 @@ public class METSFedoraExtDODeserializer
     private static final Logger logger =
             LoggerFactory.getLogger(METSFedoraExtDODeserializer.class);
 
+    private static final SAXParserFactory spf = SAXParserFactory.newInstance();
+    static {
+        spf.setValidating(false);
+        spf.setNamespaceAware(true);
+    }
+    
     /** The format this deserializer reads. */
     private final XMLFormat m_format;
 
@@ -264,9 +270,6 @@ public class METSFedoraExtDODeserializer
 
         // initialize sax for this parse
         try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setValidating(false);
-            spf.setNamespaceAware(true);
             m_parser = spf.newSAXParser();
         } catch (Exception e) {
             throw new RuntimeException("Error initializing SAX parser", e);

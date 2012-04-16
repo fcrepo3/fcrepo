@@ -167,8 +167,10 @@ public class TestRESTAPI
     // date/time strings 1 second earlier/later than now
     private static final String laterDateTime =
             df.format(new Date(now.getTime() + (1000 * 600))); // + 10 min
+    // tests for this must not be dependent on which object, so we will
+    // use a constant that predates the system objects
     private static final String earlierDateTime =
-            df.format(new Date(now.getTime() - (1000 * 600))); // - 10 min
+            "2001-01-01T00:00:00.000Z";
 
     private boolean chunked = false;
 

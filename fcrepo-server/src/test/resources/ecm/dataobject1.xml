@@ -65,7 +65,8 @@
 
 
     <foxml:datastream CONTROL_GROUP="X" ID="Demo1Stream1" STATE="A" VERSIONABLE="false">
-        <foxml:datastreamVersion ID="Demo1Stream11.0" LABEL="OAI DC xml schema" MIMETYPE="text/xml"
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
+        ID="Demo1Stream11.0" LABEL="OAI DC xml schema" MIMETYPE="text/xml"
                                  FORMAT_URI="http://demo.uris.are.us/demo1uri1">
             <foxml:xmlContent>
                 <shiporder orderid="889923"

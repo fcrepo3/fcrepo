@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -48,7 +50,7 @@ public class EcmValidator implements DOObjectValidator {
 
     public Validation validate(Context context, String pid, Date asOfDateTime)
             throws ServerException {
-
+        if (asOfDateTime == null) asOfDateTime = new Date();
         //TODO if the object and stuff exist
         DOReader currentObjectReader = doMgr.getReader(false, context, pid);
 
@@ -73,7 +75,7 @@ public class EcmValidator implements DOObjectValidator {
 		String objectUri = "info:fedora/" + pid;
 		if (!contentmodels.contains(objectUri)) {
 		
-		Validation validation = doValidate(context, currentObjectReader, null, contentmodels);
+		Validation validation = doValidate(context, currentObjectReader, new Date(), contentmodels);
 	
 			if (!validation.isValid()) {
 				throw new ObjectValidityException("ECM validation failure", validation);
@@ -86,15 +88,35 @@ public class EcmValidator implements DOObjectValidator {
     
     protected  Validation doValidate(Context context, DOReader reader, Date asOfDateTime, List<String> contentModels) throws ServerException {
 
-    	Validation validation = new Validation(reader.GetObjectPID());
+    	String pid = reader.GetObjectPID();
+        Validation validation = new Validation(pid);
         validation.setAsOfDateTime(asOfDateTime);
         validation.setContentModels(contentModels);
+        Date createDate = reader.getCreateDate();
+        if (createDate.after(asOfDateTime)) {
+            reportNonExistenceProblem(validation, pid, createDate, asOfDateTime);
+            return validation;
+        }
 
         relsExtValidator.validate(context, asOfDateTime, reader, validation);
 
         datastreamValidator.validate(context, reader, asOfDateTime, validation, m_exExternalContentManager);
     	
         return validation;
+    }
+    
+    private static void reportNonExistenceProblem(Validation validation,
+                                                  String pid, Date createDate,
+                                                  Date asOfDateTime) {
+        List<String> problems = validation.getObjectProblems();
+        if (problems == null) {
+            problems = new ArrayList<String>();
+            validation.setObjectProblems(problems);
+        }
+        problems.add(Errors.doesNotExistAsOfDateTime(pid,
+                                                     createDate, asOfDateTime));
+        validation.setValid(false);
+        
     }
 
 }

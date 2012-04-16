@@ -9,6 +9,9 @@ import java.io.UnsupportedEncodingException;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -46,9 +49,7 @@ public class TestManagementNotifications
         implements MessageListener {
 
     private FedoraAPIMMTOM apim;
-    private TextMessage currentMessage;
-    private int messageCount = 0; // The number of messages that have been received
-    private int messageNumber = 0; // The number of the next message to be processed
+    private ArrayBlockingQueue<TextMessage> messages = new ArrayBlockingQueue<TextMessage>(10, true);
     private final int messageTimeout = 5000; // Maximum number of milliseconds to wait for a message
     private Connection jmsConnection;
     private Session jmsSession;
@@ -337,7 +338,7 @@ public class TestManagementNotifications
                                                  getBaseURL() + "/get/fedora-system:ContentModel-3.0/DC",
                                                  null,
                                                  null,
-                                                 "modified datastream",
+                                                 "modified datastream by reference notification test",
                                                  false);
         // test that method returned properly
         assertNotNull(updateTimestamp);
@@ -357,7 +358,7 @@ public class TestManagementNotifications
                                              TypeUtility.convertBytesToDataHandler(dsXML),
                                              null,
                                              null,
-                                             "modified datastream",
+                                             "modified datastream by value notification test",
                                              false);
         // test that method returned properly
         assertNotNull(updateTimestamp);
@@ -446,68 +447,44 @@ public class TestManagementNotifications
      * @param methodName - the text that should be found in the message body
      */
     private void checkNotification(String pid, String methodName) throws Exception {
-        long startTime = System.currentTimeMillis();
-        messageNumber++;
+        //messageNumber++;
 
-        while (true) { // Wait for the notification message
-            if (messageCount >= messageNumber) {
-                String failureText = "Notification did not include text: " + methodName;
-                assertTrue(failureText, currentMessage.getText().contains(methodName));
-
-                failureText = "Notification did not include methodName property with " +
-                              "value: " + methodName;
-                assertTrue(failureText,
-                           methodName.equals(currentMessage.getStringProperty("methodName")));
-
-                failureText = "Notification did not include pid property with " +
-                              "value: " + pid;
-                assertTrue(failureText,
-                           pid.equals(currentMessage.getStringProperty("pid")));
-                break;
-            } else { // Check for timeout
-                long currentTime = System.currentTimeMillis();
-                if (currentTime > (startTime + messageTimeout)) {
-                    fail("Timeout reached waiting for notification " +
-                         "on message regarding: " + methodName);
-                    break;
-                } else {
-                    try {
-                        Thread.sleep(100);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
+        TextMessage message = messages.poll(messageTimeout, TimeUnit.MILLISECONDS);
+        if (message == null) {
+            fail("Timeout reached waiting for notification " +
+                 "on message regarding: " + methodName);
         }
 
-        currentMessage = null;
+            String failureText = "Notification <<" + message.getText() +
+                                 ">> did not include text: " + methodName;
+            assertTrue(failureText, message.getText().contains(methodName));
+
+            failureText = "Notification <<" + message.getStringProperty("methodName") +
+                          ">> did not include methodName property with " +
+                          "value: " + methodName;
+            assertTrue(failureText,
+                       methodName.equals(message.getStringProperty("methodName")));
+
+            failureText = "Notification did not include pid property with " +
+                          "value: " + pid;
+            assertTrue(failureText,
+                       pid.equals(message.getStringProperty("pid")));
+
+        //currentMessage = null;
     }
 
     /**
      * Waits for a notification to make sure none come through.
      */
-    private void checkNoNotifications() {
-        long startTime = System.currentTimeMillis();
+    private void checkNoNotifications() throws Exception {
 
-        while (true) { // Wait for the notification message
-            if (messageCount > messageNumber) {
-                fail("No messages should be received during this test.");
-                break;
-            } else { // Check for timeout
-                long currentTime = System.currentTimeMillis();
-                if (currentTime > (startTime + messageTimeout)) {
-                    break;
-                } else {
-                    try {
-                        Thread.sleep(100);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
+        TextMessage message = messages.poll(messageTimeout, TimeUnit.MILLISECONDS);
+
+        if (message != null) {
+            fail("No messages should be received during this test.");
         }
 
-        currentMessage = null;
+        //currentMessage = null;
     }
 
     /**
@@ -518,8 +495,9 @@ public class TestManagementNotifications
     @Override
     public void onMessage(Message msg) {
         if (msg instanceof TextMessage) {
-            currentMessage = (TextMessage) msg;
-            messageCount++;
+            //currentMessage = (TextMessage) msg;
+            messages.add((TextMessage)msg);
+            //messageCount++;
         }
     }
 

@@ -42,7 +42,7 @@
     </foxml:datastream>
 
     <foxml:datastream CONTROL_GROUP="X" ID="ONTOLOGY" STATE="A" VERSIONABLE="false">
-        <foxml:datastreamVersion
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
                 FORMAT_URI="info:fedora/fedora-system:FedoraOntology-1.0" ID="ONTOLOGY1.0"
                 LABEL="Class declaration for this content model" MIMETYPE="application/rdf+xml">
             <foxml:xmlContent>
@@ -94,7 +94,8 @@
     </foxml:datastream>
 
     <foxml:datastream CONTROL_GROUP="X" ID="Demo1_SCHEMA1" STATE="A" VERSIONABLE="false">
-        <foxml:datastreamVersion ID="Demo1_SCHEMA11.0" LABEL="OAI DC xml schema" MIMETYPE="text/xml">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
+        ID="Demo1_SCHEMA11.0" LABEL="OAI DC xml schema" MIMETYPE="text/xml">
             <foxml:xmlContent>
                 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
@@ -151,7 +152,8 @@
     </foxml:datastream>
 
     <foxml:datastream CONTROL_GROUP="X" ID="Demo1_SCHEMA2" STATE="A" VERSIONABLE="false">
-        <foxml:datastreamVersion ID="Demo1_SCHEMA21.0" LABEL="OAI DC xml schema" MIMETYPE="text/xml">
+        <foxml:datastreamVersion CREATED="2008-07-02T05:09:44.359Z"
+        ID="Demo1_SCHEMA21.0" LABEL="OAI DC xml schema" MIMETYPE="text/xml">
             <foxml:xmlContent>
                 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 

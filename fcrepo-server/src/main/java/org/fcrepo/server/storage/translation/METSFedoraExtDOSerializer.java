@@ -108,8 +108,10 @@ public class METSFedoraExtDOSerializer
                           String encoding,
                           int transContext) throws ObjectIntegrityException,
             StreamIOException, UnsupportedEncodingException {
-        logger.debug("Serializing " + m_format.uri + " for transContext: "
+        if (logger.isDebugEnabled()) {
+            logger.debug("Serializing " + m_format.uri + " for transContext: "
                 + transContext);
+        }
         m_transContext = transContext;
         OutputStreamWriter osWriter = new OutputStreamWriter(out, encoding);
         PrintWriter writer = new PrintWriter(osWriter);

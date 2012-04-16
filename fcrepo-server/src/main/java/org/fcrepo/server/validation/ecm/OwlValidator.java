@@ -62,7 +62,6 @@ public class OwlValidator {
 
         List<String> contentmodels = currentObjectReader.getContentModels();
 
-        Map<String, InputStream> ontologies = new HashMap<String, InputStream>();
         for (String contentmodel : contentmodels) {
             contentmodel = contentmodel.substring("info:fedora/".length());
             DOReader contentmodelReader;

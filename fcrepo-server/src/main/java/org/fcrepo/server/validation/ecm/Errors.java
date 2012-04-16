@@ -4,7 +4,10 @@ import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import java.io.IOException;
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,6 +17,12 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class Errors {
+
+    static final SimpleDateFormat DATE_FORMAT =
+        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    static {
+        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
 
 
     public static String unableToParseSchema(String schemaID, String datastreamID, String contentModel, Exception e) {
@@ -115,5 +124,11 @@ public class Errors {
     public static String schemaCannotParse(String contentmodel, String datastreamID, SAXException e) {
         //TODO
         return null;  //To change body of created methods use File | Settings | File Templates.
+    }
+    
+    public static String doesNotExistAsOfDateTime(String subject, Date createDate, Date asOfDateTime) {
+        return "The object " + subject + 
+        " did not yet exist as of " + DATE_FORMAT.format(asOfDateTime) +
+        " (created " + DATE_FORMAT.format(createDate) + ")";
     }
 }

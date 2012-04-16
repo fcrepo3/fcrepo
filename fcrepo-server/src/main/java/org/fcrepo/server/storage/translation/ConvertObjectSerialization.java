@@ -56,13 +56,13 @@ public class ConvertObjectSerialization {
 
     private final String m_outExt;
 
-    public ConvertObjectSerialization(DODeserializer deserializer,
-                                      DOSerializer serializer,
+    public ConvertObjectSerialization(Class<DODeserializer> deserializer,
+                                      Class<DOSerializer> serializer,
                                       boolean pretty,
                                       String inExt,
                                       String outExt) {
-        m_deserializer = deserializer;
-        m_serializer = serializer;
+        m_deserializer = getInstance(deserializer);
+        m_serializer = getInstance(serializer);
         m_pretty = pretty;
         m_inExt = inExt;
         m_outExt = outExt;
@@ -197,7 +197,7 @@ public class ConvertObjectSerialization {
      *
      * @param args command-line args.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ClassNotFoundException {
         LogConfig.initMinimal();
         if (args.length < 4 || args.length > 7) {
             die("Expected 4 to 7 arguments", true);
@@ -208,8 +208,8 @@ public class ConvertObjectSerialization {
         }
         File destDir = new File(args[1]);
 
-        DODeserializer deserializer = (DODeserializer) getInstance(args[2]);
-        DOSerializer serializer = (DOSerializer) getInstance(args[3]);
+        Class<DODeserializer> deserializer = (Class<DODeserializer>) Class.forName(args[2]);
+        Class<DOSerializer> serializer = (Class<DOSerializer>) Class.forName(args[3]);
 
         // So DOTranslationUtility works...
         System.setProperty("fedora.hostname", "localhost");
@@ -233,9 +233,9 @@ public class ConvertObjectSerialization {
         converter.convert(sourceDir, destDir);
     }
 
-    private static Object getInstance(String className) {
+    private static <T> T getInstance(Class<T> className) {
         try {
-            return Class.forName(className).newInstance();
+            return className.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
             die("Unable to instantiate: " + className, false);

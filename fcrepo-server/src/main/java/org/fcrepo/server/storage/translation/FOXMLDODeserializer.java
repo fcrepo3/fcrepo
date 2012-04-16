@@ -76,6 +76,12 @@ public class FOXMLDODeserializer
 
     private static final Logger logger =
             LoggerFactory.getLogger(FOXMLDODeserializer.class);
+    
+    private static final SAXParserFactory spf = SAXParserFactory.newInstance();
+    static {
+        spf.setValidating(false);
+        spf.setNamespaceAware(true);
+    }
 
     /** The format this deserializer reads. */
     private final XMLFormat m_format;
@@ -209,6 +215,13 @@ public class FOXMLDODeserializer
             throw new IllegalArgumentException("Not a FOXML format: "
                     + format.uri);
         }
+        // initialize sax
+        try {
+            m_parser = spf.newSAXParser();
+        } catch (Exception e) {
+            throw new RuntimeException("Error initializing SAX parser", e);
+        }
+
     }
 
     //---
@@ -225,22 +238,14 @@ public class FOXMLDODeserializer
     /**
      * {@inheritDoc}
      */
-    public void deserialize(InputStream in,
+    public synchronized void deserialize(InputStream in,
                             DigitalObject obj,
                             String encoding,
                             int transContext) throws ObjectIntegrityException,
             StreamIOException, UnsupportedEncodingException {
-        logger.debug("Deserializing " + m_format.uri + " for transContext: "
+        if (logger.isDebugEnabled()) {
+            logger.debug("Deserializing " + m_format.uri + " for transContext: "
                 + transContext);
-
-        // initialize sax for this parse
-        try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setValidating(false);
-            spf.setNamespaceAware(true);
-            m_parser = spf.newSAXParser();
-        } catch (Exception e) {
-            throw new RuntimeException("Error initializing SAX parser", e);
         }
 
         m_obj = obj;

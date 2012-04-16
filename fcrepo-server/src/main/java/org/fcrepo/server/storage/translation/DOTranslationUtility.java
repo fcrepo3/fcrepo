@@ -751,7 +751,8 @@ public abstract class DOTranslationUtility
                         }
 
                         DatastreamXMLMetadata xd = (DatastreamXMLMetadata) d;
-                        logger.debug(obj.getPid() + " : normalising URLs in "
+                        if (logger.isDebugEnabled())
+                            logger.debug(obj.getPid() + " : normalising URLs in "
                                 + dsid);
                         xd.xmlContent =
                                 DOTranslationUtility
