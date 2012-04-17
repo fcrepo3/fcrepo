@@ -9,12 +9,12 @@ import java.util.List;
 
 import org.fcrepo.client.Administrator;
 import org.fcrepo.client.SwingWorker;
-import org.fcrepo.server.types.mtom.gen.DatastreamDef;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.DatastreamDef;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.ObjectMethodsDef;
+import org.fcrepo.server.types.gen.ObjectProfile;
+import org.fcrepo.server.types.gen.RepositoryInfo;
 import org.fcrepo.server.types.mtom.gen.MIMETypedStream;
-import org.fcrepo.server.types.mtom.gen.ObjectMethodsDef;
-import org.fcrepo.server.types.mtom.gen.ObjectProfile;
-import org.fcrepo.server.types.mtom.gen.RepositoryInfo;
 
 public class APIAStubWrapper
         implements org.fcrepo.server.access.FedoraAPIAMTOM {
@@ -591,9 +591,9 @@ public class APIAStubWrapper
     }
 
     @Override
-    public FieldSearchResult findObjects(org.fcrepo.server.types.mtom.gen.ArrayOfString resultFields,
+    public FieldSearchResult findObjects(org.fcrepo.server.types.gen.ArrayOfString resultFields,
                                          BigInteger maxResults,
-                                         org.fcrepo.server.types.mtom.gen.FieldSearchQuery query) {
+                                         org.fcrepo.server.types.gen.FieldSearchQuery query) {
         String METHOD_NAME = "findObjects";
         HashMap PARMS = new HashMap();
         PARMS.put("resultFields", resultFields);
@@ -606,10 +606,10 @@ public class APIAStubWrapper
             public Object construct() {
                 // call wrapped method
                 return m_instance
-                        .findObjects((org.fcrepo.server.types.mtom.gen.ArrayOfString) parms
+                        .findObjects((org.fcrepo.server.types.gen.ArrayOfString) parms
                                              .get("resultFields"),
                                      (BigInteger) parms.get("maxResults"),
-                                     (org.fcrepo.server.types.mtom.gen.FieldSearchQuery) parms
+                                     (org.fcrepo.server.types.gen.FieldSearchQuery) parms
                                              .get("query"));
             }
         };

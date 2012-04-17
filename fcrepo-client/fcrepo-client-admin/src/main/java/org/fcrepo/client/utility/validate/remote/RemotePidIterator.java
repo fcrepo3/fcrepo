@@ -5,17 +5,14 @@
 
 package org.fcrepo.client.utility.validate.remote;
 
+import java.math.BigInteger;
 import java.rmi.RemoteException;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import java.math.BigInteger;
-
 import org.fcrepo.client.utility.validate.ObjectSourceException;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.search.FieldSearchQuery;
 import org.fcrepo.server.search.FieldSearchResult;
@@ -130,9 +127,9 @@ class RemotePidIterator
      * the results.
      */
     private void beginSearch() throws RemoteException {
-        org.fcrepo.server.types.mtom.gen.FieldSearchQuery genFieldSearchQuery =
+        org.fcrepo.server.types.gen.FieldSearchQuery genFieldSearchQuery =
                 TypeUtility.convertFieldSearchQueryToGenFieldSearchQuery(query);
-        org.fcrepo.server.types.mtom.gen.FieldSearchResult searchResult =
+        org.fcrepo.server.types.gen.FieldSearchResult searchResult =
                 apia.findObjects(org.fcrepo.server.utilities.TypeUtility.convertStringtoAOS(OBJECT_RESULT_FIELDS),
                                  MAX_FIND_RESULTS,
                                  genFieldSearchQuery);
@@ -150,7 +147,7 @@ class RemotePidIterator
      * and set the stash and token from the results.
      */
     private void resumeSearch() throws RemoteException {
-        org.fcrepo.server.types.mtom.gen.FieldSearchResult searchResult =
+        org.fcrepo.server.types.gen.FieldSearchResult searchResult =
                 apia.resumeFindObjects(token);
         FieldSearchResult fsr =
                 TypeUtility

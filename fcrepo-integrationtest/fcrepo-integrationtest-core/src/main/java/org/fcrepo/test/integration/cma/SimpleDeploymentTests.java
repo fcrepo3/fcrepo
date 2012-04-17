@@ -4,25 +4,20 @@
  */
 package org.fcrepo.test.integration.cma;
 
-import org.apache.cxf.binding.soap.SoapFault;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import org.fcrepo.client.FedoraClient;
-
-import org.fcrepo.server.access.FedoraAPIAMTOM;
-import org.fcrepo.server.types.mtom.gen.ObjectMethodsDef;
-
-import org.fcrepo.test.FedoraServerTestCase;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
-
 import static org.fcrepo.test.integration.cma.Util.filterMethods;
+
+import org.apache.cxf.binding.soap.SoapFault;
+import org.fcrepo.client.FedoraClient;
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.types.gen.ObjectMethodsDef;
+import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 
 public class SimpleDeploymentTests {

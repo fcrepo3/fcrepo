@@ -4,21 +4,17 @@
  */
 package org.fcrepo.test.integration.cma;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static org.fcrepo.test.integration.cma.Util.filterMethods;
+
+import org.fcrepo.client.FedoraClient;
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.types.gen.ObjectMethodsDef;
+import org.fcrepo.test.FedoraServerTestCase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import org.fcrepo.client.FedoraClient;
-
-import org.fcrepo.server.access.FedoraAPIAMTOM;
-import org.fcrepo.server.types.mtom.gen.ObjectMethodsDef;
-
-import org.fcrepo.test.FedoraServerTestCase;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-
-import static org.fcrepo.test.integration.cma.Util.filterMethods;
 
 
 /**

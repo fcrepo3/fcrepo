@@ -9,7 +9,6 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +31,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import org.fcrepo.client.Administrator;
-
-import org.fcrepo.server.types.mtom.gen.ComparisonOperator;
-import org.fcrepo.server.types.mtom.gen.Condition;
-import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
-import org.fcrepo.server.types.mtom.gen.ObjectFactory;
+import org.fcrepo.server.types.gen.ComparisonOperator;
+import org.fcrepo.server.types.gen.Condition;
+import org.fcrepo.server.types.gen.FieldSearchQuery;
+import org.fcrepo.server.types.gen.ObjectFactory;
 
 
 

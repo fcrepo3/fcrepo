@@ -7,9 +7,7 @@ package org.fcrepo.test.api;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-
 import java.net.URLEncoder;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,30 +16,24 @@ import java.util.concurrent.Executors;
 
 import javax.xml.ws.soap.SOAPFaultException;
 
-import org.custommonkey.xmlunit.NamespaceContext;
-import org.custommonkey.xmlunit.SimpleNamespaceContext;
-import org.custommonkey.xmlunit.XMLUnit;
-
-import org.trippi.TripleIterator;
-import org.trippi.io.RIOTripleIterator;
-
-import org.openrdf.rio.ntriples.NTriplesParser;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.custommonkey.xmlunit.NamespaceContext;
+import org.custommonkey.xmlunit.SimpleNamespaceContext;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.fcrepo.client.FedoraClient;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
-
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.server.types.mtom.gen.RelationshipTuple;
+import org.fcrepo.server.types.gen.RelationshipTuple;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.test.FedoraServerTestCase;
 import org.fcrepo.test.ManagedContentTranslator;
+import org.openrdf.rio.ntriples.NTriplesParser;
+import org.trippi.TripleIterator;
+import org.trippi.io.RIOTripleIterator;
 
 /**
  * Tests for the various relationship API-M methods. Tests assume a running
@@ -55,7 +47,7 @@ public class TestRelationships
 
     private FedoraAPIMMTOM apim;
 // probably 1 thread would be fine...
-    private ExecutorService exec = Executors.newFixedThreadPool(4);
+    private final ExecutorService exec = Executors.newFixedThreadPool(4);
 
     private static final String RISEARCH_QUERY =
             "/risearch?type=triples&lang=spo&format=NTriples&stream=on&"
@@ -213,7 +205,7 @@ public class TestRelationships
         apim.purgeObject("demo:777m", "", false);
         apim.purgeObject("demo:888m", "", false);
         XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
-        
+
     	exec.shutdown();
     }
 

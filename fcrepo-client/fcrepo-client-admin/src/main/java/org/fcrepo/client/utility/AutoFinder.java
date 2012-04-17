@@ -4,25 +4,20 @@
  */
 package org.fcrepo.client.utility;
 
-import java.net.MalformedURLException;
-
-import java.rmi.RemoteException;
-
-import java.util.Arrays;
-
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.rmi.RemoteException;
+import java.util.Arrays;
 
 import javax.xml.rpc.ServiceException;
 
 import org.fcrepo.client.FedoraClient;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
-import org.fcrepo.server.types.mtom.gen.ArrayOfString;
-import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
-import org.fcrepo.server.types.mtom.gen.ObjectFields;
+import org.fcrepo.server.types.gen.ArrayOfString;
+import org.fcrepo.server.types.gen.FieldSearchQuery;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.ObjectFields;
 
 
 
@@ -124,8 +119,8 @@ public class AutoFinder {
             AutoFinder finder = new AutoFinder(fc.getAPIAMTOM());
 
             FieldSearchQuery query = new FieldSearchQuery();
-            org.fcrepo.server.types.mtom.gen.ObjectFactory factory =
-                new org.fcrepo.server.types.mtom.gen.ObjectFactory();
+            org.fcrepo.server.types.gen.ObjectFactory factory =
+                new org.fcrepo.server.types.gen.ObjectFactory();
             query.setTerms(factory.createFieldSearchQueryTerms(phrase));
             String[] arrayS = fields.split(" ");
             ArrayOfString aux = new ArrayOfString();

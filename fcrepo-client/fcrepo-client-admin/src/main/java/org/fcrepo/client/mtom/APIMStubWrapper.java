@@ -11,10 +11,10 @@ import javax.activation.DataHandler;
 
 import org.fcrepo.client.Administrator;
 import org.fcrepo.client.SwingWorker;
-import org.fcrepo.server.types.mtom.gen.ArrayOfString;
-import org.fcrepo.server.types.mtom.gen.Datastream;
-import org.fcrepo.server.types.mtom.gen.RelationshipTuple;
-import org.fcrepo.server.types.mtom.gen.Validation;
+import org.fcrepo.server.types.gen.ArrayOfString;
+import org.fcrepo.server.types.gen.Datastream;
+import org.fcrepo.server.types.gen.RelationshipTuple;
+import org.fcrepo.server.types.gen.Validation;
 
 public class APIMStubWrapper
         implements org.fcrepo.server.management.FedoraAPIMMTOM {

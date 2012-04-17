@@ -26,7 +26,7 @@ import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.server.types.mtom.gen.ArrayOfString;
+import org.fcrepo.server.types.gen.ArrayOfString;
 import org.fcrepo.server.utilities.StringUtility;
 import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.test.FedoraServerTestCase;

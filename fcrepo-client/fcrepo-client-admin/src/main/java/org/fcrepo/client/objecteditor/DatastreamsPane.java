@@ -15,12 +15,10 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,13 +37,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import org.fcrepo.client.Administrator;
+import org.fcrepo.server.types.gen.Datastream;
+import org.fcrepo.server.utilities.TypeUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.fcrepo.client.Administrator;
-
-import org.fcrepo.server.types.mtom.gen.Datastream;
-import org.fcrepo.server.utilities.TypeUtility;
 
 /**
  * Shows a tabbed pane, one for each datastream in the object, and one special
@@ -103,7 +99,7 @@ public class DatastreamsPane
 		newIcon =
             new ImageIcon(ClassLoader
                     .getSystemResource("images/client/standard/general/New16.gif"));
-        
+
         m_tabbedPane = new JTabbedPane(SwingConstants.LEFT);
         List<Datastream> currentVersions =
                 Administrator.APIM.getDatastreams(pid, null, null);

@@ -6,22 +6,15 @@
 package org.fcrepo.server.access;
 
 import java.io.File;
-
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
-import javax.annotation.Resource;
-
 import org.apache.cxf.binding.soap.SoapFault;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
@@ -29,8 +22,9 @@ import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.ServerInitializationException;
 import org.fcrepo.server.utilities.CXFUtility;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.utilities.DateUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jiri Kremser
@@ -49,7 +43,7 @@ public class FedoraAPIAImpl
     private static Server s_server;
 
     /** Whether the service has initialized... true if initialized. */
-    private static boolean s_initialized;
+    private static boolean s_initialized = initialize();
 
     /** The exception indicating that initialization failed. */
     private static InitializationException s_initException;
@@ -63,28 +57,29 @@ public class FedoraAPIAImpl
     private static boolean debug = false;
 
     /** Before fulfilling any requests, make sure we have a server instance. */
-    static {
+    private static boolean initialize() {
+        boolean initialized = false;
         try {
             String fedoraHome = Constants.FEDORA_HOME;
             if (fedoraHome == null) {
-                s_initialized = false;
                 s_initException =
                         new ServerInitializationException("Server failed to initialize because FEDORA_HOME "
                                 + "is undefined");
             } else {
                 s_server = Server.getInstance(new File(fedoraHome));
-                s_initialized = true;
                 s_access =
                         (Access) s_server
                                 .getModule("org.fcrepo.server.access.Access");
+                initialized = true;
                 Boolean debugBool = new Boolean(s_server.getParameter("debug"));
                 debug = debugBool.booleanValue();
             }
         } catch (InitializationException ie) {
             LOG.warn("Server initialization failed", ie);
-            s_initialized = false;
+            initialized = false;
             s_initException = ie;
         }
+        return initialized;
     }
 
     /*

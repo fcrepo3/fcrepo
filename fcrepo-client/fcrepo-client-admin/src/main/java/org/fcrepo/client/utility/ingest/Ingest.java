@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -19,18 +18,15 @@ import java.util.StringTokenizer;
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.utility.AutoFinder;
 import org.fcrepo.client.utility.export.AutoExporter;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.server.types.mtom.gen.ArrayOfString;
-import org.fcrepo.server.types.mtom.gen.ComparisonOperator;
-import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
-import org.fcrepo.server.types.mtom.gen.ObjectFields;
-import org.fcrepo.server.types.mtom.gen.RepositoryInfo;
-
+import org.fcrepo.server.types.gen.ArrayOfString;
+import org.fcrepo.server.types.gen.ComparisonOperator;
+import org.fcrepo.server.types.gen.FieldSearchQuery;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.ObjectFields;
+import org.fcrepo.server.types.gen.RepositoryInfo;
 import org.fcrepo.utilities.FileComparator;
 
 /**
@@ -172,13 +168,13 @@ public class Ingest
         // prepare the FieldSearch query
         FieldSearchQuery query = new FieldSearchQuery();
         FieldSearchQuery.Conditions condi = new FieldSearchQuery.Conditions();
-        org.fcrepo.server.types.mtom.gen.Condition cond =
-                new org.fcrepo.server.types.mtom.gen.Condition();
+        org.fcrepo.server.types.gen.Condition cond =
+                new org.fcrepo.server.types.gen.Condition();
         cond.setProperty("pid");
         cond.setOperator(ComparisonOperator.fromValue("has"));
         condi.getCondition().add(cond);
-        org.fcrepo.server.types.mtom.gen.ObjectFactory factory =
-                new org.fcrepo.server.types.mtom.gen.ObjectFactory();
+        org.fcrepo.server.types.gen.ObjectFactory factory =
+                new org.fcrepo.server.types.gen.ObjectFactory();
         query.setConditions(factory.createFieldSearchQueryConditions(condi));
         query.setTerms(null);
         ArrayOfString resultFields = new ArrayOfString();

@@ -6,22 +6,19 @@ package org.fcrepo.client.utility.export;
 
 import java.io.File;
 import java.io.FileOutputStream;
-
 import java.util.List;
 import java.util.StringTokenizer;
 
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.utility.AutoFinder;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.server.types.mtom.gen.ArrayOfString;
-import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
-import org.fcrepo.server.types.mtom.gen.ObjectFields;
-import org.fcrepo.server.types.mtom.gen.RepositoryInfo;
+import org.fcrepo.server.types.gen.ArrayOfString;
+import org.fcrepo.server.types.gen.FieldSearchQuery;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.ObjectFields;
+import org.fcrepo.server.types.gen.RepositoryInfo;
 
 
 

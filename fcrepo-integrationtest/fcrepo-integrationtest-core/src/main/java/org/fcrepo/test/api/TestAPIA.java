@@ -9,40 +9,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.custommonkey.xmlunit.NamespaceContext;
-import org.custommonkey.xmlunit.SimpleNamespaceContext;
-import org.custommonkey.xmlunit.XMLUnit;
-
-import org.junit.After;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.custommonkey.xmlunit.NamespaceContext;
+import org.custommonkey.xmlunit.SimpleNamespaceContext;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.fcrepo.client.FedoraClient;
-
 import org.fcrepo.common.Models;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
-import org.fcrepo.server.types.mtom.gen.ComparisonOperator;
-import org.fcrepo.server.types.mtom.gen.Condition;
-import org.fcrepo.server.types.mtom.gen.DatastreamDef;
-import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
-import org.fcrepo.server.types.mtom.gen.FieldSearchQuery.Conditions;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult.ResultList;
+import org.fcrepo.server.types.gen.ComparisonOperator;
+import org.fcrepo.server.types.gen.Condition;
+import org.fcrepo.server.types.gen.DatastreamDef;
+import org.fcrepo.server.types.gen.FieldSearchQuery;
+import org.fcrepo.server.types.gen.FieldSearchQuery.Conditions;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.FieldSearchResult.ResultList;
+import org.fcrepo.server.types.gen.ObjectFactory;
+import org.fcrepo.server.types.gen.ObjectFields;
+import org.fcrepo.server.types.gen.ObjectMethodsDef;
+import org.fcrepo.server.types.gen.ObjectProfile;
+import org.fcrepo.server.types.gen.ObjectProfile.ObjModels;
+import org.fcrepo.server.types.gen.Property;
+import org.fcrepo.server.types.gen.RepositoryInfo;
 import org.fcrepo.server.types.mtom.gen.GetDissemination.Parameters;
 import org.fcrepo.server.types.mtom.gen.MIMETypedStream;
-import org.fcrepo.server.types.mtom.gen.ObjectFactory;
-import org.fcrepo.server.types.mtom.gen.ObjectFields;
-import org.fcrepo.server.types.mtom.gen.ObjectMethodsDef;
-import org.fcrepo.server.types.mtom.gen.ObjectProfile;
-import org.fcrepo.server.types.mtom.gen.ObjectProfile.ObjModels;
-import org.fcrepo.server.types.mtom.gen.Property;
-import org.fcrepo.server.types.mtom.gen.RepositoryInfo;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.After;
 
 /**
  * Test of the Fedora Access Service (API-A). describeRepository findObjects
@@ -188,7 +183,7 @@ public class TestAPIA
                     }
                 }
             }
-            assertTrue(found);
+            assertTrue(pid + " did not assert cmodel " + Models.FEDORA_OBJECT_CURRENT.uri, found);
         }
     }
 

@@ -12,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -29,9 +28,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 import javax.swing.plaf.basic.BasicTableUI;
 
-import org.fcrepo.swing.jtable.DefaultSortTableModel;
-import org.fcrepo.swing.jtable.JSortTable;
-
 import org.fcrepo.client.Administrator;
 import org.fcrepo.client.actions.ChangeObjectState;
 import org.fcrepo.client.actions.ExportObject;
@@ -39,12 +35,13 @@ import org.fcrepo.client.actions.PurgeObject;
 import org.fcrepo.client.actions.ViewObject;
 import org.fcrepo.client.actions.ViewObjectXML;
 import org.fcrepo.client.utility.AutoFinder;
-
-import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult.ResultList;
-import org.fcrepo.server.types.mtom.gen.ObjectFields;
+import org.fcrepo.server.types.gen.FieldSearchQuery;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.FieldSearchResult.ResultList;
+import org.fcrepo.server.types.gen.ObjectFields;
 import org.fcrepo.server.utilities.TypeUtility;
+import org.fcrepo.swing.jtable.DefaultSortTableModel;
+import org.fcrepo.swing.jtable.JSortTable;
 
 /**
  * @author Chris Wilper

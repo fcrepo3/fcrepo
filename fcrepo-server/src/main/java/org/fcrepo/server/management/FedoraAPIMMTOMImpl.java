@@ -10,26 +10,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
-
 import javax.activation.DataHandler;
 import javax.annotation.Resource;
 import javax.mail.util.ByteArrayDataSource;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.binding.soap.SoapFault;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.InitializationException;
@@ -37,8 +30,9 @@ import org.fcrepo.server.errors.ServerInitializationException;
 import org.fcrepo.server.errors.StorageDeviceException;
 import org.fcrepo.server.utilities.CXFUtility;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.utilities.DateUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jiri Kremser
@@ -242,7 +236,7 @@ public class FedoraAPIMMTOMImpl
     @Override
     public String addDatastream(String pid,
                                 String dsID,
-                                org.fcrepo.server.types.mtom.gen.ArrayOfString altIDs,
+                                org.fcrepo.server.types.gen.ArrayOfString altIDs,
                                 String dsLabel,
                                 boolean versionable,
                                 String mimeType,
@@ -296,7 +290,7 @@ public class FedoraAPIMMTOMImpl
     @Override
     public String modifyDatastreamByReference(String pid,
                                               String dsID,
-                                              org.fcrepo.server.types.mtom.gen.ArrayOfString altIDs,
+                                              org.fcrepo.server.types.gen.ArrayOfString altIDs,
                                               String dsLabel,
                                               String mimeType,
                                               String formatURI,
@@ -346,7 +340,7 @@ public class FedoraAPIMMTOMImpl
     @Override
     public String modifyDatastreamByValue(String pid,
                                           String dsID,
-                                          org.fcrepo.server.types.mtom.gen.ArrayOfString altIDs,
+                                          org.fcrepo.server.types.gen.ArrayOfString altIDs,
                                           String dsLabel,
                                           String mimeType,
                                           String formatURI,
@@ -470,7 +464,7 @@ public class FedoraAPIMMTOMImpl
      * pid ,)String dsID ,)String asOfDateTime )*
      */
     @Override
-    public org.fcrepo.server.types.mtom.gen.Datastream getDatastream(String pid,
+    public org.fcrepo.server.types.gen.Datastream getDatastream(String pid,
                                                                      String dsID,
                                                                      String asOfDateTime) {
         assertInitialized();
@@ -480,7 +474,7 @@ public class FedoraAPIMMTOMImpl
                     s_management.getDatastream(ReadOnlyContext
                             .getSoapContext(ctx), pid, dsID, DateUtility
                             .parseDateOrNull(asOfDateTime));
-            return TypeUtility.convertDatastreamToGenDatastreamMTOM(ds);
+            return TypeUtility.convertDatastreamToGenDatastream(ds);
         } catch (Throwable th) {
             LOG.error("Error getting datastream", th);
             throw CXFUtility.getFault(th);
@@ -493,7 +487,7 @@ public class FedoraAPIMMTOMImpl
      * .String pid ,)String asOfDateTime ,)String dsState )*
      */
     @Override
-    public List<org.fcrepo.server.types.mtom.gen.Datastream> getDatastreams(String pid,
+    public List<org.fcrepo.server.types.gen.Datastream> getDatastreams(String pid,
                                                                             String asOfDateTime,
                                                                             String dsState) {
         assertInitialized();
@@ -517,7 +511,7 @@ public class FedoraAPIMMTOMImpl
      * .lang.String pid ,)String dsID )*
      */
     @Override
-    public List<org.fcrepo.server.types.mtom.gen.Datastream> getDatastreamHistory(String pid,
+    public List<org.fcrepo.server.types.gen.Datastream> getDatastreamHistory(String pid,
                                                                                   String dsID) {
         assertInitialized();
         try {
@@ -603,7 +597,7 @@ public class FedoraAPIMMTOMImpl
      * .String pid ,)String relationship )*
      */
     @Override
-    public List<org.fcrepo.server.types.mtom.gen.RelationshipTuple> getRelationships(String pid,
+    public List<org.fcrepo.server.types.gen.RelationshipTuple> getRelationships(String pid,
                                                                                      String relationship) {
         LOG.debug("start: getRelationships");
         assertInitialized();
@@ -692,7 +686,7 @@ public class FedoraAPIMMTOMImpl
      * ,)String asOfDateTime )*
      */
     @Override
-    public org.fcrepo.server.types.mtom.gen.Validation validate(String pid,
+    public org.fcrepo.server.types.gen.Validation validate(String pid,
                                                                 String asOfDateTime) {
         assertInitialized();
         try {
@@ -735,9 +729,9 @@ public class FedoraAPIMMTOMImpl
         }
     }
 
-    private List<org.fcrepo.server.types.mtom.gen.RelationshipTuple> getGenRelsTuples(org.fcrepo.server.storage.types.RelationshipTuple[] intRelsTuples) {
-        List<org.fcrepo.server.types.mtom.gen.RelationshipTuple> genRelsTuples =
-                new ArrayList<org.fcrepo.server.types.mtom.gen.RelationshipTuple>(intRelsTuples.length);
+    private List<org.fcrepo.server.types.gen.RelationshipTuple> getGenRelsTuples(org.fcrepo.server.storage.types.RelationshipTuple[] intRelsTuples) {
+        List<org.fcrepo.server.types.gen.RelationshipTuple> genRelsTuples =
+                new ArrayList<org.fcrepo.server.types.gen.RelationshipTuple>(intRelsTuples.length);
         for (org.fcrepo.server.storage.types.RelationshipTuple tuple : intRelsTuples) {
             genRelsTuples
                     .add(TypeUtility.convertRelsTupleToGenRelsTuple(tuple));
@@ -753,12 +747,12 @@ public class FedoraAPIMMTOMImpl
         return out;
     }
 
-    private List<org.fcrepo.server.types.mtom.gen.Datastream> getGenDatastreams(org.fcrepo.server.storage.types.Datastream[] intDatastreams) {
-        List<org.fcrepo.server.types.mtom.gen.Datastream> genDatastreams =
-                new ArrayList<org.fcrepo.server.types.mtom.gen.Datastream>(intDatastreams.length);
+    private List<org.fcrepo.server.types.gen.Datastream> getGenDatastreams(org.fcrepo.server.storage.types.Datastream[] intDatastreams) {
+        List<org.fcrepo.server.types.gen.Datastream> genDatastreams =
+                new ArrayList<org.fcrepo.server.types.gen.Datastream>(intDatastreams.length);
         for (org.fcrepo.server.storage.types.Datastream datastream : intDatastreams) {
             genDatastreams.add(TypeUtility
-                    .convertDatastreamToGenDatastreamMTOM(datastream));
+                    .convertDatastreamToGenDatastream(datastream));
         }
         return genDatastreams;
     }

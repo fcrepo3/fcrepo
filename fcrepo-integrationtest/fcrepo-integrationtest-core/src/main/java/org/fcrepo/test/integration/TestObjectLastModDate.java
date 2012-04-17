@@ -44,10 +44,10 @@ public class TestObjectLastModDate
                                     + "/" + FOXMLPATH))),
                             FOXML1_1.uri,
                             "testing fcrepo 238");
-        org.fcrepo.server.types.mtom.gen.ObjectProfile profile = apia.getObjectProfile(pid, null);
+        org.fcrepo.server.types.gen.ObjectProfile profile = apia.getObjectProfile(pid, null);
         Date objDate = dateFormat.parse(profile.getObjLastModDate());
-        for (org.fcrepo.server.types.mtom.gen.DatastreamDef dd : apia.listDatastreams(pid, null)) {
-            org.fcrepo.server.types.mtom.gen.Datastream ds = apim.getDatastream(pid, dd.getID(), null);
+        for (org.fcrepo.server.types.gen.DatastreamDef dd : apia.listDatastreams(pid, null)) {
+            org.fcrepo.server.types.gen.Datastream ds = apim.getDatastream(pid, dd.getID(), null);
             Date dsDate = dateFormat.parse(ds.getCreateDate());
             System.out.print("object:" + dateFormat.format(objDate) + ", ");
             System.out.println("datastream: " + dateFormat.format(dsDate));

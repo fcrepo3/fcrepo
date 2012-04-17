@@ -14,14 +14,12 @@ import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -48,15 +46,13 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.client.Administrator;
-
-import org.fcrepo.server.types.mtom.gen.ArrayOfString;
-import org.fcrepo.server.types.mtom.gen.Datastream;
+import org.fcrepo.server.types.gen.ArrayOfString;
+import org.fcrepo.server.types.gen.Datastream;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.utilities.TypeUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Displays a datastream's attributes, allowing the editing of its state, and

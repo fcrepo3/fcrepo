@@ -5,7 +5,6 @@
 package org.fcrepo.client.ingest;
 
 import java.awt.Font;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,8 +27,7 @@ import org.fcrepo.client.ObjectFormatDialog;
 import org.fcrepo.client.utility.ingest.Ingest;
 import org.fcrepo.client.utility.ingest.IngestCounter;
 import org.fcrepo.client.utility.ingest.IngestLogger;
-
-import org.fcrepo.server.types.mtom.gen.RepositoryInfo;
+import org.fcrepo.server.types.gen.RepositoryInfo;
 
 
 

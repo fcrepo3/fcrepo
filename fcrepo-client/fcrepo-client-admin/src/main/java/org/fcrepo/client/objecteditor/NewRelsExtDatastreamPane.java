@@ -8,15 +8,12 @@ package org.fcrepo.client.objecteditor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.Arrays;
 
 import org.fcrepo.client.Administrator;
-
 import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.types.mtom.gen.Datastream;
-import org.fcrepo.server.types.mtom.gen.DatastreamControlGroup;
+import org.fcrepo.server.types.gen.Datastream;
+import org.fcrepo.server.types.gen.DatastreamControlGroup;
 import org.fcrepo.server.utilities.TypeUtility;
 
 

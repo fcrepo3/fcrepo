@@ -71,12 +71,11 @@ import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.server.types.mtom.gen.Datastream;
-import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.Datastream;
+import org.fcrepo.server.types.gen.FieldSearchQuery;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.ObjectFields;
 import org.fcrepo.server.types.mtom.gen.MIMETypedStream;
-import org.fcrepo.server.types.mtom.gen.ObjectFactory;
-import org.fcrepo.server.types.mtom.gen.ObjectFields;
 import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
@@ -904,7 +903,7 @@ public class TestRESTAPI
         String[] resultFields = {"pid"};
         java.math.BigInteger maxResults = new java.math.BigInteger("" + 1000);
         FieldSearchQuery query = new FieldSearchQuery();
-        ObjectFactory factory = new ObjectFactory();
+        org.fcrepo.server.types.gen.ObjectFactory factory = new org.fcrepo.server.types.gen.ObjectFactory();
         query.setTerms(factory.createFieldSearchQueryTerms("*"));
         FieldSearchResult result =
                 apia.findObjects(TypeUtility.convertStringtoAOS(resultFields),

@@ -6,50 +6,43 @@
 package org.fcrepo.client.batch;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import java.math.BigInteger;
-
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
 
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.Uploader;
 import org.fcrepo.client.batch.types.Datastream;
 import org.fcrepo.client.batch.types.DigitalObject;
 import org.fcrepo.client.utility.ingest.AutoIngestor;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.server.types.mtom.gen.ComparisonOperator;
-import org.fcrepo.server.types.mtom.gen.Condition;
-import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult.ResultList;
-import org.fcrepo.server.types.mtom.gen.ObjectFactory;
-import org.fcrepo.server.types.mtom.gen.ObjectFields;
+import org.fcrepo.server.types.gen.ComparisonOperator;
+import org.fcrepo.server.types.gen.Condition;
+import org.fcrepo.server.types.gen.FieldSearchQuery;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.FieldSearchResult.ResultList;
+import org.fcrepo.server.types.gen.ObjectFactory;
+import org.fcrepo.server.types.gen.ObjectFields;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.utilities.TypeUtility;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Parses a stream of batch modify directives and makes appropriate calls to the
@@ -470,7 +463,7 @@ public class BatchModifyParser
                 && localName.equalsIgnoreCase("modifyDatastream")) {
 
             try {
-                org.fcrepo.server.types.mtom.gen.Datastream dsOrig = null;
+                org.fcrepo.server.types.gen.Datastream dsOrig = null;
                 modifyDatastream = false;
 
                 // Get required attributes

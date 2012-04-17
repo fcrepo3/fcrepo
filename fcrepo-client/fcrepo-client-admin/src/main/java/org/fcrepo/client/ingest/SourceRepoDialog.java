@@ -25,12 +25,10 @@ import javax.swing.JTextField;
 
 import org.fcrepo.client.Administrator;
 import org.fcrepo.client.FedoraClient;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.server.types.mtom.gen.RepositoryInfo;
+import org.fcrepo.server.types.gen.RepositoryInfo;
 
 
 

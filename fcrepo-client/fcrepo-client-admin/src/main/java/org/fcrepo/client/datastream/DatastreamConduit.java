@@ -5,20 +5,16 @@
 package org.fcrepo.client.datastream;
 
 import java.net.MalformedURLException;
-
 import java.rmi.RemoteException;
-
 import java.util.List;
 
 import javax.xml.rpc.ServiceException;
 
 import org.fcrepo.client.FedoraClient;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.server.types.mtom.gen.ArrayOfString;
-import org.fcrepo.server.types.mtom.gen.Datastream;
+import org.fcrepo.server.types.gen.ArrayOfString;
+import org.fcrepo.server.types.gen.Datastream;
 import org.fcrepo.server.utilities.TypeUtility;
 
 

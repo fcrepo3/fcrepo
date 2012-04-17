@@ -9,38 +9,31 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-
 import java.util.ArrayList;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-import org.apache.http.client.ClientProtocolException;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import junit.framework.JUnit4TestAdapter;
 
+import org.apache.http.client.ClientProtocolException;
 import org.fcrepo.client.FedoraClient;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
 import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
-import org.fcrepo.server.types.mtom.gen.Datastream;
+import org.fcrepo.server.types.gen.Datastream;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.test.FedoraServerTestCase;
 import org.fcrepo.test.fesl.util.AuthorizationDeniedException;
 import org.fcrepo.test.fesl.util.HttpUtils;
 import org.fcrepo.test.fesl.util.LoadDataset;
 import org.fcrepo.test.fesl.util.RemoveDataset;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Testing of the PolicyIndex

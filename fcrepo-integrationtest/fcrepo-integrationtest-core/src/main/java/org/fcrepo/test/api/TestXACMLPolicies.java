@@ -14,28 +14,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import javax.xml.soap.SOAPFault;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.fcrepo.client.FedoraClient;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
-import org.fcrepo.server.types.mtom.gen.ArrayOfString;
-import org.fcrepo.server.types.mtom.gen.Property;
+import org.fcrepo.server.types.gen.ArrayOfString;
 import org.fcrepo.server.types.mtom.gen.GetDissemination.Parameters;
 import org.fcrepo.server.utilities.ServerUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 
@@ -458,7 +453,7 @@ public class TestXACMLPolicies
                         (SOAPFaultException) cause;
                 System.out.println("    Reason = "
                         + af.getMessage());
-                assertTrue(af.getMessage(), 
+                assertTrue(af.getMessage(),
                            af.getMessage().contains("Authorization Denied"));
                 System.out.println("Access denied correctly");
             } else {

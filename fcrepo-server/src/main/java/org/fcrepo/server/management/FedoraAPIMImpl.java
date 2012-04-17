@@ -11,24 +11,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
-import javax.annotation.Resource;
-
 import org.apache.cxf.binding.soap.SoapFault;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.InitializationException;
@@ -36,8 +29,9 @@ import org.fcrepo.server.errors.ServerInitializationException;
 import org.fcrepo.server.errors.StorageDeviceException;
 import org.fcrepo.server.utilities.CXFUtility;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.utilities.DateUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // @javax.jws.WebService(
 // serviceName = "Fedora-API-M-Service",
@@ -693,7 +687,7 @@ public class FedoraAPIMImpl
         try {
             MessageContext ctx = context.getMessageContext();
             return TypeUtility
-                    .convertValidationToGenValidationMTOM(s_management.validate(ReadOnlyContext
+                    .convertValidationToGenValidation(s_management.validate(ReadOnlyContext
                                                                                         .getSoapContext(ctx),
                                                                                 pid,
                                                                                 DateUtility
@@ -737,7 +731,7 @@ public class FedoraAPIMImpl
                 new ArrayList<org.fcrepo.server.types.gen.RelationshipTuple>(intRelsTuples.length);
         for (org.fcrepo.server.storage.types.RelationshipTuple tuple : intRelsTuples) {
             genRelsTuples.add(TypeUtility
-                    .convertRelsTupleToGenRelsTupleMTOM(tuple));
+                    .convertRelsTupleToGenRelsTuple(tuple));
         }
         return genRelsTuples;
     }

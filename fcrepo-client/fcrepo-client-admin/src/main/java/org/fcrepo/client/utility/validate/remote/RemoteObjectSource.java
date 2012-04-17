@@ -5,8 +5,10 @@
 
 package org.fcrepo.client.utility.validate.remote;
 
-import java.io.IOException;
+import static org.fcrepo.client.utility.validate.types.ContentModelInfo.DS_COMPOSITE_MODEL;
+import static org.fcrepo.client.utility.validate.types.ContentModelInfo.DS_COMPOSITE_MODEL_FORMAT;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -24,16 +26,12 @@ import org.fcrepo.client.utility.validate.types.DatastreamInfo;
 import org.fcrepo.client.utility.validate.types.DsCompositeModelDoc;
 import org.fcrepo.client.utility.validate.types.ObjectInfo;
 import org.fcrepo.client.utility.validate.types.RelationshipInfo;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.search.FieldSearchQuery;
-import org.fcrepo.server.types.mtom.gen.Datastream;
+import org.fcrepo.server.types.gen.Datastream;
+import org.fcrepo.server.types.gen.RelationshipTuple;
 import org.fcrepo.server.types.mtom.gen.MIMETypedStream;
-import org.fcrepo.server.types.mtom.gen.RelationshipTuple;
-
-import static org.fcrepo.client.utility.validate.types.ContentModelInfo.DS_COMPOSITE_MODEL;
-import static org.fcrepo.client.utility.validate.types.ContentModelInfo.DS_COMPOSITE_MODEL_FORMAT;
 
 /**
  * An {@link ObjectSource} that is based on a {@link FedoraClient} link to a

@@ -6,7 +6,6 @@ package org.fcrepo.client.objecteditor;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -20,9 +19,8 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import org.fcrepo.client.Administrator;
-
-import org.fcrepo.server.types.mtom.gen.Datastream;
-import org.fcrepo.server.types.mtom.gen.ObjectFields;
+import org.fcrepo.server.types.gen.Datastream;
+import org.fcrepo.server.types.gen.ObjectFields;
 
 
 

@@ -9,16 +9,13 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-
 import java.io.IOException;
-
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import java.math.BigInteger;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -26,14 +23,13 @@ import javax.swing.JComponent;
 import org.fcrepo.client.Administrator;
 import org.fcrepo.client.objecteditor.types.DatastreamInputSpec;
 import org.fcrepo.client.objecteditor.types.MethodDefinition;
-
-import org.fcrepo.server.types.mtom.gen.ComparisonOperator;
-import org.fcrepo.server.types.mtom.gen.Condition;
-import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult.ResultList;
-import org.fcrepo.server.types.mtom.gen.ObjectFactory;
-import org.fcrepo.server.types.mtom.gen.ObjectFields;
+import org.fcrepo.server.types.gen.ComparisonOperator;
+import org.fcrepo.server.types.gen.Condition;
+import org.fcrepo.server.types.gen.FieldSearchQuery;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.FieldSearchResult.ResultList;
+import org.fcrepo.server.types.gen.ObjectFactory;
+import org.fcrepo.server.types.gen.ObjectFields;
 import org.fcrepo.server.utilities.TypeUtility;
 
 /**

@@ -7,24 +7,19 @@ package org.fcrepo.client.utility.ingest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.MalformedURLException;
-
 import java.rmi.RemoteException;
-
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-import javax.xml.rpc.ServiceException;
-
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
+import javax.xml.rpc.ServiceException;
 
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.server.types.mtom.gen.RepositoryInfo;
+import org.fcrepo.server.types.gen.RepositoryInfo;
 import org.fcrepo.server.utilities.StreamUtility;
 
 

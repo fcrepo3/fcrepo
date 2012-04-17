@@ -6,22 +6,15 @@
 package org.fcrepo.server.access;
 
 import java.io.File;
-
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
-import javax.annotation.Resource;
-
 import org.apache.cxf.binding.soap.SoapFault;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
@@ -29,8 +22,9 @@ import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.ServerInitializationException;
 import org.fcrepo.server.utilities.CXFUtility;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.utilities.DateUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jiri Kremser
@@ -49,7 +43,7 @@ public class FedoraAPIAMTOMImpl
     private static Server s_server;
 
     /** Whether the service has initialized... true if initialized. */
-    private static boolean s_initialized;
+    private static boolean s_initialized = initialize();
 
     /** The exception indicating that initialization failed. */
     private static InitializationException s_initException;
@@ -63,20 +57,21 @@ public class FedoraAPIAMTOMImpl
     private static boolean debug = false;
 
     /** Before fulfilling any requests, make sure we have a server instance. */
-    static {
+    private static boolean initialize() {
+        boolean initialized = false;
         try {
             String fedoraHome = Constants.FEDORA_HOME;
             if (fedoraHome == null) {
-                s_initialized = false;
+                initialized = false;
                 s_initException =
                         new ServerInitializationException("Server failed to initialize because FEDORA_HOME "
                                 + "is undefined");
             } else {
                 s_server = Server.getInstance(new File(fedoraHome));
-                s_initialized = true;
                 s_access =
                         (Access) s_server
                                 .getModule("org.fcrepo.server.access.Access");
+                initialized = true;
                 Boolean debugBool = new Boolean(s_server.getParameter("debug"));
                 debug = debugBool.booleanValue();
             }
@@ -85,6 +80,7 @@ public class FedoraAPIAMTOMImpl
             s_initialized = false;
             s_initException = ie;
         }
+        return initialized;
     }
 
     /*
@@ -149,7 +145,7 @@ public class FedoraAPIAMTOMImpl
         try {
             org.fcrepo.server.storage.types.Property[] properties =
                     TypeUtility
-                            .convertGenPropertyArrayToPropertyArrayMTOM(parameters);
+                            .convertGenPropertyArrayToPropertyArray(parameters);
             org.fcrepo.server.storage.types.MIMETypedStream mimeTypedStream =
                     s_access.getDissemination(context,
                                               pid,
@@ -174,7 +170,7 @@ public class FedoraAPIAMTOMImpl
      * ,)String asOfDateTime )*
      */
     @Override
-    public org.fcrepo.server.types.mtom.gen.ObjectProfile getObjectProfile(String pid,
+    public org.fcrepo.server.types.gen.ObjectProfile getObjectProfile(String pid,
                                                                            String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
@@ -183,9 +179,9 @@ public class FedoraAPIAMTOMImpl
             org.fcrepo.server.access.ObjectProfile objectProfile =
                     s_access.getObjectProfile(context, pid, DateUtility
                             .parseDateOrNull(asOfDateTime));
-            org.fcrepo.server.types.mtom.gen.ObjectProfile genObjectProfile =
+            org.fcrepo.server.types.gen.ObjectProfile genObjectProfile =
                     TypeUtility
-                            .convertObjectProfileToGenObjectProfileMTOM(objectProfile);
+                            .convertObjectProfileToGenObjectProfile(objectProfile);
             return genObjectProfile;
         } catch (Throwable th) {
             LOG.error("Error getting object profile", th);
@@ -201,9 +197,9 @@ public class FedoraAPIAMTOMImpl
      * ,)org.fcrepo.server.types.gen.FieldSearchQuery query )*
      */
     @Override
-    public org.fcrepo.server.types.mtom.gen.FieldSearchResult findObjects(org.fcrepo.server.types.mtom.gen.ArrayOfString resultFields,
+    public org.fcrepo.server.types.gen.FieldSearchResult findObjects(org.fcrepo.server.types.gen.ArrayOfString resultFields,
                                                                           java.math.BigInteger maxResults,
-                                                                          org.fcrepo.server.types.mtom.gen.FieldSearchQuery query) {
+                                                                          org.fcrepo.server.types.gen.FieldSearchQuery query) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
@@ -218,9 +214,9 @@ public class FedoraAPIAMTOMImpl
                                          resultFieldsArray,
                                          maxResults.intValue(),
                                          TypeUtility
-                                                 .convertGenFieldSearchQueryToFieldSearchQueryMTOM(query));
+                                                 .convertGenFieldSearchQueryToFieldSearchQuery(query));
             return TypeUtility
-                    .convertFieldSearchResultToGenFieldSearchResultMTOM(result);
+                    .convertFieldSearchResultToGenFieldSearchResult(result);
         } catch (Throwable th) {
             LOG.error("Error finding objects", th);
             throw CXFUtility.getFault(th);
@@ -255,16 +251,16 @@ public class FedoraAPIAMTOMImpl
      * @see org.fcrepo.server.access.FedoraAPIA#describeRepository(*
      */
     @Override
-    public org.fcrepo.server.types.mtom.gen.RepositoryInfo describeRepository() {
+    public org.fcrepo.server.types.gen.RepositoryInfo describeRepository() {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
         try {
             org.fcrepo.server.access.RepositoryInfo repositoryInfo =
                     s_access.describeRepository(context);
-            org.fcrepo.server.types.mtom.gen.RepositoryInfo genRepositoryInfo =
+            org.fcrepo.server.types.gen.RepositoryInfo genRepositoryInfo =
                     TypeUtility
-                            .convertReposInfoToGenReposInfoMTOM(repositoryInfo);
+                            .convertReposInfoToGenReposInfo(repositoryInfo);
             return genRepositoryInfo;
         } catch (Throwable th) {
             LOG.error("Error describing repository", th);
@@ -278,7 +274,7 @@ public class FedoraAPIAMTOMImpl
      * asOfDateTime )*
      */
     @Override
-    public List<org.fcrepo.server.types.mtom.gen.ObjectMethodsDef> listMethods(String pid,
+    public List<org.fcrepo.server.types.gen.ObjectMethodsDef> listMethods(String pid,
                                                                                String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
@@ -288,7 +284,7 @@ public class FedoraAPIAMTOMImpl
                     s_access.listMethods(context, pid, DateUtility
                             .parseDateOrNull(asOfDateTime));
             return TypeUtility
-                    .convertObjectMethodsDefArrayToGenObjectMethodsDefListMTOM(objectMethodDefs);
+                    .convertObjectMethodsDefArrayToGenObjectMethodsDefList(objectMethodDefs);
         } catch (Throwable th) {
             LOG.error("Error listing methods", th);
             throw CXFUtility.getFault(th);
@@ -301,7 +297,7 @@ public class FedoraAPIAMTOMImpl
      * sessionToken )*
      */
     @Override
-    public org.fcrepo.server.types.mtom.gen.FieldSearchResult resumeFindObjects(String sessionToken) {
+    public org.fcrepo.server.types.gen.FieldSearchResult resumeFindObjects(String sessionToken) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
@@ -309,7 +305,7 @@ public class FedoraAPIAMTOMImpl
             org.fcrepo.server.search.FieldSearchResult result =
                     s_access.resumeFindObjects(context, sessionToken);
             return TypeUtility
-                    .convertFieldSearchResultToGenFieldSearchResultMTOM(result);
+                    .convertFieldSearchResultToGenFieldSearchResult(result);
         } catch (Throwable th) {
             LOG.error("Error resuming finding objects", th);
             throw CXFUtility.getFault(th);
@@ -322,7 +318,7 @@ public class FedoraAPIAMTOMImpl
      * ,)String asOfDateTime )*
      */
     @Override
-    public List<org.fcrepo.server.types.mtom.gen.DatastreamDef> listDatastreams(String pid,
+    public List<org.fcrepo.server.types.gen.DatastreamDef> listDatastreams(String pid,
                                                                                 String asOfDateTime) {
         MessageContext ctx = context.getMessageContext();
         Context context = ReadOnlyContext.getSoapContext(ctx);
@@ -332,7 +328,7 @@ public class FedoraAPIAMTOMImpl
                     s_access.listDatastreams(context, pid, DateUtility
                             .parseDateOrNull(asOfDateTime));
             return TypeUtility
-                    .convertDatastreamDefArrayToGenDatastreamDefListMTOM(datastreamDefs);
+                    .convertDatastreamDefArrayToGenDatastreamDefList(datastreamDefs);
         } catch (Throwable th) {
             LOG.error("Error listing datastreams", th);
             throw CXFUtility.getFault(th);

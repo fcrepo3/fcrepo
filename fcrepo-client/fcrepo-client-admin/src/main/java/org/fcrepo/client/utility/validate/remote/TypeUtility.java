@@ -14,18 +14,16 @@ import java.util.Set;
 
 import org.fcrepo.client.utility.validate.types.DatastreamInfo;
 import org.fcrepo.client.utility.validate.types.RelationshipInfo;
-
 import org.fcrepo.server.search.Condition;
 import org.fcrepo.server.search.FieldSearchQuery;
 import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.search.ObjectFields;
-import org.fcrepo.server.types.mtom.gen.ComparisonOperator;
-import org.fcrepo.server.types.mtom.gen.Datastream;
-import org.fcrepo.server.types.mtom.gen.ListSession;
-import org.fcrepo.server.types.mtom.gen.ObjectFactory;
-import org.fcrepo.server.types.mtom.gen.RelationshipTuple;
+import org.fcrepo.server.types.gen.ComparisonOperator;
+import org.fcrepo.server.types.gen.Datastream;
+import org.fcrepo.server.types.gen.ListSession;
+import org.fcrepo.server.types.gen.ObjectFactory;
+import org.fcrepo.server.types.gen.RelationshipTuple;
 import org.fcrepo.server.utilities.DCField;
-
 import org.fcrepo.utilities.DateUtility;
 
 
@@ -42,15 +40,15 @@ public class TypeUtility {
      * Convert a local {@link FieldSearchQuery} into a WSDL-style
      * {@link org.fcrepo.server.types.mtom.gen.FieldSearchQuery FieldSearchQuery}.
      */
-    public static org.fcrepo.server.types.mtom.gen.FieldSearchQuery convertFieldSearchQueryToGenFieldSearchQuery(FieldSearchQuery fsq) {
-        List<org.fcrepo.server.types.mtom.gen.Condition> genConditions =
+    public static org.fcrepo.server.types.gen.FieldSearchQuery convertFieldSearchQueryToGenFieldSearchQuery(FieldSearchQuery fsq) {
+        List<org.fcrepo.server.types.gen.Condition> genConditions =
                 fsq.getConditions() == null ? null
                         : convertConditionsListToGenConditionsArray(fsq
                                 .getConditions());
-        org.fcrepo.server.types.mtom.gen.FieldSearchQuery query = new org.fcrepo.server.types.mtom.gen.FieldSearchQuery();
+        org.fcrepo.server.types.gen.FieldSearchQuery query = new org.fcrepo.server.types.gen.FieldSearchQuery();
 
         ObjectFactory factory = new ObjectFactory();
-        org.fcrepo.server.types.mtom.gen.FieldSearchQuery.Conditions conds = new org.fcrepo.server.types.mtom.gen.FieldSearchQuery.Conditions();
+        org.fcrepo.server.types.gen.FieldSearchQuery.Conditions conds = new org.fcrepo.server.types.gen.FieldSearchQuery.Conditions();
         conds.getCondition().addAll(genConditions);
         query.setConditions(factory.createFieldSearchQueryConditions(conds));
         return query;
@@ -60,9 +58,9 @@ public class TypeUtility {
      * Convert a {@link List} of local {@link Condition}s into an array of
      * WSDL-style {@link org.fcrepo.server.types.mtom.gen.Condition Condition}s.
      */
-    public static List<org.fcrepo.server.types.mtom.gen.Condition> convertConditionsListToGenConditionsArray(List<Condition> conditions) {
-        List<org.fcrepo.server.types.mtom.gen.Condition> genConditions =
-                new ArrayList<org.fcrepo.server.types.mtom.gen.Condition>();
+    public static List<org.fcrepo.server.types.gen.Condition> convertConditionsListToGenConditionsArray(List<Condition> conditions) {
+        List<org.fcrepo.server.types.gen.Condition> genConditions =
+                new ArrayList<org.fcrepo.server.types.gen.Condition>();
 
         for (Condition condition : conditions) {
             genConditions.add(convertConditionToGenCondition(condition));
@@ -75,7 +73,7 @@ public class TypeUtility {
      * Convert a local {@link Condition} into a WSDL-style
      * {@link org.fcrepo.server.types.mtom.gen.Condition Condition}.
      */
-    public static org.fcrepo.server.types.mtom.gen.Condition convertConditionToGenCondition(Condition condition) {
+    public static org.fcrepo.server.types.gen.Condition convertConditionToGenCondition(Condition condition) {
         String opAbbr = condition.getOperator().getAbbreviation();
 
         ComparisonOperator compOperator;
@@ -85,7 +83,7 @@ public class TypeUtility {
             throw new IllegalArgumentException("unrecognized comparison operator string: '"
                     + opAbbr + "'");
         }
-        org.fcrepo.server.types.mtom.gen.Condition cond = new org.fcrepo.server.types.mtom.gen.Condition();
+        org.fcrepo.server.types.gen.Condition cond = new org.fcrepo.server.types.gen.Condition();
         cond.setProperty(condition.getProperty());
         cond.setOperator(compOperator);
         cond.setValue(condition.getValue());
@@ -97,7 +95,7 @@ public class TypeUtility {
      * {@link org.fcrepo.server.types.mtom.gen.FieldSearchResult FieldSearchResult} to a
      * local {@link FieldSearchResult}.
      */
-    public static FieldSearchResult convertGenFieldSearchResultToFieldSearchResult(org.fcrepo.server.types.mtom.gen.FieldSearchResult fsr) {
+    public static FieldSearchResult convertGenFieldSearchResultToFieldSearchResult(org.fcrepo.server.types.gen.FieldSearchResult fsr) {
         long completeListSize = 0;
         long cursor = 0;
         Date expirationDate = new Date(0);
@@ -115,7 +113,7 @@ public class TypeUtility {
 
         List<org.fcrepo.server.search.ObjectFields> objectFields =
                 convertGenObjectFieldsArrayToObjectFieldsList(fsr
-                        .getResultList().getObjectFields().toArray(new org.fcrepo.server.types.mtom.gen.ObjectFields[0]));
+                        .getResultList().getObjectFields().toArray(new org.fcrepo.server.types.gen.ObjectFields[0]));
 //        BasicFieldSearchResult bfsr = new BasicFieldSearchResult(
         return new BasicFieldSearchResult(completeListSize,
                                           cursor,
@@ -129,9 +127,9 @@ public class TypeUtility {
      * {@link org.fcrepo.server.types.mtom.gen.ObjectFields ObjectFields} objects to a
      * {@link List} of local {@link ObjectFields} objects.
      */
-    public static List<ObjectFields> convertGenObjectFieldsArrayToObjectFieldsList(org.fcrepo.server.types.mtom.gen.ObjectFields[] objectFields) {
+    public static List<ObjectFields> convertGenObjectFieldsArrayToObjectFieldsList(org.fcrepo.server.types.gen.ObjectFields[] objectFields) {
         List<ObjectFields> result = new ArrayList<ObjectFields>();
-        for (org.fcrepo.server.types.mtom.gen.ObjectFields objectField : objectFields) {
+        for (org.fcrepo.server.types.gen.ObjectFields objectField : objectFields) {
             result.add(convertGenObjectFieldsToObjectFields(objectField));
         }
         return result;
@@ -142,7 +140,7 @@ public class TypeUtility {
      * {@link org.fcrepo.server.types.mtom.gen.ObjectFields ObjectFields} object to a
      * local {@link ObjectFields} object.
      */
-    public static ObjectFields convertGenObjectFieldsToObjectFields(org.fcrepo.server.types.mtom.gen.ObjectFields source) {
+    public static ObjectFields convertGenObjectFieldsToObjectFields(org.fcrepo.server.types.gen.ObjectFields source) {
         if (source == null) {
             return null;
         }

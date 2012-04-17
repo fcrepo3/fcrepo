@@ -91,6 +91,7 @@
 	                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-M-MTOM.wsdl</wsdl>
 	                  <bindingFiles>
 	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-M-BindingsMTOM.xml</bindingFile>
+	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-Bindings.xml</bindingFile>
 	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-BindingsMTOM.xml</bindingFile>
 	                  </bindingFiles>
 	                </wsdlOption>
@@ -107,6 +108,7 @@
 	                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-A-MTOM.wsdl</wsdl>
 	                  <bindingFiles>
 	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-A-BindingsMTOM.xml</bindingFile>
+	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-Bindings.xml</bindingFile>
 	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-BindingsMTOM.xml</bindingFile>
 	                  </bindingFiles>
 	                </wsdlOption>

@@ -5,30 +5,25 @@
 package org.fcrepo.test.api;
 
 import java.io.File;
-
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
-
-import org.custommonkey.xmlunit.NamespaceContext;
-import org.custommonkey.xmlunit.SimpleNamespaceContext;
-import org.custommonkey.xmlunit.XMLUnit;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.apache.commons.io.FileUtils;
+import org.custommonkey.xmlunit.NamespaceContext;
+import org.custommonkey.xmlunit.SimpleNamespaceContext;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.access.FedoraAPIAMTOM;
-import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.server.types.mtom.gen.ComparisonOperator;
-import org.fcrepo.server.types.mtom.gen.Condition;
-import org.fcrepo.server.types.mtom.gen.FieldSearchQuery;
-import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
-import org.fcrepo.server.types.mtom.gen.ObjectFactory;
+import org.fcrepo.server.access.FedoraAPIA;
+import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.types.gen.ComparisonOperator;
+import org.fcrepo.server.types.gen.Condition;
+import org.fcrepo.server.types.gen.FieldSearchQuery;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.ObjectFactory;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.test.FedoraServerTestCase;
 import org.fcrepo.test.TemplatedResourceIterator;
 
@@ -42,8 +37,8 @@ public class TestAPIM2
         extends FedoraServerTestCase
         implements Constants {
 
-    private FedoraAPIMMTOM apim;
-    private FedoraAPIAMTOM apia;
+    private FedoraAPIM apim;
+    private FedoraAPIA apia;
 
     public static Test suite() {
         TestSuite suite = new TestSuite("TestAPIM2 TestSuite");
@@ -53,8 +48,8 @@ public class TestAPIM2
 
     @Override
     public void setUp() throws Exception {
-        apim = getFedoraClient().getAPIMMTOM();
-        apia = getFedoraClient().getAPIAMTOM();
+        apim = getFedoraClient().getAPIM();
+        apia = getFedoraClient().getAPIA();
 
 
         Map<String, String> nsMap = new HashMap<String, String>();
@@ -91,7 +86,7 @@ public class TestAPIM2
                 TemplatedResourceIterator tri = new TemplatedResourceIterator(resource, "src/test/resources/APIM2/values");
                 while (tri.hasNext()) {
                     byte[] foxml = tri.next().getBytes("UTF-8");
-                    apim.ingest(TypeUtility.convertBytesToDataHandler(foxml), FOXML1_1.uri,"ingesting new foxml object");
+                    apim.ingest(foxml, FOXML1_1.uri,"ingesting new foxml object");
                     count++;
                 }
             }
@@ -107,7 +102,7 @@ public class TestAPIM2
                 TemplatedResourceIterator tri = new TemplatedResourceIterator(resource, "src/test/resources/APIM2/valuesplain");
                 while (tri.hasNext()) {
                     byte[] foxml = tri.next().getBytes("UTF-8");
-                    apim.ingest(TypeUtility.convertBytesToDataHandler(foxml), FOXML1_1.uri,"ingesting new foxml object");
+                    apim.ingest(foxml, FOXML1_1.uri,"ingesting new foxml object");
                     count++;
                 }
             }
@@ -130,7 +125,7 @@ public class TestAPIM2
                 TemplatedResourceIterator tri = new TemplatedResourceIterator(resource, "src/test/resources/APIM2/valuesplain");
                 while (tri.hasNext()) {
                     byte[] foxml = tri.next().getBytes("UTF-8");
-                    apim.ingest(TypeUtility.convertBytesToDataHandler(foxml), FOXML1_1.uri,"ingesting new foxml object");
+                    apim.ingest(foxml, FOXML1_1.uri,"ingesting new foxml object");
                 }
             }
         }
@@ -174,7 +169,7 @@ public class TestAPIM2
                 tri = new TemplatedResourceIterator(resource, "src/test/resources/APIM2/valuesplain");
                 while (tri.hasNext()) {
                     byte[] foxml = tri.next().getBytes("UTF-8");
-                    apim.ingest(TypeUtility.convertBytesToDataHandler(foxml), FOXML1_1.uri,"ingesting new foxml object");
+                    apim.ingest(foxml, FOXML1_1.uri,"ingesting new foxml object");
                 }
             }
         }
@@ -192,7 +187,7 @@ public class TestAPIM2
         while (tri.hasNext()) {
             String label2 = tri.getAttributeValue("label2");
             byte[] foxml = tri.next().getBytes("UTF-8");
-            String pid = apim.ingest(TypeUtility.convertBytesToDataHandler(foxml), FOXML1_1.uri,"ingesting new foxml object");
+            String pid = apim.ingest(foxml, FOXML1_1.uri,"ingesting new foxml object");
 
             // update object label with new value
             apim.modifyObject(pid, null, label2, null, "updating object label");
@@ -210,7 +205,7 @@ public class TestAPIM2
                 tri = new TemplatedResourceIterator(resource, "src/test/resources/APIM2/valuesplain");
                 while (tri.hasNext()) {
                     byte[] foxml = tri.next().getBytes("UTF-8");
-                    apim.ingest(TypeUtility.convertBytesToDataHandler(foxml), FOXML1_1.uri,"ingesting new foxml object");
+                    apim.ingest(foxml, FOXML1_1.uri,"ingesting new foxml object");
                 }
             }
         }
@@ -228,7 +223,7 @@ public class TestAPIM2
         while (tri.hasNext()) {
             String label2 = tri.getAttributeValue("label2");
             byte[] foxml = tri.next().getBytes("UTF-8");
-            String pid = apim.ingest(TypeUtility.convertBytesToDataHandler(foxml), FOXML1_1.uri,"ingesting new foxml object");
+            String pid = apim.ingest(foxml, FOXML1_1.uri,"ingesting new foxml object");
 
             // modify datastream label
             apim.modifyDatastreamByValue(pid, "DC", null, label2, null, null, null, null, null, "modify datastream label", false);
@@ -246,7 +241,7 @@ public class TestAPIM2
                 tri = new TemplatedResourceIterator(resource, "src/test/resources/APIM2/valuesplain");
                 while (tri.hasNext()) {
                     byte[] foxml = tri.next().getBytes("UTF-8");
-                    apim.ingest(TypeUtility.convertBytesToDataHandler(foxml), FOXML1_1.uri,"ingesting new foxml object");
+                    apim.ingest(foxml, FOXML1_1.uri,"ingesting new foxml object");
                 }
             }
         }
