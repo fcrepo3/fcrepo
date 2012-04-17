@@ -20,7 +20,6 @@ package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPElement;
@@ -37,18 +35,16 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.utilities.CXFUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.xacml.attr.AttributeValue;
+import com.sun.xacml.attr.StringAttribute;
 
 /**
  * This is the AbstractHandler class which provides generic functionality for
@@ -109,6 +105,12 @@ public abstract class AbstractOperationHandler
         } catch (SOAPException e) {
             throw CXFUtility.getFault(e);
         }
+        SOAPElement bodyElement = body;
+        if (bodyElement.getNamespaceURI().equals("http://schemas.xmlsoap.org/soap/envelope/")
+                && bodyElement.getLocalName().equals("Body")){
+            bodyElement = (SOAPElement)bodyElement.getElementsByTagNameNS(operation.getNamespaceURI(), operation.getLocalPart()).item(0);
+        }
+
 
         //        // Get the envelope body
         //        SOAPBodyElement body = envelope.getFirstBody();
@@ -118,7 +120,7 @@ public abstract class AbstractOperationHandler
         // Get all the parameters from the Body Element.
         Iterator params = null;
         try {
-            params = ((SOAPElement) body).getChildElements();
+            params = bodyElement.getChildElements();
         } catch (Exception e) {
             logger.error("Problem obtaining params", e);
             throw CXFUtility.getFault(e);

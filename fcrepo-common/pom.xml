@@ -96,8 +96,7 @@
 	                </wsdlOption>
 	                <!-- API-A -->
 	                <wsdlOption>
-	                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-A.wsdl
-	                  </wsdl>
+	                  <wsdl>${basedir}/../resources/wsdl/Fedora-API-A.wsdl</wsdl>
 	                  <bindingFiles>
 	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-WS-API-A-Bindings.xml</bindingFile>
 	                    <bindingFile>${basedir}/../resources/wsdl/bindings/JAX-B-Bindings.xml</bindingFile>

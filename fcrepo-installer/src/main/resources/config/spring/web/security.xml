@@ -229,7 +229,7 @@
 
   <!-- FeSL Authz bean (SOAP) -->
   <bean id="PEP" class="org.fcrepo.server.security.xacml.pep.ws.PEP">
-    <property name="feslAuthZ" value="${security.fesl.authZ.enabled}" />
+    <constructor-arg type="boolean" value="${security.fesl.authZ.enabled}" />
   </bean>
 
 </beans>

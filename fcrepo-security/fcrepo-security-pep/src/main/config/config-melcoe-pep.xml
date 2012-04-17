@@ -133,7 +133,7 @@
 		a handler class. The handler class is responsible for generating XACML requests or performing other
 		tasks such as filtering for searches.
 	-->
-	<handlers-ws service="access">
+	<handlers-ws service="Fedora-API-A-Service">
 		<handler operation="describeRepository" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeRepositoryHandler" />
 		<handler operation="getObjectProfile" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectProfileHandler" />
 		<handler operation="listDatastreams" class="org.fcrepo.server.security.xacml.pep.ws.operations.ListDatastreamsHandler" />
@@ -144,7 +144,7 @@
 		<handler operation="resumeFindObjects" class="org.fcrepo.server.security.xacml.pep.ws.operations.ResumeFindObjectsHandler" />
 		<handler operation="getObjectHistory" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectHistoryHandler" />
 	</handlers-ws>
-	<handlers-ws service="accessS">
+	<handlers-ws service="Fedora-API-A-MTOM-Service">
 		<handler operation="describeRepository" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeRepositoryHandler" />
 		<handler operation="getObjectProfile" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectProfileHandler" />
 		<handler operation="listDatastreams" class="org.fcrepo.server.security.xacml.pep.ws.operations.ListDatastreamsHandler" />
@@ -155,7 +155,7 @@
 		<handler operation="resumeFindObjects" class="org.fcrepo.server.security.xacml.pep.ws.operations.ResumeFindObjectsHandler" />
 		<handler operation="getObjectHistory" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectHistoryHandler" />
 	</handlers-ws>
-	<handlers-ws service="management">
+	<handlers-ws service="Fedora-API-M-Service">
 		<handler operation="addDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddDatastreamHandler" />
 		<handler operation="describeUser" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeUserHandler" />
 		<handler operation="export" class="org.fcrepo.server.security.xacml.pep.ws.operations.ExportHandler" />
@@ -176,7 +176,7 @@
 		<handler operation="getRelationships" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetRelationshipsHandler" />
 		<handler operation="purgeRelationship" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeRelationshipHandler" />
 	</handlers-ws>
-	<handlers-ws service="managementS">
+	<handlers-ws service="Fedora-API-M-MTOM-Service">
 		<handler operation="addDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddDatastreamHandler" />
 		<handler operation="describeUser" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeUserHandler" />
 		<handler operation="export" class="org.fcrepo.server.security.xacml.pep.ws.operations.ExportHandler" />

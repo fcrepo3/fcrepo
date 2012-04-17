@@ -21,7 +21,6 @@ package org.fcrepo.server.security.xacml.pep.ws;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,19 +32,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.security.xacml.pep.AuthzDeniedException;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
@@ -53,6 +40,15 @@ import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandler;
 import org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandlerException;
 import org.fcrepo.server.utilities.CXFUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import com.sun.xacml.ctx.RequestCtx;
+import com.sun.xacml.ctx.ResponseCtx;
+import com.sun.xacml.ctx.Result;
 
 /**
  * This class is an JAX-WS handler. It is used as a handler on both the request
@@ -78,11 +74,7 @@ public class PEP
      */
     ContextHandler ctxHandler = null;
 
-    private boolean feslAuthZ;
-
-    public void setFeslAuthZ(boolean feslAuthZ) {
-        this.feslAuthZ = feslAuthZ;
-    }
+    private final boolean feslAuthZ;
 
     /**
      * A time stamp to note the time this AuthHandler was instantiated.
@@ -95,10 +87,11 @@ public class PEP
      *
      * @throws PEPException
      */
-    public PEP()
+    public PEP(boolean feslAuthZ)
             throws PEPException {
         super();
-        logger.warn("feslAuthZ = " + feslAuthZ);
+        this.feslAuthZ = feslAuthZ;
+        logger.info("feslAuthZ = " + feslAuthZ);
         if (feslAuthZ) {
             loadHandlers();
             ctxHandler = ContextHandlerImpl.getInstance();
