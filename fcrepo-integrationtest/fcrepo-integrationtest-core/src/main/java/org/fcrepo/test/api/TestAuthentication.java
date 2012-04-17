@@ -268,7 +268,7 @@ public class TestAuthentication
         for (int i = 0; i < numTimes; i++) {
             try {
                 if (apim == null) {
-                    apim = client.getAPIM();
+                    apim = client.getAPIMMTOM();
                 }
                 apim.modifyObject(TEST_PID, null, null, null, "i=" + i);
             } catch (Exception e) {
@@ -307,7 +307,7 @@ public class TestAuthentication
         for (int i = 0; i < numTimes; i++) {
             try {
                 if (apia == null) {
-                    apia = client.getAPIA();
+                    apia = client.getAPIAMTOM();
                 }
                 apia.listDatastreams(TEST_PID, null);
             } catch (Exception e) {

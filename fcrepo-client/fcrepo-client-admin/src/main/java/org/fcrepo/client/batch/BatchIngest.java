@@ -110,8 +110,8 @@ class BatchIngest
         // NEW: use new client utility class for SOAP stubs
         String baseURL = protocol + "://" + host + ":" + port + "/" + context;
         FedoraClient fc = new FedoraClient(baseURL, username, password);
-        APIA = fc.getAPIA();
-        APIM = fc.getAPIM();
+        APIA = fc.getAPIAMTOM();
+        APIM = fc.getAPIMMTOM();
         //*******************************************
 
     }

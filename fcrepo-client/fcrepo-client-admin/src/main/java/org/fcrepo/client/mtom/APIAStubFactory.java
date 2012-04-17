@@ -3,7 +3,7 @@
  * available online at http://fedora-commons.org/license/).
  */
 
-package org.fcrepo.client;
+package org.fcrepo.client.mtom;
 
 import java.io.PrintStream;
 import java.net.MalformedURLException;
@@ -12,7 +12,8 @@ import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
 
-import org.fcrepo.server.access.FedoraAPIA;
+import org.fcrepo.client.Administrator;
+import org.fcrepo.server.access.FedoraAPIAMTOM;
 
 /**
  * @author Chris Wilper
@@ -36,7 +37,7 @@ public abstract class APIAStubFactory {
      * @throws MalformedURLException
      * @throws ServiceException
      */
-    public static FedoraAPIA getStub(String protocol,
+    public static FedoraAPIAMTOM getStub(String protocol,
                                          String host,
                                          int port,
                                          String username,
@@ -49,13 +50,13 @@ public abstract class APIAStubFactory {
         }
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put("mtom-enabled", Boolean.FALSE);
+        props.put("mtom-enabled", Boolean.TRUE);
 
         org.apache.cxf.jaxws.JaxWsProxyFactoryBean clientFactory =
                 new org.apache.cxf.jaxws.JaxWsProxyFactoryBean();
         clientFactory.setAddress(protocol + "://" + host + ":" + port
-                + "/fedora/services/access");
-        clientFactory.setServiceClass(FedoraAPIA.class);
+                + "/fedora/services/accessMTOM");
+        clientFactory.setServiceClass(FedoraAPIAMTOM.class);
         clientFactory.setUsername(username);
         clientFactory.setPassword(password);
         clientFactory.setProperties(props);
@@ -65,7 +66,7 @@ public abstract class APIAStubFactory {
 //        clientFactory.getInInterceptors().add(log2);
         PrintStream syserr = System.err;
         System.setErr(System.out);
-        FedoraAPIA service = (FedoraAPIA) clientFactory.create();
+        FedoraAPIAMTOM service = (FedoraAPIAMTOM) clientFactory.create();
         System.setErr(syserr);
         syserr = null;
 

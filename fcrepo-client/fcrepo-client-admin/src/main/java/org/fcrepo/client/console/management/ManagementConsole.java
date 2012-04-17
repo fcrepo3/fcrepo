@@ -9,9 +9,7 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
-
 import java.lang.reflect.InvocationTargetException;
-
 import java.net.MalformedURLException;
 
 import javax.swing.BorderFactory;
@@ -25,15 +23,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
-
 import javax.xml.rpc.ServiceException;
 
-import org.fcrepo.client.APIMStubFactory;
 import org.fcrepo.client.Administrator;
 import org.fcrepo.client.console.Console;
 import org.fcrepo.client.console.ConsoleCommand;
 import org.fcrepo.client.console.ConsoleSendButtonListener;
 import org.fcrepo.client.console.ServiceConsoleCommandFactory;
+import org.fcrepo.client.mtom.APIMStubFactory;
 
 /**
  * @author Chris Wilper

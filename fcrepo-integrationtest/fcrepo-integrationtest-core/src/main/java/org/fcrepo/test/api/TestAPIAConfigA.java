@@ -54,7 +54,7 @@ public class TestAPIAConfigA
     @Override
     public void setUp() throws Exception {
         FedoraClient client = getFedoraClient();
-        apia = client.getAPIA();
+        apia = client.getAPIAMTOM();
     }
 
 }

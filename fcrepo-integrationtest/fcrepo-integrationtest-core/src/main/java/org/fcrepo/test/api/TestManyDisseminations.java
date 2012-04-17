@@ -60,7 +60,7 @@ public class TestManyDisseminations
         try {
             BASE_URL = FedoraServerTestCase.getBaseURL();
             CLIENT = FedoraServerTestCase.getFedoraClient();
-            APIM = CLIENT.getAPIM();
+            APIM = CLIENT.getAPIMMTOM();
         } catch (Exception e) {
             throw new RuntimeException("Error getting Fedora Client", e);
         }

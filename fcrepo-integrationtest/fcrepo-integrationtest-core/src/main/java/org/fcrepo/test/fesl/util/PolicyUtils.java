@@ -40,7 +40,7 @@ public class PolicyUtils
 
     public PolicyUtils(FedoraClient fedoraClient)
             throws ServiceException, IOException {
-        apim = fedoraClient.getAPIM();
+        apim = fedoraClient.getAPIMMTOM();
 
     }
 

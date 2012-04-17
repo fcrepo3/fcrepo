@@ -32,8 +32,8 @@ public class TestObjectLastModDate
 
     @Override
     protected void setUp() throws Exception {
-        apia = getFedoraClient().getAPIA();
-        apim = getFedoraClient().getAPIM();
+        apia = getFedoraClient().getAPIAMTOM();
+        apim = getFedoraClient().getAPIMMTOM();
         super.setUp();
     }
 

@@ -205,7 +205,7 @@ public class TestAPIA
     @Override
     public void setUp() throws Exception {
         FedoraClient client = getFedoraClient();
-        apia = client.getAPIA();
+        apia = client.getAPIAMTOM();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put(OAI_DC.prefix, OAI_DC.uri);
         nsMap.put(DC.prefix, DC.uri);

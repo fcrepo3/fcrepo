@@ -44,7 +44,7 @@ public abstract class Util {
                                           String sDef,
                                           String method) throws Exception {
         return new String(TypeUtility.convertDataHandlerToBytes(client
-                .getAPIA().getDissemination(pid, sDef, method, null, null)
+                .getAPIAMTOM().getDissemination(pid, sDef, method, null, null)
                 .getStream()), "UTF-8");
 
     }
@@ -69,8 +69,8 @@ public abstract class Util {
 
         Ingest.multiFromDirectory(dir,
                                   FOXML1_1.uri,
-                                  client.getAPIA(),
-                                  client.getAPIM(),
+                                  client.getAPIAMTOM(),
+                                  client.getAPIMMTOM(),
                                   null,
                                   new PrintStream(File.createTempFile("demo",
                                                                       null)),

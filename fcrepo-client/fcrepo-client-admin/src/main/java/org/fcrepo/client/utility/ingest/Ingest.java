@@ -467,8 +467,8 @@ public class Ingest
                         protocol + "://" + hp[0] + ":"
                                 + Integer.parseInt(hp[1]) + "/" + context;
                 FedoraClient fc = new FedoraClient(baseURL, args[4], args[5]);
-                FedoraAPIAMTOM targetRepoAPIA = fc.getAPIA();
-                FedoraAPIMMTOM targetRepoAPIM = fc.getAPIM();
+                FedoraAPIAMTOM targetRepoAPIA = fc.getAPIAMTOM();
+                FedoraAPIMMTOM targetRepoAPIM = fc.getAPIMMTOM();
                 //*******************************************
 
                 String pid =
@@ -512,8 +512,8 @@ public class Ingest
                         protocol + "://" + hp[0] + ":"
                                 + Integer.parseInt(hp[1]) + "/" + context;
                 FedoraClient fc = new FedoraClient(baseURL, args[4], args[5]);
-                FedoraAPIAMTOM targetRepoAPIA = fc.getAPIA();
-                FedoraAPIMMTOM targetRepoAPIM = fc.getAPIM();
+                FedoraAPIAMTOM targetRepoAPIA = fc.getAPIAMTOM();
+                FedoraAPIMMTOM targetRepoAPIM = fc.getAPIMMTOM();
                 //*******************************************
 
                 logRootName = "ingest-from-dir";
@@ -562,8 +562,8 @@ public class Ingest
                         new FedoraClient(sourceBaseURL,
                                          source_user,
                                          source_password);
-                FedoraAPIAMTOM sourceRepoAPIA = sfc.getAPIA();
-                FedoraAPIMMTOM sourceRepoAPIM = sfc.getAPIM();
+                FedoraAPIAMTOM sourceRepoAPIA = sfc.getAPIAMTOM();
+                FedoraAPIMMTOM sourceRepoAPIM = sfc.getAPIMMTOM();
                 //*******************************************
 
                 //Target repository
@@ -583,8 +583,8 @@ public class Ingest
                         new FedoraClient(targetBaseURL,
                                          target_user,
                                          target_password);
-                FedoraAPIAMTOM targetRepoAPIA = tfc.getAPIA();
-                FedoraAPIMMTOM targetRepoAPIM = tfc.getAPIM();
+                FedoraAPIAMTOM targetRepoAPIA = tfc.getAPIAMTOM();
+                FedoraAPIMMTOM targetRepoAPIM = tfc.getAPIMMTOM();
                 //*******************************************
 
                 // Determine export format

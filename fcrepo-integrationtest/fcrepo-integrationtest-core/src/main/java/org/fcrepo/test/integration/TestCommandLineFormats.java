@@ -56,7 +56,7 @@ public class TestCommandLineFormats
 
     @Override
     public void setUp() throws Exception {
-        apim = getFedoraClient(getBaseURL(), getUsername(), getPassword()).getAPIM();
+        apim = getFedoraClient(getBaseURL(), getUsername(), getPassword()).getAPIMMTOM();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put("foxml", "info:fedora/fedora-system:def/foxml#");
         nsMap.put("METS", "http://www.loc.gov/METS/");

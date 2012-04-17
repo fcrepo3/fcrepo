@@ -161,8 +161,8 @@ public class SourceRepoDialog
                                                      m_usernameField.getText(),
                                                      new String(m_passwordField
                                                              .getPassword()));
-                            m_apia = fc.getAPIA();
-                            m_apim = fc.getAPIM();
+                            m_apia = fc.getAPIAMTOM();
+                            m_apim = fc.getAPIMMTOM();
                             //*******************************************************
 
                             // Get SOAP stubs for the source repository.

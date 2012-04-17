@@ -85,8 +85,8 @@ public class TestLargeDatastreams
     @Override
     public void setUp() throws Exception {
         fedoraClient = getFedoraClient();
-        apim = fedoraClient.getAPIM();
-        apia = fedoraClient.getAPIA();
+        apim = fedoraClient.getAPIMMTOM();
+        apia = fedoraClient.getAPIAMTOM();
     }
 
     @Test

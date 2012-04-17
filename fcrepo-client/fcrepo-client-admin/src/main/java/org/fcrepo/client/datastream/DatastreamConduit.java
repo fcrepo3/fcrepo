@@ -226,7 +226,7 @@ public class DatastreamConduit {
                         protocol + "://" + hostName + ":" + portNum + "/"
                         + context;
                 FedoraClient fc = new FedoraClient(baseURL, username, password);
-                FedoraAPIMMTOM sourceRepoAPIM = fc.getAPIM();
+                FedoraAPIMMTOM sourceRepoAPIM = fc.getAPIMMTOM();
                 //*******************************************
                 DatastreamConduit c = new DatastreamConduit(sourceRepoAPIM);
 

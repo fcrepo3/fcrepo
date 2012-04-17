@@ -11,14 +11,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,23 +40,19 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
-
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.access.FedoraAPIA;
+import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.utilities.DateUtility;
 import org.jrdf.graph.Literal;
 import org.jrdf.graph.Node;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.trippi.RDFFormat;
 import org.trippi.TrippiException;
 import org.trippi.TupleIterator;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.access.FedoraAPIAMTOM;
-import org.fcrepo.server.management.FedoraAPIMMTOM;
-
-import org.fcrepo.utilities.DateUtility;
 
 /**
  * General-purpose utility class for Fedora clients. Provides methods to get
@@ -93,11 +86,17 @@ public class FedoraClient
     private static final Logger logger = LoggerFactory
             .getLogger(FedoraClient.class);
 
-    private final SOAPEndpoint m_accessEndpoint =
+    private final SOAPEndpoint m_accessMTOMEndpoint =
             new SOAPEndpoint("accessMTOM");
 
-    private final SOAPEndpoint m_managementEndpoint =
+    private final SOAPEndpoint m_managementMTOMEndpoint =
             new SOAPEndpoint("managementMTOM");
+
+    private final SOAPEndpoint m_accessEndpoint =
+            new SOAPEndpoint("access");
+
+    private final SOAPEndpoint m_managementEndpoint =
+            new SOAPEndpoint("management");
 
     private String m_baseURL;
 
@@ -445,12 +444,20 @@ public class FedoraClient
      * instead, the redirect will be followed and SSL will be used
      * automatically.
      */
-    public FedoraAPIAMTOM getAPIA() throws ServiceException, IOException {
-        return (FedoraAPIAMTOM) getSOAPStub(m_accessEndpoint);
+    public FedoraAPIA getAPIA() throws ServiceException, IOException {
+        return getSOAPStub(FedoraAPIA.class);
     }
 
     public URL getAPIAEndpointURL() throws IOException {
         return m_accessEndpoint.getURL();
+    }
+
+    public FedoraAPIAMTOM getAPIAMTOM() throws ServiceException, IOException {
+        return getSOAPStub(FedoraAPIAMTOM.class);
+    }
+
+    public URL getAPIAMTOMEndpointURL() throws IOException {
+        return m_accessMTOMEndpoint.getURL();
     }
 
     /**
@@ -460,41 +467,92 @@ public class FedoraClient
      * instead, the redirect will be followed and SSL will be used
      * automatically.
      */
-    public FedoraAPIMMTOM getAPIM() throws ServiceException, IOException {
-        return (FedoraAPIMMTOM) getSOAPStub(m_managementEndpoint);
+    public FedoraAPIM getAPIM() throws ServiceException, IOException {
+        return getSOAPStub(FedoraAPIM.class);
     }
 
     public URL getAPIMEndpointURL() throws IOException {
         return m_managementEndpoint.getURL();
     }
 
+    public FedoraAPIMMTOM getAPIMMTOM() throws ServiceException, IOException {
+        return getSOAPStub(FedoraAPIMMTOM.class);
+    }
+
+    public URL getAPIMMTOMEndpointURL() throws IOException {
+        return m_managementMTOMEndpoint.getURL();
+    }
+
     /**
      * Get the appropriate API-A/M stub, given a SOAPEndpoint.
+     * @param <T>
      */
-    private Object getSOAPStub(SOAPEndpoint endpoint) throws ServiceException,
+    private <T> T getSOAPStub(Class<T> type) throws ServiceException,
             IOException {
 
-        URL url = endpoint.getURL();
+        if (type == org.fcrepo.server.access.FedoraAPIAMTOM.class) {
+            org.fcrepo.client.mtom.APIAStubFactory.SOCKET_TIMEOUT_SECONDS = SOCKET_TIMEOUT_SECONDS;
 
-        String protocol = url.getProtocol();
-        String host = url.getHost();
-        int port = url.getPort();
-        //String path = url.getPath();
-        if (port == -1) {
-            port = url.getDefaultPort();
-        }
+            URL url = m_accessMTOMEndpoint.getURL();
 
-        if (endpoint == m_accessEndpoint) {
-            APIAStubFactory.SOCKET_TIMEOUT_SECONDS = SOCKET_TIMEOUT_SECONDS;
-            return APIAStubFactory
+            String protocol = url.getProtocol();
+            String host = url.getHost();
+            int port = url.getPort();
+            if (port == -1) {
+                port = url.getDefaultPort();
+            }
+
+            return (T) org.fcrepo.client.mtom.APIAStubFactory
                     .getStub(protocol, host, port, m_user, m_pass);
-        } else if (endpoint == m_managementEndpoint) {
-            APIMStubFactory.SOCKET_TIMEOUT_SECONDS = SOCKET_TIMEOUT_SECONDS;
-            return APIMStubFactory
+
+        } else if (type == FedoraAPIMMTOM.class) {
+            org.fcrepo.client.mtom.APIMStubFactory.SOCKET_TIMEOUT_SECONDS = SOCKET_TIMEOUT_SECONDS;
+
+            URL url = m_managementMTOMEndpoint.getURL();
+
+            String protocol = url.getProtocol();
+            String host = url.getHost();
+            int port = url.getPort();
+            if (port == -1) {
+                port = url.getDefaultPort();
+            }
+
+            return (T) org.fcrepo.client.mtom.APIMStubFactory
                     .getStub(protocol, host, port, m_user, m_pass);
+
+        } else if (type == FedoraAPIM.class) {
+            org.fcrepo.client.APIMStubFactory.SOCKET_TIMEOUT_SECONDS = SOCKET_TIMEOUT_SECONDS;
+
+            URL url = m_managementEndpoint.getURL();
+
+            String protocol = url.getProtocol();
+            String host = url.getHost();
+            int port = url.getPort();
+            if (port == -1) {
+                port = url.getDefaultPort();
+            }
+
+            return (T) org.fcrepo.client.APIMStubFactory
+                    .getStub(protocol, host, port, m_user, m_pass);
+
+        } else if (type == FedoraAPIA.class) {
+            org.fcrepo.client.APIAStubFactory.SOCKET_TIMEOUT_SECONDS = SOCKET_TIMEOUT_SECONDS;
+
+            URL url = m_accessEndpoint.getURL();
+
+            String protocol = url.getProtocol();
+            String host = url.getHost();
+            int port = url.getPort();
+            if (port == -1) {
+                port = url.getDefaultPort();
+            }
+
+            return (T) org.fcrepo.client.APIAStubFactory
+                    .getStub(protocol, host, port, m_user, m_pass);
+
         } else {
-            throw new IllegalArgumentException("Unrecognized endpoint: "
-                    + endpoint.getName());
+            throw new IllegalArgumentException("Unrecognized api class: "
+                    + type.getName());
         }
     }
 

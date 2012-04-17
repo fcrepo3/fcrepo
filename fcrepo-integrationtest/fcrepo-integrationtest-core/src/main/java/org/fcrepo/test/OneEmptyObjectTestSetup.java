@@ -47,7 +47,7 @@ public class OneEmptyObjectTestSetup
     @Override
     public void setUp() throws Exception {
         System.out.println("Ingesting test object: " + m_pid);
-        m_apim = FedoraTestCase.getFedoraClient().getAPIM();
+        m_apim = FedoraTestCase.getFedoraClient().getAPIMMTOM();
         m_apim.ingest(TypeUtility.convertBytesToDataHandler(getTestObjectBytes(m_pid)), FOXML1_1.uri, "");
     }
 

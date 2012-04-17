@@ -182,7 +182,7 @@ public class TestRelationships
 
     @Override
     public void setUp() throws Exception {
-        apim = getFedoraClient().getAPIM();
+        apim = getFedoraClient().getAPIMMTOM();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
         nsMap.put("dc", "http://purl.org/dc/elements/1.1/");

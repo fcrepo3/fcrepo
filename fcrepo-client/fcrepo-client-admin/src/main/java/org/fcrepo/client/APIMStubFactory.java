@@ -14,7 +14,7 @@ import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
 
-import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.management.FedoraAPIM;
 
 /**
  * @author Chris Wilper
@@ -38,7 +38,7 @@ public abstract class APIMStubFactory {
      * @throws MalformedURLException
      * @throws ServiceException
      */
-    public static FedoraAPIMMTOM getStub(String protocol,
+    public static FedoraAPIM getStub(String protocol,
                                          String host,
                                          int port,
                                          String username,
@@ -51,13 +51,13 @@ public abstract class APIMStubFactory {
         }
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put("mtom-enabled", Boolean.TRUE);
+        props.put("mtom-enabled", Boolean.FALSE);
 
         org.apache.cxf.jaxws.JaxWsProxyFactoryBean clientFactory =
                 new org.apache.cxf.jaxws.JaxWsProxyFactoryBean();
         clientFactory.setAddress(protocol + "://" + host + ":" + port
-                + "/fedora/services/managementMTOM");
-        clientFactory.setServiceClass(FedoraAPIMMTOM.class);
+                + "/fedora/services/management");
+        clientFactory.setServiceClass(FedoraAPIM.class);
         clientFactory.setUsername(username);
         clientFactory.setPassword(password);
         clientFactory.setProperties(props);
@@ -73,7 +73,7 @@ public abstract class APIMStubFactory {
             public void write(int arg0) throws IOException {
             }
         }));
-        FedoraAPIMMTOM service = (FedoraAPIMMTOM) clientFactory.create();
+        FedoraAPIM service = (FedoraAPIM) clientFactory.create();
         System.setErr(aux);
 
         if (Administrator.INSTANCE == null) {

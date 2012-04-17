@@ -103,7 +103,7 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods1() throws Exception {
-        FedoraAPIAMTOM apia = m_client.getAPIA();
+        FedoraAPIAMTOM apia = m_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
         methods = filterMethods(apia.listMethods(OBJECT_1_PID, null).toArray(new ObjectMethodsDef[0]));
@@ -116,7 +116,7 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods2() throws Exception {
-        FedoraAPIAMTOM apia = m_client.getAPIA();
+        FedoraAPIAMTOM apia = m_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
         methods = filterMethods(apia.listMethods(OBJECT_2_PID, null).toArray(new ObjectMethodsDef[0]));
@@ -129,7 +129,7 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods1_2() throws Exception {
-        FedoraAPIAMTOM apia = m_client.getAPIA();
+        FedoraAPIAMTOM apia = m_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
         methods = filterMethods(apia.listMethods(OBJECT_1_2_PID, null).toArray(new ObjectMethodsDef[0]));
@@ -144,7 +144,7 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods3() throws Exception {
-        FedoraAPIAMTOM apia = m_client.getAPIA();
+        FedoraAPIAMTOM apia = m_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
         methods = filterMethods(apia.listMethods(OBJECT_3_PID, null).toArray(new ObjectMethodsDef[0]));
@@ -159,7 +159,7 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods4() throws Exception {
-        FedoraAPIAMTOM apia = m_client.getAPIA();
+        FedoraAPIAMTOM apia = m_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
         methods = filterMethods(apia.listMethods(OBJECT_4_PID, null).toArray(new ObjectMethodsDef[0]));

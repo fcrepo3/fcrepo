@@ -121,7 +121,7 @@ public class AutoFinder {
             // FIXME:  Get around hardcoding the path in the baseURL
             String baseURL = protocol + "://" + host + ":" + port + "/" + context;
             FedoraClient fc = new FedoraClient(baseURL, user, pass);
-            AutoFinder finder = new AutoFinder(fc.getAPIA());
+            AutoFinder finder = new AutoFinder(fc.getAPIAMTOM());
 
             FieldSearchQuery query = new FieldSearchQuery();
             org.fcrepo.server.types.mtom.gen.ObjectFactory factory =

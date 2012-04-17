@@ -1,5 +1,5 @@
 
-package org.fcrepo.client;
+package org.fcrepo.client.mtom;
 
 import java.awt.Dimension;
 import java.math.BigInteger;
@@ -7,20 +7,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.fcrepo.server.types.gen.DatastreamDef;
-import org.fcrepo.server.types.gen.FieldSearchResult;
-import org.fcrepo.server.types.gen.MIMETypedStream;
-import org.fcrepo.server.types.gen.ObjectMethodsDef;
-import org.fcrepo.server.types.gen.ObjectProfile;
-import org.fcrepo.server.types.gen.RepositoryInfo;
+import org.fcrepo.client.Administrator;
+import org.fcrepo.client.SwingWorker;
+import org.fcrepo.server.types.mtom.gen.DatastreamDef;
+import org.fcrepo.server.types.mtom.gen.FieldSearchResult;
+import org.fcrepo.server.types.mtom.gen.MIMETypedStream;
+import org.fcrepo.server.types.mtom.gen.ObjectMethodsDef;
+import org.fcrepo.server.types.mtom.gen.ObjectProfile;
+import org.fcrepo.server.types.mtom.gen.RepositoryInfo;
 
 public class APIAStubWrapper
-        implements org.fcrepo.server.access.FedoraAPIA {
+        implements org.fcrepo.server.access.FedoraAPIAMTOM {
 
     /** The wrapped instance */
-    private final org.fcrepo.server.access.FedoraAPIA m_instance;
+    private final org.fcrepo.server.access.FedoraAPIAMTOM m_instance;
 
-    public APIAStubWrapper(org.fcrepo.server.access.FedoraAPIA instance) {
+    public APIAStubWrapper(org.fcrepo.server.access.FedoraAPIAMTOM instance) {
         m_instance = instance;
     }
 
@@ -488,7 +490,7 @@ public class APIAStubWrapper
     public MIMETypedStream getDissemination(java.lang.String pid,
                                             java.lang.String serviceDefinitionPid,
                                             java.lang.String methodName,
-                                            org.fcrepo.server.types.gen.GetDissemination.Parameters parameters,
+                                            org.fcrepo.server.types.mtom.gen.GetDissemination.Parameters parameters,
                                             java.lang.String asOfDateTime) {
         String METHOD_NAME = "getDissemination";
         HashMap PARMS = new HashMap();
@@ -509,7 +511,7 @@ public class APIAStubWrapper
                                                   .get("serviceDefinitionPid"),
                                           (java.lang.String) parms
                                                   .get("methodName"),
-                                          (org.fcrepo.server.types.gen.GetDissemination.Parameters) parms
+                                          (org.fcrepo.server.types.mtom.gen.GetDissemination.Parameters) parms
                                                   .get("parameters"),
                                           (java.lang.String) parms
                                                   .get("asOfDateTime"));
@@ -589,9 +591,9 @@ public class APIAStubWrapper
     }
 
     @Override
-    public FieldSearchResult findObjects(org.fcrepo.server.types.gen.ArrayOfString resultFields,
+    public FieldSearchResult findObjects(org.fcrepo.server.types.mtom.gen.ArrayOfString resultFields,
                                          BigInteger maxResults,
-                                         org.fcrepo.server.types.gen.FieldSearchQuery query) {
+                                         org.fcrepo.server.types.mtom.gen.FieldSearchQuery query) {
         String METHOD_NAME = "findObjects";
         HashMap PARMS = new HashMap();
         PARMS.put("resultFields", resultFields);
@@ -604,10 +606,10 @@ public class APIAStubWrapper
             public Object construct() {
                 // call wrapped method
                 return m_instance
-                        .findObjects((org.fcrepo.server.types.gen.ArrayOfString) parms
+                        .findObjects((org.fcrepo.server.types.mtom.gen.ArrayOfString) parms
                                              .get("resultFields"),
                                      (BigInteger) parms.get("maxResults"),
-                                     (org.fcrepo.server.types.gen.FieldSearchQuery) parms
+                                     (org.fcrepo.server.types.mtom.gen.FieldSearchQuery) parms
                                              .get("query"));
             }
         };

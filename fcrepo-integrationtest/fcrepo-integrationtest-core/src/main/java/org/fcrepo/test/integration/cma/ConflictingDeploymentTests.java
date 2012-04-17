@@ -172,7 +172,7 @@ public class ConflictingDeploymentTests {
         ingestTestObjects(DEPLOYMENT_1_BASE);
         ingestTestObjects(DEPLOYMENT_2_BASE);
 
-        m_client.getAPIM()
+        m_client.getAPIMMTOM()
                 .purgeObject(SDEP_1_PID, "removing first sDep", false);
 
         Assert.assertTrue("Did not disseminate expected content: ",
@@ -180,7 +180,7 @@ public class ConflictingDeploymentTests {
     }
 
     private void modify(String pid) throws Exception {
-        m_client.getAPIM().addRelationship(pid,
+        m_client.getAPIMMTOM().addRelationship(pid,
                                            "http://example.org/isModified",
                                            "true",
                                            true,

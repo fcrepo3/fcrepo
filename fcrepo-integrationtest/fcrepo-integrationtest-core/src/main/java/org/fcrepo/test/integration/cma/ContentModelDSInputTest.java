@@ -58,7 +58,7 @@ public class ContentModelDSInputTest {
     /* Assure that listMethods works as advertised */
     @Test
     public void testListMethods() throws Exception {
-        FedoraAPIAMTOM apia = m_client.getAPIA();
+        FedoraAPIAMTOM apia = m_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
         methods = filterMethods(apia.listMethods(OBJECT_PID, null).toArray(new ObjectMethodsDef[0]));

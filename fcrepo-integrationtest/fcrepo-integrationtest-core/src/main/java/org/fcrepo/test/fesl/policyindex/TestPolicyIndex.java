@@ -123,7 +123,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
 
             FedoraClient client = getFedoraClient();
             assertNotNull("FedoraTestCase.getFedoraClient() returned NULL", client);
-            apim = client.getAPIM();
+            apim = client.getAPIMMTOM();
 
             policyIndexUtils = new PolicyIndexUtils(apim);
 

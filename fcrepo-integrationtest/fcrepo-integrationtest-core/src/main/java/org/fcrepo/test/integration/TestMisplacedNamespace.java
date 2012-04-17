@@ -56,14 +56,14 @@ public class TestMisplacedNamespace
     @Override
     @After
     public void tearDown() throws Exception {
-        m_client.getAPIM().purgeObject(PID, "Cleanup", false);
+        m_client.getAPIMMTOM().purgeObject(PID, "Cleanup", false);
     }
 
     @Test
     public void testIngestAndPurge() throws Exception {
         try {
             /* Ingest of the offending foxml should fail */
-            m_client.getAPIM().ingest(TypeUtility.convertBytesToDataHandler(getFoxml(OFFENDING_FOXML)),
+            m_client.getAPIMMTOM().ingest(TypeUtility.convertBytesToDataHandler(getFoxml(OFFENDING_FOXML)),
                                       FOXML1_1.uri,
                                       "malformed foxml object");
             fail("Sould have failed initial ingest!");
@@ -74,7 +74,7 @@ public class TestMisplacedNamespace
         }
 
         /* Ingest the good object. Should succeed */
-        m_client.getAPIM().ingest(TypeUtility.convertBytesToDataHandler(getFoxml(GOOD_FOXML)),
+        m_client.getAPIMMTOM().ingest(TypeUtility.convertBytesToDataHandler(getFoxml(GOOD_FOXML)),
                                   FOXML1_1.uri,
                                   "non-malformed foxml object");
     }

@@ -164,8 +164,8 @@ public class PerformanceTests
 
         String baseURL = "http://" + host + ":" + port + "/" + context;
         FedoraClient fedoraClient = new FedoraClient(baseURL, username, password);
-        apim = fedoraClient.getAPIM();
-        apia = fedoraClient.getAPIA();
+        apim = fedoraClient.getAPIMMTOM();
+        apia = fedoraClient.getAPIAMTOM();
 
         PIDS = apim.getNextPID(new BigInteger(Integer.valueOf(iterations).toString()), "demo").toArray(new String[]{});
         FOXML = new byte[iterations][];

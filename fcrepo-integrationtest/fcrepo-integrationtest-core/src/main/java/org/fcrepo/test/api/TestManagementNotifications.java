@@ -104,7 +104,7 @@ public class TestManagementNotifications
 
     @Override
     public void setUp() throws Exception {
-        apim = getFedoraClient().getAPIM();
+        apim = getFedoraClient().getAPIMMTOM();
 
         // Create and start a subscriber
         Properties props = new Properties();

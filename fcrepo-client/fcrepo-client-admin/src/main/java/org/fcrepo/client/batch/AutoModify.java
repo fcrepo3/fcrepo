@@ -438,8 +438,8 @@ public class AutoModify {
                                     + "/" + context;
                     FedoraClient fc =
                             new FedoraClient(baseURL, username, password);
-                    APIA = fc.getAPIA();
-                    APIM = fc.getAPIM();
+                    APIA = fc.getAPIAMTOM();
+                    APIM = fc.getAPIMMTOM();
                     //*******************************************
 
                     AutoModify am =

@@ -1,5 +1,5 @@
 
-package org.fcrepo.client;
+package org.fcrepo.client.mtom;
 
 import java.awt.Dimension;
 import java.math.BigInteger;
@@ -7,23 +7,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.fcrepo.server.types.gen.ArrayOfString;
-import org.fcrepo.server.types.gen.Datastream;
-import org.fcrepo.server.types.gen.RelationshipTuple;
-import org.fcrepo.server.types.gen.Validation;
+import javax.activation.DataHandler;
+
+import org.fcrepo.client.Administrator;
+import org.fcrepo.client.SwingWorker;
+import org.fcrepo.server.types.mtom.gen.ArrayOfString;
+import org.fcrepo.server.types.mtom.gen.Datastream;
+import org.fcrepo.server.types.mtom.gen.RelationshipTuple;
+import org.fcrepo.server.types.mtom.gen.Validation;
 
 public class APIMStubWrapper
-        implements org.fcrepo.server.management.FedoraAPIM {
+        implements org.fcrepo.server.management.FedoraAPIMMTOM {
 
     /** The wrapped instance */
-    private final org.fcrepo.server.management.FedoraAPIM m_instance;
+    private final org.fcrepo.server.management.FedoraAPIMMTOM m_instance;
 
-    public APIMStubWrapper(org.fcrepo.server.management.FedoraAPIM instance) {
+    public APIMStubWrapper(org.fcrepo.server.management.FedoraAPIMMTOM instance) {
         m_instance = instance;
     }
 
     @Override
-    public java.lang.String ingest(byte[] objectXML,
+    public java.lang.String ingest(DataHandler objectXML,
                                    java.lang.String format,
                                    java.lang.String logMessage){
         String METHOD_NAME = "ingest";
@@ -37,7 +41,7 @@ public class APIMStubWrapper
             @Override
             public Object construct() {
                     // call wrapped method
-                    return m_instance.ingest((byte[]) parms.get("objectXML"),
+                    return m_instance.ingest((DataHandler) parms.get("objectXML"),
                                              (java.lang.String) parms
                                                      .get("format"),
                                              (java.lang.String) parms
@@ -224,7 +228,7 @@ public class APIMStubWrapper
     }
 
     @Override
-    public byte[] getObjectXML(java.lang.String pid){
+    public DataHandler getObjectXML(java.lang.String pid){
         String METHOD_NAME = "getObjectXML";
         HashMap PARMS = new HashMap();
         PARMS.put("pid", pid);
@@ -309,11 +313,11 @@ public class APIMStubWrapper
 
         // Otherwise, get the value from the
         // worker (returning it if applicable)
-        return (byte[]) worker.get();
+        return (DataHandler) worker.get();
     }
 
     @Override
-    public byte[] export(java.lang.String pid,
+    public DataHandler export(java.lang.String pid,
                          java.lang.String format,
                          java.lang.String context){
         String METHOD_NAME = "export";
@@ -406,7 +410,7 @@ public class APIMStubWrapper
 
         // Otherwise, get the value from the
         // worker (returning it if applicable)
-        return (byte[]) worker.get();
+        return (DataHandler) worker.get();
     }
 
     @Override
@@ -778,7 +782,7 @@ public class APIMStubWrapper
                                                     java.lang.String dsLabel,
                                                     java.lang.String MIMEType,
                                                     java.lang.String formatURI,
-                                                    byte[] dsContent,
+                                                    DataHandler dsContent,
                                                     java.lang.String checksumType,
                                                     java.lang.String checksum,
                                                     java.lang.String logMessage,
@@ -815,7 +819,7 @@ public class APIMStubWrapper
                                                              .get("MIMEType"),
                                                      (java.lang.String) parms
                                                              .get("formatURI"),
-                                                     (byte[]) parms
+                                                     (DataHandler) parms
                                                              .get("dsContent"),
                                                      (java.lang.String) parms
                                                              .get("checksumType"),

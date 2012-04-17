@@ -113,8 +113,8 @@ public class MassIngest {
                         protocol + "://" + hostName + ":" + portNum + "/"
                                 + context;
                 FedoraClient fc = new FedoraClient(baseURL, username, password);
-                APIA = fc.getAPIA();
-                APIM = fc.getAPIM();
+                APIA = fc.getAPIAMTOM();
+                APIM = fc.getAPIMMTOM();
                 //*******************************************
                 AutoIngestor autoIngestor = new AutoIngestor(APIA, APIM);
 

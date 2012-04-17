@@ -392,8 +392,8 @@ public class LoginDialog
             }
 
             // set SOAP stubs for Administrator
-            Administrator.APIA = fc.getAPIA();
-            Administrator.APIM = fc.getAPIM();
+            Administrator.APIA = fc.getAPIAMTOM();
+            Administrator.APIM = fc.getAPIMMTOM();
 
         } catch (Exception e) {
             if (e.getMessage().indexOf("Unauthorized") != -1

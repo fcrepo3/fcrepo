@@ -141,7 +141,7 @@ public class AutoPurger {
                         protocol + "://" + hostName + ":" + portNum + "/"
                         + context;
                 FedoraClient fc = new FedoraClient(baseURL, args[1], args[2]);
-                AutoPurger a = new AutoPurger(fc.getAPIM());
+                AutoPurger a = new AutoPurger(fc.getAPIMMTOM());
                 //*******************************************
 
                 /* Single PID:  just purge it */

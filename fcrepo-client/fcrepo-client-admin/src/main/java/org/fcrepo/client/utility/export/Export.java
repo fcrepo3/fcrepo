@@ -229,8 +229,8 @@ public class Export
                     protocol + "://" + hp[0] + ":" + Integer.parseInt(hp[1])
                             + "/" + context;
             FedoraClient fc = new FedoraClient(baseURL, args[1], args[2]);
-            FedoraAPIAMTOM sourceRepoAPIA = fc.getAPIA();
-            FedoraAPIMMTOM sourceRepoAPIM = fc.getAPIM();
+            FedoraAPIAMTOM sourceRepoAPIA = fc.getAPIAMTOM();
+            FedoraAPIMMTOM sourceRepoAPIM = fc.getAPIMMTOM();
             //*******************************************
 
             String exportFormat = args[4];

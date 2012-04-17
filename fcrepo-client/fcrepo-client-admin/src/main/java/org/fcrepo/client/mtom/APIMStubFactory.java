@@ -3,8 +3,10 @@
  * available online at http://fedora-commons.org/license/).
  */
 
-package org.fcrepo.client;
+package org.fcrepo.client.mtom;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.util.HashMap;
@@ -12,18 +14,19 @@ import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
 
-import org.fcrepo.server.access.FedoraAPIA;
+import org.fcrepo.client.Administrator;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 
 /**
  * @author Chris Wilper
  */
-public abstract class APIAStubFactory {
+public abstract class APIMStubFactory {
 
     public static int SOCKET_TIMEOUT_SECONDS = 120;
 
     /**
-     * Method to rewrite the default API-A base URL (specified in the service
-     * locator class FedoraAPIAServiceLocator). In this case we allow the
+     * Method to rewrite the default API-M base URL (specified in the service
+     * locator class FedoraAPIMServiceLocator). In this case we allow the
      * protocol, host, and port parts of the service URL to be replaced. A SOAP
      * stub will be returned with the desired service endpoint URL.
      *
@@ -32,11 +35,11 @@ public abstract class APIAStubFactory {
      * @param port
      * @param username
      * @param password
-     * @return FedoraAPIA SOAP stub
+     * @return FedoraAPIM SOAP stub
      * @throws MalformedURLException
      * @throws ServiceException
      */
-    public static FedoraAPIA getStub(String protocol,
+    public static FedoraAPIMMTOM getStub(String protocol,
                                          String host,
                                          int port,
                                          String username,
@@ -49,39 +52,44 @@ public abstract class APIAStubFactory {
         }
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put("mtom-enabled", Boolean.FALSE);
+        props.put("mtom-enabled", Boolean.TRUE);
 
         org.apache.cxf.jaxws.JaxWsProxyFactoryBean clientFactory =
                 new org.apache.cxf.jaxws.JaxWsProxyFactoryBean();
         clientFactory.setAddress(protocol + "://" + host + ":" + port
-                + "/fedora/services/access");
-        clientFactory.setServiceClass(FedoraAPIA.class);
+                + "/fedora/services/managementMTOM");
+        clientFactory.setServiceClass(FedoraAPIMMTOM.class);
         clientFactory.setUsername(username);
         clientFactory.setPassword(password);
         clientFactory.setProperties(props);
-//        LoggingInInterceptor log1 = new LoggingInInterceptor(new PrintWriter(System.out));
-//        LoggingOutInterceptor log2 = new LoggingOutInterceptor(new PrintWriter(System.out));
-//        clientFactory.getInInterceptors().add(log1);
-//        clientFactory.getInInterceptors().add(log2);
-        PrintStream syserr = System.err;
-        System.setErr(System.out);
-        FedoraAPIA service = (FedoraAPIA) clientFactory.create();
-        System.setErr(syserr);
-        syserr = null;
+        //      LoggingInInterceptor log1 = new LoggingInInterceptor(new PrintWriter(System.out));
+        //      LoggingOutInterceptor log2 = new LoggingOutInterceptor(new PrintWriter(System.out));
+        //      clientFactory.getInInterceptors().add(log1);
+        //      clientFactory.getInInterceptors().add(log2);
+
+        // temporarily turn off err stream, because initialization of service spams the stream
+        PrintStream aux = System.err;
+        System.setErr(new PrintStream(new OutputStream() {
+            @Override
+            public void write(int arg0) throws IOException {
+            }
+        }));
+        FedoraAPIMMTOM service = (FedoraAPIMMTOM) clientFactory.create();
+        System.setErr(aux);
 
         if (Administrator.INSTANCE == null) {
             // if running without Administrator, don't wrap it with the statusbar stuff
             return service;
         } else {
-            return new APIAStubWrapper(service);
+            return new APIMStubWrapper(service);
         }
     }
 
     //    /**
-    //     * Method to rewrite the default API-A base URL (specified in the service
-    //     * locator class FedoraAPIAServiceLocator). In this case we allow the path
-    //     * of the service URL to be replaced. A SOAP stub will be returned with the
-    //     * desired service endpoint URL.
+    //     * Method to rewrite the default API-M base URL (specified in the service
+    //     * locator class FedoraAPIMServiceLocator). In this case we allow the
+    //     * protocol, host, port, and PATH parts of the service URL to be replaced. A
+    //     * SOAP stub will be returned with the desired service endpoint URL.
     //     *
     //     * @param protocol
     //     * @param host
@@ -89,11 +97,11 @@ public abstract class APIAStubFactory {
     //     * @param path
     //     * @param username
     //     * @param password
-    //     * @return FedoraAPIA SOAP stub
+    //     * @return FedoraAPIM SOAP stub
     //     * @throws MalformedURLException
     //     * @throws ServiceException
     //     */
-    //    public static FedoraAPIA getStubAltPath(String protocol,
+    //    public static FedoraAPIM getStubAltPath(String protocol,
     //                                            String host,
     //                                            int port,
     //                                            String path,
@@ -101,8 +109,8 @@ public abstract class APIAStubFactory {
     //                                            String password)
     //            throws MalformedURLException, ServiceException {
     //
-    //        FedoraAPIAServiceLocator locator =
-    //                new FedoraAPIAServiceLocator(username,
+    //        FedoraAPIMServiceLocator locator =
+    //                new FedoraAPIMServiceLocator(username,
     //                                             password,
     //                                             SOCKET_TIMEOUT_SECONDS);
     //
@@ -110,24 +118,24 @@ public abstract class APIAStubFactory {
     //        URL ourl = null;
     //        URL nurl = null;
     //        if (protocol.equalsIgnoreCase("http")) {
-    //            ourl = new URL(locator.getFedoraAPIAPortSOAPHTTPAddress());
+    //            ourl = new URL(locator.getFedoraAPIMPortSOAPHTTPAddress());
     //            nurl = rewriteServiceURL(ourl, protocol, host, port, path);
     //            if (Administrator.INSTANCE == null) {
     //                // if running without Administrator, don't wrap it with the statusbar stuff
-    //                return locator.getFedoraAPIAPortSOAPHTTP(nurl);
+    //                return locator.getFedoraAPIMPortSOAPHTTP(nurl);
     //            } else {
-    //                return new APIAStubWrapper(locator
-    //                        .getFedoraAPIAPortSOAPHTTP(nurl));
+    //                return new APIMStubWrapper(locator
+    //                        .getFedoraAPIMPortSOAPHTTP(nurl));
     //            }
     //        } else if (protocol.equalsIgnoreCase("https")) {
-    //            ourl = new URL(locator.getFedoraAPIAPortSOAPHTTPSAddress());
+    //            ourl = new URL(locator.getFedoraAPIMPortSOAPHTTPSAddress());
     //            nurl = rewriteServiceURL(ourl, protocol, host, port, path);
     //            if (Administrator.INSTANCE == null) {
     //                // if running without Administrator, don't wrap it with the statusbar stuff
-    //                return locator.getFedoraAPIAPortSOAPHTTPS(nurl);
+    //                return locator.getFedoraAPIMPortSOAPHTTPS(nurl);
     //            } else {
-    //                return new APIAStubWrapper(locator
-    //                        .getFedoraAPIAPortSOAPHTTPS(nurl));
+    //                return new APIMStubWrapper(locator
+    //                        .getFedoraAPIMPortSOAPHTTPS(nurl));
     //            }
     //        } else {
     //            throw new javax.xml.rpc.ServiceException("The protocol" + " "
@@ -135,7 +143,7 @@ public abstract class APIAStubFactory {
     //        }
     //    }
     //
-    //    private static String rewriteServiceURL(URL ourl,
+    //    private static URL rewriteServiceURL(URL ourl,
     //                                         String protocol,
     //                                         String host,
     //                                         int port,
@@ -176,6 +184,7 @@ public abstract class APIAStubFactory {
     //            nurl.append(path);
     //        }
     //
-    //        return nurl.toString();
+    //        return new URL(nurl.toString());
     //    }
+
 }

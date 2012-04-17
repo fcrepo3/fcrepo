@@ -1298,8 +1298,8 @@ public class BatchModifyParser
                 String baseURL =
                         protocol + "://" + host + ":" + port + "/" + context;
                 FedoraClient fc = new FedoraClient(baseURL, user, pass);
-                APIA = fc.getAPIA();
-                APIM = fc.getAPIM();
+                APIA = fc.getAPIAMTOM();
+                APIM = fc.getAPIMMTOM();
                 //*******************************************
 
                 InputStream file =

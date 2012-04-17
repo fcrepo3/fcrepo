@@ -127,16 +127,16 @@ public abstract class FedoraServerTestCase
 
         Ingest.multiFromDirectory(dir,
                                   ingestFormat,
-                                  client.getAPIA(),
-                                  client.getAPIM(),
+                                  client.getAPIAMTOM(),
+                                  client.getAPIMMTOM(),
                                   null,
                                   new PrintStream(File.createTempFile("demo",
                                                                       null)),
                                   new IngestCounter());
         // clone some demo objects to managed-content equivalents for reserved datastreams (RELS-*, DC)
         try {
-            ManagedContentTranslator.createManagedClone(client.getAPIM(), "demo:SmileyPens", "demo:SmileyPens_M");
-            ManagedContentTranslator.createManagedClone(client.getAPIM(), "demo:SmileyBeerGlass", "demo:SmileyBeerGlass_M");
+            ManagedContentTranslator.createManagedClone(client.getAPIMMTOM(), "demo:SmileyPens", "demo:SmileyPens_M");
+            ManagedContentTranslator.createManagedClone(client.getAPIMMTOM(), "demo:SmileyBeerGlass", "demo:SmileyBeerGlass_M");
         } catch (Exception e) { // ignore errors, just log (for cases where ingest repeated before purge done)
             System.out.println("Could not create managed clone test objects: " + e.getMessage());
     }
@@ -163,7 +163,7 @@ public abstract class FedoraServerTestCase
 
     public static void purgeDemoObjects() throws Exception {
         FedoraClient client = getFedoraClient();
-        FedoraAPIMMTOM apim = client.getAPIM();
+        FedoraAPIMMTOM apim = client.getAPIMMTOM();
 
         for (String pid : getDemoObjects()) {
             AutoPurger.purge(apim, pid, null);

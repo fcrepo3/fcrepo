@@ -133,7 +133,7 @@ public class TestXACMLPolicies
     }
 
     private boolean canWrite(FedoraClient client, String pid) throws Exception {
-        FedoraAPIMMTOM apim = client.getAPIM();
+        FedoraAPIMMTOM apim = client.getAPIMMTOM();
         try {
             apim.modifyObject(pid, null, null, null, "log message");
             return true;
@@ -447,7 +447,7 @@ public class TestXACMLPolicies
             System.out.println("Testing " + functionToTest
                     + " from invalid user: " + username);
 
-            FedoraAPIMMTOM apim1 = user.getAPIM();
+            FedoraAPIMMTOM apim1 = user.getAPIMMTOM();
             Method func = apim1.getClass().getMethod(functionToTest, args);
             Object result = func.invoke(apim1, parms);
             fail("Illegal access allowed");
@@ -516,7 +516,7 @@ public class TestXACMLPolicies
             // testuser1 does have permission to access demo:5 datastreams, so this should succeed
             System.out.println("Testing " + functionToTest
                     + " from valid user: " + username);
-            FedoraAPIMMTOM apim1 = user.getAPIM();
+            FedoraAPIMMTOM apim1 = user.getAPIMMTOM();
             Method func = apim1.getClass().getMethod(functionToTest, args);
             Object result = func.invoke(apim1, parms);
             assertTrue(result != null);
@@ -553,7 +553,7 @@ public class TestXACMLPolicies
             System.out.println("Testing " + functionToTest
                     + " from invalid user: " + username);
 
-            FedoraAPIAMTOM apia1 = user.getAPIA();
+            FedoraAPIAMTOM apia1 = user.getAPIAMTOM();
             Method func = apia1.getClass().getMethod(functionToTest, args);
             Object result = func.invoke(apia1, parms);
             fail("Illegal access allowed");
@@ -598,7 +598,7 @@ public class TestXACMLPolicies
             // testuser1 does have permission to access demo:5 datastreams, so this should succeed
             System.out.println("Testing " + functionToTest
                     + " from valid user: " + username);
-            FedoraAPIAMTOM apia1 = user.getAPIA();
+            FedoraAPIAMTOM apia1 = user.getAPIAMTOM();
             Method func = apia1.getClass().getMethod(functionToTest, args);
             Object result = func.invoke(apia1, parms);
             assertTrue(result != null);
@@ -950,7 +950,7 @@ public class TestXACMLPolicies
             xml.append("    </foxml:datastreamVersion>");
             xml.append("  </foxml:datastream>");
             xml.append("</foxml:digitalObject>");
-            admin.getAPIM().ingest(TypeUtility.convertBytesToDataHandler(xml.toString().getBytes("UTF-8")),
+            admin.getAPIMMTOM().ingest(TypeUtility.convertBytesToDataHandler(xml.toString().getBytes("UTF-8")),
                                    FOXML1_1.uri,
                                    "");
         } catch (Exception e) {
@@ -961,7 +961,7 @@ public class TestXACMLPolicies
 
     private void removeObjectSpecificPolicies() {
         try {
-            admin.getAPIM().purgeObject("demo:ObjSpecificTest", "", false);
+            admin.getAPIMMTOM().purgeObject("demo:ObjSpecificTest", "", false);
         } catch (Exception e) {
             throw new RuntimeException("Failure removing object-specific "
                     + "policies", e);
@@ -1014,7 +1014,7 @@ public class TestXACMLPolicies
                 xml.append("</foxml:datastream>");
             }
             xml.append("</foxml:digitalObject>");
-            admin.getAPIM().ingest(TypeUtility.convertBytesToDataHandler(xml.toString().getBytes("UTF-8")),
+            admin.getAPIMMTOM().ingest(TypeUtility.convertBytesToDataHandler(xml.toString().getBytes("UTF-8")),
                                    FOXML1_1.uri,
                                    "");
         } catch (Exception e) {
@@ -1024,7 +1024,7 @@ public class TestXACMLPolicies
 
     private void removeTestObject(String pid) {
         try {
-            admin.getAPIM().purgeObject(pid, "", false);
+            admin.getAPIMMTOM().purgeObject(pid, "", false);
         } catch (Exception e) {
             throw new RuntimeException("Failure removing test object: " + pid,
                                        e);

@@ -56,7 +56,7 @@ public class TestRESTAPIConfigQ
 
     @Override
     public void setUp() throws Exception {
-        apim = getFedoraClient().getAPIM();
+        apim = getFedoraClient().getAPIMMTOM();
     }
 
     @Override

@@ -62,7 +62,7 @@ public class ResourceIndexRebuilderTest {
         if (!isTomcatRunning()) {
             startTomcat();
         }
-        apim = FedoraTestCase.getFedoraClient().getAPIM();
+        apim = FedoraTestCase.getFedoraClient().getAPIMMTOM();
     }
 
     /**

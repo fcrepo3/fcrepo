@@ -342,7 +342,7 @@ public class TestCommandLineUtilities
                         + getFedoraAppServerContext();
         FedoraClient client =
                 new FedoraClient(baseURL, getUsername(), getPassword());
-        return client.getAPIM();
+        return client.getAPIMMTOM();
     }
 
     private void batchBuild(File objectTemplateFile,

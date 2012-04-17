@@ -53,8 +53,8 @@ public class TestAPIM2
 
     @Override
     public void setUp() throws Exception {
-        apim = getFedoraClient().getAPIM();
-        apia = getFedoraClient().getAPIA();
+        apim = getFedoraClient().getAPIMMTOM();
+        apia = getFedoraClient().getAPIAMTOM();
 
 
         Map<String, String> nsMap = new HashMap<String, String>();

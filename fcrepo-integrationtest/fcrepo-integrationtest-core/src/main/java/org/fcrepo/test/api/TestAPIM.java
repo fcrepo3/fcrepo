@@ -828,7 +828,7 @@ public class TestAPIM
 
     @Override
     public void setUp() throws Exception {
-        apim = getFedoraClient().getAPIM();
+        apim = getFedoraClient().getAPIMMTOM();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
         nsMap.put("dc", "http://purl.org/dc/elements/1.1/");
@@ -2543,7 +2543,7 @@ public class TestAPIM
         // test getting xml for object demo:5
         System.out.println("Running TestAPIM.testValidate...");
         FedoraClient client = getFedoraClient();
-        FedoraAPIAMTOM apia = client.getAPIA();
+        FedoraAPIAMTOM apia = client.getAPIAMTOM();
 
         String[] resultFields = {"pid"};
         java.math.BigInteger maxResults = new java.math.BigInteger("" + 1000);

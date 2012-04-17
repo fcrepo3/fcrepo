@@ -206,8 +206,8 @@ public class TestRESTAPI
                          DS4LabelFilenameOriginal);
 
         DEMO_REST = tpl.toString();
-        apia = getFedoraClient().getAPIA();
-        apim = getFedoraClient().getAPIM();
+        apia = getFedoraClient().getAPIAMTOM();
+        apim = getFedoraClient().getAPIMMTOM();
         apim.ingest(TypeUtility.convertBytesToDataHandler(DEMO_REST
                 .getBytes("UTF-8")), FOXML1_1.uri, "ingesting new foxml object");
 

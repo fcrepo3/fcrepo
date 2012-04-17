@@ -68,7 +68,7 @@ public class SimpleDeploymentTests {
     /* Assure that listMethods works as advertised */
     @Test
     public void testListMethods() throws Exception {
-        FedoraAPIAMTOM apia = m_client.getAPIA();
+        FedoraAPIAMTOM apia = m_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
         methods = filterMethods(apia.listMethods(OBJECT_1_PID, null).toArray(new ObjectMethodsDef[0]));

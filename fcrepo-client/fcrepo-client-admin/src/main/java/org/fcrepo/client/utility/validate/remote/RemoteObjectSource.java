@@ -54,8 +54,8 @@ public class RemoteObjectSource
                 new FedoraClient(serviceInfo.getBaseUrlString(),
                                  serviceInfo.getUsername(),
                                  serviceInfo.getPassword());
-        apia = fc.getAPIA();
-        apim = fc.getAPIM();
+        apia = fc.getAPIAMTOM();
+        apim = fc.getAPIMMTOM();
     }
 
     /**

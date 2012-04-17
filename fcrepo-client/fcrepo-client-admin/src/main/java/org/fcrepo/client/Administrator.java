@@ -16,10 +16,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import java.io.File;
 import java.io.IOException;
-
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
@@ -45,12 +43,6 @@ import javax.swing.JWindow;
 import javax.swing.KeyStroke;
 
 import org.apache.cxf.binding.soap.SoapFault;
-
-import org.fcrepo.swing.mdi.MDIDesktopPane;
-import org.fcrepo.swing.mdi.WindowMenu;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.client.actions.Login;
 import org.fcrepo.client.actions.PurgeObject;
 import org.fcrepo.client.actions.ViewObject;
@@ -61,13 +53,16 @@ import org.fcrepo.client.console.access.AccessConsole;
 import org.fcrepo.client.console.management.ManagementConsole;
 import org.fcrepo.client.export.ExportDialog;
 import org.fcrepo.client.ingest.IngestDialog;
+import org.fcrepo.client.mtom.APIAStubFactory;
 import org.fcrepo.client.search.Search;
 import org.fcrepo.client.utility.ingest.XMLBuilder.OBJECT_TYPE;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.swing.mdi.MDIDesktopPane;
+import org.fcrepo.swing.mdi.WindowMenu;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fedora Administrator GUI.
@@ -204,8 +199,8 @@ public class Administrator
                 String baseURL =
                         protocol + "://" + host + ":" + port + "/" + context;
                 FedoraClient fc = new FedoraClient(baseURL, user, pass);
-                APIA = fc.getAPIA();
-                APIM = fc.getAPIM();
+                APIA = fc.getAPIAMTOM();
+                APIM = fc.getAPIMMTOM();
                 //*******************************************
                 setLoginInfo(protocol, host, port, context, user, pass);
             } catch (Exception e) {

@@ -75,7 +75,7 @@ public class TestManagedDatastreams
     @Before
     public void setUp() throws Exception {
         abdera = Abdera.getInstance();
-        apim = getFedoraClient().getAPIM();
+        apim = getFedoraClient().getAPIMMTOM();
         System.setProperty("fedoraServerHost", "localhost");
         System.setProperty("fedoraServerPort", "8080");
     }

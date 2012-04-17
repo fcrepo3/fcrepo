@@ -80,7 +80,7 @@ public class TestOAIService
     }
 
     public void testListRecords() throws Exception {
-        FedoraAPIMMTOM apim = client.getAPIM();
+        FedoraAPIMMTOM apim = client.getAPIMMTOM();
         FileInputStream in =
                 new FileInputStream(FEDORA_HOME
                                     + "/client/demo/foxml/local-server-demos/simple-document-demo/obj_demo_31.xml");
