@@ -159,6 +159,7 @@
 		<handler operation="addDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddDatastreamHandler" />
 		<handler operation="describeUser" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeUserHandler" />
 		<handler operation="export" class="org.fcrepo.server.security.xacml.pep.ws.operations.ExportHandler" />
+		<handler operation="compareDatastreamChecksum" class="org.fcrepo.server.security.xacml.pep.ws.operations.CompareDatastreamChecksumHandler" />
 		<handler operation="getDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHandler" />
 		<handler operation="getDatastreamHistory" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHistoryHandler" />
 		<handler operation="getDatastreams" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamsHandler" />
@@ -175,11 +176,13 @@
 		<handler operation="addRelationship" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddRelationshipHandler" />
 		<handler operation="getRelationships" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetRelationshipsHandler" />
 		<handler operation="purgeRelationship" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeRelationshipHandler" />
+		<handler operation="validate" class="org.fcrepo.server.security.xacml.pep.ws.operations.ValidateHandler" />
 	</handlers-ws>
 	<handlers-ws service="Fedora-API-M-MTOM-Service">
 		<handler operation="addDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddDatastreamHandler" />
 		<handler operation="describeUser" class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeUserHandler" />
 		<handler operation="export" class="org.fcrepo.server.security.xacml.pep.ws.operations.ExportHandler" />
+		<handler operation="compareDatastreamChecksum" class="org.fcrepo.server.security.xacml.pep.ws.operations.CompareDatastreamChecksumHandler" />
 		<handler operation="getDatastream" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHandler" />
 		<handler operation="getDatastreamHistory" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHistoryHandler" />
 		<handler operation="getDatastreams" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamsHandler" />
@@ -196,5 +199,6 @@
 		<handler operation="addRelationship" class="org.fcrepo.server.security.xacml.pep.ws.operations.AddRelationshipHandler" />
 		<handler operation="getRelationships" class="org.fcrepo.server.security.xacml.pep.ws.operations.GetRelationshipsHandler" />
 		<handler operation="purgeRelationship" class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeRelationshipHandler" />
+		<handler operation="validate" class="org.fcrepo.server.security.xacml.pep.ws.operations.ValidateHandler" />
 	</handlers-ws>
 </config>

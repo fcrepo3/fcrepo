@@ -18,16 +18,24 @@
 
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
+import java.lang.reflect.Method;
 import java.net.URI;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.soap.SOAPElement;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
+
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.fcrepo.server.types.gen.FieldSearchResult;
+import org.fcrepo.server.types.gen.ObjectFields;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
@@ -36,17 +44,6 @@ import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Status;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
-import org.fcrepo.server.types.gen.FieldSearchResult;
-import org.fcrepo.server.types.gen.ObjectFields;
 
 
 /**
@@ -228,13 +225,15 @@ public class FieldSearchResultHandler
     public RequestCtx handleResponse(SOAPMessageContext context)
             throws OperationHandlerException {
         try {
-            // FieldSearchResult (mtom version or not) can be determined by the namespace
-            List<org.fcrepo.server.types.gen.FieldSearchResult> result =
-                getSOAPResponseObject(context, org.fcrepo.server.types.gen.FieldSearchResult.class);
-            org.fcrepo.server.types.gen.FieldSearchResult firstResult =
-                filter(context, result.get(0));
-            SOAPElement param = null; // TODO FieldSearchResult -?-> SOAPElement ?
-            setSOAPResponseObject(context, param);
+            Object response = getSOAPResponseObject(context);
+            org.fcrepo.server.types.gen.FieldSearchResult result =
+                (org.fcrepo.server.types.gen.FieldSearchResult) callGetter("getResult",response);
+            result =
+                filter(context, result);
+            Method setter = response.getClass().getDeclaredMethod("setResult",
+                    org.fcrepo.server.types.gen.FieldSearchResult.class);
+            setter.invoke(response, result);
+            setSOAPResponseObject(context, response);
         } catch (Exception e) {
             logger.error("Error filtering Objects", e);
             throw new OperationHandlerException("Error filtering Objects", e);

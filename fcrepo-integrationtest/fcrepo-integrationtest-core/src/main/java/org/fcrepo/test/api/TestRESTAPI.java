@@ -958,7 +958,6 @@ public class TestRESTAPI
                      .getStatusCode());
         assertEquals(pid.toString(), SC_OK, getTrue.getStatusCode());
         responseXML = getTrue.getResponseBodyString();
-        System.out.println(responseXML);
         assertXpathExists("/management:validation[@valid='false']", responseXML);
 
         // original - testing at exact ingets time - fails under postgres

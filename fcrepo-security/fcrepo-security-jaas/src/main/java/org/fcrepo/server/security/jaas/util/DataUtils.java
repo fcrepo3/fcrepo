@@ -1,14 +1,14 @@
 /*
  * File: DataUtils.java
- * 
+ *
  * Copyright 2009 Muradora
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -33,12 +33,16 @@ import java.security.NoSuchAlgorithmException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 public class DataUtils {
+
+    private static Logger logger = LoggerFactory.getLogger(DataUtils.class);
 
     public static Document getDocumentFromFile(File file) throws Exception {
         byte[] document = loadFile(file);
@@ -61,7 +65,7 @@ public class DataUtils {
     public static byte[] loadFile(File file) throws Exception {
         if (!file.exists() || !file.canRead()) {
             String message = "Cannot read file: " + file.getCanonicalPath();
-            System.err.println(message);
+            logger.error(message);
             throw new Exception(message);
         }
 
@@ -89,7 +93,7 @@ public class DataUtils {
             doc = docBuilder.parse(new ByteArrayInputStream(document));
         } catch (Exception e) {
             String message = "Unable to save file: " + filename;
-            System.err.println(message);
+            logger.error(message);
             e.printStackTrace();
             throw new Exception(message, e);
         }
@@ -108,7 +112,7 @@ public class DataUtils {
             writer.close();
         } catch (Exception e) {
             String message = "Unable to save file: " + filename;
-            System.err.println(message);
+            logger.error(message);
             e.printStackTrace();
             throw new Exception(message, e);
         }
@@ -193,7 +197,7 @@ public class DataUtils {
 
     /**
      * Converts a hash into its hexadecimal string representation.
-     * 
+     *
      * @param bytes
      *        the byte array to convert
      * @return the hexadecimal string representation

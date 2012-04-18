@@ -10,22 +10,19 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
 import org.apache.commons.io.IOUtils;
-
-import org.w3c.dom.Document;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 public class DataFileUtils {
 
@@ -53,7 +50,7 @@ public class DataFileUtils {
     public static byte[] loadFile(File file) throws Exception {
         if (!file.exists() || !file.canRead()) {
             String message = "Cannot read file: " + file.getCanonicalPath();
-            System.err.println(message);
+            logger.error(message);
             throw new Exception(message);
         }
 
@@ -83,8 +80,7 @@ public class DataFileUtils {
             saveDocument(filename, doc);
         } catch (Exception e) {
             String message = "Unable to save file: " + filename;
-            System.err.println(message);
-            e.printStackTrace();
+            logger.error(message,e);
             throw new Exception(message, e);
         }
     }
@@ -100,8 +96,7 @@ public class DataFileUtils {
             writer.close();
         } catch (Exception e) {
             String message = "Unable to save file: " + filename;
-            System.err.println(message);
-            e.printStackTrace();
+            logger.error(message,e);
             throw new Exception(message, e);
         }
     }

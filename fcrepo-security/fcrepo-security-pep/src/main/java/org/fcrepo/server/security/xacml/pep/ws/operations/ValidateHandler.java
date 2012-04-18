@@ -1,24 +1,5 @@
-/*
- * File: GetNextPIDHandler.java
- *
- * Copyright 2007 Macquarie E-Learning Centre Of Excellence
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
-import java.math.BigInteger;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,41 +15,29 @@ import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.IntegerAttribute;
+import com.sun.xacml.attr.DateTimeAttribute;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
 
 
-/**
- * @author nishen@melcoe.mq.edu.au
- */
-public class GetNextPIDHandler
-        extends AbstractOperationHandler {
+public class ValidateHandler extends AbstractOperationHandler {
 
     private static final Logger logger =
-            LoggerFactory.getLogger(GetNextPIDHandler.class);
+            LoggerFactory.getLogger(ValidateHandler.class);
 
-    public GetNextPIDHandler()
-            throws PEPException {
+    public ValidateHandler() throws PEPException {
         super();
     }
-
-    @Override
-    public RequestCtx handleResponse(SOAPMessageContext context)
-            throws OperationHandlerException {
-        return null;
-    }
-
     @Override
     public RequestCtx handleRequest(SOAPMessageContext context)
             throws OperationHandlerException {
-        logger.debug("GetNextPIDHandler/handleRequest!");
+        logger.debug("GetObjectProfileHandler/handleRequest!");
 
         RequestCtx req = null;
         Object oMap = null;
 
-        BigInteger numPids = null;
-        String pidNamespace = null;
+        String pid = null;
+        String asOfDateTime = null;
 
         try {
             oMap = getSOAPRequestObjects(context);
@@ -80,35 +49,32 @@ public class GetNextPIDHandler
         }
 
         try {
-            numPids = (BigInteger) callGetter("getNumPIDs",oMap);
-            pidNamespace = (String) callGetter("getPidNamespace", oMap);
+            pid = (String) callGetter("getPid",oMap);
+            asOfDateTime = (String) callGetter("getAsOfDateTime", oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",
                                                 e);
         }
 
-        logger.debug("Extracted SOAP Request Objects");
-
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
 
         try {
-            resAttr.put(Constants.OBJECT.PID.getURI(),
-                        new StringAttribute("FedoraRepository"));
-            resAttr.put(new URI(XACML_RESOURCE_ID),
-                        new AnyURIAttribute(new URI("FedoraRepository")));
-            if (numPids != null && !"".equals(numPids)) {
-                resAttr.put(Constants.OBJECT.N_PIDS.getURI(),
-                            new IntegerAttribute(numPids.intValue()));
+            if (pid != null && !"".equals(pid)) {
+                resAttr.put(Constants.OBJECT.PID.getURI(),
+                            new StringAttribute(pid));
+                resAttr.put(new URI(XACML_RESOURCE_ID),
+                        new AnyURIAttribute(new URI(pid)));
             }
-            if (pidNamespace != null && !"".equals(pidNamespace)) {
-                resAttr.put(Constants.OBJECT.NAMESPACE.getURI(),
-                            new StringAttribute(pidNamespace));
+
+            if (asOfDateTime != null && !"".equals(asOfDateTime)) {
+                resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
+                            DateTimeAttribute.getInstance(asOfDateTime));
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.GET_NEXT_PID
+                        new StringAttribute(Constants.ACTION.VALIDATE
                                 .getURI().toASCIIString()));
             actions.put(Constants.ACTION.API.getURI(),
                         new StringAttribute(Constants.ACTION.APIM.getURI()
@@ -121,15 +87,21 @@ public class GetNextPIDHandler
                                                      getEnvironment(context));
 
             LogUtil.statLog(getUser(context),
-                            Constants.ACTION.GET_NEXT_PID.getURI()
+                            Constants.ACTION.VALIDATE.getURI()
                                     .toASCIIString(),
-                            "FedoraRepository",
+                            pid,
                             null);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new OperationHandlerException(e.getMessage(), e);
         }
-
         return req;
     }
+
+    @Override
+    public RequestCtx handleResponse(SOAPMessageContext context)
+            throws OperationHandlerException {
+        return null;
+    }
+
 }

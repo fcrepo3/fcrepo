@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import java.net.URL;
 
 import org.apache.commons.httpclient.ConnectTimeoutException;
@@ -17,7 +16,6 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -215,7 +213,7 @@ public class WebClient {
                         try {
                             in.close();
                         } catch (Exception e) {
-                            System.err.println("Can't close InputStream: "
+                            logger.error("Can't close InputStream: "
                                     + e.getMessage());
                         }
                     }
@@ -252,8 +250,7 @@ public class WebClient {
             try {
                 in.close();
             } catch (Exception e) {
-                System.err
-                        .println("Can't close InputStream: " + e.getMessage());
+                logger.error("Can't close InputStream: " + e.getMessage());
             }
         }
     }
