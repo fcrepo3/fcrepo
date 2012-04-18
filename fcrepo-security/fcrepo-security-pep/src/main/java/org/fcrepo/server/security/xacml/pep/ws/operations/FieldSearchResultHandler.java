@@ -229,9 +229,10 @@ public class FieldSearchResultHandler
             throws OperationHandlerException {
         try {
             // FieldSearchResult (mtom version or not) can be determined by the namespace
-            FieldSearchResult[] result =
-                    (FieldSearchResult[]) getSOAPResponseObject(context, FieldSearchResult.class);
-            result[0] = filter(context, result[0]);
+            List<org.fcrepo.server.types.gen.FieldSearchResult> result =
+                getSOAPResponseObject(context, org.fcrepo.server.types.gen.FieldSearchResult.class);
+            org.fcrepo.server.types.gen.FieldSearchResult firstResult =
+                filter(context, result.get(0));
             SOAPElement param = null; // TODO FieldSearchResult -?-> SOAPElement ?
             setSOAPResponseObject(context, param);
         } catch (Exception e) {

@@ -115,13 +115,14 @@ public abstract class AbstractOperationHandler
     /**
      * Extracts the return object from the context.
      * @param <T>
+     * @param <T>
      *
      * @param context
      *        the message context.
      * @return the return object for the message.
      * @throws SoapFault
      */
-    protected <T> T[] getSOAPResponseObject(SOAPMessageContext context, Class<T> clazz) {
+    protected <T> List<T>  getSOAPResponseObject(SOAPMessageContext context, Class<T> clazz) {
         // return result
 
         // Obtain the operation details and message type
@@ -129,7 +130,6 @@ public abstract class AbstractOperationHandler
                 (QName) context.get(SOAPMessageContext.WSDL_OPERATION);
         operation = new QName(operation.getNamespaceURI(),operation.getLocalPart() + "Response");
         // Extract the SOAP Message
-        SOAPMessage message = context.getMessage();
 
         Object responseObject = unmarshall(context, operation);
          
@@ -138,6 +138,8 @@ public abstract class AbstractOperationHandler
                     + operation.getLocalPart());
             logger.info("Obtained request object: (" + responseObject.getClass().getName() + ") ");
         } else {
+            logger.error("Could not obtain " + operation.toString() + " Object from SOAP Response");
+            logger.error(context.getMessage().toString());
             throw CXFUtility
                     .getFault(new Exception("Could not obtain Object from SOAP Response"));
         }
@@ -154,7 +156,7 @@ public abstract class AbstractOperationHandler
             }
         }
 
-        return (T[])resultList.toArray();
+        return resultList;
     }
 
     /**

@@ -75,9 +75,9 @@ public class ListDatastreamsHandler
         }
 
         try {
-            DatastreamDef[] dsDefs =
-                    (DatastreamDef[]) getSOAPResponseObject(context, DatastreamDef.class);
-            if (dsDefs == null || dsDefs.length == 0) {
+            List<DatastreamDef> dsDefs =
+                getSOAPResponseObject(context, DatastreamDef.class);
+            if (dsDefs == null || dsDefs.size() == 0) {
                 return null;
             }
 
@@ -182,8 +182,8 @@ public class ListDatastreamsHandler
         return req;
     }
 
-    public DatastreamDef[] filter(SOAPMessageContext context,
-                                  DatastreamDef[] dsDefs,
+    public List<DatastreamDef> filter(SOAPMessageContext context,
+                                  List<DatastreamDef> dsDefs,
                                   String pid) throws OperationHandlerException,
             PEPException {
         List<String> requests = new ArrayList<String>();
@@ -268,6 +268,6 @@ public class ListDatastreamsHandler
             }
         }
 
-        return resultObjects.toArray(new DatastreamDef[0]);
+        return resultObjects;
     }
 }
