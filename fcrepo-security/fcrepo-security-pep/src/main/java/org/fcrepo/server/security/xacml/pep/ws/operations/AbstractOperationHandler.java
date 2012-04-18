@@ -18,6 +18,9 @@
 
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -28,6 +31,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPElement;
@@ -66,6 +73,8 @@ public abstract class AbstractOperationHandler
 
     protected static final String FEDORA_ROLE =
             "urn:fedora:names:fedora:2.1:subject:role";
+    
+    protected static final JAXBContext JAXB_CONTEXT = getJAXBContext();
 
     private static ContextHandler contextHandlerImpl;
 
@@ -80,133 +89,72 @@ public abstract class AbstractOperationHandler
     }
 
     /**
-     * Extracts the request parameters as objects from the context.
+     * Extracts the request as object from the context.
      *
      * @param context
      *        the message context.
-     * @return list of Objects
+     * @return Object
      * @throws SoapFault
      */
-    protected List<Object> getSOAPRequestObjects(SOAPMessageContext context) {
-        // return result
-        List<Object> result = new ArrayList<Object>();
+    protected Object getSOAPRequestObjects(SOAPMessageContext context) {
 
         // Obtain the operation details and message type
         QName operation =
                 (QName) context.get(SOAPMessageContext.WSDL_OPERATION);
 
-        // Extract the SOAP Message
-        SOAPMessage message = context.getMessage();
-
-        // Extract the SOAP Envelope from the Message
-        SOAPBody body;
-        try {
-            body = message.getSOAPBody();
-        } catch (SOAPException e) {
-            throw CXFUtility.getFault(e);
-        }
-        SOAPElement bodyElement = body;
-        if (bodyElement.getNamespaceURI().equals("http://schemas.xmlsoap.org/soap/envelope/")
-                && bodyElement.getLocalName().equals("Body")){
-            bodyElement = (SOAPElement)bodyElement.getElementsByTagNameNS(operation.getNamespaceURI(), operation.getLocalPart()).item(0);
-        }
-
-
-        //        // Get the envelope body
-        //        SOAPBodyElement body = envelope.getFirstBody();
-
-        // Make sure that the body element is an RPCElement.
-        //        if (body instanceof RPCElement) {
-        // Get all the parameters from the Body Element.
-        Iterator params = null;
-        try {
-            params = bodyElement.getChildElements();
-        } catch (Exception e) {
-            logger.error("Problem obtaining params", e);
-            throw CXFUtility.getFault(e);
-        }
-        int i = 0;
-        if (params != null && params.hasNext()) {
+        Object result = unmarshall(context, operation);
+        if (result != null) {
             logger.info("Operation: " + operation.getNamespaceURI() + " "
                     + operation.getLocalPart());
-            while (params.hasNext()) {
-                SOAPElement param = (SOAPElement) params.next();
-                result.add(param.getValue());
-                logger.info("Obtained object: (" + i++ + ") "
-                        + param.getElementQName().toString());
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Number of params: " + i);
-            }
+            logger.info("Obtained request object: (" + result.getClass().getName() + ") ");
         }
-        //        }
 
         return result;
     }
 
     /**
      * Extracts the return object from the context.
+     * @param <T>
      *
      * @param context
      *        the message context.
      * @return the return object for the message.
      * @throws SoapFault
      */
-    protected Object getSOAPResponseObject(SOAPMessageContext context, Class clazz) {
+    protected <T> T[] getSOAPResponseObject(SOAPMessageContext context, Class<T> clazz) {
         // return result
-        Object result = null;
 
         // Obtain the operation details and message type
         QName operation =
                 (QName) context.get(SOAPMessageContext.WSDL_OPERATION);
-
+        operation = new QName(operation.getNamespaceURI(),operation.getLocalPart() + "Response");
         // Extract the SOAP Message
         SOAPMessage message = context.getMessage();
 
-        // Get the envelope body
-        SOAPBody body;
-        try {
-            body = message.getSOAPBody();
-        } catch (SOAPException e) {
-            throw CXFUtility.getFault(e);
-        }
-
-        // Make sure that the body element is an RPCElement.
-        //        if (body instanceof RPCElement) {
-        // Get all the parameters from the Body Element.
-        Iterator params = null;
-        try {
-            params = ((SOAPElement) body).getChildElements();
-        } catch (Exception e) {
-            logger.error("Problem obtaining params", e);
-            throw CXFUtility.getFault(e);
-        }
-
-        int i = 0;
-        if (params != null && params.hasNext()) {
+        Object responseObject = unmarshall(context, operation);
+         
+        if (responseObject != null) {
             logger.info("Operation: " + operation.getNamespaceURI() + " "
                     + operation.getLocalPart());
-
-            while (params.hasNext() && result == null) {
-                SOAPElement param = (SOAPElement) params.next();
-                if (clazz.getName().equals(param.getElementQName().getLocalPart())) {
-                    logger.info("Obtained object: (" + param + ") "
-                            + param.getElementQName().toString());
-                    result = param.getValue();
-                }
-            }
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Number of params: " + i);
-        }
-        //        }
-
-        if (result == null) {
+            logger.info("Obtained request object: (" + responseObject.getClass().getName() + ") ");
+        } else {
             throw CXFUtility
                     .getFault(new Exception("Could not obtain Object from SOAP Response"));
         }
+        
+        ArrayList<T> resultList = new ArrayList<T>();
+        for (Method m:responseObject.getClass().getDeclaredMethods()){
+            if (m.getReturnType() == clazz) {
+                try {
+                    resultList.add((T)m.invoke(responseObject, null));
+                } catch (Exception e) {
+                    logger.error(e.toString(),e);
+                    throw CXFUtility.getFault(e);
+                }
+            }
+        }
 
-        return result;
+        return (T[])resultList.toArray();
     }
 
     /**
@@ -447,4 +395,53 @@ public abstract class AbstractOperationHandler
                     .get(SOAPMessageContext.SERVLET_REQUEST);
         return request.getRemoteUser();
     }
+    
+    protected Object callGetter(String mname, Object context) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+        Class klass = context.getClass();
+        Method getter = klass.getDeclaredMethod(mname, null);
+        return getter.invoke(context);
+    }
+    
+    private static JAXBContext getJAXBContext(){
+        try {
+            return JAXBContext.newInstance("org.fcrepo.server.types.gen:org.fcrepo.server.types.mtom.gen");
+        } catch (JAXBException e) {
+            logger.error(e.toString(),e);
+            return null;
+        }
+
+    }
+    
+    protected static Object unmarshall(SOAPMessageContext messageContext, QName operation) {
+        SOAPMessage message = messageContext.getMessage();
+        SOAPBody body;
+        try {
+            body = message.getSOAPBody();
+        } catch (SOAPException e) {
+            throw CXFUtility.getFault(e);
+        }
+        SOAPElement bodyElement = body;
+        if (bodyElement.getNamespaceURI().equals("http://schemas.xmlsoap.org/soap/envelope/")
+                && bodyElement.getLocalName().equals("Body")){
+            bodyElement = (SOAPElement)bodyElement.getElementsByTagNameNS(operation.getNamespaceURI(), operation.getLocalPart()).item(0);
+        }
+        if (bodyElement == null) return null;
+        
+        Unmarshaller um = null;
+        try {
+            um = JAXB_CONTEXT.createUnmarshaller();
+        } catch (JAXBException e) {
+            logger.error(e.toString(),e);
+            throw CXFUtility.getFault(e);
+        }
+        Object result = null;
+        try {
+            result = um.unmarshal(bodyElement);
+        } catch (Exception e) {
+            logger.error("Problem obtaining params", e);
+            throw CXFUtility.getFault(e);
+        }
+       return result;
+    }
+    
 }

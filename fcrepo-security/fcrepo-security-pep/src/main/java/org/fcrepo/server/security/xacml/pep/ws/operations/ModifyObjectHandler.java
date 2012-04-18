@@ -68,13 +68,11 @@ public class ModifyObjectHandler
         logger.debug("ModifyObjectHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
         String state = null;
-        // String label = null;
         String ownerId = null;
-        // String logMessage = null;
 
         try {
             oMap = getSOAPRequestObjects(context);
@@ -86,11 +84,9 @@ public class ModifyObjectHandler
         }
 
         try {
-            pid = (String) oMap.get(0);
-            state = (String) oMap.get(1);
-            // label = (String) oMap.get(2);
-            ownerId = (String) oMap.get(3);
-            // logMessage = (String) oMap.get(4);
+            pid = (String) callGetter("getPid",oMap);
+            state = (String) callGetter("getState",oMap);
+            ownerId = (String) callGetter("getOwnerId",oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",

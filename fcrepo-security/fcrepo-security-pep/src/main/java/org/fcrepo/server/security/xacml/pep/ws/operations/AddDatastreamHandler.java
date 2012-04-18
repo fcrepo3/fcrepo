@@ -68,7 +68,7 @@ public class AddDatastreamHandler
         logger.debug("AddDatastreamHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
         String dsID = null;
@@ -94,19 +94,15 @@ public class AddDatastreamHandler
         }
 
         try {
-            pid = (String) oMap.get(0);
-            dsID = (String) oMap.get(1);
-            // altIDs = (String[]) oMap.get(2);
-            // dsLabel = (String) oMap.get(3);
-            // versionable = (Boolean) oMap.get(4);
-            mimeType = (String) oMap.get(5);
-            formatURI = (String) oMap.get(6);
-            dsLocation = (String) oMap.get(7);
-            controlGroup = (String) oMap.get(8);
-            dsState = (String) oMap.get(9);
-            checksumType = (String) oMap.get(10);
-            checksum = (String) oMap.get(11);
-            // logMessage = (String) oMap.get(12);
+            pid = (String) callGetter("getPid",oMap);
+            dsID = (String) callGetter("getDsID", oMap);
+            mimeType = (String) callGetter("getMIMEType", oMap);
+            formatURI = (String) callGetter("getFormatURI", oMap);
+            dsLocation = (String) callGetter("getDsLocation", oMap);
+            controlGroup = (String) callGetter("getControlGroup", oMap);
+            dsState = (String) callGetter("getDsState", oMap);
+            checksumType = (String) callGetter("getChecksumType", oMap);
+            checksum = (String) callGetter("getChecksum", oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",

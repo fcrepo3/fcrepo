@@ -68,13 +68,9 @@ public class PurgeRelationshipHandler
         logger.debug("PurgeRelationshipHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
-        // String relationship = null;
-        // String object = null;
-        // Boolean isLiteral = null;
-        // String datatype = null;
 
         try {
             oMap = getSOAPRequestObjects(context);
@@ -86,11 +82,7 @@ public class PurgeRelationshipHandler
         }
 
         try {
-            pid = (String) oMap.get(0);
-            // relationship = (String) oMap.get(1);
-            // object = (String) oMap.get(2);
-            // isLiteral = (Boolean) oMap.get(3);
-            // datatype = (String) oMap.get(4);
+            pid = (String) callGetter("getPid",oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",

@@ -81,12 +81,12 @@ public class ListDatastreamsHandler
                 return null;
             }
 
-            List<Object> oMap = getSOAPRequestObjects(context);
-            if (oMap == null || oMap.size() == 0) {
+            Object oMap = getSOAPRequestObjects(context);
+            String pid = (String) callGetter("getPid",oMap);
+            if (oMap == null || pid == null) {
                 logger.error("No request objects!");
                 throw new OperationHandlerException("ListDatastream had no pid");
             }
-            String pid = (String) oMap.get(0);
 
             dsDefs = filter(context, dsDefs, pid);
 //  todo: fix
@@ -114,7 +114,7 @@ public class ListDatastreamsHandler
         }
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
         String asOfDateTime = null;
@@ -129,8 +129,8 @@ public class ListDatastreamsHandler
         }
 
         try {
-            pid = (String) oMap.get(0);
-            asOfDateTime = (String) oMap.get(1);
+            pid = (String) callGetter("getPid",oMap);
+            asOfDateTime = (String) callGetter("getAsOfDateTime", oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",
@@ -268,6 +268,6 @@ public class ListDatastreamsHandler
             }
         }
 
-        return resultObjects.toArray(new DatastreamDef[resultObjects.size()]);
+        return resultObjects.toArray(new DatastreamDef[0]);
     }
 }

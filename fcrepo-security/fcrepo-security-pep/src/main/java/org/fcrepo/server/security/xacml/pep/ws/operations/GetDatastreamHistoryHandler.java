@@ -67,7 +67,7 @@ public class GetDatastreamHistoryHandler
         logger.debug("GetDatastreamHistoryHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
         String dsID = null;
@@ -82,8 +82,8 @@ public class GetDatastreamHistoryHandler
         }
 
         try {
-            pid = (String) oMap.get(0);
-            dsID = (String) oMap.get(1);
+            pid = (String) callGetter("getPid",oMap);
+            dsID = (String) callGetter("getDsID", oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",

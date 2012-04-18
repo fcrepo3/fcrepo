@@ -70,7 +70,7 @@ public class GetDisseminationHandler
         logger.debug("GetDisseminationHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
         String sDefPid = null;
@@ -88,11 +88,10 @@ public class GetDisseminationHandler
         }
 
         try {
-            pid = (String) oMap.get(0);
-            sDefPid = (String) oMap.get(1);
-            methodName = (String) oMap.get(2);
-            // properties = (Property[]) oMap.get(3);
-            asOfDateTime = (String) oMap.get(4);
+            pid = (String) callGetter("getPid",oMap);
+            sDefPid = (String) callGetter("getServiceDefinitionPid",oMap);
+            methodName = (String) callGetter("getMethodName",oMap);
+            asOfDateTime = (String) callGetter("getAsOfDateTime", oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",

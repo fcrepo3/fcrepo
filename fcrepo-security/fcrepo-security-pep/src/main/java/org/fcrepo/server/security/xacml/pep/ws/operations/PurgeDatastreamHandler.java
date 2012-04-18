@@ -70,14 +70,12 @@ public class PurgeDatastreamHandler
         logger.debug("PurgeDatastreamHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
         String dsID = null;
         String startDT = null;
         String endDT = null;
-        // String logMessage = null;
-        // Boolean force = null;
 
         try {
             oMap = getSOAPRequestObjects(context);
@@ -89,12 +87,10 @@ public class PurgeDatastreamHandler
         }
 
         try {
-            pid = (String) oMap.get(0);
-            dsID = (String) oMap.get(1);
-            startDT = (String) oMap.get(2);
-            endDT = (String) oMap.get(3);
-            // logMessage = (String) oMap.get(4);
-            // force = (Boolean) oMap.get(5);
+            pid = (String) callGetter("getPid",oMap);
+            dsID = (String) callGetter("getDsID", oMap);
+            startDT = (String) callGetter("getStartDT",oMap);
+            endDT = (String) callGetter("getEndDT", oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",

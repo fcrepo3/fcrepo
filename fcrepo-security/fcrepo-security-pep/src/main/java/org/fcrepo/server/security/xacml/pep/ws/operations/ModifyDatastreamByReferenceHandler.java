@@ -68,19 +68,15 @@ public class ModifyDatastreamByReferenceHandler
         logger.debug("ModifyDatastreamByReferenceHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
         String dsID = null;
-        // String[] altIDs = null;
-        // String dsLabel = null;
         String mimeType = null;
         String formatURI = null;
         String dsLocation = null;
         String checksumType = null;
         String checksum = null;
-        // String logMessage = null;
-        // Boolean force = null;
 
         try {
             oMap = getSOAPRequestObjects(context);
@@ -92,17 +88,13 @@ public class ModifyDatastreamByReferenceHandler
         }
 
         try {
-            pid = (String) oMap.get(0);
-            dsID = (String) oMap.get(1);
-            // altIDs = (String[]) oMap.get(2);
-            // dsLabel = (String) oMap.get(3);
-            mimeType = (String) oMap.get(4);
-            formatURI = (String) oMap.get(5);
-            dsLocation = (String) oMap.get(6);
-            checksumType = (String) oMap.get(7);
-            checksum = (String) oMap.get(8);
-            // logMessage = (String) oMap.get(9);
-            // force = (Boolean) oMap.get(10);
+            pid = (String) callGetter("getPid",oMap);
+            dsID = (String) callGetter("getDsID", oMap);
+            mimeType = (String) callGetter("getMIMEType", oMap);
+            formatURI = (String) callGetter("getFormatURI", oMap);
+            dsLocation = (String) callGetter("getDsLocation", oMap);
+            checksumType = (String) callGetter("getChecksumType", oMap);
+            checksum = (String) callGetter("getChecksum", oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",

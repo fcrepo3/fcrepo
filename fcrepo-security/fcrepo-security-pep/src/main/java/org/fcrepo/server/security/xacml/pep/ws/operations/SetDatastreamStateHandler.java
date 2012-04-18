@@ -69,12 +69,11 @@ public class SetDatastreamStateHandler
         logger.debug("SetDatastreamStateHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
         String dsID = null;
         String dsState = null;
-        // String logMessage = null;
 
         try {
             oMap = getSOAPRequestObjects(context);
@@ -86,10 +85,9 @@ public class SetDatastreamStateHandler
         }
 
         try {
-            pid = (String) oMap.get(0);
-            dsID = (String) oMap.get(1);
-            dsState = (String) oMap.get(2);
-            // logMessage = (String) oMap.get(3);
+            pid = (String) callGetter("getPid",oMap);
+            dsID = (String) callGetter("getDsID", oMap);
+            dsState = (String) callGetter("getDsState", oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",

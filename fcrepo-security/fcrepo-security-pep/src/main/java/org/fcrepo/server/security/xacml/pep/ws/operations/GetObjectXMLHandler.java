@@ -68,7 +68,7 @@ public class GetObjectXMLHandler
         logger.debug("GetObjectXMLHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
 
@@ -82,7 +82,7 @@ public class GetObjectXMLHandler
         }
 
         try {
-            pid = (String) oMap.get(0);
+            pid = (String) callGetter("getPid",oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",

@@ -229,9 +229,9 @@ public class FieldSearchResultHandler
             throws OperationHandlerException {
         try {
             // FieldSearchResult (mtom version or not) can be determined by the namespace
-            FieldSearchResult result =
-                    (FieldSearchResult) getSOAPResponseObject(context, FieldSearchResult.class);
-            result = filter(context, result);
+            FieldSearchResult[] result =
+                    (FieldSearchResult[]) getSOAPResponseObject(context, FieldSearchResult.class);
+            result[0] = filter(context, result[0]);
             SOAPElement param = null; // TODO FieldSearchResult -?-> SOAPElement ?
             setSOAPResponseObject(context, param);
         } catch (Exception e) {

@@ -68,10 +68,10 @@ public class GetDatastreamsHandler
         logger.debug("GetDatastreamsHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
-        String dsid = null;
+        String dsID = null;
 
         try {
             oMap = getSOAPRequestObjects(context);
@@ -83,8 +83,8 @@ public class GetDatastreamsHandler
         }
 
         try {
-            pid = (String) oMap.get(0);
-            dsid = (String) oMap.get(1);
+            pid = (String) callGetter("getPid",oMap);
+            dsID = (String) callGetter("getDsID", oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",
@@ -105,9 +105,9 @@ public class GetDatastreamsHandler
                 resAttr.put(new URI(XACML_RESOURCE_ID),
                             new AnyURIAttribute(new URI(pid)));
             }
-            if (dsid != null && !"".equals(dsid)) {
+            if (dsID != null && !"".equals(dsID)) {
                 resAttr.put(Constants.DATASTREAM.ID.getURI(),
-                            new StringAttribute(dsid));
+                            new StringAttribute(dsID));
             }
 
             actions.put(Constants.ACTION.ID.getURI(),

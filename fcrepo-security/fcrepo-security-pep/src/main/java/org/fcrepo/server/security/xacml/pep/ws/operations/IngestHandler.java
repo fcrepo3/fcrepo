@@ -68,7 +68,7 @@ public class IngestHandler
         logger.debug("IngestHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String format = null;
 
@@ -82,7 +82,7 @@ public class IngestHandler
         }
 
         try {
-            format = (String) oMap.get(1);
+            format = (String) callGetter("getFormat",oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",

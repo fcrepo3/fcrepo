@@ -70,7 +70,7 @@ public class SetDatastreamVersionableHandler
         logger.debug("SetDatastreamVersionableHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
         String dsID = null;
@@ -79,17 +79,17 @@ public class SetDatastreamVersionableHandler
 
         try {
             oMap = getSOAPRequestObjects(context);
-            logger.debug("Retrieved SOAP Request Objects");
+            logger.debug("Retrieved SOAP Request Object");
         } catch (SoapFault af) {
-            logger.error("Error obtaining SOAP Request Objects", af);
+            logger.error("Error obtaining SOAP Request Object", af);
             throw new OperationHandlerException("Error obtaining SOAP Request Objects",
                                                 af);
         }
 
         try {
-            pid = (String) oMap.get(0);
-            dsID = (String) oMap.get(1);
-            versionable = (Boolean) oMap.get(2);
+            pid = (String) callGetter("getPid",oMap);
+            dsID = (String) callGetter("getDsID", oMap);
+            versionable = (Boolean) callGetter("isVersionable",oMap);
             // logMessage = (String) oMap.get(3);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);

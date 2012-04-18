@@ -68,7 +68,7 @@ public class ListMethodsHandler
         logger.debug("ListMethodsHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
         String asOfDateTime = null;
@@ -83,8 +83,8 @@ public class ListMethodsHandler
         }
 
         try {
-            pid = (String) oMap.get(0);
-            asOfDateTime = (String) oMap.get(1);
+            pid = (String) callGetter("getPid",oMap);
+            asOfDateTime = (String) callGetter("getAsOfDateTime", oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",

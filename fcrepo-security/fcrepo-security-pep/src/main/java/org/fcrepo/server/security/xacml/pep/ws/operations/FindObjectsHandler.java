@@ -67,16 +67,18 @@ public class FindObjectsHandler
         logger.debug("FindObjectsHandler/handleRequest!");
 
         // Ensuring that there is always a PID present in a request.
-        List<Object> oMap = null;
+        Object oMap = null;
 
         try {
             oMap = getSOAPRequestObjects(context);
-            String[] resultFields = (String[]) oMap.get(0);
-            BigInteger maxResults = (BigInteger) oMap.get(1);
-            FieldSearchQuery fieldSearchQuery = (FieldSearchQuery) oMap.get(2);
+            org.fcrepo.server.types.gen.ArrayOfString resultFields =
+                (org.fcrepo.server.types.gen.ArrayOfString) callGetter("getResultFields",oMap);
+            BigInteger maxResults = (BigInteger) callGetter("getMaxResults",oMap);
+            org.fcrepo.server.types.gen.FieldSearchQuery fieldSearchQuery =
+                (org.fcrepo.server.types.gen.FieldSearchQuery) callGetter("getQuery",oMap);
 
             List<String> resultFieldsList =
-                    new ArrayList<String>(Arrays.asList(resultFields));
+                    resultFields.getItem();
 
             if (!resultFieldsList.contains("pid")) {
                 resultFieldsList.add("pid");
@@ -85,6 +87,7 @@ public class FindObjectsHandler
                     resultFieldsList
                             .toArray(new String[resultFieldsList.size()]);
 // todo: fix
+            // barmintor: How? Why would we set defaults here rather than in the actual module?
 
 //            List<RPCParam> params = new ArrayList<RPCParam>();
 //            params
@@ -104,6 +107,8 @@ public class FindObjectsHandler
                             null);
         } catch (SoapFault af) {
             throw new OperationHandlerException("Error filtering objects.", af);
+        } catch (Throwable t) {
+            throw new OperationHandlerException("Error filtering objects.", t);
         }
 
         return resultHandler.handleRequest(context);

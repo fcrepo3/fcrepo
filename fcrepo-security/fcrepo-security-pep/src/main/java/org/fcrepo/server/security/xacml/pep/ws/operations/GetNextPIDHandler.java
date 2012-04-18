@@ -71,7 +71,7 @@ public class GetNextPIDHandler
         logger.debug("GetNextPIDHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         BigInteger numPids = null;
         String pidNamespace = null;
@@ -86,8 +86,8 @@ public class GetNextPIDHandler
         }
 
         try {
-            numPids = (BigInteger) oMap.get(0);
-            pidNamespace = (String) oMap.get(1);
+            numPids = (BigInteger) callGetter("getNumPIDs()",oMap);
+            pidNamespace = (String) callGetter("getPidNamespace()", oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",

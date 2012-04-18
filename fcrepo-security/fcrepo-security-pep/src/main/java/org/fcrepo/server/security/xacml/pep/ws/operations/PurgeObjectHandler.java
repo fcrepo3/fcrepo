@@ -68,11 +68,9 @@ public class PurgeObjectHandler
         logger.debug("PurgeObjectHandler/handleRequest!");
 
         RequestCtx req = null;
-        List<Object> oMap = null;
+        Object oMap = null;
 
         String pid = null;
-        // String logMessage = null;
-        // Boolean force = null;
 
         try {
             oMap = getSOAPRequestObjects(context);
@@ -84,9 +82,7 @@ public class PurgeObjectHandler
         }
 
         try {
-            pid = (String) oMap.get(0);
-            // logMessage = (String) oMap.get(1);
-            // force = (Boolean) oMap.get(2);
+            pid = (String) callGetter("getPid",oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",
