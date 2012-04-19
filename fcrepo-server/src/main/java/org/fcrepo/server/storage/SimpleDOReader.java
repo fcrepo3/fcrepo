@@ -4,22 +4,18 @@
  */
 package org.fcrepo.server.storage;
 
+import static org.fcrepo.common.Constants.MODEL;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.jrdf.graph.ObjectNode;
-import org.jrdf.graph.PredicateNode;
-import org.jrdf.graph.SubjectNode;
 
 import org.fcrepo.common.Models;
 import org.fcrepo.server.Context;
@@ -41,10 +37,11 @@ import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.utilities.DateUtility;
+import org.jrdf.graph.ObjectNode;
+import org.jrdf.graph.PredicateNode;
+import org.jrdf.graph.SubjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.fcrepo.common.Constants.MODEL;
 
 
 
@@ -117,6 +114,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public DigitalObject getObject() {
         return m_obj;
     }
@@ -124,6 +122,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getCreateDate() {
         return m_obj.getCreateDate();
     }
@@ -131,6 +130,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getLastModDate() {
         return m_obj.getLastModDate();
     }
@@ -138,6 +138,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getOwnerId() {
         return m_obj.getOwnerId();
     }
@@ -145,6 +146,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<AuditRecord> getAuditRecords() {
         return m_obj.getAuditRecords();
     }
@@ -153,6 +155,7 @@ public class SimpleDOReader
      * Return the object as an XML input stream in the internal serialization
      * format.
      */
+    @Override
     public InputStream GetObjectXML() throws ObjectIntegrityException,
                                              StreamIOException, UnsupportedTranslationException, ServerException {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -167,6 +170,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public InputStream Export(String format, String exportContext)
             throws ObjectIntegrityException, StreamIOException,
                    UnsupportedTranslationException, ServerException {
@@ -209,6 +213,7 @@ public class SimpleDOReader
     /**
      * @deprecated in Fedora 3.0, use Export instead
      */
+    @Override
     @Deprecated
     public InputStream ExportObject(String format, String exportContext)
             throws ObjectIntegrityException, StreamIOException,
@@ -219,6 +224,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public String GetObjectPID() {
         return m_obj.getPid();
     }
@@ -226,6 +232,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public String GetObjectLabel() {
         return m_obj.getLabel();
     }
@@ -233,6 +240,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public String GetObjectState() {
         if (m_obj.getState() == null) {
             return "A"; // shouldn't happen, but if it does don't die
@@ -240,6 +248,7 @@ public class SimpleDOReader
         return m_obj.getState();
     }
 
+    @Override
     public List<String> getContentModels() throws ServerException {
 
         List<String> list = new ArrayList<String>();
@@ -249,6 +258,7 @@ public class SimpleDOReader
         return list;
     }
 
+    @Override
     public boolean hasContentModel(ObjectNode contentModel)
             throws ServerException {
         return hasRelationship(MODEL.HAS_MODEL,contentModel);
@@ -257,6 +267,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] ListDatastreamIDs(String state) {
         Iterator<String> iter = m_obj.datastreamIdIterator();
         ArrayList<String> al = new ArrayList<String>();
@@ -286,6 +297,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public Datastream getDatastream(String dsID, String versionID) {
         for (Datastream ds : m_obj.datastreams(dsID)) {
             if (ds.DSVersionID.equals(versionID)) {
@@ -298,6 +310,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public Datastream GetDatastream(String datastreamID, Date versDateTime) {
         // get the one with the closest creation date
         // without going over
@@ -313,10 +326,11 @@ public class SimpleDOReader
             if (versDateTime == null) {
                 if (ds.DSCreateDT == null || ds.DSCreateDT.getTime() > latestCreateTime) {
                     latestCreated = ds;
+                    if (ds.DSCreateDT != null) latestCreateTime = ds.DSCreateDT.getTime();
                 }
             } else {
                 //TODO If none of the versions have a create date, what should behavior be?
-                long diff = (ds.DSCreateDT == null)? 0 : vTime - ds.DSCreateDT.getTime();
+                long diff = (ds.DSCreateDT == null)? vTime : vTime - ds.DSCreateDT.getTime();
                 if (diff >= 0) {
                     if (diff < bestTimeDifference) {
                         bestTimeDifference = diff;
@@ -335,6 +349,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date[] getDatastreamVersions(String datastreamID) {
         ArrayList<Date> versionDates = new ArrayList<Date>();
         for (Datastream d : m_obj.datastreams(datastreamID)) {
@@ -346,6 +361,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public Datastream[] GetDatastreams(Date versDateTime, String state) {
         String[] ids = ListDatastreamIDs(null);
         ArrayList<Datastream> al = new ArrayList<Datastream>();
@@ -368,6 +384,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getObjectHistory(String PID) {
         String[] dsIDs = ListDatastreamIDs(null);
         TreeSet<String> modDates = new TreeSet<String>();
@@ -437,6 +454,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public ObjectMethodsDef[] listMethods(Date versDateTime)
             throws ServerException {
         ArrayList<MethodDef> methodList = new ArrayList<MethodDef>();
@@ -524,6 +542,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean hasRelationship(SubjectNode subject, PredicateNode predicate, ObjectNode object) {
         return m_obj.hasRelationship(subject, predicate, object);
     }
@@ -531,6 +550,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean hasRelationship(PredicateNode predicate, ObjectNode object) {
         return m_obj.hasRelationship(predicate, object);
     }
@@ -538,6 +558,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<RelationshipTuple> getRelationships(SubjectNode subject,
                                                    PredicateNode predicate,
                                                    ObjectNode object) {
@@ -547,6 +568,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<RelationshipTuple> getRelationships(PredicateNode predicate,
                                                    ObjectNode object) {
         return m_obj.getRelationships(predicate, object);
@@ -554,6 +576,7 @@ public class SimpleDOReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<RelationshipTuple> getRelationships() {
         return m_obj.getRelationships();
     }
