@@ -100,7 +100,8 @@ public class XMLDatastreamProcessor {
             m_dsType = DS_TYPE.MANAGED;
         } else {
             // unhandled type is a coding error
-            throw new RuntimeException("XML datastreams must be of type Managed or Inline");
+            throw new RuntimeException("XML datastreams must be of type Managed or Inline,"
+                    + " but type was " + ds.getClass().getName());
         }
     }
 
