@@ -8,6 +8,7 @@ package org.fcrepo.test.api;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,7 +27,6 @@ import junit.framework.TestSuite;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
@@ -41,12 +41,15 @@ import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.junit.After;
+import org.w3c.dom.Document;
 
 public class TestAPIM
         extends FedoraServerTestCase
         implements Constants {
 
     private FedoraAPIMMTOM apim;
+
+    private FedoraAPIAMTOM apia;
 
     public static byte[] dsXML;
 
@@ -829,6 +832,7 @@ public class TestAPIM
     @Override
     public void setUp() throws Exception {
         apim = getFedoraClient().getAPIMMTOM();
+        apia = getFedoraClient().getAPIAMTOM();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
         nsMap.put("dc", "http://purl.org/dc/elements/1.1/");
@@ -1170,8 +1174,13 @@ public class TestAPIM
         }
     }
 
+    /**
+     * Until the various datastream tests are not interdependent,
+     *  they must be executed as a single test
+     * @throws Exception
+     */
     public void testAddDatastream() throws Exception {
-
+        // (1) testAddDatastream
         System.out.println("Running TestAPIM.testAddDatastream...");
         // test adding M type datastream with unknown checksum type and no altIDs, should fail throwing exception
         try {
@@ -1246,17 +1255,18 @@ public class TestAPIM
                         .getObjectXML("demo:14"));
         assertTrue(objectXML.length > 0);
         String xmlIn = new String(objectXML, "UTF-8");
+        Document doc = XMLUnit.buildControlDocument(xmlIn);
         //System.out.println("***** Testcase: TestAPIM.testAddDatastream NEWDS1 as type M\n"+xmlIn);
-        assertXpathExists("foxml:digitalObject[@PID='demo:14']", xmlIn);
+        assertXpathExists("foxml:digitalObject[@PID='demo:14']", doc);
         assertXpathExists("//foxml:datastream[@ID='NEWDS1' and @CONTROL_GROUP='M' and @STATE='A']",
-                          xmlIn);
+                          doc);
         assertXpathExists("//foxml:datastreamVersion[@ID='NEWDS1.0' and @MIMETYPE='text/xml' and @LABEL='A New M-type Datastream' and @ALT_IDS='Datastream 1 Alternate ID' and @FORMAT_URI='info:myFormatURI/Mtype/stuff#junk']",
-                          xmlIn);
+                          doc);
         assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
-                          xmlIn);
+                          doc);
         assertXpathEvaluatesTo("6",
                                "count(//foxml:datastream[@ID!='AUDIT'])",
-                               xmlIn);
+                               doc);
 
         // check datastream size - compare against original content
         Datastream origManagedContent =
@@ -1291,17 +1301,18 @@ public class TestAPIM
                         .getObjectXML("demo:14"));
         assertTrue(objectXML.length > 0);
         xmlIn = new String(objectXML, "UTF-8");
+        doc = XMLUnit.buildControlDocument(xmlIn);
         //System.out.println("***** Testcase: TestAPIM.testAddDatastream NEWDS2 as type X\n"+xmlIn);
-        assertXpathExists("foxml:digitalObject[@PID='demo:14']", xmlIn);
+        assertXpathExists("foxml:digitalObject[@PID='demo:14']", doc);
         assertXpathExists("//foxml:datastream[@ID='NEWDS2' and @CONTROL_GROUP='X' and @STATE='A']",
-                          xmlIn);
+                          doc);
         assertXpathExists("//foxml:datastreamVersion[@ID='NEWDS2.0' and @MIMETYPE='text/xml' and @LABEL='A New X-type Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='info:myFormatURI/Xtype/stuff#junk']",
-                          xmlIn);
+                          doc);
         assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
-                          xmlIn);
+                          doc);
         assertXpathEvaluatesTo("7",
                                "count(//foxml:datastream[@ID!='AUDIT'])",
-                               xmlIn);
+                               doc);
 
         altIds[0] = "Datastream 3 Alternate ID";
         datastreamId =
@@ -1326,17 +1337,18 @@ public class TestAPIM
                         .getObjectXML("demo:14"));
         assertTrue(objectXML.length > 0);
         xmlIn = new String(objectXML, "UTF-8");
-        //System.out.println("***** Testcase: TestAPIM.testAddDatastream NEWDS3 as type E\n"+xmlIn);
-        assertXpathExists("foxml:digitalObject[@PID='demo:14']", xmlIn);
+        doc = XMLUnit.buildControlDocument(xmlIn);
+        System.out.println("***** Testcase: TestAPIM.testAddDatastream NEWDS3 as type E\n"+xmlIn);
+        assertXpathExists("foxml:digitalObject[@PID='demo:14']", doc);
         assertXpathExists("//foxml:datastream[@ID='NEWDS3' and @CONTROL_GROUP='E' and @STATE='A']",
-                          xmlIn);
+                          doc);
         assertXpathExists("//foxml:datastreamVersion[@ID='NEWDS3.0' and @MIMETYPE='text/xml' and @LABEL='A New E-type Datastream' and @ALT_IDS='Datastream 3 Alternate ID' and @FORMAT_URI='info:myFormatURI/Etype/stuff#junk']",
-                          xmlIn);
+                          doc);
         assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
-                          xmlIn);
+                          doc);
         assertXpathEvaluatesTo("8",
                                "count(//foxml:datastream[@ID!='AUDIT'])",
-                               xmlIn);
+                               doc);
 
         // test adding RELS-EXT, RELS-INT and DC datastreams triggers validation
         // add RELS-EXT from a different object - will be invalid as RELS-* for this object
@@ -1456,18 +1468,19 @@ public class TestAPIM
                             .getObjectXML(mcPID));
             assertTrue(objectXML.length > 0);
             xmlIn = new String(objectXML, "UTF-8");
+            doc = XMLUnit.buildControlDocument(xmlIn);
             assertXpathExists("foxml:digitalObject[@PID='" + mcPID + "']",
-                              xmlIn);
+                              doc);
             assertXpathExists("//foxml:datastream[@ID='" + reservedDSID
-                    + "' and @CONTROL_GROUP='M' and @STATE='A']", xmlIn);
+                    + "' and @CONTROL_GROUP='M' and @STATE='A']", doc);
             assertXpathExists("//foxml:datastream[@ID='"
                                       + reservedDSID
                                       + "']/foxml:datastreamVersion[@ID='"
                                       + reservedDSID
                                       + ".0' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='info:fedora/fedora-system:FedoraRELSExt-1.0']",
-                              xmlIn);
+                              doc);
             assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
-                              xmlIn);
+                              doc);
 
         }
     }
@@ -1477,6 +1490,10 @@ public class TestAPIM
         // (2) test modifyDatastreamByReference
         System.out
                 .println("Running TestAPIM.testModifyDatastreamByReference...");
+        List<String> testDsIds = setUpDatastreamModificationTest("demo:14", "MODREF", "M", 1);
+        int numNonAudits = getNumberNonAuditDatastreams("demo:14");
+        String testDsId = testDsIds.get(0);
+        assertEquals("MODREFDSM1", testDsId);
         Datastream origManagedContent =
                 apim.getDatastream("fedora-system:ContentModel-3.0", "DC", null);
         long managedContentSize = origManagedContent.getSize();
@@ -1485,7 +1502,7 @@ public class TestAPIM
         altIds[0] = "Datastream 1 Modified Alternate ID";
         String datastreamId =
                 apim.modifyDatastreamByReference("demo:14",
-                                                 "NEWDS1",
+                                                 testDsId,
                                                  TypeUtility
                                                          .convertStringtoAOS(altIds),
                                                  "Modified M-type Datastream",
@@ -1504,23 +1521,24 @@ public class TestAPIM
                         .getObjectXML("demo:14"));
         assertTrue(objectXML.length > 0);
         String xmlIn = new String(objectXML, "UTF-8");
+        Document doc = XMLUnit.buildControlDocument(xmlIn);
         //System.out.println("***** Testcase: TestAPIM.testModifyDatastreamByReference NEWDS1\n"+xmlIn);
-        assertXpathExists("foxml:digitalObject[@PID='demo:14']", xmlIn);
-        assertXpathExists("//foxml:datastream[@ID='NEWDS1' and @CONTROL_GROUP='M' and @STATE='A']",
-                          xmlIn);
-        assertXpathExists("//foxml:datastreamVersion[@ID='NEWDS1.1' and @MIMETYPE='text/xml' and @LABEL='Modified M-type Datastream' and @ALT_IDS='Datastream 1 Modified Alternate ID' and @FORMAT_URI='info:newMyFormatURI/Mtype/stuff#junk']",
-                          xmlIn);
+        assertXpathExists("foxml:digitalObject[@PID='demo:14']", doc);
+        assertXpathExists("//foxml:datastream[@ID='MODREFDSM1' and @CONTROL_GROUP='M' and @STATE='A']",
+                          doc);
+        assertXpathExists("//foxml:datastreamVersion[@ID='MODREFDSM1.1' and @MIMETYPE='text/xml' and @LABEL='Modified M-type Datastream' and @ALT_IDS='Datastream 1 Modified Alternate ID' and @FORMAT_URI='info:newMyFormatURI/Mtype/stuff#junk']",
+                          doc);
         assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['modifyDatastreamByReference']",
-                          xmlIn);
-        assertXpathEvaluatesTo("8",
+                          doc);
+        assertXpathEvaluatesTo(Integer.toString(numNonAudits),
                                "count(//foxml:datastream[@ID!='AUDIT'])",
-                               xmlIn);
+                               doc);
         // check size
-        assertXpathExists("//foxml:datastreamVersion[@ID='NEWDS1.0' and @SIZE='"
+        assertXpathExists("//foxml:datastreamVersion[@ID='MODREFDSM1.0' and @SIZE='"
                                   + managedContentSize + "']",
-                          xmlIn);
+                          doc);
         // check size in getDatastreamDissemination
-        Datastream ds1 = apim.getDatastream("demo:14", "NEWDS1", null);
+        Datastream ds1 = apim.getDatastream("demo:14", "MODREFDSM1", null);
         assertEquals(managedContentSize, ds1.getSize());
 
         // test modifyDatastreamByReference RELS-EXT, RELS-INT triggers validation for managed content datastreams
@@ -1591,43 +1609,52 @@ public class TestAPIM
                             .getObjectXML(mcPID));
             assertTrue(objectXML.length > 0);
             xmlIn = new String(objectXML, "UTF-8");
+            doc = XMLUnit.buildControlDocument(xmlIn);
             assertXpathExists("foxml:digitalObject[@PID='" + mcPID + "']",
-                              xmlIn);
+                              doc);
             assertXpathExists("//foxml:datastream[@ID='" + reservedDSID
-                    + "' and @CONTROL_GROUP='M' and @STATE='A']", xmlIn);
+                    + "' and @CONTROL_GROUP='M' and @STATE='A']", doc);
             assertXpathExists("//foxml:datastream[@ID='"
                                       + reservedDSID
                                       + "']/foxml:datastreamVersion[@ID='"
                                       + reservedDSID
                                       + ".1' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='"
                                       + uri + "']",
-                              xmlIn);
+                              doc);
             assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
-                              xmlIn);
+                              doc);
 
         }
+        tearDownDatastreamModificationTest("demo:14", testDsIds);
     }
 
     public void testModifyDatastreamByValue() throws Exception {
 
         // (3) test modifyDatastreamByValue
         System.out.println("Running TestAPIM.testModifyDatastreamByValue...");
+        List<String> testDsIds = setUpDatastreamModificationTest("demo:14","MODVALUE","M", 1);
+        testDsIds.addAll(setUpDatastreamModificationTest("demo:14","MODVALUE","X", 1));
+        int numNonAudits = getNumberNonAuditDatastreams("demo:14");
+        String testXDsId = testDsIds.get(1);
+        String testMDsId = testDsIds.get(0);
+        assertEquals("MODVALUEDSX1",testXDsId);
+        assertEquals("MODVALUEDSM1",testMDsId);
         String [] altIds = new String[1];
-        altIds[0] = "Datastream 2 Modified Alternate ID";
+        altIds[0] = "Datastream 1 Modified Alternate ID";
         String datastreamId =
                 apim.modifyDatastreamByValue("demo:14",
-                                             "NEWDS2",
-                                             TypeUtility
-                                                     .convertStringtoAOS(altIds),
-                                             "Modified X-type Datastream",
-                                             "text/xml",
-                                             "info:newMyFormatURI/Xtype/stuff#junk",
-                                             TypeUtility
-                                                     .convertBytesToDataHandler(dsXML),
-                                             null,
-                                             null,
-                                             "modified datastream",
-                                             false);
+                        testXDsId,
+                        TypeUtility
+                        .convertStringtoAOS(altIds),
+                        "Modified X-type Datastream",
+                        "text/xml",
+                        "info:newMyFormatURI/Xtype/stuff#junk",
+                        TypeUtility
+                        .convertBytesToDataHandler(dsXML),
+                        null,
+                        null,
+                        "modified datastream",
+                        false);
 
         // test that datastream was modified
         byte [] objectXML =
@@ -1635,22 +1662,23 @@ public class TestAPIM
                         .getObjectXML("demo:14"));
         assertTrue(objectXML.length > 0);
         String xmlIn = new String(objectXML, "UTF-8");
-        //System.out.println("***** Testcase: TestAPIM.testModifyDatastreamByValue NEWDS2\n"+xmlIn);
-        assertXpathExists("foxml:digitalObject[@PID='demo:14']", xmlIn);
-        assertXpathExists("//foxml:datastream[@ID='NEWDS2' and @CONTROL_GROUP='X' and @STATE='A']",
-                          xmlIn);
-        assertXpathExists("//foxml:datastreamVersion[@ID='NEWDS2.1' and @MIMETYPE='text/xml' and @LABEL='Modified X-type Datastream' and @ALT_IDS='Datastream 2 Modified Alternate ID' and @FORMAT_URI='info:newMyFormatURI/Xtype/stuff#junk']",
-                          xmlIn);
-        assertXpathExists("foxml:digitalObject/foxml:datastream[@ID='NEWDS2'][//dc:identifier='Identifier 5']",
-                          xmlIn);
+        Document doc = XMLUnit.buildControlDocument(xmlIn);
+        //System.out.println("***** Testcase: TestAPIM.testModifyDatastreamByValue " + testXDsId + "\n"+xmlIn);
+        assertXpathExists("foxml:digitalObject[@PID='demo:14']", doc);
+        assertXpathExists("//foxml:datastream[@ID='" + testXDsId + "' and @CONTROL_GROUP='X' and @STATE='A']",
+                          doc);
+        assertXpathExists("//foxml:datastreamVersion[@ID='" + testXDsId + ".1' and @MIMETYPE='text/xml' and @LABEL='Modified X-type Datastream' and @ALT_IDS='Datastream 1 Modified Alternate ID' and @FORMAT_URI='info:newMyFormatURI/Xtype/stuff#junk']",
+                          doc);
+        assertXpathExists("foxml:digitalObject/foxml:datastream[@ID='" + testXDsId + "'][//dc:identifier='Identifier 5']",
+                          doc);
         // this dc:identifier value is not in the submitted data; it is added by Fedora
-        assertXpathExists("foxml:digitalObject/foxml:datastream[@ID='NEWDS2'][//dc:identifier='demo:14']",
-                          xmlIn);
+        assertXpathExists("foxml:digitalObject/foxml:datastream[@ID='" + testXDsId + "'][//dc:identifier='demo:14']",
+                          doc);
         assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['modifyDatastreamByValue']",
-                          xmlIn);
-        assertXpathEvaluatesTo("8",
+                          doc);
+        assertXpathEvaluatesTo(Integer.toString(numNonAudits),
                                "count(//foxml:datastream[@ID!='AUDIT'])",
-                               xmlIn);
+                               doc);
 
         // (3.1) test modifyDatastreamByValue of M type modify
         System.out.println("Running TestAPIM.testModifyDatastreamByValue...");
@@ -1658,18 +1686,18 @@ public class TestAPIM
         altIds[0] = "Datastream 1 Modified Alternate ID";
         datastreamId =
                 apim.modifyDatastreamByValue("demo:14",
-                                             "NEWDS1",
-                                             TypeUtility
-                                                     .convertStringtoAOS(altIds),
-                                             "Modified M-type Datastream",
-                                             "text/xml",
-                                             "info:newMyFormatURI/Xtype/stuff#junk",
-                                             TypeUtility
-                                                     .convertBytesToDataHandler(dsXML),
-                                             null,
-                                             null,
-                                             "modified datastream by value (M)",
-                                             false);
+                        testMDsId,
+                        TypeUtility
+                        .convertStringtoAOS(altIds),
+                        "Modified M-type Datastream",
+                        "text/xml",
+                        "info:newMyFormatURI/Xtype/stuff#junk",
+                        TypeUtility
+                        .convertBytesToDataHandler(dsXML),
+                        null,
+                        null,
+                        "modified datastream by value (M)",
+                        false);
 
         // test that datastream was modified
         objectXML =
@@ -1677,19 +1705,20 @@ public class TestAPIM
                         .getObjectXML("demo:14"));
         assertTrue(objectXML.length > 0);
         xmlIn = new String(objectXML, "UTF-8");
+        doc = XMLUnit.buildControlDocument(xmlIn);
         //System.out.println("***** Testcase: TestAPIM.testModifyDatastreamByValue NEWDS2\n"+xmlIn);
-        assertXpathExists("foxml:digitalObject[@PID='demo:14']", xmlIn);
-        assertXpathExists("//foxml:datastream[@ID='NEWDS1' and @CONTROL_GROUP='M' and @STATE='A']",
-                          xmlIn);
-        assertXpathExists("//foxml:datastreamVersion[@ID='NEWDS1.2' and @MIMETYPE='text/xml' and @LABEL='Modified M-type Datastream' and @ALT_IDS='Datastream 1 Modified Alternate ID' and @FORMAT_URI='info:newMyFormatURI/Xtype/stuff#junk']",
-                          xmlIn);
-        assertXpathExists("foxml:digitalObject/foxml:datastream[@ID='NEWDS1'][//dc:identifier='Identifier 5']",
-                          xmlIn);
+        assertXpathExists("foxml:digitalObject[@PID='demo:14']", doc);
+        assertXpathExists("//foxml:datastream[@ID='MODVALUEDSM1' and @CONTROL_GROUP='M' and @STATE='A']",
+                          doc);
+        assertXpathExists("//foxml:datastreamVersion[@ID='MODVALUEDSM1.1' and @MIMETYPE='text/xml' and @LABEL='Modified M-type Datastream' and @ALT_IDS='Datastream 1 Modified Alternate ID' and @FORMAT_URI='info:newMyFormatURI/Xtype/stuff#junk']",
+                          doc);
+        assertXpathExists("foxml:digitalObject/foxml:datastream[@ID='MODVALUEDSM1'][//dc:identifier='Identifier 5']",
+                          doc);
         assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['modifyDatastreamByValue']",
-                          xmlIn);
-        assertXpathEvaluatesTo("8",
-                               "count(//foxml:datastream[@ID!='AUDIT'])",
-                               xmlIn);
+                          doc);
+        assertXpathEvaluatesTo(Integer.toString(numNonAudits),
+                "count(//foxml:datastream[@ID!='AUDIT'])",
+                doc);
 
         // test modifyDatastreamByValue triggers RELS-EXT and RELS-INT validation for type "X"
         // RELS datastream content is invalid as it's for a different object
@@ -1817,19 +1846,21 @@ public class TestAPIM
                             .getObjectXML(mcPID));
             assertTrue(objectXML.length > 0);
             xmlIn = new String(objectXML, "UTF-8");
+            doc = XMLUnit.buildControlDocument(xmlIn);
+            System.out.println("***** Testcase: TestAPIM.testModifyDatastreamByValue " + mcPID + "\n"+xmlIn);
             assertXpathExists("foxml:digitalObject[@PID='" + mcPID + "']",
-                              xmlIn);
+                              doc);
             assertXpathExists("//foxml:datastream[@ID='" + reservedDSID
-                    + "' and @CONTROL_GROUP='M' and @STATE='A']", xmlIn);
+                    + "' and @CONTROL_GROUP='M' and @STATE='A']", doc);
             assertXpathExists("//foxml:datastream[@ID='"
                                       + reservedDSID
                                       + "']/foxml:datastreamVersion[@ID='"
                                       + reservedDSID
                                       + ".2' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='"
                                       + uri + "']",
-                              xmlIn);
+                              doc);
             assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
-                              xmlIn);
+                              doc);
 
         }
 
@@ -1855,31 +1886,35 @@ public class TestAPIM
                         .getObjectXML("demo:2"));
         assertTrue(objectXML.length > 0);
         xmlIn = new String(objectXML, "UTF-8");
+        doc = XMLUnit.buildControlDocument(xmlIn);
         //System.out.println("***** Testcase: TestAPIM.testModifyDatastreamByValue NEWDS2\n"+xmlIn);
-        assertXpathExists("foxml:digitalObject[@PID='demo:2']", xmlIn);
+        assertXpathExists("foxml:digitalObject[@PID='demo:2']", doc);
         assertXpathExists("//foxml:datastream[@ID='METHODMAP' and @CONTROL_GROUP='X' and @STATE='A']",
-                          xmlIn);
+                          doc);
         assertXpathExists("//foxml:datastreamVersion[@ID='METHODMAP.1' and @MIMETYPE='text/xml' and @LABEL='Mapping of WSDL to Fedora Notion of Method Definitions']",
-                          xmlIn);
+                          doc);
+        tearDownDatastreamModificationTest("demo:14", testDsIds);
     }
 
     public void compareDatastreamChecksum() throws Exception {
         // (4) test modifyDatastreamByValue for checksumming and compareDatastreamChecksum
         System.out.println("Running TestAPIM.compareDatastreamChecksum...");
+        List<String> testDsIds = setUpDatastreamModificationTest("demo:14", "CHECKSUMS", "M", 1);
+        String testDsId = testDsIds.get(0);
         String datastreamId = null;
         try {
             datastreamId =
                     apim.modifyDatastreamByValue("demo:14",
-                                                 "NEWDS2",
-                                                 null,
-                                                 null,
-                                                 null,
-                                                 null,
-                                                 null,
-                                                 "MD6",
-                                                 null,
-                                                 "turned on checksumming",
-                                                 false);
+                            testDsId,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            "MD6",
+                            null,
+                            "turned on checksumming",
+                            false);
             // fail if datastream was modified
             Assert.fail();
         } catch (javax.xml.ws.soap.SOAPFaultException af) {
@@ -1890,16 +1925,16 @@ public class TestAPIM
         try {
             datastreamId =
                     apim.modifyDatastreamByValue("demo:14",
-                                                 "NEWDS2",
-                                                 null,
-                                                 null,
-                                                 null,
-                                                 null,
-                                                 null,
-                                                 "TIGER",
-                                                 null,
-                                                 "turned on checksumming",
-                                                 false);
+                            testDsId,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            "TIGER",
+                            null,
+                            "turned on checksumming",
+                            false);
             // fail if datastream was modified
             Assert.fail();
         } catch (javax.xml.ws.soap.SOAPFaultException af) {
@@ -1908,57 +1943,57 @@ public class TestAPIM
         }
         datastreamId =
                 apim.modifyDatastreamByValue("demo:14",
-                                             "NEWDS2",
-                                             null,
-                                             null,
-                                             null,
-                                             null,
-                                             null,
-                                             "MD5",
-                                             null,
-                                             "turned on checksumming",
-                                             false);
+                        testDsId,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        "MD5",
+                        null,
+                        "turned on checksumming",
+                        false);
 
         // test that datastream has a checksum that compares correctly
         String checksum =
-                apim.compareDatastreamChecksum("demo:14", "NEWDS2", null);
+                apim.compareDatastreamChecksum("demo:14", testDsId, null);
         assertTrue(checksum.length() > 0);
         assertTrue(!checksum.equals("none"));
 
         datastreamId =
                 apim.modifyDatastreamByValue("demo:14",
-                                             "NEWDS2",
-                                             null,
-                                             null,
-                                             null,
-                                             null,
-                                             null,
-                                             "MD5",
-                                             checksum,
-                                             "turned off checksumming",
-                                             false);
+                        testDsId,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        "MD5",
+                        checksum,
+                        "turned off checksumming",
+                        false);
 
         // test that datastream has a checksum that compares correctly
         String checksum2 =
-                apim.compareDatastreamChecksum("demo:14", "NEWDS2", null);
+                apim.compareDatastreamChecksum("demo:14", testDsId, null);
         assertTrue(checksum2.length() > 0);
         assertTrue(checksum2.equals(checksum));
 
         datastreamId =
                 apim.modifyDatastreamByValue("demo:14",
-                                             "NEWDS2",
-                                             null,
-                                             null,
-                                             null,
-                                             null,
-                                             null,
-                                             "DISABLED",
-                                             null,
-                                             "turned off checksumming",
-                                             false);
+                        testDsId,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        "DISABLED",
+                        null,
+                        "turned off checksumming",
+                        false);
 
         // test that datastream has a checksum that compares correctly
-        checksum = apim.compareDatastreamChecksum("demo:14", "NEWDS2", null);
+        checksum = apim.compareDatastreamChecksum("demo:14", testDsId, null);
         assertTrue(checksum.length() > 0);
         assertTrue(checksum.equals("none"));
 
@@ -1973,7 +2008,7 @@ public class TestAPIM
                                    true,
                                    null,
                                    null,
-                                   getBaseURL() + "/get/demo:14/NEWDS2",
+                                   getBaseURL() + "/get/demo:14/" + testDsId,
                                    "M",
                                    "A",
                                    "MD5",
@@ -1995,7 +2030,7 @@ public class TestAPIM
                                        true,
                                        null,
                                        null,
-                                       getBaseURL() + "/get/demo:14/NEWDS2",
+                                       getBaseURL() + "/get/demo:14/" + testDsId,
                                        "M",
                                        "A",
                                        "MD5",
@@ -2017,7 +2052,7 @@ public class TestAPIM
                                                      null,
                                                      null,
                                                      getBaseURL()
-                                                             + "/get/demo:14/NEWDS2",
+                                                             + "/get/demo:14/" + testDsId,
                                                      "MD5",
                                                      "4aff31a28b8335a24b95e02d85a0caa4",
                                                      "modifying datastream with incorrect checksum",
@@ -2037,7 +2072,7 @@ public class TestAPIM
                                                  null,
                                                  null,
                                                  getBaseURL()
-                                                         + "/get/demo:14/NEWDS2",
+                                                         + "/get/demo:14/" + testDsId,
                                                  "MD5",
                                                  checksum3,
                                                  "modifying datastream with correct checksum",
@@ -2047,14 +2082,17 @@ public class TestAPIM
         checksum4 =
                 apim.compareDatastreamChecksum("demo:14", "CHECKSUMDS", null);
         assertTrue(checksum3.equals(checksum3));
+        tearDownDatastreamModificationTest("demo:14", testDsIds);
     }
 
     public void testPurgeDatastream() throws Exception {
+        // (5) testPurgeDatastream
+        List<String> testDsIds = setUpDatastreamModificationTest("demo:14", "PURGE", "M", 3);
         System.out.println("Running TestAPIM.testPurgeDatastream...");
         // test specifying date-time for startDate and null for endDate
         String[] results =
                 apim.purgeDatastream("demo:14",
-                                     "NEWDS1",
+                                     testDsIds.get(0),
                                      "1900-01-01T00:00:00.000Z",
                                      null,
                                      "purging datastream NEWDS1",
@@ -2069,7 +2107,7 @@ public class TestAPIM
         // test specifying null for both startDate and endDate
         results =
                 apim.purgeDatastream("demo:14",
-                                     "NEWDS2",
+                                     testDsIds.get(1),
                                      null,
                                      null,
                                      "purging datastream NEWDS2",
@@ -2084,7 +2122,7 @@ public class TestAPIM
         // test specifying date-time for both startDate and endDate
         results =
                 apim.purgeDatastream("demo:14",
-                                     "NEWDS3",
+                                     testDsIds.get(2),
                                      "1900-01-01T00:00:00.000Z",
                                      "9999-01-01T00:00:00.000Z",
                                      "purging datastream NEWDS3",
@@ -2102,9 +2140,10 @@ public class TestAPIM
                         .getObjectXML("demo:14"));
         assertTrue(objectXML.length > 0);
         String xmlIn = new String(objectXML, "UTF-8");
-        assertXpathExists("foxml:digitalObject[@PID='demo:14']", xmlIn);
+        Document doc = XMLUnit.buildControlDocument(xmlIn);
+        assertXpathExists("foxml:digitalObject[@PID='demo:14']", doc);
         assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['purgeDatastream']",
-                          xmlIn);
+                          doc);
     }
 
     public void testGetDatastream() throws Exception {
@@ -2157,7 +2196,7 @@ public class TestAPIM
                         new String[] {});
     }
 
-    public void getDatastreams() throws Exception {
+    public void testGetDatastreams() throws Exception {
         System.out.println("Running TestAPIM.testGetDatastreams...");
         // test getting all datastreams for object demo:26 specifying null for datetime and state
         Datastream[] dsArray =
@@ -2286,7 +2325,7 @@ public class TestAPIM
                         new String[] {});
     }
 
-    public void getDatastreamHistory() throws Exception {
+    public void testGetDatastreamHistory() throws Exception {
         // (8) test getDatastreamHistory
         System.out.println("Running TestAPIM.testGetDatastreamHistory...");
         // test getting datastream history for datastream DC of object demo:5
@@ -2294,6 +2333,43 @@ public class TestAPIM
                 apim.getDatastreamHistory("demo:5", "DC")
                         .toArray(new Datastream[0]);
         assertEquals(dsArray.length, 1);
+    }
+
+    private List<String> setUpDatastreamModificationTest(String pid, String stub, String type, int number) throws Exception {
+        ArrayList<String> result = new ArrayList<String>(number);
+        for (int i = 0; i < number; i++){
+            String newDS = stub + "DS" + type + Integer.toString(i+1);
+            String[] altIds = new String[1];
+            altIds[0] = "Datastream " + Integer.toString(i+1) + " Alternate ID";
+            String datastreamId =
+                    apim.addDatastream(pid,
+                                       newDS,
+                                       TypeUtility.convertStringtoAOS(altIds),
+                                       "A New M-type Datastream",
+                                       true,
+                                       "text/xml",
+                                       "info:myFormatURI/Mtype/stuff#junk",
+                                       getBaseURL()
+                                               + "/get/fedora-system:ContentModel-3.0/DC",
+                                       type,
+                                       "A",
+                                       null,
+                                       null,
+                                       "adding new datastream");
+            result.add(i, datastreamId);
+        }
+        return result;
+    }
+
+    private void tearDownDatastreamModificationTest(String pid, List<String> dsids) throws Exception {
+        for (String dsid: dsids){
+            apim.purgeDatastream(pid,
+                                 dsid,
+                                 null,
+                                 null,
+                                 "purging datastream " + dsid,
+                                 false).toArray(new String[0]);
+        }
     }
 
     /**
@@ -2349,6 +2425,24 @@ public class TestAPIM
                          true,
                          false);
         }
+    }
+
+    private int getNumberNonAuditDatastreams(String pid) throws Exception {
+        byte [] objectXML =
+                TypeUtility.convertDataHandlerToBytes(apim
+                        .getObjectXML(pid));
+        return getNumberNonAuditDatastreams(objectXML);
+    }
+
+    private int getNumberNonAuditDatastreams(byte [] objectXML) throws Exception {
+        String xmlIn = new String(objectXML, "UTF-8");
+        Document doc = XMLUnit.buildControlDocument(xmlIn);
+        return getNumberNonAuditDatastreams(doc);
+    }
+
+    private int getNumberNonAuditDatastreams(Document doc) throws Exception {
+        return Integer.parseInt(XMLUnit.newXpathEngine().evaluate("count(//foxml:datastream[@ID!='AUDIT'])",
+                doc));
     }
 
     public void testSetDatastreamState() throws Exception {
@@ -2463,43 +2557,44 @@ public class TestAPIM
         byte[] objectXML = TypeUtility.convertDataHandlerToBytes(apim.getObjectXML(pid));
         assertTrue(objectXML.length > 0);
         String xmlIn = new String(objectXML, "UTF-8");
-        assertXpathExists("foxml:digitalObject[@PID='" + pid + "']", xmlIn);
+        Document doc = XMLUnit.buildControlDocument(xmlIn);
+        assertXpathExists("foxml:digitalObject[@PID='" + pid + "']", doc);
         assertXpathExists("//foxml:objectProperties/foxml:property"
                 + "[@NAME='info:fedora/fedora-system:def/model#state'"
-                + " and @VALUE='Active']", xmlIn);
+                + " and @VALUE='Active']", doc);
         assertXpathExists("//foxml:objectProperties/foxml:property"
                                   + "[@NAME='info:fedora/fedora-system:def/model#label'"
                                   + " and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']",
-                          xmlIn);
+                          doc);
         assertXpathNotExists("//foxml:objectProperties/foxml:property"
                                      + "[@NAME='info:fedora/fedora-system:def/model#contentModel']",
-                             xmlIn);
-        assertXpathNotExists("//foxml:disseminator", xmlIn);
-        assertXpathExists("//foxml:datastream[@ID='AUDIT']", xmlIn);
+                             doc);
+        assertXpathNotExists("//foxml:disseminator", doc);
+        assertXpathExists("//foxml:datastream[@ID='AUDIT']", doc);
         assertXpathEvaluatesTo("5",
                                "count(//foxml:datastream[@ID!='AUDIT'])",
-                               xmlIn);
-
+                               doc);
         // test exporting foxml 1.0 object
         objectXML = TypeUtility.convertDataHandlerToBytes(apim.export("demo:997", FOXML1_0.uri, "migrate"));
         assertTrue(objectXML.length > 0);
         xmlIn = new String(objectXML, "UTF-8");
-        assertXpathExists("foxml:digitalObject[@PID='demo:997']", xmlIn);
+        doc = XMLUnit.buildControlDocument(xmlIn);
+        assertXpathExists("foxml:digitalObject[@PID='demo:997']", doc);
         assertXpathExists("//foxml:objectProperties/foxml:property"
                 + "[@NAME='info:fedora/fedora-system:def/model#state'"
-                + " and @VALUE='Active']", xmlIn);
+                + " and @VALUE='Active']", doc);
         assertXpathExists("//foxml:objectProperties/foxml:property"
                                   + "[@NAME='info:fedora/fedora-system:def/model#label'"
                                   + " and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']",
-                          xmlIn);
+                          doc);
         assertXpathNotExists("//foxml:objectProperties/foxml:property"
                                      + "[@NAME='info:fedora/fedora-system:def/model#contentModel']",
-                             xmlIn);
-        assertXpathNotExists("//foxml:disseminator", xmlIn);
-        assertXpathExists("//foxml:datastream[@ID='AUDIT']", xmlIn);
+                             doc);
+        assertXpathNotExists("//foxml:disseminator", doc);
+        assertXpathExists("//foxml:datastream[@ID='AUDIT']", doc);
         assertXpathEvaluatesTo("5",
                                "count(//foxml:datastream[@ID!='AUDIT'])",
-                               xmlIn);
+                               doc);
 
         // purge foxml 1.0 object
         apim.purgeObject(pid, "purging object demo:997", false);
@@ -2542,8 +2637,6 @@ public class TestAPIM
 
         // test getting xml for object demo:5
         System.out.println("Running TestAPIM.testValidate...");
-        FedoraClient client = getFedoraClient();
-        FedoraAPIAMTOM apia = client.getAPIAMTOM();
 
         String[] resultFields = {"pid"};
         java.math.BigInteger maxResults = new java.math.BigInteger("" + 1000);

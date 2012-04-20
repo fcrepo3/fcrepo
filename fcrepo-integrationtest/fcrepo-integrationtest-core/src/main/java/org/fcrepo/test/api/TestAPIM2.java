@@ -29,6 +29,7 @@ import org.fcrepo.test.TemplatedResourceIterator;
 
 /**
  * Test APIM based on templating of resource files
+ * These tests also use the non-MTOM WS client
  *
  * @author Stephen Bayliss
  * @version $Id$
