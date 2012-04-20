@@ -19,27 +19,22 @@
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 import java.net.URI;
-
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.ws.handler.soap.SOAPMessageContext;
+
+import org.apache.cxf.binding.soap.SoapFault;
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
-
-import org.apache.cxf.binding.soap.SoapFault;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.LogUtil;
 
 
 /**
@@ -84,7 +79,6 @@ public class GetDatastreamsHandler
 
         try {
             pid = (String) callGetter("getPid",oMap);
-            dsID = (String) callGetter("getDsID", oMap);
         } catch (Exception e) {
             logger.error("Error obtaining parameters", e);
             throw new OperationHandlerException("Error obtaining parameters.",
@@ -104,10 +98,6 @@ public class GetDatastreamsHandler
             if (pid != null && !"".equals(pid)) {
                 resAttr.put(new URI(XACML_RESOURCE_ID),
                             new AnyURIAttribute(new URI(pid)));
-            }
-            if (dsID != null && !"".equals(dsID)) {
-                resAttr.put(Constants.DATASTREAM.ID.getURI(),
-                            new StringAttribute(dsID));
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
