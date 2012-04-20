@@ -30,12 +30,4 @@ public class NoopFilter
         return null;
     }
 
-    @Override
-    public RequestCtx handleResponse(HttpServletRequest request,
-                                     HttpServletResponse response)
-            throws IOException, ServletException {
-        return null;
-    }
-
-
 }
