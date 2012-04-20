@@ -81,26 +81,30 @@ public class DatastreamResource
     @GET
     public Response listDatastreams(@PathParam(RestParam.PID) String pid,
                                     @QueryParam(RestParam.AS_OF_DATE_TIME) String dateTime,
-                                    @QueryParam(RestParam.FORMAT) @DefaultValue(HTML) String format) {
+                                    @QueryParam(RestParam.FORMAT) @DefaultValue(HTML) String format,
+                                    @QueryParam(RestParam.PROFILES) @DefaultValue("false") boolean profiles,
+                                    @QueryParam(RestParam.DS_STATE) String dsState,
+                                    @QueryParam(RestParam.VALIDATE_CHECKSUM) @DefaultValue("false") boolean validateChecksum) {
 
         try {
-            Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
-            Context context = getContext();
-            MediaType mime = RestHelper.getContentType(format);
-            DatastreamDef[] dsDefs =
-                    apiAService.listDatastreams(context, pid, asOfDateTime);
-
-            String output =
-                    getSerializer(context).dataStreamsToXML(pid,
-                                                            asOfDateTime,
-                                                            dsDefs);
-
-            if (TEXT_HTML.isCompatible(mime)) {
-                CharArrayWriter writer = new CharArrayWriter();
-                transform(output, "access/listDatastreams.xslt", writer);
-                output = writer.toString();
+            final Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
+            final Context context = getContext();
+            final MediaType mime;
+            String output;
+            if (profiles){
+                mime=MediaType.TEXT_XML_TYPE;
+                final Datastream[] datastreams = apiMService.getDatastreams(getContext(), pid, asOfDateTime, dsState);
+                output=getSerializer(context).datastreamProfilesToXML(pid, datastreams, asOfDateTime, validateChecksum);
+            }else{
+                mime = RestHelper.getContentType(format);
+                final DatastreamDef[] dsDefs = apiAService.listDatastreams(context, pid, asOfDateTime);
+                output = getSerializer(context).dataStreamsToXML(pid, asOfDateTime, dsDefs);
+                if (TEXT_HTML.isCompatible(mime)) {
+                    final CharArrayWriter writer = new CharArrayWriter();
+                    transform(output, "access/listDatastreams.xslt", writer);
+                    output = writer.toString();
+                }
             }
-
             return Response.ok(output, mime).build();
         } catch (Exception ex) {
             return handleException(ex);

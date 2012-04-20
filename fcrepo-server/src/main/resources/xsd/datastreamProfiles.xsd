@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.fedora.info/definitions/1/0/access/" 
+            xmlns="http://www.fedora.info/definitions/1/0/access/"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+            elementFormDefault="qualified">
+	<!-- root element declaration -->
+	<xsd:element name="datastreamProfiles">
+		<xsd:simpleType>
+			<xsd:list itemType="datastreamProfile" xsi:schemaLocation="datastream datastreamProfile.xsd">
+			</xsd:list>
+		</xsd:simpleType>
+	</xsd:element>
+</xsd:schema>
