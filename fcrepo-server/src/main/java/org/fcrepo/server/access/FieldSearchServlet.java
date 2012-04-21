@@ -48,20 +48,13 @@ import org.fcrepo.server.utilities.StreamUtility;
  *
  * @author Chris Wilper
  */
+@SuppressWarnings("serial")
 public class FieldSearchServlet
-        extends HttpServlet
+        extends SpringAccessServlet
         implements Constants {
-
-    private static final long serialVersionUID = 1L;
 
     private static final Logger logger =
             LoggerFactory.getLogger(FieldSearchServlet.class);
-
-    /** Instance of the Server */
-    private static Server s_server = null;
-
-    /** Instance of the access subsystem */
-    private static Access s_access = null;
 
     private String[] getFieldsArray(HttpServletRequest req) {
         ArrayList<String> l = new ArrayList<String>();
@@ -343,18 +336,18 @@ public class FieldSearchServlet
             if (fieldsArray != null && fieldsArray.length > 0
                     || sessionToken != null) {
                 if (sessionToken != null) {
-                    fsr = s_access.resumeFindObjects(context, sessionToken);
+                    fsr = m_access.resumeFindObjects(context, sessionToken);
                 } else {
                     if (terms != null && terms.length() != 0) {
                         fsr =
-                                s_access
+                                m_access
                                         .findObjects(context,
                                                      fieldsArray,
                                                      maxResults,
                                                      new FieldSearchQuery(terms));
                     } else {
                         fsr =
-                                s_access
+                                m_access
                                         .findObjects(context,
                                                      fieldsArray,
                                                      maxResults,
@@ -700,20 +693,6 @@ public class FieldSearchServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         doGet(request, response);
-    }
-
-    /** Gets the Fedora Server instance. */
-    @Override
-    public void init() throws ServletException {
-        try {
-            s_server =
-                    Server.getInstance(new File(Constants.FEDORA_HOME), false);
-            s_access =
-                    (Access) s_server.getModule("org.fcrepo.server.access.Access");
-        } catch (InitializationException ie) {
-            throw new ServletException("Error getting Fedora Server instance: "
-                    + ie.getMessage());
-        }
     }
 
 }

@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory;
  * @author Ross Wayland
  */
 public class DescribeRepositoryServlet
-        extends HttpServlet
+        extends SpringAccessServlet
         implements Constants {
 
     private static final Logger logger =
@@ -80,14 +80,6 @@ public class DescribeRepositoryServlet
 
     /** Content type for xml. */
     private static final String CONTENT_TYPE_XML = "text/xml; charset=UTF-8";
-
-    /** Instance of the Fedora server. */
-    private static Server s_server = null;
-
-    /** Instance of the access subsystem. */
-    private static Access s_access = null;
-
-
 
     String ACTION_LABEL = "describe repository";
 
@@ -155,7 +147,7 @@ public class DescribeRepositoryServlet
         try {
             pw = new PipedWriter();
             pr = new PipedReader(pw);
-            repositoryInfo = s_access.describeRepository(context);
+            repositoryInfo = m_access.describeRepository(context);
             if (repositoryInfo != null) {
                 // Repository info obtained.
                 // Serialize the RepositoryInfo object into XML
@@ -185,7 +177,7 @@ public class DescribeRepositoryServlet
                             new OutputStreamWriter(response.getOutputStream(),
                                                    "UTF-8");
                     File xslFile =
-                            new File(s_server.getHomeDir(),
+                            new File(m_server.getHomeDir(),
                                      "access/viewRepositoryInfo.xslt");
                     TransformerFactory factory =
                             XmlTransformUtility.getTransformerFactory();
@@ -357,36 +349,6 @@ public class DescribeRepositoryServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         doGet(request, response);
-    }
-
-    /**
-     * <p>
-     * Initialize servlet.
-     * </p>
-     *
-     * @throws ServletException
-     *         If the servet cannot be initialized.
-     */
-    @Override
-    public void init() throws ServletException {
-        try {
-            s_server =
-                    Server.getInstance(new File(Constants.FEDORA_HOME), false);
-            s_access =
-                    (Access) s_server.getModule("org.fcrepo.server.access.Access");
-        } catch (InitializationException ie) {
-            throw new ServletException("Unable to get Fedora Server instance."
-                    + ie.getMessage());
-        }
-    }
-
-    /**
-     * <p>
-     * Cleans up servlet resources.
-     * </p>
-     */
-    @Override
-    public void destroy() {
     }
 
 }

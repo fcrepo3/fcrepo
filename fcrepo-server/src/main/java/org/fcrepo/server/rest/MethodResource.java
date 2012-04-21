@@ -92,7 +92,7 @@ public class MethodResource extends BaseRestResource {
             String dTime) {
         try {
             Date asOfDateTime = DateUtility.parseDateOrNull(dTime);
-            return buildResponse(apiAService.getDissemination(
+            return buildResponse(m_access.getDissemination(
                     getContext(),
                     pid,
                     sDef,
@@ -109,7 +109,7 @@ public class MethodResource extends BaseRestResource {
         try {
             Date asOfDateTime = DateUtility.parseDateOrNull(dTime);
             Context context = getContext();
-            ObjectMethodsDef[] methodDefs = apiAService.listMethods(context, pid, asOfDateTime);
+            ObjectMethodsDef[] methodDefs = m_access.listMethods(context, pid, asOfDateTime);
             String xml = getSerializer(context).objectMethodsToXml(methodDefs, pid, sDef, asOfDateTime);
 
             MediaType mime = RestHelper.getContentType(format);

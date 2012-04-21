@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.Map;
+
 import org.w3c.dom.Element;
 
 import org.fcrepo.common.Constants;
@@ -35,10 +37,20 @@ public class BasicServer
 
     private static final Logger logger =
             LoggerFactory.getLogger(BasicServer.class);
+    
+    public BasicServer(File fedoraHomeDir)
+            throws ServerInitializationException, ModuleInitializationException {
+        super(fedoraHomeDir);
+    }
 
     public BasicServer(Element rootElement, File fedoraHomeDir)
             throws ServerInitializationException, ModuleInitializationException {
         super(rootElement, fedoraHomeDir);
+    }
+
+    public BasicServer(Map<String,String> params, File fedoraHomeDir)
+            throws ServerInitializationException, ModuleInitializationException {
+        super(params, fedoraHomeDir);
     }
 
     @Override

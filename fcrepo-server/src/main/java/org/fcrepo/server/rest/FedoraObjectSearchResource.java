@@ -59,19 +59,19 @@ public class FedoraObjectSearchResource extends BaseRestResource {
 
         try {
             Context context = getContext();
-            String[] wantedFields = getWantedFields(servletRequest);
+            String[] wantedFields = getWantedFields(m_servletRequest);
             MediaType mime = RestHelper.getContentType(format);
 
             FieldSearchResult result = null;
 
             if (wantedFields.length > 0 || sessionToken != null) {
                 if (sessionToken != null) {
-                    result = apiAService.resumeFindObjects(context, sessionToken);
+                    result = m_access.resumeFindObjects(context, sessionToken);
                 } else {
                     if ((terms != null) && (terms.length() != 0)) {
-                        result = apiAService.findObjects(context, wantedFields, maxResults, new FieldSearchQuery(terms));
+                        result = m_access.findObjects(context, wantedFields, maxResults, new FieldSearchQuery(terms));
                     } else {
-                        result = apiAService.findObjects(context, wantedFields, maxResults, new FieldSearchQuery(Condition.getConditions(query)));
+                        result = m_access.findObjects(context, wantedFields, maxResults, new FieldSearchQuery(Condition.getConditions(query)));
                     }
                 }
             }
@@ -123,7 +123,7 @@ public class FedoraObjectSearchResource extends BaseRestResource {
 
         try {
             Context context = getContext();
-            String[] pidList = apiMService.getNextPID(context, numPIDS, namespace);
+            String[] pidList = m_management.getNextPID(context, numPIDS, namespace);
             MediaType mime = RestHelper.getContentType(format);
 
             if (pidList.length > 0) {

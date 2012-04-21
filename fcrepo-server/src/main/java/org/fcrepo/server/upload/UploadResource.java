@@ -47,7 +47,7 @@ public class UploadResource extends BaseRestResource {
         final InputStream fileStream = multiPart.getBodyParts().get(0).getEntityAs(InputStream.class);
         String uploaded;
         try {
-            uploaded = apiMService.putTempStream(getContext(), fileStream);
+            uploaded = m_management.putTempStream(getContext(), fileStream);
             logger.debug("File uploaded: ", uploaded);
         } catch (ServerException e) {
             logger.error(e.toString());

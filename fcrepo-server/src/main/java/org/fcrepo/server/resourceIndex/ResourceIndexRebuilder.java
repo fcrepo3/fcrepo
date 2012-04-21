@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.support.GenericApplicationContext;
 
 
 
@@ -47,7 +48,7 @@ public class ResourceIndexRebuilder
 
     private ModuleConfiguration m_riConfig;
 
-    private ApplicationContext m_context;
+    private GenericApplicationContext m_context;
 
     private ResourceIndex m_ri;
 
@@ -244,7 +245,7 @@ public class ResourceIndexRebuilder
     @Override
     public void setApplicationContext(ApplicationContext context)
             throws BeansException {
-        m_context = context;
+        m_context = (GenericApplicationContext)context;
 
     }
 

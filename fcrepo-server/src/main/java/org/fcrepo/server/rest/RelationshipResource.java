@@ -70,7 +70,7 @@ public class RelationshipResource extends BaseRestResource {
             subject = PID.toURI(pid);
         }
         try {
-            RelationshipTuple[] tuples = apiMService.getRelationships(context, subject, predicate);
+            RelationshipTuple[] tuples = m_management.getRelationships(context, subject, predicate);
             TripleIterator it = new TupleArrayTripleIterator(new ArrayList<RelationshipTuple>(Arrays.asList(tuples)));
             ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -132,7 +132,7 @@ public class RelationshipResource extends BaseRestResource {
                 // assume the subject is the object as denoted by the pid
                 subject = PID.toURI(pid);
             }
-            boolean result = apiMService.addRelationship(context, subject, predicate, object, isLiteral, datatype);
+            boolean result = m_management.addRelationship(context, subject, predicate, object, isLiteral, datatype);
             return Response.ok(Boolean.toString(result)).build(); // needs an entity to not be overridden with a 204
         } catch (ServerException e) {
             return handleException(e);
@@ -167,7 +167,7 @@ public class RelationshipResource extends BaseRestResource {
                 // assume the subject is the object as denoted by the pid
                 subject = PID.toURI(pid);
             }
-            boolean result = apiMService.purgeRelationship(context, subject, predicate, object, isLiteral, datatype);
+            boolean result = m_management.purgeRelationship(context, subject, predicate, object, isLiteral, datatype);
             return Response.ok(Boolean.toString(result), MediaType.TEXT_PLAIN_TYPE).build();
         } catch (ServerException e) {
             return handleException(e);

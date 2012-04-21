@@ -182,33 +182,35 @@ public class TestRESTAPI
         NamespaceContext ctx = new SimpleNamespaceContext(nsMap);
         XMLUnit.setXpathNamespaceContext(ctx);
 
-        DEMO_MIN =
+        if (DEMO_MIN == null) DEMO_MIN =
                 FileUtils.readFileToString(new File(REST_RESOURCE_PATH
                         + "/demo_min.xml"), "UTF-8");
-        DEMO_MIN_PID =
+        if (DEMO_MIN_PID == null) DEMO_MIN_PID =
                 FileUtils.readFileToString(new File(REST_RESOURCE_PATH
                         + "/demo_min_pid.xml"), "UTF-8");
+        if (DEMO_REST == null) {
+            StringTemplate tpl =
+                    new StringTemplate(FileUtils
+                                       .readFileToString(new File(REST_RESOURCE_PATH
+                                                                  + "/demo_rest.xml"), "UTF-8"));
+            tpl.setAttribute("MODEL_DOWNLOAD_FILENAME",
+                             MODEL.DOWNLOAD_FILENAME.localName);
+            tpl.setAttribute("DS1_RELS_FILENAME", DS1RelsFilename);
+            tpl.setAttribute("MODEL_URI", MODEL.uri);
+            tpl.setAttribute("DATETIME", datetime);
+            tpl.setAttribute("FEDORA_BASE_URL", getBaseURL());
+            tpl.setAttribute("DS2_LABEL_FILENAME", DS2LabelFilename);
+            tpl.setAttribute("DS3_LABEL_FILENAME", DS3LabelFilename);
+            tpl.setAttribute("DS4_LABEL_FILENAME_ORIGINAL",
+                             DS4LabelFilenameOriginal);
 
-        StringTemplate tpl =
-                new StringTemplate(FileUtils
-                        .readFileToString(new File(REST_RESOURCE_PATH
-                                + "/demo_rest.xml"), "UTF-8"));
-        tpl.setAttribute("MODEL_DOWNLOAD_FILENAME",
-                         MODEL.DOWNLOAD_FILENAME.localName);
-        tpl.setAttribute("DS1_RELS_FILENAME", DS1RelsFilename);
-        tpl.setAttribute("MODEL_URI", MODEL.uri);
-        tpl.setAttribute("DATETIME", datetime);
-        tpl.setAttribute("FEDORA_BASE_URL", getBaseURL());
-        tpl.setAttribute("DS2_LABEL_FILENAME", DS2LabelFilename);
-        tpl.setAttribute("DS3_LABEL_FILENAME", DS3LabelFilename);
-        tpl.setAttribute("DS4_LABEL_FILENAME_ORIGINAL",
-                         DS4LabelFilenameOriginal);
-
-        DEMO_REST = tpl.toString();
+            DEMO_REST = tpl.toString();
+            DEMO_REST_FOXML = DEMO_REST.getBytes("UTF-8");
+        }
         apia = getFedoraClient().getAPIAMTOM();
         apim = getFedoraClient().getAPIMMTOM();
-        apim.ingest(TypeUtility.convertBytesToDataHandler(DEMO_REST
-                .getBytes("UTF-8")), FOXML1_1.uri, "ingesting new foxml object");
+        apim.ingest(TypeUtility.convertBytesToDataHandler(DEMO_REST_FOXML),
+                    FOXML1_1.uri, "TestRESTAPI.setUp: ingesting new foxml object " + pid);
 
     }
 
@@ -216,7 +218,7 @@ public class TestRESTAPI
     public void tearDown() throws Exception {
         XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
 
-        apim.purgeObject(pid.toString(), "", false);
+        apim.purgeObject(pid.toString(), "TestRESTAPI.tearDown: purging " + pid, false);
     }
 
     /**
@@ -1001,7 +1003,7 @@ public class TestRESTAPI
         // inline (X) datastream
         String xmlData = "<foo>bar</foo>";
         String dsPath = "/objects/" + pid + "/datastreams/FOO";
-        url = dsPath + "?controlGroup=X&dsLabel=bar";
+        url = dsPath + "?controlGroup=X&dsLabel=foo";
         assertEquals(SC_UNAUTHORIZED, post(xmlData, false).getStatusCode());
         HttpResponse response = post(xmlData, true);
         assertEquals(SC_CREATED, response.getStatusCode());
@@ -1017,6 +1019,8 @@ public class TestRESTAPI
 
         // managed (M) datastream
         String mimeType = "text/plain";
+        Datastream ds = apim.getDatastream(pid.toString(),"BAR",null);
+        assertNull(ds);
         dsPath = "/objects/" + pid + "/datastreams/BAR";
         url = dsPath + "?controlGroup=M&dsLabel=bar&mimeType=" + mimeType;
         File temp = File.createTempFile("test", null);
@@ -1035,7 +1039,8 @@ public class TestRESTAPI
         url = dsPath + "?format=xml";
         assertEquals(response.getResponseBodyString(), get(true)
                 .getResponseBodyString());
-        Datastream ds = apim.getDatastream(pid.toString(), "BAR", null);
+        ds = apim.getDatastream(pid.toString(), "BAR", null);
+        assertNotNull(ds);
         assertEquals(ds.getMIMEType(), mimeType);
     }
 
@@ -1043,7 +1048,7 @@ public class TestRESTAPI
         // Create BAR datastream
         url =
                 String
-                        .format("/objects/%s/datastreams/BAR?controlGroup=M&dsLabel=bar",
+                        .format("/objects/%s/datastreams/BAR?controlGroup=M&dsLabel=testModifyDatastreamByReference(bar)",
                                 pid.toString());
         File temp = File.createTempFile("test", null);
         DataOutputStream os = new DataOutputStream(new FileOutputStream(temp));
@@ -1138,7 +1143,7 @@ public class TestRESTAPI
 
     public void testModifyDatastreamByValue() throws Exception {
         String xmlData = "<baz>quux</baz>";
-        url = String.format("/objects/%s/datastreams/DS1", pid.toString());
+        url = String.format("/objects/%s/datastreams/DS1?dsLabel=testModifyDatastreamByValue", pid.toString());
 
         assertEquals(SC_UNAUTHORIZED, put(xmlData, false).getStatusCode());
         assertEquals(SC_OK, put(xmlData, true).getStatusCode());
@@ -1151,7 +1156,7 @@ public class TestRESTAPI
     }
 
     public void testModifyDatastreamNoContent() throws Exception {
-        String label = "Label";
+        String label = "testModifyDatastreamNoContent";
         url =
                 String.format("/objects/%s/datastreams/DS1?dsLabel=%s", pid
                         .toString(), label);

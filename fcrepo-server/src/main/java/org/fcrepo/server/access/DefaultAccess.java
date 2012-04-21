@@ -452,7 +452,7 @@ public class DefaultAccess
                                             asOfDateTime);
 
         // Assemble and execute the dissemination request from the binding info.
-        DisseminationService dissService = new DisseminationService();
+        DisseminationService dissService = new DisseminationService(getServer());
         dissemination =
                 dissService.assembleDissemination(context,
                                                   PID,

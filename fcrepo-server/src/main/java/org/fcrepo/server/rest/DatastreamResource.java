@@ -88,7 +88,7 @@ public class DatastreamResource
             Context context = getContext();
             MediaType mime = RestHelper.getContentType(format);
             DatastreamDef[] dsDefs =
-                    apiAService.listDatastreams(context, pid, asOfDateTime);
+                    m_access.listDatastreams(context, pid, asOfDateTime);
 
             String output =
                     getSerializer(context).dataStreamsToXML(pid,
@@ -124,7 +124,7 @@ public class DatastreamResource
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
             Context context = getContext();
             Datastream dsProfile =
-                    apiMService.getDatastream(context, pid, dsID, asOfDateTime);
+                    m_management.getDatastream(context, pid, dsID, asOfDateTime);
 
             if (dsProfile == null) {
                 return Response
@@ -182,7 +182,7 @@ public class DatastreamResource
         try {
             Context context = getContext();
             Datastream[] datastreamHistory =
-                    apiMService.getDatastreamHistory(context, pid, dsID);
+                    m_management.getDatastreamHistory(context, pid, dsID);
 
             if (datastreamHistory == null || datastreamHistory.length == 0) {
                 return Response
@@ -230,12 +230,12 @@ public class DatastreamResource
         try {
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
             MIMETypedStream stream =
-                    apiAService.getDatastreamDissemination(context,
+                    m_access.getDatastreamDissemination(context,
                                                            pid,
                                                            dsID,
                                                            asOfDateTime);
-            if (datastreamFilenameHelper != null) {
-                datastreamFilenameHelper
+            if (m_datastreamFilenameHelper != null) {
+                m_datastreamFilenameHelper
                         .addContentDispositionHeader(context,
                                                      pid,
                                                      dsID,
@@ -269,7 +269,7 @@ public class DatastreamResource
             Context context = getContext();
             Date startDate = DateUtility.parseDateOrNull(startDT);
             Date endDate = DateUtility.parseDateOrNull(endDT);
-            Date[] purged = apiMService.purgeDatastream(context,
+            Date[] purged = m_management.purgeDatastream(context,
                                         pid,
                                         dsID,
                                         startDate,
@@ -281,7 +281,7 @@ public class DatastreamResource
             for (Date d : purged) {
                 results.add(DateUtility.convertDateToXSDString(d));
             }
-            return Response.ok(mapper.writeValueAsString(results)).build();
+            return Response.ok(m_mapper.writeValueAsString(results)).build();
         } catch (Exception ex) {
             return handleException(ex);
         }
@@ -315,7 +315,7 @@ public class DatastreamResource
         return addOrUpdateDatastream(false,
                                      pid,
                                      dsID,
-                                     headers.getMediaType(),
+                                     m_headers.getMediaType(),
                                      mimeType,
                                      null,
                                      dsLocation,
@@ -358,7 +358,7 @@ public class DatastreamResource
         return addOrUpdateDatastream(true,
                                      pid,
                                      dsID,
-                                     headers.getMediaType(),
+                                     m_headers.getMediaType(),
                                      mimeType,
                                      controlGroup,
                                      dsLocation,
@@ -402,7 +402,7 @@ public class DatastreamResource
             Context context = getContext();
 
             Datastream existingDS =
-                    apiMService.getDatastream(context, pid, dsID, null);
+                    m_management.getDatastream(context, pid, dsID, null);
             if (!posted && versionable == null && existingDS != null){
                 versionable = existingDS.DSVersionable;
             }
@@ -416,7 +416,7 @@ public class DatastreamResource
             if (existingDS != null && existingDS.DSState.equals("D")
                     && dsState != null) {
                 if (dsState.equals("A") || dsState.equals("I")) {
-                    apiMService.setDatastreamState(context,
+                    m_management.setDatastreamState(context,
                                                    pid,
                                                    dsID,
                                                    dsState,
@@ -431,7 +431,7 @@ public class DatastreamResource
             if (!ignoreContent) {
                 RestUtil restUtil = new RestUtil();
                 RequestContent content =
-                        restUtil.getRequestContent(servletRequest, headers);
+                        restUtil.getRequestContent(m_servletRequest, m_headers);
 
                 if (content != null && content.getContentStream() != null) {
                     is = content.getContentStream();
@@ -462,10 +462,10 @@ public class DatastreamResource
                     if ((dsLocation == null || dsLocation.equals(""))
                             && ("X".equals(controlGroup) || "M"
                                     .equals(controlGroup))) {
-                        dsLocation = apiMService.putTempStream(context, is);
+                        dsLocation = m_management.putTempStream(context, is);
                     }
                     dsID =
-                            apiMService.addDatastream(context,
+                            m_management.addDatastream(context,
                                                       pid,
                                                       dsID,
                                                       altIDs,
@@ -489,7 +489,7 @@ public class DatastreamResource
                     if (is == null && dsLocation != null
                             && !dsLocation.equals("")) {
                         try {
-                            WebClientConfiguration webconfig = fedoraServer.getWebClientConfig();
+                            WebClientConfiguration webconfig = m_server.getWebClientConfig();
                             WebClient webClient = new WebClient(webconfig);
                             is = webClient.get(dsLocation, true);
                         } catch (IOException ioe) {
@@ -499,7 +499,7 @@ public class DatastreamResource
                                     + ioe.getMessage());
                         }
                     }
-                    apiMService.modifyDatastreamByValue(context,
+                    m_management.modifyDatastreamByValue(context,
                                                         pid,
                                                         dsID,
                                                         altIDs,
@@ -518,13 +518,13 @@ public class DatastreamResource
                     if (dsLocation == null
                             && ("M".equals(existingDS.DSControlGrp))) {
                         if (is != null) {
-                            dsLocation = apiMService.putTempStream(context, is);
+                            dsLocation = m_management.putTempStream(context, is);
                         } else {
                             dsLocation = null;
                         }
                     }
 
-                    apiMService.modifyDatastreamByReference(context,
+                    m_management.modifyDatastreamByReference(context,
                                                             pid,
                                                             dsID,
                                                             altIDs,
@@ -542,7 +542,7 @@ public class DatastreamResource
                     if (dsState.equals("A") || dsState.equals("D")
                             || dsState.equals("I")) {
                         if (!dsState.equals(existingDS.DSState)) {
-                            apiMService.setDatastreamState(context,
+                            m_management.setDatastreamState(context,
                                                            pid,
                                                            dsID,
                                                            dsState,
@@ -552,7 +552,7 @@ public class DatastreamResource
                 }
 
                 if (versionable != existingDS.DSVersionable) {
-                    apiMService.setDatastreamVersionable(context,
+                    m_management.setDatastreamVersionable(context,
                                                          pid,
                                                          dsID,
                                                          versionable,
@@ -563,14 +563,14 @@ public class DatastreamResource
             ResponseBuilder builder;
             if (posted) {
                 builder =
-                        Response.created(uriInfo.getRequestUri()
+                        Response.created(m_uriInfo.getRequestUri()
                                 .resolve(URLEncoder.encode(dsID, DEFAULT_ENC)));
             } else { // put
                 builder = Response.ok();
             }
             builder.header("Content-Type", MediaType.TEXT_XML);
             Datastream dsProfile =
-                    apiMService.getDatastream(context, pid, dsID, null);
+                    m_management.getDatastream(context, pid, dsID, null);
             String xml =
                     getSerializer(context).datastreamProfileToXML(pid,
                                                                   dsID,

@@ -80,7 +80,7 @@ import org.fcrepo.utilities.XmlTransformUtility;
  * @author Ross Wayland
  */
 public class GetNextPIDServlet
-        extends HttpServlet
+        extends SpringManagementServlet
         implements Constants {
 
     private static final Logger logger =
@@ -93,12 +93,6 @@ public class GetNextPIDServlet
 
     /** Content type for xml. */
     private static final String CONTENT_TYPE_XML = "text/xml; charset=UTF-8";
-
-    /** Instance of the Fedora server. */
-    private static Server s_server = null;
-
-    /** Instance of the Management subsystem. */
-    private static Management s_management = null;
 
     public static final String ACTION_LABEL = "Get Pid";
 
@@ -198,7 +192,7 @@ public class GetNextPIDServlet
             pw = new PipedWriter();
             pr = new PipedReader(pw);
             String[] pidList =
-                    s_management.getNextPID(context, numPIDs, namespace);
+                    m_management.getNextPID(context, numPIDs, namespace);
             if (pidList.length > 0) {
                 // Repository info obtained.
                 // Serialize the RepositoryInfo object into XML
@@ -227,7 +221,7 @@ public class GetNextPIDServlet
                             new OutputStreamWriter(response.getOutputStream(),
                                                    "UTF-8");
                     File xslFile =
-                            new File(s_server.getHomeDir(),
+                            new File(m_server.getHomeDir(),
                                      "management/getNextPIDInfo.xslt");
                     TransformerFactory factory =
                             XmlTransformUtility.getTransformerFactory();
@@ -358,36 +352,6 @@ public class GetNextPIDServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         doGet(request, response);
-    }
-
-    /**
-     * <p>
-     * Initialize servlet.
-     * </p>
-     *
-     * @throws ServletException
-     *         If the servet cannot be initialized.
-     */
-    @Override
-    public void init() throws ServletException {
-        try {
-            s_server = Server.getInstance(new File(FEDORA_HOME), false);
-            s_management =
-                    (Management) s_server
-                            .getModule("org.fcrepo.server.management.Management");
-        } catch (InitializationException ie) {
-            throw new ServletException("Unable to get Fedora Server instance."
-                    + ie.getMessage());
-        }
-    }
-
-    /**
-     * <p>
-     * Cleans up servlet resources.
-     * </p>
-     */
-    @Override
-    public void destroy() {
     }
 
 }

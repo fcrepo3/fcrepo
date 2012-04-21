@@ -49,20 +49,6 @@ public class MethodParameterResolverServlet
     /** A string constant for the html MIME type */
     private static final String HTML_CONTENT_TYPE = "text/html; charset=UTF-8";
 
-    /** An instance of the Fedora server. */
-    private static Server s_server = null;
-
-    @Override
-    public void init() throws ServletException {
-        try {
-            s_server =
-                    Server.getInstance(new File(Constants.FEDORA_HOME), false);
-        } catch (InitializationException ie) {
-            throw new ServletException("Unable to get Fedora Server instance. -- "
-                    + ie.getMessage());
-        }
-    }
-
     /**
      * Treat Get request identical to Post request.
      *
@@ -102,12 +88,12 @@ public class MethodParameterResolverServlet
         String versDateTime = null;
         StringBuffer methodParms = new StringBuffer();
         response.setContentType(HTML_CONTENT_TYPE);
-        Hashtable h_methodParms = new Hashtable();
+        Hashtable<String,String> h_methodParms = new Hashtable<String,String>();
 
         // Get parameters passed from web form.
-        Enumeration parms = request.getParameterNames();
+        Enumeration<String> parms = request.getParameterNames();
         while (parms.hasMoreElements()) {
-            String name = new String((String) parms.nextElement());
+            String name = parms.nextElement();
             if (name.equals("PID")) {
                 PID = request.getParameter(name);
             } else if (name.equals("sDefPID")) {
@@ -153,11 +139,11 @@ public class MethodParameterResolverServlet
 
             // Add method parameters.
             int i = 0;
-            for (Enumeration e = h_methodParms.keys(); e.hasMoreElements();) {
+            for (Enumeration<String> e = h_methodParms.keys(); e.hasMoreElements();) {
                 String name =
-                        URLEncoder.encode((String) e.nextElement(), "UTF-8");
+                        URLEncoder.encode(e.nextElement(), "UTF-8");
                 String value =
-                        URLEncoder.encode((String) h_methodParms.get(name),
+                        URLEncoder.encode(h_methodParms.get(name),
                                           "UTF-8");
                 i++;
                 if (i == h_methodParms.size()) {

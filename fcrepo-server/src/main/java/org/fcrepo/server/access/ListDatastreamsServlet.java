@@ -12,6 +12,7 @@ import java.io.PipedWriter;
 import java.text.ParseException;
 import java.util.Date;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -85,7 +86,7 @@ import org.slf4j.LoggerFactory;
  *          $
  */
 public class ListDatastreamsServlet
-        extends HttpServlet
+        extends SpringAccessServlet
         implements Constants {
 
     private static final Logger logger =
@@ -99,12 +100,6 @@ public class ListDatastreamsServlet
     /** Content type for xml. */
     private static final String CONTENT_TYPE_XML = "text/xml; charset=UTF-8";
 
-    /** Instance of the Fedora server. */
-    private static Server s_server = null;
-
-    /** Instance of the access subsystem. */
-    private static Access s_access = null;
-
     /** Portion of initial request URL from protocol up to query string */
     private String requestURI = null;
 
@@ -117,7 +112,7 @@ public class ListDatastreamsServlet
     public static final String ACTION_LABEL = "List Datastreams";
 
     /** Configured Fedora server hostname */
-    private static String fedoraServerHost = null;
+    private String m_fedoraServerHost = null;
 
     /**
      * <p>
@@ -240,7 +235,7 @@ public class ListDatastreamsServlet
         try {
             pw = new PipedWriter();
             pr = new PipedReader(pw);
-            dsDefs = s_access.listDatastreams(context, PID, asOfDateTime);
+            dsDefs = m_access.listDatastreams(context, PID, asOfDateTime);
 
             // Object Profile found.
             // Serialize the ObjectProfile object into XML
@@ -273,7 +268,7 @@ public class ListDatastreamsServlet
                         new OutputStreamWriter(response.getOutputStream(),
                                                "UTF-8");
                 File xslFile =
-                        new File(s_server.getHomeDir(),
+                        new File(m_server.getHomeDir(),
                                  "access/listDatastreams.xslt");
                 TransformerFactory factory =
                         XmlTransformUtility.getTransformerFactory();
@@ -385,7 +380,7 @@ public class ListDatastreamsServlet
                         pw.write("\"");
                     }
                     final String baseURL =
-                            fedoraServerProtocol + "://" + fedoraServerHost
+                            fedoraServerProtocol + "://" + m_fedoraServerHost
                                     + ":" + fedoraServerPort + "/"
                                     + fedoraAppServerContext + "/";
                     pw.write(" baseURL=\"" + baseURL + "\"");
@@ -449,26 +444,9 @@ public class ListDatastreamsServlet
      *         If the servet cannot be initialized.
      */
     @Override
-    public void init() throws ServletException {
-        try {
-            s_server = Server.getInstance(new File(FEDORA_HOME), false);
-            fedoraServerHost = s_server.getParameter("fedoraServerHost");
-            s_access =
-                    (Access) s_server.getModule("org.fcrepo.server.access.Access");
-        } catch (InitializationException ie) {
-            throw new ServletException("Unable to get Fedora Server instance."
-                    + ie.getMessage());
-        }
-
-    }
-
-    /**
-     * <p>
-     * Cleans up servlet resources.
-     * </p>
-     */
-    @Override
-    public void destroy() {
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        m_fedoraServerHost = m_server.getParameter("fedoraServerHost");
     }
 
 }

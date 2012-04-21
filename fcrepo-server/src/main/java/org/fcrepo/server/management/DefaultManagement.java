@@ -648,7 +648,10 @@ public class DefaultManagement
             w = m_manager.getWriter(Server.USE_DEFINITIVE_STORE, context, pid);
             org.fcrepo.server.storage.types.Datastream orig =
                     w.GetDatastream(datastreamId, null);
-
+            if (orig == null) {
+                throw new DatastreamNotFoundException("Object " + pid + " has no datastream "
+                                                      + datastreamId + " to modify");
+            }
             // if provided, check request lastModifiedDate against the datastream,
             // rejecting the request if the datastream's mod date is more recent.
             if (lastModifiedDate != null) {
@@ -861,6 +864,11 @@ public class DefaultManagement
             w = m_manager.getWriter(Server.USE_DEFINITIVE_STORE, context, pid);
             Datastream orig =
                     w.GetDatastream(datastreamId, null);
+            if (orig == null) {
+                throw new DatastreamNotFoundException("Object " + pid + " has no datastream "
+                                                      + datastreamId + " to modify");
+            }
+
             XMLDatastreamProcessor origxml = new XMLDatastreamProcessor(orig);
 
             // if provided, check request lastModifiedDate against the datastream,
@@ -1299,7 +1307,7 @@ public class DefaultManagement
         // first clean up after old stuff
         purgeUploadedFiles();
         // then generate an id
-        int id = getNextTempId(context);
+        String id = Integer.toString(getNextTempId(context));
         // and attempt to save the stream
         File outFile = new File(m_tempDir, "" + id);
         FileOutputStream out = null;
@@ -1319,7 +1327,7 @@ public class DefaultManagement
         // if we got this far w/o an exception, add to hash with current time
         // and return the identifier-that-looks-like-a-url
         long now = System.currentTimeMillis();
-        m_uploadStartTime.put("" + id, new Long(now));
+        m_uploadStartTime.put(id, new Long(now));
         return DatastreamManagedContent.UPLOADED_SCHEME + id;
     }
 

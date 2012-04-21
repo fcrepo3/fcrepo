@@ -42,15 +42,12 @@ import org.slf4j.LoggerFactory;
  * @author Chris Wilper
  */
 public class UploadServlet
-        extends HttpServlet {
+        extends SpringManagementServlet {
 
     private static final Logger logger =
             LoggerFactory.getLogger(UploadServlet.class);
 
     private static final long serialVersionUID = 1L;
-
-    /** Instance of Management subsystem (for storing uploaded files). */
-    private static Management s_management = null;
 
     /**
      * The servlet entry point. http://host:port/fedora/management/upload
@@ -81,7 +78,7 @@ public class UploadServlet
                              response);
             } else {
                 sendResponse(HttpServletResponse.SC_CREATED,
-                             s_management.putTempStream(context, in),
+                             m_management.putTempStream(context, in),
                              response);
             }
         } catch (AuthzException ae) {
@@ -120,28 +117,6 @@ public class UploadServlet
             w.println(message);
         } catch (Exception e) {
             logger.error("Unable to send response", e);
-        }
-    }
-
-    /**
-     * Initialize servlet. Gets a reference to the fedora Server object.
-     *
-     * @throws ServletException
-     *         If the servet cannot be initialized.
-     */
-    @Override
-    public void init() throws ServletException {
-        try {
-            Server server =
-                    Server.getInstance(new File(Constants.FEDORA_HOME), false);
-            s_management = (Management)
-                    server.getModule("org.fcrepo.server.management.Management");
-            if (s_management == null) {
-                throw new ServletException("Unable to get Management module from server.");
-            }
-        } catch (InitializationException ie) {
-            throw new ServletException("Unable to get Fedora Server instance."
-                    + ie.getMessage());
         }
     }
 

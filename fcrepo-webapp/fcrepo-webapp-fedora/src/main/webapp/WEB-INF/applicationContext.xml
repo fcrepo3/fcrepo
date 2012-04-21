@@ -26,4 +26,225 @@
       </list>
     </property>
   </bean>
+  
+   <!-- Server Spring configs -->
+<bean id="org.fcrepo.server.ServerConfiguration"
+ name="org.fcrepo.server.ServerConfiguration"
+ class="org.fcrepo.server.config.ModuleConfiguration"
+ autowire-candidate="true">
+<constructor-arg index="0">
+  <list>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="datastreamExtensionMappingSource">
+	    <!-- Source of mappings from MIMETYPE to file extension -->
+	  </constructor-arg>
+	  <property name="value" value="mime-to-extensions.xml" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="datastreamExtensionMappingId">
+	    <!-- Controls filename extension mapping when the datastream ID is used
+			as the source of the filename.  Values are as above. -->
+	  </constructor-arg>
+	  <property name="value" value="ifmissing" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="httpClientMaxConnectionsPerHost">
+	    <!-- Maximum number of Fedora http client connections allowed to a given host. -->
+	  </constructor-arg>
+	  <property name="value" value="5" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="httpClientSocketTimeoutSecs">
+	    <!-- Number of seconds Fedora http client will wait for data coming across an 
+			established http connection. -->
+	  </constructor-arg>
+	  <property name="value" value="120" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="fedoraServerHost">
+	    <!-- Defines the host name for the Fedora server, as seen from the 
+			outside world. -->
+	  </constructor-arg>
+	  <property name="value" value="localhost" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="datastreamExtensionMappingLabel">
+	    <!-- Controls filename extension mapping when the datastream label is used
+			as the source of the filename.  Values are always: always generate an extension
+			based on the MIMETYPE, using the default extension if none can be determined; 
+			ifmissing: generate an extension if the filename obtained from the source does not
+			already contain one (again returning the default if there is no MIMETYPE-to-extension
+			mapping is found); never: never generate an extension, use the filename from the source
+			as-is -->
+	  </constructor-arg>
+	  <property name="value" value="always" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="httpClientMaxFollowRedirects">
+	    <!-- Maximun number of redirects the Fedora http client will follow (only if 
+			httpClientFollowRedirects is set to true.) -->
+	  </constructor-arg>
+	  <property name="value" value="3" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="httpClientUserAgent">
+	    <!-- The value to be set for the User-Agent HTTP request header. -->
+	  </constructor-arg>
+	  <property name="value" value="Fedora" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="httpClientMaxTotalConnections">
+	    <!-- Maximum number of total Fedora http client connections allowed at once. -->
+	  </constructor-arg>
+	  <property name="value" value="5" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="datastreamFilenameSource">
+	    <!-- determines the source of the filename generated when download=true
+			on a datastream dissemination.  Value is space separated list of label: use the datastream label;
+			id: use the datastream ID; rels: use the value defined in RELS-INT.  Each
+			source is checked in order, and the first containing a value is used.  Omit
+			any of the sources if that source is never to be used.  If no sources are to be used,
+			and just the default filename and extension below are to be used, specify &quot; &quot;. -->
+	  </constructor-arg>
+	  <property name="value" value="rels label id" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="adminEmailList">
+	    <!-- Defines one or more email addresses for server administrators; 
+			list is space delimited. -->
+	  </constructor-arg>
+	  <property name="value" value="bob@example.org sally@example.org" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="datastreamMediationLimit">
+	    <!-- Determines the time interval in which external mechanisms must 
+			respond to requests by the Fedora server. The value is specified in 
+			milliseconds. The value specified should be set high enough to allow 
+			for an average response time from any single external mechanisms. Note 
+			this value must be less than the limit specified for the 
+			datastreamExpirationLimit. -->
+	  </constructor-arg>
+	  <property name="value" value="5000" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="fedoraServerPort">
+	    <!-- Defines the port number on which the Fedora server runs; 
+			default is 8080. -->
+	  </constructor-arg>
+	  <property name="value" value="8080" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="fedoraRedirectPort">
+	    <!-- Defines the redirect port of the Fedora sever; default is 8443. -->
+	  </constructor-arg>
+	  <property name="value" value="8443" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="httpClientFollowRedirects">
+	    <!-- Should the Fedora http client follow redirects? -->
+	  </constructor-arg>
+	  <property name="value" value="true" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="datastreamExtensionMappingDefault">
+	    <!-- Controls filename extension mapping when no filename can be determined from
+			the sources listed in datastreamFilenameSource.  Values are always: always generate an extension
+			based on the MIMETYPE (using the default if no appropriate mapping is specified);
+			never: never generate an extension. -->
+	  </constructor-arg>
+	  <property name="value" value="never" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="datastreamContentDispositionInlineEnabled">
+	    <!-- determines if a content-disposition header specifying &quot;inline&quot; and
+			a filename is added to the response for the REST API getDatastreamDissemination
+			when no query parameter of download=true is specified.  Browser support for 
+			recognising a filename in case of &quot;inline&quot; content disposition is patchy,
+			so you may wish to disable the content disposition header in this case and only
+			have it provided when download=true is specified, in which case the content disposition
+			of &quot;attachment&quot; will be used; which is generally supported. -->
+	  </constructor-arg>
+	  <property name="value" value="true" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="fedoraAppServerContext">
+	    <!-- Defines the context name for the Fedora server within the 
+			application server. If set to eg &quot;myfedora&quot; the URL for Fedora will result
+			in http[s]://fedoraServerHost[:fedoraServerPort]/myfedora. -->
+	  </constructor-arg>
+	  <property name="value" value="fedora" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="fedoraShutdownPort">
+	    <!-- Defines the port number used to shutdown the Fedora sever; 
+			default is 8005. -->
+	  </constructor-arg>
+	  <property name="value" value="8005" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="datastreamDefaultExtension">
+	    <!-- Extension to use when none can be determined from mappings -->
+	  </constructor-arg>
+	  <property name="value" value="bin" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="datastreamDefaultFilename">
+	    <!-- Filename to use for datastream downloads when none can be determined from the
+			sources listed in datastreamFilenameSource. -->
+	  </constructor-arg>
+	  <property name="value" value="download" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="datastreamExpirationLimit">
+	    <!-- Controls the size of the datastream mediation hash by removing 
+			entries outside the specified threshold. The value is specified in 
+			seconds. Note this value must be greater than the limit specified for 
+			the datastreamMediationLimit. -->
+	  </constructor-arg>
+	  <property name="value" value="300" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="datastreamExtensionMappingRels">
+	    <!-- Controls filename extension mapping when RELS-INT is used
+			as the source of the filename.  Values are as above. -->
+	  </constructor-arg>
+	  <property name="value" value="never" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="httpClientTimeoutSecs">
+	    <!-- Number of seconds Fedora http client will wait for a connection before timing 
+			out. -->
+	  </constructor-arg>
+	  <property name="value" value="20" />
+	</bean>
+	<bean class="org.fcrepo.server.config.Parameter">
+	  <constructor-arg type="java.lang.String" value="repositoryName">
+	    <!-- Defines a human readable name for the Fedora server; default is 
+			Fedora Repository. -->
+	  </constructor-arg>
+	  <property name="value" value="Fedora Repository" />
+	</bean>
+	</list>
+  </constructor-arg>
+  <constructor-arg index="1" type="java.lang.String" value="org.fcrepo.server.Server" />
+  <constructor-arg index="2" type="java.lang.String" value="org.fcrepo.server.BasicServer" />
+  <constructor-arg index="3" type="java.lang.String" value="The Fedora server." />
+</bean>
+
+  <bean id="org.fcrepo.server.Server"
+    class="org.fcrepo.server.BasicServer" init-method="init" autowire-candidate="true">
+    <constructor-arg index="0">
+      <bean factory-bean="org.fcrepo.server.ServerConfiguration" factory-method="getParameters" />
+    </constructor-arg>
+    <constructor-arg index="1">
+      <bean class="java.io.File">
+        <constructor-arg value="${fedora.home}"></constructor-arg>
+      </bean>
+    </constructor-arg>
+  </bean>
+  <bean id="org.fcrepo.server.config.ServerConfiguration" autowire-candidate="true"
+    class="org.fcrepo.server.Server" factory-method="getConfig" />
+  <bean id="org.fcrepo.server.Module" init-method="initModule"  destroy-method="shutdownModule" abstract="true">
+  </bean>
 </beans>

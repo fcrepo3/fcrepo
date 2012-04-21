@@ -54,7 +54,7 @@ public class FedoraObjectResource extends BaseRestResource {
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
             MediaType mediaType = TEXT_XML;
 
-            Validation validation = apiMService.validate(context, pid, asOfDateTime);
+            Validation validation = m_management.validate(context, pid, asOfDateTime);
 
             String xml = getSerializer(context).objectValidationToXml(validation);
             return Response.ok(xml, mediaType).build();
@@ -89,7 +89,7 @@ public class FedoraObjectResource extends BaseRestResource {
 
         try {
             Context context = getContext();
-            InputStream is = apiMService.export(context, pid, format, exportContext, encoding);
+            InputStream is = m_management.export(context, pid, format, exportContext, encoding);
             MediaType mediaType = TEXT_XML;
             if (format.equals(ATOMZIP1_1)) {
                 mediaType = MediaType.valueOf(ZIP);
@@ -120,7 +120,7 @@ public class FedoraObjectResource extends BaseRestResource {
 
         try {
             Context context = getContext();
-            String[] objectHistory = apiAService.getObjectHistory(context, pid);
+            String[] objectHistory = m_access.getObjectHistory(context, pid);
             String xml = getSerializer(context).objectHistoryToXml(objectHistory, pid);
             MediaType mime = RestHelper.getContentType(format);
 
@@ -152,7 +152,7 @@ public class FedoraObjectResource extends BaseRestResource {
 
         try {
             Context context = getContext();
-            InputStream is = apiMService.getObjectXML(context, pid, DEFAULT_ENC);
+            InputStream is = m_management.getObjectXML(context, pid, DEFAULT_ENC);
 
             return Response.ok(is, TEXT_XML).build();
         } catch (Exception ex) {
@@ -181,7 +181,7 @@ public class FedoraObjectResource extends BaseRestResource {
         try {
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
             Context context = getContext();
-            ObjectProfile objProfile = apiAService.getObjectProfile(context, pid, asOfDateTime);
+            ObjectProfile objProfile = m_access.getObjectProfile(context, pid, asOfDateTime);
             String xml = getSerializer(context).objectProfileToXML(objProfile, asOfDateTime);
 
             MediaType mime = RestHelper.getContentType(format);
@@ -211,7 +211,7 @@ public class FedoraObjectResource extends BaseRestResource {
             String logMessage) {
         try {
             Context context = getContext();
-            Date d = apiMService.purgeObject(context, pid, logMessage);
+            Date d = m_management.purgeObject(context, pid, logMessage);
             return Response.ok(DateUtility.convertDateToXSDString(d), MediaType.TEXT_PLAIN_TYPE).build();
         } catch (Exception ex) {
             return handleException(ex);
@@ -259,7 +259,7 @@ public class FedoraObjectResource extends BaseRestResource {
             // Determine if content is provided
             RestUtil restUtil = new RestUtil();
             RequestContent content =
-                    restUtil.getRequestContent(servletRequest, headers);
+                    restUtil.getRequestContent(m_servletRequest, headers);
             if (content != null && content.getContentStream() != null) {
                 if (ignoreMime) {
                     is = content.getContentStream();
@@ -276,7 +276,7 @@ public class FedoraObjectResource extends BaseRestResource {
             // If no content is provided, use a FOXML template
             if (is == null) {
                 if (pid == null || pid.equals("new")) {
-                    pid = apiMService.getNextPID(context, 1, namespace)[0];
+                    pid = m_management.getNextPID(context, 1, namespace)[0];
                 }
 
                 if (ownerID == null || "".equals(ownerID.trim())) {
@@ -292,9 +292,9 @@ public class FedoraObjectResource extends BaseRestResource {
                 }
             }
 
-            pid = apiMService.ingest(context, is, logMessage, format, encoding, pid);
+            pid = m_management.ingest(context, is, logMessage, format, encoding, pid);
 
-            URI createdLocation = uriInfo.getRequestUri().resolve(URLEncoder.encode(pid, DEFAULT_ENC));
+            URI createdLocation = m_uriInfo.getRequestUri().resolve(URLEncoder.encode(pid, DEFAULT_ENC));
             return Response.created(createdLocation).entity(pid).build();
         } catch (Exception ex) {
             return handleException(ex);
@@ -339,7 +339,7 @@ public class FedoraObjectResource extends BaseRestResource {
                 requestModDate = lastModifiedDate.getValue();
             }
             Date lastModDate =
-                    apiMService.modifyObject(context, pid, state, label, ownerID, logMessage, requestModDate);
+                    m_management.modifyObject(context, pid, state, label, ownerID, logMessage, requestModDate);
             return Response.ok().entity(DateUtility.convertDateToXSDString(lastModDate)).build();
         } catch (Exception ex) {
             return handleException(ex);

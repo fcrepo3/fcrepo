@@ -24,6 +24,7 @@ import org.fcrepo.client.utility.ingest.IngestCounter;
 
 import org.fcrepo.common.Constants;
 
+import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 
 
@@ -81,6 +82,10 @@ public abstract class FedoraServerTestCase
     public static void ingestDemoObjects() throws Exception {
         ingestDemoObjects("/");
     }
+    
+    public static void ingestDemoObjects(FedoraAPIAMTOM apia, FedoraAPIMMTOM apim) throws Exception {
+        ingestDemoObjects("/", apia, apim);
+    }
 
     /**
      * Ingest a specific directory of demo objects.
@@ -100,6 +105,13 @@ public abstract class FedoraServerTestCase
      * @throws Exception
      */
     public static void ingestDemoObjects(String path) throws Exception {
+        FedoraClient client = FedoraTestCase.getFedoraClient();
+        FedoraAPIAMTOM apia = client.getAPIAMTOM();
+        FedoraAPIMMTOM apim = client.getAPIMMTOM();
+        ingestDemoObjects(path, apia, apim);
+    }
+    public static void ingestDemoObjects(String path, FedoraAPIAMTOM apia, FedoraAPIMMTOM apim) throws Exception {
+
         File dir = null;
 
         String specificPath = File.separator + path;
@@ -123,20 +135,18 @@ public abstract class FedoraServerTestCase
             ingestFormat = FOXML1_1.uri;
         }
 
-        FedoraClient client = FedoraTestCase.getFedoraClient();
-
         Ingest.multiFromDirectory(dir,
                                   ingestFormat,
-                                  client.getAPIAMTOM(),
-                                  client.getAPIMMTOM(),
+                                  apia,
+                                  apim,
                                   null,
                                   new PrintStream(File.createTempFile("demo",
                                                                       null)),
                                   new IngestCounter());
         // clone some demo objects to managed-content equivalents for reserved datastreams (RELS-*, DC)
         try {
-            ManagedContentTranslator.createManagedClone(client.getAPIMMTOM(), "demo:SmileyPens", "demo:SmileyPens_M");
-            ManagedContentTranslator.createManagedClone(client.getAPIMMTOM(), "demo:SmileyBeerGlass", "demo:SmileyBeerGlass_M");
+            ManagedContentTranslator.createManagedClone(apim, "demo:SmileyPens", "demo:SmileyPens_M");
+            ManagedContentTranslator.createManagedClone(apim, "demo:SmileyBeerGlass", "demo:SmileyBeerGlass_M");
         } catch (Exception e) { // ignore errors, just log (for cases where ingest repeated before purge done)
             System.out.println("Could not create managed clone test objects: " + e.getMessage());
     }
@@ -164,7 +174,10 @@ public abstract class FedoraServerTestCase
     public static void purgeDemoObjects() throws Exception {
         FedoraClient client = getFedoraClient();
         FedoraAPIMMTOM apim = client.getAPIMMTOM();
-
+        purgeDemoObjects(apim);
+    }
+    
+    public static void purgeDemoObjects(FedoraAPIMMTOM apim) throws Exception {
         for (String pid : getDemoObjects()) {
             AutoPurger.purge(apim, pid, null);
         }

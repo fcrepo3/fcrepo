@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * @version $Id$
  */
 public class BaseRestResource {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseRestResource.class);
 
     static final String[] EMPTY_STRING_ARRAY = new String[0];
     static final String DEFAULT_ENC = "UTF-8";
@@ -69,31 +69,31 @@ public class BaseRestResource {
     public static final MediaType TEXT_HTML = new MediaType("text", "html");
     public static final MediaType TEXT_XML = new MediaType("text", "xml");
 
-    protected Server fedoraServer;
-    protected Management apiMService;
-    protected Access apiAService;
-    protected String fedoraServerHost;
-    protected ObjectMapper mapper;
+    protected Server m_server;
+    protected Management m_management;
+    protected Access m_access;
+    protected String m_hostname;
+    protected ObjectMapper m_mapper;
 
-    protected DatastreamFilenameHelper datastreamFilenameHelper;
-
-    @javax.ws.rs.core.Context
-    protected HttpServletRequest servletRequest;
+    protected DatastreamFilenameHelper m_datastreamFilenameHelper;
 
     @javax.ws.rs.core.Context
-    protected UriInfo uriInfo;
+    protected HttpServletRequest m_servletRequest;
 
     @javax.ws.rs.core.Context
-    protected HttpHeaders headers;
+    protected UriInfo m_uriInfo;
+
+    @javax.ws.rs.core.Context
+    protected HttpHeaders m_headers;
 
     public BaseRestResource() {
         try {
-            this.fedoraServer = Server.getInstance(new File(Constants.FEDORA_HOME), false);
-            this.apiMService = (Management) fedoraServer.getModule("org.fcrepo.server.management.Management");
-            this.apiAService = (Access) fedoraServer.getModule("org.fcrepo.server.access.Access");
-            this.fedoraServerHost = fedoraServer.getParameter("fedoraServerHost");
-            datastreamFilenameHelper = new DatastreamFilenameHelper(fedoraServer, apiMService, apiAService );
-            mapper = new ObjectMapper();
+            this.m_server = Server.getInstance(new File(Constants.FEDORA_HOME), false);
+            this.m_management = (Management) m_server.getModule("org.fcrepo.server.management.Management");
+            this.m_access = (Access) m_server.getModule("org.fcrepo.server.access.Access");
+            this.m_hostname = m_server.getParameter("fedoraServerHost");
+            m_datastreamFilenameHelper = new DatastreamFilenameHelper(m_server, m_management, m_access );
+            m_mapper = new ObjectMapper();
         } catch (Exception ex) {
             throw new RestException("Unable to locate Fedora server instance", ex);
         }
@@ -101,18 +101,18 @@ public class BaseRestResource {
 
     protected Context getContext() {
         return ReadOnlyContext.getContext(Constants.HTTP_REQUEST.REST.uri,
-                                          servletRequest);
+                                          m_servletRequest);
     }
 
     protected DefaultSerializer getSerializer(Context context) {
-        return new DefaultSerializer(fedoraServerHost, context);
+        return new DefaultSerializer(m_hostname, context);
     }
 
     protected void transform(String xml, String xslt, Writer out)
     throws TransformerFactoryConfigurationError,
            TransformerConfigurationException,
            TransformerException {
-        File xslFile = new File(fedoraServer.getHomeDir(), xslt);
+        File xslFile = new File(m_server.getHomeDir(), xslt);
         TransformerFactory factory = TransformerFactory.newInstance();
         if (factory.getClass().getName().equals("net.sf.saxon.TransformerFactoryImpl")) {
             factory.setAttribute(FeatureKeys.VERSION_WARNING, Boolean.FALSE);
@@ -156,20 +156,20 @@ public class BaseRestResource {
     protected Response handleException(Exception ex) {
         if (ex instanceof ObjectNotInLowlevelStorageException ||
             ex instanceof DatastreamNotFoundException) {
-            logger.warn("Resource not found: " + ex.getMessage() + "; unable to fulfill REST API request", ex);
+            LOGGER.warn("Resource not found: " + ex.getMessage() + "; unable to fulfill REST API request", ex);
             return Response.status(Status.NOT_FOUND).entity(ex.getMessage()).type("text/plain").build();
         } else if (ex instanceof AuthzException) {
-            logger.warn("Authorization failed; unable to fulfill REST API request", ex);
+            LOGGER.warn("Authorization failed; unable to fulfill REST API request", ex);
             return Response.status(Status.UNAUTHORIZED).entity(ex.getMessage()).type("text/plain").build();
         } else if (ex instanceof IllegalArgumentException) {
-            logger.warn("Bad request; unable to fulfill REST API request", ex);
+            LOGGER.warn("Bad request; unable to fulfill REST API request", ex);
             return Response.status(Status.BAD_REQUEST).entity(ex.getMessage()).type("text/plain").build();
         } else if (ex instanceof ObjectLockedException ||
                    ex instanceof DatastreamLockedException) {
-            logger.warn("Lock exception; unable to fulfill REST API request", ex);
+            LOGGER.warn("Lock exception; unable to fulfill REST API request", ex);
             return Response.status(Status.CONFLICT).entity(ex.getMessage()).type(MediaType.TEXT_PLAIN).build();
         } else if (ex instanceof ObjectValidityException){
-            logger.warn("Validation exception; unable to fulfill REST API request", ex);
+            LOGGER.warn("Validation exception; unable to fulfill REST API request", ex);
 			if (((ObjectValidityException) ex).getValidation() != null) {
 				DefaultSerializer serializer = new DefaultSerializer("n/a", getContext());
 				String errors = serializer.objectValidationToXml(((ObjectValidityException) ex).getValidation());
@@ -179,7 +179,7 @@ public class BaseRestResource {
 			}
         	
         } else {
-            logger.error("Unexpected error fulfilling REST API request", ex);
+            LOGGER.error("Unexpected error fulfilling REST API request", ex);
             throw new WebApplicationException(ex);
         }
     }
