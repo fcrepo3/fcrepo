@@ -6,7 +6,6 @@
 package org.fcrepo.server.management;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,11 +21,9 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.binding.soap.SoapFault;
-import org.fcrepo.common.Constants;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
-import org.fcrepo.server.errors.InitializationException;
-import org.fcrepo.server.errors.ServerInitializationException;
+import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.StorageDeviceException;
 import org.fcrepo.server.utilities.CXFUtility;
 import org.fcrepo.server.utilities.TypeUtility;
@@ -52,41 +49,15 @@ public class FedoraAPIMMTOMImpl
     /**
      * The Fedora Server instance
      */
-    private static Server s_server;
+    private final Server m_server;
 
-    /**
-     * Whether the service has initialized... true if we got a good Server
-     * instance.
-     */
-    private static boolean s_initialized;
+    private final Management m_management;
 
-    /**
-     * The exception indicating that initialization failed.
-     */
-    private static InitializationException s_initException;
-
-    private static Management s_management;
-
-    /** Before fulfilling any requests, make sure we have a server instance. */
-    static {
-        try {
-            String fedoraHome = Constants.FEDORA_HOME;
-            if (fedoraHome == null) {
-                s_initialized = false;
-                s_initException =
-                        new ServerInitializationException("Server failed to initialize: FEDORA_HOME is undefined");
-            } else {
-                s_server = Server.getInstance(new File(fedoraHome), true);
-                s_initialized = true;
-                s_management =
-                        (Management) s_server
-                                .getModule("org.fcrepo.server.management.Management");
-            }
-        } catch (InitializationException ie) {
-            LOG.error("Error getting server", ie);
-            s_initialized = false;
-            s_initException = ie;
-        }
+    public FedoraAPIMMTOMImpl(Server server) {
+        m_server = server;
+        m_management =
+                (Management) m_server
+                        .getModule("org.fcrepo.server.management.Management");
     }
 
     /*
@@ -107,7 +78,7 @@ public class FedoraAPIMMTOMImpl
             if (objectXML != null) {
                 byteStream = objectXML.getInputStream();
             }
-            return s_management.ingest(ReadOnlyContext.getSoapContext(ctx),
+            return m_management.ingest(ReadOnlyContext.getSoapContext(ctx),
                                        byteStream,
                                        logMessage,
                                        format,
@@ -136,7 +107,7 @@ public class FedoraAPIMMTOMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            return DateUtility.convertDateToString(s_management
+            return DateUtility.convertDateToString(m_management
                     .modifyObject(ReadOnlyContext.getSoapContext(ctx),
                                   pid,
                                   state,
@@ -163,7 +134,7 @@ public class FedoraAPIMMTOMImpl
         try {
             MessageContext ctx = context.getMessageContext();
             InputStream in =
-                    s_management.getObjectXML(ReadOnlyContext
+                    m_management.getObjectXML(ReadOnlyContext
                             .getSoapContext(ctx), pid, "UTF-8");
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             pipeStream(in, out);
@@ -187,7 +158,7 @@ public class FedoraAPIMMTOMImpl
             MessageContext ctx =
                     FedoraAPIMMTOMImpl.this.context.getMessageContext();
             InputStream in =
-                    s_management.export(ReadOnlyContext.getSoapContext(ctx),
+                    m_management.export(ReadOnlyContext.getSoapContext(ctx),
                                         pid,
                                         format,
                                         context,
@@ -213,7 +184,7 @@ public class FedoraAPIMMTOMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            return DateUtility.convertDateToString(s_management
+            return DateUtility.convertDateToString(m_management
                     .purgeObject(ReadOnlyContext.getSoapContext(ctx),
                                  pid,
                                  logMessage));
@@ -255,7 +226,7 @@ public class FedoraAPIMMTOMImpl
             if (altIDs != null && altIDs.getItem() != null) {
                 altIDsArray = altIDs.getItem().toArray(new String[0]);
             }
-            return s_management.addDatastream(ReadOnlyContext
+            return m_management.addDatastream(ReadOnlyContext
                                                       .getSoapContext(ctx),
                                               pid,
                                               dsID,
@@ -307,7 +278,7 @@ public class FedoraAPIMMTOMImpl
             if (altIDs != null && altIDs.getItem() != null) {
                 altIDsArray = altIDs.getItem().toArray(new String[0]);
             }
-            return DateUtility.convertDateToString(s_management
+            return DateUtility.convertDateToString(m_management
                     .modifyDatastreamByReference(ReadOnlyContext
                                                          .getSoapContext(ctx),
                                                  pid,
@@ -361,7 +332,7 @@ public class FedoraAPIMMTOMImpl
             if (altIDs != null && altIDs.getItem() != null) {
                 altIDsArray = altIDs.getItem().toArray(new String[0]);
             }
-            return DateUtility.convertDateToString(s_management
+            return DateUtility.convertDateToString(m_management
                     .modifyDatastreamByValue(ReadOnlyContext
                                                      .getSoapContext(ctx),
                                              pid,
@@ -397,7 +368,7 @@ public class FedoraAPIMMTOMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            return DateUtility.convertDateToString(s_management
+            return DateUtility.convertDateToString(m_management
                     .setDatastreamState(ReadOnlyContext.getSoapContext(ctx),
                                         pid,
                                         dsID,
@@ -423,7 +394,7 @@ public class FedoraAPIMMTOMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            return DateUtility.convertDateToString(s_management
+            return DateUtility.convertDateToString(m_management
                     .setDatastreamVersionable(ReadOnlyContext
                                                       .getSoapContext(ctx),
                                               pid,
@@ -449,7 +420,7 @@ public class FedoraAPIMMTOMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            return s_management.compareDatastreamChecksum(ReadOnlyContext
+            return m_management.compareDatastreamChecksum(ReadOnlyContext
                     .getSoapContext(ctx), pid, dsID, DateUtility
                     .parseDateOrNull(versionDate));
         } catch (Throwable th) {
@@ -471,7 +442,7 @@ public class FedoraAPIMMTOMImpl
         try {
             MessageContext ctx = context.getMessageContext();
             org.fcrepo.server.storage.types.Datastream ds =
-                    s_management.getDatastream(ReadOnlyContext
+                    m_management.getDatastream(ReadOnlyContext
                             .getSoapContext(ctx), pid, dsID, DateUtility
                             .parseDateOrNull(asOfDateTime));
             return TypeUtility.convertDatastreamToGenDatastream(ds);
@@ -494,7 +465,7 @@ public class FedoraAPIMMTOMImpl
         try {
             MessageContext ctx = context.getMessageContext();
             org.fcrepo.server.storage.types.Datastream[] intDatastreams =
-                    s_management.getDatastreams(ReadOnlyContext
+                    m_management.getDatastreams(ReadOnlyContext
                             .getSoapContext(ctx), pid, DateUtility
                             .parseDateOrNull(asOfDateTime), dsState);
             return getGenDatastreams(intDatastreams);
@@ -517,7 +488,7 @@ public class FedoraAPIMMTOMImpl
         try {
             MessageContext ctx = context.getMessageContext();
             org.fcrepo.server.storage.types.Datastream[] intDatastreams =
-                    s_management.getDatastreamHistory(ReadOnlyContext
+                    m_management.getDatastreamHistory(ReadOnlyContext
                             .getSoapContext(ctx), pid, dsID);
             return getGenDatastreams(intDatastreams);
         } catch (Throwable th) {
@@ -544,7 +515,7 @@ public class FedoraAPIMMTOMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            return toStringList(s_management.purgeDatastream(ReadOnlyContext
+            return toStringList(m_management.purgeDatastream(ReadOnlyContext
                     .getSoapContext(ctx), pid, dsID, DateUtility
                     .parseDateOrNull(startDT), DateUtility
                     .parseDateOrNull(endDT), logMessage));
@@ -573,7 +544,7 @@ public class FedoraAPIMMTOMImpl
                 numPIDs = new java.math.BigInteger("1");
             }
             String[] aux =
-                    s_management
+                    m_management
                             .getNextPID(ReadOnlyContext.getSoapContext(ctx),
                                         numPIDs.intValue(),
                                         pidNamespace);
@@ -606,7 +577,7 @@ public class FedoraAPIMMTOMImpl
             org.fcrepo.server.storage.types.RelationshipTuple[] intRelationshipTuples =
                     null;
             intRelationshipTuples =
-                    s_management.getRelationships(ReadOnlyContext
+                    m_management.getRelationships(ReadOnlyContext
                             .getSoapContext(ctx), pid, relationship);
             return getGenRelsTuples(intRelationshipTuples);
         } catch (Throwable th) {
@@ -634,7 +605,7 @@ public class FedoraAPIMMTOMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            return s_management.addRelationship(ReadOnlyContext
+            return m_management.addRelationship(ReadOnlyContext
                                                         .getSoapContext(ctx),
                                                 pid,
                                                 relationship,
@@ -665,7 +636,7 @@ public class FedoraAPIMMTOMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            return s_management.purgeRelationship(ReadOnlyContext
+            return m_management.purgeRelationship(ReadOnlyContext
                                                           .getSoapContext(ctx),
                                                   pid,
                                                   relationship,
@@ -691,7 +662,7 @@ public class FedoraAPIMMTOMImpl
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
-            return TypeUtility.convertValidationToGenValidation(s_management
+            return TypeUtility.convertValidationToGenValidation(m_management
                     .validate(ReadOnlyContext.getSoapContext(ctx),
                               pid,
                               DateUtility.parseDateOrNull(asOfDateTime)));
@@ -704,8 +675,13 @@ public class FedoraAPIMMTOMImpl
     }
 
     private void assertInitialized() throws SoapFault {
-        if (!s_initialized) {
-            CXFUtility.throwFault(s_initException);
+        if (m_server == null) {
+            CXFUtility.throwFault(new ModuleInitializationException("Null was injected for Server to WS implementor",
+                    "org.fcrepo.server.management.FedoraAPIMMTOM"));
+        }
+        if (m_management == null) {
+            CXFUtility.throwFault(new ModuleInitializationException("No Management module found for WS implementor",
+                    "org.fcrepo.server.management.FedoraAPIMMTOM"));
         }
     }
 

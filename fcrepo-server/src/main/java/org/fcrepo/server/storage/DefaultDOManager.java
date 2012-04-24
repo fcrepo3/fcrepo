@@ -13,29 +13,23 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.RecoveryContext;
@@ -77,12 +71,14 @@ import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.DOObjectValidator;
 import org.fcrepo.server.validation.DOValidator;
 import org.fcrepo.server.validation.ValidationUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the reading and writing of digital objects by instantiating an
  * appropriate object reader or writer. Also, manages the object ingest process
  * and the object replication process.
- * 
+ *
  * @author Chris Wilper
  * @version $Id$
  */
@@ -253,7 +249,7 @@ public class DefaultDOManager extends Module implements DOManager {
 			m_readerCache = new DOReaderCache(readerCacheSize,
 					readerCacheSeconds);
 		}
-		
+
 		// configuration of ingest validation
 		String ingestValidationLevel = getParameter("ingestValidationLevel");
 		if (ingestValidationLevel == null) {
@@ -374,7 +370,7 @@ public class DefaultDOManager extends Module implements DOManager {
 					"Error while attempting to "
 							+ "check for and create non-existing table(s): "
 							+ e.getClass().getName() + ": " + e.getMessage(),
-					getRole());
+					getRole(), e);
 		}
 
 		// get ref to lowlevelstorage module
@@ -390,7 +386,8 @@ public class DefaultDOManager extends Module implements DOManager {
 		initializeCModelDeploymentCache();
 	}
 
-	public String lookupDeploymentForCModel(String cModelPid, String sDefPid) {
+	@Override
+    public String lookupDeploymentForCModel(String cModelPid, String sDefPid) {
 
 		return m_cModelDeploymentMap.getDeployment(ServiceContext.getInstance(
 				cModelPid, sDefPid));
@@ -452,7 +449,7 @@ public class DefaultDOManager extends Module implements DOManager {
 	/**
 	 * Update the registry and deployment cache to reflect the latest state of
 	 * reality.
-	 * 
+	 *
 	 * @param obj
 	 *            DOReader of a service deployment object
 	 */
@@ -556,7 +553,8 @@ public class DefaultDOManager extends Module implements DOManager {
 		}
 	}
 
-	public void releaseWriter(DOWriter writer) {
+	@Override
+    public void releaseWriter(DOWriter writer) {
 
 		// If this is a new object, but object was not successfully committed
 		// need to backout object registration.
@@ -640,7 +638,8 @@ public class DefaultDOManager extends Module implements DOManager {
 	/**
 	 * Gets a reader on an an existing digital object.
 	 */
-	public DOReader getReader(boolean cachedObjectRequired, Context context,
+	@Override
+    public DOReader getReader(boolean cachedObjectRequired, Context context,
 			String pid) throws ServerException {
 		long getReaderStartTime = System.currentTimeMillis();
 		String source = null;
@@ -676,7 +675,8 @@ public class DefaultDOManager extends Module implements DOManager {
 	/**
 	 * Gets a reader on an an existing service deployment object.
 	 */
-	public ServiceDeploymentReader getServiceDeploymentReader(
+	@Override
+    public ServiceDeploymentReader getServiceDeploymentReader(
 			boolean cachedObjectRequired, Context context, String pid)
 			throws ServerException {
 		{
@@ -690,7 +690,8 @@ public class DefaultDOManager extends Module implements DOManager {
 	/**
 	 * Gets a reader on an an existing service definition object.
 	 */
-	public ServiceDefinitionReader getServiceDefinitionReader(
+	@Override
+    public ServiceDefinitionReader getServiceDefinitionReader(
 			boolean cachedObjectRequired, Context context, String pid)
 			throws ServerException {
 		{
@@ -704,7 +705,8 @@ public class DefaultDOManager extends Module implements DOManager {
 	/**
 	 * Gets a writer on an an existing object.
 	 */
-	public DOWriter getWriter(boolean cachedObjectRequired, Context context,
+	@Override
+    public DOWriter getWriter(boolean cachedObjectRequired, Context context,
 			String pid) throws ServerException, ObjectLockedException {
 		if (cachedObjectRequired) {
 			throw new InvalidContextException(
@@ -728,7 +730,7 @@ public class DefaultDOManager extends Module implements DOManager {
 	 * validation or generation, object registry functions, getting a writer for
 	 * the digital object, and ultimately writing the object to persistent
 	 * storage via the writer.
-	 * 
+	 *
 	 * @param context
 	 * @param in
 	 *            the input stream that is the XML ingest file for a digital
@@ -742,7 +744,8 @@ public class DefaultDOManager extends Module implements DOManager {
 	 *            otherwise the value of the additional pid parameter for
 	 *            ingests (may be null or any valid pid)
 	 */
-	public synchronized DOWriter getIngestWriter(boolean cachedObjectRequired,
+	@Override
+    public synchronized DOWriter getIngestWriter(boolean cachedObjectRequired,
 			Context context, InputStream in, String format, String encoding,
 			String pid) throws ServerException {
 		logger.debug("Entered getIngestWriter");
@@ -962,7 +965,7 @@ public class DefaultDOManager extends Module implements DOManager {
 
 	/**
 	 * Adds a minimal DC datastream if one isn't already present.
-	 * 
+	 *
 	 * If there is already a DC datastream, ensure one of the dc:identifier
 	 * values is the PID of the object.
 	 */
@@ -1039,7 +1042,7 @@ public class DefaultDOManager extends Module implements DOManager {
 
 			// Object validation
 			m_objectValidator.validate(context, new SimpleDOReader(null, null, null, null, null, obj));
-			
+
 
 			try { // for cleanup catch
 
@@ -1358,11 +1361,11 @@ public class DefaultDOManager extends Module implements DOManager {
 	 * Remove the object from permanent storage.  Currently this is used both for ingest failures
 	 * and for purging an object.  failSafe indicates failure in removal of an underlying artefact
 	 * is considered safe; ie part of a tidy-up operation where the artefact may not in fact exist.
-	 * On a purge failSafe should be false so errors are logged, as all artefacts should be present for deletion 
+	 * On a purge failSafe should be false so errors are logged, as all artefacts should be present for deletion
 	 */
 	private void removeObject(DigitalObject obj, boolean failSafe)
 			throws ServerException {
-		
+
 		String pid = obj.getPid();
 		logger.info("Committing removal of " + pid);
 
@@ -1385,9 +1388,9 @@ public class DefaultDOManager extends Module implements DOManager {
 					logger.error("Object " + pid + " couldn't be removed from ResourceIndex ("
 							+ se.getMessage()
 							+ ")");
-					
+
 				}
-				
+
 			}
 		}
 
@@ -1468,12 +1471,12 @@ public class DefaultDOManager extends Module implements DOManager {
 						+ ")");
 			}
 		}
-		
-		
+
+
 	}
-	
-	
-	
+
+
+
 	private Set<Long> getDatastreamDates(Iterable<Datastream> ds) {
 		Set<Long> dates = new HashSet<Long>();
 		for (Datastream d : ds) {
@@ -1538,7 +1541,8 @@ public class DefaultDOManager extends Module implements DOManager {
 	/**
 	 * Checks the object registry for the given object.
 	 */
-	public boolean objectExists(String pid) throws StorageDeviceException {
+	@Override
+    public boolean objectExists(String pid) throws StorageDeviceException {
 		logger.debug("Checking if " + pid + " already exists");
 		Connection conn = null;
 		PreparedStatement s = null;
@@ -1665,7 +1669,8 @@ public class DefaultDOManager extends Module implements DOManager {
 		}
 	}
 
-	public String[] listObjectPIDs(Context context)
+	@Override
+    public String[] listObjectPIDs(Context context)
 			throws StorageDeviceException {
 		return getPIDs("WHERE systemVersion > 0");
 	}
@@ -1826,13 +1831,15 @@ public class DefaultDOManager extends Module implements DOManager {
 		}
 	}
 
-	public FieldSearchResult findObjects(Context context,
+	@Override
+    public FieldSearchResult findObjects(Context context,
 			String[] resultFields, int maxResults, FieldSearchQuery query)
 			throws ServerException {
 		return m_fieldSearch.findObjects(resultFields, maxResults, query);
 	}
 
-	public FieldSearchResult resumeFindObjects(Context context,
+	@Override
+    public FieldSearchResult resumeFindObjects(Context context,
 			String sessionToken) throws ServerException {
 		return m_fieldSearch.resumeFindObjects(sessionToken);
 	}
@@ -1841,7 +1848,7 @@ public class DefaultDOManager extends Module implements DOManager {
 	 * <p>
 	 * Gets a list of the requested next available PIDs. the number of PIDs.
 	 * </p>
-	 * 
+	 *
 	 * @param numPIDs
 	 *            The number of PIDs to generate. Defaults to 1 if the number is
 	 *            not a positive integer.
@@ -1853,7 +1860,8 @@ public class DefaultDOManager extends Module implements DOManager {
 	 * @throws ServerException
 	 *             If an error occurs in generating the PIDs.
 	 */
-	public String[] getNextPID(int numPIDs, String namespace)
+	@Override
+    public String[] getNextPID(int numPIDs, String namespace)
 			throws ServerException {
 
 		if (numPIDs < 1) {
@@ -1877,7 +1885,8 @@ public class DefaultDOManager extends Module implements DOManager {
 		}
 	}
 
-	public void reservePIDs(String[] pidList) throws ServerException {
+	@Override
+    public void reservePIDs(String[] pidList) throws ServerException {
 
 		try {
 			for (String element : pidList) {
@@ -1888,7 +1897,8 @@ public class DefaultDOManager extends Module implements DOManager {
 		}
 	}
 
-	public String getRepositoryHash() throws ServerException {
+	@Override
+    public String getRepositoryHash() throws ServerException {
 
 		// This implementation returns a string containing the
 		// total number of objects in the repository, followed by the

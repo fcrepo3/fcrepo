@@ -14,8 +14,20 @@
            http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
   <context:annotation-config />
+  <bean id="FedoraAPIMImpl" class="org.fcrepo.server.management.FedoraAPIMImpl">
+    <constructor-arg ref="org.fcrepo.server.Server"></constructor-arg>
+  </bean>
+  <bean id="FedoraAPIMMTOMImpl" class="org.fcrepo.server.management.FedoraAPIMMTOMImpl">
+    <constructor-arg ref="org.fcrepo.server.Server"></constructor-arg>
+  </bean>
+  <bean id="FedoraAPIAImpl" class="org.fcrepo.server.access.FedoraAPIAImpl">
+    <constructor-arg ref="org.fcrepo.server.Server"></constructor-arg>
+  </bean>
+  <bean id="FedoraAPIAMTOMImpl" class="org.fcrepo.server.access.FedoraAPIAMTOMImpl">
+    <constructor-arg ref="org.fcrepo.server.Server"></constructor-arg>
+  </bean>
   <jaxws:endpoint id="managementMTOM"
-    implementor="org.fcrepo.server.management.FedoraAPIMMTOMImpl"
+    implementor="#FedoraAPIMMTOMImpl"
     serviceName="fedora-types-mtom:Fedora-API-M-MTOM-Service"
     endpointName="fedora-types-mtom:Fedora-API-M-MTOM-Port-SOAPHTTP"
     wsdlLocation="${fedora.home}/server/management/Fedora-API-M-MTOM.wsdl"
@@ -31,7 +43,7 @@
   </jaxws:endpoint>
 
   <jaxws:endpoint id="management"
-    implementor="org.fcrepo.server.management.FedoraAPIMImpl"
+    implementor="#FedoraAPIMImpl"
     serviceName="fedora-types:Fedora-API-M-Service" endpointName="fedora-types:Fedora-API-M-Port-SOAPHTTP"
     wsdlLocation="${fedora.home}/server/management/Fedora-API-M.wsdl"
     address="/management">
@@ -45,7 +57,7 @@
   </jaxws:endpoint>
 
   <jaxws:endpoint id="accessMTOM"
-    implementor="org.fcrepo.server.access.FedoraAPIAMTOMImpl"
+    implementor="#FedoraAPIAMTOMImpl"
     serviceName="fedora-types-mtom:Fedora-API-A-MTOM-Service"
     endpointName="fedora-types-mtom:Fedora-API-A-MTOM-Port-SOAPHTTP"
     wsdlLocation="${fedora.home}/server/access/Fedora-API-A-MTOM.wsdl"
@@ -61,7 +73,7 @@
   </jaxws:endpoint>
 
   <jaxws:endpoint id="access"
-    implementor="org.fcrepo.server.access.FedoraAPIAImpl" serviceName="fedora-types:Fedora-API-A-Service"
+    implementor="#FedoraAPIAImpl" serviceName="fedora-types:Fedora-API-A-Service"
     endpointName="fedora-types:Fedora-API-A-Port-SOAPHTTP" wsdlLocation="${fedora.home}/server/access/Fedora-API-A.wsdl"
     address="/access">
     <jaxws:handlers>

@@ -5,18 +5,18 @@
 
 package org.fcrepo.server.search;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.lang.reflect.Field;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,11 +26,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import junit.framework.JUnit4TestAdapter;
 
 import org.fcrepo.mock.sql.MockConnection;
 import org.fcrepo.mock.sql.MockDriver;
@@ -40,7 +36,6 @@ import org.fcrepo.server.Context;
 import org.fcrepo.server.config.DatastoreConfiguration;
 import org.fcrepo.server.errors.InconsistentTableSpecException;
 import org.fcrepo.server.errors.ServerException;
-import org.fcrepo.server.search.FieldSearchSQLImpl;
 import org.fcrepo.server.storage.ConnectionPool;
 import org.fcrepo.server.storage.MockDOReader;
 import org.fcrepo.server.storage.MockRepositoryReader;
@@ -52,12 +47,11 @@ import org.fcrepo.server.storage.types.DeploymentDSBindSpec;
 import org.fcrepo.server.utilities.SQLUtility;
 import org.fcrepo.server.utilities.TableCreatingConnection;
 import org.fcrepo.server.utilities.TableSpec;
-
-import junit.framework.JUnit4TestAdapter;
-
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class TestFieldSearchSQLImpl {
     private static final String[] SHORT_FIELDS = FieldSearchSQLImpl.DB_COLUMN_NAMES_NODC;
@@ -120,7 +114,7 @@ public class TestFieldSearchSQLImpl {
 
     private ConnectionPool connectionPool;
 
-    private final MyMockDriver mockDriver = new MyMockDriver();
+    private MyMockDriver mockDriver;
 
     private int expectedDateInserts;
 
@@ -129,6 +123,7 @@ public class TestFieldSearchSQLImpl {
     @Before
     public void registerMockDriver() {
         try {
+            mockDriver = new MyMockDriver(mockConnection);
             DriverManager.registerDriver(mockDriver);
         } catch (SQLException e) {
             fail("Failed to register mock JDBC driver: " + e);
@@ -495,7 +490,7 @@ public class TestFieldSearchSQLImpl {
                 }
             };
         }
-        
+
         @Override
         public PreparedStatement prepareStatement(String sql) throws SQLException {
         	return new MockPreparedStatement(sql) {
@@ -556,6 +551,10 @@ public class TestFieldSearchSQLImpl {
     }
 
     private class MyMockDriver extends MockDriver {
+        MockConnection connection;
+        MyMockDriver(MockConnection connection) {
+            this.connection = connection;
+        }
         @Override
         public Connection connect(String url, Properties info)
                 throws SQLException {

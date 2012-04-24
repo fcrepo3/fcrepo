@@ -5,7 +5,6 @@
 
 package org.fcrepo.server.access;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,12 +13,10 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.binding.soap.SoapFault;
-import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
-import org.fcrepo.server.errors.InitializationException;
-import org.fcrepo.server.errors.ServerInitializationException;
+import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.utilities.CXFUtility;
 import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.utilities.DateUtility;
@@ -40,47 +37,24 @@ public class FedoraAPIAMTOMImpl
     private WebServiceContext context;
 
     /** The Fedora Server instance. */
-    private static Server s_server;
-
-    /** Whether the service has initialized... true if initialized. */
-    private static boolean s_initialized = initialize();
-
-    /** The exception indicating that initialization failed. */
-    private static InitializationException s_initException;
+    private final Server m_server;
 
     /** Instance of the access subsystem */
-    private static Access s_access;
+    private final Access m_access;
 
     /** Context for cached objects. */
     // private static ReadOnlyContext context;
     /** Debug toggle for testing. */
-    private static boolean debug = false;
+    private boolean debug = false;
 
     /** Before fulfilling any requests, make sure we have a server instance. */
-    private static boolean initialize() {
-        boolean initialized = false;
-        try {
-            String fedoraHome = Constants.FEDORA_HOME;
-            if (fedoraHome == null) {
-                initialized = false;
-                s_initException =
-                        new ServerInitializationException("Server failed to initialize because FEDORA_HOME "
-                                + "is undefined");
-            } else {
-                s_server = Server.getInstance(new File(fedoraHome));
-                s_access =
-                        (Access) s_server
-                                .getModule("org.fcrepo.server.access.Access");
-                initialized = true;
-                Boolean debugBool = new Boolean(s_server.getParameter("debug"));
-                debug = debugBool.booleanValue();
-            }
-        } catch (InitializationException ie) {
-            LOG.warn("Server initialization failed", ie);
-            s_initialized = false;
-            s_initException = ie;
-        }
-        return initialized;
+    public FedoraAPIAMTOMImpl(Server server) {
+        m_server = server;
+        m_access =
+                (Access) m_server
+                .getModule("org.fcrepo.server.access.Access");
+        Boolean debugBool = new Boolean(m_server.getParameter("debug"));
+        debug = debugBool.booleanValue();
     }
 
     /*
@@ -99,7 +73,7 @@ public class FedoraAPIAMTOMImpl
         assertInitialized();
         try {
             org.fcrepo.server.storage.types.MIMETypedStream mimeTypedStream =
-                    s_access.getDatastreamDissemination(context,
+                    m_access.getDatastreamDissemination(context,
                                                         pid,
                                                         dsID,
                                                         DateUtility
@@ -147,7 +121,7 @@ public class FedoraAPIAMTOMImpl
                     TypeUtility
                             .convertGenPropertyArrayToPropertyArray(parameters);
             org.fcrepo.server.storage.types.MIMETypedStream mimeTypedStream =
-                    s_access.getDissemination(context,
+                    m_access.getDissemination(context,
                                               pid,
                                               serviceDefinitionPid,
                                               methodName,
@@ -177,7 +151,7 @@ public class FedoraAPIAMTOMImpl
         assertInitialized();
         try {
             org.fcrepo.server.access.ObjectProfile objectProfile =
-                    s_access.getObjectProfile(context, pid, DateUtility
+                    m_access.getObjectProfile(context, pid, DateUtility
                             .parseDateOrNull(asOfDateTime));
             org.fcrepo.server.types.gen.ObjectProfile genObjectProfile =
                     TypeUtility
@@ -210,7 +184,7 @@ public class FedoraAPIAMTOMImpl
             }
 
             org.fcrepo.server.search.FieldSearchResult result =
-                    s_access.findObjects(context,
+                    m_access.findObjects(context,
                                          resultFieldsArray,
                                          maxResults.intValue(),
                                          TypeUtility
@@ -233,7 +207,7 @@ public class FedoraAPIAMTOMImpl
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
         try {
-            String[] sDefs = s_access.getObjectHistory(context, pid);
+            String[] sDefs = m_access.getObjectHistory(context, pid);
             if (sDefs != null && debug) {
                 for (int i = 0; i < sDefs.length; i++) {
                     LOG.debug("sDef[" + i + "] = " + sDefs[i]);
@@ -257,7 +231,7 @@ public class FedoraAPIAMTOMImpl
         assertInitialized();
         try {
             org.fcrepo.server.access.RepositoryInfo repositoryInfo =
-                    s_access.describeRepository(context);
+                    m_access.describeRepository(context);
             org.fcrepo.server.types.gen.RepositoryInfo genRepositoryInfo =
                     TypeUtility
                             .convertReposInfoToGenReposInfo(repositoryInfo);
@@ -281,7 +255,7 @@ public class FedoraAPIAMTOMImpl
         assertInitialized();
         try {
             org.fcrepo.server.storage.types.ObjectMethodsDef[] objectMethodDefs =
-                    s_access.listMethods(context, pid, DateUtility
+                    m_access.listMethods(context, pid, DateUtility
                             .parseDateOrNull(asOfDateTime));
             return TypeUtility
                     .convertObjectMethodsDefArrayToGenObjectMethodsDefList(objectMethodDefs);
@@ -303,7 +277,7 @@ public class FedoraAPIAMTOMImpl
         assertInitialized();
         try {
             org.fcrepo.server.search.FieldSearchResult result =
-                    s_access.resumeFindObjects(context, sessionToken);
+                    m_access.resumeFindObjects(context, sessionToken);
             return TypeUtility
                     .convertFieldSearchResultToGenFieldSearchResult(result);
         } catch (Throwable th) {
@@ -325,7 +299,7 @@ public class FedoraAPIAMTOMImpl
         assertInitialized();
         try {
             org.fcrepo.server.storage.types.DatastreamDef[] datastreamDefs =
-                    s_access.listDatastreams(context, pid, DateUtility
+                    m_access.listDatastreams(context, pid, DateUtility
                             .parseDateOrNull(asOfDateTime));
             return TypeUtility
                     .convertDatastreamDefArrayToGenDatastreamDefList(datastreamDefs);
@@ -336,8 +310,13 @@ public class FedoraAPIAMTOMImpl
     }
 
     private void assertInitialized() throws SoapFault {
-        if (!s_initialized) {
-            CXFUtility.throwFault(s_initException);
+        if (m_server == null) {
+            CXFUtility.throwFault(new ModuleInitializationException("Null was injected for Server to WS implementor",
+                    "org.fcrepo.server.access.FedoraAPIAMTOM"));
+        }
+        if (m_access == null) {
+            CXFUtility.throwFault(new ModuleInitializationException("No Access module found for WS implementor",
+                    "org.fcrepo.server.access.FedoraAPIAMTOM"));
         }
     }
 }

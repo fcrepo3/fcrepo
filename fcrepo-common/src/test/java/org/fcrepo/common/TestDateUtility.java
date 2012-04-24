@@ -2,12 +2,14 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
-package org.fcrepo.server.utilities;
+package org.fcrepo.common;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.util.Date;
+
+import junit.framework.JUnit4TestAdapter;
 
 import org.fcrepo.utilities.DateUtility;
 import org.junit.Test;
@@ -155,4 +157,9 @@ public class TestDateUtility {
 		assertEquals(nDate.getTime(), oDate.getTime());
 		assertEquals(n, DateUtility.convertDateToXSDString(nDate));
 	}
+
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestDateUtility.class);
+    }
+
 }

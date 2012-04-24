@@ -17,6 +17,7 @@ public class AllUnitTests {
         junit.framework.TestSuite suite =
                 new junit.framework.TestSuite(AllUnitTests.class.getName());
         suite.addTest(org.fcrepo.common.TestPID.suite());
+        suite.addTest(org.fcrepo.common.TestDateUtility.suite());
         return suite;
     }
 }

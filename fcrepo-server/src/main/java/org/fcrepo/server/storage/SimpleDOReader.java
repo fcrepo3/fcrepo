@@ -314,8 +314,7 @@ public class SimpleDOReader
     public Datastream GetDatastream(String datastreamID, Date versDateTime) {
         // get the one with the closest creation date
         // without going over
-        Datastream closestWithoutGoingOver = null;
-        Datastream latestCreated = null;
+        Datastream result = null;
         long bestTimeDifference = Long.MAX_VALUE;
         long latestCreateTime = -1;
         long vTime = -1;
@@ -324,8 +323,8 @@ public class SimpleDOReader
         }
         for (Datastream ds : m_obj.datastreams(datastreamID)) {
             if (versDateTime == null) {
-                if (ds.DSCreateDT == null || ds.DSCreateDT.getTime() > latestCreateTime) {
-                    latestCreated = ds;
+                if (ds.DSCreateDT == null || ds.DSCreateDT.getTime() > latestCreateTime || result == null) {
+                    result = ds;
                     if (ds.DSCreateDT != null) latestCreateTime = ds.DSCreateDT.getTime();
                 }
             } else {
@@ -334,16 +333,12 @@ public class SimpleDOReader
                 if (diff >= 0) {
                     if (diff < bestTimeDifference) {
                         bestTimeDifference = diff;
-                        closestWithoutGoingOver = ds;
+                        result = ds;
                     }
                 }
             }
         }
-        if (versDateTime == null) {
-            return latestCreated;
-        } else {
-            return closestWithoutGoingOver;
-        }
+        return result;
     }
 
     /**
