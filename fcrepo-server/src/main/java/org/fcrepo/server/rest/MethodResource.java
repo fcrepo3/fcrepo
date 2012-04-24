@@ -19,9 +19,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.fcrepo.server.Context;
+import org.fcrepo.server.Server;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.utilities.DateUtility;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -32,8 +34,13 @@ import org.fcrepo.utilities.DateUtility;
  * @version $Id$
  */
 @Path("/{pid}/methods")
+@Component
 public class MethodResource extends BaseRestResource {
     @javax.ws.rs.core.Context UriInfo uriInfo;
+
+    public MethodResource(Server server) {
+        super(server);
+    }
 
     /**
      * Lists all Service Definitions methods that can be invoked on a digital

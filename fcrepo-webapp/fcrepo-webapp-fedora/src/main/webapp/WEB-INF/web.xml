@@ -113,7 +113,7 @@
   <servlet>
     <display-name>Fedora REST API Servlet</display-name>
     <servlet-name>RestServlet</servlet-name>
-    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+    <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
     <init-param>
       <param-name>com.sun.jersey.config.property.packages</param-name>
       <param-value>org.fcrepo.server.rest</param-value>
@@ -126,7 +126,7 @@
   <servlet>
     <display-name>Fedora REST API Upload Servlet</display-name>
     <servlet-name>UploadRestServlet</servlet-name>
-    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+    <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
     <init-param>
       <param-name>com.sun.jersey.config.property.packages</param-name>
       <param-value>org.fcrepo.server.upload</param-value>

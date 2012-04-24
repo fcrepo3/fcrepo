@@ -6,7 +6,7 @@
            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
   <context:annotation-config />
-
+  
   <bean id="appContextProperties"
     class="org.springframework.web.context.support.ServletContextPropertyPlaceholderConfigurer">
     <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
@@ -247,4 +247,24 @@
     class="org.fcrepo.server.Server" factory-method="getConfig" />
   <bean id="org.fcrepo.server.Module" init-method="initModule"  destroy-method="shutdownModule" abstract="true">
   </bean>
+  
+  <bean id="org.fcrepo.server.rest.FedoraObjectResource" class="org.fcrepo.server.rest.FedoraObjectResource">
+    <constructor-arg ref="org.fcrepo.server.Server" />
+  </bean>
+  <bean id="org.fcrepo.server.rest.FedoraObjectSearchResource" class="org.fcrepo.server.rest.FedoraObjectSearchResource">
+    <constructor-arg ref="org.fcrepo.server.Server" />
+  </bean>
+  <bean id="org.fcrepo.server.rest.DatastreamResource" class="org.fcrepo.server.rest.DatastreamResource">
+    <constructor-arg ref="org.fcrepo.server.Server" />
+  </bean>
+  <bean id="org.fcrepo.server.rest.MethodResource" class="org.fcrepo.server.rest.MethodResource">
+    <constructor-arg ref="org.fcrepo.server.Server" />
+  </bean>
+  <bean id="org.fcrepo.server.rest.RelationshipResource" class="org.fcrepo.server.rest.RelationshipResource">
+    <constructor-arg ref="org.fcrepo.server.Server" />
+  </bean>
+  <bean id="org.fcrepo.server.upload.UploadResource" class="org.fcrepo.server.upload.UploadResource">
+    <constructor-arg ref="org.fcrepo.server.Server" />
+  </bean>
+  
 </beans>

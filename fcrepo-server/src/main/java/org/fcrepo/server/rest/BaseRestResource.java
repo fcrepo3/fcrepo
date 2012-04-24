@@ -14,9 +14,9 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -86,9 +86,9 @@ public class BaseRestResource {
     @javax.ws.rs.core.Context
     protected HttpHeaders m_headers;
 
-    public BaseRestResource() {
+    public BaseRestResource(Server server) {
         try {
-            this.m_server = Server.getInstance(new File(Constants.FEDORA_HOME), false);
+            this.m_server = server;
             this.m_management = (Management) m_server.getModule("org.fcrepo.server.management.Management");
             this.m_access = (Access) m_server.getModule("org.fcrepo.server.access.Access");
             this.m_hostname = m_server.getParameter("fedoraServerHost");
@@ -177,7 +177,7 @@ public class BaseRestResource {
 			} else {
 	            return Response.status(Status.BAD_REQUEST).entity(ex.getMessage()).type(MediaType.TEXT_PLAIN).build();
 			}
-        	
+
         } else {
             LOGGER.error("Unexpected error fulfilling REST API request", ex);
             throw new WebApplicationException(ex);

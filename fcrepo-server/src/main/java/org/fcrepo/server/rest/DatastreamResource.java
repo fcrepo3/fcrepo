@@ -8,9 +8,7 @@ package org.fcrepo.server.rest;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.URLEncoder;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,14 +29,15 @@ import javax.ws.rs.core.Response.Status;
 
 import org.fcrepo.common.http.WebClient;
 import org.fcrepo.common.http.WebClientConfiguration;
-
 import org.fcrepo.server.Context;
+import org.fcrepo.server.Server;
 import org.fcrepo.server.rest.RestUtil.RequestContent;
 import org.fcrepo.server.rest.param.DateTimeParam;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamDef;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.utilities.DateUtility;
+import org.springframework.stereotype.Component;
 
 /**
  * A rest controller to handle CRUD operations for the Fedora datastream API
@@ -64,9 +63,13 @@ import org.fcrepo.utilities.DateUtility;
  * @version $Id$
  */
 @Path("/{pid}/datastreams")
+@Component
 public class DatastreamResource
         extends BaseRestResource {
 
+    public DatastreamResource(Server server) {
+        super(server);
+    }
     /**
      * Inquires upon all object Datastreams to obtain datastreams contained by a
      * digital object. This returns a set of datastream locations that represent

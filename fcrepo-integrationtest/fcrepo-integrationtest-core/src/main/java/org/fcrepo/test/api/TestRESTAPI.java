@@ -1381,15 +1381,9 @@ public class TestRESTAPI
         assertTrue(response.getResponseBodyString().startsWith("uploaded://"));
 
         // Test content not supplied
-        PostMethod post = new PostMethod(url);
-        MultipartRequestEntity entity =
-                new MultipartRequestEntity(new Part[] {}, post.getParams());
-
-        post.setRequestEntity(entity);
-        getClient(true).executeMethod(post);
-        response = new HttpResponse(post);
-
-        assertEquals(500, response.getStatusCode());
+        response = _doUploadPost(url,new Part[] {});
+     // jersey now sends a 400 in this circumstance (jersey-577)
+        assertEquals(400, response.getStatusCode());
     }
 
     /////////////////////////////////////////////////
@@ -1520,11 +1514,15 @@ public class TestRESTAPI
     }
 
     private HttpResponse _doUploadPost(String path) throws Exception {
-        PostMethod post = new PostMethod(path);
         File temp = File.createTempFile("test.txt", null);
         FileUtils.writeStringToFile(temp, "This is the upload test file");
 
         Part[] parts = {new FilePart("file", temp)};
+        return _doUploadPost(path, parts);
+    }
+
+    private HttpResponse _doUploadPost(String path, Part[] parts) throws Exception {
+        PostMethod post = new PostMethod(path);
         MultipartRequestEntity entity =
                 new MultipartRequestEntity(parts, post.getParams());
 

@@ -4,8 +4,30 @@
  */
 package org.fcrepo.server.rest;
 
+import java.io.ByteArrayInputStream;
+import java.io.CharArrayWriter;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.util.Date;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
+import org.fcrepo.server.Server;
 import org.fcrepo.server.access.ObjectProfile;
 import org.fcrepo.server.rest.RestUtil.RequestContent;
 import org.fcrepo.server.rest.param.DateTimeParam;
@@ -14,17 +36,7 @@ import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayWriter;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.util.Date;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -34,12 +46,17 @@ import java.util.Date;
  * @version $Id$
  */
 @Path("/{pid}")
+@Component
 public class FedoraObjectResource extends BaseRestResource {
     private final String FOXML1_1 = "info:fedora/fedora-system:FOXML-1.1";
     private final String ATOMZIP1_1 = "info:fedora/fedora-system:ATOMZip-1.1";
 
     private static final Logger logger =
             LoggerFactory.getLogger(FedoraObjectResource.class);
+
+    public FedoraObjectResource(Server server) {
+        super(server);
+    }
 
     @Path("/validate")
     @GET

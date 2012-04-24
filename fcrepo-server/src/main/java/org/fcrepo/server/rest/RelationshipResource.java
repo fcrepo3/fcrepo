@@ -22,9 +22,11 @@ import javax.ws.rs.core.Response;
 
 import org.fcrepo.common.PID;
 import org.fcrepo.server.Context;
+import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.storage.types.TupleArrayTripleIterator;
+import org.springframework.stereotype.Component;
 import org.trippi.RDFFormat;
 import org.trippi.TripleIterator;
 import org.trippi.TrippiException;
@@ -38,7 +40,12 @@ import org.trippi.TrippiException;
  * @since 3.4.0
  */
 @Path("/{pid}/relationships")
+@Component
 public class RelationshipResource extends BaseRestResource {
+
+    public RelationshipResource(Server server) {
+        super(server);
+    }
 
     /**
      * Get relationships asserted by the object denoted by <i>pid</i>.

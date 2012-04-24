@@ -5,12 +5,10 @@
 package org.fcrepo.server.rest;
 
 import java.io.CharArrayWriter;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -21,9 +19,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.fcrepo.server.Context;
+import org.fcrepo.server.Server;
 import org.fcrepo.server.search.Condition;
 import org.fcrepo.server.search.FieldSearchQuery;
 import org.fcrepo.server.search.FieldSearchResult;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -35,11 +35,16 @@ import org.fcrepo.server.search.FieldSearchResult;
  * @version $Id$
  */
 @Path("/objects")
+@Component
 public class FedoraObjectSearchResource extends BaseRestResource {
     static final String[] SEARCHABLE_FIELDS = { "pid", "label", "state", "ownerId",
             "cDate", "mDate", "dcmDate", "title", "creator", "subject", "description",
             "publisher", "contributor", "date", "type", "format", "identifier",
             "source", "language", "relation", "coverage", "rights" };
+
+    public FedoraObjectSearchResource(Server server) {
+        super(server);
+    }
 
     @GET
     @Produces( { HTML, XML })
