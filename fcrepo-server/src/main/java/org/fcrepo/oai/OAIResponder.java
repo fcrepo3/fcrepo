@@ -5,7 +5,6 @@
 package org.fcrepo.oai;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -23,10 +22,9 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.Context;
-import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.authorization.AuthzException;
-import org.fcrepo.server.errors.authorization.AuthzOperationalException;
 import org.fcrepo.server.security.Authorization;
 
 
@@ -40,28 +38,18 @@ public class OAIResponder
         implements Constants {
 
     private final OAIProvider m_provider;
-
+    
     private DateGranularitySupport m_granularity;
 
     private Authorization m_authorization;
 
-    public OAIResponder(OAIProvider provider) {
+    public OAIResponder(OAIProvider provider, Authorization authorization) {
         m_provider = provider;
+        m_authorization = authorization;
     }
 
     public void respond(Context context, Map args, OutputStream outStream)
             throws RepositoryException, AuthzException {
-        if (m_authorization == null) {
-            Server server;
-            try {
-                server = Server.getInstance(new File(FEDORA_HOME));
-            } catch (Throwable e) {
-                throw new AuthzOperationalException("couldn't attempt authz", e);
-            }
-            m_authorization =
-                    (Authorization) server
-                            .getModule("org.fcrepo.server.security.Authorization");
-        }
         m_authorization.enforceOAIRespond(context);
         m_granularity = m_provider.getDateGranularitySupport();
         PrintWriter out = null;
