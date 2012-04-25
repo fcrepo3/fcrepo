@@ -37,7 +37,7 @@ public class ContextHandler {
     private static final Logger logger =
             LoggerFactory.getLogger(ContextHandler.class);
 
-    private static final ContextUtil contextUtil = ContextUtil.getInstance();
+    private static final ContextUtil contextUtil = new ContextUtil();
 
     private MelcoePDP m_melcoePDP;
 

@@ -30,14 +30,14 @@ import com.sun.xacml.ctx.ResponseCtx;
  * This interface represents the bridge between the PEP and the PDP. It is
  * responsible for building requests and passing them to the PDP. It then
  * receives the response and passes it to the PEP.
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public interface ContextHandler {
 
     /**
      * Creates a new Request.
-     * 
+     *
      * @param subjects
      *        a list of Map<URI, AttributeValue> containing the attributes for a
      *        set of subjects.
@@ -85,8 +85,4 @@ public interface ContextHandler {
      */
     public String evaluateBatch(String[] requests) throws PEPException;
 
-    /**
-     * @return a reference to the response cache.
-     */
-    public ResponseCache getResponseCache();
 }

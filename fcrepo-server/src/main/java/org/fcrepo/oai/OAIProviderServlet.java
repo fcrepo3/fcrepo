@@ -1,12 +1,11 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.oai;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
 import java.util.Enumeration;
 import java.util.HashMap;
 
@@ -30,6 +29,7 @@ import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
 /**
  * @author Chris Wilper
  */
+@SuppressWarnings("serial")
 public abstract class OAIProviderServlet
         extends HttpServlet {
 

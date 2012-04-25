@@ -8,6 +8,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
@@ -25,9 +26,11 @@ public class CompareDatastreamChecksumHandler extends AbstractOperationHandler {
     private static final Logger logger =
             LoggerFactory.getLogger(CompareDatastreamChecksumHandler.class);
 
-    public CompareDatastreamChecksumHandler() throws PEPException {
-        super();
+    public CompareDatastreamChecksumHandler(ContextHandler contextHandler)
+            throws PEPException {
+        super(contextHandler);
     }
+
     @Override
     public RequestCtx handleRequest(SOAPMessageContext context)
             throws OperationHandlerException {

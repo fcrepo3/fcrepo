@@ -48,16 +48,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.ParsingException;
-import com.sun.xacml.Policy;
-import com.sun.xacml.PolicySet;
-import com.sun.xacml.finder.PolicyFinder;
 
 /**
  * This class is provided as a utility for reading policies from common, simple
@@ -116,9 +111,6 @@ public class PolicyReader
     /**
      * Creates a <code>PolicyReader</code> that may schema-validate policies.
      *
-     * @param finder
-     *        a <code>PolicyFinder</code> that is used by policy sets, which may
-     *        be null only if no references are used
      * @param schemaFile
      *        the schema file used to validate policies, or null if schema
      *        validation is not desired

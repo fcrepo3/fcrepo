@@ -22,9 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.URI;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,7 +31,6 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
@@ -48,6 +45,20 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
+import org.fcrepo.server.security.xacml.pep.rest.filters.DataResponseWrapper;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.tidy.Tidy;
+
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.DateTimeAttribute;
@@ -56,24 +67,6 @@ import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Status;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.w3c.tidy.Tidy;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
-import org.fcrepo.server.security.xacml.pep.rest.filters.DataResponseWrapper;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
-import org.fcrepo.server.security.xacml.util.LogUtil;
 
 
 /**
@@ -87,7 +80,7 @@ public class ListDatastreams
     private static final Logger logger =
             LoggerFactory.getLogger(ListDatastreams.class);
 
-    private ContextUtil contextUtil = null;
+    private ContextUtil m_contextUtil = null;
 
     private Transformer xFormer = null;
 
@@ -102,8 +95,6 @@ public class ListDatastreams
             throws PEPException {
         super();
 
-        contextUtil = ContextUtil.getInstance();
-
         try {
             TransformerFactory xFactory = TransformerFactory.newInstance();
             xFormer = xFactory.newTransformer();
@@ -116,12 +107,17 @@ public class ListDatastreams
         tidy.setQuiet(true);
     }
 
+    public void setContextUtil(ContextUtil contextUtil) {
+        m_contextUtil = contextUtil;
+    }
+
     /*
      * (non-Javadoc)
      * @see
      * org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter#handleRequest(javax.servlet
      * .http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
+    @Override
     public RequestCtx handleRequest(HttpServletRequest request,
                                     HttpServletResponse response)
             throws IOException, ServletException {
@@ -187,6 +183,7 @@ public class ListDatastreams
      * org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter#handleResponse(javax.servlet
      * .http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
+    @Override
     public RequestCtx handleResponse(HttpServletRequest request,
                                      HttpServletResponse response)
             throws IOException, ServletException {
@@ -457,7 +454,7 @@ public class ListDatastreams
                                               resAttr,
                                               getEnvironment(request));
 
-                String r = contextUtil.makeRequestCtx(req);
+                String r = m_contextUtil.makeRequestCtx(req);
                 if (logger.isDebugEnabled()) {
                     logger.debug(r);
                 }
@@ -484,7 +481,7 @@ public class ListDatastreams
                 logger.debug("Response: " + res);
             }
 
-            resCtx = contextUtil.makeResponseCtx(res);
+            resCtx = m_contextUtil.makeResponseCtx(res);
         } catch (MelcoeXacmlException pe) {
             throw new ServletException("Error evaluating pids: "
                     + pe.getMessage(), pe);

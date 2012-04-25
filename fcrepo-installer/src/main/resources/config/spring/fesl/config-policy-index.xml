@@ -9,15 +9,18 @@
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+  <!--  non-validating PolicyReader -->
+  <bean id="PolicyReader" class="org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader" />
   <!--  PolicyIndex Implementations -->  
   <bean id="FilePolicyIndex"
     class="org.fcrepo.server.security.xacml.pdp.data.FilePolicyIndex"
     autowire-candidate="true" init-method="init">
+    <constructor-arg ref="PolicyReader" />
     <property name="policyDirectoryPath" value="/policy-db" />
-    <property name="subjectAttributes" ref="subjectAttributes" />
-    <property name="resourceAttributes" ref="resourceAttributes" />
-    <property name="actionAttributes" ref="actionAttributes" />
-    <property name="environmentAttributes" ref="environmentAttributes" />
+    <property name="subjectAttributes" ref="org.fcrepo.server.security.xacml.pdp.data.subjectAttributes" />
+    <property name="resourceAttributes" ref="org.fcrepo.server.security.xacml.pdp.data.resourceAttributes" />
+    <property name="actionAttributes" ref="org.fcrepo.server.security.xacml.pdp.data.actionAttributes" />
+    <property name="environmentAttributes" ref="org.fcrepo.server.security.xacml.pdp.data.environmentAttributes" />
   </bean>
   <!-- Policy Index backed by an eXist xml database 
   <PolicyIndex>org.fcrepo.server.security.xacml.pdp.data.ExistPolicyIndex</PolicyIndex>
@@ -28,10 +31,10 @@
     <property name="collection" value="fesl"/>
     <property name="user" value="admin"/>
     <property name="password" value=""/>
-    <property name="subjectAttributes" ref="subjectAttributes" />
-    <property name="resourceAttributes" ref="resourceAttributes" />
-    <property name="actionAttributes" ref="actionAttributes" />
-    <property name="environmentAttributes" ref="environmentAttributes" />
+    <property name="subjectAttributes" ref="org.fcrepo.server.security.xacml.pdp.data.subjectAttributes" />
+    <property name="resourceAttributes" ref="org.fcrepo.server.security.xacml.pdp.data.resourceAttributes" />
+    <property name="actionAttributes" ref="org.fcrepo.server.security.xacml.pdp.data.actionAttributes" />
+    <property name="environmentAttributes" ref="org.fcrepo.server.security.xacml.pdp.data.environmentAttributes" />
   </bean>
   -->
   <!-- Policy Index backed by a Berkelely DB XML database
@@ -40,37 +43,30 @@
     autowire-candidate="true" init-method="init" destroy-method="close">
     <property name="directory" value="/database" />
     <property name="container" value="policies.dbxml" />
-    <property name="subjectAttributes" ref="subjectAttributes" />
-    <property name="resourceAttributes" ref="resourceAttributes" />
-    <property name="actionAttributes" ref="actionAttributes" />
-    <property name="environmentAttributes" ref="environmentAttributes" />
+    <property name="subjectAttributes" ref="org.fcrepo.server.security.xacml.pdp.data.subjectAttributes" />
+    <property name="resourceAttributes" ref="org.fcrepo.server.security.xacml.pdp.data.resourceAttributes" />
+    <property name="actionAttributes" ref="org.fcrepo.server.security.xacml.pdp.data.actionAttributes" />
+    <property name="environmentAttributes" ref="org.fcrepo.server.security.xacml.pdp.data.environmentAttributes" />
   </bean>
   -->
-  <!--  PolicyStore Configuration -->
-  <bean id="PolicyCombiningAlgorithm" class="org.fcrepo.server.security.xacml.pdp.HierarchicalLowestChildDenyOverridesPolicyAlg" />
-  <!-- Melcoe PDP -->
-  <bean id="PDP" class="org.fcrepo.server.security.xacml.pdp.MelcoePDPImpl">
-    <constructor-arg ref="FedoraPolicyStore" />
-    <constructor-arg ref="MelcoePDPConfig" />
-  </bean>
   <!--  Attribute Map Configurations -->
-  <util:map id="subjectAttributes">
+  <util:map id="org.fcrepo.server.security.xacml.pdp.data.subjectAttributes">
     <entry key="urn:oasis:names:tc:xacml:1.0:subject:subject-id" value="http://www.w3.org/2001/XMLSchema#string" />
     <entry key="urn:fedora:names:fedora:2.1:subject:loginId" value="http://www.w3.org/2001/XMLSchema#string"/>
     <entry key="urn:fedora:names:fedora:2.1:subject:role" value="http://www.w3.org/2001/XMLSchema#string"/>
   </util:map>
-  <util:map id="resourceAttributes">
+  <util:map id="org.fcrepo.server.security.xacml.pdp.data.resourceAttributes">
     <entry key="urn:oasis:names:tc:xacml:1.0:resource:resource-id" value="http://www.w3.org/2001/XMLSchema#anyURI"/>
     <entry key="urn:fedora:names:fedora:2.1:resource:object:pid" value="http://www.w3.org/2001/XMLSchema#string"/>
     <entry key="urn:fedora:names:fedora:2.1:resource:datastream:id" value="http://www.w3.org/2001/XMLSchema#string"/>
   </util:map>
-  <util:map id="actionAttributes">
+  <util:map id="org.fcrepo.server.security.xacml.pdp.data.actionAttributes">
     <!--
       <attribute key="urn:oasis:names:tc:xacml:1.0:action:action-id" value="http://www.w3.org/2001/XMLSchema#string"/>
       <attribute key="urn:fedora:names:fedora:2.1:action:id" value="http://www.w3.org/2001/XMLSchema#string"/>
       <attribute key="urn:fedora:names:fedora:2.1:action:api" value="http://www.w3.org/2001/XMLSchema#string"/>
     -->
   </util:map>
-  <util:map id="environmentAttributes">
+  <util:map id="org.fcrepo.server.security.xacml.pdp.data.environmentAttributes">
   </util:map>
 </beans>

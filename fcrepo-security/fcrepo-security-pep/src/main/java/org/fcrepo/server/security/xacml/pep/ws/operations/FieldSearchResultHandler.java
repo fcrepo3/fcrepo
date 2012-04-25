@@ -30,6 +30,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.types.gen.FieldSearchResult;
@@ -58,16 +59,20 @@ public class FieldSearchResultHandler
     private static final Logger logger =
             LoggerFactory.getLogger(FieldSearchResultHandler.class);
 
-    private final ContextUtil contextUtil = ContextUtil.getInstance();
+    private ContextUtil m_contextUtil = null;
 
     /**
      * Default constructor.
      *
      * @throws PEPException
      */
-    public FieldSearchResultHandler()
+    public FieldSearchResultHandler(ContextHandler contextHandler)
             throws PEPException {
-        super();
+        super(contextHandler);
+    }
+
+    public void setContextUtil(ContextUtil contextUtil) {
+        m_contextUtil = contextUtil;
     }
 
     /**
@@ -124,7 +129,7 @@ public class FieldSearchResultHandler
                                                   resAttr,
                                                   getEnvironment(context));
 
-                    requests.add(contextUtil.makeRequestCtx(req));
+                    requests.add(m_contextUtil.makeRequestCtx(req));
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                     throw new OperationHandlerException(e.getMessage(), e);
@@ -137,7 +142,7 @@ public class FieldSearchResultHandler
                         .toArray(new String[requests.size()]));
         ResponseCtx resCtx;
         try {
-            resCtx = contextUtil.makeResponseCtx(response);
+            resCtx = m_contextUtil.makeResponseCtx(response);
         } catch (MelcoeXacmlException e) {
             throw new PEPException(e);
         }

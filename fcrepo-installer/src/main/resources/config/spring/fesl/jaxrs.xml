@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:security="http://www.springframework.org/schema/security"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-2.5.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+
+  <!-- FeSL Authz bean (REST) -->
+  <bean id="PEPFilter" class="org.fcrepo.server.security.xacml.pep.rest.PEP"
+    lazy-init="true" init-method="init">
+      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+      <property name="filters">
+        <map>
+          <entry key="/describe" value-ref="DescribeFilter" />
+		  <entry key="/get" value-ref="GetFilter" />
+		  <entry key="/getObjectHistory" value-ref="GetObjectHistoryFilter" />
+		  <entry key="/listDatastreams" value-ref="ListDatastreamsFilter" />
+		  <entry key="/listMethods" value-ref="ListMethodsFilter" />
+		  <entry key="/search" value-ref="SearchFilter" />
+		  <entry key="/management/getNextPID" value-ref="GetNextPIDFilter" />
+          <entry key="/management/control"  value-ref="ControlFilter" />
+          <!-- this does no results filtering, but does check for the appropriate xacml action attribute; but note this is currently also mapped to "read" -->
+          <entry key="/risearch" value-ref="BasicRISearchFilter" />
+	      <!-- 
+            Filters risearch results, but with a significant performance penalty (and currently not fully tested). 
+            <entry key="risearch" value-ref="RISearchFilter" />
+          -->
+
+          <!-- nb, two endpoints, different servlets, but same security -->
+          <entry key="/upload" value-ref="UploadFilter" />
+          <entry key="/management/upload" value-ref="UploadFilter" />
+
+          <!-- WSDL - currently no authz -->
+          <entry key="/services" value-ref="NoopFilter" />
+
+          <!-- handler for REST API - each individual API operation is mapped below in handlers-objects -->
+          <entry key="/objects" value-ref="ObjectsFilter" />
+        </map>
+      </property>
+  </bean>
+
+	<!--
+		The response cache, as its name suggests, caches XACML responses based on a hash of an
+		XACML request. Two identical requests produce the same hash and therefore can be used
+		as a cache key. The cache by default is set to store 1000 entries and each entry lives
+		for only 10 seconds.
+		
+		This can be changed to suit your needs, however if you want immediate
+		application of changed policies you are going to have to keep this number very small.
+		It is set to 10 seconds by default to handle multiple child/parent resolutions for a
+		request when doing searches.
+		
+		If an item is found in the cache, then a request is not	sent to the PDP. Instead the previously
+		calculated value is used.
+	-->
+	<bean id="response-cache" class="org.fcrepo.server.security.xacml.pep.ResponseCacheImpl">
+	  <constructor-arg value="1000" />
+	  <constructor-arg value="60000" />
+	</bean>
+	
+	<!--
+		This class handles the identification of relationships between objects.
+    
+    These relationships are used in forming a resource's XACML hierarchical, path-based
+    resource-id identifier attribute, which can be used to apply XACML policies to objects
+    based on collection memberships.
+    
+    The supplied configuration is to use the RIRelationshipResolver, which makes use of
+    the resource index.  This allows the use of both relationships to parents, and relationships from
+    from parents to the object.
+    
+    If the resource index is not available, the RELSRelationshipResolver will be used instead
+    (and if the resource index is not available the configuration should be modified to use this
+    to prevent warning messages).
+	-->
+  	
+	<!--
+		This section maps handlers for REST operations. When an operation is executed the appropriate
+		Handler is called and used to generate XACML requests or perform other tasks such as filtering 
+		in the case of 'search'.
+	-->
+
+	<bean id="DescribeFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.DescribeFilter">
+      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+	</bean>
+    <bean id="GetFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetFilter">
+      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+	</bean>
+    <bean id="GetObjectHistoryFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetObjectHistoryFilter">
+      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+	</bean>
+    <bean id="ListDatastreamsFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.ListDatastreamsFilter">
+      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+	</bean>
+    <bean id="ListMethodsFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.ListMethodsFilter">
+      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+	</bean>
+    <bean id="SearchFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.SearchFilter">
+      <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
+      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+    </bean>
+    <bean id="GetNextPIDFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetNextPIDFilter">
+      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+	</bean>
+    <bean id="ControlFilter"  class="org.fcrepo.server.security.xacml.pep.rest.filters.ControlFilter">
+      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+	</bean>
+    <!-- this does no results filtering, but does check for the appropriate xacml action attribute; but note this is currently also mapped to "read" -->
+    <bean id="BasicRISearchFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.BasicRISearchFilter">
+      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+	</bean>
+		<!-- 
+        Filters risearch results, but with a significant performance penalty (and currently not fully tested). 
+        <entry key="risearch">
+          <bean class="org.fcrepo.server.security.xacml.pep.rest.filters.RISearchFilter">
+            <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+            <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
+          </bean>
+        </entry>
+		-->
+
+    <bean id="UploadFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.UploadFilter">
+      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+	</bean>
+
+    <!-- WSDL - currently no authz -->
+    <bean id="NoopFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.NoopFilter" />
+
+    <!-- handler for REST API - each individual API operation is mapped below in handlers-objects -->
+    <util:map id="handlers-rest">
+     <entry key="findObjects">
+       <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects">
+         <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
+       </bean>
+     </entry>
+     <entry key="resumeFindObjects"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects" /></entry>
+      <entry key="getDatastreamDissemination"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastreamDissemination" /></entry>
+      <entry key="getDissemination"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDissemination"/></entry>
+      <entry key="getObjectHistory"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectHistory"/></entry>
+      <entry key="getObjectProfile"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectProfile"/></entry>
+      <entry key="listDatastreams"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ListDatastreams">
+         <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
+       </bean>
+     </entry>
+      <entry key="listMethods"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ListMethods"/></entry>
+      <entry key="addDatastream"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.AddDatastream"/></entry>
+      <entry key="export"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Export"/></entry>
+      <entry key="getDatastream"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastream"/></entry>
+      <entry key="getNextPID"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetNextPID"/></entry>
+      <entry key="getObjectXML"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectXML"/></entry>
+      <entry key="ingest"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Ingest"/></entry>
+      <entry key="modifyDatastream"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ModifyDatastream"/></entry>
+      <entry key="modifyObject"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ModifyObject"/></entry>
+      <entry key="purgeDatastream"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeDatastream"/></entry>
+      <entry key="purgeObject"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeObject"/></entry>
+      <entry key="setDatastreamState"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.SetDatastreamState"/></entry>
+      <entry key="setDatastreamVersionable"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.SetDatastreamVersionable"/></entry>
+      <entry key="validate"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Validate"/></entry>
+      <entry key="getDatastreamHistory"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastreamHistory"/></entry>
+      <entry key="getRelationships"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetRelationships"/></entry>
+      <entry key="addRelationship"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.AddRelationship"/></entry>
+      <entry key="purgeRelationship"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeRelationship"/></entry>
+    </util:map>
+    <bean id="ObjectsFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsFilter">
+      <constructor-arg ref="handlers-rest" />
+    </bean>
+	
+</beans>

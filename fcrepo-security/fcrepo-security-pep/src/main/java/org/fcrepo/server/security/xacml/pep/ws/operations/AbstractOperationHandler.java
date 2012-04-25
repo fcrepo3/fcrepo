@@ -42,7 +42,6 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
-import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.utilities.CXFUtility;
 import org.slf4j.Logger;
@@ -74,16 +73,16 @@ public abstract class AbstractOperationHandler
 
     protected static final JAXBContext JAXB_CONTEXT = getJAXBContext();
 
-    private static ContextHandler contextHandlerImpl;
+    private final ContextHandler m_contextHandler;
 
     /**
      * Default constructor that obtains an instance of the ContextHandler.
      *
      * @throws PEPException
      */
-    public AbstractOperationHandler()
+    public AbstractOperationHandler(ContextHandler contextHandler)
             throws PEPException {
-        contextHandlerImpl = ContextHandlerImpl.getInstance();
+        m_contextHandler = contextHandler;
     }
 
     /**
@@ -343,7 +342,7 @@ public abstract class AbstractOperationHandler
      * @return the Context Handler
      */
     protected ContextHandler getContextHandler() {
-        return contextHandlerImpl;
+        return m_contextHandler;
     }
 
     /**

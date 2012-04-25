@@ -19,7 +19,6 @@
 package org.fcrepo.server.security.xacml.pep.rest;
 
 import java.io.IOException;
-
 import java.util.Map;
 import java.util.Set;
 
@@ -33,20 +32,18 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.server.security.xacml.pep.AuthzDeniedException;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
-import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.rest.filters.DataResponseWrapper;
 import org.fcrepo.server.security.xacml.pep.rest.filters.ParameterRequestWrapper;
 import org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.xacml.ctx.RequestCtx;
+import com.sun.xacml.ctx.ResponseCtx;
+import com.sun.xacml.ctx.Result;
 
 
 /**
@@ -69,6 +66,7 @@ public final class PEP
      * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
      * javax.servlet.ServletResponse, javax.servlet.FilterChain)
      */
+    @Override
     public void doFilter(ServletRequest request,
                          ServletResponse response,
                          FilterChain chain) throws IOException,
@@ -184,17 +182,15 @@ public final class PEP
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
      */
     public void init() throws ServletException {
-        try {
-            m_ctxHandler = ContextHandlerImpl.getInstance();
-        } catch (PEPException pe) {
-            logger.error("Error obtaining ContextHandler", pe);
-            throw new ServletException("Error obtaining ContextHandler", pe);
+        if (m_ctxHandler == null) {
+            throw new ServletException("Error obtaining ContextHandler");
         }
 
         logger.info("Initialising Servlet Filter: " + PEP.class);
 
     }
 
+    @Override
     public void init(FilterConfig cfg) throws ServletException {
         init();
     }
@@ -204,14 +200,19 @@ public final class PEP
      * (non-Javadoc)
      * @see javax.servlet.Filter#destroy()
      */
+    @Override
     public void destroy() {
         logger.info("Destroying Servlet Filter: " + PEP.class);
         m_filters = null;
         m_ctxHandler = null;
     }
-    
+
     public void setFilters(Map<String, RESTFilter> filters) {
         m_filters = filters;
+    }
+
+    public void setContextHandler(ContextHandler ctxHandler) {
+        m_ctxHandler = ctxHandler;
     }
 
     /**

@@ -19,7 +19,6 @@
 package org.fcrepo.server.security.xacml.pep;
 
 import java.util.List;
-import java.util.Map;
 
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 import org.slf4j.Logger;
@@ -46,20 +45,8 @@ public class DirectPDPClient
      *        a Map of options for this class
      * @throws PEPException
      */
-    public DirectPDPClient(Map<String, String> options)
+    public DirectPDPClient(MelcoePDP pdp)
             throws PEPException {
-        // FIXME: this constructor is not required - no options - but is called by pep ContextHandlerImpl
-        /*
-        try {
-            client = new MelcoePDPImpl();
-        } catch (Exception e) {
-            logger.error("Could not initialise the PEP Client.");
-            throw new PEPException("Could not initialise the PEP Client.", e);
-        }
-        */
-    }
-
-    public void setClient(MelcoePDP pdp) {
         this.client = pdp;
     }
 

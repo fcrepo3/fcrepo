@@ -19,28 +19,24 @@
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 import java.net.URI;
-
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.ws.handler.soap.SOAPMessageContext;
+
+import org.apache.cxf.binding.soap.SoapFault;
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.pep.ContextHandler;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.DateTimeAttribute;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
-
-import org.apache.cxf.binding.soap.SoapFault;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.LogUtil;
 
 
 /**
@@ -52,9 +48,9 @@ public class GetDisseminationHandler
     private static final Logger logger =
             LoggerFactory.getLogger(GetDisseminationHandler.class);
 
-    public GetDisseminationHandler()
+    public GetDisseminationHandler(ContextHandler contextHandler)
             throws PEPException {
-        super();
+        super(contextHandler);
     }
 
     @Override

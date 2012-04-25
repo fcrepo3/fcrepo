@@ -18,33 +18,23 @@
 
 package org.fcrepo.server.security.xacml.pep.ws;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.AuthzDeniedException;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
-import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandler;
 import org.fcrepo.server.security.xacml.pep.ws.operations.OperationHandlerException;
 import org.fcrepo.server.utilities.CXFUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
@@ -93,10 +83,17 @@ public class PEP
         this.feslAuthZ = feslAuthZ;
         logger.info("feslAuthZ = " + feslAuthZ);
         if (feslAuthZ) {
-            loadHandlers();
-            m_ctxHandler = ContextHandlerImpl.getInstance();
+            m_serviceHandlers = new HashMap<String, Map<String,OperationHandler>>(0);
             m_ts = new Date();
         }
+    }
+
+    public void setContextHandler(ContextHandler ctxHandler) {
+        m_ctxHandler = ctxHandler;
+    }
+
+    public void setServiceHandlers(Map<String, Map<String,OperationHandler>> serviceHandlers) {
+        m_serviceHandlers = serviceHandlers;
     }
 
     /*
@@ -186,106 +183,6 @@ public class PEP
         // TODO: enforce will need to ensure that obligations are met.
         enforce(resCtx);
         return true;
-    }
-
-    /**
-     * Reads the configuration file and loads up all the handlers listed within.
-     * This method creates handlers for each of the services listed.
-     *
-     * @throws PEPException
-     */
-    private void loadHandlers() throws PEPException {
-        m_serviceHandlers = new HashMap<String, Map<String, OperationHandler>>();
-
-        try {
-            // get the PEP configuration
-            File configPEPFile =
-                    new File(Constants.FEDORA_HOME,
-                             "server/config/config-melcoe-pep.xml");
-            InputStream is = new FileInputStream(configPEPFile);
-            if (is == null) {
-                throw new PEPException("Could not locate config file: config-melcoe-pep.xml");
-            }
-
-            DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = factory.newDocumentBuilder();
-            Document doc = docBuilder.parse(is);
-
-            // to avoid having the same class instantiated multiple times for multiple services.
-            Map<String, OperationHandler> handlerMap =
-                    new HashMap<String, OperationHandler>();
-
-            NodeList nodes = doc.getElementsByTagName("handlers-ws");
-            for (int x = 0; x < nodes.getLength(); x++) {
-                String service =
-                        nodes.item(x).getAttributes().getNamedItem("service")
-                                .getNodeValue();
-                if (service == null || "".equals(service)) {
-                    throw new PEPException("Error in config file: service name missing.");
-                }
-
-                Map<String, OperationHandler> handlers =
-                        m_serviceHandlers.get(service);
-                if (handlers == null) {
-                    handlers = new HashMap<String, OperationHandler>();
-                    m_serviceHandlers.put(service, handlers);
-                }
-
-                NodeList handlerNodes = nodes.item(x).getChildNodes();
-                for (int y = 0; y < handlerNodes.getLength(); y++) {
-                    if (handlerNodes.item(y).getNodeType() == Node.ELEMENT_NODE) {
-                        String opn =
-                                handlerNodes.item(y).getAttributes()
-                                        .getNamedItem("operation")
-                                        .getNodeValue();
-                        String cls =
-                                handlerNodes.item(y).getAttributes()
-                                        .getNamedItem("class").getNodeValue();
-
-                        if (opn == null || "".equals(opn)) {
-                            throw new PEPException("Cannot have a missing or empty operation attribute");
-                        }
-
-                        if (cls == null || "".equals(cls)) {
-                            throw new PEPException("Cannot have a missing or empty class attribute");
-                        }
-
-                        OperationHandler handler = handlerMap.get(cls);
-
-                        if (handler == null) {
-                            try {
-                                Class<?> handlerClass = Class.forName(cls);
-                                handler =
-                                        (OperationHandler) handlerClass
-                                                .newInstance();
-                                handlerMap.put(cls, handler);
-                            } catch (ClassNotFoundException e) {
-                                logger.debug("handlerClass not found: " + cls);
-                            } catch (InstantiationException ie) {
-                                logger.error("Could not instantiate handler: "
-                                        + cls);
-                                throw new PEPException(ie);
-                            } catch (IllegalAccessException iae) {
-                                logger.error("Could not instantiate handler: "
-                                        + cls);
-                                throw new PEPException(iae);
-                            }
-                        }
-
-                        handlers.put(opn, handler);
-
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("handler added to handler map: "
-                                    + service + "/" + opn + "/" + cls);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Failed to initialse the PEP for WS", e);
-            throw new PEPException(e.getMessage(), e);
-        }
     }
 
     /**

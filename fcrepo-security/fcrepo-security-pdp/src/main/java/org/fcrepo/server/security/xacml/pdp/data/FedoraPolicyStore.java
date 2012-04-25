@@ -85,11 +85,11 @@ implements PolicyStore {
     protected Access apiAService;
 
 
-    public FedoraPolicyStore(Server server, Management apim, Access apia)
+    public FedoraPolicyStore(Server server)
     throws PolicyStoreException {
         this.fedoraServer = server;
-        this.apiMService = apim;
-        this.apiAService = apia;
+        this.apiMService = (Management)server.getBean("org.fcrepo.server.management.Management");
+        this.apiAService = (Access)server.getBean("org.fcrepo.server.access.Access");
     }
 
     @Override
@@ -156,7 +156,13 @@ implements PolicyStore {
         ValidationUtility.setValidateFeslPolicy(validate);
     }
 
-    public void setPolicySchemaLocations(Map<String,String> schemaLocation) throws IOException, SAXException{
+    /**
+     * Map policy schema URIs to locations for the schema document
+     * @param schemaLocation
+     * @throws IOException
+     * @throws SAXException
+     */
+    public void setSchemaLocations(Map<String,String> schemaLocation) throws IOException, SAXException{
         this.schemaLocations = schemaLocation;
     }
 

@@ -19,7 +19,6 @@
 package org.fcrepo.server.security.xacml.pep;
 
 import java.security.MessageDigest;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,17 +26,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.sun.xacml.ctx.Attribute;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.Subject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.util.AttributeComparator;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.SubjectComparator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.xacml.ctx.Attribute;
+import com.sun.xacml.ctx.RequestCtx;
+import com.sun.xacml.ctx.Subject;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -48,7 +46,7 @@ public class ResponseCacheImpl
     private static final Logger logger =
             LoggerFactory.getLogger(ResponseCacheImpl.class);
 
-    private final ContextUtil contextUtil = ContextUtil.getInstance();
+    private final ContextUtil m_contextUtil;
 
     private static final int DEFAULT_CACHE_SIZE = 1000;
 
@@ -71,9 +69,9 @@ public class ResponseCacheImpl
      *
      * @throws PEPException
      */
-    public ResponseCacheImpl()
+    public ResponseCacheImpl(ContextUtil contextUtil)
             throws PEPException {
-        this(new Integer(DEFAULT_CACHE_SIZE), new Long(DEFAULT_TTL));
+        this(contextUtil, new Integer(DEFAULT_CACHE_SIZE), new Long(DEFAULT_TTL));
     }
 
     /**
@@ -86,12 +84,30 @@ public class ResponseCacheImpl
      *        maximum time for a cache item to be valid in milliseconds
      * @throws PEPException
      */
-    public ResponseCacheImpl(Integer size, Long ttl)
+    public ResponseCacheImpl(ContextUtil contextUtil, Integer size, Long ttl)
             throws PEPException {
 
+        m_contextUtil = contextUtil;
+
         TTL = ttl.longValue();
-        
+
         CACHE_SIZE = size.intValue();
+
+        String noCache = System.getenv("PEP_NOCACHE");
+        String noCacheProp = System.getProperty("fedora.fesl.pep_nocache");
+
+        // if system property is set, use that
+        if (noCacheProp != null && noCacheProp.toLowerCase().startsWith("t")) {
+            TTL = 0;
+        } else {
+            // if system property is not set ..
+            if (noCacheProp == null || noCacheProp.length() == 0) {
+                // use env variable if set
+                if (noCache != null && noCache.toLowerCase().startsWith("t")) {
+                    TTL = 0;
+                }
+            }
+        }
 
         // Note - HashMap, ArrayList are not thread-safe
         requestCache = new HashMap<String, String>(CACHE_SIZE);
@@ -104,7 +120,8 @@ public class ResponseCacheImpl
             throw new PEPException("Could not initialize the ResponseCache", e);
         }
     }
-    
+
+    @Override
     public void setTTL(long ttl) {
         TTL = ttl;
     }
@@ -114,6 +131,7 @@ public class ResponseCacheImpl
      * @see org.fcrepo.server.security.xacml.pep.ResponseCache#addCacheItem(java.lang.String,
      * java.lang.String)
      */
+    @Override
     public void addCacheItem(String request, String response) {
         String hash = null;
 
@@ -152,6 +170,7 @@ public class ResponseCacheImpl
      * (non-Javadoc)
      * @see org.fcrepo.server.security.xacml.pep.ResponseCache#getCacheItem(java.lang.String)
      */
+    @Override
     public String getCacheItem(String request) {
         String hash = null;
         String response = null;
@@ -207,6 +226,7 @@ public class ResponseCacheImpl
      * (non-Javadoc)
      * @see org.fcrepo.server.security.xacml.pep.ResponseCache#invalidate()
      */
+    @Override
     public void invalidate() {
         // thread-safety on cache operations
         synchronized (requestCache) {
@@ -228,7 +248,7 @@ public class ResponseCacheImpl
     private String makeHash(String request) throws CacheException {
         RequestCtx reqCtx = null;
         try {
-            reqCtx = contextUtil.makeRequestCtx(request);
+            reqCtx = m_contextUtil.makeRequestCtx(request);
         } catch (MelcoeXacmlException pe) {
             throw new CacheException("Error converting request", pe);
         }

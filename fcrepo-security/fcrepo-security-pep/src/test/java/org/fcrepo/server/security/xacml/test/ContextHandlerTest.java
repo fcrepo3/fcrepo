@@ -20,22 +20,20 @@ package org.fcrepo.server.security.xacml.test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.pep.ContextHandler;
+import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
+import org.fcrepo.server.utilities.CXFUtility;
+
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
-
-import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.security.xacml.pep.ContextHandler;
-import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
-import org.fcrepo.server.utilities.CXFUtility;
 
 
 /**
@@ -49,7 +47,7 @@ public class ContextHandlerTest {
      * @param args
      */
     public static void main(String[] args) throws Exception {
-        ctx = ContextHandlerImpl.getInstance();
+        ctx = new ContextHandlerImpl();
         RequestCtx req;
 
         long a, b;

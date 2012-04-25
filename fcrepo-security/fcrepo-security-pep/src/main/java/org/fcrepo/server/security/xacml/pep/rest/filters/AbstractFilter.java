@@ -20,7 +20,6 @@ package org.fcrepo.server.security.xacml.pep.rest.filters;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,15 +29,14 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
-import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.xacml.attr.AttributeValue;
+import com.sun.xacml.attr.StringAttribute;
 
 
 /**
@@ -53,7 +51,7 @@ public abstract class AbstractFilter
     private static final Logger logger =
             LoggerFactory.getLogger(AbstractFilter.class);
 
-    private static ContextHandler contextHandlerImpl;
+    private ContextHandler m_contextHandler;
 
     protected static final String XACML_RESOURCE_ID =
             "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
@@ -71,14 +69,17 @@ public abstract class AbstractFilter
      */
     public AbstractFilter()
             throws PEPException {
-        contextHandlerImpl = ContextHandlerImpl.getInstance();
+    }
+
+    public void setContextHandler(ContextHandler contextHandler) {
+        m_contextHandler = contextHandler;
     }
 
     /**
      * @return the ContextHandler instance
      */
     public ContextHandler getContextHandler() {
-        return contextHandlerImpl;
+        return m_contextHandler;
     }
 
     /**

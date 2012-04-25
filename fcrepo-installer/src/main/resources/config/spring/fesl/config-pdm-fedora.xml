@@ -9,7 +9,9 @@
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util-2.5.xsd">
-<bean id="FedoraPolicyStore" class="org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore">
+<bean id="FedoraPolicyStore"
+      class="org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore" init-method="init">
+  <constructor-arg ref="org.fcrepo.server.Server" />
   <property name="pidNamespace" value="policy" />
   <property name="datastreamControlGroup" value="M" />
   <!-- content model (URI form) -->

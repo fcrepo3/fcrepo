@@ -21,15 +21,14 @@ package org.fcrepo.server.security.xacml.pep;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
-
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
+import com.sun.xacml.ctx.RequestCtx;
+import com.sun.xacml.ctx.ResponseCtx;
+import com.sun.xacml.ctx.Result;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -40,7 +39,7 @@ public class EvaluationEngineImpl
     private static final Logger logger =
             LoggerFactory.getLogger(EvaluationEngineImpl.class);
 
-    private final ContextUtil contextUtil = ContextUtil.getInstance();
+    private ContextUtil m_contextUtil = null;
 
     private PDPClient client = null;
 
@@ -51,16 +50,17 @@ public class EvaluationEngineImpl
      * @see
      * org.fcrepo.server.security.xacml.pep.EvaluationEngine#evaluate(com.sun.xacml.ctx.RequestCtx)
      */
+    @Override
     public ResponseCtx evaluate(RequestCtx reqCtx) throws PEPException {
         if (logger.isDebugEnabled()) {
             logger.debug("evaluating RequestCtx request");
         }
 
-        String request = contextUtil.makeRequestCtx(reqCtx);
+        String request = m_contextUtil.makeRequestCtx(reqCtx);
         String response = evaluate(request);
         ResponseCtx resCtx;
         try {
-            resCtx = contextUtil.makeResponseCtx(response);
+            resCtx = m_contextUtil.makeResponseCtx(response);
         } catch (MelcoeXacmlException e) {
             throw new PEPException(e);
         }
@@ -71,6 +71,7 @@ public class EvaluationEngineImpl
      * (non-Javadoc)
      * @see org.fcrepo.server.security.xacml.pep.EvaluationEngine#evaluate(java.lang.String)
      */
+    @Override
     public String evaluate(String request) throws PEPException {
         if (logger.isDebugEnabled()) {
             logger.debug("evaluating String request");
@@ -84,6 +85,7 @@ public class EvaluationEngineImpl
      * (non-Javadoc)
      * @see org.fcrepo.server.security.xacml.pep.EvaluationEngine#evaluate(java.lang.String[])
      */
+    @Override
     public String evaluate(String[] requests) throws PEPException {
         if (logger.isDebugEnabled()) {
             logger.debug("evaluating array of String requests");
@@ -126,7 +128,7 @@ public class EvaluationEngineImpl
 
             ResponseCtx resCtx;
             try {
-                resCtx = contextUtil.makeResponseCtx(response);
+                resCtx = m_contextUtil.makeResponseCtx(response);
             } catch (MelcoeXacmlException e) {
                 throw new PEPException(e);
             }
@@ -139,13 +141,14 @@ public class EvaluationEngineImpl
 
         ResponseCtx resultCtx = new ResponseCtx(finalResults);
 
-        return contextUtil.makeResponseCtx(resultCtx);
+        return m_contextUtil.makeResponseCtx(resultCtx);
     }
 
     /*
      * (non-Javadoc)
      * @see org.fcrepo.server.security.xacml.pep.EvaluationEngine#getClient()
      */
+    @Override
     public PDPClient getClient() {
         return client;
     }
@@ -155,6 +158,7 @@ public class EvaluationEngineImpl
      * @see
      * org.fcrepo.server.security.xacml.pep.EvaluationEngine#setClient(org.fcrepo.server.security.xacml.pep.PEPClient)
      */
+    @Override
     public void setClient(PDPClient client) {
         this.client = client;
     }
@@ -163,6 +167,7 @@ public class EvaluationEngineImpl
      * (non-Javadoc)
      * @see org.fcrepo.server.security.xacml.pep.EvaluationEngine#getResponseCache()
      */
+    @Override
     public ResponseCache getResponseCache() {
         return responseCache;
     }
@@ -173,7 +178,12 @@ public class EvaluationEngineImpl
      * org.fcrepo.server.security.xacml.pep.EvaluationEngine#setResponseCache(org.fcrepo.server.security.xacml.pep
      * .ResponseCache)
      */
+    @Override
     public void setResponseCache(ResponseCache responseCache) {
         this.responseCache = responseCache;
+    }
+
+    public void setContextUtil(ContextUtil contextUtil) {
+        m_contextUtil = contextUtil;
     }
 }

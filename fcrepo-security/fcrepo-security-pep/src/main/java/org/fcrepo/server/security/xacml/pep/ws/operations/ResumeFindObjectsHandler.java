@@ -21,32 +21,28 @@ package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import com.sun.xacml.ctx.RequestCtx;
-
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.pep.ContextHandler;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.LogUtil;
+import com.sun.xacml.ctx.RequestCtx;
 
 
 /**
  * @author nishen@melcoe.mq.edu.au
  */
 public class ResumeFindObjectsHandler
-        extends AbstractOperationHandler {
+        extends FieldSearchResultHandler {
 
     private static final Logger logger =
             LoggerFactory.getLogger(ResumeFindObjectsHandler.class);
 
-    private FieldSearchResultHandler resultHandler = null;
-
-    public ResumeFindObjectsHandler()
+    public ResumeFindObjectsHandler(ContextHandler contextHandler)
             throws PEPException {
-        super();
-        resultHandler = new FieldSearchResultHandler();
+        super(contextHandler);
     }
 
     @Override
@@ -55,7 +51,7 @@ public class ResumeFindObjectsHandler
         if (logger.isDebugEnabled()) {
             logger.debug("ResumeFindObjectsHandler/handleResponse!");
         }
-        return resultHandler.handleResponse(context);
+        return super.handleResponse(context);
     }
 
     @Override
@@ -68,6 +64,6 @@ public class ResumeFindObjectsHandler
         LogUtil.statLog(getUser(context), Constants.ACTION.FIND_OBJECTS
                 .getURI().toASCIIString(), "FedoraRepository", null);
 
-        return resultHandler.handleRequest(context);
+        return super.handleRequest(context);
     }
 }

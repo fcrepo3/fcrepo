@@ -223,13 +223,4 @@
     </property>
   </bean>
 
-  <!-- FeSL Authz bean (REST) -->
-  <bean id="PEPFilter" class="org.fcrepo.server.security.xacml.pep.rest.PEP"
-    lazy-init="true" init-method="init" />
-
-  <!-- FeSL Authz bean (SOAP) -->
-  <bean id="PEP" class="org.fcrepo.server.security.xacml.pep.ws.PEP">
-    <constructor-arg type="boolean" value="${security.fesl.authZ.enabled}" />
-  </bean>
-
 </beans>

@@ -9,8 +9,8 @@
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util-2.5.xsd">
-	<bean id="FedoraRIAttributeFinder" name="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder">
-	  <constructor-arg ref="RelationshipResolver" />
+	<bean id="FedoraRIAttributeFinder" class="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder">
+	  <constructor-arg ref="org.fcrepo.server.security.xacml.util.RelationshipResolver" />
 	<!--  the resolver tag appears to be a dead configuration -->
 	<!-- <resolver url="http://localhost:5743/fedora/melcoerisearch" username="" password="" /> -->
 
@@ -19,25 +19,25 @@
         <map>
     <!-- object and datastream properties -->
           <entry key="info:fedora/fedora-system:def/view#mimeType">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute" />
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute" />
           </entry>
           <entry key="info:fedora/fedora-system:def/model#ownerId">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute" />
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute" />
           </entry>
 	      <entry key="info:fedora/fedora-system:def/model#state">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute" />
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute" />
 		  </entry>
 		  <entry key="info:fedora/fedora-system:def/model#createdDate">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute" />
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute" />
 		  </entry>
 		  <entry key="info:fedora/fedora-system:def/model#label">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute" />
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute" />
 		  </entry>
 		  <entry key="http://www.w3.org/1999/02/22-rdf-syntax-ns#type">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute" />
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute" />
 		  </entry>   
           <entry key="http://purl.org/dc/elements/1.1/subject">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute">
               <constructor-arg>
                 <map>
       <!-- specify either "object" to retrieve attributes for the object as a whole (irrespective of datastream etc being accessed)
@@ -49,7 +49,7 @@
           </entry>
           <!-- example attributes using simple object and datastream relationships with a specified xacml attribute id -->
           <entry key="http://www.example.org/fedora/xacml/attributes/resource#rel-subject">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute">
               <constructor-arg>
                 <map>
                   <entry key="relationship" value="http://purl.org/dc/elements/1.1/subject"/>
@@ -59,7 +59,7 @@
             </bean>
           </entry>
           <entry key="http://www.example.org/fedora/xacml/attributes/resource#rel-state">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute">
               <constructor-arg>
                 <map>
                   <entry key="relationship" value="info:fedora/fedora-system:def/model#state"/>
@@ -69,7 +69,7 @@
           </entry>
           <!-- example TQL query-based attributes -->
           <entry key="http://www.example.org/fedora/xacml/attributes/resource#itql-subject">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute">
               <constructor-arg>
                 <map>
                   <entry key="queryLang" value="itql"/>
@@ -82,7 +82,7 @@
           </entry>
         
           <entry key="http://www.example.org/fedora/xacml/attributes/resource#itql-state">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute">
               <constructor-arg>
                 <map>
                    <entry key="queryLang" value="itql"/>
@@ -95,7 +95,7 @@
           </entry>
           <!-- example SPARQL query-based attributes -->
           <entry key="http://www.example.org/fedora/xacml/attributes/resource#sparql-subject">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute">
               <constructor-arg>
                 <map>
                   <entry key="queryLang" value="sparql"/>
@@ -107,7 +107,7 @@
             </bean>
           </entry>
           <entry key="http://www.example.org/fedora/xacml/attributes/resource#sparql-state">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute">
               <constructor-arg>
                 <map>
                   <entry key="queryLang" value="sparql"/>
@@ -120,7 +120,7 @@
           </entry>
     <!-- example SPO query-based attributes -->
           <entry key="http://www.example.org/fedora/xacml/attributes/resource#spo-subject">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute">
               <constructor-arg>
                 <map>
                   <entry key="queryLang" value="spo"/>
@@ -133,7 +133,7 @@
             </bean>
           </entry>
           <entry key="http://www.example.org/fedora/xacml/attributes/resource#spo-state">
-            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+            <bean class="org.fcrepo.server.security.xacml.util.Attribute">
               <constructor-arg>
                 <map>
                   <entry key="queryLang" value="spo"/>

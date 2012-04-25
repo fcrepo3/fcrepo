@@ -31,7 +31,6 @@ import java.util.Scanner;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.RIRelationshipResolver;
 import org.fcrepo.server.security.xacml.util.RelationshipResolver;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,7 @@ public class TestXacmlRequest {
     private static ContextHandler contextHandler = null;
 
     private static ContextUtil contextUtil = null;
-    
+
     private static RelationshipResolver RELATIONSHIP_RESOLVER = null;
     static {
         try{
@@ -61,7 +60,7 @@ public class TestXacmlRequest {
 
     public static void main(String[] args) throws Exception {
         contextHandler = new ContextHandler();
-        contextUtil = ContextUtil.getInstance();
+        contextUtil = new ContextUtil();
         StringBuilder request = new StringBuilder();
         if (args.length > 0) {
             File reqFile = new File(args[0]);

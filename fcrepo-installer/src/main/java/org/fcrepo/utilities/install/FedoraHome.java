@@ -5,11 +5,22 @@
 
 package org.fcrepo.utilities.install;
 
-import java.io.*;
-
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
@@ -21,7 +32,6 @@ import org.fcrepo.server.security.BESecurityConfig;
 import org.fcrepo.server.security.DefaultRoleConfig;
 import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
 import org.fcrepo.server.security.servletfilters.xmluserfile.User;
-
 import org.fcrepo.utilities.ExecUtility;
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.Zip;
@@ -302,7 +312,7 @@ public class FedoraHome {
 
         springProps.put("security.fesl.authN.jaas.apia.enabled", _opts
                 .getValue(InstallOptions.APIA_AUTH_REQUIRED, "false"));
-        
+
         springProps.put("security.fesl.authZ.enabled", _opts
                         .getValue(InstallOptions.FESL_AUTHZ_ENABLED, "false"));
 
@@ -375,6 +385,7 @@ public class FedoraHome {
             filters.append(",PEPFilter");
             filters_apia.append(",PEPFilter");
             filters_rest.append(",PEPFilter");
+            copyFESLConfigs();
         }
 
         FileInputStream springConfig = null;
@@ -404,6 +415,34 @@ public class FedoraHome {
             IOUtils.closeQuietly(springConfig);
             IOUtils.closeQuietly(writer);
             throw new InstallationFailedException(e.getMessage(), e);
+        }
+    }
+
+    private void copyFESLConfigs() throws InstallationFailedException {
+        File feslDir =
+                new File(_installDir,
+                         "server/config/spring/fesl");
+        File webDir =
+                new File(_installDir,
+                         "server/config/spring/web");
+        for (File beanDef:feslDir.listFiles()){
+            if (beanDef.isFile()){
+                FileReader reader = null;
+                FileWriter writer = null;
+                try {
+                    File copy = new File(webDir, beanDef.getName());
+                    reader = new FileReader(beanDef);
+                    writer = new FileWriter(copy);
+                    IOUtils.copy(reader, writer);
+                    writer.flush();
+                } catch (Exception e) {
+                    throw new InstallationFailedException(e.getMessage(), e);
+                }
+                finally {
+                    IOUtils.closeQuietly(writer);
+                    IOUtils.closeQuietly(reader);
+                }
+            }
         }
     }
 

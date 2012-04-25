@@ -12,7 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
 import org.fcrepo.server.security.xacml.util.AttributeFinderConfig;
-import org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator;
+import org.fcrepo.server.security.xacml.util.Designator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -52,7 +52,7 @@ public class AttributeFinderConfigUtil {
                     String attributeName = attribute.getAttributes().getNamedItem("name").getNodeValue();
                     if (attributeName == null)
                         throw new AttributeFinderException("Invalid attribute finder config, missing name attribute");
-                    org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute attr =
+                    org.fcrepo.server.security.xacml.util.Attribute attr =
                             des.get(attributeName);
                     if (attr == null) {
                         attr = des.put(attributeName);

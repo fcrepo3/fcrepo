@@ -9,6 +9,11 @@
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+  <bean id="org.fcrepo.server.security.xacml.util.ContextUtil"
+        class="org.fcrepo.server.security.xacml.util.ContextUtil">
+    <property name="actionMap" ref="actionAttributeMapping" />
+  </bean>
+        
   <util:map id="actionAttributeMapping">
 	<entry key="urn:fedora:names:fedora:2.1:action:id-addDatastream" value="create" />
 	<entry key="urn:fedora:names:fedora:2.1:action:id-addDisseminator" value="create" />

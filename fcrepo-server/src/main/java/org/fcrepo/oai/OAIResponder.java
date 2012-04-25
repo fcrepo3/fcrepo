@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.oai;
@@ -9,10 +9,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -22,26 +20,29 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.security.Authorization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 /**
  * OAIResponder.
- * 
+ *
  * @author Chris Wilper
  */
 public class OAIResponder
         implements Constants {
 
+    private static final Logger logger = LoggerFactory.getLogger(OAIResponder.class);
+
     private final OAIProvider m_provider;
-    
+
     private DateGranularitySupport m_granularity;
 
-    private Authorization m_authorization;
+    private final Authorization m_authorization;
 
     public OAIResponder(OAIProvider provider, Authorization authorization) {
         m_provider = provider;
@@ -50,7 +51,11 @@ public class OAIResponder
 
     public void respond(Context context, Map args, OutputStream outStream)
             throws RepositoryException, AuthzException {
-        m_authorization.enforceOAIRespond(context);
+        if (m_authorization != null) {
+            m_authorization.enforceOAIRespond(context);
+        } else {
+            logger.warn("Serving OAIResponses without Authorization module");
+        }
         m_granularity = m_provider.getDateGranularitySupport();
         PrintWriter out = null;
         try {
@@ -601,7 +606,7 @@ public class OAIResponder
 
     /**
      * Returns an XML-appropriate encoding of the given String.
-     * 
+     *
      * @param in
      *        The String to encode.
      * @return A new, encoded String.
@@ -615,7 +620,7 @@ public class OAIResponder
     /**
      * Appends an XML-appropriate encoding of the given String to the given
      * StringBuffer.
-     * 
+     *
      * @param in
      *        The String to encode.
      * @param buf
@@ -630,7 +635,7 @@ public class OAIResponder
     /**
      * Appends an XML-appropriate encoding of the given range of characters to
      * the given StringBuffer.
-     * 
+     *
      * @param in
      *        The char buffer to read from.
      * @param start
@@ -649,7 +654,7 @@ public class OAIResponder
     /**
      * Appends an XML-appropriate encoding of the given character to the given
      * StringBuffer.
-     * 
+     *
      * @param in
      *        The character.
      * @param out

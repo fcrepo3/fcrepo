@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:sec="http://www.springframework.org/schema/security"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:fedora-types-mtom="http://fedora-commons.org/2011/07/definitions/types/"
+  xmlns:fedora-types="http://www.fedora.info/definitions/1/0/types/"
+  xmlns:fedora-api-mtom="http://fedora-commons.org/2011/07/definitions/api/"
+  xmlns:fedora-api="http://www.fedora.info/definitions/1/0/api/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:cxf="http://cxf.apache.org/core"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+           http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd 
+           http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+
+  <context:annotation-config />
+  <jaxws:endpoint id="managementMTOM"
+    implementor="#FedoraAPIMMTOMImpl"
+    serviceName="fedora-types-mtom:Fedora-API-M-MTOM-Service"
+    endpointName="fedora-types-mtom:Fedora-API-M-MTOM-Port-SOAPHTTP"
+    wsdlLocation="${fedora.home}/server/management/Fedora-API-M-MTOM.wsdl"
+    address="/managementMTOM">
+    <jaxws:properties>
+      <entry key="mtom-enabled" value="true" />
+      <entry key="schema-validation-enabled" value="${ws.soap.validation}" />
+      <entry key="exceptionMessageCauseEnabled" value="true" />
+    </jaxws:properties>
+  </jaxws:endpoint>
+
+  <jaxws:endpoint id="management"
+    implementor="#FedoraAPIMImpl"
+    serviceName="fedora-types:Fedora-API-M-Service" endpointName="fedora-types:Fedora-API-M-Port-SOAPHTTP"
+    wsdlLocation="${fedora.home}/server/management/Fedora-API-M.wsdl"
+    address="/management">
+    <jaxws:properties>
+      <entry key="schema-validation-enabled" value="${ws.soap.validation}" />
+      <entry key="exceptionMessageCauseEnabled" value="true" />
+    </jaxws:properties>
+  </jaxws:endpoint>
+
+  <jaxws:endpoint id="accessMTOM"
+    implementor="#FedoraAPIAMTOMImpl"
+    serviceName="fedora-types-mtom:Fedora-API-A-MTOM-Service"
+    endpointName="fedora-types-mtom:Fedora-API-A-MTOM-Port-SOAPHTTP"
+    wsdlLocation="${fedora.home}/server/access/Fedora-API-A-MTOM.wsdl"
+    address="/accessMTOM">
+    <jaxws:properties>
+      <entry key="mtom-enabled" value="true" />
+      <entry key="schema-validation-enabled" value="${ws.soap.validation}" />
+      <entry key="exceptionMessageCauseEnabled" value="true" />
+    </jaxws:properties>
+  </jaxws:endpoint>
+
+  <jaxws:endpoint id="access"
+    implementor="#FedoraAPIAImpl" serviceName="fedora-types:Fedora-API-A-Service"
+    endpointName="fedora-types:Fedora-API-A-Port-SOAPHTTP" wsdlLocation="${fedora.home}/server/access/Fedora-API-A.wsdl"
+    address="/access">
+    <jaxws:properties>
+      <entry key="schema-validation-enabled" value="${ws.soap.validation}" />
+      <entry key="exceptionMessageCauseEnabled" value="true" />
+    </jaxws:properties>
+  </jaxws:endpoint>
+
+  <!-- <cxf:bus> <cxf:inInterceptors> <ref bean="PEP" /> </cxf:inInterceptors> 
+    <cxf:outInterceptors> <ref bean="PEP" /> </cxf:outInterceptors> </cxf:bus> -->
+
+  <!-- <jaxws:endpoint id="managementMTOMS" implementor="org.fcrepo.server.management2.FedoraAPIMMTOMImpl" 
+    address="/managementMTOM"> <jaxws:properties> <entry key="mtom-enabled" value="true" 
+    /> </jaxws:properties> <jaxws:features> <bean class="org.apache.cxf.feature.LoggingFeature" 
+    /> </jaxws:features> </jaxws:endpoint> -->
+
+  <!-- <http:destination name="{http://apache.org/hello_world}GreeterImplPort.http-destination"> 
+    </http:destination> <httpj:engine-factory bus="cxf"> <httpj:engine port="8443"> 
+    <httpj:tlsServerParameters> <sec:keyManagers keyPassword="password"> <sec:keyStore 
+    type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Tarpin.jks"/> 
+    </sec:keyManagers> <sec:trustManagers> <sec:keyStore type="JKS" password="password" 
+    file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/> 
+    </sec:trustManagers> <sec:cipherSuitesFilter> <sec:include>.*_EXPORT_.*</sec:include> 
+    <sec:include>.*_EXPORT1024_.*</sec:include> <sec:include>.*_WITH_DES_.*</sec:include> 
+    <sec:include>.*_WITH_NULL_.*</sec:include> <sec:exclude>.*_DH_anon_.*</sec:exclude> 
+    </sec:cipherSuitesFilter> <sec:clientAuthentication want="true" required="true"/> 
+    </httpj:tlsServerParameters> </httpj:engine> </httpj:engine-factory> -->
+</beans>

@@ -18,47 +18,39 @@
 
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import java.math.BigInteger;
+import java.util.List;
 
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import com.sun.xacml.ctx.RequestCtx;
-
 import org.apache.cxf.binding.soap.SoapFault;
-
+import org.fcrepo.server.security.xacml.pep.ContextHandler;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.LogUtil;
-import org.fcrepo.server.types.gen.FieldSearchQuery;
+import com.sun.xacml.ctx.RequestCtx;
 
 /**
  * @author nishen@melcoe.mq.edu.au
  */
 public class FindObjectsHandler
-        extends AbstractOperationHandler {
+        extends FieldSearchResultHandler {
 
     private static final Logger logger =
             LoggerFactory.getLogger(FindObjectsHandler.class);
 
-    private FieldSearchResultHandler resultHandler = null;
-
-    public FindObjectsHandler()
+    public FindObjectsHandler(ContextHandler contextHandler)
             throws PEPException {
-        super();
-        resultHandler = new FieldSearchResultHandler();
+        super(contextHandler);
     }
 
     @Override
     public RequestCtx handleResponse(SOAPMessageContext context)
             throws OperationHandlerException {
         logger.debug("FindObjectsHandler/handleResponse!");
-        return resultHandler.handleResponse(context);
+        return super.handleResponse(context);
     }
 
     @Override
@@ -83,10 +75,7 @@ public class FindObjectsHandler
             if (!resultFieldsList.contains("pid")) {
                 resultFieldsList.add("pid");
             }
-            String[] newResultFields =
-                    resultFieldsList
-                            .toArray(new String[resultFieldsList.size()]);
-// todo: fix
+            // todo: fix
             // barmintor: How? Why would we set defaults here rather than in the actual module?
 
 //            List<RPCParam> params = new ArrayList<RPCParam>();
@@ -111,6 +100,6 @@ public class FindObjectsHandler
             throw new OperationHandlerException("Error filtering objects.", t);
         }
 
-        return resultHandler.handleRequest(context);
+        return super.handleRequest(context);
     }
 }

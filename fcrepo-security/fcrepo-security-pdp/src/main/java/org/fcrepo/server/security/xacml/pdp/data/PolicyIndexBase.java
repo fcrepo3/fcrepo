@@ -14,6 +14,8 @@ import org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader;
 import org.fcrepo.server.security.xacml.util.AttributeBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
@@ -25,9 +27,6 @@ import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.BagAttribute;
 import com.sun.xacml.cond.EvaluationResult;
 import com.sun.xacml.finder.PolicyFinder;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 
 /**
@@ -78,20 +77,20 @@ implements PolicyIndex {
             indexMap.put(s, new HashMap<String, String>());
         }
     }
-    
-    public void setSubjectAttributeMap(Map<String, String> attributeMap) {
+
+    public void setSubjectAttributes(Map<String, String> attributeMap) {
         setAttributeMap(SUBJECT_KEY, attributeMap);
     }
 
-    public void setResourceAttributeMap(Map<String, String> attributeMap) {
+    public void setResourceAttributes(Map<String, String> attributeMap) {
         setAttributeMap(RESOURCE_KEY, attributeMap);
     }
 
-    public void setActionAttributeMap(Map<String, String> attributeMap) {
+    public void setActionAttributes(Map<String, String> attributeMap) {
         setAttributeMap(ACTION_KEY, attributeMap);
     }
 
-    public void setEnvironmentAttributeMap(Map<String, String> attributeMap) {
+    public void setEnvironmentAttributes(Map<String, String> attributeMap) {
         setAttributeMap(ENVIRONMENT_KEY, attributeMap);
     }
 
@@ -270,7 +269,7 @@ implements PolicyIndex {
 
         return attributeMap;
     }
-    
+
     /**
      * A private method that handles reading the policy and creates the correct
      * kind of AbstractPolicy.

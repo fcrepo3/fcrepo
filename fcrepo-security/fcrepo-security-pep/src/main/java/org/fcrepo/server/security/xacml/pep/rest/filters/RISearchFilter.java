@@ -23,9 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.URI;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +34,6 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
@@ -48,6 +45,19 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.fcrepo.server.security.xacml.util.RelationshipResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.tidy.Tidy;
+
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
@@ -56,23 +66,6 @@ import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Status;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.w3c.tidy.Tidy;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
-import org.fcrepo.server.security.xacml.util.LogUtil;
-import org.fcrepo.server.security.xacml.util.RelationshipResolver;
 
 
 /**
@@ -96,7 +89,7 @@ public class RISearchFilter
     private ContextUtil m_contextUtil = null;
 
     private Tidy m_tidy = null;
-    
+
     private RelationshipResolver m_relationshipResolver;
 
     /**
@@ -107,7 +100,6 @@ public class RISearchFilter
     public RISearchFilter()
             throws PEPException {
         super();
-        m_contextUtil = ContextUtil.getInstance();
 
         m_tidy = new Tidy();
         m_tidy.setShowWarnings(false);
@@ -151,12 +143,17 @@ public class RISearchFilter
         }
     }
 
+    public void setContextUtil(ContextUtil contextUtil) {
+        m_contextUtil = contextUtil;
+    }
+
     /*
      * (non-Javadoc)
      * @see
      * org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter#handleRequest(javax.servlet
      * .http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
+    @Override
     public RequestCtx handleRequest(HttpServletRequest request,
                                     HttpServletResponse response)
             throws IOException, ServletException {
@@ -175,6 +172,7 @@ public class RISearchFilter
      * org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter#handleResponse(javax.servlet
      * .http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
+    @Override
     public RequestCtx handleResponse(HttpServletRequest request,
                                      HttpServletResponse response)
             throws IOException, ServletException {

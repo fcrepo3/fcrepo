@@ -26,6 +26,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
@@ -46,9 +47,9 @@ public class GetDatastreamsHandler
     private static final Logger logger =
             LoggerFactory.getLogger(GetDatastreamsHandler.class);
 
-    public GetDatastreamsHandler()
+    public GetDatastreamsHandler(ContextHandler contextHandler)
             throws PEPException {
-        super();
+        super(contextHandler);
     }
 
     @Override

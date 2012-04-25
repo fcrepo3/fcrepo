@@ -2,13 +2,25 @@
 package org.fcrepo.server.security.xacml.pdp.finder.attribute;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.fcrepo.common.rdf.SimpleURIReference;
+import org.fcrepo.server.Context;
+import org.fcrepo.server.ReadOnlyContext;
+import org.fcrepo.server.security.AttributeFinderModule;
+import org.fcrepo.server.security.PolicyFinderModule;
+import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderException;
+import org.fcrepo.server.storage.DOManager;
+import org.fcrepo.server.storage.DOReader;
+import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.jrdf.graph.PredicateNode;
+import org.jrdf.graph.SubjectNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.attr.AttributeDesignator;
@@ -18,63 +30,34 @@ import com.sun.xacml.attr.BagAttribute;
 import com.sun.xacml.attr.StandardAttributeFactory;
 import com.sun.xacml.cond.EvaluationResult;
 
-import org.jrdf.graph.PredicateNode;
-import org.jrdf.graph.SubjectNode;
-import org.jrdf.graph.Triple;
-
-import org.trippi.TripleIterator;
-import org.trippi.TrippiException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.rdf.SimpleURIReference;
-
-import org.fcrepo.server.Context;
-import org.fcrepo.server.ReadOnlyContext;
-import org.fcrepo.server.errors.ServerException;
-import org.fcrepo.server.resourceIndex.ResourceIndex;
-import org.fcrepo.server.security.AttributeFinderModule;
-import org.fcrepo.server.security.PolicyFinderModule;
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderConfigUtil;
-import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderException;
-import org.fcrepo.server.security.xacml.util.AttributeFinderConfig;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
-import org.fcrepo.server.security.xacml.util.RelationshipResolver;
-import org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator;
-import org.fcrepo.server.storage.DOManager;
-import org.fcrepo.server.storage.DOReader;
-import org.fcrepo.server.storage.types.RelationshipTuple;
-
 public class DOTriplesAttributeFinder
         extends AttributeFinderModule {
 
     private static final Logger logger =
             LoggerFactory.getLogger(DOTriplesAttributeFinder.class);
-    
+
     private static final Set<String> EMPTY = Collections.emptySet();
 
-    private AttributeFactory m_attributeFactory = StandardAttributeFactory.getFactory();
+    private final AttributeFactory m_attributeFactory = StandardAttributeFactory.getFactory();
 
-    private Map<Integer,Set<String>> m_attributes = new HashMap<Integer,Set<String>>();
-    
-    private DOManager m_doManager;
-    
+    private final Map<Integer,Set<String>> m_attributes = new HashMap<Integer,Set<String>>();
+
+    private final DOManager m_doManager;
+
     private Context fedoraCtx;
 
     public DOTriplesAttributeFinder(DOManager doManager) {
         m_doManager = doManager;
     }
-    
+
     public void setActionAttributes(Set<String> attributes){
         m_attributes.put(AttributeDesignator.ACTION_TARGET,attributes);
     }
-    
+
     public void setEnvironmentAttributes(Set<String> attributes){
         m_attributes.put(AttributeDesignator.ENVIRONMENT_TARGET,attributes);
     }
-    
+
     public void setResourceAttributes(Set<String> attributes){
         m_attributes.put(AttributeDesignator.RESOURCE_TARGET,attributes);
     }
@@ -302,9 +285,9 @@ public class DOTriplesAttributeFinder
                                          URI resourceCategory,
                                          EvaluationCtx context) {
                 return null;
-            
+
     }
-    
+
     private Context getContext() throws Exception {
         if (fedoraCtx != null) {
             return fedoraCtx;

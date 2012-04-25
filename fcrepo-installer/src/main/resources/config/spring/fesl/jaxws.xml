@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:sec="http://www.springframework.org/schema/security"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:fedora-types-mtom="http://fedora-commons.org/2011/07/definitions/types/"
+  xmlns:fedora-types="http://www.fedora.info/definitions/1/0/types/"
+  xmlns:fedora-api-mtom="http://fedora-commons.org/2011/07/definitions/api/"
+  xmlns:fedora-api="http://www.fedora.info/definitions/1/0/api/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:cxf="http://cxf.apache.org/core"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+           http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd 
+           http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+  <context:annotation-config />
+  <!-- FeSL Authz bean (SOAP) -->
+  <bean id="org.fcrepo.server.security.xacml.pep.ws.PEP" class="org.fcrepo.server.security.xacml.pep.ws.PEP">
+    <constructor-arg type="boolean" value="${security.fesl.authZ.enabled}" />
+    <property name="serviceHandlers">
+      <map>
+        <entry key="Fedora-API-M-Service" value-ref="handlers-ws-Fedora-API-M-Service" />
+        <entry key="Fedora-API-M-MTOM-Service" value-ref="handlers-ws-Fedora-API-M-Service" />
+        <entry key="Fedora-API-A-Service" value-ref="handlers-ws-Fedora-API-A-Service" />
+        <entry key="Fedora-API-A-MTOM-Service" value-ref="handlers-ws-Fedora-API-A-Service" />
+      </map>
+    </property>
+    <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+  </bean>
+  
+  	<!--
+		The next sections are WS based filters. Each service has a set of operations. Each operation is mapped to
+		a handler class. The handler class is responsible for generating XACML requests or performing other
+		tasks such as filtering for searches.
+	-->
+	<util:map id="handlers-ws-Fedora-API-A-Service">
+		<entry key="describeRepository">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeRepositoryHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="getObjectProfile">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectProfileHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="listDatastreams">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.ListDatastreamsHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+            <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
+		  </bean>
+		</entry>
+		<entry key="listMethods">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.ListMethodsHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="getDatastreamDissemination">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamDisseminationHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="getDissemination">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDisseminationHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="findObjects">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.FindObjectsHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+	        <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
+		  </bean>
+		</entry>
+		<entry key="resumeFindObjects">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.ResumeFindObjectsHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+	        <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
+		  </bean>
+		</entry>
+		<entry key="getObjectHistory">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectHistoryHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+	</util:map>
+	<util:map id="handlers-ws-Fedora-API-M-Service">
+		<entry key="addDatastream">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.AddDatastreamHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="describeUser">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.DescribeUserHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="export">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.ExportHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="compareDatastreamChecksum">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.CompareDatastreamChecksumHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="getDatastream">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="getDatastreamHistory">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamHistoryHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="getDatastreams">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.GetDatastreamsHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="getNextPID">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.GetNextPIDHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="getObjectXML">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.GetObjectXMLHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="ingest">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.IngestHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="modifyDatastreamByReference">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyDatastreamByReferenceHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="modifyDatastreamByValue">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyDatastreamByValueHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="modifyObject">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.ModifyObjectHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="purgeDatastream">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeDatastreamHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="purgeObject">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeObjectHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="setDatastreamState">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.SetDatastreamStateHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="setDatastreamVersionable">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.SetDatastreamVersionableHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="addRelationship">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.AddRelationshipHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="getRelationships">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.GetRelationshipsHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="purgeRelationship">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.PurgeRelationshipHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+		<entry key="validate">
+		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.ValidateHandler">
+		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+		  </bean>
+		</entry>
+	</util:map>
+
+  <jaxws:endpoint id="managementMTOM"
+    implementor="#FedoraAPIMMTOMImpl"
+    serviceName="fedora-types-mtom:Fedora-API-M-MTOM-Service"
+    endpointName="fedora-types-mtom:Fedora-API-M-MTOM-Port-SOAPHTTP"
+    wsdlLocation="${fedora.home}/server/management/Fedora-API-M-MTOM.wsdl"
+    address="/managementMTOM">
+    <jaxws:handlers>
+      <ref bean="org.fcrepo.server.security.xacml.pep.ws.PEP" />
+    </jaxws:handlers>
+    <jaxws:properties>
+      <entry key="mtom-enabled" value="true" />
+      <entry key="schema-validation-enabled" value="${ws.soap.validation}" />
+      <entry key="exceptionMessageCauseEnabled" value="true" />
+    </jaxws:properties>
+  </jaxws:endpoint>
+
+  <jaxws:endpoint id="management"
+    implementor="#FedoraAPIMImpl"
+    serviceName="fedora-types:Fedora-API-M-Service" endpointName="fedora-types:Fedora-API-M-Port-SOAPHTTP"
+    wsdlLocation="${fedora.home}/server/management/Fedora-API-M.wsdl"
+    address="/management">
+    <jaxws:handlers>
+      <ref bean="org.fcrepo.server.security.xacml.pep.ws.PEP" />
+    </jaxws:handlers>
+    <jaxws:properties>
+      <entry key="schema-validation-enabled" value="${ws.soap.validation}" />
+      <entry key="exceptionMessageCauseEnabled" value="true" />
+    </jaxws:properties>
+  </jaxws:endpoint>
+
+  <jaxws:endpoint id="accessMTOM"
+    implementor="#FedoraAPIAMTOMImpl"
+    serviceName="fedora-types-mtom:Fedora-API-A-MTOM-Service"
+    endpointName="fedora-types-mtom:Fedora-API-A-MTOM-Port-SOAPHTTP"
+    wsdlLocation="${fedora.home}/server/access/Fedora-API-A-MTOM.wsdl"
+    address="/accessMTOM">
+    <jaxws:handlers>
+      <ref bean="org.fcrepo.server.security.xacml.pep.ws.PEP" />
+    </jaxws:handlers>
+    <jaxws:properties>
+      <entry key="mtom-enabled" value="true" />
+      <entry key="schema-validation-enabled" value="${ws.soap.validation}" />
+      <entry key="exceptionMessageCauseEnabled" value="true" />
+    </jaxws:properties>
+  </jaxws:endpoint>
+
+  <jaxws:endpoint id="access"
+    implementor="#FedoraAPIAImpl" serviceName="fedora-types:Fedora-API-A-Service"
+    endpointName="fedora-types:Fedora-API-A-Port-SOAPHTTP" wsdlLocation="${fedora.home}/server/access/Fedora-API-A.wsdl"
+    address="/access">
+    <jaxws:handlers>
+      <ref bean="org.fcrepo.server.security.xacml.pep.ws.PEP" />
+    </jaxws:handlers>
+    <jaxws:properties>
+      <entry key="schema-validation-enabled" value="${ws.soap.validation}" />
+      <entry key="exceptionMessageCauseEnabled" value="true" />
+    </jaxws:properties>
+  </jaxws:endpoint>
+
+  <!-- <cxf:bus> <cxf:inInterceptors> <ref bean="PEP" /> </cxf:inInterceptors> 
+    <cxf:outInterceptors> <ref bean="org.fcrepo.server.security.xacml.pep.ws.PEP" /> </cxf:outInterceptors> </cxf:bus> -->
+
+  <!-- <jaxws:endpoint id="managementMTOMS" implementor="org.fcrepo.server.management2.FedoraAPIMMTOMImpl" 
+    address="/managementMTOM"> <jaxws:properties> <entry key="mtom-enabled" value="true" 
+    /> </jaxws:properties> <jaxws:features> <bean class="org.apache.cxf.feature.LoggingFeature" 
+    /> </jaxws:features> </jaxws:endpoint> -->
+
+  <!-- <http:destination name="{http://apache.org/hello_world}GreeterImplPort.http-destination"> 
+    </http:destination> <httpj:engine-factory bus="cxf"> <httpj:engine port="8443"> 
+    <httpj:tlsServerParameters> <sec:keyManagers keyPassword="password"> <sec:keyStore 
+    type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Tarpin.jks"/> 
+    </sec:keyManagers> <sec:trustManagers> <sec:keyStore type="JKS" password="password" 
+    file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/> 
+    </sec:trustManagers> <sec:cipherSuitesFilter> <sec:include>.*_EXPORT_.*</sec:include> 
+    <sec:include>.*_EXPORT1024_.*</sec:include> <sec:include>.*_WITH_DES_.*</sec:include> 
+    <sec:include>.*_WITH_NULL_.*</sec:include> <sec:exclude>.*_DH_anon_.*</sec:exclude> 
+    </sec:cipherSuitesFilter> <sec:clientAuthentication want="true" required="true"/> 
+    </httpj:tlsServerParameters> </httpj:engine> </httpj:engine-factory> -->
+</beans>

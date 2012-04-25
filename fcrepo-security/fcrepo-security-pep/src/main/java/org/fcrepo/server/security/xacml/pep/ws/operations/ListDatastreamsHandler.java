@@ -19,7 +19,6 @@
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 import java.net.URI;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +26,17 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.ws.handler.soap.SOAPMessageContext;
+
+import org.apache.cxf.binding.soap.SoapFault;
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.xacml.pep.ContextHandler;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.fcrepo.server.types.gen.DatastreamDef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
@@ -36,19 +46,6 @@ import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Status;
-
-import org.apache.cxf.binding.soap.SoapFault;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
-import org.fcrepo.server.security.xacml.util.LogUtil;
-import org.fcrepo.server.types.gen.DatastreamDef;
 
 
 /**
@@ -60,11 +57,15 @@ public class ListDatastreamsHandler
     private static final Logger logger =
             LoggerFactory.getLogger(ListDatastreamsHandler.class);
 
-    private final ContextUtil contextUtil = ContextUtil.getInstance();
+    private ContextUtil m_contextUtil = null;
 
-    public ListDatastreamsHandler()
+    public ListDatastreamsHandler(ContextHandler contextHandler)
             throws PEPException {
-        super();
+        super(contextHandler);
+    }
+
+    public void setContextUtil(ContextUtil contextUtil) {
+        m_contextUtil = contextUtil;
     }
 
     @Override
@@ -221,7 +222,7 @@ public class ListDatastreamsHandler
                                               resAttr,
                                               getEnvironment(context));
 
-                requests.add(contextUtil.makeRequestCtx(req));
+                requests.add(m_contextUtil.makeRequestCtx(req));
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 throw new OperationHandlerException(e.getMessage(), e);
@@ -233,7 +234,7 @@ public class ListDatastreamsHandler
                         .toArray(new String[requests.size()]));
         ResponseCtx resCtx;
         try {
-            resCtx = contextUtil.makeResponseCtx(response);
+            resCtx = m_contextUtil.makeResponseCtx(response);
         } catch (MelcoeXacmlException e) {
             throw new PEPException(e);
         }
