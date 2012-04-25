@@ -3,29 +3,22 @@ package org.fcrepo.server.security.xacml.pdp.finder;
 
 import java.io.File;
 import java.io.FileInputStream;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
 import org.fcrepo.server.security.xacml.util.AttributeFinderConfig;
 import org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class AttributeFinderConfigUtil {
 
@@ -97,72 +90,72 @@ public class AttributeFinderConfigUtil {
 
     // the old one
     // FIXME: remove...
-    public static Map<Integer, Set<String>> getAttributeFinderConfigx(String className)
-            throws AttributeFinderException {
-        Map<Integer, Set<String>> attributeSet =
-                new HashMap<Integer, Set<String>>();
-
-        List<String> designatorTable = new ArrayList<String>();
-        designatorTable.add("subject");
-        designatorTable.add("resource");
-        designatorTable.add("action");
-        designatorTable.add("environment");
-
-        try {
-            Element attributeFinder = getAttributeFinder(className);
-            if (attributeFinder == null) {
-                throw new Exception("AttributeFinder not found: " + className);
-            }
-
-            NodeList attributes = attributeFinder.getChildNodes();
-            for (int y = 0; y < attributes.getLength(); y++) {
-                Node n = attributes.item(y);
-                if (n.getNodeType() == Node.ELEMENT_NODE
-                        && "attribute".equals(n.getNodeName())) {
-                    String designator =
-                        n.getAttributes()
-                        .getNamedItem("designator")
-                        .getNodeValue();
-
-                    if (designator == null) {
-                        throw new AttributeFinderException("Bad configuration file. Missing Designator.");
-                    }
-
-                    if (!designatorTable.contains(designator)) {
-                        throw new AttributeFinderException("Incorrect designator type. Must be 'subject', 'resource', 'action' or 'environment'");
-                    }
-
-                    Integer designatorValue =
-                        new Integer(designatorTable
-                                    .indexOf(designator));
-                    String attribute =
-                        n.getAttributes().getNamedItem("name")
-                        .getNodeValue();
-
-                    Set<String> attrs =
-                        attributeSet.get(designatorValue);
-                    if (attrs == null) {
-                        attrs = new HashSet<String>();
-                        attributeSet.put(designatorValue, attrs);
-                    }
-                    attrs.add(attribute);
-                }
-            }
-
-
-        } catch (Exception e) {
-            logger.error("Could not initialise AttributeFinder: [" + className
-                         + "] " + e.getMessage(), e);
-            throw new AttributeFinderException("Could not initialise AttributeFinder: ["
-                                                       + className
-                                                       + "] "
-                                                       + e.getMessage(),
-                                               e);
-        }
-
-        return attributeSet;
-    }
-
+//    public static Map<Integer, Set<String>> getAttributeFinderConfigx(String className)
+//            throws AttributeFinderException {
+//        Map<Integer, Set<String>> attributeSet =
+//                new HashMap<Integer, Set<String>>();
+//
+//        List<String> designatorTable = new ArrayList<String>();
+//        designatorTable.add("subject");
+//        designatorTable.add("resource");
+//        designatorTable.add("action");
+//        designatorTable.add("environment");
+//
+//        try {
+//            Element attributeFinder = getAttributeFinder(className);
+//            if (attributeFinder == null) {
+//                throw new Exception("AttributeFinder not found: " + className);
+//            }
+//
+//            NodeList attributes = attributeFinder.getChildNodes();
+//            for (int y = 0; y < attributes.getLength(); y++) {
+//                Node n = attributes.item(y);
+//                if (n.getNodeType() == Node.ELEMENT_NODE
+//                        && "attribute".equals(n.getNodeName())) {
+//                    String designator =
+//                        n.getAttributes()
+//                        .getNamedItem("designator")
+//                        .getNodeValue();
+//
+//                    if (designator == null) {
+//                        throw new AttributeFinderException("Bad configuration file. Missing Designator.");
+//                    }
+//
+//                    if (!designatorTable.contains(designator)) {
+//                        throw new AttributeFinderException("Incorrect designator type. Must be 'subject', 'resource', 'action' or 'environment'");
+//                    }
+//
+//                    Integer designatorValue =
+//                        new Integer(designatorTable
+//                                    .indexOf(designator));
+//                    String attribute =
+//                        n.getAttributes().getNamedItem("name")
+//                        .getNodeValue();
+//
+//                    Set<String> attrs =
+//                        attributeSet.get(designatorValue);
+//                    if (attrs == null) {
+//                        attrs = new HashSet<String>();
+//                        attributeSet.put(designatorValue, attrs);
+//                    }
+//                    attrs.add(attribute);
+//                }
+//            }
+//
+//
+//        } catch (Exception e) {
+//            logger.error("Could not initialise AttributeFinder: [" + className
+//                         + "] " + e.getMessage(), e);
+//            throw new AttributeFinderException("Could not initialise AttributeFinder: ["
+//                                                       + className
+//                                                       + "] "
+//                                                       + e.getMessage(),
+//                                               e);
+//        }
+//
+//        return attributeSet;
+//    }
+//
     public static Map<String, String> getResolverConfig(String className)
             throws AttributeFinderException {
         Map<String, String> config = new HashMap<String, String>();

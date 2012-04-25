@@ -4,12 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
 import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
@@ -96,12 +94,11 @@ public class PolicyIndexRebuilder
 
     @Override
     public void init() {
-        PolicyIndexFactory factory = new PolicyIndexFactory();
-        try {
-            m_policyIndex = factory.newPolicyIndex();
-        } catch (PolicyIndexException e) {
-            e.printStackTrace();
-        }
+
+    }
+
+    public void setPolicyIndex(PolicyIndex policyIndex) {
+        m_policyIndex = policyIndex;
     }
 
     @Override

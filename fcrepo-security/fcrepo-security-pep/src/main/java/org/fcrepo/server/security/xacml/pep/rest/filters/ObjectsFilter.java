@@ -58,21 +58,17 @@ public class ObjectsFilter
     private static final Logger logger =
             LoggerFactory.getLogger(ObjectsFilter.class);
 
-    private Map<String, RESTFilter> objectsHandlers = null;
+    private Map<String, RESTFilter> m_objectsHandlers = null;
 
     /**
      * Default constructor.
      *
      * @throws PEPException
      */
-    public ObjectsFilter()
+    public ObjectsFilter(Map<String,RESTFilter> objectsHandlers)
             throws PEPException {
         super();
-        try {
-            loadObjectsHandlers();
-        } catch (ServletException se) {
-            throw new PEPException(se);
-        }
+        m_objectsHandlers = objectsHandlers;
     }
 
     /*
@@ -274,7 +270,7 @@ public class ObjectsFilter
         }
 
 
-        RESTFilter handler = objectsHandlers.get(handlerName);
+        RESTFilter handler = m_objectsHandlers.get(handlerName);
         if (handler != null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("activating handler: " + handlerName);
@@ -287,70 +283,4 @@ public class ObjectsFilter
 
     }
 
-    private void loadObjectsHandlers() throws ServletException {
-        objectsHandlers = new HashMap<String, RESTFilter>();
-
-        try {
-            // get the PEP configuration
-            File configPEPFile =
-                    new File(Constants.FEDORA_HOME,
-                             "server/config/config-melcoe-pep.xml");
-            InputStream is = new FileInputStream(configPEPFile);
-            if (is == null) {
-                throw new PEPException("Could not locate config file: config-melcoe-pep.xml");
-            }
-
-            DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = factory.newDocumentBuilder();
-            Document doc = docBuilder.parse(is);
-
-            Node node = doc.getElementsByTagName("handlers-objects").item(0);
-            NodeList nodes = node.getChildNodes();
-            for (int x = 0; x < nodes.getLength(); x++) {
-                Node n = nodes.item(x);
-                if (n.getNodeType() == Node.ELEMENT_NODE
-                        && "handler".equals(n.getNodeName())) {
-                    String opn =
-                            n.getAttributes().getNamedItem("operation")
-                                    .getNodeValue();
-                    String cls =
-                            n.getAttributes().getNamedItem("class")
-                                    .getNodeValue();
-
-                    if (opn == null || "".equals(opn)) {
-                        throw new PEPException("Cannot have a missing or empty operation attribute");
-                    }
-
-                    if (cls == null || "".equals(cls)) {
-                        throw new PEPException("Cannot have a missing or empty class attribute");
-                    }
-
-                    try {
-                        Class<?> filterClass = Class.forName(cls);
-                        RESTFilter filter =
-                                (RESTFilter) filterClass.newInstance();
-                        objectsHandlers.put(opn, filter);
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("objects handler added to map: " + opn
-                                    + "/" + cls);
-                        }
-                    } catch (ClassNotFoundException e) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("filterClass not found for: " + cls);
-                        }
-                    } catch (InstantiationException ie) {
-                        logger.error("Could not instantiate filter: " + cls);
-                        throw new ServletException(ie.getMessage(), ie);
-                    } catch (IllegalAccessException iae) {
-                        logger.error("Could not instantiate filter: " + cls);
-                        throw new ServletException(iae.getMessage(), iae);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Failed to initialse the PEP for REST", e);
-            throw new ServletException(e.getMessage(), e);
-        }
-    }
 }

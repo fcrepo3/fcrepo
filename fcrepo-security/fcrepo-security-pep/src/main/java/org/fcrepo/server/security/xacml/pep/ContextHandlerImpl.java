@@ -48,6 +48,7 @@ import org.fcrepo.common.Constants;
 
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.fcrepo.server.security.xacml.util.RelationshipResolver;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -59,15 +60,17 @@ public class ContextHandlerImpl
     private static final Logger logger =
             LoggerFactory.getLogger(ContextHandlerImpl.class);
 
-    private ContextUtil contextUtil = null;
-
     private static ContextHandler contextHandler = null;
 
-    private PDPClient client = null;
+    private ContextUtil m_contextUtil = null;
 
-    private EvaluationEngine evaluationEngine = null;
+    private PDPClient m_client = null;
 
-    private ResponseCache responseCache = null;
+    private EvaluationEngine m_evaluationEngine = null;
+    
+    private RelationshipResolver m_relationshipResolver;
+
+    private ResponseCache m_responseCache = null;
 
     /**
      * The default constructor that initialises a new ContextHandler instance.
@@ -78,7 +81,6 @@ public class ContextHandlerImpl
     private ContextHandlerImpl()
             throws PEPException {
         super();
-        init();
     }
 
     /**
@@ -98,6 +100,14 @@ public class ContextHandlerImpl
 
         return contextHandler;
     }
+    
+    public void setEvaluationEngine(EvaluationEngine evaluationEngine) {
+        m_evaluationEngine = evaluationEngine;
+    }
+    
+    public void setRealtionshipResolver(RelationshipResolver relationshipResolver) {
+        m_relationshipResolver = relationshipResolver;
+    }
 
     /*
      * (non-Javadoc)
@@ -110,10 +120,11 @@ public class ContextHandlerImpl
                                    Map<URI, AttributeValue> environment)
             throws PEPException {
         try {
-            return contextUtil.buildRequest(subjects,
+            return m_contextUtil.buildRequest(subjects,
                                             actions,
                                             resources,
-                                            environment);
+                                            environment,
+                                            m_relationshipResolver);
         } catch (MelcoeXacmlException e) {
             throw new PEPException(e);
         }
@@ -125,7 +136,7 @@ public class ContextHandlerImpl
      * org.fcrepo.server.security.xacml.pep.ContextHandler#evaluate(com.sun.xacml.ctx.RequestCtx)
      */
     public ResponseCtx evaluate(RequestCtx reqCtx) throws PEPException {
-        return evaluationEngine.evaluate(reqCtx);
+        return m_evaluationEngine.evaluate(reqCtx);
     }
 
     /*
@@ -133,7 +144,7 @@ public class ContextHandlerImpl
      * @see org.fcrepo.server.security.xacml.pep.ContextHandler#evaluate(java.lang.String)
      */
     public String evaluate(String request) throws PEPException {
-        return evaluationEngine.evaluate(request);
+        return m_evaluationEngine.evaluate(request);
     }
 
     /*
@@ -141,11 +152,19 @@ public class ContextHandlerImpl
      * @see org.fcrepo.server.security.xacml.pep.ContextHandler#evaluateBatch(java.lang.String[])
      */
     public String evaluateBatch(String[] requests) throws PEPException {
-        return evaluationEngine.evaluate(requests);
+        return m_evaluationEngine.evaluate(requests);
+    }
+    
+    public void setResponseCache(ResponseCache responseCache) {
+        m_responseCache = responseCache;
     }
 
     public ResponseCache getResponseCache() {
-        return responseCache;
+        return m_responseCache;
+    }
+    
+    public void setPDPClient(PDPClient client) {
+        m_client = client;
     }
 
     /**
@@ -157,102 +176,14 @@ public class ContextHandlerImpl
      *
      * @throws PEPException
      */
-    private void init() throws PEPException {
+    public void init() throws PEPException {
         try {
             // get the PEP configuration
-            File configPEPFile =
-                    new File(Constants.FEDORA_HOME,
-                             "server/config/config-melcoe-pep.xml");
-            InputStream is = new FileInputStream(configPEPFile);
-            if (is == null) {
-                throw new PEPException("Could not locate config file: config-melcoe-pep.xml");
-            }
-
-            DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = factory.newDocumentBuilder();
-            Document doc = docBuilder.parse(is);
-            NodeList nodes = null;
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Obtained the config file: config-melcoe-pep.xml");
-            }
-
-            String className = null;
-            Constructor<?> c = null;
-
-            Map<String, String> options = new HashMap<String, String>();
-
-            // get the PDP Client
-            nodes = doc.getElementsByTagName("pdp-client");
-            if (nodes.getLength() != 1) {
-                throw new PEPException("Config file needs to contain exactly 1 'pdp-client' section.");
-            }
-
-            className =
-                    nodes.item(0).getAttributes().getNamedItem("class")
-                            .getNodeValue();
-            NodeList optionNodes = nodes.item(0).getChildNodes();
-            for (int x = 0; x < optionNodes.getLength(); x++) {
-                Node n = optionNodes.item(x);
-                if (optionNodes.item(x).getNodeType() == Node.ELEMENT_NODE) {
-                    logger.debug("Node [name]: "
-                            + n.getAttributes().getNamedItem("name")
-                                    .getNodeValue());
-                    String key =
-                            n.getAttributes().getNamedItem("name")
-                                    .getNodeValue();
-                    String value = n.getFirstChild().getNodeValue();
-                    options.put(key, value);
-                }
-            }
-
-            c =
-                    Class.forName(className)
-                            .getConstructor(new Class[] {Map.class});
-            client = (PDPClient) c.newInstance(new Object[] {options});
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Instantiated PDPClient: " + className);
-            }
-
-            // get the Response Cache
-            nodes = doc.getElementsByTagName("response-cache");
-            if (nodes.getLength() != 1) {
-                throw new PEPException("Config file needs to contain exactly 1 'response-cache' section.");
-            }
-
-            className =
-                    nodes.item(0).getAttributes().getNamedItem("class")
-                            .getNodeValue();
-            if ("true".equals(nodes.item(0).getAttributes()
-                    .getNamedItem("active").getNodeValue())) {
-                int cacheSize = 1000; // default
-                long cacheTTL = 10000; // default
-                NodeList children = nodes.item(0).getChildNodes();
-                for (int x = 0; x < children.getLength(); x++) {
-                    if (children.item(x).getNodeType() == Node.ELEMENT_NODE) {
-                        if ("cache-size".equals(children.item(x).getNodeName())) {
-                            cacheSize =
-                                    Integer.parseInt(children.item(x)
-                                            .getFirstChild().getNodeValue());
-                        }
-
-                        if ("cache-item-ttl".equals(children.item(x)
-                                .getNodeName())) {
-                            cacheTTL =
-                                    Long.parseLong(children.item(x)
-                                            .getFirstChild().getNodeValue());
-                        }
-                    }
-                }
-
-                c =
-                        Class.forName(className).getConstructor(new Class[] {
-                                Integer.class, Long.class});
-                
                 // disable caching through system property or env variable
                 // system property takes precedence (env variable to be deprecated)
+                int cacheSize = 1000; // default
+                long cacheTTL = 10000; // default
+
                 String noCache = System.getenv("PEP_NOCACHE");
                 String noCacheProp = System.getProperty("fedora.fesl.pep_nocache");
 
@@ -268,33 +199,12 @@ public class ContextHandlerImpl
     		            }
 		            }
                 }
-                
-                responseCache =
-                        (ResponseCache) c.newInstance(new Object[] {
-                                new Integer(cacheSize), new Long(cacheTTL)});
+                m_responseCache.setTTL(cacheTTL);
 
-                logger.info("Instantiated ResponseCache with TTL " + cacheTTL + " " + className);
-            }
+            m_evaluationEngine.setClient(m_client);
+            m_evaluationEngine.setResponseCache(m_responseCache);
 
-            // Get the evaluation engine
-            nodes = doc.getElementsByTagName("evaluation-engine");
-            if (nodes.getLength() != 1) {
-                throw new PEPException("Config file needs to contain exactly 1 'evaluation-engine' section.");
-            }
-
-            className =
-                    nodes.item(0).getAttributes().getNamedItem("class")
-                            .getNodeValue();
-            evaluationEngine =
-                    (EvaluationEngine) Class.forName(className).newInstance();
-            evaluationEngine.setClient(client);
-            evaluationEngine.setResponseCache(responseCache);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Instantiated EvaluationEngine: " + className);
-            }
-
-            contextUtil = ContextUtil.getInstance();
+            m_contextUtil = ContextUtil.getInstance();
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Instantiated ContextUtil.");

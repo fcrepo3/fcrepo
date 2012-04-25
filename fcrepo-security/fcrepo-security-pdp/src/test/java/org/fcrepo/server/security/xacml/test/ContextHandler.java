@@ -19,19 +19,17 @@
 package org.fcrepo.server.security.xacml.test;
 
 
+import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
-import org.fcrepo.server.security.xacml.pdp.MelcoePDPImpl;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
 
 import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 
 /**
  * Borrowed <b>heavily</b> from sunxacml samples SampleRequestBuilder.java
- * 
+ *
  * @author nishen@melcoe.mq.edu.au
  */
 public class ContextHandler {
@@ -39,28 +37,18 @@ public class ContextHandler {
     private static final Logger logger =
             LoggerFactory.getLogger(ContextHandler.class);
 
-    private static final ContextHandler contextHandler;
-
     private static final ContextUtil contextUtil = ContextUtil.getInstance();
 
-    private static MelcoePDP melcoePDPImpl;
+    private MelcoePDP m_melcoePDP;
 
-    static {
-        contextHandler = new ContextHandler();
+    public ContextHandler() {
     }
 
-    private ContextHandler() {
-        try {
-            melcoePDPImpl = new MelcoePDPImpl();
-            logger.debug("created new PDP");
-        } catch (Exception e) {
-            // test code...
-        }
+    public void setPDP(MelcoePDP melcoePDP) {
+        m_melcoePDP = melcoePDP;
     }
 
-    public static ContextHandler getInstance() {
-        return contextHandler;
-    }
+
 
     /**
      * @param reqCtx
@@ -85,7 +73,7 @@ public class ContextHandler {
      *         context.
      */
     public String evaluate(String req) throws Exception {
-        String res = melcoePDPImpl.evaluate(req);
+        String res = m_melcoePDP.evaluate(req);
         return res;
     }
 }

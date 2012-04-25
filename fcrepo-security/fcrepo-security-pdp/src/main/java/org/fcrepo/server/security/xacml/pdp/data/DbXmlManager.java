@@ -6,14 +6,13 @@
 package org.fcrepo.server.security.xacml.pdp.data;
 
 import java.io.File;
-import java.io.FileInputStream;
-
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sleepycat.db.Environment;
 import com.sleepycat.db.EnvironmentConfig;
@@ -25,15 +24,6 @@ import com.sleepycat.dbxml.XmlManager;
 import com.sleepycat.dbxml.XmlManagerConfig;
 import com.sleepycat.dbxml.XmlUpdateContext;
 import com.sleepycat.dbxml.XmlValue;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 
 
 /**
@@ -68,9 +58,99 @@ public class DbXmlManager {
     public static final Lock readLock = rwl.readLock();
     public static final Lock writeLock = rwl.writeLock();
 
-    public DbXmlManager()
+    public DbXmlManager(String databaseDirectory, String container)
             throws PolicyStoreException {
-        initConfig();
+      setDatabaseDirectory(databaseDirectory);
+      setContainer(container);
+    }
+
+    /**
+     * Closes the dbxml container and manager.
+     */
+    public void close() {
+        // getting a read lock will ensure all writes have finished
+        // if we are really closing assume that we don't care about reads
+        readLock.lock();
+        try {
+            if (container != null) {
+                try {
+                    container.close();
+                    container = null;
+                    log.info("Closed container");
+                } catch (XmlException e) {
+                    log.warn("close failed: " + e.getMessage(), e);
+                }
+            }
+
+            if (manager != null) {
+                try {
+                    manager.close();
+                    manager = null;
+                    log.info("Closed manager");
+                } catch (XmlException e) {
+                    log.warn("close failed: " + e.getMessage(), e);
+                }
+            }
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    public void deleteDatabase() {
+        readLock.lock();
+        try {
+            try {
+                //XmlIndexSpecification is = container.getIndexSpecification();
+                //container.setIndexSpecification(is);
+
+                container.close();
+
+                container = null;
+            } catch (XmlException e) {
+                log.warn("Error closing container " + e.getMessage());
+            }
+            //container.delete();
+            try {
+                manager.removeContainer(CONTAINER);
+            } catch (XmlException e) {
+                log.warn("Error removing container " + e.getMessage());
+            }
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    public void setDatabaseDirectory(String databaseDirectory) throws PolicyStoreException {
+        DB_HOME = MelcoePDP.PDP_HOME.getAbsolutePath() + databaseDirectory;
+        File db_home = new File(DB_HOME);
+        if (!db_home.exists()) {
+            try {
+                db_home.mkdirs();
+            } catch (Exception e) {
+                throw new PolicyStoreException("Could not create DB directory: "
+                       + db_home.getAbsolutePath());
+            }
+        }
+         if (log.isDebugEnabled()) {
+           log.debug("[config] databaseDirectory : " + db_home.getAbsolutePath());
+        }
+    }
+
+    public void setContainer(String container) {
+        CONTAINER = container;
+        if (log.isDebugEnabled()) {
+            log.debug("[config] container: " + container);
+        }
+    }
+
+
+    public void init() throws PolicyStoreException {
+        if (log.isDebugEnabled()) {
+            Runtime runtime = Runtime.getRuntime();
+            log.debug("Total memory: " + runtime.totalMemory() / 1024);
+            log.debug("Free memory: " + runtime.freeMemory() / 1024);
+            log.debug("Max memory: " + runtime.maxMemory() / 1024);
+        }
 
         File envHome = new File(DB_HOME);
         EnvironmentConfig envCfg = new EnvironmentConfig();
@@ -152,156 +232,6 @@ public class DbXmlManager {
 
         log.info("Opened Container: " + CONTAINER);
 
-
     }
 
-    /**
-     * Closes the dbxml container and manager.
-     */
-    public void close() {
-        // getting a read lock will ensure all writes have finished
-        // if we are really closing assume that we don't care about reads
-        readLock.lock();
-        try {
-            if (container != null) {
-                try {
-                    container.close();
-                    container = null;
-                    log.info("Closed container");
-                } catch (XmlException e) {
-                    log.warn("close failed: " + e.getMessage(), e);
-                }
-            }
-
-            if (manager != null) {
-                try {
-                    manager.close();
-                    manager = null;
-                    log.info("Closed manager");
-                } catch (XmlException e) {
-                    log.warn("close failed: " + e.getMessage(), e);
-                }
-            }
-        } finally {
-            readLock.unlock();
-        }
-    }
-
-    public void deleteDatabase() {
-        readLock.lock();
-        try {
-            try {
-                //XmlIndexSpecification is = container.getIndexSpecification();
-                //container.setIndexSpecification(is);
-
-                container.close();
-
-                container = null;
-            } catch (XmlException e) {
-                log.warn("Error closing container " + e.getMessage());
-            }
-            //container.delete();
-            try {
-                manager.removeContainer(CONTAINER);
-            } catch (XmlException e) {
-                log.warn("Error removing container " + e.getMessage());
-            }
-        } finally {
-            readLock.unlock();
-        }
-    }
-
-
-
-    /**
-     * Reads a configuration file and initialises the instance based on that
-     * information.
-     *
-     * @throws PolicyStoreException
-     */
-    private void initConfig() throws PolicyStoreException {
-        if (log.isDebugEnabled()) {
-            Runtime runtime = Runtime.getRuntime();
-            log.debug("Total memory: " + runtime.totalMemory() / 1024);
-            log.debug("Free memory: " + runtime.freeMemory() / 1024);
-            log.debug("Max memory: " + runtime.maxMemory() / 1024);
-        }
-
-        try {
-            String home = MelcoePDP.PDP_HOME.getAbsolutePath();
-
-            String filename = home + "/conf/config-dbxml.xml";
-            File f = new File(filename);
-            if (!f.exists()) {
-                throw new PolicyStoreException("Could not locate config file: "
-                        + f.getAbsolutePath());
-            }
-
-            log.info("Loading config file: " + f.getAbsolutePath());
-
-            DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = factory.newDocumentBuilder();
-            Document doc = docBuilder.parse(new FileInputStream(f));
-
-            NodeList nodes = null;
-
-            // get database information
-            nodes =
-                    doc.getElementsByTagName("database").item(0)
-                            .getChildNodes();
-            for (int x = 0; x < nodes.getLength(); x++) {
-                Node node = nodes.item(x);
-                if (node.getNodeName().equals("directory")) {
-                    DB_HOME =
-                            MelcoePDP.PDP_HOME.getAbsolutePath()
-                                    + node.getAttributes().getNamedItem("name")
-                                            .getNodeValue();
-                    File db_home = new File(DB_HOME);
-                    if (!db_home.exists()) {
-                        try {
-                            db_home.mkdirs();
-                        } catch (Exception e) {
-                            throw new PolicyStoreException("Could not create DB directory: "
-                                    + db_home.getAbsolutePath());
-                        }
-                    }
-
-                    if (log.isDebugEnabled()) {
-                        log.debug("[config] " + node.getNodeName() + ": "
-                                + db_home.getAbsolutePath());
-                    }
-                }
-                if (node.getNodeName().equals("container")) {
-                    CONTAINER =
-                            node.getAttributes().getNamedItem("name")
-                                    .getNodeValue();
-                    File conFile = new File(DB_HOME + "/" + CONTAINER);
-                    if (log.isDebugEnabled()) {
-                        log.debug("[config] " + node.getNodeName() + ": "
-                                + conFile.getAbsolutePath());
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            throw new PolicyStoreException("Could not initialise DBXML: "
-                    + e.getMessage(), e);
-        }
-    }
-
-
-    /*
-     * FIXME: should not rely on finalize, should close explicitly
-     * (non-Javadoc)
-     * @see java.lang.Object#finalize()
-     */
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            close(); // close open files
-        } finally {
-            super.finalize();
-        }
-    }
 }

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+	<bean id="FedoraRIAttributeFinder" name="org.fcrepo.server.security.xacml.pdp.finder.attribute.FedoraRIAttributeFinder">
+	  <constructor-arg ref="RelationshipResolver" />
+	<!--  the resolver tag appears to be a dead configuration -->
+	<!-- <resolver url="http://localhost:5743/fedora/melcoerisearch" username="" password="" /> -->
+
+    <!-- attributes using simple object and datastream relationships, xacml attribute is the same as the relationship -->
+      <property name="resourceAttributes">
+        <map>
+    <!-- object and datastream properties -->
+          <entry key="info:fedora/fedora-system:def/view#mimeType">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute" />
+          </entry>
+          <entry key="info:fedora/fedora-system:def/model#ownerId">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute" />
+          </entry>
+	      <entry key="info:fedora/fedora-system:def/model#state">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute" />
+		  </entry>
+		  <entry key="info:fedora/fedora-system:def/model#createdDate">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute" />
+		  </entry>
+		  <entry key="info:fedora/fedora-system:def/model#label">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute" />
+		  </entry>
+		  <entry key="http://www.w3.org/1999/02/22-rdf-syntax-ns#type">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute" />
+		  </entry>   
+          <entry key="http://purl.org/dc/elements/1.1/subject">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+              <constructor-arg>
+                <map>
+      <!-- specify either "object" to retrieve attributes for the object as a whole (irrespective of datastream etc being accessed)
+      or specify "resource" to retrieve attributes based on the full URI of the resource.  Default is "resource" -->
+                  <entry key="target" value="object"/>
+                </map>
+              </constructor-arg>
+            </bean>
+          </entry>
+          <!-- example attributes using simple object and datastream relationships with a specified xacml attribute id -->
+          <entry key="http://www.example.org/fedora/xacml/attributes/resource#rel-subject">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+              <constructor-arg>
+                <map>
+                  <entry key="relationship" value="http://purl.org/dc/elements/1.1/subject"/>
+                  <entry key="target" value="object"/>
+                </map>
+              </constructor-arg>
+            </bean>
+          </entry>
+          <entry key="http://www.example.org/fedora/xacml/attributes/resource#rel-state">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+              <constructor-arg>
+                <map>
+                  <entry key="relationship" value="info:fedora/fedora-system:def/model#state"/>
+                </map>
+              </constructor-arg>
+            </bean>
+          </entry>
+          <!-- example TQL query-based attributes -->
+          <entry key="http://www.example.org/fedora/xacml/attributes/resource#itql-subject">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+              <constructor-arg>
+                <map>
+                  <entry key="queryLang" value="itql"/>
+                  <entry key="object" value="##resource##"/>
+                   <entry key="value" value="output"/>
+                  <entry key="query" value="select $output from &lt;#ri&gt; where &lt;##resource##&gt; &lt;http://purl.org/dc/elements/1.1/subject&gt; $output"/>
+                </map>
+              </constructor-arg>
+            </bean>
+          </entry>
+        
+          <entry key="http://www.example.org/fedora/xacml/attributes/resource#itql-state">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+              <constructor-arg>
+                <map>
+                   <entry key="queryLang" value="itql"/>
+                   <entry key="resource" value="##resource##"/>
+                  <entry key="value" value="output"/>
+                  <entry key="query" value="select $output from &lt;#ri&gt; where &lt;##resource##&gt; &lt;info:fedora/fedora-system:def/model#state&gt; $output"/>
+                </map>
+              </constructor-arg>
+            </bean>
+          </entry>
+          <!-- example SPARQL query-based attributes -->
+          <entry key="http://www.example.org/fedora/xacml/attributes/resource#sparql-subject">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+              <constructor-arg>
+                <map>
+                  <entry key="queryLang" value="sparql"/>
+                  <entry key="object" value="##resource##"/>
+                  <entry key="value" value="output"/>
+                  <entry key="query" value="SELECT ?output FROM &lt;#ri&gt; WHERE { &lt;##resource##&gt; &lt;http://purl.org/dc/elements/1.1/subject&gt; ?output . }"/>
+                </map>
+              </constructor-arg>
+            </bean>
+          </entry>
+          <entry key="http://www.example.org/fedora/xacml/attributes/resource#sparql-state">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+              <constructor-arg>
+                <map>
+                  <entry key="queryLang" value="sparql"/>
+                  <entry key="resource" value="##resource##"/>
+                  <entry key="value" value="output"/>
+                  <entry key="query" value="SELECT ?output FROM &lt;#ri&gt; WHERE { &lt;##resource##&gt; &lt;info:fedora/fedora-system:def/model#state&gt; ?output . }"/>
+                </map>
+              </constructor-arg>
+            </bean>
+          </entry>
+    <!-- example SPO query-based attributes -->
+          <entry key="http://www.example.org/fedora/xacml/attributes/resource#spo-subject">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+              <constructor-arg>
+                <map>
+                  <entry key="queryLang" value="spo"/>
+                  <entry key="object" value="##resource##"/>
+                  <entry key="value" value="o"/> <!-- the object of the spo triple query -->
+                  <entry key="query" value="&lt;##resource##&gt; &lt;http://purl.org/dc/elements/1.1/subject&gt; *"/>
+                  <entry key="relationship" value="http://purl.org/dc/elements/1.1/subject"/>
+                </map>
+              </constructor-arg>
+            </bean>
+          </entry>
+          <entry key="http://www.example.org/fedora/xacml/attributes/resource#spo-state">
+            <bean class="org.fcrepo.server.security.xacml.util.AttributeFinderConfig.Designator.Attribute">
+              <constructor-arg>
+                <map>
+                  <entry key="queryLang" value="spo"/>
+                  <entry key="resource" value="##resource##"/>
+                  <entry key="value" value="o"/>
+                  <entry key="query" value="&lt;##resource##&gt; &lt;info:fedora/fedora-system:def/model#state&gt; *"/>
+                </map>
+              </constructor-arg>
+            </bean>
+          </entry>
+        </map>
+      </property>
+    </bean>
+	<!--
+	<AttributeFinder name="org.fcrepo.server.security.xacml.pdp.finder.attribute.LDAPAttributeFinder">
+	  <map>
+		<entry key="java.naming.factory.initial" value="com.sun.jndi.ldap.LdapCtxFactory" />
+		<entry key="java.naming.provider.url" value="ldap://nish.ramp.org.au:389/" />
+		<entry key="java.naming.security.authentication" value="simple" />
+		<entry key="java.naming.referral" value="follow" />
+		<entry key="java.naming.security.principal" value="cn=admin,dc=arcs,dc=org,dc=au" />
+		<entry key="java.naming.security.credentials" value="arcs" />
+		<entry key="id-attribute" value="uid" />
+		<entry key="searchbase" value="dc=arcs,dc=org,dc=au" />
+      </map>
+	  <attribute designator="subject" name="memberOf" />
+	</AttributeFinder>
+	-->
+</beans>

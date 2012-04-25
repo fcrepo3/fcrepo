@@ -5,28 +5,20 @@
 package org.fcrepo.server.security.xacml.pdp.decorator;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.apache.commons.io.IOUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.proxy.AbstractInvocationHandler;
 import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyIndex;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyIndexException;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyIndexFactory;
 import org.fcrepo.server.storage.DOManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -47,43 +39,34 @@ extends AbstractInvocationHandler {
         LoggerFactory.getLogger(PolicyIndexInvocationHandler.class.getName());
 
 
-    private Boolean initialised = null;
+    private Boolean m_initialised = null;
 
     private DOManager m_DOManager = null;
 
     // for updating the policy cache
-    private PolicyIndex policyIndex = null;
+    private PolicyIndex m_policyIndex = null;
 
-    public boolean init() {
-        if (initialised != null)
-            return initialised;
+    public void setPolicyIndex(PolicyIndex policyIndex) {
+        m_policyIndex = policyIndex;
+    }
 
-        initialised = false;
+    public void setDOManager(DOManager manager) {
+        m_DOManager = manager;
+    }
 
-        Server s_server = null;
-        try {
-            s_server = Server.getInstance(new File(Constants.FEDORA_HOME), false);
-        } catch (Exception  e) {
-            LOG.error("Failed to get server instance",e);
-            return false;
-        }
-        m_DOManager = (DOManager) s_server.getModule(
-        "org.fcrepo.server.storage.DOManager");
+    public boolean init() throws PolicyIndexException {
+        if (m_initialised != null)
+            return m_initialised;
+
+        m_initialised = false;
+
         if (m_DOManager == null) {
-            LOG.error("failed to get DOManager module");
-            return false;
+            LOG.error("DOManager module was not set");
+            throw new PolicyIndexException("DOManager module was not set");
         }
 
-        try {
-            PolicyIndexFactory  factory = new PolicyIndexFactory();
-            policyIndex = factory.newPolicyIndex();
-        } catch (PolicyIndexException e) {
-            LOG.error("Failed to initialise PolicyIndex", e);
-            return false;
-        }
-
-        initialised = true;
-        return initialised;
+        m_initialised = true;
+        return m_initialised;
 
 
     }
@@ -91,12 +74,9 @@ extends AbstractInvocationHandler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args)
     throws Throwable {
-
-        // if initialisation fails, just call the target method and quit
-        if (!init())
-            return invokeTarget(target, method, args);
 
         // get the method parameters and "type"
         ManagementMethodInvocation managementMethod = new ManagementMethodInvocation(method, args);
@@ -349,7 +329,7 @@ extends AbstractInvocationHandler {
         try {
             policy = IOUtils.toString(dsContent);
             dsContent.close();
-            policyIndex.addPolicy(pid, policy);
+            m_policyIndex.addPolicy(pid, policy);
         } catch (IOException e) {
             throw new GeneralException("Error adding policy " + pid + " to policy index: " + e.getMessage(), e);
         } catch (PolicyIndexException e) {
@@ -366,7 +346,7 @@ extends AbstractInvocationHandler {
         try {
             policy = IOUtils.toString(dsContent);
             dsContent.close();
-            policyIndex.updatePolicy(pid, policy);
+            m_policyIndex.updatePolicy(pid, policy);
         } catch (IOException e) {
             throw new GeneralException("Error adding policy " + pid + " to policy index: " + e.getMessage(), e);
         } catch (PolicyIndexException e) {
@@ -386,7 +366,7 @@ extends AbstractInvocationHandler {
 
         try {
             // in case the policy doesn't exist (corrupt policy index, failed to add because invalid, etc)
-            policyIndex.deletePolicy(pid);
+            m_policyIndex.deletePolicy(pid);
         } catch (PolicyIndexException e) {
             throw new GeneralException("Error deleting policy " + pid + " from policy index: " + e.getMessage(), e);
         }
@@ -395,4 +375,3 @@ extends AbstractInvocationHandler {
 
 
 }
-

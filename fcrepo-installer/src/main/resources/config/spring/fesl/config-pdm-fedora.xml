@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+<bean id="FedoraPolicyStore" class="org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore">
+  <property name="pidNamespace" value="policy" />
+  <property name="datastreamControlGroup" value="M" />
+  <!-- content model (URI form) -->
+  <!--
+  <property name="contentModel" value="info:fedora/policy:ContentModel" />
+  -->
+  <!-- optionally policies can be added as members of collections. will affect rebuilder and bootstrap policies
+  <property name="collection" value="info:fedora/changeme:1" />
+  <property name="collectionRelationshipName" value="isMemberOf" />
+  -->
+  <property name="schemaValidation" value="true" />
+  <property name="schemaLocations">
+    <map>
+    <!-- don't think context validation takes place, this is probably unused -->
+      <entry key="urn:oasis:names:tc:xacml:2.0:context:schema:os" value="http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-context-schema-os.xsd"/>
+      <!-- schema location is filename in the server directory (should be in xsd) -->
+      <entry key="urn:oasis:names:tc:xacml:2.0:policy:schema:os" value="xsd/cs-xacml-schema-policy-02.xsd"/>
+    </map>
+  </property>
+</bean>
+</beans>

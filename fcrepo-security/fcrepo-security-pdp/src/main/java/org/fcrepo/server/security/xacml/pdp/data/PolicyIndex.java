@@ -6,7 +6,9 @@ package org.fcrepo.server.security.xacml.pdp.data;
 
 import java.util.Map;
 
+import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
+import com.sun.xacml.finder.PolicyFinder;
 
 
 /**
@@ -46,7 +48,7 @@ public interface PolicyIndex {
      * @return the List of potential policies
      * @throws PolicyIndexException
      */
-    Map<String, byte[]> getPolicies(EvaluationCtx eval)
+    Map<String, AbstractPolicy> getPolicies(EvaluationCtx eval, PolicyFinder policyFinder)
             throws PolicyIndexException;
 
 
@@ -63,7 +65,7 @@ public interface PolicyIndex {
      * @return the policy as an array of bytes
      * @throws PolicyStoreException
      */
-    byte[] getPolicy(String name) throws PolicyIndexException;
+    AbstractPolicy getPolicy(String name, PolicyFinder policyFinder) throws PolicyIndexException;
 
 
     /**

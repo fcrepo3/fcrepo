@@ -15,6 +15,8 @@ public interface ResponseCache {
      *        the resposne to add
      */
     public void addCacheItem(String request, String response);
+    
+    public void setTTL(long ttl);
 
     /**
      * @param request

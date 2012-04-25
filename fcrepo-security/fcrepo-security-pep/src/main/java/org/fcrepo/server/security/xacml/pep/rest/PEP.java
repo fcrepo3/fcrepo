@@ -18,12 +18,8 @@
 
 package org.fcrepo.server.security.xacml.pep.rest;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,21 +33,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
 
 import org.fcrepo.server.security.xacml.pep.AuthzDeniedException;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
@@ -73,9 +60,9 @@ public final class PEP
     private static final Logger logger =
             LoggerFactory.getLogger(PEP.class);
 
-    private Map<String, RESTFilter> filters = null;
+    private Map<String, RESTFilter> m_filters = null;
 
-    private ContextHandler ctxHandler = null;
+    private ContextHandler m_ctxHandler = null;
 
     /*
      * (non-Javadoc)
@@ -155,7 +142,7 @@ public final class PEP
 
                 reqCtx = filter.handleRequest(req, res);
                 if (reqCtx != null) {
-                    resCtx = ctxHandler.evaluate(reqCtx);
+                    resCtx = m_ctxHandler.evaluate(reqCtx);
                     enforce(resCtx);
                 }
 
@@ -171,7 +158,7 @@ public final class PEP
             if (filter != null) {
                 reqCtx = filter.handleResponse(req, res);
                 if (reqCtx != null) {
-                    resCtx = ctxHandler.evaluate(reqCtx);
+                    resCtx = m_ctxHandler.evaluate(reqCtx);
                     enforce(resCtx);
                 }
 
@@ -198,7 +185,7 @@ public final class PEP
      */
     public void init() throws ServletException {
         try {
-            ctxHandler = ContextHandlerImpl.getInstance();
+            m_ctxHandler = ContextHandlerImpl.getInstance();
         } catch (PEPException pe) {
             logger.error("Error obtaining ContextHandler", pe);
             throw new ServletException("Error obtaining ContextHandler", pe);
@@ -206,7 +193,6 @@ public final class PEP
 
         logger.info("Initialising Servlet Filter: " + PEP.class);
 
-        loadFilters();
     }
 
     public void init(FilterConfig cfg) throws ServletException {
@@ -220,75 +206,12 @@ public final class PEP
      */
     public void destroy() {
         logger.info("Destroying Servlet Filter: " + PEP.class);
-        filters = null;
-        ctxHandler = null;
+        m_filters = null;
+        m_ctxHandler = null;
     }
-
-    private void loadFilters() throws ServletException {
-        filters = new HashMap<String, RESTFilter>();
-
-        try {
-            // get the PEP configuration
-            File configPEPFile =
-                    new File(Constants.FEDORA_HOME,
-                             "server/config/config-melcoe-pep.xml");
-            InputStream is = new FileInputStream(configPEPFile);
-            if (is == null) {
-                throw new PEPException("Could not locate config file: config-melcoe-pep.xml");
-            }
-
-            DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = factory.newDocumentBuilder();
-            Document doc = docBuilder.parse(is);
-
-            Node node = doc.getElementsByTagName("handlers-rest").item(0);
-            NodeList nodes = node.getChildNodes();
-            for (int x = 0; x < nodes.getLength(); x++) {
-                Node n = nodes.item(x);
-                if (n.getNodeType() == Node.ELEMENT_NODE
-                        && "handler".equals(n.getNodeName())) {
-                    String opn =
-                            n.getAttributes().getNamedItem("operation")
-                                    .getNodeValue();
-                    String cls =
-                            n.getAttributes().getNamedItem("class")
-                                    .getNodeValue();
-
-                    if (opn == null || "".equals(opn)) {
-                        throw new PEPException("Cannot have a missing or empty operation attribute");
-                    }
-
-                    if (cls == null || "".equals(cls)) {
-                        throw new PEPException("Cannot have a missing or empty class attribute");
-                    }
-
-                    try {
-                        Class<?> filterClass = Class.forName(cls);
-                        RESTFilter filter =
-                                (RESTFilter) filterClass.newInstance();
-                        filters.put(opn, filter);
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("filter added to filter map: " + opn
-                                    + "/" + cls);
-                        }
-                    } catch (ClassNotFoundException e) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("filterClass not found for: " + cls);
-                        }
-                    } catch (InstantiationException ie) {
-                        logger.error("Could not instantiate filter: " + cls);
-                        throw new ServletException(ie.getMessage(), ie);
-                    } catch (IllegalAccessException iae) {
-                        logger.error("Could not instantiate filter: " + cls);
-                        throw new ServletException(iae.getMessage(), iae);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Failed to initialse the PEP for REST", e);
-            throw new ServletException(e.getMessage(), e);
-        }
+    
+    public void setFilters(Map<String, RESTFilter> filters) {
+        m_filters = filters;
     }
 
     /**
@@ -302,7 +225,7 @@ public final class PEP
      * @throws ServletException
      */
     private RESTFilter getFilter(String servletPath) throws ServletException {
-        RESTFilter filter = filters.get(servletPath);
+        RESTFilter filter = m_filters.get(servletPath);
 
         if (filter != null && logger.isDebugEnabled())
         	logger.debug("obtaining filter: " + filter.getClass().getName());

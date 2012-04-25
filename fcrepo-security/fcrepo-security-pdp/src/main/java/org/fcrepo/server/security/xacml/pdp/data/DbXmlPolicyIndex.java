@@ -17,15 +17,16 @@
 package org.fcrepo.server.security.xacml.pdp.data;
 
 import java.io.File;
-
 import java.net.URISyntaxException;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.sun.xacml.EvaluationCtx;
+import org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader;
+import org.fcrepo.server.security.xacml.util.AttributeBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sleepycat.dbxml.XmlDocument;
 import com.sleepycat.dbxml.XmlDocumentConfig;
@@ -34,11 +35,10 @@ import com.sleepycat.dbxml.XmlQueryContext;
 import com.sleepycat.dbxml.XmlQueryExpression;
 import com.sleepycat.dbxml.XmlResults;
 import com.sleepycat.dbxml.XmlValue;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.server.security.xacml.util.AttributeBean;
+import com.sun.xacml.AbstractPolicy;
+import com.sun.xacml.EvaluationCtx;
+import com.sun.xacml.ParsingException;
+import com.sun.xacml.finder.PolicyFinder;
 
 /**
  * Encapsulates indexed access to policies stored in DbXml.
@@ -55,33 +55,46 @@ public class DbXmlPolicyIndex
     private static final Logger log =
             LoggerFactory.getLogger(DbXmlPolicyIndex.class.getName());
 
-    private DbXmlManager dbXmlManager = null;
+    private String m_databaseDirectory = null;
 
-    private volatile long lastUpdate;
+    private String m_container = null;
 
-    private PolicyUtils utils;
+    private DbXmlManager m_dbXmlManager = null;
 
-    private  Map<String, XmlQueryExpression> queries = null;
+    private volatile long m_lastUpdate;
+
+    private PolicyUtils m_utils;
+
+    private  Map<String, XmlQueryExpression> m_queries = null;
 
 
-    protected DbXmlPolicyIndex()
+    public DbXmlPolicyIndex(PolicyReader policyReader)
             throws PolicyIndexException {
-        super();
-        init();
-
-        queries = new ConcurrentHashMap<String, XmlQueryExpression>();
+        super(policyReader);
     }
 
-    private void init() throws PolicyIndexException {
+    public void setDatabaseDirectory(String databaseDirectory) {
+        m_databaseDirectory = databaseDirectory;
+    }
+
+    public void setContainer(String container) {
+        m_container = container;
+    }
+
+    public void init() throws PolicyIndexException {
         try {
-            dbXmlManager = new DbXmlManager();
-        } catch (PolicyStoreException e) {
-            throw new PolicyIndexException("Error initialising DbXmlManager - " + e.getMessage(), e);
+            m_dbXmlManager = new DbXmlManager(m_databaseDirectory, m_container);
+            m_dbXmlManager.indexMap = this.indexMap;
+        } catch (PolicyStoreException pse) {
+            throw new PolicyIndexException(pse.getMessage(),pse);
         }
-        dbXmlManager.indexMap = indexMap;
+        m_queries = new ConcurrentHashMap<String, XmlQueryExpression>();
+        m_utils = new PolicyUtils();
+    }
 
-        utils = new PolicyUtils();
-
+    public void close() {
+        m_dbXmlManager.close();
+        m_queries.clear();
     }
 
     /*
@@ -90,13 +103,13 @@ public class DbXmlPolicyIndex
      * EvaluationCtx)
      */
     @Override
-    public Map<String, byte[]> getPolicies(EvaluationCtx eval)
+    public Map<String, AbstractPolicy> getPolicies(EvaluationCtx eval, PolicyFinder policyFinder)
             throws PolicyIndexException {
         long a = 0;
         long b = 0;
         long total = 0;
 
-        Map<String, byte[]> documents = new HashMap<String, byte[]>();
+        Map<String, AbstractPolicy> documents = new HashMap<String, AbstractPolicy>();
 
         XmlQueryExpression qe = null;
         XmlQueryContext context = null;
@@ -108,8 +121,8 @@ public class DbXmlPolicyIndex
             Map<String, Set<AttributeBean>> attributeMap =
                 getAttributeMap(eval);
 
-            context = dbXmlManager.manager.createQueryContext();
-            context.setDefaultCollection(dbXmlManager.CONTAINER);
+            context = m_dbXmlManager.manager.createQueryContext();
+            context.setDefaultCollection(m_dbXmlManager.CONTAINER);
 
             for (String prefix : namespaces.keySet()) {
                 context.setNamespace(prefix, namespaces.get(prefix));
@@ -162,7 +175,8 @@ public class DbXmlPolicyIndex
                 XmlValue value = results.next();
                 byte[] content = value.asDocument().getContent();
                 if (content.length > 0) {
-                    documents.put(value.asDocument().getName(), content);
+                    documents.put(value.asDocument().getName(),
+                                  handleDocument(m_policyReader.readPolicy(content),policyFinder));
                 } else {
                     throw new PolicyIndexException("Zero-length result found");
                 }
@@ -171,7 +185,9 @@ public class DbXmlPolicyIndex
         } catch (XmlException xe) {
             log.error("Error getting query results." + xe.getMessage());
             throw new PolicyIndexException("Error getting query results." + xe.getMessage(), xe);
-
+        } catch (ParsingException pe) {
+            log.error("Error getting query results." + pe.getMessage());
+            throw new PolicyIndexException("Error getting query results." + pe.getMessage(), pe);
         } finally {
             DbXmlManager.readLock.unlock();
         }
@@ -211,7 +227,7 @@ public class DbXmlPolicyIndex
 
         // If a query of these dimensions already exists, then just return it.
         String hash = sb.toString() + r;
-        XmlQueryExpression result = queries.get(hash);
+        XmlQueryExpression result = m_queries.get(hash);
         if (result != null) {
             return result;
         }
@@ -226,9 +242,9 @@ public class DbXmlPolicyIndex
         // Once we have created a query, we can parse it and store the
         // execution plan. This is an expensive operation that we do
         // not want to have to do more than once for each dimension
-        result = dbXmlManager.manager.prepare(query, context);
+        result = m_dbXmlManager.manager.prepare(query, context);
 
-        queries.put(hash, result);
+        m_queries.put(hash, result);
 
         return result;
     }
@@ -244,7 +260,7 @@ public class DbXmlPolicyIndex
      * @return the query as a String
      */
     private String createQuery(Map<String, Set<AttributeBean>> attributeMap) {
-        return "collection('" + dbXmlManager.CONTAINER + "')" + getXpath(attributeMap);
+        return "collection('" + m_dbXmlManager.CONTAINER + "')" + getXpath(attributeMap);
 
     }
 
@@ -265,8 +281,8 @@ public class DbXmlPolicyIndex
             XmlDocument doc = makeDocument(name, document);
             docName = doc.getName();
             log.debug("Adding document: " + docName);
-            dbXmlManager.container.putDocument(doc,
-                                               dbXmlManager.updateContext);
+            m_dbXmlManager.container.putDocument(doc,
+                                               m_dbXmlManager.updateContext);
             setLastUpdate(System.currentTimeMillis());
         } catch (XmlException xe) {
             if (xe.getErrorCode() == XmlException.UNIQUE_ERROR) {
@@ -295,7 +311,7 @@ public class DbXmlPolicyIndex
 
         DbXmlManager.writeLock.lock();
         try {
-            dbXmlManager.container.deleteDocument(name, dbXmlManager.updateContext);
+            m_dbXmlManager.container.deleteDocument(name, m_dbXmlManager.updateContext);
             setLastUpdate(System.currentTimeMillis());
         } catch (XmlException xe) {
             // safe delete - only warn if not found
@@ -371,15 +387,17 @@ public class DbXmlPolicyIndex
      * (java.lang.String)
      */
     @Override
-    public byte[] getPolicy(String name) throws PolicyIndexException {
+    public AbstractPolicy getPolicy(String name, PolicyFinder policyFinder) throws PolicyIndexException {
         log.debug("Getting document: " + name);
         XmlDocument doc = null;
         DbXmlManager.readLock.lock();
         try {
-            doc = dbXmlManager.container.getDocument(name);
-            return doc.getContent();
+            doc = m_dbXmlManager.container.getDocument(name);
+            return handleDocument(m_policyReader.readPolicy(doc.getContent()), policyFinder);
         } catch (XmlException xe) {
             throw new PolicyIndexException("Error getting Policy: " + name + xe.getMessage()  + " - " + xe.getDatabaseException().getMessage(), xe);
+        } catch (ParsingException pe) {
+            throw new PolicyIndexException("Error getting Policy: " + name + pe.getMessage(), pe);
         } finally {
             DbXmlManager.readLock.unlock();
         }
@@ -399,7 +417,7 @@ public class DbXmlPolicyIndex
         log.debug("Determining if document exists: " + policyName);
         DbXmlManager.readLock.lock();
         try {
-            dbXmlManager.container.getDocument(policyName,
+            m_dbXmlManager.container.getDocument(policyName,
                                                new XmlDocumentConfig().setLazyDocs(true));
         } catch (XmlException e) {
             if (e.getErrorCode() == XmlException.DOCUMENT_NOT_FOUND) {
@@ -428,9 +446,9 @@ public class DbXmlPolicyIndex
     private XmlDocument makeDocument(String name, String document)
             throws XmlException, PolicyIndexException {
         Map<String, String> metadata =
-                utils.getDocumentMetadata(document
+                m_utils.getDocumentMetadata(document
                         .getBytes());
-        XmlDocument doc = dbXmlManager.manager.createDocument();
+        XmlDocument doc = m_dbXmlManager.manager.createDocument();
         String docName = name;
 
         if (docName == null || "".equals(docName)) {
@@ -489,7 +507,7 @@ public class DbXmlPolicyIndex
      * ()
      */
     public long getLastUpdate() {
-        return lastUpdate;
+        return m_lastUpdate;
     }
 
     /**
@@ -497,20 +515,19 @@ public class DbXmlPolicyIndex
      *        the lastUpdate to set
      */
     public void setLastUpdate(long lastUpdate) {
-        this.lastUpdate = lastUpdate;
+        this.m_lastUpdate = lastUpdate;
     }
 
     @Override
     public boolean clear() throws PolicyIndexException {
 
-        dbXmlManager.deleteDatabase();
-        dbXmlManager.close();
-        dbXmlManager = null;
+        m_dbXmlManager.deleteDatabase();
+        m_dbXmlManager.close();
+        m_dbXmlManager = null;
 
         // and init will create a new database (by creating a new dbXmlManager)
         init();
         return true;
-
     }
 
     private boolean deleteDirectory(String directory) {

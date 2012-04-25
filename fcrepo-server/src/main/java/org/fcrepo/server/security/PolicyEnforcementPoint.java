@@ -241,7 +241,7 @@ public class PolicyEnforcementPoint {
         pdp = null;
     }
 
-    private final Set wrapSubjects(String subjectLoginId) {
+    private final Set<Subject> wrapSubjects(String subjectLoginId) {
         logger.debug("wrapSubjectIdAsSubjects(): " + subjectLoginId);
         StringAttribute stringAttribute = new StringAttribute("");
         Attribute subjectAttribute =
@@ -268,7 +268,7 @@ public class PolicyEnforcementPoint {
         return subjects;
     }
 
-    private final Set wrapActions(String actionId,
+    private final Set<Attribute> wrapActions(String actionId,
                                   String actionApi,
                                   String contextIndex) {
         Set<Attribute> actions = new HashSet<Attribute>();
@@ -299,7 +299,7 @@ public class PolicyEnforcementPoint {
         return actions;
     }
 
-    private final Set wrapResources(String pid, String namespace)
+    private final Set<Attribute> wrapResources(String pid, String namespace)
             throws AuthzOperationalException {
         Set<Attribute> resources = new HashSet<Attribute>();
         Attribute attribute = null;
@@ -358,19 +358,18 @@ public class PolicyEnforcementPoint {
                 try {
                     contextIndex = (new Integer(next())).toString();
                     logger.debug("context index set=" + contextIndex);
-                    Set subjects = wrapSubjects(subjectId);
-                    Set actions = wrapActions(action, api, contextIndex);
-                    Set resources = wrapResources(pid, namespace);
+                    Set<Subject> subjects = wrapSubjects(subjectId);
+                    Set<Attribute> actions = wrapActions(action, api, contextIndex);
+                    Set<Attribute> resources = wrapResources(pid, namespace);
 
                     RequestCtx request =
                             new RequestCtx(subjects,
                                            resources,
                                            actions,
                                            NULL_SET);
-                    Set tempset = request.getAction();
-                    Iterator tempit = tempset.iterator();
+                    Iterator<Attribute> tempit = actions.iterator();
                     while (tempit.hasNext()) {
-                        Attribute tempobj = (Attribute) tempit.next();
+                        Attribute tempobj = tempit.next();
                         logger.debug("request action has " + tempobj.getId() + "="
                                 + tempobj.getValue().toString());
                     }

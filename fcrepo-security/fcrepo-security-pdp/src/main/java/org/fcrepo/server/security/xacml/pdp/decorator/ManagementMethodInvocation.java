@@ -43,7 +43,7 @@ public class ManagementMethodInvocation
 
     /** Logger for this class. */
     private static Logger LOG =
-            LoggerFactory.getLogger(PolicyIndexInvocationHandler.class.getName());
+            LoggerFactory.getLogger(ManagementMethodInvocation.class.getName());
 
     // represents the type of operation
     public static enum Action {

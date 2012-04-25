@@ -1,13 +1,7 @@
 package org.fcrepo.server.security.xacml.pdp.data;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,27 +10,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader;
+import org.fcrepo.server.security.xacml.util.AttributeBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
+import com.sun.xacml.ParsingException;
+import com.sun.xacml.Policy;
+import com.sun.xacml.PolicySet;
 import com.sun.xacml.attr.AttributeDesignator;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.BagAttribute;
 import com.sun.xacml.cond.EvaluationResult;
+import com.sun.xacml.finder.PolicyFinder;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.xml.sax.SAXException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
-import org.fcrepo.server.security.xacml.util.AttributeBean;
+import org.w3c.dom.Element;
 
 
 /**
@@ -49,21 +40,21 @@ import org.fcrepo.server.security.xacml.util.AttributeBean;
  */
 public abstract class PolicyIndexBase
 implements PolicyIndex {
-
+    private static final String SUBJECT_KEY = "subjectAttributes";
+    private static final String RESOURCE_KEY = "resourceAttributes";
+    private static final String ACTION_KEY = "actionAttributes";
+    private static final String ENVIRONMENT_KEY = "environmentAttributes";
     // used in testing - indicates if the implementation returns indexed results
     // or if false indicates that all policies are returned irrespective of the request
     public  boolean indexed = true;
 
     protected Map<String, Map<String, String>> indexMap = null;
+    protected PolicyReader m_policyReader;
+
     private static final Logger log =
         LoggerFactory.getLogger(PolicyIndexBase.class.getName());
 
     protected static final String METADATA_POLICY_NS = "metadata";
-
-
-    // FIXME: migrate to Spring-based configuration
-    // this path is relative to the pdp directory
-    private static final String CONFIG_FILE = "/conf/config-policy-index.xml";
 
     // xacml namespaces and prefixes
     public static final Map<String, String> namespaces = new HashMap<String, String>();
@@ -76,84 +67,36 @@ implements PolicyIndex {
 
 
 
-    protected PolicyIndexBase() throws PolicyIndexException {
-        initConfig();
+    protected PolicyIndexBase(PolicyReader policyReader) throws PolicyIndexException {
+        m_policyReader = policyReader;
+        String[] indexMapElements =
+        {SUBJECT_KEY, RESOURCE_KEY,
+                ACTION_KEY, ENVIRONMENT_KEY};
 
+        indexMap = new HashMap<String, Map<String, String>>();
+        for (String s : indexMapElements) {
+            indexMap.put(s, new HashMap<String, String>());
+        }
+    }
+    
+    public void setSubjectAttributeMap(Map<String, String> attributeMap) {
+        setAttributeMap(SUBJECT_KEY, attributeMap);
     }
 
-    /**
-     * read index configuration from config file
-     * configuration is a list of policy target attributes to index
-     * @throws PolicyIndexException
-     */
-    private void initConfig() throws PolicyIndexException {
-            String home = MelcoePDP.PDP_HOME.getAbsolutePath();
+    public void setResourceAttributeMap(Map<String, String> attributeMap) {
+        setAttributeMap(RESOURCE_KEY, attributeMap);
+    }
 
-            String filename = home + CONFIG_FILE;
-            File f = new File(filename);
+    public void setActionAttributeMap(Map<String, String> attributeMap) {
+        setAttributeMap(ACTION_KEY, attributeMap);
+    }
 
-            log.info("Loading config file: " + f.getAbsolutePath());
+    public void setEnvironmentAttributeMap(Map<String, String> attributeMap) {
+        setAttributeMap(ENVIRONMENT_KEY, attributeMap);
+    }
 
-
-
-            Document doc = null;
-            try {
-
-            DocumentBuilderFactory factory =
-                DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = factory.newDocumentBuilder();
-
-                doc = docBuilder.parse(new FileInputStream(f));
-            } catch (ParserConfigurationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (FileNotFoundException e) {
-                throw new PolicyIndexException("Configuration file " + filename + " not found.", e);
-            } catch (SAXException e) {
-                throw new PolicyIndexException("Error parsing config file + " + filename, e);
-            } catch (IOException e) {
-                throw new PolicyIndexException("Error reading config file " + filename, e);
-
-            }
-
-            NodeList nodes = null;
-
-            // get index map information
-            String[] indexMapElements =
-            {"subjectAttributes", "resourceAttributes",
-                    "actionAttributes", "environmentAttributes"};
-
-            indexMap = new HashMap<String, Map<String, String>>();
-            for (String s : indexMapElements) {
-                indexMap.put(s, new HashMap<String, String>());
-            }
-
-            nodes =
-                doc.getElementsByTagName("indexMap").item(0)
-                .getChildNodes();
-            for (int x = 0; x < nodes.getLength(); x++) {
-                Node node = nodes.item(x);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Node name: " + node.getNodeName());
-                    }
-
-                    NodeList attrs = node.getChildNodes();
-                    for (int y = 0; y < attrs.getLength(); y++) {
-                        Node attr = attrs.item(y);
-                        if (attr.getNodeType() == Node.ELEMENT_NODE) {
-                            String name =
-                                attr.getAttributes().getNamedItem("name")
-                                .getNodeValue();
-                            String type =
-                                attr.getAttributes().getNamedItem("type")
-                                .getNodeValue();
-                            indexMap.get(node.getNodeName()).put(name, type);
-                        }
-                    }
-                }
-            }
-
+    protected void setAttributeMap(String mapKey, Map<String, String> attributeMap) {
+        indexMap.get(mapKey).putAll(attributeMap);
     }
 
     /**
@@ -254,7 +197,7 @@ implements PolicyIndex {
                 }
             }
         }
-        attributeMap.put("resourceAttributes", new HashSet(attributeBeans
+        attributeMap.put("resourceAttributes", new HashSet<AttributeBean>(attributeBeans
                 .values()));
 
         im = indexMap.get("actionAttributes");
@@ -288,7 +231,7 @@ implements PolicyIndex {
                 }
             }
         }
-        attributeMap.put("actionAttributes", new HashSet(attributeBeans
+        attributeMap.put("actionAttributes", new HashSet<AttributeBean>(attributeBeans
                 .values()));
 
         im = indexMap.get("environmentAttributes");
@@ -322,10 +265,33 @@ implements PolicyIndex {
                 }
             }
         }
-        attributeMap.put("environmentAttributes", new HashSet(attributeBeans
+        attributeMap.put("environmentAttributes", new HashSet<AttributeBean>(attributeBeans
                 .values()));
 
         return attributeMap;
+    }
+    
+    /**
+     * A private method that handles reading the policy and creates the correct
+     * kind of AbstractPolicy.
+     * Because this makes use of the policyFinder, it cannot be reused between finders.
+     * Consider moving to policyManager, which is not intended to be reused outside
+     * of a policyFinderModule, which is not intended to be reused amongst PolicyFinder instances.
+     */
+    protected AbstractPolicy handleDocument(Document doc, PolicyFinder policyFinder) throws ParsingException {
+        // handle the policy, if it's a known type
+        Element root = doc.getDocumentElement();
+        String name = root.getTagName();
+
+        // see what type of policy this is
+        if (name.equals("Policy")) {
+            return Policy.getInstance(root);
+        } else if (name.equals("PolicySet")) {
+            return PolicySet.getInstance(root, policyFinder);
+        } else {
+            // this isn't a root type that we know how to handle
+            throw new ParsingException("Unknown root document type: " + name);
+        }
     }
 
     /**

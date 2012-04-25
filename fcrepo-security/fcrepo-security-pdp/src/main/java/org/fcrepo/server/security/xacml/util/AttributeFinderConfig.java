@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.xacml.attr.AttributeDesignator;
-
 import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderException;
+
+import com.sun.xacml.attr.AttributeDesignator;
 
 
 
@@ -145,8 +145,11 @@ public class AttributeFinderConfig {
         public class Attribute {
             private final Map<String, String> options;
 
-            protected Attribute() {
+            public Attribute() {
                 options = new HashMap<String, String>();
+            }
+            public Attribute(Map<String, String> options) {
+                this.options = options;
             }
             /**
              * Get named config item for this attribute

@@ -2,18 +2,14 @@ package org.fcrepo.server.security.xacml.pdp.data;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -26,20 +22,15 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.sun.xacml.EvaluationCtx;
-
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
+import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
+import org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader;
+import org.fcrepo.server.security.xacml.util.AttributeBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xmldb.api.DatabaseManager;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
@@ -51,8 +42,12 @@ import org.xmldb.api.modules.CollectionManagementService;
 import org.xmldb.api.modules.XMLResource;
 import org.xmldb.api.modules.XPathQueryService;
 
-import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
-import org.fcrepo.server.security.xacml.util.AttributeBean;
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+import com.sun.xacml.AbstractPolicy;
+import com.sun.xacml.EvaluationCtx;
+import com.sun.xacml.ParsingException;
+import com.sun.xacml.finder.PolicyFinder;
 
 /**
  * A PolicyIndex based on an XPath XML database.
@@ -74,27 +69,27 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
         LoggerFactory.getLogger(ExistPolicyIndex.class.getName());
 
     // path of eXist root collection (within which policies collection stored)
-    private static final String m_rootCollectionPath = "/db";
+    private static final String ROOT_COLLECTION_PATH = "/db";
 
     // eXist index config document name
-    private static final String m_indexDocumentName = "collection.xconf";
+    private static final String INDEX_DOCUMENT_NAME = "collection.xconf";
 
 
     // string URI of database
-    private static String m_databaseURI;
+    private  String m_databaseURI;
 
     // name of collection to store FeSL policies in
-    private static String m_collectionName;
+    private  String m_collectionName;
 
     // path of policies collection URI (nb: needs to include base collection - /db)
-    private static String m_collectionPath ;
+    private  String m_collectionPath ;
 
     // path to collection containing index config document
-    private static String m_indexCollectionPath;
+    private  String m_indexCollectionPath;
 
     // admin credentials
-    private static String m_user;
-    private static String m_password;
+    private  String m_user;
+    private  String m_password;
 
     // the main policies collection object used to perform queries, adds, updates etc
     protected Collection m_collection;
@@ -105,12 +100,10 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
     private static final Lock writeLock = rwl.writeLock();
 
 
-    protected ExistPolicyIndex() throws PolicyIndexException {
-        super();
+    protected ExistPolicyIndex(PolicyReader policyReader) throws PolicyIndexException {
+        super(policyReader);
 
         // initialise from config, set up driver
-        init();
-
         // create collection if needed
         try {
             writeLock.lock();
@@ -197,7 +190,7 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
 
 
     @Override
-    public Map<String, byte[]> getPolicies(EvaluationCtx eval)
+    public Map<String, AbstractPolicy> getPolicies(EvaluationCtx eval, PolicyFinder policyFinder)
     throws PolicyIndexException {
 
         Map<String, Set<AttributeBean>> attributeMap;
@@ -209,7 +202,7 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
             throw new PolicyIndexException("Error getting attribute map " + e.getMessage(), e);
         }
 
-        Map<String, byte[]> documents = new HashMap<String, byte[]>();
+        Map<String, AbstractPolicy> documents = new HashMap<String, AbstractPolicy>();
 
         // generate the xpath query and variables
         String query = getXpath(attributeMap);
@@ -228,9 +221,13 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
                     // get the result's document name (the query result just contains content as selected by the xpath query)
                     String id = res.getDocumentId();
                     log.trace("Query matched document: " + IdToName(id));
-                    documents.put(IdToName(id), ((String)m_collection.getResource(id).getContent()).getBytes("UTF-8"));
+                    Document policyDoc = m_policyReader.readPolicy(((String)m_collection.getResource(id).getContent()).getBytes("UTF-8"));
+                    documents.put(IdToName(id), handleDocument(policyDoc, policyFinder));
                 }
             } catch (XMLDBException e) {
+                log.error("Error retrieving query results " + e.getMessage(), e);
+                throw new PolicyIndexException("Error retrieving query results " + e.getMessage(), e);
+            } catch (ParsingException e) {
                 log.error("Error retrieving query results " + e.getMessage(), e);
                 throw new PolicyIndexException("Error retrieving query results " + e.getMessage(), e);
             } catch (UnsupportedEncodingException e) {
@@ -248,7 +245,7 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
 
 
     @Override
-    public byte[] getPolicy(String name) throws PolicyIndexException {
+    public AbstractPolicy getPolicy(String name, PolicyFinder policyFinder) throws PolicyIndexException {
         try {
             readLock.lock();
             XMLResource resource = (XMLResource) m_collection.getResource(nameToId(name));
@@ -256,11 +253,15 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
                 log.error("Attempting to get non-existant resource " + name);
                 throw new PolicyIndexException("Attempting to get non-existant resource " + name);
             }
-            return ((String)resource.getContent()).getBytes("UTF-8");
+            Document policyDoc = m_policyReader.readPolicy(((String)resource.getContent()).getBytes("UTF-8"));
+            return handleDocument(policyDoc, policyFinder);
         } catch (UnsupportedEncodingException e) {
             // Should never happen
             throw new RuntimeException("Unsupported encoding " + e.getMessage(), e);
         } catch (XMLDBException e) {
+            log.error("Error getting policy " + name + " " + e.getMessage(), e);
+            throw new PolicyIndexException("Error getting policy " + name + " " + e.getMessage(), e);
+        } catch (ParsingException e) {
             log.error("Error getting policy " + name + " " + e.getMessage(), e);
             throw new PolicyIndexException("Error getting policy " + name + " " + e.getMessage(), e);
         } finally {
@@ -454,7 +455,32 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
         }
     }
 
-    protected void init() throws PolicyIndexException {
+    public void setDatabaseURI(String databaseURI) {
+        m_databaseURI = databaseURI;
+    }
+
+    public void setCollectionName(String collectionName) {
+        m_collectionName = collectionName;
+        m_indexCollectionPath = ROOT_COLLECTION_PATH +"/system/config/db/" + m_collectionName;
+
+        // string URI form of collection URI (nb: needs to include base collection - /db)
+        m_collectionPath = ROOT_COLLECTION_PATH + "/" + m_collectionName;
+    }
+
+    public void setUser(String user) {
+        m_user = user;
+    }
+
+    public void setPassword(String password) {
+        m_password = password;
+    }
+
+    public void init() throws PolicyIndexException {
+        initDatabase();
+        initCollection();
+    }
+
+    public void initDatabase() throws PolicyIndexException {
         String databaseImplClassName = "org.exist.xmldb.DatabaseImpl";
         Class<?> cl;
         try {
@@ -475,50 +501,6 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
         }
 
         log.info("Loading config file: " + f.getAbsolutePath());
-
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder;
-        Document doc;
-        try {
-            docBuilder = factory.newDocumentBuilder();
-            doc = docBuilder.parse(new FileInputStream(f));
-        } catch (ParserConfigurationException e) {
-            throw new PolicyIndexException("Error parsing eXist config file " + e.getMessage(), e);
-        } catch (FileNotFoundException e) {
-            throw new PolicyIndexException("Error reading eXist config file " + e.getMessage(), e);
-        } catch (SAXException e) {
-            throw new PolicyIndexException("Error parsing eXist config file " + e.getMessage(), e);
-        } catch (IOException e) {
-            throw new PolicyIndexException("Error reading eXist config file " + e.getMessage(), e);
-        }
-
-        NodeList nodes = null;
-
-        // get database information
-        nodes = doc.getElementsByTagName("database").item(0)
-        .getChildNodes();
-
-        for (int x = 0; x < nodes.getLength(); x++) {
-            Node node = nodes.item(x);
-            if (node.getNodeName().equals("uri")) {
-                m_databaseURI = node.getAttributes().getNamedItem("name").getNodeValue();
-            }
-            if (node.getNodeName().equals("collection")) {
-                m_collectionName = node.getAttributes().getNamedItem("name").getNodeValue();
-            }
-            if (node.getNodeName().equals("user")) {
-                m_user = node.getAttributes().getNamedItem("name").getNodeValue();
-            }
-            if (node.getNodeName().equals("password")) {
-                m_password = node.getAttributes().getNamedItem("name").getNodeValue();
-            }
-        }
-
-        m_indexCollectionPath = m_rootCollectionPath +"/system/config/db/" + m_collectionName;
-
-        // string URI form of collection URI (nb: needs to include base collection - /db)
-        m_collectionPath = m_rootCollectionPath + "/" + m_collectionName;
-
 
         Database database;
         try {
@@ -543,7 +525,7 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
             // if it doesn't exist, create it and create the index document if this doesn't already exist
             if (m_collection == null) {
                 // get root collection
-                Collection rootCol = DatabaseManager.getCollection(m_databaseURI + m_rootCollectionPath ,m_user, m_password);
+                Collection rootCol = DatabaseManager.getCollection(m_databaseURI + ROOT_COLLECTION_PATH ,m_user, m_password);
                 CollectionManagementService mgtService = (CollectionManagementService) rootCol.getService("CollectionManagementService", "1.0");
 
                 // first create the index for the collection
@@ -554,10 +536,10 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
                 }
                 if (rootCol.isOpen())
                     rootCol.close();
-                XMLResource ixd = (XMLResource) indexCollection.getResource(m_indexDocumentName);
+                XMLResource ixd = (XMLResource) indexCollection.getResource(INDEX_DOCUMENT_NAME);
                 // get an already-existing index config document; or create if it doesn't exist
                 if (ixd == null ) {
-                    ixd = (XMLResource) indexCollection.createResource(m_indexDocumentName, XMLResource.RESOURCE_TYPE);
+                    ixd = (XMLResource) indexCollection.createResource(INDEX_DOCUMENT_NAME, XMLResource.RESOURCE_TYPE);
                 }
 
                 // Note: although eXist allows full path-based indexes, recommendation is to use
@@ -600,7 +582,7 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
         // get root collection management service
         Collection rootCol;
         try {
-            rootCol = DatabaseManager.getCollection(m_databaseURI + m_rootCollectionPath ,m_user, m_password);
+            rootCol = DatabaseManager.getCollection(m_databaseURI + ROOT_COLLECTION_PATH ,m_user, m_password);
             CollectionManagementService mgtService = (CollectionManagementService) rootCol.getService("CollectionManagementService", "1.0");
 
             // delete the collection
@@ -632,13 +614,12 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
         }
     }
 
-    // FIXME: better to have an explicit close - implement when Spring-ified?
-    @Override
-    public void finalize() {
-            try {
-                m_collection.close();
-            } catch (XMLDBException e) {
-                log.warn("Error closing connection " + e.getMessage(), e);
-            }
+    public void close() {
+        try {
+            m_collection.close();
+        } catch (XMLDBException e) {
+            log.warn("Error closing connection " + e.getMessage(), e);
+        }
     }
+
 }

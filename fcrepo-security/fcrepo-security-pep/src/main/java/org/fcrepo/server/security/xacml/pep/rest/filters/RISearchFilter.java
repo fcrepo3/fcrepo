@@ -72,6 +72,7 @@ import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.fcrepo.server.security.xacml.util.RelationshipResolver;
 
 
 /**
@@ -88,13 +89,15 @@ public class RISearchFilter
     private static final String XACML_RESOURCE_ID =
             "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
 
-    private Map<String, Transformer> transformers = null;
+    private Map<String, Transformer> m_transformers = null;
 
-    private Map<String, String> mimeType = null;
+    private Map<String, String> m_mimeType = null;
 
-    private ContextUtil contextUtil = null;
+    private ContextUtil m_contextUtil = null;
 
-    private Tidy tidy = null;
+    private Tidy m_tidy = null;
+    
+    private RelationshipResolver m_relationshipResolver;
 
     /**
      * Default constructor.
@@ -104,20 +107,20 @@ public class RISearchFilter
     public RISearchFilter()
             throws PEPException {
         super();
-        contextUtil = ContextUtil.getInstance();
+        m_contextUtil = ContextUtil.getInstance();
 
-        tidy = new Tidy();
-        tidy.setShowWarnings(false);
-        tidy.setQuiet(true);
+        m_tidy = new Tidy();
+        m_tidy.setShowWarnings(false);
+        m_tidy.setQuiet(true);
 
-        transformers = new HashMap<String, Transformer>();
-        mimeType = new HashMap<String, String>();
+        m_transformers = new HashMap<String, Transformer>();
+        m_mimeType = new HashMap<String, String>();
         TransformerFactory xFormerFactory = TransformerFactory.newInstance();
 
         try {
             Transformer transformer = xFormerFactory.newTransformer();
-            transformers.put("RDF/XML", transformer);
-            mimeType.put("RDF/XML", "text/xml");
+            m_transformers.put("RDF/XML", transformer);
+            m_mimeType.put("RDF/XML", "text/xml");
         } catch (TransformerConfigurationException tce) {
             logger.warn("Error loading the rdfxml2nTriples.xsl stylesheet", tce);
             throw new PEPException("Error loading the rdfxml2nTriples.xsl stylesheet",
@@ -136,8 +139,8 @@ public class RISearchFilter
 
             Transformer transformer =
                     xFormerFactory.newTransformer(new StreamSource(stylesheet));
-            transformers.put("N-Triples", transformer);
-            mimeType.put("N-Triples", "text/plain");
+            m_transformers.put("N-Triples", transformer);
+            m_mimeType.put("N-Triples", "text/plain");
         } catch (TransformerConfigurationException tce) {
             logger.warn("Error loading the rdfxml2n3.xsl stylesheet", tce);
             throw new PEPException("Error loading the rdfxml2n3.xsl stylesheet",
@@ -272,7 +275,7 @@ public class RISearchFilter
             os = new ByteArrayOutputStream();
             dst = new StreamResult(os);
 
-            Transformer xFormer = transformers.get("RDF/XML");
+            Transformer xFormer = m_transformers.get("RDF/XML");
             try {
                 xFormer.transform(src, dst);
             } catch (Exception e) {
@@ -288,7 +291,7 @@ public class RISearchFilter
             if (logger.isDebugEnabled()) {
                 logger.debug("Transforming format: " + format);
             }
-            Transformer xFormer = transformers.get(format);
+            Transformer xFormer = m_transformers.get(format);
             xFormer.transform(src, dst);
         } catch (TransformerException te) {
             throw new ServletException("error generating output", te);
@@ -299,7 +302,7 @@ public class RISearchFilter
         }
 
         res.setData(os.toByteArray());
-        res.setContentType(mimeType.get(format));
+        res.setContentType(m_mimeType.get(format));
 
         return null;
     }
@@ -364,10 +367,11 @@ public class RISearchFilter
                 }
 
                 RequestCtx req =
-                        contextUtil.buildRequest(getSubjects(request),
+                        m_contextUtil.buildRequest(getSubjects(request),
                                                  actions,
                                                  resAttr,
-                                                 getEnvironment(request));
+                                                 getEnvironment(request),
+                                                 m_relationshipResolver);
 
                 String xacmlResourceId = getXacmlResourceId(req);
                 if (xacmlResourceId != null) {
@@ -384,7 +388,7 @@ public class RISearchFilter
                     resultPid.add(pidDN);
                 }
 
-                String r = contextUtil.makeRequestCtx(req);
+                String r = m_contextUtil.makeRequestCtx(req);
                 if (logger.isDebugEnabled()) {
                     logger.debug(r);
                 }
@@ -411,7 +415,7 @@ public class RISearchFilter
                 logger.debug("Response: " + res);
             }
 
-            resCtx = contextUtil.makeResponseCtx(res);
+            resCtx = m_contextUtil.makeResponseCtx(res);
         } catch (MelcoeXacmlException pe) {
             throw new ServletException("Error evaluating pids: "
                     + pe.getMessage(), pe);

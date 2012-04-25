@@ -104,6 +104,10 @@ public class ResponseCacheImpl
             throw new PEPException("Could not initialize the ResponseCache", e);
         }
     }
+    
+    public void setTTL(long ttl) {
+        TTL = ttl;
+    }
 
     /*
      * (non-Javadoc)

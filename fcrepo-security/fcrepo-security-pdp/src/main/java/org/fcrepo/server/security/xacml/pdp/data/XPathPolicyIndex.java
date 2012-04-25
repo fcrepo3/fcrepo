@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader;
+import org.fcrepo.server.security.xacml.util.AttributeBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.fcrepo.server.security.xacml.util.AttributeBean;
 
 
 /**
@@ -38,8 +38,8 @@ public abstract class XPathPolicyIndex
             new String[] {"Subject", "Resource", "Action", "Environment"};
 
 
-    protected XPathPolicyIndex() throws PolicyIndexException {
-        super();
+    protected XPathPolicyIndex(PolicyReader policyReader) throws PolicyIndexException {
+        super(policyReader);
     }
 
 

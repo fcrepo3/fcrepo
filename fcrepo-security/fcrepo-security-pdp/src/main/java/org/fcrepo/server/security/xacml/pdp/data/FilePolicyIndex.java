@@ -17,30 +17,23 @@
 package org.fcrepo.server.security.xacml.pdp.data;
 
 import java.io.File;
-import java.io.FileInputStream;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import com.sun.xacml.EvaluationCtx;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
+import org.fcrepo.common.MalformedPIDException;
+import org.fcrepo.common.PID;
+import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
+import org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader;
+import org.fcrepo.server.security.xacml.util.DataFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.fcrepo.common.MalformedPIDException;
-import org.fcrepo.common.PID;
-
-import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
-import org.fcrepo.server.security.xacml.util.DataFileUtils;
+import com.sun.xacml.AbstractPolicy;
+import com.sun.xacml.EvaluationCtx;
+import com.sun.xacml.ParsingException;
+import com.sun.xacml.finder.PolicyFinder;
 
 /**
  * Implements PolicyIndex for a filesystem policy index, cached in memory
@@ -59,8 +52,6 @@ implements PolicyIndex {
 
     private String DB_HOME = null;
 
-    private DocumentBuilderFactory dbFactory = null;
-
     // contains the cached policies.  one and only one of these
     private static Map<String, byte[]> policies = null;
     // protects concurrent access to the policies (particularly the files in the cache directory)
@@ -68,19 +59,36 @@ implements PolicyIndex {
     public static final Lock readLock = rwl.readLock();
     public static final Lock writeLock = rwl.writeLock();
 
-    protected FilePolicyIndex()
+    protected FilePolicyIndex(PolicyReader policyReader)
     throws PolicyIndexException {
-        super();
+        super(policyReader);
         indexed = false; // this implementation returns all policies when queried - no indexing/filtering
 
         logger.info("Starting FilePolicyIndex");
 
-        dbFactory = DocumentBuilderFactory.newInstance();
-        dbFactory.setNamespaceAware(true);
+    }
 
-        initConfig();
+    public void setPolicyDirectoryPath(String dbHome) throws PolicyIndexException {
+        if (logger.isDebugEnabled()) {
+            Runtime runtime = Runtime.getRuntime();
+            logger.debug("Total memory: " + runtime.totalMemory() / 1024);
+            logger.debug("Free memory: " + runtime.freeMemory() / 1024);
+            logger.debug("Max memory: " + runtime.maxMemory() / 1024);
+        }
+
+        DB_HOME = MelcoePDP.PDP_HOME.getAbsolutePath() + dbHome;
+        File db_home = new File(DB_HOME);
+        if (!db_home.exists()) {
+            try {
+                db_home.mkdirs();
+            } catch (Exception e) {
+                throw new PolicyIndexException("Could not create DB directory: " + db_home.getAbsolutePath());
+            }
+        }
+    }
+
+    public void init() throws PolicyIndexException {
         loadPolicies(DB_HOME);
-
     }
 
     /*
@@ -89,14 +97,22 @@ implements PolicyIndex {
      * EvaluationCtx)
      */
     @Override
-    public Map<String, byte[]> getPolicies(EvaluationCtx eval)
+    public Map<String, AbstractPolicy> getPolicies(EvaluationCtx eval, PolicyFinder policyFinder)
     throws PolicyIndexException {
         // no indexing, return everything
         // return a copy, otherwise the map could change during evaluation if policies are added, deleted etc
         readLock.lock();
         try {
-            return new ConcurrentHashMap<String, byte[]>(policies);
-        } finally {
+            Map<String, AbstractPolicy> result = new ConcurrentHashMap<String, AbstractPolicy>();
+            for(String id:policies.keySet()){
+                AbstractPolicy policy = handleDocument(m_policyReader.readPolicy(policies.get(id)),policyFinder);
+                result.put(id, policy);
+            }
+            return result;
+        }
+        catch (ParsingException pe) {
+            throw new PolicyIndexException(pe.getMessage(),pe);
+        }finally {
             readLock.unlock();
         }
     }
@@ -247,15 +263,17 @@ implements PolicyIndex {
      * @see org.fcrepo.server.security.xacml.pdp.data.PolicyDataManager#getPolicy(java.lang.String)
      */
     @Override
-    public byte[] getPolicy(String name) throws PolicyIndexException {
+    public AbstractPolicy getPolicy(String name, PolicyFinder policyFinder) throws PolicyIndexException {
         readLock.lock();
         try {
             logger.debug("Getting policy named: " + name);
             if (policies.containsKey(name)) {
-                return policies.get(name);
+                return handleDocument(m_policyReader.readPolicy(policies.get(name)), policyFinder);
             } else {
                 throw new PolicyIndexException("Attempting to get non-existent policy " + name);
             }
+        } catch (ParsingException pe) {
+            throw new PolicyIndexException(pe.getMessage(),pe);
         } finally {
             readLock.unlock();
         }
@@ -295,74 +313,6 @@ implements PolicyIndex {
         }
     }
 
-
-
-    /**
-     * Reads a configuration file and initialises the instance based on that
-     * information.
-     *
-     * @throws PolicyStoreException
-     */
-    private void initConfig() throws PolicyIndexException {
-        if (logger.isDebugEnabled()) {
-            Runtime runtime = Runtime.getRuntime();
-            logger.debug("Total memory: " + runtime.totalMemory() / 1024);
-            logger.debug("Free memory: " + runtime.freeMemory() / 1024);
-            logger.debug("Max memory: " + runtime.maxMemory() / 1024);
-        }
-
-        try {
-            String home = MelcoePDP.PDP_HOME.getAbsolutePath();
-
-            String filename = home + "/conf/config-pdm-file.xml";
-            File f = new File(filename);
-            if (!f.exists()) {
-                throw new PolicyIndexException("Could not locate config file: "
-                                               + f.getAbsolutePath());
-            }
-
-            logger.info("Loading config file: " + f.getAbsolutePath());
-
-            DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
-            Document doc = docBuilder.parse(new FileInputStream(f));
-
-            NodeList nodes = null;
-
-            // get config information
-            nodes = doc.getElementsByTagName("database").item(0).getChildNodes();
-            for (int x = 0; x < nodes.getLength(); x++) {
-                Node node = nodes.item(x);
-                if (node.getNodeName().equals("directory")) {
-                    DB_HOME =
-                        MelcoePDP.PDP_HOME.getAbsolutePath()
-                        + node.getAttributes().getNamedItem("name")
-                        .getNodeValue();
-                    File db_home = new File(DB_HOME);
-                    if (!db_home.exists()) {
-                        try {
-                            db_home.mkdirs();
-                        } catch (Exception e) {
-                            throw new PolicyIndexException("Could not create DB directory: "
-                                                           + db_home.getAbsolutePath());
-                        }
-                    }
-
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("[config] " + node.getNodeName() + ": "
-                                  + db_home.getAbsolutePath());
-                    }
-                }
-            }
-            if (DB_HOME == null) {
-                throw new PolicyIndexException("Unable to read database directory from config file");
-            }
-
-        } catch (Exception e) {
-            logger.error("Could not initialise FilePolicyIndex: " + e.getMessage(), e);
-            throw new PolicyIndexException("Could not initialise FilePolicyIndex: "
-                                           + e.getMessage(), e);
-        }
-    }
     private void loadPolicies(String policyDir)
     throws PolicyIndexException {
 

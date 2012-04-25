@@ -21,11 +21,9 @@ package org.fcrepo.server.security.xacml.pep;
 import java.util.List;
 import java.util.Map;
 
+import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
-import org.fcrepo.server.security.xacml.pdp.MelcoePDPImpl;
 
 /**
  * This is the Web Services based client for the MelcoePDP. It uses the classes
@@ -61,6 +59,10 @@ public class DirectPDPClient
         */
     }
 
+    public void setClient(MelcoePDP pdp) {
+        this.client = pdp;
+    }
+
     /*
      * (non-Javadoc)
      * @see org.fcrepo.server.security.xacml.pep.PEPClient#evaluate(java.lang.String)
@@ -73,7 +75,7 @@ public class DirectPDPClient
 
         String response = null;
         try {
-            response = getClient().evaluate(request);
+            response = this.client.evaluate(request);
         } catch (Exception e) {
             logger.error("Error evaluating request.", e);
             throw new PEPException("Error evaluating request", e);
@@ -98,26 +100,12 @@ public class DirectPDPClient
 
         String response = null;
         try {
-            response = getClient().evaluateBatch(request.toArray(new String[]{}));
+            response = this.client.evaluateBatch(request.toArray(new String[]{}));
         } catch (Exception e) {
             logger.error("Error evaluating request.", e);
             throw new PEPException("Error evaluating request", e);
         }
 
         return response;
-    }
-    private MelcoePDP getClient() throws PEPException {
-        // lazy instantiation - as MelcoePDPImpl attempts to load policies when it is constructed,
-        // if we are using Fedora as a policy store the server won't be running at this point and therefore the load will fail
-        if (client == null) {
-            try {
-                client = new MelcoePDPImpl();
-            } catch (Exception e) {
-                logger.error("Could not initialise the PEP Client.");
-                throw new PEPException("Could not initialise the PEP Client.", e);
-            }
-        }
-        return client;
-
     }
 }

@@ -67,19 +67,19 @@ public class PEP
      * A list of instantiated handlers. As operations are invoked, handlers for
      * those operations are created and added to this list
      */
-    private Map<String, Map<String, OperationHandler>> serviceHandlers = null;
+    private Map<String, Map<String, OperationHandler>> m_serviceHandlers = null;
 
     /**
      * The XACML context handler.
      */
-    ContextHandler ctxHandler = null;
+    ContextHandler m_ctxHandler = null;
 
     private final boolean feslAuthZ;
 
     /**
      * A time stamp to note the time this AuthHandler was instantiated.
      */
-    private Date ts = null;
+    private Date m_ts = null;
 
     /**
      * Default constructor that initialises the handlers map and the
@@ -94,8 +94,8 @@ public class PEP
         logger.info("feslAuthZ = " + feslAuthZ);
         if (feslAuthZ) {
             loadHandlers();
-            ctxHandler = ContextHandlerImpl.getInstance();
-            ts = new Date();
+            m_ctxHandler = ContextHandlerImpl.getInstance();
+            m_ts = new Date();
         }
     }
 
@@ -115,7 +115,7 @@ public class PEP
                         .getLocalPart();
         if (logger.isDebugEnabled()) {
             logger.debug("AuthHandler executed: " + service + "/" + operation
-                    + " [" + ts + "]");
+                    + " [" + m_ts + "]");
         }
 
         //        // Obtain the service details
@@ -164,7 +164,7 @@ public class PEP
         ResponseCtx resCtx = null;
 
         try {
-            resCtx = ctxHandler.evaluate(reqCtx);
+            resCtx = m_ctxHandler.evaluate(reqCtx);
         } catch (PEPException pe) {
             logger.error("Error evaluating request", pe);
             throw CXFUtility
@@ -195,7 +195,7 @@ public class PEP
      * @throws PEPException
      */
     private void loadHandlers() throws PEPException {
-        serviceHandlers = new HashMap<String, Map<String, OperationHandler>>();
+        m_serviceHandlers = new HashMap<String, Map<String, OperationHandler>>();
 
         try {
             // get the PEP configuration
@@ -226,10 +226,10 @@ public class PEP
                 }
 
                 Map<String, OperationHandler> handlers =
-                        serviceHandlers.get(service);
+                        m_serviceHandlers.get(service);
                 if (handlers == null) {
                     handlers = new HashMap<String, OperationHandler>();
-                    serviceHandlers.put(service, handlers);
+                    m_serviceHandlers.put(service, handlers);
                 }
 
                 NodeList handlerNodes = nodes.item(x).getChildNodes();
@@ -314,7 +314,7 @@ public class PEP
         }
 
         Map<String, OperationHandler> handlers =
-                serviceHandlers.get(serviceName);
+                m_serviceHandlers.get(serviceName);
         if (handlers == null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("No Service Handlers found for: " + serviceName);
