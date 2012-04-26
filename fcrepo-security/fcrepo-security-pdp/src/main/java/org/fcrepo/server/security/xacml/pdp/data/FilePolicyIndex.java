@@ -322,7 +322,7 @@ implements PolicyIndex {
 
             if (policies == null) {
 
-                logger.info("Populating FeSL File policy index cache");
+                logger.info("Populating FeSL File policy index cache from " + policyDir);
 
                 policies = new ConcurrentHashMap<String, byte[]>();
 

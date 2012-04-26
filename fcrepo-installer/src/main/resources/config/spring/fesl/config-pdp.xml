@@ -15,7 +15,7 @@
   <util:set id="policyFinderModules">
     <bean id="GenericPolicyFinderModule"
           class="org.fcrepo.server.security.xacml.pdp.finder.policy.GenericPolicyFinderModule">
-          <constructor-arg ref="FilePolicyIndex" />
+          <constructor-arg ref="org.fcrepo.server.security.xacml.pdp.data.PolicyIndex" />
           <constructor-arg ref="PolicyCombiningAlgorithm" />
     </bean>
   </util:set>
@@ -36,7 +36,6 @@
   
     <!-- Melcoe PDP -->
   <bean id="MelcoePDP" class="org.fcrepo.server.security.xacml.pdp.MelcoePDPImpl">
-    <constructor-arg ref="FedoraPolicyStore" />
     <constructor-arg ref="MelcoePDPConfig" />
   </bean>
   

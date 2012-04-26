@@ -42,8 +42,6 @@ public class ContextHandlerImpl
     private static final Logger logger =
             LoggerFactory.getLogger(ContextHandlerImpl.class);
 
-    private static ContextHandler contextHandler = null;
-
     private ContextUtil m_contextUtil = null;
 
     private EvaluationEngine m_evaluationEngine = null;

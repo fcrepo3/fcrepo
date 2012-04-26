@@ -61,11 +61,7 @@
 		If an item is found in the cache, then a request is not	sent to the PDP. Instead the previously
 		calculated value is used.
 	-->
-	<bean id="response-cache" class="org.fcrepo.server.security.xacml.pep.ResponseCacheImpl">
-	  <constructor-arg value="1000" />
-	  <constructor-arg value="60000" />
-	</bean>
-	
+
 	<!--
 		This class handles the identification of relationships between objects.
     

@@ -11,8 +11,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.apache.commons.io.IOUtils;
+
+import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.GeneralException;
+import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.proxy.AbstractInvocationHandler;
+import org.fcrepo.server.proxy.ModuleConfiguredInvocationHandler;
 import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyIndex;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyIndexException;
@@ -32,14 +36,13 @@ import org.slf4j.LoggerFactory;
  */
 
 public class PolicyIndexInvocationHandler
-extends AbstractInvocationHandler {
+        extends AbstractInvocationHandler
+        implements ModuleConfiguredInvocationHandler {
 
     /** Logger for this class. */
     private static Logger LOG =
         LoggerFactory.getLogger(PolicyIndexInvocationHandler.class.getName());
 
-
-    private Boolean m_initialised = null;
 
     private DOManager m_DOManager = null;
 
@@ -54,20 +57,19 @@ extends AbstractInvocationHandler {
         m_DOManager = manager;
     }
 
-    public boolean init() throws PolicyIndexException {
-        if (m_initialised != null)
-            return m_initialised;
-
-        m_initialised = false;
-
+    public void init(Server server) throws InitializationException {
+        
+        m_DOManager = (DOManager)server.getBean(DOManager.class.getName());
+        m_policyIndex = (PolicyIndex)server.getBean(PolicyIndex.class.getName());
         if (m_DOManager == null) {
             LOG.error("DOManager module was not set");
-            throw new PolicyIndexException("DOManager module was not set");
+            throw new InitializationException("DOManager module was not set");
         }
 
-        m_initialised = true;
-        return m_initialised;
-
+        if (m_policyIndex == null) {
+            LOG.error("PolicyIndex was not set");
+            throw new InitializationException("PolicyIndex was not set");
+        }
 
     }
 

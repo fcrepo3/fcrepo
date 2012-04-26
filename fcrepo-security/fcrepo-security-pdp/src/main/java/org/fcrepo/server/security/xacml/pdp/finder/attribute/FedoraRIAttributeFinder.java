@@ -38,24 +38,10 @@ public class FedoraRIAttributeFinder
     private final Map<Integer,Map<String,Attribute>> m_attributes = new HashMap<Integer,Map<String,Attribute>>();
 
     public FedoraRIAttributeFinder(RelationshipResolver relationshipResolver) {
-        try {
-            Map<String, String> resolverConfig =
-                    AttributeFinderConfigUtil.getResolverConfig(this.getClass()
-                            .getName());
-            if (logger.isDebugEnabled()) {
-                for (String s : resolverConfig.keySet()) {
-                    logger.debug(s + ": " + resolverConfig.get(s));
-                }
-            }
-
-            m_relationshipResolver =
+        m_relationshipResolver =
                     relationshipResolver;
 
-            m_attributeFactory = StandardAttributeFactory.getFactory();
-        } catch (AttributeFinderException afe) {
-            logger.error("Attribute finder not initialised:"
-                    + this.getClass().getName(), afe);
-        }
+        m_attributeFactory = StandardAttributeFactory.getFactory();
     }
 
     public void setActionAttributes(Map<String,Attribute> attributes){

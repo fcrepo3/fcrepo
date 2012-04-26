@@ -56,14 +56,8 @@ public class MelcoePDPImpl
 
     private final PDP m_pdp;
 
-    public MelcoePDPImpl(PolicyStore policyStore, PDPConfig pdpConfig)
+    public MelcoePDPImpl(PDPConfig pdpConfig)
             throws MelcoePDPException {
-        try {
-            policyStore.init();
-        } catch (Exception e) {
-            logger.error("Error loading bootstrap FeSL policies: " + e.getMessage(), e);
-            throw new MelcoePDPException("Error loading bootstrap FeSL policies", e);
-        }
         m_pdp = new PDP(pdpConfig);
 
         logger.info("PDP Instantiated and initialised!");

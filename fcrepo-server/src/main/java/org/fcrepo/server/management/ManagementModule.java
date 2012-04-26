@@ -25,6 +25,7 @@ import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.ModuleShutdownException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.proxy.AbstractInvocationHandler;
+import org.fcrepo.server.proxy.ModuleConfiguredInvocationHandler;
 import org.fcrepo.server.proxy.ProxyFactory;
 import org.fcrepo.server.security.Authorization;
 import org.fcrepo.server.storage.DOManager;
@@ -565,6 +566,9 @@ public class ManagementModule
         for (int i = 0; i < pNames.size(); i++) {
             invocationHandlers[i] =
                     getInvocationHandler(getParameter(pNames.get(i)));
+            if (invocationHandlers[i] instanceof ModuleConfiguredInvocationHandler) {
+                ((ModuleConfiguredInvocationHandler)invocationHandlers[i]).init(this.getServer());
+            }
         }
 
         return invocationHandlers;

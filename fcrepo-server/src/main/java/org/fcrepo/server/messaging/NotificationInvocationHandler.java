@@ -16,6 +16,8 @@ import java.util.concurrent.Executors;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.proxy.AbstractInvocationHandler;
+import org.fcrepo.server.proxy.ModuleConfiguredInvocationHandler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,13 +29,13 @@ import org.slf4j.LoggerFactory;
  * @version $Id$
  */
 public class NotificationInvocationHandler
-        extends AbstractInvocationHandler {
+        extends AbstractInvocationHandler
+        implements ModuleConfiguredInvocationHandler {
 
     private static final Logger logger =
             LoggerFactory.getLogger(MessagingModule.class);
 
     private Messaging messaging;
-    private boolean attemptedToLoad = false;
 
     private final ExecutorService exec = Executors.newCachedThreadPool();
 
@@ -53,7 +55,13 @@ public class NotificationInvocationHandler
     public NotificationInvocationHandler(Messaging messaging) {
         if (messaging != null) {
             this.messaging = messaging;
-            attemptedToLoad = true;
+        }
+    }
+    
+    public void init(Server server) {
+        messaging = (MessagingModule)server.getModule("org.fcrepo.server.messaging.Messaging");
+        if (messaging == null) {
+            logger.warn("Unable to load MessagingModule.");
         }
     }
 
@@ -68,15 +76,6 @@ public class NotificationInvocationHandler
             returnValue = method.invoke(target, args);
         } catch(InvocationTargetException ite) {
             throw ite.getTargetException();
-        }
-
-        if (attemptedToLoad == false) {
-            Server server = Server.getInstance(new File(Constants.FEDORA_HOME), false);
-            messaging = (MessagingModule)server.getModule("org.fcrepo.server.messaging.Messaging");
-            if (messaging == null) {
-                logger.warn("Unable to load MessagingModule.");
-            }
-            attemptedToLoad = true;
         }
 
         if (messaging != null && !exec.isShutdown()) {

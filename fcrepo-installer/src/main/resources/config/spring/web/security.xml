@@ -89,6 +89,8 @@
           access="${security.ssl.api.management}" />
         <security:intercept-url pattern="/services/management"
           access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/services/managementMTOM"
+          access="${security.ssl.api.management}" />
         <security:intercept-url pattern="/management/getNextPID"
           access="${security.ssl.api.management}" />
         <security:intercept-url pattern="/getDSAuthenticated*/**"
@@ -110,6 +112,8 @@
         <security:intercept-url pattern="/search*"
           access="${security.ssl.api.access}" />
         <security:intercept-url pattern="/services/access"
+          access="${security.ssl.api.access}" />
+        <security:intercept-url pattern="/services/accessMTOM"
           access="${security.ssl.api.access}" />
         <security:intercept-url pattern="/wsdl*"
           access="${security.ssl.api.access}" />

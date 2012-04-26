@@ -8,6 +8,7 @@ package org.fcrepo.server.security.xacml.pdp.data;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -78,7 +79,7 @@ implements PolicyStore {
     private boolean validateSchema = false;
     private Map<String,String> schemaLocations = null;
 
-    private PolicyUtils utils;
+    private final PolicyUtils utils = new PolicyUtils();
     protected Server fedoraServer;
 
     protected Management apiMService;
@@ -93,14 +94,14 @@ implements PolicyStore {
     }
 
     @Override
-    public void init() throws PolicyStoreException {
+    public void init() throws PolicyStoreException, FileNotFoundException {
         if (log.isDebugEnabled()) {
             Runtime runtime = Runtime.getRuntime();
             log.debug("Total memory: " + runtime.totalMemory() / 1024);
             log.debug("Free memory: " + runtime.freeMemory() / 1024);
             log.debug("Max memory: " + runtime.maxMemory() / 1024);
         }
-
+        super.init();
         // if no pid namespace was specified, use the default specified in fedora.fcfg
         if (pidNamespace.equals("")) {
             pidNamespace = fedoraServer.getModule("org.fcrepo.server.storage.DOManager").getParameter("pidNamespace");

@@ -72,6 +72,7 @@ public class ContextUtil {
             new ConcurrentHashMap<String, String>();
 
     public ContextUtil() {
+        logger.info("created");
     }
 
     public void setActionMap(Map<String,String> actions) {

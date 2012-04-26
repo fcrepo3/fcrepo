@@ -12,7 +12,7 @@
   <!--  non-validating PolicyReader -->
   <bean id="PolicyReader" class="org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader" />
   <!--  PolicyIndex Implementations -->  
-  <bean id="FilePolicyIndex"
+  <bean id="org.fcrepo.server.security.xacml.pdp.data.PolicyIndex"
     class="org.fcrepo.server.security.xacml.pdp.data.FilePolicyIndex"
     autowire-candidate="true" init-method="init">
     <constructor-arg ref="PolicyReader" />
