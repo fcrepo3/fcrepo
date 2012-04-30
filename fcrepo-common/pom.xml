@@ -127,11 +127,6 @@
 
 	<dependencies>
 
-	    <dependency>
-	      <groupId>org.fcrepo</groupId>
-	      <artifactId>fcrepo-generate</artifactId>
-	      <version>${project.version}</version>
-	    </dependency>
 
 	    <dependency>
 	      <groupId>commons-codec</groupId>

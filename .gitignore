@@ -3,6 +3,7 @@ build
 stubwrappers
 activemq-data
 derby.log
+fcrepo-server/bin
 fcrepo-server/test
 .classpath
 .project

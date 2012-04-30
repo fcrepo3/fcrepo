@@ -587,26 +587,51 @@
     <dependency>
       <groupId>org.akubraproject</groupId>
       <artifactId>akubra-core</artifactId>
-      <version>0.3</version>
+      <version>${akubra.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.akubraproject</groupId>
       <artifactId>akubra-fs</artifactId>
-      <version>0.3</version>
+      <version>${akubra.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.akubraproject</groupId>
       <artifactId>akubra-map</artifactId>
-      <version>0.3</version>
+      <version>${akubra.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.akubraproject</groupId>
       <artifactId>akubra-mem</artifactId>
-      <version>0.3</version>
+      <version>${akubra.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>GroboTestingJUnit-core</artifactId>
@@ -629,7 +654,6 @@
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-bundle</artifactId>
-      <version>${cxf.version}</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>

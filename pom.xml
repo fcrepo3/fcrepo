@@ -123,10 +123,12 @@
     <timestamp>${maven.build.timestamp}</timestamp>
     <abdera.version>1.1.2</abdera.version>
     <activemq.version>5.5.0</activemq.version>
+    <akubra.version>0.3</akubra.version>
     <axiom.version>1.2.10</axiom.version>
     <cxf.version>2.4.0</cxf.version>
     <derby.version>10.7.1.1</derby.version>
     <jersey.version>1.8</jersey.version>
+    <slf4j.version>1.5.11</slf4j.version>
     <spring.version>3.0.5.RELEASE</spring.version>
     <trippi.version>1.5.5</trippi.version>
   </properties>
@@ -389,24 +391,24 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.5.11</version>
+        <version>${slf4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
-        <version>1.5.11</version>
+        <version>${slf4j.version}</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>log4j-over-slf4j</artifactId>
-        <version>1.5.11</version>
+        <version>${slf4j.version}</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jul-to-slf4j</artifactId>
-        <version>1.5.11</version>
+        <version>${slf4j.version}</version>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
@@ -499,6 +501,10 @@
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
