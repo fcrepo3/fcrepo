@@ -5,24 +5,17 @@
 package org.fcrepo.server.storage;
 
 import java.io.File;
-
 import java.net.URI;
 import java.net.URL;
-
 import java.util.Hashtable;
 import java.util.Map;
 
 import javax.activation.MimetypesFileTypeMap;
 
 import org.apache.commons.httpclient.Header;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.http.HttpInputStream;
 import org.fcrepo.common.http.WebClient;
 import org.fcrepo.common.http.WebClientConfiguration;
-
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.GeneralException;
@@ -36,6 +29,8 @@ import org.fcrepo.server.security.BackendSecuritySpec;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.server.utilities.ServerUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -138,6 +133,7 @@ public class DefaultExternalContentManager
      * org.fcrepo.server.storage.ExternalContentManager#getExternalContent(fedora
      * .server.storage.ContentManagerParams)
      */
+    @Override
     public MIMETypedStream getExternalContent(ContentManagerParams params)
             throws GeneralException, HttpServiceNotFoundException{
         logger.debug("in getExternalContent(), url=" + params.getUrl());
@@ -237,8 +233,8 @@ public class DefaultExternalContentManager
             // security check
             URI cURI = cFile.toURI();
             logger.info("Checking resolution security on " + cURI);
-            Authorization authModule = (Authorization) getServer().getModule(
-            "org.fcrepo.server.security.Authorization");
+            Authorization authModule = getServer()
+                    .getBean("org.fcrepo.server.security.Authorization", Authorization.class);
             if (authModule == null) {
                 throw new GeneralException(
                 "Missing required Authorization module");

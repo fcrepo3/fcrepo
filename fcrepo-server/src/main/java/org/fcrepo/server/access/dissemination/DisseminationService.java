@@ -5,29 +5,22 @@
 package org.fcrepo.server.access.dissemination;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-
 import java.net.URLEncoder;
-
 import java.sql.Timestamp;
-
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.DisseminationBindingInfoNotFoundException;
 import org.fcrepo.server.errors.DisseminationException;
 import org.fcrepo.server.errors.GeneralException;
-import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.ServerException;
-import org.fcrepo.server.errors.ServerInitializationException;
 import org.fcrepo.server.security.Authorization;
 import org.fcrepo.server.security.BackendPolicies;
 import org.fcrepo.server.security.BackendSecurity;
@@ -91,11 +84,11 @@ public class DisseminationService {
 
     private BackendSecuritySpec m_beSS = null;
 
-    private BackendSecurity m_beSecurity;
+    private final BackendSecurity m_beSecurity;
 
-    private ExternalContentManager m_ecm;
-    
-    private Authorization m_authorization;
+    private final ExternalContentManager m_ecm;
+
+    private final Authorization m_authorization;
 
     /** The hashtable containing information required for datastream mediation. */
     protected static Hashtable<String, DatastreamMediation> dsRegistry = new Hashtable<String, DatastreamMediation>(1000);
@@ -143,8 +136,8 @@ public class DisseminationService {
         }
 
 
-        m_ecm =   (ExternalContentManager) server.getModule("org.fcrepo.server.storage.ExternalContentManager");
-        m_authorization = (Authorization) server.getModule("org.fcrepo.server.security.Authorization");
+        m_ecm =   server.getBean("org.fcrepo.server.storage.ExternalContentManager", ExternalContentManager.class);
+        m_authorization = server.getBean("org.fcrepo.server.security.Authorization", Authorization.class);
     }
 
     /**

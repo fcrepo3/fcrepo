@@ -170,8 +170,7 @@ public class DefaultAccess
         }
 
         m_authorizationModule =
-                (Authorization) getServer()
-                        .getModule("org.fcrepo.server.security.Authorization");
+                getServer().getBean("org.fcrepo.server.security.Authorization", Authorization.class);
         if (m_authorizationModule == null) {
             throw new ModuleInitializationException("Can't get an Authorization module (in default access) from Server.getModule",
                                                     getRole());

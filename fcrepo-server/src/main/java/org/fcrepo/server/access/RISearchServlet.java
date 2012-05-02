@@ -69,11 +69,11 @@ extends SpringAccessServlet {
         super.init(config);
 
         m_writer =
-                (ResourceIndex) m_server
-                .getModule("org.fcrepo.server.resourceIndex.ResourceIndex");
+                m_server
+                  .getBean("org.fcrepo.server.resourceIndex.ResourceIndex", ResourceIndex.class);
         m_authorization =
-                (Authorization) m_server
-                .getModule("org.fcrepo.server.security.Authorization");
+                m_server
+                  .getBean("org.fcrepo.server.security.Authorization", Authorization.class);
 
         try {
             String indexStylesheetPath = getPath(getIndexStylesheetLocation());

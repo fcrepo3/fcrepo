@@ -37,10 +37,10 @@ public class FedoraOAIProviderServlet
     public OAIResponder getResponder() throws RepositoryException {
         if (m_responder == null) {
             try {
-                OAIProvider provider = (OAIProvider) m_server
-                        .getModule("org.fcrepo.oai.OAIProvider");
-                Authorization authz = (Authorization) m_server
-                        .getModule("org.fcrepo.server.security.Authorization");
+                OAIProvider provider = m_server
+                        .getBean("org.fcrepo.oai.OAIProvider", OAIProvider.class);
+                Authorization authz = m_server
+                        .getBean("org.fcrepo.server.security.Authorization", Authorization.class);
                 m_responder = new OAIResponder(provider, authz);
             } catch (Exception e) {
                 throw new RepositoryException(e.getClass().getName() + ": "

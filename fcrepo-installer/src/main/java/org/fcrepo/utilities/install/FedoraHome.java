@@ -419,18 +419,44 @@ public class FedoraHome {
     }
 
     private void copyFESLConfigs() throws InstallationFailedException {
-        File feslDir =
+        File feslWebDir =
                 new File(_installDir,
-                         "server/config/spring/fesl");
+                         "server/config/spring/fesl/web");
+        File feslModuleDir =
+                new File(_installDir,
+                         "server/config/spring/fesl/module");
         File webDir =
                 new File(_installDir,
                          "server/config/spring/web");
-        for (File beanDef:feslDir.listFiles()){
+        File moduleDir =
+                new File(_installDir,
+                         "server/config/spring");
+
+        for (File beanDef:feslWebDir.listFiles()){
             if (beanDef.isFile()){
                 FileReader reader = null;
                 FileWriter writer = null;
                 try {
                     File copy = new File(webDir, beanDef.getName());
+                    reader = new FileReader(beanDef);
+                    writer = new FileWriter(copy);
+                    IOUtils.copy(reader, writer);
+                    writer.flush();
+                } catch (Exception e) {
+                    throw new InstallationFailedException(e.getMessage(), e);
+                }
+                finally {
+                    IOUtils.closeQuietly(writer);
+                    IOUtils.closeQuietly(reader);
+                }
+            }
+        }
+        for (File beanDef:feslModuleDir.listFiles()){
+            if (beanDef.isFile()){
+                FileReader reader = null;
+                FileWriter writer = null;
+                try {
+                    File copy = new File(moduleDir, beanDef.getName());
                     reader = new FileReader(beanDef);
                     writer = new FileWriter(copy);
                     IOUtils.copy(reader, writer);

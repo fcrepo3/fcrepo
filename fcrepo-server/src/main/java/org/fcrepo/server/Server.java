@@ -8,14 +8,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
 import java.text.MessageFormat;
 import java.text.ParseException;
-
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,15 +28,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
-import org.xml.sax.SAXException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.FaultException;
@@ -63,6 +51,8 @@ import org.fcrepo.server.security.Authorization;
 import org.fcrepo.server.utilities.status.ServerState;
 import org.fcrepo.server.utilities.status.ServerStatusFile;
 import org.fcrepo.utilities.DateUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -85,6 +75,10 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.classreading.SimpleMetadataReaderFactory;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  * The starting point for working with a Fedora repository. This class handles
@@ -443,7 +437,7 @@ public abstract class Server
     /**
      * The server's home directory; this is typically the 'server' subdirectory under $FEDORA_HOME.
      */
-    private File m_serverDir;
+    private final File m_serverDir;
 
     private AbstractApplicationContext m_serverContext;
     private GenericApplicationContext m_moduleContext;
@@ -470,7 +464,7 @@ public abstract class Server
     /**
      * The server's configuration file
      */
-    private File m_configFile;
+    private final File m_configFile;
     /**
      * Is the server running?
      */
@@ -491,14 +485,14 @@ public abstract class Server
      * Web Client http connection configuration object
      */
     private WebClientConfiguration m_webClientConfig;
-    
+
     /**
      * Initializes the Server from a Map of Strings (as per Module)
      */
-    
-    protected Server(Map<String,String> params, File homeDir) 
+
+    protected Server(Map<String,String> params, File homeDir)
         throws ServerInitializationException, ModuleInitializationException {
-        
+
         setParameters(params);
         m_initialized = false;
         m_loadedModuleRoles = new HashSet<String>();
@@ -542,7 +536,7 @@ public abstract class Server
             throws ServerInitializationException, ModuleInitializationException {
         this(Server.loadParameters(rootConfigElement, ""), homeDir);
     }
-    
+
     public void init()  throws ServerInitializationException, ModuleInitializationException {
         logger.info("Registered server at " + getHomeDir().getPath());
         try {
@@ -619,10 +613,14 @@ public abstract class Server
                 String role = mconfig.getRole();
                 String className = mconfig.getClassName();
                 logger.info("Loading bean definitions for " + className);
-                registerBeanDefinition(role,
-                                       createModuleBeanDefinition(className, mconfig.getParameters(), role));
-                registerBeanDefinition(role+"Configuration",
-                                       createModuleConfigurationBeanDefinition(role));
+                if (!this.containsBeanDefinition(role)){
+                    registerBeanDefinition(role,
+                                           createModuleBeanDefinition(className, mconfig.getParameters(), role));
+                }
+                if (!this.containsBeanDefinition(role+"Configuration")){
+                    registerBeanDefinition(role+"Configuration",
+                                           createModuleConfigurationBeanDefinition(role));
+                }
             }
             registerBeanDefinitions();
             // initialize each module by getting Spring bean
@@ -695,7 +693,7 @@ public abstract class Server
             throw new RuntimeException(msg, th);
         }
     }
-    
+
     protected AbstractApplicationContext getDefaultContext() throws IOException {
         GenericApplicationContext appContext = new GenericApplicationContext();
         appContext.refresh(); // init event multicaster to avoid synch issue
@@ -726,7 +724,7 @@ public abstract class Server
     public void setApplicationContext(ApplicationContext applicationContext) {
         m_serverContext = (AbstractApplicationContext)applicationContext;
     }
-    
+
     protected BeanDefinition getServerBeanDefinition(){
         GenericBeanDefinition result = new GenericBeanDefinition();
         result.setAutowireCandidate(true);
@@ -1057,7 +1055,7 @@ public abstract class Server
     }
 
     public final String status(Context context) throws AuthzException {
-        ((Authorization) getModule("org.fcrepo.server.security.Authorization"))
+        (getBean("org.fcrepo.server.security.Authorization", Authorization.class))
                 .enforceServerStatus(context);
         return "RUNNING";
     }

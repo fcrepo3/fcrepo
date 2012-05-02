@@ -8,21 +8,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.errors.DatastreamNotFoundException;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ObjectNotFoundException;
@@ -36,14 +30,14 @@ import org.fcrepo.server.errors.servletExceptionExtensions.Forbidden403Exception
 import org.fcrepo.server.errors.servletExceptionExtensions.InternalError500Exception;
 import org.fcrepo.server.errors.servletExceptionExtensions.NotFound404Exception;
 import org.fcrepo.server.errors.servletExceptionExtensions.Ok200Exception;
-import org.fcrepo.server.errors.servletExceptionExtensions.Unavailable503Exception;
 import org.fcrepo.server.management.DefaultManagement;
 import org.fcrepo.server.management.ManagementModule;
 import org.fcrepo.server.security.Authorization;
 import org.fcrepo.server.utilities.PIDStreamIterableWrapper;
 import org.fcrepo.server.utilities.ServerUtilitySerializer;
 import org.fcrepo.server.utilities.status.ServerState;
-import org.fcrepo.server.utilities.status.ServerStatusFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -141,8 +135,7 @@ public class ServerController
             }
             Authorization authModule = null;
             authModule =
-                    (Authorization) m_server
-                            .getModule("org.fcrepo.server.security.Authorization");
+                    m_server.getBean("org.fcrepo.server.security.Authorization", Authorization.class);
             if (authModule == null) {
                 throw new InternalError500Exception(request,
                                                     actionLabel,
@@ -356,7 +349,7 @@ public class ServerController
             }
             m_server = null;
         }
-        
+
         super.destroy();
     }
 
