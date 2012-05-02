@@ -823,7 +823,9 @@ public class FedoraClient
 
         public URL getURL() throws IOException {
             if (m_url == null) {
-                m_url = new URL(m_baseURL + "services/" + m_name);
+                String url = m_baseURL + "services/" + m_name;
+                URL redirect = getRedirectURL(url);
+                m_url = (redirect == null)? new URL(url) : redirect;
             }
             return m_url;
         }
