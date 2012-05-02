@@ -33,8 +33,6 @@ import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
 public abstract class OAIProviderServlet
         extends HttpServlet {
 
-    OAIResponder m_responder;
-
     public OAIProviderServlet() {
     }
 
@@ -86,15 +84,6 @@ public abstract class OAIProviderServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         doGet(request, response);
-    }
-
-    @Override
-    public void init() throws ServletException {
-        try {
-            m_responder = getResponder();
-        } catch (RepositoryException re) {
-            throw new ServletException(getMessage(re));
-        }
     }
 
     public void test(String[] args) throws OAIException, RepositoryException {
