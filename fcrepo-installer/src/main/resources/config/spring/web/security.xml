@@ -85,6 +85,7 @@
       <security:filter-invocation-definition-source
         path-type="ant">
 
+        <!-- This pattern is used by FedoraClient to determine whether apim endpoint requires SSL or not -->
         <security:intercept-url pattern="/management/upload"
           access="${security.ssl.api.management}" />
         <security:intercept-url pattern="/services/management"
@@ -115,6 +116,7 @@
           access="${security.ssl.api.access}" />
         <security:intercept-url pattern="/services/accessMTOM"
           access="${security.ssl.api.access}" />
+        <!-- This pattern is used by FedoraClient to determine whether apia endpoint requires SSL or not -->
         <security:intercept-url pattern="/wsdl*"
           access="${security.ssl.api.access}" />
         <security:intercept-url pattern="**.jsp"

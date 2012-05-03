@@ -87,16 +87,16 @@ public class FedoraClient
             .getLogger(FedoraClient.class);
 
     private final SOAPEndpoint m_accessMTOMEndpoint =
-            new SOAPEndpoint("accessMTOM");
+            new SOAPEndpoint("accessMTOM", false);
 
     private final SOAPEndpoint m_managementMTOMEndpoint =
-            new SOAPEndpoint("managementMTOM");
+            new SOAPEndpoint("managementMTOM", true);
 
     private final SOAPEndpoint m_accessEndpoint =
-            new SOAPEndpoint("access");
+            new SOAPEndpoint("access", false);
 
     private final SOAPEndpoint m_managementEndpoint =
-            new SOAPEndpoint("management");
+            new SOAPEndpoint("management", true);
 
     private String m_baseURL;
 
@@ -813,8 +813,11 @@ public class FedoraClient
 
         URL m_url;
 
-        public SOAPEndpoint(String name) {
+        boolean m_apim;
+
+        public SOAPEndpoint(String name, boolean apim) {
             m_name = name;
+            m_apim = apim;
         }
 
         public String getName() {
@@ -823,11 +826,22 @@ public class FedoraClient
 
         public URL getURL() throws IOException {
             if (m_url == null) {
-                String url = m_baseURL + "services/" + m_name;
-                URL redirect = getRedirectURL(url);
-                m_url = (redirect == null)? new URL(url) : redirect;
+                String url = getChannelBaseUrl() + "services/" + m_name;
+                m_url = new URL(url);
             }
             return m_url;
+        }
+
+        public String getChannelBaseUrl() throws IOException {
+            if (m_apim) {
+                URL redirect = getRedirectURL(m_baseURL + "management/upload");
+                if (redirect == null) return m_baseURL;
+                else return redirect.toString().replace("management/upload", "");
+            } else {
+                URL redirect = getRedirectURL(m_baseURL + "wsdl");
+                if (redirect == null) return m_baseURL;
+                else return redirect.toString().replace("wsdl", "");
+            }
         }
 
     }

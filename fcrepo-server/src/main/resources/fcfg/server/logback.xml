@@ -19,6 +19,9 @@
     <appender-ref ref="FEDORA"/>
   </logger>
   
+  <logger name="org.apache.cxf" additivity="false" level="WARN">
+    <appender-ref ref="FEDORA"/>
+  </logger>
   <!-- Remove the comments around this section to send FeSL debug messages to fesl.log
   <property name="FEDORA_FESL_LOG_PATH"
             value="${fedora.home}/server/logs/fesl${logfile.extension:-.log}"/>
