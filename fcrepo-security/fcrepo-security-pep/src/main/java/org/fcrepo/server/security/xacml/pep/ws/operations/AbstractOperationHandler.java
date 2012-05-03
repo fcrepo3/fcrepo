@@ -113,9 +113,8 @@ public abstract class AbstractOperationHandler
                 && bodyElement.getLocalName().equals("Body")){
             bodyElement = (SOAPElement)bodyElement.getElementsByTagNameNS(operation.getNamespaceURI(), operation.getLocalPart()).item(0);
         }
-        if (bodyElement != null) {
-            logger.info("Operation: " + operation.getNamespaceURI() + " "
-                    + operation.getLocalPart());
+        if (logger.isDebugEnabled() && bodyElement != null) {
+            logger.debug("Operation: {} {}", operation.getNamespaceURI(), operation.getLocalPart());
         }
         return bodyElement;
     }
@@ -418,7 +417,6 @@ public abstract class AbstractOperationHandler
             logger.error("Problem obtaining params", e);
             throw CXFUtility.getFault(e);
         }
-        logger.info("Obtained SOAP object: (" + result.getClass().getName() + ") ");
         return result;
     }
 
