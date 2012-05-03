@@ -538,7 +538,7 @@ public class TestHTTPStatusCodesConfigC
         final String policyDir =
                 "data/fedora-xacml-policies/repository-policies/junit";
         File dir = new File(FEDORA_HOME, policyDir);
-        dir.mkdir();
+        dir.mkdirs();
         File policyFile = new File(dir, filename);
         writeStringToFile(xml, policyFile);
 

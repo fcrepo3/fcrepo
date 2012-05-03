@@ -46,7 +46,7 @@
         </bean>
          -->
         <bean id="org.fcrepo.server.security.PolicyEnforcementPoint"
-              class="org.fcrepo.server.security.PolicyEnforcementPoint"
+              class="org.fcrepo.server.security.PolicyEnforcementPointImpl"
               factory-method="getInstance" autowire-candidate="true">
               <property name="attributeFinderModules">
                   <list>

@@ -135,35 +135,131 @@
      <entry key="findObjects">
        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects">
          <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
        </bean>
      </entry>
-     <entry key="resumeFindObjects"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects" /></entry>
-      <entry key="getDatastreamDissemination"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastreamDissemination" /></entry>
-      <entry key="getDissemination"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDissemination"/></entry>
-      <entry key="getObjectHistory"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectHistory"/></entry>
-      <entry key="getObjectProfile"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectProfile"/></entry>
-      <entry key="listDatastreams"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ListDatastreams">
+     <entry key="resumeFindObjects">
+       <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects">
          <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
        </bean>
      </entry>
-      <entry key="listMethods"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ListMethods"/></entry>
-      <entry key="addDatastream"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.AddDatastream"/></entry>
-      <entry key="export"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Export"/></entry>
-      <entry key="getDatastream"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastream"/></entry>
-      <entry key="getNextPID"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetNextPID"/></entry>
-      <entry key="getObjectXML"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectXML"/></entry>
-      <entry key="ingest"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Ingest"/></entry>
-      <entry key="modifyDatastream"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ModifyDatastream"/></entry>
-      <entry key="modifyObject"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ModifyObject"/></entry>
-      <entry key="purgeDatastream"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeDatastream"/></entry>
-      <entry key="purgeObject"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeObject"/></entry>
-      <entry key="setDatastreamState"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.SetDatastreamState"/></entry>
-      <entry key="setDatastreamVersionable"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.SetDatastreamVersionable"/></entry>
-      <entry key="validate"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Validate"/></entry>
-      <entry key="getDatastreamHistory"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastreamHistory"/></entry>
-      <entry key="getRelationships"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetRelationships"/></entry>
-      <entry key="addRelationship"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.AddRelationship"/></entry>
-      <entry key="purgeRelationship"><bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeRelationship"/></entry>
+     <entry key="getDatastreamDissemination">
+       <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastreamDissemination">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+     </entry>
+     <entry key="getDissemination">
+       <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDissemination">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+     </entry>
+     <entry key="getObjectHistory">
+       <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectHistory">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+     </entry>
+     <entry key="getObjectProfile">
+       <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectProfile">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+     </entry>
+     <entry key="listDatastreams">
+       <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ListDatastreams">
+         <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+     </entry>
+      <entry key="listMethods">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ListMethods">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="addDatastream">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.AddDatastream">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="export">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Export">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="getDatastream">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastream">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="getNextPID">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetNextPID">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="getObjectXML">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetObjectXML">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="ingest">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Ingest">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="modifyDatastream">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ModifyDatastream">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="modifyObject">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.ModifyObject">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="purgeDatastream">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeDatastream">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="purgeObject">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeObject">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="setDatastreamState">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.SetDatastreamState">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="setDatastreamVersionable">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.SetDatastreamVersionable">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="validate">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Validate">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="getDatastreamHistory">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastreamHistory">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="getRelationships">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetRelationships">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="addRelationship">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.AddRelationship">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
+      <entry key="purgeRelationship">
+        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.PurgeRelationship">
+         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+       </bean>
+      </entry>
     </util:map>
     <bean id="ObjectsFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsFilter">
       <constructor-arg ref="handlers-rest" />

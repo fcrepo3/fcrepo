@@ -152,7 +152,7 @@ public class FindObjects
                             "FedoraRepository",
                             null);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(),e);
             CXFUtility.getFault(e);
         }
 
