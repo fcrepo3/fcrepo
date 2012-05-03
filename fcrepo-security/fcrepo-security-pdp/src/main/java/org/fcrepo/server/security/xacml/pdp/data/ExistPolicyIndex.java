@@ -1,7 +1,6 @@
 package org.fcrepo.server.security.xacml.pdp.data;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
@@ -22,7 +21,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 import org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader;
 import org.fcrepo.server.security.xacml.util.AttributeBean;
 import org.slf4j.Logger;
@@ -490,17 +488,6 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
             throw new PolicyIndexException("Class not found - check xmldb driver classes are on classpath " + e.getMessage(), e);
         }
 
-
-        String home = MelcoePDP.PDP_HOME.getAbsolutePath();
-
-        String filename = home + "/conf/config-exist.xml";
-        File f = new File(filename);
-        if (!f.exists()) {
-            throw new PolicyIndexException("Could not locate eXist config file: "
-                                           + f.getAbsolutePath());
-        }
-
-        log.info("Loading config file: " + f.getAbsolutePath());
 
         Database database;
         try {

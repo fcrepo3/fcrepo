@@ -53,8 +53,6 @@ implements PolicyStore {
     private static final String XACML20_POLICY_NS =
         "urn:oasis:names:tc:xacml:2.0:policy:schema:os";
 
-    private static final String CONFIG_FILE = "config-pdm-fedora.xml";
-
     public static final String FESL_POLICY_DATASTREAM = "FESLPOLICY";
 
     public static String FESL_BOOTSTRAP_POLICY_NAMESPACE = "fedora-policy";
@@ -109,7 +107,7 @@ implements PolicyStore {
 
         // check control group was supplied
         if (datastreamControlGroup.equals("")) {
-            throw new PolicyStoreException("No control group for policy datastreams was specified in " + CONFIG_FILE);
+            throw new PolicyStoreException("No control group for policy datastreams was specified in FedoraPolicyStore configuration");
         }
         if (validateSchema) {
             String schemaLocation = schemaLocations.get(XACML20_POLICY_NS);

@@ -1338,7 +1338,7 @@ public class TestAPIM
         assertTrue(objectXML.length > 0);
         xmlIn = new String(objectXML, "UTF-8");
         doc = XMLUnit.buildControlDocument(xmlIn);
-        System.out.println("***** Testcase: TestAPIM.testAddDatastream NEWDS3 as type E\n"+xmlIn);
+        //System.out.println("***** Testcase: TestAPIM.testAddDatastream NEWDS3 as type E\n"+xmlIn);
         assertXpathExists("foxml:digitalObject[@PID='demo:14']", doc);
         assertXpathExists("//foxml:datastream[@ID='NEWDS3' and @CONTROL_GROUP='E' and @STATE='A']",
                           doc);
@@ -1847,7 +1847,7 @@ public class TestAPIM
             assertTrue(objectXML.length > 0);
             xmlIn = new String(objectXML, "UTF-8");
             doc = XMLUnit.buildControlDocument(xmlIn);
-            System.out.println("***** Testcase: TestAPIM.testModifyDatastreamByValue " + mcPID + "\n"+xmlIn);
+            //System.out.println("***** Testcase: TestAPIM.testModifyDatastreamByValue " + mcPID + "\n"+xmlIn);
             assertXpathExists("foxml:digitalObject[@PID='" + mcPID + "']",
                               doc);
             assertXpathExists("//foxml:datastream[@ID='" + reservedDSID

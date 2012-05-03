@@ -3,7 +3,7 @@ package org.fcrepo.server.security.xacml.pdp.finder.attribute;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -17,64 +17,60 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
+import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.attr.AttributeFactory;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.BagAttribute;
 import com.sun.xacml.attr.StandardAttributeFactory;
 import com.sun.xacml.cond.EvaluationResult;
-import com.sun.xacml.finder.AttributeFinderModule;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderConfigUtil;
-import org.fcrepo.server.security.xacml.util.AttributeFinderConfig;
 
 public class LDAPAttributeFinder
-        extends AttributeFinderModule {
+        extends DesignatorAttributeFinderModule {
 
     private static final Logger logger =
             LoggerFactory.getLogger(LDAPAttributeFinder.class);
 
-    private AttributeFactory attributeFactory = null;
-
-    private AttributeFinderConfig attributes = null;
+    private final AttributeFactory attributeFactory = StandardAttributeFactory.getFactory();
 
     private Hashtable<String, String> dirEnv = null;
 
-    private Map<String, String> options = null;
+    private Map<String, String> m_options = null;
 
     private InitialDirContext ctx = null;
 
-    public LDAPAttributeFinder() {
+    public LDAPAttributeFinder(Map<String, String> options) {
         try {
-            attributes =
-                    AttributeFinderConfigUtil.getAttributeFinderConfig(this
-                            .getClass().getName());
-            logger.info("Initialised AttributeFinder:"
-                            + this.getClass().getName());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("registering the following attributes: ");
-                for (int desNum : attributes.getDesignatorIds()) {
-                    for (String attrName : attributes.get(desNum).getAttributeNames()) {
-                        logger.debug(desNum + ": " + attrName);
-                    }
-                }
-            }
-
-            options =
-                    AttributeFinderConfigUtil.getOptionMap(this.getClass()
-                            .getName());
+            m_options =
+                    options;
             dirEnv = new Hashtable<String, String>(options);
-            attributeFactory = StandardAttributeFactory.getFactory();
 
             ctx = new InitialDirContext(dirEnv);
         } catch (Exception e) {
             logger.error("Attribute finder not initialised:"
                     + this.getClass().getName(), e);
         }
+    }
+
+    public void init() throws AttributeFinderException {
+        if (emptyAttributeMap()) {
+            logger.warn(this.getClass().getName() + " configured with no registered attributes");
+            return;
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("registering the following attributes: ");
+            for (int desNum : m_attributes.keySet()) {
+                for (String attrName : m_attributes.get(desNum).keySet()) {
+                    logger.debug(desNum + ": " + attrName);
+                }
+            }
+        }
+        logger.info("Initialised AttributeFinder:"
+                    + this.getClass().getName());
     }
 
     /**
@@ -85,18 +81,6 @@ public class LDAPAttributeFinder
     @Override
     public boolean isDesignatorSupported() {
         return true;
-    }
-
-    /**
-     * Returns a <code>Set</code> with a single <code>Integer</code> specifying
-     * that environment attributes are supported by this module.
-     *
-     * @return a <code>Set</code> with
-     *         <code>AttributeDesignator.ENVIRONMENT_TARGET</code> included
-     */
-    @Override
-    public Set<Integer> getSupportedDesignatorTypes() {
-        return attributes.getDesignatorIds();
     }
 
     /**
@@ -163,7 +147,7 @@ public class LDAPAttributeFinder
         String attrName = attributeId.toString();
 
         // we only know about registered attributes from config file
-        if (attributes.get(designatorType) == null) {
+        if (m_attributes.get(designatorType) == null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Does not know about designatorType: "
                         + designatorType);
@@ -173,7 +157,7 @@ public class LDAPAttributeFinder
         }
 
         Set<String> allowedAttributes =
-                attributes.get(designatorType).getAttributeNames();
+                m_attributes.get(designatorType).keySet();
         if (!allowedAttributes.contains(attrName)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Does not know about attribute: " + attrName);
@@ -198,8 +182,8 @@ public class LDAPAttributeFinder
                                                  String attribute,
                                                  URI type) {
         String[] attrsReturned = new String[] {attribute};
-        String base = options.get("searchbase");
-        String filter = "(" + options.get("id-attribute") + "=" + user + ")";
+        String base = m_options.get("searchbase");
+        String filter = "(" + m_options.get("id-attribute") + "=" + user + ")";
 
         SearchControls searchControls = new SearchControls();
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -259,7 +243,8 @@ public class LDAPAttributeFinder
     }
 
     public static void main(String[] args) throws Exception {
-        LDAPAttributeFinder finder = new LDAPAttributeFinder();
+        HashMap<String,String> test = new HashMap<String, String>();
+        LDAPAttributeFinder finder = new LDAPAttributeFinder(test);
         URI type = new URI("http://www.w3.org/2001/XMLSchema#string");
 
         EvaluationResult result =

@@ -23,18 +23,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyStore;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreFactory;
 import org.fcrepo.server.security.xacml.util.PolicyFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -52,8 +50,7 @@ public class TestPolicyDatabase {
 
     public static void main(String[] args) throws PolicyStoreException,
             FileNotFoundException {
-        PolicyStoreFactory f = new PolicyStoreFactory();
-        dbXmlPolicyDataManager = f.newPolicyStore();
+        dbXmlPolicyDataManager = new FedoraPolicyStore(null);
 
         logger.info("Adding");
         add();

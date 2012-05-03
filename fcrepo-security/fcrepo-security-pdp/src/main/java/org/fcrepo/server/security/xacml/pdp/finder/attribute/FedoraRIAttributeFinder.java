@@ -1,13 +1,11 @@
 package org.fcrepo.server.security.xacml.pdp.finder.attribute;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderConfigUtil;
 import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderException;
 import org.fcrepo.server.security.xacml.util.Attribute;
 import org.fcrepo.server.security.xacml.util.RelationshipResolver;
@@ -15,16 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeDesignator;
 import com.sun.xacml.attr.AttributeFactory;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.BagAttribute;
 import com.sun.xacml.attr.StandardAttributeFactory;
 import com.sun.xacml.cond.EvaluationResult;
-import com.sun.xacml.finder.AttributeFinderModule;
 
 public class FedoraRIAttributeFinder
-        extends AttributeFinderModule {
+        extends DesignatorAttributeFinderModule {
 
     private static final Logger logger =
             LoggerFactory.getLogger(FedoraRIAttributeFinder.class);
@@ -33,65 +29,11 @@ public class FedoraRIAttributeFinder
 
     private RelationshipResolver m_relationshipResolver = null;
 
-    //private AttributeFinderConfig attributes = null;
-
-    private final Map<Integer,Map<String,Attribute>> m_attributes = new HashMap<Integer,Map<String,Attribute>>();
-
     public FedoraRIAttributeFinder(RelationshipResolver relationshipResolver) {
         m_relationshipResolver =
                     relationshipResolver;
 
         m_attributeFactory = StandardAttributeFactory.getFactory();
-    }
-
-    public void setActionAttributes(Map<String,Attribute> attributes){
-        setAttributes(AttributeDesignator.ACTION_TARGET,attributes);
-    }
-
-    public void setEnvironmentAttributes(Map<String,Attribute> attributes){
-        setAttributes(AttributeDesignator.ENVIRONMENT_TARGET,attributes);
-    }
-
-    public void setResourceAttributes(Map<String,Attribute> attributes){
-        setAttributes(AttributeDesignator.RESOURCE_TARGET,attributes);
-    }
-
-    public void setSubjectAttributes(Map<String,Attribute> attributes){
-        setAttributes(AttributeDesignator.SUBJECT_TARGET,attributes);
-    }
-
-    protected void setAttributes(int designator, Map<String,Attribute> attributes){
-        m_attributes.put(designator,attributes);
-        if (logger.isDebugEnabled()) {
-            logger.debug("registering the following attributes: ");
-            for (String attrName : attributes.keySet()) {
-                logger.debug(designator + ": " + attrName);
-            }
-        }
-
-    }
-
-
-    /**
-     * Returns true always because this module supports designators.
-     *
-     * @return true always
-     */
-    @Override
-    public boolean isDesignatorSupported() {
-        return true;
-    }
-
-    /**
-     * Returns a <code>Set</code> with a single <code>Integer</code> specifying
-     * that environment attributes are supported by this module.
-     *
-     * @return a <code>Set</code> with
-     *         <code>AttributeDesignator.ENVIRONMENT_TARGET</code> included
-     */
-    @Override
-    public Set<Integer> getSupportedDesignatorTypes() {
-        return m_attributes.keySet();
     }
 
     /**

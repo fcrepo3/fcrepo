@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyStore;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreFactory;
 import org.fcrepo.server.security.xacml.util.AttributeBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +19,7 @@ public class TestFindPolicies {
     private static PolicyStore dbXmlPolicyDataManager;
 
     public static void main(String[] args) throws Exception {
-        PolicyStoreFactory f = new PolicyStoreFactory();
-        dbXmlPolicyDataManager = f.newPolicyStore();
+        dbXmlPolicyDataManager = new FedoraPolicyStore(null);
 
 
         AttributeBean[] attributes = new AttributeBean[1];

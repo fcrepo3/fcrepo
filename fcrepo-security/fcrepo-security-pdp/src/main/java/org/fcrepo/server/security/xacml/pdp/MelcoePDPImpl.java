@@ -20,12 +20,12 @@ package org.fcrepo.server.security.xacml.pdp;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-
 import java.util.HashSet;
 import java.util.Set;
 
-import com.sun.xacml.ConfigurationStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sun.xacml.Indenter;
 import com.sun.xacml.PDP;
 import com.sun.xacml.PDPConfig;
@@ -33,14 +33,6 @@ import com.sun.xacml.ParsingException;
 import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.server.security.xacml.pdp.data.PolicyStore;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreFactory;
-import org.fcrepo.server.security.xacml.util.PopulatePolicyDatabase;
 
 /**
  * This is an implementation of the MelcoePDP interface. It provides for the
@@ -67,6 +59,7 @@ public class MelcoePDPImpl
      * (non-Javadoc)
      * @see org.fcrepo.server.security.xacml.pdp.MelcoePDP#evaluate(java.lang.String)
      */
+    @Override
     public String evaluate(String request) throws EvaluationException {
         logger.debug("evaluating request: {}", request);
 
@@ -93,6 +86,7 @@ public class MelcoePDPImpl
      * (non-Javadoc)
      * @see org.fcrepo.server.security.xacml.pdp.MelcoePDP#evaluateBatch(java.lang.String[])
      */
+    @Override
     public String evaluateBatch(String[] requests) throws EvaluationException {
             logger.debug("evaluating request batch");
 
