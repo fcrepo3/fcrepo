@@ -13,10 +13,6 @@
   <name>All Fedora Clients</name>
 
   <dependencies>
-  	<dependency>
-  		<groupId>org.trippi</groupId>
-  		<artifactId>trippi-core</artifactId>
-  	</dependency>
   </dependencies>
   <modules>
     <module>fcrepo-client-admin</module>

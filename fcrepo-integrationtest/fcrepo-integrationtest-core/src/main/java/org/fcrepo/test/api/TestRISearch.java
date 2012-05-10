@@ -4,6 +4,9 @@
  */
 package org.fcrepo.test.api;
 
+import java.io.FileOutputStream;
+import java.net.URLEncoder;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -51,6 +54,22 @@ extends FedoraServerTestCase {
         }
     }
 
+    /**
+     * Check for SPARQL_W3C result format
+     * 
+     */
+    public void testRISearchSparqlW3cResult() throws Exception{
+    	FedoraClient client=getFedoraClient();
+    	String query="select $object $modified from <#ri> where  " +
+    			"$object <fedora-model:hasModel> " +
+    			"<info:fedora/fedora-system:ServiceDefinition-3.0> and " +
+    			"$object <fedora-view:lastModifiedDate> $modified";
+    	FileOutputStream out=new FileOutputStream("/tmp/fcrepo-1023.log");
+    	out.write(client.getResponseAsString("/risearch?lang=itql&format=Sparql_W3C&query=" + URLEncoder.encode(query,"UTF-8"), true, true).trim().getBytes());
+    	out.flush();
+    	out.close();
+    }
+    
     /**
      * Explicit RELS-EXT relation to collection object
      * @throws Exception
