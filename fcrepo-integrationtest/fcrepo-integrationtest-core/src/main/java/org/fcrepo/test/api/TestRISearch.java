@@ -4,8 +4,21 @@
  */
 package org.fcrepo.test.api;
 
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.StringReader;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -20,6 +33,12 @@ import org.fcrepo.server.resourceIndex.UvaStdImgTripleGenerator_1;
 
 import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.fcrepo.test.api.TestRESTAPI.ValidatorErrorHandler;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 
 import static org.fcrepo.test.api.RISearchUtil.checkSPOCount;
 
@@ -64,12 +83,24 @@ extends FedoraServerTestCase {
     			"$object <fedora-model:hasModel> " +
     			"<info:fedora/fedora-system:ServiceDefinition-3.0> and " +
     			"$object <fedora-view:lastModifiedDate> $modified";
-    	FileOutputStream out=new FileOutputStream("/tmp/fcrepo-1023.log");
-    	out.write(client.getResponseAsString("/risearch?lang=itql&format=Sparql_W3C&query=" + URLEncoder.encode(query,"UTF-8"), true, true).trim().getBytes());
-    	out.flush();
-    	out.close();
+    	String xml=client.getResponseAsString("/risearch?lang=itql&format=Sparql_W3C&query=" + URLEncoder.encode(query,"UTF-8"), true, true).trim();
+    	validateXML(xml,this.getClass().getClassLoader().getResourceAsStream("schema/sparql/sparql_result.xsd"));
     }
     
+    private void validateXML(String xml,java.io.InputStream schemaIn) throws Exception {
+    	SchemaFactory sf=SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+    	Schema schema=sf.newSchema(new StreamSource(schemaIn));
+    	Validator validator=schema.newValidator();
+    	StringBuilder errorBuilder=new StringBuilder();
+    	try{
+    		validator.validate(new StreamSource(new StringReader(xml)));
+    	}catch (Exception e) {
+    		e.printStackTrace();
+    		fail("Error during validation of XML:\n" + e.getLocalizedMessage());
+		}
+    }
+
+
     /**
      * Explicit RELS-EXT relation to collection object
      * @throws Exception
