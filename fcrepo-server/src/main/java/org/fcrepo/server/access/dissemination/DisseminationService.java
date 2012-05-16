@@ -454,10 +454,9 @@ public class DisseminationService {
                 }
                 try {
                     // If the operationLocation contains datastreamInputParms
-                    // URLEncode each parameter before substitution. Otherwise, the
-                    // operationLocation has no parameters (i.e., it is a simple URL )
-                    // so bypass URLencoding.
-                    if (dissURL.indexOf("=(") != -1) {
+                    // URLEncode each parameter before substitution, except when 
+                		// the parameter comprises the first part of the the URL.
+                    if (dissURL.indexOf("(" + bindingKeyPattern + ")") > 0) {
                         dissURL =
                                 substituteString(dissURL,
                                                  bindingKeyPattern,
