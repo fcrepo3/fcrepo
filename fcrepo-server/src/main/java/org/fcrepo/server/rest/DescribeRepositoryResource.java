@@ -8,14 +8,6 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
 import javax.servlet.ServletException;
-
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -23,13 +15,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
@@ -38,8 +31,10 @@ import org.fcrepo.server.access.RepositoryInfo;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.errors.authorization.AuthzException;
-
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Implements the "describeRepository" functionality of the Fedora Access LITE
@@ -90,7 +85,7 @@ public class DescribeRepositoryResource
     public DescribeRepositoryResource(Server server) {
         super(server);
     }
-    
+
     @GET
     @POST
     @Path("/")
@@ -130,7 +125,7 @@ public class DescribeRepositoryResource
         try {
             return describeRepository(context, xml);
         } catch (Exception ae) {
-            return handleException(ae);
+            return handleException(ae, false);
         }
 
     }
@@ -200,7 +195,7 @@ public class DescribeRepositoryResource
          * </p>
          */
         @Override
-        public void write(OutputStream output) 
+        public void write(OutputStream output)
                 throws IOException {
             OutputStreamWriter pw = new OutputStreamWriter(output,"UTF-8");
             pw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -258,15 +253,15 @@ public class DescribeRepositoryResource
             pw.close();
         }
     }
-    
+
     public class HtmlTransformation implements StreamingOutput {
-        private ReposInfoSerializer reposInfo;
-        private Context context;
+        private final ReposInfoSerializer reposInfo;
+        private final Context context;
         public HtmlTransformation(Context context, ReposInfoSerializer input) {
             this.reposInfo = input;
             this.context = context;
         }
-        
+
         @Override
         public void write(OutputStream out) throws IOException {
             File xslFile =
@@ -288,11 +283,10 @@ public class DescribeRepositoryResource
             } catch (TransformerException te) {
                 throw new IOException("Transform error" + te.toString(), te);
             }
-       
+
             out.flush();
         }
     }
 
 }
 
-    

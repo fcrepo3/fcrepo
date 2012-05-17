@@ -84,7 +84,8 @@ public class DatastreamResource
     @GET
     public Response listDatastreams(@PathParam(RestParam.PID) String pid,
                                     @QueryParam(RestParam.AS_OF_DATE_TIME) String dateTime,
-                                    @QueryParam(RestParam.FORMAT) @DefaultValue(HTML) String format) {
+                                    @QueryParam(RestParam.FORMAT) @DefaultValue(HTML) String format,
+                                    @QueryParam(RestParam.FLASH) @DefaultValue("false") boolean flash) {
 
         try {
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
@@ -106,7 +107,7 @@ public class DatastreamResource
 
             return Response.ok(output, mime).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -122,7 +123,8 @@ public class DatastreamResource
                                          @PathParam(RestParam.DSID) String dsID,
                                          @QueryParam(RestParam.AS_OF_DATE_TIME) String dateTime,
                                          @QueryParam(RestParam.FORMAT) @DefaultValue(HTML) String format,
-                                         @QueryParam(RestParam.VALIDATE_CHECKSUM) @DefaultValue("false") boolean validateChecksum) {
+                                         @QueryParam(RestParam.VALIDATE_CHECKSUM) @DefaultValue("false") boolean validateChecksum,
+                                         @QueryParam(RestParam.FLASH) @DefaultValue("false") boolean flash) {
         try {
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
             Context context = getContext();
@@ -161,7 +163,7 @@ public class DatastreamResource
 
             return Response.ok(xml, mime).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -181,7 +183,8 @@ public class DatastreamResource
     @GET
     public Response getDatastreamHistory(@PathParam(RestParam.PID) String pid,
                                          @PathParam(RestParam.DSID) String dsID,
-                                         @QueryParam(RestParam.FORMAT) @DefaultValue(HTML) String format) {
+                                         @QueryParam(RestParam.FORMAT) @DefaultValue(HTML) String format,
+                                         @QueryParam(RestParam.FLASH) @DefaultValue("false") boolean flash) {
         try {
             Context context = getContext();
             Datastream[] datastreamHistory =
@@ -214,7 +217,7 @@ public class DatastreamResource
 
             return Response.ok(xml, mime).build();
         } catch (Exception e) {
-            return handleException(e);
+            return handleException(e, flash);
         }
     }
 
@@ -228,7 +231,8 @@ public class DatastreamResource
     public Response getDatastream(@PathParam(RestParam.PID) String pid,
                                   @PathParam(RestParam.DSID) String dsID,
                                   @QueryParam(RestParam.AS_OF_DATE_TIME) String dateTime,
-                                  @QueryParam(RestParam.DOWNLOAD) String download) {
+                                  @QueryParam(RestParam.DOWNLOAD) String download,
+                                  @QueryParam(RestParam.FLASH) @DefaultValue("false") boolean flash) {
         Context context = getContext();
         try {
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
@@ -250,7 +254,7 @@ public class DatastreamResource
 
             return buildResponse(stream);
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -266,7 +270,8 @@ public class DatastreamResource
                                      @PathParam(RestParam.DSID) String dsID,
                                      @QueryParam(RestParam.START_DT) String startDT,
                                      @QueryParam(RestParam.END_DT) String endDT,
-                                     @QueryParam(RestParam.LOG_MESSAGE) String logMessage) {
+                                     @QueryParam(RestParam.LOG_MESSAGE) String logMessage,
+                                     @QueryParam(RestParam.FLASH) @DefaultValue("false") boolean flash) {
 
         try {
             Context context = getContext();
@@ -286,7 +291,7 @@ public class DatastreamResource
             }
             return Response.ok(m_mapper.writeValueAsString(results)).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -314,7 +319,8 @@ public class DatastreamResource
                                      @QueryParam(RestParam.MIME_TYPE) String mimeType,
                                      @QueryParam(RestParam.LOG_MESSAGE) String logMessage,
                                      @QueryParam(RestParam.IGNORE_CONTENT) @DefaultValue("false") boolean ignoreContent,
-                                     @QueryParam(RestParam.LAST_MODIFIED_DATE) DateTimeParam lastModifiedDate) {
+                                     @QueryParam(RestParam.LAST_MODIFIED_DATE) DateTimeParam lastModifiedDate,
+                                     @QueryParam(RestParam.FLASH) @DefaultValue("false") boolean flash) {
         return addOrUpdateDatastream(false,
                                      pid,
                                      dsID,
@@ -331,7 +337,8 @@ public class DatastreamResource
                                      checksum,
                                      logMessage,
                                      ignoreContent,
-                                     lastModifiedDate);
+                                     lastModifiedDate,
+                                     flash);
     }
 
     /**
@@ -357,7 +364,8 @@ public class DatastreamResource
                                   @QueryParam(RestParam.CHECKSUM_TYPE) String checksumType,
                                   @QueryParam(RestParam.CHECKSUM) String checksum,
                                   @QueryParam(RestParam.MIME_TYPE) String mimeType,
-                                  @QueryParam(RestParam.LOG_MESSAGE) String logMessage) {
+                                  @QueryParam(RestParam.LOG_MESSAGE) String logMessage,
+                                  @QueryParam(RestParam.FLASH) @DefaultValue("false") boolean flash) {
         return addOrUpdateDatastream(true,
                                      pid,
                                      dsID,
@@ -374,7 +382,8 @@ public class DatastreamResource
                                      checksum,
                                      logMessage,
                                      false,
-                                     null);
+                                     null,
+                                     flash);
     }
 
     protected Response addOrUpdateDatastream(boolean posted,
@@ -393,7 +402,8 @@ public class DatastreamResource
                                              String checksum,
                                              String logMessage,
                                              boolean ignoreContent,
-                                             DateTimeParam lastModifiedDate) {
+                                             DateTimeParam lastModifiedDate,
+                                             boolean flash) {
 
         try {
             String[] altIDs = {};
@@ -583,7 +593,7 @@ public class DatastreamResource
             builder.entity(xml);
             return builder.build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 }

@@ -70,7 +70,10 @@ public class RelationshipResource extends BaseRestResource {
             String predicate,
             @QueryParam(RestParam.FORMAT)
             @DefaultValue("rdf/xml")
-            String format) {
+            String format,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
         Context context = getContext();
         if (subject == null) {
             // assume the subject is the object as denoted by the pid
@@ -102,11 +105,11 @@ public class RelationshipResource extends BaseRestResource {
             it.toStream(out, outputFormat);
             return Response.ok(out.toString("UTF-8"), mediaType).build();
         } catch (ServerException e) {
-            return handleException(e);
+            return handleException(e, flash);
         } catch (TrippiException e) {
-            return handleException(e);
+            return handleException(e, flash);
         } catch (UnsupportedEncodingException e) {
-            return handleException(e);
+            return handleException(e, flash);
         }
     }
 
@@ -132,7 +135,10 @@ public class RelationshipResource extends BaseRestResource {
             @QueryParam(RestParam.IS_LITERAL)
             boolean isLiteral,
             @QueryParam(RestParam.DATATYPE)
-            String datatype) {
+            String datatype,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
         Context context = getContext();
         try {
             if (subject == null) {
@@ -142,7 +148,7 @@ public class RelationshipResource extends BaseRestResource {
             boolean result = m_management.addRelationship(context, subject, predicate, object, isLiteral, datatype);
             return Response.ok(Boolean.toString(result)).build(); // needs an entity to not be overridden with a 204
         } catch (ServerException e) {
-            return handleException(e);
+            return handleException(e, flash);
         }
     }
 
@@ -167,7 +173,10 @@ public class RelationshipResource extends BaseRestResource {
             @QueryParam(RestParam.IS_LITERAL)
             boolean isLiteral,
             @QueryParam(RestParam.DATATYPE)
-            String datatype) {
+            String datatype,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
         Context context = getContext();
         try {
             if (subject == null) {
@@ -177,7 +186,7 @@ public class RelationshipResource extends BaseRestResource {
             boolean result = m_management.purgeRelationship(context, subject, predicate, object, isLiteral, datatype);
             return Response.ok(Boolean.toString(result), MediaType.TEXT_PLAIN_TYPE).build();
         } catch (ServerException e) {
-            return handleException(e);
+            return handleException(e, flash);
         }
     }
 }

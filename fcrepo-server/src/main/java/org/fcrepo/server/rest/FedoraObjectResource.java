@@ -65,7 +65,10 @@ public class FedoraObjectResource extends BaseRestResource {
             @PathParam(RestParam.PID)
             String pid,
             @QueryParam(RestParam.AS_OF_DATE_TIME)
-            String dateTime) {
+            String dateTime,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
         try {
             Context context = getContext();
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
@@ -76,7 +79,7 @@ public class FedoraObjectResource extends BaseRestResource {
             String xml = getSerializer(context).objectValidationToXml(validation);
             return Response.ok(xml, mediaType).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -102,7 +105,10 @@ public class FedoraObjectResource extends BaseRestResource {
             String exportContext,
             @QueryParam(RestParam.ENCODING)
             @DefaultValue(DEFAULT_ENC)
-            String encoding) {
+            String encoding,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
 
         try {
             Context context = getContext();
@@ -113,7 +119,7 @@ public class FedoraObjectResource extends BaseRestResource {
             }
             return Response.ok(is, mediaType).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -133,7 +139,10 @@ public class FedoraObjectResource extends BaseRestResource {
             String pid,
             @QueryParam(RestParam.FORMAT)
             @DefaultValue(HTML)
-            String format) {
+            String format,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
 
         try {
             Context context = getContext();
@@ -149,7 +158,7 @@ public class FedoraObjectResource extends BaseRestResource {
 
             return Response.ok(xml, mime).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -165,7 +174,10 @@ public class FedoraObjectResource extends BaseRestResource {
     @Produces(XML)
     public Response getObjectXML(
             @PathParam(RestParam.PID)
-            String pid) {
+            String pid,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
 
         try {
             Context context = getContext();
@@ -173,7 +185,7 @@ public class FedoraObjectResource extends BaseRestResource {
 
             return Response.ok(is, TEXT_XML).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -193,7 +205,10 @@ public class FedoraObjectResource extends BaseRestResource {
             String dateTime,
             @QueryParam(RestParam.FORMAT)
             @DefaultValue(HTML)
-            String format) {
+            String format,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
 
         try {
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
@@ -211,7 +226,7 @@ public class FedoraObjectResource extends BaseRestResource {
 
             return Response.ok(xml, mime).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -225,13 +240,16 @@ public class FedoraObjectResource extends BaseRestResource {
             @PathParam(RestParam.PID)
             String pid,
             @QueryParam("logMessage")
-            String logMessage) {
+            String logMessage,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
         try {
             Context context = getContext();
             Date d = m_management.purgeObject(context, pid, logMessage);
             return Response.ok(DateUtility.convertDateToXSDString(d), MediaType.TEXT_PLAIN_TYPE).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -267,7 +285,10 @@ public class FedoraObjectResource extends BaseRestResource {
             String state,
             @QueryParam(RestParam.IGNORE_MIME)
             @DefaultValue("false")
-            boolean ignoreMime) {
+            boolean ignoreMime,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
         try {
             Context context = getContext();
 
@@ -314,7 +335,7 @@ public class FedoraObjectResource extends BaseRestResource {
             URI createdLocation = m_uriInfo.getRequestUri().resolve(URLEncoder.encode(pid, DEFAULT_ENC));
             return Response.created(createdLocation).entity(pid).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -348,7 +369,10 @@ public class FedoraObjectResource extends BaseRestResource {
             @QueryParam(RestParam.STATE)
             String state,
             @QueryParam(RestParam.LAST_MODIFIED_DATE)
-            DateTimeParam lastModifiedDate) {
+            DateTimeParam lastModifiedDate,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
         try {
             Context context = getContext();
             Date requestModDate = null;
@@ -359,7 +383,7 @@ public class FedoraObjectResource extends BaseRestResource {
                     m_management.modifyObject(context, pid, state, label, ownerID, logMessage, requestModDate);
             return Response.ok().entity(DateUtility.convertDateToXSDString(lastModDate)).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 

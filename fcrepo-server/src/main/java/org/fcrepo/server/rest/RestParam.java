@@ -36,11 +36,19 @@ public interface RestParam {
     String IGNORE_CONTENT = "ignoreContent";
     String IGNORE_MIME = "ignoreMime";
     String DOWNLOAD = "download";
-
+    // relationships params
     String SUBJECT = "subject";
     String PREDICATE = "predicate";
     String OBJECT = "object";
     String IS_LITERAL = "isLiteral";
     String DATATYPE = "datatype";
     String LAST_MODIFIED_DATE = "lastModifiedDate";
+    // object search params
+    String TERMS = "terms";
+    String QUERY = "query";
+    String MAX_RESULTS = "maxResults";
+    String SESSION_TOKEN = "sessionToken";
+    String RESULT_FORMAT = "resultFormat";
+    // common flash override param
+    String FLASH = "flash";
 }

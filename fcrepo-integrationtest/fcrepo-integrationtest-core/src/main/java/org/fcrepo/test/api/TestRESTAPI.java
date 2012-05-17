@@ -5,7 +5,6 @@
 
 package org.fcrepo.test.api;
 
-import static org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
 import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.commons.httpclient.HttpStatus.SC_MOVED_TEMPORARILY;
@@ -743,6 +742,7 @@ public class TestRESTAPI
         if (m.find() && m.groupCount() == 1) {
             pid = m.group(1);
         }
+        pid = pid.replaceAll("\n", "").replaceAll("\r", "").replaceAll("%3A", ":");
         return pid;
     }
 
@@ -758,9 +758,6 @@ public class TestRESTAPI
         String emptyObjectPid =
                 extractPid(response.getResponseHeader("Location").getValue());
         assertNotNull(emptyObjectPid);
-        emptyObjectPid =
-                emptyObjectPid.replaceAll("\n", "").replaceAll("\r", "")
-                        .replaceAll("%3A", ":");
         // PID should be returned as a header and as the response body
         String responseBody = new String(response.getResponseBody(), "UTF-8");
         assertTrue(responseBody.equals(emptyObjectPid));
@@ -991,10 +988,9 @@ public class TestRESTAPI
     }
 
     public void testPurgeObject() throws Exception {
-        url = String.format("/objects/%s", "demo:TEST_PURGE");
+        url = "/objects/demo:TEST_PURGE";
         assertEquals(SC_UNAUTHORIZED, post("", false).getStatusCode());
         assertEquals(SC_CREATED, post("", true).getStatusCode());
-        url = String.format("/objects/demo:TEST_PURGE");
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
         assertEquals(SC_OK, delete(true).getStatusCode());
     }
@@ -1289,12 +1285,12 @@ public class TestRESTAPI
 
     public void testResponseOverride() throws Exception {
         // Make request which returns error response
-        url = String.format("/objects/%s", "BOGUS_PID");
-        assertEquals(SC_BAD_REQUEST, post("", true).getStatusCode());
+        url = String.format("/objects/%s", "demo:BOGUS_PID");
+        assertEquals(SC_NOT_FOUND, put("", true).getStatusCode());
 
         // With flash=true parameter response should be 200
-        url = String.format("/objects/%s?flash=true", "BOGUS_PID");
-        assertEquals(SC_OK, post("", true).getStatusCode());
+        url = String.format("/objects/%s?flash=true", "demo:BOGUS_PID");
+        assertEquals(SC_OK, put("", true).getStatusCode());
     }
 
     // test correct content-disposition header on getDatastreamDissemination
@@ -1382,7 +1378,6 @@ public class TestRESTAPI
 
         // Test content not supplied
         response = _doUploadPost(url,new Part[] {});
-     // jersey now sends a 400 in this circumstance (jersey-577)
         assertEquals(400, response.getStatusCode());
     }
 

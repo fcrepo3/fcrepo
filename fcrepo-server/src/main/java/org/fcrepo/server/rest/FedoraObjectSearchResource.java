@@ -49,18 +49,21 @@ public class FedoraObjectSearchResource extends BaseRestResource {
     @GET
     @Produces( { HTML, XML })
     public Response searchObjects(
-            @QueryParam("terms")
+            @QueryParam(RestParam.TERMS)
             String terms,
-            @QueryParam("query")
+            @QueryParam(RestParam.QUERY)
             String query,
-            @QueryParam("maxResults")
+            @QueryParam(RestParam.MAX_RESULTS)
             @DefaultValue("25")
             int maxResults,
-            @QueryParam("sessionToken")
+            @QueryParam(RestParam.SESSION_TOKEN)
             String sessionToken,
-            @QueryParam("resultFormat")
+            @QueryParam(RestParam.RESULT_FORMAT)
             @DefaultValue(HTML)
-            String format) {
+            String format,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
 
         try {
             Context context = getContext();
@@ -91,7 +94,7 @@ public class FedoraObjectSearchResource extends BaseRestResource {
 
             return Response.ok(output, mime).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -124,7 +127,10 @@ public class FedoraObjectSearchResource extends BaseRestResource {
             String namespace,
             @QueryParam("format")
             @DefaultValue(HTML)
-            String format) throws Exception {
+            String format,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) throws Exception {
 
         try {
             Context context = getContext();
@@ -145,7 +151,7 @@ public class FedoraObjectSearchResource extends BaseRestResource {
                 return Response.noContent().build();
             }
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 

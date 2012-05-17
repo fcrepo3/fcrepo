@@ -9,13 +9,11 @@ import java.io.CharArrayWriter;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -64,29 +62,34 @@ public class FedoraObjectsResource extends BaseRestResource {
         "publisher", "contributor", "date", "type", "format", "identifier",
         "source", "language", "relation", "coverage", "rights" };
 
+    static final String VALID_PID_PART = "/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}";
+
     private static final Logger logger =
             LoggerFactory.getLogger(FedoraObjectsResource.class);
 
     public FedoraObjectsResource(Server server) {
         super(server);
     }
-    
+
     @GET
     @Path("/")
     @Produces( { HTML, XML })
     public Response searchObjects(
-            @QueryParam("terms")
+            @QueryParam(RestParam.TERMS)
             String terms,
-            @QueryParam("query")
+            @QueryParam(RestParam.QUERY)
             String query,
-            @QueryParam("maxResults")
+            @QueryParam(RestParam.MAX_RESULTS)
             @DefaultValue("25")
             int maxResults,
-            @QueryParam("sessionToken")
+            @QueryParam(RestParam.SESSION_TOKEN)
             String sessionToken,
-            @QueryParam("resultFormat")
+            @QueryParam(RestParam.RESULT_FORMAT)
             @DefaultValue(HTML)
-            String format) {
+            String format,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
 
         try {
             Context context = getContext();
@@ -117,7 +120,7 @@ public class FedoraObjectsResource extends BaseRestResource {
 
             return Response.ok(output, mime).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -150,7 +153,10 @@ public class FedoraObjectsResource extends BaseRestResource {
             String namespace,
             @QueryParam("format")
             @DefaultValue(HTML)
-            String format) throws Exception {
+            String format,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) throws Exception {
 
         try {
             Context context = getContext();
@@ -171,7 +177,7 @@ public class FedoraObjectsResource extends BaseRestResource {
                 return Response.noContent().build();
             }
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -188,14 +194,17 @@ public class FedoraObjectsResource extends BaseRestResource {
         return fields.toArray(new String[fields.size()]);
     }
 
-    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/validate")
+    @Path(VALID_PID_PART +"/validate")
     @GET
     @Produces({XML})
     public Response doObjectValidation(
             @PathParam(RestParam.PID)
             String pid,
             @QueryParam(RestParam.AS_OF_DATE_TIME)
-            String dateTime) {
+            String dateTime,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
         try {
             Context context = getContext();
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
@@ -206,7 +215,7 @@ public class FedoraObjectsResource extends BaseRestResource {
             String xml = getSerializer(context).objectValidationToXml(validation);
             return Response.ok(xml, mediaType).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -232,7 +241,10 @@ public class FedoraObjectsResource extends BaseRestResource {
             String exportContext,
             @QueryParam(RestParam.ENCODING)
             @DefaultValue(DEFAULT_ENC)
-            String encoding) {
+            String encoding,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
 
         try {
             Context context = getContext();
@@ -243,7 +255,7 @@ public class FedoraObjectsResource extends BaseRestResource {
             }
             return Response.ok(is, mediaType).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -256,14 +268,17 @@ public class FedoraObjectsResource extends BaseRestResource {
      * <p/>
      * GET /objects/{pid}/versions ? format
      */
-    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/versions")
+    @Path(VALID_PID_PART + "/versions")
     @GET
     public Response getObjectHistory(
             @PathParam(RestParam.PID)
             String pid,
             @QueryParam(RestParam.FORMAT)
             @DefaultValue(HTML)
-            String format) {
+            String format,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
 
         try {
             Context context = getContext();
@@ -279,7 +294,7 @@ public class FedoraObjectsResource extends BaseRestResource {
 
             return Response.ok(xml, mime).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -290,12 +305,15 @@ public class FedoraObjectsResource extends BaseRestResource {
      * <p/>
      * GET /objects/{pid}/objectXML
      */
-    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/objectXML")
+    @Path(VALID_PID_PART + "/objectXML")
     @GET
     @Produces(XML)
     public Response getObjectXML(
             @PathParam(RestParam.PID)
-            String pid) {
+            String pid,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
 
         try {
             Context context = getContext();
@@ -303,7 +321,7 @@ public class FedoraObjectsResource extends BaseRestResource {
 
             return Response.ok(is, TEXT_XML).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -316,7 +334,7 @@ public class FedoraObjectsResource extends BaseRestResource {
      */
     @GET
     @Produces({HTML, XML})
-    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}")
+    @Path(VALID_PID_PART)
     public Response getObjectProfile(
             @PathParam(RestParam.PID)
             String pid,
@@ -324,7 +342,10 @@ public class FedoraObjectsResource extends BaseRestResource {
             String dateTime,
             @QueryParam(RestParam.FORMAT)
             @DefaultValue(HTML)
-            String format) {
+            String format,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
 
         try {
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
@@ -342,7 +363,7 @@ public class FedoraObjectsResource extends BaseRestResource {
 
             return Response.ok(xml, mime).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -352,21 +373,24 @@ public class FedoraObjectsResource extends BaseRestResource {
      * DELETE /objects/{pid} ? logMessage
      */
     @DELETE
-    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}")
+    @Path(VALID_PID_PART)
     public Response deleteObject(
             @PathParam(RestParam.PID)
             String pid,
             @QueryParam("logMessage")
-            String logMessage) {
+            String logMessage,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
         try {
             Context context = getContext();
             Date d = m_management.purgeObject(context, pid, logMessage);
             return Response.ok(DateUtility.convertDateToXSDString(d), MediaType.TEXT_PLAIN_TYPE).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
-    
+
     @POST
     @Path("/new")
     @Consumes({XML, FORM})
@@ -392,8 +416,11 @@ public class FedoraObjectsResource extends BaseRestResource {
                               String state,
                               @QueryParam(RestParam.IGNORE_MIME)
                               @DefaultValue("false")
-                              boolean ignoreMime) {
-        return createObject(headers, "new", label, logMessage, format, encoding, namespace, ownerID, state, ignoreMime);
+                              boolean ignoreMime,
+                              @QueryParam(RestParam.FLASH)
+                              @DefaultValue("false")
+                              boolean flash) {
+        return createObject(headers, "new", label, logMessage, format, encoding, namespace, ownerID, state, ignoreMime, flash);
     }
     /**
      * Create/Update a new digital object. If no xml given in the body, will
@@ -402,7 +429,7 @@ public class FedoraObjectsResource extends BaseRestResource {
      * POST /objects/{pid} ? label logMessage format encoding namespace ownerId state
      */
     @POST
-    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}")
+    @Path(VALID_PID_PART)
     @Consumes({XML, FORM})
     public Response createObject(
             @javax.ws.rs.core.Context
@@ -428,7 +455,10 @@ public class FedoraObjectsResource extends BaseRestResource {
             String state,
             @QueryParam(RestParam.IGNORE_MIME)
             @DefaultValue("false")
-            boolean ignoreMime) {
+            boolean ignoreMime,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
         try {
             Context context = getContext();
 
@@ -475,7 +505,7 @@ public class FedoraObjectsResource extends BaseRestResource {
             URI createdLocation = m_uriInfo.getRequestUri().resolve(URLEncoder.encode(pid, DEFAULT_ENC));
             return Response.created(createdLocation).entity(pid).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
@@ -496,7 +526,7 @@ public class FedoraObjectsResource extends BaseRestResource {
      * @see org.fcrepo.server.management.Management#modifyObject(org.fcrepo.server.Context, String, String, String, String, String)
      */
     @PUT
-    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}")
+    @Path(VALID_PID_PART)
     @Produces(MediaType.TEXT_PLAIN)
     public Response updateObject(
             @PathParam(RestParam.PID)
@@ -510,7 +540,10 @@ public class FedoraObjectsResource extends BaseRestResource {
             @QueryParam(RestParam.STATE)
             String state,
             @QueryParam(RestParam.LAST_MODIFIED_DATE)
-            DateTimeParam lastModifiedDate) {
+            DateTimeParam lastModifiedDate,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
         try {
             Context context = getContext();
             Date requestModDate = null;
@@ -521,7 +554,7 @@ public class FedoraObjectsResource extends BaseRestResource {
                     m_management.modifyObject(context, pid, state, label, ownerID, logMessage, requestModDate);
             return Response.ok().entity(DateUtility.convertDateToXSDString(lastModDate)).build();
         } catch (Exception ex) {
-            return handleException(ex);
+            return handleException(ex, flash);
         }
     }
 
