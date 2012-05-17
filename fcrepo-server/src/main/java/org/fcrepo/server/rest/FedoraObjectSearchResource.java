@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
  * @author cuong.tran@yourmediashelf.com
  * @version $Id$
  */
-@Path("/objects")
+@Path("/")
 @Component
 public class FedoraObjectSearchResource extends BaseRestResource {
     static final String[] SEARCHABLE_FIELDS = { "pid", "label", "state", "ownerId",
@@ -114,7 +114,7 @@ public class FedoraObjectSearchResource extends BaseRestResource {
      * means of viewing the object profile. If the value specified is "true",
      * then a MIME-typed stream consisting of XML is returned.</li>
      */
-    @Path("nextPID")
+    @Path("/nextPID")
     @POST
     public Response getNextPID(
             @QueryParam("numPIDs")

@@ -7,8 +7,7 @@ package org.fcrepo.server.rest;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 
-import com.sun.jersey.server.impl.model.HttpHelper;
-
+import org.apache.cxf.jaxrs.impl.MediaTypeHeaderProvider;
 
 public class RestHelper {
     static boolean toBoolean(String s) {
@@ -87,6 +86,6 @@ public class RestHelper {
             format = "text/" + format;
         }
 
-        return HttpHelper.getContentType(format);
+        return new MediaTypeHeaderProvider().fromString(format);
     }
 }

@@ -24,6 +24,10 @@
     <display-name>CXF Servlet</display-name>
     <servlet-name>CXFServlet</servlet-name>
     <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+    <init-param>
+      <param-name>static-resources-list</param-name>
+      <param-value>/(images|ri)/.*</param-value>
+    </init-param>
     <load-on-startup>3</load-on-startup>
   </servlet>
   <servlet>
@@ -156,11 +160,12 @@
     <servlet-name>DatastreamResolverServlet</servlet-name>
     <url-pattern>/getDSAuthenticated</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
+<!--   <servlet-mapping>
     <servlet-name>DescribeRepositoryServlet</servlet-name>
     <url-pattern>/describe</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
+ -->
+   <servlet-mapping>
     <servlet-name>FieldSearchServlet</servlet-name>
     <url-pattern>/search</url-pattern>
   </servlet-mapping>
@@ -188,7 +193,7 @@
     <servlet-name>OAIProviderServlet</servlet-name>
     <url-pattern>/oai</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
+<!--   <servlet-mapping>
     <servlet-name>RestServlet</servlet-name>
     <url-pattern>/objects/*</url-pattern>
   </servlet-mapping>
@@ -204,7 +209,8 @@
     <servlet-name>RestServlet</servlet-name>
     <url-pattern>/objects/nextPID.xml</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
+ -->
+   <servlet-mapping>
     <servlet-name>RISearchServlet</servlet-name>
     <url-pattern>/risearch</url-pattern>
   </servlet-mapping>
@@ -219,6 +225,12 @@
   <servlet-mapping>
     <servlet-name>UserServlet</servlet-name>
     <url-pattern>/user</url-pattern>
+  </servlet-mapping>
+  <!-- fall through to REST Servlet: what about index?
+   Convert describe servlet to resource, map to two paths -->
+  <servlet-mapping>
+    <servlet-name>CXFServlet</servlet-name>
+    <url-pattern>/*</url-pattern>
   </servlet-mapping>
   <filter>
     <filter-name>RestApiFlashFilter</filter-name>

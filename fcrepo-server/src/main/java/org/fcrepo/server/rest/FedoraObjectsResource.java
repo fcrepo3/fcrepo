@@ -9,7 +9,12 @@ import java.io.CharArrayWriter;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -31,6 +36,9 @@ import org.fcrepo.server.Server;
 import org.fcrepo.server.access.ObjectProfile;
 import org.fcrepo.server.rest.RestUtil.RequestContent;
 import org.fcrepo.server.rest.param.DateTimeParam;
+import org.fcrepo.server.search.Condition;
+import org.fcrepo.server.search.FieldSearchQuery;
+import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.utilities.DateUtility;
@@ -45,20 +53,142 @@ import org.springframework.stereotype.Component;
  * @author cuong.tran@yourmediashelf.com
  * @version $Id$
  */
-@Path("/{pid : (([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+)|(new)}")
+@Path("/")
 @Component
-public class FedoraObjectResource extends BaseRestResource {
+public class FedoraObjectsResource extends BaseRestResource {
     private final String FOXML1_1 = "info:fedora/fedora-system:FOXML-1.1";
     private final String ATOMZIP1_1 = "info:fedora/fedora-system:ATOMZip-1.1";
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(FedoraObjectResource.class);
+    static final String[] SEARCHABLE_FIELDS = { "pid", "label", "state", "ownerId",
+        "cDate", "mDate", "dcmDate", "title", "creator", "subject", "description",
+        "publisher", "contributor", "date", "type", "format", "identifier",
+        "source", "language", "relation", "coverage", "rights" };
 
-    public FedoraObjectResource(Server server) {
+    private static final Logger logger =
+            LoggerFactory.getLogger(FedoraObjectsResource.class);
+
+    public FedoraObjectsResource(Server server) {
         super(server);
     }
+    
+    @GET
+    @Path("/")
+    @Produces( { HTML, XML })
+    public Response searchObjects(
+            @QueryParam("terms")
+            String terms,
+            @QueryParam("query")
+            String query,
+            @QueryParam("maxResults")
+            @DefaultValue("25")
+            int maxResults,
+            @QueryParam("sessionToken")
+            String sessionToken,
+            @QueryParam("resultFormat")
+            @DefaultValue(HTML)
+            String format) {
 
-    @Path("/validate")
+        try {
+            Context context = getContext();
+            String[] wantedFields = getWantedFields(m_servletRequest);
+            MediaType mime = RestHelper.getContentType(format);
+
+            FieldSearchResult result = null;
+
+            if (wantedFields.length > 0 || sessionToken != null) {
+                if (sessionToken != null) {
+                    result = m_access.resumeFindObjects(context, sessionToken);
+                } else {
+                    if ((terms != null) && (terms.length() != 0)) {
+                        result = m_access.findObjects(context, wantedFields, maxResults, new FieldSearchQuery(terms));
+                    } else {
+                        result = m_access.findObjects(context, wantedFields, maxResults, new FieldSearchQuery(Condition.getConditions(query)));
+                    }
+                }
+            }
+
+            String output;
+            if (TEXT_HTML.isCompatible(mime)) {
+                output = getSerializer(context).searchResultToHtml(query, terms, SEARCHABLE_FIELDS, wantedFields, maxResults, result);
+            } else {
+                output = getSerializer(context).searchResultToXml(result);
+
+            }
+
+            return Response.ok(output, mime).build();
+        } catch (Exception ex) {
+            return handleException(ex);
+        }
+    }
+
+    /**
+     * Implements the "getNextPID" functionality of the Fedora Management LITE
+     * (API-M-LITE) interface using a java servlet front end. The syntax defined
+     * by API-M-LITE for getting a list of the next available PIDs has the
+     * following binding:
+     * <ol>
+     * <li>getNextPID URL syntax:
+     * protocol://hostname:port/fedora/objects/nextPID[?numPIDs=NUMPIDS&namespace=NAMESPACE&format=html,xml]
+     * This syntax requests a list of next available PIDS. The parameter numPIDs
+     * determines the number of requested PIDS to generate. If omitted, numPIDs
+     * defaults to 1. The namespace parameter determines the namespace to be
+     * used in generating the PIDs. If omitted, namespace defaults to the
+     * namespace defined in the fedora.fcfg configuration file for the parameter
+     * pidNamespace. The xml parameter determines the type of output returned.
+     * If the parameter is omitted or has a value of "false", a MIME-typed
+     * stream consisting of an html table is returned providing a browser-savvy
+     * means of viewing the object profile. If the value specified is "true",
+     * then a MIME-typed stream consisting of XML is returned.</li>
+     */
+    @Path("/nextPID")
+    @POST
+    public Response getNextPID(
+            @QueryParam("numPIDs")
+            @DefaultValue("1")
+            int numPIDS,
+            @QueryParam(RestParam.NAMESPACE)
+            String namespace,
+            @QueryParam("format")
+            @DefaultValue(HTML)
+            String format) throws Exception {
+
+        try {
+            Context context = getContext();
+            String[] pidList = m_management.getNextPID(context, numPIDS, namespace);
+            MediaType mime = RestHelper.getContentType(format);
+
+            if (pidList.length > 0) {
+                String output = getSerializer(context).pidsToXml(pidList);
+
+                if (TEXT_HTML.isCompatible(mime)) {
+                    CharArrayWriter writer = new CharArrayWriter();
+                    transform(output, "management/getNextPIDInfo.xslt", writer);
+                    output = writer.toString();
+                }
+
+                return Response.ok(output, mime).build();
+            } else {
+                return Response.noContent().build();
+            }
+        } catch (Exception ex) {
+            return handleException(ex);
+        }
+    }
+
+    private static String[] getWantedFields(
+            HttpServletRequest request) {
+        List<String> fields = new ArrayList<String>();
+
+        for (String f : SEARCHABLE_FIELDS) {
+            if ("true".equals(request.getParameter(f))) {
+                fields.add(f);
+            }
+        }
+
+        return fields.toArray(new String[fields.size()]);
+    }
+
+    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/validate")
     @GET
     @Produces({XML})
     public Response doObjectValidation(
@@ -89,7 +219,7 @@ public class FedoraObjectResource extends BaseRestResource {
      * <p/>
      * GET /objects/{pid}/export ? format context encoding
      */
-    @Path("/export")
+    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/export")
     @GET
     @Produces({XML, ZIP})
     public Response getObjectExport(
@@ -126,7 +256,7 @@ public class FedoraObjectResource extends BaseRestResource {
      * <p/>
      * GET /objects/{pid}/versions ? format
      */
-    @Path("/versions")
+    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/versions")
     @GET
     public Response getObjectHistory(
             @PathParam(RestParam.PID)
@@ -160,7 +290,7 @@ public class FedoraObjectResource extends BaseRestResource {
      * <p/>
      * GET /objects/{pid}/objectXML
      */
-    @Path("/objectXML")
+    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/objectXML")
     @GET
     @Produces(XML)
     public Response getObjectXML(
@@ -186,6 +316,7 @@ public class FedoraObjectResource extends BaseRestResource {
      */
     @GET
     @Produces({HTML, XML})
+    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}")
     public Response getObjectProfile(
             @PathParam(RestParam.PID)
             String pid,
@@ -221,6 +352,7 @@ public class FedoraObjectResource extends BaseRestResource {
      * DELETE /objects/{pid} ? logMessage
      */
     @DELETE
+    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}")
     public Response deleteObject(
             @PathParam(RestParam.PID)
             String pid,
@@ -234,7 +366,35 @@ public class FedoraObjectResource extends BaseRestResource {
             return handleException(ex);
         }
     }
-
+    
+    @POST
+    @Path("/new")
+    @Consumes({XML, FORM})
+    public Response newObject(
+                              @javax.ws.rs.core.Context
+                              HttpHeaders headers,
+                              @QueryParam(RestParam.LABEL)
+                              String label,
+                              @QueryParam(RestParam.LOG_MESSAGE)
+                              String logMessage,
+                              @QueryParam(RestParam.FORMAT)
+                              @DefaultValue(FOXML1_1)
+                              String format,
+                              @QueryParam(RestParam.ENCODING)
+                              @DefaultValue(DEFAULT_ENC)
+                              String encoding,
+                              @QueryParam(RestParam.NAMESPACE)
+                              String namespace,
+                              @QueryParam(RestParam.OWNER_ID)
+                              String ownerID,
+                              @QueryParam(RestParam.STATE)
+                              @DefaultValue("A")
+                              String state,
+                              @QueryParam(RestParam.IGNORE_MIME)
+                              @DefaultValue("false")
+                              boolean ignoreMime) {
+        return createObject(headers, "new", label, logMessage, format, encoding, namespace, ownerID, state, ignoreMime);
+    }
     /**
      * Create/Update a new digital object. If no xml given in the body, will
      * create an empty object.
@@ -242,6 +402,7 @@ public class FedoraObjectResource extends BaseRestResource {
      * POST /objects/{pid} ? label logMessage format encoding namespace ownerId state
      */
     @POST
+    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}")
     @Consumes({XML, FORM})
     public Response createObject(
             @javax.ws.rs.core.Context
@@ -335,6 +496,7 @@ public class FedoraObjectResource extends BaseRestResource {
      * @see org.fcrepo.server.management.Management#modifyObject(org.fcrepo.server.Context, String, String, String, String, String)
      */
     @PUT
+    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response updateObject(
             @PathParam(RestParam.PID)

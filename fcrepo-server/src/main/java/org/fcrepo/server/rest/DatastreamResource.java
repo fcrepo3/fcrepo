@@ -62,7 +62,7 @@ import org.springframework.stereotype.Component;
  * @author cuong.tran@yourmediashelf.com
  * @version $Id$
  */
-@Path("/{pid}/datastreams")
+@Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/datastreams")
 @Component
 public class DatastreamResource
         extends BaseRestResource {

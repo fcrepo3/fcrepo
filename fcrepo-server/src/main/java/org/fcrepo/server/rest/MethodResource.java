@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  * @author Chris Wilper
  * @version $Id$
  */
-@Path("/{pid}/methods")
+@Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/methods")
 @Component
 public class MethodResource extends BaseRestResource {
     @javax.ws.rs.core.Context UriInfo uriInfo;

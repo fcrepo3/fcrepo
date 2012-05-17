@@ -918,8 +918,8 @@ public class TestRESTAPI
             if (objectFields != null) {
                 pid = objectFields.getPid() != null ? objectFields.getPid().getValue() : "";
                 url =
-                        String.format("/objects/%s/validate", URLEncoder
-                                .encode(pid.toString(), "UTF-8"));
+                        String.format("/objects/%s/validate", pid.toString()); //URLEncoder
+                               // .encode(pid.toString(), "UTF-8"));
                 HttpResponse getTrue = get(true);
                 assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
                         .getStatusCode());
@@ -938,7 +938,7 @@ public class TestRESTAPI
         url =
                 String.format("/objects/%s/validate?asOfDateTime=%s",
                               pid.toString(),
-                              datetime);
+                              df.format(new Date()));
         HttpResponse getTrue = get(true);
         assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
                      .getStatusCode());

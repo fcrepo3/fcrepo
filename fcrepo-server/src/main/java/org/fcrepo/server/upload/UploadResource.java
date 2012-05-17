@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.multipart.MultiPart;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 
 /**
  * Enables the upload of temp files for the REST API. Takes a POST request with
@@ -29,7 +29,7 @@ import com.sun.jersey.multipart.MultiPart;
  *
  * @version $Id$
  */
-@Path("/upload")
+@Path("/")
 @Component
 public class UploadResource extends BaseRestResource {
 
@@ -50,8 +50,8 @@ public class UploadResource extends BaseRestResource {
      */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response upload(final MultiPart multiPart){
-        final InputStream fileStream = multiPart.getBodyParts().get(0).getEntityAs(InputStream.class);
+    public Response upload(final MultipartBody multiPart){
+        final InputStream fileStream = multiPart.getAllAttachments().get(0).getObject(InputStream.class);
         String uploaded;
         try {
             uploaded = m_management.putTempStream(getContext(), fileStream);
