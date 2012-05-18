@@ -1378,7 +1378,7 @@ public class TestRESTAPI
 
         // Test content not supplied
         response = _doUploadPost(url,new Part[] {});
-        assertEquals(400, response.getStatusCode());
+        assertEquals(500, response.getStatusCode());
     }
 
     /////////////////////////////////////////////////

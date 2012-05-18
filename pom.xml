@@ -125,11 +125,11 @@
     <activemq.version>5.5.0</activemq.version>
     <akubra.version>0.3</akubra.version>
     <axiom.version>1.2.10</axiom.version>
-    <cxf.version>2.4.0</cxf.version>
+    <cxf.version>2.6.0</cxf.version>
     <derby.version>10.7.1.1</derby.version>
     <jersey.version>1.8</jersey.version>
     <slf4j.version>1.5.11</slf4j.version>
-    <spring.version>3.0.5.RELEASE</spring.version>
+    <spring.version>3.0.7.RELEASE</spring.version>
     <trippi.version>1.5.5</trippi.version>
   </properties>
 
@@ -726,7 +726,7 @@
                   <pluginExecutionFilter>
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-codegen-plugin</artifactId>
-                    <versionRange>[2.4.0,)</versionRange>
+                    <versionRange>[2.6.0,)</versionRange>
                     <goals>
                       <goal>wsdl2java</goal>
                     </goals>

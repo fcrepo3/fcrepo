@@ -49,10 +49,7 @@ public class UploadResource extends BaseRestResource {
      */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response upload(@Multipart("file") InputStream fileStream){
-        if (fileStream == null) {
-            return Response.status(400).entity("No file part uploaded").type(MediaType.TEXT_PLAIN).build();
-        }
+    public Response upload(@Multipart(value="file") InputStream fileStream){
         String uploaded;
         try {
             uploaded = m_management.putTempStream(getContext(), fileStream);
