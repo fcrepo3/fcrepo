@@ -37,13 +37,6 @@
       </bean>
     </jaxrs:serviceBeans>
   </jaxrs:server>
-  <jaxrs:server serviceName="describeService" address="/">
-    <jaxrs:serviceBeans>
-      <bean class="org.fcrepo.server.rest.DescribeRepositoryResource">
-        <constructor-arg ref="org.fcrepo.server.Server" />
-      </bean>
-    </jaxrs:serviceBeans>
-  </jaxrs:server>
   <jaxrs:server serviceName="uploadService" address="/upload">
     <jaxrs:serviceBeans>
       <bean class="org.fcrepo.server.upload.UploadResource">
@@ -51,5 +44,13 @@
       </bean>
     </jaxrs:serviceBeans>
   </jaxrs:server>
+  <jaxrs:server serviceName="describeService" address="/describe">
+    <jaxrs:serviceBeans>
+      <ref bean="DescribeRepositoryResource" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
+  <bean id="DescribeRepositoryResource" class="org.fcrepo.server.rest.DescribeRepositoryResource">
+    <constructor-arg ref="org.fcrepo.server.Server" />
+  </bean>
   
 </beans>

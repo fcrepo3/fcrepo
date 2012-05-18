@@ -12,7 +12,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.management.UploadServlet;
@@ -49,7 +52,12 @@ public class UploadResource extends BaseRestResource {
      */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response upload(@Multipart(value="file") InputStream fileStream){
+    public Response upload(MultipartBody multipart){
+        Attachment file = multipart.getAttachment("file");
+        if (file == null) {
+            return Response.status(400).entity("Missing file part").type(MediaType.TEXT_PLAIN).build();
+        }
+        InputStream fileStream = file.getObject(InputStream.class);
         String uploaded;
         try {
             uploaded = m_management.putTempStream(getContext(), fileStream);
