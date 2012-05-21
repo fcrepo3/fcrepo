@@ -17,34 +17,8 @@
   
   <import resource="classpath:META-INF/cxf/cxf.xml"/>
   <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
-  
-  <jaxrs:server serviceName="objectsService" address="/objects">
-    <jaxrs:serviceBeans>
-<!--       <bean class="org.fcrepo.server.rest.FedoraObjectSearchResource">
-        <constructor-arg ref="org.fcrepo.server.Server" />
-      </bean> -->
-      <bean class="org.fcrepo.server.rest.FedoraObjectsResource">
-        <constructor-arg ref="org.fcrepo.server.Server" />
-      </bean>
-      <bean class="org.fcrepo.server.rest.DatastreamResource">
-        <constructor-arg ref="org.fcrepo.server.Server" />
-      </bean>
-      <bean class="org.fcrepo.server.rest.RelationshipResource">
-        <constructor-arg ref="org.fcrepo.server.Server" />
-      </bean>
-      <bean class="org.fcrepo.server.rest.MethodResource">
-        <constructor-arg ref="org.fcrepo.server.Server" />
-      </bean>
-    </jaxrs:serviceBeans>
-  </jaxrs:server>
-  <jaxrs:server serviceName="uploadService" address="/upload">
-    <jaxrs:serviceBeans>
-      <bean class="org.fcrepo.server.upload.UploadResource">
-        <constructor-arg ref="org.fcrepo.server.Server" />
-      </bean>
-    </jaxrs:serviceBeans>
-  </jaxrs:server>
-  <jaxrs:server serviceName="describeService" address="/describe">
+
+  <jaxrs:server serviceName="describeService" address="/">
     <jaxrs:serviceBeans>
       <ref bean="DescribeRepositoryResource" />
     </jaxrs:serviceBeans>

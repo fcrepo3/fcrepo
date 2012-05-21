@@ -86,16 +86,6 @@ public class DescribeRepositoryResource
         super(server);
     }
 
-    @GET
-    @POST
-    @Path("/")
-    public Response index(@QueryParam("xml")
-                          @DefaultValue("false")
-                          boolean xml)
-            throws ServletException, IOException {
-        return describe(xml);
-    }
-
     /**
      * <p>
      * Process Fedora Access Request. Parse and validate the servlet input
@@ -111,9 +101,8 @@ public class DescribeRepositoryResource
      * @throws IOException
      *         If an error occurs with an input or output operation.
      */
+    @Path("/")
     @GET
-    @POST
-    @Path("/describe")
     public Response describe(@QueryParam("xml")
                           @DefaultValue("false")
                           boolean xml)
@@ -128,6 +117,13 @@ public class DescribeRepositoryResource
             return handleException(ae, false);
         }
 
+    }
+    
+    @Path("/")
+    @POST
+    public Response postDescribe(@QueryParam("xml") @DefaultValue("false") boolean xml)
+        throws ServletException, IOException {
+        return describe(xml);
     }
 
     public Response describeRepository(Context context,
