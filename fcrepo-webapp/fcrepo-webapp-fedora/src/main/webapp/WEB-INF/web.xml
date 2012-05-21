@@ -78,11 +78,6 @@
     <servlet-class>org.fcrepo.server.access.dissemination.DatastreamResolverServlet</servlet-class>
   </servlet>
   <servlet>
-    <display-name>Fedora Repository Description Servlet</display-name>
-    <servlet-name>DescribeRepositoryServlet</servlet-name>
-    <servlet-class>org.fcrepo.server.access.DescribeRepositoryServlet</servlet-class>
-  </servlet>
-  <servlet>
     <display-name>Fedora Search Servlet</display-name>
     <servlet-name>FieldSearchServlet</servlet-name>
     <servlet-class>org.fcrepo.server.access.FieldSearchServlet</servlet-class>
@@ -160,12 +155,7 @@
     <servlet-name>DatastreamResolverServlet</servlet-name>
     <url-pattern>/getDSAuthenticated</url-pattern>
   </servlet-mapping>
-<!--   <servlet-mapping>
-    <servlet-name>DescribeRepositoryServlet</servlet-name>
-    <url-pattern>/describe</url-pattern>
-  </servlet-mapping>
- -->
-   <servlet-mapping>
+  <servlet-mapping>
     <servlet-name>FieldSearchServlet</servlet-name>
     <url-pattern>/search</url-pattern>
   </servlet-mapping>
