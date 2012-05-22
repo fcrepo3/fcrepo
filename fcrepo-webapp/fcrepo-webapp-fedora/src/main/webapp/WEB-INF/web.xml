@@ -46,7 +46,7 @@
     </init-param>
     <load-on-startup>3</load-on-startup>
   </servlet>
-  <servlet>
+<!--   <servlet>
     <display-name>CXF Describe Servlet</display-name>
     <servlet-name>CXFDescribeServlet</servlet-name>
     <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
@@ -55,7 +55,7 @@
       <param-value>file:${fedora.home}/server/config/spring/web/jaxrs/describe-jaxrs.xml</param-value>
     </init-param>
     <load-on-startup>3</load-on-startup>
-  </servlet>
+  </servlet> -->
   <servlet>
     <display-name>Fedora Access Servlet</display-name>
     <servlet-name>AccessServlet</servlet-name>
@@ -76,6 +76,11 @@
     <display-name>Fedora Datastream Resolver Servlet</display-name>
     <servlet-name>DatastreamResolverServlet</servlet-name>
     <servlet-class>org.fcrepo.server.access.dissemination.DatastreamResolverServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <display-name>Fedora Repository Description Servlet</display-name>
+    <servlet-name>DescribeRepositoryServlet</servlet-name>
+    <servlet-class>org.fcrepo.server.access.DescribeRepositoryServlet</servlet-class>
   </servlet>
   <servlet>
     <display-name>Fedora Search Servlet</display-name>
@@ -204,7 +209,7 @@
     <url-pattern>/upload</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>CXFDescribeServlet</servlet-name>
+    <servlet-name>DescribeRepositoryServlet</servlet-name>
     <url-pattern>/describe</url-pattern>
   </servlet-mapping>
   <servlet-mapping>

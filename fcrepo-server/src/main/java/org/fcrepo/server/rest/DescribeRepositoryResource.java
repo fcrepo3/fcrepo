@@ -24,9 +24,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
-import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
-import org.fcrepo.server.access.DescribeRepositoryServlet;
 import org.fcrepo.server.access.RepositoryInfo;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ServerException;
@@ -72,7 +70,7 @@ public class DescribeRepositoryResource
         implements Constants {
 
     private static final Logger logger =
-            LoggerFactory.getLogger(DescribeRepositoryServlet.class);
+            LoggerFactory.getLogger(DescribeRepositoryResource.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -108,9 +106,7 @@ public class DescribeRepositoryResource
                           boolean xml)
             throws ServletException, IOException {
 
-        Context context =
-                ReadOnlyContext.getContext(Constants.HTTP_REQUEST.REST.uri,
-                                           m_servletRequest);
+        Context context = getContext();
         try {
             return describeRepository(context, xml);
         } catch (Exception ae) {
@@ -118,7 +114,7 @@ public class DescribeRepositoryResource
         }
 
     }
-    
+
     @Path("/")
     @POST
     public Response postDescribe(@QueryParam("xml") @DefaultValue("false") boolean xml)
