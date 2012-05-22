@@ -22,6 +22,9 @@
     <jaxrs:serviceBeans>
       <ref bean="DescribeRepositoryResource" />
     </jaxrs:serviceBeans>
+    <jaxrs:providers>
+      <bean class="org.fcrepo.server.rest.cxf.WadlGenerator" />
+    </jaxrs:providers>
   </jaxrs:server>
   <bean id="DescribeRepositoryResource" class="org.fcrepo.server.rest.DescribeRepositoryResource">
     <constructor-arg ref="org.fcrepo.server.Server" />

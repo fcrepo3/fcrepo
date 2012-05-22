@@ -24,6 +24,9 @@
         <constructor-arg ref="org.fcrepo.server.Server" />
       </bean>
     </jaxrs:serviceBeans>
+    <jaxrs:providers>
+      <bean class="org.fcrepo.server.rest.cxf.WadlGenerator" />
+    </jaxrs:providers>
   </jaxrs:server>
   
 </beans>
