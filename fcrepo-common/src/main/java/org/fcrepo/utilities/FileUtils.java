@@ -11,27 +11,26 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 
 public class FileUtils {
-    
+
     private static final int BUFF_SIZE = 100000;
-    
+
     /**
      * A static 100K buffer used by the copy operation.
      */
     private static final byte[] buffer = new byte[BUFF_SIZE];
 
     /**
-     * Copy an InputStream to an OutputStream. 
+     * Copy an InputStream to an OutputStream.
      * While this method will automatically close the destination OutputStream,
      * the caller is responsible for closing the source InputStream.
-     * 
+     *
      * @param source
      * @param destination
      * @return <code>true</code> if the operation was successful;
@@ -151,6 +150,18 @@ public class FileUtils {
         return delete(new File(file));
     }
 
+    public static boolean deleteContents(File dir) {
+        boolean result = true;
+        if (dir.exists()) {
+            for (File f : dir.listFiles()) {
+                result &= f.delete();
+            }
+        } else {
+            dir.mkdirs();
+        }
+        return result;
+    }
+
     /**
      * Move a file or directory. Initally attempts to move the File using
      * java.io.File.renameTo(). However, should this operation fail (e.g. when
@@ -237,6 +248,7 @@ public class FileUtils {
             this.filenamePrefix = filenamePrefix;
         }
 
+        @Override
         public boolean accept(File file) {
             String filename = file.getName();
             return filename.startsWith(filenamePrefix);
@@ -252,6 +264,7 @@ public class FileUtils {
             this.filenameSuffix = filenameSuffix;
         }
 
+        @Override
         public boolean accept(File file) {
             String filename = file.getName();
             return filename.endsWith(filenameSuffix);

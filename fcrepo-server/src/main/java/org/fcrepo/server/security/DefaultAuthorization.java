@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -19,11 +18,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.MultiValueMap;
@@ -34,9 +29,11 @@ import org.fcrepo.server.errors.authorization.AuthzOperationalException;
 import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.utilities.status.ServerState;
 import org.fcrepo.server.validation.ValidationUtility;
-
 import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -267,71 +264,11 @@ public class DefaultAuthorization
 
     private boolean validateObjectPoliciesFromDatastream = false;
 
-    private static boolean mkdir(String dirPath) {
-        boolean createdOnThisCall = false;
-        File directory = new File(dirPath);
-        if (!directory.exists()) {
-            directory.mkdirs();
-            createdOnThisCall = true;
-        }
-        return createdOnThisCall;
-    }
-
-    private static final int BUFFERSIZE = 4096;
-
-    private static void filecopy(String srcPath, String destPath)
-            throws Exception {
-        File srcFile = new File(srcPath);
-        FileInputStream fis = new FileInputStream(srcFile);
-        File destFile = new File(destPath);
-        try {
-            destFile.createNewFile();
-        } catch (Exception e) {
-        }
-        FileOutputStream fos = new FileOutputStream(destFile);
-        byte[] buffer = new byte[BUFFERSIZE];
-        boolean reading = true;
-        while (reading) {
-            int bytesRead = fis.read(buffer);
-            if (bytesRead > 0) {
-                fos.write(buffer, 0, bytesRead);
-            }
-            reading = bytesRead > -1;
-        }
-        fis.close();
-        fos.close();
-    }
-
-    private static void dircopy(String srcPath, String destPath)
-            throws Exception {
-        File srcDir = new File(srcPath);
-        String[] paths = srcDir.list();
-        for (String element : paths) {
-            String absSrcPath = srcPath + File.separator + element;
-            String absDestPath = destPath + File.separator + element;
-            filecopy(absSrcPath, absDestPath);
-        }
-    }
-
-    private static void deldirfiles(String path) throws Exception {
-        File srcDir = new File(path);
-        if (srcDir.exists()) {
-            String[] paths = srcDir.list();
-            for (String element : paths) {
-                String absPath = path + File.separator + element;
-                File f = new File(absPath);
-                f.delete();
-            }
-        } else {
-            srcDir.mkdirs();
-        }
-    }
-
     private final void generateBackendPolicies() throws Exception {
         String fedoraHome =
                 ((Module) this).getServer().getHomeDir().getAbsolutePath();
-        deldirfiles(fedoraHome + File.separator
-                    + BACKEND_POLICIES_ACTIVE_DIRECTORY);
+        FileUtils.deleteContents(new File(fedoraHome + File.separator
+                    + BACKEND_POLICIES_ACTIVE_DIRECTORY));
         BackendPolicies backendPolicies =
                 new BackendPolicies(fedoraHome + File.separator
                                     + BE_SECURITY_XML_LOCATION);
@@ -371,12 +308,11 @@ public class DefaultAuthorization
     private void setupActivePolicyDirectories() throws Exception {
         String fedoraHome =
                 ((Module) this).getServer().getHomeDir().getAbsolutePath();
-        mkdir(repositoryPoliciesActiveDirectory);
-        if (mkdir(repositoryPoliciesActiveDirectory + File.separator + DEFAULT)) {
-            dircopy(fedoraHome + File.separator
-                    + DEFAULT_REPOSITORY_POLICIES_DIRECTORY,
-                    repositoryPoliciesActiveDirectory + File.separator
-                    + DEFAULT);
+        File repoPolicyDir = new File(repositoryPoliciesActiveDirectory + File.separator + DEFAULT);
+        if (!repoPolicyDir.exists()){
+            repoPolicyDir.mkdirs();
+            File source = new File(fedoraHome + File.separator + DEFAULT_REPOSITORY_POLICIES_DIRECTORY);
+            FileUtils.copy(source, repoPolicyDir);
         }
         generateBackendPolicies();
     }
