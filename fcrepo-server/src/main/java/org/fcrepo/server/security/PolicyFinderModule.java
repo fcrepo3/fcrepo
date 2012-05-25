@@ -6,26 +6,20 @@ package org.fcrepo.server.security;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
-import com.sun.xacml.AbstractPolicy;
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.PolicySet;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.BagAttribute;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.combine.PolicyCombiningAlgorithm;
-import com.sun.xacml.cond.EvaluationResult;
-import com.sun.xacml.ctx.Status;
-import com.sun.xacml.finder.PolicyFinder;
-import com.sun.xacml.finder.PolicyFinderResult;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.FaultException;
@@ -38,8 +32,22 @@ import org.fcrepo.server.errors.ValidationException;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.utilities.FileUtils;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.xacml.AbstractPolicy;
+import com.sun.xacml.EvaluationCtx;
+import com.sun.xacml.PolicySet;
+import com.sun.xacml.attr.AttributeValue;
+import com.sun.xacml.attr.BagAttribute;
+import com.sun.xacml.attr.StringAttribute;
+import com.sun.xacml.combine.PolicyCombiningAlgorithm;
+import com.sun.xacml.cond.EvaluationResult;
+import com.sun.xacml.ctx.Status;
+import com.sun.xacml.finder.PolicyFinder;
+import com.sun.xacml.finder.PolicyFinderResult;
 
 /**
  * XACML PolicyFinder for Fedora.
@@ -59,7 +67,27 @@ public class PolicyFinderModule
         ERROR_CODE_LIST.add(Status.STATUS_PROCESSING_ERROR);
     }
 
+    private static final String DEFAULT = "default";
+
+    private static final String XACML_DIST_BASE = "fedora-internal-use";
+
+    private static final String DEFAULT_REPOSITORY_POLICIES_DIRECTORY =
+            XACML_DIST_BASE
+            + "/fedora-internal-use-repository-policies-approximating-2.0";
+
+    private static final String BE_SECURITY_XML_LOCATION =
+            "config/beSecurity.xml";
+
+    private static final String BACKEND_POLICIES_XSL_LOCATION =
+            XACML_DIST_BASE + "/build-backend-policy.xsl";
+
     private final String m_combiningAlgorithm;
+
+    private final String m_serverHome;
+
+    private final String m_repositoryPolicyDirectoryPath;
+
+    private final String m_repositoryBackendPolicyDirectoryPath;
 
     private final RepositoryReader m_repoReader;
 
@@ -71,7 +99,8 @@ public class PolicyFinderModule
 
     private final List<AbstractPolicy> m_repositoryPolicies;
 
-    public PolicyFinderModule(String combiningAlgorithm,
+    public PolicyFinderModule(String serverHome,
+                              String combiningAlgorithm,
                               String repositoryPolicyDirectoryPath,
                               String repositoryBackendPolicyDirectoryPath,
                               String repositoryPolicyGuiToolDirectoryPath,
@@ -80,27 +109,16 @@ public class PolicyFinderModule
                               boolean validateObjectPoliciesFromDatastream,
                               PolicyParser policyParser)
             throws GeneralException {
-
+        m_serverHome = serverHome;
+        m_repositoryPolicyDirectoryPath = repositoryPolicyDirectoryPath;
+        m_repositoryBackendPolicyDirectoryPath = repositoryBackendPolicyDirectoryPath;
         m_combiningAlgorithm = combiningAlgorithm;
         m_repoReader = repoReader;
         m_validateRepositoryPolicies = validateRepositoryPolicies;
         m_validateObjectPoliciesFromDatastream = validateObjectPoliciesFromDatastream;
         m_policyParser = policyParser;
 
-        logger.info("Loading repository policies...");
         m_repositoryPolicies = new ArrayList<AbstractPolicy>();
-        try {
-            m_repositoryPolicies.addAll(
-                    loadPolicies(m_policyParser,
-                                 m_validateRepositoryPolicies,
-                                 new File(repositoryPolicyDirectoryPath)));
-            m_repositoryPolicies.addAll(
-                    loadPolicies(m_policyParser,
-                                 m_validateRepositoryPolicies,
-                                 new File(repositoryBackendPolicyDirectoryPath)));
-        } catch (Exception e) {
-            throw new GeneralException("Error loading repository policies", e);
-        }
     }
 
     /**
@@ -108,7 +126,69 @@ public class PolicyFinderModule
      */
     @Override
     public void init(PolicyFinder finder) {
+        try {
+            logger.info("Loading repository policies...");
+            setupActivePolicyDirectories();
+            m_repositoryPolicies.clear();
+            m_repositoryPolicies.addAll(
+                    loadPolicies(m_policyParser,
+                                 m_validateRepositoryPolicies,
+                                 new File(m_repositoryPolicyDirectoryPath)));
+            m_repositoryPolicies.addAll(
+                    loadPolicies(m_policyParser,
+                                 m_validateRepositoryPolicies,
+                                 new File(m_repositoryBackendPolicyDirectoryPath)));
+        } catch (Throwable t) {
+            logger.error("Error loading repository policies: " + t.toString(), t);
+        }
     }
+
+    private final void generateBackendPolicies() throws Exception {
+        logger.info("Generating backend policies...");
+        FileUtils.deleteContents(new File(m_repositoryBackendPolicyDirectoryPath));
+        BackendPolicies backendPolicies =
+                new BackendPolicies(m_serverHome + File.separator
+                                    + BE_SECURITY_XML_LOCATION);
+        Hashtable tempfiles = backendPolicies.generateBackendPolicies();
+        TransformerFactory tfactory = XmlTransformUtility.getTransformerFactory();
+        try {
+            Iterator iterator = tempfiles.keySet().iterator();
+            while (iterator.hasNext()) {
+                File f =
+                        new File(m_serverHome + File.separator
+                                 + BACKEND_POLICIES_XSL_LOCATION); // <<stylesheet
+                // location
+                StreamSource ss = new StreamSource(f);
+                Transformer transformer = tfactory.newTransformer(ss); // xformPath
+                String key = (String) iterator.next();
+                File infile = new File((String) tempfiles.get(key));
+                FileInputStream fis = new FileInputStream(infile);
+                FileOutputStream fos =
+                        new FileOutputStream(m_repositoryBackendPolicyDirectoryPath
+                                             + File.separator + key);
+                transformer.transform(new StreamSource(fis),
+                                      new StreamResult(fos));
+            }
+        } finally {
+            // we're done with temp files now, so delete them
+            Iterator iter = tempfiles.keySet().iterator();
+            while (iter.hasNext()) {
+                File tempFile = new File((String) tempfiles.get(iter.next()));
+                tempFile.delete();
+            }
+        }
+    }
+
+    private void setupActivePolicyDirectories() throws Exception {
+        File repoPolicyDir = new File(m_repositoryPolicyDirectoryPath + File.separator + DEFAULT);
+        if (!repoPolicyDir.exists()){
+            repoPolicyDir.mkdirs();
+            File source = new File(m_serverHome + File.separator + DEFAULT_REPOSITORY_POLICIES_DIRECTORY);
+            FileUtils.copy(source, repoPolicyDir);
+        }
+        generateBackendPolicies();
+    }
+
 
     /**
      * Always returns true, indicating that this impl supports finding policies

@@ -53,6 +53,7 @@
         <bean id="org.fcrepo.server.security.PolicyEnforcementPoint"
               class="org.fcrepo.server.security.PolicyEnforcementPointImpl"
               autowire-candidate="true">
+              <constructor-arg><ref bean="org.fcrepo.server.Server" /></constructor-arg>
               <constructor-arg><ref bean="org.fcrepo.server.security.ContextRegistry" /></constructor-arg>
               <property name="attributeFinderModules">
                   <list>

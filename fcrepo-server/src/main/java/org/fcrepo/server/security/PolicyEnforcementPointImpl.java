@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
+import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.authorization.AuthzDeniedException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.authorization.AuthzOperationalException;
@@ -72,10 +73,14 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 
     private final ContextRegistry m_registry;
 
+    private final String m_serverHome;
+
     private String m_enforceMode = ENFORCE_MODE_ENFORCE_POLICIES;
 
-    public PolicyEnforcementPointImpl(ContextRegistry registry) {
+    public PolicyEnforcementPointImpl(Server server, ContextRegistry registry) {
         m_registry = registry;
+
+        m_serverHome = server.getHomeDir().getAbsolutePath();
 
         URI xacmlSubjectIdUri = null;
         URI xacmlActionIdUri = null;
@@ -145,7 +150,8 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
                 new HashSet<PolicyFinderModule>();
         PolicyFinderModule combinedPolicyModule = null;
         combinedPolicyModule =
-                new PolicyFinderModule(combiningAlgorithm,
+                new PolicyFinderModule(m_serverHome,
+                                       combiningAlgorithm,
                                        globalPolicyConfig,
                                        globalBackendPolicyConfig,
                                        globalPolicyGuiToolConfig,

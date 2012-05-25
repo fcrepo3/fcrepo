@@ -6,17 +6,9 @@ package org.fcrepo.server.security;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
@@ -30,8 +22,6 @@ import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.utilities.status.ServerState;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.utilities.DateUtility;
-import org.fcrepo.utilities.FileUtils;
-import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,18 +107,8 @@ public class DefaultAuthorization
 
     private static final String XACML_DIST_BASE = "fedora-internal-use";
 
-    private static final String DEFAULT_REPOSITORY_POLICIES_DIRECTORY =
-            XACML_DIST_BASE
-            + "/fedora-internal-use-repository-policies-approximating-2.0";
-
-    private static final String BE_SECURITY_XML_LOCATION =
-            "config/beSecurity.xml";
-
     private static final String BACKEND_POLICIES_ACTIVE_DIRECTORY =
             XACML_DIST_BASE + "/fedora-internal-use-backend-service-policies";
-
-    private static final String BACKEND_POLICIES_XSL_LOCATION =
-            XACML_DIST_BASE + "/build-backend-policy.xsl";
 
     private static final String REPOSITORY_POLICIES_DIRECTORY_KEY =
             "REPOSITORY-POLICIES-DIRECTORY";
@@ -264,59 +244,6 @@ public class DefaultAuthorization
 
     private boolean validateObjectPoliciesFromDatastream = false;
 
-    private final void generateBackendPolicies() throws Exception {
-        String fedoraHome =
-                ((Module) this).getServer().getHomeDir().getAbsolutePath();
-        FileUtils.deleteContents(new File(fedoraHome + File.separator
-                    + BACKEND_POLICIES_ACTIVE_DIRECTORY));
-        BackendPolicies backendPolicies =
-                new BackendPolicies(fedoraHome + File.separator
-                                    + BE_SECURITY_XML_LOCATION);
-        Hashtable tempfiles = backendPolicies.generateBackendPolicies();
-        TransformerFactory tfactory = XmlTransformUtility.getTransformerFactory();
-        try {
-            Iterator iterator = tempfiles.keySet().iterator();
-            while (iterator.hasNext()) {
-                File f =
-                        new File(fedoraHome + File.separator
-                                 + BACKEND_POLICIES_XSL_LOCATION); // <<stylesheet
-                // location
-                StreamSource ss = new StreamSource(f);
-                Transformer transformer = tfactory.newTransformer(ss); // xformPath
-                String key = (String) iterator.next();
-                File infile = new File((String) tempfiles.get(key));
-                FileInputStream fis = new FileInputStream(infile);
-                FileOutputStream fos =
-                        new FileOutputStream(fedoraHome + File.separator
-                                             + BACKEND_POLICIES_ACTIVE_DIRECTORY
-                                             + File.separator + key);
-                transformer.transform(new StreamSource(fis),
-                                      new StreamResult(fos));
-            }
-        } finally {
-            // we're done with temp files now, so delete them
-            Iterator iter = tempfiles.keySet().iterator();
-            while (iter.hasNext()) {
-                File tempFile = new File((String) tempfiles.get(iter.next()));
-                tempFile.delete();
-            }
-        }
-    }
-
-    private static final String DEFAULT = "default";
-
-    private void setupActivePolicyDirectories() throws Exception {
-        String fedoraHome =
-                ((Module) this).getServer().getHomeDir().getAbsolutePath();
-        File repoPolicyDir = new File(repositoryPoliciesActiveDirectory + File.separator + DEFAULT);
-        if (!repoPolicyDir.exists()){
-            repoPolicyDir.mkdirs();
-            File source = new File(fedoraHome + File.separator + DEFAULT_REPOSITORY_POLICIES_DIRECTORY);
-            FileUtils.copy(source, repoPolicyDir);
-        }
-        generateBackendPolicies();
-    }
-
     @Override
     public void postInitModule() throws ModuleInitializationException {
         DOManager m_manager =
@@ -330,7 +257,6 @@ public class DefaultAuthorization
             getServer().getStatusFile()
                     .append(ServerState.STARTING,
                             "Initializing XACML Authorization Module");
-            setupActivePolicyDirectories();
             xacmlPep = getServer().getBean(PolicyEnforcementPoint.class);
             String fedoraHome =
                     ((Module) this).getServer().getHomeDir().getAbsolutePath();
@@ -355,7 +281,6 @@ public class DefaultAuthorization
     @Override
     public void reloadPolicies(Context context) throws Exception {
         enforceReloadPolicies(context);
-        generateBackendPolicies();
         xacmlPep.newPdp();
     }
 
