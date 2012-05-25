@@ -15,7 +15,6 @@ import java.util.Set;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
-import org.fcrepo.server.Server;
 import org.fcrepo.server.config.ModuleConfiguration;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ModuleInitializationException;
@@ -23,7 +22,6 @@ import org.fcrepo.server.errors.authorization.AuthzDeniedException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.authorization.AuthzOperationalException;
 import org.fcrepo.server.errors.authorization.AuthzPermittedException;
-import org.fcrepo.server.storage.DOManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +33,6 @@ import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Subject;
-import com.sun.xacml.finder.AttributeFinder;
-import com.sun.xacml.finder.PolicyFinder;
 
 /**
  * @author Bill Niebel
@@ -83,26 +79,20 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 
     private final ContextRegistry m_registry;
 
-    private final Server m_server;
-
-    private final DOManager m_manager;
-
-    private final ModuleConfiguration m_authorizationConfiguration;
-
     private final List<com.sun.xacml.finder.AttributeFinderModule> m_attrFinderModules = new ArrayList<com.sun.xacml.finder.AttributeFinderModule>(0);
 
     private String ownerIdSeparator = ",";
 
     private String m_enforceMode = ENFORCE_MODE_ENFORCE_POLICIES;
 
+    private final PDPConfig m_pdpConfig;
+
     private PDP m_pdp = null;
 
-    public PolicyEnforcementPointImpl(Server server, DOManager manager, ContextRegistry registry, ModuleConfiguration authzConfiguration)
+    public PolicyEnforcementPointImpl(PDPConfig pdpConfig, ContextRegistry registry, ModuleConfiguration authzConfiguration)
             throws ModuleInitializationException {
+        m_pdpConfig = pdpConfig;
         m_registry = registry;
-        m_authorizationConfiguration = authzConfiguration;
-        m_server = server;
-        m_manager = manager;
         Map<String,String> moduleParameters = authzConfiguration.getParameters();
         if (moduleParameters.containsKey(ENFORCE_MODE_CONFIG_KEY)) {
             m_enforceMode = moduleParameters.get(ENFORCE_MODE_CONFIG_KEY);
@@ -170,29 +160,8 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 
     @Override
     public final void newPdp() throws GeneralException {
-        AttributeFinder attrFinder = new AttributeFinder();
 
-        attrFinder.setModules(m_attrFinderModules);
-        logger.debug("before building policy finder");
-
-        PolicyFinder policyFinder = new PolicyFinder();
-
-        Set<PolicyFinderModule> policyModules =
-                new HashSet<PolicyFinderModule>();
-        PolicyFinderModule combinedPolicyModule = null;
-        combinedPolicyModule =
-                new PolicyFinderModule(m_server,
-                                       m_manager,
-                                       m_authorizationConfiguration);
-        logger.debug("after constucting fedora policy finder module");
-        logger.debug("before adding fedora policy finder module to policy finder hashset");
-        policyModules.add(combinedPolicyModule);
-        logger.debug("after adding fedora policy finder module to policy finder hashset");
-        logger.debug("o before setting policy finder hashset into policy finder");
-        policyFinder.setModules(policyModules);
-        logger.debug("o after setting policy finder hashset into policy finder");
-
-        PDP pdp = new PDP(new PDPConfig(attrFinder, policyFinder, null));
+        PDP pdp = new PDP(m_pdpConfig);
         synchronized (this) {
             this.m_pdp = pdp;
             //so enforce() will wait, if this pdp update is in progress
