@@ -10,11 +10,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Server;
+import org.fcrepo.server.config.ModuleConfiguration;
+import org.fcrepo.server.errors.GeneralException;
+import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.authorization.AuthzDeniedException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.authorization.AuthzOperationalException;
@@ -42,9 +46,15 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
     private static final Logger logger =
             LoggerFactory.getLogger(PolicyEnforcementPointImpl.class);
 
+    private static final String ROLE = org.fcrepo.server.security.PolicyEnforcementPoint.class.getName();
+
     private static PolicyEnforcementPoint singleton = null;
 
     private static int count = 0;
+
+    private static final String OWNER_ID_SEPARATOR_CONFIG_KEY = "OWNER-ID-SEPARATOR";
+
+    private static final String ENFORCE_MODE_CONFIG_KEY = "ENFORCE-MODE";
 
     static final String ENFORCE_MODE_ENFORCE_POLICIES = "enforce-policies";
 
@@ -73,14 +83,42 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 
     private final ContextRegistry m_registry;
 
-    private final String m_serverHome;
+    private final Server m_server;
+
+    private final DOManager m_manager;
+
+    private final ModuleConfiguration m_authorizationConfiguration;
+
+    private final List<com.sun.xacml.finder.AttributeFinderModule> m_attrFinderModules = new ArrayList<com.sun.xacml.finder.AttributeFinderModule>(0);
+
+    private String ownerIdSeparator = ",";
 
     private String m_enforceMode = ENFORCE_MODE_ENFORCE_POLICIES;
 
-    public PolicyEnforcementPointImpl(Server server, ContextRegistry registry) {
-        m_registry = registry;
+    private PDP m_pdp = null;
 
-        m_serverHome = server.getHomeDir().getAbsolutePath();
+    public PolicyEnforcementPointImpl(Server server, DOManager manager, ContextRegistry registry, ModuleConfiguration authzConfiguration)
+            throws ModuleInitializationException {
+        m_registry = registry;
+        m_authorizationConfiguration = authzConfiguration;
+        m_server = server;
+        m_manager = manager;
+        Map<String,String> moduleParameters = authzConfiguration.getParameters();
+        if (moduleParameters.containsKey(ENFORCE_MODE_CONFIG_KEY)) {
+            m_enforceMode = moduleParameters.get(ENFORCE_MODE_CONFIG_KEY);
+            if (ENFORCE_MODE_ENFORCE_POLICIES.equals(m_enforceMode)) {
+            } else if (ENFORCE_MODE_PERMIT_ALL_REQUESTS.equals(m_enforceMode)) {
+            } else if (ENFORCE_MODE_DENY_ALL_REQUESTS.equals(m_enforceMode)) {
+            } else {
+                throw new ModuleInitializationException("invalid enforceMode from config \"" + m_enforceMode + "\"", ROLE);
+            }
+        }
+
+        if (moduleParameters.containsKey(OWNER_ID_SEPARATOR_CONFIG_KEY)) {
+            ownerIdSeparator =
+                    moduleParameters.get(OWNER_ID_SEPARATOR_CONFIG_KEY);
+            logger.debug("ownerIdSeparator is [{}]", ownerIdSeparator);
+        }
 
         URI xacmlSubjectIdUri = null;
         URI xacmlActionIdUri = null;
@@ -117,16 +155,9 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
         }
     }
 
-    /**
-     * xacml pdp
-     */
-    private PDP pdp = null;
-
-    /**
-     * available during init(); keep as logging hook
-     */
-
-    private final List<com.sun.xacml.finder.AttributeFinderModule> m_attrFinderModules = new ArrayList<com.sun.xacml.finder.AttributeFinderModule>(0);
+    public void init() throws GeneralException {
+        newPdp();
+    }
 
     /* (non-Javadoc)
      * @see org.fcrepo.server.security.PolicyEnforcementPoint#setAttributeFinderModules(java.util.List)
@@ -138,7 +169,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
     }
 
     @Override
-    public final void newPdp() throws Exception {
+    public final void newPdp() throws GeneralException {
         AttributeFinder attrFinder = new AttributeFinder();
 
         attrFinder.setModules(m_attrFinderModules);
@@ -150,15 +181,9 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
                 new HashSet<PolicyFinderModule>();
         PolicyFinderModule combinedPolicyModule = null;
         combinedPolicyModule =
-                new PolicyFinderModule(m_serverHome,
-                                       combiningAlgorithm,
-                                       globalPolicyConfig,
-                                       globalBackendPolicyConfig,
-                                       globalPolicyGuiToolConfig,
-                                       manager,
-                                       validateRepositoryPolicies,
-                                       validateObjectPoliciesFromDatastream,
-                                       policyParser);
+                new PolicyFinderModule(m_server,
+                                       m_manager,
+                                       m_authorizationConfiguration);
         logger.debug("after constucting fedora policy finder module");
         logger.debug("before adding fedora policy finder module to policy finder hashset");
         policyModules.add(combinedPolicyModule);
@@ -169,63 +194,9 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 
         PDP pdp = new PDP(new PDPConfig(attrFinder, policyFinder, null));
         synchronized (this) {
-            this.pdp = pdp;
+            this.m_pdp = pdp;
             //so enforce() will wait, if this pdp update is in progress
         }
-    }
-
-    String combiningAlgorithm = null;
-
-    String globalPolicyConfig = null;
-
-    String globalBackendPolicyConfig = null;
-
-    String globalPolicyGuiToolConfig = null;
-
-    DOManager manager = null;
-
-    boolean validateRepositoryPolicies = false;
-
-    boolean validateObjectPoliciesFromDatastream = false;
-
-    PolicyParser policyParser;
-
-    String ownerIdSeparator = ",";
-
-    /* (non-Javadoc)
-     * @see org.fcrepo.server.security.PolicyEnforcementPoint#initPep(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.fcrepo.server.storage.DOManager, boolean, boolean, org.fcrepo.server.security.PolicyParser, java.lang.String)
-     */
-    @Override
-    public void initPep(String enforceMode,
-                        String combiningAlgorithm,
-                        String globalPolicyConfig,
-                        String globalBackendPolicyConfig,
-                        String globalPolicyGuiToolConfig,
-                        DOManager manager,
-                        boolean validateRepositoryPolicies,
-                        boolean validateObjectPoliciesFromDatastream,
-                        PolicyParser policyParser,
-                        String ownerIdSeparator) throws Exception {
-        logger.debug("in initPep()");
-        destroy();
-        this.policyParser = policyParser;
-        this.m_enforceMode = enforceMode;
-        if (ENFORCE_MODE_ENFORCE_POLICIES.equals(enforceMode)) {
-        } else if (ENFORCE_MODE_PERMIT_ALL_REQUESTS.equals(enforceMode)) {
-        } else if (ENFORCE_MODE_DENY_ALL_REQUESTS.equals(enforceMode)) {
-        } else {
-            throw new AuthzOperationalException("invalid enforceMode from config");
-        }
-        this.combiningAlgorithm = combiningAlgorithm;
-        this.globalPolicyConfig = globalPolicyConfig;
-        this.globalBackendPolicyConfig = globalBackendPolicyConfig;
-        this.globalPolicyGuiToolConfig = globalPolicyGuiToolConfig;
-        this.manager = manager;
-        this.validateRepositoryPolicies = validateRepositoryPolicies;
-        this.validateObjectPoliciesFromDatastream =
-                validateObjectPoliciesFromDatastream;
-        this.ownerIdSeparator = ownerIdSeparator;
-        newPdp();
     }
 
     /* (non-Javadoc)
@@ -241,7 +212,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
      */
     @Override
     public void destroy() {
-        pdp = null;
+        m_pdp = null;
     }
 
     private final Set<Subject> wrapSubjects(String subjectLoginId) {
@@ -358,7 +329,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
                 throw new AuthzDeniedException("all requests are currently denied");
             } else if (!ENFORCE_MODE_ENFORCE_POLICIES.equals(m_enforceMode)) {
                 logger.debug("denying request because enforceMode is invalid");
-                throw new AuthzOperationalException("invalid enforceMode from config");
+                throw new AuthzOperationalException("invalid enforceMode from config \"" + m_enforceMode + "\"");
             } else {
                 ResponseCtx response = null;
                 String contextIndex = null;
@@ -382,7 +353,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
                     m_registry.registerContext(contextIndex, context);
                     long st = System.currentTimeMillis();
                     try {
-                        response = pdp.evaluate(request);
+                        response = m_pdp.evaluate(request);
                     } finally {
                         long dur = System.currentTimeMillis() - st;
                         logger.debug("Policy evaluation took {}ms.", dur);

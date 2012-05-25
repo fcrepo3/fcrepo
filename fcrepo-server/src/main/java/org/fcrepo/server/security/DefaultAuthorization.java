@@ -4,9 +4,6 @@
  */
 package org.fcrepo.server.security;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
@@ -18,9 +15,7 @@ import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.authorization.AuthzOperationalException;
-import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.utilities.status.ServerState;
-import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,44 +100,10 @@ public class DefaultAuthorization
     private static final Logger logger =
             LoggerFactory.getLogger(DefaultAuthorization.class);
 
-    private static final String XACML_DIST_BASE = "fedora-internal-use";
-
-    private static final String BACKEND_POLICIES_ACTIVE_DIRECTORY =
-            XACML_DIST_BASE + "/fedora-internal-use-backend-service-policies";
-
-    private static final String REPOSITORY_POLICIES_DIRECTORY_KEY =
-            "REPOSITORY-POLICIES-DIRECTORY";
-
     private static final String REPOSITORY_POLICY_GUITOOL_DIRECTORY_KEY =
             "REPOSITORY-POLICY-GUITOOL-POLICIES-DIRECTORY";
 
-    private static final String COMBINING_ALGORITHM_KEY = "XACML-COMBINING-ALGORITHM";
-
-    private static final String ENFORCE_MODE_KEY = "ENFORCE-MODE";
-
-    private static final String POLICY_SCHEMA_PATH_KEY = "POLICY-SCHEMA-PATH";
-
-    private static final String VALIDATE_REPOSITORY_POLICIES_KEY =
-            "VALIDATE-REPOSITORY-POLICIES";
-
-    private static final String VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY =
-            "VALIDATE-OBJECT-POLICIES-FROM-DATASTREAM";
-
-    private static final String OWNER_ID_SEPARATOR_KEY = "OWNER-ID-SEPARATOR";
-
-    private final PolicyParser m_policyParser;
-
     private PolicyEnforcementPoint xacmlPep;
-
-    private String repositoryPoliciesActiveDirectory = "";
-
-    private String repositoryPolicyGuitoolDirectory = "";
-
-    private String combiningAlgorithm = "";
-
-    private String enforceMode = "";
-
-    private String ownerIdSeparator = ",";
 
     boolean enforceListObjectInFieldSearchResults = true;
 
@@ -159,118 +120,23 @@ public class DefaultAuthorization
      * @throws ModuleInitializationException If initilization values are invalid or initialization fails for
      *                                       some other reason.
      */
-    public DefaultAuthorization(Map moduleParameters, Server server, String role)
+    public DefaultAuthorization(Map<String,String> moduleParameters, Server server, String role)
             throws ModuleInitializationException {
         super(moduleParameters, server, role);
-        String serverHome = null;
-        try {
-            serverHome =
-                    server.getHomeDir().getCanonicalPath() + File.separator;
-        } catch (IOException e1) {
-            throw new ModuleInitializationException("couldn't get server home",
-                                                    role,
-                                                    e1);
-        }
-
-        if (moduleParameters.containsKey(REPOSITORY_POLICIES_DIRECTORY_KEY)) {
-            repositoryPoliciesActiveDirectory =
-                    getParameter(REPOSITORY_POLICIES_DIRECTORY_KEY, true);
-        }
-        if (moduleParameters
-                .containsKey(REPOSITORY_POLICY_GUITOOL_DIRECTORY_KEY)) {
-            repositoryPolicyGuitoolDirectory =
-                    getParameter(REPOSITORY_POLICY_GUITOOL_DIRECTORY_KEY, true);
-        }
-        if (moduleParameters.containsKey(COMBINING_ALGORITHM_KEY)) {
-            combiningAlgorithm =
-                    (String) moduleParameters.get(COMBINING_ALGORITHM_KEY);
-        }
-        if (moduleParameters.containsKey(ENFORCE_MODE_KEY)) {
-            enforceMode = (String) moduleParameters.get(ENFORCE_MODE_KEY);
-        }
-        if (moduleParameters.containsKey(OWNER_ID_SEPARATOR_KEY)) {
-            ownerIdSeparator =
-                    (String) moduleParameters.get(OWNER_ID_SEPARATOR_KEY);
-            logger.debug("ownerIdSeparator is [" + ownerIdSeparator + "]");
-        }
-
-        // Initialize the policy parser given the POLICY_SCHEMA_PATH_KEY
-        if (moduleParameters.containsKey(POLICY_SCHEMA_PATH_KEY)) {
-            String schemaPath =
-                    (((String) moduleParameters.get(POLICY_SCHEMA_PATH_KEY))
-                            .startsWith(File.separator) ? "" : serverHome)
-                    + (String) moduleParameters
-                            .get(POLICY_SCHEMA_PATH_KEY);
-            try {
-                FileInputStream in = new FileInputStream(schemaPath);
-                m_policyParser = new PolicyParser(in);
-                ValidationUtility.setPolicyParser(m_policyParser);
-            } catch (Exception e) {
-                throw new ModuleInitializationException("Error loading policy"
-                                                        + " schema: " + schemaPath, role, e);
-            }
-        } else {
-            throw new ModuleInitializationException("Policy schema path not"
-                                                    + " specified.  Must be given as " + POLICY_SCHEMA_PATH_KEY,
-                                                    role);
-        }
-
-        if (moduleParameters.containsKey(VALIDATE_REPOSITORY_POLICIES_KEY)) {
-            validateRepositoryPolicies =
-                    (new Boolean((String) moduleParameters
-                            .get(VALIDATE_REPOSITORY_POLICIES_KEY)))
-                            .booleanValue();
-        }
-        if (moduleParameters
-                .containsKey(VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY)) {
-            try {
-                validateObjectPoliciesFromDatastream =
-                        Boolean.parseBoolean((String) moduleParameters
-                                .get(VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY));
-            } catch (Exception e) {
-                throw new ModuleInitializationException("bad init parm boolean value for "
-                                                        + VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY,
-                                                        role,
-                                                        e);
-            }
-        }
     }
 
     @Override
     public void initModule() throws ModuleInitializationException {
     }
 
-    private boolean validateRepositoryPolicies = false;
-
-    private boolean validateObjectPoliciesFromDatastream = false;
-
     @Override
     public void postInitModule() throws ModuleInitializationException {
-        DOManager m_manager =
-                (DOManager) getServer()
-                        .getModule("org.fcrepo.server.storage.DOManager");
-        if (m_manager == null) {
-            throw new ModuleInitializationException("Can't get a DOManager from Server.getModule",
-                                                    getRole());
-        }
         try {
             getServer().getStatusFile()
                     .append(ServerState.STARTING,
                             "Initializing XACML Authorization Module");
-            xacmlPep = getServer().getBean(PolicyEnforcementPoint.class);
-            String fedoraHome =
-                    ((Module) this).getServer().getHomeDir().getAbsolutePath();
-            xacmlPep.initPep(enforceMode,
-                             combiningAlgorithm,
-                             repositoryPoliciesActiveDirectory,
-                             fedoraHome + File.separator
-                             + BACKEND_POLICIES_ACTIVE_DIRECTORY,
-                             repositoryPolicyGuitoolDirectory,
-                             m_manager,
-                             validateRepositoryPolicies,
-                             validateObjectPoliciesFromDatastream,
-                             m_policyParser,
-                             ownerIdSeparator);
+            xacmlPep = getServer().getBean(PolicyEnforcementPoint.class.getName(), PolicyEnforcementPoint.class);
+            xacmlPep.newPdp();
         } catch (Throwable e1) {
             throw new ModuleInitializationException(e1.getMessage(),
                                                     getRole(),

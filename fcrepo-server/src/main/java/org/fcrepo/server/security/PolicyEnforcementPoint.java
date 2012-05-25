@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.authorization.AuthzException;
-import org.fcrepo.server.storage.DOManager;
 
 public interface PolicyEnforcementPoint {
 
@@ -24,14 +23,6 @@ public interface PolicyEnforcementPoint {
 
     public abstract void setAttributeFinderModules(
             List<com.sun.xacml.finder.AttributeFinderModule> attrFinderModules);
-
-    public abstract void initPep(String enforceMode, String combiningAlgorithm,
-            String globalPolicyConfig, String globalBackendPolicyConfig,
-            String globalPolicyGuiToolConfig, DOManager manager,
-            boolean validateRepositoryPolicies,
-            boolean validateObjectPoliciesFromDatastream,
-            PolicyParser policyParser, String ownerIdSeparator)
-            throws Exception;
 
     public void newPdp() throws Exception;
 

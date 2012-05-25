@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -25,6 +26,7 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.common.FaultException;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
+import org.fcrepo.server.config.ModuleConfiguration;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.errors.ServerException;
@@ -32,6 +34,7 @@ import org.fcrepo.server.errors.ValidationException;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
@@ -69,17 +72,35 @@ public class PolicyFinderModule
 
     private static final String DEFAULT = "default";
 
+    private static final String DEFAULT_XACML_COMBINING_ALGORITHM = "com.sun.xacml.combine.OrderedDenyOverridesPolicyAlg";
+
     private static final String XACML_DIST_BASE = "fedora-internal-use";
 
     private static final String DEFAULT_REPOSITORY_POLICIES_DIRECTORY =
             XACML_DIST_BASE
             + "/fedora-internal-use-repository-policies-approximating-2.0";
 
+    private static final String BACKEND_POLICIES_ACTIVE_DIRECTORY =
+            XACML_DIST_BASE + "/fedora-internal-use-backend-service-policies";
+
     private static final String BE_SECURITY_XML_LOCATION =
             "config/beSecurity.xml";
 
     private static final String BACKEND_POLICIES_XSL_LOCATION =
             XACML_DIST_BASE + "/build-backend-policy.xsl";
+
+    private static final String COMBINING_ALGORITHM_KEY = "XACML-COMBINING-ALGORITHM";
+
+    private static final String REPOSITORY_POLICIES_DIRECTORY_KEY =
+            "REPOSITORY-POLICIES-DIRECTORY";
+
+    private static final String POLICY_SCHEMA_PATH_KEY = "POLICY-SCHEMA-PATH";
+
+    private static final String VALIDATE_REPOSITORY_POLICIES_KEY =
+            "VALIDATE-REPOSITORY-POLICIES";
+
+    private static final String VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY =
+            "VALIDATE-OBJECT-POLICIES-FROM-DATASTREAM";
 
     private final String m_combiningAlgorithm;
 
@@ -99,24 +120,77 @@ public class PolicyFinderModule
 
     private final List<AbstractPolicy> m_repositoryPolicies;
 
-    public PolicyFinderModule(String serverHome,
-                              String combiningAlgorithm,
-                              String repositoryPolicyDirectoryPath,
-                              String repositoryBackendPolicyDirectoryPath,
-                              String repositoryPolicyGuiToolDirectoryPath,
+    public PolicyFinderModule(Server server,
                               RepositoryReader repoReader,
-                              boolean validateRepositoryPolicies,
-                              boolean validateObjectPoliciesFromDatastream,
-                              PolicyParser policyParser)
+                              ModuleConfiguration authorizationConfig)
             throws GeneralException {
-        m_serverHome = serverHome;
-        m_repositoryPolicyDirectoryPath = repositoryPolicyDirectoryPath;
-        m_repositoryBackendPolicyDirectoryPath = repositoryBackendPolicyDirectoryPath;
-        m_combiningAlgorithm = combiningAlgorithm;
+        m_serverHome = server.getHomeDir().getAbsolutePath();
+
+        Map<String,String> moduleParameters = authorizationConfig.getParameters();
+
+        m_repositoryBackendPolicyDirectoryPath = m_serverHome + File.separator
+                + BACKEND_POLICIES_ACTIVE_DIRECTORY;
+
+        if (moduleParameters.containsKey(REPOSITORY_POLICIES_DIRECTORY_KEY)) {
+            m_repositoryPolicyDirectoryPath =
+                    authorizationConfig.getParameter(REPOSITORY_POLICIES_DIRECTORY_KEY, true);
+        } else {
+            m_repositoryPolicyDirectoryPath = "";
+        }
+
+        if (moduleParameters.containsKey(COMBINING_ALGORITHM_KEY)) {
+            m_combiningAlgorithm =
+                    moduleParameters.get(COMBINING_ALGORITHM_KEY);
+        } else {
+            m_combiningAlgorithm = DEFAULT_XACML_COMBINING_ALGORITHM;
+        }
+
+        if (moduleParameters.containsKey(VALIDATE_REPOSITORY_POLICIES_KEY)) {
+            m_validateRepositoryPolicies =
+                    (new Boolean(moduleParameters
+                            .get(VALIDATE_REPOSITORY_POLICIES_KEY)))
+                            .booleanValue();
+        } else {
+            m_validateRepositoryPolicies = false;
+        }
+        if (moduleParameters
+                .containsKey(VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY)) {
+            try {
+                m_validateObjectPoliciesFromDatastream =
+                        Boolean.parseBoolean(moduleParameters
+                                .get(VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY));
+            } catch (Exception e) {
+                throw new GeneralException("bad init parm boolean value for "
+                                                        + VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY,
+                                                        e);
+            }
+        } else {
+            m_validateObjectPoliciesFromDatastream = false;
+        }
+
+        // Initialize the policy parser given the POLICY_SCHEMA_PATH_KEY
+        if (moduleParameters.containsKey(POLICY_SCHEMA_PATH_KEY)) {
+            String schemaPath = moduleParameters.get(POLICY_SCHEMA_PATH_KEY);
+            File schema;
+            if (schemaPath.startsWith(File.separator)){ // absolute
+                schema = new File(schemaPath);
+            } else {
+                schema = new File(new File(m_serverHome), schemaPath);
+            }
+            try {
+                FileInputStream in = new FileInputStream(schema);
+                m_policyParser = new PolicyParser(in);
+                ValidationUtility.setPolicyParser(m_policyParser);
+            } catch (Exception e) {
+                throw new GeneralException("Error loading policy"
+                                                        + " schema: " + schema.getAbsolutePath(), e);
+            }
+        } else {
+            throw new GeneralException("Policy schema path not"
+                                                    + " specified.  Must be given as " + POLICY_SCHEMA_PATH_KEY);
+        }
+
         m_repoReader = repoReader;
-        m_validateRepositoryPolicies = validateRepositoryPolicies;
-        m_validateObjectPoliciesFromDatastream = validateObjectPoliciesFromDatastream;
-        m_policyParser = policyParser;
 
         m_repositoryPolicies = new ArrayList<AbstractPolicy>();
     }
