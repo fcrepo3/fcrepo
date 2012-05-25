@@ -7,17 +7,15 @@ package org.fcrepo.server.security;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import java.util.Hashtable;
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.attr.AttributeDesignator;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.cond.EvaluationResult;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -33,13 +31,11 @@ class ContextAttributeFinderModule
         return true;
     }
 
-    static private final ContextAttributeFinderModule singleton =
-            new ContextAttributeFinderModule();
+    private final ContextRegistry m_contexts;
 
-    private final Hashtable contexts = new Hashtable();
-
-    private ContextAttributeFinderModule() {
+    private ContextAttributeFinderModule(ContextRegistry contexts) {
         super();
+        m_contexts = contexts;
         try {
             registerSupportedDesignatorType(AttributeDesignator.SUBJECT_TARGET);
             registerSupportedDesignatorType(AttributeDesignator.ACTION_TARGET); //<<??????
@@ -94,10 +90,6 @@ class ContextAttributeFinderModule
         } catch (URISyntaxException e1) {
             setInstantiatedOk(false);
         }
-    }
-
-    static public final ContextAttributeFinderModule getInstance() {
-        return singleton;
     }
 
     private final String getContextId(EvaluationCtx context) {
@@ -172,7 +164,7 @@ class ContextAttributeFinderModule
         logger.debug("getAttributeLocally context");
         String contextId = getContextId(ctx);
         logger.debug("contextId=" + contextId + " attributeId=" + attributeId);
-        Context context = (Context) contexts.get(contextId);
+        Context context = m_contexts.getContext(contextId);
         logger.debug("got context");
         Object values = null;
         logger.debug("designatorType" + designatorType);
@@ -293,16 +285,6 @@ class ContextAttributeFinderModule
             logger.debug("getAttributeLocally object value=" + values);
         }
         return values;
-    }
-
-    final void registerContext(Object key, Context value) {
-        logger.debug("registering " + key);
-        contexts.put(key, value);
-    }
-
-    final void unregisterContext(Object key) {
-        logger.debug("unregistering " + key);
-        contexts.remove(key);
     }
 
 }

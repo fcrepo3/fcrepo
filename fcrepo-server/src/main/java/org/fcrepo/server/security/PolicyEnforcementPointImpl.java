@@ -45,8 +45,6 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 
     private static int count = 0;
 
-    private String enforceMode = ENFORCE_MODE_ENFORCE_POLICIES;
-
     static final String ENFORCE_MODE_ENFORCE_POLICIES = "enforce-policies";
 
     static final String ENFORCE_MODE_PERMIT_ALL_REQUESTS =
@@ -72,7 +70,12 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 
     private final URI RESOURCE_NAMESPACE_URI;
 
-    private PolicyEnforcementPointImpl() {
+    private final ContextRegistry m_registry;
+
+    private String m_enforceMode = ENFORCE_MODE_ENFORCE_POLICIES;
+
+    public PolicyEnforcementPointImpl(ContextRegistry registry) {
+        m_registry = registry;
 
         URI xacmlSubjectIdUri = null;
         URI xacmlActionIdUri = null;
@@ -107,15 +110,6 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
             RESOURCE_ID_URI = pidUri;
             RESOURCE_NAMESPACE_URI = namespaceUri;
         }
-    }
-
-    public static final PolicyEnforcementPoint getInstance() {
-        if (singleton == null) {
-            singleton = new PolicyEnforcementPointImpl();
-        }
-        count++;
-        logger.debug("***another use (" + count + ") of XACMLPep singleton");
-        return singleton;
     }
 
     /**
@@ -209,7 +203,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
         logger.debug("in initPep()");
         destroy();
         this.policyParser = policyParser;
-        this.enforceMode = enforceMode;
+        this.m_enforceMode = enforceMode;
         if (ENFORCE_MODE_ENFORCE_POLICIES.equals(enforceMode)) {
         } else if (ENFORCE_MODE_PERMIT_ALL_REQUESTS.equals(enforceMode)) {
         } else if (ENFORCE_MODE_DENY_ALL_REQUESTS.equals(enforceMode)) {
@@ -351,12 +345,12 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
             synchronized (this) {
                 //wait, if pdp update is in progress
             }
-            if (ENFORCE_MODE_PERMIT_ALL_REQUESTS.equals(enforceMode)) {
+            if (ENFORCE_MODE_PERMIT_ALL_REQUESTS.equals(m_enforceMode)) {
                 logger.debug("permitting request because enforceMode==ENFORCE_MODE_PERMIT_ALL_REQUESTS");
-            } else if (ENFORCE_MODE_DENY_ALL_REQUESTS.equals(enforceMode)) {
+            } else if (ENFORCE_MODE_DENY_ALL_REQUESTS.equals(m_enforceMode)) {
                 logger.debug("denying request because enforceMode==ENFORCE_MODE_DENY_ALL_REQUESTS");
                 throw new AuthzDeniedException("all requests are currently denied");
-            } else if (!ENFORCE_MODE_ENFORCE_POLICIES.equals(enforceMode)) {
+            } else if (!ENFORCE_MODE_ENFORCE_POLICIES.equals(m_enforceMode)) {
                 logger.debug("denying request because enforceMode is invalid");
                 throw new AuthzOperationalException("invalid enforceMode from config");
             } else {
@@ -364,7 +358,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
                 String contextIndex = null;
                 try {
                     contextIndex = (new Integer(next())).toString();
-                    logger.debug("context index set=" + contextIndex);
+                    logger.debug("context index set={}", contextIndex);
                     Set<Subject> subjects = wrapSubjects(subjectId);
                     Set<Attribute> actions = wrapActions(action, api, contextIndex);
                     Set<Attribute> resources = wrapResources(pid, namespace);
@@ -377,22 +371,15 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
                     Iterator<Attribute> tempit = actions.iterator();
                     while (tempit.hasNext()) {
                         Attribute tempobj = tempit.next();
-                        logger.debug("request action has " + tempobj.getId() + "="
-                                + tempobj.getValue().toString());
+                        logger.debug("request action has {}={}", tempobj.getId(), tempobj.getValue().toString());
                     }
-                    for (com.sun.xacml.finder.AttributeFinderModule m:m_attrFinderModules){
-                        if (m instanceof ContextAttributeFinderModule){
-                            ContextAttributeFinderModule c = (ContextAttributeFinderModule)m;
-                            logger.debug("about to ref contextAttributeFinder=" + c);
-                            c.registerContext(contextIndex, context);
-                        }
-                    }
+                    m_registry.registerContext(contextIndex, context);
                     long st = System.currentTimeMillis();
                     try {
                         response = pdp.evaluate(request);
                     } finally {
                         long dur = System.currentTimeMillis() - st;
-                        logger.debug("Policy evaluation took " + dur + "ms.");
+                        logger.debug("Policy evaluation took {}ms.", dur);
                     }
 
                     logger.debug("in pep, after evaluate() called");
@@ -400,12 +387,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
                     logger.error("Error evaluating policy", t);
                     throw new AuthzOperationalException("");
                 } finally {
-                    for (com.sun.xacml.finder.AttributeFinderModule m:m_attrFinderModules){
-                        if (m instanceof ContextAttributeFinderModule){
-                            ContextAttributeFinderModule c = (ContextAttributeFinderModule)m;
-                            c.unregisterContext(contextIndex);
-                        }
-                    }
+                    m_registry.unregisterContext(contextIndex);
                 }
                 logger.debug("in pep, before denyBiasedAuthz() called");
                 if (!denyBiasedAuthz(response.getResults())) {
@@ -417,7 +399,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
             }
         } finally {
             long dur = System.currentTimeMillis() - enforceStartTime;
-            logger.debug("Policy enforcement took " + dur + "ms.");
+            logger.debug("Policy enforcement took {}ms.", dur);
         }
     }
 
