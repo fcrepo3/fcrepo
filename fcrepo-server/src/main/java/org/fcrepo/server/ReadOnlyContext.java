@@ -85,11 +85,7 @@ public class ReadOnlyContext
                             String password,
                             boolean noOp) {
         //super(parameters);
-        m_environmentAttributes = environmentAttributes;
-        if (m_environmentAttributes == null) {
-            m_environmentAttributes = new MultiValueMap();
-        }
-        m_environmentAttributes.lock();
+        setEnvironmentValues(environmentAttributes);
         m_subjectAttributes = subjectAttributes;
         if (m_subjectAttributes == null) {
             logger.debug("subject map parm is null");
@@ -110,6 +106,14 @@ public class ReadOnlyContext
         if (request instanceof ExtendedHttpServletRequest) {
             extendedHttpServletRequest = (ExtendedHttpServletRequest) request;
         }
+    }
+    
+    public void setEnvironmentValues(MultiValueMap environmentAttributes) {
+        m_environmentAttributes = environmentAttributes;
+        if (m_environmentAttributes == null) {
+            m_environmentAttributes = new MultiValueMap();
+        }
+        m_environmentAttributes.lock();
     }
 
     @Override
