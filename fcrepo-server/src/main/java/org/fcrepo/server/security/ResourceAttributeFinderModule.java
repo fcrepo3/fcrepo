@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.sun.xacml.EvaluationCtx;
@@ -19,6 +20,7 @@ import com.sun.xacml.cond.EvaluationResult;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
+import org.fcrepo.server.config.ModuleConfiguration;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.DOReader;
@@ -35,6 +37,8 @@ class ResourceAttributeFinderModule
 
     private static final Logger logger =
             LoggerFactory.getLogger(ResourceAttributeFinderModule.class);
+
+    private static final String OWNER_ID_SEPARATOR_CONFIG_KEY = "OWNER-ID-SEPARATOR";
 
     @Override
     protected boolean canHandleAdhoc() {
@@ -100,11 +104,18 @@ class ResourceAttributeFinderModule
             this.doManager = doManager;
         }
     }
+    
+    public void setLegacyConfiguration(ModuleConfiguration authorizationConfiguration) {
+        Map<String,String> moduleParameters = authorizationConfiguration.getParameters();
+        if (moduleParameters.containsKey(OWNER_ID_SEPARATOR_CONFIG_KEY)) {
+            setOwnerIdSeparator(moduleParameters.get(OWNER_ID_SEPARATOR_CONFIG_KEY));
+        }
+    }
 
     public void setOwnerIdSeparator(String ownerIdSeparator) {
         this.ownerIdSeparator = ownerIdSeparator;
-        logger.debug("resourceAttributeFinder just set ownerIdSeparator ==["
-                + this.ownerIdSeparator + "]");
+        logger.debug("resourceAttributeFinder just set ownerIdSeparator ==[{}]",
+                this.ownerIdSeparator);
     }
 
     private final String getDatastreamId(EvaluationCtx context) {

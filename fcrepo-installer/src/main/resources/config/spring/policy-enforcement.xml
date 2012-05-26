@@ -34,6 +34,9 @@
         <property name="DOManager">
             <ref bean="org.fcrepo.server.storage.DOManager" />
         </property>
+        <property name="legacyConfiguration">
+          <ref bean="org.fcrepo.server.security.AuthorizationConfiguration" />
+        </property>
   </bean>
         <!-- TESTONLY
   <bean id="org.fcrepo.server.security.TestAttributeFinderModule"

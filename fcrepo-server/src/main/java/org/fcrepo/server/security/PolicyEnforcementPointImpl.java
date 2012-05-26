@@ -44,12 +44,6 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 
     private static final String ROLE = org.fcrepo.server.security.PolicyEnforcementPoint.class.getName();
 
-    private static PolicyEnforcementPoint singleton = null;
-
-    private static int count = 0;
-
-    private static final String OWNER_ID_SEPARATOR_CONFIG_KEY = "OWNER-ID-SEPARATOR";
-
     private static final String ENFORCE_MODE_CONFIG_KEY = "ENFORCE-MODE";
 
     static final String ENFORCE_MODE_ENFORCE_POLICIES = "enforce-policies";
@@ -102,12 +96,6 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
             } else {
                 throw new ModuleInitializationException("invalid enforceMode from config \"" + m_enforceMode + "\"", ROLE);
             }
-        }
-
-        if (moduleParameters.containsKey(OWNER_ID_SEPARATOR_CONFIG_KEY)) {
-            ownerIdSeparator =
-                    moduleParameters.get(OWNER_ID_SEPARATOR_CONFIG_KEY);
-            logger.debug("ownerIdSeparator is [{}]", ownerIdSeparator);
         }
 
         URI xacmlSubjectIdUri = null;
