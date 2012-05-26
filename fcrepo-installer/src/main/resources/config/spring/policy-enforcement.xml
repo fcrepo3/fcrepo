@@ -17,7 +17,11 @@
     <bean id="LegacyPolicyFinderModule"
           class="org.fcrepo.server.security.PolicyFinderModule">
       <constructor-arg><ref bean="org.fcrepo.server.Server" /></constructor-arg>
-      <constructor-arg><ref bean="org.fcrepo.server.storage.DOManager" /></constructor-arg>
+      <constructor-arg>
+        <bean class="org.fcrepo.server.security.impl.SimplePolicyLoader">
+          <constructor-arg><ref bean="org.fcrepo.server.storage.DOManager" /></constructor-arg>
+        </bean>
+      </constructor-arg>
       <constructor-arg><ref bean="org.fcrepo.server.security.AuthorizationConfiguration" /></constructor-arg>
     </bean>
   </util:set>

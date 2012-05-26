@@ -110,22 +110,24 @@ public class PolicyFinderModule
 
     private final String m_repositoryBackendPolicyDirectoryPath;
 
-    private final RepositoryReader m_repoReader;
-
     private final boolean m_validateRepositoryPolicies;
 
     private final boolean m_validateObjectPoliciesFromDatastream;
 
     private final PolicyParser m_policyParser;
+    
+    private final PolicyLoader m_policyLoader;
 
     private final List<AbstractPolicy> m_repositoryPolicies;
 
     public PolicyFinderModule(Server server,
-                              RepositoryReader repoReader,
+                              PolicyLoader policyLoader,
                               ModuleConfiguration authorizationConfig)
             throws GeneralException {
         m_serverHome = server.getHomeDir().getAbsolutePath();
 
+        m_policyLoader = policyLoader;
+        
         Map<String,String> moduleParameters = authorizationConfig.getParameters();
 
         m_repositoryBackendPolicyDirectoryPath = m_serverHome + File.separator
@@ -190,8 +192,6 @@ public class PolicyFinderModule
                                                     + " specified.  Must be given as " + POLICY_SCHEMA_PATH_KEY);
         }
 
-        m_repoReader = repoReader;
-
         m_repositoryPolicies = new ArrayList<AbstractPolicy>();
     }
 
@@ -204,14 +204,15 @@ public class PolicyFinderModule
             logger.info("Loading repository policies...");
             setupActivePolicyDirectories();
             m_repositoryPolicies.clear();
-            m_repositoryPolicies.addAll(
-                    loadPolicies(m_policyParser,
+            Map<String,AbstractPolicy> repositoryPolicies =
+                    m_policyLoader.loadPolicies(m_policyParser,
+                    m_validateRepositoryPolicies,
+                    new File(m_repositoryBackendPolicyDirectoryPath));
+            repositoryPolicies.putAll(
+                    m_policyLoader.loadPolicies(m_policyParser,
                                  m_validateRepositoryPolicies,
                                  new File(m_repositoryPolicyDirectoryPath)));
-            m_repositoryPolicies.addAll(
-                    loadPolicies(m_policyParser,
-                                 m_validateRepositoryPolicies,
-                                 new File(m_repositoryBackendPolicyDirectoryPath)));
+            m_repositoryPolicies.addAll(repositoryPolicies.values());
         } catch (Throwable t) {
             logger.error("Error loading repository policies: " + t.toString(), t);
         }
@@ -284,7 +285,10 @@ public class PolicyFinderModule
             List<AbstractPolicy> policies = new ArrayList<AbstractPolicy>(m_repositoryPolicies);
             String pid = getPid(context);
             if (pid != null && !"".equals(pid)) {
-                AbstractPolicy objectPolicyFromObject = loadObjectPolicy(pid);
+                AbstractPolicy objectPolicyFromObject = 
+                        m_policyLoader.loadObjectPolicy(m_policyParser.copy(),
+                                                         pid,
+                                                         m_validateObjectPoliciesFromDatastream);
                 if (objectPolicyFromObject != null) {
                     policies.add(objectPolicyFromObject);
                 }
@@ -308,26 +312,6 @@ public class PolicyFinderModule
                             .getMessage()));
         }
         return policyFinderResult;
-    }
-
-    // if the object exists and has a POLICY datastream, parse and return it
-    private AbstractPolicy loadObjectPolicy(String pid) throws ServerException {
-        try {
-            DOReader reader = m_repoReader.getReader(Server.USE_DEFINITIVE_STORE,
-                                                     ReadOnlyContext.EMPTY,
-                                                     pid);
-            Datastream ds = reader.GetDatastream("POLICY", null);
-            if (ds != null) {
-                logger.debug("Using POLICY for " + pid);
-                return m_policyParser //TODO performance hole. Each copy() performs schema parsing, which is expensive
-                        .copy().parse(ds.getContentStream(),
-                                      m_validateObjectPoliciesFromDatastream);
-            } else {
-                return null;
-            }
-        } catch (ObjectNotInLowlevelStorageException e) {
-            return null;
-        }
     }
 
     // get the pid from the context, or null if unable
