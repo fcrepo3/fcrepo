@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy 
+	xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+	xmlns:xacml-context="urn:oasis:names:tc:xacml:2.0:context:schema:os"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:oasis:names:tc:xacml:2.0:policy:schema:os http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd
+						urn:oasis:names:tc:xacml:2.0:context:schema:os http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-context-schema-os.xsd"
+    PolicyId="deny-file-resolve-if-not-allowed-dir"
+    RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+  <Description>deny any file datastream resolution unless uri ends with 'allowed'</Description>
+  <Target>
+    <Actions>
+      <Action>
+        <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-retrieveFile</AttributeValue>
+          <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:fedora:names:fedora:2.1:action:id"/>
+        </ActionMatch>
+      </Action>
+    </Actions>
+  </Target>
+  <Rule RuleId="1" Effect="Permit">
+    <Condition>
+      <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:regexp-string-match">
+        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">^file:.+isallowed$</AttributeValue>
+        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+          <ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:datastream:fileUri"
+            DataType="http://www.w3.org/2001/XMLSchema#string"/>
+        </Apply>
+      </Apply>
+    </Condition>
+  </Rule>
+  <Rule RuleId="2" Effect="Deny">
+  </Rule>
+</Policy>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" PolicyId="permit-apim-by-tomcat-user" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:1.0:policy
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" PolicyId="deny-apia-by-testuser2" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:1.0:policy
 http://www.fedora.info/definitions/1/0/api/cs-xacml-schema-policy-01.xsd">
 	<Description> </Description>
 	<Target>

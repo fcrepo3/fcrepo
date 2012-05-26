@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PolicyId="demo-7" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+<Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PolicyId="deny-apia-except-testroleC" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
 	<Description>This is an object-specific policy.  It could be stored inside the demo:7 digital object in the POLICY datastream OR in the directory for object-specific policies. (The directory location is set in the Authorization module configuration in the Fedora server configuration file (fedora.fcfg). By using multiple policy Rules, this policy shows how to deny access to all raw datastreams in the object except to particular users (e.g., the object owners).  It also shows how to deny access to a particular disseminations to selected user roles.</Description>
 	<Target>
 		<Subjects>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+        
+        <bean id="org.fcrepo.server.security.ContextRegistry"
+              class="org.fcrepo.server.security.impl.HashtableContextRegistry" />
+              
+  <util:set id="policyFinderModules">
+    <bean id="LegacyPolicyFinderModule"
+          class="org.fcrepo.server.security.PolicyFinderModule">
+      <constructor-arg><ref bean="org.fcrepo.server.Server" /></constructor-arg>
+      <constructor-arg>
+        <bean class="org.fcrepo.server.security.impl.OverridingPolicyLoader">
+          <constructor-arg><ref bean="org.fcrepo.server.storage.DOManager" /></constructor-arg>
+        </bean>
+      </constructor-arg>
+      <constructor-arg><ref bean="org.fcrepo.server.security.AuthorizationConfiguration" /></constructor-arg>
+    </bean>
+  </util:set>
+
+  <bean id="org.fcrepo.server.security.ContextAttributeFinderModule"
+        class="org.fcrepo.server.security.ContextAttributeFinderModule"
+        autowire-candidate="true">
+    <constructor-arg><ref bean="org.fcrepo.server.security.ContextRegistry" /></constructor-arg>
+  </bean>
+  <bean id="org.fcrepo.server.security.ResourceAttributeFinderModule"
+        class="org.fcrepo.server.security.ResourceAttributeFinderModule"
+        factory-method="getInstance" autowire-candidate="true">
+        <property name="ownerIdSeparator" value="," />
+        <property name="DOManager">
+            <ref bean="org.fcrepo.server.storage.DOManager" />
+        </property>
+        <property name="legacyConfiguration">
+          <ref bean="org.fcrepo.server.security.AuthorizationConfiguration" />
+        </property>
+  </bean>
+  <bean id="org.fcrepo.server.security.TestAttributeFinderModule"
+      class="org.fcrepo.server.security.TestAttributeFinderModule"
+      factory-method="getInstance" autowire-candidate="true">
+  </bean>
+
+  <util:list id="attributeFinderModules">
+    <ref bean="org.fcrepo.server.security.ContextAttributeFinderModule" />
+    <ref bean="org.fcrepo.server.security.ResourceAttributeFinderModule" />
+    <ref bean="org.fcrepo.server.security.TestAttributeFinderModule" />
+        <!-- Uncomment the bean below to enable the use of relationship index triples in XACML policies -->
+        <!--
+                      <ref bean="org.fcrepo.server.security.xacml.pdp.finder.attribute.RITriplesAttributeFinder" />
+        -->       
+  </util:list>
+  
+  <util:list id="resourceFinderModules">
+  </util:list>
+  
+  <bean id="PDPConfigurationFactory" class="org.fcrepo.server.security.PDPConfigurationFactory" />
+  
+  <bean id="LegacyPDPConfig" factory-bean="PDPConfigurationFactory" factory-method="getPDPConfig">
+    <constructor-arg ref="attributeFinderModules" />
+    <constructor-arg ref="policyFinderModules" />
+    <constructor-arg ref="resourceFinderModules" />
+  </bean>
+  
+          <!-- Uncomment the bean below to enable the use of relationship index triples in XACML policies -->
+        <!--
+        <bean id="org.fcrepo.server.security.xacml.pdp.finder.attribute.RITriplesAttributeFinder"
+              class="org.fcrepo.server.security.xacml.pdp.finder.attribute.RITriplesAttributeFinder"
+              init-method="init">
+              <constructor-arg>
+                  <ref bean="org.fcrepo.server.resourceIndex.ResourceIndex" />
+              </constructor-arg>
+              <property name="resourceAttributes">
+                <set>
+                  <value type="java.lang.String">info:fedora/fedora-system:def/view#mimeType</value>
+                  <value type="java.lang.String">info:fedora/fedora-system:def/model#ownerId</value>
+                  <value type="java.lang.String">info:fedora/fedora-system:def/model#state</value>
+                  <value type="java.lang.String">info:fedora/fedora-system:def/model#createdDate</value>
+                  <value type="java.lang.String">info:fedora/fedora-system:def/model#label</value>
+                  <value type="java.lang.String">http://www.w3.org/1999/02/22-rdf-syntax-ns#type</value>
+                  <value type="java.lang.String">http://muradora.ramp.org.au/sf#isSmartFolder</value>
+                </set>
+              </property>
+        </bean>
+         -->
+        <bean id="org.fcrepo.server.security.PolicyEnforcementPoint"
+              class="org.fcrepo.server.security.PolicyEnforcementPointImpl"
+              init-method="init"
+              autowire-candidate="true">
+              <constructor-arg><ref bean="LegacyPDPConfig" /></constructor-arg>
+              <constructor-arg><ref bean="org.fcrepo.server.security.ContextRegistry" /></constructor-arg>
+              <constructor-arg><ref bean="org.fcrepo.server.security.AuthorizationConfiguration" /></constructor-arg>
+        </bean>
+</beans>

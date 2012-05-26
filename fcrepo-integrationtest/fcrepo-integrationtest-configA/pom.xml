@@ -158,6 +158,9 @@
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
                       target="clearSQL" inheritrefs="true" />
                     <ant
+                      antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
+                      target="configureFedora" inheritrefs="true" />
+                    <ant
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml"
                       target="tomcat-start" inheritrefs="true" />
                   </target>
@@ -207,7 +210,7 @@
 
     <resources>
       <resource>
-        <directory>src/test/resources/confg</directory>
+        <directory>src/test/resources/config</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
@@ -260,7 +263,7 @@
                   <type>jar</type>
                   <overWrite>true</overWrite>
                   <outputDirectory>${project.build.directory}/ext/fcrepo-integrationtest-core/</outputDirectory>
-                  <includes>**/scripts/*.xml</includes>
+                  <includes>**/scripts/*.xml,**/test-policies/*.xml,**/fesl-test-policies/*.xml,**/config/spring/*.xml</includes>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -327,6 +330,7 @@
                 <include>**/TestAPIALiteConfigA.class</include>
                 <include>**/TestAPIM.class</include>
                 <include>**/TestAPIMLite.class</include>
+                <include>**/TestExternalDatastreams.class</include>
                 <include>**/TestRESTAPI.class</include>
                 <include>**/TestHTTPStatusCodes.class</include>
                 <include>**/TestHTTPStatusCodesConfigA.class</include>
