@@ -1,13 +1,26 @@
-package org.fcrepo.server.security.xacml.pep.module;
+package org.fcrepo.server.security.xacml.pep.impl;
 
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.fcrepo.common.Constants;
+
 import org.fcrepo.server.Context;
+import org.fcrepo.server.MultiValueMap;
 import org.fcrepo.server.errors.authorization.AuthzException;
+import org.fcrepo.server.errors.authorization.AuthzOperationalException;
 import org.fcrepo.server.security.Authorization;
+import org.fcrepo.server.security.PolicyEnforcementPoint;
 
 
 public class FESLAuthorization implements Authorization {
+    private static final Logger logger = LoggerFactory.getLogger(FESLAuthorization.class);
+    private PolicyEnforcementPoint m_pep;
+    public FESLAuthorization(PolicyEnforcementPoint pep) {
+        m_pep = pep;
+    }
 
     @Override
     public void reloadPolicies(Context context) throws Exception {
@@ -293,8 +306,30 @@ public class FESLAuthorization implements Authorization {
     @Override
     public void enforceRetrieveFile(Context context, String fileURI)
             throws AuthzException {
-        // TODO Determine whether FESL auth checks should be performed at the module level
-
+        try {
+            logger.debug("Entered enforceRetrieveFile");
+            String target = Constants.ACTION.RETRIEVE_FILE.uri;
+            context.setActionAttributes(null);
+            context.setResourceAttributes(null);
+            MultiValueMap resourceAttributes = new MultiValueMap();
+            String name = "";
+            try {
+                name = resourceAttributes.setReturn(Constants.DATASTREAM.FILE_URI.uri, fileURI);
+            } catch (Exception e) {
+                context.setResourceAttributes(null);
+                throw new AuthzOperationalException(target + " couldn't be set " + name, e);
+            }
+            context.setResourceAttributes(resourceAttributes);
+            m_pep.enforce(context
+                    .getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
+                             target,
+                             Constants.ACTION.APIM.uri,
+                             "",
+                             extractNamespace(fileURI),
+                             context);
+        } finally {
+            logger.debug("Exiting enforceRetrieveFile");
+        }
     }
 
     @Override
@@ -302,6 +337,15 @@ public class FESLAuthorization implements Authorization {
             throws AuthzException {
         // TODO Determine whether FESL auth checks should be performed at the module level
 
+    }
+
+    private final String extractNamespace(String pid) {
+        String namespace = "";
+        int colonPosition = pid.indexOf(':');
+        if (-1 < colonPosition) {
+            namespace = pid.substring(0, colonPosition);
+        }
+        return namespace;
     }
 
 }

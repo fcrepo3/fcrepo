@@ -94,7 +94,7 @@
         </bean>
          -->
         <bean id="org.fcrepo.server.security.PolicyEnforcementPoint"
-              class="org.fcrepo.server.security.PolicyEnforcementPointImpl"
+              class="org.fcrepo.server.security.impl.DefaultPolicyEnforcementPoint"
               init-method="init"
               autowire-candidate="true">
               <constructor-arg><ref bean="LegacyPDPConfig" /></constructor-arg>

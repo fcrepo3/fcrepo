@@ -1,8 +1,6 @@
 
 package org.fcrepo.server.security;
 
-import java.util.List;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.authorization.AuthzException;
 
@@ -20,9 +18,6 @@ public interface PolicyEnforcementPoint {
 
     public static final String XACML_RESOURCE_ID =
             "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
-
-    public abstract void setAttributeFinderModules(
-            List<com.sun.xacml.finder.AttributeFinderModule> attrFinderModules);
 
     public void newPdp() throws Exception;
 
