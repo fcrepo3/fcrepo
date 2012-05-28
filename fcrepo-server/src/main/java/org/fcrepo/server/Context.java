@@ -16,7 +16,7 @@ public interface Context {
 
     public MultiValueMap getEnvironmentAttributes();
 
-    public Iterator environmentAttributes();
+    public Iterator<String> environmentAttributes();
 
     public int nEnvironmentValues(String name);
 
@@ -24,7 +24,7 @@ public interface Context {
 
     public String[] getEnvironmentValues(String name);
 
-    public Iterator subjectAttributes();
+    public Iterator<String> subjectAttributes();
 
     public int nSubjectValues(String name);
 
@@ -32,7 +32,7 @@ public interface Context {
 
     public String[] getSubjectValues(String name);
 
-    public Iterator actionAttributes();
+    public Iterator<String> actionAttributes();
 
     public int nActionValues(String name);
 
@@ -40,7 +40,7 @@ public interface Context {
 
     public String[] getActionValues(String name);
 
-    public Iterator resourceAttributes();
+    public Iterator<String> resourceAttributes();
 
     public int nResourceValues(String name);
 

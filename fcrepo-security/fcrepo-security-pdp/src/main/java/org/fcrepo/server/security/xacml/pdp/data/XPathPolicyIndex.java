@@ -127,7 +127,7 @@ public abstract class XPathPolicyIndex
         // "r" is the count of resource values where the attribute ID is xacml resource-id
         // not clear why this is actually needed but the query generator tests for a zero value
         int resourceValueCount = 0;
-        for (AttributeBean b : attributeMap.get("resourceAttributes")) {
+        for (AttributeBean b : attributeMap.get(RESOURCE_KEY)) {
             if (b.getId().equals(XACML_RESOURCE_ID)) {
                 resourceValueCount = resourceValueCount + b.getValues().size();
             }

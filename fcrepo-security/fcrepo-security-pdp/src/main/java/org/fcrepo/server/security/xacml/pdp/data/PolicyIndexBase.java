@@ -39,10 +39,10 @@ import com.sun.xacml.finder.PolicyFinder;
  */
 public abstract class PolicyIndexBase
 implements PolicyIndex {
-    private static final String SUBJECT_KEY = "subjectAttributes";
-    private static final String RESOURCE_KEY = "resourceAttributes";
-    private static final String ACTION_KEY = "actionAttributes";
-    private static final String ENVIRONMENT_KEY = "environmentAttributes";
+    protected static final String SUBJECT_KEY = "subjectAttributes";
+    protected static final String RESOURCE_KEY = "resourceAttributes";
+    protected static final String ACTION_KEY = "actionAttributes";
+    protected static final String ENVIRONMENT_KEY = "environmentAttributes";
     // used in testing - indicates if the implementation returns indexed results
     // or if false indicates that all policies are returned irrespective of the request
     public  boolean indexed = true;
@@ -118,7 +118,7 @@ implements PolicyIndex {
                 new HashMap<String, Set<AttributeBean>>();
         Map<String, AttributeBean> attributeBeans = null;
 
-        im = indexMap.get("subjectAttributes");
+        im = indexMap.get(SUBJECT_KEY);
         attributeBeans = new HashMap<String, AttributeBean>();
         for (String attributeId : im.keySet()) {
             EvaluationResult result =
@@ -149,10 +149,10 @@ implements PolicyIndex {
                 }
             }
         }
-        attributeMap.put("subjectAttributes", new HashSet(attributeBeans
+        attributeMap.put(SUBJECT_KEY, new HashSet(attributeBeans
                 .values()));
 
-        im = indexMap.get("resourceAttributes");
+        im = indexMap.get(RESOURCE_KEY);
         attributeBeans = new HashMap<String, AttributeBean>();
         for (String attributeId : im.keySet()) {
             EvaluationResult result =
@@ -196,10 +196,10 @@ implements PolicyIndex {
                 }
             }
         }
-        attributeMap.put("resourceAttributes", new HashSet<AttributeBean>(attributeBeans
+        attributeMap.put(RESOURCE_KEY, new HashSet<AttributeBean>(attributeBeans
                 .values()));
 
-        im = indexMap.get("actionAttributes");
+        im = indexMap.get(ACTION_KEY);
         attributeBeans = new HashMap<String, AttributeBean>();
         for (String attributeId : im.keySet()) {
             EvaluationResult result =
@@ -230,10 +230,10 @@ implements PolicyIndex {
                 }
             }
         }
-        attributeMap.put("actionAttributes", new HashSet<AttributeBean>(attributeBeans
+        attributeMap.put(ACTION_KEY, new HashSet<AttributeBean>(attributeBeans
                 .values()));
 
-        im = indexMap.get("environmentAttributes");
+        im = indexMap.get(ENVIRONMENT_KEY);
         attributeBeans = new HashMap<String, AttributeBean>();
         for (String attributeId : im.keySet()) {
             URI imAttrId = new URI(im.get(attributeId));
@@ -264,7 +264,7 @@ implements PolicyIndex {
                 }
             }
         }
-        attributeMap.put("environmentAttributes", new HashSet<AttributeBean>(attributeBeans
+        attributeMap.put(ENVIRONMENT_KEY, new HashSet<AttributeBean>(attributeBeans
                 .values()));
 
         return attributeMap;

@@ -87,9 +87,7 @@ public class EvaluationEngineImpl
      */
     @Override
     public String evaluate(String[] requests) throws PEPException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("evaluating array of String requests");
-        }
+        logger.debug("evaluating array of String requests");
 
         long a, b;
 
@@ -110,21 +108,16 @@ public class EvaluationEngineImpl
                 response = client.evaluate(r);
 
                 // Add this new result to the cache if caching is enabled
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Adding PDP evaluation results to cache");
-                }
+                logger.debug("Adding PDP evaluation results to cache");
                 if (responseCache != null) {
                     responseCache.addCacheItem(r, response);
                 }
-            } else if (logger.isDebugEnabled()) {
+            } else {
                 logger.debug("Item found in cache");
-
             }
 
             b = System.currentTimeMillis();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Time taken for XACML Evaluation: " + (b - a) + "ms");
-            }
+            logger.debug("Time taken for XACML Evaluation: {}ms", (b - a));
 
             ResponseCtx resCtx;
             try {

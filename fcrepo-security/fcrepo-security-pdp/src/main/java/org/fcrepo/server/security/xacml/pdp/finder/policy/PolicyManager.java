@@ -122,7 +122,7 @@ public class PolicyManager {
             throws TopLevelPolicyException, PolicyIndexException {
         Map<String, AbstractPolicy> potentialPolicies =
                 m_policyIndex.getPolicies(eval, m_policyFinder);
-        logger.debug("Obtained policies: " + potentialPolicies.size());
+        logger.debug("Obtained policies: {}", potentialPolicies.size());
 
         AbstractPolicy policy = matchPolicies(eval, potentialPolicies);
         logger.debug("Matched policies and created abstract policy.");
@@ -177,7 +177,7 @@ public class PolicyManager {
                 }
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Matched policy: " + policyId);
+                    logger.debug("Matched policy: {}", policyId);
                 }
 
                 list.put(policyId, policy);

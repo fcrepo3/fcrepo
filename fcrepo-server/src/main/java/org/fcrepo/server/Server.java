@@ -551,7 +551,7 @@ public abstract class Server
             loadSpringModules();
 
             // Default definition for ModelBasedTripleGenerator
-            if (!containsBeanDefinition(ModelBasedTripleGenerator.class.getName())){
+            if (!knownBeanDefinition(ModelBasedTripleGenerator.class.getName())){
                 ScannedGenericBeanDefinition tripleGen = getScannedBeanDefinition(ModelBasedTripleGenerator.class.getName());
                 tripleGen.setScope(AbstractBeanDefinition.SCOPE_PROTOTYPE);
                 registerBeanDefinition(ModelBasedTripleGenerator.class.getName(), tripleGen);
@@ -579,7 +579,7 @@ public abstract class Server
             // ensure server's module roles are met
             String[] reqRoles = getRequiredModuleRoles();
             for (String element : reqRoles) {
-                if (!containsBeanDefinition(element) && serverConfig.getModuleConfiguration(element) == null) {
+                if (!knownBeanDefinition(element) && serverConfig.getModuleConfiguration(element) == null) {
                     throw new ServerInitializationException(MessageFormat
                             .format(INIT_SERVER_SEVERE_UNFULFILLEDROLE,
                                     new Object[] {element}));
@@ -612,12 +612,14 @@ public abstract class Server
             for (ModuleConfiguration mconfig:moduleConfigs) {
                 String role = mconfig.getRole();
                 String className = mconfig.getClassName();
-                logger.info("Loading bean definitions for " + className);
-                if (!this.containsBeanDefinition(role)){
+                if (!knownBeanDefinition(role)){
+                    logger.info("Loading bean definitions for {} impl class={}", className, role);
                     registerBeanDefinition(role,
                                            createModuleBeanDefinition(className, mconfig.getParameters(), role));
+                } else {
+                    logger.info("FCFG bean definitions for {} superceded by existing Spring bean definition", className);
                 }
-                if (!this.containsBeanDefinition(role+"Configuration")){
+                if (!knownBeanDefinition(role+"Configuration")){
                     registerBeanDefinition(role+"Configuration",
                                            createModuleConfigurationBeanDefinition(role));
                 }
@@ -1592,6 +1594,11 @@ public abstract class Server
      */
     public WebClientConfiguration getWebClientConfig() {
         return m_webClientConfig;
+    }
+    
+    protected boolean knownBeanDefinition(String beanName) {
+        return m_moduleContext.containsBeanDefinition(beanName)
+               || m_moduleContext.getParent().containsBeanDefinition(beanName);
     }
 
     // Spring methods

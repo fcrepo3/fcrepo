@@ -18,6 +18,7 @@ import org.fcrepo.server.errors.authorization.AuthzDeniedException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.authorization.AuthzOperationalException;
 import org.fcrepo.server.errors.authorization.AuthzPermittedException;
+import org.fcrepo.server.security.ContextRegistry;
 import org.fcrepo.server.security.PolicyEnforcementPoint;
 import org.fcrepo.server.security.impl.AbstractPolicyEnforcementPoint;
 
@@ -27,10 +28,20 @@ implements PolicyEnforcementPoint {
     
     private static final Logger logger = LoggerFactory.getLogger(FESLPolicyEnforcementPoint.class);
     
-    public FESLPolicyEnforcementPoint(PDPConfig pdpConfig) {
+    private final ContextRegistry m_registry;
+    
+    public FESLPolicyEnforcementPoint(PDPConfig pdpConfig, ContextRegistry registry) {
         super(pdpConfig);
+
+        m_registry = registry;
     }
     
+    private int n = 0;
+
+    private synchronized int next() {
+        return n++;
+    }
+
     @Override
     public void enforce(String subjectId,
                         String action,
@@ -44,9 +55,12 @@ implements PolicyEnforcementPoint {
                 //wait, if pdp update is in progress
             }
                 ResponseCtx response = null;
+                String contextIndex = null;
                 try {
+                    contextIndex = (new Integer(next())).toString();
+                    logger.debug("context index set={}", contextIndex);
                     Set<Subject> subjects = wrapSubjects(subjectId);
-                    Set<Attribute> actions = wrapActions(action, api, "");
+                    Set<Attribute> actions = wrapActions(action, api, contextIndex);
                     Set<Attribute> resources = wrapResources(pid, namespace);
 
                     RequestCtx request =
@@ -59,6 +73,7 @@ implements PolicyEnforcementPoint {
                         Attribute tempobj = tempit.next();
                         logger.debug("request action has {}={}", tempobj.getId(), tempobj.getValue().toString());
                     }
+                    m_registry.registerContext(contextIndex, context);
                     long st = System.currentTimeMillis();
                     try {
                         response = m_pdp.evaluate(request);
@@ -71,6 +86,8 @@ implements PolicyEnforcementPoint {
                 } catch (Throwable t) {
                     logger.error("Error evaluating policy", t);
                     throw new AuthzOperationalException("");
+                } finally {
+                    m_registry.unregisterContext(contextIndex);
                 }
                 logger.debug("in pep, before denyBiasedAuthz() called");
                 if (!denyBiasedAuthz(response.getResults())) {

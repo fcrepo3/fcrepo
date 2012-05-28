@@ -19,7 +19,7 @@ public class MultiValueMap {
 
     private boolean locked = false;
 
-    private final Map attributes = new HashMap();
+    private final Map<String,Object> attributes = new HashMap<String,Object>();
 
     /**
      * Creates and initializes the <code>WritableContext</code>.
@@ -65,7 +65,7 @@ public class MultiValueMap {
         locked = true;
     }
 
-    public Iterator names() {
+    public Iterator<String> names() {
         return attributes.keySet().iterator();
     }
 
@@ -95,9 +95,9 @@ public class MultiValueMap {
     @Override
     public String toString() {
         StringBuffer buffer = new StringBuffer();
-        Iterator it = attributes.keySet().iterator();
+        Iterator<String> it = attributes.keySet().iterator();
         while (it.hasNext()) {
-            String key = (String) it.next();
+            String key = it.next();
             buffer.append(key + "=[");
             if (attributes.get(key) instanceof String) {
                 String value = (String) attributes.get(key);

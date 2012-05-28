@@ -94,9 +94,10 @@ public class ResourceIndexModule
      * </ul>
      */
     @Override
-    public void postInitModule() throws ModuleInitializationException {
+    public void initModule() throws ModuleInitializationException {
         int level = getRequiredInt("level", 0, 1);
         if (level == 0) {
+            logger.info("Disabled in configuration ( level={} ), exiting", level);
             return;
         }
         boolean syncUpdates = getBoolean("syncUpdates", false);
@@ -104,7 +105,7 @@ public class ResourceIndexModule
             TriplestoreConnector connector = null;
             String ds = getParameter("datastore");
             if (ds != null){
-                logger.info("Configuring triplestore connector from fcfg datastore configuration " + ds);
+                logger.info("Configuring triplestore connector from fcfg datastore configuration {}", ds);
                 connector =
                     getConnector(getServer()
                                  .getDatastoreConfig(ds));

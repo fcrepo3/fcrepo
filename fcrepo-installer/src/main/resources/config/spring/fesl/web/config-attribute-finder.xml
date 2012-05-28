@@ -147,6 +147,12 @@
         </map>
       </property>
     </bean>
+    <bean id="org.fcrepo.server.security.ContextAttributeFinderModule"
+        class="org.fcrepo.server.security.ContextAttributeFinderModule"
+        autowire-candidate="true">
+      <constructor-arg><ref bean="org.fcrepo.server.security.ContextRegistry" /></constructor-arg>
+    </bean>
+    
 	<!--
 	<AttributeFinder name="org.fcrepo.server.security.xacml.pdp.finder.attribute.LDAPAttributeFinder">
 	  <map>

@@ -117,7 +117,7 @@ public class ReadOnlyContext
     }
 
     @Override
-    public Iterator environmentAttributes() {
+    public Iterator<String> environmentAttributes() {
         return m_environmentAttributes.names();
     }
 
@@ -137,7 +137,7 @@ public class ReadOnlyContext
     }
 
     @Override
-    public Iterator subjectAttributes() {
+    public Iterator<String> subjectAttributes() {
         return m_subjectAttributes.names();
     }
 
@@ -207,7 +207,7 @@ public class ReadOnlyContext
     }
 
     @Override
-    public Iterator actionAttributes() {
+    public Iterator<String> actionAttributes() {
         return m_actionAttributes.names();
     }
 
@@ -227,7 +227,7 @@ public class ReadOnlyContext
     }
 
     @Override
-    public Iterator resourceAttributes() {
+    public Iterator<String> resourceAttributes() {
         return m_resourceAttributes.names();
     }
 

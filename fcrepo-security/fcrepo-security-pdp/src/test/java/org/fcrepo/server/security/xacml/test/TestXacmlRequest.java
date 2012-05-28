@@ -54,7 +54,7 @@ public class TestXacmlRequest {
     private static RelationshipResolver RELATIONSHIP_RESOLVER = null;
     static {
         try{
-            RELATIONSHIP_RESOLVER = new RIRelationshipResolver();
+            RELATIONSHIP_RESOLVER = new RIRelationshipResolver(null, new HashMap<String,String>());
         } catch (Exception e) {}
     }
 
