@@ -269,6 +269,8 @@ public class AuthFilterJAAS
                 boolean isGetDatastream =
                         requestPath.contains("/datastreams/")
                                 && !requestPath.endsWith("/content");
+                isGetDatastream = isGetDatastream || (requestPath.endsWith("/datastreams")
+                                && Boolean.valueOf(request.getParameter("profiles")));
                 boolean isGetRelationships =
                         requestPath.endsWith("/relationships");
                 boolean isValidate = requestPath.endsWith("/validate");

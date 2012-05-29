@@ -510,6 +510,15 @@ public class TestRESTAPI
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
+
+        url =
+                String.format("/objects/%s/datastreams?format=xml&profiles=true", pid
+                        .toString());
+        // this will always require authN with the profiles option on, as it is an apim function
+        assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        HttpResponse response = get(true);
+        assertEquals(SC_OK, response.getStatusCode());
+        assertTrue(response.getResponseBodyString().indexOf("datastreamProfile") > -1);
     }
 
     // if an object is marked as deleted, only administrators have access (default XACML policy)
@@ -1954,7 +1963,7 @@ public class TestRESTAPI
         reader.setEntityResolver(new ValidatorEntityResolver());
         reader.setErrorHandler(new ValidatorErrorHandler(errors));
         reader.parse(new InputSource(new StringReader(xml)));
-
+        if (errors.length() > 0) System.out.println(xml);
         assertTrue("Online Validation failed for " + url + ". Errors: "
                 + errors.toString(), 0 == errors.length());
 

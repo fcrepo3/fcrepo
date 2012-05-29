@@ -95,20 +95,17 @@ public class DatastreamResource
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
             Context context = getContext();
             MediaType mime = RestHelper.getContentType(format);
-            DatastreamDef[] dsDefs =
-                    m_access.listDatastreams(context, pid, asOfDateTime);
 
-            String output =
-                    getSerializer(context).dataStreamsToXML(pid,
-                                                            asOfDateTime,
-                                                            dsDefs);
+            String output;
 
             if (profiles){
                 mime=MediaType.TEXT_XML_TYPE;
-                final Datastream[] datastreams = m_management.getDatastreams(getContext(), pid, asOfDateTime, dsState);
+                final Datastream[] datastreams = m_management.getDatastreams(context, pid, asOfDateTime, dsState);
                 output=getSerializer(context).datastreamProfilesToXML(pid, datastreams, asOfDateTime, validateChecksum);
             } else {
                 mime = RestHelper.getContentType(format);
+                DatastreamDef[] dsDefs =
+                        m_access.listDatastreams(context, pid, asOfDateTime);
                 output = getSerializer(context).dataStreamsToXML(pid, asOfDateTime, dsDefs);
                 if (TEXT_HTML.isCompatible(mime)) {
                     final CharArrayWriter writer = new CharArrayWriter();

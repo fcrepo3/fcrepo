@@ -46,6 +46,16 @@
     </init-param>
     <load-on-startup>3</load-on-startup>
   </servlet>
+  <servlet>
+    <display-name>CXF Schema Servlet</display-name>
+    <servlet-name>CXFSchemaServlet</servlet-name>
+    <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+    <init-param>
+      <param-name>config-location</param-name>
+      <param-value>file:${fedora.home}/server/config/spring/web/jaxrs/schema-jaxrs.xml</param-value>
+    </init-param>
+    <load-on-startup>3</load-on-startup>
+  </servlet>
 <!--   <servlet>
     <display-name>CXF Describe Servlet</display-name>
     <servlet-name>CXFDescribeServlet</servlet-name>
@@ -215,6 +225,10 @@
   <servlet-mapping>
     <servlet-name>CXFObjectsServlet</servlet-name>
     <url-pattern>/objects/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CXFSchemaServlet</servlet-name>
+    <url-pattern>/schema/*</url-pattern>
   </servlet-mapping>
   <filter>
     <filter-name>RestApiFlashFilter</filter-name>
