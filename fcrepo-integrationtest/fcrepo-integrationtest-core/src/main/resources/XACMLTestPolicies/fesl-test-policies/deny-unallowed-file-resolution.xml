@@ -29,6 +29,28 @@
       </Apply>
     </Condition>
   </Rule>
-  <Rule RuleId="2" Effect="Deny">
+  <Rule RuleId="2" Effect="Permit">
+    <Condition>
+      <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:regexp-string-match">
+        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">\/repository-policies\/junit\/</AttributeValue>
+        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+          <ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:datastream:fileUri"
+            DataType="http://www.w3.org/2001/XMLSchema#string"/>
+        </Apply>
+      </Apply>
+    </Condition>
+  </Rule>
+  <Rule RuleId="3" Effect="Permit">
+    <Condition>
+      <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:regexp-string-match">
+        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">\/test-objects\/xacml\/</AttributeValue>
+        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+          <ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:datastream:fileUri"
+            DataType="http://www.w3.org/2001/XMLSchema#string"/>
+        </Apply>
+      </Apply>
+    </Condition>
+  </Rule>
+  <Rule RuleId="4" Effect="Deny">
   </Rule>
 </Policy>

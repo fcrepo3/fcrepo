@@ -164,6 +164,9 @@ class ContextAttributeFinderModule
         logger.debug("getAttributeLocally context");
         String contextId = getContextId(ctx);
         logger.debug("contextId=" + contextId + " attributeId=" + attributeId);
+        if (contextId == null || contextId.equals("")) {
+            return null;
+        }
         Context context = m_contexts.getContext(contextId);
         logger.debug("got context");
         Object values = null;
@@ -277,12 +280,12 @@ class ContextAttributeFinderModule
         if (values instanceof String) {
             logger.debug("getAttributeLocally string value=" + (String) values);
         } else if (values instanceof String[]) {
-            logger.debug("getAttributeLocally string values=" + values);
+            logger.debug("getAttributeLocally string values={}", values);
             for (int i = 0; i < ((String[]) values).length; i++) {
-                logger.debug("another string value=" + ((String[]) values)[i]);
+                logger.debug("another string value={}", ((String[]) values)[i]);
             }
         } else {
-            logger.debug("getAttributeLocally object value=" + values);
+            logger.debug("getAttributeLocally object value={}", values);
         }
         return values;
     }
