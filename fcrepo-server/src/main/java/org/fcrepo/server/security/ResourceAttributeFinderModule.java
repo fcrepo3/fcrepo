@@ -6,16 +6,10 @@ package org.fcrepo.server.security;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeDesignator;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.cond.EvaluationResult;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.ReadOnlyContext;
@@ -29,6 +23,11 @@ import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.xacml.EvaluationCtx;
+import com.sun.xacml.attr.AttributeDesignator;
+import com.sun.xacml.attr.StringAttribute;
+import com.sun.xacml.cond.EvaluationResult;
+
 /**
  * @author Bill Niebel
  */
@@ -38,14 +37,16 @@ class ResourceAttributeFinderModule
     private static final Logger logger =
             LoggerFactory.getLogger(ResourceAttributeFinderModule.class);
 
-    private static final String OWNER_ID_SEPARATOR_CONFIG_KEY = "OWNER-ID-SEPARATOR";
+    static final String OWNER_ID_SEPARATOR_CONFIG_KEY = "OWNER-ID-SEPARATOR";
+
+    static final String DEFAULT_OWNER_ID_SEPARATOR = ",";
 
     @Override
     protected boolean canHandleAdhoc() {
         return false;
     }
 
-    private String ownerIdSeparator = ",";
+    private String ownerIdSeparator = DEFAULT_OWNER_ID_SEPARATOR;
 
     static private final ResourceAttributeFinderModule singleton =
             new ResourceAttributeFinderModule();
@@ -104,7 +105,7 @@ class ResourceAttributeFinderModule
             this.doManager = doManager;
         }
     }
-    
+
     public void setLegacyConfiguration(ModuleConfiguration authorizationConfiguration) {
         Map<String,String> moduleParameters = authorizationConfiguration.getParameters();
         if (moduleParameters.containsKey(OWNER_ID_SEPARATOR_CONFIG_KEY)) {

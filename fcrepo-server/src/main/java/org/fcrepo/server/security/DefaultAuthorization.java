@@ -109,6 +109,8 @@ public class DefaultAuthorization
 
     boolean enforceListObjectInResourceIndexResults = true;
 
+    private String m_ownerIdSeparator = ResourceAttributeFinderModule.DEFAULT_OWNER_ID_SEPARATOR;
+
     /**
      * Creates and initializes the Access Module. When the server is starting
      * up, this is invoked as part of the initialization process.
@@ -123,6 +125,11 @@ public class DefaultAuthorization
     public DefaultAuthorization(Map<String,String> moduleParameters, Server server, String role)
             throws ModuleInitializationException {
         super(moduleParameters, server, role);
+        if (moduleParameters.containsKey(ResourceAttributeFinderModule.OWNER_ID_SEPARATOR_CONFIG_KEY)) {
+            m_ownerIdSeparator = moduleParameters.get(ResourceAttributeFinderModule.OWNER_ID_SEPARATOR_CONFIG_KEY);
+            logger.debug("resourceAttributeFinder just set ownerIdSeparator ==[{}]",
+                    m_ownerIdSeparator);
+        }
     }
 
     @Override
@@ -725,9 +732,11 @@ public class DefaultAuthorization
                 name = resourceAttributes
                         .setReturn(Constants.OBJECT.NEW_STATE.uri,
                                    objectNewState);
-                //name = resourceAttributes
-                //        .setReturn(Constants.OBJECT.OWNER.uri,
-                //                   objectNewOwnerId);
+                if (objectNewOwnerId != null){
+                    name = resourceAttributes
+                        .setReturn(Constants.OBJECT.OWNER.uri,
+                                   objectNewOwnerId.split(m_ownerIdSeparator));
+                }
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
