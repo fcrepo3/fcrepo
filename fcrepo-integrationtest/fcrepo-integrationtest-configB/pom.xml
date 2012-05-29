@@ -158,6 +158,9 @@
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
                       target="clearSQL" inheritrefs="true" />
                     <ant
+                      antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
+                      target="configureFedora" inheritrefs="true" />
+                    <ant
                       antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml"
                       target="tomcat-start" inheritrefs="true" />
                   </target>
@@ -207,7 +210,7 @@
 
     <resources>
       <resource>
-        <directory>src/test/resources/confg</directory>
+        <directory>src/test/resources/config</directory>
         <filtering>true</filtering>
       </resource>
     </resources>

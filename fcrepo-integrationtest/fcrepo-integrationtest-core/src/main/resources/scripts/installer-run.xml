@@ -52,6 +52,7 @@
   	  <fileset dir="${basedir}/target/ext/fcrepo-integrationtest-core/XACMLTestPolicies/test-policies" />
   	</copy>
   	<mkdir dir="${mvn.fedora.home}/pdp/policies/" />
+    <mkdir dir="${basedir}/target/ext/fcrepo-integrationtest-core/XACMLTestPolicies/fesl-test-policies" />
   	<echo>Copying Test Repository Policies to FESL policy dir</echo>
   	<copy todir="${mvn.fedora.home}/pdp/policies/" overwrite="true">
   	  <fileset dir="${basedir}/target/ext/fcrepo-integrationtest-core/XACMLTestPolicies/fesl-test-policies" />

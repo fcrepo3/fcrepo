@@ -725,9 +725,9 @@ public class DefaultAuthorization
                 name = resourceAttributes
                         .setReturn(Constants.OBJECT.NEW_STATE.uri,
                                    objectNewState);
-                name = resourceAttributes
-                        .setReturn(Constants.OBJECT.OWNER.uri,
-                                   objectNewOwnerId);
+                //name = resourceAttributes
+                //        .setReturn(Constants.OBJECT.OWNER.uri,
+                //                   objectNewOwnerId);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -1416,7 +1416,7 @@ public class DefaultAuthorization
     @Override
     public void enforceRetrieveFile(Context context, String fileURI) throws AuthzException {
         try {
-            logger.debug("Entered enforceRetrieveFile");
+            logger.debug("Entered enforceRetrieveFile for {}", fileURI);
             String target = Constants.ACTION.RETRIEVE_FILE.uri;
             context.setActionAttributes(null);
             context.setResourceAttributes(null);

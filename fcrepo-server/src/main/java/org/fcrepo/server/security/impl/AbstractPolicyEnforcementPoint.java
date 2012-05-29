@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import com.sun.xacml.PDP;
@@ -13,6 +14,11 @@ import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.Attribute;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Subject;
+import com.sun.xacml.finder.AttributeFinder;
+import com.sun.xacml.finder.AttributeFinderModule;
+import com.sun.xacml.finder.PolicyFinder;
+import com.sun.xacml.finder.PolicyFinderModule;
+import com.sun.xacml.finder.ResourceFinder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -184,10 +184,10 @@ class ResourceAttributeFinderModule
                 logger.debug("no pid");
                 return null;
             }
-            logger.debug("getResourceAttribute, pid=" + pid);
+            logger.debug("getResourceAttribute {}, pid={}", attributeId, pid);
             DOReader reader = null;
             try {
-                logger.debug("pid=" + pid);
+                logger.debug("pid={}", pid);
                 reader =
                         doManager.getReader(Server.USE_DEFINITIVE_STORE,
                                             ReadOnlyContext.EMPTY,
@@ -204,7 +204,7 @@ class ResourceAttributeFinderModule
                     logger.debug("got " + Constants.OBJECT.STATE.uri + "="
                             + values[0]);
                 } catch (ServerException e) {
-                    logger.debug("failed getting " + Constants.OBJECT.STATE.uri);
+                    logger.debug("failed getting " + Constants.OBJECT.STATE.uri,e);
                     return null;
                 }
             }
@@ -224,7 +224,7 @@ class ResourceAttributeFinderModule
                     }
                     logger.debug(temp);
                 } catch (ServerException e) {
-                    logger.debug("failed getting " + Constants.OBJECT.OWNER.uri);
+                    logger.debug("failed getting " + Constants.OBJECT.OWNER.uri,e);
                     return null;
                 }
             } else if (Constants.MODEL.HAS_MODEL.uri.equals(attributeId)) {
@@ -232,7 +232,7 @@ class ResourceAttributeFinderModule
                 try {
                     models.addAll(reader.getContentModels());
                 } catch (ServerException e) {
-                    logger.debug("failed getting " + Constants.MODEL.HAS_MODEL.uri);
+                    logger.debug("failed getting " + Constants.MODEL.HAS_MODEL.uri,e);
                     return null;
                 }
                 values = models.toArray(new String[0]);

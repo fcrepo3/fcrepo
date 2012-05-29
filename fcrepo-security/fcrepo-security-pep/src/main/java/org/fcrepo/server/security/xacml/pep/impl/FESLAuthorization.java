@@ -307,7 +307,7 @@ public class FESLAuthorization implements Authorization {
     public void enforceRetrieveFile(Context context, String fileURI)
             throws AuthzException {
         try {
-            logger.debug("Entered enforceRetrieveFile");
+            logger.debug("Entered enforceRetrieveFile for {}", fileURI);
             String target = Constants.ACTION.RETRIEVE_FILE.uri;
             context.setActionAttributes(null);
             context.setResourceAttributes(null);

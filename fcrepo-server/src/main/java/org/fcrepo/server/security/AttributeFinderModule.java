@@ -286,13 +286,11 @@ public abstract class AttributeFinderModule
                                           URI category,
                                           EvaluationCtx context,
                                           int designatorType) {
-        logger.debug("AttributeFinder:findAttribute " + iAm());
-        logger.debug("attributeType=[" + attributeType + "], attributeId=["
-                + attributeId + "]" + iAm());
+        logger.debug("AttributeFinder:findAttribute {}", iAm());
+        logger.debug("attributeType=[{}], attributeId=[{}] {}", new Object[]{attributeType, attributeId, iAm()});
 
         if (!parmsOk(attributeType, attributeId, designatorType)) {
-            logger.debug("AttributeFinder:findAttribute" + " exit on "
-                    + "parms not ok" + iAm());
+            logger.debug("AttributeFinder:findAttribute exit on parms not ok {}", iAm());
             if (attributeType == null) {
                 try {
                     attributeType = new URI(StringAttribute.identifier);
@@ -305,26 +303,23 @@ public abstract class AttributeFinderModule
         }
 
         if (!willService(attributeId)) {
-            logger.debug("AttributeFinder:willService() " + iAm()
-                    + " returns false" + iAm());
+            logger.debug("AttributeFinder:willService() {} returns false", iAm());
             return new EvaluationResult(BagAttribute
                     .createEmptyBag(attributeType));
         }
 
         if (category != null) {
-            logger.debug("++++++++++ AttributeFinder:findAttribute " + iAm()
-                    + " category=" + category.toString());
+            logger.debug("++++++++++ AttributeFinder:findAttribute {} category={}", iAm(), category.toString());
         }
-        logger.debug("++++++++++ AttributeFinder:findAttribute " + iAm()
-                + " designatorType=" + designatorType);
+        logger.debug("++++++++++ AttributeFinder:findAttribute {} designatorType={}", iAm(), designatorType);
 
-        logger.debug("about to get temp " + iAm());
+        logger.debug("about to get temp {}", iAm());
         Object temp =
                 getAttributeLocally(designatorType,
                                     attributeId.toASCIIString(),
                                     category,
                                     context);
-        logger.debug(iAm() + " got temp=" + temp);
+        logger.debug("{} got temp={}", iAm(), temp);
 
         if (temp == null) {
             logger.debug("AttributeFinder:findAttribute" + " exit on "
@@ -335,8 +330,7 @@ public abstract class AttributeFinderModule
 
         Set<AttributeValue> set = new HashSet<AttributeValue>();
         if (temp instanceof String) {
-            logger.debug("AttributeFinder:findAttribute" + " will return a "
-                    + "String " + iAm());
+            logger.debug("AttributeFinder:findAttribute will return a String {}", iAm());
             if (attributeType.toString().equals(StringAttribute.identifier)) {
                 set.add(new StringAttribute((String) temp));
             } else if (attributeType.toString()
@@ -378,8 +372,7 @@ public abstract class AttributeFinderModule
             } //xacml fixup
             //was set.add(new StringAttribute((String)temp));
         } else if (temp instanceof String[]) {
-            logger.debug("AttributeFinder:findAttribute" + " will return a "
-                    + "String[] " + iAm());
+            logger.debug("AttributeFinder:findAttribute will return a String[] ", iAm());
             for (int i = 0; i < ((String[]) temp).length; i++) {
                 if (((String[]) temp)[i] == null) {
                     continue;
@@ -388,7 +381,7 @@ public abstract class AttributeFinderModule
                     set.add(new StringAttribute(((String[]) temp)[i]));
                 } else if (attributeType.toString()
                         .equals(DateTimeAttribute.identifier)) {
-                    logger.debug("USING AS DATETIME:" + ((String[]) temp)[i]);
+                    logger.debug("USING AS DATETIME:{}", ((String[]) temp)[i]);
                     DateTimeAttribute tempDateTimeAttribute;
                     try {
                         tempDateTimeAttribute =
@@ -399,7 +392,7 @@ public abstract class AttributeFinderModule
                     }
                 } else if (attributeType.toString()
                         .equals(DateAttribute.identifier)) {
-                    logger.debug("USING AS DATE:" + ((String[]) temp)[i]);
+                    logger.debug("USING AS DATE:{}", ((String[]) temp)[i]);
                     DateAttribute tempDateAttribute;
                     try {
                         tempDateAttribute =
@@ -409,7 +402,7 @@ public abstract class AttributeFinderModule
                     }
                 } else if (attributeType.toString()
                         .equals(TimeAttribute.identifier)) {
-                    logger.debug("USING AS TIME:" + ((String[]) temp)[i]);
+                    logger.debug("USING AS TIME:{}", ((String[]) temp)[i]);
                     TimeAttribute tempTimeAttribute;
                     try {
                         tempTimeAttribute =
@@ -419,7 +412,7 @@ public abstract class AttributeFinderModule
                     }
                 } else if (attributeType.toString()
                         .equals(IntegerAttribute.identifier)) {
-                    logger.debug("USING AS INTEGER:" + ((String[]) temp)[i]);
+                    logger.debug("USING AS INTEGER: {}", ((String[]) temp)[i]);
                     IntegerAttribute tempIntegerAttribute;
                     try {
                         tempIntegerAttribute =

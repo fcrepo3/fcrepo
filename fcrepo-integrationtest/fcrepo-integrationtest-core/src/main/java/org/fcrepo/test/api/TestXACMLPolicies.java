@@ -133,6 +133,7 @@ public class TestXACMLPolicies
             apim.modifyObject(pid, null, null, null, logMessage);
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
