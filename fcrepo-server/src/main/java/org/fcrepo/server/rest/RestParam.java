@@ -51,4 +51,5 @@ public interface RestParam {
     String RESULT_FORMAT = "resultFormat";
     // common flash override param
     String FLASH = "flash";
+    String PROFILES = "profiles";
 }

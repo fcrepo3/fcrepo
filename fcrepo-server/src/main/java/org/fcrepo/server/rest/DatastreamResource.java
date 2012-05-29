@@ -85,7 +85,11 @@ public class DatastreamResource
     public Response listDatastreams(@PathParam(RestParam.PID) String pid,
                                     @QueryParam(RestParam.AS_OF_DATE_TIME) String dateTime,
                                     @QueryParam(RestParam.FORMAT) @DefaultValue(HTML) String format,
-                                    @QueryParam(RestParam.FLASH) @DefaultValue("false") boolean flash) {
+                                    @QueryParam(RestParam.FLASH) @DefaultValue("false") boolean flash,
+                                    @QueryParam(RestParam.PROFILES) @DefaultValue("false") boolean profiles,
+                                    @QueryParam(RestParam.DS_STATE) String dsState,
+                                    @QueryParam(RestParam.VALIDATE_CHECKSUM) @DefaultValue("false") boolean validateChecksum
+                                    ) {
 
         try {
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
@@ -99,10 +103,18 @@ public class DatastreamResource
                                                             asOfDateTime,
                                                             dsDefs);
 
-            if (TEXT_HTML.isCompatible(mime)) {
-                CharArrayWriter writer = new CharArrayWriter();
-                transform(output, "access/listDatastreams.xslt", writer);
-                output = writer.toString();
+            if (profiles){
+                mime=MediaType.TEXT_XML_TYPE;
+                final Datastream[] datastreams = m_management.getDatastreams(getContext(), pid, asOfDateTime, dsState);
+                output=getSerializer(context).datastreamProfilesToXML(pid, datastreams, asOfDateTime, validateChecksum);
+            } else {
+                mime = RestHelper.getContentType(format);
+                output = getSerializer(context).dataStreamsToXML(pid, asOfDateTime, dsDefs);
+                if (TEXT_HTML.isCompatible(mime)) {
+                    final CharArrayWriter writer = new CharArrayWriter();
+                    transform(output, "access/listDatastreams.xslt", writer);
+                    output = writer.toString();
+                }
             }
 
             return Response.ok(output, mime).build();
