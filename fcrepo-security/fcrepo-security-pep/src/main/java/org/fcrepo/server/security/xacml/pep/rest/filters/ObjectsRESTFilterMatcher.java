@@ -23,11 +23,10 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.rest.objectshandlers.Handlers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Formerly ObjectsFilter, this class has been reduced to mapping requests to named RESTFilters.
@@ -42,15 +41,18 @@ public class ObjectsRESTFilterMatcher {
 
     private final Map<String, RESTFilter> m_objectsHandlers;
 
+    private final NoopFilter m_noop;
+
     /**
      * Default constructor.
      *
      * @throws PEPException
      */
-    public ObjectsRESTFilterMatcher(Map<String,RESTFilter> objectsHandlers)
+    public ObjectsRESTFilterMatcher(Map<String,RESTFilter> objectsHandlers, NoopFilter noop)
             throws PEPException {
         super();
         m_objectsHandlers = objectsHandlers;
+        m_noop = noop;
     }
 
     public RESTFilter getObjectsHandler(HttpServletRequest request)
@@ -95,11 +97,8 @@ public class ObjectsRESTFilterMatcher {
             throw new ServletException("Not enough components on the URI.");
         }
 
-        // IMPORTANT:
-        // this is the only case we return null.  No authz on the WADL.
-        // Every other endpoint MUST have a handler.
         if (parts.length == 2 && "application.wadl".equals(parts[1])) {
-            return null;
+            return m_noop;
         }
 
         // FIXME: tests below could do with tidying up

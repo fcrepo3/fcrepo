@@ -19,7 +19,6 @@
 package org.fcrepo.server.security.xacml.pep.rest;
 
 import java.io.IOException;
-
 import java.util.Map;
 import java.util.Set;
 
@@ -33,13 +32,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.server.security.xacml.pep.AuthzDeniedException;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -49,6 +41,12 @@ import org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsRESTFilterMatche
 import org.fcrepo.server.security.xacml.pep.rest.filters.ParameterRequestWrapper;
 import org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter;
 import org.fcrepo.server.security.xacml.pep.rest.filters.ResponseHandlingRESTFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.xacml.ctx.RequestCtx;
+import com.sun.xacml.ctx.ResponseCtx;
+import com.sun.xacml.ctx.Result;
 
 
 /**
@@ -66,7 +64,7 @@ public final class PEP
     private ObjectsRESTFilterMatcher m_objectsRESTFilterMatcher;
 
     private ContextHandler m_ctxHandler = null;
-    
+
     public PEP(ObjectsRESTFilterMatcher objectsRESTFilterMatcher, Map<String, RESTFilter> filters ) throws PEPException {
         m_objectsRESTFilterMatcher = objectsRESTFilterMatcher;
         m_filters = filters;
@@ -112,8 +110,8 @@ public final class PEP
         String uri = ((HttpServletRequest) request).getRequestURI();
         String servletPath = ((HttpServletRequest) request).getServletPath();
         if (logger.isDebugEnabled()) {
-            logger.debug("Incoming URI: " + uri);
-            logger.debug("Incoming servletPath: " + servletPath);
+            logger.debug("Incoming URI: {}", uri);
+            logger.debug("Incoming servletPath: {}", servletPath);
         }
 
         // Fix-up for direct web.xml servlet mappings for:
@@ -144,25 +142,19 @@ public final class PEP
             if (filter != null) {
                 // substitute our own request object that manages parameters
                 try {
-                    req =
-                            new ParameterRequestWrapper((HttpServletRequest) request);
+                    req = new ParameterRequestWrapper((HttpServletRequest) request);
                 } catch (Exception e) {
                     throw new PEPException(e);
                 }
 
-                if (logger.isDebugEnabled()) {
-                   logger.debug("Filtering URI: [" + req.getRequestURI()
-                           + "] with: [" + filter.getClass().getName() + "]");
-                }
+                logger.debug("Filtering URI: [{}] with: [{}]" , req.getRequestURI(), filter.getClass().getName());
 
                 if(ResponseHandlingRESTFilter.class.isInstance(filter)) {
-               	 // substitute our own response object that captures the data
-               	 res = new DataResponseWrapper(((HttpServletResponse) response));
-                   // get a handle for the original OutputStream
-                   out = response.getOutputStream();
-                   if (logger.isDebugEnabled()) {
-                      logger.debug("Filtering will include post-processing the response");
-                   }
+               	    // substitute our own response object that captures the data
+               	    res = new DataResponseWrapper(((HttpServletResponse) response));
+                    // get a handle for the original OutputStream
+                    out = response.getOutputStream();
+                    logger.debug("Filtering will include post-processing the response");
                 }
 
                 reqCtx = filter.handleRequest(req, res);
