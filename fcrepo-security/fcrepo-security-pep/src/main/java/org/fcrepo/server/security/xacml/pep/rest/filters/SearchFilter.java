@@ -73,7 +73,7 @@ import com.sun.xacml.ctx.Status;
  * @author nishen@melcoe.mq.edu.au
  */
 public class SearchFilter
-        extends AbstractFilter {
+        extends AbstractFilter implements ResponseHandlingRESTFilter {
 
     private static final Logger logger =
             LoggerFactory.getLogger(SearchFilter.class);

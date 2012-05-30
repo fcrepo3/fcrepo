@@ -12,12 +12,14 @@
         http://www.springframework.org/schema/util/spring-util-2.5.xsd
         http://www.springframework.org/schema/security
         http://www.springframework.org/schema/security/spring-security-3.0.xsd">
-
+  <bean id="objectsFilterMatcher" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsRESTFilterMatcher">
+      <constructor-arg ref="handlers-rest" />
+  </bean>
   <!-- FeSL Authz bean (REST) -->
   <bean id="PEPFilter" class="org.fcrepo.server.security.xacml.pep.rest.PEP"
     lazy-init="true" init-method="init">
-      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
-      <property name="filters">
+      <constructor-arg><ref bean="objectsFilterMatcher" /></constructor-arg>
+      <constructor-arg>
         <map>
           <entry key="/describe" value-ref="DescribeFilter" />
 		  <entry key="/get" value-ref="GetFilter" />
@@ -44,7 +46,8 @@
           <!-- handler for REST API - each individual API operation is mapped below in handlers-objects -->
           <entry key="/objects" value-ref="ObjectsFilter" />
         </map>
-      </property>
+      </constructor-arg>
+      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
   </bean>
 
 	<!--
@@ -122,6 +125,9 @@
           </bean>
         </entry>
 		-->
+
+    <bean id="ObjectsFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsFilter">
+    </bean>
 
     <bean id="UploadFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.UploadFilter">
       <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
@@ -261,8 +267,5 @@
        </bean>
       </entry>
     </util:map>
-    <bean id="ObjectsFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsFilter">
-      <constructor-arg ref="handlers-rest" />
-    </bean>
 	
 </beans>

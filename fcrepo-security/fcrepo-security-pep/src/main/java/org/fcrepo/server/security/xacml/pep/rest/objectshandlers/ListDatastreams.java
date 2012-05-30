@@ -50,6 +50,7 @@ import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.pep.rest.filters.DataResponseWrapper;
+import org.fcrepo.server.security.xacml.pep.rest.filters.ResponseHandlingRESTFilter;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ import com.sun.xacml.ctx.Status;
  * @author nish.naidoo@gmail.com
  */
 public class ListDatastreams
-        extends AbstractFilter {
+        extends AbstractFilter implements ResponseHandlingRESTFilter{
 
     private static final Logger logger =
             LoggerFactory.getLogger(ListDatastreams.class);
