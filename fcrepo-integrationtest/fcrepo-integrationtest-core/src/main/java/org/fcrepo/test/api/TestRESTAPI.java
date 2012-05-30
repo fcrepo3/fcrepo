@@ -714,7 +714,7 @@ public class TestRESTAPI
 
         url =
                 String
-                        .format("/objects?pid=true&query=&format=xml&sessionToken=%s",
+                        .format("/objects?pid=true&query=&resultFormat=xml&sessionToken=%s",
                                 sessionToken);
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());

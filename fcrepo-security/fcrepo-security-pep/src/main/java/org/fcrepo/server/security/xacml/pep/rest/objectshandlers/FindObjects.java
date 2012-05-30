@@ -183,19 +183,13 @@ public class FindObjects
         String body = new String(data);
 
         if (body.startsWith("<html>")) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("filtering html");
-            }
+            logger.debug("filtering html");
             result = filterHTML(request, res);
         } else if (body.startsWith("<?xml")) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("filtering html");
-            }
+            logger.debug("filtering xml");
             result = filterXML(request, res);
         } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("not filtering due to unexpected output: " + body);
-            }
+            logger.debug("not filtering due to unexpected output: {}", body);
             result = body;
         }
 
@@ -224,7 +218,8 @@ public class FindObjects
 
         try {
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-            docBuilderFactory.setNamespaceAware(true);
+         // the default namespace must be prefixed to be accessible to xpath
+            docBuilderFactory.setNamespaceAware(false);
             docBuilder =
                     docBuilderFactory.newDocumentBuilder();
             doc =
@@ -243,14 +238,12 @@ public class FindObjects
                                       doc,
                                       XPathConstants.NODESET);
         } catch (XPathExpressionException xpe) {
-            throw new ServletException("Error parsing HTML for search results: ",
+            throw new ServletException("Error parsing XML for search results: ",
                                        xpe);
         }
 
         if (rows.getLength() == 0) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("No results to filter.");
-            }
+            logger.debug("No results to filter.");
 
             return body;
         }
@@ -273,7 +266,7 @@ public class FindObjects
             if (r.getResource() == null || "".equals(r.getResource())) {
                 logger.warn("This resource has no resource identifier in the xacml response results!");
             } else if (logger.isDebugEnabled()) {
-                logger.debug("Checking: " + r.getResource());
+                logger.debug("Checking: {}", r.getResource());
             }
 
             String[] ridComponents = r.getResource().split("\\/");
@@ -283,9 +276,7 @@ public class FindObjects
                     && r.getDecision() != Result.DECISION_PERMIT) {
                 Node node = pids.get(rid);
                 node.getParentNode().removeChild(node);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Removing: " + r.getResource() + "[" + rid + "]");
-                }
+                logger.debug("Removing: {} [{}]", r.getResource(), rid);
             }
         }
 
@@ -335,9 +326,7 @@ public class FindObjects
 
         // only the header row, no results.
         if (rows.getLength() == 1) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("No results to filter.");
-            }
+            logger.debug("No results to filter.");
             return body;
         }
 
@@ -366,9 +355,7 @@ public class FindObjects
             NodeList elements = rows.item(x).getChildNodes();
             Node pidParentA = elements.item(pidHeader).getFirstChild();
             if (pidParentA != null && pidParentA.getNodeName().equals("a")) {
-                String pid =
-                        elements.item(pidHeader).getFirstChild()
-                                .getFirstChild().getNodeValue();
+                String pid = pidParentA.getFirstChild().getNodeValue();
                 pids.put(pid, rows.item(x));
             }
         }
@@ -379,7 +366,7 @@ public class FindObjects
             if (r.getResource() == null || "".equals(r.getResource())) {
                 logger.warn("This resource has no resource identifier in the xacml response results!");
             } else if (logger.isDebugEnabled()) {
-                logger.debug("Checking: " + r.getResource());
+                logger.debug("Checking: {}", r.getResource());
             }
 
             String[] ridComponents = r.getResource().split("\\/");
@@ -390,9 +377,7 @@ public class FindObjects
                 Node node = pids.get(rid);
                 node.getParentNode().removeChild(node.getNextSibling());
                 node.getParentNode().removeChild(node);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Removing: " + r.getResource() + "[" + rid + "]");
-                }
+                logger.debug("Removing: {} [{}]", r.getResource(), rid);
             }
         }
 
@@ -426,9 +411,7 @@ public class FindObjects
             throws ServletException {
         Set<String> requests = new HashSet<String>();
         for (String pid : pids) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Checking: " + pid);
-            }
+            logger.debug("Checking: {}", pid);
 
             Map<URI, AttributeValue> actions =
                     new HashMap<URI, AttributeValue>();
@@ -444,8 +427,6 @@ public class FindObjects
                 if (pid != null && !"".equals(pid)) {
                     resAttr.put(Constants.OBJECT.PID.getURI(),
                                 new StringAttribute(pid));
-                }
-                if (pid != null && !"".equals(pid)) {
                     resAttr.put(new URI(XACML_RESOURCE_ID),
                                 new AnyURIAttribute(new URI(pid)));
                 }
@@ -458,9 +439,7 @@ public class FindObjects
                                               getEnvironment(request));
 
                 String r = m_contextUtil.makeRequestCtx(req);
-                if (logger.isDebugEnabled()) {
-                    logger.debug(r);
-                }
+                logger.debug(r);
 
                 requests.add(r);
             } catch (Exception e) {
@@ -472,17 +451,13 @@ public class FindObjects
         String res = null;
         ResponseCtx resCtx = null;
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Number of requests: " + requests.size());
-            }
+            logger.debug("Number of requests: {}", requests.size());
 
             res =
                     getContextHandler().evaluateBatch(requests
                             .toArray(new String[requests.size()]));
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Response: " + res);
-            }
+            logger.debug("Response: {}", res);
 
             resCtx = m_contextUtil.makeResponseCtx(res);
         } catch (MelcoeXacmlException pe) {

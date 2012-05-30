@@ -14,6 +14,7 @@
         http://www.springframework.org/schema/security/spring-security-3.0.xsd">
   <bean id="objectsFilterMatcher" class="org.fcrepo.server.security.xacml.pep.rest.filters.ObjectsRESTFilterMatcher">
       <constructor-arg ref="handlers-rest" />
+      <constructor-arg ref="NoopFilter" />
   </bean>
   <!-- FeSL Authz bean (REST) -->
   <bean id="PEPFilter" class="org.fcrepo.server.security.xacml.pep.rest.PEP"
@@ -102,7 +103,7 @@
     <bean id="ListMethodsFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.ListMethodsFilter">
       <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
 	</bean>
-    <bean id="SearchFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.SearchFilter">
+    <bean id="SearchFilter" class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects">
       <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
       <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
     </bean>
@@ -138,18 +139,8 @@
 
     <!-- handler for REST API - each individual API operation is mapped below in handlers-objects -->
     <util:map id="handlers-rest">
-     <entry key="findObjects">
-       <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects">
-         <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
-         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
-       </bean>
-     </entry>
-     <entry key="resumeFindObjects">
-       <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.FindObjects">
-         <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
-         <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
-       </bean>
-     </entry>
+     <entry key="findObjects" value-ref="SearchFilter" />
+     <entry key="resumeFindObjects" value-ref="SearchFilter" />
      <entry key="getDatastreamDissemination">
        <bean class="org.fcrepo.server.security.xacml.pep.rest.objectshandlers.GetDatastreamDissemination">
          <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
