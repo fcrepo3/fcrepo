@@ -28,6 +28,8 @@ public class InstallOptions {
 
     public static final String APIA_AUTH_REQUIRED = "apia.auth.required";
 
+    public static final String UPSTREAM_AUTH_ENABLED = "upstream.auth.enabled";
+    
     public static final String SSL_AVAILABLE = "ssl.available";
 
     public static final String APIA_SSL_REQUIRED = "apia.ssl.required";
@@ -253,7 +255,7 @@ public class InstallOptions {
                 dbValidated = validateDatabaseConnection();
             }
         }
-
+        inputOption(UPSTREAM_AUTH_ENABLED);
         inputOption(FESL_AUTHN_ENABLED);
         inputOption(FESL_AUTHZ_ENABLED);
         if (getValue(FESL_AUTHZ_ENABLED).equals(Boolean.toString(true))) {
