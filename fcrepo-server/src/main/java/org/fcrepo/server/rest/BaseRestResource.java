@@ -153,7 +153,7 @@ public class BaseRestResource {
         }
     }
 
-    protected Response handleException(Exception ex) {
+    private Response handleException(Exception ex) {
         if (ex instanceof ObjectNotInLowlevelStorageException ||
             ex instanceof DatastreamNotFoundException) {
             LOGGER.warn("Resource not found: " + ex.getMessage() + "; unable to fulfill REST API request", ex);
@@ -182,5 +182,11 @@ public class BaseRestResource {
             LOGGER.error("Unexpected error fulfilling REST API request", ex);
             throw new WebApplicationException(ex);
         }
+    }
+
+    protected Response handleException(Exception ex, boolean flash) {
+        Response error = handleException(ex);
+        if (flash) error = Response.ok(error.getEntity()).build();
+        return error;
     }
 }

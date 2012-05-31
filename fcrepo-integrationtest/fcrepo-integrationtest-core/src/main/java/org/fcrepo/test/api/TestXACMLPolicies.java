@@ -80,9 +80,9 @@ public class TestXACMLPolicies
 
         // should only be modifiable by an owner
         try {
-            assertTrue(canWrite(admin, pid));
-            assertTrue(canWrite(testuser1, pid));
-            assertFalse(canWrite(testuserroleA, pid));
+            assertTrue(canWrite(admin, pid, "testXACMLMultiOwnerAccess"));
+            assertTrue(canWrite(testuser1, pid, "testXACMLMultiOwnerAccess"));
+            assertFalse(canWrite(testuserroleA, pid, "testXACMLMultiOwnerAccess"));
         } finally {
             removeTestObject(pid);
         }
@@ -115,10 +115,10 @@ public class TestXACMLPolicies
                       unrestrictedCModel);
 
         try {
-            assertTrue(canWrite(admin, hasUnrestricted));
-            assertFalse(canWrite(admin, hasRestricted));
-            assertFalse(canWrite(admin, hasUnrestrictedAndRestricted));
-            assertFalse(canWrite(admin, hasRestrictedAndUnrestricted));
+            assertTrue(canWrite(admin, hasUnrestricted,"testXACMLUnmodifiableContentModel"));
+            assertFalse(canWrite(admin, hasRestricted,"testXACMLUnmodifiableContentModel"));
+            assertFalse(canWrite(admin, hasUnrestrictedAndRestricted,"testXACMLUnmodifiableContentModel"));
+            assertFalse(canWrite(admin, hasRestrictedAndUnrestricted,"testXACMLUnmodifiableContentModel"));
         } finally {
             removeTestObject(hasUnrestricted);
             removeTestObject(hasRestricted);
@@ -127,12 +127,13 @@ public class TestXACMLPolicies
         }
     }
 
-    private boolean canWrite(FedoraClient client, String pid) throws Exception {
+    private boolean canWrite(FedoraClient client, String pid, String logMessage) throws Exception {
         FedoraAPIMMTOM apim = client.getAPIMMTOM();
         try {
-            apim.modifyObject(pid, null, null, null, "log message");
+            apim.modifyObject(pid, null, null, null, logMessage);
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

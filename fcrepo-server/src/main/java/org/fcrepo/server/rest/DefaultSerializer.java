@@ -125,33 +125,38 @@ public class DefaultSerializer {
         return buffer.toString();
     }
 
-    private String datastreamFieldSerialization(Datastream dsProfile, boolean validateChecksum) {
+    private String datastreamFieldSerialization(Datastream dsProfile, String prefix, boolean validateChecksum) {
         StringBuffer buffer = new StringBuffer();
-        buffer.append("<dsLabel>" + enc(dsProfile.DSLabel) + "</dsLabel>");
-        buffer.append("<dsVersionID>" + enc(dsProfile.DSVersionID) + "</dsVersionID>");
+        if (prefix != null) {
+            if (!prefix.equals("")) prefix = prefix + ":";
+        } else prefix = "";
+        buffer.append("<" + prefix + "dsLabel>" + enc(dsProfile.DSLabel) + "</" + prefix + "dsLabel>");
+        buffer.append("<" + prefix + "dsVersionID>" + enc(dsProfile.DSVersionID) + "</" + prefix + "dsVersionID>");
 
         String cDate = DateUtility.convertDateToString(dsProfile.DSCreateDT);
-        buffer.append("<dsCreateDate>" + enc(cDate) + "</dsCreateDate>");
+        buffer.append("<" + prefix + "dsCreateDate>" + enc(cDate) + "</" + prefix + "dsCreateDate>");
 
-        buffer.append("<dsState>" + enc(dsProfile.DSState) + "</dsState>");
-        buffer.append("<dsMIME>" + enc(dsProfile.DSMIME) + "</dsMIME>");
-        buffer.append("<dsFormatURI>" + enc(dsProfile.DSFormatURI) + "</dsFormatURI>");
-        buffer.append("<dsControlGroup>" + enc(dsProfile.DSControlGrp) + "</dsControlGroup>");
-        buffer.append("<dsSize>" + enc(Long.valueOf(dsProfile.DSSize).toString()) + "</dsSize>");
+        buffer.append("<" + prefix + "dsState>" + enc(dsProfile.DSState) + "</" + prefix + "dsState>");
+        buffer.append("<" + prefix + "dsMIME>" + enc(dsProfile.DSMIME) + "</" + prefix + "dsMIME>");
+        buffer.append("<" + prefix + "dsFormatURI>" + enc(dsProfile.DSFormatURI) + "</" + prefix + "dsFormatURI>");
+        buffer.append("<" + prefix + "dsControlGroup>" + enc(dsProfile.DSControlGrp) + "</" + prefix + "dsControlGroup>");
+        buffer.append("<" + prefix + "dsSize>" + enc(Long.valueOf(dsProfile.DSSize).toString()) + "</" + prefix + "dsSize>");
         buffer.append(
-                "<dsVersionable>" + enc(Boolean.valueOf(dsProfile.DSVersionable).toString()) + "</dsVersionable>");
-        buffer.append("<dsInfoType>" + enc(dsProfile.DSInfoType) + "</dsInfoType>");
-        buffer.append("<dsLocation>" + enc(dsProfile.DSLocation) + "</dsLocation>");
-        buffer.append("<dsLocationType>" + enc(dsProfile.DSLocationType) + "</dsLocationType>");
-        buffer.append("<dsChecksumType>" + enc(dsProfile.DSChecksumType) + "</dsChecksumType>");
-        buffer.append("<dsChecksum>" + enc(dsProfile.DSChecksum) + "</dsChecksum>");
+                "<" + prefix + "dsVersionable>"
+                + enc(Boolean.valueOf(dsProfile.DSVersionable).toString())
+                + "</" + prefix + "dsVersionable>");
+        buffer.append("<" + prefix + "dsInfoType>" + enc(dsProfile.DSInfoType) + "</" + prefix + "dsInfoType>");
+        buffer.append("<" + prefix + "dsLocation>" + enc(dsProfile.DSLocation) + "</" + prefix + "dsLocation>");
+        buffer.append("<" + prefix + "dsLocationType>" + enc(dsProfile.DSLocationType) + "</" + prefix + "dsLocationType>");
+        buffer.append("<" + prefix + "dsChecksumType>" + enc(dsProfile.DSChecksumType) + "</" + prefix + "dsChecksumType>");
+        buffer.append("<" + prefix + "dsChecksum>" + enc(dsProfile.DSChecksum) + "</" + prefix + "dsChecksum>");
         if (validateChecksum) {
             String valid = dsProfile.compareChecksum() ? "true" : "false";
-            buffer.append("<dsChecksumValid>" + valid + "</dsChecksumValid>");
+            buffer.append("<" + prefix + "dsChecksumValid>" + valid + "</" + prefix + "dsChecksumValid>");
         }
         String[] dsAltIDs = dsProfile.DatastreamAltIDs;
         for (int i = 0; i < dsAltIDs.length; i++) {
-            buffer.append("<dsAltID>" + enc(dsAltIDs[i]) + "</dsAltID>");
+            buffer.append("<" + prefix + "dsAltID>" + enc(dsAltIDs[i]) + "</" + prefix + "dsAltID>");
         }
         return buffer.toString();
     }
@@ -175,12 +180,46 @@ public class DefaultSerializer {
         }
         buffer.append(" >");
         // ADD PROFILE FIELDS SERIALIZATION
-        buffer.append(datastreamFieldSerialization(dsProfile, validateChecksum));
+        buffer.append(datastreamFieldSerialization(dsProfile, "", validateChecksum));
 
 
         buffer.append("</datastreamProfile>");
 
         return buffer.toString();
+    }
+
+    String datastreamProfilesToXML(String pid, Datastream[] dsProfiles, Date versDateTime,
+                                  boolean validateChecksum){
+        StringBuilder builder=new StringBuilder();
+        String dateString = "";
+        if (versDateTime != null) {
+            String tmp = DateUtility.convertDateToString(versDateTime);
+            if (tmp != null) {
+                dateString = String.format("asOfDateTime=\"%s\" ", tmp);
+            }
+        }
+        String baseUrl = enc(fedoraServerProtocol)
+                + "://" + enc(fedoraServerHost) + ":"
+                + enc(fedoraServerPort) + "/" + fedoraAppServerContext;
+        builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+            .append("<objectDatastreams xmlns=\"" + Constants.ACCESS.uri + "\" ")
+            .append("xmlns:apim=\"" + Constants.MANAGEMENT.uri + "\" ")
+            .append("xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" ")
+            .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ")
+            .append("xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/access/ ")
+            .append(baseUrl).append("/schema/listDatastreams.xsd\"")
+            .append(" pid=\"").append(enc(pid)).append("\" ").append(dateString)
+            .append(" baseURL=\"").append(baseUrl).append("/\" >");
+        for (Datastream ds:dsProfiles){
+            StringBuilder profileBuilder=new StringBuilder();
+            profileBuilder.append("<datastreamProfile pid=\"").append(enc(pid))
+                .append("\" dsID=\"").append(enc(ds.DatastreamID)).append("\" >");
+            profileBuilder.append(datastreamFieldSerialization(ds, "apim", validateChecksum));
+            profileBuilder.append("</datastreamProfile>");
+            builder.append(profileBuilder.toString());
+        }
+        builder.append("</objectDatastreams>");
+        return builder.toString();
     }
 
     String objectHistoryToXml(
@@ -219,7 +258,7 @@ public class DefaultSerializer {
             buffer.append("<datastreamProfile ").append("pid=\"").append(
                     enc(pid)).append("\"").append(" dsID=\"").append(enc(dsID))
                     .append("\">");
-            buffer.append(datastreamFieldSerialization(ds, false));
+            buffer.append(datastreamFieldSerialization(ds, "", false));
             buffer.append("</datastreamProfile>");
 
         }
@@ -509,9 +548,17 @@ public class DefaultSerializer {
     String searchResultToXml(
             FieldSearchResult result) {
         StringBuffer xmlBuf = new StringBuffer();
+        String baseUrl = enc(fedoraServerProtocol)
+                + "://" + enc(fedoraServerHost) + ":"
+                + enc(fedoraServerPort) + "/" + fedoraAppServerContext;
 
         xmlBuf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        xmlBuf.append("<result xmlns=\"http://www.fedora.info/definitions/1/0/types/\">\n");
+        xmlBuf.append("<result xmlns=\"http://www.fedora.info/definitions/1/0/types/\" ")
+        .append("xmlns:types=\"http://www.fedora.info/definitions/1/0/types/\" ")
+        .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ")
+        .append("xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/types/ ")
+        .append(baseUrl).append("/schema/findObjects.xsd\"");
+        xmlBuf.append(">\n");
         if ((result != null) && (result.getToken() != null)) {
             xmlBuf.append("  <listSession>\n");
             xmlBuf.append("    <token>" + result.getToken() + "</token>\n");

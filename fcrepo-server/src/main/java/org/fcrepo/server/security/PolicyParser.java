@@ -46,8 +46,19 @@ import org.fcrepo.server.utilities.StreamUtility;
  * Use the <code>copy()</code> method to support concurrent parsing.
  */
 public class PolicyParser {
+    
+    private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
+    
+    // Neither of these factories are thread-safe, so access is synchronized in methods below
+    private static final SchemaFactory SCHEMA_FACTORY = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
 
-    private final byte[] m_schemaBytes;
+    private static final DocumentBuilderFactory BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+    static {
+        BUILDER_FACTORY.setIgnoringComments(true);
+        BUILDER_FACTORY.setNamespaceAware(true);
+    }
+
+    private final Schema m_schema;
 
     private final Validator m_validator;
 
@@ -62,15 +73,26 @@ public class PolicyParser {
      */
     public PolicyParser(InputStream schemaStream)
             throws IOException, SAXException {
-        this(StreamUtility.getBytes(schemaStream));
+        this(getSchema(schemaStream));
     }
 
-    // actual constructor keeps schema bytes to enable cheap copying
-    private PolicyParser(byte[] schemaBytes)
+    // actual constructor keeps schema (which is thread safe) for cheap copying
+    private PolicyParser(Schema schema)
             throws SAXException {
-        m_schemaBytes = schemaBytes;
-        m_validator = createXSDValidator(new ByteArrayInputStream(m_schemaBytes));
+        m_schema = schema;
+        m_validator = schema.newValidator();
         m_domParser = createDOMParser();
+    }
+    /**
+     * Schema Factory is not thread safe
+     * @return
+     */
+    private static Schema getSchema(InputStream schemaStream) throws SAXException {
+        Schema result;
+        synchronized(SCHEMA_FACTORY){
+            result = SCHEMA_FACTORY.newSchema(new StreamSource(schemaStream));
+        }
+        return result;
     }
 
     /**
@@ -80,7 +102,7 @@ public class PolicyParser {
      */
     public PolicyParser copy() {
         try {
-            return new PolicyParser(m_schemaBytes);
+            return new PolicyParser(m_schema);
         } catch (SAXException wontHappen) {
             throw new FaultException(wontHappen);
         }
@@ -142,26 +164,18 @@ public class PolicyParser {
                                           + "Sun XACML implementation", e);
         }
     }
-
+    
     private static DocumentBuilder createDOMParser() {
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setIgnoringComments(true);
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder;
+            synchronized(BUILDER_FACTORY) {
+                builder = BUILDER_FACTORY.newDocumentBuilder();
+            }
             builder.setErrorHandler(new ThrowAllErrorHandler());
             return builder;
         } catch (ParserConfigurationException e) {
             throw new FaultException(e);
         }
-    }
-
-    private static Validator createXSDValidator(InputStream schemaStream)
-            throws SAXException {
-        if (schemaStream == null) return null;
-        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = factory.newSchema(new StreamSource(schemaStream));
-        return schema.newValidator();
     }
 
     /**

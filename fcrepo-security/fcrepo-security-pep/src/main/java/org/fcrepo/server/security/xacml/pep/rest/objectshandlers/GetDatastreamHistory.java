@@ -103,13 +103,4 @@ extends AbstractFilter {
         return req;
     }
 
-    @Override
-    public RequestCtx handleResponse(HttpServletRequest request,
-                                     HttpServletResponse response)
-            throws IOException, ServletException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
 }

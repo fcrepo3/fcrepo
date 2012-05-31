@@ -2,7 +2,10 @@
 <xsd:schema targetNamespace="http://www.fedora.info/definitions/1/0/access/" 
             xmlns="http://www.fedora.info/definitions/1/0/access/"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+            xmlns:apim="http://www.fedora.info/definitions/1/0/management/"
             elementFormDefault="qualified">
+            <xsd:import namespace="http://www.fedora.info/definitions/1/0/management/"
+                        schemaLocation="datastreamProfile.xsd" />
 	<!-- root element declaration -->
 	<xsd:element name="objectDatastreams">
 		<xsd:complexType>
@@ -13,9 +16,14 @@
 	</xsd:element>
 	<!-- complex type declarations -->
 	<xsd:complexType name="objectDatastreamsType">
-		<xsd:sequence>
-			<xsd:element name="datastream" type="datastreamType" minOccurs="0" maxOccurs="unbounded"/>
-		</xsd:sequence>
+		<xsd:choice>
+		  <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="datastream" type="datastreamType"/>
+		  </xsd:sequence>
+		  <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="datastreamProfile" type="apim:datastreamProfileType" />
+		  </xsd:sequence>
+		</xsd:choice>
 		<xsd:attribute name="pid" type="xsd:string" use="required"/>
 		<xsd:attribute name="asOfDateTime" type="xsd:string" use="optional"/>
 		<xsd:attribute name="baseURL" type="xsd:string" use="required"/>

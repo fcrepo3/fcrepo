@@ -44,4 +44,24 @@
  	</java>
   </target>
 
+  <target name="configureFedora">
+    <echo>Configuring Fedora Post-Installation</echo>
+    <echo>Copying Test Repository Policies Legacy Policy Dir</echo>
+    <mkdir dir="${basedir}/target/ext/fcrepo-integrationtest-core/XACMLTestPolicies/test-policies" />
+  	<copy todir="${mvn.fedora.home}/data/fedora-xacml-policies/repository-policies/" overwrite="true">
+  	  <fileset dir="${basedir}/target/ext/fcrepo-integrationtest-core/XACMLTestPolicies/test-policies" />
+  	</copy>
+  	<mkdir dir="${mvn.fedora.home}/pdp/policies/" />
+    <mkdir dir="${basedir}/target/ext/fcrepo-integrationtest-core/XACMLTestPolicies/fesl-test-policies" />
+  	<echo>Copying Test Repository Policies to FESL policy dir</echo>
+  	<copy todir="${mvn.fedora.home}/pdp/policies/" overwrite="true">
+  	  <fileset dir="${basedir}/target/ext/fcrepo-integrationtest-core/XACMLTestPolicies/fesl-test-policies" />
+  	</copy>
+    <echo>Copying Test Spring Configurations</echo>
+    <mkdir dir="${basedir}/target/ext/fcrepo-integrationtest-core/config/spring" />
+  	<copy todir="${mvn.fedora.home}/server/config/spring/" overwrite="true">
+  	  <fileset dir="${basedir}/target/ext/fcrepo-integrationtest-core/config/spring" />
+  	</copy>
+  </target>
+
 </project>

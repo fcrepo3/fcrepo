@@ -85,11 +85,7 @@ public class ReadOnlyContext
                             String password,
                             boolean noOp) {
         //super(parameters);
-        m_environmentAttributes = environmentAttributes;
-        if (m_environmentAttributes == null) {
-            m_environmentAttributes = new MultiValueMap();
-        }
-        m_environmentAttributes.lock();
+        setEnvironmentValues(environmentAttributes);
         m_subjectAttributes = subjectAttributes;
         if (m_subjectAttributes == null) {
             logger.debug("subject map parm is null");
@@ -111,9 +107,17 @@ public class ReadOnlyContext
             extendedHttpServletRequest = (ExtendedHttpServletRequest) request;
         }
     }
+    
+    public void setEnvironmentValues(MultiValueMap environmentAttributes) {
+        m_environmentAttributes = environmentAttributes;
+        if (m_environmentAttributes == null) {
+            m_environmentAttributes = new MultiValueMap();
+        }
+        m_environmentAttributes.lock();
+    }
 
     @Override
-    public Iterator environmentAttributes() {
+    public Iterator<String> environmentAttributes() {
         return m_environmentAttributes.names();
     }
 
@@ -133,7 +137,7 @@ public class ReadOnlyContext
     }
 
     @Override
-    public Iterator subjectAttributes() {
+    public Iterator<String> subjectAttributes() {
         return m_subjectAttributes.names();
     }
 
@@ -203,7 +207,7 @@ public class ReadOnlyContext
     }
 
     @Override
-    public Iterator actionAttributes() {
+    public Iterator<String> actionAttributes() {
         return m_actionAttributes.names();
     }
 
@@ -223,7 +227,7 @@ public class ReadOnlyContext
     }
 
     @Override
-    public Iterator resourceAttributes() {
+    public Iterator<String> resourceAttributes() {
         return m_resourceAttributes.names();
     }
 

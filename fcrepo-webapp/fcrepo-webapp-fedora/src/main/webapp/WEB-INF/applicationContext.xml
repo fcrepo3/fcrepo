@@ -248,23 +248,4 @@
   <bean id="org.fcrepo.server.Module" init-method="initModule"  destroy-method="shutdownModule" abstract="true">
   </bean>
   
-  <bean id="org.fcrepo.server.rest.FedoraObjectResource" class="org.fcrepo.server.rest.FedoraObjectResource">
-    <constructor-arg ref="org.fcrepo.server.Server" />
-  </bean>
-  <bean id="org.fcrepo.server.rest.FedoraObjectSearchResource" class="org.fcrepo.server.rest.FedoraObjectSearchResource">
-    <constructor-arg ref="org.fcrepo.server.Server" />
-  </bean>
-  <bean id="org.fcrepo.server.rest.DatastreamResource" class="org.fcrepo.server.rest.DatastreamResource">
-    <constructor-arg ref="org.fcrepo.server.Server" />
-  </bean>
-  <bean id="org.fcrepo.server.rest.MethodResource" class="org.fcrepo.server.rest.MethodResource">
-    <constructor-arg ref="org.fcrepo.server.Server" />
-  </bean>
-  <bean id="org.fcrepo.server.rest.RelationshipResource" class="org.fcrepo.server.rest.RelationshipResource">
-    <constructor-arg ref="org.fcrepo.server.Server" />
-  </bean>
-  <bean id="org.fcrepo.server.upload.UploadResource" class="org.fcrepo.server.upload.UploadResource">
-    <constructor-arg ref="org.fcrepo.server.Server" />
-  </bean>
-  
 </beans>

@@ -12,6 +12,9 @@
 
   <bean id="PolicyCombiningAlgorithm" class="org.fcrepo.server.security.xacml.pdp.HierarchicalLowestChildDenyOverridesPolicyAlg" />
 
+  <bean id="org.fcrepo.server.security.ContextRegistry"
+              class="org.fcrepo.server.security.impl.HashtableContextRegistry" />
+
   <util:set id="policyFinderModules">
     <bean id="GenericPolicyFinderModule"
           class="org.fcrepo.server.security.xacml.pdp.finder.policy.GenericPolicyFinderModule">
@@ -23,6 +26,10 @@
     <bean id="CurrentEnvModule" class="com.sun.xacml.finder.impl.CurrentEnvModule"/>
     <bean id="SelectorModule" class="com.sun.xacml.finder.impl.SelectorModule"/>
     <ref bean="FedoraRIAttributeFinder" />
+    <bean id="org.fcrepo.server.security.ContextAttributeFinderModule"
+        class="org.fcrepo.server.security.ContextAttributeFinderModule">
+      <constructor-arg><ref bean="org.fcrepo.server.security.ContextRegistry" /></constructor-arg>
+    </bean>
   </util:list>
   <util:list id="resourceFinderModules">
   </util:list>

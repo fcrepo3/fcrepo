@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  * @author Chris Wilper
  * @version $Id$
  */
-@Path("/{pid}/methods")
+@Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/methods")
 @Component
 public class MethodResource extends BaseRestResource {
     @javax.ws.rs.core.Context UriInfo uriInfo;
@@ -55,10 +55,13 @@ public class MethodResource extends BaseRestResource {
             String pid,
             @QueryParam(RestParam.AS_OF_DATE_TIME)
             String dTime,
-            @QueryParam("format")
+            @QueryParam(RestParam.FORMAT)
             @DefaultValue(HTML)
-            String format) {
-        return getObjectMethodsForSDefImpl(pid, null, dTime, format);
+            String format,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
+        return getObjectMethodsForSDefImpl(pid, null, dTime, format, flash);
     }
 
     /**
@@ -77,10 +80,13 @@ public class MethodResource extends BaseRestResource {
             String sDef,
             @QueryParam(RestParam.AS_OF_DATE_TIME)
             String dTime,
-            @QueryParam("format")
+            @QueryParam(RestParam.FORMAT)
             @DefaultValue(HTML)
-            String format) {
-        return getObjectMethodsForSDefImpl(pid, sDef, dTime, format);
+            String format,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
+        return getObjectMethodsForSDefImpl(pid, sDef, dTime, format, flash);
     }
 
     /**
@@ -96,7 +102,10 @@ public class MethodResource extends BaseRestResource {
             @PathParam(RestParam.METHOD)
             String method,
             @QueryParam(RestParam.AS_OF_DATE_TIME)
-            String dTime) {
+            String dTime,
+            @QueryParam(RestParam.FLASH)
+            @DefaultValue("false")
+            boolean flash) {
         try {
             Date asOfDateTime = DateUtility.parseDateOrNull(dTime);
             return buildResponse(m_access.getDissemination(
@@ -108,11 +117,11 @@ public class MethodResource extends BaseRestResource {
                                  asOfDateTime != null),
                     asOfDateTime));
         } catch (Exception e) {
-            return handleException(e);
+            return handleException(e, flash);
         }
     }
 
-    private Response getObjectMethodsForSDefImpl(String pid, String sDef, String dTime, String format) {
+    private Response getObjectMethodsForSDefImpl(String pid, String sDef, String dTime, String format, boolean flash) {
         try {
             Date asOfDateTime = DateUtility.parseDateOrNull(dTime);
             Context context = getContext();
@@ -129,7 +138,7 @@ public class MethodResource extends BaseRestResource {
 
             return Response.ok(xml, mime).build();
         } catch (Exception e) {
-            return handleException(e);
+            return handleException(e, flash);
         }
     }
 

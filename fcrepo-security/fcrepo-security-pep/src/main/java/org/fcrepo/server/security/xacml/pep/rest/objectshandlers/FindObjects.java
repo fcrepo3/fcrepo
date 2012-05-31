@@ -23,14 +23,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
@@ -50,6 +57,7 @@ import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.pep.rest.filters.DataResponseWrapper;
+import org.fcrepo.server.security.xacml.pep.rest.filters.ResponseHandlingRESTFilter;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.fcrepo.server.utilities.CXFUtility;
@@ -75,11 +83,21 @@ import com.sun.xacml.ctx.Status;
  * @author nish.naidoo@gmail.com
  */
 public class FindObjects
-        extends AbstractFilter {
+        extends AbstractFilter implements ResponseHandlingRESTFilter {
 
     private static final Logger logger =
             LoggerFactory.getLogger(FindObjects.class);
+    
+    private static final NamespaceContext TYPES_NAMESPACE = new TypesNamespaceContext();
 
+    private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
+
+    private static final DocumentBuilderFactory BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+    static {
+        // the default namespace must be prefixed to be accessible to xpath
+        BUILDER_FACTORY.setNamespaceAware(true);
+    }
+    
     private ContextUtil m_contextUtil = null;
 
     private Transformer xFormer = null;
@@ -182,19 +200,13 @@ public class FindObjects
         String body = new String(data);
 
         if (body.startsWith("<html>")) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("filtering html");
-            }
+            logger.debug("filtering html");
             result = filterHTML(request, res);
         } else if (body.startsWith("<?xml")) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("filtering html");
-            }
+            logger.debug("filtering xml");
             result = filterXML(request, res);
         } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("not filtering due to unexpected output: " + body);
-            }
+            logger.debug("not filtering due to unexpected output: {}", body);
             result = body;
         }
 
@@ -222,48 +234,42 @@ public class FindObjects
         Document doc = null;
 
         try {
-            DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-            docBuilderFactory.setNamespaceAware(true);
-            docBuilder =
-                    docBuilderFactory.newDocumentBuilder();
-            doc =
-                    docBuilder.parse(new ByteArrayInputStream(response
-                            .getData()));
+            synchronized(BUILDER_FACTORY){
+                docBuilder =
+                        BUILDER_FACTORY.newDocumentBuilder();
+            }
+            doc = docBuilder.parse(new ByteArrayInputStream(response.getData()));
         } catch (Exception e) {
             throw new ServletException(e);
         }
 
-        XPath xpath = XPathFactory.newInstance().newXPath();
+        XPath xpath;
+        synchronized(XPATH_FACTORY){
+            xpath = XPATH_FACTORY.newXPath();
+        }
+        xpath.setNamespaceContext(TYPES_NAMESPACE);
         NodeList rows = null;
         try {
             rows =
                     (NodeList) xpath
-                            .evaluate("/result/resultList/objectFields",
+                            .evaluate("/:result/:resultList/:objectFields/:pid",
                                       doc,
                                       XPathConstants.NODESET);
         } catch (XPathExpressionException xpe) {
-            throw new ServletException("Error parsing HTML for search results: ",
+            throw new ServletException("Error parsing XML for search results: ",
                                        xpe);
         }
 
         if (rows.getLength() == 0) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("No results to filter.");
-            }
+            logger.debug("No results to filter.");
 
             return body;
         }
 
         Map<String, Node> pids = new HashMap<String, Node>();
         for (int x = 0; x < rows.getLength(); x++) {
-            NodeList children = rows.item(x).getChildNodes();
-            for (int y = 0; y < children.getLength(); y++) {
-                if ("pid".equals(children.item(y).getNodeName())) {
-                    pids.put(children.item(y).getFirstChild().getNodeValue(),
-                             rows.item(x));
-                    break;
-                }
-            }
+            Node pid = rows.item(x);
+            pids.put(pid.getFirstChild().getNodeValue(), pid.getParentNode());
         }
 
         Set<Result> results = evaluatePids(pids.keySet(), request, response);
@@ -272,7 +278,7 @@ public class FindObjects
             if (r.getResource() == null || "".equals(r.getResource())) {
                 logger.warn("This resource has no resource identifier in the xacml response results!");
             } else if (logger.isDebugEnabled()) {
-                logger.debug("Checking: " + r.getResource());
+                logger.debug("Checking: {}", r.getResource());
             }
 
             String[] ridComponents = r.getResource().split("\\/");
@@ -282,12 +288,11 @@ public class FindObjects
                     && r.getDecision() != Result.DECISION_PERMIT) {
                 Node node = pids.get(rid);
                 node.getParentNode().removeChild(node);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Removing: " + r.getResource() + "[" + rid + "]");
-                }
+                logger.debug("Removing: {} [{}]", r.getResource(), rid);
             }
         }
-
+        // since namespaces are disabled, set the attribute explicitly
+        doc.getDocumentElement().setAttribute("xmlns", "http://www.fedora.info/definitions/1/0/types/");
         Source src = new DOMSource(doc);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         javax.xml.transform.Result dst = new StreamResult(os);
@@ -319,7 +324,10 @@ public class FindObjects
         InputStream is = new ByteArrayInputStream(body.getBytes());
         Document doc = tidy.parseDOM(is, null);
 
-        XPath xpath = XPathFactory.newInstance().newXPath();
+        XPath xpath;
+        synchronized(XPATH_FACTORY) {
+            xpath = XPATH_FACTORY.newXPath();
+        }
         NodeList rows = null;
         try {
             rows =
@@ -334,9 +342,7 @@ public class FindObjects
 
         // only the header row, no results.
         if (rows.getLength() == 1) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("No results to filter.");
-            }
+            logger.debug("No results to filter.");
             return body;
         }
 
@@ -365,9 +371,7 @@ public class FindObjects
             NodeList elements = rows.item(x).getChildNodes();
             Node pidParentA = elements.item(pidHeader).getFirstChild();
             if (pidParentA != null && pidParentA.getNodeName().equals("a")) {
-                String pid =
-                        elements.item(pidHeader).getFirstChild()
-                                .getFirstChild().getNodeValue();
+                String pid = pidParentA.getFirstChild().getNodeValue();
                 pids.put(pid, rows.item(x));
             }
         }
@@ -378,7 +382,7 @@ public class FindObjects
             if (r.getResource() == null || "".equals(r.getResource())) {
                 logger.warn("This resource has no resource identifier in the xacml response results!");
             } else if (logger.isDebugEnabled()) {
-                logger.debug("Checking: " + r.getResource());
+                logger.debug("Checking: {}", r.getResource());
             }
 
             String[] ridComponents = r.getResource().split("\\/");
@@ -389,9 +393,7 @@ public class FindObjects
                 Node node = pids.get(rid);
                 node.getParentNode().removeChild(node.getNextSibling());
                 node.getParentNode().removeChild(node);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Removing: " + r.getResource() + "[" + rid + "]");
-                }
+                logger.debug("Removing: {} [{}]", r.getResource(), rid);
             }
         }
 
@@ -425,9 +427,7 @@ public class FindObjects
             throws ServletException {
         Set<String> requests = new HashSet<String>();
         for (String pid : pids) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Checking: " + pid);
-            }
+            logger.debug("Checking: {}", pid);
 
             Map<URI, AttributeValue> actions =
                     new HashMap<URI, AttributeValue>();
@@ -443,8 +443,6 @@ public class FindObjects
                 if (pid != null && !"".equals(pid)) {
                     resAttr.put(Constants.OBJECT.PID.getURI(),
                                 new StringAttribute(pid));
-                }
-                if (pid != null && !"".equals(pid)) {
                     resAttr.put(new URI(XACML_RESOURCE_ID),
                                 new AnyURIAttribute(new URI(pid)));
                 }
@@ -457,9 +455,7 @@ public class FindObjects
                                               getEnvironment(request));
 
                 String r = m_contextUtil.makeRequestCtx(req);
-                if (logger.isDebugEnabled()) {
-                    logger.debug(r);
-                }
+                logger.debug(r);
 
                 requests.add(r);
             } catch (Exception e) {
@@ -471,17 +467,13 @@ public class FindObjects
         String res = null;
         ResponseCtx resCtx = null;
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Number of requests: " + requests.size());
-            }
+            logger.debug("Number of requests: {}", requests.size());
 
             res =
                     getContextHandler().evaluateBatch(requests
                             .toArray(new String[requests.size()]));
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Response: " + res);
-            }
+            logger.debug("Response: {}", res);
 
             resCtx = m_contextUtil.makeResponseCtx(res);
         } catch (MelcoeXacmlException pe) {
@@ -493,5 +485,43 @@ public class FindObjects
         Set<Result> results = resCtx.getResults();
 
         return results;
+    }
+    
+    static class TypesNamespaceContext implements NamespaceContext {
+        static List<String> PREFIXES = Arrays.asList(new String[]{"types",""});
+        static List<String> XSI_PREFIXES = Arrays.asList(new String[]{"xsi"});
+        static ArrayList<String> EMPTY = new ArrayList<String>(0);
+        @Override
+        public String getNamespaceURI(String prefix) {
+            if ("types".equals(prefix) || "".equals(prefix)) {
+               return "http://www.fedora.info/definitions/1/0/types/"; 
+            }
+            if ("xsi".equals(prefix)){
+                return "http://www.w3.org/2001/XMLSchema-instance";
+            }
+            return "";
+        }
+
+        @Override
+        public String getPrefix(String uri) {
+            if ("http://www.fedora.info/definitions/1/0/types/".equals(uri)) {
+                return "types";
+            }
+            if ("http://www.w3.org/2001/XMLSchema-instance".equals(uri)){
+                return "xsi";
+            }
+            return null;
+        }
+
+        @Override
+        public Iterator getPrefixes(String uri) {
+            if("http://www.fedora.info/definitions/1/0/types/".equals(uri)) {
+                return PREFIXES.iterator();
+            }
+            if ("http://www.w3.org/2001/XMLSchema-instance".equals(uri)){
+                return XSI_PREFIXES.iterator();
+            }
+            return EMPTY.iterator();
+        }
     }
 }

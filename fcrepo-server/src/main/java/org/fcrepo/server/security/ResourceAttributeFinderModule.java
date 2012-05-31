@@ -6,19 +6,15 @@ package org.fcrepo.server.security;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeDesignator;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.cond.EvaluationResult;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
+import org.fcrepo.server.config.ModuleConfiguration;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.DOReader;
@@ -26,6 +22,11 @@ import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.xacml.EvaluationCtx;
+import com.sun.xacml.attr.AttributeDesignator;
+import com.sun.xacml.attr.StringAttribute;
+import com.sun.xacml.cond.EvaluationResult;
 
 /**
  * @author Bill Niebel
@@ -36,12 +37,16 @@ class ResourceAttributeFinderModule
     private static final Logger logger =
             LoggerFactory.getLogger(ResourceAttributeFinderModule.class);
 
+    static final String OWNER_ID_SEPARATOR_CONFIG_KEY = "OWNER-ID-SEPARATOR";
+
+    static final String DEFAULT_OWNER_ID_SEPARATOR = ",";
+
     @Override
     protected boolean canHandleAdhoc() {
         return false;
     }
 
-    private String ownerIdSeparator = ",";
+    private String ownerIdSeparator = DEFAULT_OWNER_ID_SEPARATOR;
 
     static private final ResourceAttributeFinderModule singleton =
             new ResourceAttributeFinderModule();
@@ -101,10 +106,17 @@ class ResourceAttributeFinderModule
         }
     }
 
+    public void setLegacyConfiguration(ModuleConfiguration authorizationConfiguration) {
+        Map<String,String> moduleParameters = authorizationConfiguration.getParameters();
+        if (moduleParameters.containsKey(OWNER_ID_SEPARATOR_CONFIG_KEY)) {
+            setOwnerIdSeparator(moduleParameters.get(OWNER_ID_SEPARATOR_CONFIG_KEY));
+        }
+    }
+
     public void setOwnerIdSeparator(String ownerIdSeparator) {
         this.ownerIdSeparator = ownerIdSeparator;
-        logger.debug("resourceAttributeFinder just set ownerIdSeparator ==["
-                + this.ownerIdSeparator + "]");
+        logger.debug("resourceAttributeFinder just set ownerIdSeparator ==[{}]",
+                this.ownerIdSeparator);
     }
 
     private final String getDatastreamId(EvaluationCtx context) {
@@ -173,10 +185,10 @@ class ResourceAttributeFinderModule
                 logger.debug("no pid");
                 return null;
             }
-            logger.debug("getResourceAttribute, pid=" + pid);
+            logger.debug("getResourceAttribute {}, pid={}", attributeId, pid);
             DOReader reader = null;
             try {
-                logger.debug("pid=" + pid);
+                logger.debug("pid={}", pid);
                 reader =
                         doManager.getReader(Server.USE_DEFINITIVE_STORE,
                                             ReadOnlyContext.EMPTY,
@@ -193,7 +205,7 @@ class ResourceAttributeFinderModule
                     logger.debug("got " + Constants.OBJECT.STATE.uri + "="
                             + values[0]);
                 } catch (ServerException e) {
-                    logger.debug("failed getting " + Constants.OBJECT.STATE.uri);
+                    logger.debug("failed getting " + Constants.OBJECT.STATE.uri,e);
                     return null;
                 }
             }
@@ -213,7 +225,7 @@ class ResourceAttributeFinderModule
                     }
                     logger.debug(temp);
                 } catch (ServerException e) {
-                    logger.debug("failed getting " + Constants.OBJECT.OWNER.uri);
+                    logger.debug("failed getting " + Constants.OBJECT.OWNER.uri,e);
                     return null;
                 }
             } else if (Constants.MODEL.HAS_MODEL.uri.equals(attributeId)) {
@@ -221,7 +233,7 @@ class ResourceAttributeFinderModule
                 try {
                     models.addAll(reader.getContentModels());
                 } catch (ServerException e) {
-                    logger.debug("failed getting " + Constants.MODEL.HAS_MODEL.uri);
+                    logger.debug("failed getting " + Constants.MODEL.HAS_MODEL.uri,e);
                     return null;
                 }
                 values = models.toArray(new String[0]);

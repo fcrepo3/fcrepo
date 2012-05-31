@@ -21,15 +21,17 @@ package org.fcrepo.server.security.jaas;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-
 import java.security.Principal;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -39,21 +41,14 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import javax.security.auth.Subject;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.http.FilterConfigBean;
-
 import org.fcrepo.server.security.jaas.auth.AuthHttpServletRequestWrapper;
 import org.fcrepo.server.security.jaas.auth.handler.UsernamePasswordCallbackHandler;
 import org.fcrepo.server.security.jaas.util.Base64;
 import org.fcrepo.server.security.jaas.util.SubjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Servlet Filter for protecting resources. This filter uses JAAS for
@@ -141,6 +136,7 @@ public class AuthFilterJAAS
         filterConfigBean.addInitParameter("roleAttributeNames", names);
     }
 
+    @Override
     public void init(FilterConfig config) throws ServletException {
         this.filterConfig = config;
         if (this.filterConfig == null) {
@@ -241,6 +237,7 @@ public class AuthFilterJAAS
      * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
      * javax.servlet.ServletResponse, javax.servlet.FilterChain)
      */
+    @Override
     public void doFilter(ServletRequest request,
                          ServletResponse response,
                          FilterChain chain) throws IOException,
@@ -272,6 +269,8 @@ public class AuthFilterJAAS
                 boolean isGetDatastream =
                         requestPath.contains("/datastreams/")
                                 && !requestPath.endsWith("/content");
+                isGetDatastream = isGetDatastream || (requestPath.endsWith("/datastreams")
+                                && Boolean.valueOf(request.getParameter("profiles")));
                 boolean isGetRelationships =
                         requestPath.endsWith("/relationships");
                 boolean isValidate = requestPath.endsWith("/validate");
@@ -334,6 +333,7 @@ public class AuthFilterJAAS
         }
     }
 
+    @Override
     public void destroy() {
         logger.info("destroying servlet filter: " + this.getClass().getName());
         filterConfig = null;
@@ -385,7 +385,7 @@ public class AuthFilterJAAS
             byte[] data = Base64.decode(authorization.substring(6));
             auth = new String(data);
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error(e.toString());
             return null;
         }
 
@@ -403,7 +403,7 @@ public class AuthFilterJAAS
             loginContext = new LoginContext(jaasConfigName, handler);
             loginContext.login();
         } catch (LoginException le) {
-            logger.error(le.getMessage());
+            logger.error(le.toString());
             return null;
         }
 

@@ -27,6 +27,46 @@
     <load-on-startup>3</load-on-startup>
   </servlet>
   <servlet>
+    <display-name>CXF Upload Servlet</display-name>
+    <servlet-name>CXFUploadServlet</servlet-name>
+    <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+    <init-param>
+      <param-name>config-location</param-name>
+      <param-value>file:${fedora.home}/server/config/spring/web/jaxrs/upload-jaxrs.xml</param-value>
+    </init-param>
+    <load-on-startup>3</load-on-startup>
+  </servlet>
+  <servlet>
+    <display-name>CXF Objects Servlet</display-name>
+    <servlet-name>CXFObjectsServlet</servlet-name>
+    <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+    <init-param>
+      <param-name>config-location</param-name>
+      <param-value>file:${fedora.home}/server/config/spring/web/jaxrs/objects-jaxrs.xml</param-value>
+    </init-param>
+    <load-on-startup>3</load-on-startup>
+  </servlet>
+  <servlet>
+    <display-name>CXF Schema Servlet</display-name>
+    <servlet-name>CXFSchemaServlet</servlet-name>
+    <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+    <init-param>
+      <param-name>config-location</param-name>
+      <param-value>file:${fedora.home}/server/config/spring/web/jaxrs/schema-jaxrs.xml</param-value>
+    </init-param>
+    <load-on-startup>3</load-on-startup>
+  </servlet>
+<!--   <servlet>
+    <display-name>CXF Describe Servlet</display-name>
+    <servlet-name>CXFDescribeServlet</servlet-name>
+    <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+    <init-param>
+      <param-name>config-location</param-name>
+      <param-value>file:${fedora.home}/server/config/spring/web/jaxrs/describe-jaxrs.xml</param-value>
+    </init-param>
+    <load-on-startup>3</load-on-startup>
+  </servlet> -->
+  <servlet>
     <display-name>Fedora Access Servlet</display-name>
     <servlet-name>AccessServlet</servlet-name>
     <servlet-class>org.fcrepo.server.access.FedoraAccessServlet</servlet-class>
@@ -110,32 +150,6 @@
     <servlet-name>WSDLServlet</servlet-name>
     <servlet-class>org.fcrepo.server.access.WSDLServlet</servlet-class>
   </servlet>
-  <servlet>
-    <display-name>Fedora REST API Servlet</display-name>
-    <servlet-name>RestServlet</servlet-name>
-    <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
-    <init-param>
-      <param-name>com.sun.jersey.config.property.packages</param-name>
-      <param-value>org.fcrepo.server.rest</param-value>
-    </init-param>
-    <init-param>
-      <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-      <param-value>com.sun.jersey.api.container.filter.PostReplaceFilter</param-value>
-    </init-param>
-  </servlet>
-  <servlet>
-    <display-name>Fedora REST API Upload Servlet</display-name>
-    <servlet-name>UploadRestServlet</servlet-name>
-    <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
-    <init-param>
-      <param-name>com.sun.jersey.config.property.packages</param-name>
-      <param-value>org.fcrepo.server.upload</param-value>
-    </init-param>
-    <init-param>
-      <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-      <param-value>com.sun.jersey.api.container.filter.PostReplaceFilter</param-value>
-    </init-param>
-  </servlet>
   <servlet-mapping>
     <servlet-name>CXFServlet</servlet-name>
     <url-pattern>/services/*</url-pattern>
@@ -155,10 +169,6 @@
   <servlet-mapping>
     <servlet-name>DatastreamResolverServlet</servlet-name>
     <url-pattern>/getDSAuthenticated</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>DescribeRepositoryServlet</servlet-name>
-    <url-pattern>/describe</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>FieldSearchServlet</servlet-name>
@@ -188,23 +198,7 @@
     <servlet-name>OAIProviderServlet</servlet-name>
     <url-pattern>/oai</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>RestServlet</servlet-name>
-    <url-pattern>/objects/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>UploadRestServlet</servlet-name>
-    <url-pattern>/upload</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>RestServlet</servlet-name>
-    <url-pattern>/objects/nextPID</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>RestServlet</servlet-name>
-    <url-pattern>/objects/nextPID.xml</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
+   <servlet-mapping>
     <servlet-name>RISearchServlet</servlet-name>
     <url-pattern>/risearch</url-pattern>
   </servlet-mapping>
@@ -219,6 +213,22 @@
   <servlet-mapping>
     <servlet-name>UserServlet</servlet-name>
     <url-pattern>/user</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CXFUploadServlet</servlet-name>
+    <url-pattern>/upload</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>DescribeRepositoryServlet</servlet-name>
+    <url-pattern>/describe</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CXFObjectsServlet</servlet-name>
+    <url-pattern>/objects/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CXFSchemaServlet</servlet-name>
+    <url-pattern>/schema/*</url-pattern>
   </servlet-mapping>
   <filter>
     <filter-name>RestApiFlashFilter</filter-name>

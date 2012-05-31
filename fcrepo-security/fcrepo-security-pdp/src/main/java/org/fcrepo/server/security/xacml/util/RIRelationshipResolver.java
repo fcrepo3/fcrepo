@@ -28,6 +28,8 @@ import org.fcrepo.common.MalformedPIDException;
 import org.fcrepo.common.PID;
 
 import org.fcrepo.server.Server;
+import org.fcrepo.server.errors.ModuleInitializationException;
+import org.fcrepo.server.errors.ServerInitializationException;
 import org.fcrepo.server.resourceIndex.ResourceIndex;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 
@@ -38,48 +40,37 @@ public class RIRelationshipResolver
     private static final Logger logger = LoggerFactory.getLogger(RIRelationshipResolver.class);
 
     private final ResourceIndex RI;
+    
+    private boolean spoTriples = false;
+    private boolean sparqlTuples = false;
+    private boolean itqlTuples = false;
 
-    public RIRelationshipResolver() throws MelcoeXacmlException {
-        this(new HashMap<String, String>()) ;
-    }
-
-    protected final List<String> tripleLanguages;
-    protected final List<String> tupleLanguages;
+    // Because the FESL beans are created outside the Fedora module context,
+    // they can't both share a PDP with the Authorization impl and have a post-init
+    // ResourceIndex impl without circular dependencies, so the RI module's config
+    // is checked lazily
+    protected List<String> tripleLanguages;
+    protected List<String> tupleLanguages;
 
     private static final String SPO = "spo";
     private static final String SPARQL = "sparql";
     private static final String ITQL = "itql";
 
 
-    public RIRelationshipResolver(Map<String, String> options) throws MelcoeXacmlException {
+    public RIRelationshipResolver(Server server, Map<String, String> options) throws MelcoeXacmlException {
         super(options);
 
         try {
-            Server server = Server.getInstance(new File(Constants.FEDORA_HOME), false);
             RI = (ResourceIndex) server.getModule("org.fcrepo.server.resourceIndex.ResourceIndex");
         } catch (Exception e) {
             throw new MelcoeXacmlException("Error getting resource index.", e);
         }
-        if (RI == null || RI.getIndexLevel() == ResourceIndex.INDEX_LEVEL_OFF) {
-            throw new MelcoeXacmlException("The Resource Index Module is not enabled.");
+        if (RI == null) {
+            throw new MelcoeXacmlException("No Resource Index Module is available to the Server.");
         }
-
-        // get supported query languages
-        tripleLanguages = Arrays.asList(RI.listTripleLanguages());
-        tupleLanguages = Arrays.asList(RI.listTupleLanguages());
-
-        if (logger.isDebugEnabled()) {
-            for (String lang : tripleLanguages) {
-                logger.debug("Triple language: " + lang);
-            }
-            for (String lang : tupleLanguages) {
-                logger.debug("Tuple language: " + lang);
-            }
-        }
-
 
     }
-
+    
     @Override
     public Map<String, Set<String>> getRelationships(String subject)
             throws MelcoeXacmlException {
@@ -199,7 +190,7 @@ public class RIRelationshipResolver
         // tuple queries
         if (queryLang.equals(ITQL) || queryLang.equals(SPARQL)) {
             // check lang supported
-            if (!tupleLanguages.contains(queryLang)) {
+            if (!verifyTupleLanguage(queryLang)) {
                 logger.warn("RI query language " + queryLang + " is not supported");
                 return res;
             }
@@ -226,7 +217,7 @@ public class RIRelationshipResolver
         } else if (queryLang.equals(SPO)) {
             // triple query
             // check lang supported
-            if (!tripleLanguages.contains(queryLang)) {
+            if (!verifyTripleLanguage(queryLang)) {
                 logger.warn("RI query language " + queryLang + " is not supported");
                 return res;
             }
@@ -360,13 +351,13 @@ public class RIRelationshipResolver
         String pidUri = getFedoraResourceURI(pid);
 
         // tuple query
-        if (tupleLanguages.contains(ITQL) || tupleLanguages.contains(SPARQL)) {
+        if (verifyTupleLanguage(ITQL) || verifyTupleLanguage(SPARQL)) {
             String query = "";
             String lang = "";
-            if (tupleLanguages.contains(ITQL)) {
+            if (itqlTuples) {
                 lang = ITQL;
                 query = getTQLQuery(pidUri);
-            } else if (tupleLanguages.contains(SPARQL)) {
+            } else {
                 lang = SPARQL;
                 query = getSPARQLQuery(pidUri);
             }
@@ -407,7 +398,7 @@ public class RIRelationshipResolver
             }
 
 
-        } else if (tripleLanguages.contains(SPO)) {
+        } else if (verifyTripleLanguage(SPO)) {
             // gets all relationships for pid, then filters results
             // rather than executing separate queries for each relationship
 
@@ -461,6 +452,23 @@ public class RIRelationshipResolver
         }
 
         return parentPIDs;
+    }
+    
+    private boolean verifyTripleLanguage(String lang) {
+        if (tripleLanguages == null){
+            tripleLanguages = Arrays.asList(RI.listTripleLanguages());
+            spoTriples = tripleLanguages.contains(SPO);
+        }
+        return tripleLanguages.contains(lang);
+    }
+    
+    private boolean verifyTupleLanguage(String lang){
+        if (tupleLanguages == null){
+            tupleLanguages = Arrays.asList(RI.listTupleLanguages());
+            sparqlTuples = tupleLanguages.contains(SPARQL);
+            itqlTuples = tupleLanguages.contains(ITQL);
+        }
+        return tupleLanguages.contains(lang);
     }
 
 

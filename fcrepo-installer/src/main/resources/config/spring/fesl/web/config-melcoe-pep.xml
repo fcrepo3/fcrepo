@@ -62,7 +62,7 @@
     </bean>
   
   	<bean id="org.fcrepo.server.security.xacml.util.RelationshipResolver" class="org.fcrepo.server.security.xacml.util.RIRelationshipResolver">
-    <!-- relationships from object to its parent -->
+    <constructor-arg><ref bean="org.fcrepo.server.Server" /></constructor-arg>
     <constructor-arg>
       <map>
 	    <entry key="xacml-parent-relationship-1" value="info:fedora/fedora-system:def/relations-external#isMemberOf" />
@@ -76,5 +76,17 @@
       </map>
     </constructor-arg>
 	</bean>
+
+        <bean id="org.fcrepo.server.security.PolicyEnforcementPoint"
+              class="org.fcrepo.server.security.xacml.pep.impl.FESLPolicyEnforcementPoint"
+              autowire-candidate="true" init-method="init">
+              <constructor-arg><ref bean="MelcoePDPConfig" /></constructor-arg>
+              <constructor-arg><ref bean="org.fcrepo.server.security.ContextRegistry" /></constructor-arg>
+        </bean>
+        <bean id="org.fcrepo.server.security.Authorization"
+              class="org.fcrepo.server.security.xacml.pep.impl.FESLAuthorization"
+              autowire-candidate="true">
+              <constructor-arg><ref bean="org.fcrepo.server.security.PolicyEnforcementPoint" /></constructor-arg>
+        </bean>
 	
 </beans>

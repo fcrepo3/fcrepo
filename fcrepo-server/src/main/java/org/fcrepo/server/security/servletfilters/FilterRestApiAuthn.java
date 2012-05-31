@@ -45,6 +45,11 @@ public class FilterRestApiAuthn
                     !requestPath.endsWith("/content")) {
                     enforceAuthN = true;
                 }
+                if (requestPath.endsWith("/datastreams") &&
+                    Boolean.valueOf(request.getParameter("profiles"))) {
+                    enforceAuthN = true;
+                }
+                if (!enforceAuthN) logger.warn("No authn requested for {}", requestPath);
             }
         } else {
             enforceAuthN = true;

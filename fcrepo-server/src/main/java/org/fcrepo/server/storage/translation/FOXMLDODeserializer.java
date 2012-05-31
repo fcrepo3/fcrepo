@@ -217,7 +217,9 @@ public class FOXMLDODeserializer
         }
         // initialize sax
         try {
-            m_parser = spf.newSAXParser();
+            synchronized(spf){
+                m_parser = spf.newSAXParser();
+            }
         } catch (Exception e) {
             throw new RuntimeException("Error initializing SAX parser", e);
         }

@@ -5,7 +5,6 @@
 
 package org.fcrepo.test.api;
 
-import static org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
 import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.commons.httpclient.HttpStatus.SC_MOVED_TEMPORARILY;
@@ -511,6 +510,15 @@ public class TestRESTAPI
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
         }
         assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
+
+        url =
+                String.format("/objects/%s/datastreams?format=xml&profiles=true", pid
+                        .toString());
+        // this will always require authN with the profiles option on, as it is an apim function
+        assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        HttpResponse response = get(true);
+        assertEquals(SC_OK, response.getStatusCode());
+        assertTrue(response.getResponseBodyString().indexOf("datastreamProfile") > -1);
     }
 
     // if an object is marked as deleted, only administrators have access (default XACML policy)
@@ -706,7 +714,7 @@ public class TestRESTAPI
 
         url =
                 String
-                        .format("/objects?pid=true&query=&format=xml&sessionToken=%s",
+                        .format("/objects?pid=true&query=&resultFormat=xml&sessionToken=%s",
                                 sessionToken);
         if (this.getAuthAccess()) {
             assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
@@ -743,6 +751,7 @@ public class TestRESTAPI
         if (m.find() && m.groupCount() == 1) {
             pid = m.group(1);
         }
+        pid = pid.replaceAll("\n", "").replaceAll("\r", "").replaceAll("%3A", ":");
         return pid;
     }
 
@@ -758,9 +767,6 @@ public class TestRESTAPI
         String emptyObjectPid =
                 extractPid(response.getResponseHeader("Location").getValue());
         assertNotNull(emptyObjectPid);
-        emptyObjectPid =
-                emptyObjectPid.replaceAll("\n", "").replaceAll("\r", "")
-                        .replaceAll("%3A", ":");
         // PID should be returned as a header and as the response body
         String responseBody = new String(response.getResponseBody(), "UTF-8");
         assertTrue(responseBody.equals(emptyObjectPid));
@@ -918,8 +924,8 @@ public class TestRESTAPI
             if (objectFields != null) {
                 pid = objectFields.getPid() != null ? objectFields.getPid().getValue() : "";
                 url =
-                        String.format("/objects/%s/validate", URLEncoder
-                                .encode(pid.toString(), "UTF-8"));
+                        String.format("/objects/%s/validate", pid.toString()); //URLEncoder
+                               // .encode(pid.toString(), "UTF-8"));
                 HttpResponse getTrue = get(true);
                 assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
                         .getStatusCode());
@@ -938,7 +944,7 @@ public class TestRESTAPI
         url =
                 String.format("/objects/%s/validate?asOfDateTime=%s",
                               pid.toString(),
-                              datetime);
+                              df.format(new Date()));
         HttpResponse getTrue = get(true);
         assertEquals(pid.toString(), SC_UNAUTHORIZED, get(false)
                      .getStatusCode());
@@ -991,10 +997,9 @@ public class TestRESTAPI
     }
 
     public void testPurgeObject() throws Exception {
-        url = String.format("/objects/%s", "demo:TEST_PURGE");
+        url = "/objects/demo:TEST_PURGE";
         assertEquals(SC_UNAUTHORIZED, post("", false).getStatusCode());
         assertEquals(SC_CREATED, post("", true).getStatusCode());
-        url = String.format("/objects/demo:TEST_PURGE");
         assertEquals(SC_UNAUTHORIZED, delete(false).getStatusCode());
         assertEquals(SC_OK, delete(true).getStatusCode());
     }
@@ -1289,12 +1294,12 @@ public class TestRESTAPI
 
     public void testResponseOverride() throws Exception {
         // Make request which returns error response
-        url = String.format("/objects/%s", "BOGUS_PID");
-        assertEquals(SC_BAD_REQUEST, post("", true).getStatusCode());
+        url = String.format("/objects/%s", "demo:BOGUS_PID");
+        assertEquals(SC_NOT_FOUND, put("", true).getStatusCode());
 
         // With flash=true parameter response should be 200
-        url = String.format("/objects/%s?flash=true", "BOGUS_PID");
-        assertEquals(SC_OK, post("", true).getStatusCode());
+        url = String.format("/objects/%s?flash=true", "demo:BOGUS_PID");
+        assertEquals(SC_OK, put("", true).getStatusCode());
     }
 
     // test correct content-disposition header on getDatastreamDissemination
@@ -1382,7 +1387,6 @@ public class TestRESTAPI
 
         // Test content not supplied
         response = _doUploadPost(url,new Part[] {});
-     // jersey now sends a 400 in this circumstance (jersey-577)
         assertEquals(400, response.getStatusCode());
     }
 
@@ -1959,7 +1963,7 @@ public class TestRESTAPI
         reader.setEntityResolver(new ValidatorEntityResolver());
         reader.setErrorHandler(new ValidatorErrorHandler(errors));
         reader.parse(new InputSource(new StringReader(xml)));
-
+        if (errors.length() > 0) System.out.println(xml);
         assertTrue("Online Validation failed for " + url + ". Errors: "
                 + errors.toString(), 0 == errors.length());
 

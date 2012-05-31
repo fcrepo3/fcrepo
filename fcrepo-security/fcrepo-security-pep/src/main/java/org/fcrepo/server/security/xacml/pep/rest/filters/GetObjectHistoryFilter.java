@@ -134,17 +134,4 @@ public class GetObjectHistoryFilter
 
         return req;
     }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter#handleResponse(javax.servlet
-     * .http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-     */
-    @Override
-    public RequestCtx handleResponse(HttpServletRequest request,
-                                     HttpServletResponse response)
-            throws IOException, ServletException {
-        return null;
-    }
 }

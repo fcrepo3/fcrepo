@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.fedora.info/definitions/1/0/types/" 
+            xmlns="http://www.fedora.info/definitions/1/0/types/"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+            xmlns:apim="http://www.fedora.info/definitions/1/0/management/"
+            elementFormDefault="qualified">
+	<!-- root element declaration -->
+	<xsd:element name="result">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="resultType"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+    </xsd:element>
+	  <xsd:complexType name="resultType">
+        <xsd:sequence>
+            <xsd:element name="listSession" nillable="true" type="listSessionType" minOccurs="0"/>
+            <xsd:element name="resultList">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="objectFields" minOccurs="0" maxOccurs="unbounded"
+                                 type="objectFieldsType"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+      </xsd:complexType>
+    <xsd:complexType name="listSessionType">
+        <xsd:sequence>
+            <xsd:element name="token" nillable="true" type="xsd:string"/>
+            <xsd:element name="cursor" type="xsd:nonNegativeInteger" minOccurs="0"/>
+            <xsd:element name="completeListSize" type="xsd:nonNegativeInteger" minOccurs="0"/>
+            <xsd:element name="expirationDate" nillable="true" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="objectFieldsType">
+        <xsd:sequence>
+            <xsd:element name="pid" nillable="true" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="label" nillable="true" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="state" nillable="true" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="ownerId" nillable="true" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="cDate" nillable="true" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="mDate" nillable="true" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="dcmDate" nillable="true" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="title" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="creator" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="subject" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="description" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="publisher" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="contributor" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="date" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="type" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="format" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="identifier" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="source" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="language" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="relation" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="coverage" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="rights" nillable="true" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+</xsd:schema>

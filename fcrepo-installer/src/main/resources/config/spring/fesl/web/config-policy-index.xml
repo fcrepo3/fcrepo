@@ -59,6 +59,7 @@
     <entry key="urn:oasis:names:tc:xacml:1.0:resource:resource-id" value="http://www.w3.org/2001/XMLSchema#anyURI"/>
     <entry key="urn:fedora:names:fedora:2.1:resource:object:pid" value="http://www.w3.org/2001/XMLSchema#string"/>
     <entry key="urn:fedora:names:fedora:2.1:resource:datastream:id" value="http://www.w3.org/2001/XMLSchema#string"/>
+    <entry key="urn:fedora:names:fedora:2.1:resource:datastream:fileUri" value="http://www.w3.org/2001/XMLSchema#string"/>
   </util:map>
   <util:map id="org.fcrepo.server.security.xacml.pdp.data.actionAttributes">
     <!--
