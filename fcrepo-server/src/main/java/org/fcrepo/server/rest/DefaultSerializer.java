@@ -548,9 +548,17 @@ public class DefaultSerializer {
     String searchResultToXml(
             FieldSearchResult result) {
         StringBuffer xmlBuf = new StringBuffer();
+        String baseUrl = enc(fedoraServerProtocol)
+                + "://" + enc(fedoraServerHost) + ":"
+                + enc(fedoraServerPort) + "/" + fedoraAppServerContext;
 
         xmlBuf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        xmlBuf.append("<result xmlns=\"http://www.fedora.info/definitions/1/0/types/\">\n");
+        xmlBuf.append("<result xmlns=\"http://www.fedora.info/definitions/1/0/types/\" ")
+        .append("xmlns:types=\"http://www.fedora.info/definitions/1/0/types/\" ")
+        .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ")
+        .append("xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/types/ ")
+        .append(baseUrl).append("/schema/findObjects.xsd\"");
+        xmlBuf.append(">\n");
         if ((result != null) && (result.getToken() != null)) {
             xmlBuf.append("  <listSession>\n");
             xmlBuf.append("    <token>" + result.getToken() + "</token>\n");
