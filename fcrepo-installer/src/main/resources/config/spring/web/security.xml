@@ -11,66 +11,59 @@
                          http://www.springframework.org/schema/security
                          http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
-  <context:annotation-config />
+  <context:annotation-config/>
 
   <bean id="springSecurityFilterChain" class="org.springframework.security.web.FilterChainProxy">
     <security:filter-chain-map path-type="ant">
 
 
       <!-- Backend - getDSAuthenticated gets auth filters, getDS does not -->
-      <security:filter-chain pattern="/getDSAuth*"
-        filters="ChannelFilter,${security.auth.filters}" />
-      <security:filter-chain pattern="/getDS*"
-        filters="ChannelFilter" />
+      <security:filter-chain pattern="/getDSAuth*" filters="ChannelFilter,${security.auth.filters}"/>
+      <security:filter-chain pattern="/getDS*" filters="ChannelFilter"/>
 
       <!-- RISearch service gets auth protection -->
       <security:filter-chain pattern="/risearch*"
-        filters="ChannelFilter,${security.auth.filters.apia}" />
+        filters="ChannelFilter,${security.auth.filters.apia}"/>
 
       <!-- REST API -->
       <security:filter-chain pattern="/objects*/**"
-        filters="ChannelFilter,${security.auth.filters.rest}" />
+        filters="ChannelFilter,${security.auth.filters.rest}"/>
 
       <!-- User servlet -->
-      <security:filter-chain pattern="/user*"
-        filters="ChannelFilter,${security.auth.filters}" />
+      <security:filter-chain pattern="/user*" filters="ChannelFilter,${security.auth.filters}"/>
 
       <!-- BUG There is a bug in classic authN for disseminators, auth needs 
         to be off to emulate its behaviour -->
-      <security:filter-chain pattern="/get/*/*/**"
-        filters="ChannelFilter" />
+      <security:filter-chain pattern="/get/*/*/**" filters="ChannelFilter"/>
       <!-- /BUG -->
 
       <!-- Lite APIs -->
       <security:filter-chain pattern="/get*/**"
-        filters="ChannelFilter,${security.auth.filters.apia}" />
+        filters="ChannelFilter,${security.auth.filters.apia}"/>
       <security:filter-chain pattern="/search*"
-        filters="ChannelFilter,${security.auth.filters.apia}" />
+        filters="ChannelFilter,${security.auth.filters.apia}"/>
       <security:filter-chain pattern="/describe*"
-        filters="ChannelFilter,${security.auth.filters.apia}" />
+        filters="ChannelFilter,${security.auth.filters.apia}"/>
       <security:filter-chain pattern="/list*/**"
-        filters="ChannelFilter,${security.auth.filters.apia}" />
+        filters="ChannelFilter,${security.auth.filters.apia}"/>
 
       <security:filter-chain pattern="/management/*/**"
-        filters="ChannelFilter,${security.auth.filters}" />
-      <security:filter-chain pattern="/access"
-        filters="ChannelFilter,${security.auth.filters.apia}" />
-      <security:filter-chain pattern="/upload*"
-        filters="ChannelFilter,${security.auth.filters}" />
+        filters="ChannelFilter,${security.auth.filters}"/>
+      <security:filter-chain pattern="/access" filters="ChannelFilter,${security.auth.filters.apia}"/>
+      <security:filter-chain pattern="/upload*" filters="ChannelFilter,${security.auth.filters}"/>
 
       <!-- SOAP APIs -->
       <security:filter-chain pattern="/services/access"
-        filters="ChannelFilter,${security.auth.filters.apia}" />
+        filters="ChannelFilter,${security.auth.filters.apia}"/>
       <security:filter-chain pattern="/services/accessMTOM"
-        filters="ChannelFilter,${security.auth.filters.apia}" />
+        filters="ChannelFilter,${security.auth.filters.apia}"/>
       <security:filter-chain pattern="/services/management"
-        filters="ChannelFilter,${security.auth.filters}" />
+        filters="ChannelFilter,${security.auth.filters}"/>
       <security:filter-chain pattern="/services/managementMTOM"
-        filters="ChannelFilter,${security.auth.filters}" />
+        filters="ChannelFilter,${security.auth.filters}"/>
 
 
-      <security:filter-chain pattern="/**"
-        filters="ChannelFilter" />
+      <security:filter-chain pattern="/**" filters="ChannelFilter"/>
 
       <!-- Uncomment to enable Classic AuthN <security:filter-chain pattern="/**" 
         filters="ChannelFilter,SetupFilter,XmlUserfileFilter,EnforceAuthnFilter.FinalizeFilter" 
@@ -80,47 +73,34 @@
 
   <bean id="ChannelFilter"
     class="org.springframework.security.web.access.channel.ChannelProcessingFilter">
-    <property name="channelDecisionManager" ref="channelDecisionManager" />
+    <property name="channelDecisionManager" ref="channelDecisionManager"/>
     <property name="securityMetadataSource">
-      <security:filter-invocation-definition-source
-        path-type="ant">
+      <security:filter-invocation-definition-source path-type="ant">
 
         <!-- This pattern is used by FedoraClient to determine whether apim endpoint requires SSL or not -->
-        <security:intercept-url pattern="/management/upload"
-          access="${security.ssl.api.management}" />
+        <security:intercept-url pattern="/management/upload" access="${security.ssl.api.management}"/>
         <security:intercept-url pattern="/services/management"
-          access="${security.ssl.api.management}" />
+          access="${security.ssl.api.management}"/>
         <security:intercept-url pattern="/services/managementMTOM"
-          access="${security.ssl.api.management}" />
+          access="${security.ssl.api.management}"/>
         <security:intercept-url pattern="/management/getNextPID"
-          access="${security.ssl.api.management}" />
+          access="${security.ssl.api.management}"/>
         <security:intercept-url pattern="/getDSAuthenticated*/**"
-          access="${security.ssl.api.management}" />
-        <security:intercept-url pattern="/**.jws"
-          access="${security.ssl.api.management}" />
+          access="${security.ssl.api.management}"/>
+        <security:intercept-url pattern="/**.jws" access="${security.ssl.api.management}"/>
 
 
-        <security:intercept-url pattern="/get*/**"
-          access="${security.ssl.api.access}" />
-        <security:intercept-url pattern="/describe*/**"
-          access="${security.ssl.api.access}" />
-        <security:intercept-url pattern="/list*/**"
-          access="${security.ssl.api.access}" />
-        <security:intercept-url pattern="/oai*"
-          access="${security.ssl.api.access}" />
-        <security:intercept-url pattern="/risearch*"
-          access="${security.ssl.api.access}" />
-        <security:intercept-url pattern="/search*"
-          access="${security.ssl.api.access}" />
-        <security:intercept-url pattern="/services/access"
-          access="${security.ssl.api.access}" />
-        <security:intercept-url pattern="/services/accessMTOM"
-          access="${security.ssl.api.access}" />
+        <security:intercept-url pattern="/get*/**" access="${security.ssl.api.access}"/>
+        <security:intercept-url pattern="/describe*/**" access="${security.ssl.api.access}"/>
+        <security:intercept-url pattern="/list*/**" access="${security.ssl.api.access}"/>
+        <security:intercept-url pattern="/oai*" access="${security.ssl.api.access}"/>
+        <security:intercept-url pattern="/risearch*" access="${security.ssl.api.access}"/>
+        <security:intercept-url pattern="/search*" access="${security.ssl.api.access}"/>
+        <security:intercept-url pattern="/services/access" access="${security.ssl.api.access}"/>
+        <security:intercept-url pattern="/services/accessMTOM" access="${security.ssl.api.access}"/>
         <!-- This pattern is used by FedoraClient to determine whether apia endpoint requires SSL or not -->
-        <security:intercept-url pattern="/wsdl*"
-          access="${security.ssl.api.access}" />
-        <security:intercept-url pattern="**.jsp"
-          access="${security.ssl.api.access}" />
+        <security:intercept-url pattern="/wsdl*" access="${security.ssl.api.access}"/>
+        <security:intercept-url pattern="**.jsp" access="${security.ssl.api.access}"/>
 
       </security:filter-invocation-definition-source>
     </property>
@@ -131,39 +111,37 @@
     lazy-init="true">
     <property name="channelProcessors">
       <list>
-        <ref bean="secureChannelProcessor" />
-        <ref bean="insecureChannelProcessor" />
+        <ref bean="secureChannelProcessor"/>
+        <ref bean="insecureChannelProcessor"/>
       </list>
     </property>
   </bean>
 
   <bean id="insecureChannelProcessor"
     class="org.springframework.security.web.access.channel.InsecureChannelProcessor"
-    lazy-init="true" />
+    lazy-init="true"/>
 
   <bean id="secureChannelProcessor"
-    class="org.springframework.security.web.access.channel.SecureChannelProcessor"
-    lazy-init="true">
-    <property name="entryPoint" ref="HTTPS" />
+    class="org.springframework.security.web.access.channel.SecureChannelProcessor" lazy-init="true">
+    <property name="entryPoint" ref="HTTPS"/>
   </bean>
 
-  <bean id="HTTPS"
-    class="org.springframework.security.web.access.channel.RetryWithHttpsEntryPoint"
+  <bean id="HTTPS" class="org.springframework.security.web.access.channel.RetryWithHttpsEntryPoint"
     lazy-init="true">
-    <property name="portMapper" ref="portMapper" />
-    <property name="portResolver" ref="portResolver" />
+    <property name="portMapper" ref="portMapper"/>
+    <property name="portResolver" ref="portResolver"/>
   </bean>
 
   <bean id="portMapper" class="org.springframework.security.web.PortMapperImpl">
     <property name="portMappings">
       <map>
-        <entry key="${fedora.port}" value="${fedora.port.secure}" />
+        <entry key="${fedora.port}" value="${fedora.port.secure}"/>
       </map>
     </property>
   </bean>
 
   <bean id="portResolver" class="org.springframework.security.web.PortResolverImpl">
-    <property name="portMapper" ref="portMapper" />
+    <property name="portMapper" ref="portMapper"/>
   </bean>
 
   <!-- FeSL JAAS Authn bean -->
@@ -171,12 +149,19 @@
     init-method="init" lazy-init="true">
     <!-- OPTIONAL. A comma separated list of class names for user principals. 
       First one that is found is effective only. -->
-    <property name="userClassNames"
-      value="org.fcrepo.server.security.jaas.auth.UserPrincipal" />
+    <property name="userClassNames" value="org.fcrepo.server.security.jaas.auth.UserPrincipal"/>
 
     <!-- True iff API-A requests via the REST API require authentication. 
       If not specified, defaults to true. -->
-    <property name="authnAPIA" value="${security.fesl.authN.jaas.apia.enabled}" />
+    <property name="authnAPIA" value="${security.fesl.authN.jaas.apia.enabled}"/>
+  </bean>
+
+  <!-- Upstream authn bean -->
+
+  <bean id="UpstreamAuthFilter" class="org.fcrepo.security.http.AuthZHttpRequestAttributesFilter"
+    lazy-init="true" init-method="init">
+    <property name="names" value="eduPersonPrincipalName eduPersonAffiliation"/>
+    <property name="principalHeader" value="eduPersonPrincipalName"></property>
   </bean>
 
   <!-- Classic authn beans -->
@@ -184,47 +169,44 @@
     lazy-init="true" init-method="init">
     <property name="config">
       <bean class="org.fcrepo.common.http.FilterConfigBean">
-        <property name="filterName" value="SetupFilter" />
+        <property name="filterName" value="SetupFilter"/>
       </bean>
     </property>
   </bean>
 
   <bean id="XmlUserfileFilter"
-    class="org.fcrepo.server.security.servletfilters.xmluserfile.FilterXmlUserfile"
-    lazy-init="true" init-method="init">
+    class="org.fcrepo.server.security.servletfilters.xmluserfile.FilterXmlUserfile" lazy-init="true"
+    init-method="init">
     <property name="config">
       <bean class="org.fcrepo.common.http.FilterConfigBean">
-        <property name="filterName" value="XmlUserfileFilter" />
+        <property name="filterName" value="XmlUserfileFilter"/>
       </bean>
     </property>
   </bean>
 
-  <bean id="EnforceAuthnFilter"
-    class="org.fcrepo.server.security.servletfilters.FilterEnforceAuthn"
+  <bean id="EnforceAuthnFilter" class="org.fcrepo.server.security.servletfilters.FilterEnforceAuthn"
     lazy-init="true" init-method="init">
     <property name="config">
       <bean class="org.fcrepo.common.http.FilterConfigBean">
-        <property name="filterName" value="EnforceAuthnFilter" />
+        <property name="filterName" value="EnforceAuthnFilter"/>
       </bean>
     </property>
   </bean>
 
-  <bean id="FinalizeFilter"
-    class="org.fcrepo.server.security.servletfilters.FilterFinalize"
+  <bean id="FinalizeFilter" class="org.fcrepo.server.security.servletfilters.FilterFinalize"
     lazy-init="true" init-method="init">
     <property name="config">
       <bean class="org.fcrepo.common.http.FilterConfigBean">
-        <property name="filterName" value="FinalizeFilte" />
+        <property name="filterName" value="FinalizeFilte"/>
       </bean>
     </property>
   </bean>
 
-  <bean id="RestApiAuthnFilter"
-    class="org.fcrepo.server.security.servletfilters.FilterRestApiAuthn"
+  <bean id="RestApiAuthnFilter" class="org.fcrepo.server.security.servletfilters.FilterRestApiAuthn"
     lazy-init="true" init-method="init">
     <property name="config">
       <bean class="org.fcrepo.common.http.FilterConfigBean">
-        <property name="filterName" value="FilterRestApiAuthn" />
+        <property name="filterName" value="FilterRestApiAuthn"/>
       </bean>
     </property>
   </bean>
