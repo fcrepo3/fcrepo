@@ -108,7 +108,7 @@
     <dependency>
     	<groupId>com.yourmediashelf.fedora.client</groupId>
     	<artifactId>fedora-client-core</artifactId>
-    	<version>0.3</version>
+    	<version>0.4</version>
     </dependency>
   </dependencies>
 </project>
