@@ -85,4 +85,9 @@
     <constructor-arg value="##" />
   </bean>
 
+  <bean name="fedoraStorageHintProvider"
+    class="org.fcrepo.server.storage.NullStorageHintProvider"
+    singleton="true">
+  </bean>
+
 </beans>

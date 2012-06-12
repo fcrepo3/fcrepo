@@ -23,6 +23,7 @@ public interface ILowlevelStorage {
      *
      * @param objectKey the pid of the object.
      * @param content the serialized object.
+     * @param objectStorageHints a map of hints for object storage
      * @throws LowlevelStorageException if the object already exists or
      *         cannot be added for any other reason.
      */
@@ -34,6 +35,7 @@ public interface ILowlevelStorage {
      *
      * @param objectKey the pid of the object.
      * @param content the serialized object.
+     * @param objectStorageHints a map of hints for object storage
      * @throws LowlevelStorageException if the object does not already exist
      *         or cannot be replaced for any other reason.
      */
@@ -50,6 +52,18 @@ public interface ILowlevelStorage {
      */
     public InputStream retrieveObject(String objectKey)
             throws LowlevelStorageException;
+
+    /**
+     * Gets an existing object.
+     *
+     * @param objectKey the pid of the object.
+     * @param objectStorageHints a map of hints for object storage
+     * @return the serialized form of the object, as stored.
+     * @throws LowlevelStorageException if the object does not exist or
+     *         cannot be read for any other reason.
+     */
+//    public InputStream retrieveObject(String objectKey,  Map<String, String> objectHints)
+//            throws LowlevelStorageException;
 
     /**
      * Removes an object.

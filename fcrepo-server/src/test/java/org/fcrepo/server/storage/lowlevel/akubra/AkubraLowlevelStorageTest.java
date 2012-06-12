@@ -13,11 +13,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.omg.CORBA.OBJECT_NOT_EXIST;
 
 import org.akubraproject.mem.MemBlobStore;
 
@@ -26,6 +28,8 @@ import org.fcrepo.common.FaultException;
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.ObjectAlreadyInLowlevelStorageException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
+import org.fcrepo.server.storage.FedoraStorageHintProvider;
+import org.fcrepo.server.storage.MockFedoraHintsProvider;
 
 import static org.junit.Assert.assertEquals;
 
@@ -272,6 +276,31 @@ public class AkubraLowlevelStorageTest {
                      instance.getDatastreamSize(DS_KEY));
 
 
+    }
+    
+    @Test
+    public void testAddDatastreamWithHints() throws Exception {        
+        FedoraStorageHintProvider provider = new MockFedoraHintsProvider();
+        Map<String, String> hints = provider.getHintsForAboutToBeStoredDatastream(null, null);
+        instance.addDatastream(DS_KEY, toStream(DS_CONTENT), hints);
+    }
+    @Test
+    public void testReplaceDatastreamWithHints() throws Exception {        
+        FedoraStorageHintProvider provider = new MockFedoraHintsProvider();
+        Map<String, String> hints = provider.getHintsForAboutToBeStoredDatastream(null, null);
+        instance.replaceDatastream(DS_KEY, toStream(DS_CONTENT), hints);
+    }
+    @Test
+    public void testAddObjectWithHints() throws Exception {        
+        FedoraStorageHintProvider provider = new MockFedoraHintsProvider();
+        Map<String, String> hints = provider.getHintsForAboutToBeStoredObject(null);
+        instance.addObject(OBJ_KEY, toStream(OBJ_CONTENT), hints);
+    }
+    @Test
+    public void testReplaceObjectWithHints() throws Exception {        
+        FedoraStorageHintProvider provider = new MockFedoraHintsProvider();
+        Map<String, String> hints = provider.getHintsForAboutToBeStoredObject(null);
+        instance.replaceObject(OBJ_KEY, toStream(OBJ_CONTENT), hints);
     }
 
 

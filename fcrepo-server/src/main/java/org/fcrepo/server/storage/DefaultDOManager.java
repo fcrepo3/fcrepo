@@ -384,13 +384,11 @@ public class DefaultDOManager extends Module implements DOManager {
 					"LowlevelStorage not loaded", getRole());
         }
         // get ref to FedoraStorageHintProvider
-        m_hintProvider = null;
-        String hintProviderClass = this.getParameter("fedoraStorageHintProvider");
         try {
-            m_hintProvider = (FedoraStorageHintProvider) Class.forName(hintProviderClass).newInstance();
+            m_hintProvider = (FedoraStorageHintProvider) getServer().getBean("fedoraStorageHintProvider");
         }
         catch (Throwable t) {
-            logger.warn("Could not load the specified hint provider class ("+hintProviderClass+"), using default nullprovider");
+            logger.warn("Could not load the specified hint provider class (as specified in spring bean definition), using default nullprovider");
             m_hintProvider = new NullStorageHintsProvider();
         }
 

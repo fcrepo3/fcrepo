@@ -113,6 +113,7 @@ public class AkubraLowlevelStorage
             throws LowlevelStorageException {
         add(objectStore, objectKey, content, hints);
     }
+
     public void addObject(String pid, InputStream content) throws LowlevelStorageException {
         this.addObject(pid, content, null);
     }
