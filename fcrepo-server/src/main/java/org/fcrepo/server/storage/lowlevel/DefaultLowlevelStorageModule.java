@@ -118,14 +118,14 @@ public class DefaultLowlevelStorageModule
         return parameterValue;
     }
 
-    public void addObject(String pid, InputStream content)
+    public void addObject(String pid, InputStream content, Map<String, String> hints)
             throws LowlevelStorageException {
-        m_llstore.addObject(pid, content);
+        m_llstore.addObject(pid, content, hints);
     }
 
-    public void replaceObject(String pid, InputStream content)
+    public void replaceObject(String pid, InputStream content, Map<String, String> hints)
             throws LowlevelStorageException {
-        m_llstore.replaceObject(pid, content);
+        m_llstore.replaceObject(pid, content, hints);
     }
 
     public InputStream retrieveObject(String pid)
@@ -145,14 +145,14 @@ public class DefaultLowlevelStorageModule
         m_llstore.auditObject();
     }
 
-    public long addDatastream(String pid, InputStream content)
+    public long addDatastream(String pid, InputStream content, Map<String, String> hints)
             throws LowlevelStorageException {
-        return m_llstore.addDatastream(pid, content);
+        return m_llstore.addDatastream(pid, content, hints);
     }
 
-    public long replaceDatastream(String pid, InputStream content)
+    public long replaceDatastream(String pid, InputStream content, Map<String, String> hints)
             throws LowlevelStorageException {
-        return m_llstore.replaceDatastream(pid, content);
+        return m_llstore.replaceDatastream(pid, content, hints);
     }
 
     public InputStream retrieveDatastream(String pid)

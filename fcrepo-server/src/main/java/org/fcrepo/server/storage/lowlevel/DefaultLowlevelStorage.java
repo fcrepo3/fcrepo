@@ -69,12 +69,14 @@ public class DefaultLowlevelStorage
         datastreamStore = new Store(dsConfig);
     }
 
-    public void addObject(String pid, InputStream content)
+    @Override
+    public void addObject(String pid, InputStream content, Map<String, String> hints)
             throws LowlevelStorageException {
         objectStore.add(pid, content);
     }
 
-    public void replaceObject(String pid, InputStream content)
+    @Override
+    public void replaceObject(String pid, InputStream content, Map<String, String> hints)
             throws LowlevelStorageException {
         objectStore.replace(pid, content);
     }
@@ -96,12 +98,14 @@ public class DefaultLowlevelStorage
         objectStore.audit();
     }
 
-    public long addDatastream(String pid, InputStream content)
+    @Override
+    public long addDatastream(String pid, InputStream content, Map<String, String> hints)
             throws LowlevelStorageException {
         return datastreamStore.add(pid, content);
     }
 
-    public long replaceDatastream(String pid, InputStream content)
+    @Override
+    public long replaceDatastream(String pid, InputStream content, Map<String, String>hints)
             throws LowlevelStorageException {
         return datastreamStore.replace(pid, content);
     }

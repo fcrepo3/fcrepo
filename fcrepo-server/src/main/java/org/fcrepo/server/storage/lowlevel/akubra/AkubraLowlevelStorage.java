@@ -100,16 +100,21 @@ public class AkubraLowlevelStorage
     // ILowlevelStorage methods
     //
 
-    @Override
-    public long addDatastream(String dsKey, InputStream content)
+    public long addDatastream(String dsKey, InputStream content, Map<String, String> hints)
             throws LowlevelStorageException {
         return add(datastreamStore, dsKey, content);
     }
 
-    @Override
-    public void addObject(String objectKey, InputStream content)
+    public long addDatastream(String pid, InputStream content) throws LowlevelStorageException {
+        return this.addDatastream(pid, content, null);
+    }
+
+    public void addObject(String objectKey, InputStream content, Map<String, String> hints)
             throws LowlevelStorageException {
         add(objectStore, objectKey, content);
+    }
+    public void addObject(String pid, InputStream content) throws LowlevelStorageException {
+        this.addObject(pid, content, null);
     }
 
     @Override
@@ -144,16 +149,21 @@ public class AkubraLowlevelStorage
         remove(objectStore, objectKey);
     }
 
-    @Override
-    public long replaceDatastream(String dsKey, InputStream content)
+    public long replaceDatastream(String dsKey, InputStream content, Map<String, String> hints)
             throws LowlevelStorageException {
         return replace(datastreamStore, dsKey, content, forceSafeDatastreamOverwrites);
     }
+    
+    public long replaceDatastream(String pid, InputStream content) throws LowlevelStorageException {
+        return this.replaceDatastream(pid, content, null);
+    }
 
-    @Override
-    public void replaceObject(String objectKey, InputStream content)
+    public void replaceObject(String objectKey, InputStream content, Map<String, String> hints)
             throws LowlevelStorageException {
         replace(objectStore, objectKey, content, forceSafeObjectOverwrites);
+    }
+    public void replaceObject(String pid, InputStream content) throws LowlevelStorageException {
+        this.replaceObject(pid, content, null);
     }
 
     @Override
