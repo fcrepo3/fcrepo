@@ -86,7 +86,7 @@
   </bean>
 
   <bean name="fedoraStorageHintProvider"
-    class="org.fcrepo.server.storage.NullStorageHintProvider"
+    class="org.fcrepo.server.storage.NullStorageHintsProvider"
     singleton="true">
   </bean>
 
