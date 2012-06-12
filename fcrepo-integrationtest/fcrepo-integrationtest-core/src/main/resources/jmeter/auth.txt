@@ -1,0 +1,2 @@
+# JMeter generated Authorization file
+http://localhost	fedoraAdmin			
