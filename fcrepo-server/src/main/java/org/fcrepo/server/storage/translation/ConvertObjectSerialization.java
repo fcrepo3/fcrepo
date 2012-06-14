@@ -22,6 +22,7 @@ import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.utilities.LogConfig;
+import org.trippi.io.TripleIteratorFactory;
 import org.w3c.dom.Document;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
@@ -233,6 +234,8 @@ public class ConvertObjectSerialization {
                                                inExt,
                                                outExt);
         converter.convert(sourceDir, destDir);
+
+        TripleIteratorFactory.defaultInstance().shutdown();
     }
 
     private static <T> T getInstance(Class<T> className) {
