@@ -376,7 +376,7 @@
         <include>org.fcrepo:openrdf-sesame-onejar:*</include>
         <include>org.fcrepo:saxon:jar:*</include>
         <include>org.fcrepo:sunxacml:jar:*</include>
-        <include>org.fcrepo:trippi-core:jar:*</include>
+        <include>org.trippi:trippi-core:jar:*</include>
         <include>org.slf4j:slf4j-api:jar:*</include>
         <include>org.slf4j:jcl-over-slf4j:jar:*</include>
         <include>org.slf4j:log4j-over-slf4j:jar:*</include>

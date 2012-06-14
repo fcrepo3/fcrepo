@@ -196,7 +196,7 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.6</version>
+      <version>5.1.20</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -282,7 +282,6 @@
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>openrdf-sesame-onejar</artifactId>
-      <version>2.2.1</version>
     </dependency>
 
     <dependency>
@@ -293,7 +292,7 @@
     <dependency>
       <groupId>postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>8.3-603.jdbc3</version>
+      <version>9.1-901-1.jdbc4</version>
       <scope>runtime</scope>
     </dependency>
 

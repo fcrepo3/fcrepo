@@ -250,9 +250,9 @@ public class TestRESTAPI
         url = "/objects/application.wadl";
 
         if (getAuthAccess()) {
-            assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+            assertEquals(SC_UNAUTHORIZED, get(false, false).getStatusCode());
         }
-        assertEquals(SC_OK, get(getAuthAccess()).getStatusCode());
+        assertEquals(SC_OK, get(getAuthAccess(), false).getStatusCode());
     }
 
     //public void testDescribeRepository() throws Exception {}

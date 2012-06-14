@@ -49,7 +49,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.5</version>
         <executions>
           <execution>
             <id>add-wsdl-source</id>
@@ -113,7 +112,7 @@
     <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-swing</artifactId>
-      <version>1.6-1</version>
+      <version>1.7</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -122,7 +121,6 @@
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>1.3</version>
     </dependency>
     <dependency>
       <groupId>commons-discovery</groupId>
@@ -155,7 +153,7 @@
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
-      <version>1.4.1</version>
+      <version>1.4.5</version>
     </dependency>
     <dependency>
       <groupId>javax.xml</groupId>
@@ -165,18 +163,11 @@
     <dependency>
       <groupId>javax.xml.soap</groupId>
       <artifactId>saaj-api</artifactId>
-      <version>1.3</version>
+      <version>1.3.4</version>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-bundle</artifactId>
-      <version>${cxf.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.fcrepo</groupId>
@@ -195,7 +186,6 @@
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>openrdf-sesame-onejar</artifactId>
-      <version>2.2.1</version>
     </dependency>
     <dependency>
       <groupId>org.fcrepo</groupId>
@@ -203,10 +193,8 @@
       <classifier>melcoe</classifier>
     </dependency>
     <dependency>
-      <groupId>org.fcrepo</groupId>
+      <groupId>org.trippi</groupId>
       <artifactId>trippi-core</artifactId>
-      <version>1.5.4</version>
-      <type>pom</type>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

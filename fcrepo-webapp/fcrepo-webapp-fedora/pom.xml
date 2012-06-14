@@ -1,209 +1,210 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.fcrepo</groupId>
-		<artifactId>fcrepo-webapp</artifactId>
-		<version>3.6-SNAPSHOT</version>
-	</parent>
+  <parent>
+    <groupId>org.fcrepo</groupId>
+    <artifactId>fcrepo-webapp</artifactId>
+    <version>3.6-SNAPSHOT</version>
+  </parent>
 
-	<artifactId>fcrepo-webapp-fedora</artifactId>
-	<packaging>war</packaging>
-	<name>Fedora Webapp</name>
+  <artifactId>fcrepo-webapp-fedora</artifactId>
+  <packaging>war</packaging>
+  <name>Fedora Webapp</name>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<webResources>
-						<resource>
-							<directory>${basedir}/src/main/resources</directory>
-						</resource>
-						<resource>
-							<!-- this is terrible. brittle. FIXME -->
-							<directory>${project.basedir}/../../fcrepo-security/fcrepo-security-pep/src/main/resources</directory>
-							<targetPath>WEB-INF/classes</targetPath>
-							<includes>
-								<include>config-melcoe-pep.xml</include>
-								<include>config-melcoe-pep-mapping.xml</include>
-							</includes>
-						</resource>
-					</webResources>
-					<archive>
-						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-						<manifest>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-						</manifest>
-						<manifestEntries>
-							<Version>${project.version}</Version>
-							<Build>${timestamp}</Build>
-						</manifestEntries>
-					</archive>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <webResources>
+            <resource>
+              <directory>${basedir}/src/main/resources</directory>
+            </resource>
+            <resource>
+              <!-- this is terrible. brittle. FIXME -->
+              <directory>${project.basedir}/../../fcrepo-security/fcrepo-security-pep/src/main/resources</directory>
+              <targetPath>WEB-INF/classes</targetPath>
+              <includes>
+                <include>config-melcoe-pep.xml</include>
+                <include>config-melcoe-pep-mapping.xml</include>
+              </includes>
+            </resource>
+          </webResources>
+          <archive>
+            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+            <manifest>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+            </manifest>
+            <manifestEntries>
+              <Version>${project.version}</Version>
+              <Build>${timestamp}</Build>
+            </manifestEntries>
+          </archive>
 
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.0.1</version>
-				<executions>
-					<execution>
-						<id>bundle-manifest</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>manifest</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<supportedProjectTypes>
-						<supportedProjectType>jar</supportedProjectType>
-						<supportedProjectType>bundle</supportedProjectType>
-						<supportedProjectType>war</supportedProjectType>
-					</supportedProjectTypes>
-					<instructions>
-						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-						<Bundle-Version>${project.version}</Bundle-Version>
-						<!-- | assume public classes are in the top package, and private classes 
-							are under ".internal" -->
-						<Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
-						<Embed-Directory>WEB-INF/lib</Embed-Directory>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>
-							javax.servlet,
-							javax.servlet.http,
-							javax.servlet.resources,
-							javax.servlet.jsp,
-							javax.servlet.jsp.jstl.core,
-							javax.servlet.jsp.jstl.fmt,
-							javax.servlet.jsp.jstl.tlv,
-							org.apache.taglibs.standard.resources,
-							org.apache.taglibs.standard.tag.common.core,
-							org.apache.taglibs.standard.tag.rt.core,
-							org.apache.taglibs.standard.tei,
-							org.apache.taglibs.standard.tlv,
-							javax.management;resolution:=optional,
-							javax.xml.parsers;resolution:=optional,
-							javax.xml.transform;resolution:=optional,
-							javax.xml.transform.dom;resolution:=optional,
-							javax.xml.transform.stream;resolution:=optional,
-							org.w3c.dom;resolution:=optional,
-							org.xml.sax;resolution:=optional,
-							org.xml.sax.helpers;resolution:=optional
-						</Import-Package>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.0.1</version>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <supportedProjectTypes>
+            <supportedProjectType>jar</supportedProjectType>
+            <supportedProjectType>bundle</supportedProjectType>
+            <supportedProjectType>war</supportedProjectType>
+          </supportedProjectTypes>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Bundle-Version>${project.version}</Bundle-Version>
+            <!-- | assume public classes are in the top package, and private 
+              classes are under ".internal" -->
+            <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
+            <Embed-Directory>WEB-INF/lib</Embed-Directory>
+            <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+            <Import-Package>
+              javax.servlet,
+              javax.servlet.http,
+              javax.servlet.resources,
+              javax.servlet.jsp,
+              javax.servlet.jsp.jstl.core,
+              javax.servlet.jsp.jstl.fmt,
+              javax.servlet.jsp.jstl.tlv,
+              org.apache.taglibs.standard.resources,
+              org.apache.taglibs.standard.tag.common.core,
+              org.apache.taglibs.standard.tag.rt.core,
+              org.apache.taglibs.standard.tei,
+              org.apache.taglibs.standard.tlv,
+              javax.management;resolution:=optional,
+              javax.xml.parsers;resolution:=optional,
+              javax.xml.transform;resolution:=optional,
+              javax.xml.transform.dom;resolution:=optional,
+              javax.xml.transform.stream;resolution:=optional,
+              org.w3c.dom;resolution:=optional,
+              org.xml.sax;resolution:=optional,
+              org.xml.sax.helpers;resolution:=optional
+            </Import-Package>
 
-						<!-- | each module can override these defaults in their osgi.bnd file -->
-						<_include>-osgi.bnd</_include>
-					</instructions>
-				</configuration>
-			</plugin>
+            <!-- | each module can override these defaults in their osgi.bnd 
+              file -->
+            <_include>-osgi.bnd</_include>
+          </instructions>
+        </configuration>
+      </plugin>
 
-		</plugins>
-	</build>
+    </plugins>
+  </build>
 
 
-	<dependencies>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-		</dependency>
+  <dependencies>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-server</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-server</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-web</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-config</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-security-jaas</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-security-jaas</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-security-pdp</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-security-pdp</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-security-pep</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-security-pep</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-security-http</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-security-http</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.15</version>
-		</dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.20</version>
+    </dependency>
 
-		<dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.0-801.jdbc4</version>
-		</dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>9.1-901-1.jdbc4</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<scope>compile</scope>
-		</dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>compile</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<scope>compile</scope>
-		</dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>compile</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-frontend-jaxws</artifactId>
-			<version>${cxf.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-transports-http</artifactId>
-			<version>${cxf.version}</version>
-		</dependency>
-		<!-- Jetty is needed if you're using the CXFServlet -->
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-transports-http-jetty</artifactId>
-			<version>${cxf.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxws</artifactId>
+      <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-http</artifactId>
+      <version>${cxf.version}</version>
+    </dependency>
+    <!-- Jetty is needed if you're using the CXFServlet -->
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-http-jetty</artifactId>
+      <version>${cxf.version}</version>
+    </dependency>
 
-	</dependencies>
+  </dependencies>
 
 </project>
