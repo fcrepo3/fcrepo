@@ -112,7 +112,7 @@ public class RebuildServer
 
     @Override
     protected String overrideModuleClass(String moduleClass) {
-        if (moduleClass.endsWith("DOManager")) {
+        if (moduleClass != null && moduleClass.endsWith("DOManager")) {
             return "org.fcrepo.server.utilities.rebuild.RebuildDOManager";
         }
         return null;
@@ -140,6 +140,7 @@ public class RebuildServer
             try {
                 Server inst = new RebuildServer(homeDir);
                 s_instances.put(homeDir, inst);
+                inst.init();
                 return inst;
             } catch (IllegalArgumentException iae) {
                 // improbable
