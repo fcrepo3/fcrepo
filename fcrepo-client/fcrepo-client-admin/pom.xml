@@ -85,11 +85,6 @@
       <artifactId>fcrepo-server</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-all</artifactId>
-    </dependency>
     <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-swing</artifactId>

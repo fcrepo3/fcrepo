@@ -210,6 +210,38 @@
         <version>${activemq.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-core</artifactId>
+        <version>${activemq.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jsp-api-2.1</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jsp-2.1</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>servlet-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-pool</artifactId>
+        <version>${activemq.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.derby</groupId>
         <artifactId>derby</artifactId>
         <version>${derby.version}</version>
@@ -253,6 +285,10 @@
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <artifactId>wstx-asl</artifactId>
+            <groupId>woodstox</groupId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -474,6 +510,14 @@
         <artifactId>cxf-bundle</artifactId>
         <version>${cxf.version}</version>
         <exclusions>
+          <exclusion>
+            <artifactId>geronimo-servlet_2.5_spec</artifactId>
+            <groupId>org.apache.geronimo.specs</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>geronimo-servlet_3.0_spec</artifactId>
+            <groupId>org.apache.geronimo.specs</groupId>
+          </exclusion>
           <exclusion>
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
