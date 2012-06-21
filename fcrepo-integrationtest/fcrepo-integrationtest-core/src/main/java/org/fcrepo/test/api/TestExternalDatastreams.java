@@ -4,6 +4,7 @@
  */
 package org.fcrepo.test.api;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -189,13 +190,26 @@ public class TestExternalDatastreams
             apim.purgeObject(pid, "test", false);
             if (temp != null) temp.delete();
         }
+
+        pid = "demo:e_ds_test_add_portable";
+        apim.ingest(getFoxmlObject(pid, null), FOXML1_1.uri, null);
+        try {
+            String dsLocation = "http://local.fedora.server/fedora/objects/fedora-system:ContentModel-3.0/datastreams/DC/content";
+            org.fcrepo.server.types.gen.MIMETypedStream dc_content = apia.getDatastreamDissemination("fedora-system:ContentModel-3.0", "DC", null);
+            String checksum = computeChecksum(checksumType, new ByteArrayInputStream(dc_content.getStream()));
+            String dsId = addDatastream(pid, dsLocation, checksumType, checksum);
+            assertEquals("DS", dsId);
+        } finally {
+            apim.purgeObject(pid, "testAddDatastreamWithChecksumType", false);
+            if (temp != null) temp.delete();
+        }
     }
 
     @Test
     public void testAddDatastreamWithChecksumType() throws Exception {
         String pid = "demo:e_ds_test_add";
         String checksumType = "MD5";
-        apim.ingest(getFoxmlObject(pid, null), FOXML1_1.uri, null);
+        apim.ingest(getFoxmlObject(pid, null), FOXML1_1.uri, "testAddDatastreamWithChecksumType");
         File temp = null;
 
         try {
@@ -203,8 +217,21 @@ public class TestExternalDatastreams
             String dsLocation = temp.getCanonicalFile().toURI().toString();
             String dsId = addDatastream(pid, dsLocation, checksumType, null);
             assertEquals("DS", dsId);
+            String checksum = computeChecksum(checksumType, new FileInputStream(temp));
+            assertEquals(apim.getDatastream(pid, "DS", null).getChecksum(),checksum);
         } finally {
-            apim.purgeObject(pid, "test", false);
+            apim.purgeObject(pid, "testAddDatastreamWithChecksumType", false);
+            if (temp != null) temp.delete();
+        }
+        // Now test portable URLs
+        pid = "demo:e_ds_test_portable";
+        apim.ingest(getFoxmlObject(pid, null), FOXML1_1.uri, "testAddDatastreamWithChecksumType");
+        try {
+            String dsLocation = "http://local.fedora.server/fedora/objects/fedora-system:ContentModel-3.0/datastreams/DC/content";
+            String dsId = addDatastream(pid, dsLocation, checksumType, null);
+            assertEquals("DS", dsId);
+        } finally {
+            apim.purgeObject(pid, "testAddDatastreamWithChecksumType", false);
             if (temp != null) temp.delete();
         }
     }
