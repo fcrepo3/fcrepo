@@ -4,30 +4,7 @@
  */
 package org.fcrepo.server.rest;
 
-import java.io.File;
-import java.io.StringReader;
-import java.io.Writer;
-import java.net.URI;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
 import net.sf.saxon.FeatureKeys;
-
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.fcrepo.common.Constants;
@@ -47,6 +24,27 @@ import org.fcrepo.server.storage.types.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.File;
+import java.io.StringReader;
+import java.io.Writer;
+import java.net.URI;
+
 
 
 /**
@@ -56,6 +54,8 @@ import org.slf4j.LoggerFactory;
  * @version $Id$
  */
 public class BaseRestResource {
+    public static final String VALID_PID_PART = "/{pid : ([A-Za-z0-9]|-|\\.)+(:|%3A|%3a)(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseRestResource.class);
 
     static final String[] EMPTY_STRING_ARRAY = new String[0];

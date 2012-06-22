@@ -329,6 +329,7 @@
                 <include>**/TestAPIMLite.class</include>
                 <include>**/TestExternalDatastreams.class</include>
                 <include>**/TestRESTAPI.class</include>
+                <include>**/TestRESTAPIURLDecoding.class</include>
                 <include>**/TestHTTPStatusCodes.class</include>
                 <include>**/TestHTTPStatusCodesConfigA.class</include>
                 <include>**/TestManagedDatastreams.class</include>

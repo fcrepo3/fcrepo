@@ -5,13 +5,17 @@
 
 package org.fcrepo.server.rest;
 
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import org.fcrepo.common.http.WebClient;
+import org.fcrepo.common.http.WebClientConfiguration;
+import org.fcrepo.server.Context;
+import org.fcrepo.server.Server;
+import org.fcrepo.server.rest.RestUtil.RequestContent;
+import org.fcrepo.server.rest.param.DateTimeParam;
+import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.server.storage.types.DatastreamDef;
+import org.fcrepo.server.storage.types.MIMETypedStream;
+import org.fcrepo.utilities.DateUtility;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -26,18 +30,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-
-import org.fcrepo.common.http.WebClient;
-import org.fcrepo.common.http.WebClientConfiguration;
-import org.fcrepo.server.Context;
-import org.fcrepo.server.Server;
-import org.fcrepo.server.rest.RestUtil.RequestContent;
-import org.fcrepo.server.rest.param.DateTimeParam;
-import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.storage.types.DatastreamDef;
-import org.fcrepo.server.storage.types.MIMETypedStream;
-import org.fcrepo.utilities.DateUtility;
-import org.springframework.stereotype.Component;
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * A rest controller to handle CRUD operations for the Fedora datastream API
@@ -62,7 +61,7 @@ import org.springframework.stereotype.Component;
  * @author cuong.tran@yourmediashelf.com
  * @version $Id$
  */
-@Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/datastreams")
+@Path(BaseRestResource.VALID_PID_PART + "/datastreams")
 @Component
 public class DatastreamResource
         extends BaseRestResource {

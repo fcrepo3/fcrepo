@@ -62,8 +62,6 @@ public class FedoraObjectsResource extends BaseRestResource {
         "publisher", "contributor", "date", "type", "format", "identifier",
         "source", "language", "relation", "coverage", "rights" };
 
-    static final String VALID_PID_PART = "/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}";
-
     private static final Logger logger =
             LoggerFactory.getLogger(FedoraObjectsResource.class);
 
@@ -228,7 +226,7 @@ public class FedoraObjectsResource extends BaseRestResource {
      * <p/>
      * GET /objects/{pid}/export ? format context encoding
      */
-    @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/export")
+    @Path(VALID_PID_PART + "/export")
     @GET
     @Produces({XML, ZIP})
     public Response getObjectExport(

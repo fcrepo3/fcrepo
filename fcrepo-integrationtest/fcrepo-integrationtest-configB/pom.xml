@@ -331,6 +331,7 @@
                 <include>**/TestManagementNotifications.class</include>
                 <include>**/TestRelationships.class</include>
                 <include>**/TestRESTAPI.class</include>
+                <include>**/TestRESTAPIURLDecoding.class</include>
                 <include>**/TestRISearch.class</include>
                 <include>**/TestOAIService.class</include>
                 <include>**/TestCommandLineFormats.class</include>
