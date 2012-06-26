@@ -4,19 +4,19 @@
  */
 package org.fcrepo.utilities.install;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.LogConfig;
+import org.fcrepo.utilities.Zip;
 import org.fcrepo.utilities.install.container.Container;
 import org.fcrepo.utilities.install.container.ContainerFactory;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Installer {
@@ -100,20 +100,33 @@ public class Installer {
     private File buildWAR() throws InstallationFailedException {
         String fedoraWarName = _opts.getValue(InstallOptions.FEDORA_APP_SERVER_CONTEXT) ;
         System.out.println("Preparing " + fedoraWarName + ".war...");
-        // build a staging area in FEDORA_HOME
         try {
-
-            File fedoraWar = new File(installDir, fedoraWarName + ".war");
-            FileOutputStream out = new FileOutputStream(fedoraWar);
-
-            FileUtils.copy(_dist.get(Distribution.FEDORA_WAR), out);
-            return fedoraWar;
-
-        } catch (FileNotFoundException e) {
-            throw new InstallationFailedException(e.getMessage(), e);
+            File outputFile = new File(installDir, fedoraWarName + ".war");
+            String driver = _opts.getValue(InstallOptions.DATABASE_DRIVER);
+            if (driver.equals(InstallOptions.INCLUDED)) {
+                FileUtils.copy(_dist.get(Distribution.FEDORA_WAR),
+                        new FileOutputStream(outputFile));
+            } else {
+                addLibrary(_dist.get(Distribution.FEDORA_WAR),
+                        driver, outputFile);
+            }
+            return outputFile;
         } catch (IOException e) {
             throw new InstallationFailedException(e.getMessage(), e);
 		}
+    }
+    
+    private void addLibrary(InputStream inputStream, String libraryPath,
+            File outputFile) throws IOException {
+        // unzip, add file, re-zip, and remove staging dir
+        File stagingDir = new File(installDir, "fedorawar");
+        stagingDir.mkdirs();
+        Zip.unzip(inputStream, stagingDir);
+        File sourceFile = new File(libraryPath);
+        File destFile = new File(stagingDir, "WEB-INF/lib/" + sourceFile.getName());
+        FileUtils.copy(sourceFile, destFile);
+        Zip.zip(outputFile, stagingDir.listFiles());
+        FileUtils.delete(stagingDir);
     }
 
     private void deployLocalService(Container container, String filename)
