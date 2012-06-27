@@ -84,11 +84,7 @@ public abstract class JRDF {
      * @return true if equivalent, false otherwise.
      */
     public static boolean sameLiteral(Literal l1, Literal l2) {
-        String type = null;
-        URI l2Type = l2.getDatatypeURI();
-        if (l2Type != null) {
-            type = l2Type.toString();
-        }
+        URI type = l2.getDatatypeURI();
         return sameLiteral(l1, l2.getLexicalForm(), type, l2.getLanguage());
     }
 
@@ -108,14 +104,14 @@ public abstract class JRDF {
      */
     public static boolean sameLiteral(Literal l1,
                                       String l2,
-                                      String type,
+                                      URI type,
                                       String lang) {
         if (l1.getLexicalForm().equals(l2) && eq(l1.getLanguage(), lang)) {
             if (l1.getDatatypeURI() == null) {
                 return type == null;
             } else {
                 return type != null
-                        && type.equals(l1.getDatatypeURI().toString());
+                        && type.equals(l1.getDatatypeURI());
             }
         } else {
             return false;
@@ -226,7 +222,7 @@ public abstract class JRDF {
     public static boolean sameObject(ObjectNode o1,
                                      String o2,
                                      boolean isLiteral,
-                                     String type,
+                                     URI type,
                                      String lang) {
         if (o1 instanceof URIReference) {
             return sameResource((URIReference) o1, o2);

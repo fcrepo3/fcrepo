@@ -528,7 +528,8 @@ public abstract class TypeUtility {
         out.setPredicate(in.predicate);
         out.setObject(in.object);
         out.setIsLiteral(in.isLiteral);
-        out.setDatatype(in.datatype);
+        if (in.datatype == null) out.setDatatype(null);
+        else out.setDatatype(in.datatype.toString());
         return out;
     }
 

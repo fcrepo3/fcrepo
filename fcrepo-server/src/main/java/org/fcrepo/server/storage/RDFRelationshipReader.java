@@ -50,32 +50,9 @@ public abstract class RDFRelationshipReader {
         try {
             iter = TripleIteratorFactory.defaultInstance().fromStream(dsContent, RDFFormat.RDF_XML);
             Triple triple;
-            ObjectNode objectNode;
-            boolean isLiteral;
-            URI datatypeURI;
-            String subject, predicate, object, datatype;
             while (iter.hasNext()) {
                 triple = iter.next();
-
-                subject = triple.getSubject().toString();
-                predicate = triple.getPredicate().toString();
-                objectNode = triple.getObject();
-                isLiteral = objectNode instanceof Literal;
-                datatype = null;
-                if (isLiteral) {
-                    object = ((Literal) objectNode).getLexicalForm();
-                    datatypeURI = ((Literal) objectNode).getDatatypeURI();
-                    if (datatypeURI != null) {
-                        datatype = datatypeURI.toString();
-                    }
-                } else {
-                    object = triple.getObject().toString();
-                }
-                tuples.add(new RelationshipTuple(subject,
-                                                 predicate,
-                                                 object,
-                                                 isLiteral,
-                                                 datatype));
+                tuples.add(RelationshipTuple.fromTriple(triple));
             }
         } finally {
             if (iter != null) {
