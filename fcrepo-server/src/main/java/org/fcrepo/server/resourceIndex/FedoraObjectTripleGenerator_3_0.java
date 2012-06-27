@@ -178,7 +178,7 @@ public class FedoraObjectTripleGenerator_3_0
             if (tuple.isLiteral) {
                 if (tuple.datatype != null) {
                     oNode = new SimpleLiteral(tuple.object,
-                                              new URI(tuple.datatype));
+                                              tuple.datatype);
                 } else {
                     oNode = new SimpleLiteral(tuple.object);
                 }
