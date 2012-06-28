@@ -5,7 +5,22 @@
 
 package org.fcrepo.server.storage.types;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.jrdf.graph.Literal;
+import org.jrdf.graph.ObjectNode;
+import org.jrdf.graph.PredicateNode;
+import org.jrdf.graph.Triple;
+
 import org.fcrepo.common.Constants;
+import org.fcrepo.common.rdf.SimpleLiteral;
+import org.fcrepo.common.rdf.SimpleTriple;
+import org.fcrepo.common.rdf.SimpleURIReference;
 
 /**
  * A data structure for holding relationships.
@@ -23,13 +38,13 @@ public class RelationshipTuple
 
     public final boolean isLiteral;
 
-    public final String datatype;
+    public final URI datatype;
 
     public RelationshipTuple(String subject,
                              String predicate,
                              String object,
                              boolean isLiteral,
-                             String datatype) {
+                             URI datatype) {
         this.subject = subject;
         this.predicate = predicate;
         this.object = object;
@@ -90,6 +105,75 @@ public class RelationshipTuple
         } else {
             return false;
         }
+    }
+    
+    public Triple toTriple(Map<String, String> namespaces) throws URISyntaxException {
+        return new SimpleTriple(
+                                new SimpleURIReference(new URI(subject)),
+                                RelationshipTuple.makePredicateResourceFromRel(predicate,
+                                                                               namespaces),
+                                RelationshipTuple.makeObjectFromURIandLiteral(object,
+                                                                              isLiteral,
+                                                                              datatype));
+    }
+    
+    public static URI makePredicateFromRel(String relationship, Map map)
+            throws URISyntaxException {
+        String predicate = relationship;
+        Set keys = map.keySet();
+        Iterator iter = keys.iterator();
+        while (iter.hasNext()) {
+            String key = (String) iter.next();
+            if (predicate.startsWith(key + ":")) {
+                predicate = predicate.replaceFirst(key + ":",
+                                                   (String) map.get(key));
+            }
+        }
+    
+        URI retVal = null;
+        retVal = new URI(predicate);
+        return retVal;
+    }
+
+    public static PredicateNode makePredicateResourceFromRel(String predicate,
+                                                             Map<String, String> map)
+            throws URISyntaxException {
+        URI predURI = RelationshipTuple.makePredicateFromRel(predicate, map);
+        PredicateNode node = new SimpleURIReference(predURI);
+        return node;
+    }
+
+    public static ObjectNode makeObjectFromURIandLiteral(String objURI,
+                                                         boolean isLiteral,
+                                                         URI literalType)
+            throws URISyntaxException {
+        ObjectNode obj = null;
+        if (isLiteral) {
+            if (literalType == null) {
+                obj = new SimpleLiteral(objURI);
+            } else {
+                obj = new SimpleLiteral(objURI, literalType);
+            }
+        } else {
+            obj = new SimpleURIReference(new URI(objURI));
+        }
+        return obj;
+    }
+
+    public static RelationshipTuple fromTriple(Triple triple) {
+        String subject = triple.getSubject().toString();
+        String predicate = triple.getPredicate().toString();
+        ObjectNode objectNode = triple.getObject();
+        if (objectNode instanceof Literal) {
+            return getLiteral(subject, predicate, (Literal)objectNode);
+        } else {
+            return new RelationshipTuple(subject, predicate, objectNode.toString(), false, null);
+        }
+        
+    }
+    
+    private static RelationshipTuple getLiteral(String subject, String predicate, Literal literal) {
+        return new RelationshipTuple(subject, predicate, literal.getLexicalForm(), true, literal.getDatatypeURI());
     }
    
     // test for equality, accounting for null values
