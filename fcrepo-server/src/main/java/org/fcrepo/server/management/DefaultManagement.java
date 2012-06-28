@@ -915,7 +915,7 @@ public class DefaultManagement
             } else {
                 checksumType = Datastream.validateChecksumType(checksumType);
             }
-            if ("DC".equals(datastreamId)){
+            if (dsContent != null && "DC".equals(datastreamId)){
                 DCFields audited = new DCFields(dsContent);
                 try {
                     dsContent = new ByteArrayInputStream(audited.getAsXML(pid).getBytes("UTF-8"));
