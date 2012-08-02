@@ -1,5 +1,5 @@
 -------------------------------------------------------------------
-                  Fedora 3.6-SNAPSHOT
+                  Fedora 3.6
 -------------------------------------------------------------------
 This is a full source code release of Fedora.  Before using this
 software, you must read and agree to the license, found under
@@ -146,7 +146,7 @@ By default, integration tests are run against a Fedora instance configured
 to use the built-in Derby database.  If you wish to run the integration
 tests against an external database, you can specify this with the db property:
 
--Ddb postgres
+-Ddb=postgres
 
 Properties files used to configure Fedora during installation for the various 
 database configurations are in the folder:
