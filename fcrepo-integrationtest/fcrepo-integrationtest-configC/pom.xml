@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.fcrepo</groupId>
     <artifactId>fcrepo-integrationtest</artifactId>
-    <version>3.6-SNAPSHOT</version>
+    <version>3.6</version>
   </parent>
 
   <artifactId>fcrepo-integrationtest-configC</artifactId>
@@ -150,18 +149,10 @@
                 <phase>pre-integration-test</phase>
                 <configuration>
                   <target unless="${integration.test.skip}">
-                    <ant
-                      antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
-                      target="install" inheritrefs="true" />
-                    <ant
-                      antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
-                      target="clearSQL" inheritrefs="true" />
-                    <ant
-                      antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml"
-                      target="configureFedora" inheritrefs="true" />
-                    <ant
-                      antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml"
-                      target="tomcat-start" inheritrefs="true" />
+                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml" target="install" inheritrefs="true" />
+                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml" target="clearSQL" inheritrefs="true" />
+                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml" target="configureFedora" inheritrefs="true" />
+                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml" target="tomcat-start" inheritrefs="true" />
                   </target>
                 </configuration>
                 <goals>
@@ -175,9 +166,7 @@
                 <configuration>
                   <target unless="${integration.test.skip}">
                     <echo>Stopping Fedora</echo>
-                    <ant
-                      antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml"
-                      target="tomcat-stop" inheritrefs="true" />
+                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml" target="tomcat-stop" inheritrefs="true" />
                   </target>
                 </configuration>
                 <goals>
@@ -401,7 +390,7 @@
             <javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
             <fedora.username>${fedora.username}</fedora.username>
             <fedora.password>${fedora.password}</fedora.password>
-            <demo.format></demo.format>
+            <demo.format />
             <fedora.hostname>${fedora.hostname}</fedora.hostname>
             <fedora.port>${fedora.port}</fedora.port>
             <fedora.appServerContext>${fedora.appServerContext}</fedora.appServerContext>
