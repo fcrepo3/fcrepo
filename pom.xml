@@ -24,7 +24,7 @@
     <license>
       <name>Apache License, Version 2.0</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-      <comments>Copyright (c) 2011 DuraSpace</comments>
+      <comments>Copyright (c) 2012 DuraSpace</comments>
     </license>
   </licenses>
 
@@ -75,7 +75,7 @@
     </developer>
 
     <developer>
-      <name>Scott Prater</name>
+      <name>Prater, Scott</name>
       <email>sprater@gmail.com</email>
     </developer>
 
@@ -85,8 +85,8 @@
     </developer>
 
     <developer>
-      <name>Strnad, Kai</name>
-      <email>kai.strnad@googlemail.com</email>
+      <name>Sternad, Kai</name>
+      <email>kai@sternad.de</email>
     </developer>
 
     <developer>
