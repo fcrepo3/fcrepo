@@ -887,6 +887,7 @@
                     <exclude>org.slf4j:slf4j-log4j13</exclude>
                     <exclude>org.slf4j:slf4j-nop</exclude>
                     <exclude>org.slf4j:slf4j-simple</exclude>
+                    <exclude>org.apache.geronimo.specs:geronimo-servlet_2.5_spec</exclude>
                   </excludes>
                 </bannedDependencies>
               </rules>
