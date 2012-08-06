@@ -548,6 +548,10 @@
           <artifactId>geronimo-jms_1.1_spec</artifactId>
           <groupId>org.apache.geronimo.specs</groupId>
         </exclusion>
+        <exclusion>
+          <artifactId>jetty-server</artifactId>
+          <groupId>org.eclipse.jetty</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <!-- xstream is an optional activemq dependency, required for Stomp -->
