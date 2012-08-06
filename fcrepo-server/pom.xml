@@ -527,6 +527,12 @@
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>fusemq-leveldb</artifactId>
+          <groupId>org.fusesource.fuse-extra</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     
     <dependency>
