@@ -354,7 +354,6 @@
         <include>javax.xml:jaxrpc-api:jar:*</include>
         <include>com.sun.woodstock.dependlibs:jhbasic:jar:*</include>
         <include>javax.xml.soap:saaj-api:jar:*</include>
-
         <include>org.springframework:spring-context:jar:*</include>
         <include>org.springframework:spring-beans:jar:*</include>
         <include>org.springframework:spring-core:jar:*</include>
@@ -367,9 +366,6 @@
         <include>org.codehaus.woodstox:woodstox-core-asl:jar:*</include>
         <include>org.apache.geronimo.specs:geronimo-annotation_1.0_spec:jar:*</include>
         <include>org.codehaus.woodstox:stax2-api:jar:*</include>
-        
-        
-        
         <include>org.fcrepo:jai_codec:jar:*</include>
         <include>org.fcrepo:jai_core:jar:*</include>
         <include>org.fcrepo:mulgara-core:jar:*</include>

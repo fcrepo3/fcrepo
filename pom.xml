@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -510,12 +511,16 @@
         <version>${cxf.version}</version>
         <exclusions>
           <exclusion>
-            <artifactId>geronimo-servlet_2.5_spec</artifactId>
             <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_2.5_spec</artifactId>
           </exclusion>
           <exclusion>
-            <artifactId>geronimo-servlet_3.0_spec</artifactId>
             <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_3.0_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.codehaus.woodstox</groupId>
@@ -531,7 +536,21 @@
           </exclusion>
         </exclusions>
       </dependency>
-
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-jaxws</artifactId>
+        <version>${cxf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+        <version>${cxf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-transports-http</artifactId>
+        <version>${cxf.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -657,8 +676,8 @@
   <build>
     <pluginManagement>
       <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings 
-          only. It has no influence on the Maven build itself. -->
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. 
+          It has no influence on the Maven build itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
@@ -971,9 +990,8 @@
             <artifactId>maven-assembly-plugin</artifactId>
             <dependencies>
               <dependency>
-                <!-- NOTE: The fix for PLXUTILS-120 is crucial for the assembly 
-                  descriptor regex, therefore we have to insist on plexus utils >= 2.0.1 for 
-                  the time being -->
+                <!-- NOTE: The fix for PLXUTILS-120 is crucial for the assembly descriptor 
+                  regex, therefore we have to insist on plexus utils >= 2.0.1 for the time being -->
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-utils</artifactId>
                 <version>2.0.1</version>
@@ -1107,7 +1125,6 @@
       <version>4.10</version>
       <!-- <scope>test</scope> -->
     </dependency>
-
   </dependencies>
 
 </project>
