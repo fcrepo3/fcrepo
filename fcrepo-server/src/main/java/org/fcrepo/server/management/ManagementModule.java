@@ -104,7 +104,11 @@ public class ManagementModule
         try {
             m_tempDir = getServer().getUploadDir();
             if (!m_tempDir.isDirectory()) {
-                m_tempDir.mkdirs();
+               m_tempDir.mkdirs();
+            }
+            
+            if (!m_tempDir.isDirectory()) {
+                throw new ModuleInitializationException("Unable to initialize temporary storage area at " + m_tempDir.toString(), getRole());
             }
             // put leftovers in hash, while saving highest id as m_lastId
             m_uploadStartTime = new Hashtable<String, Long>();
