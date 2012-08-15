@@ -810,5 +810,10 @@
       <artifactId>owlapi</artifactId>
       <version>3.0.0-patched</version>
     </dependency>
+    
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+    </dependency>
   </dependencies>
 </project>

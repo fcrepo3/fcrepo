@@ -1234,7 +1234,7 @@ public abstract class Server
     *
     * @return The directory.
     */
-   public final File getUploadDir() {
+    public File getUploadDir() {
        return m_uploadDir;
    }
 
