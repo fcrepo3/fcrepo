@@ -10,7 +10,7 @@ online browsing or download at the following URL:
 
 Building Fedora
 ===============
-To build the executable installer, make sure you have maven2
+To build the executable installer, make sure you have Maven 3
 installed and enter the following:
 
   mvn install
