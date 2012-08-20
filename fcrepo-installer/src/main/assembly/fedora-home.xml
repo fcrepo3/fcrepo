@@ -11,6 +11,7 @@
     <fileSet>
       <directory>../resources/doc/license</directory>
       <outputDirectory>/docs/license</outputDirectory>
+      <filtered>true</filtered>
     </fileSet>
 
     <fileSet>
@@ -118,6 +119,7 @@
     <fileSet>
       <directory>src/main/resources/config/spring</directory>
       <outputDirectory>/server/config/spring</outputDirectory>
+      <filtered>true</filtered>
     </fileSet>
 
     <fileSet>

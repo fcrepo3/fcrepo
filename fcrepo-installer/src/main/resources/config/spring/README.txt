@@ -1,4 +1,4 @@
-Fedora 3.6 Spring Configuration
+Fedora ${project.version} Spring Configuration
 ==== Notes ====================
 Fedora will attempt to parse all files with a .xml extension in this directory
 as Spring bean definitions.  The application context for these definitions
