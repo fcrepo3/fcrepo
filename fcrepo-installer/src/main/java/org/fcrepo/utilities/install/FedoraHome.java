@@ -327,7 +327,7 @@ public class FedoraHome {
 
 		/* Set up authN, authZ filter configuration */
 		StringBuilder filters = new StringBuilder();
-		if (_opts.getBooleanValue(InstallOptions.FESL_AUTHN_ENABLED, false)) {
+        if (_opts.getBooleanValue(InstallOptions.FESL_AUTHN_ENABLED, true)) {
 			filters.append("AuthFilterJAAS");
 		} else {
 			filters.append("SetupFilter,XmlUserfileFilter,EnforceAuthnFilter,FinalizeFilter");
@@ -362,7 +362,7 @@ public class FedoraHome {
 		String PATTERN_REST = "${security.auth.filters.rest}";
 
 		boolean fesl_authn_enabled = _opts.getBooleanValue(
-				InstallOptions.FESL_AUTHN_ENABLED, false);
+InstallOptions.FESL_AUTHN_ENABLED, true);
 		boolean apia_auth_required = _opts.getBooleanValue(
 				InstallOptions.APIA_AUTH_REQUIRED, false);
 		boolean upstream_auth_enabled = _opts.getBooleanValue(

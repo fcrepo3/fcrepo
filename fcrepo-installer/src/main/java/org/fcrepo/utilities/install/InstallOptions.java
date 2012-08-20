@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -256,7 +255,6 @@ public class InstallOptions {
             }
         }
         inputOption(UPSTREAM_AUTH_ENABLED);
-        inputOption(FESL_AUTHN_ENABLED);
         inputOption(FESL_AUTHZ_ENABLED);
         if (getValue(FESL_AUTHZ_ENABLED).equals(Boolean.toString(true))) {
             // Disable legacy authz if FeSL is enabled
