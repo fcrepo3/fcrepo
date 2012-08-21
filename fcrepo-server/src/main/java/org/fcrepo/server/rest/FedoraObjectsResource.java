@@ -428,7 +428,7 @@ public class FedoraObjectsResource extends BaseRestResource {
      */
     @POST
     @Path(VALID_PID_PART)
-    @Consumes({XML, FORM})
+    @Consumes({XML, FORM, ZIP})
     public Response createObject(
             @javax.ws.rs.core.Context
             HttpHeaders headers,
@@ -470,11 +470,13 @@ public class FedoraObjectsResource extends BaseRestResource {
                 if (ignoreMime) {
                     is = content.getContentStream();
                 } else {
-                    // Make sure content is XML
+                    // Make sure content is XML or ZIP
                     String contentMime = content.getMimeType();
-                    if (contentMime != null &&
-                        TEXT_XML.isCompatible(MediaType.valueOf(contentMime))) {
-                        is = content.getContentStream();
+                    if (contentMime != null) {
+                        MediaType t = MediaType.valueOf(contentMime);
+                        if (TEXT_XML.isCompatible(t) || APP_ZIP.isCompatible(t)) {
+                            is = content.getContentStream();
+                        }
                     }
                 }
             }
@@ -492,7 +494,7 @@ public class FedoraObjectsResource extends BaseRestResource {
             } else {
 
                 if (namespace != null && !namespace.equals("")) {
-                    logger.warn("The namespace parameter is only applicable when object " +
+                    logger.warn("The namespace parameter is only applicable whene object " +
                                 "content is not provided, thus the namespace provided '" +
                                 namespace + "' has been ignored.");
                 }
