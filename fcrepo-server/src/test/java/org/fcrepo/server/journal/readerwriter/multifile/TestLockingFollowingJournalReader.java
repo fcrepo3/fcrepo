@@ -4,11 +4,14 @@
  */
 package org.fcrepo.server.journal.readerwriter.multifile;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,17 +24,19 @@ import org.fcrepo.server.journal.JournalConsumer;
 import org.fcrepo.server.journal.MockJournalRecoveryLog;
 import org.fcrepo.server.journal.MockServerForJournalTesting;
 import org.fcrepo.server.journal.ServerInterface;
-import org.fcrepo.server.journal.readerwriter.multifile.MultiFileJournalConstants;
-import org.fcrepo.server.journal.readerwriter.multifile.MultiFileJournalHelper;
 import org.fcrepo.server.management.MockManagementDelegate;
-
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 
 
 public class TestLockingFollowingJournalReader
-        extends TestCase
         implements Constants, JournalConstants, MultiFileJournalConstants {
+
+    @Rule
+    public TemporaryFolder tmpFolder = new TemporaryFolder();
 
     private static final int WAIT_INTERVAL = 5;
 
@@ -57,14 +62,8 @@ public class TestLockingFollowingJournalReader
 
     private int initialNumberOfThreads;
 
-    public TestLockingFollowingJournalReader(String name) {
-        super(name);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         journalDirectory = createTempDirectory("fedoraTestingJournalFiles");
         archiveDirectory = createTempDirectory("fedoraTestingArchiveFiles");
 
@@ -104,6 +103,7 @@ public class TestLockingFollowingJournalReader
     /**
      * Create 3 files and watch it process all of them
      */
+    @Test
     public void testSimpleNoLocking() {
         try {
             // create 3 files, each with an ingest
@@ -186,6 +186,7 @@ public class TestLockingFollowingJournalReader
      * A lock request created while a file is in progress, which should prevent
      * further processing until it is removed.
      */
+    @Test
     public void testLockWhileProcessingAndResume() {
         try {
             // create 3 files, each with an ingest
@@ -450,19 +451,8 @@ public class TestLockingFollowingJournalReader
         }
     }
 
-    private File createTempDirectory(String name) {
-        File directory = new File(System.getProperty("java.io.tmpdir"), name);
-        directory.mkdir();
-        cleanOutDirectory(directory);
-        directory.deleteOnExit();
-        return directory;
-    }
-
-    private void cleanOutDirectory(File directory) {
-        File[] files = directory.listFiles();
-        for (File element : files) {
-            element.delete();
-        }
+    private File createTempDirectory(String name) throws IOException {
+        return tmpFolder.newFolder(name);
     }
 
     private String getSimpleIngestString() {
