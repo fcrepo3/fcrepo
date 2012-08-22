@@ -15,17 +15,4 @@ import org.junit.runners.Suite;
     NamespaceContextImplTest.class})
 public class AllUnitTests {
 
-    // Supports legacy tests runners
-    public static junit.framework.Test suite() throws Exception {
-
-        junit.framework.TestSuite suite =
-                new junit.framework.TestSuite(AllUnitTests.class.getName());
-
-        suite.addTestSuite(TestBase64.class);
-        suite.addTestSuite(TestFileUtils.class);
-        suite.addTestSuite(TestZip.class);
-        suite.addTest(NamespaceContextImplTest.suite());
-
-        return suite;
-    }
 }
