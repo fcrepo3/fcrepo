@@ -14,17 +14,4 @@ import org.junit.runners.Suite;
         org.fcrepo.utilities.AllUnitTests.class})
 public class AllOfflineTests {
 
-    // Supports legacy tests runners
-    public static junit.framework.Test suite() throws Exception {
-
-        junit.framework.TestSuite suite =
-                new junit.framework.TestSuite(AllOfflineTests.class.getName());
-
-        suite.addTest(org.fcrepo.test.AllUnitTests.suite());
-        suite.addTest(org.fcrepo.test.AllIntegrationTests.suite());
-        suite.addTest(org.fcrepo.utilities.AllUnitTests.suite());
-        suite.addTest(org.fcrepo.server.AllUnitTests.suite());
-
-        return suite;
-    }
 }
