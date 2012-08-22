@@ -352,7 +352,7 @@ public class BasicDigitalObject
                                      t.object,
                                      t.isLiteral,
                                      t.datatype,
-                                     null)) {
+                                     t.language)) {
                     continue;
                 }
 

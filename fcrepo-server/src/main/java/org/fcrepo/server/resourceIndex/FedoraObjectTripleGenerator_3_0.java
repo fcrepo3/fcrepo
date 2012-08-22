@@ -179,6 +179,8 @@ public class FedoraObjectTripleGenerator_3_0
                 if (tuple.datatype != null) {
                     oNode = new SimpleLiteral(tuple.object,
                                               tuple.datatype);
+                } else if (tuple.language != null){
+                    oNode = new SimpleLiteral(tuple.object, tuple.language);
                 } else {
                     oNode = new SimpleLiteral(tuple.object);
                 }

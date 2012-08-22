@@ -603,7 +603,8 @@ public class RDFTupleEditor
                     RelationshipTuple
                             .makeObjectFromURIandLiteral(getObjectURI(),
                                                          getIsLiteral(),
-                                                         getLiteralType());
+                                                         getLiteralType(),
+                                                         null);
                 } catch (URISyntaxException e) {
                     JOptionPane.showMessageDialog(this,
                                                   "Error: Invalid URI in "

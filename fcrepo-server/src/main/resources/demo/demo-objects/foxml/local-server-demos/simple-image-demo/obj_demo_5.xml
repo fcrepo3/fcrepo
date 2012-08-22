@@ -34,6 +34,7 @@
         <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
           <rdf:Description rdf:about="info:fedora/demo:5">
             <fedora-model:hasModel rdf:resource="info:fedora/demo:UVA_STD_IMAGE_1"/>
+            <prefLabel xmlns="http://www.w3.org/2004/02/skos/core#" xml:lang="it">Immagine del Colosseo a Roma</prefLabel>
           </rdf:Description>
         </rdf:RDF>
       </foxml:xmlContent>

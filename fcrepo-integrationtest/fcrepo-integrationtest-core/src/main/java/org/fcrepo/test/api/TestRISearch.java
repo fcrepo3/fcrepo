@@ -47,7 +47,7 @@ extends FedoraServerTestCase {
             String query = "<" + PID.toURI(pid) + ">"
                         + " <" + Constants.MODEL.HAS_MODEL.uri + ">"
                         + " <" + Models.FEDORA_OBJECT_CURRENT.uri + ">";
-            checkSPOCount(client, query, 1);
+            RISearchUtil.checkSPOCount(client, query, 1);
         }
     }
 
@@ -64,7 +64,7 @@ extends FedoraServerTestCase {
             String query = "<" + PID.toURI(pid) + ">"
                         + " <" + Constants.RELS_EXT.IS_MEMBER_OF.uri + ">"
                         + " <" + PID.toURI(collectionPid) + ">";
-            checkSPOCount(client, query, 1);
+            RISearchUtil.checkSPOCount(client, query, 1);
         }
     }
 
@@ -80,7 +80,7 @@ extends FedoraServerTestCase {
             String query = "<" + PID.toURI(pid) + "/MEDIUM_SIZE" + ">"
                         + " <" + "http://ns.adobe.com/exif/1.0/PixelXDimension" + ">"
                         + " \"320\"";
-            checkSPOCount(client, query, 1);
+            RISearchUtil.checkSPOCount(client, query, 1);
         }
     }
     
@@ -93,5 +93,20 @@ extends FedoraServerTestCase {
         + " <" + UvaStdImgTripleGenerator_1.TEST_PREDICATE + ">"
         + " \"true\"";
         checkSPOCount(client, query, 1);
+    }
+    
+    /**
+     * Test that RELS-EXT statements with a xml:lang attribute have
+     * the language attribute propagated to the resource index
+     * @throws Exception
+     */
+    public void testLanguageAttributes() throws Exception {
+        FedoraClient client = getFedoraClient();
+        // skos: <http://www.w3.org/2004/02/skos/core#>
+        // skos:prefLabel \"Immagine del Colosseo a Roma\"
+        String query = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" +
+                       "SELECT ?x FROM <#ri>\n" +
+                       "WHERE { ?x skos:prefLabel \"Immagine del Colosseo a Roma\"@it }";
+        RISearchUtil.checkSPARQLCount(client, query, 1);
     }
 }

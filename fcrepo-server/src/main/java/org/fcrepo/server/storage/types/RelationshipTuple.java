@@ -39,17 +39,28 @@ public class RelationshipTuple
     public final boolean isLiteral;
 
     public final URI datatype;
+    
+    public final String language;
 
     public RelationshipTuple(String subject,
                              String predicate,
                              String object,
                              boolean isLiteral,
                              URI datatype) {
+        this(subject, predicate, object, isLiteral, datatype, null);
+    }
+    public RelationshipTuple(String subject,
+                             String predicate,
+                             String object,
+                             boolean isLiteral,
+                             URI datatype,
+                             String language) {
         this.subject = subject;
         this.predicate = predicate;
         this.object = object;
         this.isLiteral = isLiteral;
         this.datatype = datatype;
+        this.language = language;
     }
 
     // TODO: Consider getting rid of this method
@@ -114,19 +125,20 @@ public class RelationshipTuple
                                                                                namespaces),
                                 RelationshipTuple.makeObjectFromURIandLiteral(object,
                                                                               isLiteral,
-                                                                              datatype));
+                                                                              datatype,
+                                                                              language));
     }
     
-    public static URI makePredicateFromRel(String relationship, Map map)
+    public static URI makePredicateFromRel(String relationship, Map<String,String> map)
             throws URISyntaxException {
         String predicate = relationship;
-        Set keys = map.keySet();
-        Iterator iter = keys.iterator();
+        Set<String> keys = map.keySet();
+        Iterator<String> iter = keys.iterator();
         while (iter.hasNext()) {
-            String key = (String) iter.next();
+            String key = iter.next();
             if (predicate.startsWith(key + ":")) {
                 predicate = predicate.replaceFirst(key + ":",
-                                                   (String) map.get(key));
+                                                   map.get(key));
             }
         }
     
@@ -145,14 +157,17 @@ public class RelationshipTuple
 
     public static ObjectNode makeObjectFromURIandLiteral(String objURI,
                                                          boolean isLiteral,
-                                                         URI literalType)
+                                                         URI literalType,
+                                                         String language)
             throws URISyntaxException {
         ObjectNode obj = null;
         if (isLiteral) {
-            if (literalType == null) {
-                obj = new SimpleLiteral(objURI);
-            } else {
+            if (literalType != null) {
                 obj = new SimpleLiteral(objURI, literalType);
+            } else if (language != null){
+                obj = new SimpleLiteral(objURI, language);
+            } else {
+                obj = new SimpleLiteral(objURI);
             }
         } else {
             obj = new SimpleURIReference(new URI(objURI));
@@ -167,13 +182,13 @@ public class RelationshipTuple
         if (objectNode instanceof Literal) {
             return getLiteral(subject, predicate, (Literal)objectNode);
         } else {
-            return new RelationshipTuple(subject, predicate, objectNode.toString(), false, null);
+            return new RelationshipTuple(subject, predicate, objectNode.toString(), false, null, null);
         }
         
     }
     
     private static RelationshipTuple getLiteral(String subject, String predicate, Literal literal) {
-        return new RelationshipTuple(subject, predicate, literal.getLexicalForm(), true, literal.getDatatypeURI());
+        return new RelationshipTuple(subject, predicate, literal.getLexicalForm(), true, literal.getDatatypeURI(), literal.getLanguage());
     }
    
     // test for equality, accounting for null values
