@@ -14,14 +14,14 @@ import java.io.FileWriter;
 import java.util.zip.ZipFile;
 
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class TestZip {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @ClassRule
+    public static TemporaryFolder folder = new TemporaryFolder();
 
     private File TMP_DIR;
 
@@ -56,7 +56,10 @@ public class TestZip {
     public void testZip() throws Exception {
         Zip.zip(ZIP_FILE, SRC_DIR.listFiles());
         assertEquals(5, new ZipFile(ZIP_FILE).size());
+    }
 
+    @Test
+    public void testUnzip() throws Exception {
         FileInputStream fis = new FileInputStream(ZIP_FILE);
         Zip.unzip(fis, TMP_DIR);
 

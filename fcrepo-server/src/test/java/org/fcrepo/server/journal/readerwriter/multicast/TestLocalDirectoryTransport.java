@@ -5,12 +5,12 @@
 
 package org.fcrepo.server.journal.readerwriter.multicast;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,19 +19,14 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import org.fcrepo.server.journal.AbstractJournalTester;
 import org.fcrepo.server.journal.JournalException;
 import org.fcrepo.server.journal.MockServerForJournalTesting;
-import org.fcrepo.server.journal.readerwriter.multicast.LocalDirectoryTransport;
-import org.fcrepo.server.journal.readerwriter.multicast.Transport;
 import org.fcrepo.server.management.MockManagementDelegate;
-
-
-import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestLocalDirectoryTransport
         extends AbstractJournalTester {
@@ -54,7 +49,10 @@ public class TestLocalDirectoryTransport
                     + "timestamp=\"2007-03-05T16:49:21.392-0500\">\n"
                     + "  <junkElement2></junkElement2></FedoraJournal>\n";
 
-    private static File journalDirectory;
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+
+    private File journalDirectory;
 
     // immaterial to the test - required by the constructor.
     private static final boolean CRUCIAL = true;
@@ -63,17 +61,9 @@ public class TestLocalDirectoryTransport
 
     private MockMulticastJournalWriter parent;
 
-    @BeforeClass
-    public static void initalizeJournalDirectory() {
-        File tempDirectory = new File(System.getProperty("java.io.tmpdir"));
-        journalDirectory =
-                new File(tempDirectory, "TestLocalDirectoryTransport");
-        journalDirectory.mkdirs();
-    }
-
     @Before
-    public void cleanJournalDirectory() {
-        deleteDirectoryContents(journalDirectory);
+    public void createJournalDirectory() throws IOException {
+        journalDirectory = folder.newFolder("TestLocalDirectoryTransport");
     }
 
     @Before

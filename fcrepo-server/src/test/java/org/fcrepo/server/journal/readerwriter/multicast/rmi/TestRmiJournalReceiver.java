@@ -5,45 +5,43 @@
 
 package org.fcrepo.server.journal.readerwriter.multicast.rmi;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
-
+import java.io.IOException;
 import java.rmi.RemoteException;
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import org.fcrepo.server.journal.AbstractJournalTester;
 import org.fcrepo.server.journal.JournalException;
-import org.fcrepo.server.journal.readerwriter.multicast.rmi.RmiJournalReceiver;
-import org.fcrepo.server.journal.readerwriter.multicast.rmi.RmiJournalReceiverArguments;
-import org.fcrepo.server.journal.readerwriter.multicast.rmi.RmiJournalReceiverHelper;
-
-
-import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestRmiJournalReceiver
         extends AbstractJournalTester {
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     // Supports legacy test runners
     public static junit.framework.Test suite() {
         return new junit.framework.JUnit4TestAdapter(TestRmiTransport.class);
     }
 
-    private static File journalDirectory;
+    private File journalDirectory;
 
     private static int fileIndex;
 
     @BeforeClass
-    public static void initializeJournalDirectory() {
-        File tempDirectory = new File(System.getProperty("java.io.tmpdir"));
-        journalDirectory = new File(tempDirectory, "TestRmiJournalReceiver");
-        journalDirectory.mkdirs();
-    }
-
-    @BeforeClass
     public static void initializeFileIndex() {
         fileIndex = 0;
+    }
+
+    @Before
+    public void createJournalDirectory() throws IOException {
+        journalDirectory = folder.newFolder("TestRmiJournalReceiver");
     }
 
     @Before
