@@ -10,6 +10,7 @@ import java.io.InputStream;
 
 import java.util.Date;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.custommonkey.xmlunit.XMLTestCase;
 
 import org.jrdf.graph.URIReference;
@@ -117,6 +118,8 @@ public abstract class TranslationTest
         dmc.DatastreamID = id;
         dmc.DSVersionID = id + ".0";
         dmc.DSControlGrp = "M";
+        dmc.DSChecksumType = "MD5";
+        dmc.DSChecksum = DigestUtils.md5Hex(content);
         return dmc;
     }
 
