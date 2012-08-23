@@ -545,12 +545,12 @@ public class METSFedoraExtDOSerializer
                         writer.print(StreamUtility.enc(altIds));
                         writer.print("\"");
                     }
-                    String csType = ds.DSChecksumType;
+                    String csType = dsc.DSChecksumType;
                     if (csType != null
                             && csType.length() > 0
                             && !csType.equals(Datastream.CHECKSUMTYPE_DISABLED)) {
                         writer.print(" CHECKSUM=\"");
-                        writer.print(StreamUtility.enc(ds.DSChecksum));
+                        writer.print(StreamUtility.enc(dsc.DSChecksum));
                         writer.print("\"");
                         writer.print(" CHECKSUMTYPE=\"");
                         writer.print(StreamUtility.enc(csType));
