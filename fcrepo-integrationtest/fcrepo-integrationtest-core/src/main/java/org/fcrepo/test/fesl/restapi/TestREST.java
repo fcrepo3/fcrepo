@@ -104,7 +104,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
 
             boolean check =
                     response
-                            .contains("<a href=\"objects/test%3A1000003\">test:1000003</a>");
+                            .contains("<a href=\"/fedora/objects/test%3A1000003\">test:1000003</a>");
             Assert.assertTrue("Expected object data not found", check);
         } catch (Exception re) {
             re.printStackTrace();
@@ -127,7 +127,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
 
             boolean check =
                     response
-                            .contains("<a href=\"objects/test%3A1000003\">test:1000003</a>");
+                            .contains("<a href=\"/fedora/objects/test%3A1000003\">test:1000003</a>");
             Assert.assertTrue("Expected object data not found", check);
         } catch (Exception re) {
             Assert.fail(re.getMessage());

@@ -71,7 +71,7 @@ public class TestRESTDeny {
 
             boolean check =
                     response
-                            .contains("<a href=\"objects/test:1000003\">test:1000003</a>");
+                            .contains("<a href=\"/fedora/objects/test:1000003\">test:1000003</a>");
             Assert.assertTrue("Expected object data not found", check);
         } catch (AuthorizationDeniedException ade) {
             if (logger.isDebugEnabled()) {
@@ -97,7 +97,7 @@ public class TestRESTDeny {
 
             boolean check =
                     response
-                            .contains("<a href=\"objects/test:1000003\">test:1000003</a>");
+                            .contains("<a href=\"/fedora/objects/test:1000003\">test:1000003</a>");
             Assert.assertTrue("Expected object data not found", check);
         } catch (AuthorizationDeniedException ade) {
             if (logger.isDebugEnabled()) {
