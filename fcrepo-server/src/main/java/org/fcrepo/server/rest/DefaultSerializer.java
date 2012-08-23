@@ -437,7 +437,7 @@ public class DefaultSerializer {
                     String l = wantedFields[j];
                     html.append("<td valign=\"top\">");
                     if (l.equalsIgnoreCase("pid")) {
-                        html.append("<a href=\"objects/");
+                        html.append("<a href=\"/" + fedoraAppServerContext + "/objects/");
                         try {
                             html.append(URLEncoder.encode(f.getPid(), "UTF-8"));
                         } catch (UnsupportedEncodingException e) {
