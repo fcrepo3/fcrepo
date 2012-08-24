@@ -137,7 +137,7 @@
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>apache-tomcat</artifactId>
-      <version>6.0.29</version>
+      <version>6.0.35</version>
       <type>zip</type>
     </dependency>
 
