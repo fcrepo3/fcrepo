@@ -186,9 +186,6 @@ public class FieldSearchResultSQLImpl
     }
 
     private String getWhereClause(String terms) throws QueryParseException {
-        if (terms.indexOf("'") != -1) {
-            throw new QueryParseException("Query cannot contain the ' character.");
-        }
         StringBuffer whereClause = new StringBuffer();
         if (!terms.equals("*") && !terms.equals("")) {
             whereClause.append(" WHERE");
@@ -622,7 +619,7 @@ public class FieldSearchResultSQLImpl
                             out.append("\\\"");
                             needEscape = true;
                         } else if (nextChar == '\'') {
-                            out.append("\\\'");
+                            out.append("''");
                             needEscape = true;
                         } else if (nextChar == '%') {
                             out.append("\\%");
@@ -672,7 +669,7 @@ public class FieldSearchResultSQLImpl
                     out.append("\\\"");
                     needEscape = true;
                 } else if (c == '\'') {
-                    out.append("\\\'");
+                    out.append("''");
                     needEscape = true;
                 } else if (c == '%') {
                     out.append("\\%");
