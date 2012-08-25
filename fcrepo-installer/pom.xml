@@ -231,13 +231,6 @@
 
     <dependency>
       <groupId>org.fcrepo</groupId>
-      <artifactId>fcrepo-server</artifactId>
-      <classifier>cli-loader-main</classifier>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.fcrepo</groupId>
       <artifactId>fcrepo-webapp-imagemanip</artifactId>
       <type>war</type>
       <version>${project.version}</version>

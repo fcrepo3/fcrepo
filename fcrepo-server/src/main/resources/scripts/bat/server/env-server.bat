@@ -46,7 +46,7 @@ set JAVA="%JAVA_HOME%\bin\java"
 :gotJava
 
 set COMMON="%CATALINA_HOME%\common"
-set CP="%FEDORA_HOME%\server\bin;%FEDORA_HOME%\server\bin\${fedora-cli-loader-jar};%WEBINF%\classes"
+set CP="%FEDORA_HOME%\server\bin;%WEBINF%\classes;%WEBINF%\lib/*"
 set OPTS=-Djava.endorsed.dirs="%COMMON%\endorsed;%COMMON%\lib"
 set OPTS=%OPTS% -Djavax.net.ssl.trustStore="%FEDORA_HOME%\server\truststore"
 set OPTS=%OPTS% -Djavax.net.ssl.trustStorePassword=tomcat
@@ -56,4 +56,4 @@ set OPTS=%OPTS% -Dcom.sun.xacml.PolicySchema="%FEDORA_HOME%\server\xsd\cs-xacml-
 set OPTS=%OPTS% -Dfedora.home="%FEDORA_HOME%"
 set OPTS=%OPTS% -Dfedora.web.inf.lib="%WEBINF%\lib%"
 
-%JAVA% -server -Xmn64m -Xms256m -Xmx256m -cp %CP% %OPTS% org.fcrepo.server.utilities.rebuild.cli.CLILoader %*
+%JAVA% -server -Xmn64m -Xms256m -Xmx256m -cp %CP% %OPTS% %*

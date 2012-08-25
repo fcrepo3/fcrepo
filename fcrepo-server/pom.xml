@@ -248,33 +248,6 @@
             </configuration>
           </execution>
 
-          <execution>
-            <id>cli-loader-main</id>
-            <phase>package</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-
-            <configuration>
-              <classifier>cli-loader-main</classifier>
-
-              <archive>
-                <manifest>
-                  <mainClass>org.fcrepo.server.utilities.rebuild.cli.CLILoader</mainClass>
-                  <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                </manifest>
-
-                <manifestEntries>
-                  <Version>${project.version}</Version>
-                  <Build>${timestamp}</Build>
-                </manifestEntries>
-              </archive>
-              <includes>
-                <include>org/fcrepo/server/utilities/rebuild/cli/**</include>
-              </includes>
-            </configuration>
-          </execution>
-
         </executions>
 
       </plugin>
