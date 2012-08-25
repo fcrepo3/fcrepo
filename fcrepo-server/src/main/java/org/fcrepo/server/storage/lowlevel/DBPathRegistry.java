@@ -314,7 +314,10 @@ public class DBPathRegistry
             } catch (Exception e) {
                 throw new LowlevelStorageException(true, "Unexpected error", e);
             } finally {
-                writer.close();
+                if (writer != null) {
+                    writer.close();
+                    writer = null;
+                }
                 rs = null;
                 statement = null;
             }
