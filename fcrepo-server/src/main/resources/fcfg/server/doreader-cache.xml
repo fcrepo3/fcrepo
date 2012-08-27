@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="org.fcrepo.server.readerCache" class="org.fcrepo.server.storage.DOReaderCache">
+		<property name="maxEntries" value="20" />
+		<property name="maxSeconds" value="5" />
+	</bean>
+
+	<bean id="expireEntriesTask" class="org.springframework.scheduling.timer.ScheduledTimerTask">
+	    <property name="delay" value="10000" />
+	    <property name="period" value="1000" />
+	    <property name="timerTask" ref="org.fcrepo.server.readerCache" />
+	</bean>	
+
+	<bean id="timerFactory" class="org.springframework.scheduling.timer.TimerFactoryBean">
+	    <property name="scheduledTimerTasks">
+	        <list>
+	            <ref bean="expireEntriesTask" />
+	        </list>
+	    </property>
+	</bean>
+
+</beans>
