@@ -6,12 +6,12 @@ package org.fcrepo.server.test;
 
 import java.util.Date;
 
+import junit.framework.TestCase;
+
 import org.fcrepo.server.storage.types.AuditRecord;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
-
-import junit.framework.TestCase;
 
 
 /**
@@ -102,7 +102,7 @@ public class DigitalObjectTest
         assertEquals(m_sdef.getCreateDate(), m_startTime);
         assertEquals(m_sdep.getCreateDate(), m_startTime);
         assertEquals(m_obj.getLabel(), "Test Object");
-        assertEquals(m_sdef.getLabel(), "Test Service Deployment Object");
+        assertEquals(m_sdef.getLabel(), "Test Service Definition Object");
         assertEquals(m_sdep.getLabel(), "Test Service Deployment Object");
         assertEquals(m_obj.getLastModDate(), m_startTime);
         assertEquals(m_sdef.getLastModDate(), m_startTime);

@@ -37,7 +37,7 @@
     <echo>Clearing SQL database</echo>
     <unzip src="${mvn.fedora.home}/install/${mvn.fedora.appServerContext}.war" dest="${mvn.fedora.home}/install/fedorawar" />
  	<java classpath="${mvn.fedora.home}/install/fedorawar/WEB-INF/lib/*"
-          classname="org.fcrepo.server.test.ClearSQLDatabase" fork="true" spawn="false" failonerror="true">
+          classname="org.fcrepo.server.utilities.ClearSQLDatabase" fork="true" spawn="false" failonerror="true">
  	  <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
  	  <sysproperty key="fedora.web.inf.lib" value="${mvn.fedora.home}/install/fedorawar/WEB-INF/lib"/>
  	</java>

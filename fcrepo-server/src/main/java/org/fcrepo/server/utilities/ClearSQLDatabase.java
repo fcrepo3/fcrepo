@@ -1,5 +1,5 @@
 
-package org.fcrepo.server.test;
+package org.fcrepo.server.utilities;
 
 import org.fcrepo.server.Server;
 import org.fcrepo.server.utilities.rebuild.SQLRebuilder;
