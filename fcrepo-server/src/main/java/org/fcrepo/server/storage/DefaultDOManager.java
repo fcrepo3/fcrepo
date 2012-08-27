@@ -269,11 +269,6 @@ public class DefaultDOManager extends Module implements DOManager {
                             e.getMessage(), getRole());
         }
 
-        if (readerCacheSize > 0) {
-            m_readerCache =
-                    new DOReaderCache(readerCacheSize, readerCacheSeconds);
-        }
-
         // configuration of ingest validation
         String ingestValidationLevel = getParameter("ingestValidationLevel");
         if (ingestValidationLevel == null) {
@@ -418,6 +413,9 @@ public class DefaultDOManager extends Module implements DOManager {
             throw new ModuleInitializationException(
                     "LowlevelStorage not loaded", getRole());
         }
+        // get ref to DOReaderCache module
+        m_readerCache = (DOReaderCache) getServer().getBean("org.fcrepo.server.readerCache");
+        
         // get ref to FedoraStorageHintProvider
         try {
             m_hintProvider =
@@ -591,9 +589,6 @@ public class DefaultDOManager extends Module implements DOManager {
 
     @Override
     public void shutdownModule() {
-        if (m_readerCache != null) {
-            m_readerCache.close();
-        }
     }
 
     @Override
