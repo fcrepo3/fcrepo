@@ -3,13 +3,13 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean id="cachebuilder" class="com.google.common.cache.CacheBuilder" factory-method="from">
+        <constructor-arg value="maximumSize=20, expireAfterAccess=5s" />
+    </bean> 
+
     <bean id="org.fcrepo.server.readerCache" class="org.fcrepo.server.storage.DOReaderCache">
         <constructor-arg>
           <ref bean="cachebuilder" />
         </constructor-arg>
     </bean>
-
-    <bean id="cachebuilder" class="com.google.common.cache.CacheBuilder" factory-method="from">
-        <constructor-arg value="maximumSize=20, expireAfterAccess=5s" />
-    </bean> 
 </beans>

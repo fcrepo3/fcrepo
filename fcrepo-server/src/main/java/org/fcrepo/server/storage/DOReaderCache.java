@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 // This class is a rewrite of the original DOReaderCache using a java.util.concurrent.ConcurrentHashMap
 
@@ -29,8 +30,8 @@ public class DOReaderCache {
     /**
      * create a new {@link DOReaderCache} instance
      */
-    public DOReaderCache(Cache<String, DOReader> cache) {
-        cacheMap = cache;
+    public DOReaderCache(CacheBuilder<String, DOReader> builder) {
+        cacheMap = builder.build();
         LOG.debug("{} initialized", DOReaderCache.class.getName());
     }
 
