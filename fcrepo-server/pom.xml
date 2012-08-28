@@ -317,6 +317,11 @@
       <artifactId>google-collections</artifactId>
       <version>1.0</version>
     </dependency>
+    
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>com.sun.xml.stream</groupId>
