@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 
 // This class is a rewrite of the original DOReaderCache using a java.util.concurrent.ConcurrentHashMap
 
@@ -20,7 +22,7 @@ import com.google.common.cache.CacheBuilder;
  * @author Edwin Shin
  * 
  */
-public class DOReaderCache {
+public class DOReaderCache implements RemovalListener<String, DOReader>{
 
     private static final Logger LOG = LoggerFactory
             .getLogger(DOReaderCache.class);
@@ -31,6 +33,9 @@ public class DOReaderCache {
      * create a new {@link DOReaderCache} instance
      */
     public DOReaderCache(CacheBuilder<String, DOReader> builder) {
+        if (LOG.isDebugEnabled()){
+        	builder.removalListener(this);
+        }
         cacheMap = builder.build();
         LOG.debug("{} initialized", DOReaderCache.class.getName());
     }
@@ -72,5 +77,13 @@ public class DOReaderCache {
      */
     public final DOReader get(final String pid) {
         return cacheMap.getIfPresent(pid);
+    }
+    
+    /**
+     * listener method for debugging
+     */
+    @Override
+    public void onRemoval(RemovalNotification<String, DOReader> removed) {
+    	LOG.debug("DOReader for PID '{}' has been removed from the cache",removed.getKey());
     }
 }
