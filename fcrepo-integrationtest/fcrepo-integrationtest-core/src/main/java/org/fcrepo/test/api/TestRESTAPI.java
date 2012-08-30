@@ -90,6 +90,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
+
 /**
  * Tests of the REST API. Tests assume a running instance of Fedora with the
  * REST API enabled. //TODO: actually validate the ResponseBody instead of just
@@ -684,6 +685,27 @@ public class TestRESTAPI
         }
         // FIXME: findObjects should have a schema?  remove "false" to enable validation
         assertEquals(SC_OK, get(getAuthAccess(), false).getStatusCode());
+    }
+
+    /**
+     * test case for FCREPO-867. Since all SQL statements have been switched to
+     * PreparedStatement it's safe to use a singlequote in a search query.
+     * @throws Exception
+     */
+    public void testFindObjectWithSingleQuote() throws Exception {
+        url =
+                String
+                        .format("/objects?pid=true&description=true&terms='Coliseum'&query&maxResults=20&resultFormat=xml",
+                                pid.toString());
+        if (this.getAuthAccess()) {
+            assertEquals(SC_UNAUTHORIZED, get(false).getStatusCode());
+        }
+        // FIXME: findObjects should have a schema?  remove "false" to enable validation
+        HttpResponse resp=get(getAuthAccess(), false);
+        String xmlResult=new String(resp.getResponseBody());
+//        System.out.println("ResponseBody: " + xmlResult);
+        assertEquals(SC_OK, resp.getStatusCode());
+        assertTrue(xmlResult.indexOf("<pid>demo:REST</pid>") > 0);
     }
 
     /**
