@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.fcrepo</groupId>
     <artifactId>fcrepo-webapp</artifactId>
-    <version>3.6.1</version>
+    <version>3.6.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>fcrepo-webapp-democontent</artifactId>
