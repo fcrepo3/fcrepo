@@ -18,12 +18,16 @@ import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.cond.EvaluationResult;
 import com.sun.xacml.ctx.Result;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.policy.ActionNamespace;
 import org.fcrepo.common.policy.ObjectNamespace;
 import org.fcrepo.common.policy.SubjectNamespace;
 
 public class RightsMetadataPolicy
 extends AbstractPolicy {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RightsMetadataPolicy.class);;
     private final String pid;
     private final Map<String,String> actionMap;
     private Map<String,Set<String>> assertions = new HashMap<String,Set<String>>();
@@ -34,7 +38,7 @@ extends AbstractPolicy {
         // embargo is trivial if these are done
         this.pid = pid;
         this.actionMap = actionMap;
-
+        LOGGER.info("creating rightsMetadata policy for object " + pid);
     }
 
     @Override
@@ -67,8 +71,10 @@ extends AbstractPolicy {
         } catch (Throwable t) { } //shaddup
         String rPid = getStringAttribute(att, context);
         if (rPid.equals(this.pid)) {
+            LOGGER.info("Request pid match rightsMetadata object pid " + this.pid);
             return new MatchResult(MatchResult.MATCH);
         }
+        LOGGER.info("Request pid \"" + rPid +  "\" did not match rightsMetadata object pid " + this.pid);
         return new MatchResult(MatchResult.NO_MATCH);
     }
 
@@ -105,12 +111,16 @@ extends AbstractPolicy {
     }
     
     private String getStringAttribute(URI att, EvaluationCtx context) {
+        String result = null;
         try{
-            EvaluationResult result = (context.getResourceAttribute(new URI(StringAttribute.identifier), att, null));
-            return result.getAttributeValue().encode();
+            LOGGER.info("Requested attribute: " + att.toString());
+            EvaluationResult eval = (context.getResourceAttribute(new URI(StringAttribute.identifier), att, null));
+            result = eval.getAttributeValue().encode();
+            LOGGER.info("Returning attribute value: " + result);
         } catch (URISyntaxException e) {
-            return null;
+            LOGGER.error("Unexpected URI syntax problem: " + StringAttribute.identifier,e);
         }
+        return result;
     }
 
 }
