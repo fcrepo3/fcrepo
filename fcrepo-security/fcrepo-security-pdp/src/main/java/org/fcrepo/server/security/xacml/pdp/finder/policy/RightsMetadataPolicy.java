@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.xpath.XPathException;
+
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.Indenter;
@@ -31,7 +33,10 @@ extends AbstractPolicy {
     private final String pid;
     private final Map<String,String> actionMap;
     private Map<String,Set<String>> assertions = new HashMap<String,Set<String>>();
-    public RightsMetadataPolicy(String pid, Map<String,String> actionMap, InputStream in) {
+    public RightsMetadataPolicy(String pid,
+                                Map<String,String> actionMap,
+                                InputStream is)
+           throws XPathException {
         // resource-id mapped to {pid}
         // action-id mapped to /rightsMetadata/access@type
         // subject-id mapped to /rightsMetadata/access/machine/user
@@ -39,6 +44,10 @@ extends AbstractPolicy {
         this.pid = pid;
         this.actionMap = actionMap;
         LOGGER.info("creating rightsMetadata policy for object " + pid);
+        this.assertions = new RightsMetadataDocument(is).getActionSubjectMap();
+        for (String key: this.assertions.keySet()) {
+            LOGGER.info("found action: " + key);
+        }
     }
 
     @Override
@@ -102,11 +111,13 @@ extends AbstractPolicy {
         if (this.assertions.containsKey(mAction)) {
             String rSubject = getStringAttribute(subject, context);
             if (this.assertions.get(mAction).contains(rSubject)) {
+                LOGGER.info("Permitting " + rSubject + " to " + rAction + " for being on the list!");
                 result = Result.DECISION_PERMIT;
             } else {
+                LOGGER.info("Denying " + rSubject + " to " + rAction + " for not being on the list!");
                 result = Result.DECISION_DENY;
             }
-        }
+        } else LOGGER.info("Could not find subjects for mapped action " + mAction + " from requested action " + rAction);
         return new Result(result);
     }
     
