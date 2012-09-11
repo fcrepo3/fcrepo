@@ -53,14 +53,14 @@ extends PolicyFinderModule {
     }
     
     private AbstractPolicy findPolicy(EvaluationCtx context, String pid) throws PolicyStoreException {
-        if (pid.equals( "FedoraRepository" )) return null;
+        if (pid.equals( "FedoraRepository")) return null;
         try {
             LOGGER.info("finding policy for object with pid=" + pid);
             DOReader reader = this.manager.getReader(false, ReadOnlyContext.EMPTY, pid);
             Datastream rightsMD = reader.GetDatastream("rightsMetadata", null);
             if (rightsMD != null) {
                 InputStream is =
-                    reader.getDatastream("rightsMetadata", null).getContentStream();
+                    rightsMD.getContentStream();
                 LOGGER.info("located rightsMetadata DS for object with pid=" + pid);
                 return new RightsMetadataPolicy(pid,this.actionMap,is);
             } else {

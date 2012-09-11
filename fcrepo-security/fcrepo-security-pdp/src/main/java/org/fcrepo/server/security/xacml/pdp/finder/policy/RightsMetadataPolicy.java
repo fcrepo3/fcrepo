@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.Indenter;
 import com.sun.xacml.MatchResult;
+import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.cond.EvaluationResult;
 import com.sun.xacml.ctx.Result;
@@ -126,7 +128,14 @@ extends AbstractPolicy {
         try{
             LOGGER.info("Requested attribute: " + att.toString());
             EvaluationResult eval = (context.getResourceAttribute(new URI(StringAttribute.identifier), att, null));
-            result = eval.getAttributeValue().encode();
+            AttributeValue attVal = eval.getAttributeValue();
+            if (attVal.isBag()) {
+                List children = attVal.getChildren();
+                if (children.size() > 0) {
+                    AttributeValue c1 = (AttributeValue)attVal.getChildren().get(0);
+                    result = c1.encode();
+                }
+            } else result = attVal.encode();
             LOGGER.info("Returning attribute value: " + result);
         } catch (URISyntaxException e) {
             LOGGER.error("Unexpected URI syntax problem: " + StringAttribute.identifier,e);
