@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.fcrepo.server.ReadOnlyContext;
+import org.fcrepo.server.Server;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
 import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.DOReader;
@@ -25,8 +26,8 @@ extends PolicyFinderModule {
     private static final Logger LOGGER = LoggerFactory.getLogger(RightsMetadataPolicyFinderModule.class);
     private final DOManager manager;
     private final Map<String,String> actionMap;
-    public RightsMetadataPolicyFinderModule(DOManager manager, Map<String,String> actionMap){
-        this.manager = manager;
+    public RightsMetadataPolicyFinderModule(Server server, Map<String,String> actionMap){
+        this.manager = server.getBean("org.fcrepo.server.storage.DOManager",DOManager.class);
         this.actionMap = actionMap;
     }
 

@@ -23,8 +23,8 @@
     </bean>
     <bean id="RightsMetadataPolicyFinderModule"
           class="org.fcrepo.server.security.xacml.pdp.finder.policy.RightsMetadataPolicyFinderModule">
-          <constructor-arg ref="org.fcrepo.server.storage.DOManager" />
-          <constructor-arg ref="hydraActionMap" />
+          <constructor-arg ref="org.fcrepo.server.Server" />
+          <constructor-arg ref="hydraActionMapping" />
     </bean>
   </util:set>
   <util:list id="attributeFinderModules">

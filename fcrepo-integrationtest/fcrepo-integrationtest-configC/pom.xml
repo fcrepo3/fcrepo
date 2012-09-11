@@ -343,6 +343,7 @@
                 <include>**/TestPolicies.class</include>
                 <include>**/TestHierarchy.class</include>
                 <include>**/TestPolicyIndex.class</include>
+                <include>**/TestRightsMetadataPolicy.class</include>
 
               </includes>
 
