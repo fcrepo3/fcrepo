@@ -92,6 +92,8 @@ public class RightsMetadataDocument {
         for (int i = 0; i < nl.getLength(); i++) {
             readPersons.add(nl.item(i).getNodeValue());
         }
+        // edit implies read permissions
+        readPersons.addAll(editPersons);
         map.put("read", readPersons);
 
 
