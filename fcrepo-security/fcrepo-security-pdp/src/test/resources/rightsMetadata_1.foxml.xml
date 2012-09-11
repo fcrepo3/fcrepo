@@ -82,7 +82,6 @@
           <access type="edit">
             <human></human>
             <machine>
-              <person>researcher1</person>
               <person>archivist1</person>
               <group>researcher</group>
             </machine>

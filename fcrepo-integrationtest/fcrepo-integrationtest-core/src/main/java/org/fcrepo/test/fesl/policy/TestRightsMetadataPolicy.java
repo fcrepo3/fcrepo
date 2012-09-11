@@ -21,6 +21,7 @@ import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.utilities.TypeUtility;
 
 import com.yourmediashelf.fedora.client.FedoraClient;
+import com.yourmediashelf.fedora.client.FedoraClientException;
 import com.yourmediashelf.fedora.client.FedoraCredentials;
 
 public class TestRightsMetadataPolicy extends FedoraServerTestCase {
@@ -79,17 +80,21 @@ public class TestRightsMetadataPolicy extends FedoraServerTestCase {
 
         assertEquals(200, getDatastream(pid, "DC").execute(researcher1)
                 .getStatus());
-
-        assertEquals(401, modifyDatastream(pid, "DC")
-                .dsLabel("This request should not work")
-                .logMessage(
-                        "modifyDatastream request as researcher1 that should fail")
-                .execute(researcher1));
-
-        assertEquals(201, modifyDatastream(pid, "DC").dsLabel(
+        try {
+            modifyDatastream(pid, "DC")
+            .dsLabel("This request should not work")
+            .logMessage(
+                    "modifyDatastream request as researcher1 that should fail")
+            .execute(researcher1);
+            fail("This request should not have worked.");
+        } catch (FedoraClientException e) {
+            assertEquals(403, e.getStatus());
+        }
+        // it's not the policy enforcement's fault that this reutrns a 200 instead of a 201
+        assertEquals(200, modifyDatastream(pid, "DC").dsLabel(
                 "This request should work").logMessage(
                 "modifyDatastream request as archivist1 that should succeed")
-                .execute(archivist1));
+                .execute(archivist1).getStatus());
 
     }
 

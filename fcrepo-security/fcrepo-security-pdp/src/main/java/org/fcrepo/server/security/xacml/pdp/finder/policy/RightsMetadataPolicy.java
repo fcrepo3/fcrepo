@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,13 +19,17 @@ import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.Indenter;
 import com.sun.xacml.MatchResult;
 import com.sun.xacml.attr.AttributeValue;
+import com.sun.xacml.attr.BagAttribute;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.cond.EvaluationResult;
 import com.sun.xacml.ctx.Result;
+import com.sun.xacml.ctx.Status;
+import com.sun.xacml.ctx.Subject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.fcrepo.common.Constants;
 import org.fcrepo.common.policy.ActionNamespace;
 import org.fcrepo.common.policy.ObjectNamespace;
 import org.fcrepo.common.policy.SubjectNamespace;
@@ -101,12 +106,8 @@ extends AbstractPolicy {
      */
     @Override
     public Result evaluate(EvaluationCtx context) {
-        URI action = null;
-        URI subject = null;
-        try {
-            action = new URI(ActionNamespace.getInstance().ID.uri);
-            subject = new URI(SubjectNamespace.getInstance().LOGIN_ID.uri);
-        } catch (Throwable t) {};
+        URI action = Constants.ACTION.ID.getURI();
+        URI subject = Constants.SUBJECT.LOGIN_ID.getURI();
         String rAction = getActionAttribute(action, context);
         String mAction = this.actionMap.get(rAction);
         int result = Result.DECISION_INDETERMINATE;
@@ -127,15 +128,11 @@ extends AbstractPolicy {
         String result = null;
         try{
             LOGGER.info("Requested attribute: " + att.toString());
-            EvaluationResult eval = (context.getActionAttribute(new URI(StringAttribute.identifier), att, null));
-            AttributeValue attVal = eval.getAttributeValue();
-            if (attVal.isBag()) {
-                List children = attVal.getChildren();
-                if (children.size() > 0) {
-                    AttributeValue c1 = (AttributeValue)attVal.getChildren().get(0);
-                    result = c1.encode();
-                }
-            } else result = attVal.encode();
+            EvaluationResult eval =
+                    (context.getActionAttribute(new URI(StringAttribute.identifier),
+                                                att,
+                                                null));
+            result = getAttributeFromEvaluationResult(eval);
             LOGGER.info("Returning attribute value: " + result);
         } catch (URISyntaxException e) {
             LOGGER.error("Unexpected URI syntax problem: " + StringAttribute.identifier,e);
@@ -146,15 +143,9 @@ extends AbstractPolicy {
         String result = null;
         try{
             LOGGER.info("Requested attribute: " + att.toString());
-            EvaluationResult eval = (context.getSubjectAttribute(new URI(StringAttribute.identifier), att, null));
-            AttributeValue attVal = eval.getAttributeValue();
-            if (attVal.isBag()) {
-                List children = attVal.getChildren();
-                if (children.size() > 0) {
-                    AttributeValue c1 = (AttributeValue)attVal.getChildren().get(0);
-                    result = c1.encode();
-                }
-            } else result = attVal.encode();
+            // getSubjectAttribute(URI type, URI id, URI category)
+            EvaluationResult eval = (context.getSubjectAttribute(new URI(StringAttribute.identifier), att, Subject.DEFAULT_CATEGORY));
+            result = getAttributeFromEvaluationResult(eval);
             LOGGER.info("Returning attribute value: " + result);
         } catch (URISyntaxException e) {
             LOGGER.error("Unexpected URI syntax problem: " + StringAttribute.identifier,e);
@@ -166,19 +157,90 @@ extends AbstractPolicy {
         try{
             LOGGER.info("Requested attribute: " + att.toString());
             EvaluationResult eval = (context.getResourceAttribute(new URI(StringAttribute.identifier), att, null));
-            AttributeValue attVal = eval.getAttributeValue();
-            if (attVal.isBag()) {
-                List children = attVal.getChildren();
-                if (children.size() > 0) {
-                    AttributeValue c1 = (AttributeValue)attVal.getChildren().get(0);
-                    result = c1.encode();
-                }
-            } else result = attVal.encode();
+            result = getAttributeFromEvaluationResult(eval);
             LOGGER.info("Returning attribute value: " + result);
         } catch (URISyntaxException e) {
             LOGGER.error("Unexpected URI syntax problem: " + StringAttribute.identifier,e);
         }
         return result;
+    }
+
+    protected String iAm() {
+        return this.getClass().getName();
+    }
+
+
+    protected final String getAttributeFromEvaluationResult(EvaluationResult attribute /*
+     * URI
+     * type,
+     * URI
+     * id,
+     * URI
+     * category,
+     * EvaluationCtx
+     * context
+     */) {
+        if (attribute.indeterminate()) {
+            LOGGER.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
+                    + " exit on "
+                    + "couldn't get resource attribute from xacml request "
+                    + "indeterminate");
+            return null;
+        }
+
+        if (attribute.getStatus() != null
+                && !Status.STATUS_OK.equals(attribute.getStatus())) {
+            LOGGER.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
+                    + " exit on "
+                    + "couldn't get resource attribute from xacml request "
+                    + "bad status");
+            return null;
+        } // (resourceAttribute.getStatus() == null) == everything is ok
+
+        AttributeValue attributeValue = attribute.getAttributeValue();
+        if (!(attributeValue instanceof BagAttribute)) {
+            LOGGER.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
+                    + " exit on "
+                    + "couldn't get resource attribute from xacml request "
+                    + "no bag");
+            return null;
+        }
+
+        BagAttribute bag = (BagAttribute) attributeValue;
+        if (1 != bag.size()) {
+            LOGGER.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
+                    + " exit on "
+                    + "couldn't get resource attribute from xacml request "
+                    + "wrong bag n=" + bag.size());
+            return null;
+        }
+
+        Iterator it = bag.iterator();
+        Object element = it.next();
+
+        if (element == null) {
+            LOGGER.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
+                    + " exit on "
+                    + "couldn't get resource attribute from xacml request "
+                    + "null returned");
+            return null;
+        }
+
+        if (it.hasNext()) {
+            LOGGER.debug("AttributeFinder:getAttributeFromEvaluationCtx" + iAm()
+                    + " exit on "
+                    + "couldn't get resource attribute from xacml request "
+                    + "too many returned");
+            LOGGER.debug(element.toString());
+            while (it.hasNext()) {
+                LOGGER.debug(it.next().toString());
+            }
+            return null;
+        }
+
+        LOGGER.debug("AttributeFinder:getAttributeFromEvaluationCtx " + iAm()
+                + " returning " + element.toString());
+        return ((StringAttribute)element).getValue();
     }
 }
 
