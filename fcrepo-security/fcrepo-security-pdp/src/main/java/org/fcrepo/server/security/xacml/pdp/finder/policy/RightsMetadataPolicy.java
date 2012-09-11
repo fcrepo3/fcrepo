@@ -11,7 +11,13 @@ import com.sun.xacml.ctx.Result;
 
 public class RightsMetadataPolicy
 extends AbstractPolicy {
-    public RightsMetadataPolicy(InputStream in) {
+    public RightsMetadataPolicy(String pid, InputStream in) {
+        // resource-id mapped to {pid}
+        // action-id mapped to /rightsMetadata/access@type
+        // subject-id mapped to /rightsMetadata/access/machine/user
+        // embargo is trivial if these are done
+        
+        
 
     }
 
