@@ -29,6 +29,7 @@ extends PolicyFinderModule {
     public RightsMetadataPolicyFinderModule(Server server, Map<String,String> actionMap){
         this.manager = server.getBean("org.fcrepo.server.storage.DOManager",DOManager.class);
         this.actionMap = actionMap;
+        LOGGER.info("Hey, I'm a RightsMetadataPolicyFinderModule!");
     }
 
     @Override
@@ -43,7 +44,7 @@ extends PolicyFinderModule {
         try {
             policy = findPolicy(context, pid);
         } catch (PolicyStoreException e) {
-            e.printStackTrace();
+            LOGGER.error("There's an error here!", e);
         }
         if (policy == null) {
             return new PolicyFinderResult();
@@ -52,6 +53,7 @@ extends PolicyFinderModule {
     }
     
     private AbstractPolicy findPolicy(EvaluationCtx context, String pid) throws PolicyStoreException {
+        if (pid.equals( "FedoraRepository" )) return null;
         try {
             LOGGER.info("finding policy for object with pid=" + pid);
             DOReader reader = this.manager.getReader(false, ReadOnlyContext.EMPTY, pid);
@@ -70,5 +72,17 @@ extends PolicyFinderModule {
                                                  + pid + " - " + e.getMessage(), e);
         }
     }
+    
+    /**
+     * Always returns <code>true</code> since this module does support finding
+     * policies based on context.
+     *
+     * @return true
+     */
+    @Override
+    public boolean isRequestSupported() {
+        return true;
+    }
+
 
 }
