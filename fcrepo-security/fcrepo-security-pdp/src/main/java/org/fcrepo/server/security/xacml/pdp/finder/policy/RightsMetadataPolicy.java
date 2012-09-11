@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.xpath.XPathException;
+
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.Indenter;
@@ -18,23 +20,34 @@ import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.cond.EvaluationResult;
 import com.sun.xacml.ctx.Result;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.fcrepo.common.policy.ActionNamespace;
 import org.fcrepo.common.policy.ObjectNamespace;
 import org.fcrepo.common.policy.SubjectNamespace;
 
 public class RightsMetadataPolicy
 extends AbstractPolicy {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RightsMetadataPolicy.class);;
     private final String pid;
     private final Map<String,String> actionMap;
     private Map<String,Set<String>> assertions = new HashMap<String,Set<String>>();
-    public RightsMetadataPolicy(String pid, Map<String,String> actionMap, InputStream in) {
+    public RightsMetadataPolicy(String pid,
+                                Map<String,String> actionMap,
+                                InputStream is)
+           throws XPathException {
         // resource-id mapped to {pid}
         // action-id mapped to /rightsMetadata/access@type
         // subject-id mapped to /rightsMetadata/access/machine/user
         // embargo is trivial if these are done
         this.pid = pid;
         this.actionMap = actionMap;
-
+        LOGGER.info("creating rightsMetadata policy for object " + pid);
+        this.assertions = new RightsMetadataDocument(is).getActionSubjectMap();
+        for (String key: this.assertions.keySet()) {
+            LOGGER.info("found action: " + key);
+        }
     }
 
     @Override
@@ -67,8 +80,10 @@ extends AbstractPolicy {
         } catch (Throwable t) { } //shaddup
         String rPid = getStringAttribute(att, context);
         if (rPid.equals(this.pid)) {
+            LOGGER.info("Request pid match rightsMetadata object pid " + this.pid);
             return new MatchResult(MatchResult.MATCH);
         }
+        LOGGER.info("Request pid \"" + rPid +  "\" did not match rightsMetadata object pid " + this.pid);
         return new MatchResult(MatchResult.NO_MATCH);
     }
 
@@ -96,21 +111,27 @@ extends AbstractPolicy {
         if (this.assertions.containsKey(mAction)) {
             String rSubject = getStringAttribute(subject, context);
             if (this.assertions.get(mAction).contains(rSubject)) {
+                LOGGER.info("Permitting " + rSubject + " to " + rAction + " for being on the list!");
                 result = Result.DECISION_PERMIT;
             } else {
+                LOGGER.info("Denying " + rSubject + " to " + rAction + " for not being on the list!");
                 result = Result.DECISION_DENY;
             }
-        }
+        } else LOGGER.info("Could not find subjects for mapped action " + mAction + " from requested action " + rAction);
         return new Result(result);
     }
     
     private String getStringAttribute(URI att, EvaluationCtx context) {
+        String result = null;
         try{
-            EvaluationResult result = (context.getResourceAttribute(new URI(StringAttribute.identifier), att, null));
-            return result.getAttributeValue().encode();
+            LOGGER.info("Requested attribute: " + att.toString());
+            EvaluationResult eval = (context.getResourceAttribute(new URI(StringAttribute.identifier), att, null));
+            result = eval.getAttributeValue().encode();
+            LOGGER.info("Returning attribute value: " + result);
         } catch (URISyntaxException e) {
-            return null;
+            LOGGER.error("Unexpected URI syntax problem: " + StringAttribute.identifier,e);
         }
+        return result;
     }
 
 }

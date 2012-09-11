@@ -8,6 +8,7 @@ import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
 import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.DOReader;
+import org.fcrepo.server.storage.types.Datastream;
 
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
@@ -15,9 +16,13 @@ import com.sun.xacml.finder.PolicyFinder;
 import com.sun.xacml.finder.PolicyFinderModule;
 import com.sun.xacml.finder.PolicyFinderResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class RightsMetadataPolicyFinderModule
 extends PolicyFinderModule {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RightsMetadataPolicyFinderModule.class);
     private final DOManager manager;
     private final Map<String,String> actionMap;
     public RightsMetadataPolicyFinderModule(DOManager manager, Map<String,String> actionMap){
@@ -47,11 +52,18 @@ extends PolicyFinderModule {
     
     private AbstractPolicy findPolicy(EvaluationCtx context, String pid) throws PolicyStoreException {
         try {
+            LOGGER.info("finding policy for object with pid=" + pid);
             DOReader reader = this.manager.getReader(false, ReadOnlyContext.EMPTY, pid);
-            
-            InputStream is =
+            Datastream rightsMD = reader.GetDatastream("rightsMetadata", null);
+            if (rightsMD != null) {
+                InputStream is =
                     reader.getDatastream("rightsMetadata", null).getContentStream();
-            return new RightsMetadataPolicy(pid,this.actionMap,is);
+                LOGGER.info("located rightsMetadata DS for object with pid=" + pid);
+                return new RightsMetadataPolicy(pid,this.actionMap,is);
+            } else {
+                LOGGER.info("could not locate rightsMetadata DS for object with pid=" + pid);
+                return null;
+            }
         } catch (Exception e) {
             throw new PolicyStoreException("Get: error reading policy "
                                                  + pid + " - " + e.getMessage(), e);
