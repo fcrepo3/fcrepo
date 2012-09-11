@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rightsMetadata xmlns="http://hydra-collab.stanford.edu/schemas/rightsMetadata/v1">
+  <copyright>
+    <human>(c)2009 The Hydra Project</human>
+    <human type="someSpecialisedType">Blah Blah</human>
+    <human type="aDifferentType">More blah</human>
+    <machine>
+      <a rel="license" href="http://creativecommons.org/licenses/publicdomain/">
+        <img alt="Creative Commons License" style="border-width:0"
+          src="http://i.creativecommons.org/l/publicdomain/88x31.png" />
+      </a>
+      <br />
+      This work is in the
+      <a rel="license" href="http://creativecommons.org/licenses/publicdomain/">Public Domain</a>
+      .
+    </machine>
+  </copyright>
+  <access type="discover">
+    <human></human>
+    <machine>
+      <policy>hydra-policy:4502</policy>
+      <group>public</group>
+    </machine>
+  </access>
+  <access type="read">
+    <human></human>
+    <machine>
+      <group>public</group>
+    </machine>
+  </access>
+  <access type="edit">
+    <human></human>
+    <machine>
+      <person>researcher1</person>
+      <person>archivist1</person>
+      <group>researcher</group>
+    </machine>
+  </access>
+  <access type="etc">
+    <!-- etc -->
+  </access>
+  <use>
+    <human>You are free to re-distribute this object, but you cannot change it
+      or sell it. </human>
+    <machine>
+      <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/3.0/us/">
+        <img alt="Creative Commons License" style="border-width:0"
+          src="http://i.creativecommons.org/l/by-nc-nd/3.0/us/88x31.png" />
+      </a>
+      <br />
+      This
+      <span xmlns:dc="http://purl.org/dc/elements/1.1/" href="http://purl.org/dc/dcmitype/Sound"
+        rel="dc:type">work</span>
+      is licensed under a
+      <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/3.0/us/">Creative Commons Attribution-Noncommercial-No
+        Derivative Works 3.0 United States License</a>
+      .
+    </machine>
+  </use>
+
+</rightsMetadata>
