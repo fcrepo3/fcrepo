@@ -80,7 +80,7 @@ extends AbstractPolicy {
         try {
             att = new URI(ObjectNamespace.getInstance().PID.uri);
         } catch (Throwable t) { } //shaddup
-        String rPid = getStringAttribute(att, context);
+        String rPid = getResourceAttribute(att, context);
         if (rPid.equals(this.pid)) {
             LOGGER.info("Request pid match rightsMetadata object pid " + this.pid);
             return new MatchResult(MatchResult.MATCH);
@@ -107,11 +107,11 @@ extends AbstractPolicy {
             action = new URI(ActionNamespace.getInstance().ID.uri);
             subject = new URI(SubjectNamespace.getInstance().LOGIN_ID.uri);
         } catch (Throwable t) {};
-        String rAction = getStringAttribute(action, context);
+        String rAction = getActionAttribute(action, context);
         String mAction = this.actionMap.get(rAction);
         int result = Result.DECISION_INDETERMINATE;
         if (this.assertions.containsKey(mAction)) {
-            String rSubject = getStringAttribute(subject, context);
+            String rSubject = getSubjectAttribute(subject, context);
             if (this.assertions.get(mAction).contains(rSubject)) {
                 LOGGER.info("Permitting " + rSubject + " to " + rAction + " for being on the list!");
                 result = Result.DECISION_PERMIT;
@@ -123,7 +123,45 @@ extends AbstractPolicy {
         return new Result(result);
     }
     
-    private String getStringAttribute(URI att, EvaluationCtx context) {
+    private String getActionAttribute(URI att, EvaluationCtx context) {
+        String result = null;
+        try{
+            LOGGER.info("Requested attribute: " + att.toString());
+            EvaluationResult eval = (context.getActionAttribute(new URI(StringAttribute.identifier), att, null));
+            AttributeValue attVal = eval.getAttributeValue();
+            if (attVal.isBag()) {
+                List children = attVal.getChildren();
+                if (children.size() > 0) {
+                    AttributeValue c1 = (AttributeValue)attVal.getChildren().get(0);
+                    result = c1.encode();
+                }
+            } else result = attVal.encode();
+            LOGGER.info("Returning attribute value: " + result);
+        } catch (URISyntaxException e) {
+            LOGGER.error("Unexpected URI syntax problem: " + StringAttribute.identifier,e);
+        }
+        return result;
+    }
+    private String getSubjectAttribute(URI att, EvaluationCtx context) {
+        String result = null;
+        try{
+            LOGGER.info("Requested attribute: " + att.toString());
+            EvaluationResult eval = (context.getSubjectAttribute(new URI(StringAttribute.identifier), att, null));
+            AttributeValue attVal = eval.getAttributeValue();
+            if (attVal.isBag()) {
+                List children = attVal.getChildren();
+                if (children.size() > 0) {
+                    AttributeValue c1 = (AttributeValue)attVal.getChildren().get(0);
+                    result = c1.encode();
+                }
+            } else result = attVal.encode();
+            LOGGER.info("Returning attribute value: " + result);
+        } catch (URISyntaxException e) {
+            LOGGER.error("Unexpected URI syntax problem: " + StringAttribute.identifier,e);
+        }
+        return result;
+    }
+    private String getResourceAttribute(URI att, EvaluationCtx context) {
         String result = null;
         try{
             LOGGER.info("Requested attribute: " + att.toString());
@@ -142,6 +180,5 @@ extends AbstractPolicy {
         }
         return result;
     }
-
 }
 
