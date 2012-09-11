@@ -2,24 +2,17 @@ package org.fcrepo.server.security.xacml.pdp.finder.policy;
 
 import java.io.InputStream;
 
-import java.util.Map;
-
-import com.sun.xacml.AbstractPolicy;
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.combine.PolicyCombiningAlgorithm;
-import com.sun.xacml.ctx.Status;
-import com.sun.xacml.finder.PolicyFinder;
-import com.sun.xacml.finder.PolicyFinderModule;
-import com.sun.xacml.finder.PolicyFinderResult;
-
 import org.apache.commons.io.IOUtils;
-
 import org.fcrepo.server.ReadOnlyContext;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyIndex;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyIndexException;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
 import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.DOReader;
+
+import com.sun.xacml.AbstractPolicy;
+import com.sun.xacml.EvaluationCtx;
+import com.sun.xacml.finder.PolicyFinder;
+import com.sun.xacml.finder.PolicyFinderModule;
+import com.sun.xacml.finder.PolicyFinderResult;
 
 
 public class RightsMetadataPolicyFinderModule
@@ -37,7 +30,13 @@ extends PolicyFinderModule {
     @Override
     public PolicyFinderResult findPolicy(EvaluationCtx context) {
         String pid = org.fcrepo.server.security.PolicyFinderModule.getPid(context);
-        AbstractPolicy policy = findPolicy(pid);
+        AbstractPolicy policy = null;
+        try {
+            policy = findPolicy(context, pid);
+        } catch (PolicyStoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return new PolicyFinderResult(policy);
     }
     
@@ -52,6 +51,9 @@ extends PolicyFinderModule {
             throw new PolicyStoreException("Get: error reading policy "
                                                  + pid + " - " + e.getMessage(), e);
         }
+
+        //FIXME
+        return null;
     }
 
 }
