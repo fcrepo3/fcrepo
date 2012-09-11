@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+  <util:map id="hydraActionMapping">
+	<entry key="urn:fedora:names:fedora:2.1:action:id-addDatastream" value="edit" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-addDisseminator" value="edit" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-adminPing" value="admin" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-export" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-getDatastream" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-getDatastreamHistory" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-getDatastreams" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-getDisseminator" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-getDisseminators" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-getDisseminatorHistory" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-getObjectProperties" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-getObjectXML" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-ingest" value="edit" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-modifyDatastreamByReference" value="edit" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-modifyDatastreamByValue" value="edit" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-modifyDisseminator" value="edit" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-modifyObject" value="update" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-purgeObject" value="delete" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-purgeDatastream" value="delete" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-purgeDisseminator" value="delete" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-setDatastreamState" value="update" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-setDisseminatorState" value="update" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-describeRepository" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-findObjects" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-riFindObjects" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-getDatastreamDissemination" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-getDissemination" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-getObjectHistory" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-getObjectProfile" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-listDatastreams" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-listMethods" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-listObjectInFieldSearchResults" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-listObjectInResourceIndexResults" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-actAsSurrogateFor" value="admin" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-serverShutdown" value="admin" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-serverStatus" value="admin" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-oai" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-upload" value="edit" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-dsstate" value="edit" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-resolveDatastream" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-reloadPolicies" value="admin" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-managePolicies" value="admin" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-getRelationships" value="read" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-addRelationship" value="edit" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-purgeRelationship" value="edit" />
+	<entry key="urn:fedora:names:fedora:2.1:action:id-validate" value="read" />
+  </util:map>
+</beans>

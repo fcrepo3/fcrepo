@@ -2,7 +2,8 @@ package org.fcrepo.server.security.xacml.pdp.finder.policy;
 
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
+import java.util.Map;
+
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
 import org.fcrepo.server.storage.DOManager;
@@ -18,8 +19,10 @@ import com.sun.xacml.finder.PolicyFinderResult;
 public class RightsMetadataPolicyFinderModule
 extends PolicyFinderModule {
     private final DOManager manager;
-    public RightsMetadataPolicyFinderModule(DOManager manager){
+    private final Map<String,String> actionMap;
+    public RightsMetadataPolicyFinderModule(DOManager manager, Map<String,String> actionMap){
         this.manager = manager;
+        this.actionMap = actionMap;
     }
 
     @Override
@@ -34,8 +37,10 @@ extends PolicyFinderModule {
         try {
             policy = findPolicy(context, pid);
         } catch (PolicyStoreException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+        if (policy == null) {
+            return new PolicyFinderResult();
         }
         return new PolicyFinderResult(policy);
     }
@@ -46,14 +51,11 @@ extends PolicyFinderModule {
             
             InputStream is =
                     reader.getDatastream("rightsMetadata", null).getContentStream();
-            byte [] bytes =  IOUtils.toByteArray(is);
+            return new RightsMetadataPolicy(pid,this.actionMap,is);
         } catch (Exception e) {
             throw new PolicyStoreException("Get: error reading policy "
                                                  + pid + " - " + e.getMessage(), e);
         }
-
-        //FIXME
-        return null;
     }
 
 }

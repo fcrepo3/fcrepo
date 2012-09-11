@@ -21,6 +21,11 @@
           <constructor-arg ref="org.fcrepo.server.security.xacml.pdp.data.PolicyIndex" />
           <constructor-arg ref="PolicyCombiningAlgorithm" />
     </bean>
+    <bean id="RightsMetadataPolicyFinderModule"
+          class="org.fcrepo.server.security.xacml.pdp.finder.policy.RightsMetadataPolicyFinderModule">
+          <constructor-arg ref="org.fcrepo.server.storage.DOManager" />
+          <constructor-arg ref="hydraActionMap" />
+    </bean>
   </util:set>
   <util:list id="attributeFinderModules">
     <bean id="CurrentEnvModule" class="com.sun.xacml.finder.impl.CurrentEnvModule"/>

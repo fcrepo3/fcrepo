@@ -12,6 +12,7 @@ import org.xml.sax.SAXException;
         
 public class RightsMetadataReader implements org.xml.sax.ContentHandler {
     private Map<String,Set<String>> assertions = new HashMap<String,Set<String>>();
+    private String currentAction;
     public Map<String,Set<String>> getAssertions() {
         return this.assertions;
     }
@@ -70,7 +71,8 @@ public class RightsMetadataReader implements org.xml.sax.ContentHandler {
                              String qName,
                              Attributes atts) throws SAXException {
             if (localName.equals("access")) {
-                
+                this.currentAction = atts.getValue("type");
+                this.assertions.put(this.currentAction, new HashSet<String>());
             }
     }
 
