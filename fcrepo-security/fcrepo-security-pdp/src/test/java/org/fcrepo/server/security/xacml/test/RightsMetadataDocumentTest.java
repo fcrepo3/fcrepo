@@ -1,5 +1,7 @@
 package org.fcrepo.server.security.xacml.test;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.InputStream;
 
 import org.fcrepo.server.security.xacml.pdp.finder.policy.RightsMetadataDocument;
@@ -15,7 +17,8 @@ public class RightsMetadataDocumentTest {
                 this.getClass().getClassLoader().getResourceAsStream(
                         "rightsMetadata.xml");
         RightsMetadataDocument rmd = new RightsMetadataDocument(in);
-        rmd.getActionSubjectMap();
+        assertTrue(rmd.getActionSubjectMap().get("read")
+                .contains("researcher1"));
     }
 
 }

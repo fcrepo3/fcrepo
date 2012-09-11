@@ -26,6 +26,7 @@
     <human></human>
     <machine>
       <group>public</group>
+      <person>researcher1</person>
     </machine>
   </access>
   <access type="edit">
