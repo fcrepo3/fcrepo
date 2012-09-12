@@ -1,4 +1,4 @@
-package org.fcrepo.server.security.xacml.pdp.finder.policy;
+package org.fcrepo.server.security.xacml.pdp.finder.policy.rightsMetadata;
 
 import java.io.InputStream;
 
@@ -29,7 +29,6 @@ extends PolicyFinderModule {
     public RightsMetadataPolicyFinderModule(Server server, Map<String,String> actionMap){
         this.manager = server.getBean("org.fcrepo.server.storage.DOManager",DOManager.class);
         this.actionMap = actionMap;
-        LOGGER.info("Hey, I'm a RightsMetadataPolicyFinderModule!");
     }
 
     @Override
@@ -53,18 +52,18 @@ extends PolicyFinderModule {
     }
     
     private AbstractPolicy findPolicy(EvaluationCtx context, String pid) throws PolicyStoreException {
-        if (pid.equals( "FedoraRepository")) return null;
+        if (pid.equals( "FedoraRepository")) return null; // It's a trap! This attribute is reused for repo-wide policies
         try {
-            LOGGER.info("finding policy for object with pid=" + pid);
+            LOGGER.debug("finding policy for object with pid={}", pid);
             DOReader reader = this.manager.getReader(false, ReadOnlyContext.EMPTY, pid);
             Datastream rightsMD = reader.GetDatastream("rightsMetadata", null);
             if (rightsMD != null) {
                 InputStream is =
                     rightsMD.getContentStream();
-                LOGGER.info("located rightsMetadata DS for object with pid=" + pid);
+                LOGGER.debug("located rightsMetadata DS for object with pid={}", pid);
                 return new RightsMetadataPolicy(pid,this.actionMap,is);
             } else {
-                LOGGER.info("could not locate rightsMetadata DS for object with pid=" + pid);
+                LOGGER.debug("could not locate rightsMetadata DS for object with pid={}", pid);
                 return null;
             }
         } catch (Exception e) {

@@ -22,7 +22,7 @@
           <constructor-arg ref="PolicyCombiningAlgorithm" />
     </bean>
     <bean id="RightsMetadataPolicyFinderModule"
-          class="org.fcrepo.server.security.xacml.pdp.finder.policy.RightsMetadataPolicyFinderModule">
+          class="org.fcrepo.server.security.xacml.pdp.finder.policy.rightsMetadata.RightsMetadataPolicyFinderModule">
           <constructor-arg ref="org.fcrepo.server.Server" />
           <constructor-arg ref="hydraActionMapping" />
     </bean>

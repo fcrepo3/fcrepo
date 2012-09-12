@@ -1,4 +1,4 @@
-package org.fcrepo.server.security.xacml.pdp.finder.policy;
+package org.fcrepo.server.security.xacml.pdp.finder.policy.rightsMetadata;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,9 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.fcrepo.common.Constants;
-import org.fcrepo.common.policy.ActionNamespace;
 import org.fcrepo.common.policy.ObjectNamespace;
-import org.fcrepo.common.policy.SubjectNamespace;
 
 public class RightsMetadataPolicy
 extends AbstractPolicy {
@@ -47,7 +44,12 @@ extends AbstractPolicy {
         // resource-id mapped to {pid}
         // action-id mapped to /rightsMetadata/access@type
         // subject-id mapped to /rightsMetadata/access/machine/user
+        // fedoraRole mapped to /rightsMetadata/access/machine/group
+        // how to adopt /rightsMetadata/access/machine/world ? maybe '*' as user
         // embargo is trivial if these are done
+        // does discover < read < edit < admin ?
+        // create is a bit of a misnomer in rightsMD: indicates associations, not creation
+        // -- given that, it requires some tree-walking
         this.pid = pid;
         this.actionMap = actionMap;
         LOGGER.info("creating rightsMetadata policy for object " + pid);
@@ -81,16 +83,12 @@ extends AbstractPolicy {
     @Override
     public MatchResult match(EvaluationCtx context) {
         // getResourceAttribute(String type, URI att, URI issuer)
-        URI att = null;
-        try {
-            att = new URI(ObjectNamespace.getInstance().PID.uri);
-        } catch (Throwable t) { } //shaddup
+        URI att = Constants.OBJECT.PID.getURI();
         String rPid = getResourceAttribute(att, context);
         if (rPid.equals(this.pid)) {
-            LOGGER.info("Request pid match rightsMetadata object pid " + this.pid);
             return new MatchResult(MatchResult.MATCH);
         }
-        LOGGER.info("Request pid \"" + rPid +  "\" did not match rightsMetadata object pid " + this.pid);
+        LOGGER.debug("Request pid \"{}\" did not match rightsMetadata object pid {}", rPid, this.pid);
         return new MatchResult(MatchResult.NO_MATCH);
     }
 
@@ -114,26 +112,26 @@ extends AbstractPolicy {
         if (this.assertions.containsKey(mAction)) {
             String rSubject = getSubjectAttribute(subject, context);
             if (this.assertions.get(mAction).contains(rSubject)) {
-                LOGGER.info("Permitting " + rSubject + " to " + rAction + " for being on the list!");
+                LOGGER.debug("Permitting {} to {} for being on the list!", rSubject, rAction);
                 result = Result.DECISION_PERMIT;
             } else {
-                LOGGER.info("Denying " + rSubject + " to " + rAction + " for not being on the list!");
+                LOGGER.debug("Denying {} to {} for not being on the list!", rSubject, rAction);
                 result = Result.DECISION_DENY;
             }
-        } else LOGGER.info("Could not find subjects for mapped action " + mAction + " from requested action " + rAction);
+        } else LOGGER.debug("Could not find subjects for mapped action {} from requested action {}", mAction, rAction);
         return new Result(result);
     }
     
     private String getActionAttribute(URI att, EvaluationCtx context) {
         String result = null;
         try{
-            LOGGER.info("Requested attribute: " + att.toString());
+            LOGGER.debug("Requested attribute: {}", att.toString());
             EvaluationResult eval =
                     (context.getActionAttribute(new URI(StringAttribute.identifier),
                                                 att,
                                                 null));
             result = getAttributeFromEvaluationResult(eval);
-            LOGGER.info("Returning attribute value: " + result);
+            LOGGER.debug("Returning attribute value: {}", result);
         } catch (URISyntaxException e) {
             LOGGER.error("Unexpected URI syntax problem: " + StringAttribute.identifier,e);
         }
@@ -142,11 +140,12 @@ extends AbstractPolicy {
     private String getSubjectAttribute(URI att, EvaluationCtx context) {
         String result = null;
         try{
-            LOGGER.info("Requested attribute: " + att.toString());
+            LOGGER.debug("Requested attribute: {}", att.toString());
             // getSubjectAttribute(URI type, URI id, URI category)
+            // unlike action or resource attributes, subjects are added to a default category by sunxacml
             EvaluationResult eval = (context.getSubjectAttribute(new URI(StringAttribute.identifier), att, Subject.DEFAULT_CATEGORY));
             result = getAttributeFromEvaluationResult(eval);
-            LOGGER.info("Returning attribute value: " + result);
+            LOGGER.debug("Returning attribute value: {}", result);
         } catch (URISyntaxException e) {
             LOGGER.error("Unexpected URI syntax problem: " + StringAttribute.identifier,e);
         }
@@ -155,10 +154,10 @@ extends AbstractPolicy {
     private String getResourceAttribute(URI att, EvaluationCtx context) {
         String result = null;
         try{
-            LOGGER.info("Requested attribute: " + att.toString());
+            LOGGER.debug("Requested attribute: {}", att.toString());
             EvaluationResult eval = (context.getResourceAttribute(new URI(StringAttribute.identifier), att, null));
             result = getAttributeFromEvaluationResult(eval);
-            LOGGER.info("Returning attribute value: " + result);
+            LOGGER.debug("Returning attribute value: {}", result);
         } catch (URISyntaxException e) {
             LOGGER.error("Unexpected URI syntax problem: " + StringAttribute.identifier,e);
         }

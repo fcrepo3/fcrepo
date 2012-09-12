@@ -2,7 +2,7 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
-package org.fcrepo.server.security.xacml.pdp.finder.policy;
+package org.fcrepo.server.security.xacml.pdp.finder.policy.rightsMetadata;
 
 import java.io.InputStream;
 import java.util.HashMap;
