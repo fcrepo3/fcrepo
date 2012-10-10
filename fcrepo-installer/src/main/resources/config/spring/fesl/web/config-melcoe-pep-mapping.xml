@@ -11,7 +11,7 @@
         http://www.springframework.org/schema/util/spring-util-2.5.xsd">
   <bean id="org.fcrepo.server.security.xacml.util.ContextUtil"
         class="org.fcrepo.server.security.xacml.util.ContextUtil">
-    <property name="actionMap" ref="actionAttributeMapping" />
+    <property name="actionValueMap" ref="actionAttributeMapping" />
   </bean>
         
   <util:map id="actionAttributeMapping">

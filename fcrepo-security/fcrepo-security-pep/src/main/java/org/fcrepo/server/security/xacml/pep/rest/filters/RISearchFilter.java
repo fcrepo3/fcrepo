@@ -348,6 +348,9 @@ public class RISearchFilter
                         .put(Constants.ACTION.ID.getURI(),
                              new StringAttribute(Constants.ACTION.LIST_OBJECT_IN_RESOURCE_INDEX_RESULTS
                                      .getURI().toASCIIString()));
+                actions.put(Constants.ACTION.API.getURI(),
+                            new StringAttribute(Constants.ACTION.APIA.getURI()
+                                    .toASCIIString()));
 
                 // Modification to uniquely identify datastreams
 

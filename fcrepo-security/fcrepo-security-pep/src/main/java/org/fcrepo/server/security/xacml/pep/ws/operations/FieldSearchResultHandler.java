@@ -116,6 +116,9 @@ public class FieldSearchResultHandler
                             .put(Constants.ACTION.ID.getURI(),
                                  new StringAttribute(Constants.ACTION.LIST_OBJECT_IN_FIELD_SEARCH_RESULTS
                                          .getURI().toASCIIString()));
+                    actions.put(Constants.ACTION.API.getURI(),
+                                new StringAttribute(Constants.ACTION.APIA.getURI()
+                                        .toASCIIString()));
 
                     resAttr.put(Constants.OBJECT.PID.getURI(),
                                 new StringAttribute(pid));
