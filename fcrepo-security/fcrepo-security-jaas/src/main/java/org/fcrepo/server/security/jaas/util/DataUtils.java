@@ -43,15 +43,25 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 public class DataUtils {
 
     private static Logger logger = LoggerFactory.getLogger(DataUtils.class);
+    private static DocumentBuilderFactory FACTORY = getFactory();
 
-    public static Document getDocumentFromFile(File file) throws Exception {
-        byte[] document = loadFile(file);
+    private static DocumentBuilderFactory getFactory(){
         DocumentBuilderFactory documentBuilderFactory =
                 DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder =
-                documentBuilderFactory.newDocumentBuilder();
+        return documentBuilderFactory;
+    }
 
+    public static Document getDocumentFromFile(File file) throws Exception {
+        byte[] document = loadFile(file);
+        return getDocumentFromBytes(document);
+    }
+
+    public static Document getDocumentFromBytes(byte[] document) throws Exception {
+        DocumentBuilder docBuilder;
+        synchronized(FACTORY){
+            docBuilder = FACTORY.newDocumentBuilder();
+        }
         Document doc = docBuilder.parse(new ByteArrayInputStream(document));
 
         return doc;
@@ -84,12 +94,10 @@ public class DataUtils {
             throws Exception {
         Document doc = null;
         try {
-            DocumentBuilderFactory documentBuilderFactory =
-                    DocumentBuilderFactory.newInstance();
-            documentBuilderFactory.setNamespaceAware(true);
-            DocumentBuilder docBuilder =
-                    documentBuilderFactory.newDocumentBuilder();
-
+            DocumentBuilder docBuilder;
+            synchronized(FACTORY){
+                docBuilder = FACTORY.newDocumentBuilder();
+            }
             doc = docBuilder.parse(new ByteArrayInputStream(document));
         } catch (Exception e) {
             String message = "Unable to save file: " + filename;
@@ -135,11 +143,10 @@ public class DataUtils {
     }
 
     public static String format(byte[] document) throws Exception {
-        DocumentBuilderFactory documentBuilderFactory =
-                DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder =
-                documentBuilderFactory.newDocumentBuilder();
+        DocumentBuilder docBuilder;
+        synchronized(FACTORY){
+            docBuilder = FACTORY.newDocumentBuilder();
+        }
 
         Document doc = docBuilder.parse(new ByteArrayInputStream(document));
 
@@ -166,10 +173,11 @@ public class DataUtils {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         XMLSerializer serializer = new XMLSerializer(outStream, format);
 
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(new ByteArrayInputStream(data));
+        DocumentBuilder docBuilder;
+        synchronized(FACTORY){
+            docBuilder = FACTORY.newDocumentBuilder();
+        }
+        Document doc = docBuilder.parse(new ByteArrayInputStream(data));
         serializer.serialize(doc);
 
         ByteArrayInputStream in =

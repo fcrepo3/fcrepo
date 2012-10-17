@@ -49,20 +49,21 @@ public class XmlUsersFileModule
     private static final Logger logger =
             LoggerFactory.getLogger(XmlUsersFileModule.class);
 
+    private static final File userFile = getUsersFile();
+
+    // must be marked volatile for double-checked locking in caching method to work
+    private static volatile long userFileParsed = Long.MIN_VALUE;
+
+    private static volatile long userFileBytesLoaded = 0L;
+
+    private static volatile Document userDoc = null;
+
     private Subject subject = null;
 
     private CallbackHandler handler = null;
 
     // private Map<String, ?> sharedState = null;
     private Map<String, ?> options = null;
-
-    private String fedoraHome = null;
-
-    private File userFile = null;
-    // must be marked volatile for double-checked locking in caching method to work
-    private volatile long userFileParsed = 0L;
-
-    private Document userDoc;
 
     private String username = null;
 
@@ -89,17 +90,6 @@ public class XmlUsersFileModule
             debug = true;
         }
 
-        fedoraHome = Constants.FEDORA_HOME;
-        if (fedoraHome == null || "".equals(fedoraHome)) {
-            logger.error("FEDORA_HOME constant is not set");
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("using FEDORA_HOME: " + fedoraHome);
-            }
-        }
-
-        userFile = new File(fedoraHome + "/server/config/fedora-users.xml");
-
         attributes = new HashMap<String, Set<String>>();
 
         if (debug) {
@@ -113,7 +103,7 @@ public class XmlUsersFileModule
             logger.debug(this.getClass().getName() + " login called.");
         }
 
-        if (fedoraHome == null || "".equals(fedoraHome.trim())) {
+        if (Constants.FEDORA_HOME == null || "".equals(Constants.FEDORA_HOME.trim())) {
             logger.error("FEDORA_HOME constant is not set");
             return false;
         }
@@ -196,13 +186,12 @@ public class XmlUsersFileModule
 
     private boolean authenticate(String username, String password) {
         if (!userFile.exists()) {
-            logger.error("XmlUsersFile not found: " + userFile.getAbsolutePath());
+            logger.error("XmlUsersFile not found: {}", userFile.getAbsolutePath());
             return false;
         }
 
         try {
-            checkUserDocument();
-
+            Document userDoc = getUserDocument();
             // go through each user
             NodeList userList = userDoc.getElementsByTagName("user");
             for (int x = 0; x < userList.getLength(); x++) {
@@ -243,8 +232,19 @@ public class XmlUsersFileModule
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-
         return false;
+    }
+
+    private static File getUsersFile() {
+        if (Constants.FEDORA_HOME == null || "".equals(Constants.FEDORA_HOME)) {
+            logger.error("FEDORA_HOME constant is not set");
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("using FEDORA_HOME: " + Constants.FEDORA_HOME);
+            }
+        }
+
+        return new File(Constants.FEDORA_HOME + "/server/config/fedora-users.xml");
     }
 
     /**
@@ -252,14 +252,16 @@ public class XmlUsersFileModule
      * @return DOM of a parsed user file
      * @throws Exception
      */
-    private void checkUserDocument() throws Exception {
-        if (userFileParsed < userFile.lastModified()) {
-            synchronized(this){
-                if (userFileParsed < userFile.lastModified()) {
-                    userFileParsed = userFile.lastModified();
+    private static Document getUserDocument() throws Exception {
+        if (userDoc == null || userFileParsed != userFile.lastModified() || userFileBytesLoaded != userFile.length()) {
+            synchronized(XmlUsersFileModule.class) {
+                if (userDoc == null || userFileParsed != userFile.lastModified() || userFileBytesLoaded != userFile.length()) {
                     userDoc = DataUtils.getDocumentFromFile(userFile);
+                    userFileParsed = userFile.lastModified();
+                    userFileBytesLoaded = userFile.length();
                 }
             }
         }
+        return userDoc;
     }
 }
