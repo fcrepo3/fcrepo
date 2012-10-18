@@ -93,7 +93,7 @@ public class XmlUsersFileModule
         attributes = new HashMap<String, Set<String>>();
 
         if (debug) {
-            logger.debug("login module initialised: " + this.getClass().getName());
+            logger.debug("login module initialised: {}", this.getClass().getName());
         }
     }
 

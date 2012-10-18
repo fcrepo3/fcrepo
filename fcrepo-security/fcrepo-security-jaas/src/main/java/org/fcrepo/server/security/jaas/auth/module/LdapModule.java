@@ -19,12 +19,9 @@
 package org.fcrepo.server.security.jaas.auth.module;
 
 import java.io.IOException;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
 import java.text.MessageFormat;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,7 +40,6 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
-
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -64,6 +60,10 @@ public class LdapModule
     private static final Logger logger =
             LoggerFactory.getLogger(LdapModule.class);
 
+    private final static String LDAP_PASSWORD_REGEX = "\\{(.+)\\}(.+)";
+
+    private final static Pattern LDAP_PASSWORD_PATTERN = Pattern.compile(LDAP_PASSWORD_REGEX);
+
     private Subject subject = null;
 
     private CallbackHandler handler = null;
@@ -81,6 +81,7 @@ public class LdapModule
 
     private boolean successLogin = false;
 
+    @Override
     public void initialize(Subject subject,
                            CallbackHandler handler,
                            Map<String, ?> sharedState,
@@ -102,6 +103,7 @@ public class LdapModule
         }
     }
 
+    @Override
     public boolean login() throws LoginException {
         if (debug) {
             logger.debug(this.getClass().getName() + " login called.");
@@ -119,6 +121,15 @@ public class LdapModule
             username = ((NameCallback) callbacks[0]).getName();
             char[] passwordCharArray =
                     ((PasswordCallback) callbacks[1]).getPassword();
+            if (isEmpty(passwordCharArray)){
+                boolean allowAnon;
+                try{
+                    allowAnon = Boolean.valueOf(getOption("allow.anonymous", false));
+                } catch (Exception e) {  // only thrown for required options
+                    allowAnon = false;
+                }
+                if (!allowAnon) return false;
+            }
             password = new String(passwordCharArray);
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -134,6 +145,7 @@ public class LdapModule
         return successLogin;
     }
 
+    @Override
     public boolean commit() throws LoginException {
         if (!successLogin) {
             return false;
@@ -150,6 +162,7 @@ public class LdapModule
         return true;
     }
 
+    @Override
     public boolean abort() throws LoginException {
         try {
             clear();
@@ -161,6 +174,7 @@ public class LdapModule
         return true;
     }
 
+    @Override
     public boolean logout() throws LoginException {
         try {
             clear();
@@ -237,7 +251,7 @@ public class LdapModule
         String bindFilter = getOption("bind.filter", true);
         String dn = MessageFormat.format(bindFilter, username);
         if (debug) {
-            logger.debug("authenticating user: " + dn);
+            logger.debug("authenticating user: {}", dn);
         }
 
         env.put(Context.SECURITY_PRINCIPAL, dn);
@@ -270,7 +284,7 @@ public class LdapModule
         try {
             ctx = new InitialDirContext(env);
         } catch (NamingException ne) {
-            logger.error("Failed to bind as bindUser: " + bindUser);
+            logger.error("Failed to bind as bindUser: {}", bindUser);
             throw ne;
         }
 
@@ -303,7 +317,7 @@ public class LdapModule
 
         SearchResult result = results.next();
         if (debug) {
-            logger.debug("authenticating user: " + result.getNameInNamespace());
+            logger.debug("authenticating user: {}", result.getNameInNamespace());
         }
 
         if (bind) {
@@ -330,8 +344,8 @@ public class LdapModule
             // get userPassword attribute
             Attribute up = result.getAttributes().get("userPassword");
             if (up == null) {
-                logger.error("unable to read userPassword attribute for: "
-                        + result.getNameInNamespace());
+                logger.error("unable to read userPassword attribute for: {}",
+                             result.getNameInNamespace());
                 return false;
             }
 
@@ -369,12 +383,19 @@ public class LdapModule
                     aValues.add((String) value);
 
                     if (debug) {
-                        logger.debug("added to principal: " + attribute.getID()
-                                + "/" + value);
+                        logger.debug("added to principal: {}/{}",
+                                     attribute.getID(), value);
                     }
                 }
             }
         }
+    }
+
+    private static boolean isEmpty(char[] chars){
+        if (chars.length == 0) return true;
+        boolean result = true;
+        for (char c:chars) result &= Character.isWhitespace(c);
+        return result;
     }
 
     /**
@@ -390,9 +411,7 @@ public class LdapModule
      */
     private static boolean passwordsMatch(String userPassword,
                                           String ldapPassword) {
-        final String LDAP_PASSWORD_REGEX = "\\{(.+)\\}(.+)";
-        Pattern p = Pattern.compile(LDAP_PASSWORD_REGEX);
-        Matcher m = p.matcher(ldapPassword);
+        Matcher m = LDAP_PASSWORD_PATTERN.matcher(ldapPassword);
 
         boolean match = false;
         if (m.find() && m.groupCount() == 2) {
@@ -401,14 +420,14 @@ public class LdapModule
             String encoding = m.group(1);
             String password = m.group(2);
             if (logger.isDebugEnabled()) {
-                logger.debug("Encoding: " + encoding + ", Password: " + password);
+                logger.debug("Encoding: {}, Password: {}", encoding, password);
             }
 
             MessageDigest digest = null;
             try {
                 digest = MessageDigest.getInstance(encoding.toUpperCase());
             } catch (NoSuchAlgorithmException e) {
-                logger.error("Unsupported Algorithm used: " + encoding);
+                logger.error("Unsupported Algorithm used: {}", encoding);
                 logger.error(e.getMessage());
                 return false;
             }
