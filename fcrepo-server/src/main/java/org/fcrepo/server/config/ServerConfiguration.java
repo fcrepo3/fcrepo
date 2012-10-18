@@ -30,6 +30,17 @@ public class ServerConfiguration
         extends Configuration
         implements Constants {
 
+			private final String DEPRECATION_WARNING =
+			"\n<!--\n\n" +
+			"WARNING! ACHTUNG! ATTENZIONE!\n\n" +
+			"This configuration file is considered a legacy service and will eventually be deprecated.\n" +
+			"The recommended means of configuration is now Fedora's Spring configuration facility, as\n" +
+			"documented here:\n\n" +
+			"https://wiki.duraspace.org/display/FEDORA36/Spring+Configuration\n\n" +
+			"and here:\n\n" +
+			"https://wiki.duraspace.org/display/FEDORA36/Spring+Security\n\n" +
+			"-->\n\n";		
+			
     private String m_className;
 
     private final List<ModuleConfiguration> m_moduleConfigurations;
@@ -112,6 +123,7 @@ public class ServerConfiguration
     public void serialize(OutputStream xmlStream) throws IOException {
         PrintStream out = new PrintStream(xmlStream);
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		out.println(DEPRECATION_WARNING);
         out.println("<server xmlns=\"" + FCFG.uri + "\" class=\"" + m_className
                 + "\">");
 
