@@ -19,9 +19,7 @@
 package org.fcrepo.server.security.xacml.pep.rest.objectshandlers;
 
 import java.io.IOException;
-
 import java.net.URI;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,20 +27,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.sun.xacml.attr.AnyURIAttribute;
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
+import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.DateTimeAttribute;
 import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
-import org.fcrepo.server.security.xacml.util.LogUtil;
 
 
 /**
@@ -72,26 +67,13 @@ public class ListMethods
      * org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter#handleRequest(javax.servlet
      * .http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
+    @Override
     public RequestCtx handleRequest(HttpServletRequest request,
                                     HttpServletResponse response)
             throws IOException, ServletException {
         if (logger.isDebugEnabled()) {
-            logger.debug(this.getClass().getName() + "/handleRequest!");
+            logger.debug("{}/handleRequest!", this.getClass().getName());
         }
-
-        // -/objects/[pid]/methods and
-        // -/objects/[pid]/methods/[sdefPid]
-
-        String path = request.getPathInfo();
-        String[] parts = path.split("/");
-
-        String sDefPid = null;
-        String pid = parts[1];
-        if (parts.length > 3) {
-            sDefPid = parts[3];
-        }
-
-
 
         String asOfDateTime = request.getParameter("asOfDateTime");
         if (!isDate(asOfDateTime)) {
@@ -100,31 +82,19 @@ public class ListMethods
 
         RequestCtx req = null;
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        Map<URI, AttributeValue> resAttr;
         try {
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(Constants.OBJECT.PID.getURI(),
-                            new StringAttribute(pid));
-            }
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
-                            new AnyURIAttribute(new URI(pid)));
-            }
-            if (sDefPid != null && !"".equals(sDefPid)) {
-                resAttr.put(Constants.SDEF.PID.getURI(),
-                            new StringAttribute(sDefPid));
-            }
+            resAttr = getResources(request);
             if (asOfDateTime != null && !"".equals(asOfDateTime)) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(asOfDateTime));
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.LIST_METHODS
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.LIST_METHODS
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIA.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIA.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(request),
@@ -132,9 +102,9 @@ public class ListMethods
                                                      resAttr,
                                                      getEnvironment(request));
 
+            String pid = resAttr.get(Constants.OBJECT.PID.getURI()).toString();
             LogUtil.statLog(request.getRemoteUser(),
-                            Constants.ACTION.LIST_METHODS.getURI()
-                                    .toASCIIString(),
+                            Constants.ACTION.LIST_METHODS.uri,
                             pid,
                             null);
         } catch (Exception e) {
@@ -143,6 +113,21 @@ public class ListMethods
         }
 
         return req;
+    }
+
+    @Override
+    public void getLocalResources(String[] parts, Map<URI, AttributeValue> resAttr) {
+        // -/objects/[pid]/methods and
+        // -/objects/[pid]/methods/[sdefPid]
+        if (parts.length > 3){
+            if ("methods".equals(parts[2])) {
+                String sDefPid = parts[3];
+                if (sDefPid != null && !"".equals(sDefPid)) {
+                    resAttr.put(Constants.SDEF.PID.getURI(),
+                            new StringAttribute(sDefPid));
+                }
+            }
+        }
     }
 
     /*

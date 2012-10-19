@@ -31,9 +31,7 @@ import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
 
 /**
@@ -68,16 +66,15 @@ public class DescribeRepositoryHandler
 
         try {
             resAttr.put(Constants.OBJECT.PID.getURI(),
-                        new StringAttribute("FedoraRepository"));
-            resAttr.put(new URI(XACML_RESOURCE_ID),
-                        new AnyURIAttribute(new URI("FedoraRepository")));
+                    Constants.FEDORA_REPOSITORY_PID.getStringAttribute());
+            resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                        Constants.FEDORA_REPOSITORY_PID.getURIAttribute());
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.DESCRIBE_REPOSITORY
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.DESCRIBE_REPOSITORY
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIA.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIA.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),
@@ -85,8 +82,8 @@ public class DescribeRepositoryHandler
                                                      resAttr,
                                                      getEnvironment(context));
 
-            LogUtil.statLog(getUser(context), Constants.ACTION.DESCRIBE_REPOSITORY
-                    .getURI().toASCIIString(), "FedoraRepository", null);
+            LogUtil.statLog(getUser(context), Constants.ACTION.DESCRIBE_REPOSITORY.uri,
+                    Constants.FEDORA_REPOSITORY_PID.uri, null);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new OperationHandlerException(e.getMessage(), e);

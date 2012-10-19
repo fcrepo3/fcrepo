@@ -96,16 +96,16 @@ public class PurgeRelationshipHandler
                             new StringAttribute(pid));
             }
             if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.PURGE_RELATIONSHIP
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.PURGE_RELATIONSHIP
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIM.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIM
+                                .getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),

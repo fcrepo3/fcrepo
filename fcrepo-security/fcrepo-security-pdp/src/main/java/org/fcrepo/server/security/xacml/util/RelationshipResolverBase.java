@@ -5,14 +5,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.MalformedPIDException;
 import org.fcrepo.common.PID;
-
 import org.fcrepo.server.security.xacml.pdp.MelcoePDPException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public abstract class RelationshipResolverBase
@@ -28,7 +26,7 @@ public abstract class RelationshipResolverBase
      * but it is a special case, as it is not represented by a PID, and by
      * definition, has no parents.
      */
-    protected static final String REPOSITORY = "FedoraRepository";
+    protected static final String REPOSITORY = Constants.FEDORA_REPOSITORY_PID.uri;
     protected static String DEFAULT_RELATIONSHIP = "info:fedora/fedora-system:def/relations-external#isMemberOf";
     // relationships to parent object
     protected final List<String> parentRelationships;
@@ -94,7 +92,7 @@ public abstract class RelationshipResolverBase
         try {
             pid = new PID(parts[0]);
         } catch (MalformedPIDException e1) {
-            logger.warn("Invalid Fedora resource identifier: " + res + ". PID part of URI is malformed");
+            logger.warn("Invalid Fedora resource identifier: {}. PID part of URI is malformed", res);
             return null;
         }
 
@@ -104,7 +102,7 @@ public abstract class RelationshipResolverBase
         } else if (parts.length == 2) {
             resURI = pid.toURI() + "/" + parts[1]; // add datastream ID back
         } else {
-            logger.warn("Invalid Fedora resource identifier: " + res + ". Should be pid or datastream (URI form optional");
+            logger.warn("Invalid Fedora resource identifier: {}. Should be pid or datastream (URI form optional", res);
             return null;
         }
         return resURI;

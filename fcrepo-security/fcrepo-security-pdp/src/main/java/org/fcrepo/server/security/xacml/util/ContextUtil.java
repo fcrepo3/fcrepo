@@ -63,7 +63,7 @@ public class ContextUtil {
             LoggerFactory.getLogger(ContextUtil.class);
 
     private static final URI XACML_RESOURCE_ID =
-            URI.create("urn:oasis:names:tc:xacml:1.0:resource:resource-id");
+            Constants.XACML1_RESOURCE.ID.getURI();
 
     private final Map<URI, URI> actionMap =
             new ConcurrentHashMap<URI, URI>();

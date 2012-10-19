@@ -114,9 +114,7 @@ public class AddDatastreamHandler
             if (pid != null && !"".equals(pid)) {
                 resAttr.put(Constants.OBJECT.PID.getURI(),
                             new StringAttribute(pid));
-            }
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
             }
             if (dsID != null && !"".equals(dsID)) {
@@ -153,17 +151,16 @@ public class AddDatastreamHandler
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.ADD_DATASTREAM
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.ADD_DATASTREAM
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIM.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIM.getStringAttribute());
             // modifying the FeSL policy datastream requires policy management permissions
             if (dsID != null
                     && dsID.equals(FedoraPolicyStore.FESL_POLICY_DATASTREAM)) {
                 actions.put(Constants.ACTION.ID.getURI(),
-                            new StringAttribute(Constants.ACTION.MANAGE_POLICIES
-                                    .getURI().toASCIIString()));
+                            Constants.ACTION.MANAGE_POLICIES
+                                    .getStringAttribute());
 
             }
 
@@ -173,8 +170,7 @@ public class AddDatastreamHandler
                                                      resAttr,
                                                      getEnvironment(context));
 
-            LogUtil.statLog(getUser(context), Constants.ACTION.ADD_DATASTREAM.getURI()
-                    .toASCIIString(), pid, dsID);
+            LogUtil.statLog(getUser(context), Constants.ACTION.ADD_DATASTREAM.uri, pid, dsID);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new OperationHandlerException(e.getMessage(), e);

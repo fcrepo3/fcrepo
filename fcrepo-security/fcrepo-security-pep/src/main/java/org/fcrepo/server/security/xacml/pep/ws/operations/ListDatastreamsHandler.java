@@ -149,7 +149,7 @@ public class ListDatastreamsHandler
                             new StringAttribute(pid));
             }
             if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
             }
             if (asOfDateTime != null && !"".equals(asOfDateTime)) {
@@ -158,11 +158,11 @@ public class ListDatastreamsHandler
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.LIST_DATASTREAMS
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.LIST_DATASTREAMS
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIA.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIA
+                                .getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),
@@ -171,8 +171,7 @@ public class ListDatastreamsHandler
                                                      getEnvironment(context));
 
             LogUtil.statLog(getUser(context),
-                            Constants.ACTION.LIST_DATASTREAMS.getURI()
-                                    .toASCIIString(),
+                            Constants.ACTION.LIST_DATASTREAMS.uri,
                             pid,
                             null);
         } catch (Exception e) {
@@ -205,12 +204,12 @@ public class ListDatastreamsHandler
 
             try {
                 actions.put(Constants.ACTION.ID.getURI(),
-                            new StringAttribute(Constants.ACTION.GET_DATASTREAM
-                                    .getURI().toASCIIString()));
+                            Constants.ACTION.GET_DATASTREAM
+                                    .getStringAttribute());
 
                 resAttr.put(Constants.OBJECT.PID.getURI(),
                             new StringAttribute(pid));
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
                 resAttr.put(Constants.DATASTREAM.ID.getURI(),
                             new StringAttribute(dsDef.getID()));

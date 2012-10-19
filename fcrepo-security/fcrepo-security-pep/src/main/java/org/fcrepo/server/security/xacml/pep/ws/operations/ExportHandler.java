@@ -99,7 +99,7 @@ public class ExportHandler
                             new StringAttribute(pid));
             }
             if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
             }
             if (format != null && !"".equals(format)) {
@@ -112,11 +112,9 @@ public class ExportHandler
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.EXPORT.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.EXPORT.getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIM.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIM.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),
@@ -124,7 +122,7 @@ public class ExportHandler
                                                      resAttr,
                                                      getEnvironment(context));
             LogUtil.statLog(getUser(context), Constants.ACTION.EXPORT
-                    .getURI().toASCIIString(), pid, null);
+                    .uri, pid, null);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new OperationHandlerException(e.getMessage(), e);

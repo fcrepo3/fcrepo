@@ -5,7 +5,6 @@
 package org.fcrepo.server.security.xacml.util;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,13 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.MalformedPIDException;
 import org.fcrepo.common.PID;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
@@ -30,6 +25,8 @@ import org.fcrepo.server.management.Management;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pdp.MelcoePDPException;
 import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -49,7 +46,6 @@ public class RelationshipResolverImpl
      * but it is a special case, as it is not represented by a PID, and by
      * definition, has no parents.
      */
-    private final static String REPOSITORY = "FedoraRepository";
 
     private static String DEFAULT_RELATIONSHIP =
             "info:fedora/fedora-system:def/relations-external#isMemberOf";
@@ -94,6 +90,7 @@ public class RelationshipResolverImpl
      * org.fcrepo.server.security.xacml.pdp.finder.support.RelationshipResolver#buildRESTParentHierarchy
      * (java.lang.String)
      */
+    @Override
     public String buildRESTParentHierarchy(String pid)
             throws MelcoeXacmlException {
         Set<String> parents = getParents(pid);
@@ -118,7 +115,7 @@ public class RelationshipResolverImpl
         }
 
         Set<String> parentPIDs = new HashSet<String>();
-        if (pid.equalsIgnoreCase(REPOSITORY)) {
+        if (pid.equalsIgnoreCase(Constants.FEDORA_REPOSITORY_PID.uri)) {
             return parentPIDs;
         }
 
@@ -160,7 +157,7 @@ public class RelationshipResolverImpl
         }
         return parentPIDs;
     }
-    
+
     protected String getSubjectURI(String subject) throws MalformedPIDException {
         String strippedSubject;
         if (subject.startsWith(Constants.FEDORA.uri)) {
@@ -179,15 +176,17 @@ public class RelationshipResolverImpl
             logger.warn("Invalid subject argument for getRelationships: " + subject + ". Should be pid or datastream (URI form optional");
             subjectURI = null;
         }
-        
+
         return subjectURI;
     }
 
+    @Override
     public Map<String, Set<String>> getRelationships(String subject)
             throws MelcoeXacmlException {
         return getRelationships(subject, null);
     }
 
+    @Override
     public Map<String, Set<String>> getRelationships(String subject,
                                                       String relationship)
             throws MelcoeXacmlException {

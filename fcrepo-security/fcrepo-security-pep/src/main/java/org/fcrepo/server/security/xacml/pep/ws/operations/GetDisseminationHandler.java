@@ -103,9 +103,7 @@ public class GetDisseminationHandler
             if (pid != null && !"".equals(pid)) {
                 resAttr.put(Constants.OBJECT.PID.getURI(),
                             new StringAttribute(pid));
-            }
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
             }
             if (sDefPid != null && !"".equals(sDefPid)) {
@@ -122,11 +120,10 @@ public class GetDisseminationHandler
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.GET_DISSEMINATION
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.GET_DISSEMINATION
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIA.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIA.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),
@@ -135,8 +132,7 @@ public class GetDisseminationHandler
                                                      getEnvironment(context));
 
             LogUtil.statLog(getUser(context),
-                            Constants.ACTION.GET_DISSEMINATION.getURI()
-                                    .toASCIIString(),
+                            Constants.ACTION.GET_DISSEMINATION.uri,
                             pid,
                             null);
         } catch (Exception e) {

@@ -19,9 +19,7 @@
 package org.fcrepo.server.security.xacml.pep.rest.objectshandlers;
 
 import java.io.IOException;
-
 import java.net.URI;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,17 +27,16 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.sun.xacml.attr.AnyURIAttribute;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.ctx.RequestCtx;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.xacml.attr.AttributeValue;
+import com.sun.xacml.attr.StringAttribute;
+import com.sun.xacml.ctx.RequestCtx;
 
 
 /**
@@ -69,34 +66,30 @@ public class Ingest
      * org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter#handleRequest(javax.servlet
      * .http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
+    @Override
     public RequestCtx handleRequest(HttpServletRequest request,
                                     HttpServletResponse response)
             throws IOException, ServletException {
         if (logger.isDebugEnabled()) {
-            logger.debug(this.getClass().getName() + "/handleRequest!");
+            logger.debug("{}/handleRequest!", this.getClass().getName());
         }
 
         String format = request.getParameter("format");
 
         RequestCtx req = null;
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        Map<URI, AttributeValue> resAttr;
         try {
-            resAttr.put(Constants.OBJECT.PID.getURI(),
-                        new StringAttribute("FedoraRepository"));
-            resAttr.put(new URI(XACML_RESOURCE_ID),
-                        new AnyURIAttribute(new URI("FedoraRepository")));
+            resAttr = getRepositoryResources(request);
             if (format != null && !"".equals(format)) {
                 resAttr.put(Constants.OBJECT.FORMAT_URI.getURI(),
                             new StringAttribute(format));
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.INGEST.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.INGEST.getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIM.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIM.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(request),
@@ -104,8 +97,10 @@ public class Ingest
                                                      resAttr,
                                                      getEnvironment(request));
 
-            LogUtil.statLog(request.getRemoteUser(), Constants.ACTION.INGEST
-                    .getURI().toASCIIString(), "FedoraRepository", null);
+            LogUtil.statLog(request.getRemoteUser(),
+                            Constants.ACTION.INGEST.uri,
+                            Constants.FEDORA_REPOSITORY_PID.uri,
+                            null);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new ServletException(e.getMessage(), e);

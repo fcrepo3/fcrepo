@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.common.policy;
@@ -19,7 +19,7 @@ public abstract class XacmlNamespace {
         uri = (parent == null ? "" : parent.uri + ":") + localName;
     }
 
-    XacmlNamespace addNamespace(XacmlNamespace namespace) {
+    protected XacmlNamespace addNamespace(XacmlNamespace namespace) {
         XacmlNamespace result = null;
         if (memberNamespaces.add(namespace)) {
             result = namespace;
@@ -27,7 +27,7 @@ public abstract class XacmlNamespace {
         return result;
     }
 
-    XacmlName addName(XacmlName name) {
+    protected XacmlName addName(XacmlName name) {
         XacmlName result = null;
         if (memberNames.add(name)) {
             result = name;

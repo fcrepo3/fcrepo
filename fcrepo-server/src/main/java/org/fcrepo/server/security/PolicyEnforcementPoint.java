@@ -1,6 +1,7 @@
 
 package org.fcrepo.server.security;
 
+import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.authorization.AuthzException;
 
@@ -11,13 +12,13 @@ public interface PolicyEnforcementPoint {
     public static final String SUBRESOURCE_SEPARATOR = "//";
 
     public static final String XACML_SUBJECT_ID =
-            "urn:oasis:names:tc:xacml:1.0:subject:subject-id";
+            Constants.XACML1_SUBJECT.ID.toString();
 
     public static final String XACML_ACTION_ID =
-            "urn:oasis:names:tc:xacml:1.0:action:action-id";
+            Constants.XACML1_ACTION.ID.toString();
 
     public static final String XACML_RESOURCE_ID =
-            "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
+            Constants.XACML1_RESOURCE.ID.toString();
 
     public void newPdp() throws Exception;
 

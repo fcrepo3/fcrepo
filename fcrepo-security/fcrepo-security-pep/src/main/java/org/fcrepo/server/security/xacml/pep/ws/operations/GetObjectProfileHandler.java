@@ -97,7 +97,7 @@ public class GetObjectProfileHandler
                             new StringAttribute(pid));
             }
             if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
             }
             if (asOfDateTime != null && !"".equals(asOfDateTime)) {
@@ -106,11 +106,11 @@ public class GetObjectProfileHandler
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.GET_OBJECT_PROFILE
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.GET_OBJECT_PROFILE
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIA.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIA
+                                .getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),

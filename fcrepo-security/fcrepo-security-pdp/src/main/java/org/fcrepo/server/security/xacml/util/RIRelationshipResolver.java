@@ -1,7 +1,5 @@
 package org.fcrepo.server.security.xacml.util;
 
-import java.io.File;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,29 +7,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.fcrepo.common.Constants;
+import org.fcrepo.common.MalformedPIDException;
+import org.fcrepo.common.PID;
+import org.fcrepo.server.Server;
+import org.fcrepo.server.resourceIndex.ResourceIndex;
+import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.jrdf.graph.Node;
 import org.jrdf.graph.ObjectNode;
 import org.jrdf.graph.PredicateNode;
 import org.jrdf.graph.SubjectNode;
 import org.jrdf.graph.Triple;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.trippi.TripleIterator;
 import org.trippi.TripleMaker;
 import org.trippi.TrippiException;
 import org.trippi.TupleIterator;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.common.MalformedPIDException;
-import org.fcrepo.common.PID;
-
-import org.fcrepo.server.Server;
-import org.fcrepo.server.errors.ModuleInitializationException;
-import org.fcrepo.server.errors.ServerInitializationException;
-import org.fcrepo.server.resourceIndex.ResourceIndex;
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 
 public class RIRelationshipResolver
         extends RelationshipResolverBase
@@ -40,7 +32,7 @@ public class RIRelationshipResolver
     private static final Logger logger = LoggerFactory.getLogger(RIRelationshipResolver.class);
 
     private final ResourceIndex RI;
-    
+
     private boolean spoTriples = false;
     private boolean sparqlTuples = false;
     private boolean itqlTuples = false;
@@ -70,7 +62,7 @@ public class RIRelationshipResolver
         }
 
     }
-    
+
     @Override
     public Map<String, Set<String>> getRelationships(String subject)
             throws MelcoeXacmlException {
@@ -336,10 +328,10 @@ public class RIRelationshipResolver
     }
 
     protected Set<String> getParents(String pid) throws MelcoeXacmlException {
-        logger.debug("Obtaining parents for: " + pid);
+        logger.debug("Obtaining parents for: {}", pid);
 
         Set<String> parentPIDs = new HashSet<String>();
-        if (pid.equalsIgnoreCase(REPOSITORY)) {
+        if (pid.equalsIgnoreCase(Constants.FEDORA_REPOSITORY_PID.uri)) {
             return parentPIDs;
         }
 
@@ -453,7 +445,7 @@ public class RIRelationshipResolver
 
         return parentPIDs;
     }
-    
+
     private boolean verifyTripleLanguage(String lang) {
         if (tripleLanguages == null){
             tripleLanguages = Arrays.asList(RI.listTripleLanguages());
@@ -461,7 +453,7 @@ public class RIRelationshipResolver
         }
         return tripleLanguages.contains(lang);
     }
-    
+
     private boolean verifyTupleLanguage(String lang){
         if (tupleLanguages == null){
             tupleLanguages = Arrays.asList(RI.listTupleLanguages());

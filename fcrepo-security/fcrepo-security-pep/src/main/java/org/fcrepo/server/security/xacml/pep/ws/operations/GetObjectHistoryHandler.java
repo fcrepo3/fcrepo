@@ -94,18 +94,15 @@ public class GetObjectHistoryHandler
             if (pid != null && !"".equals(pid)) {
                 resAttr.put(Constants.OBJECT.PID.getURI(),
                             new StringAttribute(pid));
-            }
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.GET_OBJECT_HISTORY
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.GET_OBJECT_HISTORY
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIA.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIA.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),
@@ -114,8 +111,7 @@ public class GetObjectHistoryHandler
                                                      getEnvironment(context));
 
             LogUtil.statLog(getUser(context),
-                            Constants.ACTION.GET_OBJECT_HISTORY.getURI()
-                                    .toASCIIString(),
+                            Constants.ACTION.GET_OBJECT_HISTORY.uri,
                             pid,
                             null);
         } catch (Exception e) {

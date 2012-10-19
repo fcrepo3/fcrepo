@@ -33,7 +33,6 @@ import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.IntegerAttribute;
 import com.sun.xacml.attr.StringAttribute;
@@ -96,9 +95,9 @@ public class GetNextPIDHandler
 
         try {
             resAttr.put(Constants.OBJECT.PID.getURI(),
-                        new StringAttribute("FedoraRepository"));
-            resAttr.put(new URI(XACML_RESOURCE_ID),
-                        new AnyURIAttribute(new URI("FedoraRepository")));
+                        Constants.FEDORA_REPOSITORY_PID.getStringAttribute());
+            resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                        Constants.FEDORA_REPOSITORY_PID.getURIAttribute());
             if (numPids != null && !"".equals(numPids)) {
                 resAttr.put(Constants.OBJECT.N_PIDS.getURI(),
                             new IntegerAttribute(numPids.intValue()));
@@ -109,11 +108,10 @@ public class GetNextPIDHandler
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.GET_NEXT_PID
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.GET_NEXT_PID
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIM.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIM.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),
@@ -122,9 +120,8 @@ public class GetNextPIDHandler
                                                      getEnvironment(context));
 
             LogUtil.statLog(getUser(context),
-                            Constants.ACTION.GET_NEXT_PID.getURI()
-                                    .toASCIIString(),
-                            "FedoraRepository",
+                            Constants.ACTION.GET_NEXT_PID.uri,
+                            Constants.FEDORA_REPOSITORY_PID.uri,
                             null);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

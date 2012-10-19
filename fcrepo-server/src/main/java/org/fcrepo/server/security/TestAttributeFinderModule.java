@@ -7,17 +7,13 @@ package org.fcrepo.server.security;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import java.util.Hashtable;
+import org.fcrepo.common.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.attr.AttributeDesignator;
 import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.cond.EvaluationResult;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -44,9 +40,9 @@ class TestAttributeFinderModule
 
             registerAttribute(ATTRIBUTE_ID, StringAttribute.identifier);
 
-            attributesDenied.add(PolicyEnforcementPoint.XACML_SUBJECT_ID);
-            attributesDenied.add(PolicyEnforcementPoint.XACML_ACTION_ID);
-            attributesDenied.add(PolicyEnforcementPoint.XACML_RESOURCE_ID);
+            attributesDenied.add(Constants.XACML1_SUBJECT.ID.uri);
+            attributesDenied.add(Constants.XACML1_ACTION.ID.uri);
+            attributesDenied.add(Constants.XACML1_RESOURCE.ID.uri);
 
             attributesDenied.add(Constants.ACTION.CONTEXT_ID.uri);
             attributesDenied.add(Constants.SUBJECT.LOGIN_ID.uri);

@@ -19,9 +19,7 @@
 package org.fcrepo.server.security.xacml.pep.rest.filters;
 
 import java.io.IOException;
-
 import java.net.URI;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,19 +27,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.sun.xacml.attr.AnyURIAttribute;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.ctx.RequestCtx;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.fcrepo.server.utilities.CXFUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.xacml.attr.AttributeValue;
+import com.sun.xacml.ctx.RequestCtx;
 
 
 /**
@@ -81,40 +75,19 @@ public class GetObjectHistoryFilter
                     + request.getRequestURI());
         }
 
-        String[] parts = request.getPathInfo().split("/");
-        if (parts.length < 2) {
-            logger.info("Not enough path components on the URI.");
-            throw new ServletException("Not enough path components on the URI.");
-        }
-
         RequestCtx req = null;
 
-        String pid = null;
-
-        pid = parts[1];
-
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        Map<URI, AttributeValue> resAttr;
 
         try {
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(Constants.OBJECT.PID.getURI(),
-                            new StringAttribute(pid));
-            }
-            // XACML 1.0 conformance. resource-id is mandatory. Remove when
-            // switching to 2.0
-            if (pid != null && !"".equals(pid)) {
-                resAttr
-                        .put(new URI("urn:oasis:names:tc:xacml:1.0:resource:resource-id"),
-                             new AnyURIAttribute(new URI(pid)));
-            }
+            resAttr = getResources(request);
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.GET_OBJECT_HISTORY
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.GET_OBJECT_HISTORY
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIA.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIA.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(request),
@@ -123,8 +96,7 @@ public class GetObjectHistoryFilter
                                                      getEnvironment(request));
 
             LogUtil.statLog(request.getRemoteUser(),
-                            Constants.ACTION.GET_OBJECT_HISTORY.getURI()
-                                    .toASCIIString(),
+                            Constants.ACTION.GET_OBJECT_HISTORY.uri,
                             pid,
                             null);
         } catch (Exception e) {
@@ -133,5 +105,13 @@ public class GetObjectHistoryFilter
         }
 
         return req;
+    }
+
+    @Override
+    public void getLocalResources(String[] pathParts, Map<URI, AttributeValue> resAttr) throws ServletException {
+        if (pathParts.length < 2) {
+            logger.info("Not enough path components on the URI.");
+            throw new ServletException("Not enough path components on the URI.");
+        }
     }
 }

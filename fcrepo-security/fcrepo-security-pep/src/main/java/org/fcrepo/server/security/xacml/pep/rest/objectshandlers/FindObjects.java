@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,7 +35,6 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -87,7 +85,7 @@ public class FindObjects
 
     private static final Logger logger =
             LoggerFactory.getLogger(FindObjects.class);
-    
+
     private static final NamespaceContext TYPES_NAMESPACE = new TypesNamespaceContext();
 
     private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
@@ -97,7 +95,7 @@ public class FindObjects
         // the default namespace must be prefixed to be accessible to xpath
         BUILDER_FACTORY.setNamespaceAware(true);
     }
-    
+
     private ContextUtil m_contextUtil = null;
 
     private Transformer xFormer = null;
@@ -141,22 +139,17 @@ public class FindObjects
             throws IOException, ServletException {
         RequestCtx req = null;
 
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        Map<URI, AttributeValue> resAttr;
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
 
         try {
-            resAttr.put(Constants.OBJECT.PID.getURI(),
-                        new StringAttribute("FedoraRepository"));
-            resAttr
-                    .put(new URI("urn:oasis:names:tc:xacml:1.0:resource:resource-id"),
-                         new AnyURIAttribute(new URI("FedoraRepository")));
+            resAttr = getRepositoryResources(request);
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.FIND_OBJECTS
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.FIND_OBJECTS
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIA.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIA.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(request),
@@ -165,9 +158,8 @@ public class FindObjects
                                                      getEnvironment(request));
 
             LogUtil.statLog(request.getRemoteUser(),
-                            Constants.ACTION.FIND_OBJECTS.getURI()
-                                    .toASCIIString(),
-                            "FedoraRepository",
+                            Constants.ACTION.FIND_OBJECTS.uri,
+                            Constants.FEDORA_REPOSITORY_PID.uri,
                             null);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
@@ -437,15 +429,14 @@ public class FindObjects
             try {
                 actions
                         .put(Constants.ACTION.ID.getURI(),
-                             new StringAttribute(Constants.ACTION.LIST_OBJECT_IN_FIELD_SEARCH_RESULTS
-                                     .getURI().toASCIIString()));
+                             Constants.ACTION.LIST_OBJECT_IN_FIELD_SEARCH_RESULTS
+                                     .getStringAttribute());
                 actions.put(Constants.ACTION.API.getURI(),
-                            new StringAttribute(Constants.ACTION.APIA.getURI()
-                                    .toASCIIString()));
+                            Constants.ACTION.APIA.getStringAttribute());
                 if (pid != null && !"".equals(pid)) {
                     resAttr.put(Constants.OBJECT.PID.getURI(),
                                 new StringAttribute(pid));
-                    resAttr.put(new URI(XACML_RESOURCE_ID),
+                    resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                                 new AnyURIAttribute(new URI(pid)));
                 }
 
@@ -488,7 +479,7 @@ public class FindObjects
 
         return results;
     }
-    
+
     static class TypesNamespaceContext implements NamespaceContext {
         static List<String> PREFIXES = Arrays.asList(new String[]{"types",""});
         static List<String> XSI_PREFIXES = Arrays.asList(new String[]{"xsi"});
@@ -496,7 +487,7 @@ public class FindObjects
         @Override
         public String getNamespaceURI(String prefix) {
             if ("types".equals(prefix) || "".equals(prefix)) {
-               return "http://www.fedora.info/definitions/1/0/types/"; 
+               return "http://www.fedora.info/definitions/1/0/types/";
             }
             if ("xsi".equals(prefix)){
                 return "http://www.w3.org/2001/XMLSchema-instance";

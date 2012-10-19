@@ -19,9 +19,7 @@
 package org.fcrepo.server.security.xacml.pep.rest.filters;
 
 import java.io.IOException;
-
 import java.net.URI;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,19 +27,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.sun.xacml.attr.AnyURIAttribute;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.ctx.RequestCtx;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.fcrepo.server.utilities.CXFUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.xacml.attr.AttributeValue;
+import com.sun.xacml.ctx.RequestCtx;
 
 
 /**
@@ -77,30 +71,17 @@ public class GetNextPIDFilter
             throws IOException, ServletException {
         RequestCtx req = null;
 
-        String pid = "FedoraRepository";
-
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        Map<URI, AttributeValue> resAttr;
 
         try {
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(Constants.OBJECT.PID.getURI(),
-                            new StringAttribute(pid));
-            }
-            // XACML 1.0 conformance. resource-id is mandatory. Remove when
-            // switching to 2.0
-            if (pid != null && !"".equals(pid)) {
-                resAttr
-                        .put(new URI("urn:oasis:names:tc:xacml:1.0:resource:resource-id"),
-                             new AnyURIAttribute(new URI(pid)));
-            }
+            resAttr = getRepositoryResources(request);
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.GET_NEXT_PID
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.GET_NEXT_PID
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIM.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIM.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(request),
@@ -109,9 +90,8 @@ public class GetNextPIDFilter
                                                      getEnvironment(request));
 
             LogUtil.statLog(request.getRemoteUser(),
-                            Constants.ACTION.GET_NEXT_PID.getURI()
-                                    .toASCIIString(),
-                            pid,
+                            Constants.ACTION.GET_NEXT_PID.uri,
+                            Constants.FEDORA_REPOSITORY_PID.uri,
                             null);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

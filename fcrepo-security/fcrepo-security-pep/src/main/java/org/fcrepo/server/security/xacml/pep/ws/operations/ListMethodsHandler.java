@@ -98,7 +98,7 @@ public class ListMethodsHandler
                             new StringAttribute(pid));
             }
             if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
             }
             if (asOfDateTime != null && !"".equals(asOfDateTime)) {
@@ -107,11 +107,10 @@ public class ListMethodsHandler
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.LIST_METHODS
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.LIST_METHODS
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIA.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIA.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),
@@ -120,8 +119,7 @@ public class ListMethodsHandler
                                                      getEnvironment(context));
 
             LogUtil.statLog(getUser(context),
-                            Constants.ACTION.LIST_METHODS.getURI()
-                                    .toASCIIString(),
+                            Constants.ACTION.LIST_METHODS.uri,
                             pid,
                             null);
         } catch (Exception e) {

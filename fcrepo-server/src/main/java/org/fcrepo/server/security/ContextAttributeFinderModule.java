@@ -77,9 +77,9 @@ class ContextAttributeFinderModule
             registerAttribute(Constants.HTTP_REQUEST.SERVER_PORT.uri,
                               Constants.HTTP_REQUEST.SERVER_PORT.datatype);
 
-            attributesDenied.add(PolicyEnforcementPoint.XACML_SUBJECT_ID);
-            attributesDenied.add(PolicyEnforcementPoint.XACML_ACTION_ID);
-            attributesDenied.add(PolicyEnforcementPoint.XACML_RESOURCE_ID);
+            attributesDenied.add(Constants.XACML1_SUBJECT.ID.uri);
+            attributesDenied.add(Constants.XACML1_ACTION.ID.uri);
+            attributesDenied.add(Constants.XACML1_RESOURCE.ID.uri);
 
             attributesDenied.add(Constants.ACTION.CONTEXT_ID.uri);
             attributesDenied.add(Constants.SUBJECT.LOGIN_ID.uri);

@@ -100,7 +100,7 @@ public class GetDatastreamDisseminationHandler
                             new StringAttribute(pid));
             }
             if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
             }
             if (dsID != null && !"".equals(dsID)) {
@@ -113,15 +113,14 @@ public class GetDatastreamDisseminationHandler
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.GET_DATASTREAM
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.GET_DATASTREAM
+                                .getStringAttribute());
             actions
                     .put(Constants.ACTION.ID.getURI(),
-                         new StringAttribute(Constants.ACTION.GET_DATASTREAM_DISSEMINATION
-                                 .getURI().toASCIIString()));
+                         Constants.ACTION.GET_DATASTREAM_DISSEMINATION
+                                 .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIA.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIA.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),
@@ -131,7 +130,7 @@ public class GetDatastreamDisseminationHandler
 
             LogUtil.statLog(getUser(context),
                             Constants.ACTION.GET_DATASTREAM_DISSEMINATION
-                                    .getURI().toASCIIString(),
+                                    .uri,
                             pid,
                             dsID);
         } catch (Exception e) {

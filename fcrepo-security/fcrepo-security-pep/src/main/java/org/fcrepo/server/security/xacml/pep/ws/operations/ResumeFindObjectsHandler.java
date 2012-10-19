@@ -61,8 +61,10 @@ public class ResumeFindObjectsHandler
             logger.debug("ResumeFindObjectsHandler/handleRequest!");
         }
 
-        LogUtil.statLog(getUser(context), Constants.ACTION.FIND_OBJECTS
-                .getURI().toASCIIString(), "FedoraRepository", null);
+        LogUtil.statLog(getUser(context),
+                Constants.ACTION.FIND_OBJECTS.uri,
+                Constants.FEDORA_REPOSITORY_PID.uri,
+                null);
 
         return super.handleRequest(context);
     }

@@ -24,6 +24,7 @@ import java.util.List;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.apache.cxf.binding.soap.SoapFault;
+import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.util.LogUtil;
@@ -90,9 +91,8 @@ public class FindObjectsHandler
 //            setSOAPRequestObjects(context, params);
 
             LogUtil.statLog(getUser(context),
-                            org.fcrepo.common.Constants.ACTION.FIND_OBJECTS
-                                    .getURI().toASCIIString(),
-                            "FedoraRepository",
+                            Constants.ACTION.FIND_OBJECTS.uri,
+                            Constants.FEDORA_REPOSITORY_PID.uri,
                             null);
         } catch (SoapFault af) {
             throw new OperationHandlerException("Error filtering objects.", af);

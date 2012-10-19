@@ -71,7 +71,7 @@ public class CompareDatastreamChecksumHandler extends AbstractOperationHandler {
             if (pid != null && !"".equals(pid)) {
                 resAttr.put(Constants.OBJECT.PID.getURI(),
                             new StringAttribute(pid));
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
             }
             if (dsID != null && !"".equals(dsID)) {
@@ -84,11 +84,10 @@ public class CompareDatastreamChecksumHandler extends AbstractOperationHandler {
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.COMPARE_DATASTREAM_CHECKSUM
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.COMPARE_DATASTREAM_CHECKSUM
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIM.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIM.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),
@@ -97,8 +96,7 @@ public class CompareDatastreamChecksumHandler extends AbstractOperationHandler {
                                                      getEnvironment(context));
 
             LogUtil.statLog(getUser(context),
-                            Constants.ACTION.COMPARE_DATASTREAM_CHECKSUM.getURI()
-                                    .toASCIIString(),
+                            Constants.ACTION.COMPARE_DATASTREAM_CHECKSUM.uri,
                             pid,
                             dsID);
         } catch (Exception e) {

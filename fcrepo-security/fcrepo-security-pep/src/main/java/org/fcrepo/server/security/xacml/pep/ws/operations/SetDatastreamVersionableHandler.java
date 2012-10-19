@@ -104,7 +104,7 @@ public class SetDatastreamVersionableHandler
                             new StringAttribute(pid));
             }
             if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
             }
             if (dsID != null && !"".equals(dsID)) {
@@ -119,15 +119,14 @@ public class SetDatastreamVersionableHandler
 
             actions
                     .put(Constants.ACTION.ID.getURI(),
-                         new StringAttribute(Constants.ACTION.SET_DATASTREAM_VERSIONABLE
-                                 .getURI().toASCIIString()));
+                         Constants.ACTION.SET_DATASTREAM_VERSIONABLE
+                                 .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIM.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIM.getStringAttribute());
             // modifying the FeSL policy datastream requires policy management permissions
             if (dsID != null && dsID.equals(FedoraPolicyStore.FESL_POLICY_DATASTREAM)) {
                 actions.put(Constants.ACTION.ID.getURI(),
-                            new StringAttribute(Constants.ACTION.MANAGE_POLICIES.getURI().toASCIIString()));
+                            Constants.ACTION.MANAGE_POLICIES.getStringAttribute());
             }
 
 
@@ -139,7 +138,7 @@ public class SetDatastreamVersionableHandler
 
             LogUtil.statLog(getUser(context),
                             Constants.ACTION.SET_DATASTREAM_VERSIONABLE
-                                    .getURI().toASCIIString(),
+                                    .uri,
                             pid,
                             dsID);
         } catch (Exception e) {

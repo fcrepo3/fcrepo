@@ -1,5 +1,5 @@
 /* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
+ * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
 package org.fcrepo.common.policy;
@@ -8,7 +8,7 @@ import com.sun.xacml.attr.StringAttribute;
 
 /**
  * The Fedora Subject XACML namespace.
- * 
+ *
  * <pre>
  * Namespace URI    : urn:fedora:names:fedora:2.1:subject
  * </pre>
@@ -18,6 +18,8 @@ public class SubjectNamespace
 
     public final XacmlName LOGIN_ID;
 
+    public final XacmlName ROLE;
+
     public final XacmlName USER_REPRESENTED;
 
     private SubjectNamespace(XacmlNamespace parent, String localName) {
@@ -26,6 +28,11 @@ public class SubjectNamespace
                 addName(new XacmlName(this,
                                       "loginId",
                                       StringAttribute.identifier));
+        ROLE =
+                addName(new XacmlName(this,
+                                      "role",
+                                      StringAttribute.identifier));
+
         USER_REPRESENTED =
                 addName(new XacmlName(this,
                                       "subjectRepresented",

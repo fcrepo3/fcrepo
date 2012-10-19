@@ -19,9 +19,7 @@
 package org.fcrepo.server.security.xacml.pep.rest.objectshandlers;
 
 import java.io.IOException;
-
 import java.net.URI;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,20 +27,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.sun.xacml.attr.AnyURIAttribute;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.ctx.RequestCtx;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.util.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.xacml.attr.AttributeValue;
+import com.sun.xacml.attr.StringAttribute;
+import com.sun.xacml.ctx.RequestCtx;
 
 
 /**
@@ -72,36 +67,21 @@ public class SetDatastreamState
      * org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter#handleRequest(javax.servlet
      * .http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
+    @Override
     public RequestCtx handleRequest(HttpServletRequest request,
                                     HttpServletResponse response)
             throws IOException, ServletException {
         if (logger.isDebugEnabled()) {
-            logger.debug(this.getClass().getName() + "/handleRequest!");
+            logger.debug("{}/handleRequest!", this.getClass().getName());
         }
 
-        String path = request.getPathInfo();
-        String[] parts = path.split("/");
-
-        String pid = parts[1];
-        String dsID = parts[3];
         String dsState = request.getParameter("dsState");
 
         RequestCtx req = null;
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        Map<URI, AttributeValue> resAttr;
         try {
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(Constants.OBJECT.PID.getURI(),
-                            new StringAttribute(pid));
-            }
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
-                            new AnyURIAttribute(new URI(pid)));
-            }
-            if (dsID != null && !"".equals(dsID)) {
-                resAttr.put(Constants.DATASTREAM.ID.getURI(),
-                            new StringAttribute(dsID));
-            }
+            resAttr = getResources(request);
             if (dsState != null && !"".equals(dsState)) {
                 resAttr.put(Constants.DATASTREAM.NEW_STATE.getURI(),
                             new StringAttribute(dsState));
@@ -109,15 +89,20 @@ public class SetDatastreamState
 
             actions
                     .put(Constants.ACTION.ID.getURI(),
-                         new StringAttribute(Constants.ACTION.SET_DATASTREAM_STATE
-                                 .getURI().toASCIIString()));
+                         Constants.ACTION.SET_DATASTREAM_STATE
+                                 .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIM.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIM.getStringAttribute());
+
             // modifying the FeSL policy datastream requires policy management permissions
+            String pid = resAttr.get(Constants.OBJECT.PID.getURI()).toString();
+            String dsID = null;
+            if (resAttr.containsKey(Constants.DATASTREAM.ID.getURI())){
+                dsID = resAttr.get(Constants.DATASTREAM.ID.getURI()).toString();
+            }
             if (dsID != null && dsID.equals(FedoraPolicyStore.FESL_POLICY_DATASTREAM)) {
                 actions.put(Constants.ACTION.ID.getURI(),
-                            new StringAttribute(Constants.ACTION.MANAGE_POLICIES.getURI().toASCIIString()));
+                            Constants.ACTION.MANAGE_POLICIES.getStringAttribute());
             }
 
 
@@ -128,8 +113,7 @@ public class SetDatastreamState
                                                      getEnvironment(request));
 
             LogUtil.statLog(request.getRemoteUser(),
-                            Constants.ACTION.SET_DATASTREAM_STATE.getURI()
-                                    .toASCIIString(),
+                            Constants.ACTION.SET_DATASTREAM_STATE.uri,
                             pid,
                             dsID);
         } catch (Exception e) {

@@ -6,6 +6,8 @@ package org.fcrepo.server.security.xacml.pdp.data;
 
 import java.util.Map;
 
+import org.fcrepo.common.Constants;
+
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.finder.PolicyFinder;
@@ -34,7 +36,7 @@ import com.sun.xacml.finder.PolicyFinder;
 public interface PolicyIndex {
 
     public static final String XACML20_POLICY_NS = "urn:oasis:names:tc:xacml:2.0:policy:schema:os";
-    public static final String XACML_RESOURCE_ID = "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
+    public static final String XACML_RESOURCE_ID = Constants.XACML1_RESOURCE.ID.toString();
 
     /**
      * Extracts a list of policies from the Policy Index that are relevant to

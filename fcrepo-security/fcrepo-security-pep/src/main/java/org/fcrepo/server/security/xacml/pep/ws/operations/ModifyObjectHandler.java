@@ -47,6 +47,10 @@ public class ModifyObjectHandler
     private static final Logger logger =
             LoggerFactory.getLogger(ModifyObjectHandler.class);
 
+    private static final StringAttribute PUBLISH = new StringAttribute("publish");
+
+    private static final StringAttribute UNPUBLISH = new StringAttribute("unpublish");
+
     public ModifyObjectHandler(ContextHandler contextHandler)
             throws PEPException {
         super(contextHandler);
@@ -100,7 +104,7 @@ public class ModifyObjectHandler
                             new StringAttribute(pid));
             }
             if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
             }
             if (state != null && !"".equals(state)) {
@@ -114,18 +118,18 @@ public class ModifyObjectHandler
 
             if (state != null && state.equals("A")) {
                 actions.put(Constants.ACTION.ID.getURI(),
-                            new StringAttribute("publish"));
+                            PUBLISH);
             } else if (state != null && state.equals("I")) {
                 actions.put(Constants.ACTION.ID.getURI(),
-                            new StringAttribute("unpublish"));
+                            UNPUBLISH);
             } else {
                 actions.put(Constants.ACTION.ID.getURI(),
-                            new StringAttribute(Constants.ACTION.MODIFY_OBJECT
-                                    .getURI().toASCIIString()));
+                            Constants.ACTION.MODIFY_OBJECT
+                                    .getStringAttribute());
             }
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIM.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIM
+                                .getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),
@@ -134,8 +138,7 @@ public class ModifyObjectHandler
                                                      getEnvironment(context));
 
             LogUtil.statLog(getUser(context),
-                            Constants.ACTION.MODIFY_OBJECT.getURI()
-                                    .toASCIIString(),
+                            Constants.ACTION.MODIFY_OBJECT.uri,
                             pid,
                             null);
         } catch (Exception e) {

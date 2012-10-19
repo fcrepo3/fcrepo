@@ -95,18 +95,15 @@ public class GetDatastreamsHandler
             if (pid != null && !"".equals(pid)) {
                 resAttr.put(Constants.OBJECT.PID.getURI(),
                             new StringAttribute(pid));
-            }
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(new URI(XACML_RESOURCE_ID),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                             new AnyURIAttribute(new URI(pid)));
             }
 
             actions.put(Constants.ACTION.ID.getURI(),
-                        new StringAttribute(Constants.ACTION.GET_DATASTREAMS
-                                .getURI().toASCIIString()));
+                        Constants.ACTION.GET_DATASTREAMS
+                                .getStringAttribute());
             actions.put(Constants.ACTION.API.getURI(),
-                        new StringAttribute(Constants.ACTION.APIM.getURI()
-                                .toASCIIString()));
+                        Constants.ACTION.APIM.getStringAttribute());
 
             req =
                     getContextHandler().buildRequest(getSubjects(context),
@@ -115,8 +112,7 @@ public class GetDatastreamsHandler
                                                      getEnvironment(context));
 
             LogUtil.statLog(getUser(context),
-                            Constants.ACTION.GET_DATASTREAMS.getURI()
-                                    .toASCIIString(),
+                            Constants.ACTION.GET_DATASTREAMS.uri,
                             pid,
                             null);
         } catch (Exception e) {

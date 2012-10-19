@@ -40,6 +40,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.apache.cxf.binding.soap.SoapFault;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -47,6 +48,7 @@ import org.fcrepo.server.utilities.CXFUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 
@@ -61,15 +63,6 @@ public abstract class AbstractOperationHandler
 
     private static final Logger logger = LoggerFactory
             .getLogger(AbstractOperationHandler.class);
-
-    protected static final String XACML_RESOURCE_ID =
-            "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
-
-    protected static final String SUBJECT_ID =
-            "urn:oasis:names:tc:xacml:1.0:subject:subject-id";
-
-    protected static final String FEDORA_ROLE =
-            "urn:fedora:names:fedora:2.1:subject:role";
 
     protected static final JAXBContext JAXB_CONTEXT = getJAXBContext();
 
@@ -267,59 +260,55 @@ public abstract class AbstractOperationHandler
 
         Map<URI, List<AttributeValue>> subAttr = null;
         List<AttributeValue> attrList = null;
-        try {
-            subAttr = new HashMap<URI, List<AttributeValue>>();
-            attrList = new ArrayList<AttributeValue>();
-            attrList.add(new StringAttribute(getUser(context)));
-            subAttr.put(Constants.SUBJECT.LOGIN_ID.getURI(), attrList);
-            if (fedoraRole != null && fedoraRole.length > 0) {
-                attrList = new ArrayList<AttributeValue>();
-                for (String r : fedoraRole) {
-                    attrList.add(new StringAttribute(r));
-                }
-                subAttr.put(new URI(FEDORA_ROLE), attrList);
-            }
-            subjects.add(subAttr);
 
-            subAttr = new HashMap<URI, List<AttributeValue>>();
+        subAttr = new HashMap<URI, List<AttributeValue>>();
+        attrList = new ArrayList<AttributeValue>();
+        attrList.add(new StringAttribute(getUser(context)));
+        subAttr.put(Constants.SUBJECT.LOGIN_ID.getURI(), attrList);
+        if (fedoraRole != null && fedoraRole.length > 0) {
             attrList = new ArrayList<AttributeValue>();
-            attrList.add(new StringAttribute(getUser(context)));
-            subAttr.put(Constants.SUBJECT.USER_REPRESENTED.getURI(), attrList);
-            if (fedoraRole != null && fedoraRole.length > 0) {
-                attrList = new ArrayList<AttributeValue>();
-                for (String r : fedoraRole) {
-                    attrList.add(new StringAttribute(r));
-                }
-                subAttr.put(new URI(FEDORA_ROLE), attrList);
+            for (String r : fedoraRole) {
+                attrList.add(new StringAttribute(r));
             }
-            subjects.add(subAttr);
-
-            subAttr = new HashMap<URI, List<AttributeValue>>();
-            attrList = new ArrayList<AttributeValue>();
-            attrList.add(new StringAttribute(getUser(context)));
-            subAttr.put(new URI(SUBJECT_ID), attrList);
-            if (fedoraRole != null && fedoraRole.length > 0) {
-                attrList = new ArrayList<AttributeValue>();
-                for (String r : fedoraRole) {
-                    attrList.add(new StringAttribute(r));
-                }
-                subAttr.put(new URI(FEDORA_ROLE), attrList);
-            }
-            subjects.add(subAttr);
-        } catch (URISyntaxException use) {
-            logger.error(use.getMessage(), use);
-            throw CXFUtility.getFault(use);
+            subAttr.put(Constants.SUBJECT.ROLE.getURI(), attrList);
         }
+        subjects.add(subAttr);
+
+        subAttr = new HashMap<URI, List<AttributeValue>>();
+        attrList = new ArrayList<AttributeValue>();
+        attrList.add(new StringAttribute(getUser(context)));
+        subAttr.put(Constants.SUBJECT.USER_REPRESENTED.getURI(), attrList);
+        if (fedoraRole != null && fedoraRole.length > 0) {
+            attrList = new ArrayList<AttributeValue>();
+            for (String r : fedoraRole) {
+                attrList.add(new StringAttribute(r));
+            }
+            subAttr.put(Constants.SUBJECT.ROLE.getURI(), attrList);
+        }
+        subjects.add(subAttr);
+
+        subAttr = new HashMap<URI, List<AttributeValue>>();
+        attrList = new ArrayList<AttributeValue>();
+        attrList.add(new StringAttribute(getUser(context)));
+        subAttr.put(Constants.XACML1_SUBJECT.ID.getURI(), attrList);
+        if (fedoraRole != null && fedoraRole.length > 0) {
+            attrList = new ArrayList<AttributeValue>();
+            for (String r : fedoraRole) {
+                attrList.add(new StringAttribute(r));
+            }
+            subAttr.put(Constants.SUBJECT.ROLE.getURI(), attrList);
+        }
+        subjects.add(subAttr);
 
         return subjects;
     }
 
     /**
-     * Obtains a list of environment Attributes.
+     * Obtains a map of environment Attributes.
      *
      * @param context
      *        the message context
-     * @return list of environment Attributes
+     * @return map of environment Attributes
      */
     protected Map<URI, AttributeValue> getEnvironment(SOAPMessageContext context) {
         Map<URI, AttributeValue> envAttr = new HashMap<URI, AttributeValue>();
@@ -337,6 +326,46 @@ public abstract class AbstractOperationHandler
         return envAttr;
     }
 
+    /**
+     * Obtains a map of resource Attributes.
+     *
+     * @param context
+     *        the message context
+     * @return map of resource Attributes
+     * @throws OperationHandlerException
+     * @throws URISyntaxException
+     */
+    protected Map<URI, AttributeValue> getResources(SOAPMessageContext context) throws OperationHandlerException, URISyntaxException {
+        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+
+        Object oMap = null;
+
+        String pid = null;
+        try {
+            oMap = getSOAPRequestObjects(context);
+            logger.debug("Retrieved SOAP Request Objects");
+        } catch (SoapFault af) {
+            logger.error("Error obtaining SOAP Request Objects", af);
+            throw new OperationHandlerException("Error obtaining SOAP Request Objects",
+                                                af);
+        }
+
+        try {
+            pid = (String) callGetter("getPid",oMap);
+        } catch (Exception e) {
+            logger.error("Error obtaining parameters", e);
+            throw new OperationHandlerException("Error obtaining parameters.",
+                                                e);
+        }
+        if (pid != null && !"".equals(pid)) {
+            resAttr.put(Constants.OBJECT.PID.getURI(),
+                        new StringAttribute(pid));
+            resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                        new AnyURIAttribute(new URI(pid)));
+        }
+        logger.debug("Extracted SOAP Request Objects");
+        return resAttr;
+    }
     /**
      * @return the Context Handler
      */

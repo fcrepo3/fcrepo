@@ -35,6 +35,7 @@ import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 
@@ -46,21 +47,12 @@ import com.sun.xacml.attr.StringAttribute;
  * @author nishen@melcoe.mq.edu.au
  */
 public abstract class AbstractFilter
-        implements RESTFilter {
+implements RESTFilter {
 
     private static final Logger logger =
             LoggerFactory.getLogger(AbstractFilter.class);
 
     private ContextHandler m_contextHandler;
-
-    protected static final String XACML_RESOURCE_ID =
-            "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
-
-    protected static final String SUBJECT_ID =
-            "urn:oasis:names:tc:xacml:1.0:subject:subject-id";
-
-    protected static final String FEDORA_ROLE =
-            "urn:fedora:names:fedora:2.1:subject:role";
 
     /**
      * Default constructor obtains an instance of the Context Handler.
@@ -95,8 +87,8 @@ public abstract class AbstractFilter
             throws ServletException {
         @SuppressWarnings("unchecked")
         Map<String, Set<String>> reqAttr =
-                (Map<String, Set<String>>) request
-                        .getAttribute("FEDORA_AUX_SUBJECT_ATTRIBUTES");
+        (Map<String, Set<String>>) request
+        .getAttribute("FEDORA_AUX_SUBJECT_ATTRIBUTES");
 
         Set<String> fedoraRoles = null;
         if (reqAttr != null) {
@@ -117,56 +109,51 @@ public abstract class AbstractFilter
         }
 
         // setup the id and value for the requesting subject
-        try {
-            Map<URI, List<AttributeValue>> subAttr =
-                    new HashMap<URI, List<AttributeValue>>();
-            List<AttributeValue> attrList = new ArrayList<AttributeValue>();
-            attrList.add(new StringAttribute(user));
-            subAttr.put(Constants.SUBJECT.LOGIN_ID.getURI(), attrList);
-            if (fedoraRole != null && fedoraRole.length > 0) {
-                attrList = new ArrayList<AttributeValue>();
-                for (String f : fedoraRole) {
-                    attrList.add(new StringAttribute(f));
-                }
-                subAttr.put(new URI(FEDORA_ROLE), attrList);
-            }
-            subjects.add(subAttr);
-
-            subAttr = new HashMap<URI, List<AttributeValue>>();
+        Map<URI, List<AttributeValue>> subAttr =
+                new HashMap<URI, List<AttributeValue>>();
+        List<AttributeValue> attrList = new ArrayList<AttributeValue>();
+        attrList.add(new StringAttribute(user));
+        subAttr.put(Constants.SUBJECT.LOGIN_ID.getURI(), attrList);
+        if (fedoraRole != null && fedoraRole.length > 0) {
             attrList = new ArrayList<AttributeValue>();
-            attrList.add(new StringAttribute(user));
-            subAttr.put(Constants.SUBJECT.USER_REPRESENTED.getURI(), attrList);
-            if (fedoraRole != null && fedoraRole.length > 0) {
-                attrList = new ArrayList<AttributeValue>();
-                for (String f : fedoraRole) {
-                    attrList.add(new StringAttribute(f));
-                }
-                subAttr.put(new URI(FEDORA_ROLE), attrList);
+            for (String f : fedoraRole) {
+                attrList.add(new StringAttribute(f));
             }
-            subjects.add(subAttr);
-
-            subAttr = new HashMap<URI, List<AttributeValue>>();
-            attrList = new ArrayList<AttributeValue>();
-            attrList.add(new StringAttribute(user));
-            subAttr.put(new URI(SUBJECT_ID), attrList);
-            if (fedoraRole != null && fedoraRole.length > 0) {
-                attrList = new ArrayList<AttributeValue>();
-                for (String f : fedoraRole) {
-                    attrList.add(new StringAttribute(f));
-                }
-                subAttr.put(new URI(FEDORA_ROLE), attrList);
-            }
-            subjects.add(subAttr);
-        } catch (URISyntaxException use) {
-            logger.error(use.getMessage(), use);
-            throw new ServletException(use);
+            subAttr.put(Constants.SUBJECT.ROLE.getURI(), attrList);
         }
+        subjects.add(subAttr);
+
+        subAttr = new HashMap<URI, List<AttributeValue>>();
+        attrList = new ArrayList<AttributeValue>();
+        attrList.add(new StringAttribute(user));
+        subAttr.put(Constants.SUBJECT.USER_REPRESENTED.getURI(), attrList);
+        if (fedoraRole != null && fedoraRole.length > 0) {
+            attrList = new ArrayList<AttributeValue>();
+            for (String f : fedoraRole) {
+                attrList.add(new StringAttribute(f));
+            }
+            subAttr.put(Constants.SUBJECT.ROLE.getURI(), attrList);
+        }
+        subjects.add(subAttr);
+
+        subAttr = new HashMap<URI, List<AttributeValue>>();
+        attrList = new ArrayList<AttributeValue>();
+        attrList.add(new StringAttribute(user));
+        subAttr.put(Constants.SUBJECT.ROLE.getURI(), attrList);
+        if (fedoraRole != null && fedoraRole.length > 0) {
+            attrList = new ArrayList<AttributeValue>();
+            for (String f : fedoraRole) {
+                attrList.add(new StringAttribute(f));
+            }
+            subAttr.put(Constants.SUBJECT.ROLE.getURI(), attrList);
+        }
+        subjects.add(subAttr);
 
         return subjects;
     }
 
     /**
-     * Returns a list of environment attributes.
+     * Returns a map of environment attributes.
      *
      * @param request
      *        the servlet request from which to obtain the attributes
@@ -178,11 +165,79 @@ public abstract class AbstractFilter
 
         if (ip != null && !"".equals(ip)) {
             envAttr.put(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.getURI(),
-                        new StringAttribute(ip));
+                    new StringAttribute(ip));
         }
 
         return envAttr;
     }
+
+    /**
+     * Returns a map of resource attributes.
+     *
+     * @param request
+     *        the servlet request from which to obtain the attributes
+     * @return a map of resource attributes initialized with PID attributes
+     * @throws URISyntaxException
+     * @throws ServletException
+     */
+    protected Map<URI, AttributeValue> getResources(HttpServletRequest request) throws URISyntaxException, ServletException {
+        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        String path = request.getPathInfo();
+        String[] parts = path.split("/");
+        if (parts.length > 1) {
+            String pid = parts[1];
+            if (pid.endsWith(".xml")) pid = pid.substring(0,pid.length()-4);
+            if (pid != null && !"".equals(pid)) {
+                resAttr.put(Constants.OBJECT.PID.getURI(),
+                        new StringAttribute(pid));
+                try{
+                    resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                        new AnyURIAttribute(new URI(pid)));
+                } catch (URISyntaxException e) {
+                    logger.warn("pid {} is not a valid uri; write policies against the StringAttribute {} instead.",
+                            pid,
+                            Constants.OBJECT.PID.uri);
+                }
+            }
+            if (parts.length > 3){
+                if ("datastreams".equals(parts[2])) {
+                    String dsID = parts[3];
+                    if (dsID.endsWith(".xml")) dsID = dsID.substring(0,dsID.length()-4);
+                    if (dsID != null && !"".equals(dsID)) {
+                        resAttr.put(Constants.DATASTREAM.ID.getURI(),
+                                new StringAttribute(dsID));
+                    }
+                }
+            }
+        }
+        getLocalResources(parts, resAttr);
+        return resAttr;
+    }
+
+    protected Map<URI, AttributeValue> getRepositoryResources(HttpServletRequest request) throws ServletException {
+        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        resAttr.put(Constants.OBJECT.PID.getURI(),
+                    Constants.FEDORA_REPOSITORY_PID.getStringAttribute());
+        // XACML 1.0 conformance. resource-id is mandatory. Remove when switching to 2.0
+        resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                    Constants.FEDORA_REPOSITORY_PID.getURIAttribute());
+        String path = request.getPathInfo();
+        String[] parts = path.split("/");
+        getLocalResources(parts, resAttr);
+        return resAttr;
+    }
+
+
+    /**
+     * A callback to allow filters to add implementation-specific resource
+     * attributes based on the request path. Should be overridden.
+     * @param pathParts
+     * @param resAttr
+     */
+    protected void getLocalResources(String[] pathParts, Map<URI, AttributeValue> resAttr) throws ServletException {
+
+    }
+
 
     /**
      * Function to determine whether a parameter is a PID.

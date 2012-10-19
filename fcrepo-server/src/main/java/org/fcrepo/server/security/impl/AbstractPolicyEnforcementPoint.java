@@ -1,12 +1,16 @@
         package org.fcrepo.server.security.impl;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
+
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.errors.GeneralException;
+import org.fcrepo.server.errors.authorization.AuthzOperationalException;
+import org.fcrepo.server.security.PolicyEnforcementPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.PDP;
 import com.sun.xacml.PDPConfig;
@@ -14,56 +18,27 @@ import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.Attribute;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Subject;
-import com.sun.xacml.finder.AttributeFinder;
-import com.sun.xacml.finder.AttributeFinderModule;
-import com.sun.xacml.finder.PolicyFinder;
-import com.sun.xacml.finder.PolicyFinderModule;
-import com.sun.xacml.finder.ResourceFinder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.errors.GeneralException;
-import org.fcrepo.server.errors.authorization.AuthzOperationalException;
-import org.fcrepo.server.security.PolicyEnforcementPoint;
-
-        
 public abstract class AbstractPolicyEnforcementPoint
         implements PolicyEnforcementPoint {
     private static final Logger logger = LoggerFactory.getLogger(AbstractPolicyEnforcementPoint.class);
-    
-    static final URI XACML_SUBJECT_ID_URI = getSafeURI(XACML_SUBJECT_ID);
 
-    static final URI XACML_ACTION_ID_URI = getSafeURI(XACML_ACTION_ID);
+    static final URI SUBJECT_ID_URI = URI.create(Constants.SUBJECT.LOGIN_ID.uri);
 
-    static final URI XACML_RESOURCE_ID_URI = getSafeURI(XACML_RESOURCE_ID);
+    static final URI ACTION_ID_URI = URI.create(Constants.ACTION.ID.uri);
 
-    static final URI SUBJECT_ID_URI = getSafeURI(Constants.SUBJECT.LOGIN_ID.uri);
+    static final URI ACTION_API_URI = URI.create(Constants.ACTION.API.uri);
 
-    static final URI ACTION_ID_URI = getSafeURI(Constants.ACTION.ID.uri);
+    static final URI ACTION_CONTEXT_URI = URI.create(Constants.ACTION.CONTEXT_ID.uri);
 
-    static final URI ACTION_API_URI = getSafeURI(Constants.ACTION.API.uri);
+    static final URI RESOURCE_ID_URI = URI.create(Constants.OBJECT.PID.uri);
 
-    static final URI ACTION_CONTEXT_URI = getSafeURI(Constants.ACTION.CONTEXT_ID.uri);
+    static final URI RESOURCE_NAMESPACE_URI = URI.create(Constants.OBJECT.NAMESPACE.uri);
 
-    static final URI RESOURCE_ID_URI = getSafeURI(Constants.OBJECT.PID.uri);
-
-    static final URI RESOURCE_NAMESPACE_URI = getSafeURI(Constants.OBJECT.NAMESPACE.uri);
-    
     protected final PDPConfig m_pdpConfig;
     protected PDP m_pdp;
-    
-    private static URI getSafeURI(String uri) {
-        try {
-            return new URI(uri);
-        } catch (URISyntaxException e) {
-            logger.error("Bad URI syntax: " + uri, e);
-            return null;
-        } 
-    }
-    
+
     public AbstractPolicyEnforcementPoint(PDPConfig pdpConfig) {
         m_pdpConfig = pdpConfig;
     }
@@ -101,7 +76,7 @@ public abstract class AbstractPolicyEnforcementPoint
         logger.debug("wrapSubjectIdAsSubjects(): " + subjectLoginId);
         StringAttribute stringAttribute = new StringAttribute("");
         Attribute subjectAttribute =
-                new Attribute(XACML_SUBJECT_ID_URI, null, null, stringAttribute);
+                new Attribute(Constants.XACML1_SUBJECT.ID.getURI(), null, null, stringAttribute);
         logger.debug("wrapSubjectIdAsSubjects(): subjectAttribute, id="
                 + subjectAttribute.getId() + ", type="
                 + subjectAttribute.getType() + ", value="
@@ -129,7 +104,7 @@ public abstract class AbstractPolicyEnforcementPoint
                                   String contextIndex) {
         Set<Attribute> actions = new HashSet<Attribute>();
         Attribute action =
-                new Attribute(XACML_ACTION_ID_URI,
+                new Attribute(Constants.XACML1_ACTION.ID.getURI(),
                               null,
                               null,
                               new StringAttribute(""));
@@ -160,7 +135,7 @@ public abstract class AbstractPolicyEnforcementPoint
         Set<Attribute> resources = new HashSet<Attribute>();
         Attribute attribute = null;
         attribute =
-                new Attribute(XACML_RESOURCE_ID_URI,
+                new Attribute(Constants.XACML1_RESOURCE.ID.getURI(),
                               null,
                               null,
                               new StringAttribute(""));
@@ -216,4 +191,3 @@ public abstract class AbstractPolicyEnforcementPoint
     }
 }
 
-    

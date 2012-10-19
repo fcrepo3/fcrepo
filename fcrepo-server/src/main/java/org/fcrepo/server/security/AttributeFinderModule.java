@@ -6,11 +6,13 @@ package org.fcrepo.server.security;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.attr.AttributeValue;
@@ -22,9 +24,6 @@ import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.attr.TimeAttribute;
 import com.sun.xacml.cond.EvaluationResult;
 import com.sun.xacml.ctx.Status;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Bill Niebel
@@ -187,7 +186,7 @@ public abstract class AttributeFinderModule
         return element;
     }
 
-    protected final HashSet attributesDenied = new HashSet();
+    protected final HashSet<String> attributesDenied = new HashSet<String>();
 
     private final Hashtable<String, URI> attributeIdUris =
             new Hashtable<String, URI>();
@@ -215,9 +214,9 @@ public abstract class AttributeFinderModule
     }
 
     private final void showRegisteredAttributes() {
-        Iterator it = attributeIdUris.keySet().iterator();
+        Iterator<String> it = attributeIdUris.keySet().iterator();
         while (it.hasNext()) {
-            String key = (String) it.next();
+            String key = it.next();
             logger.debug("another registered attribute  = " + iAm() + " " + key);
         }
     }

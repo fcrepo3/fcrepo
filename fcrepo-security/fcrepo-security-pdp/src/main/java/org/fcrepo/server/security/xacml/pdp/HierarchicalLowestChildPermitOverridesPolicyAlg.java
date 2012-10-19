@@ -20,10 +20,8 @@ package org.fcrepo.server.security.xacml.pdp;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +30,13 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.fcrepo.common.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
@@ -43,13 +48,6 @@ import com.sun.xacml.combine.PolicyCombiningAlgorithm;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Status;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class HierarchicalLowestChildPermitOverridesPolicyAlg
         extends PolicyCombiningAlgorithm {
 
@@ -59,7 +57,7 @@ public class HierarchicalLowestChildPermitOverridesPolicyAlg
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
     public static final String XACML_RESOURCE_ID =
-            "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
+            Constants.XACML1_RESOURCE.ID.toString();
 
     public static final String algId =
             "urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:hierarchical-lowest-child-permit-overrides";
