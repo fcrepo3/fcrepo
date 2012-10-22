@@ -1,4 +1,6 @@
-package org.fcrepo.common.policy;
+package org.fcrepo.common.policy.xacml1;
+import org.fcrepo.common.policy.XacmlName;
+import org.fcrepo.common.policy.XacmlNamespace;
 
 
 
@@ -11,10 +13,8 @@ public class XACML1ActionNamespace extends XacmlNamespace {
         ID = new XacmlName(this,"action-id");
     }
 
-    public static XACML1ActionNamespace onlyInstance = new XACML1ActionNamespace(null, "action");
-    static {
-        onlyInstance.addNamespace(XACML1Namespace.getInstance());
-    }
+    public static XACML1ActionNamespace onlyInstance =
+            new XACML1ActionNamespace(XACML1Namespace.getInstance(), "action");
 
     public static final XACML1ActionNamespace getInstance() {
         return onlyInstance;

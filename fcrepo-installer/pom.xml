@@ -270,6 +270,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>sunxacml</artifactId>
+      <classifier>melcoe</classifier>
+    </dependency>
+
+    <dependency>
       <groupId>postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>9.1-902.jdbc4</version>

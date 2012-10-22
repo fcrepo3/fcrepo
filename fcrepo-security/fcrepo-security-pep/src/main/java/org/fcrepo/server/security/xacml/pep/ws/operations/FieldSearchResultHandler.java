@@ -122,7 +122,7 @@ public class FieldSearchResultHandler
 
                     resAttr.put(Constants.OBJECT.PID.getURI(),
                                 new StringAttribute(pid));
-                    resAttr.put(new URI(XACML_RESOURCE_ID),
+                    resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                                 new AnyURIAttribute(new URI(pid)));
 
                     RequestCtx req =
@@ -200,9 +200,9 @@ public class FieldSearchResultHandler
 
         try {
             resAttr.put(Constants.OBJECT.PID.getURI(),
-                        new StringAttribute("FedoraRepository"));
-            resAttr.put(new URI(XACML_RESOURCE_ID),
-                        new AnyURIAttribute(new URI("FedoraRepository")));
+                        Constants.FEDORA_REPOSITORY_PID.getStringAttribute());
+            resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                        Constants.FEDORA_REPOSITORY_PID.getURIAttribute());
 
             actions.put(Constants.ACTION.ID.getURI(),
                         new StringAttribute(Constants.ACTION.FIND_OBJECTS

@@ -360,8 +360,16 @@ public abstract class AbstractOperationHandler
         if (pid != null && !"".equals(pid)) {
             resAttr.put(Constants.OBJECT.PID.getURI(),
                         new StringAttribute(pid));
-            resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                        new AnyURIAttribute(new URI(pid)));
+            try{
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                    new AnyURIAttribute(new URI(pid)));
+            } catch (URISyntaxException e) {
+                logger.warn("pid {} is not a valid uri; write policies against the StringAttribute {} instead.",
+                        pid,
+                        Constants.OBJECT.PID.uri);
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                            new StringAttribute(pid));
+            }
         }
         logger.debug("Extracted SOAP Request Objects");
         return resAttr;

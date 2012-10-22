@@ -79,9 +79,6 @@ public class RISearchFilter
     private static final Logger logger =
             LoggerFactory.getLogger(RISearchFilter.class);
 
-    private static final String XACML_RESOURCE_ID =
-            "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
-
     private Map<String, Transformer> m_transformers = null;
 
     private Map<String, String> m_mimeType = null;
@@ -158,9 +155,8 @@ public class RISearchFilter
                                     HttpServletResponse response)
             throws IOException, ServletException {
         LogUtil.statLog(request.getRemoteUser(),
-                        Constants.ACTION.RI_FIND_OBJECTS.getURI()
-                                .toASCIIString(),
-                        "FedoraResposoty:ResourceIndex",
+                        Constants.ACTION.RI_FIND_OBJECTS.uri,
+                        "FedoraRepository:ResourceIndex",
                         null);
 
         return null;
@@ -357,9 +353,7 @@ public class RISearchFilter
                 if (pid != null && !"".equals(pid)) {
                     resAttr.put(Constants.OBJECT.PID.getURI(),
                                 new StringAttribute(pid));
-                }
-                if (pid != null && !"".equals(pid)) {
-                    resAttr.put(new URI(XACML_RESOURCE_ID),
+                    resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                                 new AnyURIAttribute(new URI(pid)));
                 }
                 if (dsID != null && !"".equals(dsID)) {
@@ -436,7 +430,7 @@ public class RISearchFilter
             if (logger.isDebugEnabled()) {
                 logger.debug("Attribute: " + attr.getId().toString());
             }
-            if (attr.getId().toString().equals(XACML_RESOURCE_ID)) {
+            if (attr.getId().toString().equals(Constants.XACML1_RESOURCE.ID.uri)) {
                 return attr.getValue().encode();
             }
         }

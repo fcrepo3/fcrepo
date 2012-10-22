@@ -40,7 +40,7 @@ public class XacmlName
             this.parent = parent;
             this.localName = localName;
             this.datatype = datatype;
-            uri = parent.uri + ":" + localName;
+            uri = (parent != null) ? parent.uri + ":" + localName : localName;
             m_uri = new URI(uri);
             m_att = new StringAttribute(m_uri.toASCIIString());
             m_uri_att = new AnyURIAttribute(m_uri);

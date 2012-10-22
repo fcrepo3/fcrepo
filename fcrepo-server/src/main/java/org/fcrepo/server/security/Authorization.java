@@ -9,6 +9,15 @@ import org.fcrepo.server.errors.authorization.AuthzException;
 
 import java.util.Date;
 
+import org.fcrepo.common.policy.xacml1.XACML1ActionCategoryNamespace;
+import org.fcrepo.common.policy.xacml1.XACML1ActionNamespace;
+import org.fcrepo.common.policy.xacml1.XACML1EnvironmentCategoryNamespace;
+import org.fcrepo.common.policy.xacml1.XACML1EnvironmentNamespace;
+import org.fcrepo.common.policy.xacml1.XACML1ResourceCategoryNamespace;
+import org.fcrepo.common.policy.xacml1.XACML1ResourceNamespace;
+import org.fcrepo.common.policy.xacml1.XACML1SubjectCategoryNamespace;
+import org.fcrepo.common.policy.xacml1.XACML1SubjectNamespace;
+
 
 /**
  * @author Bill Niebel
@@ -16,32 +25,40 @@ import java.util.Date;
 public interface Authorization {
 
     //subject
+    // "urn:oasis:names:tc:xacml:1.0:subject";
     public static final String SUBJECT_CATEGORY =
-            "urn:oasis:names:tc:xacml:1.0:subject";
+            XACML1SubjectNamespace.getInstance().uri;
 
+    // "urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
     public static final String SUBJECT_CATEGORY_ACCESS =
-            "urn:oasis:names:tc:xacml:1.0:subject-category:access-subject";
+            XACML1SubjectCategoryNamespace.getInstance().ACCESS_SUBJECT.uri;
 
     //action
+    // "urn:oasis:names:tc:xacml:1.0:action";
     public static final String ACTION_CATEGORY =
-            "urn:oasis:names:tc:xacml:1.0:action";
+            XACML1ActionNamespace.getInstance().uri;
 
+    // "urn:oasis:names:tc:xacml:1.0:action-category:access-action";
     public static final String ACTION_CATEGORY_ACCESS =
-            "urn:oasis:names:tc:xacml:1.0:action-category:access-action";
+            XACML1ActionCategoryNamespace.getInstance().ACCESS_ACTION.uri;
 
     //resource
+    // "urn:oasis:names:tc:xacml:1.0:resource";
     public static final String RESOURCE_CATEGORY =
-            "urn:oasis:names:tc:xacml:1.0:resource";
+            XACML1ResourceNamespace.getInstance().uri;
 
+    // "urn:oasis:names:tc:xacml:1.0:resource-category:access-resource";
     public static final String RESOURCE_CATEGORY_ACCESS =
-            "urn:oasis:names:tc:xacml:1.0:resource-category:access-resource";
+            XACML1ResourceCategoryNamespace.getInstance().ACCESS_RESOURCE.uri;
 
     //environment
+    // "urn:oasis:names:tc:xacml:1.0:environment";
     public static final String ENVIRONMENT_CATEGORY =
-            "urn:oasis:names:tc:xacml:1.0:environment";
+            XACML1EnvironmentNamespace.getInstance().uri;
 
+    // "urn:oasis:names:tc:xacml:1.0:environment-category:access-environment";
     public static final String ENVIRONMENT_CATEGORY_ACCESS =
-            "urn:oasis:names:tc:xacml:1.0:environment-category:access-environment";
+            XACML1EnvironmentCategoryNamespace.getInstance().ACCESS_ENVIRONMENT.uri;
 
     public static final String FEDORA_ROLE_KEY = "fedoraRole";
 

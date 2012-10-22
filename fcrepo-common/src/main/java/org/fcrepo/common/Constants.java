@@ -14,12 +14,13 @@ import org.fcrepo.common.policy.ResourceNamespace;
 import org.fcrepo.common.policy.ServiceDefinitionNamespace;
 import org.fcrepo.common.policy.ServiceDeploymentNamespace;
 import org.fcrepo.common.policy.SubjectNamespace;
-import org.fcrepo.common.policy.XACML1ActionNamespace;
-import org.fcrepo.common.policy.XACML1Namespace;
-import org.fcrepo.common.policy.XACML1PolicyNamespace;
-import org.fcrepo.common.policy.XACML1ResourceNamespace;
-import org.fcrepo.common.policy.XACML1SubjectNamespace;
 import org.fcrepo.common.policy.XacmlName;
+import org.fcrepo.common.policy.xacml1.XACML1ActionNamespace;
+import org.fcrepo.common.policy.xacml1.XACML1Namespace;
+import org.fcrepo.common.policy.xacml1.XACML1PolicyNamespace;
+import org.fcrepo.common.policy.xacml1.XACML1PolicySchemaNamespace;
+import org.fcrepo.common.policy.xacml1.XACML1ResourceNamespace;
+import org.fcrepo.common.policy.xacml1.XACML1SubjectNamespace;
 import org.fcrepo.common.rdf.DublinCoreNamespace;
 import org.fcrepo.common.rdf.FedoraModelNamespace;
 import org.fcrepo.common.rdf.FedoraNamespace;
@@ -254,7 +255,7 @@ public interface Constants {
     public static final SubjectNamespace SUBJECT =
             SubjectNamespace.getInstance();
 
-    public static final XACML1Namespace OASIS =
+    public static final XACML1Namespace XACML1 =
             XACML1Namespace.getInstance();
 
     public static final XACML1ActionNamespace XACML1_ACTION =
@@ -262,6 +263,9 @@ public interface Constants {
 
     public static final XACML1PolicyNamespace XACML1_POLICY =
             XACML1PolicyNamespace.getInstance();
+    
+    public static final XACML1PolicySchemaNamespace XACML1_POLICY_SCHEMA =
+            XACML1PolicySchemaNamespace.getInstance();
 
     public static final XACML1SubjectNamespace XACML1_SUBJECT =
             XACML1SubjectNamespace.getInstance();

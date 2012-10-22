@@ -152,6 +152,7 @@
         <include>dom4j:dom4j:jar:*</include>
         <include>org.fcrepo:mulgara-core:jar:*</include>
         <include>org.fcrepo:openrdf-sesame-onejar:jar:*</include>
+        <include>org.fcrepo:sunxacml:jar:*</include>
         <include>jaxen:jaxen:jar:*</include>
         <include>org.slf4j:slf4j-api:jar:*</include>
         <include>org.slf4j:jcl-over-slf4j:jar:*</include>

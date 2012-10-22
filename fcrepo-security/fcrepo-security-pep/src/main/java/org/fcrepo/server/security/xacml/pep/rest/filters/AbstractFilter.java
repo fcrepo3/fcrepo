@@ -51,7 +51,7 @@ implements RESTFilter {
 
     private static final Logger logger =
             LoggerFactory.getLogger(AbstractFilter.class);
-
+    private static final String[] EMPTY = new String[0];
     private ContextHandler m_contextHandler;
 
     /**
@@ -197,6 +197,8 @@ implements RESTFilter {
                     logger.warn("pid {} is not a valid uri; write policies against the StringAttribute {} instead.",
                             pid,
                             Constants.OBJECT.PID.uri);
+                    resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                                new StringAttribute(pid));
                 }
             }
             if (parts.length > 3){
@@ -222,7 +224,7 @@ implements RESTFilter {
         resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
                     Constants.FEDORA_REPOSITORY_PID.getURIAttribute());
         String path = request.getPathInfo();
-        String[] parts = path.split("/");
+        String[] parts = (path != null) ? path.split("/") : EMPTY;
         getLocalResources(parts, resAttr);
         return resAttr;
     }

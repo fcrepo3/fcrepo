@@ -30,7 +30,7 @@
 
     <org.apache.activemq.default.directory.prefix>${project.build.directory}</org.apache.activemq.default.directory.prefix>
 
-    <test.report.directory>${project.build.directory}/failsafe-reports/configA</test.report.directory>
+    <test.report.directory>${project.build.directory}/failsafe-reports/configC</test.report.directory>
   </properties>
   <profiles>
 

@@ -20,6 +20,8 @@ package org.fcrepo.server.security.xacml.pep.rest.filters;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -160,9 +162,16 @@ public class GetFilter
                 resAttr.put(Constants.OBJECT.PID.getURI(),
                             new StringAttribute(pid));
             // XACML 1.0 conformance. resource-id is mandatory. Remove when switching to 2.0
-                resAttr
-                        .put(Constants.XACML1_RESOURCE.ID.getURI(),
-                             new AnyURIAttribute(new URI(pid)));
+                try{
+                    resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                        new AnyURIAttribute(new URI(pid)));
+                } catch (URISyntaxException e) {
+                    logger.warn("pid {} is not a valid uri; write policies against the StringAttribute {} instead.",
+                            pid,
+                            Constants.OBJECT.PID.uri);
+                    resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                                new StringAttribute(pid));
+                }
             }
             if (dsID != null && !"".equals(dsID)) {
                 resAttr.put(Constants.DATASTREAM.ID.getURI(),

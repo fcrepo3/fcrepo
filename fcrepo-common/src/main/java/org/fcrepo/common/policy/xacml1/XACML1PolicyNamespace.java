@@ -1,4 +1,5 @@
-package org.fcrepo.common.policy;
+package org.fcrepo.common.policy.xacml1;
+import org.fcrepo.common.policy.XacmlNamespace;
 
 
 
@@ -8,11 +9,10 @@ public class XACML1PolicyNamespace extends XacmlNamespace {
         super(parent, localName);
     }
 
-    public static XACML1PolicyNamespace onlyInstance = new XACML1PolicyNamespace(null, "policy");
+    public static XACML1PolicyNamespace onlyInstance = new XACML1PolicyNamespace(XACML1Namespace.getInstance(), "policy");
     static {
-        onlyInstance.addNamespace(XACML1Namespace.getInstance());
+        onlyInstance.addNamespace(XACML1PolicySchemaNamespace.getInstance());
     }
-
     public static final XACML1PolicyNamespace getInstance() {
         return onlyInstance;
     }

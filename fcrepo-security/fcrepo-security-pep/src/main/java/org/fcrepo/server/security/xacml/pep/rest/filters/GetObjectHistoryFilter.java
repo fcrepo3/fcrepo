@@ -95,6 +95,7 @@ public class GetObjectHistoryFilter
                                                      resAttr,
                                                      getEnvironment(request));
 
+            String pid = resAttr.get(Constants.OBJECT.PID.getURI()).toString();
             LogUtil.statLog(request.getRemoteUser(),
                             Constants.ACTION.GET_OBJECT_HISTORY.uri,
                             pid,
