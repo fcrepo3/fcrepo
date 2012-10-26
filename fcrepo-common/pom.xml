@@ -211,6 +211,11 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+    	<groupId>joda-time</groupId>
+    	<artifactId>joda-time</artifactId>
+    	<version>1.5.2</version>
+    </dependency>
   </dependencies>
 
 </project>

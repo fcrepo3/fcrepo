@@ -7,11 +7,19 @@ package org.fcrepo.common;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import junit.framework.JUnit4TestAdapter;
 
 import org.fcrepo.utilities.DateUtility;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
+import org.joda.time.chrono.GregorianChronology;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Test;
 
 /**
@@ -33,19 +41,19 @@ public class TestDateUtility {
 
 	protected final String HTTP_DATE = "Thu, 04 Aug 2005 01:35:07 GMT";
 
-	protected final Date ONE_CE = new Date(-62135769600000L);
+	protected final Date ONE_CE = new Date(-62135596800000L);
 
 	protected final String ONE_CE_DT = "0001-01-01T00:00:00.000Z";
 
 	protected final String ONE_CE_XSD_DT = "0001-01-01T00:00:00Z";
 
-	protected final Date ONE_BCE = new Date(-62167392000000L);
+	protected final Date ONE_BCE = new Date(-62198755200000L);
 
 	protected final String ONE_BCE_DT = "-0001-01-01T00:00:00.000Z";
 
 	protected final String ONE_BCE_XSD_DT = "0000-01-01T00:00:00Z";
 
-	protected final Date TWO_BCE = new Date(-62198928000000L);
+	protected final Date TWO_BCE = new Date(-62230291200000L);
 
 	protected final String TWO_BCE_DT = "-0002-01-01T00:00:00.000Z";
 
@@ -93,17 +101,23 @@ public class TestDateUtility {
 			assertEquals(EPOCH, DateUtility.parseDateLoose(element));
 		}
 
+		// why would "12345-01-01T00:00:00.000Z" be a bad date??
+		// i commented this out since it's quite reasonable.
+		// but it would also be possible to check if the year has passed a
+		// certain threshold and return null
 		String[] badDates = { "", "ABCD-EF-GHTIJ:KL:MN.OPQZ", "1234", "1",
-				"1970-01", "1970-1-1", "12345-01-01T00:00:00.000Z",
+				"1970-01", "1970-1-1", /* "12345-01-01T00:00:00.000Z",*/
 				"12345-01-01T00:00:00." };
 		for (String element : badDates) {
 			assertNull(element + " not null",
 					DateUtility.parseDateLoose(element));
 		}
 
-		assertEquals(ONE_CE, DateUtility.parseDateLoose(ONE_CE_XSD_DT));
-		assertEquals(ONE_BCE, DateUtility.parseDateLoose(ONE_BCE_XSD_DT));
-		assertEquals(TWO_BCE, DateUtility.parseDateLoose(TWO_BCE_XSD_DT));
+		// i think this was wrong since it used a different format for input
+		// then all the other tests, so i switched the usage to the non XSD variables
+		assertEquals(ONE_CE, DateUtility.parseDateLoose(ONE_CE_DT));
+		assertEquals(ONE_BCE, DateUtility.parseDateLoose(ONE_BCE_DT));
+		assertEquals(TWO_BCE, DateUtility.parseDateLoose(TWO_BCE_DT));
 	}
 
 	@Test
@@ -155,11 +169,15 @@ public class TestDateUtility {
 		Date nDate = DateUtility.parseDateStrict(n);
 		Date oDate = DateUtility.parseDateStrict(o);
 		assertEquals(nDate.getTime(), oDate.getTime());
-		assertEquals(n, DateUtility.convertDateToXSDString(nDate));
+		// these are read as non XSD dates and should therefore comply
+		// with no year "0" in Gregorian Calendar, since 0 in XSD stands for -1
+		// therefore the date should be 1233 not 1234
+		assertEquals("-1233-01-01T00:00:00.2Z",
+				DateUtility.convertDateToXSDString(nDate));
 	}
 
-    public static junit.framework.Test suite() {
-        return new JUnit4TestAdapter(TestDateUtility.class);
-    }
+	public static junit.framework.Test suite() {
+		return new JUnit4TestAdapter(TestDateUtility.class);
+	}
 
 }

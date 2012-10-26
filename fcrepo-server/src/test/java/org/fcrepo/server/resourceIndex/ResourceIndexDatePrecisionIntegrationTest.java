@@ -10,6 +10,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.jrdf.graph.Literal;
 import org.jrdf.graph.ObjectNode;
 
@@ -36,11 +39,10 @@ public class ResourceIndexDatePrecisionIntegrationTest
 
     private static TimeZone UTC = TimeZone.getTimeZone("UTC");
 
-    private final DateFormat _millisFormat;
+    private final DateTimeFormatter _millisFormat;
 
     public ResourceIndexDatePrecisionIntegrationTest() {
-        _millisFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        _millisFormat.setTimeZone(UTC);
+        _millisFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(DateTimeZone.UTC);
     }
 
     /**
@@ -69,15 +71,17 @@ public class ResourceIndexDatePrecisionIntegrationTest
     @Test
     public void testBoundaryDates() throws Exception {
         Date EPOCH = new Date(0L);
-        Date ONE_CE = new Date(-62135769600000L);
-        Date ONE_BCE = new Date(-62167392000000L);
-        Date TWO_BCE = new Date(-62198928000000L);
+        Date ONE_CE = new Date(-62135596800000L);
+        Date ONE_BCE = new Date(-62198755200000L);
+        Date TWO_BCE = new Date(-62230291200000L);
 
         String EPOCH_DT = "1970-01-01T00:00:00.000Z";
         String ONE_CE_DT = "0001-01-01T00:00:00.000Z";
-        String ONE_BCE_DT = "0000-01-01T00:00:00.000Z";
-        String TWO_BCE_DT = "-0001-01-01T00:00:00.000Z";
+        String ONE_BCE_DT = "-0001-01-01T00:00:00.000Z";
+        String TWO_BCE_DT = "-0002-01-01T00:00:00.000Z";
 
+        // i think this was wrong since in the xsd 1 BCE should be the year 0000
+        // while 2 BCE should be 0001
         String EPOCH_XSD = "1970-01-01T00:00:00Z";
         String ONE_CE_XSD = "0001-01-01T00:00:00Z";
         String ONE_BCE_XSD = "0000-01-01T00:00:00Z";
@@ -107,7 +111,7 @@ public class ResourceIndexDatePrecisionIntegrationTest
                            Date date,
                            String pid,
                            String xsdDateTime) throws Exception {
-        Date createDate = _millisFormat.parse(dateTime);
+        Date createDate = _millisFormat.parseDateTime(dateTime).toDate();
         assertEquals(date, createDate);
         DigitalObject obj = getTestObject(pid, pid);
         obj.setCreateDate(createDate);
