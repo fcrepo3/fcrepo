@@ -32,6 +32,7 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.fcrepo.server.types.gen.DatastreamDef;
@@ -141,17 +142,10 @@ public class ListDatastreamsHandler
         logger.debug("Extracted SOAP Request Objects");
 
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        Map<URI, AttributeValue> resAttr;
 
         try {
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(Constants.OBJECT.PID.getURI(),
-                            new StringAttribute(pid));
-            }
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                            new AnyURIAttribute(new URI(pid)));
-            }
+            resAttr = ResourceAttributes.getResources(pid);
             if (asOfDateTime != null && !"".equals(asOfDateTime)) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(asOfDateTime));
@@ -199,18 +193,14 @@ public class ListDatastreamsHandler
 
             Map<URI, AttributeValue> actions =
                     new HashMap<URI, AttributeValue>();
-            Map<URI, AttributeValue> resAttr =
-                    new HashMap<URI, AttributeValue>();
+            Map<URI, AttributeValue> resAttr;
 
             try {
                 actions.put(Constants.ACTION.ID.getURI(),
                             Constants.ACTION.GET_DATASTREAM
                                     .getStringAttribute());
 
-                resAttr.put(Constants.OBJECT.PID.getURI(),
-                            new StringAttribute(pid));
-                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                            new AnyURIAttribute(new URI(pid)));
+                resAttr = ResourceAttributes.getResources(pid);
                 resAttr.put(Constants.DATASTREAM.ID.getURI(),
                             new StringAttribute(dsDef.getID()));
 

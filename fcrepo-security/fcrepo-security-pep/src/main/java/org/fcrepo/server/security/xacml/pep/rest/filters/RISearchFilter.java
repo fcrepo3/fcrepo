@@ -328,8 +328,7 @@ public class RISearchFilter
 
             Map<URI, AttributeValue> actions =
                     new HashMap<URI, AttributeValue>();
-            Map<URI, AttributeValue> resAttr =
-                    new HashMap<URI, AttributeValue>();
+            Map<URI, AttributeValue> resAttr;
 
             String[] components = pidDN.split("\\/");
             String pid = components[1];
@@ -350,12 +349,7 @@ public class RISearchFilter
 
                 // Modification to uniquely identify datastreams
 
-                if (pid != null && !"".equals(pid)) {
-                    resAttr.put(Constants.OBJECT.PID.getURI(),
-                                new StringAttribute(pid));
-                    resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                                new AnyURIAttribute(new URI(pid)));
-                }
+                resAttr = getResources(pid);
                 if (dsID != null && !"".equals(dsID)) {
                     resAttr.put(Constants.DATASTREAM.ID.getURI(),
                                 new StringAttribute(dsID));

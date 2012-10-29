@@ -32,6 +32,7 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.types.gen.FieldSearchResult;
 import org.fcrepo.server.types.gen.ObjectFields;
@@ -104,8 +105,7 @@ public class FieldSearchResultHandler
 
             Map<URI, AttributeValue> actions =
                     new HashMap<URI, AttributeValue>();
-            Map<URI, AttributeValue> resAttr =
-                    new HashMap<URI, AttributeValue>();
+            Map<URI, AttributeValue> resAttr;
 
             String pid = o.getPid() != null ? o.getPid().getValue() : null;
             if (pid != null && !"".equals(pid)) {
@@ -120,10 +120,7 @@ public class FieldSearchResultHandler
                                 new StringAttribute(Constants.ACTION.APIA.getURI()
                                         .toASCIIString()));
 
-                    resAttr.put(Constants.OBJECT.PID.getURI(),
-                                new StringAttribute(pid));
-                    resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                                new AnyURIAttribute(new URI(pid)));
+                    resAttr = ResourceAttributes.getResources(pid);
 
                     RequestCtx req =
                             getContextHandler()
@@ -195,14 +192,11 @@ public class FieldSearchResultHandler
             throws OperationHandlerException {
         RequestCtx req = null;
 
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        Map<URI, AttributeValue> resAttr;
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
 
         try {
-            resAttr.put(Constants.OBJECT.PID.getURI(),
-                        Constants.FEDORA_REPOSITORY_PID.getStringAttribute());
-            resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                        Constants.FEDORA_REPOSITORY_PID.getURIAttribute());
+            resAttr = ResourceAttributes.getRepositoryResources();
 
             actions.put(Constants.ACTION.ID.getURI(),
                         new StringAttribute(Constants.ACTION.FIND_OBJECTS

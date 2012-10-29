@@ -171,6 +171,26 @@ implements RESTFilter {
         return envAttr;
     }
 
+    protected Map<URI, AttributeValue> getResources(String pid)
+            throws URISyntaxException, ServletException {
+        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        if (pid != null && !"".equals(pid)){
+            resAttr.put(Constants.OBJECT.PID.getURI(),
+                        new StringAttribute(pid));
+            try{
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                            new AnyURIAttribute(new URI(pid)));
+            } catch (URISyntaxException e) {
+                logger.warn("pid {} is not a valid uri; write policies against the StringAttribute {} instead.",
+                            pid,
+                            Constants.OBJECT.PID.uri);
+                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                            new StringAttribute(pid));
+            }
+        }
+        return resAttr;
+    }
+        
     /**
      * Returns a map of resource attributes.
      *
@@ -181,26 +201,13 @@ implements RESTFilter {
      * @throws ServletException
      */
     protected Map<URI, AttributeValue> getResources(HttpServletRequest request) throws URISyntaxException, ServletException {
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        Map<URI, AttributeValue> resAttr;
         String path = request.getPathInfo();
         String[] parts = path.split("/");
         if (parts.length > 1) {
             String pid = parts[1];
             if (pid.endsWith(".xml")) pid = pid.substring(0,pid.length()-4);
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(Constants.OBJECT.PID.getURI(),
-                        new StringAttribute(pid));
-                try{
-                    resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                        new AnyURIAttribute(new URI(pid)));
-                } catch (URISyntaxException e) {
-                    logger.warn("pid {} is not a valid uri; write policies against the StringAttribute {} instead.",
-                            pid,
-                            Constants.OBJECT.PID.uri);
-                    resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                                new StringAttribute(pid));
-                }
-            }
+            resAttr = getResources(pid);
             if (parts.length > 3){
                 if ("datastreams".equals(parts[2])) {
                     String dsID = parts[3];
@@ -211,6 +218,8 @@ implements RESTFilter {
                     }
                 }
             }
+        } else {
+            resAttr = new HashMap<URI, AttributeValue>();
         }
         getLocalResources(parts, resAttr);
         return resAttr;

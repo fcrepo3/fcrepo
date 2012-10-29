@@ -44,6 +44,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.utilities.CXFUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -325,7 +326,7 @@ public abstract class AbstractOperationHandler
 
         return envAttr;
     }
-
+    
     /**
      * Obtains a map of resource Attributes.
      *
@@ -336,8 +337,6 @@ public abstract class AbstractOperationHandler
      * @throws URISyntaxException
      */
     protected Map<URI, AttributeValue> getResources(SOAPMessageContext context) throws OperationHandlerException, URISyntaxException {
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
-
         Object oMap = null;
 
         String pid = null;
@@ -357,20 +356,7 @@ public abstract class AbstractOperationHandler
             throw new OperationHandlerException("Error obtaining parameters.",
                                                 e);
         }
-        if (pid != null && !"".equals(pid)) {
-            resAttr.put(Constants.OBJECT.PID.getURI(),
-                        new StringAttribute(pid));
-            try{
-                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                    new AnyURIAttribute(new URI(pid)));
-            } catch (URISyntaxException e) {
-                logger.warn("pid {} is not a valid uri; write policies against the StringAttribute {} instead.",
-                        pid,
-                        Constants.OBJECT.PID.uri);
-                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                            new StringAttribute(pid));
-            }
-        }
+        Map<URI, AttributeValue> resAttr = ResourceAttributes.getResources(pid);
         logger.debug("Extracted SOAP Request Objects");
         return resAttr;
     }

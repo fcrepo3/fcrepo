@@ -423,8 +423,7 @@ public class FindObjects
 
             Map<URI, AttributeValue> actions =
                     new HashMap<URI, AttributeValue>();
-            Map<URI, AttributeValue> resAttr =
-                    new HashMap<URI, AttributeValue>();
+            Map<URI, AttributeValue> resAttr;
 
             try {
                 actions
@@ -433,12 +432,7 @@ public class FindObjects
                                      .getStringAttribute());
                 actions.put(Constants.ACTION.API.getURI(),
                             Constants.ACTION.APIA.getStringAttribute());
-                if (pid != null && !"".equals(pid)) {
-                    resAttr.put(Constants.OBJECT.PID.getURI(),
-                                new StringAttribute(pid));
-                    resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                                new AnyURIAttribute(new URI(pid)));
-                }
+                resAttr = getResources(pid);
 
                 RequestCtx req =
                         getContextHandler()

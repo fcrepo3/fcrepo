@@ -28,6 +28,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,13 +88,10 @@ public class IngestHandler
         logger.debug("Extracted SOAP Request Objects");
 
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        Map<URI, AttributeValue> resAttr;
 
         try {
-            resAttr.put(Constants.OBJECT.PID.getURI(),
-                        Constants.FEDORA_REPOSITORY_PID.getStringAttribute());
-            resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                        Constants.FEDORA_REPOSITORY_PID.getURIAttribute());
+            resAttr = ResourceAttributes.getRepositoryResources();
             if (format != null && !"".equals(format)) {
                 resAttr.put(Constants.OBJECT.FORMAT_URI.getURI(),
                             new StringAttribute(format));

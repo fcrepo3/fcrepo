@@ -28,6 +28,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,15 +98,10 @@ public class GetDisseminationHandler
         logger.debug("Extracted SOAP Request Objects");
 
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
+        Map<URI, AttributeValue> resAttr;
 
         try {
-            if (pid != null && !"".equals(pid)) {
-                resAttr.put(Constants.OBJECT.PID.getURI(),
-                            new StringAttribute(pid));
-                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                            new AnyURIAttribute(new URI(pid)));
-            }
+            resAttr = ResourceAttributes.getResources(pid);
             if (sDefPid != null && !"".equals(sDefPid)) {
                 resAttr.put(Constants.SDEF.PID.getURI(),
                             new StringAttribute(sDefPid));

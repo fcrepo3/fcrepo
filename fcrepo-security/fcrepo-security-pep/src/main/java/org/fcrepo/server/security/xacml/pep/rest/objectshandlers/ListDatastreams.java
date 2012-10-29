@@ -421,18 +421,14 @@ public class ListDatastreams
 
             Map<URI, AttributeValue> actions =
                     new HashMap<URI, AttributeValue>();
-            Map<URI, AttributeValue> resAttr =
-                    new HashMap<URI, AttributeValue>();
+            Map<URI, AttributeValue> resAttr;
 
             try {
                 actions.put(Constants.ACTION.ID.getURI(),
                             Constants.ACTION.GET_DATASTREAM
                                     .getStringAttribute());
 
-                resAttr.put(Constants.OBJECT.PID.getURI(),
-                            new StringAttribute(pid));
-                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                            new AnyURIAttribute(new URI(pid)));
+                resAttr = getResources(pid);
                 resAttr.put(Constants.DATASTREAM.ID.getURI(),
                             new StringAttribute(dsid));
 
