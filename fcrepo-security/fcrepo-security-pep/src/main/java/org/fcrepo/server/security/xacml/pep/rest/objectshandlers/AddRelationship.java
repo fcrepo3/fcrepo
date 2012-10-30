@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
@@ -54,7 +55,9 @@ public class AddRelationship
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr;
         try {
-            resAttr = getResources(request);
+            String[] parts = getPathParts(request);
+            String pid = parts[1];
+            resAttr = ResourceAttributes.getResources(parts);
             actions.put(Constants.ACTION.ID.getURI(),
                         Constants.ACTION.ADD_RELATIONSHIP
                                 .getStringAttribute());
@@ -67,7 +70,6 @@ public class AddRelationship
                                                      resAttr,
                                                      getEnvironment(request));
 
-            String pid = resAttr.get(Constants.OBJECT.PID.getURI()).toString();
             LogUtil.statLog(request.getRemoteUser(),
                             Constants.ACTION.ADD_RELATIONSHIP.uri,
                             pid,

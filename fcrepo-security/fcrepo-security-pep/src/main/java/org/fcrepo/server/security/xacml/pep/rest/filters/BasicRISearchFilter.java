@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ extends AbstractFilter {
 
         try {
 
-            resAttr = getRepositoryResources(request);
+            resAttr = ResourceAttributes.getRepositoryResources();
 
             actions.put(Constants.ACTION.API.getURI(),
                         Constants.ACTION.APIA.getStringAttribute());

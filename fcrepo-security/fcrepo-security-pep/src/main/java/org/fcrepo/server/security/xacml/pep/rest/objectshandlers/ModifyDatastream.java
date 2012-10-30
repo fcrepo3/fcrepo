@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
@@ -76,6 +77,13 @@ public class ModifyDatastream
             logger.debug("{}/handleRequest!", this.getClass().getName());
         }
 
+        String[] parts = getPathParts(request);
+        // -/objects/{pid}/datastreams/{dsID}
+        if (parts.length < 4) {
+            logger.error("Not enough path components on the URI: {}", request.getRequestURI());
+            throw new ServletException("Not enough path components on the URI: " + request.getRequestURI());
+        }
+
         String mimeType = request.getParameter("mimeType");
         String formatURI = request.getParameter("formatURI");
         String dsLocation = request.getParameter("dsLocation");
@@ -86,7 +94,7 @@ public class ModifyDatastream
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr;
         try {
-            resAttr = getResources(request);
+            resAttr = ResourceAttributes.getResources(parts);
             if (mimeType != null && !"".equals(mimeType)) {
                 resAttr.put(Constants.DATASTREAM.NEW_MIME_TYPE.getURI(),
                             new StringAttribute(mimeType));
@@ -125,11 +133,7 @@ public class ModifyDatastream
                         Constants.ACTION.APIM.getStringAttribute());
 
             // modifying the FeSL policy datastream requires policy management permissions
-            String pid = resAttr.get(Constants.OBJECT.PID.getURI()).toString();
-            String dsID = null;
-            if (resAttr.containsKey(Constants.DATASTREAM.ID.getURI())){
-                dsID = resAttr.get(Constants.DATASTREAM.ID.getURI()).toString();
-            }
+            String dsID = parts[3];
             if (dsID != null && dsID.equals(FedoraPolicyStore.FESL_POLICY_DATASTREAM)) {
                 actions.put(Constants.ACTION.ID.getURI(),
                             Constants.ACTION.MANAGE_POLICIES.getStringAttribute());
@@ -142,7 +146,7 @@ public class ModifyDatastream
                                                      resAttr,
                                                      getEnvironment(request));
 
-            LogUtil.statLog(request.getRemoteUser(), action, pid, dsID);
+            LogUtil.statLog(request.getRemoteUser(), action, parts[1], dsID);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new ServletException(e.getMessage(), e);

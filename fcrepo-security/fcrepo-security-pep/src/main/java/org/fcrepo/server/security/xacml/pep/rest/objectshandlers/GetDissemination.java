@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
@@ -50,6 +51,14 @@ public class GetDissemination
                 logger.debug("{}/handleRequest!", this.getClass().getName());
             }
 
+            String[] parts = getPathParts(request);
+            if (parts.length < 5) {
+                logger.error("Not enough path components on the URI: {}", request.getRequestURI());
+                throw new ServletException("Not enough path components on the URI: " + request.getRequestURI());
+            }
+            
+            String pid = parts[1];
+
             String asOfDateTime = request.getParameter("asOfDateTime");
             if (!isDate(asOfDateTime)) {
                 asOfDateTime = null;
@@ -59,7 +68,22 @@ public class GetDissemination
             Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
             Map<URI, AttributeValue> resAttr;
             try {
-                resAttr = getResources(request);
+                resAttr = ResourceAttributes.getResources(pid);
+
+                // - /objects/[pid]/methods/[sdef]/[method]
+                if ("methods".equals(parts[2])) {
+                    String sDefPid = parts[3];
+                    String methodName = parts[4];
+                    if (sDefPid != null && !"".equals(sDefPid)) {
+                        resAttr.put(Constants.SDEF.PID.getURI(),
+                                new StringAttribute(sDefPid));
+                    }
+                    if (methodName != null && !"".equals(methodName)) {
+                        resAttr.put(Constants.DISSEMINATOR.METHOD.getURI(),
+                                new StringAttribute(methodName));
+                    }
+                }
+
                 if (asOfDateTime != null && !"".equals(asOfDateTime)) {
                     resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                                 DateTimeAttribute.getInstance(asOfDateTime));
@@ -77,7 +101,6 @@ public class GetDissemination
                                                          resAttr,
                                                          getEnvironment(request));
 
-                String pid = resAttr.get(Constants.OBJECT.PID.getURI()).toString();
                 LogUtil.statLog(request.getRemoteUser(),
                                 Constants.ACTION.GET_DISSEMINATION.uri,
                                 pid,
@@ -88,25 +111,6 @@ public class GetDissemination
             }
 
             return req;
-        }
-
-        @Override
-        public void getLocalResources(String[] parts, Map<URI, AttributeValue> resAttr) {
-            // - /objects/[pid]/methods/[sdef]/[method]
-            if (parts.length > 3){
-                if ("methods".equals(parts[2])) {
-                    String sDefPid = parts[3];
-                    String methodName = parts[4];
-                    if (sDefPid != null && !"".equals(sDefPid)) {
-                        resAttr.put(Constants.SDEF.PID.getURI(),
-                                new StringAttribute(sDefPid));
-                    }
-                    if (methodName != null && !"".equals(methodName)) {
-                        resAttr.put(Constants.DISSEMINATOR.METHOD.getURI(),
-                                new StringAttribute(methodName));
-                    }
-                }
-            }
         }
 
 }

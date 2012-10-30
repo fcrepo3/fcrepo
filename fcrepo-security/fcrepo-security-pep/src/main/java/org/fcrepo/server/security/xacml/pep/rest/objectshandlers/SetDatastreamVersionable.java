@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
@@ -81,7 +82,8 @@ public class SetDatastreamVersionable
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr;
         try {
-            resAttr = getResources(request);
+            String[] parts = getPathParts(request);
+            resAttr = ResourceAttributes.getResources(parts);
             if (versionable != null && !"".equals(versionable)) {
                 resAttr.put(Constants.DATASTREAM.NEW_VERSIONABLE.getURI(),
                             new StringAttribute(versionable));
@@ -95,8 +97,7 @@ public class SetDatastreamVersionable
                         Constants.ACTION.APIM.getStringAttribute());
 
             // modifying the FeSL policy datastream requires policy management permissions
-            String pid = resAttr.get(Constants.OBJECT.PID.getURI()).toString();
-            String dsID = null;
+            String dsID = parts[3];
             if (resAttr.containsKey(Constants.DATASTREAM.ID.getURI())){
                 dsID = resAttr.get(Constants.DATASTREAM.ID.getURI()).toString();
             }
@@ -115,7 +116,7 @@ public class SetDatastreamVersionable
             LogUtil.statLog(request.getRemoteUser(),
                             Constants.ACTION.SET_DATASTREAM_VERSIONABLE
                                     .uri,
-                            pid,
+                            parts[1],
                             dsID);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

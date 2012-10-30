@@ -32,6 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,85 +173,6 @@ implements RESTFilter {
         return envAttr;
     }
 
-    protected Map<URI, AttributeValue> getResources(String pid)
-            throws URISyntaxException, ServletException {
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
-        if (pid != null && !"".equals(pid)){
-            resAttr.put(Constants.OBJECT.PID.getURI(),
-                        new StringAttribute(pid));
-            try{
-                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                            new AnyURIAttribute(new URI(pid)));
-            } catch (URISyntaxException e) {
-                logger.warn("pid {} is not a valid uri; write policies against the StringAttribute {} instead.",
-                            pid,
-                            Constants.OBJECT.PID.uri);
-                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                            new StringAttribute(pid));
-            }
-        }
-        return resAttr;
-    }
-        
-    /**
-     * Returns a map of resource attributes.
-     *
-     * @param request
-     *        the servlet request from which to obtain the attributes
-     * @return a map of resource attributes initialized with PID attributes
-     * @throws URISyntaxException
-     * @throws ServletException
-     */
-    protected Map<URI, AttributeValue> getResources(HttpServletRequest request) throws URISyntaxException, ServletException {
-        Map<URI, AttributeValue> resAttr;
-        String path = request.getPathInfo();
-        String[] parts = path.split("/");
-        if (parts.length > 1) {
-            String pid = parts[1];
-            if (pid.endsWith(".xml")) pid = pid.substring(0,pid.length()-4);
-            resAttr = getResources(pid);
-            if (parts.length > 3){
-                if ("datastreams".equals(parts[2])) {
-                    String dsID = parts[3];
-                    if (dsID.endsWith(".xml")) dsID = dsID.substring(0,dsID.length()-4);
-                    if (dsID != null && !"".equals(dsID)) {
-                        resAttr.put(Constants.DATASTREAM.ID.getURI(),
-                                new StringAttribute(dsID));
-                    }
-                }
-            }
-        } else {
-            resAttr = new HashMap<URI, AttributeValue>();
-        }
-        getLocalResources(parts, resAttr);
-        return resAttr;
-    }
-
-    protected Map<URI, AttributeValue> getRepositoryResources(HttpServletRequest request) throws ServletException {
-        Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
-        resAttr.put(Constants.OBJECT.PID.getURI(),
-                    Constants.FEDORA_REPOSITORY_PID.getStringAttribute());
-        // XACML 1.0 conformance. resource-id is mandatory. Remove when switching to 2.0
-        resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
-                    Constants.FEDORA_REPOSITORY_PID.getURIAttribute());
-        String path = request.getPathInfo();
-        String[] parts = (path != null) ? path.split("/") : EMPTY;
-        getLocalResources(parts, resAttr);
-        return resAttr;
-    }
-
-
-    /**
-     * A callback to allow filters to add implementation-specific resource
-     * attributes based on the request path. Should be overridden.
-     * @param pathParts
-     * @param resAttr
-     */
-    protected void getLocalResources(String[] pathParts, Map<URI, AttributeValue> resAttr) throws ServletException {
-
-    }
-
-
     /**
      * Function to determine whether a parameter is a PID.
      *
@@ -308,5 +231,10 @@ implements RESTFilter {
         }
 
         return false;
+    }
+    
+    protected static String[] getPathParts(HttpServletRequest request) {
+        String path = request.getPathInfo();
+        return (path != null) ? path.split("/") : EMPTY;
     }
 }

@@ -14,7 +14,7 @@ import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.fcrepo.common.policy.xacml1.XACML1PolicySchemaNamespace;
+import org.fcrepo.common.Constants;
 
 import com.sleepycat.db.Environment;
 import com.sleepycat.db.EnvironmentConfig;
@@ -40,7 +40,7 @@ public class DbXmlManager {
             LoggerFactory.getLogger(DbXmlManager.class.getName());
 
     private static final String XACML20_POLICY_NS =
-            XACML1PolicySchemaNamespace.getInstance().OS.uri;
+            Constants.XACML2_POLICY_SCHEMA.OS.uri;
 
     public String DB_HOME = null;
 

@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,30 +69,29 @@ public class ListDatastreamsFilter
     public RequestCtx handleRequest(HttpServletRequest request,
                                     HttpServletResponse response)
             throws IOException, ServletException {
-        if (request.getPathInfo() == null) {
-            logger.error("Bad request: " + request.getRequestURI());
-            throw new ServletException("Bad request: "
-                    + request.getRequestURI());
-        }
-
-        String[] parts = request.getPathInfo().split("/");
+        String[] parts = getPathParts(request);
         if (parts.length < 2) {
-            logger.info("Not enough path components on the URI.");
-            throw new ServletException("Not enough path components on the URI.");
+            logger.error("Not enough path components on the URI: {}", request.getRequestURI());
+            throw new ServletException("Not enough path components on the URI: " + request.getRequestURI());
         }
+        
+        String pid = parts[1];
 
         RequestCtx req = null;
 
-        String dateTime = null;
+        String asOfDateTime = request.getParameter("asOfDateTime");
+        if (!isDate(asOfDateTime)) {
+            asOfDateTime = null;
+        }
 
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr;
 
         try {
-            resAttr = getResources(request);
-            if (dateTime != null && !"".equals(dateTime)) {
+            resAttr = ResourceAttributes.getResources(pid);
+            if (asOfDateTime != null && !"".equals(asOfDateTime)) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
-                            DateTimeAttribute.getInstance(dateTime));
+                            DateTimeAttribute.getInstance(asOfDateTime));
             }
 
             actions.put(Constants.ACTION.API.getURI(),
@@ -106,7 +106,6 @@ public class ListDatastreamsFilter
                                                      resAttr,
                                                      getEnvironment(request));
 
-            String pid = resAttr.get(Constants.OBJECT.PID.getURI()).toString();
             LogUtil.statLog(request.getRemoteUser(),
                             Constants.ACTION.LIST_DATASTREAMS.uri,
                             pid,
@@ -129,13 +128,5 @@ public class ListDatastreamsFilter
                                      HttpServletResponse response)
             throws IOException, ServletException {
         return null;
-    }
-
-    @Override
-    public void getLocalResources(String[] pathParts, Map<URI, AttributeValue> resAttr) throws ServletException {
-        if (pathParts.length < 2) {
-            logger.info("Not enough path components on the URI.");
-            throw new ServletException("Not enough path components on the URI.");
-        }
     }
 }

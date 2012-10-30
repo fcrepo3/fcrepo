@@ -35,7 +35,7 @@ import com.sun.xacml.finder.PolicyFinder;
 
 public interface PolicyIndex {
 
-    public static final String XACML20_POLICY_NS = Constants.XACML1_POLICY_SCHEMA.OS.toString();
+    public static final String XACML20_POLICY_NS = Constants.XACML2_POLICY_SCHEMA.OS.toString();
     public static final String XACML_RESOURCE_ID = Constants.XACML1_RESOURCE.ID.toString();
 
     /**

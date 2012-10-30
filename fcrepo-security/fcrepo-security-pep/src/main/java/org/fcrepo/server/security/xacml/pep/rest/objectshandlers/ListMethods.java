@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
@@ -74,6 +75,14 @@ public class ListMethods
         if (logger.isDebugEnabled()) {
             logger.debug("{}/handleRequest!", this.getClass().getName());
         }
+        
+        String[] parts = getPathParts(request);
+        if (parts.length < 3) {
+            logger.error("Not enough path components on the URI: {}", request.getRequestURI());
+            throw new ServletException("Not enough path components on the URI: " + request.getRequestURI());
+        }
+        
+        String pid = parts[1];
 
         String asOfDateTime = request.getParameter("asOfDateTime");
         if (!isDate(asOfDateTime)) {
@@ -84,7 +93,20 @@ public class ListMethods
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr;
         try {
-            resAttr = getResources(request);
+            resAttr = ResourceAttributes.getResources(pid);
+
+            // -/objects/[pid]/methods and
+            // -/objects/[pid]/methods/[sdefPid]
+            if (parts.length > 3){
+                if ("methods".equals(parts[2])) {
+                    String sDefPid = parts[3];
+                    if (sDefPid != null && !"".equals(sDefPid)) {
+                        resAttr.put(Constants.SDEF.PID.getURI(),
+                                new StringAttribute(sDefPid));
+                    }
+                }
+            }
+
             if (asOfDateTime != null && !"".equals(asOfDateTime)) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(asOfDateTime));
@@ -102,7 +124,6 @@ public class ListMethods
                                                      resAttr,
                                                      getEnvironment(request));
 
-            String pid = resAttr.get(Constants.OBJECT.PID.getURI()).toString();
             LogUtil.statLog(request.getRemoteUser(),
                             Constants.ACTION.LIST_METHODS.uri,
                             pid,
@@ -113,21 +134,6 @@ public class ListMethods
         }
 
         return req;
-    }
-
-    @Override
-    public void getLocalResources(String[] parts, Map<URI, AttributeValue> resAttr) {
-        // -/objects/[pid]/methods and
-        // -/objects/[pid]/methods/[sdefPid]
-        if (parts.length > 3){
-            if ("methods".equals(parts[2])) {
-                String sDefPid = parts[3];
-                if (sDefPid != null && !"".equals(sDefPid)) {
-                    resAttr.put(Constants.SDEF.PID.getURI(),
-                            new StringAttribute(sDefPid));
-                }
-            }
-        }
     }
 
     /*

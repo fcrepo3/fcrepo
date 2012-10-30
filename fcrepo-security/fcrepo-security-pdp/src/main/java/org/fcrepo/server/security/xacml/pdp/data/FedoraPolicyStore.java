@@ -51,7 +51,7 @@ implements PolicyStore {
         LoggerFactory.getLogger(FedoraPolicyStore.class.getName());
 
     private static final String XACML20_POLICY_NS =
-        "urn:oasis:names:tc:xacml:2.0:policy:schema:os";
+        Constants.XACML2_POLICY_SCHEMA.OS.uri;
 
     public static final String FESL_POLICY_DATASTREAM = "FESLPOLICY";
 

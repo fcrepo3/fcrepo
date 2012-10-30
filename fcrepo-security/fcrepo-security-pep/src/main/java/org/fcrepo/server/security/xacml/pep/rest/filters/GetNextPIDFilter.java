@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.fcrepo.server.utilities.CXFUtility;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public class GetNextPIDFilter
         Map<URI, AttributeValue> resAttr;
 
         try {
-            resAttr = getRepositoryResources(request);
+            resAttr = ResourceAttributes.getRepositoryResources();
 
             actions.put(Constants.ACTION.ID.getURI(),
                         Constants.ACTION.GET_NEXT_PID

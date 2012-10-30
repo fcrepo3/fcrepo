@@ -10,9 +10,7 @@ public class XACML1PolicyNamespace extends XacmlNamespace {
     }
 
     public static XACML1PolicyNamespace onlyInstance = new XACML1PolicyNamespace(XACML1Namespace.getInstance(), "policy");
-    static {
-        onlyInstance.addNamespace(XACML1PolicySchemaNamespace.getInstance());
-    }
+
     public static final XACML1PolicyNamespace getInstance() {
         return onlyInstance;
     }

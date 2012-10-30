@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
@@ -74,6 +75,13 @@ public class GetDatastream
             logger.debug("{}/handleRequest!", this.getClass().getName());
         }
 
+        String[] parts = getPathParts(request);
+        // -/objects/{pid}/datastreams/{dsID}
+        if (parts.length < 4) {
+            logger.error("Not enough path components on the URI: {}", request.getRequestURI());
+            throw new ServletException("Not enough path components on the URI: " + request.getRequestURI());
+        }
+
         String asOfDateTime = request.getParameter("asOfDateTime");
         if (!isDate(asOfDateTime)) {
             asOfDateTime = null;
@@ -83,7 +91,7 @@ public class GetDatastream
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr;
         try {
-            resAttr = getResources(request);
+            resAttr = ResourceAttributes.getResources(parts);
             if (asOfDateTime != null && !"".equals(asOfDateTime)) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(asOfDateTime));
@@ -105,15 +113,10 @@ public class GetDatastream
                                                      resAttr,
                                                      getEnvironment(request));
 
-            String pid = resAttr.get(Constants.OBJECT.PID.getURI()).toString();
-            String dsID = null;
-            if (resAttr.containsKey(Constants.DATASTREAM.ID.getURI())){
-                dsID = resAttr.get(Constants.DATASTREAM.ID.getURI()).toString();
-            }
             LogUtil.statLog(request.getRemoteUser(),
                             Constants.ACTION.GET_DATASTREAM.uri,
-                            pid,
-                            dsID);
+                            parts[1],
+                            parts[3]);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new ServletException(e.getMessage(), e);

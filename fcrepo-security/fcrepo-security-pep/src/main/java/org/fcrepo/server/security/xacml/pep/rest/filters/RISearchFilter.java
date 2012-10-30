@@ -48,6 +48,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.fcrepo.server.security.xacml.util.RelationshipResolver;
@@ -349,7 +350,7 @@ public class RISearchFilter
 
                 // Modification to uniquely identify datastreams
 
-                resAttr = getResources(pid);
+                resAttr = ResourceAttributes.getResources(pid);
                 if (dsID != null && !"".equals(dsID)) {
                     resAttr.put(Constants.DATASTREAM.ID.getURI(),
                                 new StringAttribute(dsID));

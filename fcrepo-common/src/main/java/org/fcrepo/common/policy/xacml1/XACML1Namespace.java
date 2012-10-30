@@ -17,6 +17,7 @@ public class XACML1Namespace extends XacmlNamespace {
         onlyInstance.addNamespace(XACML1EnvironmentNamespace.getInstance());
         onlyInstance.addNamespace(XACML1EnvironmentCategoryNamespace.getInstance());
         onlyInstance.addNamespace(XACML1PolicyNamespace.getInstance());
+        onlyInstance.addNamespace(XACML1PolicyCombiningNamespace.getInstance());
         onlyInstance.addNamespace(XACML1ResourceNamespace.getInstance());
         onlyInstance.addNamespace(XACML1ResourceCategoryNamespace.getInstance());
         onlyInstance.addNamespace(XACML1SubjectNamespace.getInstance());

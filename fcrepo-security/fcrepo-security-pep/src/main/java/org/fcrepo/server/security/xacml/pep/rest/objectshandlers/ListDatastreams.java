@@ -48,6 +48,7 @@ import javax.xml.xpath.XPathFactory;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.pep.rest.filters.DataResponseWrapper;
 import org.fcrepo.server.security.xacml.pep.rest.filters.ResponseHandlingRESTFilter;
@@ -135,7 +136,8 @@ public class ListDatastreams
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr;
         try {
-            resAttr = getResources(request);
+            String[] parts = getPathParts(request);
+            resAttr = ResourceAttributes.getResources(parts);
             if (asOfDateTime != null && !"".equals(asOfDateTime)) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(asOfDateTime));
@@ -428,7 +430,7 @@ public class ListDatastreams
                             Constants.ACTION.GET_DATASTREAM
                                     .getStringAttribute());
 
-                resAttr = getResources(pid);
+                resAttr = ResourceAttributes.getResources(pid);
                 resAttr.put(Constants.DATASTREAM.ID.getURI(),
                             new StringAttribute(dsid));
 

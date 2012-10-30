@@ -18,7 +18,7 @@ import org.fcrepo.common.policy.XacmlName;
 import org.fcrepo.common.policy.xacml1.XACML1ActionNamespace;
 import org.fcrepo.common.policy.xacml1.XACML1Namespace;
 import org.fcrepo.common.policy.xacml1.XACML1PolicyNamespace;
-import org.fcrepo.common.policy.xacml1.XACML1PolicySchemaNamespace;
+import org.fcrepo.common.policy.xacml2.XACML2PolicySchemaNamespace;
 import org.fcrepo.common.policy.xacml1.XACML1ResourceNamespace;
 import org.fcrepo.common.policy.xacml1.XACML1SubjectNamespace;
 import org.fcrepo.common.rdf.DublinCoreNamespace;
@@ -264,8 +264,8 @@ public interface Constants {
     public static final XACML1PolicyNamespace XACML1_POLICY =
             XACML1PolicyNamespace.getInstance();
     
-    public static final XACML1PolicySchemaNamespace XACML1_POLICY_SCHEMA =
-            XACML1PolicySchemaNamespace.getInstance();
+    public static final XACML2PolicySchemaNamespace XACML2_POLICY_SCHEMA =
+            XACML2PolicySchemaNamespace.getInstance();
 
     public static final XACML1SubjectNamespace XACML1_SUBJECT =
             XACML1SubjectNamespace.getInstance();

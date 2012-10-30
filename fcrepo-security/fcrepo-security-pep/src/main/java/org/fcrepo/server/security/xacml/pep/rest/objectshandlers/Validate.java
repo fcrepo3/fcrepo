@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
@@ -58,7 +59,8 @@ extends AbstractFilter {
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr;
         try {
-            resAttr = getResources(request);
+            String[] parts = getPathParts(request);
+            resAttr = ResourceAttributes.getResources(parts);
             if (asOfDateTime != null && !"".equals(asOfDateTime)) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(asOfDateTime));
@@ -76,10 +78,9 @@ extends AbstractFilter {
                                                      resAttr,
                                                      getEnvironment(request));
 
-            String pid = resAttr.get(Constants.OBJECT.PID.getURI()).toString();
             LogUtil.statLog(request.getRemoteUser(),
                             Constants.ACTION.VALIDATE.uri,
-                            pid,
+                            parts[1],
                             null);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
@@ -81,7 +82,9 @@ public class Export
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
         Map<URI, AttributeValue> resAttr;
         try {
-            resAttr = getResources(request);
+            String[] parts = getPathParts(request);
+            String pid = parts[1];
+            resAttr = ResourceAttributes.getResources(parts);
             if (format != null && !"".equals(format)) {
                 resAttr.put(Constants.OBJECT.ENCODING.getURI(),
                             new StringAttribute(format));
@@ -101,7 +104,7 @@ public class Export
                                                      actions,
                                                      resAttr,
                                                      getEnvironment(request));
-            String pid = resAttr.get(Constants.OBJECT.PID.getURI()).toString();
+
             LogUtil.statLog(request.getRemoteUser(), Constants.ACTION.EXPORT
                     .uri, pid, null);
         } catch (Exception e) {

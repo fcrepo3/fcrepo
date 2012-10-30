@@ -21,6 +21,9 @@ import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.fcrepo.common.Constants;
+import org.fcrepo.common.policy.xacml1.XACML1SubjectCategoryNamespace;
+
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.attr.AttributeFactory;
 import com.sun.xacml.attr.AttributeValue;
@@ -33,6 +36,9 @@ public class LDAPAttributeFinder
 
     private static final Logger logger =
             LoggerFactory.getLogger(LDAPAttributeFinder.class);
+    
+    private static final URI STRING_DATATYPE = URI.create("http://www.w3.org/2001/XMLSchema#string");
+
 
     private final AttributeFactory attributeFactory = StandardAttributeFactory.getFactory();
 
@@ -114,33 +120,25 @@ public class LDAPAttributeFinder
                                           EvaluationCtx context,
                                           int designatorType) {
         String user = null;
-        try {
-            URI userId = new URI("urn:fedora:names:fedora:2.1:subject:loginId");
-            URI userType = new URI("http://www.w3.org/2001/XMLSchema#string");
-            URI category =
-                    new URI("urn:oasis:names:tc:xacml:1.0:subject-category:access-subject");
+        URI userId = Constants.SUBJECT.LOGIN_ID.getURI();
+        URI category = XACML1SubjectCategoryNamespace.getInstance().ACCESS_SUBJECT.getURI();
 
-            EvaluationResult userER =
-                    context.getSubjectAttribute(userType, userId, category);
-            if (userER == null) {
-                return new EvaluationResult(BagAttribute
-                        .createEmptyBag(attributeType));
-            }
-
-            AttributeValue userAV = userER.getAttributeValue();
-            if (userAV == null) {
-                return new EvaluationResult(BagAttribute
-                        .createEmptyBag(attributeType));
-            }
-
-            user = userAV.encode();
-            if (logger.isDebugEnabled()) {
-                logger.debug("LDAPAttributeFinder: Getting info for " + user);
-            }
-        } catch (URISyntaxException use) {
-            logger.error(use.getMessage());
+        EvaluationResult userER =
+                context.getSubjectAttribute(STRING_DATATYPE, userId, category);
+        if (userER == null) {
             return new EvaluationResult(BagAttribute
                     .createEmptyBag(attributeType));
+        }
+
+        AttributeValue userAV = userER.getAttributeValue();
+        if (userAV == null) {
+            return new EvaluationResult(BagAttribute
+                    .createEmptyBag(attributeType));
+        }
+
+        user = userAV.encode();
+        if (logger.isDebugEnabled()) {
+            logger.debug("LDAPAttributeFinder: Getting info for " + user);
         }
 
         // figure out which attribute we're looking for

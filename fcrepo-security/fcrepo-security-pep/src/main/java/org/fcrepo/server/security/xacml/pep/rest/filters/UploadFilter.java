@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,7 @@ public class UploadFilter
 
         try {
 
-            resAttr = getRepositoryResources(request);
+            resAttr = ResourceAttributes.getRepositoryResources();
 
             // note - no API specified in legacy XACML, so none specified here
             /*

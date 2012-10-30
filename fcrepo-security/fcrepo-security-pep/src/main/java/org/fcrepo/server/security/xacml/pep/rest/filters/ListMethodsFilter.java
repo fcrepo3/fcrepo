@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +98,8 @@ public class ListMethodsFilter
         Map<URI, AttributeValue> resAttr;
 
         try {
-            resAttr = getResources(request);
+            String[] parts1 = getPathParts(request);
+            resAttr = ResourceAttributes.getResources(parts1);
 
             if (dateTime != null && !"".equals(dateTime)) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),

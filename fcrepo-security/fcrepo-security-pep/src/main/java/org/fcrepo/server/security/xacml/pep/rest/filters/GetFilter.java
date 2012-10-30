@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -158,7 +159,7 @@ public class GetFilter
         }
 
         try {
-            resAttr = getResources(pid);
+            resAttr = ResourceAttributes.getResources(pid);
             
             if (dsID != null && !"".equals(dsID)) {
                 resAttr.put(Constants.DATASTREAM.ID.getURI(),

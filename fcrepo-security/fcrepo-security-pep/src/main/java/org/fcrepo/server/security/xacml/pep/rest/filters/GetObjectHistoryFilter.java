@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.fcrepo.server.utilities.CXFUtility;
 import org.slf4j.Logger;
@@ -69,11 +70,13 @@ public class GetObjectHistoryFilter
     public RequestCtx handleRequest(HttpServletRequest request,
                                     HttpServletResponse response)
             throws IOException, ServletException {
-        if (request.getPathInfo() == null) {
-            logger.error("Bad request: " + request.getRequestURI());
-            throw new ServletException("Bad request: "
-                    + request.getRequestURI());
+        String[] parts = getPathParts(request);
+        if (parts.length < 2) {
+            logger.error("Not enough path components on the URI: {}", request.getRequestURI());
+            throw new ServletException("Not enough path components on the URI: " + request.getRequestURI());
         }
+
+        String pid = parts[1];
 
         RequestCtx req = null;
 
@@ -81,7 +84,7 @@ public class GetObjectHistoryFilter
         Map<URI, AttributeValue> resAttr;
 
         try {
-            resAttr = getResources(request);
+            resAttr = ResourceAttributes.getResources(pid);
 
             actions.put(Constants.ACTION.ID.getURI(),
                         Constants.ACTION.GET_OBJECT_HISTORY
@@ -95,7 +98,6 @@ public class GetObjectHistoryFilter
                                                      resAttr,
                                                      getEnvironment(request));
 
-            String pid = resAttr.get(Constants.OBJECT.PID.getURI()).toString();
             LogUtil.statLog(request.getRemoteUser(),
                             Constants.ACTION.GET_OBJECT_HISTORY.uri,
                             pid,
@@ -106,13 +108,5 @@ public class GetObjectHistoryFilter
         }
 
         return req;
-    }
-
-    @Override
-    public void getLocalResources(String[] pathParts, Map<URI, AttributeValue> resAttr) throws ServletException {
-        if (pathParts.length < 2) {
-            logger.info("Not enough path components on the URI.");
-            throw new ServletException("Not enough path components on the URI.");
-        }
     }
 }

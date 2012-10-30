@@ -32,6 +32,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.fcrepo.common.Constants;
+import org.fcrepo.common.policy.xacml1.XACML1PolicyCombiningNamespace;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -60,19 +62,12 @@ public class HierarchicalLowestChildPermitOverridesPolicyAlg
             Constants.XACML1_RESOURCE.ID.toString();
 
     public static final String algId =
-            "urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:hierarchical-lowest-child-permit-overrides";
+            XACML1PolicyCombiningNamespace.getInstance().HIER_LOWEST_PERMIT_OVERRIDES.uri;
 
-    private static URI identifierURI;
+    private static final URI identifierURI = 
+            XACML1PolicyCombiningNamespace.getInstance().HIER_LOWEST_PERMIT_OVERRIDES.getURI();
 
     private static RuntimeException earlyException;
-
-    static {
-        try {
-            identifierURI = new URI(algId);
-        } catch (URISyntaxException se) {
-            earlyException = new IllegalArgumentException(se);
-        }
-    }
 
     /**
      * Standard constructor.

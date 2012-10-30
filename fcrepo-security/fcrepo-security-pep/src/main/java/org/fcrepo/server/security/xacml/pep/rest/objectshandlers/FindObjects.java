@@ -53,6 +53,7 @@ import javax.xml.xpath.XPathFactory;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.PEPException;
+import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.pep.rest.filters.AbstractFilter;
 import org.fcrepo.server.security.xacml.pep.rest.filters.DataResponseWrapper;
 import org.fcrepo.server.security.xacml.pep.rest.filters.ResponseHandlingRESTFilter;
@@ -143,7 +144,7 @@ public class FindObjects
         Map<URI, AttributeValue> actions = new HashMap<URI, AttributeValue>();
 
         try {
-            resAttr = getRepositoryResources(request);
+            resAttr = ResourceAttributes.getRepositoryResources();
 
             actions.put(Constants.ACTION.ID.getURI(),
                         Constants.ACTION.FIND_OBJECTS
@@ -432,7 +433,7 @@ public class FindObjects
                                      .getStringAttribute());
                 actions.put(Constants.ACTION.API.getURI(),
                             Constants.ACTION.APIA.getStringAttribute());
-                resAttr = getResources(pid);
+                resAttr = ResourceAttributes.getResources(pid);
 
                 RequestCtx req =
                         getContextHandler()
