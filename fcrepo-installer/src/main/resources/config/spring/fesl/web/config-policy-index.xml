@@ -70,4 +70,10 @@
   </util:map>
   <util:map id="org.fcrepo.server.security.xacml.pdp.data.environmentAttributes">
   </util:map>
+  <bean id="org.fcrepo.server.security.xacml.pdp.data.PolicyIndexRebuilder"
+        class="org.fcrepo.server.security.xacml.pdp.data.PolicyIndexRebuilder"
+        autowire-candidate="true" autowire="byName" init-method="init">
+        <property name="policyIndex" ref="org.fcrepo.server.security.xacml.pdp.data.PolicyIndex" />
+  </bean>
+        
 </beans>
