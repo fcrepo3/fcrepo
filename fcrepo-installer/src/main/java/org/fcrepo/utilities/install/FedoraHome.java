@@ -48,7 +48,7 @@ public class FedoraHome {
 
 	private InetAddress _host;
 
-	private boolean _usingAkubra;
+	private LLStoreType _usingAkubra;
 
 	public FedoraHome(Distribution dist, InstallOptions opts) {
 		_dist = dist;
@@ -106,9 +106,7 @@ public class FedoraHome {
 	 */
 	private void configure() throws InstallationFailedException {
 		configureFCFG();
-		if (_usingAkubra) {
-			configureAkubra();
-		}
+        configureAkubra();
 		configureSpringProperties();
 		configureSpringAuth();
 		configureFedoraUsers();
@@ -237,12 +235,10 @@ public class FedoraHome {
 			config.applyProperties(props);
 
 			// If using akubra-fs, set the class of the module and clear params.
-			String llStoreType = _opts.getValue(InstallOptions.LLSTORE_TYPE);
-			if (llStoreType == null || llStoreType.equals("akubra-fs")) {
+			if (usingAkubra()) {
 				ModuleConfiguration mConfig = config
 						.getModuleConfiguration("org.fcrepo.server.storage.lowlevel.ILowlevelStorage");
 				config.getModuleConfigurations().remove(mConfig);
-				_usingAkubra = true;
 			}
 
 			config.serialize(new FileOutputStream(fcfg));
@@ -252,45 +248,55 @@ public class FedoraHome {
 	}
 
 	private void configureAkubra() throws InstallationFailedException {
-		// Rewrite server/config/akubra-llstore.xml replacing the
-		// /tmp/[object|datastream]Store constructor-arg values
-		// with $FEDORA_HOME/data/[object|datastream]Store
-		BufferedReader reader = null;
-		PrintWriter writer = null;
-		try {
-			File file = new File(_installDir,
-					"server/config/spring/akubra-llstore.xml");
-			reader = new BufferedReader(new InputStreamReader(
-					new FileInputStream(file), "UTF-8"));
-
-			File dataDir = new File(_installDir, "data");
-			String oPath = dataDir.getPath() + File.separator + "objectStore";
-			String dPath = dataDir.getPath() + File.separator
-					+ "datastreamStore";
-			StringBuilder xml = new StringBuilder();
-
-			String line = reader.readLine();
-			while (line != null) {
-				if (line.indexOf("/tmp/objectStore") != -1) {
-					line = "    <constructor-arg value=\"" + oPath + "\"/>";
-				} else if (line.indexOf("/tmp/datastreamStore") != -1) {
-					line = "    <constructor-arg value=\"" + dPath + "\"/>";
-				}
-				xml.append(line + "\n");
-				line = reader.readLine();
-			}
-			reader.close();
-
-			writer = new PrintWriter(new OutputStreamWriter(
-					new FileOutputStream(file), "UTF-8"));
-			writer.print(xml.toString());
-			writer.close();
-		} catch (IOException e) {
-			IOUtils.closeQuietly(reader);
-			IOUtils.closeQuietly(writer);
-			throw new InstallationFailedException(e.getClass().getName() + ":"
-					+ e.getMessage());
-		}
+	    if (usingAkubra()) {
+    		// Rewrite server/config/akubra-llstore.xml replacing the
+    		// /tmp/[object|datastream]Store constructor-arg values
+    		// with $FEDORA_HOME/data/[object|datastream]Store
+    		BufferedReader reader = null;
+    		PrintWriter writer = null;
+    		try {
+    			File file = new File(_installDir,
+    					"server/config/spring/akubra-llstore.xml");
+    			reader = new BufferedReader(new InputStreamReader(
+    					new FileInputStream(file), "UTF-8"));
+    
+    			File dataDir = new File(_installDir, "data");
+    			String oPath = dataDir.getPath() + File.separator + "objectStore";
+    			String dPath = dataDir.getPath() + File.separator
+    					+ "datastreamStore";
+    			StringBuilder xml = new StringBuilder();
+    
+    			String line = reader.readLine();
+    			while (line != null) {
+    				if (line.indexOf("/tmp/objectStore") != -1) {
+    					line = "    <constructor-arg value=\"" + oPath + "\"/>";
+    				} else if (line.indexOf("/tmp/datastreamStore") != -1) {
+    					line = "    <constructor-arg value=\"" + dPath + "\"/>";
+    				}
+    				xml.append(line + "\n");
+    				line = reader.readLine();
+    			}
+    			reader.close();
+    
+    			writer = new PrintWriter(new OutputStreamWriter(
+    					new FileOutputStream(file), "UTF-8"));
+    			writer.print(xml.toString());
+    			writer.close();
+    		} catch (IOException e) {
+    			IOUtils.closeQuietly(reader);
+    			IOUtils.closeQuietly(writer);
+    			throw new InstallationFailedException(e.getClass().getName() + ":"
+    					+ e.getMessage());
+    		}
+	    } else {
+	        // remove the stub akubra configuration
+            File file = new File(_installDir,
+                    "server/config/spring/akubra-llstore.xml");
+            file.delete();
+            if (file.exists()){
+                throw new InstallationFailedException("Could not remove a conflicting config: akubra-llstore.xml");
+            }
+	    }
 	}
 
 	private void configureSpringProperties() throws InstallationFailedException {
@@ -577,6 +583,18 @@ InstallOptions.FESL_AUTHN_ENABLED, true);
 			}
 		}
 		return _host.getHostAddress();
+	}
+	
+	private boolean usingAkubra() {
+	    if (_usingAkubra == null) {
+            String llStoreType = _opts.getValue(InstallOptions.LLSTORE_TYPE);
+            if (llStoreType == null || llStoreType.equals("akubra-fs")) {
+                _usingAkubra = LLStoreType.akubra_fs;
+            } else {
+                _usingAkubra = LLStoreType.legacy_fs;
+            }
+	    }
+	    return LLStoreType.akubra_fs == _usingAkubra;
 	}
 
 	/**
