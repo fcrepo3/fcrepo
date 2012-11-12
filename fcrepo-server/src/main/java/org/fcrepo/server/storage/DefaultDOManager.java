@@ -69,6 +69,7 @@ import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.DCFields;
 import org.fcrepo.server.utilities.SQLUtility;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.server.utilities.StringLock;
 import org.fcrepo.server.validation.DOObjectValidator;
 import org.fcrepo.server.validation.DOValidator;
 import org.fcrepo.server.validation.ValidationUtility;
@@ -124,8 +125,6 @@ public class DefaultDOManager extends Module implements DOManager {
 
     private DOReaderCache m_readerCache;
 
-    private final Set<String> m_lockedPIDs;
-
     protected ConnectionPool m_connectionPool;
 
     protected Connection m_connection;
@@ -134,6 +133,8 @@ public class DefaultDOManager extends Module implements DOManager {
 
     private int m_ingestValidationLevel;
 
+    private StringLock m_stringLock;
+
     /**
      * Creates a new DefaultDOManager.
      */
@@ -141,7 +142,7 @@ public class DefaultDOManager extends Module implements DOManager {
             Server server, String role)
             throws ModuleInitializationException {
         super(moduleParameters, server, role);
-        m_lockedPIDs = new HashSet<String>();
+	m_stringLock = new StringLock();
     }
 
     /**
@@ -611,20 +612,11 @@ public class DefaultDOManager extends Module implements DOManager {
     }
 
     private void releaseWriteLock(String pid) {
-        synchronized (m_lockedPIDs) {
-            m_lockedPIDs.remove(pid);
-        }
+	m_stringLock.unlock(pid);
     }
 
-    private void getWriteLock(String pid) throws ObjectLockedException {
-        synchronized (m_lockedPIDs) {
-            if (m_lockedPIDs.contains(pid)) {
-                throw new ObjectLockedException(pid + " is currently being " +
-                        "modified by another thread");
-            } else {
-                m_lockedPIDs.add(pid);
-            }
-        }
+    private void getWriteLock(String pid) {
+	m_stringLock.lock(pid);
     }
 
     public ConnectionPool getConnectionPool() {
@@ -776,7 +768,7 @@ public class DefaultDOManager extends Module implements DOManager {
      *            ingests (may be null or any valid pid)
      */
     @Override
-    public synchronized DOWriter getIngestWriter(boolean cachedObjectRequired,
+    public DOWriter getIngestWriter(boolean cachedObjectRequired,
             Context context, InputStream in, String format, String encoding,
             String pid) throws ServerException {
         logger.debug("Entered getIngestWriter");
@@ -929,10 +921,15 @@ public class DefaultDOManager extends Module implements DOManager {
 
                 logger.info("New object PID is {}", obj.getPid());
 
+                // WRITE LOCK:
+                // ensure no one else can modify the object now
+                getWriteLock(obj.getPid());
+
                 // CHECK REGISTRY:
                 // ensure the object doesn't already exist
                 if (objectExists(obj.getPid())) {
-                    throw new ObjectExistsException("The PID '" + obj.getPid() +
+		    releaseWriteLock(obj.getPid());
+		    throw new ObjectExistsException("The PID '" + obj.getPid() +
                             "' already exists in the registry; the object can't be re-created.");
                 }
 
@@ -946,10 +943,6 @@ public class DefaultDOManager extends Module implements DOManager {
                         new SimpleDOWriter(context, this, m_translator,
                                 m_defaultExportFormat,
                                 m_storageCharacterEncoding, obj);
-
-                // WRITE LOCK:
-                // ensure no one else can modify the object now
-                getWriteLock(obj.getPid());
 
                 // DEFAULT DATASTREAMS:
                 populateDC(context, obj, w, nowUTC);
