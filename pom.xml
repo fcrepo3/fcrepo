@@ -10,7 +10,7 @@
   <groupId>org.fcrepo</groupId>
   <artifactId>fcrepo</artifactId>
   <packaging>pom</packaging>
-  <version>3.6.2</version>
+  <version>3.6.3-SNAPSHOT</version>
   <name>Fedora Repository Project</name>
   <url>http://fedora-commons.org/</url>
 
@@ -687,7 +687,7 @@
     <connection>scm:git:git://github.com/fcrepo/fcrepo.git</connection>
     <developerConnection>scm:git:git@github.com:fcrepo/fcrepo.git</developerConnection>
     <url>https://github.com/fcrepo/fcrepo</url>
-    <tag>v3.6.2</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <build>
