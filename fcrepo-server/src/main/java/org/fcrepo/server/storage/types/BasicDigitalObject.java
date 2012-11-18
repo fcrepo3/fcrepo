@@ -254,6 +254,9 @@ public class BasicDigitalObject
     }
 
     public String newAuditRecordID() {
+        if (m_auditRecords.size() == 0){
+            return "AUDREC0";
+        }
         ArrayList<String> auditIDs = new ArrayList<String>();
         Iterator<AuditRecord> iter = m_auditRecords.iterator();
         while (iter.hasNext()) {

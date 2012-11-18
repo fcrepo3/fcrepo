@@ -419,7 +419,7 @@ public class FOXMLDOSerializer
                 writer.print(obj.getPid());
                 writer.print("/AUDIT\"");
             }
-            writer.print(" STATE=\"A\" CONTROL_GROUP=\"X\" VERSIONABLE=\"false\">\n");
+            writer.print(" STATE=\"A\" CONTROL_GROUP=\"M\" VERSIONABLE=\"false\">\n");
             // insert the ds version-level elements
             writer.print("<");
             writer.print(FOXML.prefix);
@@ -431,11 +431,18 @@ public class FOXMLDOSerializer
             writer.print("\">\n");
             writer.print("<");
             writer.print(FOXML.prefix);
-            writer.print(":xmlContent>\n");
-            DOTranslationUtility.appendAuditTrail(obj, writer);
-            writer.print("</");
-            writer.print(FOXML.prefix);
-            writer.print(":xmlContent>\n");
+            writer.print(":contentLocation TYPE=\"");
+            writer.print(Datastream.DS_LOCATION_TYPE_INTERNAL);
+            writer.print("\" REF=\"");
+            writer.print(obj.getPid());
+            writer.print("+AUDIT+AUDIT.0\"/>\n");
+//            writer.print("<");
+//            writer.print(FOXML.prefix);
+//            writer.print(":xmlContent>\n");
+//            DOTranslationUtility.appendAuditTrail(obj, writer);
+//            writer.print("</");
+//            writer.print(FOXML.prefix);
+//            writer.print(":xmlContent>\n");
             writer.print("</");
             writer.print(FOXML.prefix);
             writer.print(":datastreamVersion>\n");

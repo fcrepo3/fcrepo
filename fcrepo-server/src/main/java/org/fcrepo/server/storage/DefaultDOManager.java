@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
+import javax.xml.bind.JAXBException;
+
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.server.Context;
@@ -57,6 +59,7 @@ import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
 import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.translation.DOTranslator;
+import org.fcrepo.server.storage.types.AuditRecord;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamManagedContent;
@@ -682,7 +685,8 @@ public class DefaultDOManager extends Module implements DOManager {
                                     m_defaultExportFormat,
                                     m_defaultStorageFormat,
                                     m_storageCharacterEncoding,
-                                    m_permanentStore.retrieveObject(pid));
+                                    m_permanentStore.retrieveObject(pid),
+                                    m_permanentStore.retrieveDatastream(pid + "+AUDIT+AUDIT.0"));
                     source = "filesystem";
                     if (m_readerCache != null) {
                         m_readerCache.put(reader);
@@ -745,6 +749,13 @@ public class DefaultDOManager extends Module implements DOManager {
             m_translator.deserialize(m_permanentStore.retrieveObject(pid), obj,
                     m_defaultStorageFormat, m_storageCharacterEncoding,
                     DOTranslationUtility.DESERIALIZE_INSTANCE);
+            try {
+                obj.getAuditRecords().addAll(SimpleDOReader.getAuditRecords(m_permanentStore.retrieveDatastream(pid + "+AUDIT+AUDIT.0")));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JAXBException e) {
+                e.printStackTrace();
+            }
             DOWriter w =
                     new SimpleDOWriter(context, this, m_translator,
                             m_defaultStorageFormat, m_storageCharacterEncoding,
@@ -1229,6 +1240,22 @@ public class DefaultDOManager extends Module implements DOManager {
                         }
                     }
                 }
+                
+                //create or update the managed AUDIT datastream
+                if (obj.isNew()) {
+                    AuditRecord creation = new AuditRecord();
+                    creation.action="ingest";
+                    creation.date = new Date();
+                    creation.processType = "Fedora API-M";
+                    creation.componentID=obj.getPid() + "+AUDIT+AUDIT.0";
+                    creation.id=obj.newAuditRecordID();
+                    String resp = context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri);
+                    creation.responsibility = resp.length() > 0 ? resp : Constants.SUBJECT.ROLE.stringValue();
+                    obj.getAuditRecords().add(creation);
+               		m_permanentStore.addDatastream(obj.getPid() + "+AUDIT+AUDIT.0", DOTranslationUtility.createAuditTrail(obj), null);
+                	}else{
+                		m_permanentStore.replaceDatastream(obj.getPid() + "+AUDIT+AUDIT.0", DOTranslationUtility.createAuditTrail(obj), null);
+                	}
 
                 // MANAGED DATASTREAM PURGE:
                 // find out which, if any, managed datastreams were purged,

@@ -45,6 +45,7 @@ import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.Disseminator;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.utilities.DateUtility;
+import org.fusesource.hawtbuf.ByteArrayInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -902,6 +903,20 @@ public abstract class DOTranslationUtility
         StringWriter buf = new StringWriter();
         appendAuditTrail(obj, new PrintWriter(buf));
         return buf.toString();
+    }
+    
+    /**
+     * This has been added to implement a PoC for FCREPO-1156
+     * It creates a Audit trail record in memory and returns an 
+     * Inputstream constructed from the value.
+     * @param obj The {@link DigitalObject} the audit trail will be created for
+     * @return An {@link InputStream} pointing to the audit trail bytes.
+     * @throws ObjectIntegrityException
+     */
+    public static InputStream createAuditTrail(DigitalObject obj) throws ObjectIntegrityException{
+        StringWriter writer = new StringWriter();
+        appendAuditTrail(obj, new PrintWriter(writer));
+        return new ByteArrayInputStream(writer.toString().getBytes());
     }
 
     protected static void appendAuditTrail(DigitalObject obj, PrintWriter writer)

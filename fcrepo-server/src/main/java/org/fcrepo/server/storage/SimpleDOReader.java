@@ -2,20 +2,32 @@
  * detailed in the license directory at the root of the source tree (also
  * available online at http://fedora-commons.org/license/).
  */
+
 package org.fcrepo.server.storage;
 
 import static org.fcrepo.common.Constants.MODEL;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
 
 import org.fcrepo.common.Models;
 import org.fcrepo.server.Context;
@@ -43,19 +55,15 @@ import org.jrdf.graph.SubjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
-
 /**
  * A DOReader backed by a DigitalObject.
  *
  * @author Chris Wilper
  */
-public class SimpleDOReader
-        implements DOReader {
+public class SimpleDOReader implements DOReader {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(SimpleDOReader.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(SimpleDOReader.class);
 
     protected final DigitalObject m_obj;
 
@@ -69,41 +77,149 @@ public class SimpleDOReader
 
     private String m_storageFormat;
 
-    private final SimpleDateFormat m_formatter =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    private final SimpleDateFormat m_formatter = new SimpleDateFormat(
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
-    public SimpleDOReader(Context context,
-                          RepositoryReader repoReader,
-                          DOTranslator translator,
-                          String exportFormat,
-                          String storageFormat,
-                          String encoding,
-                          InputStream serializedObject)
+    @XmlRootElement(name = "auditTrail", namespace = "info:fedora/fedora-system:def/audit#")
+    private static class ManagedAuditRecords {
+
+        private static class ManagedAuditRecord{
+            
+            private static class Process {
+
+                @XmlAttribute(name = "type")
+                private String type;
+            }
+
+            private static class Action {
+
+                @XmlValue
+                private String value;
+            }
+
+            private static class ComponentID {
+
+                @XmlValue
+                private String value;
+            }
+
+            private static class Responsibility {
+
+                @XmlValue
+                private String value;
+            }
+
+            private static class ARDate {
+
+                @XmlValue
+                private Date value;
+            }
+
+            private static class Justification {
+
+                @XmlValue
+                private String value;
+            }
+
+            @XmlAttribute(name = "ID")
+            protected String id;
+
+            @XmlElement(name = "process", namespace = "info:fedora/fedora-system:def/audit#")
+            protected Process process;
+
+            @XmlElement(name = "action", namespace = "info:fedora/fedora-system:def/audit#")
+            protected Action action;
+
+            @XmlElement(name = "componentID", namespace = "info:fedora/fedora-system:def/audit#")
+            protected ComponentID componentId;
+
+            @XmlElement(name = "responsibility", namespace = "info:fedora/fedora-system:def/audit#")
+            protected Responsibility responsibility;
+
+            @XmlElement(name = "date", namespace = "info:fedora/fedora-system:def/audit#")
+            protected ARDate date;
+
+            @XmlElement(name = "justification", namespace = "info:fedora/fedora-system:def/audit#")
+            protected Justification justification;
+
+            public AuditRecord toAuditRecord() {
+                AuditRecord rc = new AuditRecord();
+                rc.action = action.value;
+                rc.componentID = componentId.value;
+                rc.date = date.value;
+                rc.id = id;
+                rc.justification = justification.value;
+                rc.processType = process.type;
+                rc.responsibility = responsibility.value;
+                return rc;
+            }            
+        }
+        
+        @XmlElement(name="record",namespace="info:fedora/fedora-system:def/audit#")
+        private List<ManagedAuditRecord> records;
+    }
+
+    public SimpleDOReader(Context context, RepositoryReader repoReader,
+            DOTranslator translator, String exportFormat, String storageFormat,
+            String encoding, InputStream serializedObject,
+            InputStream auditTrail)
             throws ObjectIntegrityException, StreamIOException,
-                   UnsupportedTranslationException, ServerException {
+            UnsupportedTranslationException, ServerException {
         m_context = context;
         m_repoReader = repoReader;
         m_translator = translator;
         m_exportFormat = exportFormat;
         m_storageFormat = storageFormat;
         m_obj = new BasicDigitalObject();
-        m_translator.deserialize(serializedObject,
-                                 m_obj,
-                                 m_storageFormat,
-                                 encoding,
-                                 DOTranslationUtility.DESERIALIZE_INSTANCE);
+        m_translator.deserialize(serializedObject, m_obj, m_storageFormat,
+                encoding, DOTranslationUtility.DESERIALIZE_INSTANCE);
+        // add the audit records from the managed datastream
+        try {
+            m_obj.getAuditRecords().addAll(getAuditRecords(auditTrail));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // TODO: helper method which should go into deserializers, but this is a PoC
+    public static Collection<? extends AuditRecord> getAuditRecords(
+            InputStream auditTrail) throws IOException, JAXBException {
+        List<AuditRecord> auditRecords=new ArrayList<AuditRecord>();
+        Unmarshaller unmarshaller =
+                JAXBContext.newInstance(ManagedAuditRecords.class)
+                        .createUnmarshaller();
+        ManagedAuditRecords recs =
+                (ManagedAuditRecords) unmarshaller.unmarshal(auditTrail);
+        for (org.fcrepo.server.storage.SimpleDOReader.ManagedAuditRecords.ManagedAuditRecord rec : recs.records){
+            auditRecords.add(rec.toAuditRecord());
+        }
+        return auditRecords;
+    }
+
+    public SimpleDOReader(Context context, RepositoryReader repoReader,
+            DOTranslator translator, String exportFormat, String storageFormat,
+            String encoding, InputStream serializedObject)
+            throws ObjectIntegrityException, StreamIOException,
+            UnsupportedTranslationException, ServerException {
+        m_context = context;
+        m_repoReader = repoReader;
+        m_translator = translator;
+        m_exportFormat = exportFormat;
+        m_storageFormat = storageFormat;
+        m_obj = new BasicDigitalObject();
+        m_translator.deserialize(serializedObject, m_obj, m_storageFormat,
+                encoding, DOTranslationUtility.DESERIALIZE_INSTANCE);
     }
 
     /**
      * Alternate constructor for when a DigitalObject is already available for
      * some reason.
      */
-    public SimpleDOReader(Context context,
-                          RepositoryReader repoReader,
-                          DOTranslator translator,
-                          String exportFormat,
-                          String encoding,
-                          DigitalObject obj) {
+    public SimpleDOReader(Context context, RepositoryReader repoReader,
+            DOTranslator translator, String exportFormat, String encoding,
+            DigitalObject obj) {
         m_context = context;
         m_repoReader = repoReader;
         m_translator = translator;
@@ -157,13 +273,10 @@ public class SimpleDOReader
      */
     @Override
     public InputStream GetObjectXML() throws ObjectIntegrityException,
-                                             StreamIOException, UnsupportedTranslationException, ServerException {
+            StreamIOException, UnsupportedTranslationException, ServerException {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        m_translator.serialize(m_obj,
-                               bytes,
-                               m_storageFormat,
-                               "UTF-8",
-                               DOTranslationUtility.SERIALIZE_STORAGE_INTERNAL);
+        m_translator.serialize(m_obj, bytes, m_storageFormat, "UTF-8",
+                DOTranslationUtility.SERIALIZE_STORAGE_INTERNAL);
         return new ByteArrayInputStream(bytes.toByteArray());
     }
 
@@ -173,14 +286,14 @@ public class SimpleDOReader
     @Override
     public InputStream Export(String format, String exportContext)
             throws ObjectIntegrityException, StreamIOException,
-                   UnsupportedTranslationException, ServerException {
+            UnsupportedTranslationException, ServerException {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         int transContext;
         // first, set the translation context...
         logger.debug("Export context: " + exportContext);
 
-        if (exportContext == null || exportContext.equals("")
-            || exportContext.equalsIgnoreCase("default")) {
+        if (exportContext == null || exportContext.equals("") ||
+                exportContext.equalsIgnoreCase("default")) {
             // null and default is set to PUBLIC translation
             transContext = DOTranslationUtility.SERIALIZE_EXPORT_PUBLIC;
         } else if (exportContext.equalsIgnoreCase("public")) {
@@ -190,18 +303,15 @@ public class SimpleDOReader
         } else if (exportContext.equalsIgnoreCase("archive")) {
             transContext = DOTranslationUtility.SERIALIZE_EXPORT_ARCHIVE;
         } else {
-            throw new UnsupportedTranslationException("Export context "
-                                                      + exportContext + " is not valid.");
+            throw new UnsupportedTranslationException("Export context " +
+                    exportContext + " is not valid.");
         }
         // now serialize for export in the proper XML format...
-        if (format == null || format.equals("")
-            || format.equalsIgnoreCase("default")) {
+        if (format == null || format.equals("") ||
+                format.equalsIgnoreCase("default")) {
             logger.debug("Export in default format: " + m_exportFormat);
-            m_translator.serialize(m_obj,
-                                   bytes,
-                                   m_exportFormat,
-                                   "UTF-8",
-                                   transContext);
+            m_translator.serialize(m_obj, bytes, m_exportFormat, "UTF-8",
+                    transContext);
         } else {
             logger.debug("Export in format: " + format);
             m_translator.serialize(m_obj, bytes, format, "UTF-8", transContext);
@@ -217,7 +327,7 @@ public class SimpleDOReader
     @Deprecated
     public InputStream ExportObject(String format, String exportContext)
             throws ObjectIntegrityException, StreamIOException,
-                   UnsupportedTranslationException, ServerException {
+            UnsupportedTranslationException, ServerException {
         return Export(format, exportContext);
     }
 
@@ -252,7 +362,7 @@ public class SimpleDOReader
     public List<String> getContentModels() throws ServerException {
 
         List<String> list = new ArrayList<String>();
-        for (RelationshipTuple rel : getRelationships(MODEL.HAS_MODEL,null)) {
+        for (RelationshipTuple rel : getRelationships(MODEL.HAS_MODEL, null)) {
             list.add(rel.object);
         }
         return list;
@@ -261,7 +371,7 @@ public class SimpleDOReader
     @Override
     public boolean hasContentModel(ObjectNode contentModel)
             throws ServerException {
-        return hasRelationship(MODEL.HAS_MODEL,contentModel);
+        return hasRelationship(MODEL.HAS_MODEL, contentModel);
     }
 
     /**
@@ -323,13 +433,18 @@ public class SimpleDOReader
         }
         for (Datastream ds : m_obj.datastreams(datastreamID)) {
             if (versDateTime == null) {
-                if (ds.DSCreateDT == null || ds.DSCreateDT.getTime() > latestCreateTime || result == null) {
+                if (ds.DSCreateDT == null ||
+                        ds.DSCreateDT.getTime() > latestCreateTime ||
+                        result == null) {
                     result = ds;
-                    if (ds.DSCreateDT != null) latestCreateTime = ds.DSCreateDT.getTime();
+                    if (ds.DSCreateDT != null)
+                        latestCreateTime = ds.DSCreateDT.getTime();
                 }
             } else {
                 //TODO If none of the versions have a create date, what should behavior be?
-                long diff = (ds.DSCreateDT == null)? vTime : vTime - ds.DSCreateDT.getTime();
+                long diff =
+                        (ds.DSCreateDT == null) ? vTime : vTime -
+                                ds.DSCreateDT.getTime();
                 if (diff >= 0) {
                     if (diff < bestTimeDifference) {
                         bestTimeDifference = diff;
@@ -396,15 +511,14 @@ public class SimpleDOReader
      * {@inheritDoc}
      */
     private MethodDef[] listMethods(String sDefPID,
-                                    ServiceDefinitionReader sDefReader,
-                                    Date versDateTime)
+            ServiceDefinitionReader sDefReader, Date versDateTime)
             throws MethodNotFoundException, ServerException {
-        if (sDefPID.equalsIgnoreCase("fedora-system:1")
-            || sDefPID.equalsIgnoreCase("fedora-system:3")) {
-            throw new MethodNotFoundException("[getObjectMethods] The object, "
-                                              + m_obj.getPid()
-                                              + ", will not report on dynamic method definitions "
-                                              + "at this time (fedora-system:1 and fedora-system:3.");
+        if (sDefPID.equalsIgnoreCase("fedora-system:1") ||
+                sDefPID.equalsIgnoreCase("fedora-system:3")) {
+            throw new MethodNotFoundException(
+                    "[getObjectMethods] The object, " + m_obj.getPid() +
+                            ", will not report on dynamic method definitions " +
+                            "at this time (fedora-system:1 and fedora-system:3.");
         }
 
         if (sDefReader == null) {
@@ -456,14 +570,13 @@ public class SimpleDOReader
         ArrayList<String> sDefIDList = new ArrayList<String>();
 
         ServiceDefinitionReader sDefReader = null;
-/*
-        Set<RelationshipTuple> cmRels =
-                getRelationships(MODEL.HAS_MODEL, null);
+        /*
+         * Set<RelationshipTuple> cmRels =
+         * getRelationships(MODEL.HAS_MODEL, null);
+         * for (RelationshipTuple element : cmRels) {
+         */
 
-        for (RelationshipTuple element : cmRels) {
-*/
-
-        for (String cm:getContentModels()){
+        for (String cm : getContentModels()) {
             /*
              * FIXME: If the we encounter a relation to one of the "system"
              * models, then skip it, since its functionality is hardwired in.
@@ -486,29 +599,23 @@ public class SimpleDOReader
                             m_repoReader.getReader(false, m_context, cModelPid);
                 } catch (StorageException e) {
                     throw new DisseminationException(null,
-                                                     "Content Model Object "
-                                                     + cModelPid
-                                                     + " does not exist.",
-                                                     null,
-                                                     null,
-                                                     e);
+                            "Content Model Object " + cModelPid +
+                                    " does not exist.", null, null, e);
                 }
             }
             Set<RelationshipTuple> hasServiceRels =
-                    cmReader
-                            .getRelationships(MODEL.HAS_SERVICE, null);
+                    cmReader.getRelationships(MODEL.HAS_SERVICE, null);
             for (RelationshipTuple element2 : hasServiceRels) {
                 String sDefPid = element2.getObjectPID();
 
                 try {
                     sDefReader =
                             m_repoReader.getServiceDefinitionReader(false,
-                                                                    m_context,
-                                                                    sDefPid);
+                                    m_context, sDefPid);
                 } catch (StorageException se) {
-                    throw new DisseminationException("Service definition "
-                                                     + sDefPid + " required by Content Model "
-                                                     + cModelPid + " not found.");
+                    throw new DisseminationException("Service definition " +
+                            sDefPid + " required by Content Model " +
+                            cModelPid + " not found.");
                 }
                 MethodDef[] methods =
                         listMethods(sDefPid, sDefReader, versDateTime);
@@ -538,7 +645,8 @@ public class SimpleDOReader
      * {@inheritDoc}
      */
     @Override
-    public boolean hasRelationship(SubjectNode subject, PredicateNode predicate, ObjectNode object) {
+    public boolean hasRelationship(SubjectNode subject,
+            PredicateNode predicate, ObjectNode object) {
         return m_obj.hasRelationship(subject, predicate, object);
     }
 
@@ -555,8 +663,7 @@ public class SimpleDOReader
      */
     @Override
     public Set<RelationshipTuple> getRelationships(SubjectNode subject,
-                                                   PredicateNode predicate,
-                                                   ObjectNode object) {
+            PredicateNode predicate, ObjectNode object) {
         return m_obj.getRelationships(subject, predicate, object);
     }
 
@@ -565,9 +672,10 @@ public class SimpleDOReader
      */
     @Override
     public Set<RelationshipTuple> getRelationships(PredicateNode predicate,
-                                                   ObjectNode object) {
+            ObjectNode object) {
         return m_obj.getRelationships(predicate, object);
     }
+
     /**
      * {@inheritDoc}
      */
