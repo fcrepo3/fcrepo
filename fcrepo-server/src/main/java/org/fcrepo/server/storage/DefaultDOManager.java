@@ -140,7 +140,8 @@ public class DefaultDOManager extends Module implements DOManager {
 
     private int m_ingestValidationLevel;
     
-    private final static JAXBContext jaxbContext;
+    private static JAXBContext jaxbContext;
+    
     private final Marshaller auditMarshaller;
 
     static{
