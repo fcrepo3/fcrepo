@@ -62,6 +62,7 @@ import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
 import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.translation.DOTranslator;
 import org.fcrepo.server.storage.types.AuditRecord;
+import org.fcrepo.server.storage.types.AuditRecords;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamManagedContent;
@@ -139,9 +140,18 @@ public class DefaultDOManager extends Module implements DOManager {
 
     private int m_ingestValidationLevel;
     
-    private final JAXBContext jaxbContext;
-    
+    private final static JAXBContext jaxbContext;
     private final Marshaller auditMarshaller;
+
+    static{
+        try {
+            jaxbContext = JAXBContext.newInstance(AuditRecords.class,AuditRecord.class);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+        
+    }
+    
 
     /**
      * Creates a new DefaultDOManager.
@@ -151,7 +161,6 @@ public class DefaultDOManager extends Module implements DOManager {
             throws ModuleInitializationException {
         super(moduleParameters, server, role);
         try {
-            jaxbContext = JAXBContext.newInstance(SimpleDOWriter.ManagedAuditRecords.class);
             auditMarshaller = jaxbContext.createMarshaller();
         } catch (JAXBException e) {
             throw new ModuleInitializationException("Unable to instantiate deserializer", "what?");
@@ -961,7 +970,10 @@ public class DefaultDOManager extends Module implements DOManager {
                 String resp = context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri);
                 creation.responsibility = resp.length() > 0 ? resp : Constants.SUBJECT.ROLE.stringValue();
                 obj.getAuditRecords().add(creation);
-                m_permanentStore.addDatastream(obj.getPid() + "+AUDIT+AUDIT.0", DOTranslationUtility.createAuditTrail(obj), null);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                auditMarshaller.marshal(new AuditRecords(obj.getAuditRecords()),bos);
+                ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray());
+                m_permanentStore.addDatastream(obj.getPid() + "+AUDIT+AUDIT.0", bin, null);
 
                 
                 // GET DIGITAL OBJECT WRITER:
@@ -1346,7 +1358,9 @@ public class DefaultDOManager extends Module implements DOManager {
                     m_permanentStore.replaceObject(obj.getPid(),
                             new ByteArrayInputStream(out.toByteArray()),
                             objectHints);
-                    m_permanentStore.replaceDatastream(obj.getPid() + "+AUDIT+AUDIT.0", DOTranslationUtility.createAuditTrail(obj),null);
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    auditMarshaller.marshal(new AuditRecords(obj.getAuditRecords()), bos);
+                    m_permanentStore.replaceDatastream(obj.getPid() + "+AUDIT+AUDIT.0",new ByteArrayInputStream(bos.toByteArray()),null);
                 }
 
                 // INVALIDATE DOREADER CACHE:

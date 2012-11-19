@@ -37,6 +37,7 @@ import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.translation.DOTranslator;
 import org.fcrepo.server.storage.types.AuditRecord;
+import org.fcrepo.server.storage.types.AuditRecords;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.XMLDatastreamProcessor;
@@ -95,98 +96,17 @@ public class SimpleDOWriter
 
     private boolean m_committed = false;
     
-    private static Unmarshaller unmarshaller;
+    private Unmarshaller unmarshaller;
     
-    static {
+    private static JAXBContext jaxbContext;
+    
+    static{
         try {
-            unmarshaller=
-                    JAXBContext.newInstance(ManagedAuditRecords.class)
-                    .createUnmarshaller();
+            jaxbContext = JAXBContext.newInstance(AuditRecord.class,AuditRecords.class);
         } catch (JAXBException e) {
             e.printStackTrace();
         }
-
     }
-
-    @XmlRootElement(name = "auditTrail", namespace = "info:fedora/fedora-system:def/audit#")
-    public static class ManagedAuditRecords {
-
-        public static class ManagedAuditRecord{
-            
-            private static class Process {
-
-                @XmlAttribute(name = "type")
-                private String type;
-            }
-
-            private static class Action {
-
-                @XmlValue
-                private String value;
-            }
-
-            private static class ComponentID {
-
-                @XmlValue
-                private String value;
-            }
-
-            private static class Responsibility {
-
-                @XmlValue
-                private String value;
-            }
-
-            private static class ARDate {
-
-                @XmlValue
-                private Date value;
-            }
-
-            private static class Justification {
-
-                @XmlValue
-                private String value;
-            }
-
-            @XmlAttribute(name = "ID")
-            protected String id;
-
-            @XmlElement(name = "process", namespace = "info:fedora/fedora-system:def/audit#")
-            protected Process process;
-
-            @XmlElement(name = "action", namespace = "info:fedora/fedora-system:def/audit#")
-            protected Action action;
-
-            @XmlElement(name = "componentID", namespace = "info:fedora/fedora-system:def/audit#")
-            protected ComponentID componentId;
-
-            @XmlElement(name = "responsibility", namespace = "info:fedora/fedora-system:def/audit#")
-            protected Responsibility responsibility;
-
-            @XmlElement(name = "date", namespace = "info:fedora/fedora-system:def/audit#")
-            protected ARDate date;
-
-            @XmlElement(name = "justification", namespace = "info:fedora/fedora-system:def/audit#")
-            protected Justification justification;
-
-            public AuditRecord toAuditRecord() {
-                AuditRecord rc = new AuditRecord();
-                rc.action = action.value;
-                rc.componentID = componentId.value;
-                rc.date = date.value;
-                rc.id = id;
-                rc.justification = justification.value;
-                rc.processType = process.type;
-                rc.responsibility = responsibility.value;
-                return rc;
-            }            
-        }
-        
-        @XmlElement(name="record",namespace="info:fedora/fedora-system:def/audit#")
-        private List<ManagedAuditRecord> records;
-    }
-
     
     public SimpleDOWriter(Context context,
                           DefaultDOManager mgr,
@@ -199,26 +119,18 @@ public class SimpleDOWriter
         m_obj = obj;
         m_mgr = mgr;
         try {
-            m_obj.getAuditRecords().addAll(getAuditRecords(m_mgr.m_permanentStore.retrieveDatastream(obj.getPid() + "+AUDIT+AUDIT.0")));
+            unmarshaller = jaxbContext.createUnmarshaller();
+        } catch (JAXBException e1) {
+            e1.printStackTrace();
+        }
+        try {
+            List<AuditRecord> audits= ((AuditRecords) unmarshaller.unmarshal(m_mgr.m_permanentStore.retrieveDatastream(obj.getPid() + "+AUDIT+AUDIT.0"))).auditRecords;
+            m_obj.getAuditRecords().addAll(audits);
         } catch (LowlevelStorageException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         } catch (JAXBException e) {
             e.printStackTrace();
         }
-    }
-
-    // TODO: helper method which should go into deserializers, but this is a PoC
-    public static Collection<? extends AuditRecord> getAuditRecords(
-            InputStream auditTrail) throws IOException, JAXBException {
-        List<AuditRecord> auditRecords=new ArrayList<AuditRecord>();
-        ManagedAuditRecords recs =
-                (ManagedAuditRecords) unmarshaller.unmarshal(auditTrail);
-        for (ManagedAuditRecords.ManagedAuditRecord rec : recs.records){
-            auditRecords.add(rec.toAuditRecord());
-        }
-        return auditRecords;
     }
 
     public void setState(String state) throws ObjectIntegrityException {
