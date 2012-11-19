@@ -5,41 +5,49 @@
 package org.fcrepo.server.storage;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.jrdf.graph.ObjectNode;
-import org.jrdf.graph.Triple;
-
-import org.trippi.RDFFormat;
-import org.trippi.TripleIterator;
-import org.trippi.TrippiException;
-import org.trippi.io.TripleIteratorFactory;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
 import org.fcrepo.common.rdf.SimpleLiteral;
 import org.fcrepo.common.rdf.SimpleTriple;
 import org.fcrepo.common.rdf.SimpleURIReference;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.GeneralException;
+import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.translation.DOTranslator;
+import org.fcrepo.server.storage.types.AuditRecord;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.XMLDatastreamProcessor;
 import org.fcrepo.server.utilities.FilteredTripleIterator;
 import org.fcrepo.server.validation.ValidationUtility;
+import org.jrdf.graph.ObjectNode;
+import org.jrdf.graph.Triple;
+import org.trippi.RDFFormat;
+import org.trippi.TripleIterator;
+import org.trippi.TrippiException;
+import org.trippi.io.TripleIteratorFactory;
 
 
 
@@ -86,7 +94,100 @@ public class SimpleDOWriter
     private boolean m_invalidated = false;
 
     private boolean m_committed = false;
+    
+    private static Unmarshaller unmarshaller;
+    
+    static {
+        try {
+            unmarshaller=
+                    JAXBContext.newInstance(ManagedAuditRecords.class)
+                    .createUnmarshaller();
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
 
+    }
+
+    @XmlRootElement(name = "auditTrail", namespace = "info:fedora/fedora-system:def/audit#")
+    public static class ManagedAuditRecords {
+
+        public static class ManagedAuditRecord{
+            
+            private static class Process {
+
+                @XmlAttribute(name = "type")
+                private String type;
+            }
+
+            private static class Action {
+
+                @XmlValue
+                private String value;
+            }
+
+            private static class ComponentID {
+
+                @XmlValue
+                private String value;
+            }
+
+            private static class Responsibility {
+
+                @XmlValue
+                private String value;
+            }
+
+            private static class ARDate {
+
+                @XmlValue
+                private Date value;
+            }
+
+            private static class Justification {
+
+                @XmlValue
+                private String value;
+            }
+
+            @XmlAttribute(name = "ID")
+            protected String id;
+
+            @XmlElement(name = "process", namespace = "info:fedora/fedora-system:def/audit#")
+            protected Process process;
+
+            @XmlElement(name = "action", namespace = "info:fedora/fedora-system:def/audit#")
+            protected Action action;
+
+            @XmlElement(name = "componentID", namespace = "info:fedora/fedora-system:def/audit#")
+            protected ComponentID componentId;
+
+            @XmlElement(name = "responsibility", namespace = "info:fedora/fedora-system:def/audit#")
+            protected Responsibility responsibility;
+
+            @XmlElement(name = "date", namespace = "info:fedora/fedora-system:def/audit#")
+            protected ARDate date;
+
+            @XmlElement(name = "justification", namespace = "info:fedora/fedora-system:def/audit#")
+            protected Justification justification;
+
+            public AuditRecord toAuditRecord() {
+                AuditRecord rc = new AuditRecord();
+                rc.action = action.value;
+                rc.componentID = componentId.value;
+                rc.date = date.value;
+                rc.id = id;
+                rc.justification = justification.value;
+                rc.processType = process.type;
+                rc.responsibility = responsibility.value;
+                return rc;
+            }            
+        }
+        
+        @XmlElement(name="record",namespace="info:fedora/fedora-system:def/audit#")
+        private List<ManagedAuditRecord> records;
+    }
+
+    
     public SimpleDOWriter(Context context,
                           DefaultDOManager mgr,
                           DOTranslator translator,
@@ -97,6 +198,27 @@ public class SimpleDOWriter
         m_context = context;
         m_obj = obj;
         m_mgr = mgr;
+        try {
+            m_obj.getAuditRecords().addAll(getAuditRecords(m_mgr.m_permanentStore.retrieveDatastream(obj.getPid() + "+AUDIT+AUDIT.0")));
+        } catch (LowlevelStorageException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // TODO: helper method which should go into deserializers, but this is a PoC
+    public static Collection<? extends AuditRecord> getAuditRecords(
+            InputStream auditTrail) throws IOException, JAXBException {
+        List<AuditRecord> auditRecords=new ArrayList<AuditRecord>();
+        ManagedAuditRecords recs =
+                (ManagedAuditRecords) unmarshaller.unmarshal(auditTrail);
+        for (ManagedAuditRecords.ManagedAuditRecord rec : recs.records){
+            auditRecords.add(rec.toAuditRecord());
+        }
+        return auditRecords;
     }
 
     public void setState(String state) throws ObjectIntegrityException {
