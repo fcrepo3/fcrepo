@@ -8,19 +8,19 @@ import org.fcrepo.server.storage.types.DigitalObject;
 public class MockFedoraHintsProvider implements FedoraStorageHintProvider{
 
     @Override
-    public Map<String, String> getHintsForAboutToBeStoredObject(
+    public Map<Object, Object> getHintsForAboutToBeStoredObject(
             DigitalObject obj) {
         
-        Map<String, String> hints = new HashMap<String, String>();
+        Map<Object, Object> hints = new HashMap<Object, Object>();
         hints.put("object_one", "1");
         hints.put("object_two", "2");
         return hints;
     }
 
     @Override
-    public Map<String, String> getHintsForAboutToBeStoredDatastream(
+    public Map<Object, Object> getHintsForAboutToBeStoredDatastream(
             DigitalObject obj, String datastreamId) {
-        Map<String, String> hints = new HashMap<String, String>();
+        Map<Object, Object> hints = new HashMap<Object, Object>();
         hints.put("ds_one", "1");
         hints.put("ds_two", "2");
         return hints;

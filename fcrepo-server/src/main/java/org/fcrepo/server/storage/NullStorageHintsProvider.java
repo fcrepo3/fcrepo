@@ -13,13 +13,13 @@ import org.fcrepo.server.storage.types.DigitalObject;
 public class NullStorageHintsProvider implements FedoraStorageHintProvider {
 
     @Override
-    public Map<String, String> getHintsForAboutToBeStoredObject(
+    public Map<Object, Object> getHintsForAboutToBeStoredObject(
             DigitalObject obj) {
         return null;
     }
 
     @Override
-    public Map<String, String> getHintsForAboutToBeStoredDatastream(
+    public Map<Object, Object> getHintsForAboutToBeStoredDatastream(
             DigitalObject obj, String datastreamId) {        
         return null;
     }

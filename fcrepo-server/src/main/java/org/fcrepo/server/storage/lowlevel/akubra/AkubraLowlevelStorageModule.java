@@ -66,13 +66,13 @@ public class AkubraLowlevelStorageModule
     }
 
     @Override
-    public void addObject(String pid, InputStream content, Map<String, String> hints)
+    public void addObject(String pid, InputStream content, Map<Object, Object> hints)
             throws LowlevelStorageException {
         m_impl.addObject(pid, content, hints);
     }
     
     @Override
-    public void replaceObject(String pid, InputStream content, Map<String, String> hints)
+    public void replaceObject(String pid, InputStream content, Map<Object, Object> hints)
             throws LowlevelStorageException {
         m_impl.replaceObject(pid, content, hints);
     }
@@ -95,13 +95,13 @@ public class AkubraLowlevelStorageModule
     }
 
     @Override
-    public long addDatastream(String pid, InputStream content, Map<String, String> hints)
+    public long addDatastream(String pid, InputStream content, Map<Object, Object> hints)
             throws LowlevelStorageException {
         return m_impl.addDatastream(pid, content, hints);
     }
     
     @Override
-    public long replaceDatastream(String pid, InputStream content, Map<String, String> hints)
+    public long replaceDatastream(String pid, InputStream content, Map<Object, Object> hints)
             throws LowlevelStorageException {
         return m_impl.replaceDatastream(pid, content, hints);
     }

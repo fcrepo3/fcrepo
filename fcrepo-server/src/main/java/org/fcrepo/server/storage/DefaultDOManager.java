@@ -1160,7 +1160,7 @@ public class DefaultDOManager extends Module implements DOManager {
                                             pid +
                                             " / " + dsID + ")");
                                 }
-                                Map<String, String> dsHints =
+                                Map<Object, Object> dsHints =
                                         m_hintProvider
                                                 .getHintsForAboutToBeStoredDatastream(
                                                         obj, dmc.DatastreamID);
@@ -1307,7 +1307,7 @@ public class DefaultDOManager extends Module implements DOManager {
                 // STORAGE:
                 // write XML serialization of object to persistent storage
                 logger.debug("Storing digital object");
-                Map<String, String> objectHints =
+                Map<Object, Object> objectHints =
                         m_hintProvider.getHintsForAboutToBeStoredObject(obj);
                 if (obj.isNew()) {
                     m_permanentStore.addObject(obj.getPid(),

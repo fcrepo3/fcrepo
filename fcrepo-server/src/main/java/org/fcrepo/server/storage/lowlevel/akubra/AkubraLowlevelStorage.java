@@ -100,7 +100,7 @@ public class AkubraLowlevelStorage
     // ILowlevelStorage methods
     //
 
-    public long addDatastream(String dsKey, InputStream content, Map<String, String> hints)
+    public long addDatastream(String dsKey, InputStream content, Map<Object, Object> hints)
             throws LowlevelStorageException {
         return add(datastreamStore, dsKey, content, hints);
     }
@@ -109,7 +109,7 @@ public class AkubraLowlevelStorage
         return this.addDatastream(pid, content, null);
     }
 
-    public void addObject(String objectKey, InputStream content, Map<String, String> hints)
+    public void addObject(String objectKey, InputStream content, Map<Object, Object> hints)
             throws LowlevelStorageException {
         add(objectStore, objectKey, content, hints);
     }
@@ -150,7 +150,7 @@ public class AkubraLowlevelStorage
         remove(objectStore, objectKey);
     }
 
-    public long replaceDatastream(String dsKey, InputStream content, Map<String, String> hints)
+    public long replaceDatastream(String dsKey, InputStream content, Map<Object, Object> hints)
             throws LowlevelStorageException {
         return replace(datastreamStore, dsKey, content, forceSafeDatastreamOverwrites, hints);
     }
@@ -159,7 +159,7 @@ public class AkubraLowlevelStorage
         return this.replaceDatastream(pid, content, null);
     }
 
-    public void replaceObject(String objectKey, InputStream content, Map<String, String> hints)
+    public void replaceObject(String objectKey, InputStream content, Map<Object, Object> hints)
             throws LowlevelStorageException {
         replace(objectStore, objectKey, content, forceSafeObjectOverwrites, hints);
     }
@@ -208,7 +208,7 @@ public class AkubraLowlevelStorage
 
     private static long add(BlobStore store,
                             String key,
-                            InputStream content, Map<String, String> hints)
+                            InputStream content, Map<Object, Object> hints)
             throws ObjectAlreadyInLowlevelStorageException {
         BlobStoreConnection connection = null;
         try {
@@ -263,7 +263,7 @@ public class AkubraLowlevelStorage
                                 String key,
                                 InputStream content,
                                 boolean forceSafeOverwrite,
-                                Map<String, String> hints)
+                                Map<Object, Object> hints)
             throws LowlevelStorageException {
         BlobStoreConnection connection = null;
         try {
@@ -442,7 +442,7 @@ public class AkubraLowlevelStorage
     }
 
 
-    private static BlobStoreConnection getConnection(BlobStore store, Map<String, String> hints) {
+    private static BlobStoreConnection getConnection(BlobStore store, Map<Object, Object> hints) {
         try {
             return store.openConnection(null, hints);
         } catch (IOException e) {
@@ -463,7 +463,7 @@ public class AkubraLowlevelStorage
 
     private static Blob getBlob(BlobStoreConnection connection,
                                 URI blobId,
-                                Map<String, String> hints) {
+                                Map<Object, Object> hints) {
         try {
             return connection.getBlob(blobId, hints);
         } catch (Exception e) {

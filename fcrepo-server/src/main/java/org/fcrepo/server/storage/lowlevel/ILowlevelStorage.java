@@ -27,7 +27,7 @@ public interface ILowlevelStorage {
      * @throws LowlevelStorageException if the object already exists or
      *         cannot be added for any other reason.
      */
-    public void addObject(String objectKey, InputStream content, Map<String, String> objectStorageHints)
+    public void addObject(String objectKey, InputStream content, Map<Object, Object> objectStorageHints)
             throws LowlevelStorageException;
 
     /**
@@ -39,7 +39,7 @@ public interface ILowlevelStorage {
      * @throws LowlevelStorageException if the object does not already exist
      *         or cannot be replaced for any other reason.
      */
-    public void replaceObject(String objectKey, InputStream content, Map<String, String> objectHints)
+    public void replaceObject(String objectKey, InputStream content, Map<Object, Object> objectHints)
             throws LowlevelStorageException;
 
     /**
@@ -110,7 +110,7 @@ public interface ILowlevelStorage {
      *         exists or cannot be added for any other reason.
      * @returns size - the size of the added object in bytes
      */
-    public long addDatastream(String dsKey, InputStream content, Map<String, String> dsStorageHints)
+    public long addDatastream(String dsKey, InputStream content, Map<Object, Object> dsStorageHints)
             throws LowlevelStorageException;
 
     /**
@@ -123,7 +123,7 @@ public interface ILowlevelStorage {
      *         already exist or cannot be replaced for any other reason.
      * @returns size - the size of the added object in bytes
      */
-    public long replaceDatastream(String dsKey, InputStream content, Map<String, String> dsHints)
+    public long replaceDatastream(String dsKey, InputStream content, Map<Object, Object> dsHints)
             throws LowlevelStorageException;
 
     /**

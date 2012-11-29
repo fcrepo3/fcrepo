@@ -70,13 +70,13 @@ public class DefaultLowlevelStorage
     }
 
     @Override
-    public void addObject(String pid, InputStream content, Map<String, String> hints)
+    public void addObject(String pid, InputStream content, Map<Object, Object> hints)
             throws LowlevelStorageException {
         objectStore.add(pid, content);
     }
 
     @Override
-    public void replaceObject(String pid, InputStream content, Map<String, String> hints)
+    public void replaceObject(String pid, InputStream content, Map<Object, Object> hints)
             throws LowlevelStorageException {
         objectStore.replace(pid, content);
     }
@@ -99,13 +99,13 @@ public class DefaultLowlevelStorage
     }
 
     @Override
-    public long addDatastream(String pid, InputStream content, Map<String, String> hints)
+    public long addDatastream(String pid, InputStream content, Map<Object, Object> hints)
             throws LowlevelStorageException {
         return datastreamStore.add(pid, content);
     }
 
     @Override
-    public long replaceDatastream(String pid, InputStream content, Map<String, String>hints)
+    public long replaceDatastream(String pid, InputStream content, Map<Object, Object>hints)
             throws LowlevelStorageException {
         return datastreamStore.replace(pid, content);
     }

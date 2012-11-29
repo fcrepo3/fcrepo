@@ -275,26 +275,26 @@ public class AkubraLowlevelStorageTest {
     @Test
     public void testAddDatastreamWithHints() throws Exception {        
         FedoraStorageHintProvider provider = new MockFedoraHintsProvider();
-        Map<String, String> hints = provider.getHintsForAboutToBeStoredDatastream(null, null);
+        Map<Object, Object> hints = provider.getHintsForAboutToBeStoredDatastream(null, null);
         instance.addDatastream(DS_KEY, toStream(DS_CONTENT), hints);
     }
     @Test
     public void testReplaceDatastreamWithHints() throws Exception {        
         FedoraStorageHintProvider provider = new MockFedoraHintsProvider();
-        Map<String, String> hints = provider.getHintsForAboutToBeStoredDatastream(null, null);
+        Map<Object, Object> hints = provider.getHintsForAboutToBeStoredDatastream(null, null);
         instance.addDatastream(DS_KEY, toStream(DS_CONTENT), hints);
         instance.replaceDatastream(DS_KEY, toStream(DS_CONTENT), hints);
     }
     @Test
     public void testAddObjectWithHints() throws Exception {        
         FedoraStorageHintProvider provider = new MockFedoraHintsProvider();
-        Map<String, String> hints = provider.getHintsForAboutToBeStoredObject(null);
+        Map<Object, Object> hints = provider.getHintsForAboutToBeStoredObject(null);
         instance.addObject(OBJ_KEY, toStream(OBJ_CONTENT), hints);
     }
     @Test
     public void testReplaceObjectWithHints() throws Exception {        
         FedoraStorageHintProvider provider = new MockFedoraHintsProvider();
-        Map<String, String> hints = provider.getHintsForAboutToBeStoredObject(null);
+        Map<Object, Object> hints = provider.getHintsForAboutToBeStoredObject(null);
         instance.addObject(OBJ_KEY, toStream(OBJ_CONTENT), hints);
         instance.replaceObject(OBJ_KEY, toStream(OBJ_CONTENT), hints);
     }
