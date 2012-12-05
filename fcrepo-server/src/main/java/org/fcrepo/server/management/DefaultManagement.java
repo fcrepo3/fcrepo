@@ -12,12 +12,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -26,31 +23,18 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
 import org.apache.commons.betwixt.XMLUtils;
-
 import org.apache.commons.io.IOUtils;
-
-import org.jrdf.graph.URIReference;
-
-import org.w3c.dom.Document;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
 import org.fcrepo.common.rdf.SimpleURIReference;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.RecoveryContext;
 import org.fcrepo.server.Server;
@@ -88,6 +72,13 @@ import org.fcrepo.server.validation.ValidationConstants;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.server.validation.ecm.EcmValidator;
 import org.fcrepo.utilities.DateUtility;
+import org.jrdf.graph.URIReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 /**
  * Implements API-M without regard to the transport/messaging protocol.
@@ -148,6 +139,7 @@ public class DefaultManagement
         ecmValidator = new EcmValidator(doMgr,m_contentManager); //TODO, this should be controllable with the fcfg
     }
 
+    @Override
     public String ingest(Context context,
                          InputStream serialization,
                          String logMessage,
@@ -206,6 +198,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public Date modifyObject(Context context,
                              String pid,
                              String state,
@@ -281,6 +274,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public InputStream getObjectXML(Context context, String pid, String encoding)
             throws ServerException {
         try {
@@ -309,6 +303,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public InputStream export(Context context,
                               String pid,
                               String format,
@@ -346,6 +341,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public Date purgeObject(Context context,
                             String pid,
                             String logMessage) throws ServerException {
@@ -381,6 +377,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public String addDatastream(Context context,
                                 String pid,
                                 String dsID,
@@ -474,6 +471,7 @@ public class DefaultManagement
                     // set and validate the content
                     DatastreamXMLMetadata dsm = (DatastreamXMLMetadata) ds;
                     dsm.xmlContent = getEmbeddableXML(in);
+                    dsm.DSSize = dsm.xmlContent.length;
                     ValidationUtility.validateReservedDatastream(PID.getInstance(pid),
                                                                  dsID,
                                                                  dsm);
@@ -601,6 +599,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public Date modifyDatastreamByReference(Context context,
                                             String pid,
                                             String datastreamId,
@@ -821,6 +820,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public Date modifyDatastreamByValue(Context context,
                                         String pid,
                                         String datastreamId,
@@ -1009,6 +1009,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public Date[] purgeDatastream(Context context,
                                   String pid,
                                   String datastreamID,
@@ -1136,6 +1137,7 @@ public class DefaultManagement
         return buf.toString();
     }
 
+    @Override
     public Datastream getDatastream(Context context,
                                     String pid,
                                     String datastreamID,
@@ -1168,6 +1170,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public Datastream[] getDatastreams(Context context,
                                        String pid,
                                        Date asOfDateTime,
@@ -1200,6 +1203,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public Datastream[] getDatastreamHistory(Context context,
                                              String pid,
                                              String datastreamID)
@@ -1245,6 +1249,7 @@ public class DefaultManagement
     public class DatastreamDateComparator
             implements Comparator<Object> {
 
+        @Override
         public int compare(Object o1, Object o2) {
             long ms1 = ((Datastream) o1).DSCreateDT.getTime();
             long ms2 = ((Datastream) o1).DSCreateDT.getTime();
@@ -1258,6 +1263,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public String[] getNextPID(Context context, int numPIDs, String namespace)
             throws ServerException {
         try {
@@ -1301,6 +1307,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public String putTempStream(Context context, InputStream in)
             throws StreamWriteException, AuthzException {
         m_authz.enforceUpload(context);
@@ -1358,6 +1365,7 @@ public class DefaultManagement
         return m_lastId;
     }
 
+    @Override
     public InputStream getTempStream(String id) throws StreamReadException {
         // it should come in starting with "uploaded://"
         if (id.startsWith(DatastreamManagedContent.UPLOADED_SCHEME) || id.length() < 12) {
@@ -1378,6 +1386,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public Date setDatastreamState(Context context,
                                    String pid,
                                    String datastreamID,
@@ -1431,6 +1440,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public Date setDatastreamVersionable(Context context,
                                          String pid,
                                          String datastreamID,
@@ -1478,6 +1488,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public String compareDatastreamChecksum(Context context,
                                             String pid,
                                             String datastreamID,
@@ -1647,6 +1658,7 @@ public class DefaultManagement
     }
 
 
+    @Override
     public RelationshipTuple[] getRelationships(Context context,
                                                 String subject,
                                                 String relationship)
@@ -1695,6 +1707,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public boolean addRelationship(Context context,
                                    String subject,
                                    String relationship,
@@ -1746,6 +1759,7 @@ public class DefaultManagement
         }
     }
 
+    @Override
     public boolean purgeRelationship(Context context,
                                      String subject,
                                      String relationship,
@@ -1805,6 +1819,7 @@ public class DefaultManagement
      * @return The result of the validation
      * @see org.fcrepo.server.validation.ecm.EcmValidator
      */
+    @Override
     public Validation validate(Context context,
                                String pid,
                                Date asOfDateTime) throws ServerException {

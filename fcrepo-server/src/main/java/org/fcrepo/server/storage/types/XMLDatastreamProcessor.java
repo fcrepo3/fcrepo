@@ -5,18 +5,15 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.ServerInitializationException;
 import org.fcrepo.server.errors.StreamIOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wrapper class for a datastream that has XML metadata.
@@ -202,6 +199,7 @@ public class XMLDatastreamProcessor {
     public void setXMLContent(byte[] xmlContent) {
         if (m_dsType == DS_TYPE.INLINE_XML) {
             ((DatastreamXMLMetadata)m_ds).xmlContent = xmlContent;
+            ((DatastreamXMLMetadata)m_ds).DSSize = (xmlContent != null) ? xmlContent.length : -1;
         } else if (m_dsType == DS_TYPE.MANAGED) {
             ByteArrayInputStream bais = new ByteArrayInputStream(xmlContent);
             MIMETypedStream s = new MIMETypedStream("text/xml", bais, null,xmlContent.length);
