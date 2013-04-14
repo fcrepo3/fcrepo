@@ -50,8 +50,8 @@
     </resources>
 
     <plugins>
-      <!-- Note: This plugin was defined as required by: client, integrationtest, 
-        & server.test. It is certainly required by fedorahome.zip (integrationtest) 
+      <!-- Note: This plugin was defined as required by: client, integrationtest,
+        & server.test. It is certainly required by fedorahome.zip (integrationtest)
         & server.test. The other two dependencies listed above are questionable. -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -129,7 +129,7 @@
               <arguments>
                 <argument>${project.build.directory}/vocabulary.txt</argument>
               </arguments>
-              <!-- Note: this execution has the following dependencies: openrdf-sesame-2.2.1-onejar.jar 
+              <!-- Note: this execution has the following dependencies: openrdf-sesame-2.2.1-onejar.jar
                 mulgara-core-2.1.4.jar fedora-common.jar -->
             </configuration>
           </execution>
@@ -137,7 +137,7 @@
       </plugin>
 
 
-      <!-- ** This plugin needs to be removed when ANT is gone. The unit/integration 
+      <!-- ** This plugin needs to be removed when ANT is gone. The unit/integration
         test regex's should be defined at root/pom.xml ** -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -507,7 +507,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-pool</artifactId>
@@ -783,10 +783,24 @@
       <artifactId>owlapi</artifactId>
       <version>3.0.0-patched</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.jmockit</groupId>
+      <artifactId>jmockit</artifactId>
+      <version>0.999.19</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.multithreadedtc</groupId>
+      <artifactId>multithreadedtc</artifactId>
+      <version>1.01</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
