@@ -72,7 +72,7 @@ public class TestJournalRoundTrip {
      * Attributes that we expect to see added to the {@link #leadingContext}
      * when the management method is called.
      */
-    private Map<RDFName, Object> contextAdditions;
+    private Map<RDFName, String[]> contextAdditions;
 
     /**
      * Context items as expected after the call.
@@ -131,7 +131,7 @@ public class TestJournalRoundTrip {
     public void initializeContextObjects() {
         leadingContext = new JournalEntryContext();
         expectedContext = null;
-        contextAdditions = new HashMap<RDFName, Object>();
+        contextAdditions = new HashMap<RDFName, String[]>();
     }
 
     @Before
@@ -384,7 +384,10 @@ public class TestJournalRoundTrip {
      * What additional "recovery attributes" should we expect the leading
      * delegate to set into the context?
      */
-    private void expectInContext(RDFName key, Object value) {
+    private void expectInContext(RDFName key, String value) {
+        contextAdditions.put(key, new String[]{value});
+    }
+    private void expectInContext(RDFName key, String[] value) {
         contextAdditions.put(key, value);
     }
 
@@ -482,13 +485,9 @@ public class TestJournalRoundTrip {
      */
     private void loadExpectedContext() {
         expectedContext = new JournalEntryContext(leadingContext);
-        for (Map.Entry<RDFName, Object> entry : contextAdditions.entrySet()) {
-            try {
-                expectedContext.getRecoveryAttributes().set(entry.getKey().uri,
+        for (Map.Entry<RDFName, String[]> entry : contextAdditions.entrySet()) {
+            expectedContext.getRecoveryAttributes().set(entry.getKey().uri,
                                                             entry.getValue());
-            } catch (Exception e) {
-                fail("Stupid design of MultiValueMap");
-            }
         }
     }
 

@@ -6,11 +6,12 @@ package org.fcrepo.server.journal.xmlhelpers;
 
 import java.io.StringReader;
 import java.io.StringWriter;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import javanet.staxutils.IndentingXMLEventWriter;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventReader;
@@ -20,15 +21,11 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import javanet.staxutils.IndentingXMLEventWriter;
+import junit.framework.TestCase;
 
 import org.fcrepo.server.MultiValueMap;
 import org.fcrepo.server.journal.entry.JournalEntryContext;
 import org.fcrepo.server.journal.helpers.JournalHelper;
-import org.fcrepo.server.journal.xmlhelpers.ContextXmlReader;
-import org.fcrepo.server.journal.xmlhelpers.ContextXmlWriter;
-
-import junit.framework.TestCase;
 
 
 public class TestContextXmlWriterAndReader
@@ -53,15 +50,14 @@ public class TestContextXmlWriterAndReader
         JournalEntryContext context1 = new JournalEntryContext();
         context1.setPassword("SuperSecret");
         context1.setNoOp(true);
-        context1.setEnvironmentAttributes(createMap(new Object[][] {{"envAttr",
-                "envValue"}}));
-        context1.setSubjectAttributes(createMap(new Object[][] {
+        context1.setEnvironmentAttributes(createMap("envAttr", "envValue"));
+        context1.setSubjectAttributes(createMap(new String[][] {
                 {"subAttr1", "subValue1"}, {"subAttr2", "subValue2"}}));
-        context1.setActionAttributes(createMap(new Object[][] {{
+        context1.setActionAttributes(createMap(new String[][] {{
                 "ActionAttribute", "ActionValue"}}));
-        context1.setRecoveryAttributes(createMap(new Object[][] {{
+        context1.setRecoveryAttributes(createMap(
                 "recoveryAttribute",
-                new String[] {"recoveryValue", "recoveryValue2"}}}));
+                new String[] {"recoveryValue", "recoveryValue2"}));
 
         ContextXmlWriter contextWriter = new ContextXmlWriter();
         contextWriter.writeContext(context1, xmlWriter);
@@ -116,17 +112,24 @@ public class TestContextXmlWriterAndReader
                 .createXMLEventWriter(xmlStringWriter));
     }
 
-    private MultiValueMap createMap(Object[][] pairs) {
+    private MultiValueMap createMap(String key, String value) {
+        return createMap(key, new String[]{value});
+    }
+
+    private MultiValueMap createMap(String key, String[] value) {
         MultiValueMap map = new MultiValueMap();
-        for (Object[] element : pairs) {
-            try {
-                map.set((String) element[0], element[1]);
-            } catch (Exception e) {
-                // ignore this totally bogus exception
-            }
+        map.set(key, value);
+        return map;
+    }
+
+    private MultiValueMap createMap(String[][] key_value) {
+        MultiValueMap map = new MultiValueMap();
+        for (String[] pair: key_value){
+            map.set(pair[0], pair[1]);
         }
         return map;
     }
+
 
     private void advanceToContext(XMLEventReader reader)
             throws XMLStreamException {

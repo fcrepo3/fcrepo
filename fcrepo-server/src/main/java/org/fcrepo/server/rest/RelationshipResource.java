@@ -39,7 +39,7 @@ import org.trippi.TrippiException;
  * @version $Id$
  * @since 3.4.0
  */
-@Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/relationships")
+@Path(BaseRestResource.VALID_PID_PART + "/relationships")
 @Component
 public class RelationshipResource extends BaseRestResource {
 

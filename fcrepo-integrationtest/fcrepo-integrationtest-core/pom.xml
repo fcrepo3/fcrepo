@@ -5,12 +5,12 @@
   <parent>
     <groupId>org.fcrepo</groupId>
     <artifactId>fcrepo-integrationtest</artifactId>
-    <version>3.6.2-SNAPSHOT</version>
+    <version>3.6.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>fcrepo-integrationtest-core</artifactId>
   <packaging>jar</packaging>
-  <name>Fedora Integration Test - Basic Tests &amp; Resources</name>
+  <name>Fedora Integration Test - Basic Tests and Resources</name>
 
   <build>
     <resources>

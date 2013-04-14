@@ -4,6 +4,11 @@
  */
 package org.fcrepo.server.storage.translation;
 
+import static org.fcrepo.common.Models.CONTENT_MODEL_3_0;
+import static org.fcrepo.common.Models.FEDORA_OBJECT_3_0;
+import static org.fcrepo.common.Models.SERVICE_DEFINITION_3_0;
+import static org.fcrepo.common.Models.SERVICE_DEPLOYMENT_3_0;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,11 +16,8 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-
 import java.nio.charset.Charset;
-
 import java.text.ParseException;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -47,11 +49,6 @@ import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.fcrepo.common.Models.CONTENT_MODEL_3_0;
-import static org.fcrepo.common.Models.FEDORA_OBJECT_3_0;
-import static org.fcrepo.common.Models.SERVICE_DEFINITION_3_0;
-import static org.fcrepo.common.Models.SERVICE_DEPLOYMENT_3_0;
 
 /**
  * Utility methods for usage by digital object serializers and deserializers.
@@ -760,6 +757,7 @@ public abstract class DOTranslationUtility
                                                                        "UTF-8"),
                                                             transContext)
                                         .getBytes(characterEncoding);
+                        xd.DSSize = xd.xmlContent.length;
                     }
                 }
             }

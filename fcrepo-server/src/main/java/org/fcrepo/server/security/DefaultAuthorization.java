@@ -223,34 +223,26 @@ public class DefaultAuthorization
             String target = Constants.ACTION.ADD_DATASTREAM.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            String name = null;
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.MIME_TYPE.uri,
-                                   MIMEType);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.FORMAT_URI.uri,
-                                   formatURI);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.STATE.uri,
-                                   dsState);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.ID.uri, dsId);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.LOCATION.uri,
-                                   dsLocation);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.CONTROL_GROUP.uri,
-                                   controlGroup);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.ALT_IDS.uri,
-                                   altIDs);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.CHECKSUM_TYPE.uri,
-                                   checksumType);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.CHECKSUM.uri,
-                                   checksum);
+                name = Constants.DATASTREAM.MIME_TYPE.uri;
+                resourceAttributes.set(name, MIMEType);
+                name = Constants.DATASTREAM.FORMAT_URI.uri;
+                resourceAttributes.set(name, formatURI);
+                name = Constants.DATASTREAM.STATE.uri;
+                resourceAttributes.set(name, dsState);
+                name = Constants.DATASTREAM.ID.uri;
+                resourceAttributes.set(name, dsId);
+                name = Constants.DATASTREAM.LOCATION.uri;
+                resourceAttributes.set(name, dsLocation);
+                name = Constants.DATASTREAM.CONTROL_GROUP.uri;
+                resourceAttributes.set(name, controlGroup);
+                name = Constants.DATASTREAM.ALT_IDS.uri;
+                resourceAttributes.set(name, altIDs);
+                name = Constants.DATASTREAM.CHECKSUM_TYPE.uri;
+                resourceAttributes.set(name, checksumType);
+                name = Constants.DATASTREAM.CHECKSUM.uri;
+                resourceAttributes.set(name, checksum);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -281,17 +273,14 @@ public class DefaultAuthorization
             String target = Constants.ACTION.EXPORT.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            String name = null;
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.OBJECT.FORMAT_URI.uri,
-                                   format);
-                name = resourceAttributes
-                        .setReturn(Constants.OBJECT.CONTEXT.uri,
-                                   exportContext);
-                name = resourceAttributes
-                        .setReturn(Constants.OBJECT.ENCODING.uri,
-                                   exportEncoding);
+                name = Constants.OBJECT.FORMAT_URI.uri;
+                resourceAttributes.set(name, format);
+                name = Constants.OBJECT.CONTEXT.uri;
+                resourceAttributes.set(name, exportContext);
+                name = Constants.OBJECT.ENCODING.uri;
+                resourceAttributes.set(name, exportEncoding);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -332,17 +321,14 @@ public class DefaultAuthorization
             String target = Constants.ACTION.GET_NEXT_PID.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
             try {
                 String nNewPidsAsString = Integer.toString(nNewPids);
-                name =
-                        resourceAttributes
-                                .setReturn(Constants.OBJECT.N_PIDS.uri,
-                                           nNewPidsAsString);
+                resourceAttributes.set(Constants.OBJECT.N_PIDS.uri,
+                                       nNewPidsAsString);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
-                                                    + name, e);
+                                                    + Constants.OBJECT.N_PIDS.uri, e);
             }
             context.setResourceAttributes(resourceAttributes);
             xacmlPep.enforce(context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
@@ -367,14 +353,12 @@ public class DefaultAuthorization
             String target = Constants.ACTION.GET_DATASTREAM.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            String name = null;
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.ID.uri,
-                                   datastreamId);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.AS_OF_DATETIME.uri,
-                                   ensureDate(asOfDateTime, context));
+                name = Constants.DATASTREAM.ID.uri;
+                resourceAttributes.set(name, datastreamId);
+                name = Constants.DATASTREAM.AS_OF_DATETIME.uri;
+                resourceAttributes.set(name, ensureDate(asOfDateTime, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -402,15 +386,13 @@ public class DefaultAuthorization
             String target = Constants.ACTION.GET_DATASTREAM_HISTORY.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.ID.uri,
-                                   datastreamId);
+                resourceAttributes.set(Constants.DATASTREAM.ID.uri,
+                                       datastreamId);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
-                                                    + name, e);
+                                                    + Constants.DATASTREAM.ID.uri, e);
             }
             context.setResourceAttributes(resourceAttributes);
             xacmlPep.enforce(context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
@@ -450,14 +432,12 @@ public class DefaultAuthorization
             String target = Constants.ACTION.GET_DATASTREAMS.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            String name = null;
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.STATE.uri,
-                                   datastreamState);
-                name = resourceAttributes
-                        .setReturn(Constants.RESOURCE.AS_OF_DATETIME.uri,
-                                   ensureDate(asOfDate, context));
+                name = Constants.DATASTREAM.STATE.uri;
+                resourceAttributes.set(name, datastreamState);
+                name = Constants.RESOURCE.AS_OF_DATETIME.uri;
+                resourceAttributes.set(name, ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -487,15 +467,14 @@ public class DefaultAuthorization
             String target = Constants.ACTION.GET_OBJECT_XML.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.OBJECT.ENCODING.uri,
-                                   objectXmlEncoding);
+                resourceAttributes
+                        .set(Constants.OBJECT.ENCODING.uri,
+                             objectXmlEncoding);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
-                                                    + name, e);
+                                                    + Constants.OBJECT.ENCODING.uri, e);
             }
             context.setResourceAttributes(resourceAttributes);
             xacmlPep.enforce(context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
@@ -520,14 +499,12 @@ public class DefaultAuthorization
             String target = Constants.ACTION.INGEST.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            String name = null;
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.OBJECT.FORMAT_URI.uri,
-                                   format);
-                name = resourceAttributes
-                        .setReturn(Constants.OBJECT.ENCODING.uri,
-                                   ingestEncoding);
+                name = Constants.OBJECT.FORMAT_URI.uri;
+                resourceAttributes.set(name, format);
+                name = Constants.OBJECT.ENCODING.uri;
+                resourceAttributes.set(name, ingestEncoding);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -624,29 +601,22 @@ public class DefaultAuthorization
             String target = Constants.ACTION.MODIFY_DATASTREAM_BY_REFERENCE.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            String name = null;
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.ID.uri,
-                                   datastreamId);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.NEW_MIME_TYPE.uri,
-                                   datastreamNewMimeType);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.NEW_FORMAT_URI.uri,
-                                   datastreamNewFormatURI);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.NEW_LOCATION.uri,
-                                   datastreamNewLocation);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.NEW_ALT_IDS.uri,
-                                   datastreamNewAltIDs);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.NEW_CHECKSUM_TYPE.uri,
-                                   datastreamNewChecksumType);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.NEW_CHECKSUM.uri,
-                                   datastreamNewChecksum);
+                name = Constants.DATASTREAM.ID.uri;
+                resourceAttributes.set(name, datastreamId);
+                name = Constants.DATASTREAM.NEW_MIME_TYPE.uri;
+                resourceAttributes.set(name, datastreamNewMimeType);
+                name = Constants.DATASTREAM.NEW_FORMAT_URI.uri;
+                resourceAttributes.set(name, datastreamNewFormatURI);
+                name = Constants.DATASTREAM.NEW_LOCATION.uri;
+                resourceAttributes.set(name, datastreamNewLocation);
+                name = Constants.DATASTREAM.NEW_ALT_IDS.uri;
+                resourceAttributes.set(name, datastreamNewAltIDs);
+                name = Constants.DATASTREAM.NEW_CHECKSUM_TYPE.uri;
+                resourceAttributes.set(name, datastreamNewChecksumType);
+                name = Constants.DATASTREAM.NEW_CHECKSUM.uri;
+                resourceAttributes.set(name, datastreamNewChecksum);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -679,26 +649,20 @@ public class DefaultAuthorization
             String target = Constants.ACTION.MODIFY_DATASTREAM_BY_VALUE.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            String name = null;
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.ID.uri,
-                                   datastreamId);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.NEW_MIME_TYPE.uri,
-                                   newDatastreamMimeType);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.NEW_FORMAT_URI.uri,
-                                   newDatastreamFormatURI);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.NEW_ALT_IDS.uri,
-                                   newDatastreamAltIDs);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.NEW_CHECKSUM_TYPE.uri,
-                                   newDatastreamChecksumType);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.NEW_CHECKSUM.uri,
-                                   newDatastreamChecksum);
+                name = Constants.DATASTREAM.ID.uri;
+                resourceAttributes.set(name, datastreamId);
+                name = Constants.DATASTREAM.NEW_MIME_TYPE.uri;
+                resourceAttributes.set(name, newDatastreamMimeType);
+                name = Constants.DATASTREAM.NEW_FORMAT_URI.uri;
+                resourceAttributes.set(name, newDatastreamFormatURI);
+                name = Constants.DATASTREAM.NEW_ALT_IDS.uri;
+                resourceAttributes.set(name, newDatastreamAltIDs);
+                name = Constants.DATASTREAM.NEW_CHECKSUM_TYPE.uri;
+                resourceAttributes.set(name, newDatastreamChecksumType);
+                name = Constants.DATASTREAM.NEW_CHECKSUM.uri;
+                resourceAttributes.set(name, newDatastreamChecksum);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -727,15 +691,13 @@ public class DefaultAuthorization
             String target = Constants.ACTION.MODIFY_OBJECT.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            String name = null;
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.OBJECT.NEW_STATE.uri,
-                                   objectNewState);
+                name = Constants.OBJECT.NEW_STATE.uri;
+                resourceAttributes.set(name, objectNewState);
                 if (objectNewOwnerId != null){
-                    name = resourceAttributes
-                        .setReturn(Constants.OBJECT.OWNER.uri,
-                                   objectNewOwnerId.split(m_ownerIdSeparator));
+                    name = Constants.OBJECT.OWNER.uri;
+                    resourceAttributes.set(name, objectNewOwnerId.split(m_ownerIdSeparator));
                 }
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -764,17 +726,14 @@ public class DefaultAuthorization
         try {
             logger.debug("Entered enforcePurgeDatastream");
             String target = Constants.ACTION.PURGE_DATASTREAM.uri;
-            String name = "";
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            name = "";
+            String name = null;
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.ID.uri,
-                                   datastreamId);
-                name = resourceAttributes
-                        .setReturn(Constants.RESOURCE.AS_OF_DATETIME.uri,
-                                   ensureDate(endDT, context));
+                name = Constants.DATASTREAM.ID.uri;
+                resourceAttributes.set(name, datastreamId);
+                name = Constants.RESOURCE.AS_OF_DATETIME.uri;
+                resourceAttributes.set(name, ensureDate(endDT, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -822,14 +781,12 @@ public class DefaultAuthorization
             String target = Constants.ACTION.SET_DATASTREAM_STATE.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            String name = null;
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.ID.uri,
-                                   datastreamId);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.NEW_STATE.uri,
-                                   datastreamNewState);
+                name = Constants.DATASTREAM.ID.uri;
+                resourceAttributes.set(name, datastreamId);
+                name = Constants.DATASTREAM.NEW_STATE.uri;
+                resourceAttributes.set(name, datastreamNewState);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -858,15 +815,13 @@ public class DefaultAuthorization
             String target = Constants.ACTION.SET_DATASTREAM_VERSIONABLE.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            String name = null;
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.ID.uri,
-                                   datastreamId);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.NEW_VERSIONABLE.uri,
-                                   new Boolean(datastreamNewVersionable)
-                                           .toString());
+                name = Constants.DATASTREAM.ID.uri;
+                resourceAttributes.set(name, datastreamId);
+                name = Constants.DATASTREAM.NEW_VERSIONABLE.uri;
+                resourceAttributes.set(name,
+                                       new Boolean(datastreamNewVersionable).toString());
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -895,15 +850,13 @@ public class DefaultAuthorization
             String target = Constants.ACTION.COMPARE_DATASTREAM_CHECKSUM.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            String name = null;
 
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.ID.uri,
-                                   datastreamId);
-                name = resourceAttributes
-                        .setReturn(Constants.RESOURCE.AS_OF_DATETIME.uri,
-                                   ensureDate(versionDate, context));
+                name = Constants.DATASTREAM.ID.uri;
+                resourceAttributes.set(name, datastreamId);
+                name = Constants.RESOURCE.AS_OF_DATETIME.uri;
+                resourceAttributes.set(name, ensureDate(versionDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -987,14 +940,12 @@ public class DefaultAuthorization
             String target = Constants.ACTION.GET_DATASTREAM_DISSEMINATION.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            String name = null;
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.ID.uri,
-                                   datastreamId);
-                name = resourceAttributes
-                        .setReturn(Constants.RESOURCE.AS_OF_DATETIME.uri,
-                                   ensureDate(asOfDate, context));
+                name = Constants.DATASTREAM.ID.uri;
+                resourceAttributes.set(name, datastreamId);
+                name = Constants.RESOURCE.AS_OF_DATETIME.uri;
+                resourceAttributes.set(name, ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -1028,34 +979,28 @@ public class DefaultAuthorization
             String target = Constants.ACTION.GET_DISSEMINATION.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            String name = null;
             try {
-                name = resourceAttributes.setReturn(Constants.SDEF.PID.uri,
-                                                    sDefPid);
-                name = resourceAttributes
-                        .setReturn(Constants.SDEF.NAMESPACE.uri,
-                                   extractNamespace(sDefPid));
-                name = resourceAttributes
-                        .setReturn(Constants.DISSEMINATOR.METHOD.uri,
-                                   methodName);
-                name = resourceAttributes.setReturn(Constants.SDEP.PID.uri,
-                                                    sDepPid);
-                name = resourceAttributes
-                        .setReturn(Constants.SDEP.NAMESPACE.uri,
-                                   extractNamespace(sDepPid));
-                name = resourceAttributes
-                        .setReturn(Constants.OBJECT.STATE.uri,
-                                   objectState);
-                name = resourceAttributes
-                        .setReturn(Constants.DISSEMINATOR.STATE.uri,
-                                   dissState);
-                name = resourceAttributes.setReturn(Constants.SDEF.STATE.uri,
-                                                    sDefState);
-                name = resourceAttributes.setReturn(Constants.SDEP.STATE.uri,
-                                                    sDepState);
-                name = resourceAttributes
-                        .setReturn(Constants.RESOURCE.AS_OF_DATETIME.uri,
-                                   ensureDate(asOfDate, context));
+                name = Constants.SDEF.PID.uri;
+                resourceAttributes.set(name, sDefPid);
+                name = Constants.SDEF.NAMESPACE.uri;
+                resourceAttributes.set(name, extractNamespace(sDefPid));
+                name = Constants.DISSEMINATOR.METHOD.uri;
+                resourceAttributes.set(name, methodName);
+                name = Constants.SDEP.PID.uri;
+                resourceAttributes.set(name, sDepPid);
+                name = Constants.SDEP.NAMESPACE.uri;
+                resourceAttributes.set(name, extractNamespace(sDepPid));
+                name = Constants.OBJECT.STATE.uri;
+                resourceAttributes.set(name, objectState);
+                name = Constants.DISSEMINATOR.STATE.uri;
+                resourceAttributes.set(name, dissState);
+                name = Constants.SDEF.STATE.uri;
+                resourceAttributes.set(name, sDefState);
+                name = Constants.SDEP.STATE.uri;
+                resourceAttributes.set(name, sDepState);
+                name = Constants.RESOURCE.AS_OF_DATETIME.uri;
+                resourceAttributes.set(name, ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -1101,15 +1046,13 @@ public class DefaultAuthorization
             String target = Constants.ACTION.GET_OBJECT_PROFILE.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.RESOURCE.AS_OF_DATETIME.uri,
+                resourceAttributes.set(Constants.RESOURCE.AS_OF_DATETIME.uri,
                                    ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
-                                                    + name, e);
+                                                    + Constants.RESOURCE.AS_OF_DATETIME.uri, e);
             }
             context.setResourceAttributes(resourceAttributes);
             xacmlPep.enforce(context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
@@ -1132,15 +1075,13 @@ public class DefaultAuthorization
             String target = Constants.ACTION.LIST_DATASTREAMS.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.RESOURCE.AS_OF_DATETIME.uri,
+                resourceAttributes.set(Constants.RESOURCE.AS_OF_DATETIME.uri,
                                    ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
-                                                    + name, e);
+                                                    + Constants.RESOURCE.AS_OF_DATETIME.uri, e);
             }
             context.setResourceAttributes(resourceAttributes);
             xacmlPep.enforce(context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
@@ -1162,15 +1103,13 @@ public class DefaultAuthorization
             String target = Constants.ACTION.LIST_METHODS.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.RESOURCE.AS_OF_DATETIME.uri,
+                resourceAttributes.set(Constants.RESOURCE.AS_OF_DATETIME.uri,
                                    ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
-                                                    + name, e);
+                                                    + Constants.RESOURCE.AS_OF_DATETIME.uri, e);
             }
             context.setResourceAttributes(resourceAttributes);
             xacmlPep.enforce(context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
@@ -1247,17 +1186,21 @@ public class DefaultAuthorization
             String target = Constants.ACTION.INTERNAL_DSSTATE.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.ID.uri, id);
-                name = resourceAttributes
-                        .setReturn(Constants.DATASTREAM.STATE.uri,
-                                   state);
+                resourceAttributes
+                        .set(Constants.DATASTREAM.ID.uri, id);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
-                                                    + name, e);
+                                                    + Constants.DATASTREAM.ID.uri, e);
+            }
+            try {
+                resourceAttributes
+                        .set(Constants.DATASTREAM.STATE.uri, state);
+            } catch (Exception e) {
+                context.setResourceAttributes(null);
+                throw new AuthzOperationalException(target + " couldn't set "
+                                                    + Constants.DATASTREAM.STATE.uri, e);
             }
             context.setResourceAttributes(resourceAttributes);
             xacmlPep.enforce(context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
@@ -1280,17 +1223,16 @@ public class DefaultAuthorization
             String target = Constants.ACTION.RESOLVE_DATASTREAM.uri;
             context.setResourceAttributes(null);
             MultiValueMap actionAttributes = new MultiValueMap();
-            String name = "";
             try {
                 String ticketIssuedDateTimeString =
                         DateUtility.convertDateToString(ticketIssuedDateTime);
-                name = actionAttributes
-                        .setReturn(Constants.RESOURCE.TICKET_ISSUED_DATETIME.uri,
+                actionAttributes
+                        .set(Constants.RESOURCE.TICKET_ISSUED_DATETIME.uri,
                                    ticketIssuedDateTimeString);
             } catch (Exception e) {
                 context.setActionAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
-                                                    + name, e);
+                                                    + Constants.RESOURCE.TICKET_ISSUED_DATETIME.uri, e);
             }
             context.setActionAttributes(actionAttributes);
             xacmlPep.enforce(context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
@@ -1335,14 +1277,13 @@ public class DefaultAuthorization
             String target = Constants.ACTION.GET_RELATIONSHIPS.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
             try {
-                name = resourceAttributes.setReturn(Constants.OBJECT.PID.uri,
+                resourceAttributes.set(Constants.OBJECT.PID.uri,
                                                     pid);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
-                                                    + name, e);
+                                                    + Constants.OBJECT.PID.uri, e);
             }
             context.setResourceAttributes(resourceAttributes);
             xacmlPep.enforce(context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
@@ -1368,14 +1309,13 @@ public class DefaultAuthorization
             String target = Constants.ACTION.ADD_RELATIONSHIP.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
             try {
-                name = resourceAttributes.setReturn(Constants.OBJECT.PID.uri,
+                resourceAttributes.set(Constants.OBJECT.PID.uri,
                                                     pid);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
-                                                    + name, e);
+                                                    + Constants.OBJECT.PID.uri, e);
             }
             context.setResourceAttributes(resourceAttributes);
             xacmlPep.enforce(context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
@@ -1401,14 +1341,13 @@ public class DefaultAuthorization
             String target = Constants.ACTION.PURGE_RELATIONSHIP.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
             try {
-                name = resourceAttributes.setReturn(Constants.OBJECT.PID.uri,
+                resourceAttributes.set(Constants.OBJECT.PID.uri,
                                                     pid);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
-                                                    + name, e);
+                                                    + Constants.OBJECT.PID.uri, e);
             }
             context.setResourceAttributes(resourceAttributes);
             xacmlPep.enforce(context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
@@ -1430,12 +1369,11 @@ public class DefaultAuthorization
             context.setActionAttributes(null);
             context.setResourceAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
             try {
-                name = resourceAttributes.setReturn(Constants.DATASTREAM.FILE_URI.uri, fileURI);
+                resourceAttributes.set(Constants.DATASTREAM.FILE_URI.uri, fileURI);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
-                throw new AuthzOperationalException(target + " couldn't be set " + name, e);
+                throw new AuthzOperationalException(target + " couldn't be set " + Constants.DATASTREAM.FILE_URI.uri, e);
             }
             context.setResourceAttributes(resourceAttributes);
             xacmlPep.enforce(context
@@ -1458,15 +1396,14 @@ public class DefaultAuthorization
             String target = Constants.ACTION.VALIDATE.uri;
             context.setActionAttributes(null);
             MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
             try {
-                name = resourceAttributes
-                        .setReturn(Constants.RESOURCE.AS_OF_DATETIME.uri,
+                resourceAttributes
+                        .set(Constants.RESOURCE.AS_OF_DATETIME.uri,
                                    ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
-                                                    + name, e);
+                                                    + Constants.RESOURCE.AS_OF_DATETIME.uri, e);
             }
             context.setResourceAttributes(resourceAttributes);
             xacmlPep.enforce(context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),

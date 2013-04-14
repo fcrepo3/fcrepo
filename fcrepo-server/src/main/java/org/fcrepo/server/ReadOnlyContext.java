@@ -12,15 +12,11 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.servletfilters.ExtendedHttpServletRequest;
+import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.fcrepo.common.Constants;
-
-import org.fcrepo.server.security.servletfilters.ExtendedHttpServletRequest;
-
-import org.fcrepo.utilities.DateUtility;
 
 
 
@@ -107,7 +103,7 @@ public class ReadOnlyContext
             extendedHttpServletRequest = (ExtendedHttpServletRequest) request;
         }
     }
-    
+
     public void setEnvironmentValues(MultiValueMap environmentAttributes) {
         m_environmentAttributes = environmentAttributes;
         if (m_environmentAttributes == null) {
@@ -336,37 +332,38 @@ public class ReadOnlyContext
             if (auxSubjectRoles == null) {
                 logger.debug("IN CONTEXT auxSubjectRoles == null");
             } else {
-                logger.debug("IN CONTEXT processing auxSubjectRoles=="
-                        + auxSubjectRoles);
-                logger.debug("IN CONTEXT processing auxSubjectRoles.keySet()=="
-                        + auxSubjectRoles.keySet());
-                logger.debug("IN CONTEXT processing auxSubjectRoles.keySet().isEmpty()=="
-                                + auxSubjectRoles.keySet().isEmpty());
+                logger.debug("IN CONTEXT processing auxSubjectRoles=={}",
+                        auxSubjectRoles);
+                logger.debug("IN CONTEXT processing auxSubjectRoles.keySet()=={}",
+                        auxSubjectRoles.keySet());
+                logger.debug("IN CONTEXT processing auxSubjectRoles.keySet().isEmpty()=={}",
+                                auxSubjectRoles.keySet().isEmpty());
                 Iterator auxSubjectRoleKeys =
                         auxSubjectRoles.keySet().iterator();
-                logger.debug("IN CONTEXT processing auxSubjectRoleKeys=="
-                        + auxSubjectRoleKeys);
+                logger.debug("IN CONTEXT processing auxSubjectRoleKeys=={}",
+                        auxSubjectRoleKeys);
                 while (auxSubjectRoleKeys.hasNext()) {
                     Object name = auxSubjectRoleKeys.next();
                     logger.debug("IN CONTEXT name==" + name);
                     if (name instanceof String) {
-                        logger.debug("IN CONTEXT name is string==" + name);
+                        logger.debug("IN CONTEXT name is string=={}", name);
                         Object value = auxSubjectRoles.get(name);
                         if (value instanceof String
                                 || value instanceof String[]) {
                             logger.debug("IN CONTEXT value is string([])");
                             if (value instanceof String) {
-                                logger.debug("IN CONTEXT value is string=="
-                                        + (String) value);
+                                logger.debug("IN CONTEXT value is string=={}",value);
+                                subjectMap.set((String) name, (String)value);
                             }
                             if (value instanceof String[]) {
                                 logger.debug("IN CONTEXT value is string[]");
-                                for (int z = 0; z < ((String[]) value).length; z++) {
-                                    logger.debug("IN CONTEXT this value=="
-                                            + ((String[]) value)[z]);
+                                String [] values = (String[]) value;
+                                for (int z = 0; z < values.length; z++) {
+                                    logger.debug("IN CONTEXT this value=={}",
+                                                 values[z]);
                                 }
+                                subjectMap.set((String) name, values);
                             }
-                            subjectMap.set((String) name, value);
                         } else if (value instanceof Set) {
                             String temp[] = new String[((Set) value).size()];
                             int i = 0;
