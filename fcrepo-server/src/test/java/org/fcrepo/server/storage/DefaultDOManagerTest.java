@@ -27,6 +27,7 @@ import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.MalformedPidException;
 import org.fcrepo.server.errors.ObjectExistsException;
+import org.fcrepo.server.errors.ObjectLockedException;
 import org.fcrepo.server.errors.StorageDeviceException;
 import org.fcrepo.server.management.BasicPIDGenerator;
 import org.fcrepo.server.management.ManagementModule;
@@ -38,10 +39,11 @@ import org.fcrepo.server.utilities.SQLUtility;
 import org.fcrepo.server.validation.DOObjectValidatorModule;
 import org.fcrepo.server.validation.DOValidatorModule;
 import org.junit.Test;
+import static org.junit.Assert.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultDOManagerTest extends MultithreadedTestCase
+public class DefaultDOManagerTest
 {
     private static final Logger logger =
             LoggerFactory.getLogger(DefaultDOManagerTest.class.getName());
@@ -54,8 +56,7 @@ public class DefaultDOManagerTest extends MultithreadedTestCase
     @Mocked Server server;
     @Mocked Context context;
 
-    DefaultDOManager getInstance() throws Exception
-    {
+    DefaultDOManager getInstance() throws Exception {
         final Map<String, String> params = new HashMap<String,String>();
         params.put("pidNamespace", "changeme");
         params.put("defaultExportFormat", "info:fedora/fedora-system:FOXML-1.1");
@@ -81,8 +82,7 @@ public class DefaultDOManagerTest extends MultithreadedTestCase
         instance.initModule();
 
         // postInitModule expectations
-        new NonStrictExpectations(instance, SQLUtility.class )
-        {
+        new NonStrictExpectations(instance, SQLUtility.class ) {
             @Mocked ManagementModule management;
             @Mocked DefaultExternalContentManager externalContentManager;
             @Mocked BasicPIDGenerator pidGenerator;
@@ -108,17 +108,14 @@ public class DefaultDOManagerTest extends MultithreadedTestCase
                 invoke(instance, "initializeCModelDeploymentCache");
                 // Server.getPID must be overridden
                 Server.getPID(anyString);
-                result = new Delegate()
-                {
-                    PID getPID(String pidString) throws MalformedPidException
-                    {
+                result = new Delegate() {
+                    PID getPID(String pidString) throws MalformedPidException {
                         try {
                             return new PID(pidString);
                         } catch (MalformedPIDException e) {
                             throw new MalformedPidException(e.getMessage());
                         }
                     }
-
                 };
                 // XMLDatastreamProcessor mocks
                 Server.getInstance((File) any, false); result = server;
@@ -137,8 +134,7 @@ public class DefaultDOManagerTest extends MultithreadedTestCase
         final DefaultDOManager instance = getInstance();
         InputStream in = new ByteArrayInputStream("".getBytes(ENCODING));
 
-        new Expectations(instance)
-        {
+        new Expectations(instance) {
             {
                 instance.objectExists(anyString); result = false;
                 invoke(instance, "registerObject", withAny(DigitalObject.class));
@@ -153,8 +149,7 @@ public class DefaultDOManagerTest extends MultithreadedTestCase
         final DefaultDOManager instance = getInstance();
         InputStream in = new ByteArrayInputStream("".getBytes(ENCODING));
 
-        new Expectations(instance)
-        {
+        new Expectations(instance) {
             {
                 instance.objectExists(anyString); result = true;
             }
@@ -163,139 +158,225 @@ public class DefaultDOManagerTest extends MultithreadedTestCase
     }
 
     @Test (expected=ObjectExistsException.class)
-    public void testGetIngestWriterThrowsIfObjectIsCreatedTwice() throws Exception
-    {
+    public void testGetIngestWriterThrowsIfObjectIsCreatedTwice() throws Exception {
         final DefaultDOManager instance = getInstance();
         InputStream in = new ByteArrayInputStream("".getBytes(ENCODING));
 
-        new Expectations(instance)
-        {
+        new Expectations(instance) {
             {
                 instance.objectExists(anyString);
                 times = 2;
                 result = false;
                 result = true;
                 invoke(instance, "registerObject", withAny(DigitalObject.class));
+                instance.doCommit( anyBoolean, context, (DigitalObject)any, anyString, anyBoolean );
             }
         };
-        instance.getIngestWriter(Server.USE_DEFINITIVE_STORE, context, in, FORMAT, ENCODING, obj1);
-        instance.getIngestWriter(Server.USE_DEFINITIVE_STORE, context, in, FORMAT, ENCODING, obj1);
+        DOWriter ingestWriter = instance.getIngestWriter(Server.USE_DEFINITIVE_STORE, context, in, FORMAT, ENCODING, obj1);
+        ingestWriter.commit( "" );
+        instance.releaseWriter( ingestWriter );
+        ingestWriter = instance.getIngestWriter(Server.USE_DEFINITIVE_STORE, context, in, FORMAT, ENCODING, obj1);
+        instance.releaseWriter( ingestWriter );
+    }
+
+    class TestWhenThreadSwitchesBetweenCheckAndRegisterObject extends MultithreadedTestCase {
+        @Override
+        public void initialize() {
+            super.initialize();
+            try {
+                manager = getInstance();
+                final AtomicBoolean objectRegistered = new AtomicBoolean(false);
+                final AtomicBoolean objectExistsFirst = new AtomicBoolean(true);
+                new Expectations(manager) {
+                    {
+                        manager.objectExists(anyString);
+                        minTimes = 1;
+                        result = new Delegate() {
+                            public boolean objectExists(String pid) {
+                                logger.info( "{} - enter objectExists", Thread.currentThread().getName() );
+                                boolean exists = objectRegistered.get();
+                                logger.info( "{} - objectExists: {}", Thread.currentThread().getName(), exists );
+                                // First thread that passes here waits and lets the other thread register the object first
+                                if (objectExistsFirst.getAndSet( false )) {
+                                    logger.info( "{} - putting thread in wait", Thread.currentThread().getName() );
+                                    waitForTick(1);
+                                }
+                                return exists;
+                            }
+                        };
+                        invoke(manager, "registerObject", withAny(DigitalObject.class));
+                        minTimes = 1;
+                        result = new Delegate() {
+                            public void registerObject(DigitalObject ovj) throws StorageDeviceException
+                            {
+                                logger.info( "{} - enter registerObject", Thread.currentThread().getName() );
+                                // First thread that passes here waits and lets the other thread register the object first
+
+                                if (objectRegistered.getAndSet( true))
+                                {
+                                    throw new StorageDeviceException( "duplicate registration");
+                                }
+                                logger.info( "{} - registerObject object registered", Thread.currentThread().getName() );
+                                waitForTick(1);
+                            }
+                        };
+                        invoke(manager, "unregisterObject", withAny(DigitalObject.class));
+                        times = 1;
+                    }
+                };
+
+            } catch( Exception ex ) {
+                ex.printStackTrace();
+                fail( ex.toString() );
+            }
+        }
+
+        private void taskForThread()
+        {
+            InputStream in = null;
+            try {
+                in = new ByteArrayInputStream("".getBytes(ENCODING));
+                DOWriter ingestWriter = manager.getIngestWriter(Server.USE_DEFINITIVE_STORE, context, in, FORMAT, ENCODING, obj1);
+                successes.incrementAndGet();
+                logger.info( "{} - thread task completed", Thread.currentThread().getName() );
+                waitForTick( 2 );
+                manager.releaseWriter( ingestWriter );
+            } catch ( ObjectLockedException | ObjectExistsException ex ) {
+                logger.info( "{} - thread caught expected exception: {}", Thread.currentThread().getName(), ex );
+                expectedFailures.incrementAndGet();
+            } catch( Exception ex ) {
+                logger.error( Thread.currentThread().getName() + " - Exception", ex);
+                unexpectedFailures.incrementAndGet();
+            }
+            finally {
+                try {
+                    in.close();
+                } catch( IOException ex ) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        public void thread1() throws InterruptedException {
+            taskForThread();
+        }
+
+        public void thread2() throws InterruptedException {
+            taskForThread();
+        }
     }
 
     @Test
-    public void testMultithreaded() throws Throwable
-    {
+    public void testMultithreadedThreadSwitchesBetweenCheckAndRegisterObject() throws Throwable {
+        TestWhenThreadSwitchesBetweenCheckAndRegisterObject test = new TestWhenThreadSwitchesBetweenCheckAndRegisterObject();
         int count = 1;
-        TestFramework.runManyTimes( this, count );
+        TestFramework.runManyTimes( test, count );
         assertEquals( count, successes.get() );
         assertEquals( count, expectedFailures.get() );
         assertEquals( 0, unexpectedFailures.get() );
     }
 
+    class TestWhenThreadSwitchesBetweenCheckAndRegisterObjectAndSecondThreadCompletesFirst extends MultithreadedTestCase
+    {
+        @Override
+        public void initialize() {
+            super.initialize();
+            try {
+                manager = getInstance();
+                final AtomicBoolean objectRegistered = new AtomicBoolean(false);
+                final AtomicBoolean objectExistsFirst = new AtomicBoolean(true);
+                new Expectations(manager) {
+                    {
+                        manager.objectExists(anyString);
+                        minTimes = 1;
+                        result = new Delegate() {
+                            public boolean objectExists(String pid) {
+                                logger.info( "{} - enter objectExists", Thread.currentThread().getName() );
+                                boolean exists = objectRegistered.get();
+                                logger.info( "{} - objectExists: {}", Thread.currentThread().getName(), exists );
+                                // First thread that passes here waits and lets the other thread register the object first
+                                if (objectExistsFirst.getAndSet( false )) {
+                                    logger.info( "{} - putting thread in wait", Thread.currentThread().getName() );
+                                    waitForTick(1);
+                                }
+                                return exists;
+                            }
+                        };
+                        invoke(manager, "registerObject", withAny(DigitalObject.class));
+                        minTimes = 1;
+                        result = new Delegate() {
+                            public void registerObject(DigitalObject ovj) throws StorageDeviceException
+                            {
+                                logger.info( "{} - enter registerObject", Thread.currentThread().getName() );
+
+                                if (objectRegistered.getAndSet( true)) {
+                                    throw new StorageDeviceException( "duplicate registration");
+                                }
+                                logger.info( "{} - registerObject object registered", Thread.currentThread().getName() );
+                            }
+                        };
+                        //invoke(manager, "unregisterObject", withAny(DigitalObject.class));
+                        manager.doCommit( anyBoolean, context, (DigitalObject)any, anyString, anyBoolean );
+                        times = 1;
+                    }
+                };
+
+            } catch( Exception ex ) {
+                ex.printStackTrace();
+                fail( ex.toString() );
+            }
+        }
+
+        private void taskForThread()
+        {
+            InputStream in = null;
+            try {
+                in = new ByteArrayInputStream("".getBytes(ENCODING));
+                DOWriter ingestWriter = manager.getIngestWriter(Server.USE_DEFINITIVE_STORE, context, in, FORMAT, ENCODING, obj1);
+                successes.incrementAndGet();
+                ingestWriter.commit( "" );
+                manager.releaseWriter( ingestWriter );
+                logger.info( "{} - thread task completed", Thread.currentThread().getName() );
+                // Waiting thread is resumed after writer is released
+                waitForTick(1);
+            } catch ( ObjectLockedException | ObjectExistsException ex ) {
+                logger.info( "{} - thread caught expected exception: {}", Thread.currentThread().getName(), ex );
+                expectedFailures.incrementAndGet();
+            } catch( Exception ex ) {
+                logger.error( Thread.currentThread().getName() + " - Exception", ex);
+                unexpectedFailures.incrementAndGet();
+            } finally {
+                try {
+                    in.close();
+                } catch( IOException ex ) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        public void thread1() throws InterruptedException {
+            taskForThread();
+        }
+
+        public void thread2() throws InterruptedException {
+            taskForThread();
+        }
+    }
+
+    @Test
+    public void testMultithreadedThreadWhenThreadSwitchesBetweenCheckAndRegisterObjectAndSecondThreadCompletesFirst() throws Throwable {
+        TestWhenThreadSwitchesBetweenCheckAndRegisterObjectAndSecondThreadCompletesFirst test =
+                new TestWhenThreadSwitchesBetweenCheckAndRegisterObjectAndSecondThreadCompletesFirst();
+        int count = 1;
+        TestFramework.runManyTimes( test, count );
+        assertEquals( count, successes.get() );
+        assertEquals( count, expectedFailures.get() );
+        assertEquals( 0, unexpectedFailures.get() );
+    }
+
+
     DefaultDOManager manager;
     AtomicInteger successes = new AtomicInteger();
     AtomicInteger expectedFailures = new AtomicInteger();
     AtomicInteger unexpectedFailures = new AtomicInteger();
-
-    @Override
-    public void initialize()
-    {
-        super.initialize();
-        try
-        {
-            manager = getInstance();
-            final AtomicBoolean objectRegistered = new AtomicBoolean(false);
-            final AtomicBoolean registerObjectFirst = new AtomicBoolean(true);
-            new Expectations(manager)
-            {
-                {
-                    manager.objectExists(anyString);
-                    times = 2;
-                    result = new Delegate() {
-                        public boolean objectExists(String pid) {
-                            logger.info( "{} - enter objectExists", Thread.currentThread().getName() );
-                            boolean exists = objectRegistered.get();
-                            logger.info( "{} - objectExists: {}", Thread.currentThread().getName(), exists );
-                            return exists;
-                        }
-                    };
-                    invoke(manager, "registerObject", withAny(DigitalObject.class));
-                    minTimes = 1;
-                    result = new Delegate() {
-                        public void registerObject(DigitalObject ovj) throws StorageDeviceException
-                        {
-                            logger.info( "{} - enter registerObject", Thread.currentThread().getName() );
-                            // First thread that passes here waits and lets the other thread register the object first
-                            boolean localRegisterObjectFirst = registerObjectFirst.getAndSet( false );
-                            if ( localRegisterObjectFirst ) {
-                                waitForTick(1);
-                            }
-
-                            if (objectRegistered.getAndSet( true))
-                            {
-                                throw new StorageDeviceException( "duplicate registration");
-                            }
-                            logger.info( "{} - registerObject object registered", Thread.currentThread().getName() );
-
-                            // Second thread that passes here lets the first thread continue
-                            if ( !localRegisterObjectFirst ) {
-                                waitForTick(1);
-                            }
-                        }
-                    };
-                    invoke(manager, "unregisterObject", withAny(DigitalObject.class));
-                    times = 1;
-                }
-            };
-
-        }
-        catch( Exception ex )
-        {
-            ex.printStackTrace();
-            fail( ex.toString() );
-        }
-    }
-
-    private void taskForThread()
-    {
-        InputStream in = null;
-        try
-        {
-            in = new ByteArrayInputStream("".getBytes(ENCODING));
-            DOWriter ingestWriter = manager.getIngestWriter(Server.USE_DEFINITIVE_STORE, context, in, FORMAT, ENCODING, obj1);
-            successes.incrementAndGet();
-            waitForTick( 2 );
-            manager.releaseWriter( ingestWriter );
-        }
-        catch ( ObjectExistsException ex )
-        {
-            expectedFailures.incrementAndGet();
-        }
-        catch( Exception ex )
-        {
-            logger.error( Thread.currentThread().getName() + " - Exception", ex);
-            unexpectedFailures.incrementAndGet();
-        }
-        finally
-        {
-            try
-            {
-                in.close();
-            }
-            catch( IOException ex )
-            {
-                ex.printStackTrace();
-            }
-        }
-    }
-    public void thread1() throws InterruptedException {
-        taskForThread();
-    }
-
-    public void thread2() throws InterruptedException {
-        taskForThread();
-    }
-
     // Supports legacy test runners
     public static junit.framework.Test suite() {
         return new junit.framework.JUnit4TestAdapter(DefaultDOManagerTest.class);
