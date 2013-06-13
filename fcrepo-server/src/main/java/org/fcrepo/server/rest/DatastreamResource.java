@@ -15,6 +15,8 @@ import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamDef;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.utilities.DateUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.DELETE;
@@ -65,6 +67,8 @@ import java.util.List;
 @Component
 public class DatastreamResource
         extends BaseRestResource {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatastreamResource.class);
 
     public DatastreamResource(Server server) {
         super(server);
@@ -414,6 +418,7 @@ public class DatastreamResource
                                              boolean flash) {
 
         try {
+        	LOGGER.info("addOrUpdate");
             String[] altIDs = {};
 
             if (altIDList != null && altIDList.size() > 0) {
@@ -450,9 +455,8 @@ public class DatastreamResource
 
             // Determine if datastream content is included in the request
             if (!ignoreContent) {
-                RestUtil restUtil = new RestUtil();
                 RequestContent content =
-                        restUtil.getRequestContent(m_servletRequest, m_headers);
+                        RestUtil.getRequestContent(m_servletRequest, m_headers);
 
                 if (content != null && content.getContentStream() != null) {
                     is = content.getContentStream();
@@ -461,6 +465,8 @@ public class DatastreamResource
                         mimeType = content.getMimeType();
                     }
                 }
+            } else {
+            	LOGGER.warn("ignoring content on {}/{}", pid, dsID);
             }
 
             // Make sure that there is a mime type value
@@ -480,9 +486,16 @@ public class DatastreamResource
 
             if (existingDS == null) {
                 if (posted) {
+                	LOGGER.debug("new ds posted at {}/{}", pid, dsID);
                     if ((dsLocation == null || dsLocation.equals(""))
                             && ("X".equals(controlGroup) || "M"
                                     .equals(controlGroup))) {
+                    	if (is == null) {
+                    		LOGGER.warn("No content stream to copy for {}/{}",
+                    				pid, dsID);
+                    		return Response.status(Response.Status.BAD_REQUEST)
+                    				.build();
+                    	}
                         dsLocation = m_management.putTempStream(context, is);
                     }
                     dsID =
@@ -501,6 +514,7 @@ public class DatastreamResource
                                                       checksum,
                                                       logMessage);
                 } else {
+                	LOGGER.warn("new ds but no posted content at {}/{}", pid, dsID);
                     return Response.status(Response.Status.NOT_FOUND).build();
                 }
             } else {
@@ -601,6 +615,7 @@ public class DatastreamResource
             builder.entity(xml);
             return builder.build();
         } catch (Exception ex) {
+        	LOGGER.warn(ex.getMessage(), ex);
             return handleException(ex, flash);
         }
     }
