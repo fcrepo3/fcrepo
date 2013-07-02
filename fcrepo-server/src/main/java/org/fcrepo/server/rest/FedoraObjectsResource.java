@@ -463,9 +463,8 @@ public class FedoraObjectsResource extends BaseRestResource {
             InputStream is = null;
 
             // Determine if content is provided
-            RestUtil restUtil = new RestUtil();
             RequestContent content =
-                    restUtil.getRequestContent(m_servletRequest, headers);
+                    RestUtil.getRequestContent(m_servletRequest, headers);
             if (content != null && content.getContentStream() != null) {
                 if (ignoreMime) {
                     is = content.getContentStream();

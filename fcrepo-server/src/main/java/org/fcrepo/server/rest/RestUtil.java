@@ -28,15 +28,15 @@ import org.slf4j.LoggerFactory;
  *
  * @author Bill Branan
  */
-public class RestUtil {
+public abstract class RestUtil {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected static final Logger logger = LoggerFactory.getLogger(RestUtil.class);
 
     /**
      * Retrieves the contents of the HTTP Request.
      * @return InputStream from the request
      */
-    public RequestContent getRequestContent(HttpServletRequest request,
+    public static RequestContent getRequestContent(HttpServletRequest request,
                                             HttpHeaders headers)
     throws Exception {
         RequestContent rContent = null;
@@ -44,6 +44,7 @@ public class RestUtil {
         // See if the request is a multi-part file upload request
         if(ServletFileUpload.isMultipartContent(request)) {
 
+        	logger.debug("processing multipart content...");
             // Create a new file upload handler
             ServletFileUpload upload = new ServletFileUpload();
 
@@ -60,21 +61,28 @@ public class RestUtil {
                     if(itemHeaders != null) {
                         String contentLength = itemHeaders.getHeader("Content-Length");
                         if(contentLength != null) {
-                            rContent.size = Integer.parseInt(contentLength);
+                            rContent.size = Long.parseLong(contentLength);
                         }
                     }
 
                     break;
+                } else {
+                	logger.trace("ignoring form field \"{}\" \"{}\"", item.getFieldName(), item.getName());
                 }
             }
         } else {
             // If the content stream was not been found as a multipart,
             // try to use the stream from the request directly
             if(rContent == null) {
-                if (request.getContentLength() > 0) {
+                String contentLength = request.getHeader("Content-Length");
+                long size = 0;
+                if(contentLength != null) {
+                    size = Long.parseLong(contentLength);
+                } else size = request.getContentLength();
+                if (size > 0) {
                   rContent = new RequestContent();
                   rContent.contentStream = request.getInputStream();
-                  rContent.size = request.getContentLength();
+                  rContent.size = size;
                 } else {
                     String transferEncoding =
                             request.getHeader("Transfer-Encoding");
@@ -87,6 +95,11 @@ public class RestUtil {
                             rContent = new RequestContent();
                             rContent.contentStream = bis;
                         }
+                    } else {
+                    	logger.warn(
+                    			"Expected chunked data not found- " +
+                    	        "Transfer-Encoding : {}, Content-Length: {}",
+                    	        transferEncoding, size);
                     }
                 }
             }
@@ -113,7 +126,7 @@ public class RestUtil {
         return rContent;
     }
 
-    class RequestContent {
+    static class RequestContent {
         private InputStream contentStream = null;
         private String mimeType = null;
         private long size = 0;
