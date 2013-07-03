@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
 import org.fcrepo.common.Constants;
@@ -133,7 +134,7 @@ public class DefaultDOManager extends Module implements DOManager {
 
     private int m_ingestValidationLevel;
 
-    private StringLock m_stringLock;
+    private Map<String, ReentrantLock> m_pidLocks;
 
     /**
      * Creates a new DefaultDOManager.
@@ -142,7 +143,7 @@ public class DefaultDOManager extends Module implements DOManager {
             Server server, String role)
             throws ModuleInitializationException {
         super(moduleParameters, server, role);
-	m_stringLock = new StringLock();
+        m_pidLocks = new HashMap< String, ReentrantLock >();
     }
 
     /**
@@ -612,11 +613,33 @@ public class DefaultDOManager extends Module implements DOManager {
     }
 
     private void releaseWriteLock(String pid) {
-	m_stringLock.unlock(pid);
+	    synchronized(m_pidLocks) {
+	    	ReentrantLock lock = m_pidLocks.get( pid );
+		    if( lock == null ) {
+			    throw new IllegalMonitorStateException( String.format( "Unlock called and no LockAdmin corresponding to the pid: '%s' found in the lockMap", pid ) );
+		    }
+	
+		    if( !lock.hasQueuedThreads() && lock.getHoldCount() == 1) {
+		    	m_pidLocks.remove( pid );
+	        }
+		    lock.unlock();
+	    }
     }
 
     private void getWriteLock(String pid) {
-	m_stringLock.lock(pid);
+		if( pid == null ) {
+		    throw new IllegalArgumentException("pid cannot be null");
+		}
+	
+		ReentrantLock lock = null;
+		synchronized(m_pidLocks) {
+		    lock = m_pidLocks.get( pid );
+		    if( lock == null ) {
+			    lock = new ReentrantLock();
+			    m_pidLocks.put( pid, lock );
+		    }
+		}
+		lock.lock();
     }
 
     public ConnectionPool getConnectionPool() {

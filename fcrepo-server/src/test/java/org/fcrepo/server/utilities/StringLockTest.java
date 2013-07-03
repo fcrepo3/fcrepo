@@ -1,6 +1,9 @@
 package org.fcrepo.server.utilities;
 
 
+import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -164,7 +167,7 @@ public class StringLockTest
      * Thread 2 releases lock on "id_1"
      *
      * This test is implemented using two threads in order to ensure
-     * readability. Thread 1 could be the current thread, but I belive
+     * readability. Thread 1 could be the current thread, but I believe
      * that would clutter the code.
      */
     @Test
@@ -177,23 +180,30 @@ public class StringLockTest
 	// the identifier "id_1":
 	class MyThread extends Thread
 	{
-	    public void lock() { sl3.lock( "id_1" ); }
-	    public void unlock() { sl3.unlock( "id_1" ); }
-
+		long time = 0;
 	    public void run() 
 	    {
+	    	sl3.lock( "id_1" );
+	    	time = new Date().getTime();
+	    	try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+	    	sl3.unlock("id_1");
 	    }
 	}
 
 	MyThread t1 = new MyThread();
 	MyThread t2 = new MyThread();
+	sl3.lock( "id_1" );
 	t1.start(); // starting thread 1
 	t2.start(); // starting thread 2
-
-	t1.lock();
-	t2.lock();
-	t1.unlock();
-	t2.unlock();
+	Thread.sleep(1); // let those threads start
+	sl3.unlock( "id_1" );
+	t1.join();
+	t2.join();
+    assertTrue(t1.time < t2.time);
     }
 
 }
