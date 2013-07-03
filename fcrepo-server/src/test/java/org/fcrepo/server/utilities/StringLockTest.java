@@ -1,5 +1,13 @@
+/* The contents of this file are subject to the license and copyright terms
+ * detailed in the license directory at the root of the source tree (also
+ * available online at http://fedora-commons.org/license/).
+ */
+
 package org.fcrepo.server.utilities;
 
+
+import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -108,18 +116,15 @@ public class StringLockTest
     {
 	final StringLock sl1 = new StringLock(); // needs unique name
 
-	// Creating inner class with thread for test
-	class MyThread extends Thread
-	{
+	sl1.lock( "id_1" );
+
+	Thread t = new Thread() {
 	    public void run() 
 	    {
 		sl1.lock( "id_2" );
 		sl1.unlock( "id_2" );
 	    }
-	}
-
-	sl1.lock( "id_1" );
-	MyThread t = new MyThread();
+	};
 	t.start();
 	t.join(); // waiting for other thread to finish
 	sl1.unlock( "id_1" );
@@ -140,15 +145,13 @@ public class StringLockTest
 	final StringLock sl2 = new StringLock(); // needs unique name
 
 	// Creating inner class with thread for test
-	class MyThread extends Thread
-	{
+
+	Thread t = new Thread() {
 	    public void run() 
 	    {
 		sl2.lock( "id_1" );
 	    }
-	}
-
-	MyThread t = new MyThread();
+	};
 	t.start(); // starting the other thread to get the lock
 	t.join(); // wait for the other thread to finish
 	sl2.unlock( "id_1" ); // unlock in current thread; this should throw an exception. 
@@ -164,7 +167,7 @@ public class StringLockTest
      * Thread 2 releases lock on "id_1"
      *
      * This test is implemented using two threads in order to ensure
-     * readability. Thread 1 could be the current thread, but I belive
+     * readability. Thread 1 could be the current thread, but I believe
      * that would clutter the code.
      */
     @Test
@@ -177,23 +180,31 @@ public class StringLockTest
 	// the identifier "id_1":
 	class MyThread extends Thread
 	{
-	    public void lock() { sl3.lock( "id_1" ); }
-	    public void unlock() { sl3.unlock( "id_1" ); }
-
+		volatile long time = 0;
 	    public void run() 
 	    {
+	    	sl3.lock( "id_1" );
+	    	time = new Date().getTime();
+	    	try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+	    	sl3.unlock("id_1");
 	    }
 	}
 
 	MyThread t1 = new MyThread();
 	MyThread t2 = new MyThread();
+	sl3.lock( "id_1" );
 	t1.start(); // starting thread 1
+	Thread.sleep(1); // let those threads start
 	t2.start(); // starting thread 2
-
-	t1.lock();
-	t2.lock();
-	t1.unlock();
-	t2.unlock();
+	Thread.sleep(1); // let those threads start
+	sl3.unlock( "id_1" );
+	t1.join();
+	t2.join();
+	assertTrue("T2 finished before T1: " + t1.time + " " + t2.time, t1.time < t2.time);
     }
 
 }

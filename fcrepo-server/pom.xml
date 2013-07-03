@@ -789,18 +789,16 @@
       <artifactId>mockito-core</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>com.googlecode.jmockit</groupId>
-      <artifactId>jmockit</artifactId>
-      <version>0.999.19</version>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
-      <groupId>com.googlecode.multithreadedtc</groupId>
-      <artifactId>multithreadedtc</artifactId>
-      <version>1.01</version>
-      <scope>test</scope>
+    	<groupId>org.powermock</groupId>
+    	<artifactId>powermock-module-junit4</artifactId>
+    	<scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.powermock</groupId>
+    	<artifactId>powermock-api-mockito</artifactId>
+    	<scope>test</scope>
     </dependency>
   </dependencies>
 </project>
