@@ -79,8 +79,10 @@ public class DefaultDOManagerTest
     @Mock ResourceIndexModule resourceIndexModule;
     @Mock ConnectionPoolManagerImpl connectionPoolManager;
     @Mock ConnectionPool mockPool;
+    @Mock Connection mockROConnection;
     @Mock DefaultLowlevelStorageModule lowlevelStorage;
     @Mock Module doManager;
+    @Mock ResultSet pidExists;
     
     @Before
     public void setUp() {
@@ -111,6 +113,8 @@ public class DefaultDOManagerTest
         
         when(connectionPoolManager.getPool()).thenReturn(mockPool);
         when(connectionPoolManager.getPool(anyString())).thenReturn(mockPool);
+        
+        when(mockPool.getReadOnlyConnection()).thenReturn(mockROConnection);
 
         // Server.getPID must be overridden
 
@@ -118,25 +122,45 @@ public class DefaultDOManagerTest
         // Static method needs to be mocked- do we import PowerMockito?
         mockStatic(Server.class);
         when(Server.getInstance(any(File.class), eq(false))).thenReturn(server);
+        when(Server.getPID(anyString())).thenReturn(new PID(obj1));
         mockStatic(SQLUtility.class);
         //result = server;
         when(server.getModule("org.fcrepo.server.storage.DOManager")).thenReturn(instance);
 
+        PreparedStatement mockStmt = mock(PreparedStatement.class);
+        ResultSet mockResult = mock(ResultSet.class);
+        when(mockStmt.executeQuery()).thenReturn(mockResult);
+        when(mockROConnection.prepareStatement(
+                eq(DefaultDOManager.CMODEL_QUERY),
+                eq(ResultSet.TYPE_FORWARD_ONLY),
+                eq(ResultSet.CONCUR_READ_ONLY)))
+                .thenReturn(mockStmt);
+        
+        PreparedStatement mockExistsStmt = mock(PreparedStatement.class);
+        when(mockExistsStmt.executeQuery()).thenReturn(pidExists);
+
+        when(mockROConnection.prepareStatement(eq(DefaultDOManager.REGISTERED_PID_QUERY)))
+            .thenReturn(mockExistsStmt);
         instance.postInitModule();
 
         return instance;
     }
 
     @Test
-    public void testGetIngestWriterSucceeds() throws Exception
-    {
+    public void testGetIngestWriterSucceeds()
+            throws Exception {
         final DefaultDOManager instance = getInstance();
         InputStream in = new ByteArrayInputStream("".getBytes(ENCODING));
 
-        when(instance.objectExists(anyString())).thenReturn(false);
-        //verify(instance).registerObject(any(DigitalObject.class));
-        //invoke(instance, "registerObject", withAny(DigitalObject.class));
+        when(pidExists.next()).thenReturn(false).thenReturn(true);
+        Connection mockRWConnection = mock(Connection.class);
+        when(mockPool.getReadWriteConnection()).thenReturn(mockRWConnection);
+        
+        PreparedStatement mockInsert = mock(PreparedStatement.class);
+        when(mockRWConnection.prepareStatement(
+                eq(DefaultDOManager.INSERT_PID_QUERY))).thenReturn(mockInsert);
         instance.getIngestWriter(Server.USE_DEFINITIVE_STORE, context, in, FORMAT, ENCODING, obj1);
+        verify(mockInsert).executeUpdate();
     }
 
     @Test (expected=ObjectExistsException.class)
@@ -145,42 +169,9 @@ public class DefaultDOManagerTest
         final DefaultDOManager instance = getInstance();
         InputStream in = new ByteArrayInputStream("".getBytes(ENCODING));
 
-        String objectExistsQuery = "SELECT doPID FROM doRegistry WHERE doPID=?";
-        Connection mockConn = mock(Connection.class);
-        PreparedStatement mockStmt = mock(PreparedStatement.class);
-        when(mockConn.prepareStatement(objectExistsQuery))
-            .thenReturn(mockStmt);
-        when(mockPool.getReadOnlyConnection()).thenReturn(mockConn);
-        when(mockStmt.execute()).thenReturn(true);
-        ResultSet mockResults = mock(ResultSet.class);
-        
-        when(mockStmt.getResultSet()).thenReturn(mockResults);
-        when(mockResults.next()).thenReturn(true);
+        when(pidExists.next()).thenReturn(true);
 
         instance.getIngestWriter(Server.USE_DEFINITIVE_STORE, context, in, FORMAT, ENCODING, obj1);
-    }
-
-    @Test (expected=ObjectExistsException.class)
-    public void testGetIngestWriterThrowsIfObjectIsCreatedTwice() throws Exception {
-        final DefaultDOManager instance = getInstance();
-        InputStream in = new ByteArrayInputStream("".getBytes(ENCODING));
-        String objectExistsQuery = "SELECT doPID FROM doRegistry WHERE doPID=?";
-        Connection mockConn = mock(Connection.class);
-        PreparedStatement mockStmt = mock(PreparedStatement.class);
-        when(mockConn.prepareStatement(objectExistsQuery))
-            .thenReturn(mockStmt);
-        when(mockPool.getReadOnlyConnection()).thenReturn(mockConn);
-        when(mockStmt.execute()).thenReturn(true);
-        ResultSet mockResults = mock(ResultSet.class);
-        
-        when(mockStmt.getResultSet()).thenReturn(mockResults);
-        when(mockResults.next()).thenReturn(false).thenReturn(true);
-
-        DOWriter ingestWriter = instance.getIngestWriter(Server.USE_DEFINITIVE_STORE, context, in, FORMAT, ENCODING, obj1);
-        ingestWriter.commit( "" );
-        instance.releaseWriter( ingestWriter );
-        ingestWriter = instance.getIngestWriter(Server.USE_DEFINITIVE_STORE, context, in, FORMAT, ENCODING, obj1);
-        instance.releaseWriter( ingestWriter );
     }
 
 //    class TestWhenThreadSwitchesBetweenCheckAndRegisterObject extends MultithreadedTestCase {

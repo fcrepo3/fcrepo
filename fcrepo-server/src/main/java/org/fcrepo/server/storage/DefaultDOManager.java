@@ -91,7 +91,20 @@ public class DefaultDOManager extends Module implements DOManager {
             .getLogger(DefaultDOManager.class);
 
     private static final Pattern URL_PROTOCOL = Pattern.compile("^\\w+:\\/.*$");
+    
+    public static String CMODEL_QUERY =
+        "SELECT cModel, sDef, sDep, mDate " +
+        " FROM modelDeploymentMap, doFields " +
+        " WHERE doFields.pid = modelDeploymentMap.sDep";
 
+
+    public static String REGISTERED_PID_QUERY =
+            "SELECT doPID FROM doRegistry WHERE doPID=?";
+    
+    public static String INSERT_PID_QUERY =
+            "INSERT INTO doRegistry (doPID, ownerId, label) VALUES (?, ?, ?)";
+
+    
     private String m_pidNamespace;
 
     protected String m_storagePool;
@@ -433,12 +446,7 @@ public class DefaultDOManager extends Module implements DOManager {
         ResultSet r = null;
         try {
             c = m_connectionPool.getReadOnlyConnection();
-            String query =
-                    "SELECT cModel, sDef, sDep, mDate "
-                            + " FROM modelDeploymentMap, doFields "
-                            + " WHERE doFields.pid = modelDeploymentMap.sDep";
-            s =
-                    c.prepareStatement(query, ResultSet.TYPE_FORWARD_ONLY,
+            s = c.prepareStatement(CMODEL_QUERY, ResultSet.TYPE_FORWARD_ONLY,
                             ResultSet.CONCUR_READ_ONLY);
             ResultSet results = s.executeQuery();
 
@@ -1652,9 +1660,8 @@ public class DefaultDOManager extends Module implements DOManager {
         PreparedStatement s = null;
         ResultSet results = null;
         try {
-            String query = "SELECT doPID FROM doRegistry WHERE doPID=?";
             conn = m_connectionPool.getReadOnlyConnection();
-            s = conn.prepareStatement(query);
+            s = conn.prepareStatement(REGISTERED_PID_QUERY);
             s.setString(1, pid);
             results = s.executeQuery();
             return results.next(); // 'true' if match found, else 'false'
@@ -1697,10 +1704,8 @@ public class DefaultDOManager extends Module implements DOManager {
         Connection conn = null;
         PreparedStatement st = null;
         try {
-            String query =
-                    "INSERT INTO doRegistry (doPID, ownerId, label) VALUES (?, ?, ?)";
             conn = m_connectionPool.getReadWriteConnection();
-            st = conn.prepareStatement(query);
+            st = conn.prepareStatement(INSERT_PID_QUERY);
             st.setString(1, pid);
             st.setString(2, ownerID);
             st.setString(3, theLabel);
