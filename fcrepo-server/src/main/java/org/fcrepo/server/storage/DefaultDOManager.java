@@ -70,7 +70,6 @@ import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.DCFields;
 import org.fcrepo.server.utilities.SQLUtility;
 import org.fcrepo.server.utilities.StreamUtility;
-import org.fcrepo.server.utilities.StringLock;
 import org.fcrepo.server.validation.DOObjectValidator;
 import org.fcrepo.server.validation.DOValidator;
 import org.fcrepo.server.validation.ValidationUtility;
@@ -104,7 +103,12 @@ public class DefaultDOManager extends Module implements DOManager {
     public static String INSERT_PID_QUERY =
             "INSERT INTO doRegistry (doPID, ownerId, label) VALUES (?, ?, ?)";
 
-    
+    public static String PID_VERSION_QUERY =
+            "SELECT systemVersion FROM doRegistry WHERE doPID=?";
+
+    public static String PID_VERSION_UPDATE =
+            "UPDATE doRegistry SET systemVersion=? WHERE doPID=?";
+
     private String m_pidNamespace;
 
     protected String m_storagePool;
@@ -328,8 +332,8 @@ public class DefaultDOManager extends Module implements DOManager {
         }
         // get ref to fieldsearch module
         m_fieldSearch =
-                (FieldSearch) getServer().getModule(
-                        "org.fcrepo.server.search.FieldSearch");
+                getServer().getBean(
+                        "org.fcrepo.server.search.FieldSearch", FieldSearch.class);
         // get ref to pidgenerator
         m_pidGenerator =
                 (PIDGenerator) getServer().getModule(
@@ -943,14 +947,14 @@ public class DefaultDOManager extends Module implements DOManager {
                             throw new GeneralException("Error generating PID",
                                     e);
                         }
-                        logger.info("Generated new PID: " + p);
+                        logger.info("Generated new PID: {}", p);
                         obj.setPid(p);
                     } else {
                         logger.debug("Client wants to use existing PID.");
                     }
                 }
 
-                logger.info("New object PID is {}", obj.getPid());
+                logger.debug("New object PID is {}", obj.getPid());
 
                 // WRITE LOCK:
                 // ensure no one else can modify the object now
@@ -959,15 +963,15 @@ public class DefaultDOManager extends Module implements DOManager {
                 // CHECK REGISTRY:
                 // ensure the object doesn't already exist
                 if (objectExists(obj.getPid())) {
-		    releaseWriteLock(obj.getPid());
-		    throw new ObjectExistsException("The PID '" + obj.getPid() +
+                    releaseWriteLock(obj.getPid());
+                    throw new ObjectExistsException("The PID '" + obj.getPid() +
                             "' already exists in the registry; the object can't be re-created.");
                 }
 
                 // GET DIGITAL OBJECT WRITER:
                 // get an object writer configured with the DEFAULT export
                 // format
-                logger.debug("Getting new writer with default export format: " +
+                logger.debug("Getting new writer with default export format: {}",
                         m_defaultExportFormat);
                 logger.debug("Instantiating a SimpleDOWriter");
                 w =
@@ -1353,7 +1357,7 @@ public class DefaultDOManager extends Module implements DOManager {
                 // REGISTRY:
                 /*
                  * update systemVersion in doRegistry (add one), and update
-                 * deploymene maps if necesssary.
+                 * deployment maps if necessary.
                  */
                 logger.debug("Updating registry for " + pid);
                 Connection conn = null;
@@ -1361,9 +1365,7 @@ public class DefaultDOManager extends Module implements DOManager {
                 ResultSet results = null;
                 try {
                     conn = m_connectionPool.getReadWriteConnection();
-                    String query =
-                            "SELECT systemVersion FROM doRegistry WHERE doPID=?";
-                    s = conn.prepareStatement(query);
+                    s = conn.prepareStatement(PID_VERSION_QUERY);
                     s.setString(1, obj.getPid());
                     results = s.executeQuery();
                     if (!results.next()) {
@@ -1373,11 +1375,9 @@ public class DefaultDOManager extends Module implements DOManager {
                     }
                     int systemVersion = results.getInt("systemVersion");
                     systemVersion++;
-                    query =
-                            "UPDATE doRegistry SET systemVersion=" +
-                                    systemVersion + " WHERE doPID=?";
-                    s = conn.prepareStatement(query);
-                    s.setString(1, obj.getPid());
+                    s = conn.prepareStatement(PID_VERSION_UPDATE);
+                    s.setInt(1, systemVersion);
+                    s.setString(2, obj.getPid());
                     s.executeUpdate();
 
                     //TODO hasModel

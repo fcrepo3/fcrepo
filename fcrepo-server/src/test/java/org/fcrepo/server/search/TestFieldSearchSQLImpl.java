@@ -366,7 +366,7 @@ public class TestFieldSearchSQLImpl {
         protected void i_createNonExistingTables(ConnectionPool pool,
                 InputStream dbSpec) throws IOException,
                 InconsistentTableSpecException, SQLException {
-            fail("Unexpected call to MockSqlUtility.i_addRow");
+            fail("Unexpected call to MockSqlUtility.i_createNonExistingTables");
         }
 
         @Override
