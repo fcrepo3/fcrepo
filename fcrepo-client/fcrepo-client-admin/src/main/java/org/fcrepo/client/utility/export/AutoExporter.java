@@ -133,7 +133,7 @@ public class AutoExporter
             // but with ATOM_ZIP (and in the future, IMS CP/SCORM) this is no
             // longer the case. Perhaps we move pretty printing into the
             // serializers themselves.
-            if (format.equals(ATOM_ZIP1_1.uri)) {
+            if (ATOM_ZIP1_1.uri.equals(format)) {
                 FileUtils.copy(new ByteArrayInputStream(bytes), outStream);
             } else {
                 // use xerces to pretty print the xml, assuming it's well formed

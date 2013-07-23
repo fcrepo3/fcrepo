@@ -36,6 +36,8 @@ public abstract class TypeUtility {
     private static final Logger logger = LoggerFactory
             .getLogger(TypeUtility.class);
 
+    private static final String EMPTY_STRING = "";
+
     private static final int INITIAL_SIZE = 1024 * 1024;
 
     private static final int BUFFER_SIZE = 1024;
@@ -115,7 +117,7 @@ public abstract class TypeUtility {
             return new org.fcrepo.server.search.FieldSearchQuery(convertGenConditionArrayToSearchConditionList(gen
                     .getConditions().getValue()));
         } else {
-            return null;
+            return new org.fcrepo.server.search.FieldSearchQuery(EMPTY_STRING);
         }
     }
 

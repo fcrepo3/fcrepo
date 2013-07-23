@@ -346,6 +346,44 @@ public class TestCommandLineFormats
     }
 
     @Test
+    public void testBulkExportFOXML11Syntax() throws Exception {
+        System.out.println("Testing Export in FOXML 1.1 format");
+        apim.ingest(TypeUtility.convertBytesToDataHandler(TestAPIM.demo998FOXMLObjectXML), FOXML1_1.uri, "Ingest for test");
+
+        try {
+            File temp = File.createTempFile("temp", "");
+            String[] parameters = {getHost() + ":" + getPort(),
+                                   getUsername(), getPassword(), "FTYPS", "default",
+                                   "default", temp.getParent(), "http", getFedoraAppServerContext()};
+
+            Export.main(parameters);
+            File foxml11 = new File(temp.getParent() + "/demo_998.xml");
+            assertTrue(
+            		"Expected export file " + foxml11.getAbsolutePath() +
+            		" does not exist!", foxml11.exists());
+            FileInputStream fileReader = new FileInputStream(foxml11);
+            byte[] objectXML = new byte[fileReader.available()];
+            fileReader.read(objectXML);
+            String xmlIn = new String(objectXML, "UTF-8");
+            assertXpathExists("foxml:digitalObject[@PID='demo:998']", xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']",
+                    xmlIn);
+            assertXpathExists(
+                    "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#label' and @VALUE='Data Object (Coliseum) for Local Simple Image Demo']",
+                    xmlIn);
+            assertXpathEvaluatesTo("6", "count(//foxml:datastream)", xmlIn);
+            assertXpathNotExists("//foxml:disseminator", xmlIn);
+            assertXpathExists("foxml:digitalObject[@VERSION='1.1']", xmlIn);
+
+            temp.delete();
+            foxml11.delete();
+        } finally {
+            apim.purgeObject("demo:998", "Purge test object", false);
+        }
+    }
+
+    @Test
     public void testExportMETS11() throws Exception {
         System.out.println("Testing Export in METS 1.1 format");
         apim.ingest(TypeUtility.convertBytesToDataHandler(TestAPIM.demo998FOXMLObjectXML), FOXML1_1.uri, "Ingest for test");

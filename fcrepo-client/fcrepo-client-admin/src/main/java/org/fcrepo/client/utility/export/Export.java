@@ -75,7 +75,7 @@ public class Export
                            String exportContext,
                            File dir) throws Exception {
         String suffix;
-        if (format.equals(ATOM_ZIP1_1.uri)) {
+        if (ATOM_ZIP1_1.uri.equals(format)) {
             suffix = ".zip";
         } else {
             suffix = ".xml";
