@@ -38,7 +38,7 @@ public class HttpInputStream
             m_code = m_client.executeMethod(m_method);
             m_in = m_method.getResponseBodyAsStream();
             if (m_in == null) {
-                new ByteArrayInputStream(new byte[0]);
+                m_in = new ByteArrayInputStream(new byte[0]);
             }
         } catch (IOException e) {
             m_method.releaseConnection();

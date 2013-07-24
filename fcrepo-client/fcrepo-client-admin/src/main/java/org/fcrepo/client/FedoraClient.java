@@ -331,12 +331,15 @@ public class FedoraClient
                     // Handle the redirect here !
                     logger.debug("FedoraClient is handling redirect for HTTP STATUS="
                             + status);
+                    
                     Header hLoc = in.getResponseHeader("location");
                     if (hLoc != null) {
-                        logger.debug("FedoraClient is trying redirect location: "
-                                + hLoc.getValue());
+                        String location = hLoc.getValue();
+                        logger.debug("FedoraClient is trying redirect location: {}",
+                                location);
                         // Try the redirect location, but don't try to handle another level of redirection.
-                        return get(hLoc.getValue(), true, false);
+                        in.close();
+                        return get(location, true, false);
                     } else {
                         try {
                             throw new IOException("Request failed [" + status

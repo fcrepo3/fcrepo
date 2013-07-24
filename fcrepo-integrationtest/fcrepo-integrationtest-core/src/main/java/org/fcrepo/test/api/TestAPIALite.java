@@ -75,26 +75,31 @@ public class TestAPIALite
 
         // test for type E datastream
         HttpInputStream in = client.get("/get/demo:SmileyBeerGlass/MEDIUM_SIZE", true);
-        assertEquals(in.getContentType(), "image/jpeg");
-        assertTrue(in.getContentLength() > 0);
+        String actualType = in.getContentType();
+        int actualLength = in.getContentLength();
         in.close();
+        assertEquals("image/jpeg", actualType);
+        assertTrue(actualLength > 0);
 
         // test for type R datastream
         in = client.get("/get/demo:31/DS3", false, false);
-        assertEquals(in.getStatusCode(), 302);
+        int actualCode = in.getStatusCode();
         in.close();
+        assertEquals(302, actualCode);
 
         // test for type M datastream
         in = client.get("/get/demo:5/THUMBRES_IMG", true);
-        assertEquals(in.getContentType(), "image/jpeg");
+        actualType = in.getContentType();
         in.close();
+        assertEquals("image/jpeg", actualType);
     }
 
     public void testGetDisseminationDefault() throws Exception {
         HttpInputStream his =
                 client.get("/get/demo:5/fedora-system:3/viewDublinCore", true);
-        assertEquals(his.getContentType(), "text/html");
+        String actual = his.getContentType(); 
         his.close();
+        assertEquals("text/html", actual);
     }
 
 // FIXME: This test intermittently fails. See FCREPO-457
@@ -110,8 +115,9 @@ public class TestAPIALite
     public void testGetDisseminationUserInput() throws Exception {
         HttpInputStream his =
                 client.get("/get/demo:29/demo:27/convertImage?convertTo=gif", true);
-        assertEquals(his.getContentType(), "image/gif");
+        String actual = his.getContentType(); 
         his.close();
+        assertEquals("image/gif", actual);
     }
 
     public void testObjectHistory() throws Exception {
