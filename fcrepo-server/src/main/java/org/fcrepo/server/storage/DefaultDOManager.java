@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
 import org.fcrepo.common.Constants;
@@ -69,6 +70,7 @@ import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.DCFields;
 import org.fcrepo.server.utilities.SQLUtility;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.server.utilities.StringLock;
 import org.fcrepo.server.validation.DOObjectValidator;
 import org.fcrepo.server.validation.DOValidator;
 import org.fcrepo.server.validation.ValidationUtility;
@@ -89,6 +91,24 @@ public class DefaultDOManager extends Module implements DOManager {
             .getLogger(DefaultDOManager.class);
 
     private static final Pattern URL_PROTOCOL = Pattern.compile("^\\w+:\\/.*$");
+    
+    public static String CMODEL_QUERY =
+        "SELECT cModel, sDef, sDep, mDate " +
+        " FROM modelDeploymentMap, doFields " +
+        " WHERE doFields.pid = modelDeploymentMap.sDep";
+
+
+    public static String REGISTERED_PID_QUERY =
+            "SELECT doPID FROM doRegistry WHERE doPID=?";
+    
+    public static String INSERT_PID_QUERY =
+            "INSERT INTO doRegistry (doPID, ownerId, label) VALUES (?, ?, ?)";
+
+    public static String PID_VERSION_QUERY =
+            "SELECT systemVersion FROM doRegistry WHERE doPID=?";
+
+    public static String PID_VERSION_UPDATE =
+            "UPDATE doRegistry SET systemVersion=? WHERE doPID=?";
 
     private String m_pidNamespace;
 
@@ -124,8 +144,6 @@ public class DefaultDOManager extends Module implements DOManager {
 
     private DOReaderCache m_readerCache;
 
-    private final Set<String> m_lockedPIDs;
-
     protected ConnectionPool m_connectionPool;
 
     protected Connection m_connection;
@@ -134,6 +152,8 @@ public class DefaultDOManager extends Module implements DOManager {
 
     private int m_ingestValidationLevel;
 
+    private Map<String, ReentrantLock> m_pidLocks;
+
     /**
      * Creates a new DefaultDOManager.
      */
@@ -141,7 +161,7 @@ public class DefaultDOManager extends Module implements DOManager {
             Server server, String role)
             throws ModuleInitializationException {
         super(moduleParameters, server, role);
-        m_lockedPIDs = new HashSet<String>();
+        m_pidLocks = new HashMap< String, ReentrantLock >();
     }
 
     /**
@@ -313,8 +333,8 @@ public class DefaultDOManager extends Module implements DOManager {
         }
         // get ref to fieldsearch module
         m_fieldSearch =
-                (FieldSearch) getServer().getModule(
-                        "org.fcrepo.server.search.FieldSearch");
+                getServer().getBean(
+                        "org.fcrepo.server.search.FieldSearch", FieldSearch.class);
         // get ref to pidgenerator
         m_pidGenerator =
                 (PIDGenerator) getServer().getModule(
@@ -431,12 +451,7 @@ public class DefaultDOManager extends Module implements DOManager {
         ResultSet r = null;
         try {
             c = m_connectionPool.getReadOnlyConnection();
-            String query =
-                    "SELECT cModel, sDef, sDep, mDate "
-                            + " FROM modelDeploymentMap, doFields "
-                            + " WHERE doFields.pid = modelDeploymentMap.sDep";
-            s =
-                    c.prepareStatement(query, ResultSet.TYPE_FORWARD_ONLY,
+            s = c.prepareStatement(CMODEL_QUERY, ResultSet.TYPE_FORWARD_ONLY,
                             ResultSet.CONCUR_READ_ONLY);
             ResultSet results = s.executeQuery();
 
@@ -611,20 +626,33 @@ public class DefaultDOManager extends Module implements DOManager {
     }
 
     private void releaseWriteLock(String pid) {
-        synchronized (m_lockedPIDs) {
-            m_lockedPIDs.remove(pid);
-        }
+	    synchronized(m_pidLocks) {
+	    	ReentrantLock lock = m_pidLocks.get( pid );
+		    if( lock == null ) {
+			    throw new IllegalMonitorStateException( String.format( "Unlock called and no LockAdmin corresponding to the pid: '%s' found in the lockMap", pid ) );
+		    }
+	
+		    if( !lock.hasQueuedThreads() && lock.getHoldCount() == 1) {
+		    	m_pidLocks.remove( pid );
+	        }
+		    lock.unlock();
+	    }
     }
 
-    private void getWriteLock(String pid) throws ObjectLockedException {
-        synchronized (m_lockedPIDs) {
-            if (m_lockedPIDs.contains(pid)) {
-                throw new ObjectLockedException(pid + " is currently being " +
-                        "modified by another thread");
-            } else {
-                m_lockedPIDs.add(pid);
-            }
-        }
+    private void getWriteLock(String pid) {
+		if( pid == null ) {
+		    throw new IllegalArgumentException("pid cannot be null");
+		}
+	
+		ReentrantLock lock = null;
+		synchronized(m_pidLocks) {
+		    lock = m_pidLocks.get( pid );
+		    if( lock == null ) {
+			    lock = new ReentrantLock();
+			    m_pidLocks.put( pid, lock );
+		    }
+		}
+		lock.lock();
     }
 
     public ConnectionPool getConnectionPool() {
@@ -776,7 +804,7 @@ public class DefaultDOManager extends Module implements DOManager {
      *            ingests (may be null or any valid pid)
      */
     @Override
-    public synchronized DOWriter getIngestWriter(boolean cachedObjectRequired,
+    public DOWriter getIngestWriter(boolean cachedObjectRequired,
             Context context, InputStream in, String format, String encoding,
             String pid) throws ServerException {
         logger.debug("Entered getIngestWriter");
@@ -929,11 +957,16 @@ public class DefaultDOManager extends Module implements DOManager {
 
                 logger.info("New object PID is {}", obj.getPid());
 
+                // WRITE LOCK:
+                // ensure no one else can modify the object now
+                getWriteLock(obj.getPid());
+
                 // CHECK REGISTRY:
                 // ensure the object doesn't already exist
                 if (objectExists(obj.getPid())) {
+                    releaseWriteLock(obj.getPid());
                     throw new ObjectExistsException("The PID '" + obj.getPid() +
-                            "' already exists in the registry; the object can't be re-created.");
+                        "' already exists in the registry; the object can't be re-created.");
                 }
 
                 // GET DIGITAL OBJECT WRITER:
@@ -947,10 +980,6 @@ public class DefaultDOManager extends Module implements DOManager {
                                 m_defaultExportFormat,
                                 m_storageCharacterEncoding, obj);
 
-                // WRITE LOCK:
-                // ensure no one else can modify the object now
-                getWriteLock(obj.getPid());
-
                 // DEFAULT DATASTREAMS:
                 populateDC(context, obj, w, nowUTC);
 
@@ -963,19 +992,15 @@ public class DefaultDOManager extends Module implements DOManager {
                 registerObject(obj);
                 return w;
             } catch (IOException e) {
-
                 if (w != null) {
                     releaseWriteLock(obj.getPid());
                 }
-
                 throw new GeneralException("Error reading/writing temporary "
                         + "ingest file", e);
             } catch (Exception e) {
-
                 if (w != null) {
                     releaseWriteLock(obj.getPid());
                 }
-
                 if (e instanceof ServerException) {
                     ServerException se = (ServerException) e;
                     throw se;
@@ -1329,7 +1354,7 @@ public class DefaultDOManager extends Module implements DOManager {
                 // REGISTRY:
                 /*
                  * update systemVersion in doRegistry (add one), and update
-                 * deploymene maps if necesssary.
+                 * deployment maps if necessary.
                  */
                 logger.debug("Updating registry for " + pid);
                 Connection conn = null;
@@ -1337,9 +1362,7 @@ public class DefaultDOManager extends Module implements DOManager {
                 ResultSet results = null;
                 try {
                     conn = m_connectionPool.getReadWriteConnection();
-                    String query =
-                            "SELECT systemVersion FROM doRegistry WHERE doPID=?";
-                    s = conn.prepareStatement(query);
+                    s = conn.prepareStatement(PID_VERSION_QUERY);
                     s.setString(1, obj.getPid());
                     results = s.executeQuery();
                     if (!results.next()) {
@@ -1349,11 +1372,9 @@ public class DefaultDOManager extends Module implements DOManager {
                     }
                     int systemVersion = results.getInt("systemVersion");
                     systemVersion++;
-                    query =
-                            "UPDATE doRegistry SET systemVersion=" +
-                                    systemVersion + " WHERE doPID=?";
-                    s = conn.prepareStatement(query);
-                    s.setString(1, obj.getPid());
+                    s = conn.prepareStatement(PID_VERSION_UPDATE);
+                    s.setInt(1, systemVersion);
+                    s.setString(2, obj.getPid());
                     s.executeUpdate();
 
                     //TODO hasModel
@@ -1636,9 +1657,8 @@ public class DefaultDOManager extends Module implements DOManager {
         PreparedStatement s = null;
         ResultSet results = null;
         try {
-            String query = "SELECT doPID FROM doRegistry WHERE doPID=?";
             conn = m_connectionPool.getReadOnlyConnection();
-            s = conn.prepareStatement(query);
+            s = conn.prepareStatement(REGISTERED_PID_QUERY);
             s.setString(1, pid);
             results = s.executeQuery();
             return results.next(); // 'true' if match found, else 'false'
@@ -1681,10 +1701,8 @@ public class DefaultDOManager extends Module implements DOManager {
         Connection conn = null;
         PreparedStatement st = null;
         try {
-            String query =
-                    "INSERT INTO doRegistry (doPID, ownerId, label) VALUES (?, ?, ?)";
             conn = m_connectionPool.getReadWriteConnection();
-            st = conn.prepareStatement(query);
+            st = conn.prepareStatement(INSERT_PID_QUERY);
             st.setString(1, pid);
             st.setString(2, ownerID);
             st.setString(3, theLabel);
