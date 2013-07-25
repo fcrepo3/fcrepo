@@ -1439,7 +1439,7 @@ public class TestRESTAPI
     public void testAddRelationship() throws Exception {
         String s = "info:fedora/" + pid;
         String p = "http://www.example.org/test#relationship";
-        String o = "foo";
+        String o = "addRelationship";
         // check relationship not present
         url =
                 "/objects/" + pid + "/relationships" + "?subject="
@@ -1460,6 +1460,38 @@ public class TestRESTAPI
 
         // check relationship present
         url = "/objects/" + pid + "/relationships";// +
+        //"?subject=" + URLEncoder.encode(s, "UTF-8") +
+        //"&predicate=" + URLEncoder.encode(p, "UTF-8");
+        response = get(true, false);
+        assertEquals(SC_OK, response.getStatusCode());
+        checkRelationship(response.getResponseBody(), s, p, o, true);
+
+        // check the same operation with URL-encoded PID
+        o = "addRelationshipUrlEncoded";
+        // check relationship not present
+        url =
+                "/objects/" + URLEncoder.encode(pid.toString(), "UTF-8")
+                    + "/relationships" + "?subject="
+                    + URLEncoder.encode(s, "UTF-8") + "&predicate="
+                    + URLEncoder.encode(p, "UTF-8");
+        response = get(true, false);
+        assertEquals(SC_OK, response.getStatusCode());
+        checkRelationship(response.getResponseBody(), s, p, o, false);
+
+        // add relationship
+        url =
+                "/objects/" + URLEncoder.encode(pid.toString(), "UTF-8")
+                    + "/relationships/new" + "?subject="
+                    + URLEncoder.encode(s, "UTF-8") + "&predicate="
+                    + URLEncoder.encode(p, "UTF-8") + "&object="
+                    + URLEncoder.encode(o, "UTF-8") + "&isLiteral=true";
+        response = putOrPost("POST", null, true);
+        assertEquals(SC_OK, response.getStatusCode());
+
+        // check relationship present
+        url = "/objects/"
+            + URLEncoder.encode(pid.toString(), "UTF-8")
+            + "/relationships";// +
         //"?subject=" + URLEncoder.encode(s, "UTF-8") +
         //"&predicate=" + URLEncoder.encode(p, "UTF-8");
         response = get(true, false);
