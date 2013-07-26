@@ -6,6 +6,7 @@ package org.fcrepo.server.validation;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -97,6 +98,10 @@ public class DOValidatorImpl
      * format uri value = schema file path
      */
     private final Map<String, String> m_ruleSchemaMap;
+    
+    private final File m_tempDir;
+    
+    private final String m_absoluteTempPath;
 
     /**
      * <p>
@@ -141,6 +146,12 @@ public class DOValidatorImpl
             throw new ObjectValidityException("[DOValidatorImpl] ERROR in constructor. "
                     + "schematronPreprocessorPath is null.");
         }
+        m_tempDir = new File(tempDir);
+        if (!m_tempDir.exists() && !m_tempDir.mkdirs()) {
+            throw new GeneralException("Cannot read or create tempDir at " +
+                tempDir);
+        }
+        m_absoluteTempPath = m_tempDir.getAbsolutePath();
         DOValidatorImpl.tempDir = tempDir;
         DOValidatorImpl.schematronPreprocessorPath = schematronPreprocessorPath;
     }
@@ -174,23 +185,52 @@ public class DOValidatorImpl
     public void validate(InputStream objectAsStream,
                          String format,
                          int validationType,
-                         String phase) throws ObjectValidityException {
+                         String phase) throws ObjectValidityException,
+                         GeneralException {
+
         if (validationType == VALIDATE_NONE) return;
         checkFormat(format);
-        // FIXME We need to use the object Inputstream twice, once for XML
-        // Schema validation and once for Schematron validation.
-        // We may want to consider implementing some form of a rewindable
-        // InputStream. For now, I will just write the object InputStream to
-        // disk so I can read it multiple times.
-        try {
-            File objectAsFile = streamtoFile(tempDir, objectAsStream);
-            validate(objectAsFile, format, validationType, phase);
-        } catch (ObjectValidityException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ObjectValidityException("[DOValidatorImpl]: "
-                    + "ERROR in validate objectAsStream. " + e.getMessage());
+        switch (validationType) {
+            case VALIDATE_NONE:
+                break;
+            case VALIDATE_ALL:
+                try {
+                    // FIXME We need to use the object Inputstream twice, once for XML
+                    // Schema validation and once for Schematron validation.
+                    // We may want to consider implementing some form of a rewindable
+                    // InputStream. For now, I will just write the object InputStream to
+                    // disk so I can read it multiple times.
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
+                                "Validating streams against schema and schematron" +
+                                        " requires caching tempfiles to disk; consider" +
+                                        "calling validations seperately with a buffered" +
+                                        "InputStream"
+                                );
+                    }
+                    File objectAsFile = streamtoFile(objectAsStream);
+                    validate(objectAsFile, format, validationType, phase);
+                } catch (IOException ioe) {
+                    throw new ObjectValidityException("[DOValidatorImpl]: "
+                            + "ERROR in validate(InputStream objectAsStream...). " + ioe.getMessage());
+                }
+                break;
+            case VALIDATE_XML_SCHEMA:
+                validateXMLSchema(objectAsStream, m_xmlSchemaMap.get(format));
+                break;
+            case VALIDATE_SCHEMATRON:
+                validateByRules(objectAsStream,
+                        m_ruleSchemaMap.get(format),
+                        schematronPreprocessorPath,
+                        phase);
+                break;
+            default:
+                String msg = "VALIDATE: ERROR - missing or invalid validationType";
+                logger.error(msg);
+                throw new GeneralException("[DOValidatorImpl] " + msg + ":"
+                    + validationType);
         }
+        return;
     }
 
     /**
@@ -221,9 +261,8 @@ public class DOValidatorImpl
                          int validationType,
                          String phase) throws ObjectValidityException,
             GeneralException {
-        logger.debug("Validation phase=" + phase + " format=" + format);
-        logger.debug("VALIDATE: Initiating validation: " + " phase=" + phase
-                + " format=" + format);
+        logger.debug("VALIDATE: Initiating validation: phase={} format={}",
+                phase, format);
         if (validationType == VALIDATE_NONE) return;
         checkFormat(format);
 
@@ -236,7 +275,7 @@ public class DOValidatorImpl
                 ZipEntry entry;
                 while ((entry = zip.getNextEntry()) != null) {
                     if (entry.getName().equals("atommanifest.xml")) {
-                        manifest = streamtoFile(tempDir, zip);
+                        manifest = streamtoFile(zip);
                         break;
                     }
                 }
@@ -246,28 +285,37 @@ public class DOValidatorImpl
                 throw new GeneralException(e.getMessage(), e);
             }
         }
+        
+        try {
 
-        if (validationType == VALIDATE_ALL) {
-            validateByRules(objectAsFile,
-                            m_ruleSchemaMap.get(format),
-                            schematronPreprocessorPath,
-                            phase);
-            validateXMLSchema(objectAsFile, m_xmlSchemaMap.get(format));
-        } else if (validationType == VALIDATE_XML_SCHEMA) {
-            validateXMLSchema(objectAsFile, m_xmlSchemaMap.get(format));
-        } else if (validationType == VALIDATE_SCHEMATRON) {
-            validateByRules(objectAsFile,
-                            m_ruleSchemaMap.get(format),
-                            schematronPreprocessorPath,
-                            phase);
-        } else {
-            String msg = "VALIDATE: ERROR - missing or invalid validationType";
-            logger.error(msg);
+            FileInputStream objectAsStream = new FileInputStream(objectAsFile);
+            if (validationType == VALIDATE_ALL) {
+                validateByRules(objectAsStream,
+                        m_ruleSchemaMap.get(format),
+                        schematronPreprocessorPath,
+                        phase);
+                validateXMLSchema(new FileInputStream(objectAsFile),
+                    m_xmlSchemaMap.get(format));
+            } else if (validationType == VALIDATE_XML_SCHEMA) {
+                validateXMLSchema(objectAsStream, m_xmlSchemaMap.get(format));
+            } else if (validationType == VALIDATE_SCHEMATRON) {
+                validateByRules(objectAsStream,
+                        m_ruleSchemaMap.get(format),
+                        schematronPreprocessorPath,
+                        phase);
+            } else {
+                String msg = "VALIDATE: ERROR - missing or invalid validationType";
+                logger.error(msg);
+                throw new GeneralException("[DOValidatorImpl] " + msg + ":"
+                        + validationType);
+            }
+        } catch (IOException ioe) {
+            logger.error("VALIDATE: ERROR - failed validations.", ioe);
+            throw new ObjectValidityException("[DOValidatorImpl]: validate(File input...). "
+                    + ioe.getMessage());
+        } finally {
             cleanUp(objectAsFile);
-            throw new GeneralException("[DOValidatorImpl] " + msg + ":"
-                    + validationType);
         }
-        cleanUp(objectAsFile);
     }
 
     private void checkFormat(String format) throws ObjectValidityException {
@@ -290,19 +338,17 @@ public class DOValidatorImpl
      * @throws GeneralException
      *         If validation fails for any reason.
      */
-    private void validateXMLSchema(File objectAsFile, String xmlSchemaPath)
+    private void validateXMLSchema(InputStream objectAsStream, String xmlSchemaPath)
             throws ObjectValidityException, GeneralException {
 
         try {
             DOValidatorXMLSchema xsv = new DOValidatorXMLSchema(xmlSchemaPath);
-            xsv.validate(objectAsFile);
+            xsv.validate(objectAsStream);
         } catch (ObjectValidityException e) {
             logger.error("VALIDATE: ERROR - failed XML Schema validation.", e);
-            cleanUp(objectAsFile);
             throw e;
         } catch (Exception e) {
             logger.error("VALIDATE: ERROR - failed XML Schema validation.", e);
-            cleanUp(objectAsFile);
             throw new ObjectValidityException("[DOValidatorImpl]: validateXMLSchema. "
                     + e.getMessage());
         }
@@ -328,7 +374,7 @@ public class DOValidatorImpl
      * @throws GeneralException
      *         If validation fails for any reason.
      */
-    private void validateByRules(File objectAsFile,
+    private void validateByRules(InputStream objectAsStream,
                                  String ruleSchemaPath,
                                  String preprocessorPath,
                                  String phase) throws ObjectValidityException,
@@ -339,39 +385,31 @@ public class DOValidatorImpl
                     new DOValidatorSchematron(ruleSchemaPath,
                                               preprocessorPath,
                                               phase);
-            schtron.validate(objectAsFile);
+            schtron.validate(objectAsStream);
         } catch (ObjectValidityException e) {
             logger.error("VALIDATE: ERROR - failed Schematron rules validation.",
                       e);
-            cleanUp(objectAsFile);
             throw e;
         } catch (Exception e) {
             logger.error("VALIDATE: ERROR - failed Schematron rules validation.",
                       e);
-            cleanUp(objectAsFile);
             throw new ObjectValidityException("[DOValidatorImpl]: "
                     + "failed Schematron rules validation. " + e.getMessage());
         }
         logger.debug("VALIDATE: SUCCESS - passed Schematron rules validation.");
     }
 
-    private File streamtoFile(String dirname, InputStream objectAsStream)
+    private File streamtoFile(InputStream objectAsStream)
             throws IOException {
 
         File objectAsFile = null;
         try {
-            File tempDir = new File(dirname);
-            File fileLocation = null;
-            if (tempDir.exists() || tempDir.mkdirs()) {
-                fileLocation = File.createTempFile("validation", "tmp", tempDir);
+            objectAsFile = File.createTempFile("validation", "tmp", m_tempDir);
 
-                FileOutputStream fos = new FileOutputStream(fileLocation);
-                if (FileUtils.copy(objectAsStream, fos)) {
-                    objectAsFile = fileLocation;
-                }
-            }
+            FileOutputStream fos = new FileOutputStream(objectAsFile);
+            FileUtils.copy(objectAsStream, fos);
         } catch (IOException e) {
-            if (objectAsFile.exists()) {
+            if (objectAsFile != null && objectAsFile.exists()) {
                 objectAsFile.delete();
             }
             throw e;
@@ -384,10 +422,11 @@ public class DOValidatorImpl
     // but it should only blow away files in the temp directory.
     private void cleanUp(File f) {
         if (f.getParentFile() != null) {
-            if ((new File(tempDir)).getAbsolutePath().equalsIgnoreCase(f
+            if (m_absoluteTempPath.equalsIgnoreCase(f
                     .getParentFile().getAbsolutePath())) {
                 f.delete();
             }
         }
     }
+    
 }

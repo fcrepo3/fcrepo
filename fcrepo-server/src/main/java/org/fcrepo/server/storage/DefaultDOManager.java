@@ -75,6 +75,7 @@ import org.fcrepo.server.validation.DOValidator;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.tidy.Out;
 
 /**
  * Manages the reading and writing of digital objects by instantiating an
@@ -1279,15 +1280,25 @@ public class DefaultDOManager extends Module implements DOManager {
                 // MODIFIED DATE:
                 // set digital object last modified date, in UTC
                 obj.setLastModDate(Server.getCurrentDate(context));
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                ByteArrayInputStream serialized;
 
-                // FINAL XML SERIALIZATION:
-                // serialize the object in its final form for persistent storage
-                logger.debug("Serializing digital object for persistent storage " +
-                        pid);
-                m_translator.serialize(obj, out, m_defaultStorageFormat,
-                        m_storageCharacterEncoding,
-                        DOTranslationUtility.SERIALIZE_STORAGE_INTERNAL);
+                // block-scoping the ByteArrayOutputStream to ensure toArray
+                // is only called once
+                {
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+                    // FINAL XML SERIALIZATION:
+                    // serialize the object in its final form for persistent storage
+                    logger.debug("Serializing digital object for persistent storage " +
+                            pid);
+                    m_translator.serialize(obj, out, m_defaultStorageFormat,
+                            m_storageCharacterEncoding,
+                            DOTranslationUtility.SERIALIZE_STORAGE_INTERNAL);
+
+                    
+                    serialized =
+                            new ByteArrayInputStream(out.toByteArray());
+                }
 
                 // FINAL VALIDATION:
                 // As of version 2.0, final validation is only performed in
@@ -1303,17 +1314,19 @@ public class DefaultDOManager extends Module implements DOManager {
                 // a sanity check, we check that we can deserialize the object
                 // we just serialized
                 if (logger.isDebugEnabled()) {
-                    ByteArrayInputStream inV =
-                            new ByteArrayInputStream(out.toByteArray());
                     logger.debug("Final Validation (storage phase)");
-                    m_validator.validate(inV, m_defaultStorageFormat,
-                            DOValidator.VALIDATE_ALL, DOValidator.PHASE_STORE);
+                    m_validator.validate(serialized, m_defaultStorageFormat,
+                            DOValidator.VALIDATE_XML_SCHEMA, DOValidator.PHASE_STORE);
+                    serialized.reset();
+                    m_validator.validate(serialized, m_defaultStorageFormat,
+                            DOValidator.VALIDATE_SCHEMATRON, DOValidator.PHASE_STORE);
+                    serialized.reset();
                 }
                 /* Verify that we can deserialize our object. */
-                m_translator.deserialize(new ByteArrayInputStream(out
-                        .toByteArray()), new BasicDigitalObject(),
+                m_translator.deserialize(serialized, new BasicDigitalObject(),
                         m_defaultStorageFormat, m_storageCharacterEncoding,
                         DOTranslationUtility.SERIALIZE_STORAGE_INTERNAL);
+                serialized.reset();
 
                 // RESOURCE INDEX:
                 if (m_resourceIndex != null &&
@@ -1339,11 +1352,11 @@ public class DefaultDOManager extends Module implements DOManager {
                         m_hintProvider.getHintsForAboutToBeStoredObject(obj);
                 if (obj.isNew()) {
                     m_permanentStore.addObject(obj.getPid(),
-                            new ByteArrayInputStream(out.toByteArray()),
+                            serialized,
                             objectHints);
                 } else {
                     m_permanentStore.replaceObject(obj.getPid(),
-                            new ByteArrayInputStream(out.toByteArray()),
+                            serialized,
                             objectHints);
                 }
 
