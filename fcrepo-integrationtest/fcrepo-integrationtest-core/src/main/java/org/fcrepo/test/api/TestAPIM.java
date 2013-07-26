@@ -1197,7 +1197,7 @@ public class TestAPIM
                                "A",
                                "MD6",
                                null,
-                               "adding new datastream");
+                               "adding new datastream with bad checksum algorithm");
             // fail if datastream was added
             Assert.fail();
         } catch (javax.xml.ws.soap.SOAPFaultException af) {
@@ -1222,7 +1222,7 @@ public class TestAPIM
                                "A",
                                "TIGER",
                                null,
-                               "adding new datastream");
+                               "adding new datastream with unimplemented checksum algorithm");
             // fail if datastream was added
             Assert.fail();
         } catch (javax.xml.ws.soap.SOAPFaultException af) {
