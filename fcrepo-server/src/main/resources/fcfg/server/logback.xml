@@ -27,9 +27,9 @@
             value="${fedora.home}/server/logs/fesl${logfile.extension:-.log}"/>
   <appender name="FESL" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <File>${FEDORA_FESL_LOG_PATH}</File>
-    <layout class="ch.qos.logback.classic.PatternLayout">
-      <Pattern>%p %d{yyyy-MM-dd' 'HH:mm:ss.SSS} [%t] (%c{0}\\) %m%n</Pattern>
-    </layout>
+    <encoder>                                                           
+      <pattern>%p %d{yyyy-MM-dd' 'HH:mm:ss.SSS} [%t] \(%c{0}\) %m%n</pattern>
+    </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <maxIndex>5</maxIndex>
       <FileNamePattern>${FEDORA_FESL_LOG_PATH}.%i</FileNamePattern>
