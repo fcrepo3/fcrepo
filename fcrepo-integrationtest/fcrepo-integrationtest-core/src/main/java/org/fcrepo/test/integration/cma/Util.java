@@ -16,7 +16,6 @@ import org.fcrepo.client.utility.ingest.Ingest;
 import org.fcrepo.client.utility.ingest.IngestCounter;
 import org.fcrepo.server.types.gen.ObjectMethodsDef;
 import org.fcrepo.server.utilities.TypeUtility;
-import org.fcrepo.test.FedoraTestCase;
 
 public abstract class Util {
 
@@ -46,7 +45,7 @@ public abstract class Util {
 
     }
 
-    public static void ingestTestObjects(String path) throws Exception {
+    public static void ingestTestObjects(FedoraClient client, String path) throws Exception {
         File dir = null;
 
         String specificPath = File.separator + path;
@@ -62,15 +61,13 @@ public abstract class Util {
 
         dir = new File(base + "test-objects/foxml" + specificPath);
 
-        FedoraClient client = FedoraTestCase.getFedoraClient();
-
         Ingest.multiFromDirectory(dir,
-                                  FOXML1_1.uri,
-                                  client.getAPIAMTOM(),
-                                  client.getAPIMMTOM(),
-                                  null,
-                                  new PrintStream(File.createTempFile("demo",
-                                                                      null)),
-                                  new IngestCounter());
+                FOXML1_1.uri,
+                client.getAPIAMTOM(),
+                client.getAPIMMTOM(),
+                null,
+                new PrintStream(File.createTempFile("demo",
+                        null)),
+                        new IngestCounter());
     }
 }

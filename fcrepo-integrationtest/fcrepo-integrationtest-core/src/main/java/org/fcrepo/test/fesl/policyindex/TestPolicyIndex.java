@@ -1,5 +1,9 @@
 package org.fcrepo.test.fesl.policyindex;
 
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +23,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
 import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
 import org.fcrepo.server.types.gen.Datastream;
 import org.fcrepo.server.utilities.StreamUtility;
@@ -30,7 +33,10 @@ import org.fcrepo.test.fesl.util.HttpUtils;
 import org.fcrepo.test.fesl.util.LoadDataset;
 import org.fcrepo.test.fesl.util.RemoveDataset;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +74,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
 
     private static final String PROPERTIES = "fedora";
 
+    private static FedoraClient s_client;
     // nb, for testing access, don't initiate with fedora admin credentials
     private static HttpUtils httpUtils = null;
 
@@ -88,8 +95,20 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
     public static junit.framework.Test suite() {
         return new JUnit4TestAdapter(TestPolicyIndex.class);
     }
+    
+    @BeforeClass
+    public static void bootStrap() throws Exception {
+        s_client = getFedoraClient();
+        httpUtils = new HttpUtils(getBaseURL(), "testuser", "testuser");
+    }
+    
+    @AfterClass
+    public static void cleanUp() {
+        httpUtils.shutdown();
+        s_client.shutdown();
+    }
 
-    @Override
+    @Before
     public void setUp() {
 
         PropertyResourceBundle prop =
@@ -112,11 +131,11 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
 
             // used for access testing, with test credentials which must match the modified fedora-users.xml file created in createFedoraUsersTestFile()
             // nb, uses getBaseURL(), ie http not https (ssl not required for ConfigC/API-A)
-            httpUtils = new HttpUtils(getBaseURL(), "testuser", "testuser");
 
-            FedoraClient client = getFedoraClient();
-            assertNotNull("FedoraTestCase.getFedoraClient() returned NULL", client);
-            apim = client.getAPIMMTOM();
+            {
+                assertNotNull("FedoraTestCase.getFedoraClient() returned NULL", s_client);
+                apim = s_client.getAPIMMTOM();
+            }
 
             policyIndexUtils = new PolicyIndexUtils(apim);
 
@@ -128,7 +147,6 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
         }
     }
 
-    @Override
     @After
     public void tearDown() {
 
@@ -143,7 +161,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
             RemoveDataset.remove("fesl", fedoraUrl, username, password);
 
             // policies are in demo namespace
-            purgeDemoObjects();
+            purgeDemoObjects(s_client);
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -201,8 +219,10 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
             }
 
             // overwrite existing with new version
+            @SuppressWarnings("deprecation")
             FileOutputStream fu =
-                new FileOutputStream(FedoraUsers.fedoraUsersXML);
+                new FileOutputStream(
+                    org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers.fedoraUsersXML);
             OutputStreamWriter pw = new OutputStreamWriter(fu);
             pw.write(data.toString());
             pw.close();
@@ -215,14 +235,17 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
 
 
     private void backupFedoraUsersFile() {
+        @SuppressWarnings("deprecation")
+        File srcFile =
+                org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers.fedoraUsersXML;
         fedoraUsersBackup =
-                new File(FedoraUsers.fedoraUsersXML.getAbsolutePath()
+                new File(srcFile.getAbsolutePath()
                          + ".backup-fesl");
         if (!fedoraUsersBackup.exists()) {
             System.out.println("Backing Up Fedora Users");
             try {
                 fedoraUsersBackup.createNewFile();
-                copyFile(FedoraUsers.fedoraUsersXML, fedoraUsersBackup);
+                copyFile(srcFile, fedoraUsersBackup);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -230,11 +253,14 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
     }
 
     private void restoreFedoraUsersFile() {
+        @SuppressWarnings("deprecation")
+        File destFile =
+                org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers.fedoraUsersXML;
         if (!fedoraUsersBackup.exists()) {
             System.out.println("Error - Fedora Users backup file does not exist");
         } else {
             System.out.println("Restoring Fedora Users");
-            copyFile(fedoraUsersBackup, FedoraUsers.fedoraUsersXML);
+            copyFile(fedoraUsersBackup, destFile);
         }
     }
 
@@ -251,6 +277,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
             throw new RuntimeException(e);
         }
     }
+    
     @Test
     public void testObjectMethods() throws Exception {
 
@@ -718,6 +745,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
                 System.out.println("PolicyIndexExerciser failed.  Last URL was: " + ex.lastUrl());
                 System.out.println("Error was: " + ex.failure().getMessage());
             }
+            ex.shutdown();
         }
         // report any failures
         for (PolicyIndexExerciser ex : readers) {
@@ -725,6 +753,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
                 System.out.println("PolicyIndexExerciser failed.  Last URL was: " + ex.lastUrl());
                 System.out.println("Error was: " + ex.failure().getMessage());
             }
+            ex.shutdown();
         }
 
         // check for non-completed exercisers

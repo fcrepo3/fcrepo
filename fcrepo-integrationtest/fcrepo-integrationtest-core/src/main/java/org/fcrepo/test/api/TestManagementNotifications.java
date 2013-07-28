@@ -5,6 +5,11 @@
 
 package org.fcrepo.test.api;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Properties;
@@ -23,14 +28,21 @@ import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.framework.JUnit4TestAdapter;
 
+import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.utilities.TypeUtility;
-import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -42,7 +54,12 @@ import org.fcrepo.test.FedoraServerTestCase;
 public class TestManagementNotifications
         extends FedoraServerTestCase
         implements MessageListener {
+    
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(TestManagementNotifications.class);
 
+    private static FedoraClient s_client;
+    
     private FedoraAPIMMTOM apim;
     private final ArrayBlockingQueue<TextMessage> messages = new ArrayBlockingQueue<TextMessage>(10, true);
     private final int messageTimeout = 5000; // Maximum number of milliseconds to wait for a message
@@ -96,15 +113,23 @@ public class TestManagementNotifications
 
     }
 
-    public static Test suite() {
-        TestSuite suite = new TestSuite("Management Notifications TestSuite");
-        suite.addTestSuite(TestManagementNotifications.class);
-        return new DemoObjectTestSetup(suite);
+    @BeforeClass
+    public static void bootStrap() throws Exception {
+        s_client = getFedoraClient();
+        ingestDemoObjects("/", s_client);
+    }
+    
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        purgeDemoObjects(s_client);
+        s_client.shutdown();
     }
 
-    @Override
+
+
+    @Before
     public void setUp() throws Exception {
-        apim = getFedoraClient().getAPIMMTOM();
+        apim = s_client.getAPIMMTOM();
 
         // Create and start a subscriber
         Properties props = new Properties();
@@ -127,7 +152,7 @@ public class TestManagementNotifications
         jmsConnection.start();
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
         jmsConnection.stop();
         jmsSession.close();
@@ -144,10 +169,11 @@ public class TestManagementNotifications
      *
      * @throws Exception
      */
+    @Test
     public void testObjectMethodNotifications() throws Exception {
 
         // (1) test ingest
-        System.out.println("Running TestManagementNotifications.testIngest...");
+        LOGGER.info("Running TestManagementNotifications.testIngest...");
         String pid =
                 apim.ingest(TypeUtility.convertBytesToDataHandler(demo998FOXMLObjectXML),
                             FOXML1_1.uri,
@@ -158,7 +184,7 @@ public class TestManagementNotifications
         checkNotification(pid, "ingest");
 
         // (2) test modifyObject
-        System.out.println("Running TestManagementNotifications.testModifyObject...");
+        LOGGER.info("Running TestManagementNotifications.testModifyObject...");
         String modifyResult =
                 apim.modifyObject(pid,
                                   "I",
@@ -171,7 +197,7 @@ public class TestManagementNotifications
         checkNotification(pid, "modifyObject");
 
         // (3a) test addRelationship - pid
-        System.out.println("Running TestManagementNotifications.testAddRelationship...");
+        LOGGER.info("Running TestManagementNotifications.testAddRelationship...");
         boolean addRelResult =
                 apim.addRelationship(pid,
                                      "rel:isRelatedTo",
@@ -184,7 +210,7 @@ public class TestManagementNotifications
         checkNotification(pid, "addRelationship");
 
         // (3b) test addRelationship - object uri
-        System.out.println("Running TestManagementNotifications.testAddRelationship...");
+        LOGGER.info("Running TestManagementNotifications.testAddRelationship...");
         addRelResult =
                 apim.addRelationship(PID.toURI(pid),
                                      "rel:isRelatedTo",
@@ -197,7 +223,7 @@ public class TestManagementNotifications
         checkNotification(pid, "addRelationship");
 
         // (3c) test addRelationship - datastream uri
-        System.out.println("Running TestManagementNotifications.testAddRelationship...");
+        LOGGER.info("Running TestManagementNotifications.testAddRelationship...");
         addRelResult =
                 apim.addRelationship(PID.toURI(pid) + "/DS1",
                                      "rel:isRelatedTo",
@@ -210,7 +236,7 @@ public class TestManagementNotifications
         checkNotification(pid, "addRelationship");
 
         // (4a) test purgeRelationship - pid
-        System.out.println("Running TestManagementNotifications.testPurgeRelationship...");
+        LOGGER.info("Running TestManagementNotifications.testPurgeRelationship...");
         boolean purgeRelResult =
                 apim.purgeRelationship(pid,
                                        "rel:isRelatedTo",
@@ -223,7 +249,7 @@ public class TestManagementNotifications
         checkNotification(pid, "purgeRelationship");
 
         // (4b) test purgeRelationship - object uri
-        System.out.println("Running TestManagementNotifications.testPurgeRelationship...");
+        LOGGER.info("Running TestManagementNotifications.testPurgeRelationship...");
         purgeRelResult =
                 apim.purgeRelationship(PID.toURI(pid),
                                        "rel:isRelatedTo",
@@ -236,7 +262,7 @@ public class TestManagementNotifications
         checkNotification(pid, "purgeRelationship");
 
         // (4c) test purgeRelationship - datastream uri
-        System.out.println("Running TestManagementNotifications.testPurgeRelationship...");
+        LOGGER.info("Running TestManagementNotifications.testPurgeRelationship...");
         purgeRelResult =
                 apim.purgeRelationship(PID.toURI(pid) + "/DS1",
                                        "rel:isRelatedTo",
@@ -249,7 +275,7 @@ public class TestManagementNotifications
         checkNotification(pid, "purgeRelationship");
 
         // (5) test purgeObject
-        System.out.println("Running TestManagementNotifications.testPurgeObject...");
+        LOGGER.info("Running TestManagementNotifications.testPurgeObject...");
         String purgeResult = apim.purgeObject(pid, "Purging object " + pid, false);
         assertNotNull(purgeResult);
 
@@ -269,10 +295,11 @@ public class TestManagementNotifications
      *
      * @throws Exception
      */
+    @Test
     public void testDatastreamMethodNotifications() throws Exception {
 
         // (1) test addDatastream
-        System.out.println("Running TestManagementNotifications.testAddDatastream...");
+        LOGGER.info("Running TestManagementNotifications.testAddDatastream...");
 
         String[] altIds = new String[1];
         altIds[0] = "Datastream Alternate ID";
@@ -322,7 +349,7 @@ public class TestManagementNotifications
         checkNotification(pid, "addDatastream");
 
         // (2) test modifyDatastreamByReference
-        System.out.println("Running TestManagementNotifications.testModifyDatastreamByReference...");
+        LOGGER.info("Running TestManagementNotifications.testModifyDatastreamByReference...");
         String updateTimestamp =
                 apim.modifyDatastreamByReference(pid,
                                                  "NEWDS1",
@@ -342,7 +369,7 @@ public class TestManagementNotifications
         checkNotification(pid, "modifyDatastreamByReference");
 
         // (3) test modifyDatastreamByValue
-        System.out.println("Running TestManagementNotifications.testModifyDatastreamByValue...");
+        LOGGER.info("Running TestManagementNotifications.testModifyDatastreamByValue...");
         updateTimestamp =
                 apim.modifyDatastreamByValue(pid,
                                              "NEWDS2",
@@ -362,7 +389,7 @@ public class TestManagementNotifications
         checkNotification(pid, "modifyDatastreamByValue");
 
         // (4) test setDatastreamState
-        System.out.println("Running TestManagementNotifications.testSetDatastreamState...");
+        LOGGER.info("Running TestManagementNotifications.testSetDatastreamState...");
         String setStateresult =
                 apim.setDatastreamState(pid,
                                         "NEWDS1",
@@ -374,7 +401,7 @@ public class TestManagementNotifications
         checkNotification(pid, "setDatastreamState");
 
         // (5) test setDatastreamVersionable
-        System.out.println("Running TestManagementNotifications.testSetDatastreamVersionable...");
+        LOGGER.info("Running TestManagementNotifications.testSetDatastreamVersionable...");
         String setVersionableResult =
                 apim.setDatastreamVersionable(pid,
                                               "NEWDS2",
@@ -386,7 +413,7 @@ public class TestManagementNotifications
         checkNotification(pid, "setDatastreamVersionable");
 
         // (5) test purgeDatastream
-        System.out.println("Running TestManagementNotifications.testPurgeDatastream...");
+        LOGGER.info("Running TestManagementNotifications.testPurgeDatastream...");
 
         List<String> results =
                 apim.purgeDatastream(pid,
@@ -413,8 +440,9 @@ public class TestManagementNotifications
         checkNotification(pid, "purgeDatastream");
     }
 
+    @Test
     public void testSelectors() throws Exception {
-        System.out.println("Running TestManagementNotifications.testSelectors...");
+        LOGGER.info("Running TestManagementNotifications.testSelectors...");
         messageConsumer.close();
 
         String messageSelector = "methodName LIKE 'ingest%'";
@@ -496,8 +524,12 @@ public class TestManagementNotifications
         }
     }
 
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestManagementNotifications.class);
+    }
+
     public static void main(String[] args) {
-        junit.textui.TestRunner.run(TestManagementNotifications.class);
+        JUnitCore.runClasses(TestManagementNotifications.class);
     }
 
 }

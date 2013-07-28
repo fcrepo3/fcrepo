@@ -8,9 +8,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpUriRequest;
 
 /**
  * An InputStream from an HttpMethod. When this InputStream is close()d, the
@@ -21,27 +22,32 @@ public class HttpInputStream
 
     private final HttpClient m_client;
 
-    private final HttpMethod m_method;
-
-    private final String m_url;
+    private final HttpUriRequest m_method;
+    
+    private final HttpResponse m_response;
 
     private int m_code;
 
     private InputStream m_in;
 
-    public HttpInputStream(HttpClient client, HttpMethod method, String url)
+    public HttpInputStream(HttpClient client, HttpUriRequest method)
             throws IOException {
         m_client = client;
         m_method = method;
-        m_url = url;
         try {
-            m_code = m_client.executeMethod(m_method);
-            m_in = m_method.getResponseBodyAsStream();
-            if (m_in == null) {
+            m_response = m_client.execute(m_method);
+            m_code = m_response.getStatusLine().getStatusCode();
+            if (m_response.getEntity() == null) {
                 m_in = new ByteArrayInputStream(new byte[0]);
+            } else {
+                m_in = m_response.getEntity().getContent();
             }
         } catch (IOException e) {
-            m_method.releaseConnection();
+            if (m_in != null) {
+                try {
+                    m_in.close();
+                } catch (IOException ioe) {}
+            }
             throw e;
         }
     }
@@ -50,14 +56,14 @@ public class HttpInputStream
      * Get the http method name (GET or POST).
      */
     public String getMethodName() {
-        return m_method.getName();
+        return m_method.getRequestLine().getMethod();
     }
 
     /**
      * Get the original URL of the http request this InputStream is based on.
      */
     public String getURL() {
-        return m_url;
+        return m_method.getRequestLine().getUri();
     }
 
     /**
@@ -71,39 +77,53 @@ public class HttpInputStream
      * Get the "reason phrase" associated with the status code.
      */
     public String getStatusText() {
-        return m_method.getStatusLine().getReasonPhrase();
+        return m_response.getStatusLine().getReasonPhrase();
+    }
+    
+    /**
+     * Get the response headers
+     */
+    public Header[] getResponseHeaders() {
+        return m_response.getAllHeaders();
     }
 
     /**
-     * Get a specific response header.
+     * Get a header value.
      */
     public Header getResponseHeader(String name) {
-        return m_method.getResponseHeader(name);
+        return m_response.getFirstHeader(name);
     }
-
+    
     /**
-     * Get a response header value string, or <code>defaultValue</code> if the
-     * header is undefined or empty.
+     * Return the first value of a header, or the default
+     * if the fighter is not present
+     * @param name the header name
+     * @param defaultVal the default value
+     * @return
      */
-    public String getResponseHeaderValue(String name, String defaultValue) {
-        Header header = m_method.getResponseHeader(name);
-        if (header == null) {
-            return defaultValue;
+    public String getResponseHeaderValue(String name, String defaultVal) {
+        if (m_response.containsHeader(name)) {
+            return m_response.getFirstHeader(name).getValue();
         } else {
-            String value = header.getValue();
-            if (value == null || value.length() == 0) {
-                return defaultValue;
-            } else {
-                return header.getValue();
-            }
+            return defaultVal;
         }
     }
 
     /**
-     * Get all response headers.
+     * Get CONTENT-TYPE
      */
-    public Header[] getResponseHeaders() {
-        return m_method.getResponseHeaders();
+    public String getContentType() {
+        return getResponseHeader("Content-Type").getValue();
+    }
+
+    /**
+     * Get CONTENT-LENGTH in bytes.
+     */
+    public long getContentLength() {
+        if (m_response.containsHeader("Content-Length")) {
+            return Long.parseLong(m_response.getFirstHeader("Content-Length").getValue());
+        }
+        return -1;
     }
 
     /**
@@ -166,7 +186,6 @@ public class HttpInputStream
      */
     @Override
     public void close() throws IOException {
-        m_method.releaseConnection();
         m_in.close();
     }
 }

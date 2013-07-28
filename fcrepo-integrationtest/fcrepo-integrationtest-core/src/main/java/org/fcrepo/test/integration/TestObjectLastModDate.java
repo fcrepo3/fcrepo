@@ -7,9 +7,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
+import org.fcrepo.client.FedoraClient;
 import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class TestObjectLastModDate
@@ -30,11 +32,12 @@ public class TestObjectLastModDate
                     + "test-objects/foxml/cli-utils"
                     : "src/test/resources/test-objects/foxml/cli-utils";
 
-    @Override
-    protected void setUp() throws Exception {
-        apia = getFedoraClient().getAPIAMTOM();
-        apim = getFedoraClient().getAPIMMTOM();
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
+        FedoraClient client = getFedoraClient();
+        apia = client.getAPIAMTOM();
+        apim = client.getAPIMMTOM();
+        client.shutdown();
     }
 
     @Test

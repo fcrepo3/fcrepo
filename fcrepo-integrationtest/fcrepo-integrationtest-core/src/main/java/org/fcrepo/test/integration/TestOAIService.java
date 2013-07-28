@@ -4,31 +4,29 @@
  */
 package org.fcrepo.test.integration;
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathExists;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import junit.framework.JUnit4TestAdapter;
 
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
-
-import org.w3c.dom.Document;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.fcrepo.client.FedoraClient;
-
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.w3c.dom.Document;
 
 
 /**
@@ -37,26 +35,16 @@ import org.fcrepo.test.FedoraServerTestCase;
 public class TestOAIService
         extends FedoraServerTestCase {
 
-    private DocumentBuilderFactory factory;
-
-    private DocumentBuilder builder;
-
     private FedoraClient client;
 
-    public static Test suite() {
-        TestSuite suite = new TestSuite("Test OAI Service");
-        suite.addTestSuite(TestOAIService.class);
-        return suite;
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestOAIService.class);
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
 
         client = new FedoraClient(getBaseURL(), getUsername(), getPassword());
-
-        factory = DocumentBuilderFactory.newInstance();
-        builder = factory.newDocumentBuilder();
 
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put(NS_FEDORA_TYPES_PREFIX, NS_FEDORA_TYPES);
@@ -65,20 +53,21 @@ public class TestOAIService
         XMLUnit.setXpathNamespaceContext(ctx);
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
         XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
-        super.tearDown();
+        client.shutdown();
     }
 
     public void testListMetadataFormats() throws Exception {
         String request = "/oai?verb=ListMetadataFormats";
-        Document result = getXMLQueryResult(request);
+        Document result = getXMLQueryResult(client, request);
         assertXpathEvaluatesTo("oai_dc",
                                "/oai:OAI-PMH/oai:ListMetadataFormats/oai:metadataFormat/oai:metadataPrefix",
                                result);
     }
 
+    @Test
     public void testListRecords() throws Exception {
         FedoraAPIMMTOM apim = client.getAPIMMTOM();
         FileInputStream in =
@@ -91,18 +80,18 @@ public class TestOAIService
         apim.ingest(TypeUtility.convertBytesToDataHandler(out.toByteArray()), FOXML1_1.uri, "for testing");
 
         String request = "/oai?verb=ListRecords&metadataPrefix=oai_dc";
-        Document result = getXMLQueryResult(request);
+        Document result = getXMLQueryResult(client, request);
         assertXpathExists("/oai:OAI-PMH/oai:ListRecords/oai:record", result);
 
         request = "/oai?verb=ListRecords&metadataPrefix=oai_dc&from=2000-01-01";
-        result = getXMLQueryResult(request);
+        result = getXMLQueryResult(client, request);
         assertXpathExists("/oai:OAI-PMH/oai:ListRecords/oai:record", result);
 
         apim.purgeObject("demo:31", "for testing", false);
     }
 
     public static void main(String[] args) {
-        junit.textui.TestRunner.run(TestOAIService.class);
+        JUnitCore.runClasses(TestOAIService.class);
     }
 
 }

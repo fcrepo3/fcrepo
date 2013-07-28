@@ -29,6 +29,7 @@ public class AllSystemTestsConfigQ {
         suite.addTest(org.fcrepo.test.api.TestAPIALiteConfigA.suite());
         suite.addTest(org.fcrepo.test.api.TestHTTPStatusCodesConfigQ.suite());
         suite.addTest(org.fcrepo.test.api.TestManyDisseminations.suite());
+        suite.addTest(org.fcrepo.test.api.TestRESTAPIConfigQ.suite());
 
         return suite;
     }

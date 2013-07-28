@@ -112,6 +112,7 @@ class BatchIngest
         FedoraClient fc = new FedoraClient(baseURL, username, password);
         APIA = fc.getAPIAMTOM();
         APIM = fc.getAPIMMTOM();
+        fc.shutdown();
         //*******************************************
 
     }

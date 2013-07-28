@@ -8,9 +8,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpUriRequest;
 
 /**
  * An InputStream from an HttpMethod. When this InputStream is close()d, the
@@ -21,7 +22,9 @@ public class HttpInputStream
 
     private final HttpClient m_client;
 
-    private final HttpMethod m_method;
+    private final HttpUriRequest m_method;
+    
+    private final HttpResponse m_response;
 
     private final String m_url;
 
@@ -29,20 +32,18 @@ public class HttpInputStream
 
     private InputStream m_in;
 
-    public HttpInputStream(HttpClient client, HttpMethod method, String url)
+    public HttpInputStream(HttpClient client, HttpUriRequest method)
             throws IOException {
         m_client = client;
         m_method = method;
-        m_url = url;
-        try {
-            m_code = m_client.executeMethod(m_method);
-            m_in = m_method.getResponseBodyAsStream();
-            if (m_in == null) {
-                new ByteArrayInputStream(new byte[0]);
-            }
-        } catch (IOException e) {
-            m_method.releaseConnection();
-            throw e;
+        m_url = method.getURI().toString();
+
+        m_response = m_client.execute(m_method);
+        m_code = m_response.getStatusLine().getStatusCode();
+        if (m_response.getEntity() != null) {
+            m_in = m_response.getEntity().getContent();
+        } else {
+            new ByteArrayInputStream(new byte[0]);
         }
     }
 
@@ -50,7 +51,7 @@ public class HttpInputStream
      * Get the http method name (GET or POST).
      */
     public String getMethodName() {
-        return m_method.getName();
+        return m_method.getMethod();
     }
 
     /**
@@ -71,14 +72,14 @@ public class HttpInputStream
      * Get the "reason phrase" associated with the status code.
      */
     public String getStatusText() {
-        return m_method.getStatusLine().getReasonPhrase();
+        return m_response.getStatusLine().getReasonPhrase();
     }
 
     /**
      * Get a header value.
      */
     public Header getResponseHeader(String name) {
-        return m_method.getResponseHeader(name);
+        return m_response.getFirstHeader(name);
     }
 
     /**
@@ -141,7 +142,6 @@ public class HttpInputStream
      */
     @Override
     public void close() throws IOException {
-        m_method.releaseConnection();
         m_in.close();
     }
 }

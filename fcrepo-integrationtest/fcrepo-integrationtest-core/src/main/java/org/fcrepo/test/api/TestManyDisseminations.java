@@ -5,15 +5,15 @@
 
 package org.fcrepo.test.api;
 
+import static junit.framework.Assert.fail;
+
 import java.io.InputStream;
 
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.framework.JUnit4TestAdapter;
 
 import org.fcrepo.client.FedoraClient;
 
@@ -25,6 +25,13 @@ import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.utilities.TypeUtility;
 
 import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -36,6 +43,9 @@ import org.fcrepo.test.FedoraServerTestCase;
 public class TestManyDisseminations
         extends FedoraServerTestCase {
 
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(TestManyDisseminations.class);
+    
     private static final String DATA_OBJECT_PID = "test:ManyDiss";
 
     private static final String SDEF_OBJECT_PID = "test:ManyDiss-SDef";
@@ -50,28 +60,36 @@ public class TestManyDisseminations
 
     private static final String R_DS = "DC_REF_R";
 
-    private static final FedoraClient CLIENT;
+    private static FedoraAPIMMTOM APIM;
 
-    private static final FedoraAPIMMTOM APIM;
-
-    private static final String BASE_URL;
-
-    static {
-        try {
-            BASE_URL = FedoraServerTestCase.getBaseURL();
-            CLIENT = FedoraServerTestCase.getFedoraClient();
-            APIM = CLIENT.getAPIMMTOM();
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting Fedora Client", e);
-        }
+    private static final String BASE_URL = FedoraServerTestCase.getBaseURL();
+    
+    private static FedoraClient s_client;
+    
+    @BeforeClass
+    public static void bootstrap() throws Exception {
+        s_client = getFedoraClient();
+        APIM = s_client.getAPIMMTOM();
+        
+        APIM.ingest(TypeUtility.convertBytesToDataHandler(getCModelObject()), FOXML_FORMAT, "");
+        APIM.ingest(TypeUtility.convertBytesToDataHandler(getSDefObject()), FOXML_FORMAT, "");
+        APIM.ingest(TypeUtility.convertBytesToDataHandler(getSDepObject()), FOXML_FORMAT, "");
+        APIM.ingest(TypeUtility.convertBytesToDataHandler(getDataObject()), FOXML_FORMAT, "");
     }
-
-    public static Test suite() throws Exception {
-        TestSuite suite = new TestSuite("TestManyDisseminations TestSuite");
-        suite.addTestSuite(TestManyDisseminations.class);
-        return new ManyDisseminationsTestSetup(suite);
+    
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        APIM.purgeObject(DATA_OBJECT_PID, "", false);
+        APIM.purgeObject(SDEP_OBJECT_PID, "", false);
+        APIM.purgeObject(SDEF_OBJECT_PID, "", false);
+        APIM.purgeObject(CMODEL_OBJECT_PID, "", false);
+        s_client.shutdown();
     }
-
+    
+    @After
+    public void tearDown() throws Exception {
+    }
+    
     //---
     // Tests
     //---
@@ -79,6 +97,7 @@ public class TestManyDisseminations
     /**
      * Tests a rapid series of requests for an inline XML datastream.
      */
+    @Test
     public void testManyDatastreamDisseminationsX() throws Exception {
         doDissemTest(DATA_OBJECT_PID + "/" + X_DS, false);
     }
@@ -86,6 +105,7 @@ public class TestManyDisseminations
     /**
      * Tests a rapid series of requests for an External datastream.
      */
+    @Test
     public void testManyDatastreamDisseminationsE() throws Exception {
         doDissemTest(DATA_OBJECT_PID + "/" + E_DS, false);
     }
@@ -93,6 +113,7 @@ public class TestManyDisseminations
     /**
      * Tests a rapid series of requests for a Redirect datastream.
      */
+    @Test
     public void testManyDatastreamDisseminationsR() throws Exception {
         doDissemTest(DATA_OBJECT_PID + "/" + R_DS, true);
     }
@@ -101,6 +122,7 @@ public class TestManyDisseminations
      * Tests a rapid series of requests for a Saxon dissemination that uses an
      * inline XML datastream.
      */
+    @Test
     public void testManySaxonDisseminationsX() throws Exception {
         doDissemTest(DATA_OBJECT_PID + "/" + SDEF_OBJECT_PID + "/getIDFrom"
                      + X_DS, false);
@@ -110,6 +132,7 @@ public class TestManyDisseminations
      * Tests a rapid series of requests for a Saxon dissemination that uses an
      * External datastream.
      */
+    @Test
     public void testManySaxonDisseminationsE() throws Exception {
         doDissemTest(DATA_OBJECT_PID + "/" + SDEF_OBJECT_PID + "/getIDFrom"
                      + E_DS, false);
@@ -119,6 +142,7 @@ public class TestManyDisseminations
      * Tests a rapid series of requests for a Saxon dissemination that uses a
      * Redirect datastream.
      */
+    @Test
     public void testManySaxonDisseminationsR() throws Exception {
         doDissemTest(DATA_OBJECT_PID + "/" + SDEF_OBJECT_PID + "/getIDFrom"
                      + R_DS, false);
@@ -130,7 +154,7 @@ public class TestManyDisseminations
      */
     private void doDissemTest(String what, boolean redirectOK) throws Exception {
         final int num = 30;
-        System.out.println("Getting " + what + " " + num + " times...");
+        LOGGER.debug("Getting {} {} times...", what, num);
         int i = 0;
         try {
             URL url = new URL(BASE_URL + "/get/" + what);
@@ -148,12 +172,15 @@ public class TestManyDisseminations
         }
     }
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(TestAuthentication.class);
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestManyDisseminations.class);
     }
 
-    public static class ManyDisseminationsTestSetup
-            extends TestSetup {
+    public static void main(String[] args) {
+        JUnitCore.runClasses(TestManyDisseminations.class);
+    }
+
+    // static bootstrap helpers
 
         private static final String CR = System.getProperty("line.separator");
 
@@ -161,27 +188,6 @@ public class TestManyDisseminations
 
         private static final String FOXML_NAMESPACE =
                 "info:fedora/fedora-system:def/foxml#";
-
-        public ManyDisseminationsTestSetup(Test test)
-                throws Exception {
-            super(test);
-        }
-
-        @Override
-        public void setUp() throws Exception {
-            APIM.ingest(TypeUtility.convertBytesToDataHandler(getCModelObject()), FOXML_FORMAT, "");
-            APIM.ingest(TypeUtility.convertBytesToDataHandler(getSDefObject()), FOXML_FORMAT, "");
-            APIM.ingest(TypeUtility.convertBytesToDataHandler(getSDepObject()), FOXML_FORMAT, "");
-            APIM.ingest(TypeUtility.convertBytesToDataHandler(getDataObject()), FOXML_FORMAT, "");
-        }
-
-        @Override
-        public void tearDown() throws Exception {
-            APIM.purgeObject(DATA_OBJECT_PID, "", false);
-            APIM.purgeObject(SDEP_OBJECT_PID, "", false);
-            APIM.purgeObject(SDEF_OBJECT_PID, "", false);
-            APIM.purgeObject(CMODEL_OBJECT_PID, "", false);
-        }
 
         private static byte[] getCModelObject() throws Exception {
             StringBuilder buf = new StringBuilder();
@@ -686,6 +692,5 @@ public class TestManyDisseminations
         private static void closeFOXML(StringBuilder buf) {
             buf.append("</foxml:digitalObject>");
         }
-    }
 
 }

@@ -4,6 +4,8 @@
  */
 package org.fcrepo.server.storage.translation;
 
+import static junit.framework.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 
 import java.util.List;
@@ -36,7 +38,6 @@ public class DOTranslationUtilityTest extends FedoraTestCase {
     /**
      * @throws java.lang.Exception
      */
-    @Override
     @After
     public void tearDown() throws Exception {
     }

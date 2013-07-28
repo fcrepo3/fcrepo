@@ -3,11 +3,15 @@
   <target name="tomcat-start">
     <echo>Starting Fedora</echo>
     <parallel>
-      <java jar="${mvn.tomcat.home}/bin/bootstrap.jar" fork="yes" dir="${mvn.tomcat.home}" spawn="true">
+      <java jar="${mvn.tomcat.home}/bin/bootstrap.jar" 
+      	    fork="yes" dir="${mvn.tomcat.home}" spawn="true">
         <jvmarg value="-Djava.io.tmpdir=${mvn.tomcat.home}/temp" />
       	<!-- disable FeSL PEP caching or cached results will cause test failures -->
       	<jvmarg value="-Dfedora.fesl.pep_nocache=true"/>
-        <jvmarg value="-XX:MaxPermSize=512M" />
+        <jvmarg value="-Dcatalina.base=${mvn.tomcat.home}" />
+      	<jvmarg value="-Djava.util.logging.config.file=${mvn.tomcat.home}/conf/logging.properties" />
+        <jvmarg value="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager" />
+      	<jvmarg value="-XX:MaxPermSize=512M" />
         <jvmarg value="-Xmx512M" />
         <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
         <arg line="start" />

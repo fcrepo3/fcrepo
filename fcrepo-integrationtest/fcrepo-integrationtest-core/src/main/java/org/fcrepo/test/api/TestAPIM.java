@@ -5,6 +5,14 @@
 
 package org.fcrepo.test.api;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathExists;
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathNotExists;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -20,13 +28,12 @@ import java.util.zip.ZipOutputStream;
 
 import javax.xml.ws.soap.SOAPFaultException;
 
-import junit.framework.Assert;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.framework.JUnit4TestAdapter;
 
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
@@ -38,15 +45,23 @@ import org.fcrepo.server.types.gen.ObjectFactory;
 import org.fcrepo.server.types.gen.ObjectFields;
 import org.fcrepo.server.types.gen.Validation;
 import org.fcrepo.server.utilities.TypeUtility;
-import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
 import org.w3c.dom.Document;
 
 public class TestAPIM
         extends FedoraServerTestCase
         implements Constants {
 
+    private static final String DEMO_14 = "demo:14";
+
+    private static FedoraClient s_client;
+    
     private FedoraAPIMMTOM apim;
 
     private FedoraAPIAMTOM apia;
@@ -822,17 +837,25 @@ public class TestAPIM
             e.printStackTrace();
         }
     }
-
-    public static Test suite() {
-        TestSuite suite = new TestSuite("APIM TestSuite");
-        suite.addTestSuite(TestAPIM.class);
-        return new DemoObjectTestSetup(suite);
+    
+    @BeforeClass
+    public static void bootStrap() throws Exception {
+        s_client = getFedoraClient();
+        ingestDemoObjects(s_client);
+    }
+    
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        purgeDemoObjects(s_client);
+        s_client.shutdown();
     }
 
-    @Override
+
+
+    @Before
     public void setUp() throws Exception {
-        apim = getFedoraClient().getAPIMMTOM();
-        apia = getFedoraClient().getAPIAMTOM();
+        apim = s_client.getAPIMMTOM();
+        apia = s_client.getAPIAMTOM();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
         nsMap.put("dc", "http://purl.org/dc/elements/1.1/");
@@ -843,12 +866,12 @@ public class TestAPIM
         XMLUnit.setXpathNamespaceContext(ctx);
     }
 
-    @Override
     @After
     public void tearDown() {
         XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
     }
 
+    @Test
     public void testGetObjectXML() throws Exception {
 
         // test getting xml for object demo:5
@@ -869,6 +892,7 @@ public class TestAPIM
                                xmlIn);
     }
 
+    @Test
     public void testObjectMethods() throws Exception {
 
         // test the object methods
@@ -1179,12 +1203,13 @@ public class TestAPIM
      *  they must be executed as a single test
      * @throws Exception
      */
+    @Test
     public void testAddDatastream() throws Exception {
         // (1) testAddDatastream
         System.out.println("Running TestAPIM.testAddDatastream...");
         // test adding M type datastream with unknown checksum type and no altIDs, should fail throwing exception
         try {
-            apim.addDatastream("demo:14",
+            apim.addDatastream(DEMO_14,
                                "NEWDS1",
                                null,
                                "A New M-type Datastream",
@@ -1199,7 +1224,7 @@ public class TestAPIM
                                null,
                                "adding new datastream with bad checksum algorithm");
             // fail if datastream was added
-            Assert.fail();
+            fail();
         } catch (javax.xml.ws.soap.SOAPFaultException af) {
             System.out.println(af.getMessage());
             assertTrue(af.getMessage()
@@ -1209,7 +1234,7 @@ public class TestAPIM
         }
         // test adding M type datastream with unimplemented checksum type and no altIDs, should fail throwing exception
         try {
-            apim.addDatastream("demo:14",
+            apim.addDatastream(DEMO_14,
                                "NEWDS1",
                                null,
                                "A New M-type Datastream",
@@ -1224,7 +1249,7 @@ public class TestAPIM
                                null,
                                "adding new datastream with unimplemented checksum algorithm");
             // fail if datastream was added
-            Assert.fail();
+            fail();
         } catch (javax.xml.ws.soap.SOAPFaultException af) {
             assertTrue(af.getMessage()
                     .contains("Checksum algorithm not yet implemented:"));
@@ -1233,7 +1258,7 @@ public class TestAPIM
         String[] altIds = new String[1];
         altIds[0] = "Datastream 1 Alternate ID";
         String datastreamId =
-                apim.addDatastream("demo:14",
+                apim.addDatastream(DEMO_14,
                                    "NEWDS1",
                                    TypeUtility.convertStringtoAOS(altIds),
                                    "A New M-type Datastream",
@@ -1252,7 +1277,7 @@ public class TestAPIM
         assertEquals(datastreamId, "NEWDS1");
         byte[] objectXML =
                 TypeUtility.convertDataHandlerToBytes(apim
-                        .getObjectXML("demo:14"));
+                        .getObjectXML(DEMO_14));
         assertTrue(objectXML.length > 0);
         String xmlIn = new String(objectXML, "UTF-8");
         Document doc = XMLUnit.buildControlDocument(xmlIn);
@@ -1280,7 +1305,7 @@ public class TestAPIM
         //test adding X type datastream
         altIds[0] = "Datastream 2 Alternate ID";
         datastreamId =
-                apim.addDatastream("demo:14",
+                apim.addDatastream(DEMO_14,
                                    "NEWDS2",
                                    TypeUtility.convertStringtoAOS(altIds),
                                    "A New X-type Datastream",
@@ -1298,7 +1323,7 @@ public class TestAPIM
         // test that datastream was added
         objectXML =
                 TypeUtility.convertDataHandlerToBytes(apim
-                        .getObjectXML("demo:14"));
+                        .getObjectXML(DEMO_14));
         assertTrue(objectXML.length > 0);
         xmlIn = new String(objectXML, "UTF-8");
         doc = XMLUnit.buildControlDocument(xmlIn);
@@ -1316,7 +1341,7 @@ public class TestAPIM
 
         altIds[0] = "Datastream 3 Alternate ID";
         datastreamId =
-                apim.addDatastream("demo:14",
+                apim.addDatastream(DEMO_14,
                                    "NEWDS3",
                                    TypeUtility.convertStringtoAOS(altIds),
                                    "A New E-type Datastream",
@@ -1334,7 +1359,7 @@ public class TestAPIM
         // test adding E type datastream
         objectXML =
                 TypeUtility.convertDataHandlerToBytes(apim
-                        .getObjectXML("demo:14"));
+                        .getObjectXML(DEMO_14));
         assertTrue(objectXML.length > 0);
         xmlIn = new String(objectXML, "UTF-8");
         doc = XMLUnit.buildControlDocument(xmlIn);
@@ -1485,13 +1510,14 @@ public class TestAPIM
         }
     }
 
+    @Test
     public void testModifyDatastreamByReference() throws Exception {
 
         // (2) test modifyDatastreamByReference
         System.out
                 .println("Running TestAPIM.testModifyDatastreamByReference...");
-        List<String> testDsIds = setUpDatastreamModificationTest("demo:14", "MODREF", "M", 1);
-        int numNonAudits = getNumberNonAuditDatastreams("demo:14");
+        List<String> testDsIds = setUpDatastreamModificationTest(DEMO_14, "MODREF", "M", 1);
+        int numNonAudits = getNumberNonAuditDatastreams(DEMO_14);
         String testDsId = testDsIds.get(0);
         assertEquals("MODREFDSM1", testDsId);
         Datastream origManagedContent =
@@ -1501,7 +1527,7 @@ public class TestAPIM
         String [] altIds = new String[1];
         altIds[0] = "Datastream 1 Modified Alternate ID";
         String datastreamId =
-                apim.modifyDatastreamByReference("demo:14",
+                apim.modifyDatastreamByReference(DEMO_14,
                                                  testDsId,
                                                  TypeUtility
                                                          .convertStringtoAOS(altIds),
@@ -1518,7 +1544,7 @@ public class TestAPIM
         // test that datastream was modified
         byte [] objectXML =
                 TypeUtility.convertDataHandlerToBytes(apim
-                        .getObjectXML("demo:14"));
+                        .getObjectXML(DEMO_14));
         assertTrue(objectXML.length > 0);
         String xmlIn = new String(objectXML, "UTF-8");
         Document doc = XMLUnit.buildControlDocument(xmlIn);
@@ -1538,7 +1564,7 @@ public class TestAPIM
                                   + managedContentSize + "']",
                           doc);
         // check size in getDatastreamDissemination
-        Datastream ds1 = apim.getDatastream("demo:14", "MODREFDSM1", null);
+        Datastream ds1 = apim.getDatastream(DEMO_14, "MODREFDSM1", null);
         assertEquals(managedContentSize, ds1.getSize());
 
         // test modifyDatastreamByReference RELS-EXT, RELS-INT triggers validation for managed content datastreams
@@ -1564,7 +1590,8 @@ public class TestAPIM
                                                      "modifying by reference invalid datastream",
                                                      false);
                 fail(reservedDSID
-                    + " was not validated on modifyDatastreamByReference");
+                    + " was not validated on modifyDatastreamByReference"
+                    + datastreamId);
             } catch (SOAPFaultException se) {
                 assertTrue(se.getMessage(), se.getMessage().contains(reservedDSID + " validation failed"));
             }
@@ -1625,16 +1652,17 @@ public class TestAPIM
                               doc);
 
         }
-        tearDownDatastreamModificationTest("demo:14", testDsIds);
+        tearDownDatastreamModificationTest(DEMO_14, testDsIds);
     }
 
+    @Test
     public void testModifyDatastreamByValue() throws Exception {
 
         // (3) test modifyDatastreamByValue
         System.out.println("Running TestAPIM.testModifyDatastreamByValue...");
-        List<String> testDsIds = setUpDatastreamModificationTest("demo:14","MODVALUE","M", 1);
-        testDsIds.addAll(setUpDatastreamModificationTest("demo:14","MODVALUE","X", 1));
-        int numNonAudits = getNumberNonAuditDatastreams("demo:14");
+        List<String> testDsIds = setUpDatastreamModificationTest(DEMO_14,"MODVALUE","M", 1);
+        testDsIds.addAll(setUpDatastreamModificationTest(DEMO_14,"MODVALUE","X", 1));
+        int numNonAudits = getNumberNonAuditDatastreams(DEMO_14);
         String testXDsId = testDsIds.get(1);
         String testMDsId = testDsIds.get(0);
         assertEquals("MODVALUEDSX1",testXDsId);
@@ -1642,7 +1670,7 @@ public class TestAPIM
         String [] altIds = new String[1];
         altIds[0] = "Datastream 1 Modified Alternate ID";
         String datastreamId =
-                apim.modifyDatastreamByValue("demo:14",
+                apim.modifyDatastreamByValue(DEMO_14,
                         testXDsId,
                         TypeUtility
                         .convertStringtoAOS(altIds),
@@ -1659,7 +1687,7 @@ public class TestAPIM
         // test that datastream was modified
         byte [] objectXML =
                 TypeUtility.convertDataHandlerToBytes(apim
-                        .getObjectXML("demo:14"));
+                        .getObjectXML(DEMO_14));
         assertTrue(objectXML.length > 0);
         String xmlIn = new String(objectXML, "UTF-8");
         Document doc = XMLUnit.buildControlDocument(xmlIn);
@@ -1685,7 +1713,7 @@ public class TestAPIM
         altIds = new String[1];
         altIds[0] = "Datastream 1 Modified Alternate ID";
         datastreamId =
-                apim.modifyDatastreamByValue("demo:14",
+                apim.modifyDatastreamByValue(DEMO_14,
                         testMDsId,
                         TypeUtility
                         .convertStringtoAOS(altIds),
@@ -1702,7 +1730,7 @@ public class TestAPIM
         // test that datastream was modified
         objectXML =
                 TypeUtility.convertDataHandlerToBytes(apim
-                        .getObjectXML("demo:14"));
+                        .getObjectXML(DEMO_14));
         assertTrue(objectXML.length > 0);
         xmlIn = new String(objectXML, "UTF-8");
         doc = XMLUnit.buildControlDocument(xmlIn);
@@ -1747,7 +1775,9 @@ public class TestAPIM
                                                  null,
                                                  "modifying datastream",
                                                  false);
-                fail(reservedDSID + " was not validated on modifyDatastreamByValue");
+                fail(reservedDSID
+                        + " was not validated on modifyDatastreamByValue "
+                        + datastreamId);
             } catch (SOAPFaultException se) {
                 assertTrue(se.getMessage(), se.getMessage().contains(reservedDSID + " validation failed"));
             }
@@ -1893,18 +1923,19 @@ public class TestAPIM
                           doc);
         assertXpathExists("//foxml:datastreamVersion[@ID='METHODMAP.1' and @MIMETYPE='text/xml' and @LABEL='Mapping of WSDL to Fedora Notion of Method Definitions']",
                           doc);
-        tearDownDatastreamModificationTest("demo:14", testDsIds);
+        tearDownDatastreamModificationTest(DEMO_14, testDsIds);
     }
 
     public void compareDatastreamChecksum() throws Exception {
         // (4) test modifyDatastreamByValue for checksumming and compareDatastreamChecksum
         System.out.println("Running TestAPIM.compareDatastreamChecksum...");
-        List<String> testDsIds = setUpDatastreamModificationTest("demo:14", "CHECKSUMS", "M", 1);
+        List<String> testDsIds = setUpDatastreamModificationTest(DEMO_14, "CHECKSUMS", "M", 1);
         String testDsId = testDsIds.get(0);
+        String testDsUrl = getBaseURL() + "/get/" + DEMO_14 + "/" + testDsId;
         String datastreamId = null;
         try {
             datastreamId =
-                    apim.modifyDatastreamByValue("demo:14",
+                    apim.modifyDatastreamByValue(DEMO_14,
                             testDsId,
                             null,
                             null,
@@ -1916,7 +1947,7 @@ public class TestAPIM
                             "turned on checksumming",
                             false);
             // fail if datastream was modified
-            Assert.fail();
+            fail("Unexpected modification of datastream " + DEMO_14 + "/" + datastreamId);
         } catch (javax.xml.ws.soap.SOAPFaultException af) {
             assertTrue(af.getMessage()
                     .contains("Unknown checksum algorithm specified:"));
@@ -1924,7 +1955,7 @@ public class TestAPIM
         // test modifyDatastreamByValue X type datastream with unimplemented checksum type and no altIDs, should fail throwing exception
         try {
             datastreamId =
-                    apim.modifyDatastreamByValue("demo:14",
+                    apim.modifyDatastreamByValue(DEMO_14,
                             testDsId,
                             null,
                             null,
@@ -1936,13 +1967,13 @@ public class TestAPIM
                             "turned on checksumming",
                             false);
             // fail if datastream was modified
-            Assert.fail();
+            fail("Unexpected modification of datastream " + DEMO_14 + "/" + datastreamId);
         } catch (javax.xml.ws.soap.SOAPFaultException af) {
             assertTrue(af.getMessage()
                     .contains("Checksum algorithm not yet implemented:"));
         }
         datastreamId =
-                apim.modifyDatastreamByValue("demo:14",
+                apim.modifyDatastreamByValue(DEMO_14,
                         testDsId,
                         null,
                         null,
@@ -1956,12 +1987,12 @@ public class TestAPIM
 
         // test that datastream has a checksum that compares correctly
         String checksum =
-                apim.compareDatastreamChecksum("demo:14", testDsId, null);
+                apim.compareDatastreamChecksum(DEMO_14, testDsId, null);
         assertTrue(checksum.length() > 0);
         assertTrue(!checksum.equals("none"));
 
         datastreamId =
-                apim.modifyDatastreamByValue("demo:14",
+                apim.modifyDatastreamByValue(DEMO_14,
                         testDsId,
                         null,
                         null,
@@ -1975,12 +2006,12 @@ public class TestAPIM
 
         // test that datastream has a checksum that compares correctly
         String checksum2 =
-                apim.compareDatastreamChecksum("demo:14", testDsId, null);
+                apim.compareDatastreamChecksum(DEMO_14, testDsId, null);
         assertTrue(checksum2.length() > 0);
         assertTrue(checksum2.equals(checksum));
 
         datastreamId =
-                apim.modifyDatastreamByValue("demo:14",
+                apim.modifyDatastreamByValue(DEMO_14,
                         testDsId,
                         null,
                         null,
@@ -1993,7 +2024,7 @@ public class TestAPIM
                         false);
 
         // test that datastream has a checksum that compares correctly
-        checksum = apim.compareDatastreamChecksum("demo:14", testDsId, null);
+        checksum = apim.compareDatastreamChecksum(DEMO_14, testDsId, null);
         assertTrue(checksum.length() > 0);
         assertTrue(checksum.equals("none"));
 
@@ -2001,14 +2032,14 @@ public class TestAPIM
         // use demo:14/NEWDS2 as the source as we have the already-calculated checksum from above
         String checksum3 = "3aff11a78a8335a54b75e02d85a0caa3"; // tip: if this is wrong (ie demo:14/NEWDS2 changes) the axis fault will give the correct value
         datastreamId =
-                apim.addDatastream("demo:14",
+                apim.addDatastream(DEMO_14,
                                    "CHECKSUMDS",
                                    null,
                                    "datastream for testing checksums",
                                    true,
                                    null,
                                    null,
-                                   getBaseURL() + "/get/demo:14/" + testDsId,
+                                   testDsUrl,
                                    "M",
                                    "A",
                                    "MD5",
@@ -2017,27 +2048,27 @@ public class TestAPIM
 
         // check the checksum
         String checksum4 =
-                apim.compareDatastreamChecksum("demo:14", "CHECKSUMDS", null);
+                apim.compareDatastreamChecksum(DEMO_14, "CHECKSUMDS", null);
         assertTrue(checksum3.equals(checksum4));
 
         // add again, new datastream, incorrect checksum
         try {
             datastreamId =
-                    apim.addDatastream("demo:14",
+                    apim.addDatastream(DEMO_14,
                                        "CHECKSUMDSFAIL",
                                        null,
                                        "datastream for testing checksums",
                                        true,
                                        null,
                                        null,
-                                       getBaseURL() + "/get/demo:14/" + testDsId,
+                                       testDsUrl,
                                        "M",
                                        "A",
                                        "MD5",
                                        "4aff31a28b8335a24b95e02d85a0caa4",
                                        "creating datastream with checksum");
             // fail if datastream was modified
-            Assert.fail();
+            fail("Unexpected modification of datastream " + DEMO_14 + "/" + datastreamId);
         } catch (javax.xml.ws.soap.SOAPFaultException af) {
             assertTrue(af.getMessage().contains("Checksum Mismatch"));
         }
@@ -2045,34 +2076,32 @@ public class TestAPIM
         // modify datastream with incorrect checksum (same contents, incorrect checksum)
         try {
             datastreamId =
-                    apim.modifyDatastreamByReference("demo:14",
+                    apim.modifyDatastreamByReference(DEMO_14,
                                                      "CHECKSUMDS",
                                                      null,
                                                      null,
                                                      null,
                                                      null,
-                                                     getBaseURL()
-                                                             + "/get/demo:14/" + testDsId,
+                                                     testDsUrl,
                                                      "MD5",
                                                      "4aff31a28b8335a24b95e02d85a0caa4",
                                                      "modifying datastream with incorrect checksum",
                                                      false);
             // fail if datastream was modified
-            Assert.fail();
+            fail("Unexpected modification of datastream " + DEMO_14 + "/" + datastreamId);
         } catch (javax.xml.ws.soap.SOAPFaultException af) {
             assertTrue(af.getMessage().contains("Checksum Mismatch"));
         }
 
         // modify again this time with correct checksum
         datastreamId =
-                apim.modifyDatastreamByReference("demo:14",
+                apim.modifyDatastreamByReference(DEMO_14,
                                                  "CHECKSUMDS",
                                                  null,
                                                  null,
                                                  null,
                                                  null,
-                                                 getBaseURL()
-                                                         + "/get/demo:14/" + testDsId,
+                                                 testDsUrl,
                                                  "MD5",
                                                  checksum3,
                                                  "modifying datastream with correct checksum",
@@ -2080,18 +2109,19 @@ public class TestAPIM
 
         // check the checksum
         checksum4 =
-                apim.compareDatastreamChecksum("demo:14", "CHECKSUMDS", null);
+                apim.compareDatastreamChecksum(DEMO_14, "CHECKSUMDS", null);
         assertTrue(checksum3.equals(checksum3));
-        tearDownDatastreamModificationTest("demo:14", testDsIds);
+        tearDownDatastreamModificationTest(DEMO_14, testDsIds);
     }
 
+    @Test
     public void testPurgeDatastream() throws Exception {
         // (5) testPurgeDatastream
-        List<String> testDsIds = setUpDatastreamModificationTest("demo:14", "PURGE", "M", 3);
+        List<String> testDsIds = setUpDatastreamModificationTest(DEMO_14, "PURGE", "M", 3);
         System.out.println("Running TestAPIM.testPurgeDatastream...");
         // test specifying date-time for startDate and null for endDate
         String[] results =
-                apim.purgeDatastream("demo:14",
+                apim.purgeDatastream(DEMO_14,
                                      testDsIds.get(0),
                                      "1900-01-01T00:00:00.000Z",
                                      null,
@@ -2106,7 +2136,7 @@ public class TestAPIM
 
         // test specifying null for both startDate and endDate
         results =
-                apim.purgeDatastream("demo:14",
+                apim.purgeDatastream(DEMO_14,
                                      testDsIds.get(1),
                                      null,
                                      null,
@@ -2121,7 +2151,7 @@ public class TestAPIM
 
         // test specifying date-time for both startDate and endDate
         results =
-                apim.purgeDatastream("demo:14",
+                apim.purgeDatastream(DEMO_14,
                                      testDsIds.get(2),
                                      "1900-01-01T00:00:00.000Z",
                                      "9999-01-01T00:00:00.000Z",
@@ -2137,7 +2167,7 @@ public class TestAPIM
         // test purgeDatastream audit
         byte [] objectXML =
                 TypeUtility.convertDataHandlerToBytes(apim
-                        .getObjectXML("demo:14"));
+                        .getObjectXML(DEMO_14));
         assertTrue(objectXML.length > 0);
         String xmlIn = new String(objectXML, "UTF-8");
         Document doc = XMLUnit.buildControlDocument(xmlIn);
@@ -2146,6 +2176,7 @@ public class TestAPIM
                           doc);
     }
 
+    @Test
     public void testGetDatastream() throws Exception {
         System.out.println("Running TestAPIM.testGetDatastream...");
         // test getting datastream id XML_SOURCE for object demo:26 specifying null for datetime
@@ -2196,6 +2227,7 @@ public class TestAPIM
                         new String[] {});
     }
 
+    @Test
     public void testGetDatastreams() throws Exception {
         System.out.println("Running TestAPIM.testGetDatastreams...");
         // test getting all datastreams for object demo:26 specifying null for datetime and state
@@ -2325,6 +2357,7 @@ public class TestAPIM
                         new String[] {});
     }
 
+    @Test
     public void testGetDatastreamHistory() throws Exception {
         // (8) test getDatastreamHistory
         System.out.println("Running TestAPIM.testGetDatastreamHistory...");
@@ -2445,6 +2478,7 @@ public class TestAPIM
                 doc));
     }
 
+    @Test
     public void testSetDatastreamState() throws Exception {
 
         // test setting datastream state to "I" for datastream id DC of object demo:5
@@ -2478,6 +2512,7 @@ public class TestAPIM
         assertEquals("A", ds.getState());
     }
 
+    @Test
     public void testSetDatastreamVersionable() throws Exception {
 
         // test setting datastream to not versionalble for datastream id DC of object demo:5
@@ -2511,6 +2546,7 @@ public class TestAPIM
 
     }
 
+    @Test
     public void testGetNextPID() throws Exception {
 
         // test null for both arguments
@@ -2544,6 +2580,7 @@ public class TestAPIM
         assertTrue(pids[1].startsWith("namespace:"));
     }
 
+    @Test
     public void testLegacyDOFormats() throws Exception {
         System.out.println("Running TestAPIM.testDigitalObjectFormat...");
 
@@ -2633,6 +2670,7 @@ public class TestAPIM
         apim.purgeObject(pid, "purging object demo:999b", false);
     }
 
+    @Test
     public void testValidate() throws Exception {
 
         // test getting xml for object demo:5
@@ -2671,8 +2709,12 @@ public class TestAPIM
         }
     }
 
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestAPIM.class);
+    }
+
     public static void main(String[] args) {
-        junit.textui.TestRunner.run(TestAPIM.class);
+        JUnitCore.runClasses(TestAPIM.class);
     }
 
 }

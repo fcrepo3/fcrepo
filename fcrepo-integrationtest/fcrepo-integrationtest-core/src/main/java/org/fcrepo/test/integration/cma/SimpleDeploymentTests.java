@@ -22,7 +22,7 @@ import org.junit.Test;
 
 public class SimpleDeploymentTests {
 
-    private static FedoraClient m_client;
+    private static FedoraClient s_client;
 
     private static final String OBJECT_1_PID =
             "demo:simple-deployment.object.1";
@@ -53,17 +53,23 @@ public class SimpleDeploymentTests {
     @BeforeClass
     public static void bootstrap() throws Exception {
 
-        m_client =
+        s_client =
                 new FedoraClient(FedoraServerTestCase.getBaseURL(),
                                  FedoraServerTestCase.getUsername(),
                                  FedoraServerTestCase.getPassword());
-        Util.ingestTestObjects(SIMPLE_DEPLOYMENT_BASE);
+        Util.ingestTestObjects(s_client, SIMPLE_DEPLOYMENT_BASE);
+    }
+
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        FedoraServerTestCase.purgeDemoObjects(s_client);
+        s_client.shutdown();
     }
 
     /* Assure that listMethods works as advertised */
     @Test
     public void testListMethods() throws Exception {
-        FedoraAPIAMTOM apia = m_client.getAPIAMTOM();
+        FedoraAPIAMTOM apia = s_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
         methods = filterMethods(apia.listMethods(OBJECT_1_PID, null).toArray(new ObjectMethodsDef[0]));
@@ -91,14 +97,13 @@ public class SimpleDeploymentTests {
     /* Assure that listMethods works without sDeps */
     @Test
     public void testListMethodsWithoutSDeps() throws Exception {
-        FedoraServerTestCase.purgeDemoObjects();
+        FedoraServerTestCase.purgeDemoObjects(s_client);
         Util
-                .ingestTestObjects(SIMPLE_DEPLOYMENT_PUBLIC_OBJECTS);
+                .ingestTestObjects(s_client, SIMPLE_DEPLOYMENT_PUBLIC_OBJECTS);
         try {
             testListMethods();
         } finally {
-            Util
-                    .ingestTestObjects(SIMPLE_DEPLOYMENT_DEPLOYMENTS);
+            Util.ingestTestObjects(s_client, SIMPLE_DEPLOYMENT_DEPLOYMENTS);
         }
     }
 
@@ -136,11 +141,7 @@ public class SimpleDeploymentTests {
 
     private String getDissemination(String pid, String sDef, String method)
             throws Exception {
-        return Util.getDissemination(m_client, pid, sDef, method);
+        return Util.getDissemination(s_client, pid, sDef, method);
     }
 
-    @AfterClass
-    public static void cleanup() throws Exception {
-        FedoraServerTestCase.purgeDemoObjects();
-    }
 }

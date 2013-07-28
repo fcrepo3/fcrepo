@@ -142,6 +142,7 @@ public class AutoPurger {
                         + context;
                 FedoraClient fc = new FedoraClient(baseURL, args[1], args[2]);
                 AutoPurger a = new AutoPurger(fc.getAPIMMTOM());
+                fc.shutdown();
                 //*******************************************
 
                 /* Single PID:  just purge it */

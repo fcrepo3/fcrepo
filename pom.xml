@@ -118,13 +118,15 @@
     <activemq.version>5.7.0</activemq.version>
     <akubra.version>0.4.0</akubra.version>
     <axiom.version>1.2.14</axiom.version>
-    <cxf.version>2.6.2</cxf.version>
+    <cxf.version>2.7.3</cxf.version>
     <derby.version>10.9.1.0</derby.version>
     <jersey.version>1.8</jersey.version>
     <slf4j.version>1.7.2</slf4j.version>
     <spring.version>3.0.7.RELEASE</spring.version>
     <trippi.version>1.5.8</trippi.version>
     <powermock.version>1.5.1</powermock.version>
+    <httpcomponents.version>4.2.5</httpcomponents.version>
+    <httpcore.version>4.2.4</httpcore.version>
   </properties>
 
   <dependencyManagement>
@@ -134,17 +136,51 @@
         <artifactId>commons-collections</artifactId>
         <version>3.2.1</version>
       </dependency>
-      <dependency>
-        <groupId>commons-httpclient</groupId>
-        <artifactId>commons-httpclient</artifactId>
-        <version>3.1</version>
+
+	  <dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpcore</artifactId>
+	    <version>${httpcore.version}</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
+	  </dependency>
+	  <dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpcore-nio</artifactId>
+	    <version>${httpcore.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+	  </dependency>
+	  <dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpclient</artifactId>
+	    <version>${httpcomponents.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+	  </dependency>
+	  <dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpmime</artifactId>
+	    <version>${httpcomponents.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+	  </dependency>
       <dependency>
         <groupId>javax.xml.bind</groupId>
         <artifactId>jaxb-api</artifactId>
@@ -527,6 +563,14 @@
           <exclusion>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+          </exclusion>
+          <exclusion>
+          	<groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+          </exclusion>
+          <exclusion>
+          	<groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore-nio</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

@@ -33,6 +33,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
+import org.fcrepo.common.http.PreemptiveAuth;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,41 +47,31 @@ public class HttpUtils {
 
     private HttpHost httpHost = null;
 
-    private BasicHttpContext httpContext = null;
-
-    private BasicScheme basicAuth = null;
-
     public HttpUtils(String baseURL, String username, String password)
             throws Exception {
 
         try {
             URL url = new URL(baseURL);
 
-            client = new DefaultHttpClient();
-            basicAuth = new BasicScheme();
-            httpContext = new BasicHttpContext();
             httpHost =
                     new HttpHost(url.getHost(), url.getPort(), url
                             .getProtocol());
-            // default timeouts are zero, so set some
-            HttpConnectionParams.setConnectionTimeout(client.getParams(), 1000 * 30); // 60 seconds
-            HttpConnectionParams.setSoTimeout(client.getParams(), 1000 * 30); // 60 seconds
 
             if (username != null && password != null) {
-                httpContext.setAttribute("preemptive-auth", basicAuth);
+                client = new PreemptiveAuth();
 
-                // Add as the first request interceptor
-                client.addRequestInterceptor(new PreemptiveAuth(), 0);
                 AuthScope authScope =
-                        new AuthScope(url.getHost(),
-                                      url.getPort(),
-                                      AuthScope.ANY_REALM);
-                authScope = new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT);
+                     new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT);
                 Credentials credentials =
                         new UsernamePasswordCredentials(username, password);
                 client.getCredentialsProvider().setCredentials(authScope,
                                                                credentials);
+            } else {
+                client = new DefaultHttpClient();
             }
+            // default timeouts are zero, so set some
+            HttpConnectionParams.setConnectionTimeout(client.getParams(), 1000 * 30); // 60 seconds
+            HttpConnectionParams.setSoTimeout(client.getParams(), 1000 * 30); // 60 seconds
         } catch (Exception e) {
             logger.error("Failed to instantiate HttpUtils.", e);
             throw e;
@@ -241,7 +232,7 @@ public class HttpUtils {
             logger.debug("request line: " + request.getRequestLine());
         }
 
-        HttpResponse response = client.execute(host, request, httpContext);
+        HttpResponse response = client.execute(host, request);
         int sc = response.getStatusLine().getStatusCode();
 
         String phrase = response.getStatusLine().getReasonPhrase();
@@ -282,41 +273,7 @@ public class HttpUtils {
         return body;
     }
 
-    private class PreemptiveAuth
-            implements HttpRequestInterceptor {
-
-        public void process(final HttpRequest request, final HttpContext context)
-                throws HttpException, IOException {
-            AuthState authState =
-                    (AuthState) context
-                            .getAttribute(ClientContext.TARGET_AUTH_STATE);
-            if (authState.getAuthScheme() != null) {
-                return;
-            }
-
-            AuthScheme authScheme =
-                    (AuthScheme) context.getAttribute("preemptive-auth");
-            if (authScheme == null) {
-                return;
-            }
-
-            CredentialsProvider credsProvider =
-                    (CredentialsProvider) context
-                            .getAttribute(ClientContext.CREDS_PROVIDER);
-            HttpHost targetHost =
-                    (HttpHost) context
-                            .getAttribute(ExecutionContext.HTTP_TARGET_HOST);
-
-            Credentials creds =
-                    credsProvider.getCredentials(new AuthScope(targetHost
-                            .getHostName(), targetHost.getPort()));
-            if (creds == null) {
-                return;
-            }
-
-            authState.setAuthScheme(authScheme);
-            authState.setCredentials(creds);
-        }
+    public void shutdown() {
+        client.getConnectionManager().shutdown();
     }
-
 }

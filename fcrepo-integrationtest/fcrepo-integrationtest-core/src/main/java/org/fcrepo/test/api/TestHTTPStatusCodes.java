@@ -4,6 +4,9 @@
  */
 package org.fcrepo.test.api;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,20 +14,26 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
+import junit.framework.JUnit4TestAdapter;
+
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
 
 import org.fcrepo.client.FedoraClient;
-import org.fcrepo.client.HttpInputStream;
-import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
-import org.fcrepo.test.DemoObjectTestSetup;
+import org.fcrepo.common.http.HttpInputStream;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 
 
@@ -40,6 +49,8 @@ import junit.framework.TestSuite;
 public class TestHTTPStatusCodes
         extends FedoraServerTestCase {
 
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(TestHTTPStatusCodes.class);
     public static final String TEST_OBJ = "demo:SmileyBucket";
 
     public static final String BOGUS_DS = "NonExistingDS";
@@ -124,15 +135,32 @@ public class TestHTTPStatusCodes
     private static FedoraClient CLIENT_VALID_USER_BOGUS_PASS;
 
     private static FedoraClient CLIENT_BOGUS_USER;
-
-    //---
-    // Test suite setup
-    //---
-
-    public static Test suite() {
-        TestSuite suite = new TestSuite("TestHTTPStatusCodes TestSuite");
-        suite.addTestSuite(TestHTTPStatusCodes.class);
-        return new DemoObjectTestSetup(suite);
+    
+    @BeforeClass
+    public static void bootstrap() throws Exception {
+        ingestDemoObjects(getClient(true, true, true));
+    }
+    
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        purgeDemoObjects(getClient(true, true, true));
+        
+        if (CLIENT_VALID_USER_VALID_PASS != null) {
+            CLIENT_VALID_USER_VALID_PASS.shutdown();
+            CLIENT_VALID_USER_VALID_PASS = null;
+        }
+        if (CLIENT_VALID_USER_VALID_PASS_UNAUTHORIZED != null) {
+            CLIENT_VALID_USER_VALID_PASS_UNAUTHORIZED.shutdown();
+            CLIENT_VALID_USER_VALID_PASS_UNAUTHORIZED = null;
+        }
+        if (CLIENT_VALID_USER_BOGUS_PASS != null) {
+            CLIENT_VALID_USER_BOGUS_PASS.shutdown();
+            CLIENT_VALID_USER_BOGUS_PASS = null;
+        }
+        if (CLIENT_BOGUS_USER != null) {
+            CLIENT_BOGUS_USER.shutdown();
+            CLIENT_BOGUS_USER = null;
+        }
     }
 
     //---
@@ -201,14 +229,17 @@ public class TestHTTPStatusCodes
     // API-M Lite: getNextPID
     //---
 
+    @Test
     public void testGetNextPID_OK() throws Exception {
         checkOK(GET_NEXT_PID_PATH);
     }
 
+    @Test
     public void testGetNextPID_BadAuthN() throws Exception {
         checkBadAuthN(GET_NEXT_PID_PATH);
     }
 
+    @Test
     public void testGetNextPID_BadAuthZ() throws Exception {
         checkBadAuthZ(GET_NEXT_PID_PATH);
     }
@@ -217,6 +248,7 @@ public class TestHTTPStatusCodes
     // API-M Lite: upload
     //---
 
+    @Test
     public void testUpload_Created() throws Exception {
         checkUploadCode(getClient(true, true, true),
                         "file",
@@ -225,6 +257,7 @@ public class TestHTTPStatusCodes
                         201);
     }
 
+    @Test
     public void testUpload_BadAuthN() throws Exception {
         checkUploadCode(getClient(true, false, true),
                         "file",
@@ -238,6 +271,7 @@ public class TestHTTPStatusCodes
                         401);
     }
 
+    @Test
     public void testUpload_BadRequest() throws Exception {
         checkUploadCode(getClient(true, true, true),
                         "badparam",
@@ -250,6 +284,7 @@ public class TestHTTPStatusCodes
     // API-A Lite: describeRepository
     //---
 
+    @Test
     public void testDescribeRepository_OK() throws Exception {
         checkOK(DESCRIBE_REPOSITORY_PATH);
     }
@@ -258,15 +293,18 @@ public class TestHTTPStatusCodes
     // API-A Lite: getDatastreamDissemination
     //---
 
+    @Test
     public void testGetDatastreamDissemination_OK() throws Exception {
         checkOK(GET_DS_DISSEM_PATH);
     }
 
+    @Test
     public void testGetDatastreamDissemination_Datastream_NotFound()
             throws Exception {
         checkNotFound(GET_DS_DISSEM_BOGUS_DS_PATH);
     }
 
+    @Test
     public void testGetDatastreamDissemination_Object_NotFound()
             throws Exception {
         checkNotFound(GET_DS_DISSEM_BOGUS_OBJ_PATH);
@@ -276,14 +314,17 @@ public class TestHTTPStatusCodes
     // API-A Lite: getDissemination (default)
     //---
 
+    @Test
     public void testGetDissemination_Default_OK() throws Exception {
         checkOK(GET_DEFAULT_DISSEM_PATH);
     }
 
+    @Test
     public void testGetDissemination_Default_Method_NotFound() throws Exception {
         checkNotFound(GET_DEFAULT_DISSEM_BOGUS_METHOD_PATH);
     }
 
+    @Test
     public void testGetDissemination_Default_Object_NotFound() throws Exception {
         checkNotFound(GET_DEFAULT_DISSEM_BOGUS_OBJ_PATH);
     }
@@ -292,14 +333,17 @@ public class TestHTTPStatusCodes
     // API-A Lite: getDissemination (custom)
     //---
 
+    @Test
     public void testGetDissemination_Custom_OK() throws Exception {
         checkOK(GET_CUSTOM_DISSEM_PATH);
     }
 
+    @Test
     public void testGetDissemination_Custom_Method_NotFound() throws Exception {
         checkNotFound(GET_CUSTOM_DISSEM_BOGUS_METHOD_PATH);
     }
 
+    @Test
     public void testGetDissemination_Custom_Object_NotFound() throws Exception {
         checkNotFound(GET_CUSTOM_DISSEM_BOGUS_OBJ_PATH);
     }
@@ -308,10 +352,12 @@ public class TestHTTPStatusCodes
     // API-A Lite: getObjectHistory
     //---
 
+    @Test
     public void testGetObjectHistory_OK() throws Exception {
         checkOK(GET_OBJ_HISTORY_PATH);
     }
 
+    @Test
     public void testGetObjectHistory_Object_NotFound() throws Exception {
         checkNotFound(GET_OBJ_HISTORY_BOGUS_OBJ_PATH);
     }
@@ -320,10 +366,12 @@ public class TestHTTPStatusCodes
     // API-A Lite: getObjectProfile
     //---
 
+    @Test
     public void testGetObjectProfile_OK() throws Exception {
         checkOK(GET_OBJ_PROFILE_PATH);
     }
 
+    @Test
     public void testGetObjectProfile_Object_NotFound() throws Exception {
         checkNotFound(GET_OBJ_PROFILE_BOGUS_OBJ_PATH);
     }
@@ -332,10 +380,12 @@ public class TestHTTPStatusCodes
     // API-A Lite: listDatastreams
     //---
 
+    @Test
     public void testListDatastreams_OK() throws Exception {
         checkOK(LIST_DATASTREAMS_PATH);
     }
 
+    @Test
     public void testListDatastreams_Object_NotFound() throws Exception {
         checkNotFound(LIST_DATASTREAMS_BOGUS_OBJ_PATH);
     }
@@ -344,10 +394,12 @@ public class TestHTTPStatusCodes
     // API-A Lite: listMethods
     //---
 
+    @Test
     public void testListMethods_OK() throws Exception {
         checkOK(LIST_METHODS_PATH);
     }
 
+    @Test
     public void testListMethods_Object_NotFound() throws Exception {
         checkNotFound(LIST_METHODS_BOGUS_OBJ_PATH);
     }
@@ -355,10 +407,12 @@ public class TestHTTPStatusCodes
     //---
     // API-A Lite: findObjects
     //---
+    @Test
     public void testFindObjects_OK() throws Exception {
         checkOK(FIND_OBJECTS_PATH);
     }
 
+    @Test
     public void testFindObjects_BadRequest() throws Exception {
         checkBadRequest(FIND_OBJECTS_BADREQ_PATH);
     }
@@ -367,23 +421,12 @@ public class TestHTTPStatusCodes
     // Static helpers
     //---
 
-    private static int getStatus(FedoraClient client, String requestPath)
-            throws Exception {
-        HttpInputStream in = client.get(requestPath, false);
-        try {
-            return in.getStatusCode();
-        } finally {
-            in.close();
-        }
-    }
-
     private static FedoraClient getClient(boolean validUser,
                                           boolean validPass,
                                           boolean authorized) throws Exception {
         if (validUser) {
             if (validPass) {
-                System.out
-                        .println("Using Fedora Client with valid user, valid pass");
+                LOGGER.info("Using Fedora Client with valid user, valid pass");
                 if (authorized) {
                     if (CLIENT_VALID_USER_VALID_PASS == null) {
                         CLIENT_VALID_USER_VALID_PASS = getFedoraClient();
@@ -399,8 +442,7 @@ public class TestHTTPStatusCodes
                     return CLIENT_VALID_USER_VALID_PASS_UNAUTHORIZED;
                 }
             } else {
-                System.out
-                        .println("Using Fedora Client with valid user, bogus pass");
+                LOGGER.info("Using Fedora Client with valid user, bogus pass");
                 if (CLIENT_VALID_USER_BOGUS_PASS == null) {
                     CLIENT_VALID_USER_BOGUS_PASS =
                             getFedoraClient(getBaseURL(),
@@ -410,7 +452,7 @@ public class TestHTTPStatusCodes
                 return CLIENT_VALID_USER_BOGUS_PASS;
             }
         } else {
-            System.out.println("Using Fedora Client with bogus user");
+            LOGGER.info("Using Fedora Client with bogus user");
             if (CLIENT_BOGUS_USER == null) {
                 CLIENT_BOGUS_USER =
                         getFedoraClient(getBaseURL(), "bogus", "bogus");
@@ -470,9 +512,11 @@ public class TestHTTPStatusCodes
     }
 
     private static void backupFedoraUsersFile() throws Exception {
-        File sourceFile = FedoraUsers.fedoraUsersXML;
+        @SuppressWarnings("deprecation")
+        File sourceFile =
+                org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers.fedoraUsersXML;
         File destFile =
-                new File(FedoraUsers.fedoraUsersXML.getPath() + ".backup");
+                new File(sourceFile.getPath() + ".backup");
         copyFile(sourceFile, destFile);
     }
 
@@ -492,8 +536,10 @@ public class TestHTTPStatusCodes
         }
     }
 
+    @SuppressWarnings("deprecation")
     private static void writeFedoraUsersFile(String xml) throws Exception {
-        writeStringToFile(xml, FedoraUsers.fedoraUsersXML);
+        writeStringToFile(xml,
+            org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers.fedoraUsersXML);
     }
 
     private static void writeStringToFile(String string, File file)
@@ -508,9 +554,11 @@ public class TestHTTPStatusCodes
     }
 
     private static void restoreFedoraUsersFile() throws Exception {
+        @SuppressWarnings("deprecation")
+        File destFile =
+            org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers.fedoraUsersXML;
         File sourceFile =
-                new File(FedoraUsers.fedoraUsersXML.getPath() + ".backup");
-        File destFile = FedoraUsers.fedoraUsersXML;
+                new File(destFile.getPath() + ".backup");
         copyFile(sourceFile, destFile);
     }
 
@@ -592,19 +640,17 @@ public class TestHTTPStatusCodes
                                      String url,
                                      File file,
                                      String partName) throws Exception {
-        PostMethod post = null;
+        HttpPost post = null;
         try {
-            post = new PostMethod(url);
-            post.setDoAuthentication(true);
-            post.getParams().setParameter("Connection", "Keep-Alive");
-            post.setContentChunked(true);
-            Part[] parts = {new FilePart(partName, file)};
-            post.setRequestEntity(new MultipartRequestEntity(parts, post
-                    .getParams()));
-            int responseCode = client.getHttpClient().executeMethod(post);
+            post = new HttpPost(url);
+            MultipartEntity entity = new MultipartEntity();
+            entity.addPart(partName, new FileBody(file));
+            post.setEntity(entity);
+            HttpResponse response = client.getHttpClient().execute(post);
+            int responseCode = response.getStatusLine().getStatusCode();
             if (responseCode > 299 && responseCode < 400) {
-                String location = post.getResponseHeader("location").getValue();
-                System.out.println("Redirected to " + location);
+                String location = response.getFirstHeader(HttpHeaders.LOCATION).getValue();
+                LOGGER.debug("Redirected to {}", location);
                 return getUploadCode(client, location, file, partName);
             } else {
                 return responseCode;
@@ -614,6 +660,14 @@ public class TestHTTPStatusCodes
                 post.releaseConnection();
             }
         }
+    }
+
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestHTTPStatusCodes.class);
+    }
+
+    public static void main(String[] args) {
+        JUnitCore.runClasses(TestHTTPStatusCodes.class);
     }
 
 }

@@ -6,27 +6,40 @@ package org.fcrepo.server.security.servletfilters.pubcookie;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.Cookie;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
+import javax.ws.rs.core.HttpHeaders;
 
 import org.w3c.dom.Node;
 
 import org.w3c.tidy.Tidy;
 
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.client.protocol.ResponseProcessCookies;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BestMatchSpec;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,33 +77,39 @@ public class ConnectPubcookie {
         return responseCookies;
     }
 
-    private static final HttpMethodBase setup(HttpClient client,
+    private static final HttpUriRequest setup(HttpClient client,
                                               URL url,
                                               Map requestParameters,
                                               Cookie[] requestCookies) {
         logger.debug("Entered setup()");
-        HttpMethodBase method = null;
+        HttpUriRequest method = null;
         if (requestParameters == null) {
             logger.debug("Using GetMethod; requestParameters == null");
-            method = new GetMethod(url.toExternalForm());
+            method = new HttpGet(url.toExternalForm());
         } else {
             logger.debug("Using PostMethod; requestParameters specified");
-            method = new PostMethod(url.toExternalForm()); // "http://localhost:8080/"
+            HttpPost post = new HttpPost(url.toExternalForm()); // "http://localhost:8080/"
 
-            Part[] parts = new Part[requestParameters.size()];
+            List<NameValuePair> formParams = new ArrayList<NameValuePair>(requestParameters.size());
             Iterator iterator = requestParameters.keySet().iterator();
             for (int i = 0; iterator.hasNext(); i++) {
                 String fieldName = (String) iterator.next();
                 String fieldValue = (String) requestParameters.get(fieldName);
-                StringPart stringPart = new StringPart(fieldName, fieldValue);
-                parts[i] = stringPart;
+                NameValuePair stringPart = new BasicNameValuePair(fieldName, fieldValue);
+                formParams.add(stringPart);
                 logger.debug("Adding Post parameter {} = {}", fieldName, fieldValue);
-                ((PostMethod) method).addParameter(fieldName, fieldValue); //old way
             }
+            UrlEncodedFormEntity entity = null;
+            try {
+                entity = new UrlEncodedFormEntity(formParams, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                // UTF-8 is supported
+            }
+            post.setEntity(entity);
+            method = post;
         }
-        HttpState state = client.getState();
         for (Cookie cookie : requestCookies) {
-            state.addCookie(cookie);
+            method.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         }
         return method;
     }
@@ -145,14 +164,21 @@ public class ConnectPubcookie {
                     + " to " + truststorePassword);
         }
 
-        HttpClient client = new HttpClient();
+        DefaultHttpClient client = new DefaultHttpClient();
         logger.debug(".connect() requestCookies==" + requestCookies);
-        HttpMethodBase method =
+        BasicCookieStore cookies = new BasicCookieStore();
+        HttpUriRequest method =
                 setup(client, url, requestParameters, requestCookies);
+        HttpContext context = new BasicHttpContext();
+        context.setAttribute(ClientContext.COOKIE_SPEC, new BestMatchSpec());
+        context.setAttribute(ClientContext.COOKIE_STORE, cookies);
+        client.addResponseInterceptor(new ResponseProcessCookies());
+        
         int statusCode = 0;
+        HttpResponse response = null;
         try {
-            client.executeMethod(method);
-            statusCode = method.getStatusCode();
+            response = client.execute(method);
+            statusCode = response.getStatusLine().getStatusCode();
         } catch (Exception e) {
             logger.error("failed original connect, url==" + urlString, e);
         }
@@ -160,7 +186,7 @@ public class ConnectPubcookie {
         logger.debug("status code==" + statusCode);
 
         if (302 == statusCode) {
-            Header redirectHeader = method.getResponseHeader("Location");
+            Header redirectHeader = response.getFirstHeader(HttpHeaders.LOCATION);
             if (redirectHeader != null) {
                 String redirectString = redirectHeader.getValue();
                 if (redirectString != null) {
@@ -177,8 +203,8 @@ public class ConnectPubcookie {
                     }
                     statusCode = 0;
                     try {
-                        client.executeMethod(method);
-                        statusCode = method.getStatusCode();
+                        response = client.execute(method);
+                        statusCode = response.getStatusLine().getStatusCode();
                         logger.debug(".connect() (on redirect) statusCode==" + statusCode);
                     } catch (Exception e) {
                         logger.error(".connect() "
@@ -190,7 +216,9 @@ public class ConnectPubcookie {
         if (statusCode == 200) { // this is either the original, non-302, status code or the status code after redirect
             String content = null;
             try {
-                content = method.getResponseBodyAsString();
+                if (response.getEntity() != null) {
+                    content = EntityUtils.toString(response.getEntity());
+                }
             } catch (IOException e) {
                 logger.error("Error getting content", e);
                 return;
@@ -210,15 +238,16 @@ public class ConnectPubcookie {
                         new ByteArrayInputStream(inputBytes);
                 responseDocument = tidy.parseDOM(inputStream, null); //use returned root node as only output
             }
-            HttpState state = client.getState();
+
             try {
-                responseCookies2 = method.getRequestHeaders();
+                responseCookies2 = response.getAllHeaders();
                 if (logger.isDebugEnabled()) {
                     for (Header element : responseCookies2) {
                         logger.debug("Header: {}={}", element.getName(), element.getValue());
                     }
                 }
-                responseCookies = state.getCookies();
+                
+                responseCookies = cookies.getCookies().toArray(new Cookie[0]);
                 logger.debug(this.getClass().getName()
                         + ".connect() responseCookies==" + responseCookies);
             } catch (Throwable t) {

@@ -223,6 +223,7 @@ public class DatastreamConduit {
                         + context;
                 FedoraClient fc = new FedoraClient(baseURL, username, password);
                 FedoraAPIMMTOM sourceRepoAPIM = fc.getAPIMMTOM();
+                fc.shutdown();
                 //*******************************************
                 DatastreamConduit c = new DatastreamConduit(sourceRepoAPIM);
 

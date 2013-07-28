@@ -4,19 +4,30 @@
  */
 package org.fcrepo.test.api;
 
+import static junit.framework.Assert.assertEquals;
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathExists;
+import static org.fcrepo.test.OneEmptyObjectTestSetup.ingestOneEmptyObject;
+import static org.fcrepo.test.OneEmptyObjectTestSetup.purgeOneEmptyObject;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.JUnit4TestAdapter;
 
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
 
-import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import org.fcrepo.client.FedoraClient;
 
@@ -24,7 +35,6 @@ import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 
 import org.fcrepo.test.FedoraServerTestCase;
-import org.fcrepo.test.OneEmptyObjectTestSetup;
 
 
 
@@ -44,6 +54,9 @@ import org.fcrepo.test.OneEmptyObjectTestSetup;
 public class TestAuthentication
         extends FedoraServerTestCase {
 
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(TestAuthentication.class);
+    
     private final static String TEST_PID = "demo:AuthNTestObject";
 
     private final static int TIMES_PER_TEST = 50;
@@ -54,16 +67,11 @@ public class TestAuthentication
 
     private static FedoraClient CLIENT_BOGUS_USER;
 
-    public static Test suite() {
-        TestSuite suite = new TestSuite("TestAuthentication TestSuite");
-        suite.addTestSuite(TestAuthentication.class);
-        return new OneEmptyObjectTestSetup(suite, TEST_PID);
-    }
-
     //---
     // API-M SOAP Tests
     //---
 
+    @Test
     public void testAPIMSOAPAuthNValidUserValidPass() throws Exception {
         int failCount = modifyLabel(getClient(true, true), TIMES_PER_TEST);
         assertEquals("Modifying object label using valid user, valid pass failed "
@@ -75,6 +83,7 @@ public class TestAuthentication
                      failCount);
     }
 
+    @Test
     public void testAPIMSOAPAuthNValidUserBogusPass() throws Exception {
         int failCount = modifyLabel(getClient(true, false), TIMES_PER_TEST);
         int successCount = TIMES_PER_TEST - failCount;
@@ -87,6 +96,7 @@ public class TestAuthentication
                      successCount);
     }
 
+    @Test
     public void testAPIMSOAPAuthNBogusUser() throws Exception {
         int failCount = modifyLabel(getClient(false, false), TIMES_PER_TEST);
         int successCount = TIMES_PER_TEST - failCount;
@@ -103,6 +113,7 @@ public class TestAuthentication
     // API-M Lite Tests
     //---
 
+    @Test
     public void testAPIMLiteAuthNValidUserValidPass() throws Exception {
         int failCount = getNextPID(getClient(true, true), TIMES_PER_TEST);
         assertEquals("Getting next PID using valid user, valid pass failed "
@@ -112,6 +123,7 @@ public class TestAuthentication
                      failCount);
     }
 
+    @Test
     public void testAPIMLiteAuthNValidUserBogusPass() throws Exception {
         int failCount = getNextPID(getClient(true, false), TIMES_PER_TEST);
         int successCount = TIMES_PER_TEST - failCount;
@@ -120,6 +132,7 @@ public class TestAuthentication
                 + " attempts", 0, successCount);
     }
 
+    @Test
     public void testAPIMLiteAuthNBogusUser() throws Exception {
         int failCount = getNextPID(getClient(false, false), TIMES_PER_TEST);
         int successCount = TIMES_PER_TEST - failCount;
@@ -132,6 +145,7 @@ public class TestAuthentication
     // API-A SOAP Tests
     //---
 
+    @Test
     public void testAPIASOAPAuthNValidUserValidPass() throws Exception {
         int failCount = listDatastreams(getClient(true, true), TIMES_PER_TEST);
         assertEquals("Listing object datastreams using valid user, valid pass failed "
@@ -143,6 +157,7 @@ public class TestAuthentication
                      failCount);
     }
 
+    @Test
     public void testAPIASOAPAuthNValidUserBogusPass() throws Exception {
         int failCount = listDatastreams(getClient(true, false), TIMES_PER_TEST);
         int successCount = TIMES_PER_TEST - failCount;
@@ -155,6 +170,7 @@ public class TestAuthentication
                      successCount);
     }
 
+    @Test
     public void testAPIASOAPAuthNBogusUser() throws Exception {
         int failCount =
                 listDatastreams(getClient(false, false), TIMES_PER_TEST);
@@ -172,6 +188,7 @@ public class TestAuthentication
     // API-A Lite Tests
     //---
 
+    @Test
     public void testAPIALiteAuthNValidUserValidPass() throws Exception {
         int failCount = getDCContent(getClient(true, true), TIMES_PER_TEST);
         assertEquals("Getting DC content using valid user, valid pass failed "
@@ -181,6 +198,7 @@ public class TestAuthentication
                      failCount);
     }
 
+    @Test
     public void testAPIALiteAuthNValidUserBogusPass() throws Exception {
         int failCount = getDCContent(getClient(true, false), TIMES_PER_TEST);
         int successCount = TIMES_PER_TEST - failCount;
@@ -193,6 +211,7 @@ public class TestAuthentication
                      successCount);
     }
 
+    @Test
     public void testAPIALiteAuthNBogusUser() throws Exception {
         int failCount = getDCContent(getClient(false, false), TIMES_PER_TEST);
         int successCount = TIMES_PER_TEST - failCount;
@@ -209,7 +228,7 @@ public class TestAuthentication
     // Static helpers
     //---
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put("management", "http://www.fedora.info/definitions/1/0/management/");
@@ -217,26 +236,39 @@ public class TestAuthentication
         NamespaceContext ctx = new SimpleNamespaceContext(nsMap);
         XMLUnit.setXpathNamespaceContext(ctx);
     }
-
-    @Override
-    @After
-    public void tearDown() {
-        XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
+    
+    @BeforeClass
+    public static void bootstrap() throws Exception {
+        CLIENT_VALID_USER_VALID_PASS = getFedoraClient();
+        ingestOneEmptyObject(CLIENT_VALID_USER_VALID_PASS, TEST_PID);
     }
 
-    private static FedoraClient getClient(boolean validUser, boolean validPass)
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
+        purgeOneEmptyObject(CLIENT_VALID_USER_VALID_PASS, TEST_PID);
+        if (CLIENT_VALID_USER_VALID_PASS != null) {
+            CLIENT_VALID_USER_VALID_PASS.shutdown();
+        }
+        if (CLIENT_VALID_USER_BOGUS_PASS != null) {
+            CLIENT_VALID_USER_BOGUS_PASS.shutdown();
+        }
+        if (CLIENT_BOGUS_USER != null) {
+            CLIENT_BOGUS_USER.shutdown();
+        }
+    }
+
+    private FedoraClient getClient(boolean validUser, boolean validPass)
             throws Exception {
         if (validUser) {
             if (validPass) {
-                System.out
-                        .println("Using Fedora Client with valid user, valid pass");
+                LOGGER.info("Using Fedora Client with valid user, valid pass");
                 if (CLIENT_VALID_USER_VALID_PASS == null) {
                     CLIENT_VALID_USER_VALID_PASS = getFedoraClient();
                 }
                 return CLIENT_VALID_USER_VALID_PASS;
             } else {
-                System.out
-                        .println("Using Fedora Client with valid user, bogus pass");
+                LOGGER.info("Using Fedora Client with valid user, bogus pass");
                 if (CLIENT_VALID_USER_BOGUS_PASS == null) {
                     CLIENT_VALID_USER_BOGUS_PASS =
                             getFedoraClient(getBaseURL(),
@@ -246,7 +278,7 @@ public class TestAuthentication
                 return CLIENT_VALID_USER_BOGUS_PASS;
             }
         } else {
-            System.out.println("Using Fedora Client with bogus user");
+            LOGGER.info("Using Fedora Client with bogus user");
             if (CLIENT_BOGUS_USER == null) {
                 CLIENT_BOGUS_USER =
                         getFedoraClient(getBaseURL(), "bogus", "bogus");
@@ -261,8 +293,8 @@ public class TestAuthentication
 
     // returns failCount
     private int modifyLabel(FedoraClient client, int numTimes) {
-        System.out.println("Modifying object label via API-M SOAP " + numTimes
-                + " times...");
+        LOGGER.info("Modifying object label via API-M SOAP {} times...",
+                numTimes);
         int failCount = 0;
         FedoraAPIMMTOM apim = null;
         for (int i = 0; i < numTimes; i++) {
@@ -275,14 +307,13 @@ public class TestAuthentication
                 failCount++;
             }
         }
-        System.out.println("Failed " + failCount + " times");
+        LOGGER.info("Failed {} times", failCount);
         return failCount;
     }
 
     // returns failCount
     private int getNextPID(FedoraClient client, int numTimes) {
-        System.out.println("Getting next PID via API-M Lite " + numTimes
-                + " times...");
+        LOGGER.info("Getting next PID via API-M Lite {} times...", numTimes);
         int failCount = 0;
         for (int i = 0; i < numTimes; i++) {
             try {
@@ -294,14 +325,13 @@ public class TestAuthentication
                 failCount++;
             }
         }
-        System.out.println("Failed " + failCount + " times");
+        LOGGER.info("Failed {} times", failCount);
         return failCount;
     }
 
     // returns failCount
     private int listDatastreams(FedoraClient client, int numTimes) {
-        System.out.println("Listing object datastreams via API-A SOAP "
-                + numTimes + " times...");
+        LOGGER.info("Listing object datastreams via API-A SOAP {} times...", numTimes);
         int failCount = 0;
         FedoraAPIAMTOM apia = null;
         for (int i = 0; i < numTimes; i++) {
@@ -314,14 +344,13 @@ public class TestAuthentication
                 failCount++;
             }
         }
-        System.out.println("Failed " + failCount + " times");
+        LOGGER.info("Failed {} times", failCount);
         return failCount;
     }
 
     // returns failCount
     private int getDCContent(FedoraClient client, int numTimes) {
-        System.out.println("Getting DC content via API-A Lite " + numTimes
-                + " times...");
+        LOGGER.debug("Getting DC content via API-A Lite {} times...", numTimes);
         int failCount = 0;
         for (int i = 0; i < numTimes; i++) {
             try {
@@ -329,21 +358,21 @@ public class TestAuthentication
                         getXMLQueryResult(client, "/get/" + TEST_PID + "/DC");
                 assertXpathExists("/oai_dc:dc", result);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                LOGGER.info(e.getMessage());
 
                 failCount++;
             }
         }
-        System.out.println("Failed " + failCount + " times");
+        LOGGER.debug("Failed {} times", failCount);
         return failCount;
     }
 
-    //---
-    // Command-line entry point
-    //---
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestAuthentication.class);
+    }
 
     public static void main(String[] args) {
-        junit.textui.TestRunner.run(TestAuthentication.class);
+        JUnitCore.runClasses(TestAuthentication.class);
     }
 
 }

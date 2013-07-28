@@ -117,6 +117,7 @@ public class AutoFinder {
             String baseURL = protocol + "://" + host + ":" + port + "/" + context;
             FedoraClient fc = new FedoraClient(baseURL, user, pass);
             AutoFinder finder = new AutoFinder(fc.getAPIAMTOM());
+            fc.shutdown();
 
             FieldSearchQuery query = new FieldSearchQuery();
             org.fcrepo.server.types.gen.ObjectFactory factory =

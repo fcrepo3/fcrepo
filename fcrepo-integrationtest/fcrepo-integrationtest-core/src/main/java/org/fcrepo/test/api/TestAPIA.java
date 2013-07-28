@@ -5,12 +5,16 @@
 
 package org.fcrepo.test.api;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathExists;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.framework.JUnit4TestAdapter;
 
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
@@ -35,9 +39,13 @@ import org.fcrepo.server.types.gen.RepositoryInfo;
 import org.fcrepo.server.types.mtom.gen.GetDissemination.Parameters;
 import org.fcrepo.server.types.mtom.gen.MIMETypedStream;
 import org.fcrepo.server.utilities.TypeUtility;
-import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
 
 /**
  * Test of the Fedora Access Service (API-A). describeRepository findObjects
@@ -50,19 +58,17 @@ import org.junit.After;
 public class TestAPIA
         extends FedoraServerTestCase {
 
+    private static FedoraClient s_client;
+    
     private FedoraAPIAMTOM apia;
 
-    public static Test suite() {
-        TestSuite suite = new TestSuite("APIA TestSuite");
-        suite.addTestSuite(TestAPIA.class);
-        return new DemoObjectTestSetup(suite);
-    }
-
+    @Test
     public void testDescribeRepository() throws Exception {
         RepositoryInfo describe = apia.describeRepository();
         assertTrue(!describe.getRepositoryName().equals(""));
     }
 
+    @Test
     public void testFindObjects() throws Exception {
         // Test that a search for pid=demo:5 returns one result; demo:5
         String[] resultFields = {"pid"};
@@ -86,6 +92,7 @@ public class TestAPIA
         assertEquals("demo:5", fields.get(0).getPid().getValue());
     }
 
+    @Test
     public void testGetDatastreamDissemination() throws Exception {
         MIMETypedStream ds = null;
 
@@ -119,6 +126,7 @@ public class TestAPIA
         assertTrue(bytes.length > 0);
     }
 
+    @Test
     public void testGetDisseminationDefault() throws Exception {
         MIMETypedStream diss = null;
         Parameters params = new Parameters();
@@ -141,6 +149,7 @@ public class TestAPIA
      * assertTrue(diss.getStream().length > 0); }
      */
 
+    @Test
     public void testGetDisseminationUserInput() throws Exception {
         MIMETypedStream diss = null;
         Parameters params = new Parameters();
@@ -158,11 +167,13 @@ public class TestAPIA
         assertTrue(TypeUtility.convertDataHandlerToBytes(diss.getStream()).length > 0);
     }
 
+    @Test
     public void testObjectHistory() throws Exception {
         List<String> timestamps = apia.getObjectHistory("demo:5");
         assertTrue(timestamps.size() > 0);
     }
 
+    @Test
     public void testGetObjectProfile() throws Exception {
         ObjectProfile profile = apia.getObjectProfile("demo:5", null);
         assertEquals("demo:5", profile.getPid());
@@ -170,6 +181,7 @@ public class TestAPIA
         assertTrue(!profile.getObjItemIndexViewURL().equals(""));
     }
 
+    @Test
     public void testGetObjectProfileBasicCModel() throws Exception {
         for (String pid : new String[] {"demo:SmileyPens",
                 "demo:SmileyGreetingCard"}) {
@@ -187,20 +199,21 @@ public class TestAPIA
         }
     }
 
+    @Test
     public void testListDatastreams() throws Exception {
         List<DatastreamDef> dsDefs = apia.listDatastreams("demo:5", null);
         assertEquals(6, dsDefs.size());
     }
 
+    @Test
     public void testListMethods() throws Exception {
         List<ObjectMethodsDef> methodDefs = apia.listMethods("demo:5", null);
         assertEquals(8, methodDefs.size());
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
-        FedoraClient client = getFedoraClient();
-        apia = client.getAPIAMTOM();
+        apia = s_client.getAPIAMTOM();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put(OAI_DC.prefix, OAI_DC.uri);
         nsMap.put(DC.prefix, DC.uri);
@@ -208,14 +221,29 @@ public class TestAPIA
         XMLUnit.setXpathNamespaceContext(ctx);
     }
 
-    @Override
     @After
     public void tearDown() {
         XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
     }
+    
+    @BeforeClass
+    public static void bootStrap() throws Exception {
+        s_client = getFedoraClient();
+        ingestDemoObjects(s_client);
+    }
+    
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        purgeDemoObjects(s_client);
+        s_client.shutdown();
+    }
+    
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestAPIA.class);
+    }
 
     public static void main(String[] args) {
-        junit.textui.TestRunner.run(TestAPIA.class);
+        JUnitCore.runClasses(TestAPIA.class);
     }
 
 }

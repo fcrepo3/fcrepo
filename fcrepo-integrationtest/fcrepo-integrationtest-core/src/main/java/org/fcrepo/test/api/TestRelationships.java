@@ -5,6 +5,12 @@
 
 package org.fcrepo.test.api;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -16,8 +22,7 @@ import java.util.concurrent.Executors;
 
 import javax.xml.ws.soap.SOAPFaultException;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.framework.JUnit4TestAdapter;
 
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
@@ -31,6 +36,12 @@ import org.fcrepo.server.types.gen.RelationshipTuple;
 import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.fcrepo.test.ManagedContentTranslator;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
 import org.openrdf.rio.ntriples.NTriplesParser;
 import org.trippi.TripleIterator;
 import org.trippi.io.RIOTripleIterator;
@@ -45,9 +56,11 @@ public class TestRelationships
         extends FedoraServerTestCase
         implements Constants {
 
+    private static FedoraClient s_client;
+    
     private FedoraAPIMMTOM apim;
 // probably 1 thread would be fine...
-    private final ExecutorService exec = Executors.newFixedThreadPool(4);
+    private static ExecutorService exec;
 
     private static final String RISEARCH_QUERY =
             "/risearch?type=triples&lang=spo&format=NTriples&stream=on&"
@@ -166,15 +179,21 @@ public class TestRelationships
 
     }
 
-    public static Test suite() {
-        TestSuite suite = new TestSuite("TestRelationships TestSuite");
-        suite.addTestSuite(TestRelationships.class);
-        return suite;
+    @BeforeClass
+    public static void bootStrap() throws Exception {
+        s_client = getFedoraClient();
+        exec = Executors.newFixedThreadPool(4);
+    }
+    
+    @AfterClass
+    public static void cleanUp() {
+        exec.shutdown();
+        s_client.shutdown();
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
-        apim = getFedoraClient().getAPIMMTOM();
+        apim = s_client.getAPIMMTOM();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
         nsMap.put("dc", "http://purl.org/dc/elements/1.1/");
@@ -198,17 +217,16 @@ public class TestRelationships
                                                     "demo:777m");
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
         apim.purgeObject("demo:777", "", false);
         apim.purgeObject("demo:888", "", false);
         apim.purgeObject("demo:777m", "", false);
         apim.purgeObject("demo:888m", "", false);
         XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
-
-    	exec.shutdown();
     }
 
+    @Test
     public void testAddRelationship() throws Exception {
         String p, o;
         int relNum = 0; // used to form unique relationships... addRelationship needs unique predicate x object combinatinos
@@ -232,6 +250,7 @@ public class TestRelationships
         }
     }
 
+    @Test
     public void testValidation() {
         String p, o;
         int relNum = 0; // used to form unique relationships or objects/object literals... addRelationship needs unique predicate x object combinations
@@ -276,6 +295,7 @@ public class TestRelationships
         }
     }
 
+    @Test
     public void testBadSubjectURI() {
         String s, p, o;
 
@@ -317,6 +337,7 @@ public class TestRelationships
         } catch (SOAPFaultException se) {}
     }
 
+    @Test
     public void testGetRelationships() throws Exception {
         String p, o;
         int relNum = 0; // used to form unique relationships or objects/object literals... addRelationship needs unique predicate x object combinations
@@ -342,12 +363,14 @@ public class TestRelationships
         }
     }
 
+    @Test
     public void testGetAllRelationships() throws Exception {
         // subject uri and pid
         List<RelationshipTuple> tuples = apim.getRelationships("demo:777", null);
         assertEquals(1, tuples.size());
     }
 
+    @Test
     public void testBasicCModelRelationships() throws Exception {
         // just the uri form for subject, pid form has got a hammering above
         for (String pid : new String[] {"info:fedora/demo:777",
@@ -358,6 +381,7 @@ public class TestRelationships
         }
     }
 
+    @Test
     public void testPurgeRelationships() throws Exception {
         String p, o;
         int relNum = 0; // used to form unique relationships or objects/object literals... addRelationship needs unique predicate x object combinations
@@ -512,8 +536,12 @@ public class TestRelationships
 
     }
 
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestRelationships.class);
+    }
+
     public static void main(String[] args) {
-        junit.textui.TestRunner.run(TestRelationships.class);
+        JUnitCore.runClasses(TestRelationships.class);
     }
 
 }

@@ -4,6 +4,10 @@
  */
 package org.fcrepo.test.api;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +28,7 @@ import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
+import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.types.gen.ArrayOfString;
@@ -35,7 +40,9 @@ import org.fcrepo.utilities.Foxml11Document.ControlGroup;
 import org.fcrepo.utilities.Foxml11Document.Property;
 import org.fcrepo.utilities.Foxml11Document.State;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 
@@ -51,6 +58,8 @@ public class TestManagedDatastreams
 
     private static final String NON_EXIST_UPLOAD = "does not match an existing file";
 
+    private static FedoraClient s_client;
+    
     private FedoraAPIMMTOM apim;
 
     private Abdera abdera;
@@ -68,14 +77,24 @@ public class TestManagedDatastreams
             "uploaded:///tmp/foo.txt",
             "uploaded://tmp/foo.txt"};
 
+    @BeforeClass
+    public static void bootStrap() throws Exception {
+        s_client = getFedoraClient();
+    }
+    
+    @AfterClass
+    public static void cleanUp() {
+        s_client.shutdown();
+    }
+
+
     /**
      * @throws java.lang.Exception
      */
-    @Override
     @Before
     public void setUp() throws Exception {
         abdera = Abdera.getInstance();
-        apim = getFedoraClient().getAPIMMTOM();
+        apim = s_client.getAPIMMTOM();
         System.setProperty("fedoraServerHost", "localhost");
         System.setProperty("fedoraServerPort", "8080");
     }
@@ -83,7 +102,6 @@ public class TestManagedDatastreams
     /**
      * @throws java.lang.Exception
      */
-    @Override
     @After
     public void tearDown() throws Exception {
     }

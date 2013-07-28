@@ -12,7 +12,7 @@ import java.util.Map;
 
 import javax.activation.MimetypesFileTypeMap;
 
-import org.apache.commons.httpclient.Header;
+import org.apache.http.Header;
 import org.fcrepo.common.http.HttpInputStream;
 import org.fcrepo.common.http.WebClient;
 import org.fcrepo.common.http.WebClientConfiguration;

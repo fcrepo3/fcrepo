@@ -49,8 +49,12 @@
 
       <security:filter-chain pattern="/management/*/**"
         filters="ChannelFilter,${security.auth.filters}"/>
-      <security:filter-chain pattern="/access" filters="ChannelFilter,${security.auth.filters.apia}"/>
-      <security:filter-chain pattern="/upload*" filters="ChannelFilter,${security.auth.filters}"/>
+      <security:filter-chain pattern="/management/upload*"
+        filters="ChannelFilter,${security.auth.filters}"/>
+      <security:filter-chain pattern="/access"
+        filters="ChannelFilter,${security.auth.filters.apia}"/>
+      <security:filter-chain pattern="/upload*"
+        filters="ChannelFilter,${security.auth.filters}"/>
 
       <!-- SOAP APIs -->
       <security:filter-chain pattern="/services/access"
@@ -78,7 +82,10 @@
       <security:filter-invocation-definition-source path-type="ant">
 
         <!-- This pattern is used by FedoraClient to determine whether apim endpoint requires SSL or not -->
-        <security:intercept-url pattern="/management/upload" access="${security.ssl.api.management}"/>
+        <security:intercept-url pattern="/management/upload"
+          access="${security.ssl.api.management}"/>
+        <security:intercept-url pattern="/upload"
+          access="${security.ssl.api.management}"/>
         <security:intercept-url pattern="/services/management"
           access="${security.ssl.api.management}"/>
         <security:intercept-url pattern="/services/managementMTOM"
@@ -87,7 +94,8 @@
           access="${security.ssl.api.management}"/>
         <security:intercept-url pattern="/getDSAuthenticated*/**"
           access="${security.ssl.api.management}"/>
-        <security:intercept-url pattern="/**.jws" access="${security.ssl.api.management}"/>
+        <security:intercept-url pattern="/**.jws"
+          access="${security.ssl.api.management}"/>
 
 
         <security:intercept-url pattern="/get*/**" access="${security.ssl.api.access}"/>
@@ -98,7 +106,6 @@
         <security:intercept-url pattern="/search*" access="${security.ssl.api.access}"/>
         <security:intercept-url pattern="/services/access" access="${security.ssl.api.access}"/>
         <security:intercept-url pattern="/services/accessMTOM" access="${security.ssl.api.access}"/>
-        <!-- This pattern is used by FedoraClient to determine whether apia endpoint requires SSL or not -->
         <security:intercept-url pattern="/wsdl*" access="${security.ssl.api.access}"/>
         <security:intercept-url pattern="**.jsp" access="${security.ssl.api.access}"/>
 

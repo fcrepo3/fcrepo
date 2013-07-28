@@ -4,6 +4,9 @@
  */
 package org.fcrepo.server.messaging;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+
 import junit.framework.JUnit4TestAdapter;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
@@ -50,7 +53,6 @@ public class AtomAPIMMessageTest extends FedoraTestCase {
     /**
      * @throws java.lang.Exception
      */
-    @Override
     @Before
     public void setUp() throws Exception {
     }
@@ -58,7 +60,6 @@ public class AtomAPIMMessageTest extends FedoraTestCase {
     /**
      * @throws java.lang.Exception
      */
-    @Override
     @After
     public void tearDown() throws Exception {
     }

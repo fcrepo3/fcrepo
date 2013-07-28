@@ -51,6 +51,10 @@ public class LoadDataset {
             // ignore exceptions, resource index might not be enabled
             System.out.println("Exception on flushing resource index (loading test fesl objects) " + e.getMessage());
         }
+        
+        if (client != null) {
+            client.shutdown();
+        }
 
     }
 }

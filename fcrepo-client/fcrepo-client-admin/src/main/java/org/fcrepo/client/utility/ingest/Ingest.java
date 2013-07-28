@@ -465,6 +465,7 @@ public class Ingest
                 FedoraClient fc = new FedoraClient(baseURL, args[4], args[5]);
                 FedoraAPIAMTOM targetRepoAPIA = fc.getAPIAMTOM();
                 FedoraAPIMMTOM targetRepoAPIM = fc.getAPIMMTOM();
+                fc.shutdown();
                 //*******************************************
 
                 String pid =

@@ -62,6 +62,8 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.media.jai.JAI;
 import javax.servlet.ServletException;
@@ -69,9 +71,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.params.CoreConnectionPNames;
 
 import com.sun.media.jai.codec.BMPEncodeParam;
 import com.sun.media.jai.codec.ImageCodec;
@@ -95,13 +104,36 @@ public class ImageManipulation
         extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+    
+    private static final Logger LOGGER =
+            Logger.getLogger(
+                "org.apache.catalina.core.ContainerBase.[Catalina].[localhost]");
 
     private String inputMimeType;
 
     private boolean alreadyConvertedToRGB = false;
 
-    private final MultiThreadedHttpConnectionManager cManager =
-            new MultiThreadedHttpConnectionManager();
+    private final PoolingClientConnectionManager cManager =
+            getConnectionManager();
+
+    private PoolingClientConnectionManager getConnectionManager() {
+        PoolingClientConnectionManager cm =
+            new PoolingClientConnectionManager();
+        cm.getSchemeRegistry().register(
+                new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
+        cm.getSchemeRegistry().register(
+                new Scheme("https-tomcat", 8443, SSLSocketFactory.getSocketFactory()));
+        cm.getSchemeRegistry().register(
+                new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
+        cm.getSchemeRegistry().register(
+                new Scheme("http-tomcat", 8080, PlainSocketFactory.getSocketFactory()));
+        return cm;
+    }
+
+    @Override
+    public void destroy() {
+        cManager.shutdown();
+    }
 
     /**
      * Method automatically called by browser to handle image manipulations.
@@ -239,18 +271,22 @@ public class ImageManipulation
      *         If any of the aforementioned problems occurs.
      */
     private BufferedImage getImage(String url) throws Exception {
-        GetMethod get = null;
+        HttpGet get = null;
+        LOGGER.info("ImageManipulation: GET " + url);
         try {
-            cManager.getParams().setConnectionTimeout(20000);
-            HttpClient client = new HttpClient(cManager);
-            get = new GetMethod(url);
-            get.setFollowRedirects(true);
-            int resultCode = client.executeMethod(get);
+            DefaultHttpClient client = new DefaultHttpClient(cManager);
+            client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 20000);
+            get = new HttpGet(url);
+            client.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, true);
+            HttpResponse response = client.execute(get);
+            int resultCode = response.getStatusLine().getStatusCode();
             if (resultCode != 200) {
                 throw new ServletException("Could not load image: " + url
                         + ".  Errorcode " + resultCode + " from remote server.");
             }
-            inputMimeType = get.getResponseHeader("Content-Type").getValue();
+            LOGGER.info("ImageManipulation: STATUS " + resultCode);
+            inputMimeType = response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue();
+            LOGGER.info("ImageManipulation: Content-Type " + inputMimeType);
             if (inputMimeType.equals("image/gif")
                     || inputMimeType.equals("image/jpeg")
                     || inputMimeType.equals("image/tiff")
@@ -265,14 +301,15 @@ public class ImageManipulation
                 // mime type, even though it's not
                 // an IANA-registered image type
                 return JAI.create("stream",
-                                  new MemoryCacheSeekableStream(get
-                                          .getResponseBodyAsStream()))
+                                  new MemoryCacheSeekableStream(response
+                                          .getEntity().getContent()))
                         .getAsBufferedImage();
             } else {
                 throw new ServletException("Source image was not a gif, png, "
                         + "bmp, tiff, or jpg.");
             }
         } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw e;
         } finally {
             if (get != null) {

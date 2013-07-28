@@ -5,20 +5,24 @@
 package org.fcrepo.client.utility.ingest;
 
 import org.fcrepo.test.FedoraTestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class TestIngest
         extends FedoraTestCase {
 
-    @Override
+    @Before
     public void setUp() throws Exception {
 
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
 
     }
 
+    @Test
     public void testMultiFromDirectory() throws Exception {
 
     }

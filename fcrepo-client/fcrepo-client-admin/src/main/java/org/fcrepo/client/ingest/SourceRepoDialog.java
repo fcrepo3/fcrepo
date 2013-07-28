@@ -161,6 +161,7 @@ public class SourceRepoDialog
                                                              .getPassword()));
                             m_apia = fc.getAPIAMTOM();
                             m_apim = fc.getAPIMMTOM();
+                            fc.shutdown();
                             //*******************************************************
 
                             // Get SOAP stubs for the source repository.

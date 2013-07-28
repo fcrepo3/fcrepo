@@ -5,7 +5,9 @@
 package org.fcrepo.test.integration.cma;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import junit.framework.Assert;
@@ -66,25 +68,33 @@ public class ConflictingDeploymentTests {
 
     private final String METHOD_NAME = "content";
 
-    private FedoraClient m_client;
+    private static FedoraClient s_client;
 
     public static junit.framework.Test suite() {
         return new junit.framework.JUnit4TestAdapter(ConflictingDeploymentTests.class);
     }
 
-    @Before
-    public void setUp() throws Exception {
-
-        m_client =
+    @BeforeClass
+    public static void bootStrap() throws Exception {
+        s_client =
                 new FedoraClient(FedoraServerTestCase.getBaseURL(),
                                  FedoraServerTestCase.getUsername(),
                                  FedoraServerTestCase.getPassword());
-        ingestTestObjects(PUBLIC_OBJECT_BASE);
+    }
+    
+    @AfterClass
+    public static void cleanUp() {
+        s_client.shutdown();
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        ingestTestObjects(s_client, PUBLIC_OBJECT_BASE);
     }
 
     @After
     public void tearDown() throws Exception {
-        FedoraServerTestCase.purgeDemoObjects();
+        FedoraServerTestCase.purgeDemoObjects(s_client);
     }
 
     /**
@@ -94,8 +104,8 @@ public class ConflictingDeploymentTests {
     @Test
     public void testDeployFirstIngested12() throws Exception {
 
-        ingestTestObjects(DEPLOYMENT_1_BASE);
-        ingestTestObjects(DEPLOYMENT_2_BASE);
+        ingestTestObjects(s_client, DEPLOYMENT_1_BASE);
+        ingestTestObjects(s_client, DEPLOYMENT_2_BASE);
 
         String content = getDisseminatedContent();
 
@@ -113,8 +123,8 @@ public class ConflictingDeploymentTests {
     @Test
     public void testDeployFirstIngested21() throws Exception {
 
-        ingestTestObjects(DEPLOYMENT_2_BASE);
-        ingestTestObjects(DEPLOYMENT_1_BASE);
+        ingestTestObjects(s_client, DEPLOYMENT_2_BASE);
+        ingestTestObjects(s_client, DEPLOYMENT_1_BASE);
 
         String content = getDisseminatedContent();
 
@@ -131,8 +141,8 @@ public class ConflictingDeploymentTests {
      */
     @Test
     public void testModifyOldestSdep() throws Exception {
-        ingestTestObjects(DEPLOYMENT_1_BASE);
-        ingestTestObjects(DEPLOYMENT_2_BASE);
+        ingestTestObjects(s_client, DEPLOYMENT_1_BASE);
+        ingestTestObjects(s_client, DEPLOYMENT_2_BASE);
 
         modify(SDEP_1_PID);
 
@@ -150,8 +160,8 @@ public class ConflictingDeploymentTests {
      */
     @Test
     public void testModifyNewestSdep() throws Exception {
-        ingestTestObjects(DEPLOYMENT_1_BASE);
-        ingestTestObjects(DEPLOYMENT_2_BASE);
+        ingestTestObjects(s_client, DEPLOYMENT_1_BASE);
+        ingestTestObjects(s_client, DEPLOYMENT_2_BASE);
 
         modify(SDEP_2_PID);
 
@@ -169,10 +179,10 @@ public class ConflictingDeploymentTests {
      */
     @Test
     public void testPurgeReplace() throws Exception {
-        ingestTestObjects(DEPLOYMENT_1_BASE);
-        ingestTestObjects(DEPLOYMENT_2_BASE);
+        ingestTestObjects(s_client, DEPLOYMENT_1_BASE);
+        ingestTestObjects(s_client, DEPLOYMENT_2_BASE);
 
-        m_client.getAPIMMTOM()
+        s_client.getAPIMMTOM()
                 .purgeObject(SDEP_1_PID, "removing first sDep", false);
 
         Assert.assertTrue("Did not disseminate expected content: ",
@@ -180,7 +190,7 @@ public class ConflictingDeploymentTests {
     }
 
     private void modify(String pid) throws Exception {
-        m_client.getAPIMMTOM().addRelationship(pid,
+        s_client.getAPIMMTOM().addRelationship(pid,
                                            "http://example.org/isModified",
                                            "true",
                                            true,
@@ -188,7 +198,7 @@ public class ConflictingDeploymentTests {
     }
 
     private String getDisseminatedContent() throws Exception {
-        return Util.getDissemination(m_client,
+        return Util.getDissemination(s_client,
                                      OBJECT_PID,
                                      SDEF_PID,
                                      METHOD_NAME);

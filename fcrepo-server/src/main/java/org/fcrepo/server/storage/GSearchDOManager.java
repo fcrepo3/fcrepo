@@ -14,11 +14,10 @@ import java.net.URLEncoder;
 
 import java.util.Map;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.fcrepo.common.http.HttpInputStream;
 import org.fcrepo.common.http.WebClient;
 import org.fcrepo.common.http.WebClientConfiguration;

@@ -11,9 +11,8 @@ import java.io.InputStream;
 
 import java.net.URI;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-
 import org.apache.commons.io.IOUtils;
+import org.apache.http.auth.UsernamePasswordCredentials;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,23 +43,33 @@ public class ServerUtility {
 
     public static final String FEDORA_REDIRECT_PORT = "fedoraRedirectPort";
 
-    private static ServerConfiguration CONFIG;
+    private static ServerConfiguration CONFIG =
+        getServerConfig();
+    
+    private static WebClient s_webClient =
+            getWebClient();
 
-    static {
+    private static ServerConfiguration getServerConfig() {
         String fedoraHome = Constants.FEDORA_HOME;
         if (fedoraHome == null) {
             logger.warn("FEDORA_HOME not set; unable to initialize");
         } else {
             File fcfgFile = new File(fedoraHome, "server/config/fedora.fcfg");
             try {
-                CONFIG =
-                        new ServerConfigurationParser(new FileInputStream(fcfgFile))
+                return new ServerConfigurationParser(new FileInputStream(fcfgFile))
                                 .parse();
             } catch (IOException e) {
                 logger.warn("Unable to read server configuration from "
                         + fcfgFile.getPath(), e);
             }
         }
+        return null;
+    }
+    
+    private static WebClient getWebClient() {
+        WebClientConfiguration webconfig = new WebClientConfiguration();
+        initWebClientConfig(webconfig);
+        return new WebClient(webconfig);
     }
 
     /**
@@ -118,9 +127,7 @@ public class ServerUtility {
         logger.info("Getting URL: " + url);
         UsernamePasswordCredentials creds =
                 new UsernamePasswordCredentials(user, pass);
-        WebClientConfiguration webconfig = new WebClientConfiguration();
-        initWebClientConfig(webconfig);
-        return new WebClient(webconfig).getResponseAsString(url, true, creds);
+        return s_webClient.getResponseAsString(url, true, creds);
     }
 
     /**
@@ -135,7 +142,7 @@ public class ServerUtility {
         logger.info("Getting URL: " + url);
         UsernamePasswordCredentials creds =
                 new UsernamePasswordCredentials(user, pass);
-        return new WebClient().get(url, true, creds);
+        return s_webClient.get(url, true, creds);
     }
 
 

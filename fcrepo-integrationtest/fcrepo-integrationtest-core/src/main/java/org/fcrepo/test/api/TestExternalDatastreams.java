@@ -4,6 +4,10 @@
  */
 package org.fcrepo.test.api;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -20,6 +24,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import junit.framework.JUnit4TestAdapter;
 
+import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
@@ -31,8 +36,12 @@ import org.fcrepo.utilities.Foxml11Document.ControlGroup;
 import org.fcrepo.utilities.Foxml11Document.Property;
 import org.fcrepo.utilities.Foxml11Document.State;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -43,16 +52,32 @@ import org.junit.Test;
 public class TestExternalDatastreams
         extends FedoraServerTestCase {
 
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(TestExternalDatastreams.class);
+    private static FedoraClient s_client;
+    
     private FedoraAPIM apim;
     private FedoraAPIA apia;
+    
+    @BeforeClass
+    public static void bootStrap() throws Exception {
+        s_client = getFedoraClient();
+    }
+    
+    @AfterClass
+    public static void cleanUp() {
+        s_client.shutdown();
+    }
+
+
+    
     /**
      * @throws java.lang.Exception
      */
-    @Override
     @Before
     public void setUp() throws Exception {
-        apim = getFedoraClient().getAPIM();
-        apia = getFedoraClient().getAPIA();
+        apim = s_client.getAPIM();
+        apia = s_client.getAPIA();
         System.setProperty("fedoraServerHost", "localhost");
         System.setProperty("fedoraServerPort", "8080");
     }
@@ -60,7 +85,6 @@ public class TestExternalDatastreams
     /**
      * @throws java.lang.Exception
      */
-    @Override
     @After
     public void tearDown() throws Exception {
     }
@@ -72,7 +96,7 @@ public class TestExternalDatastreams
         try {
             content = getTempFile(true);
             String dsLocation = content.getCanonicalFile().toURI().toString();
-            System.out.println("Expect to succeed: " + dsLocation);
+            LOGGER.debug("Expect to succeed: {}", dsLocation);
             apim.ingest(getFoxmlObject(pid, dsLocation), FOXML1_1.uri, null);
             apia.getDatastreamDissemination(pid, "DS", null);
         } finally {
@@ -82,12 +106,12 @@ public class TestExternalDatastreams
         try {
             content = getTempFile(false);
             String dsLocation = content.getCanonicalFile().toURI().toString();
-            System.out.println("Expect to fail: " + dsLocation);
+            LOGGER.debug("Expect to fail: {}", dsLocation);
             apim.ingest(getFoxmlObject(pid, dsLocation), FOXML1_1.uri, null);
             apia.getDatastreamDissemination(pid, "DS", null);
             fail("Datastream Dissemination with unallowed dsLocation should have failed.");
         } catch (SOAPFaultException e) {
-            System.out.println("Checking failure :\"" + e.getMessage() + "\" for \"Policy blocked datastream resolution\"");
+            LOGGER.debug("Checking failure :\"{}\" for \"Policy blocked datastream resolution\"",  e.getMessage());
             assertTrue(e.getMessage().contains("Policy blocked datastream resolution"));
         } finally {
             if (content != null) content.delete();
@@ -120,7 +144,7 @@ public class TestExternalDatastreams
             apia.getDatastreamDissemination(pid, "DS", null);
             fail("Datastream Dissemination with unallowed dsLocation should have failed.");
         } catch (SOAPFaultException e) {
-            System.out.println("Checking failure :\"" + e.getMessage() + "\" for \"Policy blocked datastream resolution\"");
+            LOGGER.debug("Checking failure :\"{}\" for \"Policy blocked datastream resolution\"", e.getMessage());
             assertTrue(e.getMessage().contains("Policy blocked datastream resolution"));
         } finally {
             if (content != null) content.delete();
@@ -152,7 +176,7 @@ public class TestExternalDatastreams
             apia.getDatastreamDissemination(pid, "DS", null);
             fail("Pointing a datastream to an unallowed dsLocation should have failed.");
         } catch (SOAPFaultException e) {
-            System.out.println("Checking failure :\"" + e.getMessage() + "\" for \"Policy blocked datastream resolution\"");
+            LOGGER.debug("Checking failure :\"{}\" for \"Policy blocked datastream resolution\"", e.getMessage());
             assertTrue(e.getMessage().contains("Policy blocked datastream resolution"));
         } finally {
             if (content != null) content.delete();

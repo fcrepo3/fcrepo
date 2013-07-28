@@ -3,8 +3,6 @@ package org.fcrepo.test.api;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import java.net.URL;
-
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -34,6 +32,7 @@ public class ValidatorEntityResolver extends DefaultHandler implements EntityRes
         System.out.println("FAILED to resolve p: " + publicId + " s: " + systemId);
         return null;
     }
+    
     private InputSource inputsource(String path, String publicId, String systemId)
              throws IOException {
         FileInputStream fis = new FileInputStream(SCHEMA_RESOURCE_PATH + '/' + path);

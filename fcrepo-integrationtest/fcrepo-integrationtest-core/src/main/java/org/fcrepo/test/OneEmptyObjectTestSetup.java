@@ -4,27 +4,14 @@
  */
 package org.fcrepo.test;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-
+import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.Constants;
 
-import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.utilities.TypeUtility;
 
 
-public class OneEmptyObjectTestSetup
-        extends TestSetup
+public abstract class OneEmptyObjectTestSetup
         implements Constants {
-
-    private final String m_pid;
-
-    private FedoraAPIMMTOM m_apim;
-
-    public OneEmptyObjectTestSetup(Test test, String pid) {
-        super(test);
-        m_pid = pid;
-    }
 
     private static byte[] getTestObjectBytes(String pid) throws Exception {
         StringBuffer xml = new StringBuffer();
@@ -44,17 +31,18 @@ public class OneEmptyObjectTestSetup
         return xml.toString().getBytes("UTF-8");
     }
 
-    @Override
-    public void setUp() throws Exception {
-        System.out.println("Ingesting test object: " + m_pid);
-        m_apim = FedoraTestCase.getFedoraClient().getAPIMMTOM();
-        m_apim.ingest(TypeUtility.convertBytesToDataHandler(getTestObjectBytes(m_pid)), FOXML1_1.uri, "");
+    public static void ingestOneEmptyObject(FedoraClient client, String pid)
+        throws Exception {
+        System.out.println("Ingesting test object: " + pid);
+        client.getAPIMMTOM()
+            .ingest(TypeUtility.convertBytesToDataHandler(
+                    getTestObjectBytes(pid)), FOXML1_1.uri, "");
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        System.out.println("Purging test object: " + m_pid);
-        m_apim.purgeObject(m_pid, "", false);
+    public static void purgeOneEmptyObject(FedoraClient client, String pid)
+        throws Exception {
+        System.out.println("Purging test object: " + pid);
+        client.getAPIMMTOM().purgeObject(pid, "", false);
     }
 
 }

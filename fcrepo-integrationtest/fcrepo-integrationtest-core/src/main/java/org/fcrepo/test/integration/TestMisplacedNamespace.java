@@ -4,6 +4,8 @@
  */
 package org.fcrepo.test.integration;
 
+import static junit.framework.Assert.fail;
+
 import java.io.IOException;
 
 import org.junit.After;
@@ -47,16 +49,15 @@ public class TestMisplacedNamespace
 
     private static final String PID = "demo:failObject";
 
-    @Override
     @Before
     public void setUp() throws Exception {
         m_client = getFedoraClient();
     }
 
-    @Override
     @After
     public void tearDown() throws Exception {
         m_client.getAPIMMTOM().purgeObject(PID, "Cleanup", false);
+        m_client.shutdown();
     }
 
     @Test

@@ -29,14 +29,19 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.params.CoreConnectionPNames;
+
 import net.sf.saxon.FeatureKeys;
 import net.sf.saxon.value.StringValue;
-
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
 
 /**
  * A service that transforms a supplied input document using a supplied
@@ -79,7 +84,7 @@ public class SaxonServlet
     private Map<String, UsernamePasswordCredentials> m_creds;
 
     /** provider of http connections */
-    private MultiThreadedHttpConnectionManager m_cManager;
+    private PoolingClientConnectionManager m_cManager;
 
     /**
      * Initialize the servlet by setting up the stylesheet cache, the http
@@ -89,8 +94,15 @@ public class SaxonServlet
     public void init(ServletConfig config) throws ServletException {
         m_cache = new HashMap<String, Templates>();
         m_creds = new HashMap<String, UsernamePasswordCredentials>();
-        m_cManager = new MultiThreadedHttpConnectionManager();
-        m_cManager.getParams().setConnectionTimeout(TIMEOUT_SECONDS * 1000);
+        m_cManager = new PoolingClientConnectionManager();
+        m_cManager.getSchemeRegistry().register(
+                new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
+        m_cManager.getSchemeRegistry().register(
+                new Scheme("https-tomcat", 8443, SSLSocketFactory.getSocketFactory()));
+        m_cManager.getSchemeRegistry().register(
+                new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
+        m_cManager.getSchemeRegistry().register(
+                new Scheme("http-tomcat", 8080, PlainSocketFactory.getSocketFactory()));
 
         Enumeration<?> enm = config.getInitParameterNames();
         while (enm.hasMoreElements()) {
@@ -115,6 +127,11 @@ public class SaxonServlet
                                     .toString()));
             }
         }
+    }
+    
+    @Override
+    public void destroy() {
+        m_cManager.shutdown();
     }
 
     /**
@@ -254,16 +271,16 @@ public class SaxonServlet
      * (if any).
      */
     private InputStream getInputStream(String url) throws Exception {
-        GetMethod getMethod = new GetMethod(url);
-        HttpClient client = new HttpClient(m_cManager);
+        HttpGet getMethod = new HttpGet(url);
+        DefaultHttpClient client = new DefaultHttpClient(m_cManager);
+        client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, TIMEOUT_SECONDS * 1000);
         UsernamePasswordCredentials creds = getCreds(url);
         if (creds != null) {
-            client.getState().setCredentials(AuthScope.ANY, creds);
-            client.getParams().setAuthenticationPreemptive(true);
-            getMethod.setDoAuthentication(true);
+            client.getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
+            client.addRequestInterceptor(new PreemptiveAuth());
         }
-        getMethod.setFollowRedirects(true);
-        HttpInputStream in = new HttpInputStream(client, getMethod, url);
+        client.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, true);
+        HttpInputStream in = new HttpInputStream(client, getMethod);
         if (in.getStatusCode() != 200) {
             try {
                 in.close();

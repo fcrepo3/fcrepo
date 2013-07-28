@@ -80,7 +80,7 @@ public class SharedDeploymentTests {
 
     private static final String SDEF_4_METHOD = "content4";
 
-    private static FedoraClient m_client;
+    private static FedoraClient s_client;
 
     public static junit.framework.Test suite() {
         return new junit.framework.JUnit4TestAdapter(SharedDeploymentTests.class);
@@ -89,16 +89,22 @@ public class SharedDeploymentTests {
     @BeforeClass
     public static void bootstrap() throws Exception {
 
-        m_client =
+        s_client =
                 new FedoraClient(FedoraServerTestCase.getBaseURL(),
                                  FedoraServerTestCase.getUsername(),
                                  FedoraServerTestCase.getPassword());
-        Util.ingestTestObjects(SHARED_DEPLOYMENT_BASE);
+        Util.ingestTestObjects(s_client, SHARED_DEPLOYMENT_BASE);
+    }
+
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        s_client.shutdown();
+        FedoraServerTestCase.purgeDemoObjects(s_client);
     }
 
     @Test
     public void testListMethods1() throws Exception {
-        FedoraAPIAMTOM apia = m_client.getAPIAMTOM();
+        FedoraAPIAMTOM apia = s_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
         methods = filterMethods(apia.listMethods(OBJECT_1_PID, null).toArray(new ObjectMethodsDef[0]));
@@ -111,7 +117,7 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods2() throws Exception {
-        FedoraAPIAMTOM apia = m_client.getAPIAMTOM();
+        FedoraAPIAMTOM apia = s_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
         methods = filterMethods(apia.listMethods(OBJECT_2_PID, null).toArray(new ObjectMethodsDef[0]));
@@ -124,7 +130,7 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods1_2() throws Exception {
-        FedoraAPIAMTOM apia = m_client.getAPIAMTOM();
+        FedoraAPIAMTOM apia = s_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
         methods = filterMethods(apia.listMethods(OBJECT_1_2_PID, null).toArray(new ObjectMethodsDef[0]));
@@ -139,7 +145,7 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods3() throws Exception {
-        FedoraAPIAMTOM apia = m_client.getAPIAMTOM();
+        FedoraAPIAMTOM apia = s_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
         methods = filterMethods(apia.listMethods(OBJECT_3_PID, null).toArray(new ObjectMethodsDef[0]));
@@ -154,7 +160,7 @@ public class SharedDeploymentTests {
 
     @Test
     public void testListMethods4() throws Exception {
-        FedoraAPIAMTOM apia = m_client.getAPIAMTOM();
+        FedoraAPIAMTOM apia = s_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
         methods = filterMethods(apia.listMethods(OBJECT_4_PID, null).toArray(new ObjectMethodsDef[0]));
@@ -349,12 +355,7 @@ public class SharedDeploymentTests {
 
     private String getDissemination(String pid, String sDef, String method)
             throws Exception {
-        return Util.getDissemination(m_client, pid, sDef, method);
-    }
-
-    @AfterClass
-    public static void cleanup() throws Exception {
-        FedoraServerTestCase.purgeDemoObjects();
+        return Util.getDissemination(s_client, pid, sDef, method);
     }
 
 }

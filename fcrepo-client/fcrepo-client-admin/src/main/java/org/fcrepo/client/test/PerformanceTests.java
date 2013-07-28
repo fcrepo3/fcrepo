@@ -18,15 +18,18 @@ import java.util.concurrent.Executors;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
-
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.fcrepo.client.FedoraClient;
 
 import org.fcrepo.common.Constants;
+import org.fcrepo.common.http.PreemptiveAuth;
 
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
@@ -166,6 +169,7 @@ public class PerformanceTests
         FedoraClient fedoraClient = new FedoraClient(baseURL, username, password);
         apim = fedoraClient.getAPIMMTOM();
         apia = fedoraClient.getAPIAMTOM();
+        fedoraClient.shutdown();
 
         PIDS = apim.getNextPID(new BigInteger(Integer.valueOf(iterations).toString()), "demo").toArray(new String[]{});
         FOXML = new byte[iterations][];
@@ -236,14 +240,14 @@ public class PerformanceTests
     }
 
     private void runGetDatastreamRest(String pid) throws Exception {
-        HttpMethod httpMethod = getHttpMethod(pid);
+        HttpGet httpMethod = getHttpMethod(pid);
         HttpClient client = getHttpClient();
-        client.executeMethod(httpMethod);
-        InputStream in = httpMethod.getResponseBodyAsStream();
-        int input = in.read();
-        while (input > 0) {
-            input = in.read();
+        HttpResponse response =
+                client.execute(httpMethod);
+        if (response.getEntity() != null) {
+            EntityUtils.consumeQuietly(response.getEntity());
         }
+        httpMethod.releaseConnection();
     }
 
     /**
@@ -387,17 +391,15 @@ public class PerformanceTests
         long startTime = 0;
         long stopTime = 0;
         runIngest(FOXML[0]);
-        HttpMethod httpMethod = getHttpMethod(PIDS[0]);
+        HttpGet httpMethod = getHttpMethod(PIDS[0]);
         HttpClient client = getHttpClient();
         startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; i++) {
-            client.executeMethod(httpMethod);
-            InputStream in = httpMethod.getResponseBodyAsStream();
-            int input = in.read();
-            while (input > 0) {
-                input = in.read();
-            }
+            HttpResponse response =
+                client.execute(httpMethod);
+            EntityUtils.consumeQuietly(response.getEntity());
         }
+        httpMethod.releaseConnection();
         stopTime = System.currentTimeMillis();
         totalTime = (stopTime - startTime);
         runPurgeObject(PIDS[0]);
@@ -405,18 +407,16 @@ public class PerformanceTests
         return totalTime;
     }
 
-    private HttpMethod getHttpMethod(String pid) {
+    private HttpGet getHttpMethod(String pid) {
         String url = "http://" + host + ":" + port + "/" + context + "/get/" + pid + "/" + "MDS1";
-        HttpMethod httpMethod = new GetMethod(url);
-        httpMethod.setDoAuthentication(true);
-        httpMethod.getParams().setParameter("Connection", "Keep-Alive");
+        HttpGet httpMethod = new HttpGet(url);
+        httpMethod.setHeader(HttpHeaders.CONNECTION, "Keep-Alive");
         return httpMethod;
     }
 
     private HttpClient getHttpClient() {
-        HttpClient client = new HttpClient();
-        client.getParams().setAuthenticationPreemptive(true);
-        client.getState().setCredentials(
+        DefaultHttpClient client = new PreemptiveAuth();
+        client.getCredentialsProvider().setCredentials(
                 new AuthScope(host, Integer.valueOf(port), "realm"),
                 new UsernamePasswordCredentials(username, password));
         return client;

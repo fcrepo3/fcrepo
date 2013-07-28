@@ -5,7 +5,23 @@
 
 package org.fcrepo.server.messaging;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.TextMessage;
+import javax.naming.Context;
+
 import junit.framework.JUnit4TestAdapter;
+
 import org.fcrepo.server.MockContext;
 import org.fcrepo.server.errors.MessagingException;
 import org.fcrepo.server.management.Management;
@@ -16,14 +32,6 @@ import org.fcrepo.test.FedoraTestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.jms.TextMessage;
-import javax.naming.Context;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-
 
 /**
  * Test sending of messages by NotificationInvocationHandler.
@@ -40,7 +48,6 @@ public class NotificationInvocationHandlerTest
         return new JUnit4TestAdapter(NotificationInvocationHandlerTest.class);
     }
 
-    @Override
     @Before
     public void setUp() throws Exception {
         Properties props = new Properties();
@@ -57,7 +64,6 @@ public class NotificationInvocationHandlerTest
         jmsMgr = new JMSManager(props);
     }
 
-    @Override
     @After
     public void tearDown() throws Exception {
         if (jmsMgr != null) {

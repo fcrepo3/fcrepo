@@ -1,6 +1,10 @@
 
 package org.fcrepo.test.fesl.policy;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -12,6 +16,7 @@ import java.util.regex.Pattern;
 
 import junit.framework.JUnit4TestAdapter;
 
+import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.Constants;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.fcrepo.test.fesl.util.AuthorizationDeniedException;
@@ -21,7 +26,9 @@ import org.fcrepo.test.fesl.util.LoadDataset;
 import org.fcrepo.test.fesl.util.PolicyUtils;
 import org.fcrepo.test.fesl.util.RemoveDataset;
 import org.junit.After;
-import org.junit.Assert;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +40,10 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
             LoggerFactory.getLogger(TestPolicies.class);
 
     private static final String PROPERTIES = "fedora";
+    
+    private static FedoraClient s_client;
 
-    private static HttpUtils httpUtils = null;
+    private HttpUtils httpUtils = null;
 
     //private FedoraAPIM apim = null;
     private PolicyUtils policyUtils = null;
@@ -44,8 +53,18 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
     public static junit.framework.Test suite() {
         return new JUnit4TestAdapter(TestPolicies.class);
     }
+    
+    @BeforeClass
+    public static void bootStrap() throws Exception {
+        s_client = getFedoraClient();
+    }
+    
+    @AfterClass
+    public static void cleanUp() {
+        s_client.shutdown();
+    }
 
-    @Override
+    @Before
     public void setUp() {
 
         PropertyResourceBundle prop =
@@ -62,7 +81,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
                 logger.debug("Setting up...");
             }
 
-            policyUtils = new PolicyUtils(getFedoraClient());
+            policyUtils = new PolicyUtils(s_client);
 
 
             //PolicyStoreFactory f = new PolicyStoreFactory();
@@ -84,11 +103,10 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
             policyUtils.delPolicy(policyId);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
-    @Override
     @After
     public void tearDown() {
         PropertyResourceBundle prop =
@@ -102,6 +120,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
             if (logger.isDebugEnabled()) {
                 logger.debug("Tearing down...");
             }
+            httpUtils.shutdown();
             //PolicyStoreFactory f = new PolicyStoreFactory();
             //polMan = f.newPolicyStore();
             //polMan = new PolicyStoreService();
@@ -113,9 +132,10 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
 
             // Now that objects are loaded, remove the policy
             policyUtils.delPolicy(policyId);
+            httpUtils.shutdown();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
@@ -134,14 +154,14 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
                 String url = "/fedora/objects/test:1000007?format=xml";
                 String response = httpUtils.get(url);
                 logger.debug("http response:\n" + response);
-                Assert.fail("Access was permitted when it should have been denied:  " + url);
+                fail("Access was permitted when it should have been denied:  " + url);
             } catch (AuthorizationDeniedException e) { } // expected
             // list datastreams
             try {
                 String url = "/fedora/objects/test:1000007/datastreams";
                 String response = httpUtils.get(url);
                 logger.debug("http response:\n" + response);
-                Assert.fail("Access was permitted when it should have been denied:  " + url);
+                fail("Access was permitted when it should have been denied:  " + url);
             } catch (AuthorizationDeniedException e) { } // expected
 
             // datastream profile
@@ -149,7 +169,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
                 String url = "/fedora/objects/test:1000007/datastreams/DC";
                 String response = httpUtils.get(url);
                 logger.debug("http response:\n" + response);
-                Assert.fail("Access was permitted when it should have been denied:  " + url);
+                fail("Access was permitted when it should have been denied:  " + url);
             } catch (AuthorizationDeniedException e) { } // expected
 
             // datastream content
@@ -157,7 +177,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
                 String url = "/fedora/objects/test:1000007/datastreams/DC/content";
                 String response = httpUtils.get(url);
                 logger.debug("http response:\n" + response);
-                Assert.fail("Access was permitted when it should have been denied:  " + url);
+                fail("Access was permitted when it should have been denied:  " + url);
             } catch (AuthorizationDeniedException e) { } // expected
 
             // list methods
@@ -165,7 +185,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
                 String url = "/fedora/objects/test:1000007/methods";
                 String response = httpUtils.get(url);
                 logger.debug("http response:\n" + response);
-                Assert.fail("Access was permitted when it should have been denied:  " + url);
+                fail("Access was permitted when it should have been denied:  " + url);
             } catch (AuthorizationDeniedException e) { } // expected
 
             // get method content
@@ -173,7 +193,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
                 String url = "/fedora/objects/test:1000007/methods/fedora-system:3/viewDublinCore";
                 String response = httpUtils.get(url);
                 logger.debug("http response:\n" + response);
-                Assert.fail("Access was permitted when it should have been denied:  " + url);
+                fail("Access was permitted when it should have been denied:  " + url);
             } catch (AuthorizationDeniedException e) { } // expected
 
             // TODO: extend for all REST methods
@@ -198,10 +218,10 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
             }
 
             boolean check = response.contains("<objLabel>Dexter</objLabel>");
-            Assert.assertTrue("Expected object data not found", check);
+            assertTrue("Expected object data not found", check);
         } catch (AuthorizationDeniedException e) {
             // PEP caching must be disabled (previously cached results will invalidate test)
-            Assert.fail("Authorization denied.  (Check that system property fedora.fesl.pep_nocache is set to true)");
+            fail("Authorization denied.  (Check that system property fedora.fesl.pep_nocache is set to true)");
         } catch (Exception e) {
             throw e;
         } finally {
@@ -344,7 +364,6 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
                     "test:1000007",
                     "test:1000009"
             };
-            String [] denied = allPids.mismatch(allowed, false);
             String [] mismatches = perms.object().allowed().mismatch(allowed, true);
             assertEquals(getAccessErrorMessage(subjectPolicy, "objects", "allowed", mismatches), 0, mismatches.length);
             mismatches = perms.object().listed().mismatch(allowed, true);
@@ -392,7 +411,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
                 // test object access
                 String url = "/fedora/objects/" + pid + "?format=xml";
                 try {
-                    String response = httpUtils.get(url);
+                    httpUtils.get(url);
                     // if we got here, it was allowed, so...
                     m_object.allowed().add(pid);
                 } catch (AuthorizationDeniedException e) {
@@ -403,7 +422,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
                 if (!m_dsid.equals("")) {
                     url = "/fedora/objects/" + pid + "/datastreams/" + m_dsid + "?format=xml";
                     try {
-                        String response = httpUtils.get(url);
+                        httpUtils.get(url);
                         // if we got here, it was allowed, so...
                         m_datastream.allowed().add(pid);
                     } catch (AuthorizationDeniedException e) {

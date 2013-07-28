@@ -5,15 +5,16 @@
 
 package org.fcrepo.test.api;
 
+import static junit.framework.Assert.assertEquals;
+import junit.framework.JUnit4TestAdapter;
+
 import org.fcrepo.client.FedoraClient;
-import org.fcrepo.client.HttpInputStream;
-import org.fcrepo.test.DemoObjectTestSetup;
+import org.fcrepo.common.http.HttpInputStream;
 import org.fcrepo.test.FedoraServerTestCase;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
 
 /**
  * Test API-A Lite in configuration A (Authentication disabled on API-A).
@@ -23,26 +24,38 @@ import junit.framework.TestSuite;
 public class TestAPIALiteConfigA
         extends FedoraServerTestCase {
 
-    private static FedoraClient client;
+    private FedoraClient client;
 
-    public static Test suite() {
-        TestSuite suite = new TestSuite("APIALiteConfigA TestSuite");
-        suite.addTestSuite(TestAPIALiteConfigA.class);
-        return new DemoObjectTestSetup(suite);
-    }
-
+    @Test
     public void testGetChainedDissemination() throws Exception {
         // test chained dissemination using local services
         // The object contains an E datastream that is a dissemination of the local SAXON service.
         // This datastream is input to another dissemination that uses the local FOP service.
         HttpInputStream his = client.get("/get/demo:26/demo:19/getPDF", false);
-        assertEquals("application/pdf", his.getContentType());
+        String contentType = his.getContentType();
         his.close();
+        assertEquals("application/pdf", contentType);
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         client = getFedoraClient();
+        //TODO figure out what directory these are in
+        ingestDemoObjects("/", client);
+    }
+    
+    @After
+    public void tearDown() throws Exception {
+        purgeDemoObjects(client);
+        client.shutdown();
+    }
+
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestAPIALiteConfigA.class);
+    }
+
+    public static void main(String[] args) {
+        JUnitCore.runClasses(TestAPIALiteConfigA.class);
     }
 
 }

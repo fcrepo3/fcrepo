@@ -5,6 +5,12 @@
 
 package org.fcrepo.test.integration;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathExists; 
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathNotExists; 
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,10 +32,14 @@ import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
 
 import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import junit.framework.JUnit4TestAdapter;
 
+import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.utility.export.Export;
 import org.fcrepo.client.utility.ingest.Ingest;
 
@@ -53,10 +63,22 @@ public class TestCommandLineFormats
         extends FedoraTestCase {
 
     private FedoraAPIMMTOM apim;
+    
+    private static FedoraClient s_client;
 
-    @Override
+    @BeforeClass
+    public static void bootStrap() throws Exception {
+        s_client = getFedoraClient(getBaseURL(), getUsername(), getPassword());
+    }
+    
+    @AfterClass
+    public static void cleanUp() {
+        s_client.shutdown();
+    }
+
+    @Before
     public void setUp() throws Exception {
-        apim = getFedoraClient(getBaseURL(), getUsername(), getPassword()).getAPIMMTOM();
+        apim = s_client.getAPIMMTOM();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put("foxml", "info:fedora/fedora-system:def/foxml#");
         nsMap.put("METS", "http://www.loc.gov/METS/");
@@ -65,7 +87,6 @@ public class TestCommandLineFormats
         XMLUnit.setXpathNamespaceContext(ctx);
     }
 
-    @Override
     @After
     public void tearDown() {
         XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);

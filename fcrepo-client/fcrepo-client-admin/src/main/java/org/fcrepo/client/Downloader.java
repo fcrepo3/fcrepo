@@ -12,16 +12,24 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 
 import java.util.HashMap;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
-
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.util.EntityUtils;
+import org.fcrepo.common.http.PreemptiveAuth;
 import org.fcrepo.server.utilities.StreamUtility;
 
 
@@ -35,8 +43,8 @@ import org.fcrepo.server.utilities.StreamUtility;
  */
 public class Downloader {
 
-    private final MultiThreadedHttpConnectionManager m_cManager =
-            new MultiThreadedHttpConnectionManager();
+    private final PoolingClientConnectionManager m_cManager =
+            new PoolingClientConnectionManager();
 
     private final String m_fedoraUrlStart;
 
@@ -59,6 +67,13 @@ public class Downloader {
         m_authScope =
                 new AuthScope(host, AuthScope.ANY_PORT, AuthScope.ANY_REALM);
         m_creds = new UsernamePasswordCredentials(user, pass);
+        if (Administrator.getProtocol().equalsIgnoreCase("https")) {
+            m_cManager.getSchemeRegistry().register(
+                    new Scheme("https", port, SSLSocketFactory.getSocketFactory()));
+        } else {
+            m_cManager.getSchemeRegistry().register(
+                new Scheme(Administrator.getProtocol(), port, PlainSocketFactory.getSocketFactory()));
+        }
     }
 
     public void getDatastreamContent(String pid,
@@ -123,20 +138,20 @@ public class Downloader {
      * credentials if the host is the Fedora server.
      */
     public InputStream get(String url) throws IOException {
-        GetMethod get = null;
+        HttpGet get = null;
         boolean ok = false;
         try {
-            m_cManager.getParams().setConnectionTimeout(20000);
-            HttpClient client = new HttpClient(m_cManager);
-            client.getState().setCredentials(m_authScope, m_creds);
-            client.getParams().setAuthenticationPreemptive(true); // don't bother with challenges
+            // don't bother with challenges
+            DefaultHttpClient client = new PreemptiveAuth(m_cManager);
+            client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 20000);
+            client.getCredentialsProvider().setCredentials(m_authScope, m_creds);
             int redirectCount = 0; // how many redirects did we follow
             int resultCode = 300; // not really, but enter the loop that way
             Dimension d = null;
+            HttpResponse response = null;
             while (resultCode > 299 && resultCode < 400 && redirectCount < 25) {
-                get = new GetMethod(url);
-                get.setDoAuthentication(true);
-                get.setFollowRedirects(true);
+                get = new HttpGet(url);
+                client.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, true);
                 if (Administrator.INSTANCE != null) {
                     d = Administrator.PROGRESS.getSize();
                     // if they're using Administrator, tell them we're downloading...
@@ -146,16 +161,17 @@ public class Downloader {
                     Administrator.PROGRESS.paintImmediately(0, 0, (int) d
                             .getWidth() - 1, (int) d.getHeight() - 1);
                 }
-                resultCode = client.executeMethod(get);
+                response = client.execute(get);
+                resultCode = response.getStatusLine().getStatusCode();
                 if (resultCode > 299 && resultCode < 400) {
                     redirectCount++;
-                    url = get.getResponseHeader("Location").getValue();
+                    url = response.getFirstHeader(HttpHeaders.LOCATION).getValue();
                 }
             }
             if (resultCode != 200) {
-                System.err.println(get.getResponseBodyAsString());
+                System.err.println(EntityUtils.toString(response.getEntity()));
                 throw new IOException("Server returned error: " + resultCode
-                        + " " + HttpStatus.getStatusText(resultCode));
+                        + " " + response.getStatusLine().getReasonPhrase());
             }
             ok = true;
             if (Administrator.INSTANCE != null) {
@@ -164,7 +180,7 @@ public class Downloader {
                         File.createTempFile("fedora-client-download-", null);
                 tempFile.deleteOnExit();
                 HashMap PARMS = new HashMap();
-                PARMS.put("in", get.getResponseBodyAsStream());
+                PARMS.put("in", response.getEntity().getContent());
                 PARMS.put("out", new FileOutputStream(tempFile));
                 // do the actual download in a safe thread
                 SwingWorker worker = new SwingWorker(PARMS) {
@@ -210,9 +226,11 @@ public class Downloader {
                     Thread.sleep(100);
                 } catch (InterruptedException ie) {
                 }
+                ((InputStream) PARMS
+                        .get("in")).close();
                 return new FileInputStream(tempFile);
             }
-            return get.getResponseBodyAsStream();
+            return response.getEntity().getContent();
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         } finally {

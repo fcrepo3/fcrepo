@@ -4,13 +4,15 @@
  */
 package org.fcrepo.test.api;
 
-import org.fcrepo.test.FedoraServerTestCase;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import static org.fcrepo.test.api.TestHTTPStatusCodes.RI_SEARCH_PATH;
 import static org.fcrepo.test.api.TestHTTPStatusCodes.checkError;
+
+import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.AfterClass;
+import org.junit.Test;
+
+import junit.framework.JUnit4TestAdapter;
+import junit.framework.TestSuite;
 
 
 /**
@@ -22,17 +24,23 @@ import static org.fcrepo.test.api.TestHTTPStatusCodes.checkError;
 public class TestHTTPStatusCodesConfigA
         extends FedoraServerTestCase {
 
-    public static Test suite() {
+    public static junit.framework.Test suite() {
         TestSuite suite = new TestSuite("TestHTTPStatusCodesConfigA TestSuite");
-        suite.addTestSuite(TestHTTPStatusCodesConfigA.class);
+        suite.addTest(new JUnit4TestAdapter(TestHTTPStatusCodesConfigA.class));
         suite.addTest(org.fcrepo.test.api.TestHTTPStatusCodes.suite());
         return suite;
+    }
+        
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        TestHTTPStatusCodes.cleanUp();
     }
 
     //---
     // API-A Lite: riSearch
     //---
 
+    @Test
     public void testRISearch_Disabled() throws Exception {
         checkError(RI_SEARCH_PATH);
     }

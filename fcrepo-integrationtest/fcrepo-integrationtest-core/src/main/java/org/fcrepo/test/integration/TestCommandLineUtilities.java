@@ -5,18 +5,26 @@
 
 package org.fcrepo.test.integration;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.framework.JUnit4TestAdapter;
 
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.fcrepo.utilities.ExecUtility;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
 
 /**
  * @author Edwin Shin
@@ -30,6 +38,8 @@ public class TestCommandLineUtilities
     static ByteArrayOutputStream sbErr = null;
 
     static TestCommandLineUtilities curTest = null;
+    
+    private static FedoraClient s_client;
 
     private static final String RESOURCEBASE =
         System.getProperty("fcrepo-integrationtest-core.classes") != null ? System
@@ -45,14 +55,23 @@ public class TestCommandLineUtilities
 
     private static File logDir = null;
     private static File buildDir = null;
-
-
-    public static Test suite() {
-        TestSuite suite = new TestSuite("Command Line Utilities TestSuite");
-        suite.addTestSuite(TestCommandLineUtilities.class);
-        return new DemoObjectTestSetup(suite);
+    
+    @BeforeClass
+    public static void bootStrap() throws Exception {
+        String baseURL =
+                getProtocol() + "://" + getHost() + ":" + getPort() + "/"
+                        + getFedoraAppServerContext();
+        s_client = new FedoraClient(baseURL, getUsername(), getPassword());
+        ingestDemoObjects(s_client);
+    }
+    
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        purgeDemoObjects(s_client);
+        s_client.shutdown();
     }
 
+    @Test
     public void testFedoraIngestAndPurge() {
         System.out.println("Ingesting object test:1001");
         ingestFoxmlFile(new File(RESOURCEBASE
@@ -74,6 +93,7 @@ public class TestCommandLineUtilities
         System.out.println("Ingest and purge test succeeded");
     }
 
+    @Test
     public void testBatchBuildAndBatchIngestAndPurge() throws Exception {
         System.out.println("Building batch objects");
         batchBuild(new File(RESOURCEBASE
@@ -103,6 +123,7 @@ public class TestCommandLineUtilities
         System.out.println("Build and ingest test succeeded");
     }
 
+    @Test
     public void testBatchBuildIngestAndPurge() throws Exception {
         System.out.println("Building and Ingesting batch objects");
         batchBuildIngest(new File(RESOURCEBASE
@@ -128,6 +149,7 @@ public class TestCommandLineUtilities
         System.out.println("Build/ingest test succeeded");
     }
 
+    @Test
     public void testBatchModify() throws Exception {
         // Note: test will fail if default control group for DC datastreams (fedora.fcfg) is not X
         // as the modify script specifies control group "X" when modifying DC
@@ -153,6 +175,7 @@ public class TestCommandLineUtilities
         System.out.println("Batch modify test succeeded");
     }
 
+    @Test
     public void testBatchPurge() throws Exception {
         System.out.println("Batch purging objects from file containing PIDs");
 
@@ -196,6 +219,7 @@ public class TestCommandLineUtilities
         System.out.println("Batch purge test succeeded");
     }
 
+    @Test
     public void testExport() throws Exception {
         System.out.println("Testing fedora-export");
         System.out.println("Ingesting object test:1001");
@@ -230,6 +254,7 @@ public class TestCommandLineUtilities
         System.out.println("Export test succeeded");
     }
 
+    @Test
     public void testValidatePolicy() {
         System.out.println("Testing Validate Policies");
 
@@ -249,6 +274,7 @@ public class TestCommandLineUtilities
         System.out.println("Validate Policies test succeeded");
     }
 
+    @Test
     public void testFindObjects() {
         System.out.println("Testing Find Objects");
         execute(FEDORA_HOME + "/client/bin/fedora-find",
@@ -337,12 +363,8 @@ public class TestCommandLineUtilities
     }
 
     private static FedoraAPIMMTOM getAPIM() throws Exception {
-        String baseURL =
-                getProtocol() + "://" + getHost() + ":" + getPort() + "/"
-                        + getFedoraAppServerContext();
-        FedoraClient client =
-                new FedoraClient(baseURL, getUsername(), getPassword());
-        return client.getAPIMMTOM();
+        FedoraAPIMMTOM result = s_client.getAPIMMTOM();
+        return result;
     }
 
     private void batchBuild(File objectTemplateFile,
@@ -438,7 +460,7 @@ public class TestCommandLineUtilities
         }
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         sbOut = new ByteArrayOutputStream();
         sbErr = new ByteArrayOutputStream();
@@ -455,7 +477,7 @@ public class TestCommandLineUtilities
         }
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
         System.out.println("Deleting temporary build and log directories");
         if (buildDir.exists() && buildDir.isDirectory()) {
@@ -481,8 +503,12 @@ public class TestCommandLineUtilities
         }
     }
 
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestCommandLineUtilities.class);
+    }
+
     public static void main(String[] args) {
-        junit.textui.TestRunner.run(TestCommandLineUtilities.class);
+        JUnitCore.runClasses(TestCommandLineUtilities.class);
     }
 
 }

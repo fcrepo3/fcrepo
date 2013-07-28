@@ -4,6 +4,8 @@
  */
 package org.fcrepo.test;
 
+import static junit.framework.Assert.fail;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -12,7 +14,6 @@ import javax.xml.transform.TransformerFactory;
 
 import net.sf.saxon.FeatureKeys;
 
-import org.custommonkey.xmlunit.XMLTestCase;
 import org.custommonkey.xmlunit.XMLUnit;
 
 import org.fcrepo.client.FedoraClient;
@@ -29,13 +30,11 @@ import org.fcrepo.server.config.ServerConfigurationParser;
  * @author Edwin Shin
  */
 public abstract class FedoraTestCase
-        extends XMLTestCase
         implements FedoraTestConstants {
 
     public static String ssl = "http";
-
+    
     public FedoraTestCase() {
-        super();
         TransformerFactory factory = XMLUnit.getTransformerFactory();
         if (factory.getClass().getName()
                 .equals("net.sf.saxon.TransformerFactoryImpl")) {
@@ -44,7 +43,6 @@ public abstract class FedoraTestCase
     }
 
     public FedoraTestCase(String name) {
-        super(name);
         TransformerFactory factory = XMLUnit.getTransformerFactory();
         if (factory.getClass().getName()
                 .equals("net.sf.saxon.TransformerFactoryImpl")) {

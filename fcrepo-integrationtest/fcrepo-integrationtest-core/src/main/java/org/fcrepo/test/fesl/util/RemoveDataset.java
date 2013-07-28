@@ -13,8 +13,6 @@ public class RemoveDataset {
     private static final Logger logger =
             LoggerFactory.getLogger(RemoveDataset.class);
 
-    private static final String PROPERTIES = "fedora";
-
     private static final String RESOURCEBASE =
             System.getProperty("fcrepo-integrationtest-core.classes") != null ? System
                     .getProperty("fcrepo-integrationtest-core.classes")
@@ -36,17 +34,23 @@ public class RemoveDataset {
         File dataDir = new File(RESOURCEBASE + "/" + subdir);
         File[] files = dataDir.listFiles(new XmlFilenameFilter());
 
-        for (File f : files) {
-            // try {
-            Document doc = DataUtils.getDocumentFromFile(f);
-            String pid = doc.getDocumentElement().getAttribute("PID");
-            if (logger.isDebugEnabled()) {
-                logger.debug("Deleting object: " + pid);
+        try {
+            for (File f : files) {
+                // try {
+                Document doc = DataUtils.getDocumentFromFile(f);
+                String pid = doc.getDocumentElement().getAttribute("PID");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Deleting object: " + pid);
+                }
+                client.delete("/fedora/objects/" + pid, null);
+                //} catch (Exception e) {
+                //    logger.error(e.getMessage(), e);
+                //}
             }
-            client.delete("/fedora/objects/" + pid, null);
-            //} catch (Exception e) {
-            //    logger.error(e.getMessage(), e);
-            //}
+        } finally {
+            if (client != null) {
+                client.shutdown();
+            }
         }
     }
 }

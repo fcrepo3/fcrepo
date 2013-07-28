@@ -23,9 +23,11 @@ import org.fcrepo.client.utility.ingest.Ingest;
 import org.fcrepo.client.utility.ingest.IngestCounter;
 
 import org.fcrepo.common.Constants;
+import org.fcrepo.common.http.HttpInputStream;
 
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.junit.runner.JUnitCore;
 
 
 /**
@@ -52,6 +54,7 @@ public abstract class FedoraServerTestCase
      * @return Document
      * @throws Exception
      */
+    @Deprecated
     public Document getXMLQueryResult(String location) throws Exception {
         return getXMLQueryResult(getFedoraClient(), location);
     }
@@ -79,8 +82,13 @@ public abstract class FedoraServerTestCase
         return format != null && format.equalsIgnoreCase("atom-zip");
     }
 
+    @Deprecated
     public static void ingestDemoObjects() throws Exception {
         ingestDemoObjects("/");
+    }
+    
+    public static void ingestDemoObjects(FedoraClient client) throws Exception {
+        ingestDemoObjects("/", client);
     }
     
     public static void ingestDemoObjects(FedoraAPIAMTOM apia, FedoraAPIMMTOM apim) throws Exception {
@@ -104,12 +112,19 @@ public abstract class FedoraServerTestCase
      *             hierarchy.
      * @throws Exception
      */
+    @Deprecated
     public static void ingestDemoObjects(String path) throws Exception {
         FedoraClient client = FedoraTestCase.getFedoraClient();
+        ingestDemoObjects(path, client);
+        client.shutdown();
+    }
+
+    public static void ingestDemoObjects(String path, FedoraClient client) throws Exception {
         FedoraAPIAMTOM apia = client.getAPIAMTOM();
         FedoraAPIMMTOM apim = client.getAPIMMTOM();
         ingestDemoObjects(path, apia, apim);
     }
+
     public static void ingestDemoObjects(String path, FedoraAPIAMTOM apia, FedoraAPIMMTOM apim) throws Exception {
 
         File dir = null;
@@ -159,24 +174,48 @@ public abstract class FedoraServerTestCase
      * @return set of PIDs of the specified object type
      * @throws Exception
      */
+    @Deprecated
     public static Set<String> getDemoObjects() throws Exception {
 
         FedoraClient client = getFedoraClient();
-        InputStream queryResult;
+        Set<String> result = null;
+        try {
+            result = getDemoObjects(client);
+        } finally {
+            client.shutdown();
+        }
+        return result;
+    }
+
+    public static Set<String> getDemoObjects(FedoraClient client)
+        throws Exception {
+        HttpInputStream queryResult;
         queryResult =
                 client.get(getBaseURL() + "/search?query=pid~demo:*"
                            + "&maxResults=1000&pid=true&xml=true", true, true);
         SearchResultParser parser = new SearchResultParser(queryResult);
 
-        return parser.getPIDs();
+        Set<String> result = parser.getPIDs();
+        queryResult.close();
+        return result;
     }
-
+    
+    @Deprecated
     public static void purgeDemoObjects() throws Exception {
         FedoraClient client = getFedoraClient();
         FedoraAPIMMTOM apim = client.getAPIMMTOM();
+        client.shutdown();
         purgeDemoObjects(apim);
     }
     
+    public static void purgeDemoObjects(FedoraClient client) throws Exception {
+        FedoraAPIMMTOM apim = client.getAPIMMTOM();
+        for (String pid : getDemoObjects(client)) {
+            AutoPurger.purge(apim, pid, null);
+        }
+    }
+    
+    @Deprecated
     public static void purgeDemoObjects(FedoraAPIMMTOM apim) throws Exception {
         for (String pid : getDemoObjects()) {
             AutoPurger.purge(apim, pid, null);
@@ -184,6 +223,6 @@ public abstract class FedoraServerTestCase
     }
 
     public static void main(String[] args) {
-        junit.textui.TestRunner.run(FedoraServerTestCase.class);
+        JUnitCore.runClasses(FedoraServerTestCase.class);
     }
 }

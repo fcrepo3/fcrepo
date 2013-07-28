@@ -102,10 +102,6 @@
       <artifactId>commons-discovery</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.sun.woodstock.dependlibs</groupId>
       <artifactId>jhbasic</artifactId>
       <version>2.0</version>
@@ -143,6 +139,12 @@
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-bundle</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpcore-nio</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.fcrepo</groupId>
@@ -201,5 +203,45 @@
       <scope>runtime</scope>
     </dependency>
 
+    <dependency>
+    	<groupId>org.apache.httpcomponents</groupId>
+    	<artifactId>httpcore</artifactId>
+    	<exclusions>
+    	    <exclusion>
+    	        <groupId>commons-logging</groupId>
+    	        <artifactId>commons-logging</artifactId>
+    	    </exclusion>
+    	</exclusions>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.httpcomponents</groupId>
+    	<artifactId>httpcore-nio</artifactId>
+    	<exclusions>
+    	    <exclusion>
+    	        <groupId>commons-logging</groupId>
+    	        <artifactId>commons-logging</artifactId>
+    	    </exclusion>
+    	</exclusions>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.httpcomponents</groupId>
+    	<artifactId>httpclient</artifactId>
+    	<exclusions>
+    	    <exclusion>
+    	        <groupId>commons-logging</groupId>
+    	        <artifactId>commons-logging</artifactId>
+    	    </exclusion>
+    	</exclusions>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.httpcomponents</groupId>
+    	<artifactId>httpmime</artifactId>
+    	<exclusions>
+    	    <exclusion>
+    	        <groupId>commons-logging</groupId>
+    	        <artifactId>commons-logging</artifactId>
+    	    </exclusion>
+    	</exclusions>
+    </dependency>
   </dependencies>
 </project>

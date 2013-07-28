@@ -11,7 +11,10 @@ import java.util.regex.Pattern;
 import org.apache.http.client.ClientProtocolException;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.slf4j.Logger;
@@ -49,20 +52,32 @@ public class TestREST extends FedoraServerTestCase implements Constants {
         return new JUnit4TestAdapter(TestREST.class);
     }
 
-    @Override
-    public void setUp() {
+    @BeforeClass
+    public static void bootStrap() throws Exception {
         PropertyResourceBundle prop =
                 (PropertyResourceBundle) ResourceBundle.getBundle(PROPERTIES);
         String username = prop.getString("fedora.admin.username");
         String password = prop.getString("fedora.admin.password");
-        //String fedoraUrl = prop.getString("fedora.url");
-        String fedoraUrl = getProtocol() + "://" + getHost() + ":" + getPort() + "/" + getFedoraAppServerContext();
 
+        logger.debug("Initialising HttpUtils...");
+        httpUtils = new HttpUtils(getBaseURL(), username, password);
+    }
+    
+    @AfterClass
+    public static void cleanUp() {
+        httpUtils.shutdown();
+    }
+
+    @Before
+    public void setUp() {
         try {
+            PropertyResourceBundle prop =
+                    (PropertyResourceBundle) ResourceBundle.getBundle(PROPERTIES);
+            String username = prop.getString("fedora.admin.username");
+            String password = prop.getString("fedora.admin.password");
+            //String fedoraUrl = prop.getString("fedora.url");
+            String fedoraUrl = getProtocol() + "://" + getHost() + ":" + getPort() + "/" + getFedoraAppServerContext();
             logger.debug("Setting up...");
-
-            httpUtils = new HttpUtils(getBaseURL(), username, password);
-
             LoadDataset.load("fesl", fedoraUrl, username, password);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -70,7 +85,6 @@ public class TestREST extends FedoraServerTestCase implements Constants {
         }
     }
 
-    @Override
     @After
     public  void tearDown() {
         PropertyResourceBundle prop =
@@ -78,6 +92,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
         String username = prop.getString("fedora.admin.username");
         String password = prop.getString("fedora.admin.password");
         //  String fedoraUrl = prop.getString("fedora.url");
+
         String fedoraUrl = getProtocol() + "://" + getHost() + ":" + getPort() + "/" + getFedoraAppServerContext();
         try {
             if (logger.isDebugEnabled()) {

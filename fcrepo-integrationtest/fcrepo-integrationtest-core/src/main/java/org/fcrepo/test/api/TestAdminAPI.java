@@ -4,8 +4,11 @@
  */
 package org.fcrepo.test.api;
 
-import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
-import static org.apache.commons.httpclient.HttpStatus.SC_OK;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_OK;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -13,35 +16,43 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.nio.charset.Charset;
 import java.util.Set;
 
-import junit.framework.TestSuite;
+import junit.framework.JUnit4TestAdapter;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.fcrepo.client.FedoraClient;
+import org.fcrepo.common.http.PreemptiveAuth;
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.types.gen.Datastream;
 import org.fcrepo.server.utilities.TypeUtility;
-import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.JUnitCore;
 
 
 /**
@@ -57,6 +68,8 @@ import org.junit.Test;
 public class TestAdminAPI
         extends FedoraServerTestCase {
 
+    private static FedoraClient s_client;
+    
     private FedoraAPIAMTOM apia;
 
     private FedoraAPIMMTOM apim;
@@ -67,19 +80,27 @@ public class TestAdminAPI
     protected Boolean authorizeAccess = null;
     protected String url;
 
-    private static final String datetime =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                    .format(new Date());
-
     private final boolean chunked = false;
-
-    @Override
-    public void setUp() throws Exception {
-        apia = getFedoraClient().getAPIAMTOM();
-        apim = getFedoraClient().getAPIMMTOM();
+    
+    @BeforeClass
+    public static void bootstrap() throws Exception {
+        s_client = getFedoraClient();
+        ingestDemoObjects(s_client);
+    }
+    
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        purgeDemoObjects(s_client);
+        s_client.shutdown();
     }
 
-    @Override
+    @Before
+    public void setUp() throws Exception {
+        apia = s_client.getAPIAMTOM();
+        apim = s_client.getAPIMMTOM();
+    }
+
+    @After
     public void tearDown() throws Exception {
     }
 
@@ -117,7 +138,7 @@ public class TestAdminAPI
         url = "/objects?pid=true&title=false&query=pid~demo%3A*&maxResults=1000&resultFormat=xml";
 
         HttpResponse res = get(getAuthAccess());
-        assertEquals(SC_OK, res.getStatusCode());
+        assertEquals(SC_OK, res.getStatusLine().getStatusCode());
 
         File objectsListFile = null;
 
@@ -125,7 +146,7 @@ public class TestAdminAPI
             // output to a file
             objectsListFile = File.createTempFile("TestAdminAPI", null);
             FileWriter fw = new FileWriter(objectsListFile);
-            String queryResults = res.getResponseBodyString();
+            String queryResults = EntityUtils.toString(res.getEntity());
             fw.write(queryResults);
             fw.close();
 
@@ -139,8 +160,8 @@ public class TestAdminAPI
                     objectsListFile.deleteOnExit();
         }
 
-        purgeDemoObjects();
-        ingestDemoObjects();
+        purgeDemoObjects(s_client);
+        ingestDemoObjects(s_client);
 
         //////////////////////////////////////////////////
         // tests on file of PIDs - flat file
@@ -153,7 +174,7 @@ public class TestAdminAPI
             objectsListFile = File.createTempFile("TestAdminAPI", null);
             FileWriter fw = new FileWriter(objectsListFile);
 
-            Set<String> objects = getDemoObjects();
+            Set<String> objects = getDemoObjects(s_client);
             for (String pid : objects) {
                 fw.write(pid + "\n");
             }
@@ -169,26 +190,26 @@ public class TestAdminAPI
                     objectsListFile.deleteOnExit();
         }
 
-        purgeDemoObjects();
-        ingestDemoObjects();
+        purgeDemoObjects(s_client);
+        ingestDemoObjects(s_client);
 
         //////////////////////////////////////////////////
         // tests on single object
         //////////////////////////////////////////////////
 
-        Set<String> objects = getDemoObjects();
+        Set<String> objects = getDemoObjects(s_client);
 
         // test on the first object we find
         String pid = objects.toArray(new String[0])[0];
         // test 404 on object not found
         url = this.modifyDatastreamControlGroupUrl(pid + "doesnotexist", "DC", "M", false, false, false);
         res = get(true);
-        assertEquals(SC_NOT_FOUND, res.getStatusCode());
+        assertEquals(SC_NOT_FOUND, res.getStatusLine().getStatusCode());
 
         // test 404 on datastream not found
         url = this.modifyDatastreamControlGroupUrl(pid, "doesnotexist", "M", false, false, false);
         res = get(true);
-        assertEquals(SC_NOT_FOUND, res.getStatusCode());
+        assertEquals(SC_NOT_FOUND, res.getStatusLine().getStatusCode());
 
         // TODO: getting stream contents?  (could use REST call instead)
 
@@ -198,8 +219,8 @@ public class TestAdminAPI
 
         url = this.modifyDatastreamControlGroupUrl(pid, "DC", "M", false, false, false);
         res = get(true);
-        String contents = res.getResponseBodyString();
-        assertEquals(SC_OK, res.getStatusCode());
+        String contents = EntityUtils.toString(res.getEntity());
+        assertEquals(SC_OK, res.getStatusLine().getStatusCode());
 
         // check control group modified
         Datastream ds = apim.getDatastream(pid, "DC", null);
@@ -227,9 +248,9 @@ public class TestAdminAPI
         // modify both
         url = this.modifyDatastreamControlGroupUrl(pid1 + "," + pid2, "DC", "M", false, false, false);
         res = get(true);
-        assertEquals(SC_OK, res.getStatusCode());
+        assertEquals(SC_OK, res.getStatusLine().getStatusCode());
 
-        contents = res.getResponseBodyString();
+        contents = EntityUtils.toString(res.getEntity());
         int[] counts = getCounts(contents);
 
         // check for modification in result stream
@@ -250,7 +271,7 @@ public class TestAdminAPI
         // count objects we know already have Managed content DC
         // (ingest creates some of these, ending in _M)
         // used later in checking results
-        Set<String> objects = getDemoObjects();
+        Set<String> objects = getDemoObjects(s_client);
         int managedObjects = 0;
         for (String pid : objects) {
             if (pid.endsWith("_M"))
@@ -260,9 +281,9 @@ public class TestAdminAPI
         // modify datastreams, based on file input - DC
         url = this.modifyDatastreamControlGroupUrl("file:///" + objectsListFile.getAbsolutePath(), "DC", "M", false, false, false);
         HttpResponse res = get(true);
-
-        assertEquals(SC_OK, res.getStatusCode());
-        String modified = res.getResponseBodyString();
+        int status = res.getStatusLine().getStatusCode();
+        String modified = EntityUtils.toString(res.getEntity());
+        assertEquals(SC_OK, status);
 
         // object and datastream count message expected
         String logExpected = "Updated " + (objects.size() - managedObjects) + " objects and " + (objects.size() - managedObjects) + " datastreams";
@@ -271,8 +292,8 @@ public class TestAdminAPI
         // do again, this time we expect no modifications (already modified, so should be ingored)
         res = get(true);
 
-        modified = res.getResponseBodyString();
-        assertEquals(SC_OK, res.getStatusCode());
+        modified = EntityUtils.toString(res.getEntity());
+        assertEquals(SC_OK, res.getStatusLine().getStatusCode());
 
         // object and datastream count message expected
         logExpected = "Updated " + 0 + " objects and " + 0 + " datastreams";
@@ -285,8 +306,8 @@ public class TestAdminAPI
         // FIXME: could iterate all objects before/after and do more exact tests
         url = this.modifyDatastreamControlGroupUrl("file:///" + objectsListFile.getAbsolutePath(), "DC,RELS-EXT", "M", false, false, false);
         res = get(true);
-        modified = res.getResponseBodyString();
-        assertEquals(SC_OK, res.getStatusCode());
+        modified = EntityUtils.toString(res.getEntity());
+        assertEquals(SC_OK, res.getStatusLine().getStatusCode());
 
         int[] counts = getCounts(modified);
         int objectCount = counts[0];
@@ -340,13 +361,12 @@ public class TestAdminAPI
 // helper methods
 
     private HttpClient getClient(boolean auth) {
-        HttpClient client = new HttpClient();
-        client.getParams().setAuthenticationPreemptive(true);
+        DefaultHttpClient client = new PreemptiveAuth();
         if (auth) {
             client
-                    .getState()
+                    .getCredentialsProvider()
                     .setCredentials(new AuthScope(getHost(), Integer
-                            .valueOf(getPort()), "realm"),
+                            .valueOf(getPort())),
                                     new UsernamePasswordCredentials(getUsername(),
                                                                     getPassword()));
         }
@@ -408,24 +428,17 @@ public class TestAdminAPI
         } else if (!(url.startsWith("http://") || url.startsWith("https://"))) {
             url = getBaseURL() + url;
         }
-        HttpMethod httpMethod = null;
-        try {
-            if (method.equals("GET")) {
-                httpMethod = new GetMethod(url);
-            } else if (method.equals("DELETE")) {
-                httpMethod = new DeleteMethod(url);
-            } else {
-                throw new IllegalArgumentException("method must be one of GET or DELETE.");
-            }
-            httpMethod.setDoAuthentication(authenticate);
-            httpMethod.getParams().setParameter("Connection", "Keep-Alive");
-            getClient(authenticate).executeMethod(httpMethod);
-            return new HttpResponse(httpMethod);
-        } finally {
-            if (httpMethod != null) {
-                httpMethod.releaseConnection();
-            }
+        HttpUriRequest httpMethod = null;
+        if (method.equals("GET")) {
+            httpMethod = new HttpGet(url);
+        } else if (method.equals("DELETE")) {
+            httpMethod = new HttpDelete(url);
+        } else {
+            throw new IllegalArgumentException("method must be one of GET or DELETE.");
         }
+        httpMethod.setHeader(HttpHeaders.CONNECTION, "Keep-Alive");
+
+        return getClient(authenticate).execute(httpMethod);
     }
 
     private HttpResponse putOrPost(String method,
@@ -440,40 +453,34 @@ public class TestAdminAPI
         }
 
 
-        EntityEnclosingMethod httpMethod = null;
+        HttpEntityEnclosingRequestBase httpMethod = null;
         try {
             if (method.equals("PUT")) {
-                httpMethod = new PutMethod(url);
+                httpMethod = new HttpPut(url);
             } else if (method.equals("POST")) {
-                httpMethod = new PostMethod(url);
+                httpMethod = new HttpPost(url);
             } else {
                 throw new IllegalArgumentException("method must be one of PUT or POST.");
             }
-            httpMethod.setDoAuthentication(authenticate);
-            httpMethod.getParams().setParameter("Connection", "Keep-Alive");
+            httpMethod.setHeader(HttpHeaders.CONNECTION, "Keep-Alive");
             if (requestContent != null) {
-                httpMethod.setContentChunked(chunked);
                 if (requestContent instanceof String) {
-                    httpMethod
-                            .setRequestEntity(new StringRequestEntity((String) requestContent,
-                                                                      "text/xml",
-                                                                      "utf-8"));
+                    StringEntity entity = new StringEntity((String) requestContent,
+                            Charset.forName("UTF-8"));
+                    entity.setChunked(chunked);
+                    httpMethod.setEntity(entity);
                 } else if (requestContent instanceof File) {
-                    Part[] parts =
-                            {
-                                    new StringPart("param_name", "value"),
-                                    new FilePart(((File) requestContent)
-                                            .getName(), (File) requestContent)};
-                    httpMethod
-                            .setRequestEntity(new MultipartRequestEntity(parts,
-                                                                         httpMethod
-                                                                                 .getParams()));
+                    MultipartEntity entity =
+                            new MultipartEntity();
+                    entity.addPart(((File) requestContent)
+                            .getName(), new FileBody((File) requestContent));
+                    entity.addPart("param_name", new StringBody("value"));
+                    httpMethod.setEntity(entity);
                 } else {
                     throw new IllegalArgumentException("requestContent must be a String or File");
                 }
             }
-            getClient(authenticate).executeMethod(httpMethod);
-            return new HttpResponse(httpMethod);
+            return getClient(authenticate).execute(httpMethod);
         } finally {
             if (httpMethod != null) {
                 httpMethod.releaseConnection();
@@ -482,15 +489,7 @@ public class TestAdminAPI
     }
 
 
-// Supports legacy test runners
-
-    public static junit.framework.Test suite() {
-        TestSuite suite = new TestSuite("Admin API TestSuite");
-        suite.addTestSuite(TestAdminAPI.class);
-        return new DemoObjectTestSetup(suite);
-    }
-
-    class HttpResponse {
+    class HttpResponseInfo {
 
         private final int statusCode;
 
@@ -498,24 +497,20 @@ public class TestAdminAPI
 
         private final Header[] responseHeaders;
 
-        private final Header[] responseFooters;
-
-        HttpResponse(int status, byte[] body, Header[] headers, Header[] footers) {
+        HttpResponseInfo(int status, byte[] body, Header[] headers) {
             statusCode = status;
             responseBody = body;
             responseHeaders = headers;
-            responseFooters = footers;
         }
 
-        HttpResponse(HttpMethod method)
+        HttpResponseInfo(HttpResponse response)
                 throws IOException {
-            statusCode = method.getStatusCode();
+            statusCode = response.getStatusLine().getStatusCode();
             //responseBody = method.getResponseBody();
-            InputStream is = method.getResponseBodyAsStream();
+            InputStream is = response.getEntity().getContent();
             responseBody = IOUtils.toByteArray(is);
             IOUtils.closeQuietly(is);
-            responseHeaders = method.getResponseHeaders();
-            responseFooters = method.getResponseFooters();
+            responseHeaders = response.getAllHeaders();
         }
 
         public int getStatusCode() {
@@ -538,10 +533,6 @@ public class TestAdminAPI
             return responseHeaders;
         }
 
-        public Header[] getResponseFooters() {
-            return responseFooters;
-        }
-
         public Header getResponseHeader(String headerName) {
             for (Header header : responseHeaders) {
                 if (header.getName().equalsIgnoreCase(headerName)) {
@@ -551,4 +542,13 @@ public class TestAdminAPI
             return null;
         }
     }
+    
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestAdminAPI.class);
+    }
+
+    public static void main(String[] args) {
+        JUnitCore.runClasses(TestAdminAPI.class);
+    }
+
 }

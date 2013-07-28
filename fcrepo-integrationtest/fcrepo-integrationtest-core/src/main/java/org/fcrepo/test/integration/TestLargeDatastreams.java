@@ -4,6 +4,9 @@
  */
 package org.fcrepo.test.integration;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,21 +14,21 @@ import java.io.UnsupportedEncodingException;
 
 import java.util.Random;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.PartSource;
-
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import junit.framework.JUnit4TestAdapter;
 
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.http.util.EntityUtils;
 import org.fcrepo.client.FedoraClient;
 
 import org.fcrepo.server.access.FedoraAPIAMTOM;
@@ -82,11 +85,16 @@ public class TestLargeDatastreams
         }
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         fedoraClient = getFedoraClient();
         apim = fedoraClient.getAPIMMTOM();
         apia = fedoraClient.getAPIAMTOM();
+    }
+    
+    @After
+    public void tearDown() {
+        fedoraClient.shutdown();
     }
 
     @Test
@@ -136,43 +144,44 @@ public class TestLargeDatastreams
 
     private String upload() throws Exception {
         String url = fedoraClient.getUploadURL();
-        EntityEnclosingMethod httpMethod = new PostMethod(url);
-        httpMethod.setDoAuthentication(true);
-        httpMethod.getParams().setParameter("Connection", "Keep-Alive");
-        httpMethod.setContentChunked(true);
-        Part[] parts = {new FilePart("file", new SizedPartSource())};
-        httpMethod.setRequestEntity(
-                new MultipartRequestEntity(parts, httpMethod.getParams()));
+        HttpPost post = new HttpPost(url);
+        post.setHeader(HttpHeaders.CONNECTION, "Keep-Alive");
+        post.setHeader(HttpHeaders.TRANSFER_ENCODING, "chunked");
+        MultipartEntity entity = new MultipartEntity();
+        entity.addPart("file", new InputStreamBody(new SizedInputStream(), "file"));
+        post.setEntity(entity);
         HttpClient client = fedoraClient.getHttpClient();
+        HttpResponse response = null;
         try {
-
-            int status = client.executeMethod(httpMethod);
-            String response = new String(httpMethod.getResponseBody());
+            response = client.execute(post);
+            int status = response.getStatusLine().getStatusCode();
+            String body = EntityUtils.toString(response.getEntity());
 
             if (status != HttpStatus.SC_CREATED) {
                 throw new IOException("Upload failed: "
-                                      + HttpStatus.getStatusText(status) + ": "
-                                      + replaceNewlines(response, " "));
+                                      + response.getStatusLine().getReasonPhrase()
+                                      + ": " + replaceNewlines(body, " "));
             } else {
-                response = response.replaceAll("\r", "").replaceAll("\n", "");
-                return response;
+                body = body.replaceAll("\r", "").replaceAll("\n", "");
+                return body;
             }
         } finally {
-            httpMethod.releaseConnection();
+            if (response != null && response.getEntity() != null) {
+                response.getEntity().getContent().close();
+            }
         }
     }
 
     private long exportAPIALite(String dsId) throws Exception {
         String url = apia.describeRepository().getRepositoryBaseURL() +
                      "/get/" + pid + "/" + dsId;
-        HttpMethod httpMethod = new GetMethod(url);
-        httpMethod.setDoAuthentication(true);
-        httpMethod.getParams().setParameter("Connection", "Keep-Alive");
+        HttpGet httpMethod = new HttpGet(url);
+        httpMethod.setHeader(HttpHeaders.CONNECTION, "Keep-Alive");
 
         HttpClient client = fedoraClient.getHttpClient();
-        client.executeMethod(httpMethod);
+        HttpResponse response = client.execute(httpMethod);
         BufferedInputStream dataStream =
-                new BufferedInputStream(httpMethod.getResponseBodyAsStream());
+                new BufferedInputStream(response.getEntity().getContent());
 
         long bytesRead = 0;
         while (dataStream.read() >= 0) {
@@ -210,24 +219,6 @@ public class TestLargeDatastreams
 
     public static junit.framework.Test suite() {
         return new JUnit4TestAdapter(TestLargeDatastreams.class);
-    }
-
-    private class SizedPartSource implements PartSource {
-
-        @Override
-        public InputStream createInputStream() throws IOException {
-            return new SizedInputStream();
-        }
-
-        @Override
-        public String getFileName() {
-            return "file";
-        }
-
-        @Override
-        public long getLength() {
-            return fileSize;
-        }
     }
 
     private class SizedInputStream extends InputStream {

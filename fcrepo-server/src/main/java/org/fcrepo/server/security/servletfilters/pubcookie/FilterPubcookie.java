@@ -9,12 +9,11 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.httpclient.Cookie;
-
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.apache.http.cookie.Cookie;
 import org.fcrepo.server.security.servletfilters.BaseCaching;
 import org.fcrepo.server.security.servletfilters.CacheElement;
 import org.slf4j.Logger;

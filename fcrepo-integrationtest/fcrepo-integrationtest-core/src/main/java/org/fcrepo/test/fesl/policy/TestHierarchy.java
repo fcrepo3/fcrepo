@@ -1,11 +1,14 @@
 
 package org.fcrepo.test.fesl.policy;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.slf4j.Logger;
@@ -13,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import junit.framework.JUnit4TestAdapter;
 
+import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.Constants;
 
 import org.fcrepo.test.FedoraServerTestCase;
@@ -44,7 +48,7 @@ public class TestHierarchy extends FedoraServerTestCase implements Constants {
 
     private static final String PROPERTIES = "fedora";
 
-    private static HttpUtils httpUtils = null;
+    private HttpUtils httpUtils = null;
 
     //private FedoraAPIM apim = null;
     private PolicyUtils policyUtils = null;
@@ -55,7 +59,7 @@ public class TestHierarchy extends FedoraServerTestCase implements Constants {
         return new JUnit4TestAdapter(TestHierarchy.class);
     }
 
-    @Override
+    @Before
     public void setUp() {
 
         PropertyResourceBundle prop =
@@ -72,7 +76,9 @@ public class TestHierarchy extends FedoraServerTestCase implements Constants {
                 logger.debug("Setting up...");
             }
 
-            policyUtils = new PolicyUtils(getFedoraClient());
+            FedoraClient client = getFedoraClient();
+            policyUtils = new PolicyUtils(client);
+            client.shutdown();
 
 
             //PolicyStoreFactory f = new PolicyStoreFactory();
@@ -98,7 +104,6 @@ public class TestHierarchy extends FedoraServerTestCase implements Constants {
         }
     }
 
-    @Override
     @After
     public void tearDown() {
         PropertyResourceBundle prop =
@@ -123,6 +128,7 @@ public class TestHierarchy extends FedoraServerTestCase implements Constants {
 
             // Now that objects are loaded, remove the policy
             policyUtils.delPolicy(policyId);
+            httpUtils.shutdown();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             Assert.fail(e.getMessage());

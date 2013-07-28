@@ -395,6 +395,7 @@ public class AutoModify {
         String password = null;
         int portNum = 0;
         boolean isValidateOnly = true;
+        FedoraClient fc = null;
 
         try {
             if (args.length < 6 || args.length > 8) {
@@ -436,8 +437,7 @@ public class AutoModify {
                     String baseURL =
                             protocol + "://" + hostName + ":" + portNum
                                     + "/" + context;
-                    FedoraClient fc =
-                            new FedoraClient(baseURL, username, password);
+                    fc = new FedoraClient(baseURL, username, password);
                     APIA = fc.getAPIAMTOM();
                     APIM = fc.getAPIMMTOM();
                     //*******************************************
@@ -471,6 +471,10 @@ public class AutoModify {
                     + " - "
                     + (e.getMessage() == null ? "(no detail provided)" : e
                             .getMessage()));
+        } finally {
+            if (fc != null) {
+                fc.shutdown();
+            }
         }
     }
 

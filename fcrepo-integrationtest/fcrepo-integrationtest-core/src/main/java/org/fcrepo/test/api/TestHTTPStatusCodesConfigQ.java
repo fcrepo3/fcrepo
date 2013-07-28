@@ -5,8 +5,10 @@
 package org.fcrepo.test.api;
 
 import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.AfterClass;
+import org.junit.Test;
 
-import junit.framework.Test;
+import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
 
 import static org.fcrepo.test.api.TestHTTPStatusCodes.RI_SEARCH_PATH;
@@ -22,16 +24,20 @@ import static org.fcrepo.test.api.TestHTTPStatusCodes.checkError;
 public class TestHTTPStatusCodesConfigQ
         extends FedoraServerTestCase {
 
-    public static Test suite() {
-        TestSuite suite = new TestSuite("TestHTTPStatusCodesConfigQ TestSuite");
-        suite.addTestSuite(TestHTTPStatusCodesConfigQ.class);
-        return suite;
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestHTTPStatusCodesConfigQ.class);
+    }
+
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        TestHTTPStatusCodes.cleanUp();
     }
 
     //---
     // API-A Lite: riSearch
     //---
 
+    @Test
     public void testRISearch_Disabled() throws Exception {
         checkError(RI_SEARCH_PATH);
     }

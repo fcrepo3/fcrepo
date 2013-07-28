@@ -5,16 +5,21 @@
 
 package org.fcrepo.test.api;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import junit.framework.JUnit4TestAdapter;
 
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.types.mtom.gen.GetDissemination.Parameters;
 import org.fcrepo.server.types.mtom.gen.MIMETypedStream;
 import org.fcrepo.server.utilities.TypeUtility;
-import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
 
 
 
@@ -27,14 +32,11 @@ import org.fcrepo.test.FedoraServerTestCase;
 public class TestAPIAConfigA
         extends FedoraServerTestCase {
 
+    private static FedoraClient s_client;
+    
     private FedoraAPIAMTOM apia;
 
-    public static Test suite() {
-        TestSuite suite = new TestSuite("APIAConfigA TestSuite");
-        suite.addTestSuite(TestAPIAConfigA.class);
-        return new DemoObjectTestSetup(suite);
-    }
-
+    @Test
     public void testGetChainedDissemination() throws Exception {
         // test chained dissemination using local services
         // The object contains an E datastream that is a dissemination of the local SAXON service.
@@ -50,11 +52,30 @@ public class TestAPIAConfigA
         assertEquals(diss.getMIMEType(), "application/pdf");
         assertTrue(TypeUtility.convertDataHandlerToBytes(diss.getStream()).length > 0);
     }
+    
+    @BeforeClass
+    public static void bootstrap() throws Exception {
+        s_client = getFedoraClient();
+        ingestDemoObjects(s_client);
+    }
+    
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        purgeDemoObjects(s_client);
+        s_client.shutdown();
+    }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
-        FedoraClient client = getFedoraClient();
-        apia = client.getAPIAMTOM();
+        apia = s_client.getAPIAMTOM();
+    }
+
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestAPIAConfigA.class);
+    }
+
+    public static void main(String[] args) {
+        JUnitCore.runClasses(TestAPIAConfigA.class);
     }
 
 }

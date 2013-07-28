@@ -21,6 +21,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public Iterator actionAttributes() {
         // TODO Auto-generated method stub
         return null;
@@ -29,6 +30,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public Iterator environmentAttributes() {
         // TODO Auto-generated method stub
         return null;
@@ -163,6 +165,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public Iterator resourceAttributes() {
         // TODO Auto-generated method stub
         return null;
@@ -187,6 +190,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public Iterator subjectAttributes() {
         // TODO Auto-generated method stub
         return null;

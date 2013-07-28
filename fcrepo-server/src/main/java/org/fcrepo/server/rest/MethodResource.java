@@ -36,7 +36,6 @@ import org.springframework.stereotype.Component;
 @Path("/{pid : ([A-Za-z0-9]|-|\\.)+:(([A-Za-z0-9])|-|\\.|~|_|(%[0-9A-F]{2}))+}/methods")
 @Component
 public class MethodResource extends BaseRestResource {
-    @javax.ws.rs.core.Context UriInfo uriInfo;
 
     public MethodResource(Server server) {
         super(server);
@@ -95,6 +94,8 @@ public class MethodResource extends BaseRestResource {
     @Path("/{sDef}/{method}")
     @GET
     public Response invokeSDefMethodUsingGET(
+            @javax.ws.rs.core.Context
+            UriInfo uriInfo,
             @PathParam(RestParam.PID)
             String pid,
             @PathParam(RestParam.SDEF)

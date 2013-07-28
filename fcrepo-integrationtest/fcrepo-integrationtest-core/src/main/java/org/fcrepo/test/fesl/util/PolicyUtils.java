@@ -41,7 +41,6 @@ public class PolicyUtils
     public PolicyUtils(FedoraClient fedoraClient)
             throws ServiceException, IOException {
         apim = fedoraClient.getAPIMMTOM();
-
     }
 
     public String addPolicy(File policyFile) throws Exception {

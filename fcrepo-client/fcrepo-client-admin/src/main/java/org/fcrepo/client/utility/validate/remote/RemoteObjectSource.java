@@ -54,6 +54,7 @@ public class RemoteObjectSource
                                  serviceInfo.getPassword());
         apia = fc.getAPIAMTOM();
         apim = fc.getAPIMMTOM();
+        fc.shutdown();
     }
 
     /**

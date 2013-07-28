@@ -58,6 +58,13 @@ public class PolicyIndexExerciser
         utils = new HttpUtils(testurl, testuser, testpassword);
         isReader = true;
     }
+    
+    public void shutdown() {
+        utils.shutdown();
+        if (adminUtils != null) {
+            adminUtils.shutdown();
+        }
+    }
 
 
     @Override

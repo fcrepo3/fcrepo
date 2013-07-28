@@ -14,6 +14,7 @@ import org.junit.runners.Suite;
         org.fcrepo.test.api.TestHTTPStatusCodesConfigA.class,
         org.fcrepo.test.api.TestManyDisseminations.class,
         org.fcrepo.test.api.TestRESTAPI.class,
+        org.fcrepo.test.api.TestRESTAPIURLDecoding.class,
         // Disabled until FCREPO-798 is public:
         // org.fcrepo.test.api.TestAPIM2.class,
         org.fcrepo.test.api.TestAdminAPI.class})
@@ -32,6 +33,7 @@ public class AllSystemTestsConfigA {
         suite.addTest(org.fcrepo.test.api.TestHTTPStatusCodesConfigA.suite());
         suite.addTest(org.fcrepo.test.api.TestManyDisseminations.suite());
         suite.addTest(org.fcrepo.test.api.TestRESTAPI.suite());
+        suite.addTest(org.fcrepo.test.api.TestRESTAPIURLDecoding.suite());
         suite.addTest(org.fcrepo.test.api.TestAdminAPI.suite());
         // Disabled until FCREPO-798 is public:
         // suite.addTest(org.fcrepo.test.api.TestAPIM2.suite());

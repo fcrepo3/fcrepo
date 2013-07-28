@@ -1293,6 +1293,7 @@ public class BatchModifyParser
                 FedoraClient fc = new FedoraClient(baseURL, user, pass);
                 APIA = fc.getAPIAMTOM();
                 APIM = fc.getAPIMMTOM();
+                fc.shutdown();
                 //*******************************************
 
                 InputStream file =

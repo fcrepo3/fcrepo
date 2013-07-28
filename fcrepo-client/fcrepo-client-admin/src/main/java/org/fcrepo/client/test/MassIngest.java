@@ -115,6 +115,7 @@ public class MassIngest {
                 FedoraClient fc = new FedoraClient(baseURL, username, password);
                 APIA = fc.getAPIAMTOM();
                 APIM = fc.getAPIMMTOM();
+                fc.shutdown();
                 //*******************************************
                 AutoIngestor autoIngestor = new AutoIngestor(APIA, APIM);
 

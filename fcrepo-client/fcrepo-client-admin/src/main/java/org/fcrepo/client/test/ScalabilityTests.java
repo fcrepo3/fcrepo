@@ -90,6 +90,7 @@ public class ScalabilityTests
         String baseURL =  "http://" + host + ":" + port + "/" + context;
         FedoraClient fedoraClient = new FedoraClient(baseURL, username, password);
         apim = fedoraClient.getAPIMMTOM();
+        fedoraClient.shutdown();
 
         try {
             batchSize = Integer.valueOf(batch);

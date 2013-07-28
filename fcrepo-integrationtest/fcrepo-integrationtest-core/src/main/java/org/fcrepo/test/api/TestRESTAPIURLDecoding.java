@@ -4,9 +4,20 @@
  */
 package org.fcrepo.test.api;
 
-import org.fcrepo.test.FedoraServerTestCase;
+import static org.apache.http.HttpStatus.SC_CREATED;
 
-import static org.apache.commons.httpclient.HttpStatus.SC_OK;
+import java.net.URI;
+
+import junit.framework.JUnit4TestAdapter;
+
+import org.apache.http.entity.StringEntity;
+import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+
+import static org.apache.http.HttpStatus.SC_OK;
 
 public class TestRESTAPIURLDecoding
         extends FedoraServerTestCase {
@@ -15,7 +26,7 @@ public class TestRESTAPIURLDecoding
     private static final String pidWithEscapedColon1 = "test%3ASomeObject";
     private static final String pidWithEscapedColon2 = "test%3aSomeObject";
 
-    private static TestRESTAPI rest = new TestRESTAPI();
+    private static TestRESTAPI rest;
 
     private static String getFOXML(String pid) {
         // Test minimal FOXML object
@@ -34,26 +45,39 @@ public class TestRESTAPIURLDecoding
         return sb.toString();
     }
     
-    @Override
+    @Before
     public void setUp() throws Exception {
-        rest.url = String.format("/objects/%s", pid);
-        rest.post(getFOXML(pid), true);
+        URI url = TestRESTAPI.getURI(String.format("/objects/%s", pid));
+        StringEntity entity = TestRESTAPI.getStringEntity(getFOXML(pid), "text/xml");
+        TestRESTAPI.initClient();
+        rest = new TestRESTAPI();
+        rest.verifyPOSTStatusOnly(url, SC_CREATED, entity, true);
     }
     
-    @Override
+    @After
     public void tearDown() throws Exception {
-        rest.url = String.format("/objects/%s", pid);
-        rest.delete(true);
+        URI url = TestRESTAPI.getURI(String.format("/objects/%s", pid));
+        rest.verifyDELETEStatusOnly(url, SC_OK, true);
+        TestRESTAPI.stopClient();
     }
 
+    @Test
     public void testGetObjectProfile() throws Exception {
-        getAndExpect("/objects/" + pid, SC_OK);
-        getAndExpect("/objects/" + pidWithEscapedColon1, SC_OK);
-        getAndExpect("/objects/" + pidWithEscapedColon2, SC_OK);
+        URI url = TestRESTAPI.getURI("/objects/" + pid);
+        rest.verifyGETStatusOnly(url, SC_OK, true);
+        url = TestRESTAPI.getURI("/objects/" + pidWithEscapedColon1);
+        rest.verifyGETStatusOnly(url, SC_OK, true);
+        url = TestRESTAPI.getURI("/objects/" + pidWithEscapedColon2);
+        rest.verifyGETStatusOnly(url, SC_OK, true);
     }
     
-    private void getAndExpect(String url, int statusCode) throws Exception {
-        rest.url = url;
-        assertEquals(SC_OK, rest.get(true).getStatusCode());
+    // Supports legacy test runners
+
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestRESTAPIURLDecoding.class);
+    }
+
+    public static void main(String[] args) {
+        JUnitCore.runClasses(TestRESTAPIURLDecoding.class);
     }
 }

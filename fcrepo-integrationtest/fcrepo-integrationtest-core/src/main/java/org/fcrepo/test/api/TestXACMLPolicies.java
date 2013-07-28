@@ -5,6 +5,11 @@
 
 package org.fcrepo.test.api;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,20 +24,23 @@ import java.lang.reflect.Method;
 
 import javax.xml.ws.soap.SOAPFaultException;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.framework.JUnit4TestAdapter;
 
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers;
 import org.fcrepo.server.types.gen.ArrayOfString;
 import org.fcrepo.server.types.mtom.gen.GetDissemination.Parameters;
 import org.fcrepo.server.utilities.ServerUtility;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.utilities.TypeUtility;
-import org.fcrepo.test.DemoObjectTestSetup;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
 
 /**
  * Tests involving XACML policies, for API-A and API-M.
@@ -45,6 +53,8 @@ import org.fcrepo.test.FedoraServerTestCase;
  */
 public class TestXACMLPolicies
         extends FedoraServerTestCase {
+    
+    private static FedoraClient s_client;
 
     private FedoraClient admin;
 
@@ -65,18 +75,26 @@ public class TestXACMLPolicies
     private FedoraClient testuser4;
 
     private File fedoraUsersBackup = null;
-
-    public static Test suite() {
-        TestSuite suite = new TestSuite("XACML Policy TestSuite");
-        suite.addTestSuite(TestXACMLPolicies.class);
-        return new DemoObjectTestSetup(suite);
+    
+    @BeforeClass
+    public static void bootstrap() throws Exception {
+        s_client = getFedoraClient();
+        ingestDemoObjects(s_client);
+    }
+    
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        purgeDemoObjects(s_client);
+        s_client.shutdown();
     }
 
+    @Test
     public void testXACMLMultiOwnerAccess() throws Exception {
         // demo:MultiOwnerObject is owned by fedoraAdmin and testuser1
         final String pid = "test:MultiOwnerObject";
         final String owners = "fedoraAdmin,testuser1";
-        addTestObject(pid, owners, null);
+        String[] nullModels = null;
+        addTestObject(pid, owners, nullModels);
 
         // should only be modifiable by an owner
         try {
@@ -88,6 +106,7 @@ public class TestXACMLPolicies
         }
     }
 
+    @Test
     public void testXACMLUnmodifiableContentModel() throws Exception {
 
         // test policy disallows modifyObject for test:RestrictedCModel
@@ -138,6 +157,7 @@ public class TestXACMLPolicies
         }
     }
 
+    @Test
     public void testXACMLAPIMAccess() throws Exception {
         String dateOfFirstSuccess = null;
         String dateOfSecondSuccess = null;
@@ -146,19 +166,19 @@ public class TestXACMLPolicies
         String URL1 = getDemoBaseURL() + "/simple-image-demo/col1.jpg";
         String URL2 = getDemoBaseURL() + "/simple-image-demo/col2.jpg";
         String URL3 = getDemoBaseURL() + "/simple-image-demo/col3.jpg";
-        Class modDSArgs[] =
+        Class<?> modDSArgs[] =
                 {String.class, String.class, ArrayOfString.class, String.class,
                         String.class, String.class, String.class, String.class,
                         String.class, String.class, boolean.class};
         Object modDSParms1[] =
                 {"demo:5", "THUMBRES_IMG", null, null, null, null, null, null,
                         null, null, false};
-        Class purgeDSArgs[] =
+        Class<?> purgeDSArgs[] =
                 {String.class, String.class, String.class, String.class,
                         String.class, boolean.class};
         Object purgeDSParms1[] =
                 {"demo:5", "THUMBRES_IMG", null, null, null, false};
-        Class setVersionableArgs[] =
+        Class<?> setVersionableArgs[] =
                 {String.class, String.class, Boolean.TYPE, String.class};
         Object setVersionableFalse[] =
                 {"demo:5", "THUMBRES_IMG", Boolean.FALSE, null};
@@ -275,22 +295,23 @@ public class TestXACMLPolicies
         System.out.println("Purge Datastreams successful.");
     }
 
+    @Test
     public void testXACMLAPIAAccess() throws Exception {
         if (isAPIAAuthzOn()) {
-            Class getDDArgs[] = {String.class, String.class, String.class};
+            Class<?> getDDArgs[] = {String.class, String.class, String.class};
             Object getDDParms[] = {"demo:5", "THUMBRES_IMG", null};
             Object getDDParms2[] = {"demo:29", "url", null};
             Object getDDParms3[] = {"demo:31", "DS1", null};
             Object getDDParms4[] = {"demo:ObjSpecificTest", "DC", null};
 
-            Class getDissArgs[] =
+            Class<?> getDissArgs[] =
                     {String.class, String.class, String.class,
                             Parameters.class, String.class};
             Object getDissParms[] = {"demo:5", "demo:1", "getHigh", null, null};
             Object getDissParms2[] =
                     {"demo:29", "demo:27", "grayscaleImage", null, null};
             Object getDissParms3[] = {"demo:5", "demo:1", "getVeryHigh", null, null};
-            Class modObjArgs[] =
+            Class<?> modObjArgs[] =
                     {String.class, String.class, String.class, String.class,
                             String.class};
             Object modObjParms[] = {"demo:31", null, null, null, null};
@@ -436,7 +457,7 @@ public class TestXACMLPolicies
     public void invokeAPIMFailure(FedoraClient user,
                                   String username,
                                   String functionToTest,
-                                  Class args[],
+                                  Class<?> args[],
                                   Object parms[]) {
         // APIA access by user without access- should fail
         try {
@@ -445,7 +466,7 @@ public class TestXACMLPolicies
 
             FedoraAPIMMTOM apim1 = user.getAPIMMTOM();
             Method func = apim1.getClass().getMethod(functionToTest, args);
-            Object result = func.invoke(apim1, parms);
+            func.invoke(apim1, parms);
             fail("Illegal access allowed");
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
@@ -485,17 +506,18 @@ public class TestXACMLPolicies
     public String invokeAPIMSuccessString(FedoraClient user,
                                           String username,
                                           String functionToTest,
-                                          Class args[],
+                                          Class<?> args[],
                                           Object parms[]) {
         Object result =
                 invokeAPIMSuccess(user, username, functionToTest, args, parms);
         return (String) result;
     }
 
+    @SuppressWarnings("unchecked")
     public String[] invokeAPIMSuccessStringArray(FedoraClient user,
                                                  String username,
                                                  String functionToTest,
-                                                 Class args[],
+                                                 Class<?> args[],
                                                  Object parms[]) {
         Object result =
                 invokeAPIMSuccess(user, username, functionToTest, args, parms);
@@ -505,7 +527,7 @@ public class TestXACMLPolicies
     public Object invokeAPIMSuccess(FedoraClient user,
                                     String username,
                                     String functionToTest,
-                                    Class args[],
+                                    Class<?> args[],
                                     Object parms[]) {
         // APIA access by user with access- should succeed
         try {
@@ -542,7 +564,7 @@ public class TestXACMLPolicies
     public void invokeAPIAFailure(FedoraClient user,
                                   String username,
                                   String functionToTest,
-                                  Class args[],
+                                  Class<?> args[],
                                   Object parms[]) {
         // APIA access by user without access- should fail
         try {
@@ -551,7 +573,7 @@ public class TestXACMLPolicies
 
             FedoraAPIAMTOM apia1 = user.getAPIAMTOM();
             Method func = apia1.getClass().getMethod(functionToTest, args);
-            Object result = func.invoke(apia1, parms);
+            func.invoke(apia1, parms);
             fail("Illegal access allowed");
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
@@ -587,7 +609,7 @@ public class TestXACMLPolicies
     public Object invokeAPIASuccess(FedoraClient user,
                                     String username,
                                     String functionToTest,
-                                    Class args[],
+                                    Class<?> args[],
                                     Object parms[]) {
         // APIA access by user with access- should succeed
         try {
@@ -748,8 +770,11 @@ public class TestXACMLPolicies
     }
 
     private void backupFedoraUsersFile() {
+        @SuppressWarnings("deprecation")
+        File srcFile =
+                org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers.fedoraUsersXML;
         fedoraUsersBackup =
-                new File(FedoraUsers.fedoraUsersXML.getAbsolutePath()
+                new File(srcFile.getAbsolutePath()
                         + ".backup");
         System.out.println("Backing Up Fedora Users");
         if (!fedoraUsersBackup.exists()) {
@@ -759,7 +784,7 @@ public class TestXACMLPolicies
                 e.printStackTrace();
             }
         }
-        copyFile(FedoraUsers.fedoraUsersXML, fedoraUsersBackup);
+        copyFile(srcFile, fedoraUsersBackup);
     }
 
     private void restoreFedoraUsersFile() {
@@ -767,7 +792,10 @@ public class TestXACMLPolicies
         if (!fedoraUsersBackup.exists()) {
             return;
         }
-        copyFile(fedoraUsersBackup, FedoraUsers.fedoraUsersXML);
+        @SuppressWarnings("deprecation")
+        File destFile =
+                org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers.fedoraUsersXML;
+        copyFile(fedoraUsersBackup, destFile);
     }
 
     private void createNewFedoraUsersFileWithTestUsers() {
@@ -851,8 +879,10 @@ public class TestXACMLPolicies
                         + "      </attribute>" + sep + "    </user>" + sep
                         + "  </fedora-users>";
         try {
+            @SuppressWarnings("deprecation")
             FileOutputStream fu =
-                    new FileOutputStream(FedoraUsers.fedoraUsersXML);
+                    new FileOutputStream(
+                            org.fcrepo.server.security.servletfilters.xmluserfile.FedoraUsers.fedoraUsersXML);
             OutputStreamWriter pw = new OutputStreamWriter(fu);
             pw.write(data);
             pw.close();
@@ -861,7 +891,7 @@ public class TestXACMLPolicies
         }
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
 
         System.out.println("setting Up XACML test");
@@ -1027,15 +1057,28 @@ public class TestXACMLPolicies
         }
     }
 
-    @Override
+    @After
     public void tearDown() {
         restoreFedoraUsersFile();
         deleteJunitPolicies();
         reloadPolicies();
+        admin.shutdown();
+        testuser1.shutdown();
+        testuserroleA.shutdown();
+        testuser2.shutdown();
+        testuser3.shutdown();
+        testuserroleB.shutdown();
+        testuserroleC.shutdown();
+        testuserroleC2.shutdown();
+        testuser4.shutdown();
+    }
+
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestXACMLPolicies.class);
     }
 
     public static void main(String[] args) {
-        junit.textui.TestRunner.run(TestXACMLPolicies.class);
+        JUnitCore.runClasses(TestXACMLPolicies.class);
     }
 
 }

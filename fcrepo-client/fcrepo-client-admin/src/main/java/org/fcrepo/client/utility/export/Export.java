@@ -228,6 +228,7 @@ public class Export
             FedoraClient fc = new FedoraClient(baseURL, args[1], args[2]);
             FedoraAPIAMTOM sourceRepoAPIA = fc.getAPIAMTOM();
             FedoraAPIMMTOM sourceRepoAPIM = fc.getAPIMMTOM();
+            fc.shutdown();
             //*******************************************
 
             String exportFormat = args[4];
