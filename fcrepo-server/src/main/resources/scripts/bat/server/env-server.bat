@@ -12,6 +12,10 @@ REM                  classes required to run the utilities.
 REM   JAVA_HOME    : Optional.  Used to determine the location of java.
 REM                  If JAVA_HOME is unspecified, will use FEDORA_JAVA_HOME.
 REM                  If FEDORA_JAVA_HOME is unspecified, will use java in PATH.
+REM   FEDORA_WEBAPP_HOME:  Optional.  Used to determine the location of the
+REM                  Fedora web application.  If FEDORA_WEBAPP_HOME is
+REM                  unspecified, then will use 
+REM                  CATALINA_HOME\webapps\%WEBAPP_NAME%
 REM ---------------------------------------------------------------------------
 
 if not "%WEBAPP_NAME%" == "" goto gotWebappName
@@ -28,9 +32,16 @@ echo ERROR: The CATALINA_HOME environment variable is not defined.
 exit /B 1
 :gotCatalinaHome
 
+if not "%FEDORA_WEBAPP_HOME%" == "" goto gotFedoraWebappHome
 set WEBINF="%CATALINA_HOME%\webapps\%WEBAPP_NAME%\WEB-INF"
+goto gotWebinf
+:gotFedoraWebappHome
+set WEBINF="%FEDORA_WEBAPP_HOME%\WEB-INF"
+:gotWebinf
+
 if exist "%WEBINF%" goto webInfExists
-echo ERROR: Fedora could not be found in the specified path, please set the environment variable WEBAPP_NAME to the context Fedora is installed in.
+echo ERROR: Fedora could not be found in the specified path, please set the environment variable FEDORA_WEBAPP_HOME
+echo to the location of your Fedora web application directory, or set WEBAPP_NAME to the context Fedora is installed in.
 exit /B 1
 :webInfExists
 
