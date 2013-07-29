@@ -31,10 +31,10 @@ if [ -z "$CATALINA_HOME" ]; then
 fi
 
 if [ -z "$FEDORA_WEBAPP_HOME" ]; then
-  webinf="$CATALINA_HOME"/webapps/$webapp_name/WEB-INF                                                                                               
-else
-  webinf="$FEDORA_WEBAPP_HOME"/WEB-INF
+  FEDORA_WEBAPP_HOME="$CATALINA_HOME"/webapps/$webapp_name
 fi
+
+webinf="$FEDORA_WEBAPP_HOME"/WEB-INF
 
 if [ ! -d "$webinf" ]; then
 	echo "ERROR: Fedora could not be found in the specified path, please set the environment variable FEDORA_WEBAPP_HOME"
