@@ -9,6 +9,9 @@
 #   JAVA_HOME    : Optional.  Used to determine the location of java.
 #                  If JAVA_HOME is unspecified, will use FEDORA_JAVA_HOME.
 #                  If FEDORA_JAVA_HOME is unspecified, will use java in PATH. 
+#   FEDORA_WEBAPP_HOME:  Optional.  Used to determine the location of the
+#                  Fedora web application.  If FEDORA_WEBAPP_HOME is
+#                  unspecified, then will use CATALINA_HOME/webapps/$webapp_name.
 #------------------------------------------------------------------------------
 
 if [ -z "$WEBAPP_NAME" ]; then
@@ -27,9 +30,15 @@ if [ -z "$CATALINA_HOME" ]; then
   exit 1
 fi
 
-webinf="$CATALINA_HOME"/webapps/$webapp_name/WEB-INF                                                                                               
+if [ -z "$FEDORA_WEBAPP_HOME" ]; then
+  webinf="$CATALINA_HOME"/webapps/$webapp_name/WEB-INF                                                                                               
+else
+  webinf="$FEDORA_WEBAPP_HOME"/WEB-INF
+fi
+
 if [ ! -d "$webinf" ]; then
-	echo "ERROR: Fedora could not be found in the specified path, please set the environment variable WEBAPP_NAME to the context Fedora is installed in."
+	echo "ERROR: Fedora could not be found in the specified path, please set the environment variable FEDORA_WEBAPP_HOME"
+    echo "to the location of your Fedora web application directory, or set WEBAPP_NAME to the context Fedora is installed in."
 	exit 1
 fi  
 
