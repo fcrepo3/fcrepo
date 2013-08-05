@@ -411,6 +411,18 @@ public class TestRelationships
                                                "867-5309",
                                                true,
                                                null));
+            
+            addRelationship(s, p, o, true, null);
+            addRelationship(s, p, "foo", true, null);
+            
+            List<RelationshipTuple> tuples = apim.getRelationships(s, p);
+            assertNotNull(tuples);
+            assertEquals(2, tuples.size());
+            assertTrue("Purging relationship with null object should delete all subject/predicate matches",
+                    apim.purgeRelationship(s, p, null, true, null));
+            tuples = apim.getRelationships(s, p);
+            assertNotNull(tuples);
+            assertEquals(0, tuples.size());
         }
     }
 

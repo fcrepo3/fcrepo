@@ -479,14 +479,16 @@ public class SimpleDOWriter
             throws ServerException {
         ObjectNode o = null;
         try {
-            if (isLiteral) {
-                if (datatype == null || datatype.length() == 0) {
-                    o = new SimpleLiteral(object);
+            if (object != null) {
+                if (isLiteral) {
+                    if (datatype == null || datatype.length() == 0) {
+                        o = new SimpleLiteral(object);
+                    } else {
+                        o = new SimpleLiteral(object, new URI(datatype));
+                    }
                 } else {
-                    o = new SimpleLiteral(object, new URI(datatype));
+                    o = new SimpleURIReference(new URI(object));
                 }
-            } else {
-                o = new SimpleURIReference(new URI(object));
             }
             return new SimpleTriple(new SimpleURIReference(new URI(subject)),
                                     new SimpleURIReference(new URI(predicate)),

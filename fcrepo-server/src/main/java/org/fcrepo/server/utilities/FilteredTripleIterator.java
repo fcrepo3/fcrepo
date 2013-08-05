@@ -104,8 +104,8 @@ public class FilteredTripleIterator
                 .toString())
                 && partMatches(next.getPredicate().toString(), filter
                         .getPredicate().toString())
-                && partMatches(next.getObject().toString(), filter.getObject()
-                        .toString());
+                && (filter.getObject() == null || partMatches(next.getObject().toString(), filter.getObject()
+                        .toString()));
 
     }
 
