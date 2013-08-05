@@ -23,6 +23,7 @@ import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.resourceIndex.UvaStdImgTripleGenerator_1;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.fcrepo.test.ManagedContentTranslator;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,7 +50,11 @@ extends FedoraServerTestCase {
     @BeforeClass
     public static void bootStrap() throws Exception {
         s_client = getFedoraClient();
-        ingestDemoObjects(s_client);
+        ingestSimpleImageDemoObjects(s_client);
+        ingestImageCollectionDemoObjects(s_client);
+        // clone some demo objects to managed-content equivalents for reserved datastreams (RELS-*, DC)
+        ManagedContentTranslator.createManagedClone(s_client.getAPIMMTOM(), "demo:SmileyPens", "demo:SmileyPens_M");
+        ManagedContentTranslator.createManagedClone(s_client.getAPIMMTOM(), "demo:SmileyBeerGlass", "demo:SmileyBeerGlass_M");
     }
     
     @AfterClass

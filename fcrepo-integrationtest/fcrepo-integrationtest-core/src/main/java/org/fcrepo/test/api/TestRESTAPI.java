@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -204,7 +203,8 @@ public class TestRESTAPI
 
         initClient();
 
-        ingestDemoObjects(s_client);
+        ingestImageManipulationDemoObjects(s_client);
+        ingestDocumentTransformDemoObjects(s_client);
         
         if (DEMO_MIN == null) DEMO_MIN =
                 FileUtils.readFileToString(new File(REST_RESOURCE_PATH
@@ -962,9 +962,10 @@ public class TestRESTAPI
 
    @Test
     public void testResumeFindObjects() throws Exception {
-        URI url = getURI("/objects?pid=true&query=&resultFormat=xml");
+       // there are only the system objects and 8 demo objects, so maxResults must be constrained
+        URI url = getURI("/objects?pid=true&query=&resultFormat=xml&maxResults=4");
         verifyNoAuthFailOnAPIAAuth(url);
-        // FIXME: resumeFindObjects should have a schema?  remove "false" to enable validdation
+        // FIXME: resumeFindObjects should have a schema?  remove "false" to enable validation
         String responseXML = verifyGETStatusString(url, SC_OK, getAuthAccess(), false);
         String sessionToken =
                 responseXML.substring(responseXML.indexOf("<token>") + 7,
@@ -1905,7 +1906,7 @@ public class TestRESTAPI
     public void testDisseminationContentLengthWhenKnown() throws Exception {
         URI url =
                 getURI(
-                    "/objects/demo:SmileyBeerGlass/methods/demo:DualResolution/mediumSize");
+                    "/objects/demo:14/methods/demo:12/getDocument");
         HttpGet get = new HttpGet(url);
         HttpResponse response;
         verifyNoAuthFailOnAPIAAuth(url);
@@ -1918,7 +1919,7 @@ public class TestRESTAPI
         EntityUtils.consumeQuietly(response.getEntity());
         get.releaseConnection();
         assertEquals(SC_OK, status);
-        assertEquals("17109", cLen);
+        assertEquals("19498", cLen);
     }
 
     private MultipartEntity _doUploadPost() throws Exception {
@@ -1965,8 +1966,7 @@ public class TestRESTAPI
             s_client.getHttpClient(followRedirects, auth);
         if (auth) {
             String host = getHost();
-            LOGGER.info("credentials set for scope of {}:[ANY PORT]",
-                    host);
+            LOGGER.debug("credentials set for scope of {}:[ANY PORT]", host);
             result
                     .getCredentialsProvider()
                     .setCredentials(

@@ -40,8 +40,8 @@ public class TestAPIALiteConfigA
     @Before
     public void setUp() throws Exception {
         client = getFedoraClient();
-        //TODO figure out what directory these are in
-        ingestDemoObjects("/", client);
+        // demo:26, demo:19
+        ingestFormattingObjectsDemoObjects(client);
     }
     
     @After

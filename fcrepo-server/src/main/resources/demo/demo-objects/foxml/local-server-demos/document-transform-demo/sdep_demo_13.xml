@@ -48,6 +48,11 @@
                 <fmm:MethodMap
                         name="MethodMap - Document Transform BDEF Methods"
                         xmlns:fmm="http://fedora.comm.nsdlib.org/service/methodmap">
+                    <fmm:Method operationName="getDocument"
+                                wsdlMsgName="getDocumentRequest" wsdlMsgOutput="xml_response">
+                        <fmm:DatastreamInputParm parmName="XML_SOURCE" passBy="URL_REF" required="true"/>
+                        <fmm:MethodReturnType wsdlMsgName="xml_response" wsdlMsgTOMIME="text/xml"/>
+                    </fmm:Method>
                     <fmm:Method operationName="getDocumentStyle1"
                                 wsdlMsgName="getDocumentStyle1Request" wsdlMsgOutput="xslt_response">
                         <fmm:DatastreamInputParm parmName="XML_SOURCE" passBy="URL_REF" required="true"/>
@@ -123,6 +128,9 @@
                             </xsd:simpleType>
                         </xsd:schema>
                     </wsdl:types>
+                    <wsdl:message name="getDocumentRequest">
+                        <wsdl:part name="XML_SOURCE" type="this:URLType"/>
+                    </wsdl:message>
                     <wsdl:message name="getDocumentStyle1Request">
                         <wsdl:part name="XML_SOURCE" type="this:URLType"/>
                         <wsdl:part name="XSL_STYLESHEET1" type="this:URLType"/>
@@ -133,10 +141,17 @@
                         <wsdl:part name="XSL_STYLESHEET2" type="this:URLType"/>
                         <wsdl:part name="CLEAR_CACHE" type="this:CLEAR_CACHEType"/>
                     </wsdl:message>
+                    <wsdl:message name="xml_response">
+                        <wsdl:part name="xml" type="xsd:base64Binary"/>
+                    </wsdl:message>
                     <wsdl:message name="xslt_response">
                         <wsdl:part name="exhibit" type="xsd:base64Binary"/>
                     </wsdl:message>
                     <wsdl:portType name="FedoraSaxonPortType">
+                        <wsdl:operation name="getDocument">
+                            <wsdl:input message="this:getDocumentRequest"/>
+                            <wsdl:output message="this:xml_response"/>
+                        </wsdl:operation>
                         <wsdl:operation name="getDocumentStyle1">
                             <wsdl:input message="this:getDocumentStyle1Request"/>
                             <wsdl:output message="this:xslt_response"/>
@@ -148,14 +163,23 @@
                     </wsdl:portType>
                     <wsdl:service name="FedoraSaxon">
                         <wsdl:port binding="this:FedoraSaxon_http" name="FedoraSaxon_port">
-                            <http:address location="http://local.fedora.server/saxon/"/>
+                            <http:address location=""/>
                         </wsdl:port>
                     </wsdl:service>
                     <wsdl:binding name="FedoraSaxon_http" type="this:FedoraSaxonPortType">
                         <http:binding verb="GET"/>
+                        <wsdl:operation name="getDocument">
+                            <http:operation location="(XML_SOURCE)"/>
+                            <wsdl:input>
+                                <http:urlReplacement/>
+                            </wsdl:input>
+                            <wsdl:output>
+                                <mime:content type="text/xml"/>
+                            </wsdl:output>
+                        </wsdl:operation>
                         <wsdl:operation name="getDocumentStyle1">
                             <http:operation
-                                    location="SaxonServlet?source=(XML_SOURCE)&amp;style=(XSL_STYLESHEET1)&amp;clear-stylesheet-cache=(CLEAR_CACHE)"/>
+                                    location="http://local.fedora.server/saxon/SaxonServlet?source=(XML_SOURCE)&amp;style=(XSL_STYLESHEET1)&amp;clear-stylesheet-cache=(CLEAR_CACHE)"/>
                             <wsdl:input>
                                 <http:urlReplacement/>
                             </wsdl:input>
@@ -165,7 +189,7 @@
                         </wsdl:operation>
                         <wsdl:operation name="getDocumentStyle2">
                             <http:operation
-                                    location="SaxonServlet?source=(XML_SOURCE)&amp;style=(XSL_STYLESHEET2)&amp;clear-stylesheet-cache=(CLEAR_CACHE)"/>
+                                    location="http://local.fedora.server/saxon/SaxonServlet?source=(XML_SOURCE)&amp;style=(XSL_STYLESHEET2)&amp;clear-stylesheet-cache=(CLEAR_CACHE)"/>
                             <wsdl:input>
                                 <http:urlReplacement/>
                             </wsdl:input>

@@ -56,7 +56,8 @@ public class TestAPIAConfigA
     @BeforeClass
     public static void bootstrap() throws Exception {
         s_client = getFedoraClient();
-        ingestDemoObjects(s_client);
+        // demo:19, demo:26
+        ingestFormattingObjectsDemoObjects(s_client);
     }
     
     @AfterClass

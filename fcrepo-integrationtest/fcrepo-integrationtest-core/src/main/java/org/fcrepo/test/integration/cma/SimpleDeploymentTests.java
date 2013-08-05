@@ -12,7 +12,9 @@ import static org.fcrepo.test.integration.cma.Util.filterMethods;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.fcrepo.client.FedoraClient;
+import org.fcrepo.client.utility.AutoPurger;
 import org.fcrepo.server.access.FedoraAPIAMTOM;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.types.gen.ObjectMethodsDef;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.junit.AfterClass;
@@ -47,7 +49,7 @@ public class SimpleDeploymentTests {
     public static junit.framework.Test suite() {
         // FIXME: The specified class should be 'Simple...' not 'Shared...'
         //        But test does not work when classname set correctly.
-        return new junit.framework.JUnit4TestAdapter(SharedDeploymentTests.class);
+        return new junit.framework.JUnit4TestAdapter(SimpleDeploymentTests.class);
     }
 
     @BeforeClass
@@ -67,8 +69,7 @@ public class SimpleDeploymentTests {
     }
 
     /* Assure that listMethods works as advertised */
-    @Test
-    public void testListMethods() throws Exception {
+    private void testListMethods() throws Exception {
         FedoraAPIAMTOM apia = s_client.getAPIAMTOM();
         ObjectMethodsDef[] methods;
 
@@ -97,9 +98,9 @@ public class SimpleDeploymentTests {
     /* Assure that listMethods works without sDeps */
     @Test
     public void testListMethodsWithoutSDeps() throws Exception {
-        FedoraServerTestCase.purgeDemoObjects(s_client);
-        Util
-                .ingestTestObjects(s_client, SIMPLE_DEPLOYMENT_PUBLIC_OBJECTS);
+        FedoraAPIMMTOM apim = s_client.getAPIMMTOM();
+        AutoPurger.purge(apim, "demo:simple-deployment.sdep.1", null);
+        AutoPurger.purge(apim, "demo:simple-deployment.sdep.2", null);
         try {
             testListMethods();
         } finally {

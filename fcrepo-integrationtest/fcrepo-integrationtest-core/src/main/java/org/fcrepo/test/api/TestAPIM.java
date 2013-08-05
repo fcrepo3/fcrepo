@@ -46,6 +46,7 @@ import org.fcrepo.server.types.gen.ObjectFields;
 import org.fcrepo.server.types.gen.Validation;
 import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.test.FedoraServerTestCase;
+import org.fcrepo.test.ManagedContentTranslator;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -841,7 +842,17 @@ public class TestAPIM
     @BeforeClass
     public static void bootStrap() throws Exception {
         s_client = getFedoraClient();
-        ingestDemoObjects(s_client);
+        // the "smiley" objects
+        ingestImageCollectionDemoObjects(s_client);
+        // demo:5
+        ingestSimpleImageDemoObjects(s_client);
+        // demo:14
+        ingestDocumentTransformDemoObjects(s_client);
+        // demo:26
+        ingestFormattingObjectsDemoObjects(s_client);
+        // clone some demo objects to managed-content equivalents for reserved datastreams (RELS-*, DC)
+        ManagedContentTranslator.createManagedClone(s_client.getAPIMMTOM(), "demo:SmileyPens", "demo:SmileyPens_M");
+        ManagedContentTranslator.createManagedClone(s_client.getAPIMMTOM(), "demo:SmileyBeerGlass", "demo:SmileyBeerGlass_M");
     }
     
     @AfterClass

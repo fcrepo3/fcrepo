@@ -52,7 +52,7 @@ public class TestAPIM2
     @BeforeClass
     public static void bootStrap() throws Exception {
         s_client = getFedoraClient();
-        ingestDemoObjects(s_client);
+        ingestImageCollectionDemoObjects(s_client);
     }
     
     @AfterClass

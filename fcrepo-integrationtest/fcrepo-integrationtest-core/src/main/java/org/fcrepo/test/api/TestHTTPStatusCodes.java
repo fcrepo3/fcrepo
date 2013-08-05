@@ -138,7 +138,7 @@ public class TestHTTPStatusCodes
     
     @BeforeClass
     public static void bootstrap() throws Exception {
-        ingestDemoObjects(getClient(true, true, true));
+        ingestImageCollectionDemoObjects(getClient(true, true, true));
     }
     
     @AfterClass

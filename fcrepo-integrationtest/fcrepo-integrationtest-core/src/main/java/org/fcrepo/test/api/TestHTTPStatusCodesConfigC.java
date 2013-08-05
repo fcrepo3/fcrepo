@@ -145,7 +145,7 @@ public class TestHTTPStatusCodesConfigC
     @BeforeClass
     public static void bootstrap() throws Exception {
         policyUtils = new PolicyUtils(getClient(true, true, true));
-        ingestDemoObjects(getClient(true, true, true));
+        ingestImageCollectionDemoObjects(getClient(true, true, true));
     }
     
     @AfterClass

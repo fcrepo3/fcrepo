@@ -13,7 +13,9 @@ import org.junit.Test;
 import junit.framework.Assert;
 
 import org.fcrepo.client.FedoraClient;
+import org.fcrepo.client.utility.AutoPurger;
 
+import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.test.FedoraServerTestCase;
 
 import static org.fcrepo.test.integration.cma.Util.ingestTestObjects;
@@ -80,6 +82,7 @@ public class ConflictingDeploymentTests {
                 new FedoraClient(FedoraServerTestCase.getBaseURL(),
                                  FedoraServerTestCase.getUsername(),
                                  FedoraServerTestCase.getPassword());
+        ingestTestObjects(s_client, PUBLIC_OBJECT_BASE);
     }
     
     @AfterClass
@@ -89,12 +92,13 @@ public class ConflictingDeploymentTests {
 
     @Before
     public void setUp() throws Exception {
-        ingestTestObjects(s_client, PUBLIC_OBJECT_BASE);
     }
 
     @After
     public void tearDown() throws Exception {
-        FedoraServerTestCase.purgeDemoObjects(s_client);
+        FedoraAPIMMTOM apim = s_client.getAPIMMTOM();
+        AutoPurger.purge(apim, SDEP_1_PID, null);
+        AutoPurger.purge(apim, SDEP_2_PID, null);
     }
 
     /**
@@ -185,8 +189,12 @@ public class ConflictingDeploymentTests {
         s_client.getAPIMMTOM()
                 .purgeObject(SDEP_1_PID, "removing first sDep", false);
 
-        Assert.assertTrue("Did not disseminate expected content: ",
-                          getDisseminatedContent().contains("CONTENT_2"));
+        try {
+            Assert.assertTrue("Did not disseminate expected content: ",
+                    getDisseminatedContent().contains("CONTENT_2"));
+        } finally {
+            ingestTestObjects(s_client, DEPLOYMENT_1_BASE);
+        }
     }
 
     private void modify(String pid) throws Exception {

@@ -62,7 +62,8 @@ public class TestCommandLineUtilities
                 getProtocol() + "://" + getHost() + ":" + getPort() + "/"
                         + getFedoraAppServerContext();
         s_client = new FedoraClient(baseURL, getUsername(), getPassword());
-        ingestDemoObjects(s_client);
+        // do we actually use the demo objects in this suite of tests?
+        //ingestDemoObjects(s_client);
     }
     
     @AfterClass

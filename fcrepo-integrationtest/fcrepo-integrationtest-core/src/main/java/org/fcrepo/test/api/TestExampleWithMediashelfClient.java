@@ -33,7 +33,7 @@ public class TestExampleWithMediashelfClient extends FedoraServerTestCase {
 	public static void bootstrap() throws Exception {
 	    s_client = getFedoraClient();
 	    //TODO what directory is demo:5 in?
-	    ingestDemoObjects( "/", s_client);
+	    ingestSimpleDocumentDemoObjects( s_client);
 	}
 	
 	@AfterClass
@@ -55,7 +55,7 @@ public class TestExampleWithMediashelfClient extends FedoraServerTestCase {
 	@Test
 	public void testObjectHistory() throws Exception {
 		GetObjectHistoryResponse response = FedoraClient.getObjectHistory(
-				"demo:5").execute(client);
+				"demo:18").execute(client);
 		assertXpathExists(
 				"/access:fedoraObjectHistory/access:objectChangeDate",
 				new InputSource(response.getEntityInputStream()));

@@ -116,7 +116,8 @@ public class TestManagementNotifications
     @BeforeClass
     public static void bootStrap() throws Exception {
         s_client = getFedoraClient();
-        ingestDemoObjects("/", s_client);
+        // demo:14
+        ingestDocumentTransformDemoObjects(s_client);
     }
     
     @AfterClass

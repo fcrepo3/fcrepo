@@ -85,7 +85,8 @@ public class TestAdminAPI
     @BeforeClass
     public static void bootstrap() throws Exception {
         s_client = getFedoraClient();
-        ingestDemoObjects(s_client);
+        ingestSimpleImageDemoObjects(s_client);
+        ingestSimpleDocumentDemoObjects(s_client);
     }
     
     @AfterClass
@@ -161,7 +162,8 @@ public class TestAdminAPI
         }
 
         purgeDemoObjects(s_client);
-        ingestDemoObjects(s_client);
+        ingestSimpleImageDemoObjects(s_client);
+        ingestSimpleDocumentDemoObjects(s_client);
 
         //////////////////////////////////////////////////
         // tests on file of PIDs - flat file
@@ -191,7 +193,8 @@ public class TestAdminAPI
         }
 
         purgeDemoObjects(s_client);
-        ingestDemoObjects(s_client);
+        ingestSimpleImageDemoObjects(s_client);
+        ingestSimpleDocumentDemoObjects(s_client);
 
         //////////////////////////////////////////////////
         // tests on single object
@@ -289,7 +292,7 @@ public class TestAdminAPI
         String logExpected = "Updated " + (objects.size() - managedObjects) + " objects and " + (objects.size() - managedObjects) + " datastreams";
         assertTrue("Wrong number of objects/datastreams updated.  Expected " + logExpected + "\n" + "Log file shows:" + "\n" + modified, modified.contains(logExpected));
 
-        // do again, this time we expect no modifications (already modified, so should be ingored)
+        // do again, this time we expect no modifications (already modified, so should be ignored)
         res = get(true);
 
         modified = EntityUtils.toString(res.getEntity());
@@ -301,8 +304,8 @@ public class TestAdminAPI
 
         // do again modifying DC and RELS-EXT
         // DC is already M, so won't result in modifications
-        // not all objects have RELS-EXT
-        // so we check that object and datastream count is greater than zero but less than number of objects
+        // not all objects have RELS-EXT- the simple document demo objects don't
+        // so we check that object and datastream count is greater than zero but 2 less than number of objects
         // FIXME: could iterate all objects before/after and do more exact tests
         url = this.modifyDatastreamControlGroupUrl("file:///" + objectsListFile.getAbsolutePath(), "DC,RELS-EXT", "M", false, false, false);
         res = get(true);
@@ -313,7 +316,7 @@ public class TestAdminAPI
         int objectCount = counts[0];
         int datastreamCount = counts[1];
 
-        if (objectCount <= 0 || objectCount > (objects.size() - managedObjects - 1) || datastreamCount <= 0 || datastreamCount > (objects.size() - managedObjects - 1))
+        if (objectCount <= 0 || objectCount > (objects.size() - managedObjects - 2) || datastreamCount <= 0 || datastreamCount > (objects.size() - managedObjects - 2))
             fail("Incorrect number of objects and datastreams modified: objects " + objectCount + " datastreams " + datastreamCount);
 
     }

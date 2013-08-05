@@ -43,7 +43,14 @@ public class TestAPIALite
     @BeforeClass
     public static void bootStrap() throws Exception {
         s_client = getFedoraClient();
-        ingestDemoObjects(s_client);
+        // demo:5
+        ingestSimpleImageDemoObjects(s_client);
+        // demo:31
+        ingestSimpleDocumentDemoObjects(s_client);
+        // demo:27, demo:29
+        ingestImageManipulationDemoObjects(s_client);
+        // smiley objects
+        ingestImageCollectionDemoObjects(s_client);
     }
     
     @AfterClass

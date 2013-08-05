@@ -229,7 +229,14 @@ public class TestAPIA
     @BeforeClass
     public static void bootStrap() throws Exception {
         s_client = getFedoraClient();
-        ingestDemoObjects(s_client);
+        // demo:5
+        ingestSimpleImageDemoObjects(s_client);
+        // demo:27, 29
+        ingestImageManipulationDemoObjects(s_client);
+        // demo:31
+        ingestSimpleDocumentDemoObjects(s_client);
+        // smiley:beerglass
+        ingestImageCollectionDemoObjects(s_client);
     }
     
     @AfterClass

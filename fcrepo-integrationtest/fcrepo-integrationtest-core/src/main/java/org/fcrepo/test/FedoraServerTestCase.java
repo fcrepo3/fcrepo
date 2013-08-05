@@ -88,11 +88,11 @@ public abstract class FedoraServerTestCase
     }
     
     public static void ingestDemoObjects(FedoraClient client) throws Exception {
-        ingestDemoObjects("/", client);
+        ingestDemoObjects(client, "/");
     }
     
     public static void ingestDemoObjects(FedoraAPIAMTOM apia, FedoraAPIMMTOM apim) throws Exception {
-        ingestDemoObjects("/", apia, apim);
+        ingestDemoObjects(apia, apim, "/");
     }
 
     /**
@@ -113,58 +113,88 @@ public abstract class FedoraServerTestCase
      * @throws Exception
      */
     @Deprecated
-    public static void ingestDemoObjects(String path) throws Exception {
+    public static void ingestDemoObjects(String... paths) throws Exception {
         FedoraClient client = FedoraTestCase.getFedoraClient();
-        ingestDemoObjects(path, client);
+        ingestDemoObjects(client, paths);
         client.shutdown();
     }
 
-    public static void ingestDemoObjects(String path, FedoraClient client) throws Exception {
+    public static void ingestDemoObjects(FedoraClient client, String... paths) throws Exception {
         FedoraAPIAMTOM apia = client.getAPIAMTOM();
         FedoraAPIMMTOM apim = client.getAPIMMTOM();
-        ingestDemoObjects(path, apia, apim);
+        ingestDemoObjects(apia, apim, paths);
     }
 
-    public static void ingestDemoObjects(String path, FedoraAPIAMTOM apia, FedoraAPIMMTOM apim) throws Exception {
+    public static void ingestDemoObjects(FedoraAPIAMTOM apia, FedoraAPIMMTOM apim, String... paths) throws Exception {
 
         File dir = null;
 
-        String specificPath = File.separator + path;
+        for (String path: paths) {
+            String specificPath = File.separator + path;
 
-        String ingestFormat;
-        if (testingMETS()) {
-            System.out.println("Ingesting demo objects in METS format from " + specificPath);
-            dir = new File(FEDORA_HOME, "client/demo/mets" + specificPath);
-            ingestFormat = METS_EXT1_1.uri;
-        } else if (testingAtom()) {
-            System.out.println("Ingesting demo objects in Atom format from " + specificPath);
-            dir = new File(FEDORA_HOME, "client/demo/atom" + specificPath);
-            ingestFormat = ATOM1_1.uri;
-        } else if (testingAtomZip()) {
-            System.out.println("Ingesting all demo objects in Atom Zip format from " + specificPath);
-            dir = new File(FEDORA_HOME, "client/demo/atom-zip" + specificPath);
-            ingestFormat = ATOM_ZIP1_1.uri;
-        } else {
-            System.out.println("Ingesting demo objects in FOXML format from " + specificPath);
-            dir = new File(FEDORA_HOME, "client/demo/foxml" + specificPath);
-            ingestFormat = FOXML1_1.uri;
+            String ingestFormat;
+            if (testingMETS()) {
+                System.out.println("Ingesting demo objects in METS format from " + specificPath);
+                dir = new File(FEDORA_HOME, "client/demo/mets" + specificPath);
+                ingestFormat = METS_EXT1_1.uri;
+            } else if (testingAtom()) {
+                System.out.println("Ingesting demo objects in Atom format from " + specificPath);
+                dir = new File(FEDORA_HOME, "client/demo/atom" + specificPath);
+                ingestFormat = ATOM1_1.uri;
+            } else if (testingAtomZip()) {
+                System.out.println("Ingesting all demo objects in Atom Zip format from " + specificPath);
+                dir = new File(FEDORA_HOME, "client/demo/atom-zip" + specificPath);
+                ingestFormat = ATOM_ZIP1_1.uri;
+            } else {
+                System.out.println("Ingesting demo objects in FOXML format from " + specificPath);
+                dir = new File(FEDORA_HOME, "client/demo/foxml" + specificPath);
+                ingestFormat = FOXML1_1.uri;
+            }
+
+            Ingest.multiFromDirectory(dir,
+                    ingestFormat,
+                    apia,
+                    apim,
+                    null,
+                    new PrintStream(File.createTempFile("demo",
+                            null)),
+                            new IngestCounter());
         }
-
-        Ingest.multiFromDirectory(dir,
-                                  ingestFormat,
-                                  apia,
-                                  apim,
-                                  null,
-                                  new PrintStream(File.createTempFile("demo",
-                                                                      null)),
-                                  new IngestCounter());
-        // clone some demo objects to managed-content equivalents for reserved datastreams (RELS-*, DC)
-        try {
-            ManagedContentTranslator.createManagedClone(apim, "demo:SmileyPens", "demo:SmileyPens_M");
-            ManagedContentTranslator.createManagedClone(apim, "demo:SmileyBeerGlass", "demo:SmileyBeerGlass_M");
-        } catch (Exception e) { // ignore errors, just log (for cases where ingest repeated before purge done)
-            System.out.println("Could not create managed clone test objects: " + e.getMessage());
     }
+    
+    public static void ingestDocumentTransformDemoObjects(FedoraClient client)
+        throws Exception {
+        ingestDemoObjects(client, "local-server-demos" + File.separator + "document-transform-demo");
+    }
+
+    public static void ingestFormattingObjectsDemoObjects(FedoraClient client)
+            throws Exception {
+            ingestDemoObjects(client, "local-server-demos" + File.separator + "formatting-objects-demo");
+    }
+
+    /**
+     * Ingest the "Smiley" objects
+     * @param client
+     * @throws Exception
+     */
+    public static void ingestImageCollectionDemoObjects(FedoraClient client)
+            throws Exception {
+            ingestDemoObjects(client, "local-server-demos" + File.separator + "image-collection-demo");
+    }
+
+    public static void ingestImageManipulationDemoObjects(FedoraClient client)
+            throws Exception {
+            ingestDemoObjects(client, "local-server-demos" + File.separator + "image-manip-demo");
+    }
+
+    public static void ingestSimpleDocumentDemoObjects(FedoraClient client)
+            throws Exception {
+            ingestDemoObjects(client, "local-server-demos" + File.separator + "simple-document-demo");
+    }
+
+    public static void ingestSimpleImageDemoObjects(FedoraClient client)
+            throws Exception {
+            ingestDemoObjects(client, "local-server-demos" + File.separator + "simple-image-demo");
     }
 
     /**
@@ -203,9 +233,8 @@ public abstract class FedoraServerTestCase
     @Deprecated
     public static void purgeDemoObjects() throws Exception {
         FedoraClient client = getFedoraClient();
-        FedoraAPIMMTOM apim = client.getAPIMMTOM();
+        purgeDemoObjects(client);
         client.shutdown();
-        purgeDemoObjects(apim);
     }
     
     public static void purgeDemoObjects(FedoraClient client) throws Exception {

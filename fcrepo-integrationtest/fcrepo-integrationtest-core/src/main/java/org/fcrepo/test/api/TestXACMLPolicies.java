@@ -79,7 +79,9 @@ public class TestXACMLPolicies
     @BeforeClass
     public static void bootstrap() throws Exception {
         s_client = getFedoraClient();
-        ingestDemoObjects(s_client);
+        ingestImageManipulationDemoObjects(s_client);
+        ingestSimpleDocumentDemoObjects(s_client);
+        ingestSimpleImageDemoObjects(s_client);
     }
     
     @AfterClass

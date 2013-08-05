@@ -3,6 +3,7 @@
             xmlns="http://www.fedora.info/definitions/1/0/access/"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
             xmlns:apim="http://www.fedora.info/definitions/1/0/management/"
+            xmlns:list="http://www.fedora.info/definitions/1/0/access/"
             elementFormDefault="qualified">
             <xsd:import namespace="http://www.fedora.info/definitions/1/0/management/"
                         schemaLocation="datastreamProfile.xsd" />
@@ -18,7 +19,7 @@
 	<xsd:complexType name="objectDatastreamsType">
 		<xsd:choice>
 		  <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-			<xsd:element name="datastream" type="datastreamType"/>
+			<xsd:element name="datastream" type="list:datastreamType"/>
 		  </xsd:sequence>
 		  <xsd:sequence minOccurs="0" maxOccurs="unbounded">
 			<xsd:element name="datastreamProfile" type="apim:datastreamProfileType" />

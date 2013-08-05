@@ -62,13 +62,14 @@ import org.fcrepo.utilities.FileUtils;
 public class TestCommandLineFormats
         extends FedoraTestCase {
 
-    private FedoraAPIMMTOM apim;
+    private static FedoraAPIMMTOM apim;
     
     private static FedoraClient s_client;
 
     @BeforeClass
     public static void bootStrap() throws Exception {
         s_client = getFedoraClient(getBaseURL(), getUsername(), getPassword());
+        apim = s_client.getAPIMMTOM();
     }
     
     @AfterClass
@@ -78,7 +79,6 @@ public class TestCommandLineFormats
 
     @Before
     public void setUp() throws Exception {
-        apim = s_client.getAPIMMTOM();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put("foxml", "info:fedora/fedora-system:def/foxml#");
         nsMap.put("METS", "http://www.loc.gov/METS/");
