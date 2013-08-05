@@ -412,7 +412,9 @@ public class FOXMLDODeserializer
                 if (m_dsVersId.equals("AUDIT.0")) {
                     m_gotAudit = true;
                 }
-                m_dsChecksumType = Datastream.CHECKSUMTYPE_DISABLED;
+                m_dsChecksumType = (Datastream.autoChecksum)
+                        ? m_dsChecksumType = Datastream.getDefaultChecksumType()
+                        : Datastream.CHECKSUMTYPE_DISABLED;
                 m_dsChecksum = Datastream.CHECKSUM_NONE;
             } else if (localName.equals("contentDigest")) {
                 m_dsChecksumType = grab(a, FOXML.uri, "TYPE");
