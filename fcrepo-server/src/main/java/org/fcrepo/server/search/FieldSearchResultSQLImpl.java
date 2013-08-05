@@ -52,7 +52,7 @@ public class FieldSearchResultSQLImpl
             LoggerFactory.getLogger(FieldSearchResultSQLImpl.class);
 
     /* fields supporting public accessors */
-    private ArrayList m_objectFields;
+    private ArrayList<ObjectFields> m_objectFields;
 
     private String m_token;
 
