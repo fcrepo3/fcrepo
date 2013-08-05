@@ -270,10 +270,8 @@ public class ListDatastreamsServlet
                 File xslFile =
                         new File(m_server.getHomeDir(),
                                  "access/listDatastreams.xslt");
-                TransformerFactory factory =
-                        XmlTransformUtility.getTransformerFactory();
                 Templates template =
-                        factory.newTemplates(new StreamSource(xslFile));
+                        XmlTransformUtility.getTemplates(xslFile);
 
                 Transformer transformer = template.newTransformer();
                 transformer.setParameter("fedora", context

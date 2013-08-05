@@ -263,10 +263,8 @@ public class DescribeRepositoryResource
             PipedInputStream pr = new PipedInputStream(po);
             this.reposInfo.write(po);
             try {
-                TransformerFactory factory =
-                        XmlTransformUtility.getTransformerFactory();
                 Templates template =
-                        factory.newTemplates(new StreamSource(xslFile));
+                        XmlTransformUtility.getTemplates(xslFile);
                 Transformer transformer = template.newTransformer();
                 transformer.setParameter("fedora", context
                                          .getEnvironmentValue(FEDORA_APP_CONTEXT_NAME));

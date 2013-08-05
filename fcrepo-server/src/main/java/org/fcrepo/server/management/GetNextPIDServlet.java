@@ -223,10 +223,8 @@ public class GetNextPIDServlet
                     File xslFile =
                             new File(m_server.getHomeDir(),
                                      "management/getNextPIDInfo.xslt");
-                    TransformerFactory factory =
-                            XmlTransformUtility.getTransformerFactory();
                     Templates template =
-                            factory.newTemplates(new StreamSource(xslFile));
+                            XmlTransformUtility.getTemplates(xslFile);
                     Transformer transformer = template.newTransformer();
                     transformer.transform(new StreamSource(pr),
                                           new StreamResult(out));

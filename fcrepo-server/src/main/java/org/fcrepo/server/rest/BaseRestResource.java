@@ -44,6 +44,7 @@ import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.management.Management;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Property;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,11 +118,8 @@ public class BaseRestResource {
            TransformerConfigurationException,
            TransformerException {
         File xslFile = new File(m_server.getHomeDir(), xslt);
-        TransformerFactory factory = TransformerFactory.newInstance();
-        if (factory.getClass().getName().equals("net.sf.saxon.TransformerFactoryImpl")) {
-            factory.setAttribute(FeatureKeys.VERSION_WARNING, Boolean.FALSE);
-        }
-        Templates template = factory.newTemplates(new StreamSource(xslFile));
+        Templates template =
+                XmlTransformUtility.getTemplates(xslFile);
         Transformer transformer = template.newTransformer();
         String appContext = getContext().getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME);
         transformer.setParameter("fedora", appContext);

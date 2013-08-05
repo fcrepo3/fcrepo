@@ -179,10 +179,8 @@ public class DescribeRepositoryServlet
                     File xslFile =
                             new File(m_server.getHomeDir(),
                                      "access/viewRepositoryInfo.xslt");
-                    TransformerFactory factory =
-                            XmlTransformUtility.getTransformerFactory();
                     Templates template =
-                            factory.newTemplates(new StreamSource(xslFile));
+                            XmlTransformUtility.getTemplates(xslFile);
                     Transformer transformer = template.newTransformer();
                     transformer.setParameter("fedora", context
                                              .getEnvironmentValue(FEDORA_APP_CONTEXT_NAME));

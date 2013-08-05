@@ -4,7 +4,14 @@
  */
 package org.fcrepo.utilities;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.transform.Templates;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamSource;
 
 
 /**
@@ -14,6 +21,11 @@ import javax.xml.transform.TransformerFactory;
  */
 public class XmlTransformUtility {
 
+    private static final Map<String, Long> XSL_MODIFIED =
+            new HashMap<String, Long>();
+    
+    private static final Map<String, Templates> TEMPLATES_CACHE =
+            new HashMap<String, Templates>();
     /**
      * Convenience method to get a new instance of a TransformerFactory.
      * If the {@link #TransformerFactory} is an instance of
@@ -30,5 +42,24 @@ public class XmlTransformUtility {
             factory.setAttribute("http://saxon.sf.net/feature/version-warning", Boolean.FALSE);
         }
         return factory;
+    }
+    
+    /**
+     * Try to cache parsed Templates, but check for changes on disk
+     * @param src
+     * @return
+     */
+    public static Templates getTemplates(File src) throws TransformerException {
+        String key = src.getAbsolutePath();
+        if (XSL_MODIFIED.containsKey(key)) {
+            // check to see if it has changed
+            if (src.lastModified() <= XSL_MODIFIED.get(key).longValue()) {
+                return TEMPLATES_CACHE.get(key);
+            }
+        }
+        Templates template = getTransformerFactory().newTemplates(new StreamSource(src));
+        TEMPLATES_CACHE.put(key, template);
+        XSL_MODIFIED.put(key, src.lastModified());
+        return template;
     }
 }

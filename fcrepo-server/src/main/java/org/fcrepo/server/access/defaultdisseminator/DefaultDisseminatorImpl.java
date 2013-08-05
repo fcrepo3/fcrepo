@@ -126,10 +126,8 @@ public class DefaultDisseminatorImpl
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             File xslFile =
                     new File(reposHomeDir, "access/viewObjectProfile.xslt");
-            TransformerFactory factory =
-                    XmlTransformUtility.getTransformerFactory();
             Templates template =
-                    factory.newTemplates(new StreamSource(xslFile));
+                    XmlTransformUtility.getTemplates(xslFile);
             Transformer transformer = template.newTransformer();
             transformer.setParameter("fedora", context
                     .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME));
@@ -191,10 +189,8 @@ public class DefaultDisseminatorImpl
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             File xslFile =
                     new File(reposHomeDir, "access/listMethods.xslt");
-            TransformerFactory factory =
-                    XmlTransformUtility.getTransformerFactory();
             Templates template =
-                    factory.newTemplates(new StreamSource(xslFile));
+                    XmlTransformUtility.getTemplates(xslFile);
             Transformer transformer = template.newTransformer();
             transformer.setParameter("fedora", context
                     .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME));
@@ -242,10 +238,8 @@ public class DefaultDisseminatorImpl
             //InputStream in = getItemIndex().getStream();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             File xslFile = new File(reposHomeDir, "access/viewItemIndex.xslt");
-            TransformerFactory factory =
-                    XmlTransformUtility.getTransformerFactory();
             Templates template =
-                    factory.newTemplates(new StreamSource(xslFile));
+                    XmlTransformUtility.getTemplates(xslFile);
             Transformer transformer = template.newTransformer();
             transformer.setParameter("fedora", context
                     .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME));
@@ -299,10 +293,8 @@ public class DefaultDisseminatorImpl
             //InputStream in = getDublinCore().getStream();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             File xslFile = new File(reposHomeDir, "access/viewDublinCore.xslt");
-            TransformerFactory factory =
-                    XmlTransformUtility.getTransformerFactory();
             Templates template =
-                    factory.newTemplates(new StreamSource(xslFile));
+                    XmlTransformUtility.getTemplates(xslFile);
             Transformer transformer = template.newTransformer();
             transformer.setParameter("fedora", context
                     .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME));
