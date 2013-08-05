@@ -134,8 +134,9 @@ public class DefaultDisseminatorImpl
             transformer.setParameter("fedora", context
                     .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME));
             transformer.transform(new StreamSource(in), new StreamResult(out));
-            in = new ByteArrayInputStream(out.toByteArray());
-            return new MIMETypedStream("text/html", in, null,out.toByteArray().length);
+            byte [] bytes = out.toByteArray();
+            in = new ByteArrayInputStream(bytes);
+            return new MIMETypedStream("text/html", in, null, bytes.length);
         } catch (TransformerException e) {
             throw new DisseminationException("[DefaultDisseminatorImpl] had an error "
                     + "in transforming xml for viewObjectProfile. "
@@ -198,8 +199,9 @@ public class DefaultDisseminatorImpl
             transformer.setParameter("fedora", context
                     .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME));
             transformer.transform(new StreamSource(in), new StreamResult(out));
-            in = new ByteArrayInputStream(out.toByteArray());
-            return new MIMETypedStream("text/html", in, null,out.toByteArray().length);
+            byte [] bytes = out.toByteArray();
+            in = new ByteArrayInputStream(bytes);
+            return new MIMETypedStream("text/html", in, null, bytes.length);
         } catch (TransformerException e) {
             throw new DisseminationException("[DefaultDisseminatorImpl] had an error "
                     + "in transforming xml for viewItemIndex. "
@@ -249,8 +251,9 @@ public class DefaultDisseminatorImpl
                     .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME));
             transformer.transform(new StreamSource(in), new StreamResult(out));
 
-            in = new ByteArrayInputStream(out.toByteArray());
-            return new MIMETypedStream("text/html", in, null,out.toByteArray().length);
+            byte [] bytes = out.toByteArray();
+            in = new ByteArrayInputStream(bytes);
+            return new MIMETypedStream("text/html", in, null, bytes.length);
         } catch (TransformerException e) {
             throw new DisseminationException("[DefaultDisseminatorImpl] had an error "
                     + "in transforming xml for viewItemIndex. "
@@ -304,8 +307,9 @@ public class DefaultDisseminatorImpl
             transformer.setParameter("fedora", context
                     .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME));
             transformer.transform(new StreamSource(in), new StreamResult(out));
-            in = new ByteArrayInputStream(out.toByteArray());
-            return new MIMETypedStream("text/html", in, null,out.toByteArray().length);
+            byte[] bytes = out.toByteArray();
+            in = new ByteArrayInputStream(bytes);
+            return new MIMETypedStream("text/html", in, null,bytes.length);
         } catch (TransformerException e) {
             throw new DisseminationException("[DefaultDisseminatorImpl] had an error "
                     + "in transforming xml for viewDublinCore. "

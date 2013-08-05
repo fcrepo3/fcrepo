@@ -304,10 +304,10 @@ public abstract class TypeUtility {
             } catch (IOException ioe) {
                 logger.error("Error converting types", ioe);
             }
-            genMIMETypedStream.setStream(baos.toByteArray());
+            byte[] bytes = baos.toByteArray();
+            genMIMETypedStream.setStream(bytes);
             mimeTypedStream.close();
-            mimeTypedStream.setStream(new ByteArrayInputStream(baos
-                    .toByteArray()));
+            mimeTypedStream.setStream(new ByteArrayInputStream(bytes));
             return genMIMETypedStream;
 
         } else {
