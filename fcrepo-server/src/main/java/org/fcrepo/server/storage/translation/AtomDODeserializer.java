@@ -531,7 +531,10 @@ public class AtomDODeserializer
     private String getDSChecksumType(Entry entry) {
         List<Category> digestType = entry.getCategories(MODEL.DIGEST_TYPE.uri);
         if (digestType.isEmpty()) {
-            return Datastream.CHECKSUMTYPE_DISABLED;
+            String result = (Datastream.autoChecksum)
+                ? Datastream.getDefaultChecksumType()
+                : Datastream.CHECKSUMTYPE_DISABLED;
+                return result;
         } else {
             return digestType.get(0).getTerm();
         }

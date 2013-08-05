@@ -5,10 +5,18 @@
 
 package org.fcrepo.server.storage.translation;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Iterator;
+
 import org.junit.Test;
 
+import org.fcrepo.common.Constants;
 import org.fcrepo.server.storage.translation.FOXML1_0DODeserializer;
 import org.fcrepo.server.storage.translation.FOXML1_0DOSerializer;
+import org.fcrepo.server.storage.types.BasicDigitalObject;
+import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.server.storage.types.DigitalObject;
 
 /**
  * Unit tests for FOXML1_0DODeserializer.
@@ -33,6 +41,37 @@ public class TestFOXML1_0DODeserializer
         doTestTwoDisseminators();
     }
 
+    @Test
+    public void testDeserializeWithAutoChecksum() throws Exception {
+        Datastream.defaultChecksumType = "MD5";
+        Datastream.autoChecksum = true;
+        BasicDigitalObject obj=new BasicDigitalObject();
+        obj.setNew(true);
+        m_deserializer.deserialize(this.getClass().getClassLoader().getResourceAsStream("ecm/dataobject1.xml"), obj, "UTF-8", DOTranslationUtility.DESERIALIZE_INSTANCE);
+        for (Iterator<String> streams=obj.datastreamIdIterator();streams.hasNext();){
+            String id=streams.next();
+            for (Datastream version:obj.datastreams(id)){
+                assertEquals(Datastream.getDefaultChecksumType(), version.DSChecksumType);
+                assertEquals(32, version.getChecksum().length());
+            }
+        }
+    }
+
+    @Test
+    public void testDeserializeWithoutAutoChecksum() throws Exception {
+        Datastream.defaultChecksumType = Datastream.CHECKSUMTYPE_DISABLED;
+        Datastream.autoChecksum = false;
+        BasicDigitalObject obj=new BasicDigitalObject();
+        obj.setNew(true);
+        m_deserializer.deserialize(this.getClass().getClassLoader().getResourceAsStream("ecm/dataobject1.xml"), obj, "UTF-8", DOTranslationUtility.DESERIALIZE_INSTANCE);
+        for (Iterator<String> streams=obj.datastreamIdIterator();streams.hasNext();){
+            String id=streams.next();
+            for (Datastream version:obj.datastreams(id)){
+                assertEquals(version.DatastreamID, Datastream.CHECKSUMTYPE_DISABLED, version.DSChecksumType);
+                assertEquals(version.DatastreamID, Datastream.CHECKSUM_NONE, version.DSChecksum);
+            }
+        }
+    }
     // Supports legacy test runners
     public static junit.framework.Test suite() {
         return new junit.framework.JUnit4TestAdapter(TestFOXML1_0DODeserializer.class);

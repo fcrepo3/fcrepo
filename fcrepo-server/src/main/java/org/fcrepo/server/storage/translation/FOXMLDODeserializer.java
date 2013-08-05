@@ -413,7 +413,7 @@ public class FOXMLDODeserializer
                     m_gotAudit = true;
                 }
                 m_dsChecksumType = (Datastream.autoChecksum)
-                        ? m_dsChecksumType = Datastream.getDefaultChecksumType()
+                        ? Datastream.getDefaultChecksumType()
                         : Datastream.CHECKSUMTYPE_DISABLED;
                 m_dsChecksum = Datastream.CHECKSUM_NONE;
             } else if (localName.equals("contentDigest")) {
@@ -815,9 +815,9 @@ public class FOXMLDODeserializer
         ds.DSLocationType = m_dsLocationType;
         ds.DSInfoType = ""; // METS legacy
         ds.DSChecksumType = m_dsChecksumType;
-        logger.debug("instantiate datastream: dsid = " + m_dsId
-                + "checksumType = " + m_dsChecksumType + "checksum = "
-                + m_dsChecksum);
+        logger.debug(
+                "instantiate datastream: dsid = {} checksumType = {} checksum = {}",
+                m_dsId, m_dsChecksumType, m_dsChecksum);
         if (m_obj.isNew()) {
             logger.debug("New Object: checking supplied checksum");
             if (m_dsChecksum != null && !m_dsChecksum.equals("")
@@ -831,7 +831,9 @@ public class FOXMLDODeserializer
                     }
                 }
             }
+
             ds.DSChecksumType = ds.getChecksumType();
+            ds.DSChecksum = m_dsChecksum;
         } else {
             ds.DSChecksum = m_dsChecksum;
         }
@@ -903,9 +905,9 @@ public class FOXMLDODeserializer
             throw new RuntimeException("Error processing inline xml content in SAX parse",
                                        uee);
         }
-        logger.debug("instantiate datastream: dsid = " + m_dsId
-                + "checksumType = " + m_dsChecksumType + "checksum = "
-                + m_dsChecksum);
+        logger.debug(
+                "instantiate XML datastream: dsid = {} checksumType = {} checksum = {}",
+                m_dsId, m_dsChecksumType, m_dsChecksum);
         ds.DSChecksumType = m_dsChecksumType;
         if (m_obj.isNew()) {
             if (m_dsChecksum != null && !m_dsChecksum.equals("")
@@ -917,7 +919,9 @@ public class FOXMLDODeserializer
                             + tmpChecksum));
                 }
             }
+
             ds.DSChecksumType = ds.getChecksumType();
+            ds.DSChecksum = m_dsChecksum;
         } else {
             ds.DSChecksum = m_dsChecksum;
         }

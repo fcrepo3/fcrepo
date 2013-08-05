@@ -925,7 +925,11 @@ public class METSFedoraExtDODeserializer
         ds.DSLocationType = m_dsLocationType;
         ds.DSInfoType = m_dsInfoType;
 
-        ds.DSChecksumType = m_dsChecksumType;
+        if (m_dsChecksumType == null || "".equals(m_dsChecksumType)){
+            ds.DSChecksumType = (Datastream.autoChecksum)
+                    ? Datastream.getDefaultChecksumType()
+                    : Datastream.CHECKSUMTYPE_DISABLED;
+        }
         logger.debug("instantiate datastream: dsid = " + m_dsId
                 + "checksumType = " + m_dsChecksumType + "checksum = "
                 + m_dsChecksum);
@@ -1004,6 +1008,7 @@ public class METSFedoraExtDODeserializer
                 }
             }
             ds.DSChecksumType = ds.getChecksumType();
+            ds.DSChecksum = m_dsChecksum;
         } else {
             ds.DSChecksum = m_dsChecksum;
         }

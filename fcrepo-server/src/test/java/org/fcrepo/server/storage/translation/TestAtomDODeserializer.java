@@ -4,14 +4,20 @@
  */
 package org.fcrepo.server.storage.translation;
 
+import static org.fcrepo.common.Models.FEDORA_OBJECT_3_0;
+import static org.fcrepo.server.storage.translation.DOTranslationUtility.DESERIALIZE_INSTANCE;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -27,6 +33,7 @@ import org.fcrepo.server.storage.translation.DOSerializer;
 import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.translation.FOXML1_1DOSerializer;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
+import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 
@@ -115,7 +122,7 @@ public class TestAtomDODeserializer
         }
     }
     
-    public void testDeserializeZip() throws Exception {
+    private byte[] get_demo1001_manifest() {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         sb.append("<feed xmlns=\"http://www.w3.org/2005/Atom\">");
@@ -164,17 +171,18 @@ public class TestAtomDODeserializer
         sb.append("    <updated>2008-04-30T03:54:31.459Z</updated>");
         sb.append("    <thr:in-reply-to ref=\"info:fedora/demo:1001/RELS-EXT\"></thr:in-reply-to>");
         sb.append("    <category term=\"Relationships\" scheme=\"info:fedora/fedora-system:def/model#label\"></category>");
-        sb.append("    <category term=\"DISABLED\" scheme=\"info:fedora/fedora-system:def/model#digestType\"></category>");
-        sb.append("    <category term=\"none\" scheme=\"info:fedora/fedora-system:def/model#digest\"></category>");
+//        sb.append("    <category term=\"DISABLED\" scheme=\"info:fedora/fedora-system:def/model#digestType\"></category>");
+//        sb.append("    <category term=\"none\" scheme=\"info:fedora/fedora-system:def/model#digest\"></category>");
         sb.append("    <category term=\"472\" scheme=\"info:fedora/fedora-system:def/model#length\"></category>");
         sb.append("    <content type=\"application/rdf+xml\" src=\"RELS-EXT1.0.xml\"/>");
         sb.append("    <summary type=\"text\">RELS-EXT1.0</summary>");
         sb.append("  </entry>");
         sb.append("</feed>");
-        
-        byte[] demo1001_manifest = sb.toString().getBytes("UTF-8");
-        
-        sb = new StringBuilder();
+        return sb.toString().getBytes(Charset.forName("UTF-8"));
+    }
+    
+    private byte[] get_demo1001_dc() {
+        StringBuilder sb = new StringBuilder();
         sb.append("      <oai_dc:dc xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\">");                 
         sb.append("        <dc:title>Coliseum in Rome</dc:title>");
         sb.append("        <dc:creator>Thornton Staples</dc:creator>");
@@ -184,15 +192,25 @@ public class TestAtomDODeserializer
         sb.append("        <dc:format>image/jpeg</dc:format>");
         sb.append("        <dc:identifier>demo:1001</dc:identifier>");
         sb.append("      </oai_dc:dc>");
-        byte[] demo1001_dc = sb.toString().getBytes("UTF-8");
-        
-        sb = new StringBuilder();
+        return sb.toString().getBytes(Charset.forName("UTF-8"));
+    }
+    
+    private byte[] get_demo1001_rels() {
+        StringBuilder sb = new StringBuilder();
         sb.append("      <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:fedora-model=\"info:fedora/fedora-system:def/model#\">");
         sb.append("        <rdf:Description rdf:about=\"info:fedora/demo:1001\">");
         sb.append("          <fedora-model:hasModel rdf:resource=\"info:fedora/demo:UVA_STD_IMAGE_1\"></fedora-model:hasModel>");
         sb.append("        </rdf:Description>");
         sb.append("      </rdf:RDF>");
-        byte[] demo1001_relsext = sb.toString().getBytes("UTF-8");
+        return sb.toString().getBytes(Charset.forName("UTF-8"));
+    }
+    
+    private byte[] get_demo1001_zip() throws IOException {
+        byte[] demo1001_manifest = get_demo1001_manifest();
+        
+        byte[] demo1001_dc = get_demo1001_dc();
+        
+        byte[] demo1001_relsext = get_demo1001_rels();
         
         ZipEntry manifest = new ZipEntry("atommanifest.xml");
         ZipEntry dc = new ZipEntry("DC1.0.xml");
@@ -207,16 +225,55 @@ public class TestAtomDODeserializer
         zip.write(demo1001_relsext);
         zip.flush();
         zip.close();
-        byte[] demo1001ATOMZip = bout.toByteArray();
+        return bout.toByteArray();
+    }
+        
+    @Test
+    public void testDeserializeWithAutoChecksum() throws Exception {
+        Datastream.defaultChecksumType = "MD5";
+        Datastream.autoChecksum = true;
+        byte[] demo1001ATOMZip = get_demo1001_zip();
 
         InputStream in = new ByteArrayInputStream(demo1001ATOMZip);
         DigitalObject obj = new BasicDigitalObject();
         DODeserializer dser = new AtomDODeserializer(Constants.ATOM_ZIP1_1);
         dser.deserialize(in, obj, "UTF-8", DOTranslationUtility.DESERIALIZE_INSTANCE);
         assertEquals("demo:1001", obj.getPid());
-        //TODO more tests
+        assertEquals(true, Datastream.autoChecksum);
+
+        // RELS-EXT is not marked, so should default
+        String id = "RELS-EXT";
+        for (Datastream version : obj.datastreams(id)) {
+            System.out.println("Test object was: " + obj.getPid());
+            assertEquals(obj.getPid() + "/" + id + " did not have expected CS type",
+                    Datastream.getDefaultChecksumType(),
+                    version.DSChecksumType);
+            assertEquals(32, version.getChecksum().length());
+        }
     }
 
+    @Test
+    public void testDeserializeWithoutAutoChecksum() throws Exception {
+        Datastream.defaultChecksumType = "DISABLED";
+        Datastream.autoChecksum = false;
+        byte[] demo1001ATOMZip = get_demo1001_zip();
+
+        InputStream in = new ByteArrayInputStream(demo1001ATOMZip);
+        DigitalObject obj = new BasicDigitalObject();
+        DODeserializer dser = new AtomDODeserializer(Constants.ATOM_ZIP1_1);
+        dser.deserialize(in, obj, "UTF-8", DOTranslationUtility.DESERIALIZE_INSTANCE);
+        assertEquals("demo:1001", obj.getPid());
+        assertEquals(false, Datastream.autoChecksum);
+
+        String id = "RELS-EXT";
+        for (Datastream version : obj.datastreams(id)) {
+            System.out.println("Test object was: " + obj.getPid());
+            assertEquals(obj.getPid() + "/" + id + " did not have expected CS type",
+                    Datastream.CHECKSUMTYPE_DISABLED,
+                    version.DSChecksumType);
+            assertEquals(Datastream.CHECKSUM_NONE, version.getChecksum());
+        }
+    }
     // Supports legacy test runners
     public static junit.framework.Test suite() {
         return new junit.framework.JUnit4TestAdapter(TestAtomDODeserializer.class);
