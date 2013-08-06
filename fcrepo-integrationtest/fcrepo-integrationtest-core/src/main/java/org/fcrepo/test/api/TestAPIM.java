@@ -1419,6 +1419,8 @@ public class TestAPIM
         // object has pre-existing RELS-EXTso purge first
         // FIXME: can't do this for DC as (default) content model checks make sure that datastreams used by disseminators can't be removed
         String mcPID = "demo:SmileyBeerGlass_M";
+        int expected = apim.getDatastreamHistory(mcPID, "RELS-EXT").size();
+        assertTrue("There were no extant versions of " + mcPID + "/RELS-EXT to purge!", expected > 0);
         String[] purgedDatastreams =
                 apim.purgeDatastream(mcPID,
                                      "RELS-EXT",
@@ -1427,8 +1429,8 @@ public class TestAPIM
                                      "Purge managed content datastream RELS-EXT"
                                              + mcPID,
                                      false).toArray(new String[0]);
-        assertTrue("Check purged managed datastream RELS-EXT",
-                   purgedDatastreams.length == 1);
+        assertEquals("Check purged managed datastream RELS-EXT",
+                   expected, purgedDatastreams.length);
         for (String reservedDSID : new String[] {"RELS-EXT", "RELS-INT"}) {
             altIds[0] = "Datastream 2 Alternate ID";
             try {
@@ -1458,6 +1460,8 @@ public class TestAPIM
         // but there's sufficient reserved-datastream-specific code to warrant this
         // FIXME: also do for DC, can't do unless DC is purged, content model checks currently prevent this (DC used in default content model)
         mcPID = "demo:SmileyPens_M";
+        expected = apim.getDatastreamHistory(mcPID, "RELS-EXT").size();
+        assertTrue("There were no extant versions of " + mcPID + "/RELS-EXT to purge!", expected > 0);
         purgedDatastreams =
                 apim.purgeDatastream(mcPID,
                                      "RELS-EXT",
@@ -1466,8 +1470,10 @@ public class TestAPIM
                                      "Purge managed content datastream RELS-EXT"
                                              + mcPID,
                                      false).toArray(new String[0]);
-        assertTrue("Check purged managed datastream RELS-EXT",
-                   purgedDatastreams.length == 1);
+        assertEquals("Check purged managed datastream RELS-EXT",
+                expected, purgedDatastreams.length);
+        expected = apim.getDatastreamHistory(mcPID, "RELS-INT").size();
+        assertTrue("There were no extant versions of " + mcPID + "/RELS-INT to purge!", expected > 0);
         purgedDatastreams =
                 apim.purgeDatastream(mcPID,
                                      "RELS-INT",
@@ -1476,8 +1482,8 @@ public class TestAPIM
                                      "Purge managed content datastream RELS-INT"
                                              + mcPID,
                                      false).toArray(new String[0]);
-        assertTrue("Check purged managed datastream RELS-INT",
-                   purgedDatastreams.length == 1);
+        assertEquals("Check purged managed datastream RELS-INT",
+            expected, purgedDatastreams.length);
 
         for (String reservedDSID : new String[] {"RELS-EXT", "RELS-INT"}) {
             altIds[0] = "Datastream 2 Alternate ID";
@@ -1826,7 +1832,7 @@ public class TestAPIM
                                                  "modifying by value M type reserved datastream",
                                                  false);
                 fail(reservedDSID
-                    + " was not validated on modifyDatastreamByReference");
+                    + " was not validated on modifyDatastreamByValue");
             } catch (SOAPFaultException se) {
                 assertTrue(se.getMessage(), se.getMessage().contains(reservedDSID + " validation failed"));
             }
