@@ -5,21 +5,22 @@
 package org.fcrepo.server.storage;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.fcrepo.server.errors.ServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// This class is a rewrite of the original DOReaderCache using a java.util.concurrent.ConcurrentHashMap
-
 /**
  * DOReader Cache to be used by DOManager to make object retrieval more
  * efficient
  * 
- * @author frank asseg
+ * @author Frank Asseg
+ * @author Benjamin Armintor
  * 
  */
 public class DOReaderCache extends TimerTask {
@@ -28,9 +29,15 @@ public class DOReaderCache extends TimerTask {
 			.getLogger(DOReaderCache.class);
 
 	private int maxSeconds;
-	private int maxEntries;
-	private final Map<String, CacheEntry> cacheMap = new ConcurrentHashMap<String, DOReaderCache.CacheEntry>();
+	// default the max entries to default initial size of the map
+	private int maxEntries = 16;
+	
+	// since we need to synchronize access, we might as well
+	// gain the utility of a linked map
+	private final Map<String, CacheEntry> cacheMap =
+	    new FiniteLinkedMap<String, CacheEntry>();
 
+	private final ReentrantLock mapLock = new ReentrantLock();
 	/**
 	 * create a new {@link DOReaderCache} instance
 	 */
@@ -69,34 +76,13 @@ public class DOReaderCache extends TimerTask {
 		try {
 			String pid = reader.GetObjectPID();
 			LOG.debug("adding {} to cache", pid);
-			synchronized (cacheMap) {
-				cacheMap.put(pid, new CacheEntry(System.currentTimeMillis(),
-						reader));
-				if (cacheMap.size() > maxEntries) {
-					removeOldest();
-				}
-			}
+			mapLock.lock();
+			cacheMap.put(pid, new CacheEntry(System.currentTimeMillis(),
+			        reader));
+			mapLock.unlock();
 		} catch (ServerException e) {
 			throw new RuntimeException(
 					"Unable to retrieve PID from reader for caching");
-		}
-	}
-
-	/**
-	 * used to remove the oldest entry in the Hashmap to keep size under maxSize
-	 */
-	private void removeOldest() {
-		String oldestEntryPid = null;
-		long oldestTimestamp = Long.MAX_VALUE;
-		LOG.debug("evicting oldest entry");
-		synchronized (cacheMap) {
-			for (Map.Entry<String, CacheEntry> e : cacheMap.entrySet()) {
-				if (e.getValue().timeStamp <= oldestTimestamp) {
-					oldestTimestamp = e.getValue().timeStamp;
-					oldestEntryPid = e.getKey();
-				}
-			}
-			cacheMap.remove(oldestEntryPid);
 		}
 	}
 
@@ -107,7 +93,9 @@ public class DOReaderCache extends TimerTask {
 	 *            the entry's pid
 	 */
 	public final void remove(final String pid) {
+        mapLock.lock();
 		cacheMap.remove(pid);
+        mapLock.unlock();
 	}
 
 	/**
@@ -115,18 +103,22 @@ public class DOReaderCache extends TimerTask {
 	 * 
 	 * @param pid
 	 *            the pid of the {@link DOReader}
-	 * @return th correpsondung {@link DOReader} or null if there is no
+	 * @return the corresponding {@link DOReader} or null if there is no
 	 *         applicable cache content
 	 */
 	public final DOReader get(final String pid) {
+	    DOReader result = null;
+	    mapLock.lock();
 		if (cacheMap.containsKey(pid)) {
 			CacheEntry e = cacheMap.get(pid).copy(System.currentTimeMillis());
 			cacheMap.put(pid, e);
 			LOG.debug("cache hit for {}", pid);
-			return e.reader;
+			result = e.reader;
+		} else {
+		    LOG.debug("cache miss for {}", pid);
 		}
-		LOG.debug("cache miss for {}", pid);
-		return null;
+		mapLock.unlock();
+		return result;
 	}
 
 	/**
@@ -142,21 +134,22 @@ public class DOReaderCache extends TimerTask {
 	 * remove expired entries from the cache
 	 */
 	public final void removeExpired() {
-		synchronized (cacheMap) {
-			for (Iterator<String> it = cacheMap.keySet().iterator(); it
-					.hasNext();) {
-				String pid = it.next();
-				CacheEntry e = cacheMap.get(pid);
-				long timeStamp = e.timeStamp;
-				long age = System.currentTimeMillis() - timeStamp;
-				if (age > (maxSeconds * 1000)) {
-					it.remove();
-					LOG.debug("removing entry {} after {} seconds", pid,
-							((double) age / 1000d));
-				}
+		mapLock.lock();
+		Iterator<Entry<String, CacheEntry>> entries = cacheMap.entrySet().iterator();
+		while (entries.hasNext()) {
+		    Entry<String, CacheEntry> entry = entries.next();
+		    CacheEntry e = entry.getValue();
+		    long timeStamp = e.timeStamp;
+		    long age = System.currentTimeMillis() - timeStamp;
+		    if (age > (maxSeconds * 1000)) {
+		        entries.remove();
+	            String pid = entry.getKey();
+		        LOG.debug("removing entry {} after {} seconds", pid,
+		                ((double) age / 1000d));
+		    }
 
-			}
 		}
+		mapLock.unlock();
 	}
 
 	private class CacheEntry {
@@ -173,5 +166,13 @@ public class DOReaderCache extends TimerTask {
 			return new CacheEntry(timeStamp, this.reader);
 		}
 
+	}
+	
+	@SuppressWarnings("serial")
+    private class FiniteLinkedMap<K, V> extends LinkedHashMap<K, V> {
+	    @Override
+	    protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+	        return this.size() > maxEntries;
+	    }
 	}
 }
