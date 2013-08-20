@@ -12,11 +12,18 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
+import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -41,17 +48,29 @@ public class DOValidatorXMLSchema
 
     private static final Logger logger =
             LoggerFactory.getLogger(DOValidatorXMLSchema.class);
-
-    /** Constants used for JAXP 1.2 */
-    private static final String JAXP_SCHEMA_LANGUAGE =
-            "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
-
-    private URI schemaURI = null;
+    
+    
+    private static SAXParserFactory getParserFactory(Schema schema) {
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setNamespaceAware(true);
+        spf.setValidating(true);
+        spf.setSchema(schema);
+        return spf;
+    }
+    
+    private final Schema m_schema;
+    
+    public DOValidatorXMLSchema(Schema schema) {
+        m_schema = schema;
+    }
 
     public DOValidatorXMLSchema(String schemaPath)
             throws GeneralException {
         try {
-            schemaURI = (new File(schemaPath)).toURI();
+            File schemaFile = new File(schemaPath);
+            SchemaFactory schemaFactory =
+                    SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            m_schema = schemaFactory.newSchema(schemaFile);
         } catch (Exception e) {
             logger.error("Error constructing validator", e);
             throw new GeneralException(e.getMessage());
@@ -61,7 +80,7 @@ public class DOValidatorXMLSchema
     public void validate(File objectAsFile) throws ObjectValidityException,
             GeneralException {
         try {
-            validate(new InputSource(new FileInputStream(objectAsFile)));
+            validate(new StreamSource(new FileInputStream(objectAsFile)));
         } catch (IOException e) {
             String msg =
                     "DOValidatorXMLSchema returned error.\n"
@@ -74,37 +93,20 @@ public class DOValidatorXMLSchema
 
     public void validate(InputStream objectAsStream)
             throws ObjectValidityException, GeneralException {
-        validate(new InputSource(objectAsStream));
+        validate(new StreamSource(objectAsStream));
     }
 
-    private void validate(InputSource objectAsSource)
+    private void validate(StreamSource objectAsSource)
             throws ObjectValidityException, GeneralException {
-        InputSource doXML = objectAsSource;
+        StreamSource doXML = objectAsSource;
         try {
             // XMLSchema validation via SAX parser
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            spf.setValidating(true);
-            SAXParser sp = spf.newSAXParser();
-            sp.setProperty(JAXP_SCHEMA_LANGUAGE, XML_XSD.uri);
+            
+            Validator xsv = m_schema.newValidator();
+            xsv.setErrorHandler(new DOValidatorXMLErrorHandler());
 
-            // JAXP property for schema location
-            sp
-                    .setProperty("http://java.sun.com/xml/jaxp/properties/schemaSource",
-                                 schemaURI.toString());
-
-            XMLReader xmlreader = sp.getXMLReader();
-            xmlreader.setErrorHandler(new DOValidatorXMLErrorHandler());
-            xmlreader.setEntityResolver(this);
-            xmlreader.parse(doXML);
-        } catch (ParserConfigurationException e) {
-            String msg =
-                    "DOValidatorXMLSchema returned parser error.\n"
-                            + "The underlying exception was a "
-                            + e.getClass().getName() + ".\n"
-                            + "The message was " + "\"" + e.getMessage() + "\"";
-            throw new GeneralException(msg, e);
-        } catch (SAXException e) {
+            xsv.validate(doXML);
+        }  catch (SAXException e) {
             String msg =
                     "DOValidatorXMLSchema returned validation exception.\n"
                             + "The underlying exception was a "
@@ -139,4 +141,5 @@ public class DOValidatorXMLSchema
             return new InputSource();
         }
     }
+    
 }

@@ -62,4 +62,9 @@ public class XmlTransformUtility {
         XSL_MODIFIED.put(key, src.lastModified());
         return template;
     }
+    
+    public static Templates getTemplates(StreamSource source)
+        throws TransformerException {
+        return getTransformerFactory().newTemplates(source);
+    }
 }

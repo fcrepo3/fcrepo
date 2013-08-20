@@ -84,7 +84,7 @@ public class DOValidatorModule
                         logger.error(msg, e);
                         throw new ModuleInitializationException(msg + ": "
                                 + e.getClass().getName() + ": "
-                                + e.getMessage(), getRole());
+                                + e.getMessage(), getRole(), e);
                     }
                 } else if (paramName.startsWith("rules_")) {
                     String ruleSchemaName = paramName.substring(6);
@@ -102,7 +102,7 @@ public class DOValidatorModule
                         logger.error(msg, e);
                         throw new ModuleInitializationException(msg + ": "
                                 + e.getClass().getName() + ": "
-                                + e.getMessage(), getRole());
+                                + e.getMessage(), getRole(), e);
                     }
                 } else if (paramName.equals("tempDir")) {
                     tempDir =
@@ -127,7 +127,7 @@ public class DOValidatorModule
                                         ruleSchemaMap);
         } catch (Exception e) {
             throw new ModuleInitializationException(e.getMessage(),
-                                                    "org.fcrepo.server.validation.DOValidatorModule");
+                                                    "org.fcrepo.server.validation.DOValidatorModule", e);
         }
     }
 

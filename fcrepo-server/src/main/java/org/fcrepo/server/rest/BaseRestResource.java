@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.StringReader;
 import java.io.Writer;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
@@ -44,6 +46,7 @@ import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.management.Management;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Property;
+import org.fcrepo.server.utilities.TimestampedCacheEntry;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +82,10 @@ public class BaseRestResource {
     protected Access m_access;
     protected String m_hostname;
     protected ObjectMapper m_mapper;
+    
+    protected Map<String, TimestampedCacheEntry<Templates>> m_templates =
+        new HashMap<String, TimestampedCacheEntry<Templates>>(1);
+            
 
     protected DatastreamFilenameHelper m_datastreamFilenameHelper;
 
@@ -118,9 +125,14 @@ public class BaseRestResource {
            TransformerConfigurationException,
            TransformerException {
         File xslFile = new File(m_server.getHomeDir(), xslt);
-        Templates template =
-                XmlTransformUtility.getTemplates(xslFile);
-        Transformer transformer = template.newTransformer();
+        TimestampedCacheEntry<Templates> entry = m_templates.get(xslt);
+        if (entry == null || entry.timestamp() < xslFile.lastModified()) {
+            Templates template =
+                    XmlTransformUtility.getTemplates(xslFile);
+            entry = new TimestampedCacheEntry<Templates>(xslFile.lastModified(), template);
+            m_templates.put(xslt, entry);
+        }
+        Transformer transformer = entry.value().newTransformer();
         String appContext = getContext().getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME);
         transformer.setParameter("fedora", appContext);
         transformer.transform(new StreamSource(new StringReader(xml)), new StreamResult(out));
@@ -191,4 +203,5 @@ public class BaseRestResource {
         if (flash) error = Response.ok(error.getEntity()).build();
         return error;
     }
+    
 }

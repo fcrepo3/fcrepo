@@ -6,16 +6,20 @@ package org.fcrepo.server.validation;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import javax.xml.XMLConstants;
+import javax.xml.validation.SchemaFactory;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.errors.GeneralException;
@@ -25,6 +29,7 @@ import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.utilities.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -91,7 +96,7 @@ public class DOValidatorImpl
      * Map of XML Schemas configured with the Fedora Repository. key = format
      * uri value = schema file path
      */
-    private final Map<String, String> m_xmlSchemaMap;
+    private final Map<String, DOValidatorXMLSchema> m_xmlSchemaMap;
 
     /**
      * Map of Schematron rule schemas configured with the Fedora Repository. key =
@@ -136,7 +141,20 @@ public class DOValidatorImpl
                            Map<String, String> ruleSchemaMap)
             throws ServerException {
         logger.debug("VALIDATE: Initializing object validation...");
-        m_xmlSchemaMap = xmlSchemaMap;
+        m_xmlSchemaMap = new HashMap<String, DOValidatorXMLSchema>(xmlSchemaMap.size());
+        SchemaFactory schemaFactory =
+            SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        for (Entry<String,String> entry: xmlSchemaMap.entrySet()) {
+            try {
+                m_xmlSchemaMap.put(
+                    entry.getKey(),
+                    new DOValidatorXMLSchema(
+                        schemaFactory.newSchema(new File(entry.getValue()))));
+            } catch (SAXException e) {
+                throw new GeneralException("Cannot read or create schema at " +
+                        entry.getValue(),e);
+            }
+        }
         m_ruleSchemaMap = ruleSchemaMap;
         if (tempDir == null) {
             throw new ObjectValidityException("[DOValidatorImpl] ERROR in constructor: "
@@ -338,11 +356,10 @@ public class DOValidatorImpl
      * @throws GeneralException
      *         If validation fails for any reason.
      */
-    private void validateXMLSchema(InputStream objectAsStream, String xmlSchemaPath)
+    private void validateXMLSchema(InputStream objectAsStream, DOValidatorXMLSchema xsv)
             throws ObjectValidityException, GeneralException {
 
         try {
-            DOValidatorXMLSchema xsv = new DOValidatorXMLSchema(xmlSchemaPath);
             xsv.validate(objectAsStream);
         } catch (ObjectValidityException e) {
             logger.error("VALIDATE: ERROR - failed XML Schema validation.", e);

@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -52,10 +53,10 @@ public class DOValidatorSchematron {
 
     private StreamSource preprocessorSource;
 
-    private final StreamSource validatingStyleSheet;
+    private final Templates validatingStyleSheet;
 
-    private static Map<String, ByteArrayOutputStream> generatedStyleSheets =
-        new HashMap<String, ByteArrayOutputStream>();
+    private static Map<String, Templates> generatedStyleSheets =
+        new HashMap<String, Templates>(2);
 
     /**
      * Constructs a DOValidatorSchematron instance with a Schematron
@@ -75,7 +76,7 @@ public class DOValidatorSchematron {
     public DOValidatorSchematron(String schemaPath,
                                  String preprocessorPath,
                                  String phase)
-            throws ObjectValidityException {
+            throws ObjectValidityException, TransformerException {
         validatingStyleSheet = setUp(preprocessorPath, schemaPath, phase);
     }
 
@@ -114,9 +115,8 @@ public class DOValidatorSchematron {
             // Create a transformer that uses the validating stylesheet.
             // Run the Schematron validation of the Fedora object and
             // output results in DOM format.
-            TransformerFactory tfactory = XmlTransformUtility.getTransformerFactory();
             Transformer vtransformer =
-                    tfactory.newTransformer(validatingStyleSheet);
+                    validatingStyleSheet.newTransformer();
             DOMResult validationResult = new DOMResult();
             vtransformer.transform(objectSource, validationResult);
             result = new DOValidatorSchematronResult(validationResult);
@@ -161,22 +161,21 @@ public class DOValidatorSchematron {
      * @return StreamSource
      * @throws ObjectValidityException
      */
-    private StreamSource setUp(String preprocessorPath,
+    private Templates setUp(String preprocessorPath,
                                String fedoraschemaPath,
-                               String phase) throws ObjectValidityException {
+                               String phase)
+        throws ObjectValidityException, TransformerException {
         String key = fedoraschemaPath + "#" + phase;
-        ByteArrayOutputStream out =
+        Templates templates =
                 generatedStyleSheets.get(key);
-        if (out == null) {
+        if (templates == null) {
             rulesSource = fileToStreamSource(fedoraschemaPath);
             preprocessorSource = fileToStreamSource(preprocessorPath);
-            out =
-                    createValidatingStyleSheet(rulesSource,
-                                               preprocessorSource,
-                                               phase);
-            generatedStyleSheets.put(key, out);
+            templates = createValidatingStyleSheet(rulesSource,
+                    preprocessorSource, phase);
+            generatedStyleSheets.put(key, templates);
         }
-        return new StreamSource(new ByteArrayInputStream(out.toByteArray()));
+        return templates;
     }
 
     /**
@@ -199,11 +198,12 @@ public class DOValidatorSchematron {
      *        should pertain. (Currently options are "ingest" and "store"
      * @return A ByteArrayOutputStream containing the stylesheet
      * @throws ObjectValidityException
+     * @throws TransformerException 
      */
-    private ByteArrayOutputStream createValidatingStyleSheet(StreamSource rulesSource,
+    private Templates createValidatingStyleSheet(StreamSource rulesSource,
                                                              StreamSource preprocessorSource,
                                                              String phase)
-            throws ObjectValidityException {
+            throws ObjectValidityException, TransformerException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             // Create a transformer for that uses the Schematron preprocessor stylesheet.
@@ -217,7 +217,9 @@ public class DOValidatorSchematron {
             logger.error("Schematron validation failed", e);
             throw new ObjectValidityException(e.getMessage());
         }
-        return out;
+        return XmlTransformUtility.getTemplates(
+            new StreamSource(
+                new ByteArrayInputStream(out.toByteArray())));
     }
 
     /** Code based on com.jclark.xsl.sax.Driver: * */

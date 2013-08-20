@@ -75,11 +75,6 @@ public class DOValidatorXMLSchemaTest
         DOValidatorXMLSchema dov = new DOValidatorXMLSchema(RESOURCES + "xsd/atom.xsd");
         dov.validate(in);
 
-        SchemaFactory sf =
-                SchemaFactory.newInstance(Constants.XML_XSD.uri);
-        Schema schema = sf.newSchema(new File(RESOURCES + "xsd/atom.xsd"));
-        Validator validator = schema.newValidator();
-        //validator.validate(new StreamSource(in));
     }
 
     public static junit.framework.Test suite() {

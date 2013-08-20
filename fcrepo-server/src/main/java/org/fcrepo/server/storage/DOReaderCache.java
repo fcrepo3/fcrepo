@@ -12,6 +12,7 @@ import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.utilities.TimestampedCacheEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +35,8 @@ public class DOReaderCache extends TimerTask {
 	
 	// since we need to synchronize access, we might as well
 	// gain the utility of a linked map
-	private final Map<String, CacheEntry> cacheMap =
-	    new FiniteLinkedMap<String, CacheEntry>();
+	private final Map<String, TimestampedCacheEntry<DOReader>> cacheMap =
+	    new FiniteLinkedMap<String, TimestampedCacheEntry<DOReader>>();
 
 	private final ReentrantLock mapLock = new ReentrantLock();
 	/**
@@ -77,7 +78,7 @@ public class DOReaderCache extends TimerTask {
 			String pid = reader.GetObjectPID();
 			LOG.debug("adding {} to cache", pid);
 			mapLock.lock();
-			cacheMap.put(pid, new CacheEntry(System.currentTimeMillis(),
+			cacheMap.put(pid, new TimestampedCacheEntry<DOReader>(System.currentTimeMillis(),
 			        reader));
 			mapLock.unlock();
 		} catch (ServerException e) {
@@ -110,10 +111,10 @@ public class DOReaderCache extends TimerTask {
 	    DOReader result = null;
 	    mapLock.lock();
 		if (cacheMap.containsKey(pid)) {
-			CacheEntry e = cacheMap.get(pid).copy(System.currentTimeMillis());
-			cacheMap.put(pid, e);
+			TimestampedCacheEntry<DOReader> e = cacheMap.get(pid);
+			e.refresh();
 			LOG.debug("cache hit for {}", pid);
-			result = e.reader;
+			result = e.value();
 		} else {
 		    LOG.debug("cache miss for {}", pid);
 		}
@@ -135,12 +136,11 @@ public class DOReaderCache extends TimerTask {
 	 */
 	public final void removeExpired() {
 		mapLock.lock();
-		Iterator<Entry<String, CacheEntry>> entries = cacheMap.entrySet().iterator();
+		Iterator<Entry<String, TimestampedCacheEntry<DOReader>>> entries = cacheMap.entrySet().iterator();
 		while (entries.hasNext()) {
-		    Entry<String, CacheEntry> entry = entries.next();
-		    CacheEntry e = entry.getValue();
-		    long timeStamp = e.timeStamp;
-		    long age = System.currentTimeMillis() - timeStamp;
+		    Entry<String, TimestampedCacheEntry<DOReader>> entry = entries.next();
+		    TimestampedCacheEntry<DOReader> e = entry.getValue();
+		    long age = e.age();
 		    if (age > (maxSeconds * 1000)) {
 		        entries.remove();
 	            String pid = entry.getKey();
@@ -152,22 +152,6 @@ public class DOReaderCache extends TimerTask {
 		mapLock.unlock();
 	}
 
-	private class CacheEntry {
-		private final long timeStamp;
-		private final DOReader reader;
-
-		private CacheEntry(final long timeStamp, final DOReader reader) {
-			super();
-			this.timeStamp = timeStamp;
-			this.reader = reader;
-		}
-
-		private CacheEntry copy(final long timeStamp) {
-			return new CacheEntry(timeStamp, this.reader);
-		}
-
-	}
-	
 	@SuppressWarnings("serial")
     private class FiniteLinkedMap<K, V> extends LinkedHashMap<K, V> {
 	    @Override
