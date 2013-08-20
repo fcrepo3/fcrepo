@@ -163,7 +163,7 @@ public class TestLockingFollowingJournalReader
      * A lock request created before startup will prevent processing. When the
      * request is removed, processing will occur.
      */
-    @Test
+    @Ignore
     public void testLockBeforeStartingAndResume() throws Exception {
             // create 3 files, each with an ingest, and create a lock request.
             createJournalFileFromString(getSimpleIngestString());
@@ -211,7 +211,7 @@ public class TestLockingFollowingJournalReader
      * A lock request created while a file is in progress, which should prevent
      * further processing until it is removed.
      */
-    @Ignore
+    @Test
     public void testLockWhileProcessingAndResume() throws Exception {
             // create 3 files, each with an ingest
             createJournalFileFromString(getSimpleIngestString());
