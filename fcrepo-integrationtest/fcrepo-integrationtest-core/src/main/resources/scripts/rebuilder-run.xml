@@ -1,0 +1,56 @@
+<project name="rebuilder-run">
+  	<condition property="isUnix">
+  		<os family="unix" />
+  	</condition>
+  	<condition property="isWin">
+  		<os family="windows" />
+  	</condition>
+
+	<condition property="mvn.opts" value="${mvn.env.opts}" else=" ">
+      <and>
+        <isset property="mvn.env.opts"/>
+        <not>
+          <equals arg1="${mvn.env.opts}" arg2="${env.MAVEN_OPTS}"/>
+        </not>
+      </and>
+    </condition>
+    
+    <condition property="fedora.install.properties.extra" value=" ">
+      <not>
+        <isset property="fedora.install.properties.extra"/>
+      </not>
+    </condition>
+	
+  <target name="run">  	
+  	<antcall target="run_unix" />
+  	<antcall target="run_win" />
+  </target>
+	
+  <target name="run_unix" if="isUnix">
+    <echo>Running a Fedora Rebuilder</echo>
+    <echo>Rebuild script: ${mvn.fedora.home}/server/bin/fedora-rebuild.sh</echo>
+    <echo>Properties: ${fedora.install.properties} ${fedora.install.properties.extra}</echo>
+    <exec executable="bin/fedora-rebuild.sh"
+    	dir="${mvn.fedora.home}/server"
+    	inputstring="1" failonerror="true">
+        <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
+        <env key="CATALINA_HOME" value="${mvn.tomcat.home}" />
+        <arg value="-r" />
+        <arg value="org.fcrepo.server.utilities.rebuild.SQLRebuilder" />
+    </exec>
+  </target>
+  <target name="run_win" if="isWin">
+    <echo>Running a Fedora Rebuilder</echo>
+    <echo>Rebuild script: ${mvn.fedora.home}\server\bin\fedora-rebuuld.bat</echo>
+    <echo>Properties: ${fedora.install.properties} ${fedora.install.properties.extra}</echo>
+    <exec executable="cmd" inputstring="1" failonerror="true">
+        <arg value="/c" />
+    	<arg value="${mvn.fedora.home}\server\bin\fedora-rebuild.bat" />
+           <arg value="-r" />
+           <arg value="org.fcrepo.server.utilities.rebuild.SQLRebuilder" />
+    	<env key="FEDORA_HOME" value="${mvn.fedora.home}" />
+        <env key="CATALINA_HOME" value="${mvn.tomcat.home}" />
+    </exec>
+  </target>
+
+</project>

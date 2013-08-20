@@ -125,6 +125,7 @@ public class RebuildServer
                 || "org.fcrepo.oai.OAIProvider".equals(moduleRole)
                 || "org.fcrepo.oai.OAIProvider".equals(moduleRole)
                 || "org.fcrepo.server.management.Management".equals(moduleRole)
+                || "org.fcrepo.server.management.ManagementDelegate".equals(moduleRole)
                 || "org.fcrepo.server.resourceIndex.ResourceIndex".equals(moduleRole)) {
             return true;
         }

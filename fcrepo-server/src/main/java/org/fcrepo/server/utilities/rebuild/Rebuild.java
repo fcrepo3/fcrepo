@@ -401,11 +401,17 @@ public class Rebuild implements Constants, Runnable {
 
     public static void main(String[] args) {
         String profile = null;
-        if (args.length > 0) {
+        if (args.length == 1) {
             profile = args[0];
         }
         if (args.length > 1) {
-            fail("Too many arguments", true, true);
+            for (int i = 0; i < args.length - 1; i+=2) {
+                if ("-p".equals(args[i])) profile = args[i+1];
+                if ("-r".equals(args[i])) System.setProperty("rebuilder", args[i+1]);
+            }
+            if (profile == null && System.getProperty("rebuilder") == null) {
+                fail("Too many arguments", true, true);
+            }
         }
         try {
             File fedoraHomeDir = new File(Constants.FEDORA_HOME);

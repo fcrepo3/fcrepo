@@ -166,6 +166,8 @@
                   <target unless="${integration.test.skip}">
                     <echo>Stopping Fedora</echo>
                     <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml" target="tomcat-stop" inheritrefs="true" />
+                    <echo>Running a Fedora Rebuilder</echo>
+                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/rebuilder-run.xml" target="run" inheritrefs="true" />
                   </target>
                 </configuration>
                 <goals>
