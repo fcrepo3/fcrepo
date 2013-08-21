@@ -33,9 +33,9 @@ exit /B 1
 :gotCatalinaHome
 
 if not "%FEDORA_WEBAPP_HOME%" == "" goto gotFedoraWebappHome
-set FEDORA_WEBAPP_HOME="%CATALINA_HOME%\webapps\%WEBAPP_NAME%"
+set FEDORA_WEBAPP_HOME=%CATALINA_HOME%\webapps\%WEBAPP_NAME%
 :gotFedoraWebappHome
-set WEBINF="%FEDORA_WEBAPP_HOME%\WEB-INF"
+set WEBINF=%FEDORA_WEBAPP_HOME%\WEB-INF
 
 if exist "%WEBINF%" goto webInfExists
 echo ERROR: Fedora could not be found in the specified path, please set the environment variable FEDORA_WEBAPP_HOME
