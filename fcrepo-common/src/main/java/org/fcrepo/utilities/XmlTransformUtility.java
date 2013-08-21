@@ -6,11 +6,13 @@ package org.fcrepo.utilities;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.SAXParser;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -18,9 +20,12 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.pool.impl.StackObjectPool;
 import org.fcrepo.utilities.xml.PoolableDocumentBuilderFactory;
+import org.fcrepo.utilities.xml.PoolableSAXParserFactory;
 import org.fcrepo.utilities.xml.PoolableTransformerFactoryFactory;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *
@@ -36,11 +41,17 @@ public class XmlTransformUtility {
     // Using a Stack pool means that objectsare created on demand after the
     // pool is exhausted
     //TODO how should the default values be configured?
-    private static final StackObjectPool DOCUMENT_BUILDERS =
-        new StackObjectPool(new PoolableDocumentBuilderFactory(true, false), 10);
+    private static final StackObjectPool<DocumentBuilder> DOCUMENT_BUILDERS =
+        new StackObjectPool<DocumentBuilder>(
+            new PoolableDocumentBuilderFactory(true, false), 10);
     
-    private static final StackObjectPool TRANSFORM_FACTORIES =
-        new StackObjectPool(new PoolableTransformerFactoryFactory(), 10);
+    private static final StackObjectPool<TransformerFactory> TRANSFORM_FACTORIES =
+        new StackObjectPool<TransformerFactory>(
+            new PoolableTransformerFactoryFactory(), 10);
+    
+    private static final StackObjectPool<SAXParser> SAX_PARSERS =
+        new StackObjectPool<SAXParser>(
+            new PoolableSAXParserFactory(true, false), 10);
     
     /**
      * Convenience method to get a new instance of a TransformerFactory.
@@ -137,4 +148,30 @@ public class XmlTransformUtility {
         }
         return result;
     }
-}
+    
+    public static void parseWithoutValidating(InputStream in, DefaultHandler handler)
+        throws SAXException, IOException {
+        parseWithoutValidating(new InputSource(in), handler);
+    }
+
+    public static void parseWithoutValidating(InputSource in, DefaultHandler handler)
+            throws SAXException, IOException {
+            SAXParser parser = null;
+            try {
+                parser = (SAXParser) SAX_PARSERS.borrowObject();
+            } catch (Exception e) {
+                throw new RuntimeException("Error initializing SAX parser", e);
+            }
+            
+            try {
+                parser.parse(in, handler);
+            } finally {
+                if (parser != null) {
+                    try {
+                        SAX_PARSERS.returnObject(parser);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }}

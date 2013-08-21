@@ -9,7 +9,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.pool.PoolableObjectFactory;
 
 
-public class PoolableDocumentBuilderFactory implements PoolableObjectFactory {
+public class PoolableDocumentBuilderFactory
+implements PoolableObjectFactory<DocumentBuilder> {
 
     private final DocumentBuilderFactory m_factory;
     
@@ -23,30 +24,34 @@ public class PoolableDocumentBuilderFactory implements PoolableObjectFactory {
     }
     
     @Override
-    public void activateObject(Object object) throws Exception {
-        ((DocumentBuilder)object).reset();
+    public void activateObject(DocumentBuilder object) throws Exception {
+        object.reset();
     }
     
     @Override
-    public void destroyObject(Object object) throws Exception {
+    public void destroyObject(DocumentBuilder object) throws Exception {
         // no-op
     }
 
     @Override
-    public Object makeObject() throws ParserConfigurationException {
+    public DocumentBuilder makeObject() throws ParserConfigurationException {
         m_lock.lock();
-        Object result =  m_factory.newDocumentBuilder();
-        m_lock.unlock();
+        DocumentBuilder result =  null;
+        try {
+            result = m_factory.newDocumentBuilder();
+        } finally {
+            m_lock.unlock();
+        }
         return result;
     }
 
     @Override
-    public void passivateObject(Object object) throws Exception {
+    public void passivateObject(DocumentBuilder object) throws Exception {
         // no-op
     }
 
     @Override
-    public boolean validateObject(Object object) {
+    public boolean validateObject(DocumentBuilder object) {
         return true;
     }
 

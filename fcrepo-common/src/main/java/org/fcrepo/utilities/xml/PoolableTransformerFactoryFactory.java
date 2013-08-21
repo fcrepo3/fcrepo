@@ -5,24 +5,25 @@ import javax.xml.transform.TransformerFactory;
 import org.apache.commons.pool.PoolableObjectFactory;
 
 
-public class PoolableTransformerFactoryFactory implements PoolableObjectFactory {
+public class PoolableTransformerFactoryFactory
+implements PoolableObjectFactory<TransformerFactory> {
 
     public PoolableTransformerFactoryFactory() {
 
     }
     
     @Override
-    public void activateObject(Object object) throws Exception {
+    public void activateObject(TransformerFactory object) throws Exception {
         // no-op
     }
     
     @Override
-    public void destroyObject(Object object) throws Exception {
+    public void destroyObject(TransformerFactory object) throws Exception {
         // no-op
     }
 
     @Override
-    public Object makeObject() throws Exception {
+    public TransformerFactory makeObject() throws Exception {
         TransformerFactory factory = TransformerFactory.newInstance();
         if (factory.getClass().getName().equals("net.sf.saxon.TransformerFactoryImpl")) {
             factory.setAttribute("http://saxon.sf.net/feature/version-warning", Boolean.FALSE);
@@ -31,12 +32,12 @@ public class PoolableTransformerFactoryFactory implements PoolableObjectFactory 
     }
 
     @Override
-    public void passivateObject(Object object) throws Exception {
+    public void passivateObject(TransformerFactory object) throws Exception {
         // no-op
     }
 
     @Override
-    public boolean validateObject(Object object) {
+    public boolean validateObject(TransformerFactory object) {
         return true;
     }
 

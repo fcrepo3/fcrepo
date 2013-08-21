@@ -12,9 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -24,6 +21,7 @@ import org.fcrepo.common.rdf.RDFName;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.RepositoryConfigurationException;
 import org.fcrepo.server.errors.StreamIOException;
+import org.fcrepo.utilities.XmlTransformUtility;
 
 
 
@@ -78,18 +76,8 @@ public class DCFields
     public DCFields(InputStream in)
             throws RepositoryConfigurationException, ObjectIntegrityException,
             StreamIOException {
-        SAXParser parser = null;
         try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            parser = spf.newSAXParser();
-        } catch (Exception e) {
-            throw new RepositoryConfigurationException("Error getting SAX "
-                    + "parser for DC metadata: " + e.getClass().getName()
-                    + ": " + e.getMessage());
-        }
-        try {
-            parser.parse(in, this);
+            XmlTransformUtility.parseWithoutValidating(in, this);
         } catch (SAXException saxe) {
             throw new ObjectIntegrityException("Parse error parsing DC XML Metadata: "
                     + saxe.getMessage());

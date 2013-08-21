@@ -22,9 +22,6 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -53,6 +50,7 @@ import org.fcrepo.server.validation.ValidationUtility;
 
 import org.fcrepo.utilities.Base64;
 import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.XmlTransformUtility;
 
 
 
@@ -76,12 +74,6 @@ public class FOXMLDODeserializer
 
     private static final Logger logger =
             LoggerFactory.getLogger(FOXMLDODeserializer.class);
-    
-    private static final SAXParserFactory spf = SAXParserFactory.newInstance();
-    static {
-        spf.setValidating(false);
-        spf.setNamespaceAware(true);
-    }
 
     /** The format this deserializer reads. */
     private final XMLFormat m_format;
@@ -92,8 +84,6 @@ public class FOXMLDODeserializer
     /** The object to deserialize to. */
     private DigitalObject m_obj;
 
-    /** SAX parser */
-    private SAXParser m_parser;
 
     // Namespace prefix-to-URI mapping info from SAX2 startPrefixMapping events.
     private HashMap<String, String> m_prefixMap;
@@ -215,14 +205,6 @@ public class FOXMLDODeserializer
             throw new IllegalArgumentException("Not a FOXML format: "
                     + format.uri);
         }
-        // initialize sax
-        try {
-            synchronized(spf){
-                m_parser = spf.newSAXParser();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error initializing SAX parser", e);
-        }
 
     }
 
@@ -257,7 +239,7 @@ public class FOXMLDODeserializer
         m_transContext = transContext;
         initialize();
         try {
-            m_parser.parse(in, this);
+            XmlTransformUtility.parseWithoutValidating(in, this);
         } catch (IOException ioe) {
             throw new StreamIOException("low-level stream io problem occurred "
                     + "while sax was parsing this object.");
