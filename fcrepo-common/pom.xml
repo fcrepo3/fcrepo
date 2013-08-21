@@ -233,6 +233,10 @@
     	<artifactId>joda-time</artifactId>
     	<version>1.5.2</version>
     </dependency>
+    <dependency>
+    	<groupId>commons-pool</groupId>
+    	<artifactId>commons-pool</artifactId>
+    </dependency>
   </dependencies>
 
 </project>

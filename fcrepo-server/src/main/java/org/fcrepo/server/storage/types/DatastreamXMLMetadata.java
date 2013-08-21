@@ -20,6 +20,7 @@ import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 import org.fcrepo.server.Context;
+import org.fcrepo.utilities.XmlTransformUtility;
 
 import org.w3c.dom.Document;
 
@@ -105,12 +106,14 @@ public class DatastreamXMLMetadata
             fmt.setLineWidth(0);
             fmt.setPreserveSpace(false);
             XMLSerializer ser = new XMLSerializer(outStream, fmt);
-            DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(new ByteArrayInputStream(xmlContent));
-            ser.serialize(doc);
+            
+            DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
+            try {
+                Document doc = builder.parse(new ByteArrayInputStream(xmlContent));
+                ser.serialize(doc);
+            } finally {
+                XmlTransformUtility.returnDocumentBuilder(builder);
+            }
 
             br =
                     new BufferedReader(new InputStreamReader(new ByteArrayInputStream(outStream
@@ -127,8 +130,6 @@ public class DatastreamXMLMetadata
         } catch (UnsupportedEncodingException e) {
             return getContentStream();
         } catch (IOException e) {
-            return getContentStream();
-        } catch (ParserConfigurationException e) {
             return getContentStream();
         } catch (SAXException e) {
             return getContentStream();

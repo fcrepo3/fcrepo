@@ -53,7 +53,14 @@ public class DOValidatorSchematronResult {
         Writer w = new StringWriter();
         PrintWriter out = new PrintWriter(w);
 
-        TransformerFactory tfactory = XmlTransformUtility.getTransformerFactory();
+        TransformerFactory tfactory = null;
+        try {
+            tfactory = XmlTransformUtility.getTransformerFactory();
+        } finally {
+            if (tfactory != null) {
+                XmlTransformUtility.returnTransformerFactory(tfactory);
+            }
+        }
         Transformer transformer = tfactory.newTransformer();
         Properties transProps = new Properties();
         transProps.put("method", "xml");

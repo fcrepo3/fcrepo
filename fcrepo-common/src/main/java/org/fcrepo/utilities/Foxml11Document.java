@@ -11,8 +11,6 @@ import java.io.StringReader;
 import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -50,8 +48,6 @@ public class Foxml11Document {
 
     public static final String FOXML_NS="info:fedora/fedora-system:def/foxml#";
 
-    private DocumentBuilder builder;
-
     private Document doc;
 
     private Element rootElement;
@@ -59,8 +55,6 @@ public class Foxml11Document {
     private Element objectProperties;
 
     private final XPath xpath;
-
-    private final TransformerFactory xformFactory;
 
     public enum Property {
         STATE("info:fedora/fedora-system:def/model#state"),
@@ -89,11 +83,10 @@ public class Foxml11Document {
     }
 
     public Foxml11Document(String pid) {
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        dbFactory.setNamespaceAware(true);
 
+        DocumentBuilder builder = null;
         try {
-            builder = dbFactory.newDocumentBuilder();
+            builder = XmlTransformUtility.borrowDocumentBuilder();
             DOMImplementation impl = builder.getDOMImplementation();
             doc = impl.createDocument(FOXML_NS, "foxml:digitalObject", null);
             rootElement = doc.getDocumentElement();
@@ -106,9 +99,10 @@ public class Foxml11Document {
             rootElement.setAttribute("VERSION", "1.1");
             rootElement.setAttribute("PID", pid);
 
-        } catch (ParserConfigurationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } finally {
+            if (builder != null) {
+                XmlTransformUtility.returnDocumentBuilder(builder);
+            }
         }
 
         NamespaceContextImpl nsCtx = new NamespaceContextImpl();
@@ -117,7 +111,6 @@ public class Foxml11Document {
         xpath = factory.newXPath();
         xpath.setNamespaceContext(nsCtx);
 
-        xformFactory = XmlTransformUtility.getTransformerFactory();
     }
 
     public void addObjectProperties() {
@@ -176,7 +169,9 @@ public class Foxml11Document {
     }
 
     public void addXmlContent(String dsvId, String xmlContent) {
+        DocumentBuilder builder = null;
         try {
+            builder = XmlTransformUtility.borrowDocumentBuilder();
             Document contentDoc = builder.parse(new InputSource(new StringReader(xmlContent)));
             Node importedContent = doc.adoptNode(contentDoc.getDocumentElement());
             Node dsv = getDatastreamVersion(dsvId);
@@ -189,6 +184,10 @@ public class Foxml11Document {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        } finally {
+            if (builder != null) {
+                XmlTransformUtility.returnDocumentBuilder(builder);
+            }
         }
     }
 
@@ -234,7 +233,9 @@ public class Foxml11Document {
 
     public void serialize(OutputStream out) {
         Transformer idTransform;
+        TransformerFactory xformFactory = null;
         try {
+            xformFactory = XmlTransformUtility.getTransformerFactory();
             idTransform = xformFactory.newTransformer();
             Source input = new DOMSource(doc);
             Result output = new StreamResult(out);
@@ -245,6 +246,10 @@ public class Foxml11Document {
         } catch (TransformerException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        } finally {
+            if (xformFactory != null) {
+                XmlTransformUtility.returnTransformerFactory(xformFactory);
+            }
         }
     }
 }

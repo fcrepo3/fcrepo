@@ -16,6 +16,7 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 import org.w3c.dom.Document;
 
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,10 +32,14 @@ public class DataUtils {
                     DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setNamespaceAware(true);
             DocumentBuilder docBuilder =
-                    documentBuilderFactory.newDocumentBuilder();
+                    XmlTransformUtility.borrowDocumentBuilder();
 
-            Document doc = docBuilder.parse(new ByteArrayInputStream(document));
-
+            Document doc = null;
+            try {
+                doc = docBuilder.parse(new ByteArrayInputStream(document));
+            } finally {
+                XmlTransformUtility.returnDocumentBuilder(docBuilder);
+            }
             File file = new File(filename.trim());
             String data = format(doc);
             PrintWriter writer = new PrintWriter(file, "UTF-8");

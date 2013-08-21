@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.Iterator;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.fcrepo.common.Constants;
@@ -22,6 +23,7 @@ import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.utilities.LogConfig;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.trippi.io.TripleIteratorFactory;
 import org.w3c.dom.Document;
 
@@ -41,12 +43,6 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 public class ConvertObjectSerialization {
 
     private static final String ENCODING = "UTF-8";
-
-    private static final DocumentBuilderFactory factory =
-            DocumentBuilderFactory.newInstance();
-    static {
-        factory.setNamespaceAware(true);
-    }
 
     private static final OutputFormat fmt = new OutputFormat("XML", ENCODING, true);
     static {
@@ -118,8 +114,13 @@ public class ConvertObjectSerialization {
                                     OutputStream destination)
             throws Exception {
         XMLSerializer ser = new XMLSerializer(destination, fmt);
-        Document doc = factory.newDocumentBuilder().parse(source);
-        ser.serialize(doc);
+        DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
+        try {
+            Document doc = builder.parse(source);
+            ser.serialize(doc);
+        } finally {
+            XmlTransformUtility.returnDocumentBuilder(builder);
+        }
         destination.close();
     }
 

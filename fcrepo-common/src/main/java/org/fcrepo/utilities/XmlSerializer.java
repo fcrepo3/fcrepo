@@ -151,7 +151,11 @@ public class XmlSerializer {
                 XmlTransformUtility.getTransformerFactory();
         Transformer serializer;
         try {
-            serializer = tfactory.newTransformer();
+            try {
+                serializer = tfactory.newTransformer();
+            } finally {
+                XmlTransformUtility.returnTransformerFactory(tfactory);
+            }
             //Setup indenting to "pretty print"
             serializer.setOutputProperty(OutputKeys.INDENT, "yes");
             serializer
@@ -268,9 +272,13 @@ public class XmlSerializer {
      */
     protected static Document getDocument(InputStream in)
             throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        return builder.parse(in);
+        DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
+        Document doc = null;
+        try {
+            doc = builder.parse(in);
+        } finally {
+            XmlTransformUtility.returnDocumentBuilder(builder);
+        }
+        return doc;
     }
 }
