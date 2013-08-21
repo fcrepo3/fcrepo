@@ -18,6 +18,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.pool.impl.SoftReferenceObjectPool;
 import org.apache.commons.pool.impl.StackObjectPool;
 import org.fcrepo.utilities.xml.PoolableDocumentBuilderFactory;
 import org.fcrepo.utilities.xml.PoolableSAXParserFactory;
@@ -41,17 +42,17 @@ public class XmlTransformUtility {
     // Using a Stack pool means that objectsare created on demand after the
     // pool is exhausted
     //TODO how should the default values be configured?
-    private static final StackObjectPool<DocumentBuilder> DOCUMENT_BUILDERS =
-        new StackObjectPool<DocumentBuilder>(
-            new PoolableDocumentBuilderFactory(true, false), 10);
+    private static final SoftReferenceObjectPool<DocumentBuilder> DOCUMENT_BUILDERS =
+        new SoftReferenceObjectPool<DocumentBuilder>(
+            new PoolableDocumentBuilderFactory(true, false));
     
-    private static final StackObjectPool<TransformerFactory> TRANSFORM_FACTORIES =
-        new StackObjectPool<TransformerFactory>(
-            new PoolableTransformerFactoryFactory(), 10);
+    private static final SoftReferenceObjectPool<TransformerFactory> TRANSFORM_FACTORIES =
+        new SoftReferenceObjectPool<TransformerFactory>(
+            new PoolableTransformerFactoryFactory());
     
-    private static final StackObjectPool<SAXParser> SAX_PARSERS =
-        new StackObjectPool<SAXParser>(
-            new PoolableSAXParserFactory(true, false), 10);
+    private static final SoftReferenceObjectPool<SAXParser> SAX_PARSERS =
+        new SoftReferenceObjectPool<SAXParser>(
+            new PoolableSAXParserFactory(true, false));
     
     /**
      * Convenience method to get a new instance of a TransformerFactory.
