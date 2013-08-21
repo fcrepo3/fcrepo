@@ -149,6 +149,7 @@
         <include>commons-betwixt:commons-betwixt:*</include>
         <include>commons-collections:commons-collections:jar:*</include>
         <include>commons-digester:commons-digester:jar:*</include>
+        <include>commons-pool:commons-pool:jar:*</include>
         <include>dom4j:dom4j:jar:*</include>
         <include>org.fcrepo:mulgara-core:jar:*</include>
         <include>org.fcrepo:openrdf-sesame-onejar:jar:*</include>

@@ -21,9 +21,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -47,6 +44,7 @@ import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.utilities.Base64;
 import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,12 +72,6 @@ public class METSFedoraExtDODeserializer
     private static final Logger logger =
             LoggerFactory.getLogger(METSFedoraExtDODeserializer.class);
 
-    private static final SAXParserFactory spf = SAXParserFactory.newInstance();
-    static {
-        spf.setValidating(false);
-        spf.setNamespaceAware(true);
-    }
-    
     /** The format this deserializer reads. */
     private final XMLFormat m_format;
 
@@ -105,8 +97,6 @@ public class METSFedoraExtDODeserializer
 
     /** Hashtables to correlate audit record ids to datastreams */
     private HashMap<String, String> m_AuditIdToComponentId;
-
-    private SAXParser m_parser;
 
     private String m_characterEncoding;
 
@@ -268,13 +258,6 @@ public class METSFedoraExtDODeserializer
         logger.debug("Deserializing " + m_format.uri + " for transContext: "
                 + transContext);
 
-        // initialize sax for this parse
-        try {
-            m_parser = spf.newSAXParser();
-        } catch (Exception e) {
-            throw new RuntimeException("Error initializing SAX parser", e);
-        }
-
         m_obj = obj;
         m_obj.setOwnerId("");
         m_obj.setLabel("");
@@ -282,7 +265,7 @@ public class METSFedoraExtDODeserializer
         m_transContext = transContext;
         initialize();
         try {
-            m_parser.parse(in, this);
+            XmlTransformUtility.parseWithoutValidating(in, this);
         } catch (IOException ioe) {
             throw new StreamIOException("Low-level stream IO problem occurred "
                     + "while SAX parsing this object.");

@@ -7,6 +7,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,7 +166,7 @@ public class DOM {
     // TODO: Consider optimizing this with ThreadLocal Transformers
     public static String domToString(Node dom, boolean withXmlDeclaration)
             throws TransformerException {
-        Transformer t = TransformerFactory.newInstance().newTransformer();
+        Transformer t = XmlTransformUtility.getTransformer();
         t.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         if (withXmlDeclaration) {
             t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");

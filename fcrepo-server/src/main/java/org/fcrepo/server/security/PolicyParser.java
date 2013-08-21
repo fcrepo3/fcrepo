@@ -4,12 +4,10 @@
  */
 package org.fcrepo.server.security;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -33,7 +31,7 @@ import org.xml.sax.SAXParseException;
 
 import org.fcrepo.common.FaultException;
 import org.fcrepo.server.errors.ValidationException;
-import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.utilities.XmlTransformUtility;
 
 
 
@@ -52,17 +50,11 @@ public class PolicyParser {
     // Neither of these factories are thread-safe, so access is synchronized in methods below
     private static final SchemaFactory SCHEMA_FACTORY = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
 
-    private static final DocumentBuilderFactory BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-    static {
-        BUILDER_FACTORY.setIgnoringComments(true);
-        BUILDER_FACTORY.setNamespaceAware(true);
-    }
-
+    private static final ErrorHandler THROW_ALL = new ThrowAllErrorHandler();
+    
     private final Schema m_schema;
 
     private final Validator m_validator;
-
-    private final DocumentBuilder m_domParser;
 
     /**
      * Creates an instance that will validate according to the given schema.
@@ -81,7 +73,6 @@ public class PolicyParser {
             throws SAXException {
         m_schema = schema;
         m_validator = schema.newValidator();
-        m_domParser = createDOMParser();
     }
     /**
      * Schema Factory is not thread safe
@@ -130,10 +121,17 @@ public class PolicyParser {
 
         // Parse; die if not well-formed
         Document doc = null;
+        DocumentBuilder domParser = null;
         try {
-            doc = m_domParser.parse(policyStream);
+            domParser = XmlTransformUtility.borrowDocumentBuilder();
+            domParser.setErrorHandler(THROW_ALL);
+            doc = domParser.parse(policyStream);
         } catch (Exception e) {
             throw new ValidationException("Policy invalid; malformed XML", e);
+        } finally {
+            if (domParser != null) {
+                XmlTransformUtility.returnDocumentBuilder(domParser);
+            }
         }
 
         if (schemaValidate) {
@@ -165,19 +163,6 @@ public class PolicyParser {
         }
     }
     
-    private static DocumentBuilder createDOMParser() {
-        try {
-            DocumentBuilder builder;
-            synchronized(BUILDER_FACTORY) {
-                builder = BUILDER_FACTORY.newDocumentBuilder();
-            }
-            builder.setErrorHandler(new ThrowAllErrorHandler());
-            return builder;
-        } catch (ParserConfigurationException e) {
-            throw new FaultException(e);
-        }
-    }
-
     /**
      * Command-line utility for validating XACML policies.
      * <p>

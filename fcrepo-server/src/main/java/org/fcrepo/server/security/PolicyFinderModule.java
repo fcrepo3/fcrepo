@@ -224,10 +224,10 @@ public class PolicyFinderModule
         BackendPolicies backendPolicies =
                 new BackendPolicies(m_serverHome + File.separator
                                     + BE_SECURITY_XML_LOCATION);
-        Hashtable tempfiles = backendPolicies.generateBackendPolicies();
+        Hashtable<String, String> tempfiles = backendPolicies.generateBackendPolicies();
         TransformerFactory tfactory = XmlTransformUtility.getTransformerFactory();
         try {
-            Iterator iterator = tempfiles.keySet().iterator();
+            Iterator<String> iterator = tempfiles.keySet().iterator();
             while (iterator.hasNext()) {
                 File f =
                         new File(m_serverHome + File.separator
@@ -235,8 +235,8 @@ public class PolicyFinderModule
                 // location
                 StreamSource ss = new StreamSource(f);
                 Transformer transformer = tfactory.newTransformer(ss); // xformPath
-                String key = (String) iterator.next();
-                File infile = new File((String) tempfiles.get(key));
+                String key = iterator.next();
+                File infile = new File(tempfiles.get(key));
                 FileInputStream fis = new FileInputStream(infile);
                 FileOutputStream fos =
                         new FileOutputStream(m_repositoryBackendPolicyDirectoryPath
@@ -245,10 +245,12 @@ public class PolicyFinderModule
                                       new StreamResult(fos));
             }
         } finally {
+            // return the transformerFactory
+            XmlTransformUtility.returnTransformerFactory(tfactory);
             // we're done with temp files now, so delete them
-            Iterator iter = tempfiles.keySet().iterator();
+            Iterator<String> iter = tempfiles.keySet().iterator();
             while (iter.hasNext()) {
-                File tempFile = new File((String) tempfiles.get(iter.next()));
+                File tempFile = new File(tempfiles.get(iter.next()));
                 tempFile.delete();
             }
         }

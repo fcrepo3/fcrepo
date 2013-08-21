@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.betwixt.XMLUtils;
 import org.apache.commons.io.IOUtils;
@@ -72,6 +71,7 @@ import org.fcrepo.server.validation.ValidationConstants;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.server.validation.ecm.EcmValidator;
 import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.jrdf.graph.URIReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1560,11 +1560,8 @@ public class DefaultManagement
             fmt.setOmitXMLDeclaration(!includeXMLDeclaration);
             fmt.setOmitDocumentType(true);
             XMLSerializer ser = new XMLSerializer(out, fmt);
-            DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(in);
+            Document doc =
+                XmlTransformUtility.parseNamespaceAware(in);
             ser.serialize(doc);
             return out.toByteArray();
         } catch (Exception e) {

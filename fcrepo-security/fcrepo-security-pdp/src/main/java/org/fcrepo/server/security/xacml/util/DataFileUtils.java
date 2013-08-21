@@ -17,6 +17,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -31,13 +32,15 @@ public class DataFileUtils {
 
     public static Document getDocumentFromFile(File file) throws Exception {
         byte[] document = loadFile(file);
-        DocumentBuilderFactory documentBuilderFactory =
-                DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
         DocumentBuilder docBuilder =
-                documentBuilderFactory.newDocumentBuilder();
+                XmlTransformUtility.borrowDocumentBuilder();
 
-        Document doc = docBuilder.parse(new ByteArrayInputStream(document));
+        Document doc = null;
+        try {
+            doc = docBuilder.parse(new ByteArrayInputStream(document));
+        } finally {
+            XmlTransformUtility.returnDocumentBuilder(docBuilder);
+        }
 
         return doc;
     }
@@ -70,13 +73,15 @@ public class DataFileUtils {
     public static void saveDocument(String filename, byte[] document)
             throws Exception {
         try {
-            DocumentBuilderFactory documentBuilderFactory =
-                    DocumentBuilderFactory.newInstance();
-            documentBuilderFactory.setNamespaceAware(true);
             DocumentBuilder docBuilder =
-                    documentBuilderFactory.newDocumentBuilder();
+                    XmlTransformUtility.borrowDocumentBuilder();
 
-            Document doc = docBuilder.parse(new ByteArrayInputStream(document));
+            Document doc = null;
+            try {
+                doc = docBuilder.parse(new ByteArrayInputStream(document));
+            } finally {
+                XmlTransformUtility.returnDocumentBuilder(docBuilder);
+            }
             saveDocument(filename, doc);
         } catch (Exception e) {
             String message = "Unable to save file: " + filename;
@@ -124,13 +129,14 @@ public class DataFileUtils {
     }
 
     public static String format(byte[] document) throws Exception {
-        DocumentBuilderFactory documentBuilderFactory =
-                DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder =
-                documentBuilderFactory.newDocumentBuilder();
+        DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
 
-        Document doc = docBuilder.parse(new ByteArrayInputStream(document));
+        Document doc = null;
+        try {
+            doc = builder.parse(new ByteArrayInputStream(document));
+        } finally {
+            XmlTransformUtility.returnDocumentBuilder(builder);
+        }
 
         return format(doc);
     }
@@ -143,11 +149,13 @@ public class DataFileUtils {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         XMLSerializer serializer = new XMLSerializer(outStream, format);
 
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(new ByteArrayInputStream(data));
-        serializer.serialize(doc);
+        DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
+        try {
+            Document doc = builder.parse(new ByteArrayInputStream(data));
+            serializer.serialize(doc);
+        } finally {
+            XmlTransformUtility.returnDocumentBuilder(builder);
+        }
 
         ByteArrayInputStream in =
                 new ByteArrayInputStream(outStream.toByteArray());

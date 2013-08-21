@@ -25,6 +25,7 @@ import org.fcrepo.server.storage.types.DeploymentDSBindSpec;
 import org.fcrepo.server.storage.types.MethodDef;
 import org.fcrepo.server.storage.types.MethodDefOperationBind;
 import org.fcrepo.server.storage.types.MethodParmDef;
+import org.fcrepo.utilities.XmlTransformUtility;
 
 
 /**
@@ -160,22 +161,8 @@ public class ServiceMapper {
             GeneralException {
         try {
             // XMLSchema validation via SAX parser
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            spf.setValidating(false);
-            SAXParser sp = spf.newSAXParser();
-            DefaultHandler handler = eventHandler;
-            XMLReader xmlreader = sp.getXMLReader();
-            xmlreader.setContentHandler(handler);
-            xmlreader.parse(xml);
-            return handler;
-        } catch (ParserConfigurationException e) {
-            String msg =
-                    "ServiceMapper returned parser error. "
-                            + "The underlying exception was a "
-                            + e.getClass().getName() + ".  "
-                            + "The message was " + "\"" + e.getMessage() + "\"";
-            throw new RepositoryConfigurationException(msg);
+            XmlTransformUtility.parseWithoutValidating(xml, eventHandler);
+            return eventHandler;
         } catch (SAXException e) {
             String msg =
                     "ServiceMapper returned SAXException. "

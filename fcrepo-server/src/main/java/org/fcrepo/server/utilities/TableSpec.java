@@ -14,6 +14,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.fcrepo.server.errors.InconsistentTableSpecException;
+import org.fcrepo.utilities.XmlTransformUtility;
 
 
 /**
@@ -157,11 +158,8 @@ public class TableSpec {
     public static List<TableSpec> getTableSpecs(InputStream in)
             throws InconsistentTableSpecException, IOException {
         try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            SAXParser parser = spf.newSAXParser();
             TableSpecDeserializer tsd = new TableSpecDeserializer();
-            parser.parse(in, tsd);
+            XmlTransformUtility.parseWithoutValidating(in, tsd);
             tsd.assertTableSpecsConsistent();
             return tsd.getTableSpecs();
         } catch (InconsistentTableSpecException itse) {
