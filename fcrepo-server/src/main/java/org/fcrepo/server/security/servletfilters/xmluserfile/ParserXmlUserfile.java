@@ -12,14 +12,12 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import org.fcrepo.server.security.servletfilters.FinishedParsingException;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +28,6 @@ public class ParserXmlUserfile
     private static final Logger logger =
             LoggerFactory.getLogger(ParserXmlUserfile.class);
 
-    private SAXParser m_parser;
-
     private final InputStream m_xmlStream;
 
     public ParserXmlUserfile(InputStream xmlStream)
@@ -39,13 +35,6 @@ public class ParserXmlUserfile
         logger.debug("Initializing XMLUserfile parser");
 
         m_xmlStream = xmlStream;
-        try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            m_parser = spf.newSAXParser();
-        } catch (Exception e) {
-            throw new IOException("Error getting XML parser", e);
-        }
     }
 
     private String username = null;
@@ -54,17 +43,17 @@ public class ParserXmlUserfile
 
     private Boolean authenticated = null;
 
-    private Map namedAttributes = null;
+    private Map<String, Set<String>> namedAttributes = null;
 
     private String attributeName = null;
 
-    private Set attributeValues = null;
+    private Set<String> attributeValues = null;
 
     public final Boolean getAuthenticated() {
         return authenticated;
     }
 
-    public final Map getNamedAttributes() {
+    public final Map<String, Set<String>> getNamedAttributes() {
         return namedAttributes;
     }
 
@@ -95,7 +84,7 @@ public class ParserXmlUserfile
             logger.debug("<attribute> foundUser==" + foundUser);
             if (foundUser) {
                 attributeName = a.getValue("name");
-                attributeValues = new HashSet();
+                attributeValues = new HashSet<String>();
                 logger.debug("attributeName==" + attributeName);
             }
         } else if (localName.equals("value")) {
@@ -155,9 +144,9 @@ public class ParserXmlUserfile
         try {
             value = new StringBuffer();
             authenticated = null;
-            namedAttributes = new Hashtable();
+            namedAttributes = new Hashtable<String, Set<String>>();
             foundUser = false;
-            m_parser.parse(m_xmlStream, this);
+            XmlTransformUtility.parseWithoutValidating(m_xmlStream, this);
         } catch (FinishedParsingException fpe) {
             throw fpe;
         } catch (Throwable e) {

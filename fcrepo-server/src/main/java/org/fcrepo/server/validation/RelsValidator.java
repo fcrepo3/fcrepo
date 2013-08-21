@@ -19,6 +19,7 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.common.FaultException;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.errors.ValidationException;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -129,21 +130,11 @@ public class RelsValidator
 
     private StringBuffer m_literalValue;
 
-    // SAX parser
-    private final SAXParser m_parser;
-
     private static final String RELS_EXT = "RELS-EXT";
 
     private static final String RELS_INT = "RELS-INT";
 
     public RelsValidator() {
-        try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            m_parser = spf.newSAXParser();
-        } catch (Exception wontHappen) {
-            throw new FaultException(wontHappen);
-        }
     }
 
     public void validate(PID pid, String dsId, InputStream content)
@@ -159,7 +150,7 @@ public class RelsValidator
                         + dsId + ")");
             }
             m_dsId = dsId;
-            m_parser.parse(content, this);
+            XmlTransformUtility.parseWithoutValidating(content, this);
         } catch (Exception e) {
             throw new ValidationException(dsId + " validation failed: "
                     + e.getMessage(), e);

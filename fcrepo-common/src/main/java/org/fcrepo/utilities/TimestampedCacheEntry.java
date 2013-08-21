@@ -1,4 +1,4 @@
-package org.fcrepo.server.utilities;
+package org.fcrepo.utilities;
 
 public class TimestampedCacheEntry<T> {
 	private long timeStamp;

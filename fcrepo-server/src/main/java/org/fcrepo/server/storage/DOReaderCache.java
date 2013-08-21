@@ -12,7 +12,7 @@ import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.fcrepo.server.errors.ServerException;
-import org.fcrepo.server.utilities.TimestampedCacheEntry;
+import org.fcrepo.utilities.TimestampedCacheEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -40,6 +40,7 @@ import org.w3c.dom.Element;
 
 import org.fcrepo.server.security.jaas.util.DataUtils;
 import org.fcrepo.server.security.jaas.util.SubjectUtils;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,23 +67,12 @@ public class UserServlet
     private static final String SESSION_SUBJECT_KEY =
             "javax.security.auth.subject";
 
-    private DocumentBuilder documentBuilder = null;
-
     /*
      * (non-Javadoc)
      * @see javax.servlet.GenericServlet#init()
      */
     @Override
     public void init() throws ServletException {
-        try {
-            DocumentBuilderFactory documentBuilderFactory =
-                    DocumentBuilderFactory.newInstance();
-            documentBuilderFactory.setNamespaceAware(true);
-            documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        } catch (ParserConfigurationException pce) {
-            logger.error("Unable to initialise UserServlet: " + pce.getMessage(),
-                      pce);
-        }
     }
 
     /*
@@ -119,7 +109,9 @@ public class UserServlet
             userId = principal.getName();
         }
 
+        DocumentBuilder documentBuilder = XmlTransformUtility.borrowDocumentBuilder();
         Document doc = documentBuilder.newDocument();
+        XmlTransformUtility.returnDocumentBuilder(documentBuilder);
         doc.setXmlVersion("1.0");
 
         Element root = doc.createElement("user");

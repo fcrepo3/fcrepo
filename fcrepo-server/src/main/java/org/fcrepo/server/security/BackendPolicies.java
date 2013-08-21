@@ -44,9 +44,9 @@ public class BackendPolicies {
         this(inFilePath, null);
     }
 
-    public Hashtable generateBackendPolicies() throws Exception {
+    public Hashtable<String, String> generateBackendPolicies() throws Exception {
         logger.debug("in BackendPolicies.generateBackendPolicies() 1");
-        Hashtable tempfiles = null;
+        Hashtable<String, String> tempfiles = null;
         if (inFilePath.endsWith(".xml")) { // replacing code for .properties
             logger.debug("in BackendPolicies.generateBackendPolicies() .xml 1");
             BackendSecurityDeserializer bds =
@@ -79,14 +79,14 @@ public class BackendPolicies {
         return parts;
     }
 
-    private static final String getExcludedRolesText(String key, Set roles) {
+    private static final String getExcludedRolesText(String key, Set<String> roles) {
         StringBuffer excludedRolesText = new StringBuffer();
         if ("default".equals(key) && roles.size() > 1) {
             excludedRolesText.append("\t\t<ExcludedRoles>\n");
-            Iterator excludedRoleIterator = roles.iterator();
+            Iterator<String> excludedRoleIterator = roles.iterator();
             while (excludedRoleIterator.hasNext()) {
                 logger.debug("in BackendPolicies.newWritePolicies() another inner it");
-                String excludedRole = (String) excludedRoleIterator.next();
+                String excludedRole = excludedRoleIterator.next();
                 if ("default".equals(excludedRole)) {
                     continue;
                 }
@@ -105,7 +105,7 @@ public class BackendPolicies {
                                            String callbackSsl,
                                            String iplist,
                                            String role,
-                                           Set roles) throws Exception {
+                                           Set<String> roles) throws Exception {
         StringBuffer temp = new StringBuffer();
         temp.append("\t<Rule RuleId=\"1\" Effect=\"Permit\">\n");
         temp.append(getExcludedRolesText(role, roles));
@@ -146,11 +146,11 @@ public class BackendPolicies {
         return temp.toString();
     }
 
-    private Hashtable writePolicies() throws Exception {
+    private Hashtable<String, String> writePolicies() throws Exception {
         logger.debug("in BackendPolicies.newWritePolicies() 1");
         StringBuffer sb = null;
         Hashtable<String, String> tempfiles = new Hashtable<String, String>();
-        Iterator coarseIterator = backendSecuritySpec.listRoleKeys().iterator();
+        Iterator<String> coarseIterator = backendSecuritySpec.listRoleKeys().iterator();
         while (coarseIterator.hasNext()) {
             String key = (String) coarseIterator.next();
             String[] parts = parseForSlash(key);
@@ -179,7 +179,7 @@ public class BackendPolicies {
             }
             sb = new StringBuffer();
             logger.debug("in BackendPolicies.newWritePolicies() another outer it, key={}", key);
-            Hashtable properties = backendSecuritySpec.getSecuritySpec(key);
+            Hashtable<String,String> properties = backendSecuritySpec.getSecuritySpec(key);
             logger.debug("in BackendPolicies.newWritePolicies() properties.size()="
                             + properties.size());
             logger.debug("in BackendPolicies.newWritePolicies() properties.get(BackendSecurityDeserializer.ROLE)="
