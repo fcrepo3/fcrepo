@@ -384,7 +384,7 @@ public class FieldSearchSQLImpl
         if (dcFields.size() == 0) {
             return null;
         }
-        StringBuilder out = new StringBuilder();
+        StringBuilder out = new StringBuilder(64 * dcFields.size());
 
         for (DCField dcField : dcFields) {
             out.append(" ");

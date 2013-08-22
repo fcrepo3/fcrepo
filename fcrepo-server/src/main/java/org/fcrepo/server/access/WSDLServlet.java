@@ -49,10 +49,10 @@ public class WSDLServlet
     private static final String _XSD_PATH = "xsd/fedora-types.xsd";
 
     /** Source WSDL file relative paths, mapped by name */
-    private static final Map _WSDL_PATHS = new HashMap();
+    private static final Map<String, String> _WSDL_PATHS = new HashMap<String, String>();
 
     /** Paths to each service endpoint, relative to the root of the webapp. */
-    private static final Map _SERVICE_PATHS = new HashMap();
+    private static final Map<String, String> _SERVICE_PATHS = new HashMap<String, String>();
 
     /** $FEDORA_HOME/server */
     private File _serverDir;
@@ -78,46 +78,39 @@ public class WSDLServlet
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-        String body;
         String api = request.getParameter("api");
 
         if (api == null || api.length() == 0) {
-            body = getIndex();
             response.setContentType("text/html; charset=UTF-8");
+            getIndex(response.getWriter());
         } else {
-            body =
-                    getWSDL(api.toUpperCase(), request.getRequestURL()
-                            .toString());
             response.setContentType("text/xml; charset=UTF-8");
+            getWSDL(api.toUpperCase(), request.getRequestURL()
+                            .toString(), response.getWriter());
         }
 
-        PrintWriter writer = response.getWriter();
-        writer.print(body);
-        writer.flush();
-        writer.close();
+        response.flushBuffer();
     }
 
     /**
      * Get a simple HTML index pointing to each WSDL file provided by the
      * servlet.
      */
-    private String getIndex() {
-        StringBuffer out = new StringBuffer();
+    private void getIndex(PrintWriter out) {
         out.append("<html><body>WSDL Index<ul>\n");
-        Iterator names = _WSDL_PATHS.keySet().iterator();
+        Iterator<String> names = _WSDL_PATHS.keySet().iterator();
         while (names.hasNext()) {
-            String name = (String) names.next();
+            String name = names.next();
             out.append("<li> <a href=\"?api=" + name + "\">" + name
                     + "</a></li>\n");
         }
         out.append("</ul></body></html>");
-        return out.toString();
     }
 
     /**
      * Get the self-contained WSDL given the api name and request URL.
      */
-    private String getWSDL(String api, String requestURL) throws IOException,
+    private void getWSDL(String api, String requestURL, PrintWriter out) throws IOException,
             ServletException {
 
         String wsdlPath = (String) _WSDL_PATHS.get(api);
@@ -133,14 +126,7 @@ public class WSDLServlet
                     new RuntimeWSDL(schemaFile, sourceWSDL, baseURL + "/"
                             + svcPath);
 
-            StringWriter stringWriter = new StringWriter();
-            PrintWriter out = new PrintWriter(stringWriter);
-
             wsdl.serialize(out);
-            out.flush();
-            out.close();
-
-            return stringWriter.toString();
 
         } else {
             throw new ServletException("No such api: '" + api + "'");

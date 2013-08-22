@@ -36,7 +36,9 @@ public class DerbyDDLConverter
         ArrayList<String> l = new ArrayList<String>();
         StringBuilder out = new StringBuilder();
 
-        out.append("CREATE TABLE " + spec.getName() + " (\n");
+        out.append("CREATE TABLE ");
+        out.append(spec.getName());
+        out.append(" (\n");
 
         Iterator<ColumnSpec> csi = spec.columnSpecIterator();
         int csNum = 0;
@@ -48,10 +50,10 @@ public class DerbyDDLConverter
             csNum++;
             ColumnSpec cs = csi.next();
 
-            out.append(getColumnName(cs));
-            out.append(getDataType(cs));
-            out.append(getColumnConstraint(cs));
-            out.append(getDefaultValue(cs));
+            getColumnName(cs, out);
+            getDataType(cs, out);
+            getColumnConstraint(cs, out);
+            getDefaultValue(cs, out);
 
             if (cs.getIndexName() != null) {
                 l.add(createIndexStatement(spec, cs));
@@ -61,7 +63,7 @@ public class DerbyDDLConverter
         out = removeTrailingWhitespace(out);
         if (spec.getPrimaryColumnName() != null) {
             out.append(",\n");
-            out.append(getTableConstraint(spec));
+            getTableConstraint(spec, out);
         }
 
         out.append(')');
@@ -76,18 +78,14 @@ public class DerbyDDLConverter
         return out;
     }
 
-    private StringBuilder getColumnName(ColumnSpec cs) {
-        StringBuilder out = new StringBuilder();
+    private void getColumnName(ColumnSpec cs, StringBuilder out) {
 
         out.append("  ");
         out.append(cs.getName());
         out.append(' ');
-
-        return out;
     }
 
-    private Object getDataType(ColumnSpec cs) {
-        StringBuilder out = new StringBuilder();
+    private Object getDataType(ColumnSpec cs, StringBuilder out) {
 
         if (isNumberType(cs)) {
             out.append(getTypeWithoutByteLength(cs));
@@ -115,8 +113,7 @@ public class DerbyDDLConverter
         return cs.getType().substring(0, end);
     }
 
-    private Object getColumnConstraint(ColumnSpec cs) {
-        StringBuilder out = new StringBuilder();
+    private void getColumnConstraint(ColumnSpec cs, StringBuilder out) {
 
         if (cs.isUnique()) {
             out.append("UNIQUE ");
@@ -128,12 +125,9 @@ public class DerbyDDLConverter
         if (cs.isAutoIncremented() && isNumberType(cs)) {
             out.append("GENERATED ALWAYS AS IDENTITY ");
         }
-
-        return out;
     }
 
-    private StringBuilder getDefaultValue(ColumnSpec cs) {
-        StringBuilder out = new StringBuilder();
+    private void getDefaultValue(ColumnSpec cs, StringBuilder out) {
 
         if (cs.getDefaultValue() != null) {
             out.append("DEFAULT ");
@@ -148,11 +142,9 @@ public class DerbyDDLConverter
             out.append(' ');
         }
 
-        return out;
     }
 
-    private StringBuilder getTableConstraint(TableSpec ts) {
-        StringBuilder out = new StringBuilder();
+    private void getTableConstraint(TableSpec ts, StringBuilder out) {
 
         if (ts.getPrimaryColumnName() != null) {
             out.append("  PRIMARY KEY (");
@@ -160,11 +152,10 @@ public class DerbyDDLConverter
             out.append(")");
         }
 
-        return out;
     }
 
     private String createIndexStatement(TableSpec ts, ColumnSpec cs) {
-        StringBuilder out = new StringBuilder();
+        StringBuilder out = new StringBuilder(22 + (ts.getName().length() * 2) + (cs.getName().length() * 2));
 
         if (cs.getIndexName() != null) {
             out.append("CREATE INDEX " + ts.getName() + "_" + cs.getName()

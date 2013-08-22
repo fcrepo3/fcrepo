@@ -53,10 +53,11 @@ public abstract class CXFUtility {
         String[] details = se.getDetails();
         String detailString = "";
         if (details.length > 0) {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
+            String className = se.getClass().getName();
             for (String element : details) {
                 buf.append("<detail>");
-                buf.append(se.getClass().getName());
+                buf.append(className);
                 buf.append(": ");
                 buf.append(element);
                 buf.append("</detail>\n");

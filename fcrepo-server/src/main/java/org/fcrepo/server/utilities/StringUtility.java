@@ -4,6 +4,7 @@
  */
 package org.fcrepo.server.utilities;
 
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 
@@ -40,7 +41,8 @@ public class StringUtility {
      *         the specified line length.
      */
     public static String prettyPrint(String in, int lineLength, String delim) {
-        StringBuffer sb = new StringBuffer();
+        // make a guess about resulting length to minimize copying
+        StringBuilder sb = new StringBuilder(in.length() + in.length()/lineLength);
         if (delim == null) {
             delim = " ";
         }
@@ -50,11 +52,13 @@ public class StringUtility {
             String s = st.nextToken();
             charCount = charCount + s.length();
             if (charCount < lineLength) {
-                sb.append(s + " ");
+                sb.append(s);
+                sb.append(' ');
                 charCount++;
             } else {
-                sb.append("\n");
-                sb.append(s + " ");
+                sb.append('\n');
+                sb.append(s);
+                sb.append(' ');
                 charCount = s.length() + 1;
             }
         }
@@ -89,7 +93,7 @@ public class StringUtility {
                 (indent + 1) * (fullLines + 1);
         int outputLength = inputLength + formatLength;
         
-        StringBuffer sb = new StringBuffer(outputLength);
+        StringBuilder sb = new StringBuilder(outputLength);
         char[] ib = new char[indent];
         Arrays.fill(ib, ' ');
 
@@ -105,6 +109,28 @@ public class StringUtility {
         }
 
         return sb.toString();
+
+    }
+    
+    public static void splitAndIndent(String str, int indent,
+            int numChars, PrintWriter writer) {
+        final int inputLength = str.length();
+        boolean perfectFit = (inputLength % numChars == 0);
+        int fullLines = (inputLength / numChars);
+        
+        char[] ib = new char[indent];
+        Arrays.fill(ib, ' ');
+
+        for (int offset = 0; offset < inputLength; offset += numChars) {
+            writer.print(ib);
+            writer.append(str, offset, offset + numChars);
+            writer.print('\n');
+        }
+        if (!perfectFit) {
+            writer.print(ib);
+            writer.append(str, fullLines * numChars, inputLength);
+            writer.print('\n');
+        }
 
     }
     

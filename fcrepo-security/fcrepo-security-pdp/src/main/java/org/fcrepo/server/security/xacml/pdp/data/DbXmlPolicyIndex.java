@@ -217,7 +217,7 @@ public class DbXmlPolicyIndex
                                         XmlQueryContext context,
                                         int r) throws XmlException  {
         // The dimensions for this query.
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(64 * attributeMap.size());
         for (Set<AttributeBean> attributeBeans : attributeMap.values()) {
             sb.append(attributeBeans.size() + ":");
             for (AttributeBean bean : attributeBeans) {
@@ -236,7 +236,7 @@ public class DbXmlPolicyIndex
         String query = createQuery(attributeMap);
 
         if (log.isDebugEnabled()) {
-            log.debug("Query [" + hash + "]:\n" + query);
+            log.debug("Query [{}]:\n{}", hash, query);
         }
 
         // Once we have created a query, we can parse it and store the
@@ -260,8 +260,12 @@ public class DbXmlPolicyIndex
      * @return the query as a String
      */
     private String createQuery(Map<String, Set<AttributeBean>> attributeMap) {
-        return "collection('" + m_dbXmlManager.CONTAINER + "')" + getXpath(attributeMap);
-
+        StringBuilder sb = new StringBuilder(256);
+        sb.append("collection('");
+        sb.append(m_dbXmlManager.CONTAINER);
+        sb.append("')");
+        getXpath(attributeMap, sb);
+        return  sb.toString();
     }
 
     /*

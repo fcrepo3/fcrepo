@@ -103,26 +103,26 @@ public class ParserXmlUserfile
             logger.debug("</user> foundUser==" + foundUser);
             if (foundUser) {
                 logger.debug("at </user> (quick audit)");
-                logger.debug("authenticated==" + authenticated);
-                logger.debug("namedAttributes n==" + namedAttributes.size());
+                logger.debug("authenticated=={}", authenticated);
+                logger.debug("namedAttributes n=={}", namedAttributes.size());
                 throw new FinishedParsingException("");
             }
         } else if (localName.equals("attribute")) {
             logger.debug("</attribute> foundUser==" + foundUser);
             if (foundUser) {
-                logger.debug("set n==" + attributeValues.size());
+                logger.debug("set n=={}", attributeValues.size());
                 namedAttributes.put(attributeName, attributeValues);
-                logger.debug("just added values for " + attributeName);
+                logger.debug("just added values for {}", attributeName);
             }
             attributeName = null;
             attributeValues = null;
         } else if (localName.equals("value")) {
-            logger.debug("</value> foundUser==" + foundUser);
+            logger.debug("</value> foundUser=={}", foundUser);
             if (foundUser) {
                 attributeValues.add(value.toString());
-                logger.debug("just added " + value);
+                logger.debug("just added {}", value);
             }
-            logger.debug("quick audit of value string ==" + value);
+            logger.debug("quick audit of value string =={}", value);
             value.setLength(0);
             inValue = false;
         }
@@ -132,8 +132,8 @@ public class ParserXmlUserfile
     public void characters(char[] ch, int start, int length) {
         if (inValue && foundUser && value != null) {
             value.append(ch, start, length);
-            logger.debug("characters called start==" + start + " length=="
-                    + length);
+            logger.debug("characters called start=={} length=={}",
+                    start, length);
         }
     }
 

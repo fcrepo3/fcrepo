@@ -121,7 +121,7 @@ public class GetObjectHistoryServlet
         }
 
         PID = URIArray[5];
-        logger.debug("Servicing getObjectHistory request (PID=" + PID + ")");
+        logger.debug("Servicing getObjectHistory request (PID={})", PID);
 
         // Check for xml encoding parameter; ignore any other parameters
         Hashtable<String, String> h_userParms = new Hashtable<String, String>();

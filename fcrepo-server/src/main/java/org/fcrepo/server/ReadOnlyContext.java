@@ -88,8 +88,8 @@ public class ReadOnlyContext
             m_subjectAttributes = new MultiValueMap();
         }
         m_subjectAttributes.lock();
-        logger.debug("subject attributes in readonlycontext constructor == "
-                + m_subjectAttributes);
+        logger.debug("subject attributes in readonlycontext constructor == {}",
+                m_subjectAttributes);
         m_actionAttributes = new MultiValueMap();
         m_actionAttributes.lock();
         m_resourceAttributes = new MultiValueMap();
@@ -140,12 +140,12 @@ public class ReadOnlyContext
     @Override
     public int nSubjectValues(String name) {
         int n = m_subjectAttributes.length(name);
-        logger.debug("N SUBJECT VALUES without == " + n);
+        logger.debug("N SUBJECT VALUES without == {}", n);
         if (extendedHttpServletRequest != null
                 && extendedHttpServletRequest.isUserInRole(name)) {
             n++;
         }
-        logger.debug("N SUBJECT VALUES with == " + n);
+        logger.debug("N SUBJECT VALUES with == {}", n);
         return n;
     }
 
@@ -154,11 +154,11 @@ public class ReadOnlyContext
         String value = null;
         if (m_subjectAttributes.length(name) == 1) {
             value = m_subjectAttributes.getString(name);
-            logger.debug("SINGLE SUBJECT VALUE from map == " + value);
+            logger.debug("SINGLE SUBJECT VALUE from map == {}", value);
         } else if (extendedHttpServletRequest != null
                 && extendedHttpServletRequest.isUserInRole(name)) {
             value = "";
-            logger.debug("SINGLE SUBJECT VALUE from iuir() == " + value);
+            logger.debug("SINGLE SUBJECT VALUE from iuir() == {}", value);
         }
         return value;
     }
@@ -179,10 +179,8 @@ public class ReadOnlyContext
                 && extendedHttpServletRequest.isUserInRole(name)) {
             values[n - 1] = "";
         }
-        if (values == null) {
-            logger.debug("INNER RETURNING NO VALUES FOR " + name);
-        } else {
-            StringBuffer sb = new StringBuffer();
+        if (logger.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder();
             sb.append("INNER RETURNING " + values.length + " VALUES FOR "
                     + name + " ==");
             for (int i = 0; i < values.length; i++) {
@@ -253,7 +251,7 @@ public class ReadOnlyContext
 
     @Override
     public String toString() {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder(256);
         buffer.append("READ-ONLY CONTEXT:\n");
         buffer.append(m_environmentAttributes);
         buffer.append(m_subjectAttributes);
@@ -304,7 +302,7 @@ public class ReadOnlyContext
      * password, roles, existingContext.getNoOp()); }
      */
 
-    private static final Class STRING_ARRAY_CLASS;
+    private static final Class<?> STRING_ARRAY_CLASS;
     static {
         String[] temp = {""};
         STRING_ARRAY_CLASS = temp.getClass();
@@ -344,7 +342,7 @@ public class ReadOnlyContext
                         auxSubjectRoleKeys);
                 while (auxSubjectRoleKeys.hasNext()) {
                     Object name = auxSubjectRoleKeys.next();
-                    logger.debug("IN CONTEXT name==" + name);
+                    logger.debug("IN CONTEXT name=={}", name);
                     if (name instanceof String) {
                         logger.debug("IN CONTEXT name is string=={}", name);
                         Object value = auxSubjectRoles.get(name);
@@ -358,9 +356,11 @@ public class ReadOnlyContext
                             if (value instanceof String[]) {
                                 logger.debug("IN CONTEXT value is string[]");
                                 String [] values = (String[]) value;
-                                for (int z = 0; z < values.length; z++) {
-                                    logger.debug("IN CONTEXT this value=={}",
-                                                 values[z]);
+                                if (logger.isDebugEnabled()) {
+                                    for (int z = 0; z < values.length; z++) {
+                                        logger.debug("IN CONTEXT this value=={}",
+                                                values[z]);
+                                    }
                                 }
                                 subjectMap.set((String) name, values);
                             }
@@ -372,8 +372,8 @@ public class ReadOnlyContext
                                     .hasNext();) {
                                 String singleValue =
                                         (String) setIterator.next();
-                                logger.debug("IN CONTEXT singleValue is string=="
-                                        + singleValue);
+                                logger.debug("IN CONTEXT singleValue is string=={}",
+                                        singleValue);
                                 temp[i++] = singleValue;
                             }
                             subjectMap.set((String) name, temp);
@@ -480,13 +480,13 @@ public class ReadOnlyContext
                                    request.getContentType());
             }
             if (request.getLocalAddr() != null) {
-                logger.debug("Request Server IP Address is '" + request.getLocalAddr() + "'");
+                logger.debug("Request Server IP Address is '{}'", request.getLocalAddr());
                 environmentMap
                         .set(Constants.HTTP_REQUEST.SERVER_IP_ADDRESS.uri,
                              request.getLocalAddr());
             }
             if (request.getRemoteAddr() != null) {
-                logger.debug("Request Client IP Address is '" + request.getRemoteAddr() + "'");
+                logger.debug("Request Client IP Address is '{}'", request.getRemoteAddr());
                 environmentMap
                         .set(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.uri,
                              request.getRemoteAddr());
@@ -534,10 +534,10 @@ public class ReadOnlyContext
         try {
             noOp =
                     Boolean.parseBoolean(request.getParameter(NOOP_PARAMETER_NAME));
-            logger.debug("NOOP_PARAMETER_NAME=" + NOOP_PARAMETER_NAME);
-            logger.debug("request.getParameter(NOOP_PARAMETER_NAME)="
-                    + request.getParameter(NOOP_PARAMETER_NAME));
-            logger.debug("noOp=" + noOp);
+            logger.debug("NOOP_PARAMETER_NAME={}", NOOP_PARAMETER_NAME);
+            logger.debug("request.getParameter(NOOP_PARAMETER_NAME)={}",
+                    request.getParameter(NOOP_PARAMETER_NAME));
+            logger.debug("noOp={}", noOp);
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

@@ -104,7 +104,7 @@ public class FedoraAPIMImpl
                                String label,
                                String ownerId,
                                String logMessage) {
-        LOG.debug("start: modifyObject, " + pid);
+        LOG.debug("start: modifyObject, {}", pid);
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
@@ -120,7 +120,7 @@ public class FedoraAPIMImpl
             LOG.error("Error modifying object", th);
             throw CXFUtility.getFault(th);
         } finally {
-            LOG.debug("end: modifyObject, " + pid);
+            LOG.debug("end: modifyObject, {}", pid);
         }
     }
 
@@ -179,7 +179,7 @@ public class FedoraAPIMImpl
      */
     @Override
     public String purgeObject(String pid, String logMessage, boolean force) {
-        LOG.debug("start: purgeObject, " + pid);
+        LOG.debug("start: purgeObject, {}", pid);
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
@@ -191,7 +191,7 @@ public class FedoraAPIMImpl
             LOG.error("Error purging object", th);
             throw CXFUtility.getFault(th);
         } finally {
-            LOG.debug("end: purgeObject, " + pid);
+            LOG.debug("end: purgeObject, {}", pid);
         }
     }
 
@@ -217,7 +217,7 @@ public class FedoraAPIMImpl
                                 String checksumType,
                                 String checksum,
                                 String logMessage) {
-        LOG.debug("start: addDatastream, " + pid + ", " + dsID);
+        LOG.debug("start: addDatastream, {}, {}", pid, dsID);
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
@@ -244,7 +244,7 @@ public class FedoraAPIMImpl
             LOG.error("Error adding datastream", th);
             throw CXFUtility.getFault(th);
         } finally {
-            LOG.debug("end: addDatastream, " + pid + ", " + dsID);
+            LOG.debug("end: addDatastream, {}, {}", pid, dsID);
         }
     }
 
@@ -269,7 +269,7 @@ public class FedoraAPIMImpl
                                               String checksum,
                                               String logMessage,
                                               boolean force) {
-        LOG.debug("start: modifyDatastreamByReference, " + pid + ", " + dsID);
+        LOG.debug("start: modifyDatastreamByReference, {}, {}", pid, dsID);
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
@@ -295,7 +295,7 @@ public class FedoraAPIMImpl
             LOG.error("Error modifying datastream by reference", th);
             throw CXFUtility.getFault(th);
         } finally {
-            LOG.debug("end: modifyDatastreamByReference, " + pid + ", " + dsID);
+            LOG.debug("end: modifyDatastreamByReference, {}, {}", pid, dsID);
         }
     }
 
@@ -319,7 +319,7 @@ public class FedoraAPIMImpl
                                           String checksum,
                                           String logMessage,
                                           boolean force) {
-        LOG.debug("start: modifyDatastreamByValue, " + pid + ", " + dsID);
+        LOG.debug("start: modifyDatastreamByValue, {}, {}", pid, dsID);
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
@@ -345,7 +345,7 @@ public class FedoraAPIMImpl
             LOG.error("Error modifying datastream by value", th);
             throw CXFUtility.getFault(th);
         } finally {
-            LOG.debug("end: modifyDatastreamByValue, " + pid + ", " + dsID);
+            LOG.debug("end: modifyDatastreamByValue, {}, {}", pid, dsID);
         }
     }
 
@@ -506,7 +506,7 @@ public class FedoraAPIMImpl
                                         String endDT,
                                         String logMessage,
                                         boolean force) {
-        LOG.debug("start: purgeDatastream, " + pid + ", " + dsID);
+        LOG.debug("start: purgeDatastream, {}, {}", pid, dsID);
         assertInitialized();
         try {
             MessageContext ctx = context.getMessageContext();
@@ -518,7 +518,7 @@ public class FedoraAPIMImpl
             LOG.error("Error purging datastream", th);
             throw CXFUtility.getFault(th);
         } finally {
-            LOG.debug("end: purgeDatastream, " + pid + ", " + dsID);
+            LOG.debug("end: purgeDatastream, {}, {}", pid, dsID);
         }
     }
 
@@ -664,10 +664,10 @@ public class FedoraAPIMImpl
                                                                                 DateUtility
                                                                                         .parseDateOrNull(asOfDateTime)));
         } catch (Throwable th) {
-            LOG.error("Error purging relationships", th);
+            LOG.error("Error validating", th);
             throw CXFUtility.getFault(th);
         } finally {
-            LOG.debug("end: purgeRelationship");
+            LOG.debug("end: validate");
         }
     }
 

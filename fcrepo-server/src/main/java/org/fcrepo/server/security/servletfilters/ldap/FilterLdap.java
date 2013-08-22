@@ -596,36 +596,36 @@ public class FilterLdap
             logger.debug(m + "looking for return attribute==" + passwordAttribute);
             Attribute attribute = attributes.get(passwordAttribute);
             if (attribute == null) {
-                logger.error(m + "null object");
+                logger.error("{}null object", m);
             } else {
                 int size = attribute.size();
-                logger.debug(m + "object with n==" + size);
+                logger.debug("{}object with n=={}", m, size);
                 for (int j = 0; j < size; j++) {
                     Object o = attribute.get(j);
                     if (password.equals(o.toString())) {
-                        logger.debug(m + "compares true");
+                        logger.debug("{}compares true", m);
                         if (rc == null) {
-                            logger.debug(m + "1st comp:  authenticate");
+                            logger.debug("{}1st comp:  authenticate", m);
                             rc = Boolean.TRUE;
                         } else {
-                            logger.error(m + "dup comp:  keep previous rc==" + rc);
+                            logger.error("{}dup comp:  keep previous rc=={}", m, rc);
                         }
                     } else {
-                        logger.debug(m + "compares false, -un-authenticate");
+                        logger.debug("{}compares false, -un-authenticate", m);
                         if (rc == null) {
-                            logger.debug(m + "1st comp (fyi)");
+                            logger.debug("{}1st comp (fyi)", m);
                         } else {
-                            logger.error(m + "dup comp (fyi)");
+                            logger.error("{}dup comp (fyi)", m);
                         }
                         rc = Boolean.FALSE;
                     }
                 }
             }
         } catch (Throwable th) {
-            logger.error(m + "resetting to null rc==" + rc + th.getMessage());
+            logger.error("{}resetting to null rc=={}{}",m, rc, th.getMessage());
             throw new PasswordComparisonException("in ldap servlet filter", th);
         } finally {
-            logger.debug(m + "< " + rc);
+            logger.debug("{}<{} ", m, rc);
         }
         return rc;
     }
@@ -634,42 +634,39 @@ public class FilterLdap
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " getAttributes() ";
-        logger.debug(m + ">");
+        logger.debug("{}>", m);
         try {
             for (String key : ATTRIBUTES2RETURN) {
-                logger.debug(m + "looking for return attribute==" + key);
+                logger.debug("{}looking for return attribute=={}", m, key);
                 Attribute attribute = attributes.get(key);
                 if (attribute == null) {
-                    logger.error(m + "null object...continue to next attr sought");
+                    logger.error("{}null object...continue to next attr sought", m);
                     continue;
                 }
                 if (GROUPS_NAME != null && !"".equals(GROUPS_NAME)) {
                     key = GROUPS_NAME;
-                    logger.debug(m
-                            + "values collected and interpreted as groups=="
-                            + key);
+                    logger.debug("{}values collected and interpreted as groups=={}",
+                            m, key);
                 }
                 Set values;
                 if (map.containsKey(key)) {
-                    logger.debug(m + "already a value-set for attribute==" + key);
+                    logger.debug("{}already a value-set for attribute=={}", m, key);
                     values = (Set) map.get(key);
                 } else {
-                    logger.debug(m + "making+storing a value-set for attribute=="
-                            + key);
+                    logger.debug("{}making+storing a value-set for attribute=={}", m, key);
                     values = new HashSet();
                     map.put(key, values);
                 }
                 int size = attribute.size();
-                logger.debug(m + "object with n==" + size);
+                logger.debug("{}object with n=={}", m, size);
                 for (int j = 0; j < size; j++) {
                     Object o = attribute.get(j);
                     values.add(o);
-                    logger.debug(m + "added value==" + o.toString() + ", class=="
-                            + o.getClass().getName());
+                    logger.debug("{}added value=={}, class=={}", m, o, o.getClass().getName());
                 }
             }
         } finally {
-            logger.debug(m + "<");
+            logger.debug("{}<", m);
         }
     }
 
@@ -680,18 +677,18 @@ public class FilterLdap
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " processNamingEnumeration() ";
-        logger.debug(m + ">");
+        logger.debug("{}>", m);
         try {
             boolean errorOnSomeComparison = false;
             while (ne.hasMoreElements()) {
-                logger.debug(m + "another element");
+                logger.debug("{}another element", m);
                 SearchResult s = null;
                 try {
                     Object o = ne.nextElement();
-                    logger.debug(m + "got a " + o.getClass().getName());
+                    logger.debug("{}got a {}", m, o.getClass().getName());
                     s = (SearchResult) o;
                 } catch (Throwable th) {
-                    logger.error(m + "naming enum contains obj not SearchResult");
+                    logger.error("{} naming enum contains obj not SearchResult", m);
                     continue;
                 }
                 Attributes attributes = s.getAttributes();
@@ -700,22 +697,21 @@ public class FilterLdap
                     Boolean temp = null;
                     try {
                         temp = comparePassword(attributes, password, PASSWORD);
-                        logger.debug(m + "-this- comp yields " + temp);
+                        logger.debug("{}-this- comp yields {}", m, temp);
                         if (authenticated != null && !authenticated) {
-                            logger.debug(m + "keeping prev failed authn");
+                            logger.debug("{}keeping prev failed authn", m);
                         } else {
-                            logger.debug(m + "replacing prvsuccess or null authn");
+                            logger.debug("{}replacing prvsuccess or null authn", m);
                             if (errorOnSomeComparison) {
-                                logger.debug(m + "errorOnSomeComparison=="
-                                        + errorOnSomeComparison);
+                                logger.debug("{}errorOnSomeComparison=={}",
+                                        m, errorOnSomeComparison);
                             } else {
                                 authenticated = temp;
                             }
                         }
                     } catch (Throwable th) {
-                        logger.debug(m
-                                + "in iUC conditional, caught throwable th=="
-                                + th);
+                        logger.debug("{}in iUC conditional, caught throwable th=={}",
+                                m, th);
                         errorOnSomeComparison = true;
                         authenticated = null;
                     }
@@ -723,14 +719,14 @@ public class FilterLdap
             }
             if (individualUserComparison()) {
                 if (errorOnSomeComparison) {
-                    logger.debug(m + "exception, so assuring authenticated=="
-                            + authenticated);
+                    logger.debug("{}exception, so assuring authenticated=={}",
+                            m, authenticated);
                     authenticated = null;
                     map.clear();
                 } else if (authenticated == null) {
                     authenticated = Boolean.FALSE;
-                    logger.debug(m + "no passwd attr found, so authenticated=="
-                            + authenticated);
+                    logger.debug("{}no passwd attr found, so authenticated=={}",
+                            m, authenticated);
                 }
             }
         } catch (Throwable th) { // play it safe:
@@ -745,7 +741,7 @@ public class FilterLdap
                 logger.error(m + "ldap filter failure" + th.getMessage());
             }
         } finally {
-            logger.debug(m + "< authenticated==" + authenticated + " map==" + map);
+            logger.debug("{}< authenticated=={} map=={}",m,authenticated, map);
         }
         return authenticated;
     }
@@ -756,11 +752,11 @@ public class FilterLdap
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " populateCacheElement() ";
-        logger.debug(m + ">");
+        logger.debug("{}>", m);
         Boolean authenticated = null;
         Map map = new Hashtable();
         try {
-            logger.debug(m + "about to call getNamingEnumeration()");
+            logger.debug("{}about to call getNamingEnumeration()", m);
 
             String filter = getFilter(cacheElement.getUserid());
 
@@ -778,15 +774,15 @@ public class FilterLdap
                                              searchControls,
                                              env);
                 assert ne != null;
-                logger.debug(m + "got expected non-null ne, no exception thrown");
+                logger.debug("{}got expected non-null ne, no exception thrown", m);
                 if (AUTHENTICATE && individualUserBind()) {
                     authenticated = Boolean.TRUE;
                 }
                 if (AUTHENTICATE && individualUserBind()
                         && !authenticated.booleanValue()) {
-                    logger.debug(m + "-not- calling processNamingEnumeration()");
+                    logger.debug("{}-not- calling processNamingEnumeration()", m);
                 } else {
-                    logger.debug(m + "about to call processNamingEnumeration()");
+                    logger.debug("{}about to call processNamingEnumeration()", m);
 
                     assert map.isEmpty();
                     try {
@@ -796,15 +792,14 @@ public class FilterLdap
                                                          authenticated,
                                                          map);
 
-                        logger.debug(m + "back from pNE.  AUTHENTICATE=="
-                                + AUTHENTICATE + " authenticated=="
-                                + authenticated + " map==" + map);
+                        logger.debug(m + "{}back from pNE.  AUTHENTICATE=={} authenticated=={} map=={}",
+                                m, AUTHENTICATE, authenticated, map);
                         if (authenticated != null) {
-                            logger.debug(m + "authenticated.booleanValue()=="
-                                    + authenticated.booleanValue());
+                            logger.debug("{}authenticated.booleanValue()=={}",
+                                    m, authenticated.booleanValue());
                         }
                         if (map != null) {
-                            logger.debug(m + "map.isEmpty()==" + map.isEmpty());
+                            logger.debug("{}map.isEmpty()=={}", m, map.isEmpty());
                         }
 
                         if (AUTHENTICATE
@@ -813,7 +808,7 @@ public class FilterLdap
                             map.clear();
                         }
 
-                        logger.debug(m + "before catch");
+                        logger.debug("{}before catch", m);
 
                     } catch (Throwable th) {
                         map.clear();
@@ -824,9 +819,9 @@ public class FilterLdap
                             authenticated = null;
                         }
                         if (LOG_STACK_TRACES) {
-                            logger.error(m + "caught th==" + th);
+                            logger.error("{}caught th=={}", m, th);
                         } else {
-                            logger.error(m + "caught th==" + th.getMessage());
+                            logger.error("{}caught th=={}", m, th.getMessage());
                         }
                     }
                 }
@@ -834,17 +829,17 @@ public class FilterLdap
                 // the -error- logs here are because, though ne==null
                 // never before seen, yet hull log suggests caution and
                 // preemptive logging
-                logger.error(m + "unexpected null ne w/o exception thrown");
+                logger.error("{}unexpected null ne w/o exception thrown", m);
                 if (!AUTHENTICATE) {
-                    logger.error(m + "wasn't authenticating");
+                    logger.error("{}wasn't authenticating", m);
                 } else {
                     authenticated = Boolean.FALSE;
                     if (individualUserComparison()) {
-                        logger.error(m + "can't do password comparison, so false");
+                        logger.error("{}can't do password comparison, so false", m);
                     } else if (individualUserBind()) {
-                        logger.error(m + "accept to mean failed bind, so false");
+                        logger.error("{}accept to mean failed bind, so false", m);
                     } else {
-                        logger.error(m + "authenticating, so now set false");
+                        logger.error("{}authenticating, so now set false", m);
                     }
                 }
             } catch (Exception e) {
@@ -860,10 +855,10 @@ public class FilterLdap
             }
 
         } finally {
-            logger.debug(m + "in finally, authenticated==" + authenticated
-                    + " map==" + map);
+            logger.debug("{}in finally, authenticated=={} map=={}",
+                    m, authenticated, map);
             cacheElement.populate(authenticated, null, map, null);
-            logger.debug(m + "<");
+            logger.debug("{}<", m);
         }
 
     }
