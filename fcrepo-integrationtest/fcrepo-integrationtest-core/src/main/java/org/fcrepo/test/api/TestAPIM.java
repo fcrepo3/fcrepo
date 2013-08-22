@@ -1635,7 +1635,7 @@ public class TestAPIM
                                                      reservedDSID,
                                                      TypeUtility
                                                              .convertStringtoAOS(altIds),
-                                                     "A New RELS Datastream",
+                                                     "A New " + reservedDSID + " Datastream",
                                                      "application/rdf+xml",
                                                      uri,
                                                      getDemoBaseURL()
@@ -1660,9 +1660,7 @@ public class TestAPIM
                     + "' and @CONTROL_GROUP='M' and @STATE='A']", doc);
             assertXpathExists("//foxml:datastream[@ID='"
                                       + reservedDSID
-                                      + "']/foxml:datastreamVersion[@ID='"
-                                      + reservedDSID
-                                      + ".1' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='"
+                                      + "']/foxml:datastreamVersion[@MIMETYPE='application/rdf+xml' and @LABEL='A New " + reservedDSID + " Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='"
                                       + uri + "']",
                               doc);
             assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
@@ -1876,7 +1874,7 @@ public class TestAPIM
                                                  reservedDSID,
                                                  TypeUtility
                                                          .convertStringtoAOS(altIds),
-                                                 "A New RELS Datastream",
+                                                 "An Updated " + reservedDSID + " Datastream",
                                                  "application/rdf+xml",
                                                  uri,
                                                  TypeUtility
@@ -1901,9 +1899,7 @@ public class TestAPIM
                     + "' and @CONTROL_GROUP='M' and @STATE='A']", doc);
             assertXpathExists("//foxml:datastream[@ID='"
                                       + reservedDSID
-                                      + "']/foxml:datastreamVersion[@ID='"
-                                      + reservedDSID
-                                      + ".2' and @MIMETYPE='application/rdf+xml' and @LABEL='A New RELS Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='"
+                                      + "']/foxml:datastreamVersion[@MIMETYPE='application/rdf+xml' and @LABEL='An Updated " + reservedDSID + " Datastream' and @ALT_IDS='Datastream 2 Alternate ID' and @FORMAT_URI='"
                                       + uri + "']",
                               doc);
             assertXpathExists("//audit:auditTrail/audit:record[last()]/audit:action['addDatastream']",
