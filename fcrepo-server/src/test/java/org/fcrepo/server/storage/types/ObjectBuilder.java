@@ -194,8 +194,8 @@ public abstract class ObjectBuilder {
         StringBuffer x = new StringBuffer();
         x.append("<oai_dc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\"");
         x.append(" xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\">\n");
-        x.append(content + "\n");
-        x.append("</oai_dc:dc>");
+        x.append(content);
+        x.append("\n</oai_dc:dc>");
         return x.toString();
     }
 
@@ -207,9 +207,8 @@ public abstract class ObjectBuilder {
         x.append("<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"");
         x.append(" xmlns:foo=\"http://example.org/foo#\">\n");
         x.append("<rdf:Description rdf:about=\"" + PID.getInstance(pid).toURI() + "\">\n");
-        x.append(content + "\n");
-        x.append("</rdf:Description>\n");
-        x.append("</rdf:RDF>");
+        x.append(content);
+        x.append("\n</rdf:Description>\n</rdf:RDF>");
         return x.toString();
     }
 
@@ -222,13 +221,12 @@ public abstract class ObjectBuilder {
         x.append(" xmlns:foo=\"http://example.org/foo#\">\n");
         // relationship(s) from datastream DS1
         x.append("<rdf:Description rdf:about=\"" + PID.getInstance(pid).toURI() + "/DS1" + "\">\n");
-        x.append(content1 + "\n");
-        x.append("</rdf:Description>\n");
+        x.append(content1);
+        x.append("\n</rdf:Description>\n");
         // relationship(s) from datastream DS2
         x.append("<rdf:Description rdf:about=\"" + PID.getInstance(pid).toURI() + "/DS2" + "\">\n");
-        x.append(content2 + "\n");
-        x.append("</rdf:Description>\n");
-        x.append("</rdf:RDF>");
+        x.append(content2);
+        x.append("\n</rdf:Description>\n</rdf:RDF>");
         return x.toString();
     }
 
