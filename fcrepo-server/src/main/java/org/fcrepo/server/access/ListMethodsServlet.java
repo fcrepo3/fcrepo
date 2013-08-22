@@ -167,8 +167,8 @@ public class ListMethodsServlet
                 }
                 asOfDateTime = versDateTime;
             }
-            logger.debug("Listing methods (PID=" + PID + ", asOfDate="
-                    + versDateTime + ")");
+            logger.debug("Listing methods (PID={}, asOfDate={})",
+                    PID, versDateTime);
         } else {
             logger.error("Bad syntax (expected 6 or 7 parts) in request");
             throw new BadRequest400Exception(request,

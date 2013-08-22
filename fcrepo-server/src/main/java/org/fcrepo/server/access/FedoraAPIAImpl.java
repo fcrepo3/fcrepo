@@ -53,7 +53,7 @@ public class FedoraAPIAImpl
         m_access =
                 (Access) m_server
                 .getModule("org.fcrepo.server.access.Access");
-        debug = Boolean.valueOf(m_server.getParameter("debug"));
+        debug = Boolean.parseBoolean(m_server.getParameter("debug"));
     }
 
     /*
@@ -164,7 +164,7 @@ public class FedoraAPIAImpl
             String[] sDefs = m_access.getObjectHistory(context, pid);
             if (sDefs != null && debug) {
                 for (int i = 0; i < sDefs.length; i++) {
-                    LOG.debug("sDef[" + i + "] = " + sDefs[i]);
+                    LOG.debug("sDef[{}] = {}", i, sDefs[i]);
                 }
             }
             return sDefs == null ? null : Arrays.asList(new String[0]);

@@ -137,7 +137,7 @@ public class DefaultExternalContentManager
     @Override
     public MIMETypedStream getExternalContent(ContentManagerParams params)
             throws GeneralException, HttpServiceNotFoundException{
-        logger.debug("in getExternalContent(), url=" + params.getUrl());
+        logger.debug("in getExternalContent(), url={}", params.getUrl());
         try {
             if(params.getProtocol().equals("file")){
                 return getFromFilesystem(params);
@@ -164,7 +164,7 @@ public class DefaultExternalContentManager
      */
     private MIMETypedStream get(String url, String user, String pass, String knownMimeType)
             throws GeneralException {
-        logger.debug("DefaultExternalContentManager.get(" + url + ")");
+        logger.debug("DefaultExternalContentManager.get({})", url);
         try {
             HttpInputStream response = m_http.get(url, true, user, pass);
             String mimeType =
@@ -226,7 +226,7 @@ public class DefaultExternalContentManager
      */
     private MIMETypedStream getFromFilesystem(ContentManagerParams params)
             throws HttpServiceNotFoundException,GeneralException {
-        logger.debug("in getFile(), url=" + params.getUrl());
+        logger.debug("in getFromFilesystem(), url={}", params.getUrl());
 
         try {
             URL fileUrl = new URL(params.getUrl());

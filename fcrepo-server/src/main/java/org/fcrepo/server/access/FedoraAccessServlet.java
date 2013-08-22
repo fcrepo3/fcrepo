@@ -409,8 +409,7 @@ public class FedoraAccessServlet
 
         try {
             if (isGetObjectProfileRequest) {
-                logger.debug("Servicing getObjectProfile request " + "(PID="
-                        + PID + ", asOfDate=" + versDateTime + ")");
+                logger.debug("Servicing getObjectProfile request (PID={}, asOfDate={})", PID, versDateTime);
 
                 Context context =
                         ReadOnlyContext.getContext(HTTP_REQUEST.REST.uri,
@@ -425,9 +424,8 @@ public class FedoraAccessServlet
                 logger.debug("Finished servicing getObjectProfile request");
             } else if (isGetDisseminationRequest) {
                 sDefPID = URIArray[6];
-                logger.debug("Servicing getDissemination request (PID=" + PID
-                        + ", sDefPID=" + sDefPID + ", methodName=" + methodName
-                        + ", asOfDate=" + versDateTime + ")");
+                logger.debug("Servicing getDissemination request (PID={}, sDefPID={}, methodName={}, asOfDate={})",
+                        PID, sDefPID, methodName, versDateTime);
 
                 Context context =
                         ReadOnlyContext.getContext(HTTP_REQUEST.REST.uri,
@@ -444,8 +442,8 @@ public class FedoraAccessServlet
                 logger.debug("Finished servicing getDissemination request");
             } else if (isGetDatastreamDisseminationRequest) {
                 logger.debug("Servicing getDatastreamDissemination request "
-                        + "(PID=" + PID + ", dsID=" + dsID + ", asOfDate="
-                        + versDateTime + ")");
+                        + "(PID={}, dsID={}, asOfDate={})",
+                        PID, dsID, versDateTime);
 
                 Context context =
                         ReadOnlyContext.getContext(HTTP_REQUEST.REST.uri,
@@ -614,8 +612,8 @@ public class FedoraAccessServlet
                         sb.append((String) headerValues.nextElement());
                     }
                     String value = sb.toString();
-                    logger.debug("FEDORASERVLET REQUEST HEADER CONTAINED: "
-                            + name + " : " + value);
+                    logger.debug("FEDORASERVLET REQUEST HEADER CONTAINED: {} : {}",
+                            name, value);
                 }
             }
 
@@ -657,10 +655,9 @@ public class FedoraAccessServlet
                                         .equalsIgnoreCase("content-type")) {
                             response.addHeader(headerArray[i].name,
                                                headerArray[i].value);
-                            logger.debug("THIS WAS ADDED TO FEDORASERVLET "
-                                    + "RESPONSE HEADER FROM ORIGINATING "
-                                    + "PROVIDER " + headerArray[i].name + " : "
-                                    + headerArray[i].value);
+                            logger.debug(
+                                    "THIS WAS ADDED TO FEDORASERVLET RESPONSE HEADER FROM ORIGINATING PROVIDER {} : {}",
+                                    headerArray[i].name, headerArray[i].value);
                         }
                     }
                 }
@@ -742,8 +739,8 @@ public class FedoraAccessServlet
                         sb.append((String) headerValues.nextElement());
                     }
                     String value = sb.toString();
-                    logger.debug("FEDORASERVLET REQUEST HEADER CONTAINED: "
-                            + name + " : " + value);
+                    logger.debug("FEDORASERVLET REQUEST HEADER CONTAINED: {} : {}",
+                            name, value);
                 }
             }
 
@@ -784,10 +781,8 @@ public class FedoraAccessServlet
                                         .equalsIgnoreCase("content-type")) {
                             response.addHeader(headerArray[i].name,
                                                headerArray[i].value);
-                            logger.debug("THIS WAS ADDED TO FEDORASERVLET "
-                                    + "RESPONSE HEADER FROM ORIGINATING "
-                                    + "PROVIDER " + headerArray[i].name + " : "
-                                    + headerArray[i].value);
+                            logger.debug(
+                                    "THIS WAS ADDED TO FEDORASERVLET  RESPONSE HEADER FROM ORIGINATING  PROVIDER {} : {}", headerArray[i].name, headerArray[i].value);
                         }
                     }
                 }

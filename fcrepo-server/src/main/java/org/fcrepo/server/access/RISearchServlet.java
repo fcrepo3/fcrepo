@@ -132,8 +132,12 @@ extends SpringAccessServlet {
                 StringWriter sWriter = new StringWriter();
                 PrintWriter out = new PrintWriter(sWriter);
                 out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                out.println("<error context=\"" + enc(getContext(request.getContextPath())) + "\">");
-                out.println("<message>" + enc(getLongestMessage(th, "Error")) + "</message>");
+                out.print("<error context=\"");
+                enc(getContext(request.getContextPath()), out);
+                out.println("\">");
+                out.print("<message>");
+                enc(getLongestMessage(th, "Error"), out);
+                out.println("</message>");
                 out.print("<detail><![CDATA[");
                 th.printStackTrace(out);
                 out.println("]]></detail>");
@@ -153,8 +157,7 @@ extends SpringAccessServlet {
         }
     }
 
-    private String enc(String in) {
-        StringBuffer out = new StringBuffer();
+    private void enc(String in, PrintWriter out) {
         for (int i = 0; i < in.length(); i++) {
             char c = in.charAt(i);
             if (c == '<') {
@@ -171,7 +174,6 @@ extends SpringAccessServlet {
                 out.append(c);
             }
         }
-        return out.toString();
     }
 
     private String getLongestMessage(Throwable th, String longestSoFar) {
@@ -268,45 +270,66 @@ extends SpringAccessServlet {
             PrintWriter sout = new PrintWriter(sWriter);
             sout.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             TriplestoreReader reader = server.getReader();
-            String href = enc(requestURI.replaceAll("/$", ""));
-            sout.println("<query-service href=\"" + href + "\" context=\"" + enc(getContext(contextPath)) + "\">");
+            sout.print("<query-service href=\"");
+            enc(requestURI.replaceAll("/$", ""), out);
+            sout.print("\" context=\"");
+            enc(getContext(contextPath), sout);
+            sout.println("\">");
             sout.println("  <alias-map>");
             Map<String, String> map = reader.getAliasMap();
             Iterator<String> iter = map.keySet().iterator();
             while (iter.hasNext()) {
                 String name = iter.next();
                 String uri = map.get(name);
-                sout.println("    <alias name=\"" + name + "\" uri=\"" + enc(uri) + "\"/>");
+                sout.print("    <alias name=\"");
+                sout.print(name);
+                sout.print("\" uri=\"");
+                enc(uri, sout);
+                sout.println("\"/>");
             }
             sout.println("  </alias-map>");
             sout.println("  <triple-languages>");
             String[] langs = reader.listTripleLanguages();
             for (int i = 0; i < langs.length; i++) {
-                sout.println("    <language name=\"" + enc(langs[i]) + "\"/>");
+                sout.print("    <language name=\"");
+                enc(langs[i], sout);
+                sout.println("\"/>");
             }
             sout.println("  </triple-languages>");
             langs = reader.listTupleLanguages();
             sout.println("  <tuple-languages>");
             for (int i = 0; i < langs.length; i++) {
-                sout.println("    <language name=\"" + enc(langs[i]) + "\"/>");
+                sout.println("    <language name=\"");
+                enc(langs[i], sout);
+                sout.println("\"/>");
             }
             sout.println("  </tuple-languages>");
             sout.println("  <triple-output-formats>");
             RDFFormat[] formats = TripleIterator.OUTPUT_FORMATS;
             for (int i = 0; i < formats.length; i++) {
-                sout.println("    <format name=\"" + enc(formats[i].getName())
-                        + "\" encoding=\"" + formats[i].getEncoding()
-                        + "\" media-type=\"" + formats[i].getMediaType()
-                        + "\" extension=\"" + formats[i].getExtension() + "\"/>");
+                sout.print("    <format name=\"");
+                enc(formats[i].getName(), sout);
+                sout.print("\" encoding=\"");
+                sout.print(formats[i].getEncoding());
+                sout.print("\" media-type=\"");
+                sout.print(formats[i].getMediaType());
+                sout.print("\" extension=\"");
+                sout.print(formats[i].getExtension());
+                sout.println("\"/>");
             }
             sout.println("  </triple-output-formats>");
             sout.println("  <tuple-output-formats>");
             formats = TupleIterator.OUTPUT_FORMATS;
             for (int i = 0; i < formats.length; i++) {
-                sout.println("    <format name=\"" + enc(formats[i].getName())
-                        + "\" encoding=\"" + formats[i].getEncoding()
-                        + "\" media-type=\"" + formats[i].getMediaType()
-                        + "\" extension=\"" + formats[i].getExtension() + "\"/>");
+                sout.print("    <format name=\"");
+                enc(formats[i].getName(), sout);
+                sout.print("\" encoding=\"");
+                sout.print(formats[i].getEncoding());
+                sout.print("\" media-type=\"");
+                sout.print(formats[i].getMediaType());
+                sout.print("\" extension=\"");
+                sout.print(formats[i].getExtension());
+                sout.println("\"/>");
             }
             sout.println("  </tuple-output-formats>");
             sout.println("</query-service>");

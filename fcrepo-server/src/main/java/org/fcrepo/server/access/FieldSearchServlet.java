@@ -4,32 +4,22 @@
  */
 package org.fcrepo.server.access;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
-import org.fcrepo.server.Server;
-import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.servletExceptionExtensions.BadRequest400Exception;
 import org.fcrepo.server.errors.servletExceptionExtensions.InternalError500Exception;
@@ -40,6 +30,8 @@ import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.search.ObjectFields;
 import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -152,6 +144,8 @@ public class FieldSearchServlet
         }
         return ret;
     }
+    
+    private static String CHECKED = " checked=\"checked\"";
 
     public static final String ACTION_LABEL = "Field Search";
 
@@ -201,137 +195,7 @@ public class FieldSearchServlet
                             .toLowerCase().startsWith("y"))) {
                 xml = true;
             }
-            StringBuffer xmlBuf = new StringBuffer();
-            StringBuffer html = new StringBuffer();
-            if (!xml) {
-                html.append("<form method=\"post\" action=\"search\">");
-                html
-                        .append("<center><table border=0 cellpadding=6 cellspacing=0>\n");
-                html
-                        .append("<tr><td colspan=3 valign=top><i>Fields to display:</i></td><td></td></tr>");
-                html.append("<tr><td valign=top><font size=-1>");
-                html
-                        .append("<input type=\"checkbox\" name=\"pid\" value=\"true\" checked> <a href=\"#\" onClick=\"javascript:alert('Persistent Identfier\\n\\nThe globally unique identifier of the resource.')\">pid</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"label\" value=\"true\""
-                                + (fieldHash.contains("label") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Label\\n\\nThe label of the object')\">label</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"state\" value=\"true\""
-                                + (fieldHash.contains("state") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('State\\n\\nThe state of the object.\\nThis will be:\\n  A - Active')\">state</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"ownerId\" value=\"true\""
-                                + (fieldHash.contains("ownerId") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Owner Id\\n\\nThe userId of the user who owns the object.')\">ownerId</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"cDate\" value=\"true\""
-                                + (fieldHash.contains("cDate") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Creation Date\\n\\nThe UTC date the object was created,\\nin YYYY-MM-DDTHH:MM:SS.SSSZ format')\">cDate</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"mDate\" value=\"true\""
-                                + (fieldHash.contains("mDate") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Modified Date\\n\\nThe UTC date the object was last modified,\\nin YYYY-MM-DDTHH:MM:SS.SSSZ format')\">mDate</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"dcmDate\" value=\"true\""
-                                + (fieldHash.contains("dcmDate") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Dublin Core Modified Date\\n\\nThe UTC date the DC datastream was last modified,\\nin YYYY-MM-DDTHH:MM:SS.SSSZ format')\">dcmDate</a><br>");
-                html.append("</font></td><td valign=top><font size=-1>");
-                html
-                        .append("<input type=\"checkbox\" name=\"title\" value=\"true\" checked> <a href=\"#\" onClick=\"javascript:alert('Title\\n\\nA name given to the resource.\\nThis is a repeating field.')\">title</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"creator\" value=\"true\""
-                                + (fieldHash.contains("creator") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Creator\\n\\nAn entity primarily responsible for making\\nthe content of the resource.\\nThis is a repeating field.')\">creator</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"subject\" value=\"true\""
-                                + (fieldHash.contains("subject") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Subject and Keywords\\n\\nA topic of the content of the resource.\\nThis is a repeating field.')\">subject</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"description\" value=\"true\""
-                                + (fieldHash.contains("description") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Description\\n\\nAn account of the content of the resource.\\nThis is a repeating field.')\">description</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"publisher\" value=\"true\""
-                                + (fieldHash.contains("publisher") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Publisher\\n\\nAn entity responsible for making the resource available.\\nThis is a repeating field.')\">publisher</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"contributor\" value=\"true\""
-                                + (fieldHash.contains("contributor") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Contributor\\n\\nAn entity responsible for making contributions\\nto the content of the resource.\\nThis is a repeating field.')\">contributor</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"date\" value=\"true\""
-                                + (fieldHash.contains("date") ? " checked" : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Date\\n\\nA date of an event in the lifecycle of the resource.\\nThis is a repeating field.')\">date</a><br>");
-                html.append("</font></td><td valign=top><font size=-1>");
-                html
-                        .append("<input type=\"checkbox\" name=\"type\" value=\"true\""
-                                + (fieldHash.contains("type") ? " checked" : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Resource Type\\n\\nThe nature or genre of the resource.\\nThis is a repeating field.')\">type</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"format\" value=\"true\""
-                                + (fieldHash.contains("format") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Format\\n\\nThe physical or digital manifestation of the resource.\\nThis is a repeating field.')\">format</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"identifier\" value=\"true\""
-                                + (fieldHash.contains("identifier") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Resource Identifier\\n\\nAn unambiguous reference to the resource within a given context.\\nThis is a repeating field.')\">identifier</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"source\" value=\"true\""
-                                + (fieldHash.contains("source") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Source\\n\\nA reference to a resource from which the present resource is derived.\\nThis is a repeating field.')\">source</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"language\" value=\"true\""
-                                + (fieldHash.contains("language") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Language\\n\\nA language of the intellectual content of the resource.\\nThis is a repeating field.')\">language</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"relation\" value=\"true\""
-                                + (fieldHash.contains("relation") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Relation\\n\\nA reference to a related resource.\\nThis is a repeating field.')\">relation</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"coverage\" value=\"true\""
-                                + (fieldHash.contains("coverage") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Coverage\\n\\nThe extent or scope of the content of the resource.\\nThis is a repeating field.')\">coverage</a><br>");
-                html
-                        .append("<input type=\"checkbox\" name=\"rights\" value=\"true\""
-                                + (fieldHash.contains("rights") ? " checked"
-                                        : "")
-                                + "> <a href=\"#\" onClick=\"javascript:alert('Rights Management\\n\\nInformation about rights held in and over the resource.\\nThis is a repeating field.')\">rights</a><br>");
-                html
-                        .append("</font></td><td bgcolor=silver valign=top>&nbsp;&nbsp;&nbsp;</td><td valign=top>");
-                html
-                        .append("Search all fields for phrase: <input type=\"text\" name=\"terms\" size=\"15\" value=\""
-                                + (terms == null ? "" : StreamUtility
-                                        .enc(terms))
-                                + "\"> <a href=\"#\" onClick=\"javascript:alert('Search All Fields\\n\\nEnter a phrase.  Objects where any field contains the phrase will be returned.\\nThis is a case-insensitive search, and you may use the * or ? wildcards.\\n\\nExamples:\\n\\n  *o*\\n    finds objects where any field contains the letter o.\\n\\n  ?edora\\n    finds objects where a word starts with any letter and ends with edora.')\"><i>help</i></a><p> ");
-                html
-                        .append("Or search specific field(s): <input type=\"text\" name=\"query\" size=\"15\" value=\""
-                                + (query == null ? "" : StreamUtility
-                                        .enc(query))
-                                + "\"> <a href=\"#\" onClick=\"javascript:alert('Search Specific Field(s)\\n\\nEnter one or more conditions, separated by space.  Objects matching all conditions will be returned.\\nA condition is a field (choose from the field names on the left) followed by an operator, followed by a value.\\nThe = operator will match if the field\\'s entire value matches the value given.\\nThe ~ operator will match on phrases within fields, and accepts the ? and * wildcards.\\nThe &lt;, &gt;, &lt;=, and &gt;= operators can be used with numeric values, such as dates.\\n\\nExamples:\\n\\n  pid~demo:* description~fedora\\n    Matches all demo objects with a description containing the word fedora.\\n\\n  cDate&gt;=1976-03-04 creator~*n*\\n    Matches objects created on or after March 4th, 1976 where at least one of the creators has an n in their name.\\n\\n  mDate&gt;2002-10-2 mDate&lt;2002-10-2T12:00:00\\n    Matches objects modified sometime before noon (UTC) on October 2nd, 2002')\"><i>help</i></a><p> ");
-                html
-                        .append("Maximum Results: <select name=\"maxResults\"><option value=\"20\">20</option><option value=\"40\">40</option><option value=\"60\">60</option><option value=\"80\">80</option></select> ");
-                html.append("<p><input type=\"submit\" value=\"Search\"> ");
-                html.append("</td></tr></table></center>");
-                html.append("</form><hr size=1>");
-            }
+
             FieldSearchResult fsr = null;
             if (fieldsArray != null && fieldsArray.length > 0
                     || sessionToken != null) {
@@ -355,235 +219,10 @@ public class FieldSearchServlet
                                                              .getConditions(query)));
                     }
                 }
-                List<ObjectFields> searchResults = fsr.objectFieldsList();
-                if (!xml) {
-                    html
-                            .append("<center><table width=\"90%\" border=\"1\" cellpadding=\"5\" cellspacing=\"5\" bgcolor=\"silver\">\n");
-                    html.append("<tr>");
-                    for (String element : fieldsArray) {
-                        html
-                                .append("<td valign=\"top\"><strong>");
-                        html.append(element);
-                        html.append("</strong></td>");
-                    }
-                    html.append("</tr>");
-                }
-                SimpleDateFormat formatter =
-                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                for (int i = 0; i < searchResults.size(); i++) {
-                    ObjectFields f = searchResults.get(i);
-                    if (xml) {
-                        xmlBuf.append("  <objectFields>\n");
-                        appendXML("pid", f.getPid(), xmlBuf);
-                        appendXML("label", f.getLabel(), xmlBuf);
-                        appendXML("state", f.getState(), xmlBuf);
-                        appendXML("ownerId", f.getOwnerId(), xmlBuf);
-                        appendXML("cDate", f.getCDate(), formatter, xmlBuf);
-                        appendXML("mDate", f.getMDate(), formatter, xmlBuf);
-                        appendXML("dcmDate", f.getDCMDate(), formatter, xmlBuf);
-                        appendXML("title", f.titles(), xmlBuf);
-                        appendXML("creator", f.creators(), xmlBuf);
-                        appendXML("subject", f.subjects(), xmlBuf);
-                        appendXML("description", f.descriptions(), xmlBuf);
-                        appendXML("publisher", f.publishers(), xmlBuf);
-                        appendXML("contributor", f.contributors(), xmlBuf);
-                        appendXML("date", f.dates(), xmlBuf);
-                        appendXML("type", f.types(), xmlBuf);
-                        appendXML("format", f.formats(), xmlBuf);
-                        appendXML("identifier", f.identifiers(), xmlBuf);
-                        appendXML("source", f.sources(), xmlBuf);
-                        appendXML("language", f.languages(), xmlBuf);
-                        appendXML("relation", f.relations(), xmlBuf);
-                        appendXML("coverage", f.coverages(), xmlBuf);
-                        appendXML("rights", f.rights(), xmlBuf);
-                        xmlBuf.append("  </objectFields>\n");
-                    } else {
-                        html.append("<tr>");
-                        for (String l : fieldsArray) {
-                            html.append("<td valign=\"top\">");
-                            if (l.equalsIgnoreCase("pid")) {
-                                html.append("<a href=\"objects/");
-                                html.append(f.getPid().replace("%", "%25"));
-                                html.append("\">");
-                                html.append(f.getPid());
-                                html.append("</a>");
-                            } else if (l.equalsIgnoreCase("label")) {
-                                if (f.getLabel() != null) {
-                                    html
-                                            .append(StreamUtility.enc(f
-                                                    .getLabel()));
-                                }
-                            } else if (l.equalsIgnoreCase("state")) {
-                                html.append(f.getState());
-                            } else if (l.equalsIgnoreCase("ownerId")) {
-                                if (f.getOwnerId() != null) {
-                                    html.append(f.getOwnerId());
-                                }
-                            } else if (l.equalsIgnoreCase("cDate")) {
-                                html.append(formatter.format(f.getCDate()));
-                            } else if (l.equalsIgnoreCase("mDate")) {
-                                html.append(formatter.format(f.getMDate()));
-                            } else if (l.equalsIgnoreCase("dcmDate")) {
-                                if (f.getDCMDate() != null) {
-                                    html.append(formatter
-                                            .format(f.getDCMDate()));
-                                }
-                            } else if (l.equalsIgnoreCase("title")) {
-                                html.append(getList(f.titles()));
-                            } else if (l.equalsIgnoreCase("creator")) {
-                                html.append(getList(f.creators()));
-                            } else if (l.equalsIgnoreCase("subject")) {
-                                html.append(getList(f.subjects()));
-                            } else if (l.equalsIgnoreCase("description")) {
-                                html.append(getList(f.descriptions()));
-                            } else if (l.equalsIgnoreCase("publisher")) {
-                                html.append(getList(f.publishers()));
-                            } else if (l.equalsIgnoreCase("contributor")) {
-                                html.append(getList(f.contributors()));
-                            } else if (l.equalsIgnoreCase("date")) {
-                                html.append(getList(f.dates()));
-                            } else if (l.equalsIgnoreCase("type")) {
-                                html.append(getList(f.types()));
-                            } else if (l.equalsIgnoreCase("format")) {
-                                html.append(getList(f.formats()));
-                            } else if (l.equalsIgnoreCase("identifier")) {
-                                html.append(getList(f.identifiers()));
-                            } else if (l.equalsIgnoreCase("source")) {
-                                html.append(getList(f.sources()));
-                            } else if (l.equalsIgnoreCase("language")) {
-                                html.append(getList(f.languages()));
-                            } else if (l.equalsIgnoreCase("relation")) {
-                                html.append(getList(f.relations()));
-                            } else if (l.equalsIgnoreCase("coverage")) {
-                                html.append(getList(f.coverages()));
-                            } else if (l.equalsIgnoreCase("rights")) {
-                                html.append(getList(f.rights()));
-                            }
-                            html.append("</td>");
-                        }
-                        html.append("</tr>");
-                        html.append("<tr><td colspan=\"");
-                        html.append(fieldsArray.length);
-                        html.append("\"></td></tr>");
-                    }
-                }
-                if (!xml) {
-                    html.append("</table>");
-                    if (fsr != null && fsr.getToken() != null) {
-                        if (fsr.getCursor() != -1) {
-                            long viewingStart = fsr.getCursor() + 1;
-                            long viewingEnd =
-                                    fsr.objectFieldsList().size()
-                                            + viewingStart - 1;
-                            html.append("<p>Viewing results " + viewingStart
-                                    + " to " + viewingEnd);
-                            if (fsr.getCompleteListSize() != -1) {
-                                html.append(" of " + fsr.getCompleteListSize());
-                            }
-                            html.append("</p>\n");
-                        }
-                        html.append("<form method=\"post\" action=\"search\">");
-                        if (fieldHash.contains("pid")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"pid\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("label")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"label\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("state")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"state\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("ownerId")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"ownerId\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("cDate")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"cDate\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("mDate")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"mDate\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("dcmDate")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"dcmDate\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("title")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"title\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("creator")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"creator\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("subject")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"subject\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("description")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"description\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("publisher")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"publisher\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("contributor")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"contributor\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("date")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"date\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("type")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"type\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("format")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"format\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("identifier")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"identifier\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("source")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"source\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("language")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"language\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("relation")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"relation\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("coverage")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"coverage\" value=\"true\">");
-                        }
-                        if (fieldHash.contains("rights")) {
-                            html
-                                    .append("<input type=\"hidden\" name=\"rights\" value=\"true\">");
-                        }
-                        html
-                                .append("\n<input type=\"hidden\" name=\"sessionToken\" value=\""
-                                        + fsr.getToken() + "\">\n");
-                        html
-                                .append("\n<input type=\"hidden\" name=\"maxResults\" value=\""
-                                        + maxResults + "\">\n");
-                        html
-                                .append("<input type=\"submit\" value=\"More Results &gt;\"></form>");
-                    }
-                    html.append("</center>\n");
-                }
             }
             if (!xml) {
+                SimpleDateFormat formatter =
+                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                 response.setContentType("text/html; charset=UTF-8");
                 PrintWriter out = response.getWriter();
                 out
@@ -597,7 +236,16 @@ public class FieldSearchServlet
                 out.println("<center><h2>Fedora Repository</h2>");
                 out.println("<h3>Find Objects</h3>");
                 out.println("</center></td></tr></table>");
-                out.print(html.toString());
+                printSearchFormToHtml(fieldHash, terms, query, out);
+                printFieldsArrayTableHeader(fieldsArray, out);
+                List<ObjectFields> searchResults = fsr.objectFieldsList();
+                for (int i = 0; i < searchResults.size(); i++) {
+                    ObjectFields f = searchResults.get(i);
+                    printObjectFieldsToHtml(f, fieldsArray, formatter, out);
+                }
+                    out.append("</table>");
+                    printHiddenFieldsFormToHtml(fsr, fieldHash, maxResults, out);
+                    out.append("</center>\n");
                 out.print("</center>");
                 out.print("</body>");
                 out.print("</html>");
@@ -610,30 +258,41 @@ public class FieldSearchServlet
                                 .getOutputStream(), "UTF-8"));
                 out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
                 out.println("<result xmlns=\"" + TYPES.uri + "\">");
-                if (fsr != null && fsr.getToken() != null) {
+                if (fsr != null) {
+                    SimpleDateFormat formatter =
+                            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                     out.println("  <listSession>");
-                    out.println("    <token>" + fsr.getToken() + "</token>");
+                    if (fsr.getToken() != null) {
+                        out.print("    <token>");
+                        out.print(fsr.getToken());
+                        out.println("</token>");
+                    }
                     if (fsr.getCursor() != -1) {
-                        out.println("    <cursor>" + fsr.getCursor()
-                                + "</cursor>");
+                        out.print("    <cursor>");
+                        out.print(Long.toString(fsr.getCursor()));
+                        out.println("</cursor>");
                     }
                     if (fsr.getCompleteListSize() != -1) {
-                        out.println("    <completeListSize>"
-                                + fsr.getCompleteListSize()
-                                + "</completeListSize>");
+                        out.print("    <completeListSize>");
+                        out.print(Long.toString(fsr.getCompleteListSize()));
+                        out.println("</completeListSize>");
                     }
                     if (fsr.getExpirationDate() != null) {
-                        out
-                                .println("    <expirationDate>"
-                                        + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                                                .format(fsr.getExpirationDate())
-                                        + "</expirationDate>");
+                        out.print("    <expirationDate>");
+                        out.print(formatter.format(fsr.getExpirationDate()));
+                        out.println("</expirationDate>");
                     }
                     out.println("  </listSession>");
+                    out.println("<resultList>");
+                    List<ObjectFields> searchResults = fsr.objectFieldsList();
+                    for (int i = 0; i < searchResults.size(); i++) {
+                        ObjectFields f = searchResults.get(i);
+                        printObjectFieldsToXml(f, formatter, out);
+                    }
+                    out.println("</resultList>");
+                } else {
+                    out.println("<resultList />");
                 }
-                out.println("<resultList>");
-                out.println(xmlBuf.toString());
-                out.println("</resultList>");
                 out.println("</result>");
                 out.flush();
                 out.close();
@@ -654,15 +313,329 @@ public class FieldSearchServlet
                                                 new String[0]);
         }
     }
-
-    private void appendXML(String name, String value, StringBuffer out) {
-        if (value != null) {
-            out.append("      <" + name + ">" + StreamUtility.enc(value) + "</"
-                    + name + ">\n");
+    
+    private void printObjectFieldsToXml(
+            ObjectFields objFields, SimpleDateFormat formatter, PrintWriter xmlBuf) {
+        xmlBuf.append("  <objectFields>\n");
+        appendXML("pid", objFields.getPid(), xmlBuf);
+        appendXML("label", objFields.getLabel(), xmlBuf);
+        appendXML("state", objFields.getState(), xmlBuf);
+        appendXML("ownerId", objFields.getOwnerId(), xmlBuf);
+        appendXML("cDate", objFields.getCDate(), formatter, xmlBuf);
+        appendXML("mDate", objFields.getMDate(), formatter, xmlBuf);
+        appendXML("dcmDate", objFields.getDCMDate(), formatter, xmlBuf);
+        appendXML("title", objFields.titles(), xmlBuf);
+        appendXML("creator", objFields.creators(), xmlBuf);
+        appendXML("subject", objFields.subjects(), xmlBuf);
+        appendXML("description", objFields.descriptions(), xmlBuf);
+        appendXML("publisher", objFields.publishers(), xmlBuf);
+        appendXML("contributor", objFields.contributors(), xmlBuf);
+        appendXML("date", objFields.dates(), xmlBuf);
+        appendXML("type", objFields.types(), xmlBuf);
+        appendXML("format", objFields.formats(), xmlBuf);
+        appendXML("identifier", objFields.identifiers(), xmlBuf);
+        appendXML("source", objFields.sources(), xmlBuf);
+        appendXML("language", objFields.languages(), xmlBuf);
+        appendXML("relation", objFields.relations(), xmlBuf);
+        appendXML("coverage", objFields.coverages(), xmlBuf);
+        appendXML("rights", objFields.rights(), xmlBuf);
+        xmlBuf.append("  </objectFields>\n");
+    }
+    
+    private void printFieldsArrayTableHeader(String[] fieldsArray, PrintWriter html) {
+        html.append("<center><table width=\"90%\" border=\"1\" cellpadding=\"5\" cellspacing=\"5\" bgcolor=\"silver\">\n"
+                + "<tr>");
+        for (String element : fieldsArray) {
+            html
+            .append("<td valign=\"top\"><strong>");
+            html.append(element);
+            html.append("</strong></td>");
+        }
+        html.append("</tr>");
+    }
+    
+    private void printSearchFormToHtml(HashSet<String> fieldHash, String terms, String query, PrintWriter html) {
+        html.append("<form method=\"post\" action=\"search\">"
+                + "<center><table border=0 cellpadding=6 cellspacing=0>\n"
+                + "<tr><td colspan=3 valign=top><i>Fields to display:</i></td><td></td></tr>"
+                + "<tr><td valign=top><font size=-1>"
+                + "<input type=\"checkbox\" name=\"pid\" value=\"true\" checked> <a href=\"#\" onClick=\"javascript:alert('Persistent Identfier\\n\\nThe globally unique identifier of the resource.')\">pid</a><br>"
+                + "<input type=\"checkbox\" name=\"label\" value=\"true\"");
+        html.append(fieldHash.contains("label") ? " checked"
+                                : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Label\\n\\nThe label of the object')\">label</a><br>"
+                + "<input type=\"checkbox\" name=\"state\" value=\"true\"");
+        html.append(fieldHash.contains("state") ? CHECKED
+                                : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('State\\n\\nThe state of the object.\\nThis will be:\\n  A - Active')\">state</a><br>"
+                + "<input type=\"checkbox\" name=\"ownerId\" value=\"true\"");
+        html.append(fieldHash.contains("ownerId") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Owner Id\\n\\nThe userId of the user who owns the object.')\">ownerId</a><br>"
+                + "<input type=\"checkbox\" name=\"cDate\" value=\"true\"");
+        html.append(fieldHash.contains("cDate") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Creation Date\\n\\nThe UTC date the object was created,\\nin YYYY-MM-DDTHH:MM:SS.SSSZ format')\">cDate</a><br>"
+                 + "<input type=\"checkbox\" name=\"mDate\" value=\"true\"");
+        html.append(fieldHash.contains("mDate") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Modified Date\\n\\nThe UTC date the object was last modified,\\nin YYYY-MM-DDTHH:MM:SS.SSSZ format')\">mDate</a><br>"
+                + "<input type=\"checkbox\" name=\"dcmDate\" value=\"true\"");
+        html.append(fieldHash.contains("dcmDate") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Dublin Core Modified Date\\n\\nThe UTC date the DC datastream was last modified,\\nin YYYY-MM-DDTHH:MM:SS.SSSZ format')\">dcmDate</a><br>"
+                + "</font></td><td valign=top><font size=-1>"
+                + "<input type=\"checkbox\" name=\"title\" value=\"true\" checked> <a href=\"#\" onClick=\"javascript:alert('Title\\n\\nA name given to the resource.\\nThis is a repeating field.')\">title</a><br>"
+                + "<input type=\"checkbox\" name=\"creator\" value=\"true\"");
+        html.append(fieldHash.contains("creator") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Creator\\n\\nAn entity primarily responsible for making\\nthe content of the resource.\\nThis is a repeating field.')\">creator</a><br>"
+                + "<input type=\"checkbox\" name=\"subject\" value=\"true\"");
+        html.append(fieldHash.contains("subject") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Subject and Keywords\\n\\nA topic of the content of the resource.\\nThis is a repeating field.')\">subject</a><br>"
+                + "<input type=\"checkbox\" name=\"description\" value=\"true\"");
+        html.append(fieldHash.contains("description") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Description\\n\\nAn account of the content of the resource.\\nThis is a repeating field.')\">description</a><br>"
+                + "<input type=\"checkbox\" name=\"publisher\" value=\"true\"");
+        html.append(fieldHash.contains("publisher") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Publisher\\n\\nAn entity responsible for making the resource available.\\nThis is a repeating field.')\">publisher</a><br>"
+                + "<input type=\"checkbox\" name=\"contributor\" value=\"true\"");
+        html.append(fieldHash.contains("contributor") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Contributor\\n\\nAn entity responsible for making contributions\\nto the content of the resource.\\nThis is a repeating field.')\">contributor</a><br>"
+                + "<input type=\"checkbox\" name=\"date\" value=\"true\"");
+        html.append(fieldHash.contains("date") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Date\\n\\nA date of an event in the lifecycle of the resource.\\nThis is a repeating field.')\">date</a><br>"
+                + "</font></td><td valign=top><font size=-1>"
+                + "<input type=\"checkbox\" name=\"type\" value=\"true\"");
+        html.append(fieldHash.contains("type") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Resource Type\\n\\nThe nature or genre of the resource.\\nThis is a repeating field.')\">type</a><br>"
+                + "<input type=\"checkbox\" name=\"format\" value=\"true\"");
+        html.append(fieldHash.contains("format") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Format\\n\\nThe physical or digital manifestation of the resource.\\nThis is a repeating field.')\">format</a><br>"
+                + "<input type=\"checkbox\" name=\"identifier\" value=\"true\"");
+        html.append(fieldHash.contains("identifier") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Resource Identifier\\n\\nAn unambiguous reference to the resource within a given context.\\nThis is a repeating field.')\">identifier</a><br>"
+                + "<input type=\"checkbox\" name=\"source\" value=\"true\"");
+        html.append(fieldHash.contains("source") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Source\\n\\nA reference to a resource from which the present resource is derived.\\nThis is a repeating field.')\">source</a><br>"
+                + "<input type=\"checkbox\" name=\"language\" value=\"true\"");
+        html.append(fieldHash.contains("language") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Language\\n\\nA language of the intellectual content of the resource.\\nThis is a repeating field.')\">language</a><br>"
+                + "<input type=\"checkbox\" name=\"relation\" value=\"true\"");
+        html.append(fieldHash.contains("relation") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Relation\\n\\nA reference to a related resource.\\nThis is a repeating field.')\">relation</a><br>"
+                + "<input type=\"checkbox\" name=\"coverage\" value=\"true\"");
+        html.append(fieldHash.contains("coverage") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Coverage\\n\\nThe extent or scope of the content of the resource.\\nThis is a repeating field.')\">coverage</a><br>"
+                + "<input type=\"checkbox\" name=\"rights\" value=\"true\"");
+        html.append(fieldHash.contains("rights") ? CHECKED : "");
+        html.append("> <a href=\"#\" onClick=\"javascript:alert('Rights Management\\n\\nInformation about rights held in and over the resource.\\nThis is a repeating field.')\">rights</a><br>"
+                + "</font></td><td bgcolor=silver valign=top>&nbsp;&nbsp;&nbsp;</td><td valign=top>"
+                + "Search all fields for phrase: <input type=\"text\" name=\"terms\" size=\"15\" value=\"");
+        if (terms != null) StreamUtility.enc(terms, html);
+        html.append("\"> <a href=\"#\" onClick=\"javascript:alert('Search All Fields\\n\\nEnter a phrase.  Objects where any field contains the phrase will be returned.\\nThis is a case-insensitive search, and you may use the * or ? wildcards.\\n\\nExamples:\\n\\n  *o*\\n    finds objects where any field contains the letter o.\\n\\n  ?edora\\n    finds objects where a word starts with any letter and ends with edora.')\"><i>help</i></a><p> "
+                +"Or search specific field(s): <input type=\"text\" name=\"query\" size=\"15\" value=\"");
+        if (query != null) StreamUtility.enc(query, html);
+        html.append("\"> <a href=\"#\" onClick=\"javascript:alert('Search Specific Field(s)\\n\\nEnter one or more conditions, separated by space.  Objects matching all conditions will be returned.\\nA condition is a field (choose from the field names on the left) followed by an operator, followed by a value.\\nThe = operator will match if the field\\'s entire value matches the value given.\\nThe ~ operator will match on phrases within fields, and accepts the ? and * wildcards.\\nThe &lt;, &gt;, &lt;=, and &gt;= operators can be used with numeric values, such as dates.\\n\\nExamples:\\n\\n  pid~demo:* description~fedora\\n    Matches all demo objects with a description containing the word fedora.\\n\\n  cDate&gt;=1976-03-04 creator~*n*\\n    Matches objects created on or after March 4th, 1976 where at least one of the creators has an n in their name.\\n\\n  mDate&gt;2002-10-2 mDate&lt;2002-10-2T12:00:00\\n    Matches objects modified sometime before noon (UTC) on October 2nd, 2002')\"><i>help</i></a><p> ");
+        html.append("Maximum Results: <select name=\"maxResults\"><option value=\"20\">20</option><option value=\"40\">40</option><option value=\"60\">60</option><option value=\"80\">80</option></select> "
+                + "<p><input type=\"submit\" value=\"Search\"> "
+                + "</td></tr></table></center>"
+                + "</form><hr size=1>");
+    }
+    
+    private void printObjectFieldsToHtml(ObjectFields f, String[] fieldsArray,
+            SimpleDateFormat formatter, PrintWriter html) {
+        html.append("<tr>");
+        for (String l : fieldsArray) {
+            html.append("<td valign=\"top\">");
+            if (l.equalsIgnoreCase("pid")) {
+                html.append("<a href=\"objects/");
+                html.append(f.getPid().replace("%", "%25"));
+                html.append("\">");
+                html.append(f.getPid());
+                html.append("</a>");
+            } else if (l.equalsIgnoreCase("label")) {
+                if (f.getLabel() != null) {
+                    html
+                            .append(StreamUtility.enc(f
+                                    .getLabel()));
+                }
+            } else if (l.equalsIgnoreCase("state")) {
+                html.append(f.getState());
+            } else if (l.equalsIgnoreCase("ownerId")) {
+                if (f.getOwnerId() != null) {
+                    html.append(f.getOwnerId());
+                }
+            } else if (l.equalsIgnoreCase("cDate")) {
+                html.append(formatter.format(f.getCDate()));
+            } else if (l.equalsIgnoreCase("mDate")) {
+                html.append(formatter.format(f.getMDate()));
+            } else if (l.equalsIgnoreCase("dcmDate")) {
+                if (f.getDCMDate() != null) {
+                    html.append(formatter
+                            .format(f.getDCMDate()));
+                }
+            } else if (l.equalsIgnoreCase("title")) {
+                getList(f.titles(), html);
+            } else if (l.equalsIgnoreCase("creator")) {
+                getList(f.creators(), html);
+            } else if (l.equalsIgnoreCase("subject")) {
+                getList(f.subjects(), html);
+            } else if (l.equalsIgnoreCase("description")) {
+                getList(f.descriptions(), html);
+            } else if (l.equalsIgnoreCase("publisher")) {
+                getList(f.publishers(), html);
+            } else if (l.equalsIgnoreCase("contributor")) {
+                getList(f.contributors(), html);
+            } else if (l.equalsIgnoreCase("date")) {
+                getList(f.dates(), html);
+            } else if (l.equalsIgnoreCase("type")) {
+                getList(f.types(), html);
+            } else if (l.equalsIgnoreCase("format")) {
+                getList(f.formats(), html);
+            } else if (l.equalsIgnoreCase("identifier")) {
+                getList(f.identifiers(), html);
+            } else if (l.equalsIgnoreCase("source")) {
+                getList(f.sources(), html);
+            } else if (l.equalsIgnoreCase("language")) {
+                getList(f.languages(), html);
+            } else if (l.equalsIgnoreCase("relation")) {
+                getList(f.relations(), html);
+            } else if (l.equalsIgnoreCase("coverage")) {
+                getList(f.coverages(), html);
+            } else if (l.equalsIgnoreCase("rights")) {
+                getList(f.rights(), html);
+            }
+            html.append("</td>");
+        }
+        html.append("</tr><tr><td colspan=\"");
+        html.append(Integer.toString(fieldsArray.length));
+        html.append("\"></td></tr>");
+    }
+    
+    private void printHiddenFieldsFormToHtml(FieldSearchResult fsr, 
+            HashSet<String> fieldHash, long maxResults, PrintWriter html) {
+        if (fsr != null && fsr.getToken() != null) {
+            if (fsr.getCursor() != -1) {
+                long viewingStart = fsr.getCursor() + 1;
+                long viewingEnd =
+                        fsr.objectFieldsList().size()
+                                + viewingStart - 1;
+                html.append("<p>Viewing results " + viewingStart
+                        + " to " + viewingEnd);
+                if (fsr.getCompleteListSize() != -1) {
+                    html.append(" of " + fsr.getCompleteListSize());
+                }
+                html.append("</p>\n");
+            }
+            html.append("<form method=\"post\" action=\"search\">");
+            if (fieldHash.contains("pid")) {
+                html
+                        .append("<input type=\"hidden\" name=\"pid\" value=\"true\">");
+            }
+            if (fieldHash.contains("label")) {
+                html
+                        .append("<input type=\"hidden\" name=\"label\" value=\"true\">");
+            }
+            if (fieldHash.contains("state")) {
+                html
+                        .append("<input type=\"hidden\" name=\"state\" value=\"true\">");
+            }
+            if (fieldHash.contains("ownerId")) {
+                html
+                        .append("<input type=\"hidden\" name=\"ownerId\" value=\"true\">");
+            }
+            if (fieldHash.contains("cDate")) {
+                html
+                        .append("<input type=\"hidden\" name=\"cDate\" value=\"true\">");
+            }
+            if (fieldHash.contains("mDate")) {
+                html
+                        .append("<input type=\"hidden\" name=\"mDate\" value=\"true\">");
+            }
+            if (fieldHash.contains("dcmDate")) {
+                html
+                        .append("<input type=\"hidden\" name=\"dcmDate\" value=\"true\">");
+            }
+            if (fieldHash.contains("title")) {
+                html
+                        .append("<input type=\"hidden\" name=\"title\" value=\"true\">");
+            }
+            if (fieldHash.contains("creator")) {
+                html
+                        .append("<input type=\"hidden\" name=\"creator\" value=\"true\">");
+            }
+            if (fieldHash.contains("subject")) {
+                html
+                        .append("<input type=\"hidden\" name=\"subject\" value=\"true\">");
+            }
+            if (fieldHash.contains("description")) {
+                html
+                        .append("<input type=\"hidden\" name=\"description\" value=\"true\">");
+            }
+            if (fieldHash.contains("publisher")) {
+                html
+                        .append("<input type=\"hidden\" name=\"publisher\" value=\"true\">");
+            }
+            if (fieldHash.contains("contributor")) {
+                html
+                        .append("<input type=\"hidden\" name=\"contributor\" value=\"true\">");
+            }
+            if (fieldHash.contains("date")) {
+                html
+                        .append("<input type=\"hidden\" name=\"date\" value=\"true\">");
+            }
+            if (fieldHash.contains("type")) {
+                html
+                        .append("<input type=\"hidden\" name=\"type\" value=\"true\">");
+            }
+            if (fieldHash.contains("format")) {
+                html
+                        .append("<input type=\"hidden\" name=\"format\" value=\"true\">");
+            }
+            if (fieldHash.contains("identifier")) {
+                html
+                        .append("<input type=\"hidden\" name=\"identifier\" value=\"true\">");
+            }
+            if (fieldHash.contains("source")) {
+                html
+                        .append("<input type=\"hidden\" name=\"source\" value=\"true\">");
+            }
+            if (fieldHash.contains("language")) {
+                html
+                        .append("<input type=\"hidden\" name=\"language\" value=\"true\">");
+            }
+            if (fieldHash.contains("relation")) {
+                html
+                        .append("<input type=\"hidden\" name=\"relation\" value=\"true\">");
+            }
+            if (fieldHash.contains("coverage")) {
+                html
+                        .append("<input type=\"hidden\" name=\"coverage\" value=\"true\">");
+            }
+            if (fieldHash.contains("rights")) {
+                html
+                        .append("<input type=\"hidden\" name=\"rights\" value=\"true\">");
+            }
+            html
+                    .append("\n<input type=\"hidden\" name=\"sessionToken\" value=\""
+                            + fsr.getToken() + "\">\n");
+            html
+                    .append("\n<input type=\"hidden\" name=\"maxResults\" value=\""
+                            + maxResults + "\">\n");
+            html
+                    .append("<input type=\"submit\" value=\"More Results &gt;\"></form>");
         }
     }
 
-    private void appendXML(String name, List<DCField> values, StringBuffer out) {
+    private void appendXML(String name, String value, PrintWriter out) {
+        if (value != null) {
+            out.append("      <");
+            out.append(name);
+            out.append(">");
+            StreamUtility.enc(value, out);
+            out.append("</");
+            out.append(name);
+            out.append(">\n");
+        }
+    }
+
+    private void appendXML(String name, List<DCField> values, PrintWriter out) {
         for (int i = 0; i < values.size(); i++) {
             appendXML(name, values.get(i).getValue(), out);
         }
@@ -671,21 +644,19 @@ public class FieldSearchServlet
     private void appendXML(String name,
                            Date dt,
                            SimpleDateFormat formatter,
-                           StringBuffer out) {
+                           PrintWriter out) {
         if (dt != null) {
             appendXML(name, formatter.format(dt), out);
         }
     }
 
-    private String getList(List<DCField> l) {
-        StringBuffer ret = new StringBuffer();
+    private void getList(List<DCField> l, PrintWriter ret) {
         for (int i = 0; i < l.size(); i++) {
             if (i > 0) {
                 ret.append(", ");
             }
-            ret.append(StreamUtility.enc(l.get(i).getValue()));
+            StreamUtility.enc(l.get(i).getValue(), ret);
         }
-        return ret.toString();
     }
 
     /** Exactly the same behavior as doGet. */

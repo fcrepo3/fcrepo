@@ -118,9 +118,13 @@ public abstract class XPathPolicyIndex
      * @return
      */
     protected static String getXpath(Map<String, Set<AttributeBean>> attributeMap) {
-
-        int sections = 0;
         StringBuilder sb = new StringBuilder();
+        getXpath(attributeMap, sb);
+        return sb.toString();
+    }
+    
+    protected static void getXpath(Map<String, Set<AttributeBean>> attributeMap, StringBuilder sb) {
+        int sections = 0;
 
         // FIXME:
         // this from the original dbxml implementation
@@ -258,7 +262,6 @@ public abstract class XPathPolicyIndex
         }
         sb.append("]");
 
-        return sb.toString();
     }
 
 

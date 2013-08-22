@@ -96,7 +96,7 @@ public class OracleDDLConverter
                 out.append(" NOT NULL");
             }
             if (cs.isUnique()) {
-                if (!end.toString().equals("")) {
+                if (end.length() != 0) {
                     end.append(",\n");
                 }
                 end.append("  UNIQUE ");
@@ -109,7 +109,7 @@ public class OracleDDLConverter
                       + " ON " + spec.getName() + " (" + cs.getName() + ")");
             }
             if (cs.getForeignTableName() != null) {
-                if (!end.toString().equals("")) {
+                if (end.length() != 0) {
                     end.append(",\n");
                 }
                 end.append("  FOREIGN KEY ");
@@ -132,7 +132,7 @@ public class OracleDDLConverter
             out.append(spec.getPrimaryColumnName());
             out.append(")");
         }
-        if (!end.toString().equals("")) {
+        if (end.length() != 0) {
             out.append(",\n");
             out.append(end);
         }

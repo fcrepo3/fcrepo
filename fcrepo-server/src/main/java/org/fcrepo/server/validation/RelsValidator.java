@@ -128,7 +128,7 @@ public class RelsValidator
 
     private String m_literalType;
 
-    private StringBuffer m_literalValue;
+    private StringBuilder m_literalValue;
 
     private static final String RELS_EXT = "RELS-EXT";
 
@@ -217,7 +217,7 @@ public class RelsValidator
                     } else {
                         m_literalType = datatypeURI;
                     }
-                    m_literalValue = new StringBuffer();
+                    m_literalValue = new StringBuilder();
                 }
             } else {
                 throw new SAXException("RelsExtValidator:"

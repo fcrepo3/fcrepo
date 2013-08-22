@@ -577,7 +577,7 @@ public class AtomDODeserializer
                     && !checksum.equals(Datastream.CHECKSUM_NONE)) {
                 String tmpChecksum = ds.getChecksum();
                 if (logger.isDebugEnabled()) {
-                    logger.debug("checksum = " + tmpChecksum);
+                    logger.debug("checksum = {}", tmpChecksum);
                 }
                 if (!checksum.equals(tmpChecksum)) {
                     throw new ValidationException("Checksum Mismatch: "

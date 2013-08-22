@@ -177,7 +177,7 @@ public class SimpleDOReader
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         int transContext;
         // first, set the translation context...
-        logger.debug("Export context: " + exportContext);
+        logger.debug("Export context: {}", exportContext);
 
         if (exportContext == null || exportContext.equals("")
             || exportContext.equalsIgnoreCase("default")) {
@@ -196,14 +196,14 @@ public class SimpleDOReader
         // now serialize for export in the proper XML format...
         if (format == null || format.equals("")
             || format.equalsIgnoreCase("default")) {
-            logger.debug("Export in default format: " + m_exportFormat);
+            logger.debug("Export in default format: {}", m_exportFormat);
             m_translator.serialize(m_obj,
                                    bytes,
                                    m_exportFormat,
                                    "UTF-8",
                                    transContext);
         } else {
-            logger.debug("Export in format: " + format);
+            logger.debug("Export in format: {}", format);
             m_translator.serialize(m_obj, bytes, format, "UTF-8", transContext);
         }
 

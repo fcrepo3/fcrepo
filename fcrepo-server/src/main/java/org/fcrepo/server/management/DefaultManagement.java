@@ -1046,28 +1046,29 @@ public class DefaultManagement
                     usedList.add("The default disseminator");
                 }
                 if (usedList.size() > 0) {
-                    StringBuffer msg = new StringBuffer();
+                    StringBuilder msg = new StringBuilder();
                     msg.append("Cannot purge entire datastream because it\n");
                     msg.append("is used by the following disseminators:");
                     for (int i = 0; i < usedList.size(); i++) {
-                        msg.append("\n - " + usedList.get(i));
+                        msg.append("\n - ");
+                        msg.append(usedList.get(i));
                     }
                     throw new GeneralException(msg.toString());
                 }
             }
             // add an explanation of what happened to the user-supplied message.
-            if (logMessage == null) {
-                logMessage = "";
-            } else {
-                logMessage += " . . . ";
+            StringBuilder logMsgBuilder = (logMessage == null) ? new StringBuilder() :
+                new StringBuilder(logMessage);
+            if (logMessage != null) {
+                logMsgBuilder.append(" . . . ");
             }
-            logMessage +=
-                    getPurgeLogMessage("datastream",
+            getPurgeLogMessage("datastream",
                                        datastreamID,
                                        startDT,
                                        endDT,
-                                       deletedDates);
-
+                                       deletedDates,
+                                       logMsgBuilder);
+            logMessage = logMsgBuilder.toString();
             // Update audit trail
             Date nowUTC = Server.getCurrentDate(context);
             addAuditRecord(context,
@@ -1099,14 +1100,14 @@ public class DefaultManagement
         }
     }
 
-    private String getPurgeLogMessage(String kindaThing,
+    private void getPurgeLogMessage(String kindaThing,
                                       String id,
                                       Date start,
                                       Date end,
-                                      Date[] deletedDates) {
+                                      Date[] deletedDates,
+                                      StringBuilder buf) {
         SimpleDateFormat formatter =
                 new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        StringBuffer buf = new StringBuffer();
         buf.append("Purged ");
         buf.append(kindaThing);
         buf.append(" (ID=");
@@ -1134,7 +1135,6 @@ public class DefaultManagement
             buf.append(formatter.format(deletedDates[i]));
         }
         buf.append(") and all associated audit records.");
-        return buf.toString();
     }
 
     @Override
@@ -1505,12 +1505,11 @@ public class DefaultManagement
 
             logger.debug("Getting Reader");
             r = m_manager.getReader(Server.USE_DEFINITIVE_STORE, context, pid);
-            logger.debug("Getting datastream:" + datastreamID + "date: "
-                         + versionDate);
+            logger.debug("Getting datastream:{} date:{}", datastreamID, versionDate);
             Datastream ds = r.GetDatastream(datastreamID, versionDate);
             logger.debug("Got Datastream, comparing checksum");
             boolean check = ds.compareChecksum();
-            logger.debug("compared checksum = " + check);
+            logger.debug("compared checksum = {}", check);
 
             return check ? ds.getChecksum() : "Checksum validation error";
         } finally {
@@ -1672,8 +1671,8 @@ public class DefaultManagement
                                             relationship);
 
             r = m_manager.getReader(Server.USE_DEFINITIVE_STORE, context, pid);
-            logger.debug("Getting Relationships:  pid = " + pid + " predicate = "
-                         + relationship);
+            logger.debug("Getting Relationships:  pid = {} predicate = {}",
+                         pid, relationship);
             try {
                 URIReference pred = null;
                 if (relationship != null) {
@@ -2076,13 +2075,14 @@ public class DefaultManagement
                     // checksum only needs recalc if we added a header
                     // note getChecksum() caters for checksum type set to disabled
                     if (addXMLHeader) {
-                        logger.debug("Recalculating checksum.  Type=" + newDS.DSChecksumType + " Existing checksum: " + newDS.DSChecksum != null ? newDS.DSChecksum : "none");
+                        logger.debug("Recalculating checksum.  Type={} Existing checksum: {}",
+                                newDS.DSChecksumType, newDS.DSChecksum != null ? newDS.DSChecksum : "none");
 
                         // forces computation rather than return existing
                         newDS.DSChecksum = Datastream.CHECKSUM_NONE;
                         newDS.DSChecksum = newDS.getChecksum();
 
-                        logger.debug("New checksum: " + newDS.DSChecksum);
+                        logger.debug("New checksum: {}", newDS.DSChecksum);
                         logger.debug("Testing new checksum, response is {}", newDS.compareChecksum());
                     }
 
