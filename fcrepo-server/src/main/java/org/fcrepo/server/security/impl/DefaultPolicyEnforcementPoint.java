@@ -106,7 +106,7 @@ implements PolicyEnforcementPoint {
                 ResponseCtx response = null;
                 String contextIndex = null;
                 try {
-                    contextIndex = (new Integer(next())).toString();
+                    contextIndex = Integer.toString(next());
                     logger.debug("context index set={}", contextIndex);
                     Set<Subject> subjects = wrapSubjects(subjectId);
                     Set<Attribute> actions = wrapActions(action, api, contextIndex);

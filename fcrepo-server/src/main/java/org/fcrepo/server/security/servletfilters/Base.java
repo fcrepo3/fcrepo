@@ -75,7 +75,7 @@ public class Base {
     public static final boolean booleanValue(String string) throws Exception {
         if (Boolean.TRUE.toString().equals(string)
                 || Boolean.FALSE.toString().equals(string)) {
-            return (new Boolean(string)).booleanValue();
+            return (Boolean.parseBoolean(string));
         } else {
             throw new Exception("does not represent a boolean");
         }

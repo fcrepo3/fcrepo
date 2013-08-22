@@ -129,7 +129,7 @@ public class DisseminationService {
 		if (dsMediation == null || dsMediation.equalsIgnoreCase("")) {
 			logger.info("doMediateDatastreams unspecified; defaulting to false");
 		} else {
-			m_doDatastreamMediation = new Boolean(dsMediation).booleanValue();
+			m_doDatastreamMediation = Boolean.parseBoolean(dsMediation);
 		}
 
 		String useNewUrlEncodingTest = server
@@ -138,7 +138,7 @@ public class DisseminationService {
 		if (useNewUrlEncodingTest == null || useNewUrlEncodingTest.equalsIgnoreCase("")) {
 			logger.info("useNewUrlEncodingTest unspecified; defaulting to false");
 		} else {
-			m_useNewUrlEncodingTest = new Boolean(useNewUrlEncodingTest).booleanValue();
+			m_useNewUrlEncodingTest = Boolean.parseBoolean(useNewUrlEncodingTest);
 		}
 		
 		m_ecm = server.getBean(
@@ -331,10 +331,9 @@ public class DisseminationService {
 				String callbackRole = deploymentPID;
 				Hashtable<String, String> beHash = m_beSS.getSecuritySpec(
 						callbackRole, methodName);
-				boolean callbackBasicAuth = new Boolean(
-						beHash.get("callbackBasicAuth")).booleanValue();
-				boolean callbackSSL = new Boolean(beHash.get("callbackSSL"))
-						.booleanValue();
+				boolean callbackBasicAuth = Boolean.parseBoolean(
+						beHash.get("callbackBasicAuth"));
+				boolean callbackSSL = Boolean.parseBoolean(beHash.get("callbackSSL"));
 				String dsMediatedServletPath = null;
 				if (callbackBasicAuth) {
 					dsMediatedServletPath = "/" + m_fedoraAppServerContext
@@ -695,12 +694,12 @@ public class DisseminationService {
 					// "call" to the backend service.
 					Hashtable<String, String> beHash = m_beSS.getSecuritySpec(
 							beServiceRole, methodName);
-					boolean beServiceCallSSL = new Boolean(
-							beHash.get("callSSL")).booleanValue();
+					boolean beServiceCallSSL = Boolean.parseBoolean(
+							beHash.get("callSSL"));
 					String beServiceCallUsername = "";
 					String beServiceCallPassword = "";
-					boolean beServiceCallBasicAuth = new Boolean(
-							beHash.get("callBasicAuth")).booleanValue();
+					boolean beServiceCallBasicAuth = Boolean.parseBoolean(
+							beHash.get("callBasicAuth"));
 					if (beServiceCallBasicAuth) {
 						beServiceCallUsername = beHash.get("callUsername");
 						beServiceCallPassword = beHash.get("callPassword");
@@ -873,14 +872,14 @@ public class DisseminationService {
 				// Store beSecurity info in hash
 				Hashtable<String, String> beHash = m_beSS.getSecuritySpec(
 						beServiceRole, methodName);
-				boolean beServiceCallbackBasicAuth = new Boolean(
-						beHash.get("callbackBasicAuth")).booleanValue();
-				boolean beServiceCallBasicAuth = new Boolean(
-						beHash.get("callBasicAuth")).booleanValue();
-				boolean beServiceCallbackSSL = new Boolean(
-						beHash.get("callbackSSL")).booleanValue();
-				boolean beServiceCallSSL = new Boolean(beHash.get("callSSL"))
-						.booleanValue();
+				boolean beServiceCallbackBasicAuth = Boolean.parseBoolean(
+						beHash.get("callbackBasicAuth"));
+				boolean beServiceCallBasicAuth = Boolean.parseBoolean(
+						beHash.get("callBasicAuth"));
+				boolean beServiceCallbackSSL = Boolean.parseBoolean(
+						beHash.get("callbackSSL"));
+				boolean beServiceCallSSL = Boolean.parseBoolean(
+				        beHash.get("callSSL"));
 				String beServiceCallUsername = beHash.get("callUsername");
 				String beServiceCallPassword = beHash.get("callPassword");
 				if (logger.isDebugEnabled()) {

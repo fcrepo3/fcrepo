@@ -178,7 +178,7 @@ public class ListMethodsServlet
         }
 
         if (request.getParameter("xml") != null) {
-            xml = new Boolean(request.getParameter("xml")).booleanValue();
+            xml = Boolean.parseBoolean(request.getParameter("xml"));
         }
 
         try {

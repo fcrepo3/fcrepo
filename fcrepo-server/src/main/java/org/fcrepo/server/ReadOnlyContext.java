@@ -533,7 +533,7 @@ public class ReadOnlyContext
         boolean noOp = true; //safest approach
         try {
             noOp =
-                    Boolean.valueOf(request.getParameter(NOOP_PARAMETER_NAME));
+                    Boolean.parseBoolean(request.getParameter(NOOP_PARAMETER_NAME));
             logger.debug("NOOP_PARAMETER_NAME=" + NOOP_PARAMETER_NAME);
             logger.debug("request.getParameter(NOOP_PARAMETER_NAME)="
                     + request.getParameter(NOOP_PARAMETER_NAME));

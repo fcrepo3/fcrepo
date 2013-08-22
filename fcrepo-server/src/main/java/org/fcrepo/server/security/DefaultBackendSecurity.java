@@ -93,7 +93,7 @@ public class DefaultBackendSecurity
                                     + "\". Validation is defaulted to "
                                     + "\"false\".");
                 } else {
-                    m_validate = new Boolean(validate).booleanValue();
+                    m_validate = Boolean.parseBoolean(validate);
                 }
             } else {
                 logger.warn("Validation setting for backend "
