@@ -384,7 +384,7 @@ public class FedoraAccessServlet
                 .hasMoreElements();) {
             String name = URLDecoder.decode((String) e.nextElement(), "UTF-8");
             if (isGetObjectProfileRequest && name.equalsIgnoreCase("xml")) {
-                xml = new Boolean(request.getParameter(name)).booleanValue();
+                xml = Boolean.parseBoolean(request.getParameter(name));
             } else {
                 String value =
                         URLDecoder.decode(request.getParameter(name), "UTF-8");

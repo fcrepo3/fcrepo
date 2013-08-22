@@ -69,7 +69,7 @@ public abstract class AttributeFinderModule
                                   int designatorType) {
         logger.debug("in parmsOk " + iAm());
         if (!getSupportedDesignatorTypes()
-                .contains(new Integer(designatorType))) {
+                .contains(Integer.valueOf(designatorType))) {
             logger.debug("AttributeFinder:parmsOk" + iAm() + " exit on "
                     + "target not supported");
             return false;

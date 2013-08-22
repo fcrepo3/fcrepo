@@ -178,8 +178,7 @@ class MmapParser
                     methodMapParm.parmRequired = true;
                 } else {
                     methodMapParm.parmRequired =
-                            new Boolean(attrs.getValue("required"))
-                                    .booleanValue();
+                            Boolean.parseBoolean(attrs.getValue("required"));
                 }
                 methodMapParm.parmDefaultValue = null;
                 methodMapParm.parmDomainValues = new String[0];
@@ -195,8 +194,7 @@ class MmapParser
                     methodMapParm.parmRequired = true;
                 } else {
                     methodMapParm.parmRequired =
-                            new Boolean(attrs.getValue("required"))
-                                    .booleanValue();
+                            Boolean.parseBoolean(attrs.getValue("required"));
                 }
                 methodMapParm.parmDefaultValue = attrs.getValue("defaultValue");
                 methodMapParm.parmDomainValues = new String[0];
@@ -213,8 +211,7 @@ class MmapParser
                     methodMapParm.parmRequired = true;
                 } else {
                     methodMapParm.parmRequired =
-                            new Boolean(attrs.getValue("required"))
-                                    .booleanValue();
+                            Boolean.parseBoolean(attrs.getValue("required"));
                 }
                 methodMapParm.parmDefaultValue = attrs.getValue("defaultValue");
             } else if (inUserInputParm) {
