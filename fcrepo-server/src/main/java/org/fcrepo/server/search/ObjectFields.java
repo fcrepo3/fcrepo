@@ -45,7 +45,7 @@ public class ObjectFields
 
     private Date m_dcmDate;
 
-    private StringBuffer m_currentContent;
+    private StringBuilder m_currentContent = new StringBuilder();
 
     private final boolean[] m_want = new boolean[26];
 
@@ -171,7 +171,7 @@ public class ObjectFields
                              String localName,
                              String qName,
                              Attributes attrs) {
-        m_currentContent = new StringBuffer();
+        m_currentContent.setLength(0);
     }
 
     @Override

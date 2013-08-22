@@ -167,7 +167,7 @@ public class Datastream {
         if (DSChecksum == null || DSChecksum.equals(CHECKSUM_NONE)) {
             DSChecksum = computeChecksum(getChecksumType());
         }
-        logger.debug("Checksum = " + DSChecksum);
+        logger.debug("Checksum = {}", DSChecksum);
         return DSChecksum;
     }
 
@@ -175,7 +175,7 @@ public class Datastream {
         if (csType != null) {
             DSChecksumType = csType;
         }
-        logger.debug("setting checksum using type: " + DSChecksumType);
+        logger.debug("setting checksum using type: {}", DSChecksumType);
         DSChecksum = computeChecksum(DSChecksumType);
         return DSChecksum;
     }

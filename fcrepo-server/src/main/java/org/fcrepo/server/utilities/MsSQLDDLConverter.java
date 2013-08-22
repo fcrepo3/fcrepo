@@ -70,7 +70,7 @@ public class MsSQLDDLConverter
                 out.append("'");
             }
             if (cs.isUnique()) {
-                if (!end.toString().equals("")) {
+                if (end.length() != 0) {
                     end.append(",\n");
                 }
                 end.append(" CONSTRAINT ");
@@ -84,7 +84,7 @@ public class MsSQLDDLConverter
                         + spec.getName() + " (" + cs.getName() + ")");
             }
             if (cs.getForeignTableName() != null) {
-                if (!end.toString().equals("")) {
+                if (end.length() != 0) {
                     end.append(",\n");
                 }
                 end.append(" CONSTRAINT ");
@@ -103,7 +103,7 @@ public class MsSQLDDLConverter
             }
         }
         if (spec.getPrimaryColumnName() != null) {
-            if (!end.toString().equals("")) {
+            if (end.length() != 0) {
                 end.append(",\n");
             }
             end.append(" CONSTRAINT ");
@@ -114,7 +114,7 @@ public class MsSQLDDLConverter
         }
         out.append(")");
 	list.add(0, out.toString());
-        if (!end.toString().equals("")) {
+        if (end.length() != 0) {
             list.add(1, "ALTER TABLE " + spec.getName() + " ADD" + end.toString());
         }
         return list;

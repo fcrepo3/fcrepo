@@ -831,8 +831,8 @@ public class DisseminationService {
 				timeStamp = Timestamp.valueOf(extractTimestamp(key));
 				if (expireLimit > timeStamp.getTime()) {
 					dsRegistry.remove(key);
-					logger.debug("DatastreamMediationKey removed from Hash: "
-							+ key);
+					logger.debug("DatastreamMediationKey removed from Hash: {}",
+							key);
 				}
 			}
 
@@ -948,10 +948,10 @@ public class DisseminationService {
 	 * @return The extracted Timestamp value as a string.
 	 */
 	public String extractTimestamp(String tempID) {
-		StringBuffer sb = new StringBuffer();
-		sb.append(tempID);
-		sb.replace(tempID.lastIndexOf(":"), tempID.length(), "");
-		return sb.toString();
+//		StringBuffer sb = new StringBuffer();
+//		sb.append(tempID);
+//		sb.replace(tempID.lastIndexOf(":"), tempID.length(), "");
+		return tempID.substring(0, tempID.lastIndexOf(":"));
 	}
 
 	/**
@@ -1055,8 +1055,8 @@ public class DisseminationService {
 			logger.error(message);
 			throw new GeneralException(message);
 		}
-		logger.debug("********** Resolving Internal Datastream dsLocation: "
-				+ dsLocation);
+		logger.debug("********** Resolving Internal Datastream dsLocation: {}",
+				dsLocation);
 		return dsLocation;
 	}
 

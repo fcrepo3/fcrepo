@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +31,7 @@ import org.fcrepo.server.errors.DisseminationException;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.rest.DefaultSerializer;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.MIMETypedStream;
@@ -108,10 +110,8 @@ public class DefaultDisseminatorImpl
             InputStream in = null;
             try {
                 in =
-                        new ByteArrayInputStream(new ObjectInfoAsXML(context)
-                                .getObjectProfile(reposBaseURL,
-                                                  profile,
-                                                  asOfDateTime)
+                        new ByteArrayInputStream(
+                                DefaultSerializer.objectProfileToXML(profile, asOfDateTime)
                                 .getBytes("UTF-8"));
             } catch (UnsupportedEncodingException uee) {
                 throw new GeneralException("[DefaultDisseminatorImpl] An error has occurred. "
@@ -169,7 +169,7 @@ public class DefaultDisseminatorImpl
         InputStream in = null;
         try {
             in =
-                    new ByteArrayInputStream(new ObjectInfoAsXML(context)
+                    new ByteArrayInputStream(ObjectInfoAsXML
                             .getMethodIndex(reposBaseURL,
                                             reader.GetObjectPID(),
                                             methods,
@@ -220,7 +220,7 @@ public class DefaultDisseminatorImpl
         InputStream in = null;
         try {
             in =
-                    new ByteArrayInputStream(new ObjectInfoAsXML(context)
+                    new ByteArrayInputStream(ObjectInfoAsXML
                             .getItemIndex(reposBaseURL,
                                           context
                                                   .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME),
@@ -271,7 +271,7 @@ public class DefaultDisseminatorImpl
                     reader.GetDatastream("DC",
                                                                  asOfDateTime);
             in =
-                    new ByteArrayInputStream(new ObjectInfoAsXML(context)
+                    new ByteArrayInputStream(ObjectInfoAsXML
                             .getOAIDublinCore(dcmd).getBytes("UTF-8"));
         } catch (ClassCastException cce) {
             throw new ObjectIntegrityException("Object "
@@ -310,41 +310,26 @@ public class DefaultDisseminatorImpl
     }
 
     private MIMETypedStream noMethodIndexMsg() throws GeneralException {
-        String msg =
-                new String("The Dissemination Index is not available"
-                        + " for Content Model objects, \n or Service Definition objects or Service Deployment objects.\n"
-                        + " The addition of this feature is not currently scheduled.");
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder(613);
         sb
-                .append("<html><head><title>Dissemination Index Not Available</title></head>");
-        sb.append("<body><center>");
-        sb
-                .append("<table width=\"784\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">");
-        sb
-                .append("<tr><td width=\"141\" height=\"134\" valign=\"top\"><img src=\"/")
+                .append("<html><head><title>Dissemination Index Not Available</title></head>"
+                        + "<body><center>"
+                        + "<table width=\"784\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">"
+                        + "<tr><td width=\"141\" height=\"134\" valign=\"top\"><img src=\"/")
                 .append(context
                         .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME))
-                .append("/images/newlogo2.jpg\" width=\"141\" height=\"134\"/></td>");
-        sb.append("<td width=\"643\" valign=\"top\">");
-        sb.append("<center><h2>Fedora Repository</h2>");
-        sb.append("<h3>Dissemination Index</h3>");
-        sb.append("</center></td></tr></table>");
-        sb.append("<p>" + msg + "</p>");
-        sb.append("</body>");
-        sb.append("</html>");
+                .append("/images/newlogo2.jpg\" width=\"141\" height=\"134\"/></td>"
+                        + "<td width=\"643\" valign=\"top\">"
+                        + "<center><h2>Fedora Repository</h2>"
+                        + "<h3>Dissemination Index</h3>"
+                        + "</center></td></tr></table><p>");
+        sb.append("The Dissemination Index is not available"
+                + " for Content Model objects, \n or Service Definition objects or Service Deployment objects.\n"
+                + " The addition of this feature is not currently scheduled.");
+        sb.append("</p></body></html>");
         String msgOut = sb.toString();
-        ByteArrayInputStream in = null;
-        try {
-            in = new ByteArrayInputStream(msgOut.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException uee) {
-            throw new GeneralException("[DefaultDisseminatorImpl] An error has occurred. "
-                    + "The error was a \""
-                    + uee.getClass().getName()
-                    + "\"  . The "
-                    + "Reason was \""
-                    + uee.getMessage()
-                    + "\"  .");
-        }
+        ByteArrayInputStream in =
+            new ByteArrayInputStream(msgOut.getBytes(Charset.forName("UTF-8")));
         return new MIMETypedStream("text/html", in, null,in.available());
     }
 

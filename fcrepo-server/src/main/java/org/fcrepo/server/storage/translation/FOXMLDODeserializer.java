@@ -11,6 +11,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 
 import java.text.ParseException;
 
@@ -46,6 +49,7 @@ import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.Disseminator;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.server.utilities.StringUtility;
 import org.fcrepo.server.validation.ValidationUtility;
 
 import org.fcrepo.utilities.Base64;
@@ -179,9 +183,9 @@ public class FOXMLDODeserializer
     private String m_auditJustification;
 
     // buffers for reading content
-    private StringBuffer m_elementContent; // single element
+    private StringBuilder m_elementContent; // single element
 
-    private StringBuffer m_dsXMLBuffer; // chunks of inline XML metadata
+    private StringBuilder m_dsXMLBuffer; // chunks of inline XML metadata
 
     /**
      * Creates a deserializer that reads the default FOXML format.
@@ -228,8 +232,8 @@ public class FOXMLDODeserializer
                             int transContext) throws ObjectIntegrityException,
             StreamIOException, UnsupportedEncodingException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Deserializing " + m_format.uri + " for transContext: "
-                + transContext);
+            logger.debug("Deserializing {} for transContext: {}",
+                    m_format.uri, transContext);
         }
 
         m_obj = obj;
@@ -295,7 +299,11 @@ public class FOXMLDODeserializer
 
         // Initialize string buffer to hold content of the new element.
         // This will start a fresh buffer for every element encountered.
-        m_elementContent = new StringBuffer();
+        if (m_elementContent == null) {
+            m_elementContent = new StringBuilder();
+        } else {
+            m_elementContent.setLength(0);
+        }
 
         if (uri.equals(FOXML.uri) && !m_inXMLMetadata) {
             // WE ARE NOT INSIDE A BLOCK OF INLINE XML...
@@ -352,7 +360,7 @@ public class FOXMLDODeserializer
                 if (versionable == null || versionable.equals("")) {
                     m_dsVersionable = true;
                 } else {
-                    m_dsVersionable = Boolean.valueOf(versionable);
+                    m_dsVersionable = Boolean.parseBoolean(versionable);
                 }
                 // Never allow the AUDIT datastream to be versioned
                 // since it naturally represents a system-controlled
@@ -408,7 +416,11 @@ public class FOXMLDODeserializer
             // inside a datastreamVersion element, it's either going to be
             // xmlContent (inline xml), contentLocation (a reference) or binaryContent
             else if (localName.equals("xmlContent")) {
-                m_dsXMLBuffer = new StringBuffer();
+                if (m_dsXMLBuffer == null) {
+                    m_dsXMLBuffer = new StringBuilder();
+                } else {
+                    m_dsXMLBuffer.setLength(0);
+                }
                 m_xmlDataLevel = 0;
                 m_inXMLMetadata = true;
             } else if (localName.equals("contentLocation")) {
@@ -730,7 +742,7 @@ public class FOXMLDODeserializer
                                     String localName,
                                     String qName,
                                     Attributes a,
-                                    StringBuffer out) {
+                                    StringBuilder out) {
         out.append("<" + qName);
         // add the current qName's namespace to m_localPrefixMap
         // and m_prefixList if it's not already in m_localPrefixMap
@@ -749,17 +761,18 @@ public class FOXMLDODeserializer
             String prefix = m_prefixList.remove(0);
             out.append(" xmlns");
             if (prefix.length() > 0) {
-                out.append(":");
+                out.append(':');
             }
-            out.append(prefix + "=\""
-                    + StreamUtility.enc(m_prefixMap.get(prefix))
-                    + "\"");
+            out.append(prefix + "=\"");
+            StreamUtility.enc(m_prefixMap.get(prefix), out);
+            out.append('"');
         }
         for (int i = 0; i < a.getLength(); i++) {
-            out.append(" " + a.getQName(i) + "=\""
-                    + StreamUtility.enc(a.getValue(i)) + "\"");
+            out.append(" " + a.getQName(i) + "=\"");
+            StreamUtility.enc(a.getValue(i), out);
+            out.append('"');
         }
-        out.append(">");
+        out.append('>');
     }
 
     private static String grab(Attributes a,
@@ -805,7 +818,7 @@ public class FOXMLDODeserializer
             if (m_dsChecksum != null && !m_dsChecksum.equals("")
                     && !m_dsChecksum.equals(Datastream.CHECKSUM_NONE)) {
                 String tmpChecksum = ds.getChecksum();
-                logger.debug("checksum = " + tmpChecksum);
+                logger.debug("checksum = {}", tmpChecksum);
                 if (!m_dsChecksum.equals(tmpChecksum)) {
                     {
                         throw new SAXException(new ValidationException("Checksum Mismatch: "
@@ -862,31 +875,24 @@ public class FOXMLDODeserializer
         ds.DSMDClass = m_dsMDClass; // METS legacy
 
         // now set the xml content stream itself...
-        try {
-            String xmlString = m_dsXMLBuffer.toString();
 
-            StringBuilder streams = new StringBuilder();
-            Iterator<String> ids = m_obj.datastreamIdIterator();
-            while (ids.hasNext()) {
-                streams.append(ids.next() + " ");
-            }
-            ds.xmlContent = xmlString.getBytes(m_characterEncoding);
-
+        ByteBuffer bytes = Charset.forName(m_characterEncoding).
+                encode(CharBuffer.wrap(m_dsXMLBuffer));
+        ds.xmlContent = new byte[bytes.limit()];
+        bytes.get(ds.xmlContent);
+        if (logger.isDebugEnabled()) {
             StringBuilder rels = new StringBuilder();
             if (m_dsId.equals("WSDL")) {
                 if (m_obj.hasContentModel(Models.SERVICE_DEPLOYMENT_3_0)){
                     rels.append(Models.SERVICE_DEPLOYMENT_3_0 + "\n");
                 }
 
-                logger.debug("Not processing WSDL from " + m_obj.getPid()
-                        + " with models:\n" + rels);
+                logger.debug("Not processing WSDL from {} with models:\n{}", m_obj.getPid(), rels);
             }
-            //LOOK! this sets bytes, not characters.  Do we want to set this?
-            ds.DSSize = ds.xmlContent.length;
-        } catch (UnsupportedEncodingException uee) {
-            throw new RuntimeException("Error processing inline xml content in SAX parse",
-                                       uee);
         }
+        //LOOK! this sets bytes, not characters.  Do we want to set this?
+        ds.DSSize = ds.xmlContent.length;
+
         logger.debug(
                 "instantiate XML datastream: dsid = {} checksumType = {} checksum = {}",
                 m_dsId, m_dsChecksumType, m_dsChecksum);
@@ -895,7 +901,7 @@ public class FOXMLDODeserializer
             if (m_dsChecksum != null && !m_dsChecksum.equals("")
                     && !m_dsChecksum.equals(Datastream.CHECKSUM_NONE)) {
                 String tmpChecksum = ds.getChecksum();
-                logger.debug("checksum = " + tmpChecksum);
+                logger.debug("checksum = {}", tmpChecksum);
                 if (!m_dsChecksum.equals(tmpChecksum)) {
                     throw new SAXException(new ValidationException("Checksum Mismatch: "
                             + tmpChecksum));

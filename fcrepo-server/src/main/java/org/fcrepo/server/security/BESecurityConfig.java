@@ -589,7 +589,9 @@ public class BESecurityConfig
             } else {
                 // otherwise its a String[], so space-delimit the values
                 String[] tokens = (String[]) value;
-                StringBuffer buf = new StringBuffer();
+                int bufLen = tokens.length - 1;
+                for (String token: tokens) bufLen += token.length();
+                StringBuffer buf = new StringBuffer(bufLen);
                 for (int i = 0; i < tokens.length; i++) {
                     if (i > 0) {
                         buf.append(' ');

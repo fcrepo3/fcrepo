@@ -282,7 +282,7 @@ public class DCFields
             out.append(" xml:lang=\"" + value.getLang() + "\"");
         }
         out.append(">");
-        out.append(StreamUtility.enc(value.getValue()));
+        StreamUtility.enc(value.getValue(), out);
         out.append("</dc:" + name + ">\n");
     }
 }

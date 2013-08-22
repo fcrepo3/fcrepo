@@ -103,8 +103,8 @@ public class DescribeRepositoryServlet
             throws ServletException, IOException {
         boolean xml = false;
 
-        logger.debug("Got request: " + request.getRequestURL().toString() + "?"
-                + request.getQueryString());
+        logger.debug("Got request: {}?{}", request.getRequestURL(),
+                request.getQueryString());
 
         // Check for xml parameter.
         for (Enumeration<?> e = request.getParameterNames(); e.hasMoreElements();) {

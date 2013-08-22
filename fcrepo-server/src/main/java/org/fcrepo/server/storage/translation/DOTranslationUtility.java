@@ -327,7 +327,7 @@ public abstract class DOTranslationUtility
         // Second pass: convert non-fedora-app-context URLs via variable substitution
         output = s_fedoraLocalPattern.matcher(output).replaceAll(s_hostInfo);
 
-        logger.debug("makeAbsoluteURLs: input=" + input + ", output=" + output);
+        logger.debug("makeAbsoluteURLs: input={}, output={}", input, output);
         return output;
     }
 
@@ -376,7 +376,7 @@ public abstract class DOTranslationUtility
                         .replaceAll(s_fedoraLocalPattern.pattern());
         }
 
-        logger.debug("makeFedoraLocalURLs: input=" + input + ", output=" + output);
+        logger.debug("makeFedoraLocalURLs: input={}, output={}", input, output);
         return output;
     }
 
@@ -397,7 +397,7 @@ public abstract class DOTranslationUtility
         // (i.e., getItem), and replace with new API-A-LITE syntax.
 
         output = s_getItemPattern.matcher(input).replaceAll("/");
-        logger.debug("convertGetItemURLs: input=" + input + ", output=" + output);
+        logger.debug("convertGetItemURLs: input={}, output={}", input, output);
         return output;
     }
 
@@ -749,8 +749,8 @@ public abstract class DOTranslationUtility
 
                         DatastreamXMLMetadata xd = (DatastreamXMLMetadata) d;
                         if (logger.isDebugEnabled())
-                            logger.debug(obj.getPid() + " : normalising URLs in "
-                                + dsid);
+                            logger.debug("{} : normalising URLs in {}",
+                                    obj.getPid(), dsid);
                         xd.xmlContent =
                                 DOTranslationUtility
                                         .normalizeInlineXML(new String(xd.xmlContent,
@@ -779,7 +779,10 @@ public abstract class DOTranslationUtility
     }
 
     protected static String oneString(String[] idList) {
-        StringBuffer out = new StringBuffer();
+        if (idList.length == 0) return "";
+        int bufLen = idList.length - 1; // the number of spaces we'll add
+        for (String val: idList) bufLen += val.length();
+        StringBuilder out = new StringBuilder(bufLen);
         for (int i = 0; i < idList.length; i++) {
             if (i > 0) {
                 out.append(' ');
@@ -1038,7 +1041,7 @@ public abstract class DOTranslationUtility
         writer.print(" ");
         writer.print(attribute.localName);
         writer.print("=\"");
-        writer.print(StreamUtility.enc(attributeContent));
+        StreamUtility.enc(attributeContent, writer);
         writer.print("\">\n");
     }
 
@@ -1057,7 +1060,7 @@ public abstract class DOTranslationUtility
         writer.print(" ");
         writer.print(attribute.localName);
         writer.print("=\"");
-        writer.print(StreamUtility.enc(attributeContent));
+        StreamUtility.enc(attributeContent, writer);
         writer.print("\"/>\n");
     }
 
@@ -1067,7 +1070,7 @@ public abstract class DOTranslationUtility
         writer.print("<");
         writer.print(element.qName);
         writer.print(">");
-        writer.print(StreamUtility.enc(elementContent));
+        StreamUtility.enc(elementContent, writer);
         writer.print("</");
         writer.print(element.qName);
         writer.print(">\n");

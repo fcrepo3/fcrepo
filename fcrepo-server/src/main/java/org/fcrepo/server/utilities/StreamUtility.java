@@ -9,7 +9,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.nio.CharBuffer;
 
 import org.fcrepo.common.FaultException;
 import org.slf4j.Logger;
@@ -34,12 +38,11 @@ public abstract class StreamUtility {
      * @return A new, encoded String.
      */
     public static String enc(String in) {
-        String inStr = in;
-        if (inStr == null) {
-            inStr = "";
+        if (in == null || "".equals(in)) {
+            return "";
         }
         StringBuffer out = new StringBuffer();
-        enc(inStr, out);
+        enc(in, out);
         return out.toString();
     }
 
@@ -53,6 +56,44 @@ public abstract class StreamUtility {
      *        The StringBuffer to write to.
      */
     public static void enc(String in, StringBuffer out) {
+        if (in == null) return;
+        for (int i = 0; i < in.length(); i++) {
+            enc(in.charAt(i), out);
+        }
+    }
+
+    public static void enc(String in, StringBuilder out) {
+        if (in == null) return;
+        for (int i = 0; i < in.length(); i++) {
+            enc(in.charAt(i), out);
+        }
+    }
+
+    public static void enc(String in, CharBuffer out) {
+        if (in == null) return;
+        for (int i = 0; i < in.length(); i++) {
+            enc(in.charAt(i), out);
+        }
+    }
+
+    public static void enc(String in, PrintStream out) {
+        if (in == null) return;
+        for (int i = 0; i < in.length(); i++) {
+            enc(in.charAt(i), out);
+        }
+    }
+
+    /**
+     * Prints an XML-appropriate encoding of the given String to the given
+     * Writer.
+     *
+     * @param in
+     *        The String to encode.
+     * @param out
+     *        The PrintWriter to write to.
+     */
+    public static void enc(String in, PrintWriter out) {
+        if (in == null) return;
         for (int i = 0; i < in.length(); i++) {
             enc(in.charAt(i), out);
         }
@@ -72,6 +113,37 @@ public abstract class StreamUtility {
      *        The StringBuffer to write to.
      */
     public static void enc(char[] in, int start, int length, StringBuffer out) {
+        for (int i = start; i < length + start; i++) {
+            enc(in[i], out);
+        }
+    }
+
+    /**
+     * Prints an XML-appropriate encoding of the given range of characters to
+     * the given Writer.
+     *
+     * @param in
+     *        The char buffer to read from.
+     * @param start
+     *        The starting index.
+     * @param length
+     *        The number of characters in the range.
+     * @param out
+     *        The PrintWriter to write to.
+     */
+    public static void enc(char[] in, int start, int length, PrintWriter out) {
+        for (int i = start; i < length + start; i++) {
+            enc(in[i], out);
+        }
+    }
+
+    public static void enc(char[] in, int start, int length, PrintStream out) {
+        for (int i = start; i < length + start; i++) {
+            enc(in[i], out);
+        }
+    }
+
+    public static void enc(char[] in, int start, int length, StringBuilder out) {
         for (int i = start; i < length + start; i++) {
             enc(in[i], out);
         }
@@ -99,6 +171,78 @@ public abstract class StreamUtility {
             out.append("&apos;");
         } else {
             out.append(in);
+        }
+    }
+
+    public static void enc(char in, StringBuilder out) {
+        if (in == '&') {
+            out.append("&amp;");
+        } else if (in == '<') {
+            out.append("&lt;");
+        } else if (in == '>') {
+            out.append("&gt;");
+        } else if (in == '\"') {
+            out.append("&quot;");
+        } else if (in == '\'') {
+            out.append("&apos;");
+        } else {
+            out.append(in);
+        }
+    }
+
+    public static void enc(char in, CharBuffer out) {
+        if (in == '&') {
+            out.append("&amp;");
+        } else if (in == '<') {
+            out.append("&lt;");
+        } else if (in == '>') {
+            out.append("&gt;");
+        } else if (in == '\"') {
+            out.append("&quot;");
+        } else if (in == '\'') {
+            out.append("&apos;");
+        } else {
+            out.append(in);
+        }
+    }
+
+    public static void enc(char in, PrintStream out) {
+        if (in == '&') {
+            out.append("&amp;");
+        } else if (in == '<') {
+            out.append("&lt;");
+        } else if (in == '>') {
+            out.append("&gt;");
+        } else if (in == '\"') {
+            out.append("&quot;");
+        } else if (in == '\'') {
+            out.append("&apos;");
+        } else {
+            out.append(in);
+        }
+    }
+    /**
+     * Prints an XML-appropriate encoding of the given character to the given
+     * Writer.
+     *
+     * @param in
+     *        The character.
+     * @param out
+     *        The Writer to write to.
+     */
+    public static void enc(char in, PrintWriter out) {
+        if (in == '&') {
+            out.print("&amp;");
+        } else if (in == '<') {
+            out.print("&lt;");
+        } else if (in == '>') {
+            out.print("&gt;");
+        } else if (in == '\"') {
+            out.print("&quot;");
+        } else if (in == '\'') {
+            out.print("&apos;");
+        } else {
+            out.print(in);
         }
     }
 

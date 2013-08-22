@@ -65,7 +65,7 @@ public class DOTranslatorImpl
                             int transContext) throws ObjectIntegrityException,
             StreamIOException, UnsupportedTranslationException, ServerException {
         try {
-            logger.debug("Grabbing deserializer for: " + format);
+            logger.debug("Grabbing deserializer for: {}", format);
             DODeserializer des = m_deserializers.get(format);
             if (des == null) {
                 throw new UnsupportedTranslationException("No deserializer exists for format: "
@@ -89,7 +89,7 @@ public class DOTranslatorImpl
                           int transContext) throws ObjectIntegrityException,
             StreamIOException, UnsupportedTranslationException, ServerException {
         try {
-            logger.debug("Grabbing serializer for: " + format);
+            logger.debug("Grabbing serializer for: {}", format);
             DOSerializer ser = m_serializers.get(format);
             if (ser == null) {
                 throw new UnsupportedTranslationException("No serializer exists for format: "

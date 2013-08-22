@@ -281,7 +281,8 @@ public class FedoraObjectsResource extends BaseRestResource {
         try {
             Context context = getContext();
             String[] objectHistory = m_access.getObjectHistory(context, pid);
-            String xml = getSerializer(context).objectHistoryToXml(objectHistory, pid);
+            getSerializer(context);
+            String xml = DefaultSerializer.objectHistoryToXml(objectHistory, pid);
             MediaType mime = RestHelper.getContentType(format);
 
             if (TEXT_HTML.isCompatible(mime)) {
@@ -562,25 +563,31 @@ public class FedoraObjectsResource extends BaseRestResource {
             String label,
             String ownerId,
             String encoding) {
-        StringBuilder xml = new StringBuilder();
-        xml.append("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>\n");
-        xml.append("<foxml:digitalObject VERSION=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
-        xml.append("    xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\"\n");
-        xml.append(
-                "           xsi:schemaLocation=\"" + Constants.FOXML.uri + " " + Constants.FOXML1_1.xsdLocation + "\"");
+        StringBuilder xml = new StringBuilder(1024);
+        xml.append("<?xml version=\"1.0\" encoding=\"");
+        xml.append(encoding);
+        xml.append("\"?>\n"
+                + "<foxml:digitalObject VERSION=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                + "    xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\"\n"
+                +  "           xsi:schemaLocation=\"");
+        xml.append(Constants.FOXML.uri);
+        xml.append(' ');
+        xml.append(Constants.FOXML1_1.xsdLocation);
+        xml.append('"');
         if (pid != null && pid.length() > 0) {
-            xml.append("\n           PID=\"" + StreamUtility.enc(pid) + "\">\n");
-        } else {
-            xml.append(">\n");
+            xml.append("\n           PID=\"");
+            StreamUtility.enc(pid, xml);
+            xml.append('"');
         }
-        xml.append("  <foxml:objectProperties>\n");
-        xml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>\n");
-        xml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\""
-                   + StreamUtility.enc(label) + "\"/>\n");
-        xml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#ownerId\" VALUE=\""
-                   + ownerId + "\"/>\n");
-        xml.append("  </foxml:objectProperties>\n");
-        xml.append("</foxml:digitalObject>");
+
+        xml.append(">\n  <foxml:objectProperties>\n"
+                + "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>\n"
+                + "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\"");
+        StreamUtility.enc(label, xml);
+        xml.append("\"/>\n"
+                + "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#ownerId\" VALUE=\"");
+        xml.append(ownerId);
+        xml.append("\"/>\n  </foxml:objectProperties>\n</foxml:digitalObject>");
 
         return xml.toString();
     }

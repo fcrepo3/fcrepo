@@ -42,48 +42,48 @@ public class ObjectInfoAsXML
         m_context = context;
     }
 
-    public String getObjectProfile(String reposBaseURL,
+    public static String getObjectProfile(String reposBaseURL,
                                    ObjectProfile objProfile,
                                    Date versDateTime) throws ServerException {
 
         // use REST serializer
-        Server fedoraServer = Server.getInstance(new File(Constants.FEDORA_HOME), false);
-        String fedoraServerHost = fedoraServer.getParameter("fedoraServerHost");
-        DefaultSerializer ser = new DefaultSerializer(fedoraServerHost, m_context);
-        return ser.objectProfileToXML(objProfile, versDateTime);
+        return DefaultSerializer.objectProfileToXML(objProfile, versDateTime);
     }
 
-    public String getItemIndex(String reposBaseURL,
+    public static String getItemIndex(String reposBaseURL,
                                String applicationContext,
                                DOReader reader,
                                Date versDateTime) throws ServerException {
         try {
             Datastream[] datastreams =
                     reader.GetDatastreams(versDateTime, null);
-            StringBuffer out = new StringBuffer();
+            StringBuilder out = new StringBuilder(512);
 
-            out.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-            out.append("<objectItemIndex");
-            out.append(" PID=\"" + reader.GetObjectPID() + "\"");
+            out.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                    + "<objectItemIndex PID=\"");
+            out.append(reader.GetObjectPID());
+            out.append('"');
             if (versDateTime != null) {
                 out.append(" dateTime=\"");
                 out.append(DateUtility.convertDateToString(versDateTime));
-                out.append("\"");
+                out.append('"');
             }
-            out.append(" xmlns:xsi=\"" + XSI.uri + "\"");
-            out.append(" xsi:schemaLocation=\"" + ACCESS.uri + " ");
-            out.append(OBJ_ITEMS1_0.xsdLocation + "\">");
+            out.append(" xmlns:xsi=\"");
+            out.append(XSI.uri);
+            out.append("\" xsi:schemaLocation=\"");
+            out.append(ACCESS.uri);
+            out.append(' ');
+            out.append(OBJ_ITEMS1_0.xsdLocation);
+            out.append("\">");
 
             for (Datastream element : datastreams) {
-                out.append("<item>\n");
-                out.append("<itemId>" + StreamUtility.enc(element.DatastreamID)
-                        + "</itemId>\n");
+                out.append("<item>\n<itemId>");
+                StreamUtility.enc(element.DatastreamID, out);
+                out.append("</itemId>\n");
                 String label = element.DSLabel;
-                if (label == null) {
-                    label = "";
-                }
-                out.append("<itemLabel>" + StreamUtility.enc(label)
-                        + "</itemLabel>\n");
+                out.append("<itemLabel>");
+                StreamUtility.enc(label, out);
+                out.append("</itemLabel>\n");
 
                 String itemDissURL =
                         getItemDissURL(reposBaseURL,
@@ -91,11 +91,11 @@ public class ObjectInfoAsXML
                                        reader.GetObjectPID(),
                                        element.DatastreamID,
                                        versDateTime);
-                out.append("<itemURL>" + StreamUtility.enc(itemDissURL)
-                        + "</itemURL>\n");
-                out.append("<itemMIMEType>" + StreamUtility.enc(element.DSMIME)
-                        + "</itemMIMEType>\n");
-                out.append("</item>\n");
+                out.append("<itemURL>");
+                StreamUtility.enc(itemDissURL, out);
+                out.append("</itemURL>\n<itemMIMEType>");
+                StreamUtility.enc(element.DSMIME, out);
+                out.append("</itemMIMEType>\n</item>\n");
             }
             out.append("</objectItemIndex>");
             return out.toString();
@@ -105,20 +105,17 @@ public class ObjectInfoAsXML
         }
     }
 
-    public String getMethodIndex(String reposBaseURL,
+    public static String getMethodIndex(String reposBaseURL,
                                  String PID,
                                  ObjectMethodsDef[] methods,
                                  Date versDateTime) throws ServerException {
 
         // use REST serializer
-        Server fedoraServer = Server.getInstance(new File(Constants.FEDORA_HOME), false);
-        String fedoraServerHost = fedoraServer.getParameter("fedoraServerHost");
-        DefaultSerializer ser = new DefaultSerializer(fedoraServerHost, m_context);
-        return ser.objectMethodsToXml(methods, PID, null, versDateTime);
+        return DefaultSerializer.objectMethodsToXml(reposBaseURL, methods, PID, null, versDateTime);
 
     }
 
-    public String getOAIDublinCore(Datastream dublinCore)
+    public static String getOAIDublinCore(Datastream dublinCore)
             throws ServerException {
         DCFields dc;
         if (dublinCore == null) {
@@ -130,7 +127,7 @@ public class ObjectInfoAsXML
         return dc.getAsXML();
     }
 
-    private String getItemDissURL(String reposBaseURL,
+    private static String getItemDissURL(String reposBaseURL,
                                   String applicationContext,
                                   String PID,
                                   String datastreamID,

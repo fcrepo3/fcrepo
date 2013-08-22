@@ -164,7 +164,7 @@ class SQLUtilityImpl
                                   boolean[] numeric) throws SQLException {
 
         // prepare update statement
-        StringBuffer sql = new StringBuffer();
+        StringBuilder sql = new StringBuilder();
         sql.append("UPDATE " + table + " SET ");
         boolean needComma = false;
         for (int i = 0; i < columns.length; i++) {
@@ -182,8 +182,12 @@ class SQLUtilityImpl
                 }
             }
         }
-        sql.append(" WHERE " + uniqueColumn + " = ?");
-        logger.debug("About to execute: " + sql.toString());
+        sql.append(" WHERE ");
+        sql.append(uniqueColumn);
+        sql.append(" = ?");
+        if (logger.isDebugEnabled()) {
+            logger.debug("About to execute: " + sql.toString());
+        }
         PreparedStatement stmt = conn.prepareStatement(sql.toString());
 
         try {
@@ -227,7 +231,7 @@ class SQLUtilityImpl
                             boolean[] numeric) throws SQLException {
 
         // prepare insert statement
-        StringBuffer sql = new StringBuffer();
+        StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO " + table + " (");
         for (int i = 0; i < columns.length; i++) {
             if (i > 0) {
@@ -247,7 +251,9 @@ class SQLUtilityImpl
             }
         }
         sql.append(")");
-        logger.debug("About to execute: " + sql.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("About to execute: {}", sql.toString());
+        }
         PreparedStatement stmt = conn.prepareStatement(sql.toString());
 
         try {
@@ -354,7 +360,7 @@ class SQLUtilityImpl
         while (nii.hasNext()) {
             TableSpec spec = nii.next();
             if (logger.isInfoEnabled()) {
-                StringBuffer sqlCmds = new StringBuffer();
+                StringBuilder sqlCmds = new StringBuilder();
                 Iterator<String> iter =
                         tcConn.getDDLConverter().getDDL(spec).iterator();
                 while (iter.hasNext()) {
@@ -362,7 +368,7 @@ class SQLUtilityImpl
                     sqlCmds.append(iter.next());
                     sqlCmds.append(";");
                 }
-                logger.info("Creating new " + "table '" + spec.getName()
+                logger.info("Creating new table '" + spec.getName()
                         + "' with command(s): " + sqlCmds.toString());
             }
             tcConn.createTable(spec);

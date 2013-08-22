@@ -317,23 +317,27 @@ implements PolicyIndex {
 
         String[] parts = resourceId.split("\\/");
 
+        int bufPrimer = 0;
         for (int x = 1; x < parts.length; x++) {
-            StringBuilder sb = new StringBuilder();
+            bufPrimer = Math.max(bufPrimer, (parts[x].length() + 1));
+            StringBuilder sb = new StringBuilder(bufPrimer);
             for (int y = 0; y < x; y++) {
                 sb.append("/");
                 sb.append(parts[y + 1]);
             }
 
-            components.add(sb.toString());
+            String componentBase = sb.toString();
+            bufPrimer = componentBase.length() + 16;
+            components.add(componentBase);
 
             if (x != parts.length - 1) {
-                components.add(sb.toString() + "/.*");
+                components.add(componentBase.concat("/.*"));
             } else {
-                components.add(sb.toString() + "$");
+                components.add(componentBase.concat("$"));
             }
         }
 
-        return components.toArray(new String[components.size()]);
+        return components.toArray(parts);
     }
 
 
