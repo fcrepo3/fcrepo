@@ -33,7 +33,7 @@ public class AttributeFinderConfig {
      * @return
      */
     public Designator get(int designator) {
-        return designators.get(new Integer(designator));
+        return designators.get(Integer.valueOf(designator));
     }
     /**
      * Get a Designator based on the XACML target name (in lower case)
@@ -66,7 +66,7 @@ public class AttributeFinderConfig {
             if (des == null) {
                 des = new Designator();
             }
-            designators.put(new Integer(target), des);
+            designators.put(Integer.valueOf(target), des);
             return des;
         } else {
             throw new AttributeFinderException("Invalid attribute designator name " + designatorName);

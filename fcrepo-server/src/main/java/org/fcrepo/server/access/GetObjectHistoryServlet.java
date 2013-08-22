@@ -130,7 +130,7 @@ public class GetObjectHistoryServlet
             String value =
                     URLDecoder.decode(request.getParameter(name), "UTF-8");
             if (name.equalsIgnoreCase("xml")) {
-                xml = new Boolean(request.getParameter(name)).booleanValue();
+                xml = Boolean.parseBoolean(request.getParameter(name));
             }
             h_userParms.put(name, value);
         }

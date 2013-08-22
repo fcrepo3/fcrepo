@@ -149,9 +149,8 @@ public class PolicyFinderModule
 
         if (moduleParameters.containsKey(VALIDATE_REPOSITORY_POLICIES_KEY)) {
             m_validateRepositoryPolicies =
-                    (new Boolean(moduleParameters
-                            .get(VALIDATE_REPOSITORY_POLICIES_KEY)))
-                            .booleanValue();
+                    Boolean.parseBoolean(moduleParameters
+                            .get(VALIDATE_REPOSITORY_POLICIES_KEY));
         } else {
             m_validateRepositoryPolicies = false;
         }

@@ -302,8 +302,7 @@ public class DefaultExternalContentManager
             username = beHash.get("callUsername");
             password = beHash.get("callPassword");
             backendSSL =
-                    new Boolean(beHash.get("callSSL"))
-                            .booleanValue();
+                    Boolean.parseBoolean(beHash.get("callSSL"));
             if (backendSSL) {
                 if (params.getProtocol().equals("http")) {
                     url = url.replaceFirst("http:", "https:");

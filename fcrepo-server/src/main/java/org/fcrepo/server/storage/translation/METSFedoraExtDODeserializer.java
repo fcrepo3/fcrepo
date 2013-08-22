@@ -377,8 +377,7 @@ public class METSFedoraExtDODeserializer
                 String dsVersionable = grab(a, METS.uri, "VERSIONABLE");
                 if (dsVersionable != null && !dsVersionable.equals("")) {
                     m_dsVersionable =
-                            new Boolean(grab(a, METS.uri, "VERSIONABLE"))
-                                    .booleanValue();
+                            Boolean.parseBoolean(grab(a, METS.uri, "VERSIONABLE"));
                 } else {
                     m_dsVersionable = true;
                 }
@@ -388,8 +387,7 @@ public class METSFedoraExtDODeserializer
                 String dsVersionable = grab(a, METS.uri, "VERSIONABLE");
                 if (dsVersionable != null && !dsVersionable.equals("")) {
                     m_dsVersionable =
-                            new Boolean(grab(a, METS.uri, "VERSIONABLE"))
-                                    .booleanValue();
+                            Boolean.parseBoolean(grab(a, METS.uri, "VERSIONABLE"));
                 } else {
                     m_dsVersionable = true;
                 }
@@ -441,8 +439,7 @@ public class METSFedoraExtDODeserializer
                 String dsVersionable = grab(a, METS.uri, "VERSIONABLE");
                 if (dsVersionable != null && !dsVersionable.equals("")) {
                     m_dsVersionable =
-                            new Boolean(grab(a, METS.uri, "VERSIONABLE"))
-                                    .booleanValue();
+                            Boolean.parseBoolean(grab(a, METS.uri, "VERSIONABLE"));
                 } else {
                     m_dsVersionable = true;
                 }

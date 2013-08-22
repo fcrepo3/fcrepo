@@ -110,7 +110,7 @@ public class DescribeRepositoryServlet
         for (Enumeration<?> e = request.getParameterNames(); e.hasMoreElements();) {
             String name = URLDecoder.decode((String) e.nextElement(), "UTF-8");
             if (name.equalsIgnoreCase("xml")) {
-                xml = new Boolean(request.getParameter(name)).booleanValue();
+                xml = Boolean.parseBoolean(request.getParameter(name));
             }
         }
         Context context =

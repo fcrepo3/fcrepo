@@ -664,7 +664,7 @@ public class FOXMLDODeserializer
             if (versionable == null || versionable.equals("")) {
                 m_dissVersionable = true;
             } else {
-                m_dissVersionable = Boolean.valueOf(versionable);
+                m_dissVersionable = Boolean.parseBoolean(versionable);
             }
         } else if (localName.equals("disseminatorVersion")) {
             m_diss = new Disseminator();
@@ -676,7 +676,7 @@ public class FOXMLDODeserializer
             if (versionable == null || versionable.equals("")) {
                 m_dissVersionable = true;
             } else {
-                m_dissVersionable = Boolean.valueOf(versionable);
+                m_dissVersionable = Boolean.parseBoolean(versionable);
             }
             m_diss.dissVersionID = grab(a, FOXML.uri, "ID");
             m_diss.dissLabel = grab(a, FOXML.uri, "LABEL");
