@@ -232,11 +232,9 @@ public class Foxml11Document {
     }
 
     public void serialize(OutputStream out) {
-        Transformer idTransform;
-        TransformerFactory xformFactory = null;
+        final Transformer idTransform;
         try {
-            xformFactory = XmlTransformUtility.getTransformerFactory();
-            idTransform = xformFactory.newTransformer();
+            idTransform = XmlTransformUtility.getTransformer();
             Source input = new DOMSource(doc);
             Result output = new StreamResult(out);
             idTransform.transform(input, output);
@@ -246,10 +244,6 @@ public class Foxml11Document {
         } catch (TransformerException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } finally {
-            if (xformFactory != null) {
-                XmlTransformUtility.returnTransformerFactory(xformFactory);
-            }
         }
     }
 }

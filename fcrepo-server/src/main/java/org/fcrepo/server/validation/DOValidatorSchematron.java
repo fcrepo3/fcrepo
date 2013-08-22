@@ -205,23 +205,18 @@ public class DOValidatorSchematron {
                                                              String phase)
             throws ObjectValidityException, TransformerException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        TransformerFactory tfactory = null;
         try {
             // Create a transformer for that uses the Schematron preprocessor stylesheet.
             // Transform the Schematron schema (rules) into a validating stylesheet.
-            tfactory = XmlTransformUtility.getTransformerFactory();
             Transformer ptransformer =
-                    tfactory.newTransformer(preprocessorSource);
+                    XmlTransformUtility.getTransformer(preprocessorSource);
             ptransformer.setParameter("phase", phase);
             ptransformer.transform(rulesSource, new StreamResult(out));
         } catch (TransformerException e) {
             logger.error("Schematron validation failed", e);
             throw new ObjectValidityException(e.getMessage());
-        } finally {
-            if (tfactory != null) {
-                XmlTransformUtility.returnTransformerFactory(tfactory);
-            }
         }
+
         return XmlTransformUtility.getTemplates(
             new StreamSource(
                 new ByteArrayInputStream(out.toByteArray())));

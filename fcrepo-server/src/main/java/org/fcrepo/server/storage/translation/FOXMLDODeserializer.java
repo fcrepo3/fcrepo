@@ -352,7 +352,7 @@ public class FOXMLDODeserializer
                 if (versionable == null || versionable.equals("")) {
                     m_dsVersionable = true;
                 } else {
-                    m_dsVersionable = new Boolean(versionable).booleanValue();
+                    m_dsVersionable = Boolean.valueOf(versionable);
                 }
                 // Never allow the AUDIT datastream to be versioned
                 // since it naturally represents a system-controlled
@@ -664,7 +664,7 @@ public class FOXMLDODeserializer
             if (versionable == null || versionable.equals("")) {
                 m_dissVersionable = true;
             } else {
-                m_dissVersionable = new Boolean(versionable).booleanValue();
+                m_dissVersionable = Boolean.valueOf(versionable);
             }
         } else if (localName.equals("disseminatorVersion")) {
             m_diss = new Disseminator();
@@ -676,7 +676,7 @@ public class FOXMLDODeserializer
             if (versionable == null || versionable.equals("")) {
                 m_dissVersionable = true;
             } else {
-                m_dissVersionable = new Boolean(versionable).booleanValue();
+                m_dissVersionable = Boolean.valueOf(versionable);
             }
             m_diss.dissVersionID = grab(a, FOXML.uri, "ID");
             m_diss.dissLabel = grab(a, FOXML.uri, "LABEL");

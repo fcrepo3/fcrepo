@@ -147,15 +147,8 @@ public class XmlSerializer {
     }
 
     public static void prettyPrintWithTransformer(Document doc, OutputStream out) {
-        TransformerFactory tfactory =
-                XmlTransformUtility.getTransformerFactory();
-        Transformer serializer;
         try {
-            try {
-                serializer = tfactory.newTransformer();
-            } finally {
-                XmlTransformUtility.returnTransformerFactory(tfactory);
-            }
+            final Transformer serializer = XmlTransformUtility.getTransformer();
             //Setup indenting to "pretty print"
             serializer.setOutputProperty(OutputKeys.INDENT, "yes");
             serializer

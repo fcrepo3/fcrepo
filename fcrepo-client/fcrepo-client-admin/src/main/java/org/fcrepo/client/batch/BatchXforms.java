@@ -89,7 +89,7 @@ class BatchXforms
 
     private Vector<String> keys = null;
 
-    /* package */Vector getKeys() {
+    Vector<String> getKeys() {
         return keys;
     }
 

@@ -13,7 +13,9 @@ import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.SAXParser;
+import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
@@ -79,6 +81,33 @@ public class XmlTransformUtility {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    public static Transformer getTransformer() throws TransformerException {
+        return getTransformer(null);
+    }
+    public static Transformer getTransformer(Source src) throws TransformerException {
+        TransformerFactory factory = null;
+        Transformer result = null;
+        try {
+            factory = TRANSFORM_FACTORIES.borrowObject();
+            result = (src == null) ? factory.newTransformer()
+                    : factory.newTransformer(src);
+            
+        } catch (TransformerException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (factory != null) {
+                try {
+                    TRANSFORM_FACTORIES.returnObject(factory);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return result;
     }
     
     /**
