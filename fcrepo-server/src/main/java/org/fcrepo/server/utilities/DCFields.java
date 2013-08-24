@@ -277,12 +277,12 @@ public class DCFields
         }
     }
     private void appendXML(DCField value, String name, StringBuffer out) {
-        out.append("  <dc:" + name);
+        out.append("  <dc:").append(name);
         if (value.getLang() != null) {
-            out.append(" xml:lang=\"" + value.getLang() + "\"");
+            out.append(" xml:lang=\"").append(value.getLang()).append('"');
         }
-        out.append(">");
+        out.append('>');
         StreamUtility.enc(value.getValue(), out);
-        out.append("</dc:" + name + ">\n");
+        out.append("</dc:").append(name).append(">\n");
     }
 }

@@ -53,7 +53,7 @@ public class FedoraAPIAMTOMImpl
         m_access =
                 (Access) m_server
                 .getModule("org.fcrepo.server.access.Access");
-        debug = Boolean.valueOf(m_server.getParameter("debug"));
+        debug = Boolean.parseBoolean(m_server.getParameter("debug"));
     }
 
     /*

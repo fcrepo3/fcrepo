@@ -763,12 +763,12 @@ public class FOXMLDODeserializer
             if (prefix.length() > 0) {
                 out.append(':');
             }
-            out.append(prefix + "=\"");
+            out.append(prefix).append("=\"");
             StreamUtility.enc(m_prefixMap.get(prefix), out);
             out.append('"');
         }
         for (int i = 0; i < a.getLength(); i++) {
-            out.append(" " + a.getQName(i) + "=\"");
+            out.append(" ").append(a.getQName(i)).append("=\"");
             StreamUtility.enc(a.getValue(i), out);
             out.append('"');
         }

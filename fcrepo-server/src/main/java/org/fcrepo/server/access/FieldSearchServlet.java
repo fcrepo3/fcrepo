@@ -258,25 +258,29 @@ public class FieldSearchServlet
                                 .getOutputStream(), "UTF-8"));
                 out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
                 out.println("<result xmlns=\"" + TYPES.uri + "\">");
-                if (fsr != null && fsr.getToken() != null) {
+                if (fsr != null) {
                     SimpleDateFormat formatter =
                             new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                     out.println("  <listSession>");
-                    out.println("    <token>" + fsr.getToken() + "</token>");
+                    if (fsr.getToken() != null) {
+                        out.print("    <token>");
+                        out.print(fsr.getToken());
+                        out.println("</token>");
+                    }
                     if (fsr.getCursor() != -1) {
-                        out.println("    <cursor>" + fsr.getCursor()
-                                + "</cursor>");
+                        out.print("    <cursor>");
+                        out.print(Long.toString(fsr.getCursor()));
+                        out.println("</cursor>");
                     }
                     if (fsr.getCompleteListSize() != -1) {
-                        out.println("    <completeListSize>"
-                                + fsr.getCompleteListSize()
-                                + "</completeListSize>");
+                        out.print("    <completeListSize>");
+                        out.print(Long.toString(fsr.getCompleteListSize()));
+                        out.println("</completeListSize>");
                     }
                     if (fsr.getExpirationDate() != null) {
-                        out
-                                .println("    <expirationDate>"
-                                        + formatter.format(fsr.getExpirationDate())
-                                        + "</expirationDate>");
+                        out.print("    <expirationDate>");
+                        out.print(formatter.format(fsr.getExpirationDate()));
+                        out.println("</expirationDate>");
                     }
                     out.println("  </listSession>");
                     out.println("<resultList>");
