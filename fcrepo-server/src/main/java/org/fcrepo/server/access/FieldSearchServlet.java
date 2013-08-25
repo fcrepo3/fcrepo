@@ -451,9 +451,7 @@ public class FieldSearchServlet
                 html.append("</a>");
             } else if (l.equalsIgnoreCase("label")) {
                 if (f.getLabel() != null) {
-                    html
-                            .append(StreamUtility.enc(f
-                                    .getLabel()));
+                    StreamUtility.enc(f.getLabel(), html);
                 }
             } else if (l.equalsIgnoreCase("state")) {
                 html.append(f.getState());

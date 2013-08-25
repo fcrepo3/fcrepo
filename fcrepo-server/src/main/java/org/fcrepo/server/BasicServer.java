@@ -72,8 +72,8 @@ public class BasicServer
                     + "not given, but it's required.");
         }
 
-        logger.info("Fedora Version: " + Server.VERSION);
-        logger.info("Fedora Build Date: " + Server.BUILD_DATE);
+        logger.info("Fedora Version: {}", Server.VERSION);
+        logger.info("Fedora Build Date: {}", Server.BUILD_DATE);
 
         ServerStatusFile status = getStatusFile();
         try {
@@ -141,7 +141,7 @@ public class BasicServer
         PID pid = new PID(objectName.uri.substring("info:fedora/".length()));
         boolean exists = doManager.objectExists(pid.toString());
         if (exists && firstRun) {
-            logger.info("Purging old system object: " + pid.toString());
+            logger.info("Purging old system object: {}", pid);
             Context context = ReadOnlyContext.getContext(null,
                                                          null,
                                                          null,
@@ -158,7 +158,7 @@ public class BasicServer
             }
         }
         if (!exists) {
-            logger.info("Ingesting new system object: " + pid.toString());
+            logger.info("Ingesting new system object: {}", pid);
             InputStream xml = getStream("org/fcrepo/server/resources/"
                                         + pid.toFilename() + ".xml");
             Context context = ReadOnlyContext.getContext(null,

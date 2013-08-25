@@ -72,7 +72,7 @@ public class DOObjectValidatorModule extends Module implements
 	
 	// spring config of the validators
 	public void setValidators(Map<String,? extends DOObjectValidator> validators){
-		logger.info("Adding " + validators.size() + " object validators");
+		logger.info("Adding {} object validators", validators.size());
         m_validators.putAll(validators);
         if (m_validators.size() > 0) {
         	m_enabled = true;
