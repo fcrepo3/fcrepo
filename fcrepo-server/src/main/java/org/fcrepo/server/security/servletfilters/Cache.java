@@ -179,11 +179,11 @@ public class Cache {
             logger.debug(m + "> " + getCacheId() + " [" + userid + "] ["
                     + password + "]");
         } else {
-            logger.info("Authenticating user [" + userid + "]");
+            logger.info("Authenticating user [{}]", userid);
         }
 
         CacheElement cacheElement = getCacheElement(userid /* , password */);
-        logger.debug(m + "cacheElement==" + cacheElement.getInstanceId());
+        logger.debug("{}cacheElement=={}", m, cacheElement.getInstanceId());
 
         Boolean authenticated = null;
         try {
@@ -192,7 +192,7 @@ public class Cache {
             logger.error("Error authenticating", t);
             throw t;
         }
-        logger.debug(m + "< " + authenticated);
+        logger.debug("{}< {}", m, authenticated);
 
         return authenticated;
     }
@@ -213,7 +213,7 @@ public class Cache {
         }
 
         CacheElement cacheElement = getCacheElement(userid /* , password */);
-        logger.debug(m + "cacheElement==" + cacheElement.getInstanceId());
+        logger.debug("{}cacheElement=={}", m, cacheElement.getInstanceId());
         Map namedValues = null;
         try {
             namedValues = cacheElement.getNamedValues(this, password);
@@ -221,7 +221,7 @@ public class Cache {
             logger.error("Error getting named values", t);
             throw t;
         }
-        logger.debug(m + "< " + namedValues);
+        logger.debug("{}< {}", m, namedValues);
 
         return namedValues;
     }

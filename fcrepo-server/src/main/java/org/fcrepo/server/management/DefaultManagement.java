@@ -1929,8 +1929,7 @@ public class DefaultManagement
                 File file = new File(this.m_tempDir, id);
                 if (file.exists()) {
                     if (file.delete()) {
-                        logger.info("Removed uploaded file '" + id
-                                    + "' because it expired.");
+                        logger.info("Removed uploaded file '{}' because it expired.", id);
                     } else {
                         logger.warn("Could not remove expired uploaded file '"
                                     + id + "'. Check permissions in " + m_tempDir.getPath() + " directory.");

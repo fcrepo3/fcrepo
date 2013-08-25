@@ -256,7 +256,7 @@ public class FilterLdap
                 logger.info(m + "known parameter " + key + "==" + value);
             }
         } finally {
-            logger.debug(m + "<");
+            logger.debug("{}<", m);
         }
     }
 
@@ -265,14 +265,14 @@ public class FilterLdap
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " applyFilter() ";
         String result = filter;
-        logger.debug(m + "result==" + result);
+        logger.debug("{}result=={}", m, result);
         int i = args.length - 1;
         for (; i >= 0; i--) {
             String regex = "\\{" + Integer.toString(i) + "\\}";
-            logger.debug(m + "regex ==" + regex);
-            logger.debug(m + "arg ==" + args[i]);
+            logger.debug("{}regex =={}", m, regex);
+            logger.debug("{}arg =={}", m, args[i]);
             result = result.replaceFirst(regex, args[i]);
-            logger.debug(m + "result==" + result);
+            logger.debug("{}result=={}", m, result);
         }
         return result;
     }
@@ -307,16 +307,16 @@ public class FilterLdap
                     "com.sun.jndi.ldap.LdapCtxFactory");
 
             if (VERSION != null && !"".equals(VERSION)) {
-                logger.debug(m + "ldap explicit version==" + VERSION);
+                logger.debug("{}ldap explicit version=={}", m, VERSION);
                 env.put(CONTEXT_VERSION_KEY, VERSION);
             }
-            logger.debug(m + "ldap version==" + env.get(CONTEXT_VERSION_KEY));
+            logger.debug("ldap version==", m,  env.get(CONTEXT_VERSION_KEY));
 
             env.put(Context.PROVIDER_URL, URL);
-            logger.debug(m + "ldap url==" + env.get(Context.PROVIDER_URL));
+            logger.debug("{}ldap url=={}", m, env.get(Context.PROVIDER_URL));
 
             if (!bindRequired()) {
-                logger.debug(m + "\"binding\" anonymously");
+                logger.debug("{}\"binding\" anonymously", m);
             } else {
                 env.put(Context.SECURITY_AUTHENTICATION,
                         SECURITY_AUTHENTICATION);
@@ -326,17 +326,17 @@ public class FilterLdap
                 if (!individualUserBind()) {
                     userForBind = SECURITY_PRINCIPAL;
                     passwordForBind = SECURITY_CREDENTIALS;
-                    logger.debug(m + "binding to protected directory");
+                    logger.debug("{}binding to protected directory", m);
                 } else {
                     passwordForBind = password;
                     if (SECURITY_PRINCIPAL == null
                             || "".equals(SECURITY_PRINCIPAL)) {
                         userForBind = userid;
-                        logger.debug(m + "binding for real user");
+                        logger.debug("{}binding for real user", m);
                     } else {
                         //simulate test against user-bind at directory server
                         userForBind = SECURITY_PRINCIPAL;
-                        logger.debug(m + "binding for --test-- user");
+                        logger.debug("{}binding for --test-- user", m);
                     }
                 }
                 env.put(Context.SECURITY_CREDENTIALS, passwordForBind);
@@ -344,9 +344,9 @@ public class FilterLdap
                 String userFormattedForBind = applyFilter(BIND_FILTER, parms);
                 env.put(Context.SECURITY_PRINCIPAL, userFormattedForBind);
             }
-            logger.debug(m + "bind w " + env.get(Context.SECURITY_AUTHENTICATION));
-            logger.debug(m + "user== " + env.get(Context.SECURITY_PRINCIPAL));
-            logger.debug(m + "passwd==" + env.get(Context.SECURITY_CREDENTIALS));
+            logger.debug("{}bind w {}", m, env.get(Context.SECURITY_AUTHENTICATION));
+            logger.debug("{}user== {}", m, env.get(Context.SECURITY_PRINCIPAL));
+            logger.debug("{}passwd=={}", m, env.get(Context.SECURITY_CREDENTIALS));
         } catch (Throwable th) {
             if (LOG_STACK_TRACES) {
                 logger.error(m + "couldn't set up env for DirContext", th);
@@ -355,7 +355,7 @@ public class FilterLdap
                         + th.getMessage());
             }
         } finally {
-            logger.debug(m + "< " + env);
+            logger.debug("{}< {}", m, env);
         }
         return env;
     }
@@ -363,7 +363,7 @@ public class FilterLdap
     private final String getFilter(String userid) {
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME) + " getFilter() ";
-        logger.debug(m + ">");
+        logger.debug("{}>", m);
         String filter = null;
         try {
             filter = new String(FILTER);
@@ -376,7 +376,7 @@ public class FilterLdap
                         + th.getMessage());
             }
         } finally {
-            logger.debug(m + "< " + filter);
+            logger.debug("{}< {}", m, filter);
         }
         return filter;
     }
@@ -385,7 +385,7 @@ public class FilterLdap
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " getSearchControls() ";
-        logger.debug(m + ">");
+        logger.debug("{}>", m);
         SearchControls searchControls = null;
         try {
             int nEntries2return = 0;
@@ -408,7 +408,7 @@ public class FilterLdap
                         + th.getMessage());
             }
         } finally {
-            logger.debug(m + "< " + searchControls);
+            logger.debug("{}< {}", m, searchControls);
         }
         return searchControls;
     }
@@ -422,7 +422,7 @@ public class FilterLdap
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " getNamingEnumeration() ";
-        logger.debug(m + ">");
+        logger.debug("{}>", m);
         NamingEnumeration ne = null;
         try {
             DirContext ctx;
@@ -457,7 +457,7 @@ public class FilterLdap
                 throw new NamingException("");
             }
         } finally {
-            logger.debug(m + "< " + ne);
+            logger.debug("{}< {}", m, ne);
         }
         return ne;
     }
@@ -471,7 +471,7 @@ public class FilterLdap
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " getNamingEnumeration() ";
-        logger.debug(m + ">");
+        logger.debug("{}>", m);
         // this condition is to -further- protect against behavior suggested by
         // log from hull (see below for first-line protection)
         // the idea here is to steer clear of possible trouble in underlying
@@ -480,23 +480,22 @@ public class FilterLdap
         String msg = "[LDAP: error code 49 - Bind failed: ";
 
         if (!individualUserBind()) {
-            logger.info(m + "-not- binding individual user");
+            logger.info("{}-not- binding individual user", m);
         } else {
-            logger.info(m + "-binding- individual user");
+            logger.info("{}-binding- individual user", m);
             if (password == null) {
-                logger.debug(m + "null password");
+                logger.debug("{}null password", m);
                 if (USE_FILTER.equalsIgnoreCase(PW_NULL)) {
-                    logger.debug(m + "-no- pre null password handling");
+                    logger.debug("{}-no- pre null password handling", m);
                 } else {
                     if (AUTHENTICATE) {
-                        logger.info(m + "-doing- pre null password handling");
+                        logger.info("{}-doing- pre null password handling", m);
                         if (UNAUTHENTICATE_USER_UNCONDITIONALLY
                                 .equalsIgnoreCase(PW_NULL)) {
-                            logger.info(m
-                                    + "pre unauthenticating for null password");
+                            logger.info("{}pre unauthenticating for null password", m);
                             throw new NamingException(msg + "null password]");
                         } else if (SKIP_FILTER.equalsIgnoreCase(PW_NULL)) {
-                            logger.info(m + "pre ignoring for null passwd");
+                            logger.info("{}pre ignoring for null passwd", m);
                             throw new Exception(msg + "null password]");
                         } else {
                             assert true : "bad value for PW_NULL==" + PW_NULL;
@@ -504,19 +503,19 @@ public class FilterLdap
                     }
                 }
             } else if ("".equals(password)) {
-                logger.debug(m + "0-length password");
+                logger.debug("{}0-length password", m);
                 if (USE_FILTER.equalsIgnoreCase(PW_0)) {
-                    logger.debug(m + "-no- pre 0-length password handling");
+                    logger.debug("{}-no- pre 0-length password handling", m);
                 } else {
                     if (AUTHENTICATE) {
-                        logger.info(m + "-doing- pre 0-length password handling");
+                        logger.info("{}-doing- pre 0-length password handling", m);
                         if (UNAUTHENTICATE_USER_UNCONDITIONALLY
                                 .equalsIgnoreCase(PW_0)) {
-                            logger.info(m + "pre unauthenticating for 0-length password");
+                            logger.info("{}pre unauthenticating for 0-length password", m);
                             throw new NamingException(msg
                                     + "0-length password]");
                         } else if (SKIP_FILTER.equalsIgnoreCase(PW_0)) {
-                            logger.info(m + "pre ignoring for 0-length passwd");
+                            logger.info("{}pre ignoring for 0-length passwd", m);
                             throw new Exception(msg + "0-length password]");
                         } else {
                             assert true : "bad value for PW_0==" + PW_0;
@@ -538,37 +537,36 @@ public class FilterLdap
                                               env);
             assert ne != null;
             if (ne.hasMoreElements()) {
-                logger.debug(m + "enumeration has elements");
+                logger.debug("{}enumeration has elements", m);
             } else {
-                logger.debug(m + "enumeration has no elements, yet no exceptions");
+                logger.debug("{}enumeration has no elements, yet no exceptions", m);
                 if (bindRequired() && !individualUserBind()) {
-                    logger.debug(m + "failed security bind");
+                    logger.debug("{}failed security bind", m);
                     throw new NamingException(msg + "failed security bind]");
                 }
                 if (!AUTHENTICATE) {
-                    logger.debug(m
-                            + "user authentication -not- done by this filter");
+                    logger.debug("{}user authentication -not- done by this filter", m);
                 } else {
-                    logger.debug(m + "user authentication -done- by this filter");
+                    logger.debug("{}user authentication -done- by this filter", m);
                     if (!bindRequired()) {
-                        logger.debug(m + "but -not- binding");
+                        logger.debug("{}but -not- binding", m);
                     } else {
-                        logger.debug(m + "-and- binding");
+                        logger.debug("{}-and- binding", m);
                         if (SKIP_FILTER.equalsIgnoreCase(EMPTY_RESULTS)) {
-                            logger.debug(m + "passing thru for EMPTY_RESULTS");
+                            logger.debug("{}passing thru for EMPTY_RESULTS", m);
                             throw new Exception(msg + "null password]");
                         } else if (UNAUTHENTICATE_USER_UNCONDITIONALLY
                                 .equalsIgnoreCase(EMPTY_RESULTS)) {
-                            logger.debug(m + "failing for EMPTY_RESULTS");
+                            logger.debug("{}failing for EMPTY_RESULTS", m);
                             throw new NamingException(msg + "null password]");
                         } else if (USE_FILTER.equalsIgnoreCase(EMPTY_RESULTS)) {
-                            logger.debug(m + "passing for EMPTY_RESULTS");
+                            logger.debug("{}passing for EMPTY_RESULTS", m);
                             //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                         } else if (UNAUTHENTICATE_USER_CONDITIONALLY
                                 .equalsIgnoreCase(EMPTY_RESULTS)) {
                             if (ATTRIBUTES2RETURN == null
                                     || ATTRIBUTES2RETURN.length < 1) {
-                                logger.debug(m + "fair enough");
+                                logger.debug("{}fair enough", m);
                             } else {
                                 throw new NamingException(msg + "expected some");
                             }
@@ -580,7 +578,7 @@ public class FilterLdap
                 }
             }
         } finally {
-            logger.debug(m + "< " + ne);
+            logger.debug("{}< {}", m, ne);
         }
         return ne;
     }
@@ -590,10 +588,10 @@ public class FilterLdap
                                            String passwordAttribute)
             throws PasswordComparisonException {
         String m = "- comparePassword() ";
-        logger.debug(m + ">");
+        logger.debug("{}>", m);
         Boolean rc = null;
         try {
-            logger.debug(m + "looking for return attribute==" + passwordAttribute);
+            logger.debug("{}looking for return attribute=={}", m, passwordAttribute);
             Attribute attribute = attributes.get(passwordAttribute);
             if (attribute == null) {
                 logger.error("{}null object", m);

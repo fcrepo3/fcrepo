@@ -111,9 +111,9 @@ public class DatastreamResolverServlet
                         + "of 5 seconds");
                 datastreamMediationLimit = 5000;
             } else {
-                datastreamMediationLimit = new Integer(expireLimit).intValue();
-                logger.info("datastreamMediationLimit: "
-                        + datastreamMediationLimit);
+                datastreamMediationLimit = Integer.parseInt(expireLimit);
+                logger.info("datastreamMediationLimit: {}",
+                        datastreamMediationLimit);
             }
         } catch (Throwable th) {
             logger.error("Error initializing servlet", th);

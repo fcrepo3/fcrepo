@@ -389,11 +389,13 @@ public class ListMethodsServlet
                         pw.write(DateUtility.convertDateToString(versDateTime));
                         pw.write("\"");
                     }
-                    pw.write(" baseURL=\""
-                            + StreamUtility.enc(fedoraServerProtocol) + "://"
-                            + StreamUtility.enc(m_fedoraServerHost) + ":"
-                            + StreamUtility.enc(fedoraServerPort) + "/"
-                            + fedoraAppServerContext + "/\"");
+                    pw.write(" baseURL=\"");
+                    StreamUtility.enc(fedoraServerProtocol, pw);
+                    pw.write("://");
+                    StreamUtility.enc(m_fedoraServerHost, pw);
+                    pw.write(':');
+                    StreamUtility.enc(fedoraServerPort, pw);
+                    pw.write("/" + fedoraAppServerContext + "/\"");
                     pw.write(" xmlns=\"" + OBJ_METHODS1_0.namespace.uri + "\" ");
                     pw.write(" xmlns:xsi=\"" + XSI.uri + "\" ");
                     pw.write(" xsi:schemaLocation=\"" + OBJ_METHODS1_0.namespace.uri);
@@ -408,31 +410,30 @@ public class ListMethodsServlet
                             if (i != 0) {
                                 pw.write("</sDef>");
                             }
-                            pw.write("<sDef pid=\""
-                                    + StreamUtility.enc(methodDefs[i].sDefPID)
-                                    + "\" >");
+                            pw.write("<sDef pid=\"");
+                            StreamUtility.enc(methodDefs[i].sDefPID, pw);
+                            pw.write("\" >");
                         }
-                        pw.write("<method name=\""
-                                + StreamUtility.enc(methodDefs[i].methodName)
-                                + "\" >");
+                        pw.write("<method name=\"");
+                        StreamUtility.enc(methodDefs[i].methodName, pw);
+                        pw.write("\" >");
                         MethodParmDef[] methodParms =
                                 methodDefs[i].methodParmDefs;
                         for (MethodParmDef element : methodParms) {
-                            pw.write("<methodParm parmName=\""
-                                    + StreamUtility.enc(element.parmName)
-                                    + "\" parmDefaultValue=\""
-                                    + StreamUtility
-                                            .enc(element.parmDefaultValue)
-                                    + "\" parmRequired=\""
-                                    + element.parmRequired + "\" parmLabel=\""
-                                    + StreamUtility.enc(element.parmLabel)
-                                    + "\" >");
+                            pw.write("<methodParm parmName=\"");
+                            StreamUtility.enc(element.parmName, pw);
+                            pw.write("\" parmDefaultValue=\"");
+                            StreamUtility.enc(element.parmDefaultValue, pw);
+                            pw.write("\" parmRequired=\""
+                                    + element.parmRequired + "\" parmLabel=\"");
+                            StreamUtility.enc(element.parmLabel, pw);
+                            pw.write("\" >");
                             if (element.parmDomainValues.length > 0) {
                                 pw.write("<methodParmDomain>");
                                 for (String element2 : element.parmDomainValues) {
-                                    pw.write("<methodParmValue>"
-                                            + StreamUtility.enc(element2)
-                                            + "</methodParmValue>");
+                                    pw.write("<methodParmValue>");
+                                    StreamUtility.enc(element2, pw);
+                                    pw.write("</methodParmValue>");
                                 }
                                 pw.write("</methodParmDomain>");
                             }

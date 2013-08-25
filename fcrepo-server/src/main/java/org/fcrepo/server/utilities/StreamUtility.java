@@ -57,9 +57,27 @@ public abstract class StreamUtility {
      */
     public static void enc(String in, Appendable out) {
         if (in == null) return;
-        for (int i = 0; i < in.length(); i++) {
-            enc(in.charAt(i), out);
+        int startAt = 0;
+        try {
+            for (int i = 0; i < in.length(); i++) {
+                char c = in.charAt(i);
+                if (c == '&' || c == '<' || c == '>' || c == '"' || c == '\'') {
+                    if (i != startAt) out.append(in, startAt, i);
+                    enc(in.charAt(i), out);
+                    startAt = i + 1;
+                }
+            }
+            if (startAt == 0) {
+                // we never encountered a character to escape for xml
+                out.append(in);
+            } else {
+                // append the remaining safe characters
+                out.append(in, startAt, in.length());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
+        
     }
 
     /**
@@ -100,7 +118,7 @@ public abstract class StreamUtility {
                 out.append("&lt;");
             } else if (in == '>') {
                 out.append("&gt;");
-            } else if (in == '\"') {
+            } else if (in == '"') {
                 out.append("&quot;");
             } else if (in == '\'') {
                 out.append("&apos;");

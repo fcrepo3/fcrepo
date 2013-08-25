@@ -875,17 +875,20 @@ public class METSFedoraExtDODeserializer
             String prefix = m_prefixList.remove(0);
             out.append(" xmlns");
             if (prefix.length() > 0) {
-                out.append(":");
+                out.append(':');
             }
-            out.append(prefix + "=\""
-                    + StreamUtility.enc(m_prefixMap.get(prefix))
-                    + "\"");
+            out.append(prefix + "=\"");
+            StreamUtility.enc(m_prefixMap.get(prefix), out);
+            out.append('"');
         }
         for (int i = 0; i < a.getLength(); i++) {
-            out.append(" " + a.getQName(i) + "=\""
-                    + StreamUtility.enc(a.getValue(i)) + "\"");
+            out.append(' ');
+            out.append(a.getQName(i));
+            out.append("=\"");
+            StreamUtility.enc(a.getValue(i), out);
+            out.append('"');
         }
-        out.append(">");
+        out.append('>');
     }
 
     private void instantiateDatastream(Datastream ds) throws SAXException {

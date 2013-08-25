@@ -119,9 +119,9 @@ public class DisseminationService {
 					+ "300 seconds");
 			datastreamExpirationLimit = 300;
 		} else {
-			datastreamExpirationLimit = new Integer(expireLimit).intValue();
-			logger.info("datastreamExpirationLimit="
-					+ datastreamExpirationLimit);
+			datastreamExpirationLimit = Integer.parseInt(expireLimit);
+			logger.info("datastreamExpirationLimit={}",
+					datastreamExpirationLimit);
 		}
 		String dsMediation = server
 				.getModule("org.fcrepo.server.access.Access").getParameter(
