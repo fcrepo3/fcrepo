@@ -233,7 +233,7 @@ public class DefaultExternalContentManager
             File cFile = new File(fileUrl.toURI()).getCanonicalFile();
             // security check
             URI cURI = cFile.toURI();
-            logger.info("Checking resolution security on " + cURI);
+            logger.info("Checking resolution security on {}", cURI);
             Authorization authModule = getServer()
                     .getBean("org.fcrepo.server.security.Authorization", Authorization.class);
             if (authModule == null) {

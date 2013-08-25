@@ -111,7 +111,7 @@ public class ResourceIndexModule
                                  .getDatastoreConfig(ds));
 
             } else {
-                logger.info("Configuring triplestore from bean " + TriplestoreConnector.class.getName());
+                logger.info("Configuring triplestore from bean {}", TriplestoreConnector.class.getName());
                 connector =
                     getServer().getBean(TriplestoreConnector.class.getName(),TriplestoreConnector.class);
             }

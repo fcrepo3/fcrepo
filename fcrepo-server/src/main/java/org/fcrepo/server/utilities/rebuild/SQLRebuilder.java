@@ -401,7 +401,7 @@ public class SQLRebuilder
         }
 
         try {
-            logger.info("COMMIT: Attempting replication: " + obj.getPid());
+            logger.info("COMMIT: Attempting replication: {}", obj.getPid());
             DOReader reader =
                     manager.getReader(Server.USE_DEFINITIVE_STORE,
                                       m_context,

@@ -125,8 +125,8 @@ public class Rebuild implements Constants, Runnable {
                         logger.error("No module/bean definition for " +
                                 llstoreInterface);
                     } else {
-                        logger.info("Loaded bean/module " + llstoreInterface +
-                                " with impl " + llstore.getClass().getName());
+                        logger.info("Loaded bean/module {} with impl ",
+                                llstoreInterface, llstore.getClass().getName());
                     }
                     Iterator<String> pids = ((IListable) llstore).listObjects();
                     int total = 0;

@@ -127,17 +127,14 @@ public abstract class PathRegistry {
                             switch (operation) {
                                 case REPORT_FILES: {
                                     if (report == FULL_REPORT) {
-                                        logger.info("file [" + path
-                                                + "] would have pid [" + pid
-                                                + "]");
+                                        logger.info("file [{}] would have pid [{}]", path, pid);
                                     }
                                     break;
                                 }
                                 case REBUILD: {
                                     put(pid, path);
                                     if (report == FULL_REPORT) {
-                                        logger.info("added to registry: [" + pid
-                                                + "] ==> [" + path + "]");
+                                        logger.info("added to registry: [{}] ==> [{}]", pid, path);
                                     }
                                     break;
                                 }

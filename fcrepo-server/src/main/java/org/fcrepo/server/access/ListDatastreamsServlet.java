@@ -388,12 +388,13 @@ public class ListDatastreamsServlet
                     pw.write(" " + OBJ_DATASTREAMS1_0.xsdLocation + "\">");
                     // DatastreamDef SERIALIZATION
                     for (DatastreamDef element : dsDefs) {
-                        pw.write("    <datastream " + "dsid=\""
-                                + StreamUtility.enc(element.dsID) + "\" "
-                                + "label=\""
-                                + StreamUtility.enc(element.dsLabel) + "\" "
-                                + "mimeType=\""
-                                + StreamUtility.enc(element.dsMIME) + "\" />");
+                        pw.write("    <datastream dsid=\"");
+                        StreamUtility.enc(element.dsID, pw);
+                        pw.write("\" label=\"");
+                        StreamUtility.enc(element.dsLabel, pw);
+                        pw.write("\" mimeType=\"");
+                        StreamUtility.enc(element.dsMIME, pw);
+                        pw.write("\" />");
                     }
                     pw.write("</objectDatastreams>");
                     pw.flush();

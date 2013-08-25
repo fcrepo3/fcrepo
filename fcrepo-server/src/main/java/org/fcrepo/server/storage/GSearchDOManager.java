@@ -161,14 +161,14 @@ public class GSearchDOManager
         String pid = obj.getPid();
         url.append("&value=" + urlEncode(pid));
         if (remove) {
-            logger.info("Signaling removal of " + pid + " to GSearch");
+            logger.info("Signaling removal of {} to GSearch", pid);
             url.append("&action=deletePid");
         } else {
             if (logger.isInfoEnabled()) {
                 if (obj.isNew()) {
-                    logger.info("Signaling add of " + pid + " to GSearch");
+                    logger.info("Signaling add of {} to GSearch", pid);
                 } else {
-                    logger.info("Signaling mod of " + pid + " to GSearch");
+                    logger.info("Signaling mod of {} to GSearch", pid);
                 }
             }
             url.append("&action=fromPid");

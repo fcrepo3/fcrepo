@@ -1098,9 +1098,9 @@ implements DOManager {
             // OBJECT INGEST (ADD) OR MODIFY...
         } else {
             if (obj.isNew()) {
-                logger.info("Committing addition of " + obj.getPid());
+                logger.info("Committing addition of {}", obj.getPid());
             } else {
-                logger.info("Committing modification of " + obj.getPid());
+                logger.info("Committing modification of {}", obj.getPid());
             }
 
             // Object validation
@@ -1137,9 +1137,8 @@ implements DOManager {
                                                             .getTempStream(dmc.DSLocation),
                                                     null, dmc.DSSize);
                                     logger.info("Getting managed datastream from internal uploaded " +
-                                            "location: " +
-                                            dmc.DSLocation +
-                                            " for " + pid);
+                                            "location: {} for ",
+                                            dmc.DSLocation, pid);
                                 } else if (dmc.DSLocation
                                         .startsWith(DatastreamManagedContent.COPY_SCHEME)) {
                                     // make a copy of the pre-existing content
@@ -1154,8 +1153,8 @@ implements DOManager {
                                     File file =
                                             new File(dmc.DSLocation
                                                     .substring(7));
-                                    logger.info("Getting base64 decoded datastream spooled from archive for datastream " +
-                                            dsID + " (" + pid + ")");
+                                    logger.info("Getting base64 decoded datastream spooled from archive for datastream {} ({})",
+                                            dsID, pid);
                                     try {
                                         InputStream str =
                                                 new FileInputStream(file);
@@ -1183,11 +1182,8 @@ implements DOManager {
                                     mimeTypedStream =
                                             m_contentManager
                                                     .getExternalContent(params);
-                                    logger.info("Getting managed datastream from remote location: " +
-                                            dmc.DSLocation +
-                                            " (" +
-                                            pid +
-                                            " / " + dsID + ")");
+                                    logger.info("Getting managed datastream from remote location: {} ({} / {})",
+                                            dmc.DSLocation, pid, dsID);
                                 }
                                 Map<String, String> dsHints =
                                         m_hintProvider
@@ -1245,7 +1241,7 @@ implements DOManager {
                                     dmc.DSLocation = internalId;
                                     dmc.DSLocationType =
                                             Datastream.DS_LOCATION_TYPE_INTERNAL;
-                                    logger.info("Replaced managed datastream location with internal id: " +
+                                    logger.info("Replaced managed datastream location with internal id: {}",
                                             internalId);
                                 }
                             } else if (!internalId.equals(dmc.DSLocation)) {
@@ -1584,7 +1580,7 @@ implements DOManager {
         // FIELD SEARCH INDEX:
         // remove digital object from the default search index
         try {
-            logger.info("Deleting " + pid + " from FieldSearch index");
+            logger.info("Deleting {} from FieldSearch index", pid);
             m_fieldSearch.delete(obj.getPid());
         } catch (ServerException se) {
             if (failSafe) {
@@ -1641,8 +1637,8 @@ implements DOManager {
                             try {
                                 m_permanentStore.removeDatastream(token);
                                 logger.info("Removed purged datastream version " +
-                                        "from low level storage (token = " +
-                                        token + ")");
+                                        "from low level storage (token = {})",
+                                        token);
                             } catch (Exception e) {
                                 logger.error(
                                         "Error removing purged datastream " +

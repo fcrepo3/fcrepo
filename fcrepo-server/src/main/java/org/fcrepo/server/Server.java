@@ -539,7 +539,7 @@ public abstract class Server
     }
 
     public void init()  throws ServerInitializationException, ModuleInitializationException {
-        logger.info("Registered server at " + getHomeDir().getPath());
+        logger.info("Registered server at {}", getHomeDir().getPath());
         try {
             if (m_serverContext == null) {
                 m_serverContext = getDefaultContext();
@@ -563,14 +563,13 @@ public abstract class Server
                 logger.debug("fedora.serverProfile property not set... will always "
                         + "use param 'value' attributes from configuration for param values.");
             } else {
-                logger.debug("fedora.serverProfile property was '"
-                        + s_serverProfile + "'... will use param '"
-                        + s_serverProfile + "value' attributes from "
+                logger.debug("fedora.serverProfile property was '{}"
+                        + "'... will use param '{}value' attributes from "
                         + "configuration for param values, falling back to "
-                        + "'value' attributes where unspecified.");
+                        + "'value' attributes where unspecified.", s_serverProfile, s_serverProfile);
             }
-            logger.debug("Loading and validating configuration file \""
-                    + m_configFile + "\"");
+            logger.debug("Loading and validating configuration file \"{}\"",
+                    m_configFile);
 
             // do the parsing and validation of configuration
             ServerConfiguration serverConfig = getConfig();
@@ -884,7 +883,7 @@ public abstract class Server
             for(String path:springDir.list()){
                 if (path.endsWith(".xml")){
                     File springConfig = new File(springDir,path);
-                    logger.info("loading spring beans from " + springConfig.getAbsolutePath());
+                    logger.info("loading spring beans from {}", springConfig.getAbsolutePath());
                     FileSystemResource beanConfig = new FileSystemResource(springConfig);
                     int count = beanReader.loadBeanDefinitions(beanConfig);
                     if (count < 1){

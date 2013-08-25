@@ -124,7 +124,7 @@ public class ServerUtility {
                                             String pass,
                                             String path) throws IOException {
         String url = getBaseURL(protocol) + path;
-        logger.info("Getting URL: " + url);
+        logger.info("Getting URL: {}", url);
         UsernamePasswordCredentials creds =
                 new UsernamePasswordCredentials(user, pass);
         return s_webClient.getResponseAsString(url, true, creds);
@@ -139,7 +139,7 @@ public class ServerUtility {
                                             String pass,
                                             String path) throws IOException {
         String url = getBaseURL(protocol) + path;
-        logger.info("Getting URL: " + url);
+        logger.info("Getting URL: {}", url);
         UsernamePasswordCredentials creds =
                 new UsernamePasswordCredentials(user, pass);
         return s_webClient.get(url, true, creds);

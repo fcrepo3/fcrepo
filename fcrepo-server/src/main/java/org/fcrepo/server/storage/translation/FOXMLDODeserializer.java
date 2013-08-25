@@ -231,10 +231,8 @@ public class FOXMLDODeserializer
                             String encoding,
                             int transContext) throws ObjectIntegrityException,
             StreamIOException, UnsupportedEncodingException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Deserializing {} for transContext: {}",
-                    m_format.uri, transContext);
-        }
+        logger.debug("Deserializing {} for transContext: {}",
+                m_format.uri, transContext);
 
         m_obj = obj;
         m_obj.setLabel("");

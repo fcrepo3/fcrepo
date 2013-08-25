@@ -376,8 +376,8 @@ class SQLUtilityImpl
                     sqlCmds.append(iter.next());
                     sqlCmds.append(";");
                 }
-                logger.info("Creating new table '" + spec.getName()
-                        + "' with command(s): " + sqlCmds.toString());
+                logger.info("Creating new table '{}' with command(s): {}",
+                        spec.getName(), sqlCmds.toString());
             }
             tcConn.createTable(spec);
         }

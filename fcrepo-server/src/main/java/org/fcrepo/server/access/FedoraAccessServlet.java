@@ -186,11 +186,10 @@ public class FedoraAccessServlet
         boolean isGetDatastreamDisseminationRequest = false;
         boolean xml = false;
 
-        requestURI =
-                request.getRequestURL().toString()
-                        + (request.getQueryString() != null ? "?"
-                                + request.getQueryString() : "");
-        logger.info("Got request: " + requestURI);
+        requestURI = request.getQueryString() != null ?
+                request.getRequestURL().toString() + "?" + request.getQueryString()
+                : request.getRequestURL().toString();
+        logger.info("Got request: {}", requestURI);
 
         // Parse servlet URL.
         // For the Fedora API-A-LITE "get" syntax, valid entries include:
@@ -209,7 +208,8 @@ public class FedoraAccessServlet
         // http://host:port/fedora/get/pid/dsID
         // http://host:port/fedora/get/pid/dsID/timestamp
         //
-        String[] URIArray = request.getRequestURL().toString().split("/");
+        // use substring to avoid an additional char array copy
+        String[] URIArray = requestURI.substring(0, request.getRequestURL().length()).split("/");
         if (URIArray.length == 6 || URIArray.length == 7) {
             // Request is either an ObjectProfile request or a datastream
             // request
@@ -857,7 +857,9 @@ public class FedoraAccessServlet
                 try {
                     pw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
                     pw.write("<objectProfile");
-                    pw.write(" pid=\"" + StreamUtility.enc(PID) + "\"");
+                    pw.write(" pid=\"");
+                    StreamUtility.enc(PID, pw);
+                    pw.write('"');
                     if (versDateTime != null) {
                         DateUtility.convertDateToString(versDateTime);
                         pw.write(" dateTime=\""
@@ -871,12 +873,12 @@ public class FedoraAccessServlet
                             + OBJ_PROFILE1_0.xsdLocation + "\">");
 
                     // PROFILE FIELDS SERIALIZATION
-                    pw.write("<objLabel>"
-                            + StreamUtility.enc(objProfile.objectLabel)
-                            + "</objLabel>");
-                    pw.write("<objOwnerId>"
-                            + StreamUtility.enc(objProfile.objectOwnerId)
-                            + "</objOwnerId>");
+                    pw.write("<objLabel>");
+                    StreamUtility.enc(objProfile.objectLabel, pw);
+                    pw.write("</objLabel>");
+                    pw.write("<objOwnerId>");
+                    StreamUtility.enc(objProfile.objectOwnerId, pw);
+                    pw.write("</objOwnerId>");
 
                     pw.write("<objModels>\n");
                     for (String model : objProfile.objectModels) {
@@ -893,12 +895,12 @@ public class FedoraAccessServlet
                                     .convertDateToString(objProfile.objectLastModDate);
                     pw.write("<objLastModDate>" + mDate + "</objLastModDate>");;
 
-                    pw.write("<objDissIndexViewURL>"
-                            + StreamUtility.enc(objProfile.dissIndexViewURL)
-                            + "</objDissIndexViewURL>");
-                    pw.write("<objItemIndexViewURL>"
-                            + StreamUtility.enc(objProfile.itemIndexViewURL)
-                            + "</objItemIndexViewURL>");
+                    pw.write("<objDissIndexViewURL>");
+                    StreamUtility.enc(objProfile.dissIndexViewURL, pw);
+                    pw.write("</objDissIndexViewURL>");
+                    pw.write("<objItemIndexViewURL>");
+                    StreamUtility.enc(objProfile.itemIndexViewURL, pw);
+                    pw.write("</objItemIndexViewURL>");
                     pw.write("</objectProfile>");
                     pw.flush();
                     pw.close();
