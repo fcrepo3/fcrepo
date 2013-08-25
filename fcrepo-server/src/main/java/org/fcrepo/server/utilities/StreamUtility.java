@@ -59,7 +59,8 @@ public abstract class StreamUtility {
         if (in == null) return;
         int startAt = 0;
         try {
-            for (int i = 0; i < in.length(); i++) {
+            int inLen = in.length();
+            for (int i = 0; i < inLen; i++) {
                 char c = in.charAt(i);
                 if (c == '&' || c == '<' || c == '>' || c == '"' || c == '\'') {
                     if (i != startAt) out.append(in, startAt, i);
@@ -70,14 +71,13 @@ public abstract class StreamUtility {
             if (startAt == 0) {
                 // we never encountered a character to escape for xml
                 out.append(in);
-            } else {
+            } else if (startAt < inLen){
                 // append the remaining safe characters
-                out.append(in, startAt, in.length());
+                out.append(in, startAt, inLen);
             }
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        
     }
 
     /**

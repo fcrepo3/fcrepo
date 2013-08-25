@@ -25,25 +25,29 @@ public class XacmlName
 
     public final String localName;
 
-    public final String datatype;
+    public final URI datatype;
 
     public final String uri;
 
-    private final URI m_uri;
+    public final URI attributeId;
 
     private final StringAttribute m_att;
 
     private final AnyURIAttribute m_uri_att;
 
     public XacmlName(XacmlNamespace parent, String localName, String datatype) {
+        this(parent, localName, URI.create(datatype));
+    }
+    
+    public XacmlName(XacmlNamespace parent, String localName, URI datatype) {
         try {
             this.parent = parent;
             this.localName = localName;
             this.datatype = datatype;
             uri = (parent != null) ? parent.uri + ":" + localName : localName;
-            m_uri = new URI(uri);
-            m_att = new StringAttribute(m_uri.toASCIIString());
-            m_uri_att = new AnyURIAttribute(m_uri);
+            attributeId = new URI(uri);
+            m_att = new StringAttribute(attributeId.toASCIIString());
+            m_uri_att = new AnyURIAttribute(attributeId);
         } catch (URISyntaxException e) {
             throw new RuntimeException("Bad URI Syntax", e);
         }
@@ -89,7 +93,7 @@ public class XacmlName
 
     @Override
     public URI getURI() {
-        return m_uri;
+        return attributeId;
     }
 
     public StringAttribute getStringAttribute() {
