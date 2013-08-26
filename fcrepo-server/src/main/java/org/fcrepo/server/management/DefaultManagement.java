@@ -264,7 +264,7 @@ public class DefaultManagement
                 logMsg.append("pid: ").append(pid);
                 logMsg.append(", state: ").append(state);
                 logMsg.append(", label: ").append(label);
-                logMsg.append(", ownderId: ").append(ownerId);
+                logMsg.append(", ownerId: ").append(ownerId);
                 logMsg.append(", logMessage: ").append(logMessage);
                 logMsg.append(")");
                 logger.info(logMsg.toString());
