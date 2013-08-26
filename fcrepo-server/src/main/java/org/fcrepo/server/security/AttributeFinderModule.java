@@ -11,6 +11,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.fcrepo.common.policy.XacmlName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,16 +37,6 @@ public abstract class AttributeFinderModule
 
     protected AttributeFinderModule() {
 
-        URI temp;
-
-        try {
-            temp = new URI(StringAttribute.identifier);
-        } catch (URISyntaxException e1) {
-            temp = null;
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        STRING_ATTRIBUTE_URI = temp;
     }
 
     private Boolean instantiatedOk = null;
@@ -88,18 +79,17 @@ public abstract class AttributeFinderModule
         }
 
         logger.debug("AttributeFinder:parmsOk{} looking for {}",
-                iAm(), attributeId.toString());
+                iAm(), attributeId);
         showRegisteredAttributes();
 
-        if (hasAttribute(attributeId.toString())) {
-            if (!getAttributeType(attributeId.toString()).equals(attributeType
-                    .toString())) {
+        if (hasAttribute(attributeId)) {
+            if (!getAttributeType(attributeId).equals(attributeType)) {
                 logger.debug("AttributeFinder:parmsOk{} exit on attributeType incorrect for attributeId",
                         iAm());
                 return false;
             }
         } else {
-            if (!StringAttribute.identifier.equals(attributeType.toString())) {
+            if (!STRING_ATTRIBUTE_TYPE_URI.equals(attributeType)) {
                 logger.debug("AttributeFinder:parmsOk{} exit on attributeType incorrect for attributeId",
                         iAm());
                 return false;
@@ -177,50 +167,80 @@ public abstract class AttributeFinderModule
         return element;
     }
 
-    protected final HashSet<String> attributesDenied = new HashSet<String>();
+    protected final HashSet<URI> attributesDenied = new HashSet<URI>();
 
-    private final Hashtable<String, URI> attributeIdUris =
-            new Hashtable<String, URI>();
+    private final HashSet<URI> attributeIdUris =
+            new HashSet<URI>();
 
-    private final Hashtable<String, String> attributeTypes =
-            new Hashtable<String, String>();
+    private final Hashtable<URI, URI> attributeTypes =
+            new Hashtable<URI, URI>();
 
-    private final Hashtable<String, URI> attributeTypeUris =
-            new Hashtable<String, URI>();
-
+    @Deprecated
     protected final void registerAttribute(String id, String type)
             throws URISyntaxException {
         logger.debug("registering attribute {} {}", iAm(), id);
-        attributeIdUris.put(id, new URI(id));
-        attributeTypeUris.put(id, new URI(type));
+        URI idUri = new URI(id);
+        URI typeUri = new URI(type);
+        attributeIdUris.add(idUri);
+        attributeTypes.put(idUri, typeUri);
+    }
+
+    protected final void registerAttribute(URI id, URI type)
+            throws URISyntaxException {
+        logger.debug("registering attribute {} {}", iAm(), id);
+        attributeIdUris.add(id);
         attributeTypes.put(id, type);
     }
-
-    protected final URI getAttributeIdUri(String id) {
-        return attributeIdUris.get(id);
+    
+    protected final void registerAttribute(XacmlName attribute) {
+        logger.debug("registering attribute {} {}", iAm(), attribute.uri);
+        attributeIdUris.add(attribute.attributeId);
+        attributeTypes.put(attribute.attributeId, attribute.datatype);
+    }
+    
+    protected final void denyAttribute(URI id) {
+        logger.debug("Denying attribute {} {}", iAm(), id);
+        attributesDenied.add(id);
     }
 
+    @Deprecated
+    protected final URI getAttributeIdUri(String id) {
+        URI test = URI.create(id);
+        return (attributeIdUris.contains(test)) ? test : null;
+    }
+
+    @Deprecated
     protected final boolean hasAttribute(String id) {
-        return attributeIdUris.containsKey(id);
+        return attributeIdUris.contains(URI.create(id));
+    }
+
+    protected final boolean hasAttribute(URI id) {
+        return attributeIdUris.contains(id);
     }
 
     private final void showRegisteredAttributes() {
-        Iterator<String> it = attributeIdUris.keySet().iterator();
+        if (!logger.isDebugEnabled()) return;
+        Iterator<URI> it = attributeIdUris.iterator();
         while (it.hasNext()) {
-            String key = it.next();
+            String key = it.next().toString();
             logger.debug("another registered attribute  = {} {}", iAm(), key);
         }
     }
 
+    @Deprecated
     protected final String getAttributeType(String id) {
-        return attributeTypes.get(id);
+        return getAttributeTypeUri(id).toString();
     }
 
     protected final URI getAttributeTypeUri(String id) {
-        return attributeTypeUris.get(id);
+        return getAttributeType(URI.create(id));
     }
 
-    private static final Set NULLSET = new HashSet();
+    protected final URI getAttributeType(URI id) {
+        return attributeTypes.get(id);
+    }
+
+    private static final Set<?> NULLSET = new HashSet<Object>();
 
     private final Set<Integer> supportedDesignatorTypes =
             new HashSet<Integer>();
@@ -233,7 +253,7 @@ public abstract class AttributeFinderModule
     @Override
     public Set getSupportedDesignatorTypes() {
         if (instantiatedOk != null && instantiatedOk.booleanValue()) {
-            logger.debug("getSupportedDesignatorTypes() will return {} set of elements, n=",
+            logger.debug("getSupportedDesignatorTypes() will return {} set of elements, n={}",
                     iAm(), supportedDesignatorTypes.size());
             return supportedDesignatorTypes;
         }
@@ -244,24 +264,23 @@ public abstract class AttributeFinderModule
     protected abstract boolean canHandleAdhoc();
 
     private final boolean willService(URI attributeId) {
-        String temp = attributeId.toString();
-        if (hasAttribute(temp)) {
+        if (hasAttribute(attributeId)) {
             logger.debug("willService() {} accept this known serviced attribute {}",
-                    iAm(), attributeId.toString());
+                    iAm(), attributeId);
             return true;
         }
         if (!canHandleAdhoc()) {
             logger.debug("willService() {} deny any adhoc attribute {}",
-                    iAm(), attributeId.toString());
+                    iAm(), attributeId);
             return false;
         }
-        if (attributesDenied.contains(temp)) {
-            logger.debug("willService() {} deny this known adhoc attribute ",
-                    iAm(), attributeId.toString());
+        if (attributesDenied.contains(attributeId)) {
+            logger.debug("willService() {} deny this known adhoc attribute {}",
+                    iAm(), attributeId);
             return false;
         }
-        logger.debug("willService() {} allow this unknown adhoc attribute ",
-                iAm(), attributeId.toString());
+        logger.debug("willService() {} allow this unknown adhoc attribute {}",
+                iAm(), attributeId);
         return true;
     }
 
@@ -273,16 +292,12 @@ public abstract class AttributeFinderModule
                                           EvaluationCtx context,
                                           int designatorType) {
         logger.debug("AttributeFinder:findAttribute {}", iAm());
-        logger.debug("attributeType=[{}], attributeId=[{}] {}", new Object[]{attributeType, attributeId, iAm()});
+        logger.debug("attributeType=[{}], attributeId=[{}] {}", attributeType, attributeId, iAm());
 
         if (!parmsOk(attributeType, attributeId, designatorType)) {
             logger.debug("AttributeFinder:findAttribute exit on parms not ok {}", iAm());
             if (attributeType == null) {
-                try {
-                    attributeType = new URI(StringAttribute.identifier);
-                } catch (URISyntaxException e) {
-                    //we tried
-                }
+                attributeType = STRING_ATTRIBUTE_TYPE_URI;
             }
             return new EvaluationResult(BagAttribute
                     .createEmptyBag(attributeType));
@@ -302,7 +317,7 @@ public abstract class AttributeFinderModule
         logger.debug("about to get temp {}", iAm());
         Object temp =
                 getAttributeLocally(designatorType,
-                                    attributeId.toASCIIString(),
+                                    attributeId,
                                     category,
                                     context);
         logger.debug("{} got temp={}", iAm(), temp);
@@ -317,10 +332,9 @@ public abstract class AttributeFinderModule
         Set<AttributeValue> set = new HashSet<AttributeValue>();
         if (temp instanceof String) {
             logger.debug("AttributeFinder:findAttribute will return a String {}", iAm());
-            if (attributeType.toString().equals(StringAttribute.identifier)) {
+            if (attributeType.equals(STRING_ATTRIBUTE_TYPE_URI)) {
                 set.add(new StringAttribute((String) temp));
-            } else if (attributeType.toString()
-                    .equals(DateTimeAttribute.identifier)) {
+            } else if (attributeType.equals(DATETIME_ATTRIBUTE_TYPE_URI)) {
                 DateTimeAttribute tempDateTimeAttribute;
                 try {
                     tempDateTimeAttribute =
@@ -328,8 +342,7 @@ public abstract class AttributeFinderModule
                     set.add(tempDateTimeAttribute);
                 } catch (Throwable t) {
                 }
-            } else if (attributeType.toString()
-                    .equals(DateAttribute.identifier)) {
+            } else if (attributeType.equals(DATE_ATTRIBUTE_TYPE_URI)) {
                 DateAttribute tempDateAttribute;
                 try {
                     tempDateAttribute =
@@ -337,8 +350,7 @@ public abstract class AttributeFinderModule
                     set.add(tempDateAttribute);
                 } catch (Throwable t) {
                 }
-            } else if (attributeType.toString()
-                    .equals(TimeAttribute.identifier)) {
+            } else if (attributeType.equals(TIME_ATTRIBUTE_TYPE_URI)) {
                 TimeAttribute tempTimeAttribute;
                 try {
                     tempTimeAttribute =
@@ -346,8 +358,7 @@ public abstract class AttributeFinderModule
                     set.add(tempTimeAttribute);
                 } catch (Throwable t) {
                 }
-            } else if (attributeType.toString()
-                    .equals(IntegerAttribute.identifier)) {
+            } else if (attributeType.equals(INTEGER_ATTRIBUTE_TYPE_URI)) {
                 IntegerAttribute tempIntegerAttribute;
                 try {
                     tempIntegerAttribute =
@@ -363,10 +374,9 @@ public abstract class AttributeFinderModule
                 if (((String[]) temp)[i] == null) {
                     continue;
                 }
-                if (attributeType.toString().equals(StringAttribute.identifier)) {
+                if (attributeType.equals(STRING_ATTRIBUTE_TYPE_URI)) {
                     set.add(new StringAttribute(((String[]) temp)[i]));
-                } else if (attributeType.toString()
-                        .equals(DateTimeAttribute.identifier)) {
+                } else if (attributeType.equals(DATETIME_ATTRIBUTE_TYPE_URI)) {
                     logger.debug("USING AS DATETIME:{}", ((String[]) temp)[i]);
                     DateTimeAttribute tempDateTimeAttribute;
                     try {
@@ -376,8 +386,7 @@ public abstract class AttributeFinderModule
                         set.add(tempDateTimeAttribute);
                     } catch (Throwable t) {
                     }
-                } else if (attributeType.toString()
-                        .equals(DateAttribute.identifier)) {
+                } else if (attributeType.equals(DATE_ATTRIBUTE_TYPE_URI)) {
                     logger.debug("USING AS DATE:{}", ((String[]) temp)[i]);
                     DateAttribute tempDateAttribute;
                     try {
@@ -386,8 +395,7 @@ public abstract class AttributeFinderModule
                         set.add(tempDateAttribute);
                     } catch (Throwable t) {
                     }
-                } else if (attributeType.toString()
-                        .equals(TimeAttribute.identifier)) {
+                } else if (attributeType.equals(TIME_ATTRIBUTE_TYPE_URI)) {
                     logger.debug("USING AS TIME:{}", ((String[]) temp)[i]);
                     TimeAttribute tempTimeAttribute;
                     try {
@@ -396,8 +404,7 @@ public abstract class AttributeFinderModule
                         set.add(tempTimeAttribute);
                     } catch (Throwable t) {
                     }
-                } else if (attributeType.toString()
-                        .equals(IntegerAttribute.identifier)) {
+                } else if (attributeType.equals(INTEGER_ATTRIBUTE_TYPE_URI)) {
                     logger.debug("USING AS INTEGER: {}", ((String[]) temp)[i]);
                     IntegerAttribute tempIntegerAttribute;
                     try {
@@ -413,10 +420,18 @@ public abstract class AttributeFinderModule
         return new EvaluationResult(new BagAttribute(attributeType, set));
     }
 
-    protected final URI STRING_ATTRIBUTE_URI;
+    protected static final URI DATE_ATTRIBUTE_TYPE_URI = URI.create(DateAttribute.identifier);
+
+    protected static final URI DATETIME_ATTRIBUTE_TYPE_URI = URI.create(DateTimeAttribute.identifier);
+
+    protected static final URI INTEGER_ATTRIBUTE_TYPE_URI = URI.create(IntegerAttribute.identifier);
+
+    protected static final URI STRING_ATTRIBUTE_TYPE_URI = URI.create(StringAttribute.identifier);
+
+    protected static final URI TIME_ATTRIBUTE_TYPE_URI = URI.create(TimeAttribute.identifier);
 
     abstract protected Object getAttributeLocally(int designatorType,
-                                                  String attributeId,
+                                                  URI attributeId,
                                                   URI resourceCategory,
                                                   EvaluationCtx context);
 

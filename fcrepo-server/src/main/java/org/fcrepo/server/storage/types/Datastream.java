@@ -6,6 +6,7 @@ package org.fcrepo.server.storage.types;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -132,9 +133,9 @@ public class Datastream {
         /**
          * What should the context be here?
          */
-        MultiValueMap environmentAttributes = beginEnvironmentMap("");
+        MultiValueMap<URI> environmentAttributes = beginEnvironmentMap("");
         try {
-            environmentAttributes.set(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.uri, "127.0.0.1");
+            environmentAttributes.set(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.attributeId, "127.0.0.1");
         } catch (Exception e) {
             logger.warn("Could not set client IP for checksum context!");
         }
@@ -325,17 +326,17 @@ public class Datastream {
         target.DSChecksum = DSChecksum;
     }
 
-    private static final MultiValueMap beginEnvironmentMap(String messageProtocol) {
-        MultiValueMap environmentMap = new MultiValueMap();
+    private static final MultiValueMap<URI> beginEnvironmentMap(String messageProtocol) {
+        MultiValueMap<URI> environmentMap = new MultiValueMap<URI>();
         try {
-        environmentMap.set(Constants.HTTP_REQUEST.MESSAGE_PROTOCOL.uri,
+        environmentMap.set(Constants.HTTP_REQUEST.MESSAGE_PROTOCOL.attributeId,
                            messageProtocol);
         Date now = new Date();
-        environmentMap.set(Constants.ENVIRONMENT.CURRENT_DATE_TIME.uri,
+        environmentMap.set(Constants.ENVIRONMENT.CURRENT_DATE_TIME.attributeId,
                            DateUtility.convertDateToString(now));
-        environmentMap.set(Constants.ENVIRONMENT.CURRENT_DATE.uri, DateUtility
+        environmentMap.set(Constants.ENVIRONMENT.CURRENT_DATE.attributeId, DateUtility
                 .convertDateToDateString(now));
-        environmentMap.set(Constants.ENVIRONMENT.CURRENT_TIME.uri, DateUtility
+        environmentMap.set(Constants.ENVIRONMENT.CURRENT_TIME.attributeId, DateUtility
                 .convertDateToTimeString(now));
         } catch (Exception e) {
             logger.warn("Datastream could not set envAttributes for checksum context");

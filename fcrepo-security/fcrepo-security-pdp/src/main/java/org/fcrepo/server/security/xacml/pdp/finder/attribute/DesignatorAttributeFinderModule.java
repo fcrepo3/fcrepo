@@ -43,7 +43,7 @@ public abstract class DesignatorAttributeFinderModule
         if (logger.isDebugEnabled()) {
             logger.debug("registering the following attributes: ");
             for (String attrName : attributes.keySet()) {
-                logger.debug(designator + ": " + attrName);
+                logger.debug("{}: {}", designator, attrName);
             }
         }
 
@@ -87,7 +87,7 @@ public abstract class DesignatorAttributeFinderModule
      */
     @Override
     protected Object getAttributeLocally(int designatorType,
-                                         String attributeId,
+                                         URI attributeId,
                                          URI resourceCategory,
                                          EvaluationCtx context) {
                 return null;

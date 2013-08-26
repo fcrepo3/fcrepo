@@ -287,9 +287,9 @@ public class GetNextPIDServlet
             this.pw = pw;
             this.pidList = pidList;
             if (HTTP_REQUEST.SECURE.uri.equals(context
-                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.uri))) {
+                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.attributeId))) {
             } else if (HTTP_REQUEST.INSECURE.uri.equals(context
-                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.uri))) {
+                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.attributeId))) {
             }
         }
 

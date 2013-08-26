@@ -26,7 +26,7 @@ public class RDFName
 
     public final String qName;
 
-    private URI m_uri;
+    public final URI attributeId;
 
     public RDFName(RDFNamespace namespace, String localName) {
         try {
@@ -34,7 +34,7 @@ public class RDFName
             this.localName = localName;
             uri = namespace.uri + localName;
             qName = namespace.prefix + ":" + this.localName;
-            m_uri = new URI(uri);
+            attributeId = new URI(uri);
         } catch (URISyntaxException e) {
             throw new RuntimeException("Bad URI Syntax", e);
         }
@@ -77,7 +77,7 @@ public class RDFName
     }
 
     public URI getURI() {
-        return m_uri;
+        return attributeId;
     }
 
     @Override

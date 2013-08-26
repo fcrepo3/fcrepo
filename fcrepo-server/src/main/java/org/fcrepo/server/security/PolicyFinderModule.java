@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -23,17 +22,10 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.fcrepo.common.Constants;
-import org.fcrepo.common.FaultException;
-import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.config.ModuleConfiguration;
 import org.fcrepo.server.errors.GeneralException;
-import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
-import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.errors.ValidationException;
-import org.fcrepo.server.storage.DOReader;
-import org.fcrepo.server.storage.RepositoryReader;
-import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.XmlTransformUtility;
@@ -102,6 +94,10 @@ public class PolicyFinderModule
     private static final String VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY =
             "VALIDATE-OBJECT-POLICIES-FROM-DATASTREAM";
 
+    private static final URI STRING_ATTRIBUTE = URI.create(StringAttribute.identifier);
+    
+    private static final URI EMPTY_URI = URI.create("");
+    
     private final String m_combiningAlgorithm;
 
     private final String m_serverHome;
@@ -298,7 +294,7 @@ public class PolicyFinderModule
                     (PolicyCombiningAlgorithm) Class
                             .forName(m_combiningAlgorithm).newInstance();
             PolicySet policySet =
-                    new PolicySet(new URI(""),
+                    new PolicySet(EMPTY_URI,
                                   policyCombiningAlgorithm,
                                   null /*
                                    * no general target beyond those of
@@ -317,28 +313,20 @@ public class PolicyFinderModule
 
     // get the pid from the context, or null if unable
     public static String getPid(EvaluationCtx context) {
-        URI resourceIdType = null;
-        URI resourceIdId = null;
-        try {
-            resourceIdType = new URI(StringAttribute.identifier);
-            resourceIdId = new URI(Constants.OBJECT.PID.uri);
-        } catch (URISyntaxException e) {
-            throw new FaultException("Bad URI syntax", e);
-        }
         EvaluationResult attribute
-                = context.getResourceAttribute(resourceIdType,
-                                               resourceIdId,
+                = context.getResourceAttribute(STRING_ATTRIBUTE,
+                        Constants.OBJECT.PID.getURI(),
                                                null);
         Object element = getAttributeFromEvaluationResult(attribute);
         if (element == null) {
             logger.debug("PolicyFinderModule:getPid exit on "
-                    + "can't get contextId on request callback");
+                    + "can't get pid on request callback");
             return null;
         }
 
         if (!(element instanceof StringAttribute)) {
             logger.debug("PolicyFinderModule:getPid exit on "
-                    + "couldn't get contextId from xacml request "
+                    + "couldn't get pid from xacml request "
                     + "non-string returned");
             return null;
         }

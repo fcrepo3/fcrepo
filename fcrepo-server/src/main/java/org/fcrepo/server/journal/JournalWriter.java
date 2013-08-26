@@ -213,7 +213,7 @@ public abstract class JournalWriter
         String[] clientIpArray =
                 journalEntry
                         .getContext()
-                        .getEnvironmentValues(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.uri);
+                        .getEnvironmentValues(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.attributeId);
         if (clientIpArray != null && clientIpArray.length > 0) {
             putAttribute(writer, QNAME_ATTR_CLIENT_IP, clientIpArray[0]);
         }

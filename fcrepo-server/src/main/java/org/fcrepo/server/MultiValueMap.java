@@ -12,7 +12,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MultiValueMap {
+public class MultiValueMap<T> {
 
     private static final Logger logger =
             LoggerFactory.getLogger(MultiValueMap.class);
@@ -21,7 +21,7 @@ public class MultiValueMap {
 
     private boolean locked = false;
 
-    private final Map<String,String[]> attributes = new HashMap<String,String[]>();
+    private final Map<T,String[]> attributes = new HashMap<T,String[]>();
 
     /**
      * Creates and initializes the <code>WritableContext</code>.
@@ -32,13 +32,13 @@ public class MultiValueMap {
     public MultiValueMap() {
     }
 
-    public String setReturn(String name, String value)
+    public T setReturn(T name, String value)
             throws IllegalArgumentException, IllegalStateException {
         set(name, value);
         return name;
     }
 
-    public void set(String name, String value)
+    public void set(T name, String value)
             throws IllegalArgumentException, IllegalStateException {
         audit(name, value);
         if (value != null) {
@@ -51,13 +51,13 @@ public class MultiValueMap {
         }
     }
 
-    public String setReturn(String name, String[] value)
+    public T setReturn(T name, String[] value)
             throws IllegalArgumentException, IllegalStateException {
         set(name, value);
         return name;
     }
 
-    public void set(String name, String[] value)
+    public void set(T name, String[] value)
             throws IllegalArgumentException, IllegalStateException {
         audit(name, value);
         if (value != null) {
@@ -71,11 +71,11 @@ public class MultiValueMap {
         locked = true;
     }
 
-    public Iterator<String> names() {
+    public Iterator<T> names() {
         return attributes.keySet().iterator();
     }
 
-    public int length(String name) {
+    public int length(T name) {
         if (attributes.get(name) != null) {
             return attributes.get(name).length;
         } else {
@@ -88,21 +88,21 @@ public class MultiValueMap {
      * @param name
      * @return first available value
      */
-    public String getString(String name) {
+    public String getString(T name) {
          return (attributes.containsKey(name)) ? attributes.get(name)[0] : null;
     }
 
-    public String[] getStringArray(String name) {
+    public String[] getStringArray(T name) {
         return attributes.get(name);
     }
 
     @Override
     public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        Iterator<String> it = attributes.keySet().iterator();
+        StringBuilder buffer = new StringBuilder(128*attributes.size());
+        Iterator<T> it = attributes.keySet().iterator();
         while (it.hasNext()) {
-            String key = it.next();
-            buffer.append(key + "=[");
+            T key = it.next();
+            buffer.append(key.toString() + "=[");
             if (attributes.get(key) != null) {
                 String[] temp = attributes.get(key);
                 boolean second = false;
@@ -133,23 +133,24 @@ public class MultiValueMap {
         if (!(obj instanceof MultiValueMap)) {
             return false;
         }
-        MultiValueMap that = (MultiValueMap) obj;
+        @SuppressWarnings("unchecked")
+        MultiValueMap<T> that = (MultiValueMap<T>) obj;
 
         return locked == that.locked && equalMaps(attributes, that.attributes);
     }
 
-    private static boolean equalMaps(Map<String,String[]> thisMap, Map<String,String[]> thatMap) {
+    private boolean equalMaps(Map<T,String[]> thisMap, Map<T,String[]> thatMap) {
 
         /* Check for obvious differences (same number and value of keys) */
         if (!thisMap.keySet().equals(thatMap.keySet())) {
             return false;
         }
 
-        Iterator<String> theseKeys = thisMap.keySet().iterator();
+        Iterator<T> theseKeys = thisMap.keySet().iterator();
 
         /* Now do a deep compare of contents.. */
         while (theseKeys.hasNext()) {
-            Object key = theseKeys.next();
+            T key = theseKeys.next();
             if (!Arrays.equals(thisMap.get(key), thatMap.get(key))) {
                 return false;
             }
@@ -168,7 +169,7 @@ public class MultiValueMap {
         here = "MultiValueMap";
     }
 
-    private void audit(String key, Object value)
+    private void audit(T key, Object value)
             throws IllegalArgumentException, IllegalStateException {
         if (key == null) {
             String msg = "{}: set() has null name, value={}";

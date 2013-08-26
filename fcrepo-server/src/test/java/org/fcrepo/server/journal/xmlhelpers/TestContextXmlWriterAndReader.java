@@ -6,6 +6,7 @@ package org.fcrepo.server.journal.xmlhelpers;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -50,13 +51,12 @@ public class TestContextXmlWriterAndReader
         JournalEntryContext context1 = new JournalEntryContext();
         context1.setPassword("SuperSecret");
         context1.setNoOp(true);
-        context1.setEnvironmentAttributes(createMap("envAttr", "envValue"));
+        context1.setEnvironmentAttributes(createMap(new URI("envAttr"), "envValue"));
         context1.setSubjectAttributes(createMap(new String[][] {
                 {"subAttr1", "subValue1"}, {"subAttr2", "subValue2"}}));
-        context1.setActionAttributes(createMap(new String[][] {{
-                "ActionAttribute", "ActionValue"}}));
+        context1.setActionAttributes(createMap(new URI("ActionAttribute"), "ActionValue"));
         context1.setRecoveryAttributes(createMap(
-                "recoveryAttribute",
+                new URI("recoveryAttribute"),
                 new String[] {"recoveryValue", "recoveryValue2"}));
 
         ContextXmlWriter contextWriter = new ContextXmlWriter();
@@ -112,18 +112,18 @@ public class TestContextXmlWriterAndReader
                 .createXMLEventWriter(xmlStringWriter));
     }
 
-    private MultiValueMap createMap(String key, String value) {
+    private <T> MultiValueMap<T> createMap(T key, String value) {
         return createMap(key, new String[]{value});
     }
 
-    private MultiValueMap createMap(String key, String[] value) {
-        MultiValueMap map = new MultiValueMap();
+    private <T> MultiValueMap<T> createMap(T key, String[] value) {
+        MultiValueMap<T> map = new MultiValueMap<T>();
         map.set(key, value);
         return map;
     }
 
-    private MultiValueMap createMap(String[][] key_value) {
-        MultiValueMap map = new MultiValueMap();
+    private MultiValueMap<String> createMap(String[][] key_value) {
+        MultiValueMap<String> map = new MultiValueMap<String>();
         for (String[] pair: key_value){
             map.set(pair[0], pair[1]);
         }
@@ -158,12 +158,12 @@ public class TestContextXmlWriterAndReader
                 .getRecoveryAttributes());
     }
 
-    private void assertEqualMultiMaps(MultiValueMap map1, MultiValueMap map2) {
-        Iterator names1 = map1.names();
-        Iterator names2 = map2.names();
+    private <T> void assertEqualMultiMaps(MultiValueMap<T> map1, MultiValueMap<T> map2) {
+        Iterator<T> names1 = map1.names();
+        Iterator<T> names2 = map2.names();
         while (names1.hasNext() && names2.hasNext()) {
-            String name1 = (String) names1.next();
-            String name2 = (String) names2.next();
+            T name1 = names1.next();
+            T name2 = names2.next();
             assertEquals(name1, name2);
             String[] values1 = map1.getStringArray(name1);
             String[] values2 = map1.getStringArray(name2);

@@ -207,11 +207,11 @@ public class DynamicAccessImpl {
 
             String reposBaseURL =
                     getReposBaseURL(context
-                                            .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri)
+                                            .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.attributeId)
                                             .equals(Constants.HTTP_REQUEST.SECURE.uri) ? "https"
                                             : "http",
                                     context
-                                            .getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.uri));
+                                            .getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.attributeId));
 
             Object result =
                     dispatcher

@@ -41,11 +41,11 @@ public class DefaultSerializer {
 
     public DefaultSerializer(String fedoraServerHost, Context context) {
         this.fedoraServerHost = fedoraServerHost;
-        this.fedoraServerPort = context.getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.uri);
+        this.fedoraServerPort = context.getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.attributeId);
         this.fedoraAppServerContext = context.getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME);
 
         if (Constants.HTTP_REQUEST.SECURE.uri
-                .equals(context.getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri))) {
+                .equals(context.getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.attributeId))) {
             this.fedoraServerProtocol = "https";
         } else {
             this.fedoraServerProtocol = "http";
