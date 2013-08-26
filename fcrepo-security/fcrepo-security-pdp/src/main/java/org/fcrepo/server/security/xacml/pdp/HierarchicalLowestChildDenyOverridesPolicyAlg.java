@@ -212,7 +212,7 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
 
             int current;
 
-            if ("".equals(resourceId)) {
+            if (resourceId.isEmpty()) {
                 current = 0;
             } else {
                 current = getLength(resourceId);
@@ -294,7 +294,7 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
     }
 
     private int getLength(String resourceId) {
-        if (resourceId == null || "".equals(resourceId)) {
+        if (resourceId == null || resourceId.isEmpty()) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Length: " + resourceId + " " + 0);
             }

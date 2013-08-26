@@ -96,13 +96,13 @@ public class ExtendedHttpServletRequestWrapper
     }
 
     public final boolean isUserSponsored() {
-        return !(sponsoredUser == null || "".equals(sponsoredUser));
+        return !(sponsoredUser == null || sponsoredUser.isEmpty());
     }
 
     protected boolean isSponsoredUserRequested() {
         String sponsoredUser = getFromHeader();
         boolean isSponsoredUserRequested =
-                !(sponsoredUser == null || "".equals(sponsoredUser));
+                !(sponsoredUser == null || sponsoredUser.isEmpty());
         return isSponsoredUserRequested;
     }
 
@@ -343,12 +343,12 @@ public class ExtendedHttpServletRequestWrapper
         String[] usernamePassword = null;
 
         String msg = here + "header intact";
-        if (header == null || "".equals(header)) {
+        if (header == null || header.isEmpty()) {
             String exceptionMsg = msg + FAILED;
             logger.error(exceptionMsg + ", header==" + header);
             throw new Exception(exceptionMsg);
         }
-        logger.debug(msg + SUCCEEDED);
+        logger.debug("{}{}", msg, SUCCEEDED);
 
         String authschemeUsernamepassword[] = header.split("\\s+");
 
@@ -358,7 +358,7 @@ public class ExtendedHttpServletRequestWrapper
             logger.error(exceptionMsg + ", header==" + header);
             throw new Exception(exceptionMsg);
         }
-        logger.debug(msg + SUCCEEDED);
+        logger.debug("{}{}", msg, SUCCEEDED);
 
         msg = here + "auth scheme";
         String authscheme = authschemeUsernamepassword[0];
@@ -367,45 +367,45 @@ public class ExtendedHttpServletRequestWrapper
             logger.error(exceptionMsg + ", authscheme==" + authscheme);
             throw new Exception(exceptionMsg);
         }
-        logger.debug(msg + SUCCEEDED);
+        logger.debug("{}{}", msg, SUCCEEDED);
 
         msg = here + "digest non-null";
         String usernamepassword = authschemeUsernamepassword[1];
-        if (usernamepassword == null || "".equals(usernamepassword)) {
+        if (usernamepassword == null || usernamepassword.isEmpty()) {
             String exceptionMsg = msg + FAILED;
             logger.error(exceptionMsg + ", usernamepassword==" + usernamepassword);
             throw new Exception(exceptionMsg);
         }
-        logger.debug(msg + SUCCEEDED + ", usernamepassword==" + usernamepassword);
+        logger.debug("{}{}, usernamepassword=={}", msg, SUCCEEDED,
+                usernamepassword);
 
         byte[] encoded = usernamepassword.getBytes();
-        msg = here + "digest base64-encoded";
         if (!Base64.isArrayByteBase64(encoded)) {
-            String exceptionMsg = msg + FAILED;
+            String exceptionMsg = here + "digest base64-encoded" + FAILED;
             logger.error(exceptionMsg + ", encoded==" + encoded);
             throw new Exception(exceptionMsg);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug(msg + SUCCEEDED + ", encoded==" + encoded);
+            logger.debug("{}digest base64-encoded{}, encoded=={}",
+                    here, SUCCEEDED,encoded);
         }
 
         byte[] decodedAsByteArray = Base64.decodeBase64(encoded);
-        logger.debug(here + "got decoded bytes" + SUCCEEDED
-                + ", decodedAsByteArray==" + decodedAsByteArray);
+        logger.debug("{}got decoded bytes{}, decodedAsByteArray=={}",
+                here, SUCCEEDED, decodedAsByteArray);
 
         String decoded = new String(decodedAsByteArray); //decodedAsByteArray.toString();
-        logger.debug(here + "got decoded string" + SUCCEEDED + ", decoded=="
-                + decoded);
+        logger.debug("{}got decoded string{}, decoded=={}",
+                here, SUCCEEDED, decoded);
 
-        msg = here + "digest decoded";
-        if (decoded == null || "".equals(decoded)) {
+        if (decoded == null || decoded.isEmpty()) {
             String exceptionMsg = msg + FAILED;
             logger.error(exceptionMsg + ", digest decoded==" + decoded);
             throw new Exception(exceptionMsg);
         }
-        logger.debug(msg + SUCCEEDED);
+        logger.debug("{}digest decoded{}", here, SUCCEEDED);
 
-        String DELIMITER = ":";
+        char DELIMITER = ':';
         if (decoded == null) {
             logger.error("decoded user/password is null . . . returning 0-length strings");
             usernamePassword = new String[2];
@@ -415,26 +415,28 @@ public class ExtendedHttpServletRequestWrapper
             String exceptionMsg = "decoded user/password lacks delimiter";
             logger.error(exceptionMsg + " . . . throwing exception");
             throw new Exception(exceptionMsg);
-        } else if (decoded.startsWith(DELIMITER)) {
+        } else if (decoded.charAt(0) == DELIMITER) {
             logger.error("decoded user/password is lacks user . . . returning 0-length strings");
             usernamePassword = new String[2];
             usernamePassword[0] = "";
             usernamePassword[1] = "";
-        } else if (decoded.endsWith(DELIMITER)) { // no password, e.g., user == "guest"
+        } else if (decoded.charAt(decoded.length()-1) == DELIMITER) { // no password, e.g., user == "guest"
             usernamePassword = new String[2];
             usernamePassword[0] = decoded.substring(0, decoded.length() - 1);
             usernamePassword[1] = "";
         } else { // usual, expected case
-            usernamePassword = decoded.split(DELIMITER);
+            usernamePassword = new String[2];
+            int ix = decoded.indexOf(DELIMITER);
+            usernamePassword[0] = decoded.substring(0, ix);
+            usernamePassword[1] = decoded.substring(ix + 1);
         }
 
-        msg = here + "user/password split";
         if (usernamePassword.length != 2) {
-            String exceptionMsg = msg + FAILED;
+            String exceptionMsg = here + "user/password split" + FAILED;
             logger.error(exceptionMsg + ", digest decoded==" + decoded);
             throw new Exception(exceptionMsg);
         }
-        logger.debug(msg + SUCCEEDED);
+        logger.debug("{}user/password split{}", here, SUCCEEDED);
 
         return usernamePassword;
     }

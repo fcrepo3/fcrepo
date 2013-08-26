@@ -98,31 +98,31 @@ public class AddDatastream
         Map<URI, AttributeValue> resAttr;
         try {
             resAttr = ResourceAttributes.getResources(parts);
-            if (mimeType != null && !"".equals(mimeType)) {
+            if (mimeType != null && !mimeType.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_MIME_TYPE.getURI(),
                             new StringAttribute(mimeType));
             }
-            if (formatURI != null && !"".equals(formatURI)) {
+            if (formatURI != null && !formatURI.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_FORMAT_URI.getURI(),
                             new AnyURIAttribute(new URI(formatURI)));
             }
-            if (dsLocation != null && !"".equals(dsLocation)) {
+            if (dsLocation != null && !dsLocation.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_LOCATION.getURI(),
                             new AnyURIAttribute(new URI(dsLocation)));
             }
-            if (controlGroup != null && !"".equals(controlGroup)) {
+            if (controlGroup != null && !controlGroup.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_CONTROL_GROUP.getURI(),
                             new StringAttribute(controlGroup));
             }
-            if (dsState != null && !"".equals(dsState)) {
+            if (dsState != null && !dsState.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_STATE.getURI(),
                             new StringAttribute(dsState));
             }
-            if (checksumType != null && !"".equals(checksumType)) {
+            if (checksumType != null && !checksumType.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_CHECKSUM_TYPE.getURI(),
                             new StringAttribute(checksumType));
             }
-            if (checksum != null && !"".equals(checksum)) {
+            if (checksum != null && !checksum.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_CHECKSUM.getURI(),
                             new StringAttribute(checksum));
             }

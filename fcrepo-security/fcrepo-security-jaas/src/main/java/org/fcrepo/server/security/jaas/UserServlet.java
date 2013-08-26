@@ -103,7 +103,7 @@ public class UserServlet
         java.security.Principal principal = request.getUserPrincipal();
         String userId = null;
         if (principal == null || principal.getName() == null
-                || "".equals(principal.getName())) {
+                || principal.getName().isEmpty()) {
             userId = "anonymous";
         } else {
             userId = principal.getName();

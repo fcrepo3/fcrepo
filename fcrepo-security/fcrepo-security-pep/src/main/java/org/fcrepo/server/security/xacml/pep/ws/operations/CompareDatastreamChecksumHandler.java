@@ -70,11 +70,11 @@ public class CompareDatastreamChecksumHandler extends AbstractOperationHandler {
 
         try {
             resAttr = ResourceAttributes.getResources(pid);
-            if (dsID != null && !"".equals(dsID)) {
+            if (dsID != null && !dsID.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.ID.getURI(),
                             new StringAttribute(dsID));
             }
-            if (versionDate != null && !"".equals(versionDate)) {
+            if (versionDate != null && !versionDate.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(versionDate));
             }

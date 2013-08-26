@@ -84,7 +84,7 @@ public class SetDatastreamState
         try {
             String[] parts = getPathParts(request);
             resAttr = ResourceAttributes.getResources(parts);
-            if (dsState != null && !"".equals(dsState)) {
+            if (dsState != null && !dsState.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_STATE.getURI(),
                             new StringAttribute(dsState));
             }

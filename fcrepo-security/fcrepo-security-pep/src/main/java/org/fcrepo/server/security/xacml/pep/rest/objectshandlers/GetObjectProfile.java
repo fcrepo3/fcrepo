@@ -86,7 +86,7 @@ public class GetObjectProfile
         try {
             String[] parts = getPathParts(request);
             resAttr = ResourceAttributes.getResources(parts);
-            if (asOfDateTime != null && !"".equals(asOfDateTime)) {
+            if (asOfDateTime != null && !asOfDateTime.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(asOfDateTime));
             }

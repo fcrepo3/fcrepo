@@ -741,17 +741,18 @@ public class FOXMLDODeserializer
                                     String qName,
                                     Attributes a,
                                     StringBuilder out) {
-        out.append("<" + qName);
+        out.append("<").append(qName);
         // add the current qName's namespace to m_localPrefixMap
         // and m_prefixList if it's not already in m_localPrefixMap
         // This ensures that all namespaces used in inline XML are declared within,
         // since it's supposed to be a standalone chunk.
-        String[] parts = qName.split(":");
-        if (parts.length == 2) {
-            String nsuri = m_localPrefixMap.get(parts[0]);
+        int colon = qName.indexOf(':');
+        if (colon > -1) {
+            String prefix = qName.substring(0, colon);
+            String nsuri = m_localPrefixMap.get(prefix);
             if (nsuri == null) {
-                m_localPrefixMap.put(parts[0], parts[1]);
-                m_prefixList.add(parts[0]);
+                m_localPrefixMap.put(prefix, qName.substring(colon+1));
+                m_prefixList.add(prefix);
             }
         }
         // do we have any newly-mapped namespaces?

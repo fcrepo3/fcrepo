@@ -78,7 +78,7 @@ public class GetNextPID
 
         int numPids = -1;
         String numPidsStr = request.getParameter("numPIDs");
-        if (numPidsStr != null && !"".equals(numPidsStr)) {
+        if (numPidsStr != null && !numPidsStr.isEmpty()) {
             numPids = Integer.valueOf(numPidsStr);
         }
         String pidNamespace = request.getParameter("namespace");
@@ -92,7 +92,7 @@ public class GetNextPID
                 resAttr.put(Constants.OBJECT.N_PIDS.getURI(),
                             new IntegerAttribute(numPids));
             }
-            if (pidNamespace != null && !"".equals(pidNamespace)) {
+            if (pidNamespace != null && !pidNamespace.isEmpty()) {
                 resAttr.put(Constants.OBJECT.NAMESPACE.getURI(),
                             new StringAttribute(pidNamespace));
             }

@@ -89,7 +89,7 @@ public class ListDatastreamsFilter
 
         try {
             resAttr = ResourceAttributes.getResources(pid);
-            if (asOfDateTime != null && !"".equals(asOfDateTime)) {
+            if (asOfDateTime != null && !asOfDateTime.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(asOfDateTime));
             }

@@ -254,7 +254,7 @@ public abstract class BaseCaching
                 logger.debug(format(method, null, "userid", userid));
             }
             boolean authenticated = false;
-            if (userid != null && !"".equals(userid)) {
+            if (userid != null && !userid.isEmpty()) {
                 String password = extendedHttpServletRequest.getPassword();
                 if (logger.isDebugEnabled()) {
                     logger.debug(format(method, null, "password", password));
@@ -351,7 +351,7 @@ public abstract class BaseCaching
             logger.debug(enter(method));
         }
         String sponsoredUser = extendedHttpServletRequest.getFromHeader();
-        if (sponsoredUser != null && !"".equals(sponsoredUser)) {
+        if (sponsoredUser != null && !sponsoredUser.isEmpty()) {
             String password = "";
             contributeAttributes(extendedHttpServletRequest,
                                  sponsoredUser,

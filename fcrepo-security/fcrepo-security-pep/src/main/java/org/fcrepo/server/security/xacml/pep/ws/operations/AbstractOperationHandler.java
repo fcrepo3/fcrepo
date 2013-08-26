@@ -253,7 +253,7 @@ public abstract class AbstractOperationHandler
                 new ArrayList<Map<URI, List<AttributeValue>>>();
 
         if (getUser(context) == null
-                || "".equals(getUser(context).trim())) {
+                || getUser(context).trim().isEmpty()) {
             return subjects;
         }
 
@@ -319,7 +319,7 @@ public abstract class AbstractOperationHandler
                         .get(SOAPMessageContext.SERVLET_REQUEST);
         String ip = request.getRemoteAddr();
 
-        if (ip != null && !"".equals(ip)) {
+        if (ip != null && !ip.isEmpty()) {
             envAttr.put(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.getURI(),
                         new StringAttribute(ip));
         }

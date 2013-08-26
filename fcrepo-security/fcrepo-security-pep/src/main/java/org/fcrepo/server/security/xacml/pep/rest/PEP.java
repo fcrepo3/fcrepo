@@ -185,8 +185,8 @@ public final class PEP
             }
         } catch (AuthzDeniedException ae) {
             if (!res.isCommitted()
-                    && (req.getRemoteUser() == null || "".equals(req
-                            .getRemoteUser().trim()))) {
+                    && (req.getRemoteUser() == null || req
+                            .getRemoteUser().trim().isEmpty())) {
                 loginForm(res);
             } else {
                 denyAccess((HttpServletResponse) response, ae.getMessage());
@@ -201,7 +201,7 @@ public final class PEP
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
      */
     public void init() throws ServletException {
-        logger.info("Initialising Servlet Filter: " + PEP.class);
+        logger.info("Initialising Servlet Filter: {}", PEP.class);
         if (m_ctxHandler == null) {
             throw new ServletException("Error obtaining ContextHandler");
         }
@@ -219,7 +219,7 @@ public final class PEP
      */
     @Override
     public void destroy() {
-        logger.info("Destroying Servlet Filter: " + PEP.class);
+        logger.info("Destroying Servlet Filter: {}", PEP.class);
         m_filters = null;
         m_objectsRESTFilterMatcher = null;
         m_ctxHandler = null;
@@ -267,7 +267,7 @@ public final class PEP
     private void denyAccess(HttpServletResponse response, String message)
             throws IOException {
         StringBuilder sb = new StringBuilder();
-        sb.append("Fedora: 403 " + message.toUpperCase());
+        sb.append("Fedora: 403 ").append(message.toUpperCase());
 
         response.reset();
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
