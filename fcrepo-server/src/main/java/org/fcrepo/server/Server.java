@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -1525,7 +1526,7 @@ public abstract class Server
      */
     public static Date getCurrentDate(Context context) throws GeneralException {
 
-        String propName = Constants.ENVIRONMENT.CURRENT_DATE_TIME.uri;
+        URI propName = Constants.ENVIRONMENT.CURRENT_DATE_TIME.attributeId;
         String dateTimeValue = context.getEnvironmentValue(propName);
         if (dateTimeValue == null) {
             throw new GeneralException("Missing value for environment "

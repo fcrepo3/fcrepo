@@ -413,7 +413,7 @@ public class DefaultManagement
             RecoveryContext rContext = (RecoveryContext) context;
             dsID =
                     rContext
-                            .getRecoveryValue(Constants.RECOVERY.DATASTREAM_ID.uri);
+                            .getRecoveryValue(Constants.RECOVERY.DATASTREAM_ID.attributeId);
             if (dsID != null) {
                 logger.debug("Using new dsID from recovery context");
             }
@@ -1278,7 +1278,7 @@ public class DefaultManagement
                 RecoveryContext rContext = (RecoveryContext) context;
                 pidList =
                         rContext
-                                .getRecoveryValues(Constants.RECOVERY.PID_LIST.uri);
+                                .getRecoveryValues(Constants.RECOVERY.PID_LIST.attributeId);
                 if (pidList != null && pidList.length > 0) {
                     logger.debug("Reserving and returning PID_LIST "
                                  + "from recovery context");
@@ -1346,7 +1346,7 @@ public class DefaultManagement
         if (context instanceof RecoveryContext) {
             RecoveryContext rContext = (RecoveryContext) context;
             String uploadURL =
-                    rContext.getRecoveryValue(Constants.RECOVERY.UPLOAD_ID.uri);
+                    rContext.getRecoveryValue(Constants.RECOVERY.UPLOAD_ID.attributeId);
             if (uploadURL != null) {
                 try {
                     String n = uploadURL.substring(11);

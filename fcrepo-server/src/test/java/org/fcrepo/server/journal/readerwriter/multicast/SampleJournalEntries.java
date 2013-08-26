@@ -6,6 +6,7 @@
 package org.fcrepo.server.journal.readerwriter.multicast;
 
 import java.io.ByteArrayInputStream;
+import java.net.URI;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -718,11 +719,11 @@ public class SampleJournalEntries {
         context.setPassword(password);
         context.setNoOp(noop);
         context.setNow(now);
-        context.setEnvironmentAttributes(buildMultiMap(environment));
+        context.setEnvironmentAttributes(buildUriMultiMap(environment));
         context.setSubjectAttributes(buildMultiMap(subject));
-        context.setActionAttributes(buildMultiMap(action));
-        context.setResourceAttributes(buildMultiMap(resource));
-        context.setRecoveryAttributes(buildMultiMap(recovery));
+        context.setActionAttributes(buildUriMultiMap(action));
+        context.setResourceAttributes(buildUriMultiMap(resource));
+        context.setRecoveryAttributes(buildUriMultiMap(recovery));
         return context;
     }
 
@@ -730,15 +731,18 @@ public class SampleJournalEntries {
         return new ByteArrayInputStream(content.getBytes());
     }
 
-    private static MultiValueMap buildMultiMap(String[][] pairs) {
-        MultiValueMap map = new MultiValueMap();
+    private static MultiValueMap<String> buildMultiMap(String[][] pairs) {
+        MultiValueMap<String> map = new MultiValueMap<String>();
         for (String[] pair : pairs) {
-            try {
-                map.set(pair[0], pair[1]);
-            } catch (Exception e) {
-                e.printStackTrace();
-                // Just eat the stupid Exception!!
-            }
+            map.set(pair[0], pair[1]);
+        }
+        return map;
+    }
+
+    private static MultiValueMap<URI> buildUriMultiMap(String[][] pairs) {
+        MultiValueMap<URI> map = new MultiValueMap<URI>();
+        for (String[] pair : pairs) {
+            map.set(URI.create(pair[0]), pair[1]);
         }
         return map;
     }

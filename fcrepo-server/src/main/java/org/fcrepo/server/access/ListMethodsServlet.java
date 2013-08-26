@@ -358,16 +358,16 @@ public class ListMethodsServlet
             this.methodDefs = methodDefs;
             this.versDateTime = versDateTime;
             fedoraServerPort =
-                    context.getEnvironmentValue(HTTP_REQUEST.SERVER_PORT.uri);
+                    context.getEnvironmentValue(HTTP_REQUEST.SERVER_PORT.attributeId);
 
             fedoraAppServerContext =
                     context
                             .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME);
             if (HTTP_REQUEST.SECURE.uri.equals(context
-                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.uri))) {
+                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.attributeId))) {
                 fedoraServerProtocol = HTTPS;
             } else if (HTTP_REQUEST.INSECURE.uri.equals(context
-                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.uri))) {
+                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.attributeId))) {
                 fedoraServerProtocol = HTTP;
             }
         }

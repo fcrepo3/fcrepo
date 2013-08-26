@@ -246,9 +246,9 @@ public class DescribeRepositoryServlet
             this.pw = pw;
             this.repositoryInfo = repositoryInfo;
             if (Constants.HTTP_REQUEST.SECURE.uri.equals(context
-                    .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri))) {
+                    .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.attributeId))) {
             } else if (Constants.HTTP_REQUEST.INSECURE.uri.equals(context
-                    .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri))) {
+                    .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.attributeId))) {
             }
         }
 

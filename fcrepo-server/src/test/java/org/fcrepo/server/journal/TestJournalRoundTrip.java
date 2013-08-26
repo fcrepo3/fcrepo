@@ -486,7 +486,7 @@ public class TestJournalRoundTrip {
     private void loadExpectedContext() {
         expectedContext = new JournalEntryContext(leadingContext);
         for (Map.Entry<RDFName, String[]> entry : contextAdditions.entrySet()) {
-            expectedContext.getRecoveryAttributes().set(entry.getKey().uri,
+            expectedContext.getRecoveryAttributes().set(entry.getKey().attributeId,
                                                             entry.getValue());
         }
     }

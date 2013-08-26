@@ -168,10 +168,10 @@ public abstract class JournalRecoveryLog
             buffer.append("        now=" + journalEntry.getContext().getNoOp()
                     + "\n");
             buffer.append("    arguments\n");
-            Map argumentsMap = journalEntry.getArgumentsMap();
-            for (Iterator names = argumentsMap.keySet().iterator(); names
+            Map<String, Object> argumentsMap = journalEntry.getArgumentsMap();
+            for (Iterator<String> names = argumentsMap.keySet().iterator(); names
                     .hasNext();) {
-                String name = (String) names.next();
+                String name = names.next();
                 Object value = argumentsMap.get(name);
                 if (value instanceof String[]) {
                     buffer.append(writeStringArray(name, (String[]) value));
@@ -204,12 +204,12 @@ public abstract class JournalRecoveryLog
      * Helper for the {@link #log(ConsumerJournalEntry)} method. Writes the
      * values of a context multi-map.
      */
-    private String writeMapValues(String mapName, MultiValueMap map) {
+    private <T> String writeMapValues(String mapName, MultiValueMap<T> map) {
         StringBuffer buffer = new StringBuffer();
         buffer.append("        " + mapName + "\n");
-        for (Iterator names = map.names(); names.hasNext();) {
-            String name = (String) names.next();
-            buffer.append("            ").append(name).append("\n");
+        for (Iterator<T> names = map.names(); names.hasNext();) {
+            T name = names.next();
+            buffer.append("            ").append(name.toString()).append("\n");
             String[] values = map.getStringArray(name);
             for (String element : values) {
                 buffer.append("                ").append(element).append("\n");

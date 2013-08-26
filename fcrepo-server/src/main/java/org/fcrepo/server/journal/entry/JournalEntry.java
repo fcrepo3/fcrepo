@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -105,13 +106,13 @@ public abstract class JournalEntry {
     }
 
     // convenience method for setting values into the Context recovery space.
-    public void setRecoveryValue(String attribute, String value) {
+    public void setRecoveryValue(URI attribute, String value) {
         checkOpen();
         context.setRecoveryValue(attribute, value);
     }
 
     // convenience method for setting values into the Context recovery space.
-    public void setRecoveryValues(String attribute, String[] values) {
+    public void setRecoveryValues(URI attribute, String[] values) {
         checkOpen();
         context.setRecoveryValues(attribute, values);
     }

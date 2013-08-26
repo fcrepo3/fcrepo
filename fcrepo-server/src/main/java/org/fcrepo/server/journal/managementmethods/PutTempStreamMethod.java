@@ -32,7 +32,7 @@ public class PutTempStreamMethod
                         .getStreamArgument(ARGUMENT_NAME_IN));
 
         // Store the Upload ID for writing to the journal.
-        parent.setRecoveryValue(Constants.RECOVERY.UPLOAD_ID.uri, uploadId);
+        parent.setRecoveryValue(Constants.RECOVERY.UPLOAD_ID.attributeId, uploadId);
 
         return uploadId;
     }
