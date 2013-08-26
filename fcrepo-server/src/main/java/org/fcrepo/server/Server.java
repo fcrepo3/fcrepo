@@ -1001,8 +1001,8 @@ public abstract class Server
                             throw new ServerInitializationException(INIT_CONFIG_SEVERE_INCOMPLETEPARAM);
                         }
                     }
-                    if (nameNode.getNodeValue().equals("")
-                            || valueNode.getNodeValue().equals("")) {
+                    if (nameNode.getNodeValue().isEmpty()
+                            || valueNode.getNodeValue().isEmpty()) {
                         throw new ServerInitializationException(MessageFormat
                                 .format(INIT_CONFIG_SEVERE_INCOMPLETEPARAM,
                                         new Object[] {CONFIG_ELEMENT_PARAM,
@@ -1147,11 +1147,11 @@ public abstract class Server
             Element rootElement = getConfigElement(homeDir);
             // select <server class="THIS_PART"> .. </server>
             String className = rootElement.getAttribute(CONFIG_ATTRIBUTE_CLASS);
-            if (className.equals("")) {
+            if (className.isEmpty()) {
                 className =
                         rootElement.getAttributeNS(CONFIG_NAMESPACE,
                                                    CONFIG_ATTRIBUTE_CLASS);
-                if (className.equals("")) {
+                if (className.isEmpty()) {
                     className = DEFAULT_SERVER_CLASS;
                 }
             }

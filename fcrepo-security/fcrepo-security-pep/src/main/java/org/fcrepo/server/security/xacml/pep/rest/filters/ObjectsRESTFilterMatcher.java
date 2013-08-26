@@ -73,7 +73,7 @@ public class ObjectsRESTFilterMatcher {
 
         // The method override header. Takes precedence over the HTTP method
         String method = request.getHeader("X-HTTP-Method-Override");
-        if (method == null || "".equals(method)) {
+        if (method == null || method.isEmpty()) {
             method = request.getMethod();
         }
 

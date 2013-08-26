@@ -183,7 +183,7 @@ public class XMLBuilder {
     }
 
     private String encodePid(String pid) throws RemoteException {
-        if(pid == null || pid.equals("")) {
+        if(pid == null || pid.isEmpty()) {
             pid = apim.getNextPID(null, null).get(0);
         }
         return StreamUtility.enc(pid);

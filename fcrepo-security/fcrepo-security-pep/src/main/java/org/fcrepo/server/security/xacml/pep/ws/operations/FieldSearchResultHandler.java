@@ -108,7 +108,7 @@ public class FieldSearchResultHandler
             Map<URI, AttributeValue> resAttr;
 
             String pid = o.getPid() != null ? o.getPid().getValue() : null;
-            if (pid != null && !"".equals(pid)) {
+            if (pid != null && !pid.isEmpty()) {
                 objects.put(pid, o);
 
                 try {
@@ -152,27 +152,25 @@ public class FieldSearchResultHandler
 
         List<ObjectFields> resultObjects = new ArrayList<ObjectFields>();
         for (Result r : results) {
-            if (r.getResource() == null || "".equals(r.getResource())) {
+            String resource = r.getResource();
+            if (resource == null || resource.isEmpty()) {
                 logger.warn("This resource has no resource identifier in the xacml response results!");
             } else {
-                logger.debug("Checking: {}", r.getResource());
+                logger.debug("Checking: {}", resource);
             }
 
-            String[] ridComponents = r.getResource().split("\\/");
-            String rid = ridComponents[ridComponents.length - 1];
+            int lastSlash = resource.lastIndexOf('/');
+            String rid = resource.substring(lastSlash + 1);
 
             if (r.getStatus().getCode().contains(Status.STATUS_OK)
                     && r.getDecision() == Result.DECISION_PERMIT) {
                 ObjectFields tmp = objects.get(rid);
                 if (tmp != null) {
                     resultObjects.add(tmp);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Adding: " + r.getResource() + "[" + rid
-                                + "]");
-                    }
+                    logger.debug("Adding: {}[{}]", resource, rid);
                 } else {
-                    logger.warn("Not adding this object as no object found for this key: "
-                                    + r.getResource() + "[" + rid + "]");
+                    logger.warn("Not adding this object as no object found for this key: {}[{}]",
+                                    resource, rid);
                 }
             }
         }

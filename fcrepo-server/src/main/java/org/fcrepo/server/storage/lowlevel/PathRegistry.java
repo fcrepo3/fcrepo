@@ -81,7 +81,7 @@ public abstract class PathRegistry {
     }
 
     public static final boolean stringNull(String string) {
-        return null == string || string.equals("");
+        return null == string || string.isEmpty();
     }
 
     private final void traverseFiles(File[] files,

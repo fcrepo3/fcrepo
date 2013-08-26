@@ -183,7 +183,7 @@ class BatchIngest
                                         + "any objects which were already successfully ingested in this batch");
                         throw e;
                     }
-                    if (pid == null || pid.equals("")) {
+                    if (pid == null || pid.isEmpty()) {
                         failedIngestCount++;
                         System.err.println("ingest failed for: "
                                 + files[i].getName());

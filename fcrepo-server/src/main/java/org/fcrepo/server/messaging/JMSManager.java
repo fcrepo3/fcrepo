@@ -904,7 +904,7 @@ public class JMSManager {
         if (jndiProps != null) {
             String connectionFactoryName =
                     jndiProps.getProperty(CONNECTION_FACTORY_NAME);
-            if(connectionFactoryName == null || connectionFactoryName.equals("")) {
+            if(connectionFactoryName == null || connectionFactoryName.isEmpty()) {
                 connectionFactoryName = defaultConnectionFactoryName;
             }
             connectionFactory =

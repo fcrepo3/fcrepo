@@ -301,7 +301,7 @@ public class PID {
                 try {
                     System.out.print("Enter a PID (ENTER to exit): ");
                     String line = reader.readLine();
-                    if (line.equals("")) {
+                    if (line.isEmpty()) {
                         done = true;
                     } else {
                         PID p = new PID(line);

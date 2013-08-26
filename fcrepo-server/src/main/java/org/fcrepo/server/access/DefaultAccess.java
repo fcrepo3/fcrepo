@@ -1099,7 +1099,7 @@ public class DefaultAccess
     private String getReposBaseURL(String protocol, String port) {
         String reposBaseURL = null;
         String fedoraServerHost = getServer().getParameter("fedoraServerHost");
-        if (fedoraServerHost == null || fedoraServerHost.equals("")) {
+        if (fedoraServerHost == null || fedoraServerHost.isEmpty()) {
             logger.warn("Configuration parameter fedoraServerHost is empty.");
             try {
                 InetAddress hostIP = InetAddress.getLocalHost();

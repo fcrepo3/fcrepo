@@ -450,7 +450,7 @@ public class Ingest
                     logMessage = args[7];
                 }
 
-                if (args.length == 9 && !args[8].equals("")) {
+                if (args.length == 9 && !args[8].isEmpty()) {
                     context = args[8];
                 }
 
@@ -496,7 +496,7 @@ public class Ingest
                     logMessage = args[7];
                 }
 
-                if (args.length == 9 && !args[8].equals("")) {
+                if (args.length == 9 && !args[8].isEmpty()) {
                     context = args[8];
                 }
 
@@ -539,7 +539,7 @@ public class Ingest
                     logMessage = args[10];
                 }
 
-                if (args.length == 12 && !args[11].equals("")) {
+                if (args.length == 12 && !args[11].isEmpty()) {
                     context = args[11];
                 }
                 //Source repository

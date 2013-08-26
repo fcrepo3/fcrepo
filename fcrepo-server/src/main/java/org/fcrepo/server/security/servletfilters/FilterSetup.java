@@ -73,7 +73,7 @@ public class FilterSetup
         initErrors = false;
         if (filterConfig != null) {
             FILTER_NAME = filterConfig.getFilterName();
-            if (FILTER_NAME == null || "".equals(FILTER_NAME)) {
+            if (FILTER_NAME == null || FILTER_NAME.isEmpty()) {
                 if (logger.isErrorEnabled()) {
                     logger.error(format(method, "FILTER_NAME not set"));
                 }

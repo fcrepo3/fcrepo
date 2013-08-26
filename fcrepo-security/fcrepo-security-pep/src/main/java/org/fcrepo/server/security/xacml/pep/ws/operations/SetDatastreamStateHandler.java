@@ -98,11 +98,11 @@ public class SetDatastreamStateHandler
 
         try {
             resAttr = ResourceAttributes.getResources(pid);
-            if (dsID != null && !"".equals(dsID)) {
+            if (dsID != null && !dsID.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.ID.getURI(),
                             new StringAttribute(dsID));
             }
-            if (dsState != null && !"".equals(dsState)) {
+            if (dsState != null && !dsState.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_STATE.getURI(),
                             new StringAttribute(dsState));
             }

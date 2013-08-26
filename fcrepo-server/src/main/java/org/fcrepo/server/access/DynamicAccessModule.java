@@ -117,7 +117,7 @@ public class DynamicAccessModule
             logger.error("Unable to resolve Fedora host", uhe);
         }
         String fedoraServerHost = getServer().getParameter("fedoraServerHost");
-        if (fedoraServerHost == null || fedoraServerHost.equals("")) {
+        if (fedoraServerHost == null || fedoraServerHost.isEmpty()) {
             fedoraServerHost = hostIP.getHostName();
         }
         reposHomeDir = getServer().getHomeDir();

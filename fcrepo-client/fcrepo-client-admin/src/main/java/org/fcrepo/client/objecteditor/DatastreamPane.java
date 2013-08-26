@@ -322,7 +322,7 @@ public class DatastreamPane
     }
 
     public static String getFormattedChecksumTypeAndChecksum(Datastream m_ds) {
-        if (m_ds.getChecksumType() == null || m_ds.getChecksumType().equals("")
+        if (m_ds.getChecksumType() == null || m_ds.getChecksumType().isEmpty()
                 || m_ds.getChecksumType().equals("none")) {
             return "";
         }

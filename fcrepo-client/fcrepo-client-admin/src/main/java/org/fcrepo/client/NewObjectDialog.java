@@ -172,7 +172,7 @@ public class NewObjectDialog
                 String pid = null;
                 String label = m_labelField.getText();
                 boolean ok = true;
-                if (m_labelField.getText().equals("")) {
+                if (m_labelField.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(Administrator.getDesktop(),
                                                   "Label must be non-empty",
                                                   "Error",

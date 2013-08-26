@@ -103,7 +103,7 @@ public class XmlUsersFileModule
             logger.debug(this.getClass().getName() + " login called.");
         }
 
-        if (Constants.FEDORA_HOME == null || "".equals(Constants.FEDORA_HOME.trim())) {
+        if (Constants.FEDORA_HOME == null || Constants.FEDORA_HOME.isEmpty()) {
             logger.error("FEDORA_HOME constant is not set");
             return false;
         }
@@ -236,7 +236,7 @@ public class XmlUsersFileModule
     }
 
     private static File getUsersFile() {
-        if (Constants.FEDORA_HOME == null || "".equals(Constants.FEDORA_HOME)) {
+        if (Constants.FEDORA_HOME == null || Constants.FEDORA_HOME.isEmpty()) {
             logger.error("FEDORA_HOME constant is not set");
         } else {
             if (logger.isDebugEnabled()) {

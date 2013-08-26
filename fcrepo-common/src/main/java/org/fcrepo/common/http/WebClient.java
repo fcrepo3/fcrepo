@@ -156,7 +156,7 @@ public class WebClient {
                                String user,
                                String pass) throws IOException {
         UsernamePasswordCredentials creds = null;
-        if (user != null && !user.equals("") && pass != null && !pass.equals(""))
+        if (user != null && !user.isEmpty() && pass != null && !pass.isEmpty())
             creds = new UsernamePasswordCredentials(user, pass);
         return get(url, failIfNotOK, creds);
     }

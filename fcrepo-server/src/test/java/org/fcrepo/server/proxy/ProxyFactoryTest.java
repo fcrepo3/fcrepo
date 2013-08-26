@@ -110,8 +110,9 @@ public class ProxyFactoryTest {
                 throws Throwable {
             for (int i = 0; i < args.length; i++) {
                 if (args[i] instanceof String) {
-                    if (args[i] != null && !args[i].equals("")) {
-                        StringBuilder sb = new StringBuilder((String) args[i]);
+                    String arg = (String) args[i];
+                    if (arg != null && !arg.isEmpty()) {
+                        StringBuilder sb = new StringBuilder(arg);
                         args[i] = sb.reverse().toString();
                     }
                 }

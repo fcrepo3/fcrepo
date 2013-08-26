@@ -256,10 +256,10 @@ public class BatchBuildGUI
 
     public void buildBatch() {
         try {
-            if (!m_templateField.getText().equals("")
-                    && !m_specsField.getText().equals("")
-                    && !m_objectsField.getText().equals("")
-                    && !m_pidsField.getText().equals("")) {
+            if (!m_templateField.getText().isEmpty()
+                    && !m_specsField.getText().isEmpty()
+                    && !m_objectsField.getText().isEmpty()
+                    && !m_pidsField.getText().isEmpty()) {
                 Properties properties = new Properties();
                 properties.setProperty("merge-objects", "yes");
                 properties.setProperty("template", m_templateField.getText());

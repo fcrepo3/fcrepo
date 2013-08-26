@@ -38,7 +38,7 @@ public abstract class StreamUtility {
      * @return A new, encoded String.
      */
     public static String enc(String in) {
-        if (in == null || "".equals(in)) {
+        if (in == null || in.isEmpty()) {
             return "";
         }
         StringBuilder out = new StringBuilder();

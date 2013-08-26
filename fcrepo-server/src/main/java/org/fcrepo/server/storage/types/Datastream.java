@@ -154,7 +154,7 @@ public class Datastream {
     }
 
     public String getChecksumType() {
-        if (DSChecksumType == null || DSChecksumType.equals("")
+        if (DSChecksumType == null || DSChecksumType.isEmpty()
                 || DSChecksumType.equals(CHECKSUM_NONE)) {
             DSChecksumType = getDefaultChecksumType();
             if (DSChecksumType == null) {
@@ -182,7 +182,7 @@ public class Datastream {
     }
 
     public boolean compareChecksum() {
-        if (DSChecksumType == null || DSChecksumType.equals("")
+        if (DSChecksumType == null || DSChecksumType.isEmpty()
                 || DSChecksumType.equals(CHECKSUM_NONE)) {
             return false;
         }

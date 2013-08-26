@@ -178,7 +178,7 @@ public class ServerController
         String parameter = request.getParameter(name);
         boolean res;
 
-        if (parameter == null || parameter.equals("")) {
+        if (parameter == null || parameter.isEmpty()) {
             res = defaultValue;
         } else {
             if (parameter.toLowerCase().equals("true") || parameter.toLowerCase().equals("yes")) {

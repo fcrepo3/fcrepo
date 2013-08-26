@@ -664,7 +664,7 @@ public class DefaultSerializer {
         if (value != null || force) {
             if (indent != null) out.append(indent);
             out.append('<');
-            if (prefix != null && !"".equals(prefix)) {
+            if (prefix != null && !prefix.isEmpty()) {
                 out.append(prefix);
                 out.append(':');
             }
@@ -672,7 +672,7 @@ public class DefaultSerializer {
             out.append('>');
             enc(value, out);
             out.append("</");
-            if (prefix != null && !"".equals(prefix)) {
+            if (prefix != null && !prefix.isEmpty()) {
                 out.append(prefix);
                 out.append(':');
             }

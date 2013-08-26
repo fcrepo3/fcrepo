@@ -487,7 +487,7 @@ public class DatastreamResource
             if (existingDS == null) {
                 if (posted) {
                 	LOGGER.debug("new ds posted at {}/{}", pid, dsID);
-                    if ((dsLocation == null || dsLocation.equals(""))
+                    if ((dsLocation == null || dsLocation.isEmpty())
                             && ("X".equals(controlGroup) || "M"
                                     .equals(controlGroup))) {
                     	if (is == null) {
@@ -522,7 +522,7 @@ public class DatastreamResource
                     // Inline XML can only be modified by value. If there is no stream,
                     // but there is a dsLocation attempt to retrieve the content.
                     if (is == null && dsLocation != null
-                            && !dsLocation.equals("")) {
+                            && !dsLocation.isEmpty()) {
                         try {
                             WebClientConfiguration webconfig = m_server.getWebClientConfig();
                             WebClient webClient = new WebClient(webconfig);

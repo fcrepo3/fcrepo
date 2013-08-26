@@ -96,11 +96,11 @@ public class ExportHandler
 
         try {
             resAttr = ResourceAttributes.getResources(pid);
-            if (format != null && !"".equals(format)) {
+            if (format != null && !format.isEmpty()) {
                 resAttr.put(Constants.OBJECT.ENCODING.getURI(),
                             new StringAttribute(format));
             }
-            if (eContext != null && !"".equals(eContext)) {
+            if (eContext != null && !eContext.isEmpty()) {
                 resAttr.put(Constants.OBJECT.CONTEXT.getURI(),
                             new StringAttribute(eContext));
             }

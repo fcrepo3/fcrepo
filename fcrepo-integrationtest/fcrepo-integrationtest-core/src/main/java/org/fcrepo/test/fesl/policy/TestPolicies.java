@@ -419,7 +419,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
                     m_object.denied().add(pid);
                 }
                 // test datastream access
-                if (!m_dsid.equals("")) {
+                if (!m_dsid.isEmpty()) {
                     url = "/fedora/objects/" + pid + "/datastreams/" + m_dsid + "?format=xml";
                     try {
                         httpUtils.get(url);
@@ -443,7 +443,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
                 fail("Error in checking permissions - total of allowed and denied objects does not equal number of objects tested");
                 throw new RuntimeException("Should not happen");
             }
-            if (!m_dsid.equals("")) {
+            if (!m_dsid.isEmpty()) {
                 if (m_datastream.allowed().size() + m_datastream.denied().size() != pidCount()) {
                     fail("Error in checking permissions - total of allowed and denied datastreams does not equal number of object datastreams tested");
                     throw new RuntimeException("Also should not happen");

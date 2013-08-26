@@ -258,8 +258,8 @@ public class BatchIngestGUI
 
     public void ingestBatch() {
         try {
-            if (!m_objectsField.getText().equals("")
-                    && !m_pidsField.getText().equals("")) {
+            if (!m_objectsField.getText().isEmpty()
+                    && !m_pidsField.getText().isEmpty()) {
                 Properties properties = new Properties();
                 properties.setProperty("ingest", "yes");
                 properties.setProperty("objects", m_objectsField.getText());

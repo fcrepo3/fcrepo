@@ -180,7 +180,7 @@ public class ImportDialog
         public void actionPerformed(ActionEvent evt) {
             try {
                 if (m_fileButton.isSelected()) {
-                    if (m_fileField.getText().equals("")) {
+                    if (m_fileField.getText().isEmpty()) {
                         throw new IOException("No filename entered.");
                     }
                     File f = new File(m_fileField.getText());
@@ -189,7 +189,7 @@ public class ImportDialog
                     }
                     file = f;
                 } else {
-                    if (m_urlField.getText().equals("")) {
+                    if (m_urlField.getText().isEmpty()) {
                         throw new IOException("No URL entered.");
                     }
                     File f = File.createTempFile("fedora-ingest-", null);

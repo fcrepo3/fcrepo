@@ -79,7 +79,7 @@ public class ProxyConfiguration {
      * @return the Pattern or null.
      */
     protected Pattern createNonProxyPattern(String nonProxyHosts) {
-        if (nonProxyHosts == null || nonProxyHosts.equals("")) return null;
+        if (nonProxyHosts == null || nonProxyHosts.isEmpty()) return null;
 
         // "*.fedora-commons.org" -> ".*?\.fedora-commons\.org"
         nonProxyHosts = nonProxyHosts.replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*?");
@@ -154,8 +154,8 @@ public class ProxyConfiguration {
      * @return true if the credentials are valid, false otherwise
      */
     public boolean hasValidCredentials() {
-        return getProxyUser() != null && !getProxyUser().equals("")
-                && getProxyPassword() != null && !getProxyPassword().equals("");
+        return getProxyUser() != null && !getProxyUser().isEmpty()
+                && getProxyPassword() != null && !getProxyPassword().isEmpty();
     }
 
 }

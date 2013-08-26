@@ -84,7 +84,7 @@ public class SetDatastreamVersionable
         try {
             String[] parts = getPathParts(request);
             resAttr = ResourceAttributes.getResources(parts);
-            if (versionable != null && !"".equals(versionable)) {
+            if (versionable != null && !versionable.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_VERSIONABLE.getURI(),
                             new StringAttribute(versionable));
             }

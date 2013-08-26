@@ -149,7 +149,7 @@ public class AuthFilterJAAS
     public void init() throws ServletException {
         // get FEDORA_HOME. This being set is mandatory.
         String fedoraHome = Constants.FEDORA_HOME;
-        if (fedoraHome == null || "".equals(fedoraHome)) {
+        if (fedoraHome == null || fedoraHome.isEmpty()) {
             String msg = "FEDORA_HOME environment variable not set";
             throw new ServletException(msg);
         }
@@ -165,7 +165,7 @@ public class AuthFilterJAAS
         String tmp = null;
 
         tmp = filterConfig.getInitParameter("jaas.config.location");
-        if (tmp != null && !"".equals(tmp)) {
+        if (tmp != null && !tmp.isEmpty()) {
             jaasConfigLocation = tmp;
             if (logger.isDebugEnabled()) {
                 logger.debug("using location from init file: "
@@ -174,7 +174,7 @@ public class AuthFilterJAAS
         }
 
         tmp = filterConfig.getInitParameter("jaas.config.name");
-        if (tmp != null && !"".equals(tmp)) {
+        if (tmp != null && !tmp.isEmpty()) {
             jaasConfigName = tmp;
             if (logger.isDebugEnabled()) {
                 logger.debug("using name from init file: " + jaasConfigName);
@@ -368,7 +368,7 @@ public class AuthFilterJAAS
      */
     private Subject authenticate(HttpServletRequest req) {
         String authorization = req.getHeader("authorization");
-        if (authorization == null || "".equals(authorization.trim())) {
+        if (authorization == null || authorization.trim().isEmpty()) {
             return null;
         }
 

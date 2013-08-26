@@ -101,11 +101,11 @@ public class ModifyObjectHandler
 
         try {
             resAttr = ResourceAttributes.getResources(pid);
-            if (state != null && !"".equals(state)) {
+            if (state != null && !state.isEmpty()) {
                 resAttr.put(Constants.OBJECT.STATE.getURI(),
                             new StringAttribute(state));
             }
-            if (ownerId != null && !"".equals(ownerId)) {
+            if (ownerId != null && !ownerId.isEmpty()) {
                 resAttr.put(Constants.OBJECT.OWNER.getURI(),
                             new StringAttribute(state));
             }
