@@ -23,7 +23,7 @@ class TestAttributeFinderModule
 
     private static final Logger logger =
             LoggerFactory.getLogger(TestAttributeFinderModule.class);
-    public static final String ATTRIBUTE_ID = Constants.ENVIRONMENT.uri + ":springConfigured";
+    public static final URI ATTRIBUTE_ID = URI.create(Constants.ENVIRONMENT.uri + ":springConfigured");
     public static final String ATTRIBUTE_VALUE = "demo:5";
     @Override
     protected boolean canHandleAdhoc() {
@@ -38,7 +38,7 @@ class TestAttributeFinderModule
         try {
             registerSupportedDesignatorType(AttributeDesignator.ENVIRONMENT_TARGET);
 
-            registerAttribute(URI.create(ATTRIBUTE_ID), STRING_ATTRIBUTE_TYPE_URI);
+            registerAttribute(ATTRIBUTE_ID, STRING_ATTRIBUTE_TYPE_URI);
 
             denyAttribute(Constants.XACML1_SUBJECT.ID.attributeId);
             denyAttribute(Constants.XACML1_ACTION.ID.attributeId);
