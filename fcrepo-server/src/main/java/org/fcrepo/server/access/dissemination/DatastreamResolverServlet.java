@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URI;
 
 import java.sql.Timestamp;
 
@@ -364,9 +365,9 @@ public class DatastreamResolverServlet
                     logger.debug("context.getSubjectValue(targetRole)="
                             + context.getSubjectValue(targetRole));
                 }
-                Iterator it = context.subjectAttributes();
-                while (it.hasNext()) {
-                    String name = (String) it.next();
+                Iterator<String> subjectNames = context.subjectAttributes();
+                while (subjectNames.hasNext()) {
+                    String name = subjectNames.next();
                     int n = context.nSubjectValues(name);
                     switch (n) {
                         case 0:
@@ -386,9 +387,9 @@ public class DatastreamResolverServlet
                             }
                     }
                 }
-                it = context.environmentAttributes();
+                Iterator<URI> it = context.environmentAttributes();
                 while (it.hasNext()) {
-                    String name = (String) it.next();
+                    URI name = it.next();
                     String value = context.getEnvironmentValue(name);
                     logger.debug("another environment attribute from context "
                             + name + "=" + value);

@@ -647,7 +647,7 @@ public class DefaultAccess
 */
         // "bootstrap" context won't have the uri to determine security
         String securityUri = context
-                .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri);
+                .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.attributeId);
 
         if (securityUri != null) {
             String reposBaseURL =
@@ -655,7 +655,7 @@ public class DefaultAccess
                                             .equals(Constants.HTTP_REQUEST.SECURE.uri) ? "https"
                                                                                        : "http",
                                     context
-                                            .getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.uri));
+                                            .getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.attributeId));
             profile.dissIndexViewURL =
                     getDissIndexViewURL(reposBaseURL,
                                         context
@@ -741,11 +741,11 @@ public class DefaultAccess
                 getServer().getParameter("repositoryName");
         String reposBaseURL =
                 getReposBaseURL(context
-                                        .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri)
+                                        .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.attributeId)
                                         .equals(Constants.HTTP_REQUEST.SECURE.uri) ? "https"
                                                                                    : "http",
                                 context
-                                        .getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.uri));
+                                        .getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.attributeId));
         repositoryInfo.repositoryBaseURL =
                 reposBaseURL + "/" + context.getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME);
 

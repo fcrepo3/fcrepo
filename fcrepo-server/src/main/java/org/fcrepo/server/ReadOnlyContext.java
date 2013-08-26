@@ -4,6 +4,7 @@
  */
 package org.fcrepo.server;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,21 +40,23 @@ public class ReadOnlyContext
         EMPTY.setActionAttributes(null);
         EMPTY.setResourceAttributes(null);
     }
+    
+    private static final String[] EMPTY_VALUES = new String[0];
 
     private final Date now = new Date();
 
-    private MultiValueMap m_environmentAttributes;
+    private MultiValueMap<URI> m_environmentAttributes;
 
     @Override
-    public final MultiValueMap getEnvironmentAttributes() {
+    public final MultiValueMap<URI> getEnvironmentAttributes() {
         return m_environmentAttributes;
     }
 
-    private MultiValueMap m_subjectAttributes;
+    private MultiValueMap<String> m_subjectAttributes;
 
-    private MultiValueMap m_actionAttributes;
+    private MultiValueMap<URI> m_actionAttributes;
 
-    private MultiValueMap m_resourceAttributes;
+    private MultiValueMap<URI> m_resourceAttributes;
 
     private final String password;
 
@@ -76,8 +79,8 @@ public class ReadOnlyContext
      *        A pre-loaded Map of name-value pairs comprising the context.
      */
     private ReadOnlyContext(HttpServletRequest request,
-                            MultiValueMap environmentAttributes,
-                            MultiValueMap subjectAttributes,
+                            MultiValueMap<URI> environmentAttributes,
+                            MultiValueMap<String> subjectAttributes,
                             String password,
                             boolean noOp) {
         //super(parameters);
@@ -85,14 +88,14 @@ public class ReadOnlyContext
         m_subjectAttributes = subjectAttributes;
         if (m_subjectAttributes == null) {
             logger.debug("subject map parm is null");
-            m_subjectAttributes = new MultiValueMap();
+            m_subjectAttributes = new MultiValueMap<String>();
         }
         m_subjectAttributes.lock();
         logger.debug("subject attributes in readonlycontext constructor == {}",
                 m_subjectAttributes);
-        m_actionAttributes = new MultiValueMap();
+        m_actionAttributes = new MultiValueMap<URI>();
         m_actionAttributes.lock();
-        m_resourceAttributes = new MultiValueMap();
+        m_resourceAttributes = new MultiValueMap<URI>();
         m_resourceAttributes.lock();
         if (password == null) {
             password = "";
@@ -104,31 +107,31 @@ public class ReadOnlyContext
         }
     }
 
-    public void setEnvironmentValues(MultiValueMap environmentAttributes) {
+    public void setEnvironmentValues(MultiValueMap<URI> environmentAttributes) {
         m_environmentAttributes = environmentAttributes;
         if (m_environmentAttributes == null) {
-            m_environmentAttributes = new MultiValueMap();
+            m_environmentAttributes = new MultiValueMap<URI>();
         }
         m_environmentAttributes.lock();
     }
 
     @Override
-    public Iterator<String> environmentAttributes() {
+    public Iterator<URI> environmentAttributes() {
         return m_environmentAttributes.names();
     }
 
     @Override
-    public int nEnvironmentValues(String name) {
+    public int nEnvironmentValues(URI name) {
         return m_environmentAttributes.length(name);
     }
 
     @Override
-    public String getEnvironmentValue(String name) {
+    public String getEnvironmentValue(URI name) {
         return m_environmentAttributes.getString(name);
     }
 
     @Override
-    public String[] getEnvironmentValues(String name) {
+    public String[] getEnvironmentValues(URI name) {
         return m_environmentAttributes.getStringArray(name);
     }
 
@@ -192,60 +195,60 @@ public class ReadOnlyContext
     }
 
     @Override
-    public void setActionAttributes(MultiValueMap actionAttributes) {
+    public void setActionAttributes(MultiValueMap<URI> actionAttributes) {
         m_actionAttributes = actionAttributes;
         if (m_actionAttributes == null) {
-            m_actionAttributes = new MultiValueMap();
+            m_actionAttributes = new MultiValueMap<URI>();
         }
         m_actionAttributes.lock();
     }
 
     @Override
-    public Iterator<String> actionAttributes() {
+    public Iterator<URI> actionAttributes() {
         return m_actionAttributes.names();
     }
 
     @Override
-    public int nActionValues(String name) {
+    public int nActionValues(URI name) {
         return m_actionAttributes.length(name);
     }
 
     @Override
-    public String getActionValue(String name) {
+    public String getActionValue(URI name) {
         return m_actionAttributes.getString(name);
     }
 
     @Override
-    public String[] getActionValues(String name) {
+    public String[] getActionValues(URI name) {
         return m_actionAttributes.getStringArray(name);
     }
 
     @Override
-    public Iterator<String> resourceAttributes() {
+    public Iterator<URI> resourceAttributes() {
         return m_resourceAttributes.names();
     }
 
     @Override
-    public void setResourceAttributes(MultiValueMap resourceAttributes) {
+    public void setResourceAttributes(MultiValueMap<URI> resourceAttributes) {
         m_resourceAttributes = resourceAttributes;
         if (m_resourceAttributes == null) {
-            m_resourceAttributes = new MultiValueMap();
+            m_resourceAttributes = new MultiValueMap<URI>();
         }
         m_resourceAttributes.lock();
     }
 
     @Override
-    public int nResourceValues(String name) {
+    public int nResourceValues(URI name) {
         return m_resourceAttributes.length(name);
     }
 
     @Override
-    public String getResourceValue(String name) {
+    public String getResourceValue(URI name) {
         return m_resourceAttributes.getString(name);
     }
 
     @Override
-    public String[] getResourceValues(String name) {
+    public String[] getResourceValues(URI name) {
         return m_resourceAttributes.getStringArray(name);
     }
 
@@ -266,17 +269,17 @@ public class ReadOnlyContext
         return now;
     }
 
-    private static final MultiValueMap beginEnvironmentMap(String messageProtocol)
+    private static final MultiValueMap<URI> beginEnvironmentMap(String messageProtocol)
             throws Exception {
-        MultiValueMap environmentMap = new MultiValueMap();
-        environmentMap.set(Constants.HTTP_REQUEST.MESSAGE_PROTOCOL.uri,
+        MultiValueMap<URI> environmentMap = new MultiValueMap<URI>();
+        environmentMap.set(Constants.HTTP_REQUEST.MESSAGE_PROTOCOL.attributeId,
                            messageProtocol);
         Date now = new Date();
-        environmentMap.set(Constants.ENVIRONMENT.CURRENT_DATE_TIME.uri,
+        environmentMap.set(Constants.ENVIRONMENT.CURRENT_DATE_TIME.attributeId,
                            DateUtility.convertDateToString(now));
-        environmentMap.set(Constants.ENVIRONMENT.CURRENT_DATE.uri, DateUtility
+        environmentMap.set(Constants.ENVIRONMENT.CURRENT_DATE.attributeId, DateUtility
                 .convertDateToDateString(now));
-        environmentMap.set(Constants.ENVIRONMENT.CURRENT_TIME.uri, DateUtility
+        environmentMap.set(Constants.ENVIRONMENT.CURRENT_TIME.attributeId, DateUtility
                 .convertDateToTimeString(now));
         return environmentMap;
     }
@@ -302,22 +305,16 @@ public class ReadOnlyContext
      * password, roles, existingContext.getNoOp()); }
      */
 
-    private static final Class<?> STRING_ARRAY_CLASS;
-    static {
-        String[] temp = {""};
-        STRING_ARRAY_CLASS = temp.getClass();
-    }
-
     private static final ReadOnlyContext getContext(HttpServletRequest request,
-                                                    MultiValueMap environmentMap,
+                                                    MultiValueMap<URI> environmentMap,
                                                     String subjectId,
                                                     String password, /*
                                                      * String[]
                                                      * roles,
                                                      */
-                                                    Map auxSubjectRoles,
+                                                    Map<String, ?> auxSubjectRoles,
                                                     boolean noOp) {
-        MultiValueMap subjectMap = new MultiValueMap();
+        MultiValueMap<String> subjectMap = new MultiValueMap<String>();
         try {
             subjectMap.set(Constants.SUBJECT.LOGIN_ID.uri,
                            subjectId == null ? "" : subjectId);
@@ -336,7 +333,7 @@ public class ReadOnlyContext
                         auxSubjectRoles.keySet());
                 logger.debug("IN CONTEXT processing auxSubjectRoles.keySet().isEmpty()=={}",
                                 auxSubjectRoles.keySet().isEmpty());
-                Iterator auxSubjectRoleKeys =
+                Iterator<String> auxSubjectRoleKeys =
                         auxSubjectRoles.keySet().iterator();
                 logger.debug("IN CONTEXT processing auxSubjectRoleKeys=={}",
                         auxSubjectRoleKeys);
@@ -365,18 +362,17 @@ public class ReadOnlyContext
                                 subjectMap.set((String) name, values);
                             }
                         } else if (value instanceof Set) {
-                            String temp[] = new String[((Set) value).size()];
-                            int i = 0;
-                            for (Iterator setIterator =
-                                    ((Set) value).iterator(); setIterator
-                                    .hasNext();) {
-                                String singleValue =
-                                        (String) setIterator.next();
-                                logger.debug("IN CONTEXT singleValue is string=={}",
-                                        singleValue);
-                                temp[i++] = singleValue;
+                            @SuppressWarnings("unchecked")
+                            Set<String> values = (Set<String>) value;
+                            String temp[] = values.toArray(EMPTY_VALUES);
+                            if (logger.isDebugEnabled()) {
+                                for (String singleValue: temp) {
+                                    logger.debug("IN CONTEXT singleValue is string=={}",
+                                            singleValue);
+                                }
                             }
-                            subjectMap.set((String) name, temp);
+
+                            subjectMap.set((String)name, temp);
                         }
                     }
                 }
@@ -412,26 +408,27 @@ public class ReadOnlyContext
                                                     */
                                                    boolean noOp)
             throws Exception {
-        MultiValueMap environmentMap = beginEnvironmentMap(messageProtocol);
+        MultiValueMap<URI> environmentMap = beginEnvironmentMap(messageProtocol);
         environmentMap.lock(); // no request to grok more from
         return getContext(null, environmentMap, subjectId, password, /* roles, */
         null, noOp);
     }
 
+    @SuppressWarnings("unchecked")
     public static final ReadOnlyContext getContext(String messageProtocol,
                                                    HttpServletRequest request /*
      * ,
      * String[]
      * overrideRoles
      */) {
-        MultiValueMap environmentMap = null;
+        MultiValueMap<URI> environmentMap = null;
         try {
             environmentMap = beginEnvironmentMap(messageProtocol);
 
-            environmentMap.set(Constants.HTTP_REQUEST.SECURITY.uri, request
+            environmentMap.set(Constants.HTTP_REQUEST.SECURITY.attributeId, request
                     .isSecure() ? Constants.HTTP_REQUEST.SECURE.uri
                     : Constants.HTTP_REQUEST.INSECURE.uri);
-            environmentMap.set(Constants.HTTP_REQUEST.SESSION_STATUS.uri,
+            environmentMap.set(Constants.HTTP_REQUEST.SESSION_STATUS.attributeId,
                                request.isRequestedSessionIdValid() ? "valid"
                                        : "invalid");
 
@@ -447,62 +444,62 @@ public class ReadOnlyContext
             }
 
             if (request.getContentLength() > -1) {
-                environmentMap.set(Constants.HTTP_REQUEST.CONTENT_LENGTH.uri,
-                                   "" + request.getContentLength());
+                environmentMap.set(Constants.HTTP_REQUEST.CONTENT_LENGTH.attributeId,
+                                   Integer.toString(request.getContentLength()));
             }
             if (request.getLocalPort() > -1) {
-                environmentMap.set(Constants.HTTP_REQUEST.SERVER_PORT.uri, ""
-                        + request.getLocalPort());
+                environmentMap.set(Constants.HTTP_REQUEST.SERVER_PORT.attributeId,
+                        Integer.toString(request.getLocalPort()));
             }
 
             if (request.getProtocol() != null) {
-                environmentMap.set(Constants.HTTP_REQUEST.PROTOCOL.uri, request
+                environmentMap.set(Constants.HTTP_REQUEST.PROTOCOL.attributeId, request
                         .getProtocol());
             }
             if (request.getScheme() != null) {
-                environmentMap.set(Constants.HTTP_REQUEST.SCHEME.uri, request
+                environmentMap.set(Constants.HTTP_REQUEST.SCHEME.attributeId, request
                         .getScheme());
             }
             if (request.getAuthType() != null) {
-                environmentMap.set(Constants.HTTP_REQUEST.AUTHTYPE.uri, request
+                environmentMap.set(Constants.HTTP_REQUEST.AUTHTYPE.attributeId, request
                         .getAuthType());
             }
             if (request.getMethod() != null) {
-                environmentMap.set(Constants.HTTP_REQUEST.METHOD.uri, request
+                environmentMap.set(Constants.HTTP_REQUEST.METHOD.attributeId, request
                         .getMethod());
             }
             if (sessionEncoding != null) {
-                environmentMap.set(Constants.HTTP_REQUEST.SESSION_ENCODING.uri,
+                environmentMap.set(Constants.HTTP_REQUEST.SESSION_ENCODING.attributeId,
                                    sessionEncoding);
             }
             if (request.getContentType() != null) {
-                environmentMap.set(Constants.HTTP_REQUEST.CONTENT_TYPE.uri,
+                environmentMap.set(Constants.HTTP_REQUEST.CONTENT_TYPE.attributeId,
                                    request.getContentType());
             }
             if (request.getLocalAddr() != null) {
                 logger.debug("Request Server IP Address is '{}'", request.getLocalAddr());
                 environmentMap
-                        .set(Constants.HTTP_REQUEST.SERVER_IP_ADDRESS.uri,
+                        .set(Constants.HTTP_REQUEST.SERVER_IP_ADDRESS.attributeId,
                              request.getLocalAddr());
             }
             if (request.getRemoteAddr() != null) {
                 logger.debug("Request Client IP Address is '{}'", request.getRemoteAddr());
                 environmentMap
-                        .set(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.uri,
+                        .set(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.attributeId,
                              request.getRemoteAddr());
             }
 
             if (request.getRemoteHost() != null) {
                 if (!request.getRemoteHost()
                         .matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}")) {
-                    environmentMap.set(Constants.HTTP_REQUEST.CLIENT_FQDN.uri,
+                    environmentMap.set(Constants.HTTP_REQUEST.CLIENT_FQDN.attributeId,
                                        request.getRemoteHost().toLowerCase());
                 }
             }
             if (request.getLocalName() != null) {
                 if (!request.getLocalName()
                         .matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}")) {
-                    environmentMap.set(Constants.HTTP_REQUEST.SERVER_FQDN.uri,
+                    environmentMap.set(Constants.HTTP_REQUEST.SERVER_FQDN.attributeId,
                                        request.getLocalName().toLowerCase());
                 }
             }
@@ -542,12 +539,12 @@ public class ReadOnlyContext
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        Map auxSubjectRoles = null;
+        Map<String, ?> auxSubjectRoles = null;
         Object testFedoraAuxSubjectAttributes =
                 request.getAttribute(FEDORA_AUX_SUBJECT_ATTRIBUTES);
         if (testFedoraAuxSubjectAttributes != null
                 && testFedoraAuxSubjectAttributes instanceof Map) {
-            auxSubjectRoles = (Map) testFedoraAuxSubjectAttributes;
+            auxSubjectRoles = (Map<String, ?>) testFedoraAuxSubjectAttributes;
         }
         return getContext(request, environmentMap, subjectId, password, /* overrideRoles, */
         auxSubjectRoles, noOp);

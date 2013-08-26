@@ -242,7 +242,7 @@ public class TestExternalDatastreams
             String dsId = addDatastream(pid, dsLocation, checksumType, null);
             assertEquals("DS", dsId);
             String checksum = computeChecksum(checksumType, new FileInputStream(temp));
-            assertEquals(apim.getDatastream(pid, "DS", null).getChecksum(),checksum);
+            assertEquals(checksum, apim.getDatastream(pid, "DS", null).getChecksum());
         } finally {
             apim.purgeObject(pid, "testAddDatastreamWithChecksumType", false);
             if (temp != null) temp.delete();

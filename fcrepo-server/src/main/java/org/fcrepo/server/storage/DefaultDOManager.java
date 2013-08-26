@@ -935,7 +935,7 @@ implements DOManager {
                                 RecoveryContext rContext =
                                         (RecoveryContext) context;
                                 p =
-                                        rContext.getRecoveryValue(Constants.RECOVERY.PID.uri);
+                                        rContext.getRecoveryValue(Constants.RECOVERY.PID.attributeId);
                             }
                             if (p == null) {
                                 p =

@@ -31,7 +31,7 @@ public class GetNextPidMethod
                         .getStringArgument(ARGUMENT_NAME_NAMESPACE));
 
         // Store the list of PIDs for writing to the journal.
-        parent.setRecoveryValues(Constants.RECOVERY.PID_LIST.uri, pidList);
+        parent.setRecoveryValues(Constants.RECOVERY.PID_LIST.attributeId, pidList);
 
         return pidList;
     }

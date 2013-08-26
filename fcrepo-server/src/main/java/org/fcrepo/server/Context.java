@@ -4,6 +4,7 @@
  */
 package org.fcrepo.server;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -14,16 +15,17 @@ import java.util.Iterator;
  */
 public interface Context {
 
-    public MultiValueMap getEnvironmentAttributes();
+    public MultiValueMap<URI> getEnvironmentAttributes();
 
-    public Iterator<String> environmentAttributes();
+    public Iterator<URI> environmentAttributes();
 
-    public int nEnvironmentValues(String name);
+    public int nEnvironmentValues(URI name);
 
-    public String getEnvironmentValue(String name);
+    public String getEnvironmentValue(URI name);
 
-    public String[] getEnvironmentValues(String name);
+    public String[] getEnvironmentValues(URI name);
 
+    // subject attributes may just be roleNames, and aren't necessarily URIs
     public Iterator<String> subjectAttributes();
 
     public int nSubjectValues(String name);
@@ -32,25 +34,25 @@ public interface Context {
 
     public String[] getSubjectValues(String name);
 
-    public Iterator<String> actionAttributes();
+    public Iterator<URI> actionAttributes();
 
-    public int nActionValues(String name);
+    public int nActionValues(URI name);
 
-    public String getActionValue(String name);
+    public String getActionValue(URI name);
 
-    public String[] getActionValues(String name);
+    public String[] getActionValues(URI name);
 
-    public Iterator<String> resourceAttributes();
+    public Iterator<URI> resourceAttributes();
 
-    public int nResourceValues(String name);
+    public int nResourceValues(URI name);
 
-    public String getResourceValue(String name);
+    public String getResourceValue(URI name);
 
-    public String[] getResourceValues(String name);
+    public String[] getResourceValues(URI name);
 
-    public void setActionAttributes(MultiValueMap actionAttributes);
+    public void setActionAttributes(MultiValueMap<URI> actionAttributes);
 
-    public void setResourceAttributes(MultiValueMap resourceAttributes);
+    public void setResourceAttributes(MultiValueMap<URI> resourceAttributes);
 
     public String getPassword();
 

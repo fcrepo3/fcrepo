@@ -70,11 +70,11 @@ public class OAIResponder
         String baseURL =
                 m_provider
                         .getBaseURL(context
-                                            .getEnvironmentValue(HTTP_REQUEST.SECURITY.uri)
+                                            .getEnvironmentValue(HTTP_REQUEST.SECURITY.attributeId)
                                             .equals(HTTP_REQUEST.SECURE.uri) ? "https"
                                             : "http",
                                     context
-                                            .getEnvironmentValue(HTTP_REQUEST.SERVER_PORT.uri));
+                                            .getEnvironmentValue(HTTP_REQUEST.SERVER_PORT.attributeId));
         try {
             if (verb == null) {
                 throw new BadVerbException("Request did not specify a verb.");

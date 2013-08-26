@@ -1,5 +1,6 @@
 package org.fcrepo.server.security.xacml.pep.impl;
 
+import java.net.URI;
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -17,6 +18,8 @@ import org.fcrepo.server.security.PolicyEnforcementPoint;
 
 public class FESLAuthorization implements Authorization {
     private static final Logger logger = LoggerFactory.getLogger(FESLAuthorization.class);
+    private static final URI BLANK = URI.create("");
+    
     private PolicyEnforcementPoint m_pep;
     public FESLAuthorization(PolicyEnforcementPoint pep) {
         m_pep = pep;
@@ -311,13 +314,13 @@ public class FESLAuthorization implements Authorization {
             String target = Constants.ACTION.RETRIEVE_FILE.uri;
             context.setActionAttributes(null);
             context.setResourceAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = "";
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
             try {
-                name = resourceAttributes.setReturn(Constants.DATASTREAM.FILE_URI.uri, fileURI);
+                resourceAttributes.setReturn(Constants.DATASTREAM.FILE_URI.attributeId, fileURI);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
-                throw new AuthzOperationalException(target + " couldn't be set " + name, e);
+                throw new AuthzOperationalException(target + " couldn't be set " +
+                Constants.DATASTREAM.FILE_URI.attributeId, e);
             }
             context.setResourceAttributes(resourceAttributes);
             m_pep.enforce(context

@@ -4,6 +4,7 @@
  */
 package org.fcrepo.server;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -21,8 +22,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public Iterator actionAttributes() {
+    public Iterator<URI> actionAttributes() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -30,8 +30,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public Iterator environmentAttributes() {
+    public Iterator<URI> environmentAttributes() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -39,7 +38,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    public String getActionValue(String name) {
+    public String getActionValue(URI name) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -47,7 +46,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    public String[] getActionValues(String name) {
+    public String[] getActionValues(URI name) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -55,7 +54,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    public MultiValueMap getEnvironmentAttributes() {
+    public MultiValueMap<URI> getEnvironmentAttributes() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -63,7 +62,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    public String getEnvironmentValue(String name) {
+    public String getEnvironmentValue(URI name) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -71,7 +70,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    public String[] getEnvironmentValues(String name) {
+    public String[] getEnvironmentValues(URI name) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -95,7 +94,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    public String getResourceValue(String name) {
+    public String getResourceValue(URI name) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -103,7 +102,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    public String[] getResourceValues(String name) {
+    public String[] getResourceValues(URI name) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -126,7 +125,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    public int nActionValues(String name) {
+    public int nActionValues(URI name) {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -134,7 +133,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    public int nEnvironmentValues(String name) {
+    public int nEnvironmentValues(URI name) {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -142,7 +141,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    public int nResourceValues(String name) {
+    public int nResourceValues(URI name) {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -165,8 +164,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public Iterator resourceAttributes() {
+    public Iterator<URI> resourceAttributes() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -174,7 +172,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    public void setActionAttributes(MultiValueMap actionAttributes) {
+    public void setActionAttributes(MultiValueMap<URI> actionAttributes) {
         // TODO Auto-generated method stub
 
     }
@@ -182,7 +180,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    public void setResourceAttributes(MultiValueMap resourceAttributes) {
+    public void setResourceAttributes(MultiValueMap<URI> resourceAttributes) {
         // TODO Auto-generated method stub
 
     }
@@ -190,8 +188,7 @@ public class MockContext
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public Iterator subjectAttributes() {
+    public Iterator<String> subjectAttributes() {
         // TODO Auto-generated method stub
         return null;
     }

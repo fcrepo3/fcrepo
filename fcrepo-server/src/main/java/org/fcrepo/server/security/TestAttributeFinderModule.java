@@ -38,16 +38,16 @@ class TestAttributeFinderModule
         try {
             registerSupportedDesignatorType(AttributeDesignator.ENVIRONMENT_TARGET);
 
-            registerAttribute(ATTRIBUTE_ID, StringAttribute.identifier);
+            registerAttribute(URI.create(ATTRIBUTE_ID), STRING_ATTRIBUTE_TYPE_URI);
 
-            attributesDenied.add(Constants.XACML1_SUBJECT.ID.uri);
-            attributesDenied.add(Constants.XACML1_ACTION.ID.uri);
-            attributesDenied.add(Constants.XACML1_RESOURCE.ID.uri);
+            denyAttribute(Constants.XACML1_SUBJECT.ID.attributeId);
+            denyAttribute(Constants.XACML1_ACTION.ID.attributeId);
+            denyAttribute(Constants.XACML1_RESOURCE.ID.attributeId);
 
-            attributesDenied.add(Constants.ACTION.CONTEXT_ID.uri);
-            attributesDenied.add(Constants.SUBJECT.LOGIN_ID.uri);
-            attributesDenied.add(Constants.ACTION.ID.uri);
-            attributesDenied.add(Constants.ACTION.API.uri);
+            denyAttribute(Constants.ACTION.CONTEXT_ID.attributeId);
+            denyAttribute(Constants.SUBJECT.LOGIN_ID.attributeId);
+            denyAttribute(Constants.ACTION.ID.attributeId);
+            denyAttribute(Constants.ACTION.API.attributeId);
 
             setInstantiatedOk(true);
         } catch (URISyntaxException e1) {
@@ -61,11 +61,11 @@ class TestAttributeFinderModule
 
     @Override
     protected final Object getAttributeLocally(int designatorType,
-                                               String attributeId,
+                                               URI attributeId,
                                                URI resourceCategory,
                                                EvaluationCtx ctx) {
         logger.debug("getAttributeLocally test");
-        logger.debug("TestAttributeFinderModule attributeId=" + attributeId);
+        logger.debug("TestAttributeFinderModule attributeId={}", attributeId);
         Object values = null;
         logger.debug("designatorType" + designatorType);
         if (designatorType == AttributeDesignator.ENVIRONMENT_TARGET) {
@@ -78,9 +78,9 @@ class TestAttributeFinderModule
             values = null;
         }
         if (values instanceof String) {
-            logger.debug("getAttributeLocally string value=" + (String) values);
+            logger.debug("getAttributeLocally string value={}", (String) values);
         } else {
-            logger.debug("getAttributeLocally object value=" + values);
+            logger.debug("getAttributeLocally object value={}", values);
         }
         return values;
     }

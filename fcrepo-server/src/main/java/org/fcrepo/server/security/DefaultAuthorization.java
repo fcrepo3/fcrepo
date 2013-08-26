@@ -4,6 +4,7 @@
  */
 package org.fcrepo.server.security;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.Map;
 
@@ -222,26 +223,26 @@ public class DefaultAuthorization
             logger.debug("Entered enforceAddDatastream");
             String target = Constants.ACTION.ADD_DATASTREAM.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
             try {
-                name = Constants.DATASTREAM.MIME_TYPE.uri;
+                name = Constants.DATASTREAM.MIME_TYPE.attributeId;
                 resourceAttributes.set(name, MIMEType);
-                name = Constants.DATASTREAM.FORMAT_URI.uri;
+                name = Constants.DATASTREAM.FORMAT_URI.attributeId;
                 resourceAttributes.set(name, formatURI);
-                name = Constants.DATASTREAM.STATE.uri;
+                name = Constants.DATASTREAM.STATE.attributeId;
                 resourceAttributes.set(name, dsState);
-                name = Constants.DATASTREAM.ID.uri;
+                name = Constants.DATASTREAM.ID.attributeId;
                 resourceAttributes.set(name, dsId);
-                name = Constants.DATASTREAM.LOCATION.uri;
+                name = Constants.DATASTREAM.LOCATION.attributeId;
                 resourceAttributes.set(name, dsLocation);
-                name = Constants.DATASTREAM.CONTROL_GROUP.uri;
+                name = Constants.DATASTREAM.CONTROL_GROUP.attributeId;
                 resourceAttributes.set(name, controlGroup);
-                name = Constants.DATASTREAM.ALT_IDS.uri;
+                name = Constants.DATASTREAM.ALT_IDS.attributeId;
                 resourceAttributes.set(name, altIDs);
-                name = Constants.DATASTREAM.CHECKSUM_TYPE.uri;
+                name = Constants.DATASTREAM.CHECKSUM_TYPE.attributeId;
                 resourceAttributes.set(name, checksumType);
-                name = Constants.DATASTREAM.CHECKSUM.uri;
+                name = Constants.DATASTREAM.CHECKSUM.attributeId;
                 resourceAttributes.set(name, checksum);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -272,14 +273,14 @@ public class DefaultAuthorization
             logger.debug("Entered enforceExport");
             String target = Constants.ACTION.EXPORT.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
             try {
-                name = Constants.OBJECT.FORMAT_URI.uri;
+                name = Constants.OBJECT.FORMAT_URI.attributeId;
                 resourceAttributes.set(name, format);
-                name = Constants.OBJECT.CONTEXT.uri;
+                name = Constants.OBJECT.CONTEXT.attributeId;
                 resourceAttributes.set(name, exportContext);
-                name = Constants.OBJECT.ENCODING.uri;
+                name = Constants.OBJECT.ENCODING.attributeId;
                 resourceAttributes.set(name, exportEncoding);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -320,10 +321,10 @@ public class DefaultAuthorization
             logger.debug("Entered enforceGetNextPid");
             String target = Constants.ACTION.GET_NEXT_PID.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
             try {
                 String nNewPidsAsString = Integer.toString(nNewPids);
-                resourceAttributes.set(Constants.OBJECT.N_PIDS.uri,
+                resourceAttributes.set(Constants.OBJECT.N_PIDS.attributeId,
                                        nNewPidsAsString);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -352,12 +353,12 @@ public class DefaultAuthorization
             logger.debug("Entered enforceGetDatastream");
             String target = Constants.ACTION.GET_DATASTREAM.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
             try {
-                name = Constants.DATASTREAM.ID.uri;
+                name = Constants.DATASTREAM.ID.attributeId;
                 resourceAttributes.set(name, datastreamId);
-                name = Constants.DATASTREAM.AS_OF_DATETIME.uri;
+                name = Constants.DATASTREAM.AS_OF_DATETIME.attributeId;
                 resourceAttributes.set(name, ensureDate(asOfDateTime, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -385,9 +386,9 @@ public class DefaultAuthorization
             logger.debug("Entered enforceGetDatastreamHistory");
             String target = Constants.ACTION.GET_DATASTREAM_HISTORY.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
             try {
-                resourceAttributes.set(Constants.DATASTREAM.ID.uri,
+                resourceAttributes.set(Constants.DATASTREAM.ID.attributeId,
                                        datastreamId);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -431,12 +432,12 @@ public class DefaultAuthorization
             logger.debug("Entered enforceGetDatastreams");
             String target = Constants.ACTION.GET_DATASTREAMS.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
             try {
-                name = Constants.DATASTREAM.STATE.uri;
+                name = Constants.DATASTREAM.STATE.attributeId;
                 resourceAttributes.set(name, datastreamState);
-                name = Constants.RESOURCE.AS_OF_DATETIME.uri;
+                name = Constants.RESOURCE.AS_OF_DATETIME.attributeId;
                 resourceAttributes.set(name, ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -466,10 +467,10 @@ public class DefaultAuthorization
             logger.debug("Entered enforceGetObjectXML");
             String target = Constants.ACTION.GET_OBJECT_XML.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
             try {
                 resourceAttributes
-                        .set(Constants.OBJECT.ENCODING.uri,
+                        .set(Constants.OBJECT.ENCODING.attributeId,
                              objectXmlEncoding);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -498,12 +499,12 @@ public class DefaultAuthorization
             logger.debug("Entered enforceIngest");
             String target = Constants.ACTION.INGEST.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
             try {
-                name = Constants.OBJECT.FORMAT_URI.uri;
+                name = Constants.OBJECT.FORMAT_URI.attributeId;
                 resourceAttributes.set(name, format);
-                name = Constants.OBJECT.ENCODING.uri;
+                name = Constants.OBJECT.ENCODING.attributeId;
                 resourceAttributes.set(name, ingestEncoding);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -600,22 +601,22 @@ public class DefaultAuthorization
             logger.debug("Entered enforceModifyDatastreamByReference");
             String target = Constants.ACTION.MODIFY_DATASTREAM_BY_REFERENCE.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
             try {
-                name = Constants.DATASTREAM.ID.uri;
+                name = Constants.DATASTREAM.ID.attributeId;
                 resourceAttributes.set(name, datastreamId);
-                name = Constants.DATASTREAM.NEW_MIME_TYPE.uri;
+                name = Constants.DATASTREAM.NEW_MIME_TYPE.attributeId;
                 resourceAttributes.set(name, datastreamNewMimeType);
-                name = Constants.DATASTREAM.NEW_FORMAT_URI.uri;
+                name = Constants.DATASTREAM.NEW_FORMAT_URI.attributeId;
                 resourceAttributes.set(name, datastreamNewFormatURI);
-                name = Constants.DATASTREAM.NEW_LOCATION.uri;
+                name = Constants.DATASTREAM.NEW_LOCATION.attributeId;
                 resourceAttributes.set(name, datastreamNewLocation);
-                name = Constants.DATASTREAM.NEW_ALT_IDS.uri;
+                name = Constants.DATASTREAM.NEW_ALT_IDS.attributeId;
                 resourceAttributes.set(name, datastreamNewAltIDs);
-                name = Constants.DATASTREAM.NEW_CHECKSUM_TYPE.uri;
+                name = Constants.DATASTREAM.NEW_CHECKSUM_TYPE.attributeId;
                 resourceAttributes.set(name, datastreamNewChecksumType);
-                name = Constants.DATASTREAM.NEW_CHECKSUM.uri;
+                name = Constants.DATASTREAM.NEW_CHECKSUM.attributeId;
                 resourceAttributes.set(name, datastreamNewChecksum);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -648,20 +649,20 @@ public class DefaultAuthorization
             logger.debug("Entered enforceModifyDatastreamByValue");
             String target = Constants.ACTION.MODIFY_DATASTREAM_BY_VALUE.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
             try {
-                name = Constants.DATASTREAM.ID.uri;
+                name = Constants.DATASTREAM.ID.attributeId;
                 resourceAttributes.set(name, datastreamId);
-                name = Constants.DATASTREAM.NEW_MIME_TYPE.uri;
+                name = Constants.DATASTREAM.NEW_MIME_TYPE.attributeId;
                 resourceAttributes.set(name, newDatastreamMimeType);
-                name = Constants.DATASTREAM.NEW_FORMAT_URI.uri;
+                name = Constants.DATASTREAM.NEW_FORMAT_URI.attributeId;
                 resourceAttributes.set(name, newDatastreamFormatURI);
-                name = Constants.DATASTREAM.NEW_ALT_IDS.uri;
+                name = Constants.DATASTREAM.NEW_ALT_IDS.attributeId;
                 resourceAttributes.set(name, newDatastreamAltIDs);
-                name = Constants.DATASTREAM.NEW_CHECKSUM_TYPE.uri;
+                name = Constants.DATASTREAM.NEW_CHECKSUM_TYPE.attributeId;
                 resourceAttributes.set(name, newDatastreamChecksumType);
-                name = Constants.DATASTREAM.NEW_CHECKSUM.uri;
+                name = Constants.DATASTREAM.NEW_CHECKSUM.attributeId;
                 resourceAttributes.set(name, newDatastreamChecksum);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -690,13 +691,13 @@ public class DefaultAuthorization
             logger.debug("Entered enforceModifyObject");
             String target = Constants.ACTION.MODIFY_OBJECT.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
             try {
-                name = Constants.OBJECT.NEW_STATE.uri;
+                name = Constants.OBJECT.NEW_STATE.attributeId;
                 resourceAttributes.set(name, objectNewState);
                 if (objectNewOwnerId != null){
-                    name = Constants.OBJECT.OWNER.uri;
+                    name = Constants.OBJECT.OWNER.attributeId;
                     resourceAttributes.set(name, objectNewOwnerId.split(m_ownerIdSeparator));
                 }
             } catch (Exception e) {
@@ -727,12 +728,12 @@ public class DefaultAuthorization
             logger.debug("Entered enforcePurgeDatastream");
             String target = Constants.ACTION.PURGE_DATASTREAM.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
             try {
-                name = Constants.DATASTREAM.ID.uri;
+                name = Constants.DATASTREAM.ID.attributeId;
                 resourceAttributes.set(name, datastreamId);
-                name = Constants.RESOURCE.AS_OF_DATETIME.uri;
+                name = Constants.RESOURCE.AS_OF_DATETIME.attributeId;
                 resourceAttributes.set(name, ensureDate(endDT, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -780,12 +781,12 @@ public class DefaultAuthorization
             logger.debug("Entered enforceSetDatastreamState");
             String target = Constants.ACTION.SET_DATASTREAM_STATE.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
             try {
-                name = Constants.DATASTREAM.ID.uri;
+                name = Constants.DATASTREAM.ID.attributeId;
                 resourceAttributes.set(name, datastreamId);
-                name = Constants.DATASTREAM.NEW_STATE.uri;
+                name = Constants.DATASTREAM.NEW_STATE.attributeId;
                 resourceAttributes.set(name, datastreamNewState);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -814,12 +815,12 @@ public class DefaultAuthorization
             logger.debug("Entered enforceSetDatastreamVersionable");
             String target = Constants.ACTION.SET_DATASTREAM_VERSIONABLE.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
             try {
-                name = Constants.DATASTREAM.ID.uri;
+                name = Constants.DATASTREAM.ID.attributeId;
                 resourceAttributes.set(name, datastreamId);
-                name = Constants.DATASTREAM.NEW_VERSIONABLE.uri;
+                name = Constants.DATASTREAM.NEW_VERSIONABLE.attributeId;
                 resourceAttributes.set(name,
                                        new Boolean(datastreamNewVersionable).toString());
             } catch (Exception e) {
@@ -849,13 +850,13 @@ public class DefaultAuthorization
             logger.debug("Entered enforceCompareDatastreamChecksum");
             String target = Constants.ACTION.COMPARE_DATASTREAM_CHECKSUM.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
 
             try {
-                name = Constants.DATASTREAM.ID.uri;
+                name = Constants.DATASTREAM.ID.attributeId;
                 resourceAttributes.set(name, datastreamId);
-                name = Constants.RESOURCE.AS_OF_DATETIME.uri;
+                name = Constants.RESOURCE.AS_OF_DATETIME.attributeId;
                 resourceAttributes.set(name, ensureDate(versionDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -939,12 +940,12 @@ public class DefaultAuthorization
             logger.debug("Entered enforceGetDatastreamDissemination");
             String target = Constants.ACTION.GET_DATASTREAM_DISSEMINATION.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
             try {
-                name = Constants.DATASTREAM.ID.uri;
+                name = Constants.DATASTREAM.ID.attributeId;
                 resourceAttributes.set(name, datastreamId);
-                name = Constants.RESOURCE.AS_OF_DATETIME.uri;
+                name = Constants.RESOURCE.AS_OF_DATETIME.attributeId;
                 resourceAttributes.set(name, ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -978,28 +979,28 @@ public class DefaultAuthorization
             logger.debug("Entered enforceGetDissemination");
             String target = Constants.ACTION.GET_DISSEMINATION.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
-            String name = null;
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+            URI name = null;
             try {
-                name = Constants.SDEF.PID.uri;
+                name = Constants.SDEF.PID.attributeId;
                 resourceAttributes.set(name, sDefPid);
-                name = Constants.SDEF.NAMESPACE.uri;
+                name = Constants.SDEF.NAMESPACE.attributeId;
                 resourceAttributes.set(name, extractNamespace(sDefPid));
-                name = Constants.DISSEMINATOR.METHOD.uri;
+                name = Constants.DISSEMINATOR.METHOD.attributeId;
                 resourceAttributes.set(name, methodName);
-                name = Constants.SDEP.PID.uri;
+                name = Constants.SDEP.PID.attributeId;
                 resourceAttributes.set(name, sDepPid);
-                name = Constants.SDEP.NAMESPACE.uri;
+                name = Constants.SDEP.NAMESPACE.attributeId;
                 resourceAttributes.set(name, extractNamespace(sDepPid));
-                name = Constants.OBJECT.STATE.uri;
+                name = Constants.OBJECT.STATE.attributeId;
                 resourceAttributes.set(name, objectState);
-                name = Constants.DISSEMINATOR.STATE.uri;
+                name = Constants.DISSEMINATOR.STATE.attributeId;
                 resourceAttributes.set(name, dissState);
-                name = Constants.SDEF.STATE.uri;
+                name = Constants.SDEF.STATE.attributeId;
                 resourceAttributes.set(name, sDefState);
-                name = Constants.SDEP.STATE.uri;
+                name = Constants.SDEP.STATE.attributeId;
                 resourceAttributes.set(name, sDepState);
-                name = Constants.RESOURCE.AS_OF_DATETIME.uri;
+                name = Constants.RESOURCE.AS_OF_DATETIME.attributeId;
                 resourceAttributes.set(name, ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -1045,9 +1046,9 @@ public class DefaultAuthorization
             logger.debug("Entered enforceGetObjectProfile");
             String target = Constants.ACTION.GET_OBJECT_PROFILE.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
             try {
-                resourceAttributes.set(Constants.RESOURCE.AS_OF_DATETIME.uri,
+                resourceAttributes.set(Constants.RESOURCE.AS_OF_DATETIME.attributeId,
                                    ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -1074,9 +1075,9 @@ public class DefaultAuthorization
             logger.debug("Entered enforceListDatastreams");
             String target = Constants.ACTION.LIST_DATASTREAMS.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
             try {
-                resourceAttributes.set(Constants.RESOURCE.AS_OF_DATETIME.uri,
+                resourceAttributes.set(Constants.RESOURCE.AS_OF_DATETIME.attributeId,
                                    ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -1102,9 +1103,9 @@ public class DefaultAuthorization
             logger.debug("Entered enforceListMethods");
             String target = Constants.ACTION.LIST_METHODS.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
             try {
-                resourceAttributes.set(Constants.RESOURCE.AS_OF_DATETIME.uri,
+                resourceAttributes.set(Constants.RESOURCE.AS_OF_DATETIME.attributeId,
                                    ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -1185,10 +1186,10 @@ public class DefaultAuthorization
             logger.debug("Entered enforce_Internal_DSState");
             String target = Constants.ACTION.INTERNAL_DSSTATE.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
             try {
                 resourceAttributes
-                        .set(Constants.DATASTREAM.ID.uri, id);
+                        .set(Constants.DATASTREAM.ID.attributeId, id);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -1196,7 +1197,7 @@ public class DefaultAuthorization
             }
             try {
                 resourceAttributes
-                        .set(Constants.DATASTREAM.STATE.uri, state);
+                        .set(Constants.DATASTREAM.STATE.attributeId, state);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't set "
@@ -1222,12 +1223,12 @@ public class DefaultAuthorization
             logger.debug("Entered enforceResolveDatastream");
             String target = Constants.ACTION.RESOLVE_DATASTREAM.uri;
             context.setResourceAttributes(null);
-            MultiValueMap actionAttributes = new MultiValueMap();
+            MultiValueMap<URI> actionAttributes = new MultiValueMap<URI>();
             try {
                 String ticketIssuedDateTimeString =
                         DateUtility.convertDateToString(ticketIssuedDateTime);
                 actionAttributes
-                        .set(Constants.RESOURCE.TICKET_ISSUED_DATETIME.uri,
+                        .set(Constants.RESOURCE.TICKET_ISSUED_DATETIME.attributeId,
                                    ticketIssuedDateTimeString);
             } catch (Exception e) {
                 context.setActionAttributes(null);
@@ -1276,9 +1277,9 @@ public class DefaultAuthorization
             logger.debug("Entered enforceGetRelationships");
             String target = Constants.ACTION.GET_RELATIONSHIPS.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
             try {
-                resourceAttributes.set(Constants.OBJECT.PID.uri,
+                resourceAttributes.set(Constants.OBJECT.PID.attributeId,
                                                     pid);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -1308,9 +1309,9 @@ public class DefaultAuthorization
             logger.debug("Entered enforceAddRelationship");
             String target = Constants.ACTION.ADD_RELATIONSHIP.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
             try {
-                resourceAttributes.set(Constants.OBJECT.PID.uri,
+                resourceAttributes.set(Constants.OBJECT.PID.attributeId,
                                                     pid);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -1340,9 +1341,9 @@ public class DefaultAuthorization
             logger.debug("Entered enforcePurgeRelationship");
             String target = Constants.ACTION.PURGE_RELATIONSHIP.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
             try {
-                resourceAttributes.set(Constants.OBJECT.PID.uri,
+                resourceAttributes.set(Constants.OBJECT.PID.attributeId,
                                                     pid);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -1367,15 +1368,14 @@ public class DefaultAuthorization
             logger.debug("Entered enforceRetrieveFile for {}", fileURI);
             String target = Constants.ACTION.RETRIEVE_FILE.uri;
             context.setActionAttributes(null);
-            context.setResourceAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
             try {
-                resourceAttributes.set(Constants.DATASTREAM.FILE_URI.uri, fileURI);
+                MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
+                resourceAttributes.set(Constants.DATASTREAM.FILE_URI.attributeId, fileURI);
+                context.setResourceAttributes(resourceAttributes);
             } catch (Exception e) {
                 context.setResourceAttributes(null);
                 throw new AuthzOperationalException(target + " couldn't be set " + Constants.DATASTREAM.FILE_URI.uri, e);
             }
-            context.setResourceAttributes(resourceAttributes);
             xacmlPep.enforce(context
                     .getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri),
                              target,
@@ -1395,10 +1395,10 @@ public class DefaultAuthorization
             logger.debug("Entered enforceValidate");
             String target = Constants.ACTION.VALIDATE.uri;
             context.setActionAttributes(null);
-            MultiValueMap resourceAttributes = new MultiValueMap();
+            MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
             try {
                 resourceAttributes
-                        .set(Constants.RESOURCE.AS_OF_DATETIME.uri,
+                        .set(Constants.RESOURCE.AS_OF_DATETIME.attributeId,
                                    ensureDate(asOfDate, context));
             } catch (Exception e) {
                 context.setResourceAttributes(null);
@@ -1414,7 +1414,7 @@ public class DefaultAuthorization
                              context);
 
         } finally {
-            logger.debug("Exiting enforceGetDatastream");
+            logger.debug("Exiting enforceValidate");
         }
     }
 }
