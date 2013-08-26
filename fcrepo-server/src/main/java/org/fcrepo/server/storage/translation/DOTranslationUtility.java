@@ -578,17 +578,17 @@ public abstract class DOTranslationUtility
     public static Datastream setDatastreamDefaults(Datastream ds)
             throws ObjectIntegrityException {
 
-        if ((ds.DSMIME == null || ds.DSMIME.equals(""))
+        if ((ds.DSMIME == null || ds.DSMIME.isEmpty())
                 && ds.DSControlGrp.equalsIgnoreCase("X")) {
             ds.DSMIME = "text/xml";
         }
 
-        if (ds.DSState == null || ds.DSState.equals("")) {
+        if (ds.DSState == null || ds.DSState.isEmpty()) {
             ds.DSState = "A";
         }
 
         // For METS backward compatibility
-        if (ds.DSInfoType == null || ds.DSInfoType.equals("")
+        if (ds.DSInfoType == null || ds.DSInfoType.isEmpty()
                 || ds.DSInfoType.equalsIgnoreCase("OTHER")) {
             ds.DSInfoType = "UNSPECIFIED";
         }
@@ -772,7 +772,7 @@ public abstract class DOTranslationUtility
         // set default to true.
         diss.dissVersionable = true;
 
-        if (diss.dissState == null || diss.dissState.equals("")) {
+        if (diss.dissState == null || diss.dissState.isEmpty()) {
             diss.dissState = "A";
         }
         return diss;
@@ -802,7 +802,7 @@ public abstract class DOTranslationUtility
      */
     public static String getStateAttribute(DigitalObject obj) throws ObjectIntegrityException {
 
-            if (obj.getState() == null || obj.getState().equals("")) {
+            if (obj.getState() == null || obj.getState().isEmpty()) {
                 return MODEL.ACTIVE.localName;
             } else {
                 switch (obj.getState().charAt(0)) {
@@ -840,7 +840,7 @@ public abstract class DOTranslationUtility
             return "I";
         } else if (MODEL.ACTIVE.looselyMatches(rawValue, true)
                     || rawValue == null
-                    || rawValue.equals("")) {
+                    || rawValue.isEmpty()) {
             return "A";
         } else {
                 throw new ParseException("Could not interpret state value of '"
@@ -877,23 +877,23 @@ public abstract class DOTranslationUtility
      */
     protected static void validateAudit(AuditRecord audit)
             throws ObjectIntegrityException {
-        if (audit.id == null || audit.id.equals("")) {
+        if (audit.id == null || audit.id.isEmpty()) {
             throw new ObjectIntegrityException("Audit record must have id.");
         }
-        if (audit.date == null || audit.date.equals("")) {
+        if (audit.date == null) {
             throw new ObjectIntegrityException("Audit record must have date.");
         }
-        if (audit.processType == null || audit.processType.equals("")) {
+        if (audit.processType == null || audit.processType.isEmpty()) {
             throw new ObjectIntegrityException("Audit record must have processType.");
         }
-        if (audit.action == null || audit.action.equals("")) {
+        if (audit.action == null || audit.action.isEmpty()) {
             throw new ObjectIntegrityException("Audit record must have action.");
         }
         if (audit.componentID == null) {
             audit.componentID = ""; // for backwards compatibility, no error on null
             // throw new ObjectIntegrityException("Audit record must have componentID.");
         }
-        if (audit.responsibility == null || audit.responsibility.equals("")) {
+        if (audit.responsibility == null || audit.responsibility.isEmpty()) {
             throw new ObjectIntegrityException("Audit record must have responsibility.");
         }
     }

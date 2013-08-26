@@ -102,7 +102,7 @@ public abstract class BaseContributing
         inited = false;
         if (!initErrors) {
             if (FILTERS_CONTRIBUTING_AUTHENTICATED_ATTRIBUTES.isEmpty()) {
-                if (FILTER_NAME == null || "".equals(FILTER_NAME)) {
+                if (FILTER_NAME == null || FILTER_NAME.isEmpty()) {
                     initErrors = true;
                     if (logger.isErrorEnabled()) {
                         logger.error(format(method, "FILTER_NAME not set"));
@@ -204,14 +204,15 @@ public abstract class BaseContributing
                                   HttpServletResponse response)
             throws Throwable {
         String method = "doThisSubclass() ";
-        if (logger.isDebugEnabled()) {
+        boolean debug = logger.isDebugEnabled();
+        if (debug) {
             logger.debug(enter(method));
         }
         super.doThisSubclass(extendedHttpServletRequest, response);
         boolean alreadyAuthenticated =
                 extendedHttpServletRequest.getUserPrincipal() != null;
 
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             logger.debug(format(method, null, "alreadyAuthenticated")
                     + alreadyAuthenticated);
             logger.debug(format(method, null, "AUTHENTICATE") + AUTHENTICATE);
@@ -223,38 +224,45 @@ public abstract class BaseContributing
             }
             authenticate(extendedHttpServletRequest); //"authenticate" is really a conditional cache refresh . . . refactor name?
         } else {
-            if (logger.isDebugEnabled()) {
+            if (debug) {
                 logger.debug(format(method, "not calling authenticate()"));
             }
         }
 
         String authority = extendedHttpServletRequest.getAuthority();
-        logger.debug(format(method, null, "authority", authority));
-        if (authority != null && !"".equals(authority)) {
+        if (debug) {
+            logger.debug(format(method, null, "authority", authority));
+        }
+        if (authority != null && !authority.isEmpty()) {
 
             if (extendedHttpServletRequest.isUserSponsored()) {
-                logger.debug(format(method, "user already sponsored")); //so neither get normal user attribute nor check for sponsored user
+                if (debug) {
+                    //so neither get normal user attribute nor check for sponsored user
+                  logger.debug(format(method, "user already sponsored"));
+                }
             } else {
-                logger.debug(format(method, "user not already sponsored"));
+                if (debug) {
+                    logger.debug(format(method, "user not already sponsored"));
+                }
                 if (!FILTERS_CONTRIBUTING_AUTHENTICATED_ATTRIBUTES
                         .contains(authority)) {
-                    if (logger.isDebugEnabled()) {
+                    if (debug) {
                         logger.debug(format(method, "not calling gatherAuthenticatedAttributes()"));
                     }
                 } else {
-                    if (logger.isDebugEnabled()) {
+                    if (debug) {
                         logger.debug(format(method, "calling gatherAuthenticatedAttributes() . . ."));
                     }
                     contributeAuthenticatedAttributes(extendedHttpServletRequest);
 
                     //these newly-collect attributes could allow surrogate feature, so check:
                     boolean surrogateTurnedOnHere = false;
-                    if (SURROGATE_ROLE == null || "".equals(SURROGATE_ROLE)) {
-                        if (logger.isDebugEnabled()) {
+                    if (SURROGATE_ROLE == null || SURROGATE_ROLE.isEmpty()) {
+                        if (debug) {
                             logger.debug(format(method, "no surrogate role configured"));
                         }
                     } else {
-                        if (logger.isDebugEnabled()) {
+                        if (debug) {
                             logger.debug(format(method,
                                          "surrogate role configured",
                                          SURROGATE_ROLE_KEY,
@@ -262,26 +270,26 @@ public abstract class BaseContributing
                         }
                         if (extendedHttpServletRequest
                                 .isUserInRole(SURROGATE_ROLE)) {
-                            if (logger.isDebugEnabled()) {
+                            if (debug) {
                                 logger.debug(format(method,
                                                   "authenticated user has surrogate role"));
                             }
                             surrogateTurnedOnHere = true;
                         } else {
-                            if (logger.isDebugEnabled()) {
+                            if (debug) {
                                 logger.debug(format(method,
                                                   "authenticated user doesn't have surrogate role"));
                             }
                         }
                     }
                     if (SURROGATE_ATTRIBUTE == null
-                            || "".equals(SURROGATE_ATTRIBUTE)) {
-                        if (logger.isDebugEnabled()) {
+                            || SURROGATE_ATTRIBUTE.isEmpty()) {
+                        if (debug) {
                             logger.debug(format(method,
                                          "no surrogate attribute configured"));
                         }
                     } else {
-                        if (logger.isDebugEnabled()) {
+                        if (debug) {
                             logger.debug(format(method,
                                          "surrogate attribute configured",
                                          SURROGATE_ATTRIBUTE_KEY,
@@ -295,19 +303,19 @@ public abstract class BaseContributing
                             }
                             surrogateTurnedOnHere = true;
                         } else {
-                            if (logger.isDebugEnabled()) {
+                            if (debug) {
                                 logger.debug(format(method,
                                                   "authenticated user doesn't have surrogate attribute"));
                             }
                         }
                     }
                     if (surrogateTurnedOnHere) {
-                        if (logger.isDebugEnabled()) {
+                        if (debug) {
                             logger.debug(format(method, "setting user to sponsored"));
                         }
                         extendedHttpServletRequest.setSponsoredUser();
                         if (extendedHttpServletRequest.isUserSponsored()) {
-                            if (logger.isDebugEnabled()) {
+                            if (debug) {
                                 logger.debug(format(method,
                                                   "verified that user is sponsored"));
                             }
@@ -322,12 +330,12 @@ public abstract class BaseContributing
             if (extendedHttpServletRequest.isUserSponsored()) { //either from earlier filter or in this filter's code directly above
                 if (!FILTERS_CONTRIBUTING_SPONSORED_ATTRIBUTES
                         .contains(authority)) {
-                    if (logger.isDebugEnabled()) {
+                    if (debug) {
                         logger.debug(format(method,
                                               "not calling gatherSponsoredAttributes()"));
                     }
                 } else {
-                    if (logger.isDebugEnabled()) {
+                    if (debug) {
                         logger.debug(format(method,
                                               "calling gatherSponsoredAttributes() . . ."));
                     }

@@ -92,7 +92,7 @@ public class IngestHandler
 
         try {
             resAttr = ResourceAttributes.getRepositoryResources();
-            if (format != null && !"".equals(format)) {
+            if (format != null && !format.isEmpty()) {
                 resAttr.put(Constants.OBJECT.FORMAT_URI.getURI(),
                             new StringAttribute(format));
             }

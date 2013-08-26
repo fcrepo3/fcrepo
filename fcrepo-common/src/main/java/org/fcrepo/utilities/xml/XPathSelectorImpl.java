@@ -35,7 +35,7 @@ public class XPathSelectorImpl implements XPathSelector {
     @Override
     public Integer selectInteger(Node node, String xpath, Integer defaultValue) {
         String strVal = selectString(node, xpath);
-        if (strVal == null || "".equals(strVal)) {
+        if (strVal == null || strVal.isEmpty()) {
             return defaultValue;
         }
         return Integer.valueOf(strVal);

@@ -101,12 +101,12 @@ implements PolicyStore {
         }
         super.init();
         // if no pid namespace was specified, use the default specified in fedora.fcfg
-        if (pidNamespace.equals("")) {
+        if (pidNamespace.isEmpty()) {
             pidNamespace = fedoraServer.getModule("org.fcrepo.server.storage.DOManager").getParameter("pidNamespace");
         }
 
         // check control group was supplied
-        if (datastreamControlGroup.equals("")) {
+        if (datastreamControlGroup.isEmpty()) {
             throw new PolicyStoreException("No control group for policy datastreams was specified in FedoraPolicyStore configuration");
         }
         if (validateSchema) {
@@ -215,7 +215,7 @@ implements PolicyStore {
 
         String policyName;
 
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             // no policy name, derive from document
             // (note: policy ID is mandatory according to schema)
             try {
@@ -641,7 +641,7 @@ implements PolicyStore {
         // RELS-EXT specifying content model - if present, collection relationship if present
         // but not for bootstrap policies
         if (!pid.startsWith(FESL_BOOTSTRAP_POLICY_NAMESPACE + ":")) {
-            if (!contentModel.equals("") || !collection.equals("")) {
+            if (!contentModel.isEmpty() || !collection.isEmpty()) {
                 foxml.append("<foxml:datastream ID=\"RELS-EXT\" CONTROL_GROUP=\"X\">");
                 foxml.append("<foxml:datastreamVersion FORMAT_URI=\"info:fedora/fedora-system:FedoraRELSExt-1.0\" ID=\"RELS-EXT.0\" MIMETYPE=\"application/rdf+xml\" LABEL=\"RDF Statements about this object\">");
                 foxml.append("  <foxml:xmlContent>");
@@ -649,12 +649,12 @@ implements PolicyStore {
                 foxml.append("      <rdf:Description rdf:about=\"" + "info:fedora/");
                 StreamUtility.enc(pid, foxml);
                 foxml.append("\">");
-                if (!contentModel.equals("")) {
+                if (!contentModel.isEmpty()) {
                     foxml.append("        <fedora-model:hasModel rdf:resource=\"");
                     StreamUtility.enc(contentModel, foxml);
                     foxml.append("\"/>");
                 }
-                if (!collection.equals("")) {
+                if (!collection.isEmpty()) {
                     foxml.append("        <rel:");
                     StreamUtility.enc(collectionRelationship, foxml);
                     foxml.append(" rdf:resource=\"");

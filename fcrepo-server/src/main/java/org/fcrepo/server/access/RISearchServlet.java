@@ -244,7 +244,7 @@ extends SpringAccessServlet {
         boolean streamImmediately = (stream != null) && (stream.toLowerCase().startsWith("t") || stream.toLowerCase().equals("on"));
         String flush = request.getParameter("flush");
         if (type == null && template == null && lang == null && query == null && limit == null && distinct == null && format == null) {
-            if (flush == null || flush.equals("")) flush = "false";
+            if (flush == null || flush.isEmpty()) flush = "false";
             boolean doFlush = flush.toLowerCase().startsWith("t");
             if (doFlush) {
                 TriplestoreWriter writer = server.getWriter();

@@ -267,7 +267,7 @@ public class BatchModifyParser
             m_obj.logMessage = attrs.getValue("logMessage");
 
             try {
-                if (m_obj.label.equals("")) {
+                if (m_obj.label.isEmpty()) {
                     failedCount++;
                     logFailedDirective(m_obj.pid,
                                        localName,
@@ -275,7 +275,7 @@ public class BatchModifyParser
                                        "Object Label must be non-empty.");
                     return;
                 }
-                if (!m_obj.pid.equals("")) {
+                if (!m_obj.pid.isEmpty()) {
                     if (m_obj.pid.indexOf(":") < 1) {
                         failedCount++;
                         logFailedDirective(m_obj.pid,
@@ -301,7 +301,7 @@ public class BatchModifyParser
             m_obj.logMessage = attrs.getValue("logMessage");
 
             try {
-                if (!m_obj.pid.equals("")) {
+                if (!m_obj.pid.isEmpty()) {
                     if (m_obj.pid.indexOf(":") < 1) {
                         failedCount++;
                         logFailedDirective(m_obj.pid,
@@ -344,7 +344,7 @@ public class BatchModifyParser
             m_obj.logMessage = attrs.getValue("logMessage");
 
             try {
-                if (!m_obj.pid.equals("")) {
+                if (!m_obj.pid.isEmpty()) {
                     if (m_obj.pid.indexOf(":") < 1) {
                         failedCount++;
                         logFailedDirective(m_obj.pid,
@@ -384,35 +384,35 @@ public class BatchModifyParser
 
                 // Check for optional attributes
                 if (attrs.getValue("dsID") != null
-                        && !attrs.getValue("dsID").equals("")) {
+                        && !attrs.getValue("dsID").isEmpty()) {
                     m_ds.dsID = attrs.getValue("dsID");
                 } else {
                     m_ds.dsID = null;
                 }
                 if (attrs.getValue("dsLocation") != null
-                        && !attrs.getValue("dsLocation").equals("")) {
+                        && !attrs.getValue("dsLocation").isEmpty()) {
                     m_ds.dsLocation = attrs.getValue("dsLocation");
                 }
                 if (attrs.getValue("formatURI") != null
-                        && !attrs.getValue("formatURI").equals("")) {
+                        && !attrs.getValue("formatURI").isEmpty()) {
                     m_ds.formatURI = attrs.getValue("formatURI");
                 }
                 if (attrs.getValue("versionable") != null
-                        && !attrs.getValue("versionable").equals("")) {
+                        && !attrs.getValue("versionable").isEmpty()) {
                     m_ds.versionable =
                             new Boolean(attrs.getValue("versionable"))
                                     .booleanValue();
                 }
                 if (attrs.getValue("altIDs") != null
-                        && !attrs.getValue("altIDs").equals("")) {
+                        && !attrs.getValue("altIDs").isEmpty()) {
                     m_ds.altIDs = attrs.getValue("altIDs").split(" ");
                 }
                 if (attrs.getValue("checksumType") != null
-                        && !attrs.getValue("checksumType").equals("")) {
+                        && !attrs.getValue("checksumType").isEmpty()) {
                     m_ds.checksumType = attrs.getValue("checksumType");
                 }
                 if (attrs.getValue("checksum") != null
-                        && !attrs.getValue("checksum").equals("")) {
+                        && !attrs.getValue("checksum").isEmpty()) {
                     m_ds.checksum = attrs.getValue("checksum");
                 }
 
@@ -440,15 +440,15 @@ public class BatchModifyParser
                 // or empty its value is null and indicates that all versions
                 // of the datastream are to be purged.
                 if (attrs.getValue("asOfDate") != null
-                        && !attrs.getValue("asOfDate").equals("")) {
+                        && !attrs.getValue("asOfDate").isEmpty()) {
                     m_ds.asOfDate = attrs.getValue("asOfDate");
                 }
                 if (attrs.getValue("endDate") != null
-                        && !attrs.getValue("endDate").equals("")) {
+                        && !attrs.getValue("endDate").isEmpty()) {
                     m_ds.endDate = attrs.getValue("endDate");
                 }
                 if (attrs.getValue("force") != null
-                        && !attrs.getValue("force").equals("")) {
+                        && !attrs.getValue("force").isEmpty()) {
                     m_ds.force =
                             new Boolean(attrs.getValue("force")).booleanValue();
                 }
@@ -612,7 +612,7 @@ public class BatchModifyParser
 
                 // Get optional attributes
                 if (attrs.getValue("asOfDate") != null
-                        && !attrs.getValue("asOfDate").equals("")) {
+                        && !attrs.getValue("asOfDate").isEmpty()) {
                     m_ds.asOfDate = attrs.getValue("asOfDate");
                 }
 
@@ -1271,7 +1271,7 @@ public class BatchModifyParser
             String protocol = args[4];
 
             String context = Constants.FEDORA_DEFAULT_APP_CONTEXT;
-            if (args.length == 6 && !args[5].equals("")) {
+            if (args.length == 6 && !args[5].isEmpty()) {
                 context = args[5];
             }
 

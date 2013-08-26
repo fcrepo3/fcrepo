@@ -204,7 +204,7 @@ public class LdapModule
             // retrieve the attributes to fetch from ldap
             String[] attrList = null;
             String attrsFetch = getOption("attrs.fetch", false);
-            if (attrsFetch != null && !"".equals(attrsFetch)) {
+            if (attrsFetch != null && !attrsFetch.isEmpty()) {
                 attrList = attrsFetch.split(" *, *");
             } else if (attrList == null || attrList.length == 0) {
                 attrList = new String[] {"cn", "sn", "mail", "displayName"};
@@ -448,7 +448,7 @@ public class LdapModule
 
     private String getOption(String key, boolean required) throws Exception {
         String value = (String) options.get(key);
-        if (required && (value == null || "".equals(value))) {
+        if (required && (value == null || value.isEmpty())) {
             throw new Exception("Missing required option in JAAS Config file: "
                     + key);
         }

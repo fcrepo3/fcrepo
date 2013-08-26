@@ -106,7 +106,7 @@ implements RESTFilter {
                 new ArrayList<Map<URI, List<AttributeValue>>>();
         String user = request.getRemoteUser();
 
-        if (user == null || "".equals(user)) {
+        if (user == null || user.isEmpty()) {
             user = "anonymous";
         }
 
@@ -165,7 +165,7 @@ implements RESTFilter {
         Map<URI, AttributeValue> envAttr = new HashMap<URI, AttributeValue>();
         String ip = request.getRemoteAddr();
 
-        if (ip != null && !"".equals(ip)) {
+        if (ip != null && !ip.isEmpty()) {
             envAttr.put(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.getURI(),
                     new StringAttribute(ip));
         }

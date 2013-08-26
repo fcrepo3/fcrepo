@@ -85,11 +85,11 @@ public class Export
             String[] parts = getPathParts(request);
             String pid = parts[1];
             resAttr = ResourceAttributes.getResources(parts);
-            if (format != null && !"".equals(format)) {
+            if (format != null && !format.isEmpty()) {
                 resAttr.put(Constants.OBJECT.ENCODING.getURI(),
                             new StringAttribute(format));
             }
-            if (eContext != null && !"".equals(eContext)) {
+            if (eContext != null && !eContext.isEmpty()) {
                 resAttr.put(Constants.OBJECT.CONTEXT.getURI(),
                             new StringAttribute(eContext));
             }

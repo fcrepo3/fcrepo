@@ -55,7 +55,7 @@ public class WebServicesPDPClient
             throws PEPException {
         try {
             String serviceEndpoint = options.get("ServiceEndpoint");
-            if (serviceEndpoint == null || "".equals(serviceEndpoint)) {
+            if (serviceEndpoint == null || serviceEndpoint.isEmpty()) {
                 throw new PEPException("The serviceEnpoint option has not been set in the configuration file.");
             }
             MelcoePDP service = new MelcoePDP(new URL("wsdl"));//TODO

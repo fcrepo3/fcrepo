@@ -111,7 +111,7 @@ public class FilterLdap
                         temp.add(element);
                     }
                 }
-                if (AUTHENTICATE && PASSWORD != null && !"".equals(PASSWORD)) {
+                if (AUTHENTICATE && PASSWORD != null && !PASSWORD.isEmpty()) {
                     temp.add(PASSWORD);
                 }
                 DIRECTORY_ATTRIBUTES_NEEDED =
@@ -119,54 +119,24 @@ public class FilterLdap
 
                 boolean haveBindMethod = false;
                 if (SECURITY_AUTHENTICATION != null
-                        && !"".equals(SECURITY_AUTHENTICATION)) {
+                        && !SECURITY_AUTHENTICATION.isEmpty()) {
                     haveBindMethod = true;
                 }
 
                 boolean haveSuperUser = false;
                 if (SECURITY_PRINCIPAL != null
-                        && !"".equals(SECURITY_PRINCIPAL)) {
+                        && !SECURITY_PRINCIPAL.isEmpty()) {
                     haveSuperUser = true;
                 }
 
                 boolean haveSuperUserPassword = false;
                 if (SECURITY_CREDENTIALS != null
-                        && !"".equals(SECURITY_CREDENTIALS)) {
+                        && !SECURITY_CREDENTIALS.isEmpty()) {
                     haveSuperUserPassword = true;
                 }
 
-                boolean haveUserPasswordAttributeName = false;
-                if (PASSWORD != null && !"".equals(PASSWORD)) {
-                    haveUserPasswordAttributeName = true;
-                }
-
-                boolean commonBindConfigured = false;
                 if (haveBindMethod && haveSuperUserPassword) {
-                    boolean error = false;
-                    if (!haveSuperUser) {
-                        error = true;
-                    }
-                    if (error) {
-                        initErrors = true;
-                    } else {
-                        commonBindConfigured = true;
-                    }
-                }
-
-                boolean individualBindConfigured = false;
-                boolean individualBindTestConfigured = false;
-
-                if (haveBindMethod && !haveSuperUserPassword) {
-                    if (haveSuperUser) {
-                        individualBindTestConfigured = true;
-                    } else {
-                        individualBindConfigured = true;
-                    }
-                }
-
-                boolean individualCompareConfigured = false;
-                if (haveUserPasswordAttributeName) {
-                    individualCompareConfigured = true;
+                    initErrors = !haveSuperUser;
                 }
 
             }
@@ -175,7 +145,7 @@ public class FilterLdap
             }
             inited = true;
         } finally {
-            logger.debug(m + "<");
+            logger.debug("{}<", m);
         }
     }
 
@@ -183,10 +153,10 @@ public class FilterLdap
     public void destroy() {
         String m = FilterSetup.getFilterNameAbbrev(FILTER_NAME) + " destroy() ";
         try {
-            logger.debug(m + ">");
+            logger.debug("{}>", m);
             super.destroy();
         } finally {
-            logger.debug(m + "<");
+            logger.debug("{}<", m);
         }
     }
 
@@ -196,8 +166,8 @@ public class FilterLdap
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " initThisSubclass() ";
         try {
-            logger.debug(m + ">");
-            logger.debug(m + key + "==" + value);
+            logger.debug("{}>", m);
+            logger.debug("{}{}=={}", m, key, value);
             boolean setLocally = false;
             if (VERSION_KEY.equals(key)) {
                 VERSION = value;
@@ -215,7 +185,7 @@ public class FilterLdap
                 setLocally = true;
             } else if (ATTRIBUTES2RETURN_KEY.equals(key)) {
                 if (value.indexOf(",") < 0) {
-                    if ("".equals(value)) {
+                    if (value.isEmpty()) {
                         ATTRIBUTES2RETURN = null;
                     } else {
                         ATTRIBUTES2RETURN = new String[1];
@@ -249,11 +219,11 @@ public class FilterLdap
                  * true;
                  */
             } else {
-                logger.debug(m + "deferring to super");
+                logger.debug("{}deferring to super", m);
                 super.initThisSubclass(key, value);
             }
             if (setLocally) {
-                logger.info(m + "known parameter " + key + "==" + value);
+                logger.info("{}known parameter {}=={}", m, key, value);
             }
         } finally {
             logger.debug("{}<", m);
@@ -285,13 +255,13 @@ public class FilterLdap
     private boolean individualUserBind() {
         boolean individualUserBind =
                 bindRequired() && AUTHENTICATE
-                        && (PASSWORD == null || "".equals(PASSWORD));
+                        && (PASSWORD == null || PASSWORD.isEmpty());
         return individualUserBind;
     }
 
     private boolean individualUserComparison() {
         boolean individualUserComparison =
-                AUTHENTICATE && PASSWORD != null && !"".equals(PASSWORD);
+                AUTHENTICATE && PASSWORD != null && !PASSWORD.isEmpty();
         return individualUserComparison;
     }
 
@@ -306,7 +276,7 @@ public class FilterLdap
             env.put(Context.INITIAL_CONTEXT_FACTORY,
                     "com.sun.jndi.ldap.LdapCtxFactory");
 
-            if (VERSION != null && !"".equals(VERSION)) {
+            if (VERSION != null && !VERSION.isEmpty()) {
                 logger.debug("{}ldap explicit version=={}", m, VERSION);
                 env.put(CONTEXT_VERSION_KEY, VERSION);
             }
@@ -330,7 +300,7 @@ public class FilterLdap
                 } else {
                     passwordForBind = password;
                     if (SECURITY_PRINCIPAL == null
-                            || "".equals(SECURITY_PRINCIPAL)) {
+                            || SECURITY_PRINCIPAL.isEmpty()) {
                         userForBind = userid;
                         logger.debug("{}binding for real user", m);
                     } else {
@@ -641,7 +611,7 @@ public class FilterLdap
                     logger.error("{}null object...continue to next attr sought", m);
                     continue;
                 }
-                if (GROUPS_NAME != null && !"".equals(GROUPS_NAME)) {
+                if (GROUPS_NAME != null && !GROUPS_NAME.isEmpty()) {
                     key = GROUPS_NAME;
                     logger.debug("{}values collected and interpreted as groups=={}",
                             m, key);

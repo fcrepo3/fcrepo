@@ -108,7 +108,7 @@ public final class PIDStreamIterableWrapper implements Iterable<String> {
             m_nextPID = null;
             while ((m_nextLine = m_reader.readLine()) != null) {
                 // skip blank lines
-                if (!m_nextLine.trim().equals("")) {
+                if (!m_nextLine.trim().isEmpty()) {
                     // first time read, see what kind of file it is
                     if (!m_started) {
                         if (m_nextLine.contains("<")) {
@@ -149,7 +149,7 @@ public final class PIDStreamIterableWrapper implements Iterable<String> {
                 }
             } else {
                 // raw contents of line, ignore leading/trailing whitespace, ignore empty lines
-                if (line.trim().equals("")) {
+                if (line.trim().isEmpty()) {
                     return null;
                 } else {
                     return line.trim();

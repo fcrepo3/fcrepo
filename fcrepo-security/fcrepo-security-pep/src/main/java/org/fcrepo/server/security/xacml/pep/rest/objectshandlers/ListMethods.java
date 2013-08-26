@@ -100,14 +100,14 @@ public class ListMethods
             if (parts.length > 3){
                 if ("methods".equals(parts[2])) {
                     String sDefPid = parts[3];
-                    if (sDefPid != null && !"".equals(sDefPid)) {
+                    if (sDefPid != null && !sDefPid.isEmpty()) {
                         resAttr.put(Constants.SDEF.PID.getURI(),
                                 new StringAttribute(sDefPid));
                     }
                 }
             }
 
-            if (asOfDateTime != null && !"".equals(asOfDateTime)) {
+            if (asOfDateTime != null && !asOfDateTime.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(asOfDateTime));
             }

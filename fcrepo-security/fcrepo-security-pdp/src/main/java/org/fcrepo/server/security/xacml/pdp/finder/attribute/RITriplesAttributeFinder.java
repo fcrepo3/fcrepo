@@ -103,7 +103,7 @@ public class RITriplesAttributeFinder
                                           int designatorType) {
 
         String resourceId = context.getResourceId().encode();
-        if (resourceId == null || resourceId.equals("")) {
+        if (resourceId == null || resourceId.isEmpty()) {
             String pid = PolicyFinderModule.getPid(context);
             if (pid != null) {
                 resourceId = "info:fedora/" + pid;
@@ -114,7 +114,7 @@ public class RITriplesAttributeFinder
                     + attributeId + ", rid=" + resourceId);
         }
 
-        if (resourceId == null || resourceId.equals("")) {
+        if (resourceId == null || resourceId.isEmpty()) {
             return new EvaluationResult(BagAttribute
                     .createEmptyBag(attributeType));
         }

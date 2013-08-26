@@ -74,17 +74,17 @@ public class GetDissemination
                 if ("methods".equals(parts[2])) {
                     String sDefPid = parts[3];
                     String methodName = parts[4];
-                    if (sDefPid != null && !"".equals(sDefPid)) {
+                    if (sDefPid != null && !sDefPid.isEmpty()) {
                         resAttr.put(Constants.SDEF.PID.getURI(),
                                 new StringAttribute(sDefPid));
                     }
-                    if (methodName != null && !"".equals(methodName)) {
+                    if (methodName != null && !methodName.isEmpty()) {
                         resAttr.put(Constants.DISSEMINATOR.METHOD.getURI(),
                                 new StringAttribute(methodName));
                     }
                 }
 
-                if (asOfDateTime != null && !"".equals(asOfDateTime)) {
+                if (asOfDateTime != null && !asOfDateTime.isEmpty()) {
                     resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                                 DateTimeAttribute.getInstance(asOfDateTime));
                 }

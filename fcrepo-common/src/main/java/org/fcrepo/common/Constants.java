@@ -746,6 +746,7 @@ public interface Constants {
                 } else {
                     value = System.getenv("FEDORA_HOME");
                 }
+                if (value != null) value = value.trim();
             }
             return value;
         }

@@ -812,7 +812,7 @@ public class DatastreamsPane
                     // try to save... first set common values for call
                     String pid = m_pid;
                     String dsID = m_idTextField.getText().trim();
-                    if (dsID.equals("")) {
+                    if (dsID.isEmpty()) {
                         dsID = null;
                     }
                     String trimmed = m_altIDsTextField.getText().trim();

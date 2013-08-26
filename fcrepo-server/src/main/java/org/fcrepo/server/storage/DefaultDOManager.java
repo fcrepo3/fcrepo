@@ -845,12 +845,11 @@ public class DefaultDOManager extends Module implements DOManager {
                 // SET OBJECT PROPERTIES:
                 logger.debug("Setting object/component states and create dates if unset");
                 // set object state to "A" (Active) if not already set
-                if (obj.getState() == null || obj.getState().equals("")) {
+                if (obj.getState() == null || obj.getState().isEmpty()) {
                     obj.setState("A");
                 }
                 // set object create date to UTC if not already set
-                if (obj.getCreateDate() == null ||
-                        obj.getCreateDate().equals("")) {
+                if (obj.getCreateDate() == null) {
                     obj.setCreateDate(nowUTC);
                 }
                 // set object last modified date to UTC
@@ -861,11 +860,11 @@ public class DefaultDOManager extends Module implements DOManager {
                 while (dsIter.hasNext()) {
                     for (Datastream ds : obj.datastreams(dsIter.next())) {
                         // Set create date to UTC if not already set
-                        if (ds.DSCreateDT == null || ds.DSCreateDT.equals("")) {
+                        if (ds.DSCreateDT == null) {
                             ds.DSCreateDT = nowUTC;
                         }
                         // Set state to "A" (Active) if not already set
-                        if (ds.DSState == null || ds.DSState.equals("")) {
+                        if (ds.DSState == null || ds.DSState.isEmpty()) {
                             ds.DSState = "A";
                         }
                         ds.DSChecksumType =
@@ -1047,7 +1046,7 @@ public class DefaultDOManager extends Module implements DOManager {
             dc.DSState = "A";
             dc.DSVersionable = true;
             dcf = new DCFields();
-            if (obj.getLabel() != null && !obj.getLabel().equals("")) {
+            if (obj.getLabel() != null && !obj.getLabel().isEmpty()) {
                 dcf.titles().add(new DCField(obj.getLabel()));
             }
             w.addDatastream(dc, dc.DSVersionable);
@@ -1981,7 +1980,7 @@ public class DefaultDOManager extends Module implements DOManager {
             numPIDs = 1;
         }
         String[] pidList = new String[numPIDs];
-        if (namespace == null || namespace.equals("")) {
+        if (namespace == null || namespace.isEmpty()) {
             namespace = m_pidNamespace;
         }
         try {

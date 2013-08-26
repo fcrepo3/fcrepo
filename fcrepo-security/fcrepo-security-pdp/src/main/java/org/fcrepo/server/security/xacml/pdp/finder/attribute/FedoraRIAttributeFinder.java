@@ -73,7 +73,7 @@ public class FedoraRIAttributeFinder
                     + attributeId + ", rid=" + resourceId);
         }
 
-        if (resourceId == null || resourceId.equals("")) {
+        if (resourceId == null || resourceId.isEmpty()) {
             return new EvaluationResult(BagAttribute
                     .createEmptyBag(attributeType));
         }

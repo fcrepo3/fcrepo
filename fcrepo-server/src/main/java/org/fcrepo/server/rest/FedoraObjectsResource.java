@@ -487,13 +487,13 @@ public class FedoraObjectsResource extends BaseRestResource {
                     pid = m_management.getNextPID(context, 1, namespace)[0];
                 }
 
-                if (ownerID == null || "".equals(ownerID.trim())) {
+                if (ownerID == null || ownerID.trim().isEmpty()) {
                     ownerID = context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri);
                 }
                 is = new ByteArrayInputStream(getFOXMLTemplate(pid, label, ownerID, encoding).getBytes());
             } else {
 
-                if (namespace != null && !namespace.equals("")) {
+                if (namespace != null && !namespace.isEmpty()) {
                     logger.warn("The namespace parameter is only applicable whene object " +
                                 "content is not provided, thus the namespace provided '" +
                                 namespace + "' has been ignored.");

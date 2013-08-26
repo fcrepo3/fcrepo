@@ -138,7 +138,7 @@ public class ListDatastreams
         try {
             String[] parts = getPathParts(request);
             resAttr = ResourceAttributes.getResources(parts);
-            if (asOfDateTime != null && !"".equals(asOfDateTime)) {
+            if (asOfDateTime != null && !asOfDateTime.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(asOfDateTime));
             }
@@ -267,21 +267,22 @@ public class ListDatastreams
                 evaluatePids(dsids.keySet(), pid, request, response);
 
         for (Result r : results) {
-            if (r.getResource() == null || "".equals(r.getResource())) {
+            String resource = r.getResource();
+            if (resource == null || resource.isEmpty()) {
                 logger.warn("This resource has no resource identifier in the xacml response results!");
             } else if (logger.isDebugEnabled()) {
                 logger.debug("Checking: " + r.getResource());
             }
 
-            String[] ridComponents = r.getResource().split("\\/");
-            String rid = ridComponents[ridComponents.length - 1];
+            int lastSlash = resource.lastIndexOf('/');
+            String rid = resource.substring(lastSlash + 1);
 
             if (r.getStatus().getCode().contains(Status.STATUS_OK)
                     && r.getDecision() != Result.DECISION_PERMIT) {
                 Node node = dsids.get(rid);
                 node.getParentNode().removeChild(node);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Removing: " + r.getResource() + "[" + rid + "]");
+                    logger.debug("Removing: " + resource + "[" + rid + "]");
                 }
             }
         }
@@ -367,21 +368,22 @@ public class ListDatastreams
                 evaluatePids(dsids.keySet(), pid, request, response);
 
         for (Result r : results) {
-            if (r.getResource() == null || "".equals(r.getResource())) {
+            String resource = r.getResource();
+            if (resource == null || resource.isEmpty()) {
                 logger.warn("This resource has no resource identifier in the xacml response results!");
             } else if (logger.isDebugEnabled()) {
                 logger.debug("Checking: " + r.getResource());
             }
 
-            String[] ridComponents = r.getResource().split("\\/");
-            String rid = ridComponents[ridComponents.length - 1];
+            int lastSlash = resource.lastIndexOf('/');
+            String rid = resource.substring(lastSlash + 1);
 
             if (r.getStatus().getCode().contains(Status.STATUS_OK)
                     && r.getDecision() != Result.DECISION_PERMIT) {
                 Node node = dsids.get(rid);
                 node.getParentNode().removeChild(node);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Removing: " + r.getResource() + "[" + rid + "]");
+                    logger.debug("Removing: " + resource + "[" + rid + "]");
                 }
             }
         }

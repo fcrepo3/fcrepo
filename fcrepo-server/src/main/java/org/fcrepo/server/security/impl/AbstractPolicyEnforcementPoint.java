@@ -95,7 +95,7 @@ public abstract class AbstractPolicyEnforcementPoint
                 subjectAttribute.getId(), subjectAttribute.getType(), subjectAttribute.getValue());
         Set<Attribute> subjectAttributes = new HashSet<Attribute>();
         subjectAttributes.add(subjectAttribute);
-        if (subjectLoginId != null && !"".equals(subjectLoginId)) {
+        if (subjectLoginId != null && !subjectLoginId.isEmpty()) {
             stringAttribute = new StringAttribute(subjectLoginId);
             subjectAttribute =
                     new Attribute(SUBJECT_ID_URI, null, null, stringAttribute);

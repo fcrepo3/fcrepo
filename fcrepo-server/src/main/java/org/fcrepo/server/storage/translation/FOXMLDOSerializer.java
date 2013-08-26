@@ -311,7 +311,7 @@ public class FOXMLDOSerializer
                 }
                 String altIds =
                         DOTranslationUtility.oneString(vds.DatastreamAltIDs);
-                if (altIds != null && !altIds.equals("")) {
+                if (altIds != null && !altIds.isEmpty()) {
                     writer.print(" ALT_IDS=\"");
                     writer.print(StreamUtility.enc(altIds));
                     writer.print("\"");
@@ -319,7 +319,7 @@ public class FOXMLDOSerializer
                 writer.print(" MIMETYPE=\"");
                 writer.print(StreamUtility.enc(vds.DSMIME));
                 writer.print("\"");
-                if (vds.DSFormatURI != null && !vds.DSFormatURI.equals("")) {
+                if (vds.DSFormatURI != null && !vds.DSFormatURI.isEmpty()) {
                     writer.print(" FORMAT_URI=\"");
                     writer.print(StreamUtility.enc(vds.DSFormatURI));
                     writer.print("\"");
@@ -512,7 +512,7 @@ public class FOXMLDOSerializer
                 writer.print(":disseminatorVersion ID=\"");
                 writer.print(vdiss.dissVersionID);
                 writer.print("\"");
-                if (vdiss.dissLabel != null && !vdiss.dissLabel.equals("")) {
+                if (vdiss.dissLabel != null && !vdiss.dissLabel.isEmpty()) {
                     writer.print(" LABEL=\"");
                     writer.print(StreamUtility.enc(vdiss.dissLabel));
                     writer.print("\"");
@@ -544,13 +544,13 @@ public class FOXMLDOSerializer
                     writer.print(bindings[j].datastreamID);
                     writer.print("\"");
                     if (bindings[j].bindLabel != null
-                            && !bindings[j].bindLabel.equals("")) {
+                            && !bindings[j].bindLabel.isEmpty()) {
                         writer.print(" LABEL=\"");
                         writer.print(StreamUtility.enc(bindings[j].bindLabel));
                         writer.print("\"");
                     }
                     if (bindings[j].seqNo != null
-                            && !bindings[j].seqNo.equals("")) {
+                            && !bindings[j].seqNo.isEmpty()) {
                         writer.print(" ORDER=\"");
                         writer.print(bindings[j].seqNo);
                         writer.print("\"");

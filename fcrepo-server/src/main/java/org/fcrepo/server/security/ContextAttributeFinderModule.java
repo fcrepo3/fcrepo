@@ -132,7 +132,7 @@ class ContextAttributeFinderModule
         logger.debug("getAttributeLocally context");
         String contextId = getContextId(ctx);
         logger.debug("contextId={} attributeID={}", contextId, attributeId);
-        if (contextId == null || contextId.equals("")) {
+        if (contextId == null || contextId.isEmpty()) {
             return null;
         }
         Context context = m_contexts.getContext(contextId);

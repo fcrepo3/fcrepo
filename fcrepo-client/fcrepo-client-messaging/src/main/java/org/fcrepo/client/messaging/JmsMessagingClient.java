@@ -192,7 +192,7 @@ public class JmsMessagingClient implements MessagingClient, MessageListener {
 
         // Check for valid client ID if durable subscriptions are required
         if (durable) {
-            if (clientId == null || clientId.equals("")) {
+            if (clientId == null || clientId.isEmpty()) {
                 throw new MessagingException("ClientId must be "
                         + "specified for durable subscriptions");
             }

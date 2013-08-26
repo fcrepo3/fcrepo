@@ -85,7 +85,7 @@ public class AutoBatchIngest
                 errors = true;
             }
 
-            if (args.length == 9 && !args[8].equals("")) {
+            if (args.length == 9 && !args[8].isEmpty()) {
                 context = args[8];
             }
             if (!errors) {

@@ -123,9 +123,9 @@ class BatchAdditions
                         metadataProperties.getProperty(elementName); //metadataCategories.get(elementName);
                 String parentPath = context + directoryName;
                 String fileName = getFilename(parentPath, objectname);
-                if (fileName != null && !fileName.equals("")) {
+                if (fileName != null && !fileName.isEmpty()) {
                     String metadata = getContents(parentPath + FS + fileName);
-                    if (metadata != null && !metadata.equals("")) {
+                    if (metadata != null && !metadata.isEmpty()) {
                         out.println(tabs + "\t<metadata id=\"" + elementName
                                 + "\">");
                         out.println(metadata);

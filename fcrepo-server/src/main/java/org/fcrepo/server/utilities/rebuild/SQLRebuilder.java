@@ -281,11 +281,11 @@ public class SQLRebuilder
         // SET OBJECT PROPERTIES:
         logger.debug("Rebuild: Setting object/component states and create dates if unset...");
         // set object state to "A" (Active) if not already set
-        if (obj.getState() == null || obj.getState().equals("")) {
+        if (obj.getState() == null || obj.getState().isEmpty()) {
             obj.setState("A");
         }
         // set object create date to UTC if not already set
-        if (obj.getCreateDate() == null || obj.getCreateDate().equals("")) {
+        if (obj.getCreateDate() == null) {
             obj.setCreateDate(nowUTC);
         }
         // set object last modified date to UTC
@@ -294,11 +294,11 @@ public class SQLRebuilder
         // SET OBJECT PROPERTIES:
         logger.debug("Rebuild: Setting object/component states and create dates if unset...");
         // set object state to "A" (Active) if not already set
-        if (obj.getState() == null || obj.getState().equals("")) {
+        if (obj.getState() == null || obj.getState().isEmpty()) {
             obj.setState("A");
         }
         // set object create date to UTC if not already set
-        if (obj.getCreateDate() == null || obj.getCreateDate().equals("")) {
+        if (obj.getCreateDate() == null) {
             obj.setCreateDate(nowUTC);
         }
         // set object last modified date to UTC
@@ -309,11 +309,11 @@ public class SQLRebuilder
         while (dsIter.hasNext()) {
             for (Datastream ds : obj.datastreams(dsIter.next())) {
                 // Set create date to UTC if not already set
-                if (ds.DSCreateDT == null || ds.DSCreateDT.equals("")) {
+                if (ds.DSCreateDT == null) {
                     ds.DSCreateDT = nowUTC;
                 }
                 // Set state to "A" (Active) if not already set
-                if (ds.DSState == null || ds.DSState.equals("")) {
+                if (ds.DSState == null || ds.DSState.isEmpty()) {
                     ds.DSState = "A";
                 }
             }

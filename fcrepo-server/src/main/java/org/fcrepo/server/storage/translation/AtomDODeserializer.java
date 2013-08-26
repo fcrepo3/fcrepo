@@ -573,7 +573,7 @@ public class AtomDODeserializer
             if (logger.isDebugEnabled()) {
                 logger.debug("New Object: checking supplied checksum");
             }
-            if (checksum != null && !checksum.equals("")
+            if (checksum != null && !checksum.isEmpty()
                     && !checksum.equals(Datastream.CHECKSUM_NONE)) {
                 String tmpChecksum = ds.getChecksum();
                 if (logger.isDebugEnabled()) {

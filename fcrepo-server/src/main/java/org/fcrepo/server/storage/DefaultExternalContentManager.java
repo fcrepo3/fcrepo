@@ -173,7 +173,7 @@ public class DefaultExternalContentManager
             long length = Long.parseLong(response.getResponseHeaderValue("Content-Length","-1"));
             Property[] headerArray =
                     toPropertyArray(response.getResponseHeaders());
-            if (mimeType == null || mimeType.equals("")) {
+            if (mimeType == null || mimeType.isEmpty()) {
                 mimeType = DEFAULT_MIMETYPE;
             }
             return new MIMETypedStream(mimeType, response, headerArray, length);

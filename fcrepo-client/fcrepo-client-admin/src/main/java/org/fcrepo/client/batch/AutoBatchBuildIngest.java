@@ -97,7 +97,7 @@ public class AutoBatchBuildIngest
                 errors = true;
             }
 
-            if (args.length == 10 && !args[9].equals("")){
+            if (args.length == 10 && !args[9].isEmpty()){
                 context = "/" + args[9];
             }
             // Verify format of template file to see if it is a METS or FOXML template

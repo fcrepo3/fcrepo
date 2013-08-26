@@ -36,7 +36,7 @@ public class FilterXmlUserfile
     private String FILEPATH = "";
 
     private final String getFilepath() {
-        if (FILEPATH == null || FILEPATH.equals("")) {
+        if (FILEPATH == null || FILEPATH.isEmpty()) {
             FILEPATH = FedoraUsers.fedoraUsersXML.getAbsolutePath();
         }
         return FILEPATH;

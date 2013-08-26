@@ -455,11 +455,11 @@ public class DbXmlPolicyIndex
         XmlDocument doc = m_dbXmlManager.manager.createDocument();
         String docName = name;
 
-        if (docName == null || "".equals(docName)) {
+        if (docName == null || docName.isEmpty()) {
             docName = metadata.get("PolicyId");
         }
 
-        if (docName == null || "".equals(docName)) {
+        if (docName == null || docName.isEmpty()) {
             throw new PolicyIndexException("Could not extract PolicyID from document.");
         }
 
