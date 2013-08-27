@@ -174,7 +174,7 @@ public class Uploader {
 
                 String context = Constants.FEDORA_DEFAULT_APP_CONTEXT;
 
-                if (args.length == 6 && !args[5].equals("")) {
+                if (args.length == 6 && !args[5].isEmpty()) {
                     context = args[5];
                 }
 

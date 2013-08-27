@@ -181,13 +181,13 @@ public class BatchTool {
                 if (pidsFormat.equals("xml")) {
                     //System.out.println("in loop, think it's xml i'm after]");
                     out.print("\t<map ");
-                    if (buildPath2file != null && !buildPath2file.equals("")) {
+                    if (buildPath2file != null && !buildPath2file.isEmpty()) {
                         out.print("path2spec=\"" + buildPath2file + "\" ");
                     }
-                    if (ingestPath2file != null && !ingestPath2file.equals("")) {
+                    if (ingestPath2file != null && !ingestPath2file.isEmpty()) {
                         out.print("path2object=\"" + ingestPath2file + "\" ");
                     }
-                    if (pid != null && !pid.equals("")) {
+                    if (pid != null && !pid.isEmpty()) {
                         out.print("pid=\"" + pid + "\" ");
                     }
                     //out.print("\t<map path2spec=\"" + buildPath2file + "\" path2object=\"" + ingestPath2file + "\" pid=\"" + pid + "\" />");
@@ -253,7 +253,7 @@ public class BatchTool {
     static final String OBJECTFORMAT = "object-format";
 
     static final boolean argOK(String value) {
-        return value != null && !value.equals("");
+        return value != null && !value.isEmpty();
     }
 
     public static final void main(String[] args) throws Exception {

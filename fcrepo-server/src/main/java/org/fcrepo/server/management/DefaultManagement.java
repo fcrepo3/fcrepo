@@ -161,7 +161,7 @@ public class DefaultManagement
             m_authz.enforceIngest(context, objPid, format, encoding);
 
             // Only create an audit record if there is a log message to capture
-            if (logMessage != null && !logMessage.equals("")) {
+            if (logMessage != null && !logMessage.isEmpty()) {
                 Date nowUTC = Server.getCurrentDate(context);
                 addAuditRecord(context, w, "ingest", "", logMessage, nowUTC);
             }
@@ -232,7 +232,7 @@ public class DefaultManagement
                 }
             }
 
-            if (state != null && !state.equals("")) {
+            if (state != null && !state.isEmpty()) {
                 if (!state.equals("A") && !state.equals("D")
                     && !state.equals("I")) {
                     throw new InvalidStateException("The object state of \""
@@ -698,7 +698,7 @@ public class DefaultManagement
 
             // In cases where an empty attribute value is not allowed, then
             // NULL or EMPTY PARM means no change to ds attribute...
-            if (dsLocation == null || dsLocation.equals("")) {
+            if (dsLocation == null || dsLocation.isEmpty()) {
                 if (orig.DSControlGrp.equals("M")) {
                     // if managed content location is unspecified,
                     // cause a copy of the prior content to be made at
@@ -2026,7 +2026,7 @@ public class DefaultManagement
 
                     // add character encoding to mime type (will always be UTF-8 as it has come from X datastream in FOXML)
                     if (setMIMETypeCharset) {
-                        if (newDS.DSMIME != null && !newDS.DSMIME.equals("") & !newDS.DSMIME.contains("charset=")) {
+                        if (newDS.DSMIME != null && !newDS.DSMIME.isEmpty() & !newDS.DSMIME.contains("charset=")) {
                             newDS.DSMIME = newDS.DSMIME + "; charset=UTF-8";
                         } else {
                             newDS.DSMIME = "text/xml; charset=UTF-8";

@@ -58,7 +58,7 @@ public class BasicPIDGenerator
         // we can automatically upgrade from a pre-1.2 version of Fedora by
         // making sure the old "last pid generated" value is respected later.
         String dir = getParameter("pidgen_log_dir");
-        if (dir != null && !dir.equals("")) {
+        if (dir != null && !dir.isEmpty()) {
             if (dir.startsWith("/") || dir.startsWith("\\")
                     || dir.substring(1).startsWith(":\\")) {
                 m_oldPidGenDir = new File(dir);

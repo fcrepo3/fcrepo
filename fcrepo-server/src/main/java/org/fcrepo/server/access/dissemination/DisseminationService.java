@@ -1032,7 +1032,7 @@ public class DisseminationService {
 			String internalDSLocation, Date dsCreateDT, String callbackHost)
 			throws ServerException {
 
-		if (callbackHost == null || callbackHost.equals("")) {
+		if (callbackHost == null || callbackHost.isEmpty()) {
 			throw new DisseminationException(
 					"[DisseminationService] was unable to "
 							+ "resolve the base URL of the Fedora Server. The URL specified was: \""

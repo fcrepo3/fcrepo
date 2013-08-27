@@ -35,7 +35,7 @@ public abstract class ResourceAttributes {
 
     public static Map<URI, AttributeValue> getResources(String pid) {
         Map<URI, AttributeValue> resAttr = new HashMap<URI, AttributeValue>();
-        if (pid != null && !"".equals(pid)) {
+        if (pid != null && !pid.isEmpty()) {
             resAttr.put(Constants.OBJECT.PID.getURI(),
                         new StringAttribute(pid));
             try{
@@ -62,7 +62,7 @@ public abstract class ResourceAttributes {
                 if ("datastreams".equals(parts[2])) {
                     String dsID = parts[3];
                     if (dsID.endsWith(".xml")) dsID = dsID.substring(0,dsID.length()-4);
-                    if (dsID != null && !"".equals(dsID)) {
+                    if (dsID != null && !dsID.isEmpty()) {
                         resAttr.put(Constants.DATASTREAM.ID.getURI(),
                                 new StringAttribute(dsID));
                     }

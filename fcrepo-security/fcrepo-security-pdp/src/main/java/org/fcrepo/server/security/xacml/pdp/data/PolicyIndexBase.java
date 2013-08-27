@@ -308,7 +308,7 @@ implements PolicyIndex {
      * @return array of individual resource-id values that can be used to match against policies
      */
     protected static String[] makeComponents(String resourceId) {
-        if (resourceId == null || resourceId.equals("")
+        if (resourceId == null || resourceId.isEmpty()
                 || !resourceId.startsWith("/")) {
             return null;
         }

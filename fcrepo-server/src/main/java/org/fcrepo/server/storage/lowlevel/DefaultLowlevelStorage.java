@@ -238,7 +238,7 @@ public class DefaultLowlevelStorage
                 // OK:  keep going
             }
             filePath = pathAlgorithm.get(pid);
-            if (filePath == null || filePath.equals("")) { //guard against algorithm implementation
+            if (filePath == null || filePath.isEmpty()) { //guard against algorithm implementation
                 LowlevelStorageException nullPath =
                         new LowlevelStorageException(true,
                                                      "null path from algorithm for pid "
@@ -277,7 +277,7 @@ public class DefaultLowlevelStorage
                                 + " not in registry", ffff);
                 throw noPath;
             }
-            if (filePath == null || filePath.equals("")) { //guard against registry implementation
+            if (filePath == null || filePath.isEmpty()) { //guard against registry implementation
                 LowlevelStorageException nullPath =
                         new LowlevelStorageException(true, "pid " + pid
                                 + " not in registry");
@@ -310,7 +310,7 @@ public class DefaultLowlevelStorage
                 throw eReg;
             }
 
-            if (filePath == null || filePath.equals("")) { //guard against registry implementation
+            if (filePath == null || filePath.isEmpty()) { //guard against registry implementation
                 LowlevelStorageException nullPath =
                         new LowlevelStorageException(true,
                                                      "null path from registry for pid "
@@ -343,7 +343,7 @@ public class DefaultLowlevelStorage
                 throw eReg;
             }
 
-            if (filePath == null || filePath.equals("")) { //guard against registry implementation
+            if (filePath == null || filePath.isEmpty()) { //guard against registry implementation
                 LowlevelStorageException nullPath =
                         new LowlevelStorageException(true,
                                                      "null path from registry for pid "
@@ -376,7 +376,7 @@ public class DefaultLowlevelStorage
             } catch (ObjectNotInLowlevelStorageException eReg) {
                 throw eReg;
             }
-            if (filePath == null || filePath.equals("")) { //guard against registry implementation
+            if (filePath == null || filePath.isEmpty()) { //guard against registry implementation
                 LowlevelStorageException nullPath =
                         new LowlevelStorageException(true,
                                                      "null path from registry for pid "

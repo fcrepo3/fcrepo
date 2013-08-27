@@ -355,7 +355,7 @@ public class FOXMLDODeserializer
                 m_dsControlGrp = grab(a, FOXML.uri, "CONTROL_GROUP");
                 String versionable = grab(a, FOXML.uri, "VERSIONABLE");
                 // If dsVersionable is null or missing, default to true.
-                if (versionable == null || versionable.equals("")) {
+                if (versionable == null || versionable.isEmpty()) {
                     m_dsVersionable = true;
                 } else {
                     m_dsVersionable = Boolean.parseBoolean(versionable);
@@ -387,7 +387,7 @@ public class FOXMLDODeserializer
                 checkMETSFormat(m_dsFormatURI);
                 m_dsMimeType = grab(a, FOXML.uri, "MIMETYPE");
                 String sizeString = grab(a, FOXML.uri, "SIZE");
-                if (sizeString != null && !sizeString.equals("")) {
+                if (sizeString != null && !sizeString.isEmpty()) {
                     try {
                         m_dsSize = Long.parseLong(sizeString);
                     } catch (NumberFormatException nfe) {
@@ -423,7 +423,7 @@ public class FOXMLDODeserializer
                 m_inXMLMetadata = true;
             } else if (localName.equals("contentLocation")) {
                 String dsLocation = grab(a, FOXML.uri, "REF");
-                if (dsLocation == null || dsLocation.equals("")) {
+                if (dsLocation == null || dsLocation.isEmpty()) {
                     throw new SAXException("REF attribute must be specified in contentLocation element");
                 }
                 // check if datastream is ExternalReferenced
@@ -671,7 +671,7 @@ public class FOXMLDODeserializer
             m_dissState = grab(a, FOXML.uri, "STATE");
             String versionable = grab(a, FOXML.uri, "VERSIONABLE");
             // disseminator versioning is defaulted to true
-            if (versionable == null || versionable.equals("")) {
+            if (versionable == null || versionable.isEmpty()) {
                 m_dissVersionable = true;
             } else {
                 m_dissVersionable = Boolean.parseBoolean(versionable);
@@ -683,7 +683,7 @@ public class FOXMLDODeserializer
             m_diss.dissState = m_dissState;
             String versionable = grab(a, FOXML.uri, "VERSIONABLE");
             // disseminator versioning is defaulted to true
-            if (versionable == null || versionable.equals("")) {
+            if (versionable == null || versionable.isEmpty()) {
                 m_dissVersionable = true;
             } else {
                 m_dissVersionable = Boolean.parseBoolean(versionable);
@@ -814,7 +814,7 @@ public class FOXMLDODeserializer
                 m_dsId, m_dsChecksumType, m_dsChecksum);
         if (m_obj.isNew()) {
             logger.debug("New Object: checking supplied checksum");
-            if (m_dsChecksum != null && !m_dsChecksum.equals("")
+            if (m_dsChecksum != null && !m_dsChecksum.isEmpty()
                     && !m_dsChecksum.equals(Datastream.CHECKSUM_NONE)) {
                 String tmpChecksum = ds.getChecksum();
                 logger.debug("checksum = {}", tmpChecksum);
@@ -860,7 +860,7 @@ public class FOXMLDODeserializer
         ds.DSVersionID = m_dsVersId;
         ds.DSLabel = m_dsLabel;
         ds.DSCreateDT = m_dsCreateDate;
-        if (m_dsMimeType == null || m_dsMimeType.equals("")) {
+        if (m_dsMimeType == null || m_dsMimeType.isEmpty()) {
             ds.DSMIME = "text/xml";
         } else {
             ds.DSMIME = m_dsMimeType;
@@ -897,7 +897,7 @@ public class FOXMLDODeserializer
                 m_dsId, m_dsChecksumType, m_dsChecksum);
         ds.DSChecksumType = m_dsChecksumType;
         if (m_obj.isNew()) {
-            if (m_dsChecksum != null && !m_dsChecksum.equals("")
+            if (m_dsChecksum != null && !m_dsChecksum.isEmpty()
                     && !m_dsChecksum.equals(Datastream.CHECKSUM_NONE)) {
                 String tmpChecksum = ds.getChecksum();
                 logger.debug("checksum = {}", tmpChecksum);
@@ -917,7 +917,7 @@ public class FOXMLDODeserializer
     }
 
     private void checkMETSFormat(String formatURI) {
-        if (formatURI != null && !formatURI.equals("")) {
+        if (formatURI != null && !formatURI.isEmpty()) {
             Matcher m = metsPattern.matcher(formatURI);
             //Matcher m = metsURI.matcher(formatURI);
             if (m.lookingAt()) {

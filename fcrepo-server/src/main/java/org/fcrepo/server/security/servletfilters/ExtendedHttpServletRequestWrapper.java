@@ -472,15 +472,15 @@ public class ExtendedHttpServletRequestWrapper
         if (username == null) {
             logger.debug("username==null, so will grok now");
             String authorizationHeader = getAuthorizationHeader();
-            logger.debug("authorizationHeader==" + authorizationHeader);
-            if (authorizationHeader != null && !"".equals(authorizationHeader)) {
+            logger.debug("authorizationHeader=={}", authorizationHeader);
+            if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
                 logger.debug("authorizationHeader is intact");
                 String[] usernamePassword =
                         parseUsernamePassword(authorizationHeader);
                 logger.debug("usernamePassword[] length=="
                         + usernamePassword.length);
                 username = usernamePassword[0];
-                logger.debug("username (usernamePassword[0])==" + username);
+                logger.debug("username (usernamePassword[0])=={}", username);
                 if (super.getRemoteUser() == null) {
                     logger.debug("had none before");
                 } else if (super.getRemoteUser() == username
@@ -491,20 +491,20 @@ public class ExtendedHttpServletRequestWrapper
                 }
             }
         }
-        logger.debug("return user==" + username);
+        logger.debug("return user=={}", username);
         return username;
     }
 
     public final String getPassword() throws Exception {
         if (password == null) {
             String authorizationHeader = getAuthorizationHeader();
-            if (authorizationHeader != null && !"".equals(authorizationHeader)) {
+            if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
                 String[] usernamePassword =
                         parseUsernamePassword(authorizationHeader);
                 password = usernamePassword[1];
             }
         }
-        logger.debug("return password==" + password);
+        logger.debug("return password=={}", password);
         return password;
     }
 
@@ -539,11 +539,13 @@ public class ExtendedHttpServletRequestWrapper
 
     @Override
     public boolean isSecure() {
-        logger.debug("super.isSecure()==" + super.isSecure());
-        logger.debug("this.getLocalPort()==" + getLocalPort());
-        logger.debug("this.getProtocol()==" + getProtocol());
-        logger.debug("this.getServerPort()==" + getServerPort());
-        logger.debug("this.getRequestURI()==" + getRequestURI());
+        if (logger.isDebugEnabled()){
+            logger.debug("super.isSecure()=={}", super.isSecure());
+            logger.debug("this.getLocalPort()=={}", getLocalPort());
+            logger.debug("this.getProtocol()=={}", getProtocol());
+            logger.debug("this.getServerPort()=={}", getServerPort());
+            logger.debug("this.getRequestURI()=={}", getRequestURI());
+        }
         return super.isSecure();
     }
 

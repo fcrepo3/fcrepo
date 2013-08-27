@@ -179,7 +179,7 @@ public class SimpleDOReader
         // first, set the translation context...
         logger.debug("Export context: {}", exportContext);
 
-        if (exportContext == null || exportContext.equals("")
+        if (exportContext == null || exportContext.isEmpty()
             || exportContext.equalsIgnoreCase("default")) {
             // null and default is set to PUBLIC translation
             transContext = DOTranslationUtility.SERIALIZE_EXPORT_PUBLIC;
@@ -194,7 +194,7 @@ public class SimpleDOReader
                                                       + exportContext + " is not valid.");
         }
         // now serialize for export in the proper XML format...
-        if (format == null || format.equals("")
+        if (format == null || format.isEmpty()
             || format.equalsIgnoreCase("default")) {
             logger.debug("Export in default format: {}", m_exportFormat);
             m_translator.serialize(m_obj,

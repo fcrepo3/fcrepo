@@ -493,7 +493,7 @@ public class FedoraObjectsResource extends BaseRestResource {
                 is = new ByteArrayInputStream(getFOXMLTemplate(pid, label, ownerID, encoding).getBytes());
             } else {
 
-                if (namespace != null && !namespace.equals("")) {
+                if (namespace != null && !namespace.isEmpty()) {
                     logger.warn("The namespace parameter is only applicable whene object " +
                                 "content is not provided, thus the namespace provided '" +
                                 namespace + "' has been ignored.");

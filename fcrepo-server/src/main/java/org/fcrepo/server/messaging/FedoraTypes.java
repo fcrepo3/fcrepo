@@ -58,7 +58,7 @@ public class FedoraTypes
             XPath xpath = DocumentHelper.createXPath(query);
             xpath.setNamespaceURIs(ns2prefix);
             String datatype = xpath.valueOf(getDocument());
-            if (datatype.equals("")) {
+            if (datatype.isEmpty()) {
                 datatype = null;
             }
             method2datatype.put(key, datatype);
@@ -75,7 +75,7 @@ public class FedoraTypes
             XPath xpath = DocumentHelper.createXPath(query);
             xpath.setNamespaceURIs(ns2prefix);
             String param = xpath.valueOf(getDocument());
-            if (param.equals("")) {
+            if (param.isEmpty()) {
                 param = null;
             }
             response2parameter.put(response, param);

@@ -96,11 +96,11 @@ public class GetNextPIDHandler
 
         try {
             resAttr = ResourceAttributes.getRepositoryResources();
-            if (numPids != null && !"".equals(numPids)) {
+            if (numPids != null) {
                 resAttr.put(Constants.OBJECT.N_PIDS.getURI(),
                             new IntegerAttribute(numPids.intValue()));
             }
-            if (pidNamespace != null && !"".equals(pidNamespace)) {
+            if (pidNamespace != null && !pidNamespace.isEmpty()) {
                 resAttr.put(Constants.OBJECT.NAMESPACE.getURI(),
                             new StringAttribute(pidNamespace));
             }

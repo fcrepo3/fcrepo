@@ -425,7 +425,7 @@ public class AutoModify {
                 }
 
                 String context = Constants.FEDORA_DEFAULT_APP_CONTEXT;
-                if (args.length == 8 && !args[7].equals("")){
+                if (args.length == 8 && !args[7].isEmpty()){
                     context = args[7];
                 }
 

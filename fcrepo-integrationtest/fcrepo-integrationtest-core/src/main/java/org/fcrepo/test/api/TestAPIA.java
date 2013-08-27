@@ -65,7 +65,7 @@ public class TestAPIA
     @Test
     public void testDescribeRepository() throws Exception {
         RepositoryInfo describe = apia.describeRepository();
-        assertTrue(!describe.getRepositoryName().equals(""));
+        assertTrue(!describe.getRepositoryName().isEmpty());
     }
 
     @Test
@@ -177,8 +177,8 @@ public class TestAPIA
     public void testGetObjectProfile() throws Exception {
         ObjectProfile profile = apia.getObjectProfile("demo:5", null);
         assertEquals("demo:5", profile.getPid());
-        assertTrue(!profile.getObjDissIndexViewURL().equals(""));
-        assertTrue(!profile.getObjItemIndexViewURL().equals(""));
+        assertTrue(!profile.getObjDissIndexViewURL().isEmpty());
+        assertTrue(!profile.getObjItemIndexViewURL().isEmpty());
     }
 
     @Test

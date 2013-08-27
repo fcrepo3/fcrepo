@@ -21,7 +21,7 @@ public class ProtocolPort {
                 && !ServerUtility.HTTPS.equals(protocol)) {
             throw new GeneralException("bad protocol in ProtocolPort constructor");
         }
-        if (port == null || "".equals(port)) {
+        if (port == null || port.isEmpty()) {
             throw new GeneralException("bad port in ProtocolPort constructor");
         }
         this.protocol = protocol;

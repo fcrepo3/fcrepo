@@ -165,14 +165,14 @@ public class AtomAPIMMessage
         setAuthor();
         setTitle();
         addMethodParameters();
-        if (pid != null || !pid.equals("")) {
+        if (pid != null || !pid.isEmpty()) {
             entry.setSummary(pid);
         }
         setReturnValue();
 
-        if (serverVersion != null && !serverVersion.equals(""))
+        if (serverVersion != null && !serverVersion.isEmpty())
             entry.addCategory(versionPredicate, serverVersion, null);
-        if (format != null && !format.equals(""))
+        if (format != null && !format.isEmpty())
             entry.addCategory(formatPredicate, format, null);
     }
 

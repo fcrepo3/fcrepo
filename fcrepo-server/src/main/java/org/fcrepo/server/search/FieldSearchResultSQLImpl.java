@@ -187,7 +187,7 @@ public class FieldSearchResultSQLImpl
 
     private String getWhereClause(String terms) throws QueryParseException {
         StringBuffer whereClause = new StringBuffer();
-        if (!terms.equals("*") && !terms.equals("")) {
+        if (!terms.equals("*") && !terms.isEmpty()) {
             whereClause.append(" WHERE");
             // formulate the where clause if the terms aren't * or ""
             int usedCount = 0;

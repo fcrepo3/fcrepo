@@ -117,7 +117,7 @@ public class BackendPolicies {
         }
         logger.debug("DEBUGGING IPREGEX0 [" + iplist + "]");
         String[] ipRegexes = new String[0];
-        if (iplist != null && !"".equals(iplist.trim())) {
+        if (iplist != null && !iplist.trim().isEmpty()) {
             ipRegexes = iplist.trim().split("\\s");
         }
         /*

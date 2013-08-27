@@ -281,7 +281,7 @@ public class PolicyFinderModule
         try {
             List<AbstractPolicy> policies = new ArrayList<AbstractPolicy>(m_repositoryPolicies);
             String pid = getPid(context);
-            if (pid != null && !"".equals(pid)) {
+            if (pid != null && !pid.isEmpty()) {
                 AbstractPolicy objectPolicyFromObject = 
                         m_policyLoader.loadObjectPolicy(m_policyParser.copy(),
                                                          pid,

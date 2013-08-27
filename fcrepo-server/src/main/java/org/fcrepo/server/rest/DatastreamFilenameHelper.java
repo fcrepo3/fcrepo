@@ -235,18 +235,18 @@ public class DatastreamFilenameHelper {
             // try and get filename and extension from specified source
             if (source.equals("rels")) {
                 filename = getFilenameFromRels(context, pid, dsid, MIMETYPE);
-                if (!filename.equals(""))
+                if (!filename.isEmpty())
                     extension = getExtension(filename, m_datastreamExtensionMappingRels, MIMETYPE);
             } else {
                 if (source.equals("id")) {
                     filename = getFilenameFromId(pid, dsid, MIMETYPE);
-                    if (!filename.equals(""))
+                    if (!filename.isEmpty())
                         extension = getExtension(filename, m_datastreamExtensionMappingId, MIMETYPE);
 
                 } else {
                     if (source.equals("label")) {
                         filename = getFilenameFromLabel(context, pid, dsid, asOfDateTime, MIMETYPE);
-                        if (!filename.equals(""))
+                        if (!filename.isEmpty())
                             extension = getExtension(filename, m_datastreamExtensionMappingLabel, MIMETYPE);
                     } else {
                         logger.warn("Unknown datastream filename source specified in datastreamFilenameSource in fedora.fcfg: " + source + ". Please specify zero or more of: rels id label");
@@ -254,17 +254,17 @@ public class DatastreamFilenameHelper {
                 }
             }
             // if we've got one by here, quit loop
-            if (!filename.equals(""))
+            if (!filename.isEmpty())
                 break;
         }
         // if not determined from above use the default
-        if (filename.equals("")) {
+        if (filename.isEmpty()) {
             filename = m_datastreamDefaultFilename;
             extension = getExtension(m_datastreamDefaultFilename, m_datastreamExtensionMappingDefault, MIMETYPE);
         }
 
         // clean up filename - remove illegal chars
-        if (extension.equals("")) {
+        if (extension.isEmpty()) {
             return ILLEGAL_FILENAME_REGEX.matcher(filename).replaceAll("");
         } else {
             return ILLEGAL_FILENAME_REGEX.matcher(filename + "." + extension).replaceAll("");
@@ -378,7 +378,7 @@ public class DatastreamFilenameHelper {
                     // look up extension from mapping
                     extension = getExtension(MIMETYPE);
                     // if not found in mappings, use the default
-                    if (extension.equals(""))
+                    if (extension.isEmpty())
                         extension = m_datastreamDefaultExtension;
                 } else {
                     // unknown mapping type

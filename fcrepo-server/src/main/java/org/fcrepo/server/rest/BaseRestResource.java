@@ -151,7 +151,7 @@ public class BaseRestResource {
                 builder.header("content-length",result.getSize());
             }
 
-            if (!result.MIMEType.equals("")){
+            if (!result.MIMEType.isEmpty()){
                 builder.type(result.MIMEType);
             }
             builder.entity(result.getStream());

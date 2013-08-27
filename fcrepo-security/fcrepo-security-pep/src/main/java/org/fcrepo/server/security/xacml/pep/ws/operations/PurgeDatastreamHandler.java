@@ -101,15 +101,15 @@ public class PurgeDatastreamHandler
 
         try {
             resAttr = ResourceAttributes.getResources(pid);
-            if (dsID != null && !"".equals(dsID)) {
+            if (dsID != null && !dsID.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.ID.getURI(),
                             new StringAttribute(dsID));
             }
-            if (startDT != null && !"".equals(startDT)) {
+            if (startDT != null && !startDT.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.CREATED_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(startDT));
             }
-            if (endDT != null && !"".equals(endDT)) {
+            if (endDT != null && !endDT.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(endDT));
             }
