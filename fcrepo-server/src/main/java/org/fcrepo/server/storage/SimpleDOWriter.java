@@ -279,7 +279,8 @@ public class SimpleDOWriter
         Datastream relsDatastream = GetDatastream(dsId, null);
         XMLDatastreamProcessor dsxml = null;
         if (relsDatastream == null) {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            // make a guess for the initial capacity to minimize copy-up
+            ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
             Map<String, String> map = new HashMap<String, String>();
             // namespaces for RELS-EXT
             if (dsId.equals("RELS-EXT")) {
@@ -317,8 +318,9 @@ public class SimpleDOWriter
             newds.DSLocation = null;
             newds.DSLocationType = null;
             newds.DSChecksumType = Datastream.getDefaultChecksumType();
-            dsxml.setXMLContent(out.toByteArray());
-            newds.DSSize = dsxml.getXMLContent().length;
+            byte[] content = out.toByteArray();
+            dsxml.setXMLContent(content);
+            newds.DSSize = content.length;
 
             ValidationUtility.validateReservedDatastream(PID.getInstance(m_obj.getPid()),
                                                          newds.DatastreamID,
@@ -328,7 +330,8 @@ public class SimpleDOWriter
             dsxml = new XMLDatastreamProcessor(relsDatastream);
             FilteredTripleIterator newIter = null;
             try {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                // make a guess as to initial capacity to minimize copy-up
+                ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
                 TripleIterator iter =
                         TripleIteratorFactory.defaultInstance().fromStream(relsDatastream.getContentStream(),
                                                   RDFFormat.RDF_XML);
@@ -445,8 +448,9 @@ public class SimpleDOWriter
                     newds.DSLocation = null;
                     newds.DSLocationType = null;
                     newds.DSChecksumType = relsDatastream.DSChecksumType;
-                    newdsxml.setXMLContent(out.toByteArray());
-                    newds.DSSize = newdsxml.getXMLContent().length;
+                    byte [] content = out.toByteArray();
+                    newdsxml.setXMLContent(content);
+                    newds.DSSize = content.length;
 
                     ValidationUtility.validateReservedDatastream(PID.getInstance(m_obj.getPid()),
                                                                  newds.DatastreamID,
