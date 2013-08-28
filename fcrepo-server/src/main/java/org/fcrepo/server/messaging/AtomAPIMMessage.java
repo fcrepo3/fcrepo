@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -32,6 +33,7 @@ import org.fcrepo.server.errors.MessagingException;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.storage.types.TupleArrayTripleIterator;
 import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trippi.RDFFormat;
@@ -264,13 +266,13 @@ public class AtomAPIMMessage
             TupleArrayTripleIterator iter =
                     new TupleArrayTripleIterator(new ArrayList<RelationshipTuple>(Arrays
                             .asList(tuples)));
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ReadableByteArrayOutputStream os = new ReadableByteArrayOutputStream();
             try {
                 iter.toStream(os, RDFFormat.NOTATION_3, false);
             } catch (TrippiException e) {
                 e.printStackTrace();
             }
-            term = new String(os.toByteArray());
+            term = os.getString(Charset.forName("UTF-8"));
         } else if (javaType != null && javaType.equals("java.lang.String")) {
             term = (String) obj;
             term = term.replaceAll("\"", "'");

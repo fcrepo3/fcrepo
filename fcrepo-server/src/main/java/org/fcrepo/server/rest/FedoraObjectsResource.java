@@ -4,11 +4,15 @@
  */
 package org.fcrepo.server.rest;
 
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayWriter;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Reader;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +44,8 @@ import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -108,15 +114,18 @@ public class FedoraObjectsResource extends BaseRestResource {
                 }
             }
 
-            String output;
+            ReadableCharArrayWriter writer = new ReadableCharArrayWriter(2048);
             if (TEXT_HTML.isCompatible(mime)) {
-                output = getSerializer(context).searchResultToHtml(query, terms, SEARCHABLE_FIELDS, wantedFields, maxResults, result);
+                
+                getSerializer(context).searchResultToHtml(
+                        query, terms, SEARCHABLE_FIELDS, wantedFields, maxResults, result, writer);
+                writer.close();
             } else {
-                output = getSerializer(context).searchResultToXml(result);
-
+                getSerializer(context).searchResultToXml(result, writer);
+                writer.close();
             }
 
-            return Response.ok(output, mime).build();
+            return Response.ok(writer.toReader(), mime).build();
         } catch (Exception ex) {
             return handleException(ex, flash);
         }
@@ -162,15 +171,18 @@ public class FedoraObjectsResource extends BaseRestResource {
             MediaType mime = RestHelper.getContentType(format);
 
             if (pidList.length > 0) {
-                String output = getSerializer(context).pidsToXml(pidList);
+                ReadableCharArrayWriter xml = new ReadableCharArrayWriter(512);
+                DefaultSerializer.pidsToXml(pidList, xml);
+                xml.close();
 
                 if (TEXT_HTML.isCompatible(mime)) {
-                    CharArrayWriter writer = new CharArrayWriter();
-                    transform(output, "management/getNextPIDInfo.xslt", writer);
-                    output = writer.toString();
+                    Reader reader = xml.toReader();
+                    xml = new ReadableCharArrayWriter(512);
+                    transform(reader, "management/getNextPIDInfo.xslt", xml);
+                    xml.close();
                 }
 
-                return Response.ok(output, mime).build();
+                return Response.ok(xml.toReader(), mime).build();
             } else {
                 return Response.noContent().build();
             }
@@ -210,8 +222,10 @@ public class FedoraObjectsResource extends BaseRestResource {
 
             Validation validation = m_management.validate(context, pid, asOfDateTime);
 
-            String xml = getSerializer(context).objectValidationToXml(validation);
-            return Response.ok(xml, mediaType).build();
+            ReadableCharArrayWriter xml = new ReadableCharArrayWriter(1024);
+            DefaultSerializer.objectValidationToXml(validation, xml);
+            xml.close();
+            return Response.ok(xml.toReader(), mediaType).build();
         } catch (Exception ex) {
             return handleException(ex, flash);
         }
@@ -282,16 +296,19 @@ public class FedoraObjectsResource extends BaseRestResource {
             Context context = getContext();
             String[] objectHistory = m_access.getObjectHistory(context, pid);
             getSerializer(context);
-            String xml = DefaultSerializer.objectHistoryToXml(objectHistory, pid);
+            ReadableCharArrayWriter xml = new ReadableCharArrayWriter(1024);
+            DefaultSerializer.objectHistoryToXml(objectHistory, pid, xml);
+            xml.close();
             MediaType mime = RestHelper.getContentType(format);
 
             if (TEXT_HTML.isCompatible(mime)) {
-                CharArrayWriter writer = new CharArrayWriter();
-                transform(xml, "access/viewObjectHistory.xslt", writer);
-                xml = writer.toString();
+                Reader reader = xml.toReader();
+                xml = new ReadableCharArrayWriter(1024);
+                transform(reader, "access/viewObjectHistory.xslt", xml);
+                xml.close();
             }
 
-            return Response.ok(xml, mime).build();
+            return Response.ok(xml.toReader(), mime).build();
         } catch (Exception ex) {
             return handleException(ex, flash);
         }
@@ -350,17 +367,20 @@ public class FedoraObjectsResource extends BaseRestResource {
             Date asOfDateTime = DateUtility.parseDateOrNull(dateTime);
             Context context = getContext();
             ObjectProfile objProfile = m_access.getObjectProfile(context, pid, asOfDateTime);
-            String xml = getSerializer(context).objectProfileToXML(objProfile, asOfDateTime);
+            ReadableCharArrayWriter out = new ReadableCharArrayWriter(1024);
+            DefaultSerializer.objectProfileToXML(objProfile, asOfDateTime, out);
+            out.close();
 
             MediaType mime = RestHelper.getContentType(format);
 
             if (TEXT_HTML.isCompatible(mime)) {
-                CharArrayWriter writer = new CharArrayWriter();
-                transform(xml, "access/viewObjectProfile.xslt", writer);
-                xml = writer.toString();
+                Reader reader = out.toReader();
+                out = new ReadableCharArrayWriter(1024);
+                transform(reader, "access/viewObjectProfile.xslt", out);
+                out.close();
             }
 
-            return Response.ok(xml, mime).build();
+            return Response.ok(out.toReader(), mime).build();
         } catch (Exception ex) {
             return handleException(ex, flash);
         }
@@ -490,7 +510,13 @@ public class FedoraObjectsResource extends BaseRestResource {
                 if (ownerID == null || ownerID.trim().isEmpty()) {
                     ownerID = context.getSubjectValue(Constants.SUBJECT.LOGIN_ID.uri);
                 }
-                is = new ByteArrayInputStream(getFOXMLTemplate(pid, label, ownerID, encoding).getBytes());
+                ReadableByteArrayOutputStream bytes =
+                        new ReadableByteArrayOutputStream(1024);
+                PrintWriter xml = new PrintWriter(
+                            new OutputStreamWriter(bytes, Charset.forName(encoding)));
+                getFOXMLTemplate(pid, label, ownerID, encoding, xml);
+                xml.close();
+                is = bytes.toInputStream();
             } else {
 
                 if (namespace != null && !namespace.isEmpty()) {
@@ -558,12 +584,13 @@ public class FedoraObjectsResource extends BaseRestResource {
         }
     }
 
-    private static String getFOXMLTemplate(
+    private static void getFOXMLTemplate(
             String pid,
             String label,
             String ownerId,
-            String encoding) {
-        StringBuilder xml = new StringBuilder(1024);
+            String encoding,
+            Appendable xml) throws IOException {
+        
         xml.append("<?xml version=\"1.0\" encoding=\"");
         xml.append(encoding);
         xml.append("\"?>\n"
@@ -588,7 +615,5 @@ public class FedoraObjectsResource extends BaseRestResource {
                 + "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#ownerId\" VALUE=\"");
         xml.append(ownerId);
         xml.append("\"/>\n  </foxml:objectProperties>\n</foxml:digitalObject>");
-
-        return xml.toString();
     }
 }

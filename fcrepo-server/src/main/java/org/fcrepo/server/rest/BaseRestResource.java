@@ -5,6 +5,7 @@
 package org.fcrepo.server.rest;
 
 import java.io.File;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
 import java.net.URI;
@@ -119,6 +120,13 @@ public class BaseRestResource {
     throws TransformerFactoryConfigurationError,
            TransformerConfigurationException,
            TransformerException {
+        transform(new StringReader(xml), xslt, out);
+    }
+    
+    protected void transform(Reader xml, String xslt, Writer out)
+                throws TransformerFactoryConfigurationError,
+                       TransformerConfigurationException,
+                       TransformerException {
         File xslFile = new File(m_server.getHomeDir(), xslt);
 
         // XmlTransformUtility maintains a cache of Templates
@@ -127,7 +135,7 @@ public class BaseRestResource {
         Transformer transformer = template.newTransformer();
         String appContext = getContext().getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME);
         transformer.setParameter("fedora", appContext);
-        transformer.transform(new StreamSource(new StringReader(xml)), new StreamResult(out));
+        transformer.transform(new StreamSource(xml), new StreamResult(out));
     }
 
     protected Response buildResponse(MIMETypedStream result) throws Exception {

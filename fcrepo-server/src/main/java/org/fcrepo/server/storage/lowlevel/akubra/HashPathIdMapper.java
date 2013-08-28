@@ -181,7 +181,7 @@ public class HashPathIdMapper
                 }
             } else {
                 try {
-                    out.append(URLEncoder.encode("" + c, "UTF-8"));
+                    out.append(URLEncoder.encode(Character.toString(c), "UTF-8"));
                 } catch (UnsupportedEncodingException wontHappen) {
                     throw new RuntimeException(wontHappen);
                 }

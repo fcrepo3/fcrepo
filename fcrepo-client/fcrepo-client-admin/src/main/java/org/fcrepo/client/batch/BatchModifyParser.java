@@ -231,12 +231,13 @@ public class BatchModifyParser
                                     String qName,
                                     Attributes a,
                                     StringBuffer out) {
-        out.append("<" + qName);
+        out.append('<').append(qName);
         for (int i = 0; i < a.getLength(); i++) {
-            out.append(" " + a.getQName(i) + "=\""
-                    + StreamUtility.enc(a.getValue(i)) + "\"");
+            out.append(' ').append(a.getQName(i)).append("=\"");
+            StreamUtility.enc(a.getValue(i), out);
+            out.append('"');
         }
-        out.append(">");
+        out.append('>');
     }
 
     @Override

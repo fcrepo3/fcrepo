@@ -4,7 +4,7 @@
  */
 package org.fcrepo.server.rest;
 
-import java.io.CharArrayWriter;
+import java.io.Reader;
 import java.util.Date;
 
 import javax.ws.rs.DefaultValue;
@@ -23,6 +23,7 @@ import org.fcrepo.server.Server;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.springframework.stereotype.Component;
 
 
@@ -127,17 +128,21 @@ public class MethodResource extends BaseRestResource {
             Date asOfDateTime = DateUtility.parseDateOrNull(dTime);
             Context context = getContext();
             ObjectMethodsDef[] methodDefs = m_access.listMethods(context, pid, asOfDateTime);
-            String xml = getSerializer(context).objectMethodsToXml(methodDefs, pid, sDef, asOfDateTime);
+            ReadableCharArrayWriter out = new ReadableCharArrayWriter(1024);
+            getSerializer(context)
+                    .objectMethodsToXml(methodDefs, pid, sDef, asOfDateTime, out);
 
+            out.close();
             MediaType mime = RestHelper.getContentType(format);
 
             if (TEXT_HTML.isCompatible(mime)) {
-                CharArrayWriter writer = new CharArrayWriter();
-                transform(xml, "access/listMethods.xslt", writer);
-                xml = writer.toString();
+                Reader reader = out.toReader();
+                out = new ReadableCharArrayWriter(1024);
+                transform(reader, "access/listMethods.xslt", out);
+                out.close();
             }
 
-            return Response.ok(xml, mime).build();
+            return Response.ok(out.toReader(), mime).build();
         } catch (Exception e) {
             return handleException(e, flash);
         }

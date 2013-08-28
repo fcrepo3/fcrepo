@@ -136,7 +136,7 @@ public class FedoraAPIMMTOMImpl
             InputStream in =
                     m_management.getObjectXML(ReadOnlyContext
                             .getSoapContext(ctx), pid, "UTF-8");
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ByteArrayOutputStream out = new ByteArrayOutputStream(2048);
             pipeStream(in, out);
             return new DataHandler(new ByteArrayDataSource(out.toByteArray(),
                                                            "text/xml"));
@@ -163,7 +163,7 @@ public class FedoraAPIMMTOMImpl
                                         format,
                                         context,
                                         "UTF-8");
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ByteArrayOutputStream out = new ByteArrayOutputStream(2048);
             pipeStream(in, out);
             return new DataHandler(new ByteArrayDataSource(out.toByteArray(),
                                                            "text/xml"));

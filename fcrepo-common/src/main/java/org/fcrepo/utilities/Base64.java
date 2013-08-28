@@ -7,8 +7,9 @@ package org.fcrepo.utilities;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
+import org.apache.commons.codec.binary.Base64OutputStream;
 import org.fcrepo.common.FaultException;
 
 
@@ -17,6 +18,7 @@ import org.fcrepo.common.FaultException;
  */
 public abstract class Base64 {
 
+    private static Charset UTF8 = Charset.forName("UTF-8");
     /**
      * Encodes bytes to base 64, returning bytes.
      *
@@ -38,13 +40,15 @@ public abstract class Base64 {
      */
     public static byte[] encode(InputStream in) {
         try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            Base64OutputStream out = new Base64OutputStream(bytes);
             byte[] buf = new byte[4096];
             int len;
             while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
             }
-            return encode(out.toByteArray());
+            out.flush();
+            return bytes.toByteArray();
         } catch (IOException e) {
             return null;
         } finally {
@@ -115,21 +119,13 @@ public abstract class Base64 {
     }
 
     private static String getString(byte[] bytes) {
-        try {
-            if (bytes == null) return null;
-            return new String(bytes, "UTF-8");
-        } catch (UnsupportedEncodingException wontHappen) {
-            throw new FaultException(wontHappen);
-        }
+        if (bytes == null) return null;
+        return new String(bytes, UTF8);
     }
 
     private static byte[] getBytes(String string) {
-        try {
-            if (string == null) return null;
-            return string.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException wontHappen) {
-            throw new FaultException(wontHappen);
-        }
+        if (string == null) return null;
+        return string.getBytes(UTF8);
     }
 
 }

@@ -5,6 +5,7 @@
 
 package org.fcrepo.server.storage;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,7 +14,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -73,6 +77,7 @@ import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.DOObjectValidator;
 import org.fcrepo.server.validation.DOValidator;
 import org.fcrepo.server.validation.ValidationUtility;
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.tidy.Out;
@@ -1054,18 +1059,16 @@ public class DefaultDOManager extends Module implements DOManager {
             dcxml = new XMLDatastreamProcessor(dc);
             // note: context may be required to get through authz as content
             // could be filesystem file (or URL)
-            dcf =
-                    new DCFields(new ByteArrayInputStream(dcxml
-                            .getXMLContent(ctx)));
+            dcf = new DCFields(dc.getContentStream(ctx));
         }
         // set the value of the dc datastream according to what's in the
         // DCFields object
         // ensure one of the dc:identifiers is the pid
-        try {
-            dcxml.setXMLContent(dcf.getAsXML(obj.getPid()).getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException uee) {
-            // safely ignore... we know UTF-8 works
-        }
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream(512);
+        PrintWriter out = new PrintWriter(new OutputStreamWriter(bytes, Charset.forName("UTF-8")));
+        dcf.getAsXML(obj.getPid(), out);
+        out.close();
+        dcxml.setXMLContent(bytes.toByteArray());
     }
 
     /**
@@ -1274,8 +1277,9 @@ public class DefaultDOManager extends Module implements DOManager {
 
                 // block-scoping the ByteArrayOutputStream to ensure toArray
                 // is only called once
+                // initial capacity is just a guess to prevent copying up from 32 bytes
                 {
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    ReadableByteArrayOutputStream out = new ReadableByteArrayOutputStream(4096);
 
                     // FINAL XML SERIALIZATION:
                     // serialize the object in its final form for persistent storage
@@ -1286,8 +1290,7 @@ public class DefaultDOManager extends Module implements DOManager {
                             DOTranslationUtility.SERIALIZE_STORAGE_INTERNAL);
 
                     
-                    serialized =
-                            new ByteArrayInputStream(out.toByteArray());
+                    serialized = out.toInputStream();
                 }
 
                 // FINAL VALIDATION:
