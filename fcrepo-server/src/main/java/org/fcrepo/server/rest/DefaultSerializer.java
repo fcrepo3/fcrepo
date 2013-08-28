@@ -6,6 +6,7 @@ package org.fcrepo.server.rest;
 
 import static org.fcrepo.server.utilities.StreamUtility.enc;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
@@ -52,8 +53,18 @@ public class DefaultSerializer {
         }
     }
 
-    String pidsToXml(String[] pidList) {
+    static String pidsToXml(String[] pidList) {
         StringBuilder xml = new StringBuilder(512);
+        try {
+            pidsToXml(pidList, xml);
+        } catch (IOException wonthappen) {
+            throw new RuntimeException(wonthappen);
+        }
+        return xml.toString();
+    }
+    
+    static void pidsToXml(String[] pidList, Appendable xml)
+            throws IOException {
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<pidList  xmlns=\"")
         .append(Constants.PID_LIST1_0.namespace.uri)
@@ -71,14 +82,24 @@ public class DefaultSerializer {
             .append("</pid>\n");
         }
         xml.append("</pidList>\n");
-        return xml.toString();
     }
 
     public static String objectProfileToXML(
             ObjectProfile objProfile,
             Date versDateTime)  {
         StringBuilder buffer = new StringBuilder(1024);
+        try {
+            objectProfileToXML(objProfile, versDateTime, buffer);
+        } catch (IOException wonthappen) {
+            throw new RuntimeException(wonthappen);
+        }
+        return buffer.toString();
+    }
 
+    public static void objectProfileToXML(
+                ObjectProfile objProfile,
+                Date versDateTime,
+                Appendable buffer) throws IOException  {
         String pid = objProfile.PID;
         String dateString = "";
         if (versDateTime != null) {
@@ -128,12 +149,11 @@ public class DefaultSerializer {
         buffer.append("</objItemIndexViewURL><objState>");
         enc(objProfile.objectState, buffer);
         buffer.append("</objState></objectProfile>");
-
-        return buffer.toString();
     }
 
     private void datastreamFieldSerialization(Datastream dsProfile, String prefix,
-            boolean validateChecksum, StringBuilder buffer) {
+            boolean validateChecksum, Appendable buffer)
+            throws IOException {
         appendXML(null, prefix, "dsLabel", dsProfile.DSLabel, buffer, true);
         appendXML(null, prefix, "dsVersionID", dsProfile.DSVersionID, buffer, true);
 
@@ -164,7 +184,14 @@ public class DefaultSerializer {
     String datastreamProfileToXML(String pid, String dsID, Datastream dsProfile, Date versDateTime,
                                   boolean validateChecksum) {
         StringBuilder buffer = new StringBuilder(512);
+        try {
+            datastreamProfileToXML(pid, dsID, dsProfile, versDateTime, validateChecksum, buffer);
+        } catch (IOException ioe) {}
+        return buffer.toString();
+    }
 
+    String datastreamProfileToXML(String pid, String dsID, Datastream dsProfile, Date versDateTime,
+            boolean validateChecksum, Appendable buffer) throws IOException {
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + "<datastreamProfile  xmlns=\"")
         .append(Constants.MANAGEMENT.uri)
@@ -191,6 +218,15 @@ public class DefaultSerializer {
     String datastreamProfilesToXML(String pid, Datastream[] dsProfiles, Date versDateTime,
                                   boolean validateChecksum){
         StringBuilder builder = new StringBuilder(2048);
+        try {
+            datastreamProfilesToXML(pid, dsProfiles, versDateTime, validateChecksum, builder);
+        } catch (IOException ioe) {}
+        return builder.toString();
+    }
+    
+    void datastreamProfilesToXML(String pid, Datastream[] dsProfiles, Date versDateTime,
+            boolean validateChecksum, Appendable builder) throws IOException {
+    
         builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             + "<objectDatastreams xmlns=\"")
         .append(Constants.ACCESS.uri)
@@ -222,13 +258,24 @@ public class DefaultSerializer {
             builder.append("</datastreamProfile>");
         }
         builder.append("</objectDatastreams>");
-        return builder.toString();
     }
 
     static String objectHistoryToXml(
             String[] objectHistory,
             String pid)  {
         StringBuilder buffer = new StringBuilder(1024);
+        try {
+            objectHistoryToXml(objectHistory, pid, buffer);
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+        return buffer.toString();
+    }
+    
+    static void objectHistoryToXml(
+            String[] objectHistory,
+            String pid,
+            Appendable buffer) throws IOException {
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><fedoraObjectHistory  xmlns=\"")
         .append(Constants.OBJ_HISTORY1_0.namespace.uri)
         .append("\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
@@ -247,11 +294,19 @@ public class DefaultSerializer {
             .append("</objectChangeDate>");
         }
         buffer.append("</fedoraObjectHistory>");
-        return buffer.toString();
     }
 
     String datastreamHistoryToXml(String pid, String dsID, Datastream[] history) {
         StringBuilder buffer = new StringBuilder(1024);
+        try {
+            datastreamHistoryToXml(pid, dsID, history, buffer);
+        } catch (IOException ioe) {}
+        return buffer.toString();
+    }
+    
+    
+    String datastreamHistoryToXml(String pid, String dsID,
+            Datastream[] history, Appendable buffer) throws IOException {
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + "<datastreamHistory  xmlns=\"")
         .append(Constants.MANAGEMENT.uri)
@@ -285,8 +340,21 @@ public class DefaultSerializer {
             String sDef,
             Date versDateTime) {
         StringBuilder urlBuf = new StringBuilder(128);
-        baseUrl(urlBuf);
+        try {
+            baseUrl(urlBuf);
+        } catch (IOException ioe) {}
         return objectMethodsToXml(urlBuf.toString(), methodDefs, pid, sDef, versDateTime);
+    }
+
+    public void objectMethodsToXml(
+            ObjectMethodsDef[] methodDefs,
+            String pid,
+            String sDef,
+            Date versDateTime,
+            Appendable out) throws IOException {
+        StringBuilder urlBuf = new StringBuilder(128);
+        baseUrl(urlBuf);
+        objectMethodsToXml(urlBuf.toString(), methodDefs, pid, sDef, versDateTime, out);
     }
 
     public static String objectMethodsToXml(
@@ -296,6 +364,22 @@ public class DefaultSerializer {
             String sDef,
             Date versDateTime) {
         StringBuilder buffer = new StringBuilder(1024);
+        try {
+            objectMethodsToXml(baseUrl, methodDefs, pid, sDef, versDateTime, buffer);
+        } catch (IOException wonthappen) {
+            throw new RuntimeException(wonthappen);
+        }
+        return buffer.toString();
+    }
+    
+    public static void objectMethodsToXml(
+                String baseUrl,
+                ObjectMethodsDef[] methodDefs,
+                String pid,
+                String sDef,
+                Date versDateTime,
+                Appendable buffer)
+            throws IOException {
 
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + "<objectMethods xmlns=\"")
@@ -347,7 +431,7 @@ public class DefaultSerializer {
                     buffer.append("\" parmDefaultValue=\"");
                     enc(methodParms[j].parmDefaultValue, buffer);
                     buffer.append("\" parmRequired=\"");
-                    buffer.append(methodParms[j].parmRequired);
+                    buffer.append(Boolean.toString(methodParms[j].parmRequired));
                     buffer.append("\" parmLabel=\"");
                     enc(methodParms[j].parmLabel, buffer);
                     buffer.append("\" >");
@@ -371,8 +455,6 @@ public class DefaultSerializer {
             buffer.append("</sDef>");
         }
         buffer.append("</objectMethods>");
-
-        return buffer.toString();
     }
 
     String searchResultToHtml(
@@ -383,6 +465,21 @@ public class DefaultSerializer {
             int maxResults,
             FieldSearchResult result) {
         StringBuilder html = new StringBuilder(2048);
+        try {
+            searchResultToHtml(query, terms, searchableFields, wantedFields, maxResults, result, html);
+        } catch (IOException ioe) {}
+        return html.toString();
+    }
+    
+    
+    void searchResultToHtml(
+            String query,
+            String terms,
+            String[] searchableFields,
+            String[] wantedFields,
+            int maxResults,
+            FieldSearchResult result,
+            Appendable html) throws IOException {
         HashSet<String> fieldHash = new HashSet<String>();
 
         if (wantedFields != null) {
@@ -559,13 +656,22 @@ public class DefaultSerializer {
 
         html.append("</center></body></html>");
 
-        return html.toString();
     }
 
     String searchResultToXml(
             FieldSearchResult result) {
-
         StringBuilder xmlBuf = new StringBuilder(2048);
+        try {
+            searchResultToXml(result, xmlBuf);
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+        return xmlBuf.toString();
+    }
+    
+    void searchResultToXml(
+            FieldSearchResult result,
+            Appendable xmlBuf) throws IOException {
         xmlBuf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<result xmlns=\"http://www.fedora.info/definitions/1/0/types/\" "
                 + "xmlns:types=\"http://www.fedora.info/definitions/1/0/types/\" "
@@ -628,11 +734,9 @@ public class DefaultSerializer {
             }
         }
         xmlBuf.append("  </resultList>\n</result>\n");
-
-        return xmlBuf.toString();
     }
     
-    private void baseUrl(StringBuilder baseUrlBuf) {
+    private void baseUrl(Appendable baseUrlBuf) throws IOException {
         enc(fedoraServerProtocol, baseUrlBuf);
         baseUrlBuf.append("://");
         enc(fedoraServerHost, baseUrlBuf);
@@ -642,7 +746,7 @@ public class DefaultSerializer {
     }
 
     static private void join(
-            List<DCField> l, StringBuilder ret) {
+            List<DCField> l, Appendable ret) throws IOException{
         for (int i = 0; i < l.size(); i++) {
             if (i > 0) {
                 ret.append(", ");
@@ -651,16 +755,20 @@ public class DefaultSerializer {
         }
     }
 
-    private static void appendXML(String name, String value, StringBuilder out) {
+    private static void appendXML(String name, String value, Appendable out)
+            throws IOException {
         appendXML("      ", null, name, value, out);
     }
 
-    private static void appendXML(String indent, String prefix, String name, String value, StringBuilder out) {
+    private static void appendXML(String indent, String prefix, String name,
+            String value, Appendable out)
+            throws IOException {
         appendXML(indent, prefix, name, value, out, false);
     }
     
     private static void appendXML(String indent, String prefix, String name,
-            String value, StringBuilder out, boolean force) {
+            String value, Appendable out, boolean force)
+            throws IOException {
         if (value != null || force) {
             if (indent != null) out.append(indent);
             out.append('<');
@@ -681,7 +789,8 @@ public class DefaultSerializer {
         }
     }
 
-    private static void appendXML(String name, List<DCField> values, StringBuilder out) {
+    private static void appendXML(String name, List<DCField> values, Appendable out)
+            throws IOException {
         for (DCField value: values) {
             appendXML(name, value.getValue(), out);
         }
@@ -690,7 +799,8 @@ public class DefaultSerializer {
     private static void appendXML(
             String name,
             Date dt,
-            StringBuilder out) {
+            Appendable out)
+            throws IOException {
         if (dt != null) {
             appendXML(name, DateUtility.convertDateToString(dt), out);
         }
@@ -701,6 +811,19 @@ public class DefaultSerializer {
             Date asOfDateTime,
             DatastreamDef[] dsDefs) {
         StringBuilder xml = new StringBuilder(1024);
+        try {
+            dataStreamsToXML(pid, asOfDateTime, dsDefs, xml);
+        } catch (IOException wonthappen) {
+            throw new RuntimeException(wonthappen);
+        }
+        return xml.toString();
+    }
+    
+    public void dataStreamsToXML(
+            String pid,
+            Date asOfDateTime,
+            DatastreamDef[] dsDefs,
+            Appendable xml) throws IOException {
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + "<objectDatastreams  xmlns=\"")
         .append(Constants.OBJ_DATASTREAMS1_0.namespace.uri)
@@ -733,12 +856,23 @@ public class DefaultSerializer {
             xml.append("\" />");
         }
         xml.append("</objectDatastreams>");
-
-        return xml.toString();
     }
 
-    public String objectValidationToXml(Validation validation) {
+    public static String objectValidationToXml(Validation validation) {
         StringBuilder buffer = new StringBuilder(1024);
+        try {
+            objectValidationToXml(validation, buffer);
+        } catch (IOException wonthappen) {
+            // StringBuilders are fine
+            throw new RuntimeException(wonthappen);
+        }
+        return buffer.toString();
+    }
+    
+    public static String objectValidationToXml(
+            Validation validation, Appendable buffer)
+            throws IOException {
+
         String pid = validation.getPid();
         Date date = validation.getAsOfDateTime();
         String dateString = null;
@@ -756,7 +890,7 @@ public class DefaultSerializer {
                 + " " + Constants.OBJ_VALIDATION1_0.xsdLocation + "\" pid=\"");
         enc(pid, buffer);
         buffer.append("\"  valid=\"")
-        .append(valid)
+        .append(Boolean.toString(valid))
         .append("\">\n");
         if (date != null) {
         	buffer.append("  <management:asOfDateTime>" + dateString + "</management:asOfDateTime>\n");

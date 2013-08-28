@@ -741,7 +741,7 @@ public class FOXMLDODeserializer
                                     String qName,
                                     Attributes a,
                                     StringBuilder out) {
-        out.append("<").append(qName);
+        out.append('<').append(qName);
         // add the current qName's namespace to m_localPrefixMap
         // and m_prefixList if it's not already in m_localPrefixMap
         // This ensures that all namespaces used in inline XML are declared within,
@@ -878,7 +878,9 @@ public class FOXMLDODeserializer
         ByteBuffer bytes = Charset.forName(m_characterEncoding).
                 encode(CharBuffer.wrap(m_dsXMLBuffer));
         ds.xmlContent = new byte[bytes.limit()];
-        bytes.get(ds.xmlContent);
+        System.arraycopy(
+                bytes.array(), bytes.arrayOffset(),
+                ds.xmlContent, 0, bytes.limit());
         if (logger.isDebugEnabled()) {
             StringBuilder rels = new StringBuilder();
             if (m_dsId.equals("WSDL")) {

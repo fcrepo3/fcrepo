@@ -16,8 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 import org.fcrepo.server.search.Condition;
 import org.fcrepo.server.types.gen.ArrayOfString;
 import org.fcrepo.utilities.DateUtility;
@@ -293,21 +295,13 @@ public abstract class TypeUtility {
             }
             genMIMETypedStream.setHeader(head);
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
-            InputStream is = mimeTypedStream.getStream();
-            int byteStream = 0;
-            try {
-                byte[] buffer = new byte[255];
-                while ((byteStream = is.read(buffer)) != -1) {
-                    baos.write(buffer, 0, byteStream);
-                }
+            try{
+                genMIMETypedStream.setStream(
+                        StreamUtility.getBytes(mimeTypedStream.getStream()));
             } catch (IOException ioe) {
                 logger.error("Error converting types", ioe);
             }
-            byte[] bytes = baos.toByteArray();
-            genMIMETypedStream.setStream(bytes);
-            mimeTypedStream.close();
-            mimeTypedStream.setStream(new ByteArrayInputStream(bytes));
+                    
             return genMIMETypedStream;
 
         } else {
@@ -334,23 +328,9 @@ public abstract class TypeUtility {
             }
             genMIMETypedStream.setHeader(head);
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
-            InputStream is = mimeTypedStream.getStream();
-            int byteStream = 0;
-            try {
-                byte[] buffer = new byte[255];
-                while ((byteStream = is.read(buffer)) != -1) {
-                    baos.write(buffer, 0, byteStream);
-                }
-            } catch (IOException ioe) {
-                logger.error("Error converting types", ioe);
-            }
+            InputStreamDataSource ds = new InputStreamDataSource(mimeTypedStream.getStream(), mimeTypedStream.MIMEType);
             genMIMETypedStream
-                    .setStream(new DataHandler(new ByteArrayDataSource(baos
-                            .toByteArray(), "text/html")));
-            mimeTypedStream.close();
-            mimeTypedStream.setStream(new ByteArrayInputStream(baos
-                    .toByteArray()));
+                    .setStream(new DataHandler(ds));
             return genMIMETypedStream;
 
         } else {

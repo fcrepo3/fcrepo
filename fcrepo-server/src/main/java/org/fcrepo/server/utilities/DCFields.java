@@ -227,15 +227,29 @@ public class DCFields
      * the oai_dc schema.... but without the xml declaration.
      */
     public String getAsXML() {
-        return getAsXML(null);
+        return getAsXML((String)null);
     }
     
+    public void getAsXML(Appendable out) throws IOException {
+        getAsXML(null, out);
+    }
+
     /**
      * Ensure the dc:identifiers include the pid of the target object
             * @param targetPid
             * @return
      */
     public String getAsXML(String targetPid) {
+        StringBuilder out = new StringBuilder(512);
+        try {
+            getAsXML(targetPid, out);
+        } catch (IOException wonthappen) {
+            throw new RuntimeException(wonthappen);
+        }
+        return out.toString();
+    }
+    
+    public void getAsXML(String targetPid, Appendable out) throws IOException {
         boolean addPid = (targetPid != null);
         if (addPid) {
         for (DCField dcField : identifiers()) {
@@ -244,7 +258,6 @@ public class DCFields
             }
         }
         }
-        StringBuffer out = new StringBuffer();
         out.append("<" + OAI_DC.prefix + ":dc" + " xmlns:" + OAI_DC.prefix
                 + "=\"" + OAI_DC.uri + "\"" + "\nxmlns:" + DC.prefix + "=\""
                 + DC.uri + "\"\nxmlns:xsi=\"" + XSI.uri
@@ -269,14 +282,16 @@ public class DCFields
         appendXML(coverages(), "coverage", out);
         appendXML(rights(), "rights", out);
         out.append("</oai_dc:dc>\n");
-        return out.toString();    }
+    }
 
-    private void appendXML(List<DCField> values, String name, StringBuffer out) {
+    private void appendXML(List<DCField> values, String name, Appendable out)
+        throws IOException {
         for (DCField value : values) {
             appendXML(value, name, out);
         }
     }
-    private void appendXML(DCField value, String name, StringBuffer out) {
+    private void appendXML(DCField value, String name, Appendable out)
+        throws IOException {
         out.append("  <dc:").append(name);
         if (value.getLang() != null) {
             out.append(" xml:lang=\"").append(value.getLang()).append('"');

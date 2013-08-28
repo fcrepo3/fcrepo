@@ -9,6 +9,7 @@ import org.fcrepo.common.PID;
 import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.translation.FOXML1_1DODeserializer;
 import org.fcrepo.server.storage.translation.FOXML1_1DOSerializer;
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.jrdf.graph.URIReference;
 
 import java.io.ByteArrayInputStream;
@@ -169,12 +170,12 @@ public abstract class ObjectBuilder {
         String charEncoding = "UTF-8";
         int transContext = DOTranslationUtility.SERIALIZE_STORAGE_INTERNAL;
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ReadableByteArrayOutputStream out = new ReadableByteArrayOutputStream(4096);
         FOXML1_1DOSerializer ser = new FOXML1_1DOSerializer();
         ser.serialize(obj, out, charEncoding, transContext);
 
         FOXML1_1DODeserializer deser = new FOXML1_1DODeserializer();
-        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+        ByteArrayInputStream in = out.toInputStream();
         DigitalObject objCopy = new BasicDigitalObject();
         deser.deserialize(in, objCopy, charEncoding, transContext);
 

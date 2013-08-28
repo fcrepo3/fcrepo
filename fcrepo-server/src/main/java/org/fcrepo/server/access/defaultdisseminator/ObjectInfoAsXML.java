@@ -5,6 +5,7 @@
 package org.fcrepo.server.access.defaultdisseminator;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.Date;
@@ -16,6 +17,7 @@ import org.fcrepo.server.Server;
 import org.fcrepo.server.access.ObjectProfile;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.rest.DefaultSerializer;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.types.Datastream;
@@ -45,19 +47,39 @@ public class ObjectInfoAsXML
     public static String getObjectProfile(String reposBaseURL,
                                    ObjectProfile objProfile,
                                    Date versDateTime) throws ServerException {
+        StringBuilder buffer = new StringBuilder(1024);
+        getObjectProfile(reposBaseURL, objProfile, versDateTime, buffer);
+        return buffer.toString();
+    }
 
+    public static void getObjectProfile(String reposBaseURL,
+                ObjectProfile objProfile,
+                Date versDateTime, Appendable out) throws ServerException {
         // use REST serializer
-        return DefaultSerializer.objectProfileToXML(objProfile, versDateTime);
+        try {
+            DefaultSerializer.objectProfileToXML(objProfile, versDateTime, out);
+        } catch (IOException e) {
+            throw new StreamIOException(e.getMessage(), e);
+        }
     }
 
     public static String getItemIndex(String reposBaseURL,
                                String applicationContext,
                                DOReader reader,
                                Date versDateTime) throws ServerException {
+        StringBuilder out = new StringBuilder(512);
+        getItemIndex(reposBaseURL, applicationContext, reader, versDateTime, out);
+        return out.toString();
+    }
+    
+    public static void getItemIndex(String reposBaseURL,
+                String applicationContext,
+                DOReader reader,
+                Date versDateTime,
+                Appendable out) throws ServerException {
         try {
             Datastream[] datastreams =
                     reader.GetDatastreams(versDateTime, null);
-            StringBuilder out = new StringBuilder(512);
 
             out.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                     + "<objectItemIndex PID=\"");
@@ -98,7 +120,6 @@ public class ObjectInfoAsXML
                 out.append("</itemMIMEType>\n</item>\n");
             }
             out.append("</objectItemIndex>");
-            return out.toString();
         } catch (Exception e) {
             e.printStackTrace();
             throw new ObjectIntegrityException(e.getMessage());
@@ -109,9 +130,22 @@ public class ObjectInfoAsXML
                                  String PID,
                                  ObjectMethodsDef[] methods,
                                  Date versDateTime) throws ServerException {
+        StringBuilder buffer = new StringBuilder(1024);
+        getMethodIndex(reposBaseURL, PID, methods, versDateTime, buffer);
+        return buffer.toString();
+    }
 
+    public static void getMethodIndex(String reposBaseURL,
+                String PID,
+                ObjectMethodsDef[] methods,
+                Date versDateTime,
+                Appendable buffer) throws ServerException {
         // use REST serializer
-        return DefaultSerializer.objectMethodsToXml(reposBaseURL, methods, PID, null, versDateTime);
+        try {
+            DefaultSerializer.objectMethodsToXml(reposBaseURL, methods, PID, null, versDateTime, buffer);
+        } catch (IOException e) {
+            throw new StreamIOException(e.getMessage(), e);
+        }
 
     }
 
@@ -125,6 +159,22 @@ public class ObjectInfoAsXML
             dc = new DCFields(in);
         }
         return dc.getAsXML();
+    }
+    
+    public static void getOAIDublinCore(Datastream dublinCore, Appendable out)
+            throws ServerException {
+        DCFields dc;
+        if (dublinCore == null) {
+            dc = new DCFields();
+        } else {
+            InputStream in = dublinCore.getContentStream();
+            dc = new DCFields(in);
+        }
+        try {
+            dc.getAsXML(out);
+        } catch (IOException e) {
+            throw new StreamIOException(e.getMessage(), e);
+        }
     }
 
     private static String getItemDissURL(String reposBaseURL,

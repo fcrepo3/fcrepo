@@ -4,6 +4,7 @@
  */
 package org.fcrepo.server.storage.translation;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -12,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -23,6 +25,7 @@ import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.utilities.LogConfig;
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.trippi.io.TripleIteratorFactory;
 import org.w3c.dom.Document;
@@ -101,27 +104,29 @@ public class ConvertObjectSerialization {
 
     private void prettyPrint(DigitalObject obj, OutputStream destination)
             throws Exception {
-        ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
+        ReadableByteArrayOutputStream outBuf =
+                new ReadableByteArrayOutputStream(4096);
         m_serializer.serialize(obj,
                                outBuf,
                                ENCODING,
                                DOTranslationUtility.AS_IS);
-        InputStream inBuf = new ByteArrayInputStream(outBuf.toByteArray());
-        prettyPrint(inBuf, destination);
+        outBuf.close();
+        prettyPrint(outBuf.toInputStream(), destination);
     }
 
     private static void prettyPrint(InputStream source,
                                     OutputStream destination)
             throws Exception {
-        XMLSerializer ser = new XMLSerializer(destination, fmt);
+        BufferedWriter outWriter = new BufferedWriter(new PrintWriter(destination));
+        XMLSerializer ser = new XMLSerializer(outWriter, fmt);
         DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
         try {
             Document doc = builder.parse(source);
             ser.serialize(doc);
+            outWriter.close();
         } finally {
             XmlTransformUtility.returnDocumentBuilder(builder);
         }
-        destination.close();
     }
 
     /**

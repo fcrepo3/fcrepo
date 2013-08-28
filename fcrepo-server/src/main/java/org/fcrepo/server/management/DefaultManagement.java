@@ -4,6 +4,7 @@
  */
 package org.fcrepo.server.management;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -11,9 +12,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.SequenceInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,10 +32,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-
 import org.apache.commons.betwixt.XMLUtils;
-import org.apache.commons.io.IOUtils;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
 import org.fcrepo.common.rdf.SimpleURIReference;
@@ -71,6 +73,7 @@ import org.fcrepo.server.validation.ValidationConstants;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.server.validation.ecm.EcmValidator;
 import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.jrdf.graph.URIReference;
 import org.slf4j.Logger;
@@ -112,7 +115,8 @@ public class DefaultManagement
     private final EcmValidator ecmValidator;
 
     // FCREPO-765: move to Admin module
-    private static final String xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    private static final byte[] xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            .getBytes(Charset.forName("UTF-8"));
 
     /**
      * @param purgeDelayInMillis milliseconds to delay before removing
@@ -918,9 +922,15 @@ public class DefaultManagement
             if (dsContent != null && "DC".equals(datastreamId)){
                 DCFields audited = new DCFields(dsContent);
                 try {
-                    dsContent = new ByteArrayInputStream(audited.getAsXML(pid).getBytes("UTF-8"));
-                } catch (UnsupportedEncodingException uee) {
-                    // safely ignore... we know UTF-8 works
+                    ReadableByteArrayOutputStream bytes =
+                            new ReadableByteArrayOutputStream(512);
+                    PrintWriter out = new PrintWriter(
+                            new OutputStreamWriter(bytes, Charset.forName("UTF-8")));
+                    audited.getAsXML(pid, out);
+                    out.close();
+                    dsContent = bytes.toInputStream();
+                } catch (IOException ioe) {
+                    // safely ignore... we know byte arrays works
                 }
             }
 
@@ -1549,20 +1559,27 @@ public class DefaultManagement
     }
 
     private byte[] getXML(InputStream in, boolean includeXMLDeclaration) throws GeneralException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream(2048);
+        getXML(in, out, includeXMLDeclaration);
+        return out.toByteArray();
+    }
+    
+    private void getXML(InputStream in, OutputStream outStream, boolean includeXMLDeclaration) throws GeneralException {
         // parse with xerces and re-serialize the fixed xml to a byte array
         try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
             OutputFormat fmt = new OutputFormat("XML", "UTF-8", true);
             fmt.setIndent(2);
             fmt.setLineWidth(120);
             fmt.setPreserveSpace(false);
             fmt.setOmitXMLDeclaration(!includeXMLDeclaration);
             fmt.setOmitDocumentType(true);
+            BufferedWriter out = new BufferedWriter(
+                    new OutputStreamWriter(outStream, Charset.forName("UTF-8")));
             XMLSerializer ser = new XMLSerializer(out, fmt);
             Document doc =
                 XmlTransformUtility.parseNamespaceAware(in);
             ser.serialize(doc);
-            return out.toByteArray();
+            out.flush();
         } catch (Exception e) {
             String message = e.getMessage();
             if (message == null) {
@@ -2033,42 +2050,33 @@ public class DefaultManagement
                         }
                     }
 
-                    byte[] byteContent;
+                    InputStream byteContent;
+                    long byteLength;
 
                     // Note: use getContentStream() rather than getting bytes directly, as this is how
                     // X datastreams are disseminated (we want the M content to be identical on
                     // dissemination)
                     if (reformat) {
-                        byteContent = this.getXML(existing.getContentStream(), addXMLHeader);
+                        ReadableByteArrayOutputStream out = new ReadableByteArrayOutputStream(2048);
+                        this.getXML(existing.getContentStream(), out, addXMLHeader);
+                        out.close();
+                        byteContent = out.toInputStream();
+                        byteLength = out.length();
                     } else {
                         // add just the XML header declaring encoding, if requested
                         if (addXMLHeader) {
-                            byte[] header;
-                            try {
-                                header = xmlHeader.getBytes("UTF-8");
-                            } catch (UnsupportedEncodingException e) {
-                                // should never happen
-                                throw new RuntimeException(e);
-                            }
-                            byte[] existingContent;
-                            try {
-                                existingContent = IOUtils.toByteArray(existing.getContentStream());
-                            } catch (IOException e) {
-                                throw new GeneralException("Error reading existing content from X datastream", e);
-                            }
-                            byteContent = Arrays.copyOf(header, header.length + existingContent.length);
-                            System.arraycopy(existing.xmlContent, 0, byteContent, header.length, existingContent.length);
+                            byteContent = new SequenceInputStream(
+                                    new ByteArrayInputStream(xmlHeader),
+                                    existing.getContentStream());
+                            byteLength = xmlHeader.length + existing.DSSize;
                         } else {
-                            try {
-                                byteContent = IOUtils.toByteArray(existing.getContentStream());
-                            } catch (IOException e) {
-                                throw new GeneralException("Error reading existing content from X datastream", e);
-                            }
+                            byteContent = existing.getContentStream();
+                            byteLength = existing.DSSize;
                         }
                     }
 
                     // add the content stream
-                    MIMETypedStream content = new MIMETypedStream(null, new ByteArrayInputStream(byteContent), null, byteContent.length);
+                    MIMETypedStream content = new MIMETypedStream(null, byteContent, null, byteLength);
                     newDS.putContentStream(content);
 
                     // checksum only needs recalc if we added a header
@@ -2081,8 +2089,10 @@ public class DefaultManagement
                         newDS.DSChecksum = Datastream.CHECKSUM_NONE;
                         newDS.DSChecksum = newDS.getChecksum();
 
-                        logger.debug("New checksum: {}", newDS.DSChecksum);
-                        logger.debug("Testing new checksum, response is {}", newDS.compareChecksum());
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("New checksum: {}", newDS.DSChecksum);
+                            logger.debug("Testing new checksum, response is {}", newDS.compareChecksum());
+                        }
                     }
 
                     w.addDatastream(newDS, true);

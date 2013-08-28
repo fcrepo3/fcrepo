@@ -19,6 +19,7 @@
 package org.fcrepo.server.security.jaas.util;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,12 +28,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,13 +123,14 @@ public class DataUtils {
         format.setIndent(2);
         format.setOmitXMLDeclaration(true);
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Writer output = new OutputStreamWriter(out);
+        ReadableByteArrayOutputStream out = new ReadableByteArrayOutputStream(8192);
+        Writer output = new BufferedWriter(new OutputStreamWriter(out));
 
         XMLSerializer serializer = new XMLSerializer(output, format);
         serializer.serialize(doc);
+        output.close();
 
-        return new String(out.toByteArray(), "UTF-8");
+        return out.getString(Charset.forName("UTF-8"));
     }
 
     public static String format(byte[] data) throws Exception {
@@ -140,10 +144,11 @@ public class DataUtils {
         format.setOmitXMLDeclaration(true);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Writer output = new OutputStreamWriter(out);
+        Writer output = new BufferedWriter(new OutputStreamWriter(out));
 
         XMLSerializer serializer = new XMLSerializer(output, format);
         serializer.serialize(doc);
+        output.close();
 
         return new String(out.toByteArray(), "UTF-8");
     }

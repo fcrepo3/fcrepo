@@ -6,6 +6,7 @@ package org.fcrepo.oai;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashMap;
 
@@ -23,6 +24,7 @@ import org.fcrepo.server.errors.authorization.AuthzOperationalException;
 import org.fcrepo.server.errors.authorization.AuthzPermittedException;
 import org.fcrepo.server.errors.servletExceptionExtensions.InternalError500Exception;
 import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 
 
 
@@ -48,12 +50,13 @@ public abstract class OAIProviderServlet
                 String name = (String) enm.nextElement();
                 params.put(name, request.getParameter(name));
             }
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ReadableByteArrayOutputStream out = new ReadableByteArrayOutputStream();
             Context context =
                     ReadOnlyContext.getContext(Constants.HTTP_REQUEST.REST.uri,
                                                request);
             try {
                 getResponder().respond(context, params, out);
+                out.close();
             } catch (AuthzException ae) {
                 throw RootException.getServletException(ae,
                                                         request,
@@ -61,7 +64,7 @@ public abstract class OAIProviderServlet
                                                         new String[0]);
             }
             response.setContentType("text/xml; charset=UTF-8");
-            response.getWriter().print(new String(out.toByteArray(), "UTF-8"));
+            response.getWriter().print(out.getString(Charset.forName("UTF-8")));
         } catch (Throwable t) {
             throw new InternalError500Exception("",
                                                 t,

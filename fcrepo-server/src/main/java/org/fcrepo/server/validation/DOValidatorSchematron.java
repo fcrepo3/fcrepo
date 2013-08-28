@@ -4,13 +4,9 @@
  */
 package org.fcrepo.server.validation;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
-
 import java.net.URL;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +15,6 @@ import java.util.Map;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -27,6 +22,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.fcrepo.server.errors.ObjectValidityException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.types.Validation;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -204,7 +200,7 @@ public class DOValidatorSchematron {
                                                              StreamSource preprocessorSource,
                                                              String phase)
             throws ObjectValidityException, TransformerException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ReadableCharArrayWriter out = new ReadableCharArrayWriter(4096);
         try {
             // Create a transformer for that uses the Schematron preprocessor stylesheet.
             // Transform the Schematron schema (rules) into a validating stylesheet.
@@ -212,14 +208,14 @@ public class DOValidatorSchematron {
                     XmlTransformUtility.getTransformer(preprocessorSource);
             ptransformer.setParameter("phase", phase);
             ptransformer.transform(rulesSource, new StreamResult(out));
+            out.close();
         } catch (TransformerException e) {
             logger.error("Schematron validation failed", e);
             throw new ObjectValidityException(e.getMessage());
         }
 
         return XmlTransformUtility.getTemplates(
-            new StreamSource(
-                new ByteArrayInputStream(out.toByteArray())));
+            new StreamSource(out.toReader()));
     }
 
     /** Code based on com.jclark.xsl.sax.Driver: * */
