@@ -36,11 +36,26 @@
   <target name="clearSQL">
     <echo>Clearing SQL database</echo>
     <unzip src="${mvn.fedora.home}/install/${mvn.fedora.appServerContext}.war" dest="${mvn.fedora.home}/install/fedorawar" />
- 	<java classpath="${mvn.fedora.home}/install/fedorawar/WEB-INF/lib/*"
-          classname="org.fcrepo.server.utilities.ClearSQLDatabase" fork="true" spawn="false" failonerror="true">
- 	  <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
- 	  <sysproperty key="fedora.web.inf.lib" value="${mvn.fedora.home}/install/fedorawar/WEB-INF/lib"/>
- 	</java>
+    <!-- Build an empty jar with the classpath in the manifest file, 
+         to get around the Windows/Ant/Java 6 problem with very long classpaths -->
+    <path id="build-classpath">
+      <fileset dir="${mvn.fedora.home}/install/fedorawar/WEB-INF/lib">
+        <include name="*" />
+      </fileset>
+    </path>
+    <manifestclasspath property="lib.list" jarfile="${mvn.fedora.home}/install/fedorawar/WEB-INF/lib/testclasspath.jar">
+      <classpath refid="build-classpath" />
+    </manifestclasspath>
+    <jar jarfile="${mvn.fedora.home}/install/fedorawar/WEB-INF/lib/testclasspath.jar">
+      <manifest>
+        <attribute name="Class-Path" value=". ${lib.list}" />
+      </manifest>
+    </jar>
+    <java classname="org.fcrepo.server.utilities.ClearSQLDatabase" fork="true" spawn="false" failonerror="true">
+      <classpath location="${mvn.fedora.home}/install/fedorawar/WEB-INF/lib/testclasspath.jar" />
+      <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
+      <sysproperty key="fedora.web.inf.lib" value="${mvn.fedora.home}/install/fedorawar/WEB-INF/lib" />
+    </java>
   </target>
 
   <target name="configureFedora">
