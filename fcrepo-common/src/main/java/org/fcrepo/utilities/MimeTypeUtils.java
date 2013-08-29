@@ -62,9 +62,10 @@ public class MimeTypeUtils {
 
     /**
      * Table for converting MIME type strings to file extensions. The table is
-     * initialized the first time fileExtensionForMIMEType() is called.
+     * initialized on class load.
      */
-    private static Map<String, String> mimeTypeToExtensionMap = null;
+    private static final Map<String, String> mimeTypeToExtensionMap =
+            loadMappings();
 
     /**
      * Resource bundle containing MIME type mappings
@@ -97,10 +98,10 @@ public class MimeTypeUtils {
     /**
      * Load the MIME type mappings into memory.
      */
-    private static synchronized void loadMappings() {
-        if (mimeTypeToExtensionMap != null) return;
+    private static HashMap<String, String> loadMappings() {
 
-        mimeTypeToExtensionMap = new HashMap<String, String>();
+        HashMap<String, String> mimeTypeToExtensionMap =
+                new HashMap<String, String>();
 
         // First, check the user's home directory.
 
@@ -151,6 +152,7 @@ public class MimeTypeUtils {
                           ex);
             }
         }
+        return mimeTypeToExtensionMap;
     }
 
     /**
