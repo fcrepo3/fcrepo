@@ -91,11 +91,8 @@ public class WebClient {
         cManager.getSchemeRegistry().register(
                 new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
         cManager.getSchemeRegistry().register(
-                new Scheme("https", 8443, SSLSocketFactory.getSocketFactory()));
-        cManager.getSchemeRegistry().register(
                 new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
-        cManager.getSchemeRegistry().register(
-                new Scheme("http", 8080, PlainSocketFactory.getSocketFactory()));
+
         return cManager;
     }
     
