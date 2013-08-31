@@ -243,7 +243,7 @@ public class SimpleDOWriter
         if (subject.equals(pidURI)) {
             dsId = "RELS-EXT";
         } else {
-            if (subject.startsWith(pidURI + "/")) {
+            if (subject.startsWith(pidURI) && subject.charAt(pidURI.length()) == '/') {
                 dsId = "RELS-INT";
             } else {
                 throw new GeneralException("Cannot determine which relationship datastream to update for subject " + subject + ".  Relationship subjects must be the URI of the object or the URI of a datastream within the object.");

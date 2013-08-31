@@ -187,7 +187,7 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
         Set<AbstractPolicy> applicablePolicies = new HashSet<AbstractPolicy>();
 
         for (AbstractPolicy policy : policies) {
-            String resourceId = null;
+            String resourceId = "";
 
             @SuppressWarnings("unchecked")
             List<TargetMatchGroup> tmg =

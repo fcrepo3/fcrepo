@@ -187,13 +187,13 @@ public class DatastreamFilenameHelper {
         if (download != null && download.equals("true")) {
             // generate an "attachment" content disposition header with the filename
             filename = getFilename(context, pid, dsID, asOfDateTime, stream.MIMEType);
-            headerValue="attachment; filename=\"" + filename + "\"";
+            headerValue= attachmentHeader(filename);
         } else {
             // is the content disposition header enabled in the case of not downloading?
             if (m_datastreamContentDispositionInlineEnabled.equals("true")) {
                 // it is... generate the header with "inline"
                 filename = getFilename(context, pid, dsID, asOfDateTime, stream.MIMEType);
-                headerValue="inline; filename=\"" + filename + "\"";
+                headerValue= inlineHeader(filename);
             }
         }
         // create content disposition header to add
@@ -208,6 +208,18 @@ public class DatastreamFilenameHelper {
             stream.header = header;
         }
 
+    }
+
+    private static final String attachmentHeader(String filename) {
+        StringBuilder sb = new StringBuilder(filename.length() + 23);
+        sb.append("attachment; filename=\"").append(filename).append('"');
+        return sb.toString();
+    }
+    
+    private static final String inlineHeader(String filename) {
+        StringBuilder sb = new StringBuilder(filename.length() + 20);
+        sb.append("inline; filename=\"").append(filename).append('"');
+        return sb.toString();
     }
 
     /**
@@ -295,8 +307,9 @@ public class DatastreamFilenameHelper {
 
         // find the tuple specifying the filename
         int matchingTuples = 0;
+        String dsSubject = (relsIntTuples.size() > 0) ? Constants.FEDORA.uri + pid + "/" + dsid : null;
         for ( RelationshipTuple tuple : relsIntTuples ) {
-            if (tuple.subject.equals(Constants.FEDORA.uri + pid + "/" + dsid) && tuple.predicate.equals(FILENAME_REL)) {
+            if (tuple.subject.equals(dsSubject) && tuple.predicate.equals(FILENAME_REL)) {
                 // use the first found relationship by default (report warning later if there are more)
                 if (matchingTuples == 0) {
                     if (tuple.isLiteral) {
