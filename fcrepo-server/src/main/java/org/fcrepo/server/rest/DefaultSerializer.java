@@ -205,7 +205,7 @@ public class DefaultSerializer {
         buffer.append('"');
         if (versDateTime != null &&
             !DateUtility.convertDateToString(versDateTime).equalsIgnoreCase("")) {
-            buffer.append(" dateTime=\"" + DateUtility.convertDateToString(versDateTime) + "\"");
+            buffer.append(" dateTime=\"").append(DateUtility.convertDateToString(versDateTime)).append('"');
         }
         buffer.append('>');
         // ADD PROFILE FIELDS SERIALIZATION
@@ -313,7 +313,7 @@ public class DefaultSerializer {
         .append("\"  xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
                 + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                 + " xsi:schemaLocation=\"http://www.fedora.info/definitions/1/0/management/ "
-                + "http://www.fedora.info/definitions/1/0/datastreamHistory.xsd" + "\" pid=\"");
+                + "http://www.fedora.info/definitions/1/0/datastreamHistory.xsd\" pid=\"");
         enc(pid, buffer);
         buffer.append("\" dsID=\"");
         enc(dsID, buffer);

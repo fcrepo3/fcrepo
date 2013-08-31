@@ -376,7 +376,7 @@ public class RelsValidator
                         + m_doURI + ").");
             }
         } else if (m_dsId.equals(RELS_INT)) {
-            if (!aboutURI.startsWith(m_doURI + "/")) {
+            if (!(aboutURI.startsWith(m_doURI) && (aboutURI.charAt(m_doURI.length()) == '/'))) {
                 throw new SAXException("RelsExtValidator:"
                         + " The RELS-INT datastream refers to"
                         + " an improper URI in the 'about' attribute of the"
@@ -386,7 +386,7 @@ public class RelsValidator
                         + m_doURI + ", " + aboutURI + ").");
 
             }
-            String dsId = aboutURI.replace(m_doURI + "/", "");
+            String dsId = aboutURI.substring(m_doURI.length() + 1);
             // datastream ID must be an XML NCName, implemented using NCName class
             if (dsId.length() > ValidationConstants.DATASTREAM_ID_MAXLEN
                     || dsId.length() < 1 || !isValid(dsId)) {
