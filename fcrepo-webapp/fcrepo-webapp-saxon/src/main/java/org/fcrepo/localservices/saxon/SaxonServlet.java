@@ -156,9 +156,7 @@ public class SaxonServlet
         String clear = req.getParameter("clear-stylesheet-cache");
 
         if (clear != null && clear.equals("yes")) {
-            synchronized (m_cache) {
-                m_cache = new HashMap<String, Templates>();
-            }
+            m_cache.remove(style);
         }
 
         try {
