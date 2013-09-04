@@ -191,7 +191,7 @@ public class HashPathIdMapper
 
     private static String decode(String encodedURI) {
         if (encodedURI.endsWith("%2E")) {
-            encodedURI = encodedURI.substring(0, encodedURI.length() - 3) + ".";
+            encodedURI = encodedURI.substring(0, encodedURI.length() - 3).concat(".");
         }
         try {
             return URLDecoder.decode(encodedURI, "UTF-8");

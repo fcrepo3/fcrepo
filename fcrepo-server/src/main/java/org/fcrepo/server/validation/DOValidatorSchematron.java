@@ -7,9 +7,8 @@ package org.fcrepo.server.validation;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.transform.Templates;
@@ -118,9 +117,8 @@ public class DOValidatorSchematron {
             result = new DOValidatorSchematronResult(validationResult);
         } catch (Exception e) {
         	Validation validation = new Validation("unknown");
-        	List<String> probs = new ArrayList<String>();
-        	probs.add("Schematron validation failed:" + e.getMessage());
-        	validation.setObjectProblems(probs);
+        	String problem = "Schematron validation failed:".concat(e.getMessage());
+        	validation.setObjectProblems(Collections.singletonList(problem));
             logger.error("Schematron validation failed", e);
             throw new ObjectValidityException(e.getMessage(), validation);
         }
@@ -133,12 +131,10 @@ public class DOValidatorSchematron {
                 logger.warn("Error getting XML result of schematron validation failure", e);
             }
         	Validation validation = new Validation("unknown");
-        	List<String> probs = new ArrayList<String>();
-        	if (msg != null) {
-        		probs.add(msg);
-        	} else {
-        		probs.add("Unknown schematron error.  Error getting XML results of schematron validation");
+        	if (msg == null) {
+        		msg = "Unknown schematron error.  Error getting XML results of schematron validation";
         	}
+        	validation.setObjectProblems(Collections.singletonList(msg));
             throw new ObjectValidityException(msg, validation);
         }
     }

@@ -73,7 +73,7 @@ class ContextAttributeFinderModule
 
     private final String getContextId(EvaluationCtx context) {
         final URI contextIdType = STRING_ATTRIBUTE_TYPE_URI;
-        final URI contextIdId = Constants.ACTION.CONTEXT_ID.getURI();
+        final URI contextIdId = Constants.ACTION.CONTEXT_ID.attributeId;
 
         logger.debug("ContextAttributeFinder:findAttribute"
                 + " about to call getAttributeFromEvaluationCtx");
@@ -112,10 +112,7 @@ class ContextAttributeFinderModule
     }
 
     private final boolean validContextId(String contextId) {
-        if (contextId == null) {
-            return false;
-        }
-        if ("".equals(contextId)) {
+        if (contextId == null || contextId.isEmpty()) {
             return false;
         }
         if (" ".equals(contextId)) {

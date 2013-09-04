@@ -118,6 +118,8 @@ public class DefaultDOManagerTest
 
     @Mock
     private SQLUtility mockSqlUtility;
+    
+    private DOReaderCache mockReaderCache = new DOReaderCache();
 
     @Mock
     private ResultSet pidExists;
@@ -189,6 +191,7 @@ public class DefaultDOManagerTest
         when(mockServer.getBean("org.fcrepo.server.search.FieldSearch", FieldSearch.class))
             .thenReturn(mockFieldSearch);
         when(mockServer.getBean("fedoraStorageHintProvider")).thenReturn(DUMMY_HINTS);
+        when(mockServer.getBean("org.fcrepo.server.readerCache")).thenReturn(mockReaderCache);
         
         when(mockConnectionPoolManager.getPool()).thenReturn(mockPool);
         when(mockConnectionPoolManager.getPool(anyString())).thenReturn(mockPool);

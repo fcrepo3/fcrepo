@@ -4,7 +4,7 @@
  */
 package org.fcrepo.server.resourceIndex;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 
 import org.jrdf.graph.Triple;
@@ -27,7 +27,7 @@ public class ServiceDeploymentTripleGenerator
     public Set<Triple> getTriplesForObject(DOReader reader)
             throws ResourceIndexException {
         // no special triples for this content model
-        return new HashSet<Triple>();
+        return Collections.emptySet();
     }
 
 }

@@ -9,37 +9,22 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-
 import java.text.ParseException;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.common.xml.format.XMLFormat;
-
-import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.errors.ValidationException;
-import org.fcrepo.server.storage.translation.DODeserializer;
 import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.types.AuditRecord;
 import org.fcrepo.server.storage.types.DSBinding;
@@ -51,12 +36,16 @@ import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.Disseminator;
 import org.fcrepo.server.utilities.StreamUtility;
-import org.fcrepo.server.utilities.StringUtility;
 import org.fcrepo.server.validation.ValidationUtility;
-
 import org.fcrepo.utilities.Base64;
 import org.fcrepo.utilities.DateUtility;
-import org.fcrepo.utilities.XmlTransformUtility;
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 
 
@@ -185,10 +174,10 @@ public class FOXMLContentHandler
     private String m_auditJustification;
 
     // buffers for reading content
-    private StringBuilder m_elementContent; // single element
+    private ReadableByteArrayOutputStream m_elementContent; // single element
 
-    private StringBuilder m_dsXMLBuffer; // chunks of inline XML metadata
-
+    private ReadableCharArrayWriter m_dsXMLBuffer; // chunks of inline XML metadata
+    
     /**
      * Creates a deserializer that reads the default FOXML format.
      */
@@ -264,13 +253,9 @@ public class FOXMLContentHandler
                              String qName,
                              Attributes a) throws SAXException {
 
-        // Initialize string buffer to hold content of the new element.
+        // null out any existing content buffer.
         // This will start a fresh buffer for every element encountered.
-        if (m_elementContent == null) {
-            m_elementContent = new StringBuilder();
-        } else {
-            m_elementContent.setLength(0);
-        }
+        m_elementContent = null;
 
         if (uri.equals(FOXML.uri) && !m_inXMLMetadata) {
             // WE ARE NOT INSIDE A BLOCK OF INLINE XML...
@@ -383,11 +368,7 @@ public class FOXMLContentHandler
             // inside a datastreamVersion element, it's either going to be
             // xmlContent (inline xml), contentLocation (a reference) or binaryContent
             else if (localName.equals("xmlContent")) {
-                if (m_dsXMLBuffer == null) {
-                    m_dsXMLBuffer = new StringBuilder();
-                } else {
-                    m_dsXMLBuffer.setLength(0);
-                }
+                m_dsXMLBuffer = new ReadableCharArrayWriter();
                 m_xmlDataLevel = 0;
                 m_inXMLMetadata = true;
             } else if (localName.equals("contentLocation")) {
@@ -481,20 +462,26 @@ public class FOXMLContentHandler
      * {@inheritDoc}
      */
     @Override
-    public void characters(char[] ch, int start, int length) {
-        // read normal element content into a string buffer
-        if (m_elementContent != null) {
-            m_elementContent.append(ch, start, length);
-        }
+    public void characters(char[] ch, int start, int length) 
+        throws SAXException {
         // read entire inline XML metadata chunks into a buffer
-        if (m_inXMLMetadata) {
+        if (m_inXMLMetadata && !m_gotAudit) {
             // since this data is encoded straight back to xml,
             // we need to make sure special characters &, <, >, ", and '
             // are re-converted to the xml-acceptable equivalents.
             StreamUtility.enc(ch, start, length, m_dsXMLBuffer);
-        } else if (m_readingBinaryContent) {
-            // append it to something...
-            // FIXME: IMPLEMENT HERE IN POST v2.0
+        } else if (m_gotAudit || m_readingBinaryContent){
+            // Use a separate buffer to deal with the special case
+            // of AUDIT datastreams, which may be inline, but need to
+            // retrieve individual element content to deserialize correctly
+            // append element content into a byte buffer; or b64-encoded
+            // binary content
+            if (m_elementContent == null) {
+                m_elementContent = new ReadableByteArrayOutputStream();
+            }
+            CharBuffer chars = CharBuffer.wrap(ch, start, length);
+            ByteBuffer bytes = Charset.forName(m_characterEncoding).encode(chars);
+            m_elementContent.write(bytes.array(), bytes.arrayOffset(), bytes.limit());
         }
     }
 
@@ -515,17 +502,22 @@ public class FOXMLContentHandler
                 // Pick up audit records from the current ds version
                 // and instantiate audit records array in digital object.
                 if (localName.equals("action")) {
-                    m_auditAction = m_elementContent.toString();
+                    m_auditAction = (m_elementContent != null) ?
+                            m_elementContent.toString() : "";
                     //} else if (localName.equals("recordID")) {
                     //    m_auditRecordID=m_elementContent.toString();
                 } else if (localName.equals("componentID")) {
-                    m_auditComponentID = m_elementContent.toString();
+                    m_auditComponentID = (m_elementContent != null) ?
+                            m_elementContent.toString() : "";
                 } else if (localName.equals("responsibility")) {
-                    m_auditResponsibility = m_elementContent.toString();
+                    m_auditResponsibility = (m_elementContent != null) ?
+                            m_elementContent.toString() : "";
                 } else if (localName.equals("date")) {
-                    m_auditDate = m_elementContent.toString();
+                    m_auditDate = (m_elementContent != null) ?
+                            m_elementContent.toString() : "";
                 } else if (localName.equals("justification")) {
-                    m_auditJustification = m_elementContent.toString();
+                    m_auditJustification = (m_elementContent != null) ?
+                            m_elementContent.toString() : "";
                 } else if (localName.equals("record")) {
                     //m_auditRec.id=m_auditRecordID;
                     m_auditRec.processType = m_auditProcessType;
@@ -571,7 +563,7 @@ public class FOXMLContentHandler
                 }
             } else {
                 // finished an element within inline xml metadata
-                m_dsXMLBuffer.append("</" + qName + ">");
+                m_dsXMLBuffer.append("</").append(qName).append('>');
                 // make sure we know when to pay attention to FOXML again
                 if (uri.equals(FOXML.uri) && localName.equals("xmlContent")) {
                     m_xmlDataLevel--;
@@ -586,9 +578,7 @@ public class FOXMLContentHandler
                     FileOutputStream os =
                             new FileOutputStream(m_binaryContentTempFile);
                     // remove all spaces and newlines, this might not be necessary.
-                    String elementStr =
-                            m_elementContent.toString().replaceAll("\\s", "");
-                    byte elementBytes[] = Base64.decode(elementStr);
+                    byte elementBytes[] = Base64.decode(m_elementContent.toInputStream());
                     os.write(elementBytes);
                     os.close();
                     m_dsLocationType = Datastream.DS_LOCATION_TYPE_INTERNAL;
@@ -709,7 +699,7 @@ public class FOXMLContentHandler
                                     String localName,
                                     String qName,
                                     Attributes a,
-                                    StringBuilder out) {
+                                    ReadableCharArrayWriter out) {
         out.append('<').append(qName);
         // add the current qName's namespace to m_localPrefixMap
         // and m_prefixList if it's not already in m_localPrefixMap
@@ -736,7 +726,7 @@ public class FOXMLContentHandler
             out.append('"');
         }
         for (int i = 0; i < a.getLength(); i++) {
-            out.append(" ").append(a.getQName(i)).append("=\"");
+            out.append(' ').append(a.getQName(i)).append("=\"");
             StreamUtility.enc(a.getValue(i), out);
             out.append('"');
         }
@@ -845,7 +835,7 @@ public class FOXMLContentHandler
         // now set the xml content stream itself...
 
         ByteBuffer bytes = Charset.forName(m_characterEncoding).
-                encode(CharBuffer.wrap(m_dsXMLBuffer));
+                encode(m_dsXMLBuffer.toBuffer());
         ds.xmlContent = new byte[bytes.limit()];
         System.arraycopy(
                 bytes.array(), bytes.arrayOffset(),
@@ -854,7 +844,7 @@ public class FOXMLContentHandler
             StringBuilder rels = new StringBuilder();
             if (m_dsId.equals("WSDL")) {
                 if (m_obj.hasContentModel(Models.SERVICE_DEPLOYMENT_3_0)){
-                    rels.append(Models.SERVICE_DEPLOYMENT_3_0 + "\n");
+                    rels.append(Models.SERVICE_DEPLOYMENT_3_0 ).append('\n');
                 }
 
                 logger.debug("Not processing WSDL from {} with models:\n{}", m_obj.getPid(), rels);

@@ -139,24 +139,24 @@ public class FOXMLDOSerializer
 
     private void appendRootElementStart(DigitalObject obj, PrintWriter writer)
             throws ObjectIntegrityException {
-        writer.print("<");
+        writer.print('<');
         writer.print(FOXML.DIGITAL_OBJECT.qName);
         if (m_format.equals(FOXML1_1)) {
-            writer.print(" ");
+            writer.print(' ');
             writer.print(FOXML.VERSION.localName);
             writer.print("=\"1.1\"");
         }
-        writer.print(" ");
+        writer.print(' ');
         writer.print(FOXML.PID.localName);
         writer.print("=\"");
         writer.print(obj.getPid());
-        writer.print("\"");
+        writer.print('"');
         if (m_transContext == DOTranslationUtility.SERIALIZE_EXPORT_PUBLIC) {
-            writer.print(" ");
+            writer.print(' ');
             writer.print(FOXML.FEDORA_URI.localName);
             writer.print("=\"info:fedora/");
             writer.print(obj.getPid());
-            writer.print("\"");
+            writer.print('"');
         }
         writer.print("\nxmlns:");
         writer.print(FOXML.prefix);
@@ -170,7 +170,7 @@ public class FOXMLDOSerializer
         writer.print(XSI.SCHEMA_LOCATION.qName);
         writer.print("=\"");
         writer.print(FOXML.uri);
-        writer.print(" ");
+        writer.print(' ');
         writer.print(m_format.xsdLocation);
         writer.print("\">\n");
     }
@@ -180,7 +180,7 @@ public class FOXMLDOSerializer
                                   String encoding)
             throws ObjectIntegrityException {
 
-        writer.print("<");
+        writer.print('<');
         writer.print(FOXML.prefix);
         writer.print(":objectProperties>\n");
 
@@ -221,7 +221,7 @@ public class FOXMLDOSerializer
                                        PrintWriter writer,
                                        boolean extProperty) {
         if (value != null) {
-            writer.print("<");
+            writer.print('<');
             writer.print(FOXML.prefix);
             writer.print(':');
             if (extProperty) {
@@ -270,25 +270,25 @@ public class FOXMLDOSerializer
 
                 // insert the ds attributes common to all versions, when necessary
                 if (!haveWrittenCommonAttributes) {
-                    writer.print("<");
+                    writer.print('<');
                     writer.print(FOXML.prefix);
                     writer.print(":datastream ID=\"");
                     writer.print(vds.DatastreamID);
-                    writer.print("\"");
+                    writer.print('"');
                     if (m_transContext == DOTranslationUtility.SERIALIZE_EXPORT_PUBLIC) {
                         writer.print(" FEDORA_URI=\"");
                         writer.print("info:fedora/");
                         writer.print(obj.getPid());
                         writer.print("/");
                         writer.print(vds.DatastreamID);
-                        writer.print("\"");
+                        writer.print('"');
                     }
                     writer.print(" STATE=\"");
                     writer.print(vds.DSState);
-                    writer.print("\"");
+                    writer.print('"');
                     writer.print(" CONTROL_GROUP=\"");
                     writer.print(vds.DSControlGrp);
-                    writer.print("\"");
+                    writer.print('"');
                     writer.print(" VERSIONABLE=\"");
                     writer.print(vds.DSVersionable);
                     writer.print("\">\n");
@@ -296,39 +296,39 @@ public class FOXMLDOSerializer
                 }
 
                 // insert the ds version elements
-                writer.print("<");
+                writer.print('<');
                 writer.print(FOXML.prefix);
                 writer.print(":datastreamVersion ID=\"");
                 writer.print(vds.DSVersionID);
-                writer.print("\"");
+                writer.print('"');
                 writer.print(" LABEL=\"");
                 StreamUtility.enc(vds.DSLabel, writer);
-                writer.print("\"");
+                writer.print('"');
                 if (vds.DSCreateDT != null) {
                     writer.print(" CREATED=\"");
                     writer.print(DateUtility.convertDateToString(vds.DSCreateDT));
-                    writer.print("\"");
+                    writer.print('"');
                 }
                 String altIds =
                         DOTranslationUtility.oneString(vds.DatastreamAltIDs);
                 if (altIds != null && !altIds.isEmpty()) {
                     writer.print(" ALT_IDS=\"");
                     StreamUtility.enc(altIds, writer);
-                    writer.print("\"");
+                    writer.print('"');
                 }
                 writer.print(" MIMETYPE=\"");
                 StreamUtility.enc(vds.DSMIME, writer);
-                writer.print("\"");
+                writer.print('"');
                 if (vds.DSFormatURI != null && !vds.DSFormatURI.isEmpty()) {
                     writer.print(" FORMAT_URI=\"");
                     StreamUtility.enc(vds.DSFormatURI, writer);
-                    writer.print("\"");
+                    writer.print('"');
                 }
                 // include size if it's non-zero
                 if (vds.DSSize != 0) {
                     writer.print(" SIZE=\"");
                     writer.print(vds.DSSize);
-                    writer.print("\"");
+                    writer.print('"');
                 }
                 writer.print(">\n");
 
@@ -336,11 +336,11 @@ public class FOXMLDOSerializer
                 String csType = vds.getChecksumType();
                 if (csType != null && csType.length() > 0
                         && !csType.equals(Datastream.CHECKSUMTYPE_DISABLED)) {
-                    writer.print("<");
+                    writer.print('<');
                     writer.print(FOXML.prefix);
                     writer.print(":contentDigest TYPE=\"");
                     writer.print(csType);
-                    writer.print("\"");
+                    writer.print('"');
                     writer.print(" DIGEST=\"");
                     writer.print(vds.getChecksum());
                     writer.print("\"/>\n");
@@ -349,7 +349,7 @@ public class FOXMLDOSerializer
                 // if E or R insert ds content location as URL
                 if (vds.DSControlGrp.equalsIgnoreCase("E")
                         || vds.DSControlGrp.equalsIgnoreCase("R")) {
-                    writer.print("<");
+                    writer.print('<');
                     writer.print(FOXML.prefix);
                     writer.print(":contentLocation TYPE=\"");
                     writer.print(Datastream.DS_LOCATION_TYPE_URL);
@@ -363,7 +363,7 @@ public class FOXMLDOSerializer
                     // if M insert ds content location as an internal identifier
                 } else if (vds.DSControlGrp.equalsIgnoreCase("M")) {
                     if (m_transContext == DOTranslationUtility.SERIALIZE_EXPORT_ARCHIVE) {
-                        writer.print("<");
+                        writer.print('<');
                         writer.print(FOXML.prefix);
                         writer.print(":binaryContent> \n");
                         String encoded = Base64.encodeToString(vds.getContentStream());
@@ -374,7 +374,7 @@ public class FOXMLDOSerializer
                         writer.print(FOXML.prefix);
                         writer.print(":binaryContent> \n");
                     } else {
-                        writer.print("<");
+                        writer.print('<');
                         writer.print(FOXML.prefix);
                         writer.print(":contentLocation TYPE=\"");
                         writer.print(Datastream.DS_LOCATION_TYPE_INTERNAL);
@@ -410,7 +410,7 @@ public class FOXMLDOSerializer
         if (obj.getAuditRecords().size() > 0) {
             // Audit trail datastream re-created from audit records.
             // There is only ONE version of the audit trail datastream!
-            writer.print("<");
+            writer.print('<');
             writer.print(FOXML.prefix);
             writer.print(":datastream ID=\"");
             writer.print("AUDIT\"");
@@ -421,7 +421,7 @@ public class FOXMLDOSerializer
             }
             writer.print(" STATE=\"A\" CONTROL_GROUP=\"X\" VERSIONABLE=\"false\">\n");
             // insert the ds version-level elements
-            writer.print("<");
+            writer.print('<');
             writer.print(FOXML.prefix);
             writer.print(":datastreamVersion ID=\"AUDIT.0\" LABEL=\"");
             writer.print("Audit Trail for this object\" CREATED=\"");
@@ -429,7 +429,7 @@ public class FOXMLDOSerializer
             writer.print("\" MIMETYPE=\"text/xml\" FORMAT_URI=\"");
             writer.print(AUDIT1_0.uri);
             writer.print("\">\n");
-            writer.print("<");
+            writer.print('<');
             writer.print(FOXML.prefix);
             writer.print(":xmlContent>\n");
             DOTranslationUtility.appendAuditTrail(obj, writer);
@@ -452,7 +452,7 @@ public class FOXMLDOSerializer
             throws ObjectIntegrityException, UnsupportedEncodingException,
             StreamIOException {
 
-        writer.print("<");
+        writer.print('<');
         writer.print(FOXML.prefix);
         writer.print(":xmlContent>\n");
 
@@ -494,7 +494,7 @@ public class FOXMLDOSerializer
                                         .disseminators(did).get(i));
                 // insert the disseminator elements common to all versions.
                 if (i == 0) {
-                    writer.print("<");
+                    writer.print('<');
                     writer.print(FOXML.prefix);
                     writer.print(":disseminator ID=\"");
                     writer.print(did);
@@ -507,53 +507,53 @@ public class FOXMLDOSerializer
                     writer.print("\">\n");
                 }
                 // insert the disseminator version-level elements
-                writer.print("<");
+                writer.print('<');
                 writer.print(FOXML.prefix);
                 writer.print(":disseminatorVersion ID=\"");
                 writer.print(vdiss.dissVersionID);
-                writer.print("\"");
+                writer.print('"');
                 if (vdiss.dissLabel != null && !vdiss.dissLabel.isEmpty()) {
                     writer.print(" LABEL=\"");
                     StreamUtility.enc(vdiss.dissLabel, writer);
-                    writer.print("\"");
+                    writer.print('"');
                 }
                 writer.print(" BMECH_SERVICE_PID=\"");
                 writer.print(vdiss.sDepID);
-                writer.print("\"");
+                writer.print('"');
                 if (vdiss.dissCreateDT != null) {
                     writer.print(" CREATED=\"");
                     writer.print(DateUtility.convertDateToString(vdiss.dissCreateDT));
-                    writer.print("\"");
+                    writer.print('"');
                 }
                 writer.print(">\n");
 
                 // datastream bindings...
                 DSBinding[] bindings = vdiss.dsBindMap.dsBindings;
-                writer.print("<");
+                writer.print('<');
                 writer.print(FOXML.prefix);
                 writer.print(":serviceInputMap>\n");
                 for (int j = 0; j < bindings.length; j++) {
                     if (bindings[j].seqNo == null) {
                         bindings[j].seqNo = "";
                     }
-                    writer.print("<");
+                    writer.print('<');
                     writer.print(FOXML.prefix);
                     writer.print(":datastreamBinding KEY=\"");
                     writer.print(bindings[j].bindKeyName);
                     writer.print("\" DATASTREAM_ID=\"");
                     writer.print(bindings[j].datastreamID);
-                    writer.print("\"");
+                    writer.print('"');
                     if (bindings[j].bindLabel != null
                             && !bindings[j].bindLabel.isEmpty()) {
                         writer.print(" LABEL=\"");
                         writer.print(StreamUtility.enc(bindings[j].bindLabel));
-                        writer.print("\"");
+                        writer.print('"');
                     }
                     if (bindings[j].seqNo != null
                             && !bindings[j].seqNo.isEmpty()) {
                         writer.print(" ORDER=\"");
                         writer.print(bindings[j].seqNo);
-                        writer.print("\"");
+                        writer.print('"');
                     }
                     writer.print("/>\n");
                 }

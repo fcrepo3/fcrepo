@@ -74,19 +74,22 @@ public class DOReaderCache extends TimerTask {
 	 *            the {@link DOReader} to be cached
 	 */
 	public final void put(final DOReader reader) {
-		try {
-			String pid = reader.GetObjectPID();
-			LOG.debug("adding {} to cache", pid);
-			mapLock.lock();
-			cacheMap.put(pid, new TimestampedCacheEntry<DOReader>(System.currentTimeMillis(),
-			        reader));
-			mapLock.unlock();
-		} catch (ServerException e) {
-			throw new RuntimeException(
-					"Unable to retrieve PID from reader for caching");
-		}
+		put(reader, System.currentTimeMillis());
 	}
 
+    public final void put(final DOReader reader, long cacheTime) {
+        try {
+            String pid = reader.GetObjectPID();
+            LOG.debug("adding {} to cache", pid);
+            mapLock.lock();
+            cacheMap.put(pid,
+                    new TimestampedCacheEntry<DOReader>(cacheTime, reader));
+            mapLock.unlock();
+        } catch (ServerException e) {
+            throw new RuntimeException(
+                    "Unable to retrieve PID from reader for caching");
+        }
+    }
 	/**
 	 * remove an entry from the cache
 	 * 
@@ -112,7 +115,6 @@ public class DOReaderCache extends TimerTask {
 	    mapLock.lock();
 		if (cacheMap.containsKey(pid)) {
 			TimestampedCacheEntry<DOReader> e = cacheMap.get(pid);
-			e.refresh();
 			LOG.debug("cache hit for {}", pid);
 			result = e.value();
 		} else {
@@ -137,17 +139,20 @@ public class DOReaderCache extends TimerTask {
 	public final void removeExpired() {
 		mapLock.lock();
 		Iterator<Entry<String, TimestampedCacheEntry<DOReader>>> entries = cacheMap.entrySet().iterator();
-		while (entries.hasNext()) {
-		    Entry<String, TimestampedCacheEntry<DOReader>> entry = entries.next();
-		    TimestampedCacheEntry<DOReader> e = entry.getValue();
-		    long age = e.age();
-		    if (age > (maxSeconds * 1000)) {
-		        entries.remove();
-	            String pid = entry.getKey();
-		        LOG.debug("removing entry {} after {} seconds", pid,
-		                ((double) age / 1000d));
-		    }
+		if (entries.hasNext()) {
+		    long now = System.currentTimeMillis();
+		    while (entries.hasNext()) {
+		        Entry<String, TimestampedCacheEntry<DOReader>> entry = entries.next();
+		        TimestampedCacheEntry<DOReader> e = entry.getValue();
+		        long age = e.ageAt(now);
+		        if (age > (maxSeconds * 1000)) {
+		            entries.remove();
+		            String pid = entry.getKey();
+		            LOG.debug("removing entry {} after {} milliseconds",
+		                    pid, age);
+		        }
 
+		    }
 		}
 		mapLock.unlock();
 	}

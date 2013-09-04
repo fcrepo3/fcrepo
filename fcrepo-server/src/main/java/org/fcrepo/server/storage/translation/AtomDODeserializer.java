@@ -264,7 +264,7 @@ public class AtomDODeserializer
                     ds.xmlContent = byteBuffer.array();
 
                 } else {
-                    ds.xmlContent = entry.getContent().getBytes(m_encoding); //IOUtils.toByteArray(entry.getContentStream());
+                    ds.xmlContent = entry.getContent().getBytes(m_encoding);
                 }
             } catch (UnsupportedEncodingException e) {
                 throw new StreamIOException(e.getMessage(), e);

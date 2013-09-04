@@ -8,6 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -41,6 +42,7 @@ import org.fcrepo.server.utilities.StreamUtility;
 
 import org.fcrepo.utilities.DateUtility;
 import org.fcrepo.utilities.MimeTypeUtils;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
 
 /**
  * <p>Serializes a Fedora Object in Atom with Threading Extensions.</p>
@@ -316,10 +318,13 @@ public class AtomDOSerializer
             String name = "AUDIT.0.xml";
             try {
                 m_zout.putNextEntry(new ZipEntry(name));
-                Reader r = new StringReader(DOTranslationUtility.getAuditTrail(m_obj));
-                IOUtils.copy(r, m_zout, m_encoding);
+                ReadableCharArrayWriter buf =
+                        new ReadableCharArrayWriter(512);
+                PrintWriter pw  = new PrintWriter(buf);
+                DOTranslationUtility.appendAuditTrail(m_obj, pw);
+                pw.close();
+                IOUtils.copy(buf.toReader(), m_zout, m_encoding);
                 m_zout.closeEntry();
-                r.close();
             } catch(IOException e) {
                 throw new StreamIOException(e.getMessage(), e);
             }
@@ -346,7 +351,7 @@ public class AtomDOSerializer
 
     private void setInlineXML(Entry entry, DatastreamXMLMetadata ds)
             throws UnsupportedEncodingException, StreamIOException {
-        String content;
+        byte[] content;
 
         if (m_obj.hasContentModel(
                                   Models.SERVICE_DEPLOYMENT_3_0)
@@ -356,16 +361,16 @@ public class AtomDOSerializer
                     DOTranslationUtility
                             .normalizeInlineXML(new String(ds.xmlContent,
                                                            m_encoding),
-                                                m_transContext);
+                                                m_transContext).getBytes(m_encoding);
         } else {
-            content = new String(ds.xmlContent, m_encoding);
+            content = ds.xmlContent;
         }
 
         if (m_format.equals(ATOM_ZIP1_1)) {
             String name = ds.DSVersionID + ".xml";
             try {
                 m_zout.putNextEntry(new ZipEntry(name));
-                InputStream is = new ByteArrayInputStream(content.getBytes(m_encoding));
+                InputStream is = new ByteArrayInputStream(content);
                 IOUtils.copy(is, m_zout);
                 m_zout.closeEntry();
                 is.close();
@@ -376,7 +381,7 @@ public class AtomDOSerializer
             entry.setSummary(ds.DSVersionID);
             entry.setContent(iri, ds.DSMIME);
         } else {
-            entry.setContent(content, ds.DSMIME);
+            entry.setContent(new String(content, m_encoding), ds.DSMIME);
         }
     }
 

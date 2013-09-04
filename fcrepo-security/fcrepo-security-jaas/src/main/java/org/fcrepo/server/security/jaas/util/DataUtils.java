@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -36,6 +37,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.fcrepo.utilities.ReadableByteArrayOutputStream;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,22 +145,22 @@ public class DataUtils {
         format.setIndent(2);
         format.setOmitXMLDeclaration(true);
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Writer output = new BufferedWriter(new OutputStreamWriter(out));
+        ReadableCharArrayWriter out = new ReadableCharArrayWriter();
+        Writer output = new BufferedWriter(out);
 
         XMLSerializer serializer = new XMLSerializer(output, format);
         serializer.serialize(doc);
         output.close();
 
-        return new String(out.toByteArray(), "UTF-8");
+        return out.getString();
     }
 
-    public static byte[] fedoraXMLHashFormat(byte[] data) throws Exception {
+    public static InputStream fedoraXMLHashFormat(byte[] data) throws Exception {
         OutputFormat format = new OutputFormat("XML", "UTF-8", false);
         format.setIndent(0);
         format.setLineWidth(0);
         format.setPreserveSpace(false);
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        ReadableByteArrayOutputStream outStream = new ReadableByteArrayOutputStream();
         XMLSerializer serializer = new XMLSerializer(outStream, format);
 
         Document doc =
@@ -166,17 +168,19 @@ public class DataUtils {
         serializer.serialize(doc);
 
         ByteArrayInputStream in =
-                new ByteArrayInputStream(outStream.toByteArray());
+                outStream.toInputStream();
         BufferedReader br =
                 new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line = null;
-        StringBuffer sb = new StringBuffer();
+        outStream = new ReadableByteArrayOutputStream();
+        OutputStreamWriter sb = new OutputStreamWriter(outStream, "UTF-8");
         while ((line = br.readLine()) != null) {
             line = line.trim();
-            sb = sb.append(line);
+            sb.write(line);
         }
+        sb.close();
 
-        return sb.toString().getBytes("UTF-8");
+        return outStream.toInputStream();
     }
 
     public static String getHash(byte[] data) throws NoSuchAlgorithmException {
@@ -200,7 +204,7 @@ public class DataUtils {
                 {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b',
                         'c', 'd', 'e', 'f'};
 
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer(bytes.length * 2);
         for (byte b : bytes) {
             sb.append(hexChars[b >> 4 & 0xf]);
             sb.append(hexChars[b & 0xf]);

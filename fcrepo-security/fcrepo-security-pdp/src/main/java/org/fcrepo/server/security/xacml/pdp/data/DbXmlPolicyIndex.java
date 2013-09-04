@@ -18,6 +18,7 @@ package org.fcrepo.server.security.xacml.pdp.data;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -118,7 +119,7 @@ public class DbXmlPolicyIndex
             // Get the query (query gets prepared if necesary)
             a = System.nanoTime();
 
-            Map<String, Set<AttributeBean>> attributeMap =
+            Map<String, Collection<AttributeBean>> attributeMap =
                 getAttributeMap(eval);
 
             context = m_dbXmlManager.manager.createQueryContext();
@@ -213,12 +214,12 @@ public class DbXmlPolicyIndex
      * @throws XmlException
      * @throws PolicyIndexException
      */
-    private XmlQueryExpression getQuery(Map<String, Set<AttributeBean>> attributeMap,
+    private XmlQueryExpression getQuery(Map<String, Collection<AttributeBean>> attributeMap,
                                         XmlQueryContext context,
                                         int r) throws XmlException  {
         // The dimensions for this query.
         StringBuilder sb = new StringBuilder(64 * attributeMap.size());
-        for (Set<AttributeBean> attributeBeans : attributeMap.values()) {
+        for (Collection<AttributeBean> attributeBeans : attributeMap.values()) {
             sb.append(attributeBeans.size() + ":");
             for (AttributeBean bean : attributeBeans) {
                 sb.append(bean.getValues().size() + "-");
@@ -259,7 +260,7 @@ public class DbXmlPolicyIndex
      *        the number of components in the resource id
      * @return the query as a String
      */
-    private String createQuery(Map<String, Set<AttributeBean>> attributeMap) {
+    private String createQuery(Map<String, Collection<AttributeBean>> attributeMap) {
         StringBuilder sb = new StringBuilder(256);
         sb.append("collection('");
         sb.append(m_dbXmlManager.CONTAINER);

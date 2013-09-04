@@ -4,6 +4,10 @@ package org.fcrepo.server.security.jaas.util;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 
 /**
  * <p>
@@ -648,14 +652,14 @@ public class Base64 {
         } // end if: null
 
         // Streams
-        java.io.ByteArrayOutputStream baos = null;
+        ReadableByteArrayOutputStream baos = null;
         java.io.OutputStream b64os = null;
         java.io.ObjectOutputStream oos = null;
 
         try {
             // ObjectOutputStream -> (GZIP) -> Base64 -> ByteArrayOutputStream
             // Note that the optional GZIPping is handled by Base64.OutputStream.
-            baos = new java.io.ByteArrayOutputStream();
+            baos = new ReadableByteArrayOutputStream();
             b64os = new Base64.OutputStream(baos, ENCODE | options);
             oos = new java.io.ObjectOutputStream(b64os);
             oos.writeObject(serializableObject);
@@ -682,9 +686,9 @@ public class Base64 {
 
         // Return value according to relevant encoding.
         try {
-            return new String(baos.toByteArray(), PREFERRED_ENCODING);
+            return baos.getString(Charset.forName(PREFERRED_ENCODING));
         } // end try
-        catch (java.io.UnsupportedEncodingException uue) {
+        catch (IllegalCharsetNameException uue) {
             // Fall back to some Java default
             return new String(baos.toByteArray());
         } // end catch
@@ -1675,8 +1679,6 @@ public class Base64 {
 
         private final int options; // Record options used to create the stream.
 
-        private final byte[] alphabet; // Local copies to avoid extra method calls
-
         private final byte[] decodabet; // Local copies to avoid extra method calls
 
         /**
@@ -1723,7 +1725,6 @@ public class Base64 {
             buffer = new byte[bufferLength];
             position = -1;
             lineLength = 0;
-            alphabet = getAlphabet(options);
             decodabet = getDecodabet(options);
         } // end constructor
 
@@ -1898,8 +1899,6 @@ public class Base64 {
 
         private final int options; // Record for later
 
-        private final byte[] alphabet; // Local copies to avoid extra method calls
-
         private final byte[] decodabet; // Local copies to avoid extra method calls
 
         /**
@@ -1949,7 +1948,6 @@ public class Base64 {
             suspendEncoding = false;
             b4 = new byte[4];
             this.options = options;
-            alphabet = getAlphabet(options);
             decodabet = getDecodabet(options);
         } // end constructor
 

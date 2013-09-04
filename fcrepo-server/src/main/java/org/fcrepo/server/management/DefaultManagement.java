@@ -1046,23 +1046,13 @@ public class DefaultManagement
                     w.removeDatastream(datastreamID, startDT, endDT);
             // check if there's at least one version with this id...
             if (w.GetDatastream(datastreamID, null) == null) {
-                // if deleting would result in no versions remaining,
-                // only continue if there are no disseminators that use
-                // this datastream.
-                // to do this, we must look through all versions of every
-                // disseminator, regardless of state
-                ArrayList<String> usedList = new ArrayList<String>();
+                // if deleting would result in no versions of the DC
+                // datastream remaining, do not continue
                 if (datastreamID.equals("DC")) {
-                    usedList.add("The default disseminator");
-                }
-                if (usedList.size() > 0) {
                     StringBuilder msg = new StringBuilder();
                     msg.append("Cannot purge entire datastream because it\n");
                     msg.append("is used by the following disseminators:");
-                    for (int i = 0; i < usedList.size(); i++) {
-                        msg.append("\n - ");
-                        msg.append(usedList.get(i));
-                    }
+                    msg.append("\n - The default disseminator");
                     throw new GeneralException(msg.toString());
                 }
             }
@@ -1228,19 +1218,15 @@ public class DefaultManagement
             DOReader r =
                     m_manager.getReader(Server.GLOBAL_CHOICE, context, pid);
             Date[] versionDates = r.getDatastreamVersions(datastreamID);
+            // sort the dates in their natural order
+            Arrays.sort(versionDates);
+            // then copy the Datastreams in the reverse date order (most recent first)
             Datastream[] versions = new Datastream[versionDates.length];
+            final int v = versionDates.length - 1;
             for (int i = 0; i < versionDates.length; i++) {
-                versions[i] = r.GetDatastream(datastreamID, versionDates[i]);
+                versions[v - i] = r.GetDatastream(datastreamID, versionDates[i]);
             }
-            // sort, ascending
-            Arrays.sort(versions, new DatastreamDateComparator());
-            // reverse it (make it descend, so most recent date is element 0)
-            Datastream[] out = new Datastream[versions.length];
-            for (int i = 0; i < versions.length; i++) {
-                out[i] = versions[versions.length - 1 - i];
-            }
-
-            return out;
+            return versions;
         } finally {
             // Logger completion
             if (logger.isInfoEnabled()) {
@@ -1253,23 +1239,6 @@ public class DefaultManagement
             }
 
             logger.debug("Exiting getDatastreamHistory");
-        }
-    }
-
-    public class DatastreamDateComparator
-            implements Comparator<Object> {
-
-        @Override
-        public int compare(Object o1, Object o2) {
-            long ms1 = ((Datastream) o1).DSCreateDT.getTime();
-            long ms2 = ((Datastream) o1).DSCreateDT.getTime();
-            if (ms1 < ms2) {
-                return -1;
-            }
-            if (ms1 > ms2) {
-                return 1;
-            }
-            return 0;
         }
     }
 
@@ -1922,7 +1891,7 @@ public class DefaultManagement
             // List files to purge and remove filename to map
             // This operation is synchronized to be thread-safe
             // ------------------------------------------------
-            List<String> removeList = new ArrayList<String>();
+            final List<String> removeList = new ArrayList<String>();
             synchronized (this.m_uploadStartTime) {
                 for (Entry<String, Long> entry :
                         m_uploadStartTime.entrySet()) {
@@ -2015,7 +1984,7 @@ public class DefaultManagement
 
                 // take a copy of the existing datastream versions
                 Date[] versions = w.getDatastreamVersions(dsID);
-                Map<Date, Datastream> copyDS = new HashMap<Date, Datastream>();
+                Map<Date, Datastream> copyDS = new HashMap<Date, Datastream>(versions.length);
                 for (Date version: versions) {
                     Datastream d = w.GetDatastream(dsID, version);
                     copyDS.put(version, d.copy());

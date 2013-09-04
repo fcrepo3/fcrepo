@@ -5,7 +5,6 @@
 
 package org.fcrepo.server.storage;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -16,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -80,7 +78,6 @@ import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.tidy.Out;
 
 /**
  * Manages the reading and writing of digital objects by instantiating an
@@ -94,6 +91,8 @@ public class DefaultDOManager extends Module implements DOManager {
 
     private static final Logger logger = LoggerFactory
             .getLogger(DefaultDOManager.class);
+    
+    private static final String[] STRING_TYPE = new String[0];
 
     private static final Pattern URL_PROTOCOL = Pattern.compile("^\\w+:\\/.*$");
     
@@ -617,6 +616,14 @@ public class DefaultDOManager extends Module implements DOManager {
         }
 
         writer.invalidate();
+        
+        if (writer.isCommitted()) {
+            try{
+                m_readerCache.remove(writer.GetObjectPID());
+            } catch (ServerException e) {
+                logger.warn("Error invalidating reader cache; Unable to obtain pid from writer.");
+            }
+        }
 
         try {
             releaseWriteLock(writer.GetObjectPID());
@@ -696,7 +703,8 @@ public class DefaultDOManager extends Module implements DOManager {
     @Override
     public DOReader getReader(boolean cachedObjectRequired, Context context,
             String pid) throws ServerException {
-        long getReaderStartTime = System.currentTimeMillis();
+        long getReaderStartTime = logger.isDebugEnabled() ?
+                System.currentTimeMillis() : -1;
         String source = null;
         try {
             {
@@ -713,7 +721,7 @@ public class DefaultDOManager extends Module implements DOManager {
                                     m_permanentStore.retrieveObject(pid));
                     source = "filesystem";
                     if (m_readerCache != null) {
-                        m_readerCache.put(reader);
+                        m_readerCache.put(reader, getReaderStartTime);
                     }
                 } else {
                     source = "memory";
@@ -723,8 +731,8 @@ public class DefaultDOManager extends Module implements DOManager {
         } finally {
             if (logger.isDebugEnabled()) {
                 long dur = System.currentTimeMillis() - getReaderStartTime;
-                logger.debug("Got DOReader (source=" + source + ") for " + pid +
-                        " in " + dur + "ms.");
+                logger.debug("Got DOReader (source={}) for {} in {}ms.",
+                        source, pid, dur);
             }
         }
     }
@@ -1899,7 +1907,6 @@ public class DefaultDOManager extends Module implements DOManager {
 
     /** whereClause is a WHERE clause, starting with "where" */
     private String[] getPIDs(String whereClause) throws StorageDeviceException {
-        ArrayList<String> pidList = new ArrayList<String>();
         Connection conn = null;
         PreparedStatement s = null;
         ResultSet results = null;
@@ -1909,16 +1916,15 @@ public class DefaultDOManager extends Module implements DOManager {
             s = conn.prepareStatement(query);
             logger.debug("Executing db query: {}", query);
             results = s.executeQuery();
-            while (results.next()) {
-                pidList.add(results.getString("doPID"));
+            if (results.next()){
+                ArrayList<String> pidList = new ArrayList<String>();
+                do {
+                    pidList.add(results.getString("doPID"));
+                } while (results.next()); 
+                return pidList.toArray(STRING_TYPE);
+            } else {
+                return STRING_TYPE;
             }
-            String[] ret = new String[pidList.size()];
-            Iterator<String> pidIter = pidList.iterator();
-            int i = 0;
-            while (pidIter.hasNext()) {
-                ret[i++] = pidIter.next();
-            }
-            return ret;
         } catch (SQLException sqle) {
             throw new StorageDeviceException(
                     "Unexpected error from SQL database: " + sqle.getMessage(),

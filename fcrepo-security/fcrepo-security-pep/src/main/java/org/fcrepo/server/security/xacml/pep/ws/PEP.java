@@ -18,6 +18,7 @@
 
 package org.fcrepo.server.security.xacml.pep.ws;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,9 +82,9 @@ public class PEP
             throws PEPException {
         super();
         this.feslAuthZ = feslAuthZ;
-        logger.info("feslAuthZ = " + feslAuthZ);
+        logger.info("feslAuthZ = {}", feslAuthZ);
         if (feslAuthZ) {
-            m_serviceHandlers = new HashMap<String, Map<String,OperationHandler>>(0);
+            m_serviceHandlers = Collections.emptyMap();
             m_ts = new Date();
         }
     }

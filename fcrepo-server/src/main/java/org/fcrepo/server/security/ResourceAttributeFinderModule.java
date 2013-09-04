@@ -106,11 +106,7 @@ class ResourceAttributeFinderModule
     }
 
     private final String getDatastreamId(EvaluationCtx context) {
-        URI datastreamIdUri = null;
-        try {
-            datastreamIdUri = new URI(Constants.DATASTREAM.ID.uri);
-        } catch (URISyntaxException e) {
-        }
+        URI datastreamIdUri = Constants.DATASTREAM.ID.attributeId;
 
         EvaluationResult attribute =
                 context.getResourceAttribute(STRING_ATTRIBUTE_TYPE_URI,
@@ -216,14 +212,13 @@ class ResourceAttributeFinderModule
                     return null;
                 }
             } else if (Constants.MODEL.HAS_MODEL.attributeId.equals(attributeId)) {
-                Set<String> models = new HashSet<String>();
                 try {
-                    models.addAll(reader.getContentModels());
+                    values = new HashSet<String>(reader.getContentModels())
+                            .toArray(new String[0]);
                 } catch (ServerException e) {
                     logger.debug("failed getting {}", Constants.MODEL.HAS_MODEL.uri,e);
                     return null;
                 }
-                values = models.toArray(new String[0]);
             } else if (Constants.OBJECT.CREATED_DATETIME.attributeId.equals(attributeId)) {
                 try {
                     values = new String[1];

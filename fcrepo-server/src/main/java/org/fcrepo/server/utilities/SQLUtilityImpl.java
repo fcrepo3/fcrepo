@@ -178,7 +178,7 @@ class SQLUtilityImpl
                 if (values[i] == null) {
                     sql.append("NULL");
                 } else {
-                    sql.append("?");
+                    sql.append('?');
                 }
             }
         }
@@ -247,10 +247,10 @@ class SQLUtilityImpl
             if (values[i] == null) {
                 sql.append("NULL");
             } else {
-                sql.append("?");
+                sql.append('?');
             }
         }
-        sql.append(")");
+        sql.append(')');
         if (logger.isDebugEnabled()) {
             logger.debug("About to execute: {}", sql.toString());
         }
@@ -364,9 +364,9 @@ class SQLUtilityImpl
                 Iterator<String> iter =
                         tcConn.getDDLConverter().getDDL(spec).iterator();
                 while (iter.hasNext()) {
-                    sqlCmds.append("\n");
+                    sqlCmds.append('\n');
                     sqlCmds.append(iter.next());
-                    sqlCmds.append(";");
+                    sqlCmds.append(';');
                 }
                 logger.info("Creating new table '{}' with command(s): {}",
                         spec.getName(), sqlCmds.toString());

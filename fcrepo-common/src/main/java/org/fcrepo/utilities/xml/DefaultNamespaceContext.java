@@ -2,7 +2,14 @@ package org.fcrepo.utilities.xml;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Default implementation of a {@link NamespaceContext}
@@ -76,7 +83,7 @@ public class DefaultNamespaceContext implements NamespaceContext {
      * predefined in any context.
      *
      * @param namespaceURL the namespace uri
-     * @param prefix       the prifix to registere with the uri
+     * @param prefix       the prefix to register with the uri
      * @throws IllegalArgumentException thrown when trying to assign a
      *                                  namespace to a reserved prefix
      */
@@ -155,7 +162,7 @@ public class DefaultNamespaceContext implements NamespaceContext {
         if (s != null && !namespace.isEmpty()) {
             return new NonModifiableIterator(s.iterator());
         } else {
-            return new NonModifiableIterator(new HashSet().iterator());
+            return Collections.emptySet().iterator();
         }
     }
 

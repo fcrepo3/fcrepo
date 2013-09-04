@@ -243,7 +243,7 @@ public class SQLRebuilder
                     getClass().getClassLoader()
                             .getResourceAsStream(dbSpecLocation);
             List<TableSpec> specs = TableSpec.getTableSpecs(in);
-            ArrayList<String> names = new ArrayList<String>();
+            ArrayList<String> names = new ArrayList<String>(specs.size());
             for (int i = 0; i < specs.size(); i++) {
                 TableSpec spec = specs.get(i);
                 names.add(spec.getName().toUpperCase());

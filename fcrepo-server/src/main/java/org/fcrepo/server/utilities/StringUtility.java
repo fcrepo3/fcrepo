@@ -140,24 +140,26 @@ public class StringUtility {
     };
 
     public static String byteArraytoHexString(byte[] array) {
-        StringBuffer buf = new StringBuffer(array.length * 2);
-        for (byte val: array) {
-            int v1 = val >>> 4 & 0x0f;
-            int v2 = val & 0x0f;
-            buf.append(HEX_CHARS[v1]).append(HEX_CHARS[v2]);
+        char[] chars = new char[array.length * 2];
+        int pos = 0;
+        for (int i=0; i< array.length; i++) {
+            int v1 = array[i] >>> 4 & 0x0f;
+            int v2 = array[i] & 0x0f;
+            chars[pos++] = HEX_CHARS[v1];
+            chars[pos++] = HEX_CHARS[v2];
         }
-        return buf.toString();
+        return new String(chars);
     }
 
     public static byte[] hexStringtoByteArray(String str) {
-        if ((str.length() & 0x01) != 0) {
+        int sLen = str.length();
+        if ((sLen & 0x01) != 0) {
             throw new NumberFormatException();
         }
-        byte ret[] = new byte[str.length() / 2];
-        for (int i = 0; i < str.length() / 2; i++) {
-            ret[i] =
-                    (byte) Integer
-                            .parseInt(str.substring(i * 2, i * 2 + 2), 16);
+        byte ret[] = new byte[sLen / 2];
+        for (int i = 0; i < sLen; i+=2) {
+            ret[i/2] = (byte) ((Character.digit(str.charAt(i), 16) << 4) +
+                     Character.digit(str.charAt(i+1), 16));
         }
         return ret;
     }

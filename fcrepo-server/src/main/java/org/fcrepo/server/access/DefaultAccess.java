@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -78,6 +79,8 @@ public class DefaultAccess
     private static final Logger logger =
             LoggerFactory.getLogger(DefaultAccess.class);
 
+    private static final MethodParmDef[] METHOD_PARM_DEF_TYPE =
+            new MethodParmDef[0];
     /** Current DOManager of the Fedora server. */
     private DOManager m_manager;
 
@@ -264,11 +267,6 @@ public class DefaultAccess
         for (String cModelURI: reader.getContentModels()){
             String cModelPID = cModelURI.substring("info:fedora/".length());
 
-/*
-        for (RelationshipTuple rel : reader.getRelationships(MODEL.HAS_MODEL,
-                                                             null)) {
-            String cModelPID = rel.getObjectPID();
-*/
             String foundDeploymentPID =
                     m_manager.lookupDeploymentForCModel(cModelPID, sDefPID);
 
@@ -322,11 +320,6 @@ public class DefaultAccess
             String cModelPID = null;
             String message = null;
 
-/*
-            models: for (RelationshipTuple rel : reader
-                    .getRelationships(MODEL.HAS_MODEL, null)) {
-                cModelPID = rel.getObjectPID();
-*/
             models: for (String cm:reader.getContentModels()){
                 cModelPID = cm.substring(12);
 
@@ -519,7 +512,7 @@ public class DefaultAccess
         // If the datastream is *really* required in order to invoke the
         // dissemination method in question, rest assured it will fail later.
         List<DisseminationBindingInfo> bindingInfoList =
-                new ArrayList<DisseminationBindingInfo>();
+                new ArrayList<DisseminationBindingInfo>(dsBindRules.length);
 
         for (int i = 0; i < dsBindRules.length; i++) {
             DeploymentDSBindRule dsBindRule = dsBindRules[i];
@@ -573,17 +566,12 @@ public class DefaultAccess
         // DYNAMIC!! Grab any dynamic method definitions and merge them with
         // the statically bound method definitions
         ObjectMethodsDef[] dynamicMethodDefs =
-                //m_dynamicAccess.getObjectMethods(context, PID, asOfDateTime);
                 m_dynamicAccess.listMethods(context, PID, asOfDateTime);
-        ArrayList<ObjectMethodsDef> methodList =
-                new ArrayList<ObjectMethodsDef>();
-        for (ObjectMethodsDef element : methodDefs) {
-            methodList.add(element);
-        }
-        for (ObjectMethodsDef element : dynamicMethodDefs) {
-            methodList.add(element);
-        }
-        return methodList.toArray(new ObjectMethodsDef[0]);
+        ObjectMethodsDef[] result =
+                new ObjectMethodsDef[methodDefs.length + dynamicMethodDefs.length];
+        System.arraycopy(methodDefs, 0, result, 0, methodDefs.length);
+        System.arraycopy(dynamicMethodDefs, 0, result, methodDefs.length, dynamicMethodDefs.length);
+        return result;
     }
 
     @Override
@@ -639,12 +627,6 @@ public class DefaultAccess
 
         profile.objectModels.addAll(reader.getContentModels());
 
-/*
-        for (RelationshipTuple rel : reader
-                .getRelationships(Constants.MODEL.HAS_MODEL, null)) {
-            profile.objectModels.add(rel.object);
-        }
-*/
         // "bootstrap" context won't have the uri to determine security
         String securityUri = context
                 .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.attributeId);
@@ -898,7 +880,7 @@ public class DefaultAccess
                             filteredParms.add(element2);
                         }
                     }
-                    methodParms = filteredParms.toArray(new MethodParmDef[0]);
+                    methodParms = filteredParms.toArray(METHOD_PARM_DEF_TYPE);
                 }
             }
         } else {
@@ -990,11 +972,9 @@ public class DefaultAccess
                                 }
                                 if (!isValidValue) {
                                     for (int i = 0; i < parmDomainValues.length; i++) {
-                                        if (i == parmDomainValues.length - 1) {
-                                            sb.append(parmDomainValues[i]);
-                                        } else {
-                                            sb.append(parmDomainValues[i]
-                                                      + ", ");
+                                        sb.append(parmDomainValues[i]);
+                                        if (i != parmDomainValues.length - 1) {
+                                            sb.append(", ");
                                         }
                                     }
                                     sb
@@ -1177,25 +1157,13 @@ public class DefaultAccess
             // special fedora-specific MIME type to identify the stream as
             // a MIMETypedStream whose contents contain a URL to which the client
             // should be redirected.
-            try {
-                InputStream inStream =
-                        new ByteArrayInputStream(drc.DSLocation
-                                                         .getBytes("UTF-8"));
-                mimeTypedStream =
-                        new MIMETypedStream("application/fedora-redirect",
-                                            inStream,
-                                            null);
-            } catch (UnsupportedEncodingException uee) {
-                String message =
-                        "[DefaultAccess] An error has occurred. "
-                        + "The error was a \""
-                        + uee.getClass().getName() + "\"  . The "
-                        + "Reason was \"" + uee.getMessage()
-                        + "\"  . String value: " + drc.DSLocation
-                        + "  . ";
-                logger.error(message);
-                throw new GeneralException(message);
-            }
+            InputStream inStream =
+                    new ByteArrayInputStream(drc.DSLocation
+                            .getBytes(Charset.forName("UTF-8")));
+            mimeTypedStream =
+                    new MIMETypedStream("application/fedora-redirect",
+                            inStream,
+                            null);
         }
         if (logger.isDebugEnabled()) {
             long stopTime = new Date().getTime();

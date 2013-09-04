@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -203,8 +204,6 @@ public class ExecUtility {
 
     private static String[] getEnv() {
 
-        ArrayList<String> fixedEnv = new ArrayList<String>();
-
         Map<String, String> env = new HashMap<String, String>(System.getenv());
 
         if (!env.containsKey("FEDORA_HOME")
@@ -226,11 +225,13 @@ public class ExecUtility {
             env.put("OFFLINE", System.getProperty("offline"));
         }
 
+        String[] fixedEnv = new String[env.size()];
+        int i = 0;
         for (String envName : env.keySet()) {
-            fixedEnv.add(String.format("%s=%s", envName, env.get(envName)));
+            fixedEnv[i++] = (String.format("%s=%s", envName, env.get(envName)));
         }
 
-        return fixedEnv.toArray(new String[0]);
+        return fixedEnv;
 
     }
 

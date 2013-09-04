@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -339,10 +340,10 @@ public class DOValidatorImpl
     private void checkFormat(String format) throws ObjectValidityException {
         if (!m_xmlSchemaMap.containsKey(format)) {
         	Validation validation = new Validation("unknown");
-        	List<String> probs = new ArrayList<String>();
-        	probs.add("Unsupported format: " + format);
-        	validation.setObjectProblems(probs);
-            throw new ObjectValidityException("Unsupported format: " + format, validation);
+        	String problem = "Unsupported format: ".concat(format);
+        	validation.setObjectProblems(
+        	        Collections.singletonList(problem));
+            throw new ObjectValidityException(problem, validation);
         }
     }
 

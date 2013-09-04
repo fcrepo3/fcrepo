@@ -2,6 +2,8 @@ package org.fcrepo.utilities;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
@@ -43,6 +45,10 @@ public class ReadableByteArrayOutputStream extends ByteArrayOutputStream {
     
     public int length() {
         return count;
+    }
+    
+    public void writeAllTo(OutputStream out) throws IOException {
+        out.write(buf, 0, count);
     }
     
     public ByteArrayInputStream toInputStream() {

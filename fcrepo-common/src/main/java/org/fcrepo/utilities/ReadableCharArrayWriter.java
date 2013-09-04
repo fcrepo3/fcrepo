@@ -2,6 +2,9 @@ package org.fcrepo.utilities;
 
 import java.io.CharArrayReader;
 import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.CharBuffer;
 
 
 public class ReadableCharArrayWriter extends CharArrayWriter {
@@ -41,9 +44,18 @@ public class ReadableCharArrayWriter extends CharArrayWriter {
         return count;
     }
     
+    public void writeAllTo(Writer writer) throws IOException {
+        writer.write(buf, 0, count);
+    }
+    
     public CharArrayReader toReader() {
         closed = true;
         return new CharArrayReader(buf, 0, count);
+    }
+    
+    public CharBuffer toBuffer() {
+        closed = true;
+        return CharBuffer.wrap(buf, 0, count).asReadOnlyBuffer();
     }
     
     public String getString() {

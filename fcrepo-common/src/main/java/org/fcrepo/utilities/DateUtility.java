@@ -124,7 +124,7 @@ public abstract class DateUtility {
 		if (date.before(ONE_CE)) {
 			// fix the format for lexical representation of the year
 			// e.g. 1 BCE: 0000-01.01 (1BCE is year 0)
-			int pos = dateTime.indexOf("-", 1);
+			int pos = dateTime.indexOf('-', 1);
 			int year = Integer.parseInt(dateTime.substring(0, pos));
 			if (year == -1) {
 				dateTime = "0000" + dateTime.substring(pos);
@@ -260,9 +260,12 @@ public abstract class DateUtility {
 		try {
 			if (dateString == null) {
 				throw new ParseException("Argument cannot be null.", 0);
-			} else if (dateString.isEmpty()) {
+			}
+			
+            int last = dateString.length() - 1;
+			if (dateString.length() == 0) {
 				throw new ParseException("Argument cannot be empty.", 0);
-			} else if (dateString.endsWith(".")) {
+			} else if (dateString.charAt(last) == '.') {
 				throw new ParseException(
 						"dateString ends with invalid character.",
 						dateString.length() - 1);
@@ -270,11 +273,11 @@ public abstract class DateUtility {
 			// SimpleDateFormat formatter = new SimpleDateFormat();
 			// formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 			int length = dateString.length();
-			if (dateString.startsWith("-")) {
+			if (dateString.charAt(0) == '-') {
 				length--;
 			}
 			DateTimeFormatter formatter = FORMATTER_MILLISECONDS_T_Z;
-			if (dateString.endsWith("Z")) {
+			if (dateString.charAt(last) == 'Z') {
 				if (length == 11) {
 					// formatter.applyPattern("yyyy-MM-dd'Z'");
 					formatter = FORMATTER_DATE_Z;
@@ -283,15 +286,15 @@ public abstract class DateUtility {
 					formatter = FORMATTER_SECONDS_T_Z;
 				} else if (length > 21 && length < 24) {
 					// right-pad the milliseconds with 0s up to three places
-					StringBuilder sb = new StringBuilder(dateString.substring(
-							0, dateString.length() - 1));
+					StringBuilder sb = new StringBuilder(dateString.subSequence(
+							0, last));
 					int dotIndex = sb.lastIndexOf(".");
 					int endIndex = sb.length() - 1;
 					int padding = 3 - (endIndex - dotIndex);
 					for (int i = 0; i < padding; i++) {
-						sb.append("0");
+						sb.append('0');
 					}
-					sb.append("Z");
+					sb.append('Z');
 					dateString = sb.toString();
 					// formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 					formatter = FORMATTER_MILLISECONDS_T_Z;
@@ -313,7 +316,7 @@ public abstract class DateUtility {
 					int endIndex = sb.length() - 1;
 					int padding = 3 - (endIndex - dotIndex);
 					for (int i = 0; i < padding; i++) {
-						sb.append("0");
+						sb.append('0');
 					}
 					dateString = sb.toString();
 					// formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -329,7 +332,7 @@ public abstract class DateUtility {
 					// see
 					// http://joda-time.sourceforge.net/apidocs/org/joda/time/format/DateTimeFormat.html
 					dateString = dateString.substring(0,
-							dateString.length() - 4).trim();
+							dateString.length() - 4);
 					formatter = FORMATTER_TIMEZONE;
 				}
 			}

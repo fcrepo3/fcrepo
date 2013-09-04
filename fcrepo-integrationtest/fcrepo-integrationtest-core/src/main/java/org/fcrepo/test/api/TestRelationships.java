@@ -346,17 +346,20 @@ public class TestRelationships
 
             p = "urn:bar" + relNum++;
             o = "urn:baz";
+            // test object relationship
             getRelationship(s, p, o, false, null);
 
             p = "urn:title" + relNum;
             o = "asdf";
+            // test untyped literal relationship
             getRelationship(s, p, o, true, null);
 
             p = "urn:temperature" + relNum;
             o = "98.6";
+            // test typed literal relationship
             getRelationship(s, p, o, true, Constants.RDF_XSD.FLOAT.uri);
 
-            // utf-8 literal with multibyte sequences
+            // test untyped utf-8 literal with multibyte sequences
             p = "urn:utf8literal" + relNum;
             o = MULTIBYTE_UTF8;
             getRelationship(s, p, o, true, null);

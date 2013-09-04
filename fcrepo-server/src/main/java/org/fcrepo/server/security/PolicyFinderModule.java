@@ -7,8 +7,6 @@ package org.fcrepo.server.security;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -25,7 +23,6 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.config.ModuleConfiguration;
 import org.fcrepo.server.errors.GeneralException;
-import org.fcrepo.server.errors.ValidationException;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.XmlTransformUtility;
@@ -356,26 +353,6 @@ public class PolicyFinderModule
         } else {
             return bag.iterator().next();
         }
-    }
-
-    // load and parse all policies (*.xml) from a given directory, recursively
-    private static List<AbstractPolicy> loadPolicies(PolicyParser parser,
-                                                     boolean validate,
-                                                     File dir)
-            throws IOException, ValidationException {
-        List<AbstractPolicy> policies = new ArrayList<AbstractPolicy>();
-        for (File file: dir.listFiles()) {
-            if (file.isDirectory()) {
-                policies.addAll(loadPolicies(parser, validate, file));
-            } else {
-                if (file.getName().endsWith(".xml")) {
-                    logger.info("Loading policy: " + file.getPath());
-                    InputStream policyStream = new FileInputStream(file);
-                    policies.add(parser.parse(policyStream, validate));
-                }
-            }
-        }
-        return policies;
     }
 
 }

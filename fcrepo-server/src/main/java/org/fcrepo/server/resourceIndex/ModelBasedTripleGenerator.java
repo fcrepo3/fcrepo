@@ -94,10 +94,6 @@ public class ModelBasedTripleGenerator
 
         try {
             for (String modelRelobject:reader.getContentModels()){
-/*
-            for (RelationshipTuple modelRel : reader
-                    .getRelationships(MODEL.HAS_MODEL, null)) {
-*/
 
                 if (m_generators.containsKey(modelRelobject)) {
                     objectTriples.addAll(m_generators.get(modelRelobject)

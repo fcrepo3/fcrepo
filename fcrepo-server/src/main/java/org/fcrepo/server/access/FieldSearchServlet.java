@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -160,11 +161,14 @@ public class FieldSearchServlet
                                                request);
 
             String[] fieldsArray = getFieldsArray(request);
-            HashSet<String> fieldHash = new HashSet<String>();
+            HashSet<String> fieldHash;
             if (fieldsArray != null) {
+                fieldHash = new HashSet<String>(fieldsArray.length);
                 for (String element : fieldsArray) {
                     fieldHash.add(element);
                 }
+            } else {
+                fieldHash = new HashSet<String>(0);
             }
             String terms = request.getParameter("terms");
             String query = request.getParameter("query");

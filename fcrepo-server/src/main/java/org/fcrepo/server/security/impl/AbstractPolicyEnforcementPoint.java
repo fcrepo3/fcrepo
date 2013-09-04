@@ -101,8 +101,8 @@ public abstract class AbstractPolicyEnforcementPoint
                     new Attribute(SUBJECT_ID_URI, null, null, stringAttribute);
             logger.debug("wrapSubjectIdAsSubjects(): subjectAttribute, id={}, type={}, value={}",
                     subjectAttribute.getId(), subjectAttribute.getType(), subjectAttribute.getValue());
+            subjectAttributes.add(subjectAttribute);
         }
-        subjectAttributes.add(subjectAttribute);
         Subject singleSubject = new Subject(subjectAttributes);
         Set<Subject> subjects = new HashSet<Subject>();
         subjects.add(singleSubject);
