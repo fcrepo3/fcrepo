@@ -726,7 +726,7 @@ implements DOManager {
                                     m_permanentStore.retrieveObject(pid));
                     source = "filesystem";
                     if (m_readerCache != null) {
-                        m_readerCache.put(reader);
+                        m_readerCache.put(reader, getReaderStartTime);
                     }
                 } else {
                     source = "memory";
