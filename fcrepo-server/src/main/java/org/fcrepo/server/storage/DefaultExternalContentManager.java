@@ -137,7 +137,7 @@ public class DefaultExternalContentManager
     @Override
     public MIMETypedStream getExternalContent(ContentManagerParams params)
             throws GeneralException, HttpServiceNotFoundException{
-        logger.debug("in getExternalContent(), url=" + params.getUrl());
+        logger.debug("in getExternalContent(), url={}", params.getUrl());
         try {
             if(params.getProtocol().equals("file")){
                 return getFromFilesystem(params);
@@ -164,7 +164,7 @@ public class DefaultExternalContentManager
      */
     private MIMETypedStream get(String url, String user, String pass, String knownMimeType)
             throws GeneralException {
-        logger.debug("DefaultExternalContentManager.get(" + url + ")");
+        logger.debug("DefaultExternalContentManager.get({})", url);
         try {
             HttpInputStream response = m_http.get(url, true, user, pass);
             String mimeType =
@@ -173,7 +173,7 @@ public class DefaultExternalContentManager
             long length = Long.parseLong(response.getResponseHeaderValue("Content-Length","-1"));
             Property[] headerArray =
                     toPropertyArray(response.getResponseHeaders());
-            if (mimeType == null || mimeType.equals("")) {
+            if (mimeType == null || mimeType.isEmpty()) {
                 mimeType = DEFAULT_MIMETYPE;
             }
             return new MIMETypedStream(mimeType, response, headerArray, length);
@@ -226,14 +226,14 @@ public class DefaultExternalContentManager
      */
     private MIMETypedStream getFromFilesystem(ContentManagerParams params)
             throws HttpServiceNotFoundException,GeneralException {
-        logger.debug("in getFile(), url=" + params.getUrl());
+        logger.debug("in getFromFilesystem(), url={}", params.getUrl());
 
         try {
             URL fileUrl = new URL(params.getUrl());
             File cFile = new File(fileUrl.toURI()).getCanonicalFile();
             // security check
             URI cURI = cFile.toURI();
-            logger.info("Checking resolution security on " + cURI);
+            logger.info("Checking resolution security on {}", cURI);
             Authorization authModule = getServer()
                     .getBean("org.fcrepo.server.security.Authorization", Authorization.class);
             if (authModule == null) {
@@ -302,8 +302,7 @@ public class DefaultExternalContentManager
             username = beHash.get("callUsername");
             password = beHash.get("callPassword");
             backendSSL =
-                    new Boolean(beHash.get("callSSL"))
-                            .booleanValue();
+                    Boolean.parseBoolean(beHash.get("callSSL"));
             if (backendSSL) {
                 if (params.getProtocol().equals("http")) {
                     url = url.replaceFirst("http:", "https:");

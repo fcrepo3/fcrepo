@@ -102,7 +102,11 @@ public class HashPathIdMapper
             throw new NullPointerException();
         }
         String uri = externalId.toString();
-        return URI.create(internalScheme + ":" + getPath(uri) + encode(uri));
+        StringBuilder buffer = new StringBuilder(uri.length() + 16);
+        buffer.append(internalScheme + ":");
+        getPath(uri, buffer);
+        encode(uri, buffer);
+        return URI.create(buffer.toString());
     }
 
     //@Override
@@ -113,18 +117,20 @@ public class HashPathIdMapper
         }
         // we can only do this if pattern is ""
         if (pattern.length() == 0) {
-            return internalScheme + ":" + encode(externalPrefix);
+            StringBuilder buffer = new StringBuilder(externalPrefix.length() + 16);
+            buffer.append(internalScheme + ":");
+            encode(externalPrefix, buffer);
+            return buffer.toString();
         } else {
             return null;
         }
     }
 
     // gets the path based on the hash of the uri, or "" if the pattern is empty
-    private String getPath(String uri) {
+    private void getPath(String uri, StringBuilder builder) {
         if (pattern.length() == 0) {
-            return "";
+            return;
         }
-        StringBuilder builder = new StringBuilder();
         String hash = getHash(uri);
         int hashPos = 0;
         for (int i = 0; i < pattern.length(); i++) {
@@ -136,7 +142,6 @@ public class HashPathIdMapper
             }
         }
         builder.append('/');
-        return builder.toString();
     }
 
     // computes the md5 and returns a 32-char lowercase hex string
@@ -144,10 +149,9 @@ public class HashPathIdMapper
         return MD5Utility.getBase16Hash(uri);
     }
 
-    private static String encode(String uri) {
+    private static void encode(String uri, StringBuilder out) {
         // encode char-by-char because we only want to borrow
         // URLEncoder.encode's behavior for some characters
-        StringBuilder out = new StringBuilder();
         for (int i = 0; i < uri.length(); i++) {
             char c = uri.charAt(i);
             if (c >= 'a' && c <= 'z') {
@@ -177,18 +181,17 @@ public class HashPathIdMapper
                 }
             } else {
                 try {
-                    out.append(URLEncoder.encode("" + c, "UTF-8"));
+                    out.append(URLEncoder.encode(Character.toString(c), "UTF-8"));
                 } catch (UnsupportedEncodingException wontHappen) {
                     throw new RuntimeException(wontHappen);
                 }
             }
         }
-        return out.toString();
     }
 
     private static String decode(String encodedURI) {
         if (encodedURI.endsWith("%2E")) {
-            encodedURI = encodedURI.substring(0, encodedURI.length() - 3) + ".";
+            encodedURI = encodedURI.substring(0, encodedURI.length() - 3).concat(".");
         }
         try {
             return URLDecoder.decode(encodedURI, "UTF-8");

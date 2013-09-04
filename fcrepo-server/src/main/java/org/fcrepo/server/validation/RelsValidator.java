@@ -19,6 +19,7 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.common.FaultException;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.errors.ValidationException;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -127,23 +128,13 @@ public class RelsValidator
 
     private String m_literalType;
 
-    private StringBuffer m_literalValue;
-
-    // SAX parser
-    private final SAXParser m_parser;
+    private StringBuilder m_literalValue;
 
     private static final String RELS_EXT = "RELS-EXT";
 
     private static final String RELS_INT = "RELS-INT";
 
     public RelsValidator() {
-        try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            m_parser = spf.newSAXParser();
-        } catch (Exception wontHappen) {
-            throw new FaultException(wontHappen);
-        }
     }
 
     public void validate(PID pid, String dsId, InputStream content)
@@ -159,7 +150,7 @@ public class RelsValidator
                         + dsId + ")");
             }
             m_dsId = dsId;
-            m_parser.parse(content, this);
+            XmlTransformUtility.parseWithoutValidating(content, this);
         } catch (Exception e) {
             throw new ValidationException(dsId + " validation failed: "
                     + e.getMessage(), e);
@@ -226,7 +217,7 @@ public class RelsValidator
                     } else {
                         m_literalType = datatypeURI;
                     }
-                    m_literalValue = new StringBuffer();
+                    m_literalValue = new StringBuilder();
                 }
             } else {
                 throw new SAXException("RelsExtValidator:"
@@ -385,7 +376,7 @@ public class RelsValidator
                         + m_doURI + ").");
             }
         } else if (m_dsId.equals(RELS_INT)) {
-            if (!aboutURI.startsWith(m_doURI + "/")) {
+            if (!(aboutURI.startsWith(m_doURI) && (aboutURI.charAt(m_doURI.length()) == '/'))) {
                 throw new SAXException("RelsExtValidator:"
                         + " The RELS-INT datastream refers to"
                         + " an improper URI in the 'about' attribute of the"
@@ -395,7 +386,7 @@ public class RelsValidator
                         + m_doURI + ", " + aboutURI + ").");
 
             }
-            String dsId = aboutURI.replace(m_doURI + "/", "");
+            String dsId = aboutURI.substring(m_doURI.length() + 1);
             // datastream ID must be an XML NCName, implemented using NCName class
             if (dsId.length() > ValidationConstants.DATASTREAM_ID_MAXLEN
                     || dsId.length() < 1 || !isValid(dsId)) {

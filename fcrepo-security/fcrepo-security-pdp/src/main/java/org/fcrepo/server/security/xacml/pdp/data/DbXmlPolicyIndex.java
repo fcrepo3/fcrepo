@@ -18,6 +18,7 @@ package org.fcrepo.server.security.xacml.pdp.data;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -118,7 +119,7 @@ public class DbXmlPolicyIndex
             // Get the query (query gets prepared if necesary)
             a = System.nanoTime();
 
-            Map<String, Set<AttributeBean>> attributeMap =
+            Map<String, Collection<AttributeBean>> attributeMap =
                 getAttributeMap(eval);
 
             context = m_dbXmlManager.manager.createQueryContext();
@@ -213,12 +214,12 @@ public class DbXmlPolicyIndex
      * @throws XmlException
      * @throws PolicyIndexException
      */
-    private XmlQueryExpression getQuery(Map<String, Set<AttributeBean>> attributeMap,
+    private XmlQueryExpression getQuery(Map<String, Collection<AttributeBean>> attributeMap,
                                         XmlQueryContext context,
                                         int r) throws XmlException  {
         // The dimensions for this query.
-        StringBuilder sb = new StringBuilder();
-        for (Set<AttributeBean> attributeBeans : attributeMap.values()) {
+        StringBuilder sb = new StringBuilder(64 * attributeMap.size());
+        for (Collection<AttributeBean> attributeBeans : attributeMap.values()) {
             sb.append(attributeBeans.size() + ":");
             for (AttributeBean bean : attributeBeans) {
                 sb.append(bean.getValues().size() + "-");
@@ -236,7 +237,7 @@ public class DbXmlPolicyIndex
         String query = createQuery(attributeMap);
 
         if (log.isDebugEnabled()) {
-            log.debug("Query [" + hash + "]:\n" + query);
+            log.debug("Query [{}]:\n{}", hash, query);
         }
 
         // Once we have created a query, we can parse it and store the
@@ -259,9 +260,13 @@ public class DbXmlPolicyIndex
      *        the number of components in the resource id
      * @return the query as a String
      */
-    private String createQuery(Map<String, Set<AttributeBean>> attributeMap) {
-        return "collection('" + m_dbXmlManager.CONTAINER + "')" + getXpath(attributeMap);
-
+    private String createQuery(Map<String, Collection<AttributeBean>> attributeMap) {
+        StringBuilder sb = new StringBuilder(256);
+        sb.append("collection('");
+        sb.append(m_dbXmlManager.CONTAINER);
+        sb.append("')");
+        getXpath(attributeMap, sb);
+        return  sb.toString();
     }
 
     /*
@@ -451,11 +456,11 @@ public class DbXmlPolicyIndex
         XmlDocument doc = m_dbXmlManager.manager.createDocument();
         String docName = name;
 
-        if (docName == null || "".equals(docName)) {
+        if (docName == null || docName.isEmpty()) {
             docName = metadata.get("PolicyId");
         }
 
-        if (docName == null || "".equals(docName)) {
+        if (docName == null || docName.isEmpty()) {
             throw new PolicyIndexException("Could not extract PolicyID from document.");
         }
 

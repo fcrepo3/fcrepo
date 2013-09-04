@@ -37,6 +37,7 @@ import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.jrdf.graph.ObjectNode;
 import org.jrdf.graph.PredicateNode;
 import org.jrdf.graph.SubjectNode;
@@ -158,13 +159,13 @@ public class SimpleDOReader
     @Override
     public InputStream GetObjectXML() throws ObjectIntegrityException,
                                              StreamIOException, UnsupportedTranslationException, ServerException {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        ReadableByteArrayOutputStream bytes = new ReadableByteArrayOutputStream(4096);
         m_translator.serialize(m_obj,
                                bytes,
                                m_storageFormat,
                                "UTF-8",
                                DOTranslationUtility.SERIALIZE_STORAGE_INTERNAL);
-        return new ByteArrayInputStream(bytes.toByteArray());
+        return bytes.toInputStream();
     }
 
     /**
@@ -174,12 +175,11 @@ public class SimpleDOReader
     public InputStream Export(String format, String exportContext)
             throws ObjectIntegrityException, StreamIOException,
                    UnsupportedTranslationException, ServerException {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         int transContext;
         // first, set the translation context...
-        logger.debug("Export context: " + exportContext);
+        logger.debug("Export context: {}", exportContext);
 
-        if (exportContext == null || exportContext.equals("")
+        if (exportContext == null || exportContext.isEmpty()
             || exportContext.equalsIgnoreCase("default")) {
             // null and default is set to PUBLIC translation
             transContext = DOTranslationUtility.SERIALIZE_EXPORT_PUBLIC;
@@ -193,21 +193,24 @@ public class SimpleDOReader
             throw new UnsupportedTranslationException("Export context "
                                                       + exportContext + " is not valid.");
         }
+
+        // allocate the ByteArrayOutputStream with a 4k initial capacity to constrain copying up
+        ReadableByteArrayOutputStream bytes = new ReadableByteArrayOutputStream(4096);
         // now serialize for export in the proper XML format...
-        if (format == null || format.equals("")
+        if (format == null || format.isEmpty()
             || format.equalsIgnoreCase("default")) {
-            logger.debug("Export in default format: " + m_exportFormat);
+            logger.debug("Export in default format: {}", m_exportFormat);
             m_translator.serialize(m_obj,
                                    bytes,
                                    m_exportFormat,
                                    "UTF-8",
                                    transContext);
         } else {
-            logger.debug("Export in format: " + format);
+            logger.debug("Export in format: {}", format);
             m_translator.serialize(m_obj, bytes, format, "UTF-8", transContext);
         }
 
-        return new ByteArrayInputStream(bytes.toByteArray());
+        return bytes.toInputStream();
     }
 
     /**

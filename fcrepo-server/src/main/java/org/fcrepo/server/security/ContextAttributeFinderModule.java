@@ -5,7 +5,6 @@
 package org.fcrepo.server.security;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
@@ -36,77 +35,46 @@ class ContextAttributeFinderModule
     private ContextAttributeFinderModule(ContextRegistry contexts) {
         super();
         m_contexts = contexts;
-        try {
-            registerSupportedDesignatorType(AttributeDesignator.SUBJECT_TARGET);
-            registerSupportedDesignatorType(AttributeDesignator.ACTION_TARGET); //<<??????
-            registerSupportedDesignatorType(AttributeDesignator.RESOURCE_TARGET); //<<?????
-            registerSupportedDesignatorType(AttributeDesignator.ENVIRONMENT_TARGET);
 
-            registerAttribute(Constants.ENVIRONMENT.CURRENT_DATE_TIME.uri,
-                              Constants.ENVIRONMENT.CURRENT_DATE_TIME.datatype);
-            registerAttribute(Constants.ENVIRONMENT.CURRENT_DATE.uri,
-                              Constants.ENVIRONMENT.CURRENT_DATE.datatype);
-            registerAttribute(Constants.ENVIRONMENT.CURRENT_TIME.uri,
-                              Constants.ENVIRONMENT.CURRENT_TIME.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.PROTOCOL.uri,
-                              Constants.HTTP_REQUEST.PROTOCOL.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.SCHEME.uri,
-                              Constants.HTTP_REQUEST.SCHEME.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.SECURITY.uri,
-                              Constants.HTTP_REQUEST.SECURITY.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.AUTHTYPE.uri,
-                              Constants.HTTP_REQUEST.AUTHTYPE.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.METHOD.uri,
-                              Constants.HTTP_REQUEST.METHOD.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.SESSION_ENCODING.uri,
-                              Constants.HTTP_REQUEST.SESSION_ENCODING.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.SESSION_STATUS.uri,
-                              Constants.HTTP_REQUEST.SESSION_STATUS.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.CONTENT_LENGTH.uri,
-                              Constants.HTTP_REQUEST.CONTENT_LENGTH.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.CONTENT_TYPE.uri,
-                              Constants.HTTP_REQUEST.CONTENT_TYPE.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.CLIENT_FQDN.uri,
-                              Constants.HTTP_REQUEST.CLIENT_FQDN.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.uri,
-                              Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.SERVER_FQDN.uri,
-                              Constants.HTTP_REQUEST.SERVER_FQDN.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.SERVER_IP_ADDRESS.uri,
-                              Constants.HTTP_REQUEST.SERVER_IP_ADDRESS.datatype);
-            registerAttribute(Constants.HTTP_REQUEST.SERVER_PORT.uri,
-                              Constants.HTTP_REQUEST.SERVER_PORT.datatype);
+        registerSupportedDesignatorType(AttributeDesignator.SUBJECT_TARGET);
+        registerSupportedDesignatorType(AttributeDesignator.ACTION_TARGET); //<<??????
+        registerSupportedDesignatorType(AttributeDesignator.RESOURCE_TARGET); //<<?????
+        registerSupportedDesignatorType(AttributeDesignator.ENVIRONMENT_TARGET);
 
-            attributesDenied.add(Constants.XACML1_SUBJECT.ID.uri);
-            attributesDenied.add(Constants.XACML1_ACTION.ID.uri);
-            attributesDenied.add(Constants.XACML1_RESOURCE.ID.uri);
+        registerAttribute(Constants.ENVIRONMENT.CURRENT_DATE_TIME);
+        registerAttribute(Constants.ENVIRONMENT.CURRENT_DATE);
+        registerAttribute(Constants.ENVIRONMENT.CURRENT_TIME);
+        registerAttribute(Constants.HTTP_REQUEST.PROTOCOL);
+        registerAttribute(Constants.HTTP_REQUEST.SCHEME);
+        registerAttribute(Constants.HTTP_REQUEST.SECURITY);
+        registerAttribute(Constants.HTTP_REQUEST.AUTHTYPE);
+        registerAttribute(Constants.HTTP_REQUEST.METHOD);
+        registerAttribute(Constants.HTTP_REQUEST.SESSION_ENCODING);
+        registerAttribute(Constants.HTTP_REQUEST.SESSION_STATUS);
+        registerAttribute(Constants.HTTP_REQUEST.CONTENT_LENGTH);
+        registerAttribute(Constants.HTTP_REQUEST.CONTENT_TYPE);
+        registerAttribute(Constants.HTTP_REQUEST.CLIENT_FQDN);
+        registerAttribute(Constants.HTTP_REQUEST.CLIENT_IP_ADDRESS);
+        registerAttribute(Constants.HTTP_REQUEST.SERVER_FQDN);
+        registerAttribute(Constants.HTTP_REQUEST.SERVER_IP_ADDRESS);
+        registerAttribute(Constants.HTTP_REQUEST.SERVER_PORT);
 
-            attributesDenied.add(Constants.ACTION.CONTEXT_ID.uri);
-            attributesDenied.add(Constants.SUBJECT.LOGIN_ID.uri);
-            attributesDenied.add(Constants.ACTION.ID.uri);
-            attributesDenied.add(Constants.ACTION.API.uri);
+        denyAttribute(Constants.XACML1_SUBJECT.ID.attributeId);
+        denyAttribute(Constants.XACML1_ACTION.ID.attributeId);
+        denyAttribute(Constants.XACML1_RESOURCE.ID.attributeId);
 
-            setInstantiatedOk(true);
-        } catch (URISyntaxException e1) {
-            setInstantiatedOk(false);
-        }
+        denyAttribute(Constants.ACTION.CONTEXT_ID.attributeId);
+        denyAttribute(Constants.SUBJECT.LOGIN_ID.attributeId);
+        denyAttribute(Constants.ACTION.ID.attributeId);
+        denyAttribute(Constants.ACTION.API.attributeId);
+
+        setInstantiatedOk(true);
     }
 
     private final String getContextId(EvaluationCtx context) {
-        URI contextIdType = null;
-        URI contextIdId = null;
-        try {
-            contextIdType = new URI(StringAttribute.identifier);
-        } catch (URISyntaxException e) {
-            logger.debug("ContextAttributeFinder:getContextId" + " exit on "
-                    + "couldn't make URI for contextId type");
-        }
-        try {
-            contextIdId = new URI(Constants.ACTION.CONTEXT_ID.uri);
-        } catch (URISyntaxException e) {
-            logger.debug("ContextAttributeFinder:getContextId" + " exit on "
-                    + "couldn't make URI for contextId itself");
-        }
+        final URI contextIdType = STRING_ATTRIBUTE_TYPE_URI;
+        final URI contextIdId = Constants.ACTION.CONTEXT_ID.getURI();
+
         logger.debug("ContextAttributeFinder:findAttribute"
                 + " about to call getAttributeFromEvaluationCtx");
 
@@ -144,10 +112,7 @@ class ContextAttributeFinderModule
     }
 
     private final boolean validContextId(String contextId) {
-        if (contextId == null) {
-            return false;
-        }
-        if ("".equals(contextId)) {
+        if (contextId == null || contextId.isEmpty()) {
             return false;
         }
         if (" ".equals(contextId)) {
@@ -158,27 +123,30 @@ class ContextAttributeFinderModule
 
     @Override
     protected final Object getAttributeLocally(int designatorType,
-                                               String attributeId,
+                                               URI attributeId,
                                                URI resourceCategory,
                                                EvaluationCtx ctx) {
         logger.debug("getAttributeLocally context");
         String contextId = getContextId(ctx);
-        logger.debug("contextId=" + contextId + " attributeId=" + attributeId);
-        if (contextId == null || contextId.equals("")) {
+        logger.debug("contextId={} attributeID={}", contextId, attributeId);
+        if (contextId == null || contextId.isEmpty()) {
             return null;
         }
         Context context = m_contexts.getContext(contextId);
         logger.debug("got context");
         Object values = null;
-        logger.debug("designatorType" + designatorType);
+        logger.debug("designatorType{}", designatorType);
         switch (designatorType) {
             case AttributeDesignator.SUBJECT_TARGET:
-                if (0 > context.nSubjectValues(attributeId)) {
+                String attributeName = attributeId.toString();
+                if (0 > context.nSubjectValues(attributeName)) {
                     values = null;
                 } else {
-                    logger.debug("getting n values for " + attributeId + "="
-                            + context.nSubjectValues(attributeId));
-                    switch (context.nSubjectValues(attributeId)) {
+                    if (logger.isDebugEnabled()) {
+                    logger.debug("getting n values for {}={}", attributeId,
+                            context.nSubjectValues(attributeName));
+                    }
+                    switch (context.nSubjectValues(attributeName)) {
                         case 0:
                             values = null;
                             /*
@@ -189,18 +157,18 @@ class ContextAttributeFinderModule
                         case 1:
                             values = new String[1];
                             ((String[]) values)[0] =
-                                    context.getSubjectValue(attributeId);
+                                    context.getSubjectValue(attributeName);
                             break;
                         default:
-                            values = context.getSubjectValues(attributeId);
+                            values = context.getSubjectValues(attributeName);
                     }
                     if (logger.isDebugEnabled()) {
                         if (values == null) {
-                            logger.debug("RETURNING NO VALUES FOR " + attributeId);
+                            logger.debug("RETURNING NO VALUES FOR " + attributeName);
                         } else {
                             StringBuffer sb = new StringBuffer();
                             sb.append("RETURNING " + ((String[]) values).length
-                                    + " VALUES FOR " + attributeId + " ==");
+                                    + " VALUES FOR " + attributeName + " ==");
                             for (int i = 0; i < ((String[]) values).length; i++) {
                                 sb.append(" " + ((String[]) values)[i]);
                             }
@@ -277,8 +245,9 @@ class ContextAttributeFinderModule
                 break;
             default:
         }
+        logger.debug("local context attribute {}", attributeId);
         if (values instanceof String) {
-            logger.debug("getAttributeLocally string value=" + (String) values);
+            logger.debug("getAttributeLocally string value={}", (String) values);
         } else if (values instanceof String[]) {
             logger.debug("getAttributeLocally string values={}", values);
             for (int i = 0; i < ((String[]) values).length; i++) {

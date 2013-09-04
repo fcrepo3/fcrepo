@@ -101,7 +101,7 @@ public class ListMethodsFilter
             String[] parts1 = getPathParts(request);
             resAttr = ResourceAttributes.getResources(parts1);
 
-            if (dateTime != null && !"".equals(dateTime)) {
+            if (dateTime != null && !dateTime.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(dateTime));
             }

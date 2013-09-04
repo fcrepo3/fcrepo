@@ -69,7 +69,7 @@ public class PostgresDDLConverter
                 }
             }
             if (cs.isUnique()) {
-                if (!end.toString().equals("")) {
+                if (end.length() != 0) {
                     end.append(",\n");
                 }
                 end.append("  UNIQUE");
@@ -84,7 +84,7 @@ public class PostgresDDLConverter
             }
 
             if (cs.getForeignTableName() != null) {
-                if (!end.toString().equals("")) {
+                if (end.length() != 0) {
                     end.append(",\n");
                 }
                 end.append("  FOREIGN KEY ");
@@ -107,7 +107,7 @@ public class PostgresDDLConverter
             out.append(spec.getPrimaryColumnName());
             out.append(")");
         }
-        if (!end.toString().equals("")) {
+        if (end.length() != 0) {
             out.append(",\n");
             out.append(end);
         }

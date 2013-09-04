@@ -64,12 +64,13 @@ public class PID {
     public PID(String pidString)
             throws MalformedPIDException {
         if (pidString.startsWith(Constants.FEDORA.uri)) {
-            pidString = pidString.substring(Constants.FEDORA.uri.length());
+            m_normalized = normalize(pidString, Constants.FEDORA.uri.length(), pidString.length());
+        } else {
+            m_normalized = normalize(pidString);
         }
-        m_normalized = normalize(pidString);
-        String[] split = m_normalized.split(":");
-        m_namespaceId = split[0];
-        m_objectId = split[1];
+        int colon = m_normalized.indexOf(':');
+        m_namespaceId = m_normalized.substring(0, colon);
+        m_objectId = m_normalized.substring(colon + 1);
     }
 
     /**
@@ -106,11 +107,16 @@ public class PID {
         if (pidString == null) {
             throw new MalformedPIDException("PID is null.");
         }
+        
+        return normalize(pidString, 0, pidString.length());
+    }
 
+    private static String normalize(String pidString, int offset, int stop)
+            throws MalformedPIDException {
         // Then normalize while checking syntax
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
         boolean inObjectID = false;
-        for (int i = 0; i < pidString.length(); i++) {
+        for (int i = offset; i < stop; i++) {
             char c = pidString.charAt(i);
             if (!inObjectID) {
                 if (c == ':') {
@@ -124,7 +130,7 @@ public class PID {
                             i++;
                             c = pidString.charAt(i);
                             if (c == 'a' || c == 'A') {
-                                out.append(":");
+                                out.append(':');
                                 inObjectID = true;
                             } else {
                                 throw new MalformedPIDException("Error in PID after first '%': expected '3a' or '3A', but saw '3"
@@ -153,7 +159,7 @@ public class PID {
                 if (pidString.length() >= i + 3) {
                     char h1 = getNormalizedHexChar(pidString.charAt(++i));
                     char h2 = getNormalizedHexChar(pidString.charAt(++i));
-                    out.append("%" + h1 + h2);
+                    out.append(new char[]{'%', h1, h2});
                 } else {
                     throw new MalformedPIDException("PID object-id ended early: need at least 2 chars after '%'.");
                 }
@@ -192,9 +198,11 @@ public class PID {
         if (c >= '0' && c <= '9') {
             return c;
         }
-        c = ("" + c).toUpperCase().charAt(0);
         if (c >= 'A' && c <= 'F') {
             return c;
+        }
+        if (c >= 'a' && c <= 'f') {
+            return Character.toUpperCase(c);
         }
         throw new MalformedPIDException("Bad hex-digit in PID object-id: " + c);
     }
@@ -212,14 +220,14 @@ public class PID {
      * "info:fedora/".
      */
     public String toURI() {
-        return Constants.FEDORA.uri + m_normalized;
+        return Constants.FEDORA.uri.concat(m_normalized);
     }
 
     /**
      * Return the URI form of some PID string, assuming it is well-formed.
      */
     public static String toURI(String pidString) {
-        return Constants.FEDORA.uri + pidString;
+        return Constants.FEDORA.uri.concat(pidString);
     }
 
     /**
@@ -301,7 +309,7 @@ public class PID {
                 try {
                     System.out.print("Enter a PID (ENTER to exit): ");
                     String line = reader.readLine();
-                    if (line.equals("")) {
+                    if (line.isEmpty()) {
                         done = true;
                     } else {
                         PID p = new PID(line);

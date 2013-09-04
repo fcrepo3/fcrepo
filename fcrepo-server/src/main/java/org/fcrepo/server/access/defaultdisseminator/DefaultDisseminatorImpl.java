@@ -4,25 +4,24 @@
  */
 package org.fcrepo.server.access.defaultdisseminator;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.access.Access;
 import org.fcrepo.server.access.ObjectProfile;
@@ -30,13 +29,15 @@ import org.fcrepo.server.errors.DisseminationException;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.rest.DefaultSerializer;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.MethodDef;
 import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
-
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
 
 
@@ -105,25 +106,27 @@ public class DefaultDisseminatorImpl
                     m_access.getObjectProfile(context,
                                               reader.GetObjectPID(),
                                               asOfDateTime);
-            InputStream in = null;
+            Reader in = null;
             try {
-                in =
-                        new ByteArrayInputStream(new ObjectInfoAsXML(context)
-                                .getObjectProfile(reposBaseURL,
-                                                  profile,
-                                                  asOfDateTime)
-                                .getBytes("UTF-8"));
-            } catch (UnsupportedEncodingException uee) {
+                ReadableCharArrayWriter out = new ReadableCharArrayWriter(1024);
+                DefaultSerializer.objectProfileToXML(profile, asOfDateTime, out);
+                out.close();
+                in = out.toReader();
+            } catch (IOException ioe) {
                 throw new GeneralException("[DefaultDisseminatorImpl] An error has occurred. "
                         + "The error was a \""
-                        + uee.getClass().getName()
+                        + ioe.getClass().getName()
                         + "\"  . The "
                         + "Reason was \""
-                        + uee.getMessage()
+                        + ioe.getMessage()
                         + "\"  .");
             }
             //InputStream in = getObjectProfile().getStream();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ReadableByteArrayOutputStream bytes =
+                    new ReadableByteArrayOutputStream(4096);
+            PrintWriter out =
+                    new PrintWriter(
+                            new OutputStreamWriter(bytes, Charset.forName("UTF-8")));
             File xslFile =
                     new File(reposHomeDir, "access/viewObjectProfile.xslt");
             Templates template =
@@ -132,10 +135,10 @@ public class DefaultDisseminatorImpl
             transformer.setParameter("fedora", context
                     .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME));
             transformer.transform(new StreamSource(in), new StreamResult(out));
-            byte [] bytes = out.toByteArray();
-            in = new ByteArrayInputStream(bytes);
-            return new MIMETypedStream("text/html", in, null, bytes.length);
-        } catch (TransformerException e) {
+            out.close();
+            return new MIMETypedStream("text/html", bytes.toInputStream(),
+                    null, bytes.length());
+        } catch (Exception e) {
             throw new DisseminationException("[DefaultDisseminatorImpl] had an error "
                     + "in transforming xml for viewObjectProfile. "
                     + "Underlying exception was: " + e.getMessage());
@@ -166,27 +169,22 @@ public class DefaultDisseminatorImpl
                 m_access.listMethods(context,
                                      reader.GetObjectPID(),
                                      asOfDateTime);
-        InputStream in = null;
-        try {
-            in =
-                    new ByteArrayInputStream(new ObjectInfoAsXML(context)
-                            .getMethodIndex(reposBaseURL,
-                                            reader.GetObjectPID(),
-                                            methods,
-                                            asOfDateTime).getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException uee) {
-            throw new GeneralException("[DefaultDisseminatorImpl] An error has occurred. "
-                    + "The error was a \""
-                    + uee.getClass().getName()
-                    + "\"  . The "
-                    + "Reason was \""
-                    + uee.getMessage()
-                    + "\"  .");
-        }
+        ReadableCharArrayWriter buffer = new ReadableCharArrayWriter(1024);
+        ObjectInfoAsXML
+        .getMethodIndex(reposBaseURL,
+                reader.GetObjectPID(),
+                methods,
+                asOfDateTime,
+                buffer);
+        buffer.close();
+        Reader in = buffer.toReader();
 
         // transform the method definitions xml to an html view
         try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ReadableByteArrayOutputStream bytes =
+                    new ReadableByteArrayOutputStream(2048);
+            PrintWriter out = new PrintWriter(
+                    new OutputStreamWriter(bytes, Charset.forName("UTF-8")));
             File xslFile =
                     new File(reposHomeDir, "access/listMethods.xslt");
             Templates template =
@@ -195,10 +193,10 @@ public class DefaultDisseminatorImpl
             transformer.setParameter("fedora", context
                     .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME));
             transformer.transform(new StreamSource(in), new StreamResult(out));
-            byte [] bytes = out.toByteArray();
-            in = new ByteArrayInputStream(bytes);
-            return new MIMETypedStream("text/html", in, null, bytes.length);
-        } catch (TransformerException e) {
+            out.close();
+            return new MIMETypedStream("text/html", bytes.toInputStream(),
+                    null, bytes.length());
+        } catch (Exception e) {
             throw new DisseminationException("[DefaultDisseminatorImpl] had an error "
                     + "in transforming xml for viewItemIndex. "
                     + "Underlying exception was: " + e.getMessage());
@@ -217,15 +215,17 @@ public class DefaultDisseminatorImpl
      */
     public MIMETypedStream viewItemIndex() throws ServerException {
         // get the item index as xml
-        InputStream in = null;
+        Reader in = null;
         try {
-            in =
-                    new ByteArrayInputStream(new ObjectInfoAsXML(context)
+            ReadableCharArrayWriter out = new ReadableCharArrayWriter(4096);
+            ObjectInfoAsXML
                             .getItemIndex(reposBaseURL,
                                           context
                                                   .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME),
                                           reader,
-                                          asOfDateTime).getBytes("UTF-8"));
+                                          asOfDateTime, out);
+            out.close();
+            in = out.toReader();
         } catch (Exception e) {
             throw new GeneralException("[DefaultDisseminatorImpl] An error has occurred. "
                     + "The error was a \""
@@ -236,7 +236,10 @@ public class DefaultDisseminatorImpl
         // convert the xml to an html view
         try {
             //InputStream in = getItemIndex().getStream();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ReadableByteArrayOutputStream bytes =
+                    new ReadableByteArrayOutputStream(2048);
+            PrintWriter out = new PrintWriter(
+                    new OutputStreamWriter(bytes, Charset.forName("UTF-8")));
             File xslFile = new File(reposHomeDir, "access/viewItemIndex.xslt");
             Templates template =
                     XmlTransformUtility.getTemplates(xslFile);
@@ -245,10 +248,10 @@ public class DefaultDisseminatorImpl
                     .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME));
             transformer.transform(new StreamSource(in), new StreamResult(out));
 
-            byte [] bytes = out.toByteArray();
-            in = new ByteArrayInputStream(bytes);
-            return new MIMETypedStream("text/html", in, null, bytes.length);
-        } catch (TransformerException e) {
+            out.close();
+            return new MIMETypedStream("text/html", bytes.toInputStream(),
+                    null, bytes.length());
+        } catch (Exception e) {
             throw new DisseminationException("[DefaultDisseminatorImpl] had an error "
                     + "in transforming xml for viewItemIndex. "
                     + "Underlying exception was: " + e.getMessage());
@@ -265,33 +268,30 @@ public class DefaultDisseminatorImpl
     public MIMETypedStream viewDublinCore() throws ServerException {
         // get dublin core record as xml
         Datastream dcmd = null;
-        InputStream in = null;
+        Reader in = null;
         try {
+            ReadableCharArrayWriter out = new ReadableCharArrayWriter(512);
             dcmd =
                     reader.GetDatastream("DC",
                                                                  asOfDateTime);
-            in =
-                    new ByteArrayInputStream(new ObjectInfoAsXML(context)
-                            .getOAIDublinCore(dcmd).getBytes("UTF-8"));
+            ObjectInfoAsXML.getOAIDublinCore(dcmd, out);
+            out.close();
+            in = out.toReader();
         } catch (ClassCastException cce) {
             throw new ObjectIntegrityException("Object "
                     + reader.GetObjectPID()
                     + " has a DC datastream, but it's not inline XML.");
 
-        } catch (UnsupportedEncodingException uee) {
-            throw new GeneralException("[DefaultDisseminatorImpl] An error has occurred. "
-                    + "The error was a \""
-                    + uee.getClass().getName()
-                    + "\"  . The "
-                    + "Reason was \""
-                    + uee.getMessage()
-                    + "\"  .");
         }
 
         // convert the dublin core xml to an html view
         try {
             //InputStream in = getDublinCore().getStream();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ReadableByteArrayOutputStream bytes =
+                    new ReadableByteArrayOutputStream(1024);
+            PrintWriter out =
+                    new PrintWriter(
+                            new OutputStreamWriter(bytes, Charset.forName("UTF-8")));
             File xslFile = new File(reposHomeDir, "access/viewDublinCore.xslt");
             Templates template =
                     XmlTransformUtility.getTemplates(xslFile);
@@ -299,10 +299,10 @@ public class DefaultDisseminatorImpl
             transformer.setParameter("fedora", context
                     .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME));
             transformer.transform(new StreamSource(in), new StreamResult(out));
-            byte[] bytes = out.toByteArray();
-            in = new ByteArrayInputStream(bytes);
-            return new MIMETypedStream("text/html", in, null,bytes.length);
-        } catch (TransformerException e) {
+            out.close();
+            return new MIMETypedStream("text/html", bytes.toInputStream(),
+                    null, bytes.length());
+        } catch (Exception e) {
             throw new DisseminationException("[DefaultDisseminatorImpl] had an error "
                     + "in transforming xml for viewDublinCore. "
                     + "Underlying exception was: " + e.getMessage());
@@ -310,42 +310,30 @@ public class DefaultDisseminatorImpl
     }
 
     private MIMETypedStream noMethodIndexMsg() throws GeneralException {
-        String msg =
-                new String("The Dissemination Index is not available"
-                        + " for Content Model objects, \n or Service Definition objects or Service Deployment objects.\n"
-                        + " The addition of this feature is not currently scheduled.");
-        StringBuffer sb = new StringBuffer();
+        ReadableByteArrayOutputStream bytes = new ReadableByteArrayOutputStream(1024);
+        PrintWriter sb =
+            new PrintWriter(
+                        new OutputStreamWriter(bytes, Charset.forName("UTF-8")));
         sb
-                .append("<html><head><title>Dissemination Index Not Available</title></head>");
-        sb.append("<body><center>");
-        sb
-                .append("<table width=\"784\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">");
-        sb
-                .append("<tr><td width=\"141\" height=\"134\" valign=\"top\"><img src=\"/")
+        .append("<html><head><title>Dissemination Index Not Available</title></head>"
+                + "<body><center>"
+                + "<table width=\"784\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">"
+                + "<tr><td width=\"141\" height=\"134\" valign=\"top\"><img src=\"/")
                 .append(context
                         .getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME))
-                .append("/images/newlogo2.jpg\" width=\"141\" height=\"134\"/></td>");
-        sb.append("<td width=\"643\" valign=\"top\">");
-        sb.append("<center><h2>Fedora Repository</h2>");
-        sb.append("<h3>Dissemination Index</h3>");
-        sb.append("</center></td></tr></table>");
-        sb.append("<p>" + msg + "</p>");
-        sb.append("</body>");
-        sb.append("</html>");
-        String msgOut = sb.toString();
-        ByteArrayInputStream in = null;
-        try {
-            in = new ByteArrayInputStream(msgOut.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException uee) {
-            throw new GeneralException("[DefaultDisseminatorImpl] An error has occurred. "
-                    + "The error was a \""
-                    + uee.getClass().getName()
-                    + "\"  . The "
-                    + "Reason was \""
-                    + uee.getMessage()
-                    + "\"  .");
-        }
-        return new MIMETypedStream("text/html", in, null,in.available());
+                        .append("/images/newlogo2.jpg\" width=\"141\" height=\"134\"/></td>"
+                                + "<td width=\"643\" valign=\"top\">"
+                                + "<center><h2>Fedora Repository</h2>"
+                                + "<h3>Dissemination Index</h3>"
+                                + "</center></td></tr></table><p>");
+        sb.append("The Dissemination Index is not available"
+                + " for Content Model objects, \n or Service Definition objects or Service Deployment objects.\n"
+                + " The addition of this feature is not currently scheduled.");
+        sb.append("</p></body></html>");
+        sb.close();
+
+        InputStream in = bytes.toInputStream();
+        return new MIMETypedStream("text/html", in, null, bytes.length());
     }
 
     /**

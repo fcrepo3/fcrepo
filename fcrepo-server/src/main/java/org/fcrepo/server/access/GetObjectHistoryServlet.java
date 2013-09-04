@@ -121,7 +121,7 @@ public class GetObjectHistoryServlet
         }
 
         PID = URIArray[5];
-        logger.debug("Servicing getObjectHistory request (PID=" + PID + ")");
+        logger.debug("Servicing getObjectHistory request (PID={})", PID);
 
         // Check for xml encoding parameter; ignore any other parameters
         Hashtable<String, String> h_userParms = new Hashtable<String, String>();
@@ -130,7 +130,7 @@ public class GetObjectHistoryServlet
             String value =
                     URLDecoder.decode(request.getParameter(name), "UTF-8");
             if (name.equalsIgnoreCase("xml")) {
-                xml = new Boolean(request.getParameter(name)).booleanValue();
+                xml = Boolean.parseBoolean(request.getParameter(name));
             }
             h_userParms.put(name, value);
         }
@@ -290,9 +290,9 @@ public class GetObjectHistoryServlet
             this.objectHistory = objectHistory;
             this.PID = PID;
             if (HTTP_REQUEST.SECURE.uri.equals(context
-                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.uri))) {
+                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.attributeId))) {
             } else if (HTTP_REQUEST.INSECURE.uri.equals(context
-                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.uri))) {
+                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.attributeId))) {
             }
         }
 

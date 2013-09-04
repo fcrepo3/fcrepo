@@ -119,9 +119,9 @@ public class DisseminationService {
 					+ "300 seconds");
 			datastreamExpirationLimit = 300;
 		} else {
-			datastreamExpirationLimit = new Integer(expireLimit).intValue();
-			logger.info("datastreamExpirationLimit="
-					+ datastreamExpirationLimit);
+			datastreamExpirationLimit = Integer.parseInt(expireLimit);
+			logger.info("datastreamExpirationLimit={}",
+					datastreamExpirationLimit);
 		}
 		String dsMediation = server
 				.getModule("org.fcrepo.server.access.Access").getParameter(
@@ -129,7 +129,7 @@ public class DisseminationService {
 		if (dsMediation == null || dsMediation.equalsIgnoreCase("")) {
 			logger.info("doMediateDatastreams unspecified; defaulting to false");
 		} else {
-			m_doDatastreamMediation = new Boolean(dsMediation).booleanValue();
+			m_doDatastreamMediation = Boolean.parseBoolean(dsMediation);
 		}
 
 		String useNewUrlEncodingTest = server
@@ -138,7 +138,7 @@ public class DisseminationService {
 		if (useNewUrlEncodingTest == null || useNewUrlEncodingTest.equalsIgnoreCase("")) {
 			logger.info("useNewUrlEncodingTest unspecified; defaulting to false");
 		} else {
-			m_useNewUrlEncodingTest = new Boolean(useNewUrlEncodingTest).booleanValue();
+			m_useNewUrlEncodingTest = Boolean.parseBoolean(useNewUrlEncodingTest);
 		}
 		
 		m_ecm = server.getBean(
@@ -221,7 +221,7 @@ public class DisseminationService {
 						replaced.append(parts[0]);
 						for (int x = 1; x < parts.length; x++) {
 							replaced.append('=');
-							int rightParenPos = parts[x].indexOf(")");
+							int rightParenPos = parts[x].indexOf(')');
 							if (rightParenPos != -1 && rightParenPos > 0) {
 								String key = parts[x].substring(0,
 										rightParenPos);
@@ -331,10 +331,9 @@ public class DisseminationService {
 				String callbackRole = deploymentPID;
 				Hashtable<String, String> beHash = m_beSS.getSecuritySpec(
 						callbackRole, methodName);
-				boolean callbackBasicAuth = new Boolean(
-						beHash.get("callbackBasicAuth")).booleanValue();
-				boolean callbackSSL = new Boolean(beHash.get("callbackSSL"))
-						.booleanValue();
+				boolean callbackBasicAuth = Boolean.parseBoolean(
+						beHash.get("callbackBasicAuth"));
+				boolean callbackSSL = Boolean.parseBoolean(beHash.get("callbackSSL"));
 				String dsMediatedServletPath = null;
 				if (callbackBasicAuth) {
 					dsMediatedServletPath = "/" + m_fedoraAppServerContext
@@ -695,12 +694,12 @@ public class DisseminationService {
 					// "call" to the backend service.
 					Hashtable<String, String> beHash = m_beSS.getSecuritySpec(
 							beServiceRole, methodName);
-					boolean beServiceCallSSL = new Boolean(
-							beHash.get("callSSL")).booleanValue();
+					boolean beServiceCallSSL = Boolean.parseBoolean(
+							beHash.get("callSSL"));
 					String beServiceCallUsername = "";
 					String beServiceCallPassword = "";
-					boolean beServiceCallBasicAuth = new Boolean(
-							beHash.get("callBasicAuth")).booleanValue();
+					boolean beServiceCallBasicAuth = Boolean.parseBoolean(
+							beHash.get("callBasicAuth"));
 					if (beServiceCallBasicAuth) {
 						beServiceCallUsername = beHash.get("callUsername");
 						beServiceCallPassword = beHash.get("callPassword");
@@ -832,8 +831,8 @@ public class DisseminationService {
 				timeStamp = Timestamp.valueOf(extractTimestamp(key));
 				if (expireLimit > timeStamp.getTime()) {
 					dsRegistry.remove(key);
-					logger.debug("DatastreamMediationKey removed from Hash: "
-							+ key);
+					logger.debug("DatastreamMediationKey removed from Hash: {}",
+							key);
 				}
 			}
 
@@ -873,14 +872,14 @@ public class DisseminationService {
 				// Store beSecurity info in hash
 				Hashtable<String, String> beHash = m_beSS.getSecuritySpec(
 						beServiceRole, methodName);
-				boolean beServiceCallbackBasicAuth = new Boolean(
-						beHash.get("callbackBasicAuth")).booleanValue();
-				boolean beServiceCallBasicAuth = new Boolean(
-						beHash.get("callBasicAuth")).booleanValue();
-				boolean beServiceCallbackSSL = new Boolean(
-						beHash.get("callbackSSL")).booleanValue();
-				boolean beServiceCallSSL = new Boolean(beHash.get("callSSL"))
-						.booleanValue();
+				boolean beServiceCallbackBasicAuth = Boolean.parseBoolean(
+						beHash.get("callbackBasicAuth"));
+				boolean beServiceCallBasicAuth = Boolean.parseBoolean(
+						beHash.get("callBasicAuth"));
+				boolean beServiceCallbackSSL = Boolean.parseBoolean(
+						beHash.get("callbackSSL"));
+				boolean beServiceCallSSL = Boolean.parseBoolean(
+				        beHash.get("callSSL"));
 				String beServiceCallUsername = beHash.get("callUsername");
 				String beServiceCallPassword = beHash.get("callPassword");
 				if (logger.isDebugEnabled()) {
@@ -949,10 +948,10 @@ public class DisseminationService {
 	 * @return The extracted Timestamp value as a string.
 	 */
 	public String extractTimestamp(String tempID) {
-		StringBuffer sb = new StringBuffer();
-		sb.append(tempID);
-		sb.replace(tempID.lastIndexOf(":"), tempID.length(), "");
-		return sb.toString();
+//		StringBuffer sb = new StringBuffer();
+//		sb.append(tempID);
+//		sb.replace(tempID.lastIndexOf(":"), tempID.length(), "");
+		return tempID.substring(0, tempID.lastIndexOf(":"));
 	}
 
 	/**
@@ -992,25 +991,26 @@ public class DisseminationService {
 	 */
 	private String stripParms(String dissURL) {
 		// if no parameters, simply return passed in string.
-		if (dissURL.indexOf("?") == -1) {
+		if (dissURL.indexOf('?') == -1) {
 			return dissURL;
 		}
-		String requestURI = dissURL.substring(0, dissURL.indexOf("?") + 1);
-		String parmString = dissURL.substring(dissURL.indexOf("?") + 1,
+		String parmString = dissURL.substring(dissURL.indexOf('?') + 1,
 				dissURL.length());
 		String[] parms = parmString.split("&");
 		StringBuffer sb = new StringBuffer();
+		sb.append(dissURL, 0, dissURL.indexOf('?') + 1);
+		int index = -1;
 		for (String element : parms) {
 			int len = element.length() - 1;
-			if (element.lastIndexOf(")") != len) {
+			if (element.lastIndexOf(')') != len) {
 				sb.append(element + "&");
+				index = sb.length() - 1;
 			}
 		}
-		int index = sb.lastIndexOf("&");
 		if (index != -1 && index + 1 == sb.length()) {
-			sb.replace(index, sb.length(), "");
+			sb.setLength(index);
 		}
-		return requestURI + sb.toString();
+		return sb.toString();
 	}
 
 	/**
@@ -1033,7 +1033,7 @@ public class DisseminationService {
 			String internalDSLocation, Date dsCreateDT, String callbackHost)
 			throws ServerException {
 
-		if (callbackHost == null || callbackHost.equals("")) {
+		if (callbackHost == null || callbackHost.isEmpty()) {
 			throw new DisseminationException(
 					"[DisseminationService] was unable to "
 							+ "resolve the base URL of the Fedora Server. The URL specified was: \""
@@ -1056,8 +1056,8 @@ public class DisseminationService {
 			logger.error(message);
 			throw new GeneralException(message);
 		}
-		logger.debug("********** Resolving Internal Datastream dsLocation: "
-				+ dsLocation);
+		logger.debug("********** Resolving Internal Datastream dsLocation: {}",
+				dsLocation);
 		return dsLocation;
 	}
 

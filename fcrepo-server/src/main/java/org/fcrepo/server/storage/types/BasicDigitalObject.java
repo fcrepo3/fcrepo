@@ -4,9 +4,6 @@
  */
 package org.fcrepo.server.storage.types;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -27,7 +24,6 @@ import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
 import org.fcrepo.common.rdf.JRDF;
-import org.fcrepo.common.rdf.SimpleURIReference;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.RDFRelationshipReader;
 
@@ -250,7 +246,7 @@ public class BasicDigitalObject
             Datastream ds = iter.next();
             versionIDs.add(ds.DSVersionID);
         }
-        return newID(versionIDs.iterator(), id + ".");
+        return newID(versionIDs.iterator(), id.concat("."));
     }
 
     public String newAuditRecordID() {
@@ -267,7 +263,7 @@ public class BasicDigitalObject
      * Sets an extended property on the object.
      *
      * @param propName
-     *        The extende property name, either a string, or URI as string.
+     *        The extended property name, either a string, or URI as string.
      */
     public void setExtProperty(String propName, String propValue) {
         m_extProperties.put(propName, propValue);
@@ -328,6 +324,7 @@ public class BasicDigitalObject
 
         // Iterate explicit relationships, finding matches and
         // determining whether the object has an explicit basic cmodel.
+
         for (RelationshipTuple t : m_rels) {
 
             // Do any hasModel rels point to a basic cmodel?
@@ -361,23 +358,19 @@ public class BasicDigitalObject
         }
 
         // If necessary, add the current basic cmodel to the set of matches
-        try {
-            if (!basicExplicit
-                    && (subject == null ||
-                            JRDF.sameSubject(subject, new SimpleURIReference(new URI(PID.toURI(m_pid)))))
-                    && (predicate == null ||
-                        JRDF.samePredicate(predicate, Constants.MODEL.HAS_MODEL))
-                    && (object == null ||
-                        JRDF.sameObject(object, Models.FEDORA_OBJECT_CURRENT))) {
-                foundRels.add(
-                        new RelationshipTuple(Constants.FEDORA.uri + m_pid,
-                                              Constants.MODEL.HAS_MODEL.uri,
-                                              Models.FEDORA_OBJECT_CURRENT.uri,
-                                              false,
-                                              null));
-            }
-        } catch (URISyntaxException e) {
-            // assume that m_pid is a valid pid
+        if (!basicExplicit
+                && (subject == null ||
+                JRDF.sameSubject(subject, PID.toURI(m_pid)))
+                && (predicate == null ||
+                JRDF.samePredicate(predicate, Constants.MODEL.HAS_MODEL))
+                && (object == null ||
+                JRDF.sameObject(object, Models.FEDORA_OBJECT_CURRENT))) {
+            foundRels.add(
+                    new RelationshipTuple(Constants.FEDORA.uri.concat(m_pid),
+                            Constants.MODEL.HAS_MODEL.uri,
+                            Models.FEDORA_OBJECT_CURRENT.uri,
+                            false,
+                            null));
         }
 
         return foundRels;

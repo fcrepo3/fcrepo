@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -23,17 +22,10 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.fcrepo.common.Constants;
-import org.fcrepo.common.FaultException;
-import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.config.ModuleConfiguration;
 import org.fcrepo.server.errors.GeneralException;
-import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
-import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.errors.ValidationException;
-import org.fcrepo.server.storage.DOReader;
-import org.fcrepo.server.storage.RepositoryReader;
-import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.XmlTransformUtility;
@@ -102,6 +94,10 @@ public class PolicyFinderModule
     private static final String VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY =
             "VALIDATE-OBJECT-POLICIES-FROM-DATASTREAM";
 
+    private static final URI STRING_ATTRIBUTE = URI.create(StringAttribute.identifier);
+    
+    private static final URI EMPTY_URI = URI.create("");
+    
     private final String m_combiningAlgorithm;
 
     private final String m_serverHome;
@@ -149,9 +145,8 @@ public class PolicyFinderModule
 
         if (moduleParameters.containsKey(VALIDATE_REPOSITORY_POLICIES_KEY)) {
             m_validateRepositoryPolicies =
-                    (new Boolean(moduleParameters
-                            .get(VALIDATE_REPOSITORY_POLICIES_KEY)))
-                            .booleanValue();
+                    Boolean.parseBoolean(moduleParameters
+                            .get(VALIDATE_REPOSITORY_POLICIES_KEY));
         } else {
             m_validateRepositoryPolicies = false;
         }
@@ -224,10 +219,10 @@ public class PolicyFinderModule
         BackendPolicies backendPolicies =
                 new BackendPolicies(m_serverHome + File.separator
                                     + BE_SECURITY_XML_LOCATION);
-        Hashtable tempfiles = backendPolicies.generateBackendPolicies();
+        Hashtable<String, String> tempfiles = backendPolicies.generateBackendPolicies();
         TransformerFactory tfactory = XmlTransformUtility.getTransformerFactory();
         try {
-            Iterator iterator = tempfiles.keySet().iterator();
+            Iterator<String> iterator = tempfiles.keySet().iterator();
             while (iterator.hasNext()) {
                 File f =
                         new File(m_serverHome + File.separator
@@ -235,8 +230,8 @@ public class PolicyFinderModule
                 // location
                 StreamSource ss = new StreamSource(f);
                 Transformer transformer = tfactory.newTransformer(ss); // xformPath
-                String key = (String) iterator.next();
-                File infile = new File((String) tempfiles.get(key));
+                String key = iterator.next();
+                File infile = new File(tempfiles.get(key));
                 FileInputStream fis = new FileInputStream(infile);
                 FileOutputStream fos =
                         new FileOutputStream(m_repositoryBackendPolicyDirectoryPath
@@ -245,10 +240,12 @@ public class PolicyFinderModule
                                       new StreamResult(fos));
             }
         } finally {
+            // return the transformerFactory
+            XmlTransformUtility.returnTransformerFactory(tfactory);
             // we're done with temp files now, so delete them
-            Iterator iter = tempfiles.keySet().iterator();
+            Iterator<String> iter = tempfiles.keySet().iterator();
             while (iter.hasNext()) {
-                File tempFile = new File((String) tempfiles.get(iter.next()));
+                File tempFile = new File(tempfiles.get(iter.next()));
                 tempFile.delete();
             }
         }
@@ -284,7 +281,7 @@ public class PolicyFinderModule
         try {
             List<AbstractPolicy> policies = new ArrayList<AbstractPolicy>(m_repositoryPolicies);
             String pid = getPid(context);
-            if (pid != null && !"".equals(pid)) {
+            if (pid != null && !pid.isEmpty()) {
                 AbstractPolicy objectPolicyFromObject = 
                         m_policyLoader.loadObjectPolicy(m_policyParser.copy(),
                                                          pid,
@@ -297,7 +294,7 @@ public class PolicyFinderModule
                     (PolicyCombiningAlgorithm) Class
                             .forName(m_combiningAlgorithm).newInstance();
             PolicySet policySet =
-                    new PolicySet(new URI(""),
+                    new PolicySet(EMPTY_URI,
                                   policyCombiningAlgorithm,
                                   null /*
                                    * no general target beyond those of
@@ -316,28 +313,20 @@ public class PolicyFinderModule
 
     // get the pid from the context, or null if unable
     public static String getPid(EvaluationCtx context) {
-        URI resourceIdType = null;
-        URI resourceIdId = null;
-        try {
-            resourceIdType = new URI(StringAttribute.identifier);
-            resourceIdId = new URI(Constants.OBJECT.PID.uri);
-        } catch (URISyntaxException e) {
-            throw new FaultException("Bad URI syntax", e);
-        }
         EvaluationResult attribute
-                = context.getResourceAttribute(resourceIdType,
-                                               resourceIdId,
+                = context.getResourceAttribute(STRING_ATTRIBUTE,
+                        Constants.OBJECT.PID.getURI(),
                                                null);
         Object element = getAttributeFromEvaluationResult(attribute);
         if (element == null) {
             logger.debug("PolicyFinderModule:getPid exit on "
-                    + "can't get contextId on request callback");
+                    + "can't get pid on request callback");
             return null;
         }
 
         if (!(element instanceof StringAttribute)) {
             logger.debug("PolicyFinderModule:getPid exit on "
-                    + "couldn't get contextId from xacml request "
+                    + "couldn't get pid from xacml request "
                     + "non-string returned");
             return null;
         }

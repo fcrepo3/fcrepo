@@ -107,10 +107,16 @@ public class NormalizedURI {
         String host = uri.getHost();
         String rURI = toString();
         if (scheme != null) {
-            rURI = rURI.replaceFirst(scheme, scheme.toLowerCase());
+            String lc = scheme.toLowerCase();
+            if (!scheme.equals(lc)){
+                rURI = rURI.replaceFirst(scheme, lc);
+            }
         }
         if (host != null) {
-            rURI = rURI.replaceFirst(host, host.toLowerCase());
+            String lc = host.toLowerCase();
+            if (!host.equals(lc)){
+                rURI = rURI.replaceFirst(host, lc);
+            }
         }
 
         // Percent-encoded characters should be uppercase
@@ -120,11 +126,11 @@ public class NormalizedURI {
             StringBuffer sb = new StringBuffer();
             int lastEnd = 0;
             while(m.find()) {
-                sb.append(rURI.substring(lastEnd, m.start()));
+                sb.append(rURI,lastEnd, m.start());
                 sb.append(m.group().toUpperCase());
                 lastEnd = m.end();
             }
-            sb.append(rURI.substring(lastEnd, rURI.length()));
+            sb.append(rURI, lastEnd, rURI.length());
             rURI = sb.toString();
         }
         uri = URI.create(rURI);

@@ -195,6 +195,7 @@ public class TestAtomDOSerializer
         StringReader in = new StringReader(stylesheet);
         StreamSource sheet = new StreamSource(in);
         Transformer validator = factory.newTransformer(sheet);
+        XmlTransformUtility.returnTransformerFactory(factory);
         validator.setOutputProperty("method", "text");
         temp = new StringWriter();
         result = new StreamResult(temp);

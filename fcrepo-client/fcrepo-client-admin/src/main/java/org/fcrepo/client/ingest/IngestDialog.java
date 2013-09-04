@@ -130,7 +130,7 @@ public class IngestDialog {
                     String sourceExportFormat = Ingest.getExportFormat(repoinfo);
                     String pid = JOptionPane.
                         showInputDialog("Enter the PID of the object to ingest.");
-                    if (pid != null && !pid.equals("")) {
+                    if (pid != null && !pid.isEmpty()) {
                         pid =
                                 Ingest.oneFromRepository(sdlg.getAPIA(),
                                                          sdlg.getAPIM(),

@@ -174,24 +174,7 @@ public class FedoraObjectTripleGenerator_3_0
                                         Set<Triple> set)
             throws Exception {
         for (RelationshipTuple tuple : reader.getRelationships()) {
-            ObjectNode oNode;
-            if (tuple.isLiteral) {
-                if (tuple.datatype != null) {
-                    oNode = new SimpleLiteral(tuple.object,
-                                              tuple.datatype);
-                } else if (tuple.language != null){
-                    oNode = new SimpleLiteral(tuple.object, tuple.language);
-                } else {
-                    oNode = new SimpleLiteral(tuple.object);
-                }
-            } else {
-                oNode = new SimpleURIReference(new URI(tuple.object));
-            }
-            set.add(new SimpleTriple(new SimpleURIReference(
-                                             new URI(tuple.subject)),
-                                     new SimpleURIReference(
-                                             new URI(tuple.predicate)),
-                                     oNode));
+            set.add(tuple.toTriple(null));
         }
     }
 

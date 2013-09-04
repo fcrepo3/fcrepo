@@ -22,6 +22,7 @@ import org.fcrepo.server.errors.UnrecognizedFieldException;
 import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.DCFields;
 import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.XmlTransformUtility;
 
 
 /**
@@ -44,7 +45,7 @@ public class ObjectFields
 
     private Date m_dcmDate;
 
-    private StringBuffer m_currentContent;
+    private StringBuilder m_currentContent = new StringBuilder();
 
     private final boolean[] m_want = new boolean[26];
 
@@ -154,18 +155,8 @@ public class ObjectFields
             RepositoryConfigurationException, ObjectIntegrityException,
             StreamIOException {
         this(fieldNames);
-        SAXParser parser = null;
         try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            parser = spf.newSAXParser();
-        } catch (Exception e) {
-            throw new RepositoryConfigurationException("Error getting SAX "
-                    + "parser for DC metadata: " + e.getClass().getName()
-                    + ": " + e.getMessage());
-        }
-        try {
-            parser.parse(in, this);
+            XmlTransformUtility.parseWithoutValidating(in, this);
         } catch (SAXException saxe) {
             throw new ObjectIntegrityException("Parse error parsing ObjectFields: "
                     + saxe.getMessage());
@@ -180,7 +171,7 @@ public class ObjectFields
                              String localName,
                              String qName,
                              Attributes attrs) {
-        m_currentContent = new StringBuffer();
+        m_currentContent.setLength(0);
     }
 
     @Override

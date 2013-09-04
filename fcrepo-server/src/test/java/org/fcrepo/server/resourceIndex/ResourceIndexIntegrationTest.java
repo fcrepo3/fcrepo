@@ -31,6 +31,9 @@ import org.trippi.RDFFormat;
 import org.trippi.RDFUtil;
 import org.trippi.TripleIterator;
 import org.trippi.TriplestoreConnector;
+import org.trippi.TriplestoreReader;
+import org.trippi.TriplestoreWriter;
+import org.trippi.io.SimpleTripleIterator;
 import org.trippi.io.TripleIteratorFactory;
 
 import org.fcrepo.common.Models;
@@ -162,29 +165,21 @@ public abstract class ResourceIndexIntegrationTest {
     private void tearDownTriplestore() throws Exception {
 
         // delete all triples from the RI
-        File dump = new File(TEST_DIR + "/all-triples.txt");
-        FileOutputStream out = null;
+        initRI(1);
         try {
+            TriplestoreWriter writer = getConnector().getWriter();
             // write all to temp file
-            TripleIterator triples = _ri.findTriples(null, null, null, -1);
-            out = new FileOutputStream(dump);
-            triples.toStream(out, RDFFormat.TURTLE);
-            try {
-                out.close();
-            } catch (Exception e) {
+            TripleIterator triples = writer.findTriples(null, null, null, -1);
+            HashSet<Triple> temp = new HashSet<Triple>();
+            while(triples.hasNext()) {
+                temp.add(triples.next());
             }
-            out = null;
-
-            // load all from temp file
-            triples =
-                    _factory.fromStream(new FileInputStream(dump),
-                                              RDFFormat.TURTLE);
+            
+            triples.close();
+            triples = new SimpleTripleIterator(temp, triples.getAliasMap());
             _ri.delete(triples, true);
         } finally {
-            if (out != null) {
-                out.close();
-            }
-            dump.delete();
+            // nothing left to do
         }
 
         _ri.close();
@@ -194,7 +189,7 @@ public abstract class ResourceIndexIntegrationTest {
 
     protected void doAddDelTest(int riLevel, DigitalObject obj)
             throws Exception {
-        Set<DigitalObject> set = new HashSet<DigitalObject>();
+        Set<DigitalObject> set = new HashSet<DigitalObject>(1);
         set.add(obj);
         doAddDelTest(riLevel, set);
     }
@@ -376,11 +371,15 @@ public abstract class ResourceIndexIntegrationTest {
                 out.append("Actual set has " + actual.size() + " triples.\n\n");
                 out.append("Expected triples:\n");
                 for (String t : eStrings) {
-                    out.append("  " + t + "\n");
+                    if (!aStrings.contains(t)) {
+                        out.append("<<  " + t + "\n");
+                    }
                 }
                 out.append("\nActual triples:\n");
                 for (String t : aStrings) {
-                    out.append("  " + t + "\n");
+                    if (!eStrings.contains(t)) {
+                        out.append(">>  " + t + "\n");
+                    }
                 }
                 logger.warn(out.toString());
             }

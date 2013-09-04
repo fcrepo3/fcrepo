@@ -161,19 +161,19 @@ public class GetFilter
         try {
             resAttr = ResourceAttributes.getResources(pid);
             
-            if (dsID != null && !"".equals(dsID)) {
+            if (dsID != null && !dsID.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.ID.getURI(),
                             new StringAttribute(dsID));
             }
-            if (dissID != null && !"".equals(dissID)) {
+            if (dissID != null && !dissID.isEmpty()) {
                 resAttr.put(Constants.DISSEMINATOR.ID.getURI(),
                             new StringAttribute(dissID));
             }
-            if (methodName != null && !"".equals(methodName)) {
+            if (methodName != null && !methodName.isEmpty()) {
                 resAttr.put(Constants.DISSEMINATOR.METHOD.getURI(),
                             new StringAttribute(methodName));
             }
-            if (dateTime != null && !"".equals(dateTime)) {
+            if (dateTime != null && !dateTime.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(dateTime));
             }

@@ -5,19 +5,13 @@
 
 package org.fcrepo.server.rest;
 
-import org.fcrepo.common.http.WebClient;
-import org.fcrepo.common.http.WebClientConfiguration;
-import org.fcrepo.server.Context;
-import org.fcrepo.server.Server;
-import org.fcrepo.server.rest.RestUtil.RequestContent;
-import org.fcrepo.server.rest.param.DateTimeParam;
-import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.storage.types.DatastreamDef;
-import org.fcrepo.server.storage.types.MIMETypedStream;
-import org.fcrepo.utilities.DateUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -32,13 +26,21 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
+import org.fcrepo.common.http.WebClient;
+import org.fcrepo.common.http.WebClientConfiguration;
+import org.fcrepo.server.Context;
+import org.fcrepo.server.Server;
+import org.fcrepo.server.rest.RestUtil.RequestContent;
+import org.fcrepo.server.rest.param.DateTimeParam;
+import org.fcrepo.server.storage.types.Datastream;
+import org.fcrepo.server.storage.types.DatastreamDef;
+import org.fcrepo.server.storage.types.MIMETypedStream;
+import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * A rest controller to handle CRUD operations for the Fedora datastream API
@@ -99,22 +101,29 @@ public class DatastreamResource
             Context context = getContext();
             MediaType mime = RestHelper.getContentType(format);
 
-            String output;
+            Reader output;
 
             if (profiles){
                 mime=MediaType.TEXT_XML_TYPE;
                 final Datastream[] datastreams = m_management.getDatastreams(context, pid, asOfDateTime, dsState);
-                output=getSerializer(context).datastreamProfilesToXML(pid, datastreams, asOfDateTime, validateChecksum);
+                ReadableCharArrayWriter xml = new ReadableCharArrayWriter(2048);
+                getSerializer(context).datastreamProfilesToXML(pid, datastreams, asOfDateTime, validateChecksum, xml);
+                xml.close();
+                output = xml.toReader();
             } else {
                 mime = RestHelper.getContentType(format);
                 DatastreamDef[] dsDefs =
                         m_access.listDatastreams(context, pid, asOfDateTime);
-                output = getSerializer(context).dataStreamsToXML(pid, asOfDateTime, dsDefs);
+                ReadableCharArrayWriter xml = new ReadableCharArrayWriter(1024);
+                getSerializer(context).dataStreamsToXML(pid, asOfDateTime, dsDefs, xml);
+                xml.close();
                 if (TEXT_HTML.isCompatible(mime)) {
-                    final CharArrayWriter writer = new CharArrayWriter();
-                    transform(output, "access/listDatastreams.xslt", writer);
-                    output = writer.toString();
+                    Reader reader = xml.toReader();
+                    xml = new ReadableCharArrayWriter(1024);
+                    transform(reader, "access/listDatastreams.xslt", xml);
+                    xml.close();
                 }
+                output = xml.toReader();
             }
 
             return Response.ok(output, mime).build();
@@ -157,23 +166,26 @@ public class DatastreamResource
                         .build();
             }
 
-            String xml =
-                    getSerializer(context)
-                            .datastreamProfileToXML(pid,
-                                                    dsID,
-                                                    dsProfile,
-                                                    asOfDateTime,
-                                                    validateChecksum);
+            ReadableCharArrayWriter out = new ReadableCharArrayWriter(512);
+            getSerializer(context)
+                .datastreamProfileToXML(
+                    pid,
+                    dsID,
+                    dsProfile,
+                    asOfDateTime,
+                    validateChecksum,
+                    out);
 
+            out.close();
             MediaType mime = RestHelper.getContentType(format);
 
             if (TEXT_HTML.isCompatible(mime)) {
-                CharArrayWriter writer = new CharArrayWriter();
-                transform(xml, "management/viewDatastreamProfile.xslt", writer);
-                xml = writer.toString();
+                Reader reader = out.toReader();
+                out = new ReadableCharArrayWriter(512);
+                transform(reader, "management/viewDatastreamProfile.xslt", out);
             }
 
-            return Response.ok(xml, mime).build();
+            return Response.ok(out.toReader(), mime).build();
         } catch (Exception ex) {
             return handleException(ex, flash);
         }
@@ -213,21 +225,24 @@ public class DatastreamResource
 
             }
 
-            String xml =
-                    getSerializer(context)
-                            .datastreamHistoryToXml(pid,
-                                                    dsID,
-                                                    datastreamHistory);
+            ReadableCharArrayWriter out = new ReadableCharArrayWriter(1024);
+            getSerializer(context).datastreamHistoryToXml(
+                    pid,
+                    dsID,
+                    datastreamHistory,
+                    out);
+            out.close();
 
             MediaType mime = RestHelper.getContentType(format);
 
             if (TEXT_HTML.isCompatible(mime)) {
-                CharArrayWriter writer = new CharArrayWriter();
-                transform(xml, "management/viewDatastreamHistory.xslt", writer);
-                xml = writer.toString();
+                Reader reader = out.toReader();
+                out = new ReadableCharArrayWriter(1024);
+                transform(reader, "management/viewDatastreamHistory.xslt", out);
+                out.close();
             }
-
-            return Response.ok(xml, mime).build();
+            
+            return Response.ok(out.toReader(), mime).build();
         } catch (Exception e) {
             return handleException(e, flash);
         }
@@ -487,7 +502,7 @@ public class DatastreamResource
             if (existingDS == null) {
                 if (posted) {
                 	LOGGER.debug("new ds posted at {}/{}", pid, dsID);
-                    if ((dsLocation == null || dsLocation.equals(""))
+                    if ((dsLocation == null || dsLocation.isEmpty())
                             && ("X".equals(controlGroup) || "M"
                                     .equals(controlGroup))) {
                     	if (is == null) {
@@ -522,7 +537,7 @@ public class DatastreamResource
                     // Inline XML can only be modified by value. If there is no stream,
                     // but there is a dsLocation attempt to retrieve the content.
                     if (is == null && dsLocation != null
-                            && !dsLocation.equals("")) {
+                            && !dsLocation.isEmpty()) {
                         try {
                             WebClientConfiguration webconfig = m_server.getWebClientConfig();
                             WebClient webClient = new WebClient(webconfig);
@@ -606,13 +621,16 @@ public class DatastreamResource
             builder.header("Content-Type", MediaType.TEXT_XML);
             Datastream dsProfile =
                     m_management.getDatastream(context, pid, dsID, null);
-            String xml =
-                    getSerializer(context).datastreamProfileToXML(pid,
-                                                                  dsID,
-                                                                  dsProfile,
-                                                                  null,
-                                                                  false);
-            builder.entity(xml);
+            ReadableCharArrayWriter out = new ReadableCharArrayWriter(512);
+            getSerializer(context).datastreamProfileToXML(
+                    pid,
+                    dsID,
+                    dsProfile,
+                    null,
+                    false,
+                    out);
+            out.close();
+            builder.entity(out.toReader());
             return builder.build();
         } catch (Exception ex) {
         	LOGGER.warn(ex.getMessage(), ex);

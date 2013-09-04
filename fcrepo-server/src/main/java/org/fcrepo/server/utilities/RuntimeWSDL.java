@@ -5,6 +5,7 @@
 package org.fcrepo.server.utilities;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -14,6 +15,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -39,12 +41,10 @@ public class RuntimeWSDL {
         try {
 
             // init dom parser and parse input
-            DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document xsdDoc = builder.parse(schemaFile);
-            _wsdlDoc = builder.parse(sourceWSDL);
+            Document xsdDoc =
+                XmlTransformUtility.parseNamespaceAware(new FileInputStream(schemaFile));
+            _wsdlDoc =
+                XmlTransformUtility.parseNamespaceAware(new FileInputStream(sourceWSDL));
 
             // put schema into the wsdl types section
             Element typesElement = getTopElement("types");

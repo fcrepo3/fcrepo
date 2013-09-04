@@ -42,7 +42,7 @@ public class LogSetupContextListener implements ServletContextListener {
         // it is used for the value of Constants.FEDORA_HOME
         String contextFH =
                 event.getServletContext().getInitParameter("fedora.home");
-        if (contextFH != null && !contextFH.equals("")) {
+        if (contextFH != null && !contextFH.isEmpty()) {
             setProperty("servlet.fedora.home", contextFH);
         }
 

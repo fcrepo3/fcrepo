@@ -79,7 +79,6 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
             throw earlyException;
         }
 
-        factory = DocumentBuilderFactory.newInstance();
     }
 
     /**
@@ -188,7 +187,7 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
         Set<AbstractPolicy> applicablePolicies = new HashSet<AbstractPolicy>();
 
         for (AbstractPolicy policy : policies) {
-            String resourceId = null;
+            String resourceId = "";
 
             @SuppressWarnings("unchecked")
             List<TargetMatchGroup> tmg =
@@ -213,7 +212,7 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
 
             int current;
 
-            if ("".equals(resourceId)) {
+            if (resourceId.isEmpty()) {
                 current = 0;
             } else {
                 current = getLength(resourceId);
@@ -295,7 +294,7 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
     }
 
     private int getLength(String resourceId) {
-        if (resourceId == null || "".equals(resourceId)) {
+        if (resourceId == null || resourceId.isEmpty()) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Length: " + resourceId + " " + 0);
             }

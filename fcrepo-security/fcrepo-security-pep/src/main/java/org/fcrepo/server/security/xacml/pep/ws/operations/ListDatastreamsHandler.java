@@ -39,7 +39,6 @@ import org.fcrepo.server.types.gen.DatastreamDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.DateTimeAttribute;
 import com.sun.xacml.attr.StringAttribute;
@@ -146,7 +145,7 @@ public class ListDatastreamsHandler
 
         try {
             resAttr = ResourceAttributes.getResources(pid);
-            if (asOfDateTime != null && !"".equals(asOfDateTime)) {
+            if (asOfDateTime != null && !asOfDateTime.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(asOfDateTime));
             }
@@ -233,14 +232,14 @@ public class ListDatastreamsHandler
 
         List<DatastreamDef> resultObjects = new ArrayList<DatastreamDef>();
         for (Result r : results) {
-            if (r.getResource() == null || "".equals(r.getResource())) {
+            String resource = r.getResource();
+            if (resource == null || resource.isEmpty()) {
                 logger.warn("This resource has no resource identifier in the xacml response results!");
-            } else if (logger.isDebugEnabled()) {
-                logger.debug("Checking: " + r.getResource());
             }
+            logger.debug("Checking: {}", resource);
 
-            String[] ridComponents = r.getResource().split("\\/");
-            String rid = ridComponents[ridComponents.length - 1];
+            int lastSlash = resource.lastIndexOf('/');
+            String rid = resource.substring(lastSlash + 1);
 
             if (r.getStatus().getCode().contains(Status.STATUS_OK)
                     && r.getDecision() == Result.DECISION_PERMIT) {
@@ -248,12 +247,11 @@ public class ListDatastreamsHandler
                 if (tmp != null) {
                     resultObjects.add(tmp);
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Adding: " + r.getResource() + "[" + rid
-                                + "]");
+                        logger.debug("Adding: {}[{}]", resource, rid);
                     }
                 } else {
-                    logger.warn("Not adding this object as no object found for this key: "
-                                    + r.getResource() + "[" + rid + "]");
+                    logger.warn("Not adding this object as no object found for this key: {}[{}]",
+                                resource, rid);
                 }
             }
         }

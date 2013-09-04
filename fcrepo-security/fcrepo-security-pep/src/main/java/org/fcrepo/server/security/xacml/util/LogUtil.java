@@ -45,13 +45,13 @@ public class LogUtil {
         tmp = "".equals(username) ? "anonymous" : username;
         sb.append(tmp).append(separator);
 
-        tmp = action == null || "".equals(action) ? "" : action;
+        tmp = action == null || action.isEmpty() ? "" : action;
         sb.append(tmp).append(separator);
 
-        tmp = resourceId == null || "".equals(resourceId) ? "" : resourceId;
+        tmp = resourceId == null || resourceId.isEmpty() ? "" : resourceId;
         sb.append(tmp).append(separator);
 
-        tmp = dsID == null || "".equals(dsID) ? "" : dsID;
+        tmp = dsID == null || dsID.isEmpty() ? "" : dsID;
         sb.append(tmp);
 
         statlogger.info(sb.toString());

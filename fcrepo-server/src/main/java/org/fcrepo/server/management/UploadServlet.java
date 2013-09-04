@@ -67,7 +67,7 @@ public class UploadServlet
             FileItemIterator iter = upload.getItemIterator(request);
             while (in == null && iter.hasNext()) {
                 FileItemStream item = iter.next();
-                logger.info("Got next item: isFormField=" + item.isFormField() + " fieldName=" + item.getFieldName());
+                logger.info("Got next item: isFormField={} fieldName={}", item.isFormField(), item.getFieldName());
                 if (!item.isFormField() && item.getFieldName().equals("file")) {
                     in = item.openStream();
                 }
@@ -107,7 +107,7 @@ public class UploadServlet
                              HttpServletResponse response) {
         try {
             if (status == HttpServletResponse.SC_CREATED) {
-                logger.info("Successful upload, id=" + message);
+                logger.info("Successful upload, id={}", message);
             } else {
                 logger.error("Failed upload: " + message);
             }

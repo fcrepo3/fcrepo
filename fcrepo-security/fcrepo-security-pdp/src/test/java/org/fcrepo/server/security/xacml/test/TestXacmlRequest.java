@@ -123,7 +123,7 @@ public class TestXacmlRequest {
         List<Map<URI, List<AttributeValue>>> subjects =
                 new ArrayList<Map<URI, List<AttributeValue>>>();
 
-        if (subject == null || subject.equals("")) {
+        if (subject == null || subject.isEmpty()) {
             return subjects;
         }
 
@@ -173,7 +173,7 @@ public class TestXacmlRequest {
                 new HashMap<URI, AttributeValue>();
 
         try {
-            if (pid != null && !pid.equals("")) {
+            if (pid != null && !pid.isEmpty()) {
                 resAttr
                         .put(new URI("urn:fedora:names:fedora:2.1:resource:object:pid"),
                              new StringAttribute(pid));
@@ -182,7 +182,7 @@ public class TestXacmlRequest {
                              new AnyURIAttribute(new URI(pid)));
             }
 
-            if (action != null && !action.equals("")) {
+            if (action != null && !action.isEmpty()) {
                 actionAttr
                         .put(new URI("urn:fedora:names:fedora:2.1:action:id"),
                              new StringAttribute(action));

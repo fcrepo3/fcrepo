@@ -216,7 +216,7 @@ public class Export
             }
 
             String context = Constants.FEDORA_DEFAULT_APP_CONTEXT;
-            if (args.length == 9 && !args[8].equals("")) {
+            if (args.length == 9 && !args[8].isEmpty()) {
                 context = args[8];
             }
 

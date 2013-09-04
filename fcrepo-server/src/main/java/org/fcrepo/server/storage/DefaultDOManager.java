@@ -5,6 +5,7 @@
 
 package org.fcrepo.server.storage;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,7 +14,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -73,6 +77,7 @@ import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.DOObjectValidator;
 import org.fcrepo.server.validation.DOValidator;
 import org.fcrepo.server.validation.ValidationUtility;
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.tidy.Out;
@@ -198,7 +203,7 @@ public class DefaultDOManager extends Module implements DOManager {
                 badChars.append(c);
             }
         }
-        if (badChars.toString().length() > 0) {
+        if (badChars.length() > 0) {
             throw new ModuleInitializationException("pidNamespace contains " +
                     "invalid character(s) '" + badChars.toString() + "'",
                     getRole());
@@ -708,7 +713,7 @@ public class DefaultDOManager extends Module implements DOManager {
                                     m_permanentStore.retrieveObject(pid));
                     source = "filesystem";
                     if (m_readerCache != null) {
-                        m_readerCache.put(reader);
+                        m_readerCache.put(reader, getReaderStartTime);
                     }
                 } else {
                     source = "memory";
@@ -718,8 +723,8 @@ public class DefaultDOManager extends Module implements DOManager {
         } finally {
             if (logger.isDebugEnabled()) {
                 long dur = System.currentTimeMillis() - getReaderStartTime;
-                logger.debug("Got DOReader (source=" + source + ") for " + pid +
-                        " in " + dur + "ms.");
+                logger.debug("Got DOReader (source={}) for {} in {}ms.",
+                        source, pid, dur);
             }
         }
     }
@@ -821,7 +826,7 @@ public class DefaultDOManager extends Module implements DOManager {
                 // TEMP STORAGE:
                 // write ingest input stream to a temporary file
                 tempFile = File.createTempFile("fedora-ingest-temp", ".xml");
-                logger.debug("Creating temporary file for ingest: " +
+                logger.debug("Creating temporary file for ingest: {}",
                         tempFile.toString());
                 StreamUtility.pipeStream(in, new FileOutputStream(tempFile),
                         4096);
@@ -837,7 +842,7 @@ public class DefaultDOManager extends Module implements DOManager {
                 // instance
                 obj = new BasicDigitalObject();
                 obj.setNew(true);
-                logger.debug("Deserializing from format: " + format);
+                logger.debug("Deserializing from format: {}", format);
                 m_translator.deserialize(new FileInputStream(tempFile), obj,
                         format, encoding,
                         DOTranslationUtility.DESERIALIZE_INSTANCE);
@@ -845,12 +850,11 @@ public class DefaultDOManager extends Module implements DOManager {
                 // SET OBJECT PROPERTIES:
                 logger.debug("Setting object/component states and create dates if unset");
                 // set object state to "A" (Active) if not already set
-                if (obj.getState() == null || obj.getState().equals("")) {
+                if (obj.getState() == null || obj.getState().isEmpty()) {
                     obj.setState("A");
                 }
                 // set object create date to UTC if not already set
-                if (obj.getCreateDate() == null ||
-                        obj.getCreateDate().equals("")) {
+                if (obj.getCreateDate() == null) {
                     obj.setCreateDate(nowUTC);
                 }
                 // set object last modified date to UTC
@@ -861,11 +865,11 @@ public class DefaultDOManager extends Module implements DOManager {
                 while (dsIter.hasNext()) {
                     for (Datastream ds : obj.datastreams(dsIter.next())) {
                         // Set create date to UTC if not already set
-                        if (ds.DSCreateDT == null || ds.DSCreateDT.equals("")) {
+                        if (ds.DSCreateDT == null) {
                             ds.DSCreateDT = nowUTC;
                         }
                         // Set state to "A" (Active) if not already set
-                        if (ds.DSState == null || ds.DSState.equals("")) {
+                        if (ds.DSState == null || ds.DSState.isEmpty()) {
                             ds.DSState = "A";
                         }
                         ds.DSChecksumType =
@@ -929,7 +933,7 @@ public class DefaultDOManager extends Module implements DOManager {
                                 RecoveryContext rContext =
                                         (RecoveryContext) context;
                                 p =
-                                        rContext.getRecoveryValue(Constants.RECOVERY.PID.uri);
+                                        rContext.getRecoveryValue(Constants.RECOVERY.PID.attributeId);
                             }
                             if (p == null) {
                                 p =
@@ -1047,7 +1051,7 @@ public class DefaultDOManager extends Module implements DOManager {
             dc.DSState = "A";
             dc.DSVersionable = true;
             dcf = new DCFields();
-            if (obj.getLabel() != null && !obj.getLabel().equals("")) {
+            if (obj.getLabel() != null && !obj.getLabel().isEmpty()) {
                 dcf.titles().add(new DCField(obj.getLabel()));
             }
             w.addDatastream(dc, dc.DSVersionable);
@@ -1055,18 +1059,16 @@ public class DefaultDOManager extends Module implements DOManager {
             dcxml = new XMLDatastreamProcessor(dc);
             // note: context may be required to get through authz as content
             // could be filesystem file (or URL)
-            dcf =
-                    new DCFields(new ByteArrayInputStream(dcxml
-                            .getXMLContent(ctx)));
+            dcf = new DCFields(dc.getContentStream(ctx));
         }
         // set the value of the dc datastream according to what's in the
         // DCFields object
         // ensure one of the dc:identifiers is the pid
-        try {
-            dcxml.setXMLContent(dcf.getAsXML(obj.getPid()).getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException uee) {
-            // safely ignore... we know UTF-8 works
-        }
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream(512);
+        PrintWriter out = new PrintWriter(new OutputStreamWriter(bytes, Charset.forName("UTF-8")));
+        dcf.getAsXML(obj.getPid(), out);
+        out.close();
+        dcxml.setXMLContent(bytes.toByteArray());
     }
 
     /**
@@ -1092,9 +1094,9 @@ public class DefaultDOManager extends Module implements DOManager {
             // OBJECT INGEST (ADD) OR MODIFY...
         } else {
             if (obj.isNew()) {
-                logger.info("Committing addition of " + obj.getPid());
+                logger.info("Committing addition of {}", obj.getPid());
             } else {
-                logger.info("Committing modification of " + obj.getPid());
+                logger.info("Committing modification of {}", obj.getPid());
             }
 
             // Object validation
@@ -1131,9 +1133,8 @@ public class DefaultDOManager extends Module implements DOManager {
                                                             .getTempStream(dmc.DSLocation),
                                                     null, dmc.DSSize);
                                     logger.info("Getting managed datastream from internal uploaded " +
-                                            "location: " +
-                                            dmc.DSLocation +
-                                            " for " + pid);
+                                            "location: {} for ",
+                                            dmc.DSLocation, pid);
                                 } else if (dmc.DSLocation
                                         .startsWith(DatastreamManagedContent.COPY_SCHEME)) {
                                     // make a copy of the pre-existing content
@@ -1149,8 +1150,8 @@ public class DefaultDOManager extends Module implements DOManager {
                                     File file =
                                             new File(dmc.DSLocation
                                                     .substring(7));
-                                    logger.info("Getting base64 decoded datastream spooled from archive for datastream " +
-                                            dsID + " (" + pid + ")");
+                                    logger.info("Getting base64 decoded datastream spooled from archive for datastream {} ({})",
+                                            dsID, pid);
                                     try {
                                         InputStream str =
                                                 new FileInputStream(file);
@@ -1178,11 +1179,8 @@ public class DefaultDOManager extends Module implements DOManager {
                                     mimeTypedStream =
                                             m_contentManager
                                                     .getExternalContent(params);
-                                    logger.info("Getting managed datastream from remote location: " +
-                                            dmc.DSLocation +
-                                            " (" +
-                                            pid +
-                                            " / " + dsID + ")");
+                                    logger.info("Getting managed datastream from remote location: {} ({} / {})",
+                                            dmc.DSLocation, pid, dsID);
                                 }
                                 Map<String, String> dsHints =
                                         m_hintProvider
@@ -1241,7 +1239,7 @@ public class DefaultDOManager extends Module implements DOManager {
                                     dmc.DSLocation = internalId;
                                     dmc.DSLocationType =
                                             Datastream.DS_LOCATION_TYPE_INTERNAL;
-                                    logger.info("Replaced managed datastream location with internal id: " +
+                                    logger.info("Replaced managed datastream location with internal id: {}",
                                             internalId);
                                 }
                             } else if (!internalId.equals(dmc.DSLocation)) {
@@ -1279,20 +1277,20 @@ public class DefaultDOManager extends Module implements DOManager {
 
                 // block-scoping the ByteArrayOutputStream to ensure toArray
                 // is only called once
+                // initial capacity is just a guess to prevent copying up from 32 bytes
                 {
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    ReadableByteArrayOutputStream out = new ReadableByteArrayOutputStream(4096);
 
                     // FINAL XML SERIALIZATION:
                     // serialize the object in its final form for persistent storage
-                    logger.debug("Serializing digital object for persistent storage " +
+                    logger.debug("Serializing digital object for persistent storage {}",
                             pid);
                     m_translator.serialize(obj, out, m_defaultStorageFormat,
                             m_storageCharacterEncoding,
                             DOTranslationUtility.SERIALIZE_STORAGE_INTERNAL);
 
                     
-                    serialized =
-                            new ByteArrayInputStream(out.toByteArray());
+                    serialized = out.toInputStream();
                 }
 
                 // FINAL VALIDATION:
@@ -1336,8 +1334,7 @@ public class DefaultDOManager extends Module implements DOManager {
                                 null, null, null, obj));
 
                     }
-                    logger.debug("Finished adding " + pid +
-                            " to ResourceIndex.");
+                    logger.debug("Finished adding {} to ResourceIndex.", pid);
                 }
 
                 // STORAGE:
@@ -1367,7 +1364,7 @@ public class DefaultDOManager extends Module implements DOManager {
                  * update systemVersion in doRegistry (add one), and update
                  * deployment maps if necessary.
                  */
-                logger.debug("Updating registry for " + pid);
+                logger.debug("Updating registry for {}", pid);
                 Connection conn = null;
                 PreparedStatement s = null;
                 ResultSet results = null;
@@ -1419,7 +1416,7 @@ public class DefaultDOManager extends Module implements DOManager {
 
                 // REPLICATE:
                 // add to replication jobs table and do replication to db
-                logger.info("Updating dissemination index for " + pid);
+                logger.info("Updating dissemination index for {}", pid);
                 String whichIndex = "FieldSearch";
 
                 try {
@@ -1477,7 +1474,7 @@ public class DefaultDOManager extends Module implements DOManager {
             throws ServerException {
 
         String pid = obj.getPid();
-        logger.info("Committing removal of " + pid);
+        logger.info("Committing removal of {}", pid);
 
         // RESOURCE INDEX:
         // remove digital object from the resourceIndex
@@ -1485,10 +1482,10 @@ public class DefaultDOManager extends Module implements DOManager {
         // relationships might be in managed datastreams)
         if (m_resourceIndex.getIndexLevel() != ResourceIndex.INDEX_LEVEL_OFF) {
             try {
-                logger.info("Deleting " + pid + " from ResourceIndex");
+                logger.info("Deleting {} from ResourceIndex", pid);
                 m_resourceIndex.deleteObject(new SimpleDOReader(null, null,
                         null, null, null, obj));
-                logger.debug("Finished deleting " + pid + " from ResourceIndex");
+                logger.debug("Finished deleting {} from ResourceIndex", pid);
             } catch (ServerException se) {
                 if (failSafe) {
                     logger.warn("Object " + pid +
@@ -1519,8 +1516,8 @@ public class DefaultDOManager extends Module implements DOManager {
                     String id =
                             obj.getPid() + "+" + dmc.DatastreamID + "+" +
                                     dmc.DSVersionID;
-                    logger.info("Deleting managed datastream: " + id + " for " +
-                            pid);
+                    logger.info("Deleting managed datastream: {} for {}",
+                            id, pid);
                     try {
                         m_permanentStore.removeDatastream(id);
                     } catch (LowlevelStorageException llse) {
@@ -1581,7 +1578,7 @@ public class DefaultDOManager extends Module implements DOManager {
         // FIELD SEARCH INDEX:
         // remove digital object from the default search index
         try {
-            logger.info("Deleting " + pid + " from FieldSearch index");
+            logger.info("Deleting {} from FieldSearch index", pid);
             m_fieldSearch.delete(obj.getPid());
         } catch (ServerException se) {
             if (failSafe) {
@@ -1638,8 +1635,8 @@ public class DefaultDOManager extends Module implements DOManager {
                             try {
                                 m_permanentStore.removeDatastream(token);
                                 logger.info("Removed purged datastream version " +
-                                        "from low level storage (token = " +
-                                        token + ")");
+                                        "from low level storage (token = {})",
+                                        token);
                             } catch (Exception e) {
                                 logger.error(
                                         "Error removing purged datastream " +
@@ -1663,7 +1660,7 @@ public class DefaultDOManager extends Module implements DOManager {
      */
     @Override
     public boolean objectExists(String pid) throws StorageDeviceException {
-        logger.debug("Checking if " + pid + " already exists");
+        logger.debug("Checking if {} already exists", pid);
         Connection conn = null;
         PreparedStatement s = null;
         ResultSet results = null;
@@ -1796,10 +1793,10 @@ public class DefaultDOManager extends Module implements DOManager {
     // translates simple wildcard string to sql-appropriate.
     // the first character is a " " if it needs an escape
     public static String toSql(String name, String in) {
-        if (in.indexOf("\\") != -1) {
+        if (in.indexOf('\\') != -1) {
             // has one or more escapes, un-escape and translate
             StringBuffer out = new StringBuffer();
-            out.append("\'");
+            out.append('\'');
             boolean needLike = false;
             boolean needEscape = false;
             boolean lastWasEscape = false;
@@ -1845,7 +1842,7 @@ public class DefaultDOManager extends Module implements DOManager {
                     lastWasEscape = false;
                 }
             }
-            out.append("\'");
+            out.append('\'');
             if (needLike) {
                 out.insert(0, " LIKE ");
             } else {
@@ -1859,7 +1856,7 @@ public class DefaultDOManager extends Module implements DOManager {
         } else {
             // no escapes, just translate if needed
             StringBuffer out = new StringBuffer();
-            out.append("\'");
+            out.append('\'');
             boolean needLike = false;
             boolean needEscape = false;
             for (int i = 0; i < in.length(); i++) {
@@ -1886,7 +1883,7 @@ public class DefaultDOManager extends Module implements DOManager {
                     out.append(c);
                 }
             }
-            out.append("\'");
+            out.append('\'');
             if (needLike) {
                 out.insert(0, " LIKE ");
             } else {
@@ -1910,7 +1907,7 @@ public class DefaultDOManager extends Module implements DOManager {
             conn = m_connectionPool.getReadOnlyConnection();
             String query = "SELECT doPID FROM doRegistry " + whereClause;
             s = conn.prepareStatement(query);
-            logger.debug("Executing db query: " + query);
+            logger.debug("Executing db query: {}", query);
             results = s.executeQuery();
             while (results.next()) {
                 pidList.add(results.getString("doPID"));
@@ -1986,7 +1983,7 @@ public class DefaultDOManager extends Module implements DOManager {
             numPIDs = 1;
         }
         String[] pidList = new String[numPIDs];
-        if (namespace == null || namespace.equals("")) {
+        if (namespace == null || namespace.isEmpty()) {
             namespace = m_pidNamespace;
         }
         try {
@@ -2055,12 +2052,15 @@ public class DefaultDOManager extends Module implements DOManager {
 
         PreparedStatement st = null;
         try {
-            StringBuffer query = new StringBuffer();
-            query.append("SELECT COUNT(*) FROM doRegistry");
+            String query;
+            // Because we are dealing with only two Strings, one of which is fixed,
+            // take advantage of String.concat
             if (n > 0) {
-                query.append(" WHERE systemVersion = " + n);
+                query = "SELECT COUNT(*) FROM doRegistry WHERE systemVersion = ".concat(Integer.toString(n));
+            } else {
+                query = "SELECT COUNT(*) FROM doRegistry";
             }
-            st = conn.prepareStatement(query.toString());
+            st = conn.prepareStatement(query);
             ResultSet results = st.executeQuery();
             results.next();
             return results.getInt(1);
@@ -2074,7 +2074,7 @@ public class DefaultDOManager extends Module implements DOManager {
     private long getLatestModificationDate(Connection conn) throws SQLException {
         PreparedStatement st = null;
         try {
-            st = conn.prepareStatement("SELECT MAX(mDate) " + "FROM doFields ");
+            st = conn.prepareStatement("SELECT MAX(mDate) FROM doFields ");
             ResultSet results = st.executeQuery();
             if (results.next()) {
                 return results.getLong(1);
@@ -2134,11 +2134,10 @@ public class DefaultDOManager extends Module implements DOManager {
                 }
 
                 if (count > 1) {
-                    logger.info("More than one service deployment specified for sDef " +
-                            cxt.sDef +
+                    logger.info("More than one service deployment specified for sDef {}" +
                             " in model " +
-                            cxt.cModel +
-                            ".  Using the one with the EARLIEST modification date.");
+                            "{}.  Using the one with the EARLIEST modification date.",
+                            cxt.sDef, cxt.cModel);
                 }
                 return sDep;
             } else {
@@ -2168,6 +2167,7 @@ public class DefaultDOManager extends Module implements DOManager {
 
         public final String sDef;
 
+        private static final String VAL_TEMPLATE = "(%1$s,%2$s)";
         /* Internal string value for calculating hash code, equality */
         private final String _val;
 
@@ -2175,7 +2175,7 @@ public class DefaultDOManager extends Module implements DOManager {
             cModel = cModelPid;
             sDef = sDefPid;
 
-            _val = "(" + cModelPid + "," + sDefPid + ")";
+            _val = String.format(VAL_TEMPLATE, cModelPid, sDefPid);
         }
 
         public static ServiceContext getInstance(String cModel, String sDef) {

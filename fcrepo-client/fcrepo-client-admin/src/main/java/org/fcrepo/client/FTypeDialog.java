@@ -93,7 +93,7 @@ public class FTypeDialog
                 if (cButton.isSelected()) {
                     selections += "C";
                 }
-                if (selections.equals("")) {
+                if (selections.isEmpty()) {
                     selections = null;
                 }
                 dispose();

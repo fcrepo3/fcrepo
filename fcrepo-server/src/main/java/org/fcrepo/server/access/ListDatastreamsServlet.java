@@ -168,8 +168,8 @@ public class ListDatastreamsServlet
                 }
                 asOfDateTime = versDateTime;
             }
-            logger.debug("Listing datastreams (PID=" + PID + ", asOfDate="
-                    + versDateTime + ")");
+            logger.debug("Listing datastreams (PID={}, asOfDate={})",
+                    PID, versDateTime);
         } else {
             logger.error("Bad syntax (expected 6 or 7 parts) in request");
             throw new BadRequest400Exception(request,
@@ -179,7 +179,7 @@ public class ListDatastreamsServlet
         }
 
         if (request.getParameter("xml") != null) {
-            xml = new Boolean(request.getParameter("xml")).booleanValue();
+            xml = Boolean.parseBoolean(request.getParameter("xml"));
         }
 
         try {
@@ -348,15 +348,15 @@ public class ListDatastreamsServlet
             this.dsDefs = dsDefs;
             this.versDateTime = versDateTime;
             fedoraServerPort =
-                    context.getEnvironmentValue(HTTP_REQUEST.SERVER_PORT.uri);
+                    context.getEnvironmentValue(HTTP_REQUEST.SERVER_PORT.attributeId);
             fedoraAppServerContext =
                     context.getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME);
 
             if (HTTP_REQUEST.SECURE.uri.equals(context
-                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.uri))) {
+                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.attributeId))) {
                 fedoraServerProtocol = HTTPS;
             } else if (HTTP_REQUEST.INSECURE.uri.equals(context
-                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.uri))) {
+                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.attributeId))) {
                 fedoraServerProtocol = HTTP;
             }
         }
@@ -388,12 +388,13 @@ public class ListDatastreamsServlet
                     pw.write(" " + OBJ_DATASTREAMS1_0.xsdLocation + "\">");
                     // DatastreamDef SERIALIZATION
                     for (DatastreamDef element : dsDefs) {
-                        pw.write("    <datastream " + "dsid=\""
-                                + StreamUtility.enc(element.dsID) + "\" "
-                                + "label=\""
-                                + StreamUtility.enc(element.dsLabel) + "\" "
-                                + "mimeType=\""
-                                + StreamUtility.enc(element.dsMIME) + "\" />");
+                        pw.write("    <datastream dsid=\"");
+                        StreamUtility.enc(element.dsID, pw);
+                        pw.write("\" label=\"");
+                        StreamUtility.enc(element.dsLabel, pw);
+                        pw.write("\" mimeType=\"");
+                        StreamUtility.enc(element.dsMIME, pw);
+                        pw.write("\" />");
                     }
                     pw.write("</objectDatastreams>");
                     pw.flush();

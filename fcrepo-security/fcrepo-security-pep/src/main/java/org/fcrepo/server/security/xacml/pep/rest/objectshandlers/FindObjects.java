@@ -189,7 +189,7 @@ public class FindObjects
         DataResponseWrapper res = (DataResponseWrapper) response;
         byte[] data = res.getData();
 
-        String result = null;
+        byte[] result = null;
         String body = new String(data);
 
         if (body.startsWith("<html>")) {
@@ -200,10 +200,10 @@ public class FindObjects
             result = filterXML(request, res);
         } else {
             logger.debug("not filtering due to unexpected output: {}", body);
-            result = body;
+            result = data;
         }
 
-        res.setData(result.getBytes());
+        res.setData(result);
 
         return null;
     }
@@ -219,10 +219,10 @@ public class FindObjects
      * @return the new response body without non-permissable objects.
      * @throws ServletException
      */
-    private String filterXML(HttpServletRequest request,
+    private byte[] filterXML(HttpServletRequest request,
                              DataResponseWrapper response)
             throws ServletException {
-        String body = new String(response.getData());
+        byte[] data = response.getData();
         DocumentBuilder docBuilder = null;
         Document doc = null;
 
@@ -231,7 +231,7 @@ public class FindObjects
                 docBuilder =
                         BUILDER_FACTORY.newDocumentBuilder();
             }
-            doc = docBuilder.parse(new ByteArrayInputStream(response.getData()));
+            doc = docBuilder.parse(new ByteArrayInputStream(data));
         } catch (Exception e) {
             throw new ServletException(e);
         }
@@ -256,7 +256,7 @@ public class FindObjects
         if (rows.getLength() == 0) {
             logger.debug("No results to filter.");
 
-            return body;
+            return data;
         }
 
         Map<String, Node> pids = new HashMap<String, Node>();
@@ -268,20 +268,21 @@ public class FindObjects
         Set<Result> results = evaluatePids(pids.keySet(), request, response);
 
         for (Result r : results) {
-            if (r.getResource() == null || "".equals(r.getResource())) {
+            String resource = r.getResource();
+            if (resource == null || resource.isEmpty()) {
                 logger.warn("This resource has no resource identifier in the xacml response results!");
             } else if (logger.isDebugEnabled()) {
-                logger.debug("Checking: {}", r.getResource());
+                logger.debug("Checking: {}", resource);
             }
 
-            String[] ridComponents = r.getResource().split("\\/");
-            String rid = ridComponents[ridComponents.length - 1];
+            int lastSlash = resource.lastIndexOf('/');
+            String rid = resource.substring(lastSlash+1);
 
             if (r.getStatus().getCode().contains(Status.STATUS_OK)
                     && r.getDecision() != Result.DECISION_PERMIT) {
                 Node node = pids.get(rid);
                 node.getParentNode().removeChild(node);
-                logger.debug("Removing: {} [{}]", r.getResource(), rid);
+                logger.debug("Removing: {} [{}]", resource, rid);
             }
         }
         // since namespaces are disabled, set the attribute explicitly
@@ -295,7 +296,7 @@ public class FindObjects
             throw new ServletException("error generating output", te);
         }
 
-        return new String(os.toByteArray());
+        return os.toByteArray();
     }
 
     /**
@@ -309,12 +310,12 @@ public class FindObjects
      * @return the new response body without non-permissable objects.
      * @throws ServletException
      */
-    private String filterHTML(HttpServletRequest request,
+    private byte[] filterHTML(HttpServletRequest request,
                               DataResponseWrapper response)
             throws ServletException {
-        String body = new String(response.getData());
+        byte[] data = response.getData();
 
-        InputStream is = new ByteArrayInputStream(body.getBytes());
+        InputStream is = new ByteArrayInputStream(data);
         Document doc = tidy.parseDOM(is, null);
 
         XPath xpath;
@@ -336,7 +337,7 @@ public class FindObjects
         // only the header row, no results.
         if (rows.getLength() == 1) {
             logger.debug("No results to filter.");
-            return body;
+            return data;
         }
 
         NodeList headers = rows.item(0).getChildNodes();
@@ -372,21 +373,22 @@ public class FindObjects
         Set<Result> results = evaluatePids(pids.keySet(), request, response);
 
         for (Result r : results) {
-            if (r.getResource() == null || "".equals(r.getResource())) {
+            String resource = r.getResource();
+            if (r.getResource() == null || resource.isEmpty()) {
                 logger.warn("This resource has no resource identifier in the xacml response results!");
             } else if (logger.isDebugEnabled()) {
                 logger.debug("Checking: {}", r.getResource());
             }
 
-            String[] ridComponents = r.getResource().split("\\/");
-            String rid = ridComponents[ridComponents.length - 1];
+            int lastSlash = resource.lastIndexOf('/');
+            String rid = resource.substring(lastSlash + 1);
 
             if (r.getStatus().getCode().contains(Status.STATUS_OK)
                     && r.getDecision() != Result.DECISION_PERMIT) {
                 Node node = pids.get(rid);
                 node.getParentNode().removeChild(node.getNextSibling());
                 node.getParentNode().removeChild(node);
-                logger.debug("Removing: {} [{}]", r.getResource(), rid);
+                logger.debug("Removing: {} [{}]", resource, rid);
             }
         }
 
@@ -399,7 +401,7 @@ public class FindObjects
             throw new ServletException("error generating output", te);
         }
 
-        return new String(os.toByteArray());
+        return os.toByteArray();
     }
 
     /**
@@ -481,7 +483,7 @@ public class FindObjects
         static ArrayList<String> EMPTY = new ArrayList<String>(0);
         @Override
         public String getNamespaceURI(String prefix) {
-            if ("types".equals(prefix) || "".equals(prefix)) {
+            if ("types".equals(prefix) || prefix.isEmpty()) {
                return "http://www.fedora.info/definitions/1/0/types/";
             }
             if ("xsi".equals(prefix)){

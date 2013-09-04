@@ -386,7 +386,7 @@ public class ConnectionPool {
             try {
                 connection.setReadOnly(readOnly);
             } catch (Throwable th) {
-                logger.info("Read-only connections not supported (" + th.getMessage() + ")");
+                logger.info("Read-only connections not supported ({})", th.getMessage());
                 supportsReadOnly = false;
             }
         }

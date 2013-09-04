@@ -131,39 +131,31 @@ public class ConnectionPoolManagerImpl
                 dbPassword = config.getParameter("dbPassword");
                 jdbcURL = config.getParameter("jdbcURL");
                 maxActive =
-                        new Integer(config.getParameter("maxActive"))
-                                .intValue();
+                        Integer.parseInt(config.getParameter("maxActive"));
                 maxIdle =
-                        new Integer(config.getParameter("maxIdle")).intValue();
+                        Integer.parseInt(config.getParameter("maxIdle"));
                 maxWait =
-                        new Integer(config.getParameter("maxWait")).intValue();
+                        Integer.parseInt(config.getParameter("maxWait"));
                 minIdle =
-                        new Integer(config.getParameter("minIdle")).intValue();
+                        Integer.parseInt(config.getParameter("minIdle"));
                 numTestsPerEvictionRun =
-                        new Integer(config
-                                .getParameter("numTestsPerEvictionRun"))
-                                .intValue();
+                        Integer.parseInt(config
+                                .getParameter("numTestsPerEvictionRun"));
                 minEvictableIdleTimeMillis =
-                        new Long(config
-                                .getParameter("minEvictableIdleTimeMillis"))
-                                .longValue();
+                        Long.parseLong(config
+                                .getParameter("minEvictableIdleTimeMillis"));
                 timeBetweenEvictionRunsMillis =
-                        new Long(config
-                                .getParameter("timeBetweenEvictionRunsMillis"))
-                                .longValue();
+                        Long.parseLong(config
+                                .getParameter("timeBetweenEvictionRunsMillis"));
                 validationQuery = config.getParameter("validationQuery");
                 testOnBorrow =
-                        new Boolean(config.getParameter("testOnBorrow"))
-                                .booleanValue();
+                        Boolean.parseBoolean(config.getParameter("testOnBorrow"));
                 testOnReturn =
-                        new Boolean(config.getParameter("testOnReturn"))
-                                .booleanValue();
+                        Boolean.parseBoolean(config.getParameter("testOnReturn"));
                 testWhileIdle =
-                        new Boolean(config.getParameter("testWhileIdle"))
-                                .booleanValue();
+                        Boolean.parseBoolean(config.getParameter("testWhileIdle"));
                 whenExhaustedAction =
-                        new Byte(config.getParameter("whenExhaustedAction"))
-                                .byteValue();
+                        Byte.parseByte(config.getParameter("whenExhaustedAction"));
                 if (whenExhaustedAction != 0 && whenExhaustedAction != 1
                         && whenExhaustedAction != 2) {
                     logger.debug("Valid values for whenExhaustedAction are: 0 - (fail), 1 - (block), or 2 - (grow)");

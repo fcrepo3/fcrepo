@@ -5,25 +5,27 @@
 package org.fcrepo.server.storage.types;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.SequenceInputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+
+import org.fcrepo.server.Context;
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
+import org.fcrepo.utilities.XmlTransformUtility;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
-import org.fcrepo.server.Context;
-
-import org.w3c.dom.Document;
-
-import org.xml.sax.SAXException;
 
 /**
  * @author Sandy Payette
@@ -77,9 +79,7 @@ public class DatastreamXMLMetadata
         copy(ds);
         if (xmlContent != null) {
             ds.xmlContent = new byte[xmlContent.length];
-            for (int i = 0; i < xmlContent.length; i++) {
-                ds.xmlContent[i] = xmlContent[i];
-            }
+            System.arraycopy(xmlContent, 0, ds.xmlContent, 0, xmlContent.length);
         }
         ds.DSMDClass = DSMDClass;
         return ds;
@@ -99,36 +99,39 @@ public class DatastreamXMLMetadata
     public InputStream getContentStreamForChecksum() {
         BufferedReader br;
         try {
-            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-            OutputFormat fmt = new OutputFormat("XML", "UTF-8", false);
+            ReadableCharArrayWriter out =
+                new ReadableCharArrayWriter(xmlContent.length + (xmlContent.length /4));
+            OutputFormat fmt = new OutputFormat("XML", m_encoding, false);
             fmt.setIndent(0);
             fmt.setLineWidth(0);
             fmt.setPreserveSpace(false);
-            XMLSerializer ser = new XMLSerializer(outStream, fmt);
-            DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(new ByteArrayInputStream(xmlContent));
-            ser.serialize(doc);
+            XMLSerializer ser = new XMLSerializer(out, fmt);
+            
+            DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
+            try {
+                Document doc = builder.parse(new ByteArrayInputStream(xmlContent));
+                ser.serialize(doc);
+                out.close();
+            } finally {
+                XmlTransformUtility.returnDocumentBuilder(builder);
+            }
 
             br =
-                    new BufferedReader(new InputStreamReader(new ByteArrayInputStream(outStream
-                                                                     .toByteArray()),
-                                                             m_encoding));
+                    new BufferedReader(out.toReader());
             String line;
-            StringBuffer buf = new StringBuffer();
+            ReadableByteArrayOutputStream bytes =
+                    new ReadableByteArrayOutputStream(out.length());
+            PrintWriter outStream = new PrintWriter(
+                    new OutputStreamWriter(bytes, Charset.forName(m_encoding)));
             while ((line = br.readLine()) != null) {
                 line = line.trim();
-                buf = buf.append(line);
+                outStream.append(line);
             }
-            String bufStr = buf.toString();
-            return new ByteArrayInputStream(bufStr.getBytes(m_encoding));
+            outStream.close();
+            return bytes.toInputStream();
         } catch (UnsupportedEncodingException e) {
             return getContentStream();
         } catch (IOException e) {
-            return getContentStream();
-        } catch (ParserConfigurationException e) {
             return getContentStream();
         } catch (SAXException e) {
             return getContentStream();
@@ -141,14 +144,7 @@ public class DatastreamXMLMetadata
         String firstLine =
                 "<?xml version=\"1.0\" encoding=\"" + m_encoding + "\" ?>\n";
         byte[] firstLineBytes = firstLine.getBytes(m_encoding);
-        byte[] out = new byte[xmlContent.length + firstLineBytes.length];
-        for (int i = 0; i < firstLineBytes.length; i++) {
-            out[i] = firstLineBytes[i];
-        }
-        for (int i = firstLineBytes.length; i < firstLineBytes.length
-                + xmlContent.length; i++) {
-            out[i] = xmlContent[i - firstLineBytes.length];
-        }
-        return new ByteArrayInputStream(out);
+        return new SequenceInputStream(new ByteArrayInputStream(firstLineBytes),
+                new ByteArrayInputStream(xmlContent));
     }
 }

@@ -70,11 +70,11 @@ public class OAIResponder
         String baseURL =
                 m_provider
                         .getBaseURL(context
-                                            .getEnvironmentValue(HTTP_REQUEST.SECURITY.uri)
+                                            .getEnvironmentValue(HTTP_REQUEST.SECURITY.attributeId)
                                             .equals(HTTP_REQUEST.SECURE.uri) ? "https"
                                             : "http",
                                     context
-                                            .getEnvironmentValue(HTTP_REQUEST.SERVER_PORT.uri));
+                                            .getEnvironmentValue(HTTP_REQUEST.SERVER_PORT.attributeId));
         try {
             if (verb == null) {
                 throw new BadVerbException("Request did not specify a verb.");
@@ -612,7 +612,7 @@ public class OAIResponder
      * @return A new, encoded String.
      */
     private static String enc(String in) {
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder(in.length() + 16);
         enc(in, out);
         return out.toString();
     }
@@ -626,7 +626,7 @@ public class OAIResponder
      * @param buf
      *        The StringBuffer to write to.
      */
-    private static void enc(String in, StringBuffer out) {
+    private static void enc(String in, StringBuilder out) {
         for (int i = 0; i < in.length(); i++) {
             enc(in.charAt(i), out);
         }
@@ -645,7 +645,7 @@ public class OAIResponder
      * @param out
      *        The StringBuffer to write to.
      */
-    private static void enc(char[] in, int start, int length, StringBuffer out) {
+    private static void enc(char[] in, int start, int length, StringBuilder out) {
         for (int i = start; i < length + start; i++) {
             enc(in[i], out);
         }
@@ -660,7 +660,7 @@ public class OAIResponder
      * @param out
      *        The StringBuffer to write to.
      */
-    private static void enc(char in, StringBuffer out) {
+    private static void enc(char in, StringBuilder out) {
         if (in == '&') {
             out.append("&amp;");
         } else if (in == '<') {

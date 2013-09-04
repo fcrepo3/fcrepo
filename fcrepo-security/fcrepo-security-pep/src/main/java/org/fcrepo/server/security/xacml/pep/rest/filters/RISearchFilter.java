@@ -221,7 +221,7 @@ public class RISearchFilter
 
             for (Result r : results) {
                 String rid = r.getResource();
-                if (rid == null || "".equals(rid)) {
+                if (rid == null || rid.isEmpty()) {
                     logger.warn("This resource has no resource identifier in the xacml response results!");
                 } else {
                     logger.debug("Checking: {}", rid);
@@ -351,7 +351,7 @@ public class RISearchFilter
                 // Modification to uniquely identify datastreams
 
                 resAttr = ResourceAttributes.getResources(pid);
-                if (dsID != null && !"".equals(dsID)) {
+                if (dsID != null && !dsID.isEmpty()) {
                     resAttr.put(Constants.DATASTREAM.ID.getURI(),
                                 new StringAttribute(dsID));
                 }

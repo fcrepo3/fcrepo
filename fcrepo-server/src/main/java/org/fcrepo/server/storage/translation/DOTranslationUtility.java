@@ -327,7 +327,7 @@ public abstract class DOTranslationUtility
         // Second pass: convert non-fedora-app-context URLs via variable substitution
         output = s_fedoraLocalPattern.matcher(output).replaceAll(s_hostInfo);
 
-        logger.debug("makeAbsoluteURLs: input=" + input + ", output=" + output);
+        logger.debug("makeAbsoluteURLs: input={}, output={}", input, output);
         return output;
     }
 
@@ -376,7 +376,7 @@ public abstract class DOTranslationUtility
                         .replaceAll(s_fedoraLocalPattern.pattern());
         }
 
-        logger.debug("makeFedoraLocalURLs: input=" + input + ", output=" + output);
+        logger.debug("makeFedoraLocalURLs: input={}, output={}", input, output);
         return output;
     }
 
@@ -397,7 +397,7 @@ public abstract class DOTranslationUtility
         // (i.e., getItem), and replace with new API-A-LITE syntax.
 
         output = s_getItemPattern.matcher(input).replaceAll("/");
-        logger.debug("convertGetItemURLs: input=" + input + ", output=" + output);
+        logger.debug("convertGetItemURLs: input={}, output={}", input, output);
         return output;
     }
 
@@ -578,17 +578,17 @@ public abstract class DOTranslationUtility
     public static Datastream setDatastreamDefaults(Datastream ds)
             throws ObjectIntegrityException {
 
-        if ((ds.DSMIME == null || ds.DSMIME.equals(""))
+        if ((ds.DSMIME == null || ds.DSMIME.isEmpty())
                 && ds.DSControlGrp.equalsIgnoreCase("X")) {
             ds.DSMIME = "text/xml";
         }
 
-        if (ds.DSState == null || ds.DSState.equals("")) {
+        if (ds.DSState == null || ds.DSState.isEmpty()) {
             ds.DSState = "A";
         }
 
         // For METS backward compatibility
-        if (ds.DSInfoType == null || ds.DSInfoType.equals("")
+        if (ds.DSInfoType == null || ds.DSInfoType.isEmpty()
                 || ds.DSInfoType.equalsIgnoreCase("OTHER")) {
             ds.DSInfoType = "UNSPECIFIED";
         }
@@ -749,8 +749,8 @@ public abstract class DOTranslationUtility
 
                         DatastreamXMLMetadata xd = (DatastreamXMLMetadata) d;
                         if (logger.isDebugEnabled())
-                            logger.debug(obj.getPid() + " : normalising URLs in "
-                                + dsid);
+                            logger.debug("{} : normalising URLs in {}",
+                                    obj.getPid(), dsid);
                         xd.xmlContent =
                                 DOTranslationUtility
                                         .normalizeInlineXML(new String(xd.xmlContent,
@@ -772,14 +772,17 @@ public abstract class DOTranslationUtility
         // set default to true.
         diss.dissVersionable = true;
 
-        if (diss.dissState == null || diss.dissState.equals("")) {
+        if (diss.dissState == null || diss.dissState.isEmpty()) {
             diss.dissState = "A";
         }
         return diss;
     }
 
     protected static String oneString(String[] idList) {
-        StringBuffer out = new StringBuffer();
+        if (idList.length == 0) return "";
+        int bufLen = idList.length - 1; // the number of spaces we'll add
+        for (String val: idList) bufLen += val.length();
+        StringBuilder out = new StringBuilder(bufLen);
         for (int i = 0; i < idList.length; i++) {
             if (i > 0) {
                 out.append(' ');
@@ -799,7 +802,7 @@ public abstract class DOTranslationUtility
      */
     public static String getStateAttribute(DigitalObject obj) throws ObjectIntegrityException {
 
-            if (obj.getState() == null || obj.getState().equals("")) {
+            if (obj.getState() == null || obj.getState().isEmpty()) {
                 return MODEL.ACTIVE.localName;
             } else {
                 switch (obj.getState().charAt(0)) {
@@ -837,7 +840,7 @@ public abstract class DOTranslationUtility
             return "I";
         } else if (MODEL.ACTIVE.looselyMatches(rawValue, true)
                     || rawValue == null
-                    || rawValue.equals("")) {
+                    || rawValue.isEmpty()) {
             return "A";
         } else {
                 throw new ParseException("Could not interpret state value of '"
@@ -874,23 +877,23 @@ public abstract class DOTranslationUtility
      */
     protected static void validateAudit(AuditRecord audit)
             throws ObjectIntegrityException {
-        if (audit.id == null || audit.id.equals("")) {
+        if (audit.id == null || audit.id.isEmpty()) {
             throw new ObjectIntegrityException("Audit record must have id.");
         }
-        if (audit.date == null || audit.date.equals("")) {
+        if (audit.date == null) {
             throw new ObjectIntegrityException("Audit record must have date.");
         }
-        if (audit.processType == null || audit.processType.equals("")) {
+        if (audit.processType == null || audit.processType.isEmpty()) {
             throw new ObjectIntegrityException("Audit record must have processType.");
         }
-        if (audit.action == null || audit.action.equals("")) {
+        if (audit.action == null || audit.action.isEmpty()) {
             throw new ObjectIntegrityException("Audit record must have action.");
         }
         if (audit.componentID == null) {
             audit.componentID = ""; // for backwards compatibility, no error on null
             // throw new ObjectIntegrityException("Audit record must have componentID.");
         }
-        if (audit.responsibility == null || audit.responsibility.equals("")) {
+        if (audit.responsibility == null || audit.responsibility.isEmpty()) {
             throw new ObjectIntegrityException("Audit record must have responsibility.");
         }
     }
@@ -1017,14 +1020,14 @@ public abstract class DOTranslationUtility
     private static void appendOpenElement(PrintWriter writer,
                                           QName element,
                                           boolean declareNamespace) {
-        writer.print("<");
+        writer.print('<');
         writer.print(element.qName);
         if (declareNamespace) {
             writer.print(" xmlns:");
             writer.print(element.namespace.prefix);
             writer.print("=\"");
             writer.print(element.namespace.uri);
-            writer.print("\"");
+            writer.print('"');
         }
         writer.print(">\n");
     }
@@ -1033,12 +1036,12 @@ public abstract class DOTranslationUtility
                                           QName element,
                                           QName attribute,
                                           String attributeContent) {
-        writer.print("<");
+        writer.print('<');
         writer.print(element.qName);
-        writer.print(" ");
+        writer.print(' ');
         writer.print(attribute.localName);
         writer.print("=\"");
-        writer.print(StreamUtility.enc(attributeContent));
+        StreamUtility.enc(attributeContent, writer);
         writer.print("\">\n");
     }
 
@@ -1052,22 +1055,22 @@ public abstract class DOTranslationUtility
                                           QName element,
                                           QName attribute,
                                           String attributeContent) {
-        writer.print("<");
+        writer.print('<');
         writer.print(element.qName);
-        writer.print(" ");
+        writer.print(' ');
         writer.print(attribute.localName);
         writer.print("=\"");
-        writer.print(StreamUtility.enc(attributeContent));
+        StreamUtility.enc(attributeContent, writer);
         writer.print("\"/>\n");
     }
 
     private static void appendFullElement(PrintWriter writer,
                                           QName element,
                                           String elementContent) {
-        writer.print("<");
+        writer.print('<');
         writer.print(element.qName);
-        writer.print(">");
-        writer.print(StreamUtility.enc(elementContent));
+        writer.print('>');
+        StreamUtility.enc(elementContent, writer);
         writer.print("</");
         writer.print(element.qName);
         writer.print(">\n");

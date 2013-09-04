@@ -19,6 +19,7 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 
 import java.text.ParseException;
 
@@ -140,8 +141,10 @@ public class AtomDODeserializer
                 m_tempDir = FileUtils.createTempDir("atomzip", null);
                 m_zin = new ZipInputStream(new BufferedInputStream(in));
                 ZipEntry entry;
+                // reusable this byte buffer
+                byte[] buf = new byte[4096];
                 while ((entry = m_zin.getNextEntry()) != null) {
-                    FileUtils.copy(m_zin, new FileOutputStream(new File(m_tempDir, entry.getName())));
+                    FileUtils.copy(m_zin, new FileOutputStream(new File(m_tempDir, entry.getName())), buf);
                 }
                 in = new FileInputStream(new File(m_tempDir, "atommanifest.xml"));
             } catch (FileNotFoundException e) {
@@ -254,10 +257,11 @@ public class AtomDODeserializer
         } else {
             try {
                 if (m_format.equals(ATOM_ZIP1_1)) {
-                    ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                    FileUtils.copy(new FileInputStream(getContentSrcAsFile(entry.getContentSrc())),
-                            bout);
-                    ds.xmlContent = bout.toByteArray();
+                    File entryContent = getContentSrcAsFile(entry.getContentSrc());
+                    ByteBuffer byteBuffer = ByteBuffer.allocate((int)entryContent.length());
+                    FileUtils.copy(new FileInputStream(entryContent),
+                            byteBuffer);
+                    ds.xmlContent = byteBuffer.array();
 
                 } else {
                     ds.xmlContent = entry.getContent().getBytes(m_encoding); //IOUtils.toByteArray(entry.getContentStream());
@@ -573,11 +577,11 @@ public class AtomDODeserializer
             if (logger.isDebugEnabled()) {
                 logger.debug("New Object: checking supplied checksum");
             }
-            if (checksum != null && !checksum.equals("")
+            if (checksum != null && !checksum.isEmpty()
                     && !checksum.equals(Datastream.CHECKSUM_NONE)) {
                 String tmpChecksum = ds.getChecksum();
                 if (logger.isDebugEnabled()) {
-                    logger.debug("checksum = " + tmpChecksum);
+                    logger.debug("checksum = {}", tmpChecksum);
                 }
                 if (!checksum.equals(tmpChecksum)) {
                     throw new ValidationException("Checksum Mismatch: "

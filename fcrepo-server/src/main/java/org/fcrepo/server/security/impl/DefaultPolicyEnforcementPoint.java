@@ -89,7 +89,8 @@ implements PolicyEnforcementPoint {
                               String namespace,
                               Context context) throws AuthzException {
 
-        long enforceStartTime = System.currentTimeMillis();
+        boolean debug = logger.isDebugEnabled();
+        long enforceStartTime = debug ? System.currentTimeMillis() : 0;
         try {
             synchronized (this) {
                 //wait, if pdp update is in progress
@@ -106,7 +107,7 @@ implements PolicyEnforcementPoint {
                 ResponseCtx response = null;
                 String contextIndex = null;
                 try {
-                    contextIndex = (new Integer(next())).toString();
+                    contextIndex = Integer.toString(next());
                     logger.debug("context index set={}", contextIndex);
                     Set<Subject> subjects = wrapSubjects(subjectId);
                     Set<Attribute> actions = wrapActions(action, api, contextIndex);
@@ -123,12 +124,14 @@ implements PolicyEnforcementPoint {
                         logger.debug("request action has {}={}", tempobj.getId(), tempobj.getValue().toString());
                     }
                     m_registry.registerContext(contextIndex, context);
-                    long st = System.currentTimeMillis();
+                    long st = debug ? System.currentTimeMillis() : 0;
                     try {
                         response = m_pdp.evaluate(request);
                     } finally {
-                        long dur = System.currentTimeMillis() - st;
-                        logger.debug("Policy evaluation took {}ms.", dur);
+                        if (debug) {
+                          long dur = System.currentTimeMillis() - st;
+                          logger.debug("Policy evaluation took {}ms.", dur);
+                        }
                     }
 
                     logger.debug("in pep, after evaluate() called");
@@ -140,6 +143,7 @@ implements PolicyEnforcementPoint {
                 }
                 logger.debug("in pep, before denyBiasedAuthz() called");
                 if (!denyBiasedAuthz(response.getResults())) {
+                    response.encode(System.out);
                     throw new AuthzDeniedException("");
                 }
             }
@@ -147,8 +151,10 @@ implements PolicyEnforcementPoint {
                 throw new AuthzPermittedException("noOp");
             }
         } finally {
-            long dur = System.currentTimeMillis() - enforceStartTime;
-            logger.debug("Policy enforcement took {}ms.", dur);
+            if (debug) {
+                long dur = System.currentTimeMillis() - enforceStartTime;
+                logger.debug("Policy enforcement took {}ms.", dur);
+            }
         }
     }
 

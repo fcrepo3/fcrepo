@@ -129,12 +129,10 @@ class MmapParser
 
     @Override
     public void skippedEntity(String name) throws SAXException {
-        StringBuffer sb = new StringBuffer();
-        sb.append('&');
-        sb.append(name);
-        sb.append(';');
-        char[] text = new char[sb.length()];
-        sb.getChars(0, sb.length(), text, 0);
+        char[] text = new char[name.length() + 2];
+        text[0] = '&';
+        text[text.length - 1] = ';';
+        name.getChars(0, name.length(), text, 1);
         characters(text, 0, text.length);
     }
 
@@ -178,8 +176,7 @@ class MmapParser
                     methodMapParm.parmRequired = true;
                 } else {
                     methodMapParm.parmRequired =
-                            new Boolean(attrs.getValue("required"))
-                                    .booleanValue();
+                            Boolean.parseBoolean(attrs.getValue("required"));
                 }
                 methodMapParm.parmDefaultValue = null;
                 methodMapParm.parmDomainValues = new String[0];
@@ -195,8 +192,7 @@ class MmapParser
                     methodMapParm.parmRequired = true;
                 } else {
                     methodMapParm.parmRequired =
-                            new Boolean(attrs.getValue("required"))
-                                    .booleanValue();
+                            Boolean.parseBoolean(attrs.getValue("required"));
                 }
                 methodMapParm.parmDefaultValue = attrs.getValue("defaultValue");
                 methodMapParm.parmDomainValues = new String[0];
@@ -213,8 +209,7 @@ class MmapParser
                     methodMapParm.parmRequired = true;
                 } else {
                     methodMapParm.parmRequired =
-                            new Boolean(attrs.getValue("required"))
-                                    .booleanValue();
+                            Boolean.parseBoolean(attrs.getValue("required"));
                 }
                 methodMapParm.parmDefaultValue = attrs.getValue("defaultValue");
             } else if (inUserInputParm) {

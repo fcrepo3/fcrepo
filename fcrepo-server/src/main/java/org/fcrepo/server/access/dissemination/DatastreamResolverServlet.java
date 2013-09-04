@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URI;
 
 import java.sql.Timestamp;
 
@@ -111,9 +112,9 @@ public class DatastreamResolverServlet
                         + "of 5 seconds");
                 datastreamMediationLimit = 5000;
             } else {
-                datastreamMediationLimit = new Integer(expireLimit).intValue();
-                logger.info("datastreamMediationLimit: "
-                        + datastreamMediationLimit);
+                datastreamMediationLimit = Integer.parseInt(expireLimit);
+                logger.info("datastreamMediationLimit: {}",
+                        datastreamMediationLimit);
             }
         } catch (Throwable th) {
             logger.error("Error initializing servlet", th);
@@ -165,7 +166,7 @@ public class DatastreamResolverServlet
                         + request.getQueryString();
 
         id = request.getParameter("id").replaceAll("T", " ");
-        logger.debug("Datastream tempID=" + id);
+        logger.debug("Datastream tempID={}", id);
 
         logger.debug("DRS doGet()");
 
@@ -285,8 +286,8 @@ public class DatastreamResolverServlet
             }
             keyTimestamp = Timestamp.valueOf(ds.extractTimestamp(id));
             currentTimestamp = new Timestamp(new Date().getTime());
-            logger.debug("dsPhysicalLocation=" + dsPhysicalLocation
-                    + "dsControlGroupType=" + dsControlGroupType);
+            logger.debug("dsPhysicalLocation={} dsControlGroupType={}",
+                    dsPhysicalLocation, dsControlGroupType);
 
             // Deny mechanism requests that fall outside the specified time
             // interval.
@@ -294,8 +295,8 @@ public class DatastreamResolverServlet
             // parameter
             // named "datastreamMediationLimit" which is in milliseconds.
             long diff = currentTimestamp.getTime() - keyTimestamp.getTime();
-            logger.debug("Timestamp diff for mechanism's reponse: " + diff
-                    + " ms.");
+            logger.debug("Timestamp diff for mechanism's reponse: {} ms.",
+                    diff);
             if (diff > datastreamMediationLimit) {
                 out = response.getWriter();
                 response.setContentType(HTML_CONTENT_TYPE);
@@ -338,8 +339,8 @@ public class DatastreamResolverServlet
                  * if (roles == null) { roles = new String[0]; }
                  */
                 //XXXXXXXXXXXXXXXXXXXXXXxif (contains(roles, targetRole)) {
-                logger.debug("DatastreamResolverServlet: user=="
-                        + request.getRemoteUser());
+                logger.debug("DatastreamResolverServlet: user=={}",
+                        request.getRemoteUser());
                 /*
                  * if
                  * (((ExtendedHttpServletRequest)request).isUserInRole(targetRole)) {
@@ -364,9 +365,9 @@ public class DatastreamResolverServlet
                     logger.debug("context.getSubjectValue(targetRole)="
                             + context.getSubjectValue(targetRole));
                 }
-                Iterator it = context.subjectAttributes();
-                while (it.hasNext()) {
-                    String name = (String) it.next();
+                Iterator<String> subjectNames = context.subjectAttributes();
+                while (subjectNames.hasNext()) {
+                    String name = subjectNames.next();
                     int n = context.nSubjectValues(name);
                     switch (n) {
                         case 0:
@@ -386,9 +387,9 @@ public class DatastreamResolverServlet
                             }
                     }
                 }
-                it = context.environmentAttributes();
+                Iterator<URI> it = context.environmentAttributes();
                 while (it.hasNext()) {
-                    String name = (String) it.next();
+                    URI name = it.next();
                     String value = context.getEnvironmentValue(name);
                     logger.debug("another environment attribute from context "
                             + name + "=" + value);
@@ -446,11 +447,8 @@ public class DatastreamResolverServlet
                                         .equalsIgnoreCase("content-type")) {
                             response.addHeader(headerArray[i].name,
                                                headerArray[i].value);
-                            logger
-                                    .debug("THIS WAS ADDED TO DATASTREAMRESOLVERSERVLET RESPONSE HEADER FROM ORIGINATING PROVIDER "
-                                            + headerArray[i].name
-                                            + " : "
-                                            + headerArray[i].value);
+                            logger.debug("THIS WAS ADDED TO DATASTREAMRESOLVERSERVLET RESPONSE HEADER FROM ORIGINATING PROVIDER {} : {}",
+                                            headerArray[i].name, headerArray[i].value);
                         }
                     }
                 }
@@ -484,8 +482,8 @@ public class DatastreamResolverServlet
                 PID = s[0];
                 dsID = s[1];
                 dsVersionID = s[2];
-                logger.debug("PID=" + PID + ", dsID=" + dsID + ", dsVersionID="
-                        + dsVersionID);
+                logger.debug("PID={}, dsID={}, dsVersionID={}",
+                        PID, dsID, dsVersionID);
 
                 DOReader doReader =
                         m_manager.getReader(Server.USE_DEFINITIVE_STORE,
@@ -493,7 +491,7 @@ public class DatastreamResolverServlet
                                             PID);
                 Datastream d =
                         doReader.getDatastream(dsID, dsVersionID);
-                logger.debug("Got datastream: " + d.DatastreamID);
+                logger.debug("Got datastream: {}", d.DatastreamID);
                 InputStream is = d.getContentStream(context);
                 int bytestream = 0;
                 response.setContentType(d.DSMIME);

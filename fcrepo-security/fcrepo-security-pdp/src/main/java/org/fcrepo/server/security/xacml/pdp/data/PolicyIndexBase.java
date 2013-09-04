@@ -3,6 +3,7 @@ package org.fcrepo.server.security.xacml.pdp.data;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,6 +44,8 @@ implements PolicyIndex {
     protected static final String RESOURCE_KEY = "resourceAttributes";
     protected static final String ACTION_KEY = "actionAttributes";
     protected static final String ENVIRONMENT_KEY = "environmentAttributes";
+    protected static final URI SUBJECT_CATEGORY_DEFAULT =
+            URI.create(AttributeDesignator.SUBJECT_CATEGORY_DEFAULT);
     // used in testing - indicates if the implementation returns indexed results
     // or if false indicates that all policies are returned irrespective of the request
     public  boolean indexed = true;
@@ -109,13 +112,12 @@ implements PolicyIndex {
      * @throws URISyntaxException
      */
     @SuppressWarnings("unchecked")
-    protected Map<String, Set<AttributeBean>> getAttributeMap(EvaluationCtx eval) throws URISyntaxException {
-        URI defaultCategoryURI =
-                new URI(AttributeDesignator.SUBJECT_CATEGORY_DEFAULT);
+    protected Map<String, Collection<AttributeBean>> getAttributeMap(EvaluationCtx eval) throws URISyntaxException {
+        final URI defaultCategoryURI = SUBJECT_CATEGORY_DEFAULT;
 
         Map<String, String> im = null;
-        Map<String, Set<AttributeBean>> attributeMap =
-                new HashMap<String, Set<AttributeBean>>();
+        Map<String, Collection<AttributeBean>> attributeMap =
+                new HashMap<String, Collection<AttributeBean>>();
         Map<String, AttributeBean> attributeBeans = null;
 
         im = indexMap.get(SUBJECT_KEY);
@@ -149,8 +151,7 @@ implements PolicyIndex {
                 }
             }
         }
-        attributeMap.put(SUBJECT_KEY, new HashSet(attributeBeans
-                .values()));
+        attributeMap.put(SUBJECT_KEY, attributeBeans.values());
 
         im = indexMap.get(RESOURCE_KEY);
         attributeBeans = new HashMap<String, AttributeBean>();
@@ -196,8 +197,7 @@ implements PolicyIndex {
                 }
             }
         }
-        attributeMap.put(RESOURCE_KEY, new HashSet<AttributeBean>(attributeBeans
-                .values()));
+        attributeMap.put(RESOURCE_KEY, attributeBeans.values());
 
         im = indexMap.get(ACTION_KEY);
         attributeBeans = new HashMap<String, AttributeBean>();
@@ -230,8 +230,7 @@ implements PolicyIndex {
                 }
             }
         }
-        attributeMap.put(ACTION_KEY, new HashSet<AttributeBean>(attributeBeans
-                .values()));
+        attributeMap.put(ACTION_KEY, attributeBeans.values());
 
         im = indexMap.get(ENVIRONMENT_KEY);
         attributeBeans = new HashMap<String, AttributeBean>();
@@ -264,8 +263,7 @@ implements PolicyIndex {
                 }
             }
         }
-        attributeMap.put(ENVIRONMENT_KEY, new HashSet<AttributeBean>(attributeBeans
-                .values()));
+        attributeMap.put(ENVIRONMENT_KEY, attributeBeans.values());
 
         return attributeMap;
     }
@@ -308,7 +306,7 @@ implements PolicyIndex {
      * @return array of individual resource-id values that can be used to match against policies
      */
     protected static String[] makeComponents(String resourceId) {
-        if (resourceId == null || resourceId.equals("")
+        if (resourceId == null || resourceId.isEmpty()
                 || !resourceId.startsWith("/")) {
             return null;
         }
@@ -317,23 +315,27 @@ implements PolicyIndex {
 
         String[] parts = resourceId.split("\\/");
 
+        int bufPrimer = 0;
         for (int x = 1; x < parts.length; x++) {
-            StringBuilder sb = new StringBuilder();
+            bufPrimer = Math.max(bufPrimer, (parts[x].length() + 1));
+            StringBuilder sb = new StringBuilder(bufPrimer);
             for (int y = 0; y < x; y++) {
                 sb.append("/");
                 sb.append(parts[y + 1]);
             }
 
-            components.add(sb.toString());
+            String componentBase = sb.toString();
+            bufPrimer = componentBase.length() + 16;
+            components.add(componentBase);
 
             if (x != parts.length - 1) {
-                components.add(sb.toString() + "/.*");
+                components.add(componentBase.concat("/.*"));
             } else {
-                components.add(sb.toString() + "$");
+                components.add(componentBase.concat("$"));
             }
         }
 
-        return components.toArray(new String[components.size()]);
+        return components.toArray(parts);
     }
 
 

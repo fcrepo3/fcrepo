@@ -164,8 +164,8 @@ class SQLUtilityImpl
                                   boolean[] numeric) throws SQLException {
 
         // prepare update statement
-        StringBuffer sql = new StringBuffer();
-        sql.append("UPDATE " + table + " SET ");
+        StringBuilder sql = new StringBuilder(64);
+        sql.append("UPDATE ").append(table).append(" SET ");
         boolean needComma = false;
         for (int i = 0; i < columns.length; i++) {
             if (!columns[i].equals(uniqueColumn)) {
@@ -178,12 +178,16 @@ class SQLUtilityImpl
                 if (values[i] == null) {
                     sql.append("NULL");
                 } else {
-                    sql.append("?");
+                    sql.append('?');
                 }
             }
         }
-        sql.append(" WHERE " + uniqueColumn + " = ?");
-        logger.debug("About to execute: " + sql.toString());
+        sql.append(" WHERE ");
+        sql.append(uniqueColumn);
+        sql.append(" = ?");
+        if (logger.isDebugEnabled()) {
+            logger.debug("About to execute: " + sql.toString());
+        }
         PreparedStatement stmt = conn.prepareStatement(sql.toString());
 
         try {
@@ -227,8 +231,8 @@ class SQLUtilityImpl
                             boolean[] numeric) throws SQLException {
 
         // prepare insert statement
-        StringBuffer sql = new StringBuffer();
-        sql.append("INSERT INTO " + table + " (");
+        StringBuilder sql = new StringBuilder(128);
+        sql.append("INSERT INTO ").append(table).append(" (");
         for (int i = 0; i < columns.length; i++) {
             if (i > 0) {
                 sql.append(", ");
@@ -243,11 +247,13 @@ class SQLUtilityImpl
             if (values[i] == null) {
                 sql.append("NULL");
             } else {
-                sql.append("?");
+                sql.append('?');
             }
         }
-        sql.append(")");
-        logger.debug("About to execute: " + sql.toString());
+        sql.append(')');
+        if (logger.isDebugEnabled()) {
+            logger.debug("About to execute: {}", sql.toString());
+        }
         PreparedStatement stmt = conn.prepareStatement(sql.toString());
 
         try {
@@ -354,16 +360,16 @@ class SQLUtilityImpl
         while (nii.hasNext()) {
             TableSpec spec = nii.next();
             if (logger.isInfoEnabled()) {
-                StringBuffer sqlCmds = new StringBuffer();
+                StringBuilder sqlCmds = new StringBuilder(128);
                 Iterator<String> iter =
                         tcConn.getDDLConverter().getDDL(spec).iterator();
                 while (iter.hasNext()) {
-                    sqlCmds.append("\n");
+                    sqlCmds.append('\n');
                     sqlCmds.append(iter.next());
-                    sqlCmds.append(";");
+                    sqlCmds.append(';');
                 }
-                logger.info("Creating new " + "table '" + spec.getName()
-                        + "' with command(s): " + sqlCmds.toString());
+                logger.info("Creating new table '{}' with command(s): {}",
+                        spec.getName(), sqlCmds.toString());
             }
             tcConn.createTable(spec);
         }

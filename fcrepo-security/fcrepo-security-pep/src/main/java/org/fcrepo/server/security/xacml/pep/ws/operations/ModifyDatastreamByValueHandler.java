@@ -110,23 +110,23 @@ public class ModifyDatastreamByValueHandler
 
         try {
             resAttr = ResourceAttributes.getResources(pid);
-            if (dsID != null && !"".equals(dsID)) {
+            if (dsID != null && !dsID.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.ID.getURI(),
                             new StringAttribute(dsID));
             }
-            if (mimeType != null && !"".equals(mimeType)) {
+            if (mimeType != null && !mimeType.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_MIME_TYPE.getURI(),
                             new StringAttribute(mimeType));
             }
-            if (formatURI != null && !"".equals(formatURI)) {
+            if (formatURI != null && !formatURI.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_FORMAT_URI.getURI(),
                             new AnyURIAttribute(new URI(formatURI)));
             }
-            if (checksumType != null && !"".equals(checksumType)) {
+            if (checksumType != null && !checksumType.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_CHECKSUM_TYPE.getURI(),
                             new StringAttribute(checksumType));
             }
-            if (checksum != null && !"".equals(checksum)) {
+            if (checksum != null && !checksum.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.NEW_CHECKSUM.getURI(),
                             new StringAttribute(checksum));
             }

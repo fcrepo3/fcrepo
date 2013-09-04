@@ -157,7 +157,7 @@ public class ContextUtil {
                         res.get(Constants.DATASTREAM.ID.getURI());
                 if (dsidAttr != null) {
                     dsid = dsidAttr.encode();
-                    if (!dsid.equals("")) {
+                    if (!dsid.isEmpty()) {
                         pid += "/" + dsid;
                     }
                 }

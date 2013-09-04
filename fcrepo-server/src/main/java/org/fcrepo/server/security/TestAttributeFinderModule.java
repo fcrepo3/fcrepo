@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.attr.AttributeDesignator;
-import com.sun.xacml.attr.StringAttribute;
 
 /**
  * @author Bill Niebel
@@ -23,7 +22,7 @@ class TestAttributeFinderModule
 
     private static final Logger logger =
             LoggerFactory.getLogger(TestAttributeFinderModule.class);
-    public static final String ATTRIBUTE_ID = Constants.ENVIRONMENT.uri + ":springConfigured";
+    public static final URI ATTRIBUTE_ID = URI.create(Constants.ENVIRONMENT.uri + ":springConfigured");
     public static final String ATTRIBUTE_VALUE = "demo:5";
     @Override
     protected boolean canHandleAdhoc() {
@@ -38,16 +37,16 @@ class TestAttributeFinderModule
         try {
             registerSupportedDesignatorType(AttributeDesignator.ENVIRONMENT_TARGET);
 
-            registerAttribute(ATTRIBUTE_ID, StringAttribute.identifier);
+            registerAttribute(ATTRIBUTE_ID, STRING_ATTRIBUTE_TYPE_URI);
 
-            attributesDenied.add(Constants.XACML1_SUBJECT.ID.uri);
-            attributesDenied.add(Constants.XACML1_ACTION.ID.uri);
-            attributesDenied.add(Constants.XACML1_RESOURCE.ID.uri);
+            denyAttribute(Constants.XACML1_SUBJECT.ID.attributeId);
+            denyAttribute(Constants.XACML1_ACTION.ID.attributeId);
+            denyAttribute(Constants.XACML1_RESOURCE.ID.attributeId);
 
-            attributesDenied.add(Constants.ACTION.CONTEXT_ID.uri);
-            attributesDenied.add(Constants.SUBJECT.LOGIN_ID.uri);
-            attributesDenied.add(Constants.ACTION.ID.uri);
-            attributesDenied.add(Constants.ACTION.API.uri);
+            denyAttribute(Constants.ACTION.CONTEXT_ID.attributeId);
+            denyAttribute(Constants.SUBJECT.LOGIN_ID.attributeId);
+            denyAttribute(Constants.ACTION.ID.attributeId);
+            denyAttribute(Constants.ACTION.API.attributeId);
 
             setInstantiatedOk(true);
         } catch (URISyntaxException e1) {
@@ -61,13 +60,13 @@ class TestAttributeFinderModule
 
     @Override
     protected final Object getAttributeLocally(int designatorType,
-                                               String attributeId,
+                                               URI attributeId,
                                                URI resourceCategory,
                                                EvaluationCtx ctx) {
         logger.debug("getAttributeLocally test");
-        logger.debug("TestAttributeFinderModule attributeId=" + attributeId);
+        logger.debug("TestAttributeFinderModule attributeId={}", attributeId);
         Object values = null;
-        logger.debug("designatorType" + designatorType);
+        logger.debug("designatorType{}", designatorType);
         if (designatorType == AttributeDesignator.ENVIRONMENT_TARGET) {
             if (ATTRIBUTE_ID.equals(attributeId)) {
                 values = ATTRIBUTE_VALUE;
@@ -77,10 +76,10 @@ class TestAttributeFinderModule
         } else {
             values = null;
         }
-        if (values instanceof String) {
-            logger.debug("getAttributeLocally string value=" + (String) values);
+        if (values != null) {
+            logger.debug("getAttributeLocally string value={}", values);
         } else {
-            logger.debug("getAttributeLocally object value=" + values);
+            logger.debug("getAttributeLocally object value=null");
         }
         return values;
     }

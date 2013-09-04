@@ -102,7 +102,7 @@ public class MassIngest {
                 File f = new File(args[4]);
                 String protocol = args[8];
                 String context = Constants.FEDORA_DEFAULT_APP_CONTEXT;
-                if (args.length == 10 && !args[9].equals("")){
+                if (args.length == 10 && !args[9].isEmpty()){
                     context = args[9];
                 }
 

@@ -24,17 +24,31 @@ public abstract class AbstractPolicyEnforcementPoint
         implements PolicyEnforcementPoint {
     private static final Logger logger = LoggerFactory.getLogger(AbstractPolicyEnforcementPoint.class);
 
-    static final URI SUBJECT_ID_URI = URI.create(Constants.SUBJECT.LOGIN_ID.uri);
+    static final URI SUBJECT_ID_URI = Constants.SUBJECT.LOGIN_ID.attributeId;
 
-    static final URI ACTION_ID_URI = URI.create(Constants.ACTION.ID.uri);
+    static final URI ACTION_ID_URI = Constants.ACTION.ID.attributeId;
 
-    static final URI ACTION_API_URI = URI.create(Constants.ACTION.API.uri);
+    static final URI ACTION_API_URI = Constants.ACTION.API.attributeId;
 
-    static final URI ACTION_CONTEXT_URI = URI.create(Constants.ACTION.CONTEXT_ID.uri);
+    static final URI ACTION_CONTEXT_URI = Constants.ACTION.CONTEXT_ID.attributeId;
 
-    static final URI RESOURCE_ID_URI = URI.create(Constants.OBJECT.PID.uri);
+    static final URI RESOURCE_ID_URI = Constants.OBJECT.PID.attributeId;
 
-    static final URI RESOURCE_NAMESPACE_URI = URI.create(Constants.OBJECT.NAMESPACE.uri);
+    static final URI RESOURCE_NAMESPACE_URI = Constants.OBJECT.NAMESPACE.attributeId;
+    
+    static final StringAttribute EMPTY_ATTRIBUTE = new StringAttribute("");
+
+    static final Attribute ACTION_ATTRIBUTE =
+            new Attribute(Constants.XACML1_ACTION.ID.attributeId,
+                    null, null, EMPTY_ATTRIBUTE);
+
+    static final Attribute RESOURCE_ATTRIBUTE =
+            new Attribute(Constants.XACML1_RESOURCE.ID.attributeId,
+                    null, null, EMPTY_ATTRIBUTE);
+
+    static final Attribute SUBJECT_ATTRIBUTE =
+            new Attribute(Constants.XACML1_SUBJECT.ID.attributeId,
+                    null, null, EMPTY_ATTRIBUTE);
 
     protected final PDPConfig m_pdpConfig;
     protected PDP m_pdp;
@@ -73,24 +87,20 @@ public abstract class AbstractPolicyEnforcementPoint
     }
 
     protected Set<Subject> wrapSubjects(String subjectLoginId) {
-        logger.debug("wrapSubjectIdAsSubjects(): " + subjectLoginId);
-        StringAttribute stringAttribute = new StringAttribute("");
+        logger.debug("wrapSubjectIdAsSubjects(): {}", subjectLoginId);
+        StringAttribute stringAttribute = EMPTY_ATTRIBUTE;
         Attribute subjectAttribute =
-                new Attribute(Constants.XACML1_SUBJECT.ID.getURI(), null, null, stringAttribute);
-        logger.debug("wrapSubjectIdAsSubjects(): subjectAttribute, id="
-                + subjectAttribute.getId() + ", type="
-                + subjectAttribute.getType() + ", value="
-                + subjectAttribute.getValue());
+                SUBJECT_ATTRIBUTE;
+        logger.debug("wrapSubjectIdAsSubjects(): subjectAttribute, id={}, type={}, value={}",
+                subjectAttribute.getId(), subjectAttribute.getType(), subjectAttribute.getValue());
         Set<Attribute> subjectAttributes = new HashSet<Attribute>();
         subjectAttributes.add(subjectAttribute);
-        if (subjectLoginId != null && !"".equals(subjectLoginId)) {
+        if (subjectLoginId != null && !subjectLoginId.isEmpty()) {
             stringAttribute = new StringAttribute(subjectLoginId);
             subjectAttribute =
                     new Attribute(SUBJECT_ID_URI, null, null, stringAttribute);
-            logger.debug("wrapSubjectIdAsSubjects(): subjectAttribute, id="
-                    + subjectAttribute.getId() + ", type="
-                    + subjectAttribute.getType() + ", value="
-                    + subjectAttribute.getValue());
+            logger.debug("wrapSubjectIdAsSubjects(): subjectAttribute, id={}, type={}, value={}",
+                    subjectAttribute.getId(), subjectAttribute.getType(), subjectAttribute.getValue());
         }
         subjectAttributes.add(subjectAttribute);
         Subject singleSubject = new Subject(subjectAttributes);
@@ -98,18 +108,14 @@ public abstract class AbstractPolicyEnforcementPoint
         subjects.add(singleSubject);
         return subjects;
     }
-
+    
     protected Set<Attribute> wrapActions(String actionId,
                                   String actionApi,
                                   String contextIndex) {
-        Set<Attribute> actions = new HashSet<Attribute>();
+        Set<Attribute> actions = new HashSet<Attribute>(4);
+        actions.add(ACTION_ATTRIBUTE);
+        
         Attribute action =
-                new Attribute(Constants.XACML1_ACTION.ID.getURI(),
-                              null,
-                              null,
-                              new StringAttribute(""));
-        actions.add(action);
-        action =
                 new Attribute(ACTION_ID_URI,
                               null,
                               null,
@@ -132,15 +138,10 @@ public abstract class AbstractPolicyEnforcementPoint
 
     protected Set<Attribute> wrapResources(String pid, String namespace)
             throws AuthzOperationalException {
-        Set<Attribute> resources = new HashSet<Attribute>();
-        Attribute attribute = null;
-        attribute =
-                new Attribute(Constants.XACML1_RESOURCE.ID.getURI(),
-                              null,
-                              null,
-                              new StringAttribute(""));
-        resources.add(attribute);
-        attribute =
+        Set<Attribute> resources = new HashSet<Attribute>(3);
+        resources.add(RESOURCE_ATTRIBUTE);
+
+        Attribute attribute =
                 new Attribute(RESOURCE_ID_URI,
                               null,
                               null,
@@ -183,11 +184,14 @@ public abstract class AbstractPolicyEnforcementPoint
                     break;
             }
         }
-        logger.debug("AUTHZ:  permits=" + nPermits + " denies=" + nDenies
+        if (logger.isDebugEnabled()) {
+            logger.debug("AUTHZ:  permits=" + nPermits + " denies=" + nDenies
                 + " indeterminates=" + nIndeterminates + " notApplicables="
                 + nNotApplicables + " unexpecteds=" + nWrongs);
+        }
         return nPermits >= 1 && nDenies == 0 && nIndeterminates == 0
                 && nWrongs == 0; // don't care about NotApplicables
     }
+    
 }
 

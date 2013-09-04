@@ -12,9 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -24,6 +21,7 @@ import org.fcrepo.common.rdf.RDFName;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.RepositoryConfigurationException;
 import org.fcrepo.server.errors.StreamIOException;
+import org.fcrepo.utilities.XmlTransformUtility;
 
 
 
@@ -78,18 +76,8 @@ public class DCFields
     public DCFields(InputStream in)
             throws RepositoryConfigurationException, ObjectIntegrityException,
             StreamIOException {
-        SAXParser parser = null;
         try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            parser = spf.newSAXParser();
-        } catch (Exception e) {
-            throw new RepositoryConfigurationException("Error getting SAX "
-                    + "parser for DC metadata: " + e.getClass().getName()
-                    + ": " + e.getMessage());
-        }
-        try {
-            parser.parse(in, this);
+            XmlTransformUtility.parseWithoutValidating(in, this);
         } catch (SAXException saxe) {
             throw new ObjectIntegrityException("Parse error parsing DC XML Metadata: "
                     + saxe.getMessage());
@@ -239,15 +227,29 @@ public class DCFields
      * the oai_dc schema.... but without the xml declaration.
      */
     public String getAsXML() {
-        return getAsXML(null);
+        return getAsXML((String)null);
     }
     
+    public void getAsXML(Appendable out) throws IOException {
+        getAsXML(null, out);
+    }
+
     /**
      * Ensure the dc:identifiers include the pid of the target object
             * @param targetPid
             * @return
      */
     public String getAsXML(String targetPid) {
+        StringBuilder out = new StringBuilder(512);
+        try {
+            getAsXML(targetPid, out);
+        } catch (IOException wonthappen) {
+            throw new RuntimeException(wonthappen);
+        }
+        return out.toString();
+    }
+    
+    public void getAsXML(String targetPid, Appendable out) throws IOException {
         boolean addPid = (targetPid != null);
         if (addPid) {
         for (DCField dcField : identifiers()) {
@@ -256,7 +258,6 @@ public class DCFields
             }
         }
         }
-        StringBuffer out = new StringBuffer();
         out.append("<" + OAI_DC.prefix + ":dc" + " xmlns:" + OAI_DC.prefix
                 + "=\"" + OAI_DC.uri + "\"" + "\nxmlns:" + DC.prefix + "=\""
                 + DC.uri + "\"\nxmlns:xsi=\"" + XSI.uri
@@ -281,20 +282,22 @@ public class DCFields
         appendXML(coverages(), "coverage", out);
         appendXML(rights(), "rights", out);
         out.append("</oai_dc:dc>\n");
-        return out.toString();    }
+    }
 
-    private void appendXML(List<DCField> values, String name, StringBuffer out) {
+    private void appendXML(List<DCField> values, String name, Appendable out)
+        throws IOException {
         for (DCField value : values) {
             appendXML(value, name, out);
         }
     }
-    private void appendXML(DCField value, String name, StringBuffer out) {
-        out.append("  <dc:" + name);
+    private void appendXML(DCField value, String name, Appendable out)
+        throws IOException {
+        out.append("  <dc:").append(name);
         if (value.getLang() != null) {
-            out.append(" xml:lang=\"" + value.getLang() + "\"");
+            out.append(" xml:lang=\"").append(value.getLang()).append('"');
         }
-        out.append(">");
-        out.append(StreamUtility.enc(value.getValue()));
-        out.append("</dc:" + name + ">\n");
+        out.append('>');
+        StreamUtility.enc(value.getValue(), out);
+        out.append("</dc:").append(name).append(">\n");
     }
 }

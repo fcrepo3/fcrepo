@@ -78,15 +78,15 @@ public class ContextXmlWriter
         putEndTag(writer, QNAME_TAG_NOW);
     }
 
-    private void writeMultiMap(XMLEventWriter writer,
+    private <T> void writeMultiMap(XMLEventWriter writer,
                                String mapName,
-                               MultiValueMap map) throws XMLStreamException {
+                               MultiValueMap<T> map) throws XMLStreamException {
         putStartTag(writer, QNAME_TAG_MULTI_VALUE_MAP);
         putAttribute(writer, QNAME_ATTR_NAME, mapName);
-        for (Iterator attributes = map.names(); attributes.hasNext();) {
-            String attribute = (String) attributes.next();
+        for (Iterator<T> attributes = map.names(); attributes.hasNext();) {
+            T attribute = attributes.next();
             putStartTag(writer, QNAME_TAG_MULTI_VALUE_MAP_KEY);
-            putAttribute(writer, QNAME_ATTR_NAME, attribute);
+            putAttribute(writer, QNAME_ATTR_NAME, attribute.toString());
             String[] values = map.getStringArray(attribute);
             for (String element : values) {
                 putStartTag(writer, QNAME_TAG_MULTI_VALUE_MAP_VALUE);

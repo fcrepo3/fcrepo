@@ -108,7 +108,7 @@ public class AutoFinder {
         String phrase = args[5];
         String protocol = args[6];
 
-        if (args.length == 8 && !args[7].equals("")){
+        if (args.length == 8 && !args[7].isEmpty()){
             context = args[7];
         }
 

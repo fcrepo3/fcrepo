@@ -42,7 +42,7 @@ public class AddDatastreamMethod
                         .getStringArgument(ARGUMENT_NAME_LOG_MESSAGE));
 
         // Store the Datastream ID for writing to the journal.
-        parent.setRecoveryValue(Constants.RECOVERY.DATASTREAM_ID.uri,
+        parent.setRecoveryValue(Constants.RECOVERY.DATASTREAM_ID.attributeId,
                                 datastreamId);
 
         return datastreamId;

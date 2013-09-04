@@ -1,4 +1,4 @@
-package org.fcrepo.server.utilities;
+package org.fcrepo.utilities;
 
 public class TimestampedCacheEntry<T> {
 	private long timeStamp;
@@ -10,7 +10,7 @@ public class TimestampedCacheEntry<T> {
 
     public TimestampedCacheEntry(final long timeStamp, final T object) {
         super();
-        this.timeStamp = System.currentTimeMillis();
+        this.timeStamp = timeStamp;
         this.object = object;
     }
 
@@ -23,11 +23,26 @@ public class TimestampedCacheEntry<T> {
 	    return this.timeStamp;
 	}
 	
+	/**
+	 * Calculate the age since the object was created (or claimed creation)
+	 * and the Current system time
+	 * @return
+	 */
 	public long age() {
 	    return System.currentTimeMillis() - this.timeStamp;
 	}
 	
-	public T value() {
+	/**
+	 * Calculate the age since the object was created (or claimed creation)
+	 * and the passed time as a long. Useful for loop processing of entries.
+	 * @param time
+	 * @return
+	 */
+    public long ageAt(long time) {
+        return time - this.timeStamp;
+    }
+
+    public T value() {
 	    return this.object;
 	}
 

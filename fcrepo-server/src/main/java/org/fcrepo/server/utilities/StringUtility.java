@@ -4,6 +4,8 @@
  */
 package org.fcrepo.server.utilities;
 
+import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 /**
@@ -39,7 +41,8 @@ public class StringUtility {
      *         the specified line length.
      */
     public static String prettyPrint(String in, int lineLength, String delim) {
-        StringBuffer sb = new StringBuffer();
+        // make a guess about resulting length to minimize copying
+        StringBuilder sb = new StringBuilder(in.length() + in.length()/lineLength);
         if (delim == null) {
             delim = " ";
         }
@@ -49,11 +52,13 @@ public class StringUtility {
             String s = st.nextToken();
             charCount = charCount + s.length();
             if (charCount < lineLength) {
-                sb.append(s + " ");
+                sb.append(s);
+                sb.append(' ');
                 charCount++;
             } else {
-                sb.append("\n");
-                sb.append(s + " ");
+                sb.append('\n');
+                sb.append(s);
+                sb.append(' ');
                 charCount = s.length() + 1;
             }
         }
@@ -77,52 +82,84 @@ public class StringUtility {
      *         than the specified length + indent amount.
      */
     public static String splitAndIndent(String str, int indent, int numChars) {
-        StringBuffer sb = new StringBuffer();
-        StringBuffer ib = new StringBuffer();
-        for (int i = 0; i < indent; i++) {
-            ib.append(" ");
+        final int inputLength = str.length();
+        // to prevent resizing, we can predict the size of the indented string
+        // the formatting addition is the indent spaces plus a newline
+        // this length is added once for each line
+        boolean perfectFit = (inputLength % numChars == 0);
+        int fullLines = (inputLength / numChars);
+        int formatLength = perfectFit ?
+                (indent + 1) * fullLines :
+                (indent + 1) * (fullLines + 1);
+        int outputLength = inputLength + formatLength;
+        
+        StringBuilder sb = new StringBuilder(outputLength);
+        char[] ib = new char[indent];
+        Arrays.fill(ib, ' ');
+
+        for (int offset = 0; offset < inputLength; offset += numChars) {
+            sb.append(ib);
+            sb.append(str, offset, offset + numChars);
+            sb.append('\n');
         }
-        String indentStr = ib.toString();
-        int offset = 0;
-        int totalLength = str.length();
-        while (totalLength > numChars) {
-            String s = str.substring(offset, offset + numChars);
-            sb.append(indentStr);
-            sb.append(s);
-            sb.append("\n");
-            offset += numChars;
-            totalLength -= numChars;
+        if (!perfectFit) {
+            sb.append(ib);
+            sb.append(str, fullLines * numChars, inputLength);
+            sb.append('\n');
         }
-        String s = str.substring(offset);
-        sb.append(indentStr);
-        sb.append(s);
-        sb.append("\n");
 
         return sb.toString();
 
     }
+    
+    public static void splitAndIndent(String str, int indent,
+            int numChars, PrintWriter writer) {
+        final int inputLength = str.length();
+        boolean perfectFit = (inputLength % numChars == 0);
+        int fullLines = (inputLength / numChars);
+        
+        char[] ib = new char[indent];
+        Arrays.fill(ib, ' ');
+
+        for (int offset = 0; offset < inputLength; offset += numChars) {
+            writer.print(ib);
+            writer.append(str, offset, offset + numChars);
+            writer.print('\n');
+        }
+        if (!perfectFit) {
+            writer.print(ib);
+            writer.append(str, fullLines * numChars, inputLength);
+            writer.print('\n');
+        }
+
+    }
+    
+    private static final char[] HEX_CHARS = new char[]{
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'a', 'b', 'c', 'd', 'e', 'f'
+    };
 
     public static String byteArraytoHexString(byte[] array) {
-        final String hexByte = "0123456789abcdef";
-        StringBuffer buf = new StringBuffer();
-        for (byte val : array) {
-            int v1 = val >>> 4 & 0x0f;
-            int v2 = val & 0x0f;
-            buf.append(hexByte.substring(v1, v1 + 1)).append(hexByte
-                    .substring(v2, v2 + 1));
+        char[] chars = new char[array.length * 2];
+        int pos = 0;
+        for (int i=0; i< array.length; i++) {
+            int v1 = array[i] >>> 4 & 0x0f;
+            int v2 = array[i] & 0x0f;
+            chars[pos++] = HEX_CHARS[v1];
+            chars[pos++] = HEX_CHARS[v2];
         }
-        return buf.toString();
+        return new String(chars);
     }
 
     public static byte[] hexStringtoByteArray(String str) {
-        if ((str.length() & 0x01) != 0) {
+        int sLen = str.length();
+        if ((sLen & 0x01) != 0) {
             throw new NumberFormatException();
         }
-        byte ret[] = new byte[str.length() / 2];
-        for (int i = 0; i < str.length() / 2; i++) {
-            ret[i] =
-                    (byte) Integer
-                            .parseInt(str.substring(i * 2, i * 2 + 2), 16);
+        byte ret[] = new byte[sLen / 2];
+        for (int i = 0; i < sLen; i+=2) {
+            ret[i/2] = (byte) ((Character.digit(str.charAt(i), 16) << 4) +
+                     Character.digit(str.charAt(i+1), 16));
         }
         return ret;
     }

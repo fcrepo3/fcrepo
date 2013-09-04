@@ -39,6 +39,8 @@ public class DBPathRegistry
     private static final Logger logger =
             LoggerFactory.getLogger(DBPathRegistry.class);
 
+    private static final String escapedBackslash = "\\\\"; //Java quotes will interpolate these as 2 backslashes
+
     private ConnectionPool connectionPool = null;
 
     private final boolean backslashIsEscape;
@@ -197,16 +199,14 @@ public class DBPathRegistry
             LowlevelStorageInconsistencyException, LowlevelStorageException {
         if (backslashIsEscape) {
             StringBuffer buffer = new StringBuffer();
-            String backslash = "\\"; //Java quotes will interpolate this as 1 backslash
-            String escapedBackslash = "\\\\"; //Java quotes will interpolate these as 2 backslashes
             /*
              * Escape each backspace so that DB will correctly record a single
              * backspace, instead of incorrectly escaping the following
              * character.
              */
             for (int i = 0; i < path.length(); i++) {
-                String s = path.substring(i, i + 1);
-                buffer.append(s.equals(backslash) ? escapedBackslash : s);
+                char s = path.charAt(i);
+                buffer.append(s == '\\' ? escapedBackslash : s);
             }
             path = buffer.toString();
         }

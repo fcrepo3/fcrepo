@@ -9,6 +9,7 @@ import org.fcrepo.common.PID;
 import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.translation.FOXML1_1DODeserializer;
 import org.fcrepo.server.storage.translation.FOXML1_1DOSerializer;
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.jrdf.graph.URIReference;
 
 import java.io.ByteArrayInputStream;
@@ -169,12 +170,12 @@ public abstract class ObjectBuilder {
         String charEncoding = "UTF-8";
         int transContext = DOTranslationUtility.SERIALIZE_STORAGE_INTERNAL;
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ReadableByteArrayOutputStream out = new ReadableByteArrayOutputStream(4096);
         FOXML1_1DOSerializer ser = new FOXML1_1DOSerializer();
         ser.serialize(obj, out, charEncoding, transContext);
 
         FOXML1_1DODeserializer deser = new FOXML1_1DODeserializer();
-        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+        ByteArrayInputStream in = out.toInputStream();
         DigitalObject objCopy = new BasicDigitalObject();
         deser.deserialize(in, objCopy, charEncoding, transContext);
 
@@ -191,11 +192,11 @@ public abstract class ObjectBuilder {
      * Get the DC xml for an object.
      */
     public static String getDC(String content) {
-        StringBuffer x = new StringBuffer();
-        x.append("<oai_dc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\"");
-        x.append(" xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\">\n");
-        x.append(content + "\n");
-        x.append("</oai_dc:dc>");
+        StringBuilder x = new StringBuilder(131 + content.length());
+        x.append("<oai_dc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\""
+                + " xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\">\n");
+        x.append(content);
+        x.append("\n</oai_dc:dc>");
         return x.toString();
     }
 
@@ -203,13 +204,14 @@ public abstract class ObjectBuilder {
      * Get the RELS-EXT xml for an object.
      */
     public static String getRELSEXT(String pid, String content) {
-        StringBuffer x = new StringBuffer();
-        x.append("<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"");
-        x.append(" xmlns:foo=\"http://example.org/foo#\">\n");
-        x.append("<rdf:Description rdf:about=\"" + PID.getInstance(pid).toURI() + "\">\n");
-        x.append(content + "\n");
-        x.append("</rdf:Description>\n");
-        x.append("</rdf:RDF>");
+        StringBuilder x = new StringBuilder(185 + content.length() + pid.length());
+        x.append("<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""
+                + " xmlns:foo=\"http://example.org/foo#\">\n"
+                + "<rdf:Description rdf:about=\"");
+        x.append(PID.getInstance(pid).toURI());
+        x.append("\">\n");
+        x.append(content);
+        x.append("\n</rdf:Description>\n</rdf:RDF>");
         return x.toString();
     }
 
@@ -217,18 +219,19 @@ public abstract class ObjectBuilder {
      * Get the RELS-INT xml for an object.
      */
     public static String getRELSINT(String pid, String content1, String content2) {
-        StringBuffer x = new StringBuffer();
-        x.append("<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"");
-        x.append(" xmlns:foo=\"http://example.org/foo#\">\n");
+        StringBuilder x = new StringBuilder();
+        x.append("<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""
+                + " xmlns:foo=\"http://example.org/foo#\">\n"
         // relationship(s) from datastream DS1
-        x.append("<rdf:Description rdf:about=\"" + PID.getInstance(pid).toURI() + "/DS1" + "\">\n");
-        x.append(content1 + "\n");
-        x.append("</rdf:Description>\n");
+                + "<rdf:Description rdf:about=\"");
+        x.append(PID.getInstance(pid).toURI());
+        x.append("/DS1\">\n");
+        x.append(content1);
+        x.append("\n</rdf:Description>\n");
         // relationship(s) from datastream DS2
         x.append("<rdf:Description rdf:about=\"" + PID.getInstance(pid).toURI() + "/DS2" + "\">\n");
-        x.append(content2 + "\n");
-        x.append("</rdf:Description>\n");
-        x.append("</rdf:RDF>");
+        x.append(content2);
+        x.append("\n</rdf:Description>\n</rdf:RDF>");
         return x.toString();
     }
 

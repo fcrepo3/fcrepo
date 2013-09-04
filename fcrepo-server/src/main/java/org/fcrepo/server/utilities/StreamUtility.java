@@ -9,7 +9,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.nio.CharBuffer;
 
 import org.fcrepo.common.FaultException;
 import org.slf4j.Logger;
@@ -34,33 +38,51 @@ public abstract class StreamUtility {
      * @return A new, encoded String.
      */
     public static String enc(String in) {
-        String inStr = in;
-        if (inStr == null) {
-            inStr = "";
+        if (in == null || in.isEmpty()) {
+            return "";
         }
-        StringBuffer out = new StringBuffer();
-        enc(inStr, out);
+        StringBuilder out = new StringBuilder();
+        enc(in, out);
         return out.toString();
     }
 
     /**
      * Appends an XML-appropriate encoding of the given String to the given
-     * StringBuffer.
+     * Appendable.
      *
      * @param in
      *        The String to encode.
      * @param out
-     *        The StringBuffer to write to.
+     *        The Appendable to write to.
      */
-    public static void enc(String in, StringBuffer out) {
-        for (int i = 0; i < in.length(); i++) {
-            enc(in.charAt(i), out);
+    public static void enc(String in, Appendable out) {
+        if (in == null) return;
+        int startAt = 0;
+        try {
+            int inLen = in.length();
+            for (int i = 0; i < inLen; i++) {
+                char c = in.charAt(i);
+                if (c == '&' || c == '<' || c == '>' || c == '"' || c == '\'') {
+                    if (i != startAt) out.append(in, startAt, i);
+                    enc(in.charAt(i), out);
+                    startAt = i + 1;
+                }
+            }
+            if (startAt == 0) {
+                // we never encountered a character to escape for xml
+                out.append(in);
+            } else if (startAt < inLen){
+                // append the remaining safe characters
+                out.append(in, startAt, inLen);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     /**
-     * Appends an XML-appropriate encoding of the given range of characters to
-     * the given StringBuffer.
+     * Prints an XML-appropriate encoding of the given range of characters to
+     * the given Writer.
      *
      * @param in
      *        The char buffer to read from.
@@ -69,9 +91,9 @@ public abstract class StreamUtility {
      * @param length
      *        The number of characters in the range.
      * @param out
-     *        The StringBuffer to write to.
+     *        The Appendable to write to.
      */
-    public static void enc(char[] in, int start, int length, StringBuffer out) {
+    public static void enc(char[] in, int start, int length, Appendable out) {
         for (int i = start; i < length + start; i++) {
             enc(in[i], out);
         }
@@ -79,28 +101,35 @@ public abstract class StreamUtility {
 
     /**
      * Appends an XML-appropriate encoding of the given character to the given
-     * StringBuffer.
+     * Appendable.
      *
      * @param in
      *        The character.
      * @param out
-     *        The StringBuffer to write to.
+     *        The Appendable to write to. Since we expect only PrintStream,
+     *        PrintWriter, and the String-building classes, we wrap
+     *        the IOException in a RuntimeException
      */
-    public static void enc(char in, StringBuffer out) {
-        if (in == '&') {
-            out.append("&amp;");
-        } else if (in == '<') {
-            out.append("&lt;");
-        } else if (in == '>') {
-            out.append("&gt;");
-        } else if (in == '\"') {
-            out.append("&quot;");
-        } else if (in == '\'') {
-            out.append("&apos;");
-        } else {
-            out.append(in);
+    public static void enc(char in, Appendable out) {
+        try {
+            if (in == '&') {
+                out.append("&amp;");
+            } else if (in == '<') {
+                out.append("&lt;");
+            } else if (in == '>') {
+                out.append("&gt;");
+            } else if (in == '"') {
+                out.append("&quot;");
+            } else if (in == '\'') {
+                out.append("&apos;");
+            } else {
+                out.append(in);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
+
 
     /**
      * Copies the contents of an InputStream to an OutputStream, then closes

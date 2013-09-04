@@ -102,15 +102,15 @@ public class GetDisseminationHandler
 
         try {
             resAttr = ResourceAttributes.getResources(pid);
-            if (sDefPid != null && !"".equals(sDefPid)) {
+            if (sDefPid != null && !sDefPid.isEmpty()) {
                 resAttr.put(Constants.SDEF.PID.getURI(),
                             new StringAttribute(sDefPid));
             }
-            if (methodName != null && !"".equals(methodName)) {
+            if (methodName != null && !methodName.isEmpty()) {
                 resAttr.put(Constants.DISSEMINATOR.METHOD.getURI(),
                             new StringAttribute(methodName));
             }
-            if (asOfDateTime != null && !"".equals(asOfDateTime)) {
+            if (asOfDateTime != null && !asOfDateTime.isEmpty()) {
                 resAttr.put(Constants.DATASTREAM.AS_OF_DATETIME.getURI(),
                             DateTimeAttribute.getInstance(asOfDateTime));
             }

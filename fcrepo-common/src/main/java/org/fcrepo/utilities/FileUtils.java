@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,13 +19,6 @@ import java.util.Properties;
 import java.util.Set;
 
 public class FileUtils {
-
-    private static final int BUFF_SIZE = 100000;
-
-    /**
-     * A static 100K buffer used by the copy operation.
-     */
-    private static final byte[] buffer = new byte[BUFF_SIZE];
 
     /**
      * Copy an InputStream to an OutputStream.
@@ -38,18 +32,36 @@ public class FileUtils {
      * @see http://java.sun.com/docs/books/performance/1st_edition/html/JPIOPerformance.fm.html#22980
      */
     public static boolean copy(InputStream source, OutputStream destination) {
+        return copy(source, destination, new byte[4096]);
+    }
+
+    public static boolean copy(InputStream source, OutputStream destination, byte[] buffer) {
         try {
-            while (true) {
-                synchronized (buffer) {
-                    int amountRead = source.read(buffer);
-                    if (amountRead == -1) {
-                        break;
-                    }
-                    destination.write(buffer, 0, amountRead);
-                }
+            int n = 0;
+            while (-1 != (n = source.read(buffer))) {
+                destination.write(buffer, 0, n);
             }
             destination.flush();
             destination.close();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+    
+    /**
+     * This method should only be used when the ByteBuffer is known to be able to accomodate the input!
+     * @param source
+     * @param destination
+     * @return
+     */
+    public static boolean copy(InputStream source, ByteBuffer destination) {
+        try {
+            byte [] buffer = new byte[4096];
+            int n = 0;
+            while (-1 != (n = source.read(buffer))) {
+                destination.put(buffer, 0, n);
+            }
             return true;
         } catch (IOException e) {
             return false;

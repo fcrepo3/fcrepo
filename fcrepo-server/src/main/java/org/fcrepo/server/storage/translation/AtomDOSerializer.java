@@ -219,10 +219,10 @@ public class AtomDOSerializer
 
                 String altIds =
                         DOTranslationUtility.oneString(dsv.DatastreamAltIDs);
-                if (altIds != null && !altIds.equals("")) {
+                if (altIds != null && !altIds.isEmpty()) {
                     dsvEntry.addCategory(MODEL.ALT_IDS.uri, altIds, null);
                 }
-                if (dsv.DSFormatURI != null && !dsv.DSFormatURI.equals("")) {
+                if (dsv.DSFormatURI != null && !dsv.DSFormatURI.isEmpty()) {
                     dsvEntry.addCategory(MODEL.FORMAT_URI.uri,
                                          dsv.DSFormatURI,
                                          null);

@@ -43,7 +43,7 @@ public class ExportDialog {
                         String pid =
                                 JOptionPane
                                         .showInputDialog("Enter the PID of the object to export.");
-                        if (pid != null && !pid.equals("")) {
+                        if (pid != null && !pid.isEmpty()) {
                             Export.one(Administrator.APIA,
                                        Administrator.APIM,
                                        pid,

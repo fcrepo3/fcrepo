@@ -132,24 +132,24 @@ public class ConnectPubcookie {
             logger.error("Malformed url: " + urlString, mue);
         }
 
-        if (urlString.startsWith("https:") && null != truststoreLocation
-                && !"".equals(truststoreLocation) && null != truststorePassword
-                && !"".equals(truststorePassword)) {
-            logger.debug("setting " + FilterPubcookie.TRUSTSTORE_LOCATION_KEY
-                    + " to " + truststoreLocation);
+        if (urlString.startsWith("https:") && truststoreLocation != null
+                && !truststoreLocation.isEmpty() && truststorePassword != null
+                && !truststorePassword.isEmpty()) {
+            logger.debug("setting {} to {}", FilterPubcookie.TRUSTSTORE_LOCATION_KEY,
+                    truststoreLocation);
             System.setProperty(FilterPubcookie.TRUSTSTORE_LOCATION_KEY,
                                truststoreLocation);
-            logger.debug("setting " + FilterPubcookie.TRUSTSTORE_PASSWORD_KEY
-                    + " to " + truststorePassword);
+            logger.debug("setting {} to {}", FilterPubcookie.TRUSTSTORE_PASSWORD_KEY,
+                    truststorePassword);
             System.setProperty(FilterPubcookie.TRUSTSTORE_PASSWORD_KEY,
                                truststorePassword);
 
-            logger.debug("setting " + FilterPubcookie.KEYSTORE_LOCATION_KEY
-                    + " to " + truststoreLocation);
+            logger.debug("setting {} to {}", FilterPubcookie.KEYSTORE_LOCATION_KEY,
+                    truststoreLocation);
             System.setProperty(FilterPubcookie.KEYSTORE_LOCATION_KEY,
                                truststoreLocation);
-            logger.debug("setting " + FilterPubcookie.KEYSTORE_PASSWORD_KEY
-                    + " to " + truststorePassword);
+            logger.debug("setting {} to {}", FilterPubcookie.KEYSTORE_PASSWORD_KEY,
+                    truststorePassword);
             System.setProperty(FilterPubcookie.KEYSTORE_PASSWORD_KEY,
                                truststorePassword);
 
@@ -157,15 +157,15 @@ public class ConnectPubcookie {
                                "ssl,handshake,data,trustmanager");
 
         } else {
-            logger.debug("DIAGNOSTIC urlString==" + urlString);
-            logger.debug("didn't set " + FilterPubcookie.TRUSTSTORE_LOCATION_KEY
-                    + " to " + truststoreLocation);
-            logger.debug("didn't set " + FilterPubcookie.TRUSTSTORE_PASSWORD_KEY
-                    + " to " + truststorePassword);
+            logger.debug("DIAGNOSTIC urlString=={}", urlString);
+            logger.debug("didn't set {} to {}", FilterPubcookie.TRUSTSTORE_LOCATION_KEY,
+                    truststoreLocation);
+            logger.debug("didn't set {} to {}", FilterPubcookie.TRUSTSTORE_PASSWORD_KEY,
+                    truststorePassword);
         }
 
         DefaultHttpClient client = new DefaultHttpClient();
-        logger.debug(".connect() requestCookies==" + requestCookies);
+        logger.debug(".connect() requestCookies=={}", requestCookies.toString());
         BasicCookieStore cookies = new BasicCookieStore();
         HttpUriRequest method =
                 setup(client, url, requestParameters, requestCookies);
@@ -180,10 +180,10 @@ public class ConnectPubcookie {
             response = client.execute(method);
             statusCode = response.getStatusLine().getStatusCode();
         } catch (Exception e) {
-            logger.error("failed original connect, url==" + urlString, e);
+            logger.error("failed original connect, url=={}", urlString, e);
         }
 
-        logger.debug("status code==" + statusCode);
+        logger.debug("status code=={}", statusCode);
 
         if (302 == statusCode) {
             Header redirectHeader = response.getFirstHeader(HttpHeaders.LOCATION);
@@ -248,8 +248,8 @@ public class ConnectPubcookie {
                 }
                 
                 responseCookies = cookies.getCookies().toArray(new Cookie[0]);
-                logger.debug(this.getClass().getName()
-                        + ".connect() responseCookies==" + responseCookies);
+                logger.debug("{}.connect() responseCookies=={}",
+                        this.getClass().getName(), responseCookies.toString());
             } catch (Throwable t) {
                 logger.error(this.getClass().getName() + ".connect() exception=="
                         + t.getMessage());
@@ -259,8 +259,8 @@ public class ConnectPubcookie {
                 }
             }
             completedFully = true;
-            logger.debug(this.getClass().getName() + ".connect() completedFully=="
-                    + completedFully);
+            logger.debug("{}.connect() completedFully=={}",
+                    this.getClass().getName(), completedFully);
         }
     }
 

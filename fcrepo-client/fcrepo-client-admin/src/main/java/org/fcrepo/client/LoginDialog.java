@@ -491,17 +491,17 @@ public class LoginDialog
                     }
                     String protocol =
                             (String) m_protocolComboBox.getSelectedItem();
-                    if (protocol.equals("")) {
+                    if (protocol.isEmpty()) {
                         throw new IOException("No protocol provided.");
                     }
                     String context = (String) m_contextComboBox.getSelectedItem();
-                    if (context.equals("")){
+                    if (context.isEmpty()){
                         throw new IOException("No context provided");
                     }
 
                     String username =
                             (String) m_usernameComboBox.getSelectedItem();
-                    if (username.equals("")) {
+                    if (username.isEmpty()) {
                         throw new IOException("No username provided.");
                     }
                     String pass = new String(m_passwordField.getPassword());

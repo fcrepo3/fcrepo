@@ -134,7 +134,7 @@ public class SourceRepoDialog
             public void actionPerformed(ActionEvent evt) {
                 // construct apia and apim after doing some field validation
                 if (m_passwordField.getPassword().length == 0
-                        || m_usernameField.getText().equals("")) {
+                        || m_usernameField.getText().isEmpty()) {
                     JOptionPane
                             .showMessageDialog(Administrator.getDesktop(),
                                                "Username and password must both be non-empty",

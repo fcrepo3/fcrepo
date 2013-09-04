@@ -174,7 +174,7 @@ public class METSFedoraExtDOSerializer
         if (label != null && label.length() > 0) {
             writer.print(METS.LABEL.localName);
             writer.print("=\"");
-            writer.print(StreamUtility.enc(label));
+            StreamUtility.enc(label, writer);
             writer.print("\"\n");
         }
         writer.print("xmlns:");
@@ -232,7 +232,7 @@ public class METSFedoraExtDOSerializer
         writer.print(">\n");
         // use agent to identify the owner of the digital object
         String ownerId = obj.getOwnerId();
-        if (ownerId != null && !ownerId.equals("")) {
+        if (ownerId != null && !ownerId.isEmpty()) {
             writer.print("<");
             writer.print(METS.prefix);
             writer.print(":agent");
@@ -321,7 +321,7 @@ public class METSFedoraExtDOSerializer
             writer.print("<");
             writer.print(METS.prefix);
             writer.print(":mdWrap MIMETYPE=\"");
-            writer.print(StreamUtility.enc(ds.DSMIME));
+            StreamUtility.enc(ds.DSMIME, writer);
             writer.print("\" MDTYPE=\"");
             String mdType = ds.DSInfoType;
             if (!mdType.equals("MARC") && !mdType.equals("EAD")
@@ -330,28 +330,28 @@ public class METSFedoraExtDOSerializer
                     && !mdType.equals("TEIHDR") && !mdType.equals("DDI")
                     && !mdType.equals("FGDC")) {
                 writer.print("OTHER\" OTHERMDTYPE=\"");
-                writer.print(StreamUtility.enc(mdType));
+                StreamUtility.enc(mdType, writer);
             } else {
                 writer.print(mdType);
             }
             writer.print("\" ");
 
-            if (ds.DSLabel != null && !ds.DSLabel.equals("")) {
+            if (ds.DSLabel != null && !ds.DSLabel.isEmpty()) {
                 writer.print(" LABEL=\"");
-                writer.print(StreamUtility.enc(ds.DSLabel));
+                StreamUtility.enc(ds.DSLabel, writer);
                 writer.print("\"");
             }
 
-            if (ds.DSFormatURI != null && !ds.DSFormatURI.equals("")) {
+            if (ds.DSFormatURI != null && !ds.DSFormatURI.isEmpty()) {
                 writer.print(" FORMAT_URI=\"");
-                writer.print(StreamUtility.enc(ds.DSFormatURI));
+                StreamUtility.enc(ds.DSFormatURI, writer);
                 writer.print("\"");
             }
 
             String altIds = DOTranslationUtility.oneString(ds.DatastreamAltIDs);
-            if (altIds != null && !altIds.equals("")) {
+            if (altIds != null && !altIds.isEmpty()) {
                 writer.print(" ALT_IDS=\"");
-                writer.print(StreamUtility.enc(altIds));
+                StreamUtility.enc(altIds, writer);
                 writer.print("\"");
             }
 
@@ -361,9 +361,9 @@ public class METSFedoraExtDOSerializer
                     && csType.length() > 0
                     && !csType.equals(Datastream.CHECKSUMTYPE_DISABLED)) {
                 writer.print(" CHECKSUM=\"");
-                writer.print(StreamUtility.enc(ds.DSChecksum));
+                StreamUtility.enc(ds.DSChecksum, writer);
                 writer.print("\" CHECKSUMTYPE=\"");
-                writer.print(StreamUtility.enc(csType));
+                StreamUtility.enc(csType, writer);
                 writer.print("\"");
             }
 
@@ -527,22 +527,22 @@ public class METSFedoraExtDOSerializer
                         writer.print("\"");
                     }
                     writer.print(" MIMETYPE=\"");
-                    writer.print(StreamUtility.enc(dsc.DSMIME));
+                    StreamUtility.enc(dsc.DSMIME, writer);
                     writer.print("\"");
                     if (dsc.DSSize != 0) {
                         writer.print(" SIZE=\"" + dsc.DSSize + "\"");
                     }
-                    if (dsc.DSFormatURI != null && !dsc.DSFormatURI.equals("")) {
+                    if (dsc.DSFormatURI != null && !dsc.DSFormatURI.isEmpty()) {
                         writer.print(" FORMAT_URI=\"");
-                        writer.print(StreamUtility.enc(dsc.DSFormatURI));
+                        StreamUtility.enc(dsc.DSFormatURI, writer);
                         writer.print("\"");
                     }
                     String altIds =
                             DOTranslationUtility
                                     .oneString(dsc.DatastreamAltIDs);
-                    if (altIds != null && !altIds.equals("")) {
+                    if (altIds != null && !altIds.isEmpty()) {
                         writer.print(" ALT_IDS=\"");
-                        writer.print(StreamUtility.enc(altIds));
+                        StreamUtility.enc(altIds, writer);
                         writer.print("\"");
                     }
                     String csType = dsc.DSChecksumType;
@@ -550,10 +550,10 @@ public class METSFedoraExtDOSerializer
                             && csType.length() > 0
                             && !csType.equals(Datastream.CHECKSUMTYPE_DISABLED)) {
                         writer.print(" CHECKSUM=\"");
-                        writer.print(StreamUtility.enc(dsc.DSChecksum));
+                        StreamUtility.enc(dsc.DSChecksum, writer);
                         writer.print("\"");
                         writer.print(" CHECKSUMTYPE=\"");
-                        writer.print(StreamUtility.enc(csType));
+                        StreamUtility.enc(csType, writer);
                         writer.print("\"");
                     }
                     writer.print(" OWNERID=\"");
@@ -566,21 +566,21 @@ public class METSFedoraExtDOSerializer
                         writer.print("<");
                         writer.print(METS.prefix);
                         writer.print(":FLocat");
-                        if (dsc.DSLabel != null && !dsc.DSLabel.equals("")) {
+                        if (dsc.DSLabel != null && !dsc.DSLabel.isEmpty()) {
                             writer.print(" ");
                             writer.print(XLINK.prefix);
                             writer.print(":title=\"");
-                            writer.print(StreamUtility.enc(dsc.DSLabel));
+                            StreamUtility.enc(dsc.DSLabel, writer);
                             writer.print("\"");
                         }
                         writer.print(" LOCTYPE=\"URL\" ");
                         writer.print(XLINK.prefix);
                         writer.print(":href=\"");
-                        writer.print(StreamUtility.enc(
+                        StreamUtility.enc(
                                 DOTranslationUtility.normalizeDSLocationURLs(
                                         obj.getPid(),
                                         dsc,
-                                        m_transContext).DSLocation));
+                                        m_transContext).DSLocation, writer);
                         writer.print("\"/>\n");
                     }
                     writer.print("</");
@@ -646,16 +646,16 @@ public class METSFedoraExtDOSerializer
                 writer.print(diss.sDepID);
                 writer.print("\"");
                 if (diss.dsBindMap.dsBindMapLabel != null
-                        && !diss.dsBindMap.dsBindMapLabel.equals("")) {
+                        && !diss.dsBindMap.dsBindMapLabel.isEmpty()) {
                     writer.print(" LABEL=\"");
-                    writer.print(StreamUtility.enc(diss.dsBindMap.dsBindMapLabel));
+                    StreamUtility.enc(diss.dsBindMap.dsBindMapLabel, writer);
                     writer.print("\"");
                 }
                 writer.print(">\n");
                 DSBinding[] bindings = diss.dsBindMap.dsBindings;
                 for (int i = 0; i < bindings.length; i++) {
                     if (bindings[i].bindKeyName == null
-                            || bindings[i].bindKeyName.equals("")) {
+                            || bindings[i].bindKeyName.isEmpty()) {
                         throw new ObjectIntegrityException("Object's disseminator"
                                 + " binding map binding must have a binding key name.");
                     }
@@ -664,17 +664,17 @@ public class METSFedoraExtDOSerializer
                     writer.print(":div TYPE=\"");
                     writer.print(bindings[i].bindKeyName);
                     if (bindings[i].bindLabel != null
-                            && !bindings[i].bindLabel.equals("")) {
+                            && !bindings[i].bindLabel.isEmpty()) {
                         writer.print("\" LABEL=\"");
-                        writer.print(StreamUtility.enc(bindings[i].bindLabel));
+                        StreamUtility.enc(bindings[i].bindLabel, writer);
                     }
                     if (bindings[i].seqNo != null
-                            && !bindings[i].seqNo.equals("")) {
+                            && !bindings[i].seqNo.isEmpty()) {
                         writer.print("\" ORDER=\"");
                         writer.print(bindings[i].seqNo);
                     }
                     if (bindings[i].datastreamID == null
-                            || bindings[i].datastreamID.equals("")) {
+                            || bindings[i].datastreamID.isEmpty()) {
                         throw new ObjectIntegrityException("Object's disseminator"
                                 + " binding map binding must point to a datastream.");
                     }
@@ -728,9 +728,9 @@ public class METSFedoraExtDOSerializer
                 writer.print("\" CREATED=\"");
                 writer.print(DateUtility.convertDateToString(diss.dissCreateDT));
                 writer.print("\"");
-                if (diss.dissLabel != null && !diss.dissLabel.equals("")) {
+                if (diss.dissLabel != null && !diss.dissLabel.isEmpty()) {
                     writer.print(" LABEL=\"");
-                    writer.print(StreamUtility.enc(diss.dissLabel));
+                    StreamUtility.enc(diss.dissLabel, writer);
                     writer.print("\"");
                 }
                 writer.print(">\n");

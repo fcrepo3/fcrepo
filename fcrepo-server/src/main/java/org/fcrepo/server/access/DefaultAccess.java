@@ -217,8 +217,8 @@ public class DefaultAccess
             throws ServerException {
         PID = Server.getPID(PID).toString();
         sDefPID = Server.getPID(sDefPID).toString();
-        long initStartTime = new Date().getTime();
-        long startTime = new Date().getTime();
+        long initStartTime = (logger.isDebugEnabled()) ? System.currentTimeMillis() : 0;
+        long startTime = initStartTime;
         long stopTime;
         long interval;
         ServiceDeploymentReader deploymentReader = null;
@@ -247,10 +247,11 @@ public class DefaultAccess
                                                      methodName,
                                                      userParms,
                                                      asOfDateTime);
-            stopTime = new Date().getTime();
-            interval = stopTime - startTime;
-            logger.debug("Roundtrip DynamicDisseminator: " + interval
-                         + " milliseconds.");
+            if (logger.isDebugEnabled()) {
+                stopTime = System.currentTimeMillis();
+                interval = stopTime - startTime;
+                logger.debug("Roundtrip DynamicDisseminator: {} milliseconds.", interval);
+            }
             return retVal;
         }
 
@@ -287,8 +288,7 @@ public class DefaultAccess
 
                 serviceDeploymentPID = foundDeploymentPID;
             } else {
-                logger.debug("No deployment for (" + cModelPID + ", " + sDefPID
-                             + ")");
+                logger.debug("No deployment for ({}, {})", cModelPID, sDefPID);
             }
         }
 
@@ -360,10 +360,11 @@ public class DefaultAccess
             }
             throw new DisseminatorNotFoundException(message);
         }
-        stopTime = new Date().getTime();
-        interval = stopTime - startTime;
-        logger.debug("Roundtrip Looping Diss: " + interval + " milliseconds.");
-
+        if (logger.isDebugEnabled()) {
+            stopTime = System.currentTimeMillis();
+            interval = stopTime - startTime;
+            logger.debug("Roundtrip Looping Diss: {} milliseconds.", interval);
+        }
         // Check deployment object state
         String authzAux_sDepState = deploymentReader.GetObjectState();
         String authzAux_sDepPID = deploymentReader.GetObjectPID();
@@ -400,12 +401,13 @@ public class DefaultAccess
                           h_userParms,
                           asOfDateTime);
 
-        stopTime = new Date().getTime();
-        interval = stopTime - startTime;
-        logger.debug("Roundtrip Get/Validate User Parms: " + interval
-                     + " milliseconds.");
+        if (logger.isDebugEnabled()) {
+            stopTime = System.currentTimeMillis();
+            interval = stopTime - startTime;
+            logger.debug("Roundtrip Get/Validate User Parms:  milliseconds.", interval);
 
-        startTime = new Date().getTime();
+            startTime = System.currentTimeMillis();
+        }
         // SDP: GET INFO FROM DEPLOYMENT READER:
         // Add any default method parameters to validated user parm list
         defaultMethodParms =
@@ -415,8 +417,8 @@ public class DefaultAccess
             if (!defaultMethodParms[i].parmType
                     .equals(MethodParmDef.DATASTREAM_INPUT)) {
                 if (!h_userParms.containsKey(defaultMethodParms[i].parmName)) {
-                    logger.debug("addedDefaultName: "
-                                 + defaultMethodParms[i].parmName);
+                    logger.debug("addedDefaultName: {}",
+                                 defaultMethodParms[i].parmName);
                     String pdv = defaultMethodParms[i].parmDefaultValue;
                     try {
                         // here we make sure the PID is decoded so that encoding
@@ -430,18 +432,19 @@ public class DefaultAccess
                         }
                     } catch (UnsupportedEncodingException uee) {
                     }
-                    logger.debug("addedDefaultValue: " + pdv);
+                    logger.debug("addedDefaultValue: {}", pdv);
                     h_userParms.put(defaultMethodParms[i].parmName, pdv);
                 }
             }
         }
 
-        stopTime = new Date().getTime();
-        interval = stopTime - startTime;
-        logger.debug("Roundtrip Get Deployment Parms: " + interval
-                     + " milliseconds.");
+        if (logger.isDebugEnabled()) {
+            stopTime = System.currentTimeMillis();
+            interval = stopTime - startTime;
+            logger.debug("Roundtrip Get Deployment Parms: {} milliseconds.", interval);
+            startTime = System.currentTimeMillis();
+        }
 
-        startTime = new Date().getTime();
         DisseminationBindingInfo[] dissBindInfo;
         dissBindInfo =
                 getDisseminationBindingInfo(context,
@@ -461,14 +464,14 @@ public class DefaultAccess
                                                   deploymentReader,
                                                   methodName);
 
-        stopTime = new Date().getTime();
-        interval = stopTime - startTime;
-        logger.debug("Roundtrip Assemble Dissemination: " + interval
-                     + " milliseconds.");
+        if (logger.isDebugEnabled()) {
+            stopTime = System.currentTimeMillis();
+            interval = stopTime - startTime;
+            logger.debug("Roundtrip Assemble Dissemination: {} milliseconds.", interval);
 
-        stopTime = new Date().getTime();
-        interval = stopTime - initStartTime;
-        logger.debug("Roundtrip GetDissemination: " + interval + " milliseconds.");
+            interval = stopTime - initStartTime;
+            logger.debug("Roundtrip GetDissemination: {} milliseconds.", interval);
+        }
         return dissemination;
     }
 
@@ -554,16 +557,18 @@ public class DefaultAccess
                                           String PID,
                                           Date asOfDateTime)
             throws ServerException {
-        long startTime = new Date().getTime();
+        long startTime = logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
         PID = Server.getPID(PID).toString();
         m_authorizationModule.enforceListMethods(context, PID, asOfDateTime);
         DOReader reader =
                 m_manager.getReader(Server.USE_DEFINITIVE_STORE, context, PID);
 
         ObjectMethodsDef[] methodDefs = reader.listMethods(asOfDateTime);
-        long stopTime = new Date().getTime();
-        long interval = stopTime - startTime;
-        logger.debug("Roundtrip listMethods: " + interval + " milliseconds.");
+        if (logger.isDebugEnabled()) {
+            long stopTime = System.currentTimeMillis();
+            long interval = stopTime - startTime;
+            logger.debug("Roundtrip listMethods: {} milliseconds.", interval);
+        }
 
         // DYNAMIC!! Grab any dynamic method definitions and merge them with
         // the statically bound method definitions
@@ -586,7 +591,7 @@ public class DefaultAccess
                                            String PID,
                                            Date asOfDateTime)
             throws ServerException {
-        long startTime = new Date().getTime();
+        long startTime = logger.isDebugEnabled() ? new Date().getTime() : 0;
         PID = Server.getPID(PID).toString();
         m_authorizationModule
                 .enforceListDatastreams(context, PID, asOfDateTime);
@@ -602,9 +607,11 @@ public class DefaultAccess
                                       datastreams[i].DSMIME);
         }
 
-        long stopTime = new Date().getTime();
-        long interval = stopTime - startTime;
-        logger.debug("Roundtrip listDatastreams: " + interval + " milliseconds.");
+        if (logger.isDebugEnabled()) {
+            long stopTime = new Date().getTime();
+            long interval = stopTime - startTime;
+            logger.debug("Roundtrip listDatastreams: {} milliseconds.", interval);
+        }
         return dsDefs;
     }
 
@@ -640,7 +647,7 @@ public class DefaultAccess
 */
         // "bootstrap" context won't have the uri to determine security
         String securityUri = context
-                .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri);
+                .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.attributeId);
 
         if (securityUri != null) {
             String reposBaseURL =
@@ -648,7 +655,7 @@ public class DefaultAccess
                                             .equals(Constants.HTTP_REQUEST.SECURE.uri) ? "https"
                                                                                        : "http",
                                     context
-                                            .getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.uri));
+                                            .getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.attributeId));
             profile.dissIndexViewURL =
                     getDissIndexViewURL(reposBaseURL,
                                         context
@@ -734,11 +741,11 @@ public class DefaultAccess
                 getServer().getParameter("repositoryName");
         String reposBaseURL =
                 getReposBaseURL(context
-                                        .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.uri)
+                                        .getEnvironmentValue(Constants.HTTP_REQUEST.SECURITY.attributeId)
                                         .equals(Constants.HTTP_REQUEST.SECURE.uri) ? "https"
                                                                                    : "http",
                                 context
-                                        .getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.uri));
+                                        .getEnvironmentValue(Constants.HTTP_REQUEST.SERVER_PORT.attributeId));
         repositoryInfo.repositoryBaseURL =
                 reposBaseURL + "/" + context.getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME);
 
@@ -915,7 +922,7 @@ public class DefaultAccess
                                  + methodParms[i].parmRequired + "\ntype: "
                                  + methodParms[i].parmType);
                     for (String element : methodParms[i].parmDomainValues) {
-                        logger.debug("domainValue: " + element);
+                        logger.debug("domainValue: {}", element);
                     }
                 }
             }
@@ -1092,7 +1099,7 @@ public class DefaultAccess
     private String getReposBaseURL(String protocol, String port) {
         String reposBaseURL = null;
         String fedoraServerHost = getServer().getParameter("fedoraServerHost");
-        if (fedoraServerHost == null || fedoraServerHost.equals("")) {
+        if (fedoraServerHost == null || fedoraServerHost.isEmpty()) {
             logger.warn("Configuration parameter fedoraServerHost is empty.");
             try {
                 InetAddress hostIP = InetAddress.getLocalHost();
@@ -1118,7 +1125,7 @@ public class DefaultAccess
                                                                 dsID,
                                                                 asOfDateTime);
         MIMETypedStream mimeTypedStream = null;
-        long startTime = new Date().getTime();
+        long startTime = (logger.isDebugEnabled()) ? new Date().getTime() : 0;
         DOReader reader =
                 m_manager.getReader(Server.USE_DEFINITIVE_STORE, context, PID);
 
@@ -1190,10 +1197,11 @@ public class DefaultAccess
                 throw new GeneralException(message);
             }
         }
-        long stopTime = new Date().getTime();
-        long interval = stopTime - startTime;
-        logger.debug("Roundtrip getDatastreamDissemination: " + interval
-                     + " milliseconds.");
+        if (logger.isDebugEnabled()) {
+            long stopTime = new Date().getTime();
+            long interval = stopTime - startTime;
+            logger.debug("Roundtrip getDatastreamDissemination: {} milliseconds.", interval);
+        }
         return mimeTypedStream;
     }
 

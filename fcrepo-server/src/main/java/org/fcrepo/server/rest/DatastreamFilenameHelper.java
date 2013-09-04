@@ -187,13 +187,13 @@ public class DatastreamFilenameHelper {
         if (download != null && download.equals("true")) {
             // generate an "attachment" content disposition header with the filename
             filename = getFilename(context, pid, dsID, asOfDateTime, stream.MIMEType);
-            headerValue="attachment; filename=\"" + filename + "\"";
+            headerValue= attachmentHeader(filename);
         } else {
             // is the content disposition header enabled in the case of not downloading?
             if (m_datastreamContentDispositionInlineEnabled.equals("true")) {
                 // it is... generate the header with "inline"
                 filename = getFilename(context, pid, dsID, asOfDateTime, stream.MIMEType);
-                headerValue="inline; filename=\"" + filename + "\"";
+                headerValue= inlineHeader(filename);
             }
         }
         // create content disposition header to add
@@ -208,6 +208,18 @@ public class DatastreamFilenameHelper {
             stream.header = header;
         }
 
+    }
+
+    private static final String attachmentHeader(String filename) {
+        StringBuilder sb = new StringBuilder(filename.length() + 23);
+        sb.append("attachment; filename=\"").append(filename).append('"');
+        return sb.toString();
+    }
+    
+    private static final String inlineHeader(String filename) {
+        StringBuilder sb = new StringBuilder(filename.length() + 20);
+        sb.append("inline; filename=\"").append(filename).append('"');
+        return sb.toString();
     }
 
     /**
@@ -235,18 +247,18 @@ public class DatastreamFilenameHelper {
             // try and get filename and extension from specified source
             if (source.equals("rels")) {
                 filename = getFilenameFromRels(context, pid, dsid, MIMETYPE);
-                if (!filename.equals(""))
+                if (!filename.isEmpty())
                     extension = getExtension(filename, m_datastreamExtensionMappingRels, MIMETYPE);
             } else {
                 if (source.equals("id")) {
                     filename = getFilenameFromId(pid, dsid, MIMETYPE);
-                    if (!filename.equals(""))
+                    if (!filename.isEmpty())
                         extension = getExtension(filename, m_datastreamExtensionMappingId, MIMETYPE);
 
                 } else {
                     if (source.equals("label")) {
                         filename = getFilenameFromLabel(context, pid, dsid, asOfDateTime, MIMETYPE);
-                        if (!filename.equals(""))
+                        if (!filename.isEmpty())
                             extension = getExtension(filename, m_datastreamExtensionMappingLabel, MIMETYPE);
                     } else {
                         logger.warn("Unknown datastream filename source specified in datastreamFilenameSource in fedora.fcfg: " + source + ". Please specify zero or more of: rels id label");
@@ -254,17 +266,17 @@ public class DatastreamFilenameHelper {
                 }
             }
             // if we've got one by here, quit loop
-            if (!filename.equals(""))
+            if (!filename.isEmpty())
                 break;
         }
         // if not determined from above use the default
-        if (filename.equals("")) {
+        if (filename.isEmpty()) {
             filename = m_datastreamDefaultFilename;
             extension = getExtension(m_datastreamDefaultFilename, m_datastreamExtensionMappingDefault, MIMETYPE);
         }
 
         // clean up filename - remove illegal chars
-        if (extension.equals("")) {
+        if (extension.isEmpty()) {
             return ILLEGAL_FILENAME_REGEX.matcher(filename).replaceAll("");
         } else {
             return ILLEGAL_FILENAME_REGEX.matcher(filename + "." + extension).replaceAll("");
@@ -295,8 +307,9 @@ public class DatastreamFilenameHelper {
 
         // find the tuple specifying the filename
         int matchingTuples = 0;
+        String dsSubject = (relsIntTuples.size() > 0) ? Constants.FEDORA.uri + pid + "/" + dsid : null;
         for ( RelationshipTuple tuple : relsIntTuples ) {
-            if (tuple.subject.equals(Constants.FEDORA.uri + pid + "/" + dsid) && tuple.predicate.equals(FILENAME_REL)) {
+            if (tuple.subject.equals(dsSubject) && tuple.predicate.equals(FILENAME_REL)) {
                 // use the first found relationship by default (report warning later if there are more)
                 if (matchingTuples == 0) {
                     if (tuple.isLiteral) {
@@ -378,7 +391,7 @@ public class DatastreamFilenameHelper {
                     // look up extension from mapping
                     extension = getExtension(MIMETYPE);
                     // if not found in mappings, use the default
-                    if (extension.equals(""))
+                    if (extension.isEmpty())
                         extension = m_datastreamDefaultExtension;
                 } else {
                     // unknown mapping type

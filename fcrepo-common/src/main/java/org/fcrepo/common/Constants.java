@@ -4,6 +4,8 @@
  */
 package org.fcrepo.common;
 
+import java.net.URI;
+
 import org.fcrepo.common.policy.ActionNamespace;
 import org.fcrepo.common.policy.DatastreamNamespace;
 import org.fcrepo.common.policy.DisseminatorNamespace;
@@ -116,7 +118,7 @@ public interface Constants {
      * The default lookup key name for application server related context
      * values.
      */
-    public static final String FEDORA_APP_CONTEXT_NAME = "FEDORA_CONTEXT_NAME";
+    public static final URI FEDORA_APP_CONTEXT_NAME = URI.create("FEDORA_CONTEXT_NAME");
 
     /**
      * The default application server context of fedora.
@@ -744,6 +746,7 @@ public interface Constants {
                 } else {
                     value = System.getenv("FEDORA_HOME");
                 }
+                if (value != null) value = value.trim();
             }
             return value;
         }

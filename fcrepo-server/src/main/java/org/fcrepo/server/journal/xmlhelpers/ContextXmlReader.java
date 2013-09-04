@@ -4,8 +4,10 @@
  */
 package org.fcrepo.server.journal.xmlhelpers;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.stream.XMLEventReader;
@@ -46,17 +48,17 @@ public class ContextXmlReader
         context.setNoOp(readContextNoOp(reader));
         context.setNow(readContextNow(reader));
         context
-                .setEnvironmentAttributes(readMultiMap(reader,
-                                                       CONTEXT_MAPNAME_ENVIRONMENT));
+                .setEnvironmentAttributes(convertStringMap(readMultiMap(reader,
+                                                       CONTEXT_MAPNAME_ENVIRONMENT)));
         context.setSubjectAttributes(readMultiMap(reader,
                                                   CONTEXT_MAPNAME_SUBJECT));
         context
-                .setActionAttributes(readMultiMap(reader,
-                                                  CONTEXT_MAPNAME_ACTION));
-        context.setResourceAttributes(readMultiMap(reader,
-                                                   CONTEXT_MAPNAME_RESOURCE));
-        context.setRecoveryAttributes(readMultiMap(reader,
-                                                   CONTEXT_MAPNAME_RECOVERY));
+                .setActionAttributes(convertStringMap(readMultiMap(reader,
+                                                  CONTEXT_MAPNAME_ACTION)));
+        context.setResourceAttributes(convertStringMap(readMultiMap(reader,
+                                                   CONTEXT_MAPNAME_RESOURCE)));
+        context.setRecoveryAttributes(convertStringMap(readMultiMap(reader,
+                                                   CONTEXT_MAPNAME_RECOVERY)));
 
         event = reader.nextTag();
         if (!isEndTagEvent(event, QNAME_TAG_CONTEXT)) {
@@ -101,13 +103,22 @@ public class ContextXmlReader
         String value = readCharactersUntilEndTag(reader, QNAME_TAG_NOW);
         return JournalHelper.parseDate(value);
     }
+    
+    private MultiValueMap<URI> convertStringMap(MultiValueMap<String> input) {
+        MultiValueMap<URI> result = new MultiValueMap<URI>();
+        for (Iterator<String> names = input.names(); names.hasNext();) {
+            String name = names.next();
+            result.set(URI.create(name), input.getStringArray(name));
+        }
+        return result;
+    }
 
     /**
      * Read a multi-map, with its nested tags.
      */
-    private MultiValueMap readMultiMap(XMLEventReader reader, String mapName)
+    private MultiValueMap<String> readMultiMap(XMLEventReader reader, String mapName)
             throws JournalException, XMLStreamException {
-        MultiValueMap map = new MultiValueMap();
+        MultiValueMap<String> map = new MultiValueMap<String>();
 
         // must start with a multi-map tag
         XMLEvent event = reader.nextTag();
@@ -134,7 +145,7 @@ public class ContextXmlReader
     /**
      * Read through the keys of the multi-map, adding to the map as we go.
      */
-    private void readMultiMapKeys(XMLEventReader reader, MultiValueMap map)
+    private void readMultiMapKeys(XMLEventReader reader, MultiValueMap<String> map)
             throws XMLStreamException, JournalException {
         while (true) {
             XMLEvent event2 = reader.nextTag();
@@ -183,7 +194,7 @@ public class ContextXmlReader
      * This method is just to guard against the totally bogus Exception
      * declaration in MultiValueMap.set()
      */
-    private void storeInMultiMap(MultiValueMap map, String key, String[] values)
+    private void storeInMultiMap(MultiValueMap<String> map, String key, String[] values)
             throws JournalException {
         try {
             map.set(key, values);

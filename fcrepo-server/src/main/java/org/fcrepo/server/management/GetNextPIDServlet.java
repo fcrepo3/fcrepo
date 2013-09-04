@@ -126,7 +126,7 @@ public class GetNextPIDServlet
         for (Enumeration<?> e = request.getParameterNames(); e.hasMoreElements();) {
             String name = URLDecoder.decode((String) e.nextElement(), "UTF-8");
             if (name.equalsIgnoreCase("xml")) {
-                xml = new Boolean(request.getParameter(name)).booleanValue();
+                xml = Boolean.parseBoolean(request.getParameter(name));
             }
             if (name.equalsIgnoreCase("numPIDs")) {
                 numPIDs =
@@ -287,9 +287,9 @@ public class GetNextPIDServlet
             this.pw = pw;
             this.pidList = pidList;
             if (HTTP_REQUEST.SECURE.uri.equals(context
-                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.uri))) {
+                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.attributeId))) {
             } else if (HTTP_REQUEST.INSECURE.uri.equals(context
-                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.uri))) {
+                    .getEnvironmentValue(HTTP_REQUEST.SECURITY.attributeId))) {
             }
         }
 

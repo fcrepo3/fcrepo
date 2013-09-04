@@ -69,11 +69,11 @@ public class BackendSecuritySpec {
         logger.debug(">>>>>> setSecuritySpec: " + " serviceRoleID="
                 + serviceRoleID + " methodName=" + methodName
                 + " property count=" + properties.size());
-        if (serviceRoleID == null || serviceRoleID.equals("")) {
+        if (serviceRoleID == null || serviceRoleID.isEmpty()) {
             throw new GeneralException("serviceRoleID is missing.");
         }
         // if methodRoleID is missing, then set properties at the service level.
-        if (methodName == null || methodName.equals("")) {
+        if (methodName == null || methodName.isEmpty()) {
             rolePropertiesTable.put(serviceRoleID, properties);
 
             // otherwise set properties at the method level, but only if
@@ -124,9 +124,9 @@ public class BackendSecuritySpec {
      *         BackendSecurityDeserializer.IPLIST
      */
     public Hashtable<String, String> getSecuritySpec(String serviceRoleID, String methodName) {
-        if (serviceRoleID == null || serviceRoleID.equals("")) {
+        if (serviceRoleID == null || serviceRoleID.isEmpty()) {
             return getDefaultSecuritySpec();
-        } else if (methodName == null || methodName.equals("")) {
+        } else if (methodName == null || methodName.isEmpty()) {
             return rolePropertiesTable.get(serviceRoleID);
         } else {
             String roleKey = serviceRoleID + "/" + methodName;

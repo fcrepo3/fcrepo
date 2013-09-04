@@ -101,12 +101,12 @@ implements PolicyStore {
         }
         super.init();
         // if no pid namespace was specified, use the default specified in fedora.fcfg
-        if (pidNamespace.equals("")) {
+        if (pidNamespace.isEmpty()) {
             pidNamespace = fedoraServer.getModule("org.fcrepo.server.storage.DOManager").getParameter("pidNamespace");
         }
 
         // check control group was supplied
-        if (datastreamControlGroup.equals("")) {
+        if (datastreamControlGroup.isEmpty()) {
             throw new PolicyStoreException("No control group for policy datastreams was specified in FedoraPolicyStore configuration");
         }
         if (validateSchema) {
@@ -215,7 +215,7 @@ implements PolicyStore {
 
         String policyName;
 
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             // no policy name, derive from document
             // (note: policy ID is mandatory according to schema)
             try {
@@ -623,38 +623,43 @@ implements PolicyStore {
                                                  String policyOrLocation,
                                                  String controlGroup)
     throws PolicyStoreException {
-        StringBuilder foxml = new StringBuilder();
+        StringBuilder foxml = new StringBuilder(1024);
         foxml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         foxml.append("<foxml:digitalObject VERSION=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
         foxml.append("    xmlns:foxml=\"info:fedora/fedora-system:def/foxml#\"\n");
         foxml.append("           xsi:schemaLocation=\"" + Constants.FOXML.uri
                      + " " + Constants.FOXML1_1.xsdLocation + "\"");
-        foxml.append("\n           PID=\"" + StreamUtility.enc(pid)
-                         + "\">\n");
-        foxml.append("  <foxml:objectProperties>\n");
+        foxml.append("\n           PID=\"");
+        StreamUtility.enc(pid, foxml);
+        foxml.append("\">\n  <foxml:objectProperties>\n");
         foxml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>\n");
-        foxml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\""
-                + StreamUtility.enc(label) + "\"/>\n");
-        foxml.append("  </foxml:objectProperties>\n");
+        foxml.append("    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\"");
+        StreamUtility.enc(label, foxml);
+        foxml.append("\"/>\n  </foxml:objectProperties>\n");
 
 
         // RELS-EXT specifying content model - if present, collection relationship if present
         // but not for bootstrap policies
         if (!pid.startsWith(FESL_BOOTSTRAP_POLICY_NAMESPACE + ":")) {
-            if (!contentModel.equals("") || !collection.equals("")) {
+            if (!contentModel.isEmpty() || !collection.isEmpty()) {
                 foxml.append("<foxml:datastream ID=\"RELS-EXT\" CONTROL_GROUP=\"X\">");
                 foxml.append("<foxml:datastreamVersion FORMAT_URI=\"info:fedora/fedora-system:FedoraRELSExt-1.0\" ID=\"RELS-EXT.0\" MIMETYPE=\"application/rdf+xml\" LABEL=\"RDF Statements about this object\">");
                 foxml.append("  <foxml:xmlContent>");
                 foxml.append("   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:fedora-model=\"info:fedora/fedora-system:def/model#\" xmlns:rel=\"info:fedora/fedora-system:def/relations-external#\">");
-                foxml.append("      <rdf:Description rdf:about=\"" + "info:fedora/"
-                             + StreamUtility.enc(pid) + "\">");
-                if (!contentModel.equals("")) {
-                    foxml.append("        <fedora-model:hasModel rdf:resource=\""
-                                 + StreamUtility.enc(contentModel) + "\"/>");
+                foxml.append("      <rdf:Description rdf:about=\"" + "info:fedora/");
+                StreamUtility.enc(pid, foxml);
+                foxml.append("\">");
+                if (!contentModel.isEmpty()) {
+                    foxml.append("        <fedora-model:hasModel rdf:resource=\"");
+                    StreamUtility.enc(contentModel, foxml);
+                    foxml.append("\"/>");
                 }
-                if (!collection.equals("")) {
-                    foxml.append("        <rel:" + StreamUtility.enc(collectionRelationship) + " rdf:resource=\""
-                                 + StreamUtility.enc(collection) + "\"/>");
+                if (!collection.isEmpty()) {
+                    foxml.append("        <rel:");
+                    StreamUtility.enc(collectionRelationship, foxml);
+                    foxml.append(" rdf:resource=\"");
+                    StreamUtility.enc(collection, foxml);
+                    foxml.append("\"/>");
                 }
                 foxml.append("       </rdf:Description>");
                 foxml.append("      </rdf:RDF>");

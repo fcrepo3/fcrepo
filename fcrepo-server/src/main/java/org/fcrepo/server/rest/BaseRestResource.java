@@ -5,6 +5,7 @@
 package org.fcrepo.server.rest;
 
 import java.io.File;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
 import java.net.URI;
@@ -46,7 +47,6 @@ import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.management.Management;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Property;
-import org.fcrepo.server.utilities.TimestampedCacheEntry;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,10 +83,6 @@ public class BaseRestResource {
     protected String m_hostname;
     protected ObjectMapper m_mapper;
     
-    protected Map<String, TimestampedCacheEntry<Templates>> m_templates =
-        new HashMap<String, TimestampedCacheEntry<Templates>>(1);
-            
-
     protected DatastreamFilenameHelper m_datastreamFilenameHelper;
 
     @javax.ws.rs.core.Context
@@ -124,18 +120,22 @@ public class BaseRestResource {
     throws TransformerFactoryConfigurationError,
            TransformerConfigurationException,
            TransformerException {
+        transform(new StringReader(xml), xslt, out);
+    }
+    
+    protected void transform(Reader xml, String xslt, Writer out)
+                throws TransformerFactoryConfigurationError,
+                       TransformerConfigurationException,
+                       TransformerException {
         File xslFile = new File(m_server.getHomeDir(), xslt);
-        TimestampedCacheEntry<Templates> entry = m_templates.get(xslt);
-        if (entry == null || entry.timestamp() < xslFile.lastModified()) {
-            Templates template =
-                    XmlTransformUtility.getTemplates(xslFile);
-            entry = new TimestampedCacheEntry<Templates>(xslFile.lastModified(), template);
-            m_templates.put(xslt, entry);
-        }
-        Transformer transformer = entry.value().newTransformer();
+
+        // XmlTransformUtility maintains a cache of Templates
+        Templates template =
+                XmlTransformUtility.getTemplates(xslFile);
+        Transformer transformer = template.newTransformer();
         String appContext = getContext().getEnvironmentValue(Constants.FEDORA_APP_CONTEXT_NAME);
         transformer.setParameter("fedora", appContext);
-        transformer.transform(new StreamSource(new StringReader(xml)), new StreamResult(out));
+        transformer.transform(new StreamSource(xml), new StreamResult(out));
     }
 
     protected Response buildResponse(MIMETypedStream result) throws Exception {
@@ -159,7 +159,7 @@ public class BaseRestResource {
                 builder.header("content-length",result.getSize());
             }
 
-            if (!result.MIMEType.equals("")){
+            if (!result.MIMEType.isEmpty()){
                 builder.type(result.MIMEType);
             }
             builder.entity(result.getStream());

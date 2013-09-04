@@ -12,9 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -24,8 +22,6 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class ServerConfigurationParser
         extends DefaultHandler {
-
-    private SAXParser m_parser;
 
     private final InputStream m_xmlStream;
 
@@ -68,14 +64,6 @@ public class ServerConfigurationParser
     public ServerConfigurationParser(InputStream xmlStream)
             throws IOException {
         m_xmlStream = xmlStream;
-        try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            m_parser = spf.newSAXParser();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("Error getting XML parser: " + e.getMessage());
-        }
     }
 
     public ServerConfiguration parse() throws IOException {
@@ -83,7 +71,7 @@ public class ServerConfigurationParser
         m_moduleConfigurations = new ArrayList<ModuleConfiguration>();
         m_datastoreConfigurations = new ArrayList<DatastoreConfiguration>();
         try {
-            m_parser.parse(m_xmlStream, this);
+            XmlTransformUtility.parseWithoutValidating(m_xmlStream, this);
             return new ServerConfiguration(m_serverClassName,
                                            m_serverParameters,
                                            m_moduleConfigurations,

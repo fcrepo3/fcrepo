@@ -4,6 +4,7 @@
  */
 package org.fcrepo.server.journal.entry;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -21,15 +22,15 @@ import org.fcrepo.server.RecoveryContext;
 public class JournalEntryContext
         implements RecoveryContext {
 
-    private MultiValueMap environmentAttributes = new MultiValueMap();
+    private MultiValueMap<URI> environmentAttributes = new MultiValueMap<URI>();
 
-    private MultiValueMap subjectAttributes = new MultiValueMap();
+    private MultiValueMap<String> subjectAttributes = new MultiValueMap<String>();
 
-    private MultiValueMap actionAttributes = new MultiValueMap();
+    private MultiValueMap<URI> actionAttributes = new MultiValueMap<URI>();
 
-    private MultiValueMap resourceAttributes = new MultiValueMap();
+    private MultiValueMap<URI> resourceAttributes = new MultiValueMap<URI>();
 
-    private MultiValueMap recoveryAttributes = new MultiValueMap();
+    private MultiValueMap<URI> recoveryAttributes = new MultiValueMap<URI>();
 
     private String password = "";
 
@@ -52,21 +53,21 @@ public class JournalEntryContext
         password = source.getPassword();
         noOp = source.getNoOp();
         now = source.now();
-        for (Iterator keys = source.environmentAttributes(); keys.hasNext();) {
-            String key = (String) keys.next();
+        for (Iterator<URI> keys = source.environmentAttributes(); keys.hasNext();) {
+            URI key = keys.next();
             storeInMap(environmentAttributes, key, source
                     .getEnvironmentValues(key));
         }
-        for (Iterator keys = source.subjectAttributes(); keys.hasNext();) {
-            String key = (String) keys.next();
+        for (Iterator<String> keys = source.subjectAttributes(); keys.hasNext();) {
+            String key = keys.next();
             storeInMap(subjectAttributes, key, source.getSubjectValues(key));
         }
-        for (Iterator keys = source.actionAttributes(); keys.hasNext();) {
-            String key = (String) keys.next();
+        for (Iterator<URI> keys = source.actionAttributes(); keys.hasNext();) {
+            URI key = keys.next();
             storeInMap(actionAttributes, key, source.getActionValues(key));
         }
-        for (Iterator keys = source.resourceAttributes(); keys.hasNext();) {
-            String key = (String) keys.next();
+        for (Iterator<URI> keys = source.resourceAttributes(); keys.hasNext();) {
+            URI key = keys.next();
             storeInMap(resourceAttributes, key, source.getResourceValues(key));
         }
     }
@@ -75,8 +76,9 @@ public class JournalEntryContext
      * This method covers the totally bogus Exception that is thrown by
      * MultiValueMap.set(), and wraps it in an IllegalArgumentException, which
      * is more appropriate.
+     * @param <T>
      */
-    private void storeInMap(MultiValueMap map, String key, String[] values) {
+    private <T> void storeInMap(MultiValueMap<T> map, T key, String[] values) {
         try {
             map.set(key, values);
         } catch (Exception e) {
@@ -84,27 +86,27 @@ public class JournalEntryContext
         }
     }
 
-    public MultiValueMap getEnvironmentAttributes() {
+    public MultiValueMap<URI> getEnvironmentAttributes() {
         return environmentAttributes;
     }
 
-    public Iterator environmentAttributes() {
+    public Iterator<URI> environmentAttributes() {
         return environmentAttributes.names();
     }
 
-    public int nEnvironmentValues(String name) {
+    public int nEnvironmentValues(URI name) {
         return environmentAttributes.length(name);
     }
 
-    public String getEnvironmentValue(String name) {
+    public String getEnvironmentValue(URI name) {
         return environmentAttributes.getString(name);
     }
 
-    public String[] getEnvironmentValues(String name) {
+    public String[] getEnvironmentValues(URI name) {
         return environmentAttributes.getStringArray(name);
     }
 
-    public Iterator subjectAttributes() {
+    public Iterator<String> subjectAttributes() {
         return subjectAttributes.names();
     }
 
@@ -120,48 +122,48 @@ public class JournalEntryContext
         return subjectAttributes.getStringArray(name);
     }
 
-    public Iterator actionAttributes() {
+    public Iterator<URI> actionAttributes() {
         return actionAttributes.names();
     }
 
-    public int nActionValues(String name) {
+    public int nActionValues(URI name) {
         return actionAttributes.length(name);
     }
 
-    public String getActionValue(String name) {
+    public String getActionValue(URI name) {
         return actionAttributes.getString(name);
     }
 
-    public String[] getActionValues(String name) {
+    public String[] getActionValues(URI name) {
         return actionAttributes.getStringArray(name);
     }
 
-    public Iterator resourceAttributes() {
+    public Iterator<URI> resourceAttributes() {
         return resourceAttributes.names();
     }
 
-    public int nResourceValues(String name) {
+    public int nResourceValues(URI name) {
         return resourceAttributes.length(name);
     }
 
-    public String getResourceValue(String name) {
+    public String getResourceValue(URI name) {
         return resourceAttributes.getString(name);
     }
 
-    public String[] getResourceValues(String name) {
+    public String[] getResourceValues(URI name) {
         return resourceAttributes.getStringArray(name);
     }
 
-    public void setActionAttributes(MultiValueMap actionAttributes) {
+    public void setActionAttributes(MultiValueMap<URI> actionAttributes) {
         if (actionAttributes == null) {
-            actionAttributes = new MultiValueMap();
+            actionAttributes = new MultiValueMap<URI>();
         }
         this.actionAttributes = actionAttributes;
     }
 
-    public void setResourceAttributes(MultiValueMap resourceAttributes) {
+    public void setResourceAttributes(MultiValueMap<URI> resourceAttributes) {
         if (resourceAttributes == null) {
-            resourceAttributes = new MultiValueMap();
+            resourceAttributes = new MultiValueMap<URI>();
         }
         this.resourceAttributes = resourceAttributes;
     }
@@ -178,15 +180,15 @@ public class JournalEntryContext
         return noOp;
     }
 
-    public Iterator getRecoveryNames() {
+    public Iterator<URI> getRecoveryNames() {
         return recoveryAttributes.names();
     }
 
-    public String getRecoveryValue(String attribute) {
+    public String getRecoveryValue(URI attribute) {
         return recoveryAttributes.getString(attribute);
     }
 
-    public String[] getRecoveryValues(String attribute) {
+    public String[] getRecoveryValues(URI attribute) {
         return recoveryAttributes.getStringArray(attribute);
     }
 
@@ -206,39 +208,39 @@ public class JournalEntryContext
 
     // Make the class fully read/write.
 
-    public MultiValueMap getActionAttributes() {
+    public MultiValueMap<URI> getActionAttributes() {
         return actionAttributes;
     }
 
-    public void setEnvironmentAttributes(MultiValueMap environmentAttributes) {
+    public void setEnvironmentAttributes(MultiValueMap<URI> environmentAttributes) {
         this.environmentAttributes = environmentAttributes;
     }
 
-    public void setSubjectAttributes(MultiValueMap subjectAttributes) {
+    public void setSubjectAttributes(MultiValueMap<String> subjectAttributes) {
         this.subjectAttributes = subjectAttributes;
     }
 
-    public MultiValueMap getSubjectAttributes() {
+    public MultiValueMap<String> getSubjectAttributes() {
         return subjectAttributes;
     }
 
-    public MultiValueMap getResourceAttributes() {
+    public MultiValueMap<URI> getResourceAttributes() {
         return resourceAttributes;
     }
 
-    public void setRecoveryAttributes(MultiValueMap recoveryAttributes) {
+    public void setRecoveryAttributes(MultiValueMap<URI> recoveryAttributes) {
         this.recoveryAttributes = recoveryAttributes;
     }
 
-    public MultiValueMap getRecoveryAttributes() {
+    public MultiValueMap<URI> getRecoveryAttributes() {
         return recoveryAttributes;
     }
 
-    public void setRecoveryValue(String attribute, String value) {
+    public void setRecoveryValue(URI attribute, String value) {
         setRecoveryValues(attribute, new String[] {value});
     }
 
-    public void setRecoveryValues(String attribute, String[] values) {
+    public void setRecoveryValues(URI attribute, String[] values) {
         storeInMap(recoveryAttributes, attribute, values);
     }
 

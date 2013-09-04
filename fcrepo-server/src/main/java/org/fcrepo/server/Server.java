@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -51,6 +52,7 @@ import org.fcrepo.server.security.Authorization;
 import org.fcrepo.server.utilities.status.ServerState;
 import org.fcrepo.server.utilities.status.ServerStatusFile;
 import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -538,7 +540,7 @@ public abstract class Server
     }
 
     public void init()  throws ServerInitializationException, ModuleInitializationException {
-        logger.info("Registered server at " + getHomeDir().getPath());
+        logger.info("Registered server at {}", getHomeDir().getPath());
         try {
             if (m_serverContext == null) {
                 m_serverContext = getDefaultContext();
@@ -562,14 +564,13 @@ public abstract class Server
                 logger.debug("fedora.serverProfile property not set... will always "
                         + "use param 'value' attributes from configuration for param values.");
             } else {
-                logger.debug("fedora.serverProfile property was '"
-                        + s_serverProfile + "'... will use param '"
-                        + s_serverProfile + "value' attributes from "
+                logger.debug("fedora.serverProfile property was '{}"
+                        + "'... will use param '{}value' attributes from "
                         + "configuration for param values, falling back to "
-                        + "'value' attributes where unspecified.");
+                        + "'value' attributes where unspecified.", s_serverProfile, s_serverProfile);
             }
-            logger.debug("Loading and validating configuration file \""
-                    + m_configFile + "\"");
+            logger.debug("Loading and validating configuration file \"{}\"",
+                    m_configFile);
 
             // do the parsing and validation of configuration
             ServerConfiguration serverConfig = getConfig();
@@ -883,7 +884,7 @@ public abstract class Server
             for(String path:springDir.list()){
                 if (path.endsWith(".xml")){
                     File springConfig = new File(springDir,path);
-                    logger.info("loading spring beans from " + springConfig.getAbsolutePath());
+                    logger.info("loading spring beans from {}", springConfig.getAbsolutePath());
                     FileSystemResource beanConfig = new FileSystemResource(springConfig);
                     int count = beanReader.loadBeanDefinitions(beanConfig);
                     if (count < 1){
@@ -1000,8 +1001,8 @@ public abstract class Server
                             throw new ServerInitializationException(INIT_CONFIG_SEVERE_INCOMPLETEPARAM);
                         }
                     }
-                    if (nameNode.getNodeValue().equals("")
-                            || valueNode.getNodeValue().equals("")) {
+                    if (nameNode.getNodeValue().isEmpty()
+                            || valueNode.getNodeValue().isEmpty()) {
                         throw new ServerInitializationException(MessageFormat
                                 .format(INIT_CONFIG_SEVERE_INCOMPLETEPARAM,
                                         new Object[] {CONFIG_ELEMENT_PARAM,
@@ -1081,17 +1082,13 @@ public abstract class Server
             throws ServerInitializationException {
         File configFile = null;
         try {
-            DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
             configFile =
                     new File(homeDir + File.separator + "server"
                             + File.separator + CONFIG_DIR + File.separator
                             + CONFIG_FILE);
             // suck it in
             Element rootElement =
-                    builder.parse(configFile).getDocumentElement();
+                    XmlTransformUtility.parseNamespaceAware(configFile).getDocumentElement();
             // ensure root element name ok
             if (!rootElement.getLocalName().equals(CONFIG_ELEMENT_ROOT)) {
                 throw new ServerInitializationException(MessageFormat
@@ -1110,12 +1107,14 @@ public abstract class Server
             throw new ServerInitializationException(MessageFormat
                     .format(INIT_CONFIG_SEVERE_UNREADABLE, new Object[] {
                             configFile, ioe.getMessage()}));
-        } catch (ParserConfigurationException pce) {
-            throw new ServerInitializationException(INIT_XMLPARSER_SEVERE_MISSING);
         } catch (SAXException saxe) {
             throw new ServerInitializationException(MessageFormat
                     .format(INIT_CONFIG_SEVERE_MALFORMEDXML, new Object[] {
                             configFile, saxe.getMessage()}));
+        } catch (Exception e) {
+            throw new ServerInitializationException(MessageFormat
+                    .format(INIT_XMLPARSER_SEVERE_MISSING, new Object[] {
+                            configFile, e.getMessage()}));
         }
     }
 
@@ -1148,11 +1147,11 @@ public abstract class Server
             Element rootElement = getConfigElement(homeDir);
             // select <server class="THIS_PART"> .. </server>
             String className = rootElement.getAttribute(CONFIG_ATTRIBUTE_CLASS);
-            if (className.equals("")) {
+            if (className.isEmpty()) {
                 className =
                         rootElement.getAttributeNS(CONFIG_NAMESPACE,
                                                    CONFIG_ATTRIBUTE_CLASS);
-                if (className.equals("")) {
+                if (className.isEmpty()) {
                     className = DEFAULT_SERVER_CLASS;
                 }
             }
@@ -1527,7 +1526,7 @@ public abstract class Server
      */
     public static Date getCurrentDate(Context context) throws GeneralException {
 
-        String propName = Constants.ENVIRONMENT.CURRENT_DATE_TIME.uri;
+        URI propName = Constants.ENVIRONMENT.CURRENT_DATE_TIME.attributeId;
         String dateTimeValue = context.getEnvironmentValue(propName);
         if (dateTimeValue == null) {
             throw new GeneralException("Missing value for environment "
