@@ -139,24 +139,24 @@ public class FOXMLDOSerializer
 
     private void appendRootElementStart(DigitalObject obj, PrintWriter writer)
             throws ObjectIntegrityException {
-        writer.print("<");
+        writer.print('<');
         writer.print(FOXML.DIGITAL_OBJECT.qName);
         if (m_format.equals(FOXML1_1)) {
-            writer.print(" ");
+            writer.print(' ');
             writer.print(FOXML.VERSION.localName);
             writer.print("=\"1.1\"");
         }
-        writer.print(" ");
+        writer.print(' ');
         writer.print(FOXML.PID.localName);
         writer.print("=\"");
         writer.print(obj.getPid());
-        writer.print("\"");
+        writer.print('"');
         if (m_transContext == DOTranslationUtility.SERIALIZE_EXPORT_PUBLIC) {
-            writer.print(" ");
+            writer.print(' ');
             writer.print(FOXML.FEDORA_URI.localName);
             writer.print("=\"info:fedora/");
             writer.print(obj.getPid());
-            writer.print("\"");
+            writer.print('"');
         }
         writer.print("\nxmlns:");
         writer.print(FOXML.prefix);
@@ -170,7 +170,7 @@ public class FOXMLDOSerializer
         writer.print(XSI.SCHEMA_LOCATION.qName);
         writer.print("=\"");
         writer.print(FOXML.uri);
-        writer.print(" ");
+        writer.print(' ');
         writer.print(m_format.xsdLocation);
         writer.print("\">\n");
     }
@@ -180,7 +180,7 @@ public class FOXMLDOSerializer
                                   String encoding)
             throws ObjectIntegrityException {
 
-        writer.print("<");
+        writer.print('<');
         writer.print(FOXML.prefix);
         writer.print(":objectProperties>\n");
 

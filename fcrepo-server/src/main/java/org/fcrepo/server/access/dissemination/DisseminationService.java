@@ -221,7 +221,7 @@ public class DisseminationService {
 						replaced.append(parts[0]);
 						for (int x = 1; x < parts.length; x++) {
 							replaced.append('=');
-							int rightParenPos = parts[x].indexOf(")");
+							int rightParenPos = parts[x].indexOf(')');
 							if (rightParenPos != -1 && rightParenPos > 0) {
 								String key = parts[x].substring(0,
 										rightParenPos);
@@ -991,25 +991,26 @@ public class DisseminationService {
 	 */
 	private String stripParms(String dissURL) {
 		// if no parameters, simply return passed in string.
-		if (dissURL.indexOf("?") == -1) {
+		if (dissURL.indexOf('?') == -1) {
 			return dissURL;
 		}
-		String requestURI = dissURL.substring(0, dissURL.indexOf("?") + 1);
-		String parmString = dissURL.substring(dissURL.indexOf("?") + 1,
+		String parmString = dissURL.substring(dissURL.indexOf('?') + 1,
 				dissURL.length());
 		String[] parms = parmString.split("&");
 		StringBuffer sb = new StringBuffer();
+		sb.append(dissURL, 0, dissURL.indexOf('?') + 1);
+		int index = -1;
 		for (String element : parms) {
 			int len = element.length() - 1;
-			if (element.lastIndexOf(")") != len) {
+			if (element.lastIndexOf(')') != len) {
 				sb.append(element + "&");
+				index = sb.length() - 1;
 			}
 		}
-		int index = sb.lastIndexOf("&");
 		if (index != -1 && index + 1 == sb.length()) {
-			sb.replace(index, sb.length(), "");
+			sb.setLength(index);
 		}
-		return requestURI + sb.toString();
+		return sb.toString();
 	}
 
 	/**

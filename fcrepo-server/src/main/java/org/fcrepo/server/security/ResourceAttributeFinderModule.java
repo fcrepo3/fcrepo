@@ -106,11 +106,7 @@ class ResourceAttributeFinderModule
     }
 
     private final String getDatastreamId(EvaluationCtx context) {
-        URI datastreamIdUri = null;
-        try {
-            datastreamIdUri = new URI(Constants.DATASTREAM.ID.uri);
-        } catch (URISyntaxException e) {
-        }
+        URI datastreamIdUri = Constants.DATASTREAM.ID.attributeId;
 
         EvaluationResult attribute =
                 context.getResourceAttribute(STRING_ATTRIBUTE_TYPE_URI,

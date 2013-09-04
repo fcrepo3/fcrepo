@@ -90,7 +90,10 @@ public class XmlUsersFileModule
             debug = true;
         }
 
-        attributes = new HashMap<String, Set<String>>();
+        // the default size is 16, but the common case is accounts
+        // with 1 attribute, 'fedoraRole', with 1 or 2 values. 4 should
+        // accommodate most cases without resizing.
+        attributes = new HashMap<String, Set<String>>(4);
 
         if (debug) {
             logger.debug("login module initialised: {}", this.getClass().getName());
@@ -220,7 +223,7 @@ public class XmlUsersFileModule
 
                         Set<String> values = attributes.get(name);
                         if (values == null) {
-                            values = new HashSet<String>();
+                            values = new HashSet<String>(4);
                             attributes.put(name, values);
                         }
                         values.add(v);

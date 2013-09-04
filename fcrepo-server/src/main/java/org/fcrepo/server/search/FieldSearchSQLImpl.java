@@ -387,7 +387,7 @@ public class FieldSearchSQLImpl
         StringBuilder out = new StringBuilder(64 * dcFields.size());
 
         for (DCField dcField : dcFields) {
-            out.append(" ");
+            out.append(' ');
             out.append(dcField.getValue().toLowerCase());
         }
         out.append(" .");

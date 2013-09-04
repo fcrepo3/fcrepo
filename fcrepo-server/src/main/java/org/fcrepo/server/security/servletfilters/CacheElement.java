@@ -379,9 +379,9 @@ public class CacheElement {
         } else {
             String padNeeded = pad.substring(0, pad.length() - st.length());
             if (padLeft) {
-                rc = padNeeded + st;
+                rc = padNeeded.concat(st);
             } else {
-                rc = st + padNeeded;
+                rc = st.concat(padNeeded);
             }
         }
         return rc;
@@ -400,17 +400,17 @@ public class CacheElement {
         StringBuffer sb = new StringBuffer();
         if (dayPad != null) {
             sb.append(CacheElement.pad(day, "00"));
-            sb.append(" ");
+            sb.append(' ');
         } else {
             sb.append(Long.toString(day));
             sb.append(" days ");
         }
         sb.append(CacheElement.pad(hour, "00"));
-        sb.append(":");
+        sb.append(':');
         sb.append(CacheElement.pad(minute, "00"));
-        sb.append(":");
+        sb.append(':');
         sb.append(CacheElement.pad(second, "00"));
-        sb.append(".");
+        sb.append('.');
         sb.append(CacheElement.pad(millisecond, "000"));
         return sb.toString();
     }

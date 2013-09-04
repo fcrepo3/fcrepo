@@ -7,6 +7,7 @@ package org.fcrepo.server.utilities;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -39,7 +40,9 @@ public final class ServerUtilitySerializer {
     }
 
     private void indent(int level) throws IOException {
-        m_writer.write(new String(new char[level * INDENT]).replace("\0", " "));
+        char[] indent = new char[level * INDENT];
+        Arrays.fill(indent, ' ');
+        m_writer.write(indent);
     }
 
     private void start() throws IOException {

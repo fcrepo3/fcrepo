@@ -25,6 +25,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +40,6 @@ public class DOValidatorSchematronResult {
 
     private static final Logger logger =
             LoggerFactory.getLogger(DOValidatorSchematronResult.class);
-
-    private final StringBuffer string = new StringBuffer();
 
     private final Element rootElement;
 
@@ -83,51 +82,46 @@ public class DOValidatorSchematronResult {
      * Serializes the specified node, recursively, to a Writer and returns it as
      * a String too.
      */
-    public String serializeResult(Writer out) {
-        return serializeNode(rootElement, out);
+    public void serializeResult(Writer out) {
+        serializeNode(rootElement, out);
+    }
+    
+    public String serializeResult() {
+        ReadableCharArrayWriter writer = new ReadableCharArrayWriter();
+        serializeResult(writer);
+        writer.close();
+        return writer.getString();
     }
 
-    private String serializeNode(Node node, Writer out) {
+    private void serializeNode(Node node, Writer out) {
         try {
             if (node == null) {
-                return null;
+                return;
             }
 
             int type = node.getNodeType();
             switch (type) {
                 case Node.DOCUMENT_NODE:
                     out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                    string
-                            .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n");
                     serializeNode(((Document) node).getDocumentElement(), out);
                     break;
 
                 case Node.ELEMENT_NODE:
-                    string.append("<");
-                    string.append(node.getNodeName());
-
-                    out.write("<");
+                    out.write('<');
                     out.write(node.getNodeName());
 
                     // do attributes
                     NamedNodeMap attrs = node.getAttributes();
                     for (int i = 0; i < attrs.getLength(); i++) {
-                        string.append(" ");
-                        string.append(attrs.item(i).getNodeName());
-                        string.append("=\"");
-                        string.append(attrs.item(i).getNodeValue());
-                        string.append("\"");
-
-                        out.write(" ");
+                        out.write(' ');
                         out.write(attrs.item(i).getNodeName());
                         out.write("=\"");
                         out.write(attrs.item(i).getNodeValue());
-                        out.write("\"");
+                        out.write('"');
                     }
 
                     // close up the current element
-                    string.append(">");
-                    out.write(">");
+                    out.write('>');
 
                     // recursive call to process this node's children
                     NodeList children = node.getChildNodes();
@@ -140,15 +134,11 @@ public class DOValidatorSchematronResult {
                     break;
 
                 case Node.TEXT_NODE:
-                    string.append(node.getNodeValue());
                     out.write(node.getNodeValue());
                     break;
             }
 
             if (type == Node.ELEMENT_NODE) {
-                string.append("</");
-                string.append(node.getNodeName());
-                string.append(">");
                 out.write("</");
                 out.write(node.getNodeName());
                 out.write(">");
@@ -157,7 +147,6 @@ public class DOValidatorSchematronResult {
         } catch (Exception e) {
             logger.error("Error serializing node", e);
         }
-        return string.toString();
     }
 
 }

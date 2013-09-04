@@ -112,10 +112,7 @@ class ContextAttributeFinderModule
     }
 
     private final boolean validContextId(String contextId) {
-        if (contextId == null) {
-            return false;
-        }
-        if ("".equals(contextId)) {
+        if (contextId == null || contextId.isEmpty()) {
             return false;
         }
         if (" ".equals(contextId)) {

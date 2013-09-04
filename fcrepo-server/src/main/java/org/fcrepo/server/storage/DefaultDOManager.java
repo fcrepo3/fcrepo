@@ -713,7 +713,7 @@ public class DefaultDOManager extends Module implements DOManager {
                                     m_permanentStore.retrieveObject(pid));
                     source = "filesystem";
                     if (m_readerCache != null) {
-                        m_readerCache.put(reader);
+                        m_readerCache.put(reader, getReaderStartTime);
                     }
                 } else {
                     source = "memory";
@@ -723,8 +723,8 @@ public class DefaultDOManager extends Module implements DOManager {
         } finally {
             if (logger.isDebugEnabled()) {
                 long dur = System.currentTimeMillis() - getReaderStartTime;
-                logger.debug("Got DOReader (source=" + source + ") for " + pid +
-                        " in " + dur + "ms.");
+                logger.debug("Got DOReader (source={}) for {} in {}ms.",
+                        source, pid, dur);
             }
         }
     }

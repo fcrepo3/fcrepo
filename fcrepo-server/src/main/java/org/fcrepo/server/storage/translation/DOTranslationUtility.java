@@ -1020,14 +1020,14 @@ public abstract class DOTranslationUtility
     private static void appendOpenElement(PrintWriter writer,
                                           QName element,
                                           boolean declareNamespace) {
-        writer.print("<");
+        writer.print('<');
         writer.print(element.qName);
         if (declareNamespace) {
             writer.print(" xmlns:");
             writer.print(element.namespace.prefix);
             writer.print("=\"");
             writer.print(element.namespace.uri);
-            writer.print("\"");
+            writer.print('"');
         }
         writer.print(">\n");
     }
@@ -1036,9 +1036,9 @@ public abstract class DOTranslationUtility
                                           QName element,
                                           QName attribute,
                                           String attributeContent) {
-        writer.print("<");
+        writer.print('<');
         writer.print(element.qName);
-        writer.print(" ");
+        writer.print(' ');
         writer.print(attribute.localName);
         writer.print("=\"");
         StreamUtility.enc(attributeContent, writer);
@@ -1055,9 +1055,9 @@ public abstract class DOTranslationUtility
                                           QName element,
                                           QName attribute,
                                           String attributeContent) {
-        writer.print("<");
+        writer.print('<');
         writer.print(element.qName);
-        writer.print(" ");
+        writer.print(' ');
         writer.print(attribute.localName);
         writer.print("=\"");
         StreamUtility.enc(attributeContent, writer);
@@ -1067,9 +1067,9 @@ public abstract class DOTranslationUtility
     private static void appendFullElement(PrintWriter writer,
                                           QName element,
                                           String elementContent) {
-        writer.print("<");
+        writer.print('<');
         writer.print(element.qName);
-        writer.print(">");
+        writer.print('>');
         StreamUtility.enc(elementContent, writer);
         writer.print("</");
         writer.print(element.qName);

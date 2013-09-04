@@ -6,6 +6,10 @@ package org.fcrepo.server.security;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -329,17 +333,18 @@ public abstract class AttributeFinderModule
                     .createEmptyBag(attributeType));
         }
 
-        Set<AttributeValue> set = new HashSet<AttributeValue>();
+        Collection<AttributeValue> set = null;
         if (temp instanceof String) {
+            AttributeValue att = null;
             logger.debug("AttributeFinder:findAttribute will return a String {}", iAm());
             if (attributeType.equals(STRING_ATTRIBUTE_TYPE_URI)) {
-                set.add(new StringAttribute((String) temp));
+                att = StringAttribute.getInstance((String) temp);
             } else if (attributeType.equals(DATETIME_ATTRIBUTE_TYPE_URI)) {
                 DateTimeAttribute tempDateTimeAttribute;
                 try {
                     tempDateTimeAttribute =
                             DateTimeAttribute.getInstance((String) temp);
-                    set.add(tempDateTimeAttribute);
+                    att = tempDateTimeAttribute;
                 } catch (Throwable t) {
                 }
             } else if (attributeType.equals(DATE_ATTRIBUTE_TYPE_URI)) {
@@ -347,7 +352,7 @@ public abstract class AttributeFinderModule
                 try {
                     tempDateAttribute =
                             DateAttribute.getInstance((String) temp);
-                    set.add(tempDateAttribute);
+                    att = tempDateAttribute;
                 } catch (Throwable t) {
                 }
             } else if (attributeType.equals(TIME_ATTRIBUTE_TYPE_URI)) {
@@ -355,7 +360,7 @@ public abstract class AttributeFinderModule
                 try {
                     tempTimeAttribute =
                             TimeAttribute.getInstance((String) temp);
-                    set.add(tempTimeAttribute);
+                    att = tempTimeAttribute;
                 } catch (Throwable t) {
                 }
             } else if (attributeType.equals(INTEGER_ATTRIBUTE_TYPE_URI)) {
@@ -363,59 +368,65 @@ public abstract class AttributeFinderModule
                 try {
                     tempIntegerAttribute =
                             IntegerAttribute.getInstance((String) temp);
-                    set.add(tempIntegerAttribute);
+                    att = tempIntegerAttribute;
                 } catch (Throwable t) {
                 }
-            } //xacml fixup
-            //was set.add(new StringAttribute((String)temp));
+            }
+            if (att != null) {
+                set = Collections.singleton(att);
+            }
         } else if (temp instanceof String[]) {
+            String[] strings = (String[]) temp;
+            // Because the number of attributes tends to be small,
+            // we can minimize object creation by avoiding HashSets
+            // and sizing to the size of the value list
+            set = new ArrayList<AttributeValue>(strings.length);
             logger.debug("AttributeFinder:findAttribute will return a String[] {}", iAm());
             for (int i = 0; i < ((String[]) temp).length; i++) {
-                if (((String[]) temp)[i] == null) {
+                if (strings[i] == null) {
                     continue;
                 }
+                AttributeValue tempAtt = null;
                 if (attributeType.equals(STRING_ATTRIBUTE_TYPE_URI)) {
-                    set.add(new StringAttribute(((String[]) temp)[i]));
+                    set.add(new StringAttribute(strings[i]));
                 } else if (attributeType.equals(DATETIME_ATTRIBUTE_TYPE_URI)) {
-                    logger.debug("USING AS DATETIME:{}", ((String[]) temp)[i]);
-                    DateTimeAttribute tempDateTimeAttribute;
+                    logger.debug("USING AS DATETIME:{}", strings[i]);
                     try {
-                        tempDateTimeAttribute =
+                        tempAtt =
                                 DateTimeAttribute
-                                        .getInstance(((String[]) temp)[i]);
-                        set.add(tempDateTimeAttribute);
+                                        .getInstance(strings[i]);
                     } catch (Throwable t) {
                     }
                 } else if (attributeType.equals(DATE_ATTRIBUTE_TYPE_URI)) {
-                    logger.debug("USING AS DATE:{}", ((String[]) temp)[i]);
-                    DateAttribute tempDateAttribute;
+                    logger.debug("USING AS DATE:{}", strings[i]);
                     try {
-                        tempDateAttribute =
-                                DateAttribute.getInstance(((String[]) temp)[i]);
-                        set.add(tempDateAttribute);
+                        tempAtt =
+                                DateAttribute.getInstance(strings[i]);
                     } catch (Throwable t) {
                     }
                 } else if (attributeType.equals(TIME_ATTRIBUTE_TYPE_URI)) {
-                    logger.debug("USING AS TIME:{}", ((String[]) temp)[i]);
-                    TimeAttribute tempTimeAttribute;
+                    logger.debug("USING AS TIME:{}", strings[i]);
                     try {
-                        tempTimeAttribute =
-                                TimeAttribute.getInstance(((String[]) temp)[i]);
-                        set.add(tempTimeAttribute);
+                        tempAtt =
+                                TimeAttribute.getInstance(strings[i]);
                     } catch (Throwable t) {
                     }
                 } else if (attributeType.equals(INTEGER_ATTRIBUTE_TYPE_URI)) {
-                    logger.debug("USING AS INTEGER: {}", ((String[]) temp)[i]);
-                    IntegerAttribute tempIntegerAttribute;
+                    logger.debug("USING AS INTEGER: {}", strings[i]);
                     try {
-                        tempIntegerAttribute =
+                        tempAtt =
                                 IntegerAttribute
-                                        .getInstance(((String[]) temp)[i]);
-                        set.add(tempIntegerAttribute);
+                                        .getInstance(strings[i]);
                     } catch (Throwable t) {
                     }
                 }
+                if (tempAtt != null && !set.contains(tempAtt)) {
+                    set.add(tempAtt);
+                }
             }
+        }
+        if (set == null) {
+            set = Collections.emptySet();
         }
         return new EvaluationResult(new BagAttribute(attributeType, set));
     }

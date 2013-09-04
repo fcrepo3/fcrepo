@@ -45,6 +45,8 @@ public class UvaStdImgTripleGenerator_1
         implements Constants, TripleGenerator {
 
     public static final String TEST_PREDICATE = "info:fedora/fedora-system:test/tests#tripleGenerator";
+    
+    private static URI PREDICATE = URI.create(TEST_PREDICATE);
     /**
      * {@inheritDoc}
      */
@@ -54,9 +56,8 @@ public class UvaStdImgTripleGenerator_1
         Set<Triple> set = new HashSet<Triple>();
         try{
         set.add(new SimpleTriple(new SimpleURIReference(
-                                                        new URI(Constants.FEDORA.uri + reader.GetObjectPID())),
-                                                new SimpleURIReference(
-                                                        new URI(TEST_PREDICATE)),
+                                                        new URI(Constants.FEDORA.uri.concat(reader.GetObjectPID()))),
+                                                        new SimpleURIReference(PREDICATE),
                                                         new SimpleLiteral("true")));
         }
         catch (ServerException e){
