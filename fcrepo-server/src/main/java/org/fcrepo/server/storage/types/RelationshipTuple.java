@@ -15,7 +15,11 @@ import java.util.Set;
 import org.jrdf.graph.Literal;
 import org.jrdf.graph.ObjectNode;
 import org.jrdf.graph.PredicateNode;
+import org.jrdf.graph.SubjectNode;
 import org.jrdf.graph.Triple;
+import org.trippi.RDFUtil;
+import org.trippi.TrippiException;
+import org.trippi.io.transform.Transformer;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.rdf.SimpleLiteral;
@@ -29,6 +33,9 @@ import org.fcrepo.common.rdf.SimpleURIReference;
  */
 public class RelationshipTuple
         implements Constants {
+    
+    public static final Transformer<RelationshipTuple> TRANSFORMER =
+            new TripleTransformer();
 
     public final String subject;
 
@@ -49,6 +56,7 @@ public class RelationshipTuple
                              URI datatype) {
         this(subject, predicate, object, isLiteral, datatype, null);
     }
+    
     public RelationshipTuple(String subject,
                              String predicate,
                              String object,
@@ -132,16 +140,17 @@ public class RelationshipTuple
     public static URI makePredicateFromRel(String relationship, Map<String,String> map)
             throws URISyntaxException {
         String predicate = relationship;
-        Set<String> keys = map.keySet();
-        Iterator<String> iter = keys.iterator();
-        while (iter.hasNext()) {
-            String key = iter.next();
-            if (predicate.startsWith(key) && predicate.charAt(key.length()) == ':') {
-                predicate =
-                        map.get(key).concat(predicate.substring(key.length() + 1));
+        if (map != null) {
+            Set<String> keys = map.keySet();
+            Iterator<String> iter = keys.iterator();
+            while (iter.hasNext()) {
+                String key = iter.next();
+                if (predicate.startsWith(key) && predicate.charAt(key.length()) == ':') {
+                    predicate =
+                            map.get(key).concat(predicate.substring(key.length() + 1));
+                }
             }
         }
-    
         URI retVal = null;
         retVal = new URI(predicate);
         return retVal;
@@ -176,15 +185,19 @@ public class RelationshipTuple
     }
 
     public static RelationshipTuple fromTriple(Triple triple) {
-        String subject = triple.getSubject().toString();
-        String predicate = triple.getPredicate().toString();
-        ObjectNode objectNode = triple.getObject();
-        if (objectNode instanceof Literal) {
-            return getLiteral(subject, predicate, (Literal)objectNode);
+        return fromNodes(triple.getSubject(),
+                triple.getPredicate(), triple.getObject());
+    }
+    
+    public static RelationshipTuple fromNodes(
+            SubjectNode sNode, PredicateNode pNode, ObjectNode oNode) {
+        String subject = sNode.toString();
+        String predicate = pNode.toString();
+        if (oNode instanceof Literal) {
+            return getLiteral(subject, predicate, (Literal)oNode);
         } else {
-            return new RelationshipTuple(subject, predicate, objectNode.toString(), false, null, null);
+            return new RelationshipTuple(subject, predicate, oNode.toString(), false, null, null);
         }
-        
     }
     
     private static RelationshipTuple getLiteral(String subject, String predicate, Literal literal) {
@@ -207,5 +220,20 @@ public class RelationshipTuple
         } else {
             return o.hashCode();
         }
+    }
+    
+    public static class TripleTransformer implements Transformer<RelationshipTuple> {
+
+        @Override
+        public RelationshipTuple transform(Triple input) {
+            return RelationshipTuple.fromTriple(input);
+        }
+
+        @Override
+        public RelationshipTuple transform(SubjectNode s, PredicateNode p,
+                ObjectNode o, RDFUtil u) throws TrippiException {
+            return RelationshipTuple.fromNodes(s, p, o);
+        }
+        
     }
 }

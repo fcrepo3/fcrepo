@@ -102,6 +102,10 @@ public class AtomAPIMMessage
     private final static String versionPredicate = Constants.VIEW.VERSION.uri;
 
     private final static String formatPredicate = "http://www.fedora.info/definitions/1/0/types/formatURI";
+    
+    private final static String nullstring = "null";
+    private final static String delimiter = ", ";
+
 
     private static FedoraTypes fedoraTypes;
 
@@ -384,8 +388,6 @@ public class AtomAPIMMessage
     }
 
     private static String array2string(Object array) {
-        String nullstring = "null";
-        String delimiter = ", ";
         if (array == null) {
             return nullstring;
         }

@@ -191,7 +191,7 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
     public Map<String, AbstractPolicy> getPolicies(EvaluationCtx eval, PolicyFinder policyFinder)
     throws PolicyIndexException {
 
-        Map<String, Set<AttributeBean>> attributeMap;
+        Map<String, java.util.Collection<AttributeBean>> attributeMap;
         try {
             // get evaluation context attributes to query on
             attributeMap = getAttributeMap(eval);

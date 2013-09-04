@@ -138,7 +138,7 @@ public abstract class StreamUtility {
      * @param in
      *        The source stream.
      * @param out
-     *        The target stram.
+     *        The target stream.
      * @param bufSize
      *        Number of bytes to attempt to copy at a time.
      * @throws IOException

@@ -20,6 +20,7 @@ import java.util.Properties;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 
 
 /**
@@ -62,10 +63,9 @@ public class ServerConfiguration
      * Make an exact copy of this ServerConfiguration.
      */
     public ServerConfiguration copy() throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ReadableByteArrayOutputStream out = new ReadableByteArrayOutputStream();
         serialize(out);
-        return new ServerConfigurationParser(new ByteArrayInputStream(out
-                .toByteArray())).parse();
+        return new ServerConfigurationParser(out.toInputStream()).parse();
     }
 
     /**

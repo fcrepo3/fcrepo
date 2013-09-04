@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.XMLConstants;
@@ -96,9 +97,7 @@ public class DOValidatorXMLSchema
                             + e.getClass().getName() + ".\n"
                             + "The message was " + "\"" + e.getMessage() + "\"";
             Validation validation = new Validation("unknown");
-            List<String> problems = new ArrayList<String>();
-            problems.add(msg);
-            validation.setObjectProblems(problems);
+            validation.setObjectProblems(Collections.singletonList(msg));
             throw new ObjectValidityException(msg, validation, e);
         } catch (Exception e) {
             String msg =

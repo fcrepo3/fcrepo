@@ -43,10 +43,10 @@ public class ServiceMethodDispatcher {
             userParms = new Property[0];
         }
         Object[] parmValues = new Object[userParms.length];
-        Class[] parmClassTypes = new Class[userParms.length];
+        Class<?>[] parmClassTypes = new Class[userParms.length];
         for (int i = 0; i < userParms.length; i++) {
             // Get parm value.  Always treat the parm value as a string.
-            parmValues[i] = new String(userParms[i].value == null ? "" : userParms[i].value);
+            parmValues[i] = userParms[i].value == null ? "" : userParms[i].value;
             parmClassTypes[i] = parmValues[i].getClass();
         }
         // Invoke method: using Java Reflection

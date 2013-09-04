@@ -37,35 +37,35 @@ public class DCFields
         extends DefaultHandler
         implements Constants {
 
-    private final ArrayList<DCField> m_titles = new ArrayList<DCField>();
+    private ArrayList<DCField> m_titles = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_creators = new ArrayList<DCField>();
+    private ArrayList<DCField> m_creators = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_subjects = new ArrayList<DCField>();
+    private ArrayList<DCField> m_subjects = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_descriptions = new ArrayList<DCField>();
+    private ArrayList<DCField> m_descriptions = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_publishers = new ArrayList<DCField>();
+    private ArrayList<DCField> m_publishers = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_contributors = new ArrayList<DCField>();
+    private ArrayList<DCField> m_contributors = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_dates = new ArrayList<DCField>();
+    private ArrayList<DCField> m_dates = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_types = new ArrayList<DCField>();
+    private ArrayList<DCField> m_types = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_formats = new ArrayList<DCField>();
+    private ArrayList<DCField> m_formats = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_identifiers = new ArrayList<DCField>();
+    private ArrayList<DCField> m_identifiers = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_sources = new ArrayList<DCField>();
+    private ArrayList<DCField> m_sources = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_languages = new ArrayList<DCField>();
+    private ArrayList<DCField> m_languages = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_relations = new ArrayList<DCField>();
+    private ArrayList<DCField> m_relations = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_coverages = new ArrayList<DCField>();
+    private ArrayList<DCField> m_coverages = new ArrayList<DCField>();
 
-    private final ArrayList<DCField> m_rights = new ArrayList<DCField>();
+    private ArrayList<DCField> m_rights = new ArrayList<DCField>();
 
     private StringBuffer m_currentContent;
     
@@ -141,7 +141,7 @@ public class DCFields
      * values for that field.
      */
     public Map<RDFName, List<DCField>> getMap() {
-        Map<RDFName, List<DCField>> map = new HashMap<RDFName, List<DCField>>();
+        Map<RDFName, List<DCField>> map = new HashMap<RDFName, List<DCField>>(15);
 
         map.put(DC.TITLE, m_titles);
         map.put(DC.CREATOR, m_creators);
@@ -163,62 +163,77 @@ public class DCFields
     }
 
     public List<DCField> titles() {
+        if (m_titles == null) m_titles = new ArrayList<DCField>(2);
         return m_titles;
     }
 
     public List<DCField> creators() {
+        if (m_creators == null) m_creators = new ArrayList<DCField>(2);
         return m_creators;
     }
 
     public List<DCField> subjects() {
+        if (m_subjects == null) m_subjects = new ArrayList<DCField>(2);
         return m_subjects;
     }
 
     public List<DCField> descriptions() {
+        if (m_descriptions == null) m_descriptions = new ArrayList<DCField>(2);
         return m_descriptions;
     }
 
     public List<DCField> publishers() {
+        if (m_publishers == null) m_publishers = new ArrayList<DCField>(2);
         return m_publishers;
     }
 
     public List<DCField> contributors() {
+        if (m_contributors == null) m_contributors = new ArrayList<DCField>(2);
         return m_contributors;
     }
 
     public List<DCField> dates() {
+        if (m_dates == null) m_dates = new ArrayList<DCField>(2);
         return m_dates;
     }
 
     public List<DCField> types() {
+        if (m_types == null) m_types = new ArrayList<DCField>(2);
         return m_types;
     }
 
     public List<DCField> formats() {
+        if (m_formats == null) m_formats = new ArrayList<DCField>(2);
         return m_formats;
     }
 
     public List<DCField> identifiers() {
+        if (m_identifiers == null) m_identifiers = new ArrayList<DCField>(2);
         return m_identifiers;
     }
 
     public List<DCField> sources() {
+        if (m_sources == null) m_sources = new ArrayList<DCField>(2);
         return m_sources;
     }
 
     public List<DCField> languages() {
+        if (m_languages == null) m_languages = new ArrayList<DCField>(2);
         return m_languages;
     }
 
     public List<DCField> relations() {
+        if (m_relations == null) m_relations = new ArrayList<DCField>(2);
         return m_relations;
     }
 
     public List<DCField> coverages() {
+        if (m_coverages == null) m_coverages = new ArrayList<DCField>(2);
         return m_coverages;
     }
 
     public List<DCField> rights() {
+        if (m_rights == null) m_rights = new ArrayList<DCField>(2);
         return m_rights;
     }
 
@@ -263,29 +278,30 @@ public class DCFields
                 + DC.uri + "\"\nxmlns:xsi=\"" + XSI.uri
                 + "\"\nxsi:schemaLocation=\"" + OAI_DC.uri + " "
                 + OAI_DC2_0.xsdLocation + "\">\n");
-        appendXML(titles(), "title", out);
-        appendXML(creators(), "creator", out);
-        appendXML(subjects(), "subject", out);
-        appendXML(descriptions(), "description", out);
-        appendXML(publishers(), "publisher", out);
-        appendXML(contributors(), "contributor", out);
-        appendXML(dates(), "date", out);
-        appendXML(types(), "type", out);
-        appendXML(formats(), "format", out);
+        appendXML(m_titles, "title", out);
+        appendXML(m_creators, "creator", out);
+        appendXML(m_subjects, "subject", out);
+        appendXML(m_descriptions, "description", out);
+        appendXML(m_publishers, "publisher", out);
+        appendXML(m_contributors, "contributor", out);
+        appendXML(m_dates, "date", out);
+        appendXML(m_types, "type", out);
+        appendXML(m_formats, "format", out);
         if (addPid) {
             appendXML(new DCField(targetPid), "identifier", out);
         }
-        appendXML(identifiers(), "identifier", out);
-        appendXML(sources(), "source", out);
-        appendXML(languages(), "language", out);
-        appendXML(relations(), "relation", out);
-        appendXML(coverages(), "coverage", out);
-        appendXML(rights(), "rights", out);
+        appendXML(m_identifiers, "identifier", out);
+        appendXML(m_sources, "source", out);
+        appendXML(m_languages, "language", out);
+        appendXML(m_relations, "relation", out);
+        appendXML(m_coverages, "coverage", out);
+        appendXML(m_rights, "rights", out);
         out.append("</oai_dc:dc>\n");
     }
 
     private void appendXML(List<DCField> values, String name, Appendable out)
         throws IOException {
+        if (values == null || values.size() == 0) return;
         for (DCField value : values) {
             appendXML(value, name, out);
         }

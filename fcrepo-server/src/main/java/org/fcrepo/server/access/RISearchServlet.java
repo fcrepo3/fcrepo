@@ -29,6 +29,7 @@ import org.fcrepo.server.errors.servletExceptionExtensions.InternalError500Excep
 import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
 import org.fcrepo.server.resourceIndex.ResourceIndex;
 import org.fcrepo.server.security.Authorization;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trippi.RDFFormat;
@@ -129,7 +130,7 @@ extends SpringAccessServlet {
             try {
                 response.setContentType("text/html; charset=UTF-8");
                 response.setStatus(500);
-                StringWriter sWriter = new StringWriter();
+                ReadableCharArrayWriter sWriter = new ReadableCharArrayWriter();
                 PrintWriter out = new PrintWriter(sWriter);
                 out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
                 out.print("<error context=\"");
@@ -147,7 +148,7 @@ extends SpringAccessServlet {
                 PrintWriter reallyOut = new PrintWriter(
                         new OutputStreamWriter(
                                 response.getOutputStream(), "UTF-8"));
-                m_styler.sendError(sWriter.toString(), reallyOut);
+                m_styler.sendError(sWriter.toReader(), reallyOut);
                 reallyOut.flush();
                 reallyOut.close();
             } catch (Exception e2) {
@@ -266,7 +267,7 @@ extends SpringAccessServlet {
             String contextPath)
                     throws Exception {
         try {
-            StringWriter sWriter = new StringWriter();
+            ReadableCharArrayWriter sWriter = new ReadableCharArrayWriter();
             PrintWriter sout = new PrintWriter(sWriter);
             sout.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             TriplestoreReader reader = server.getReader();
@@ -334,7 +335,7 @@ extends SpringAccessServlet {
             sout.println("  </tuple-output-formats>");
             sout.println("</query-service>");
             sout.flush();
-            m_styler.sendForm(sWriter.toString(), out);
+            m_styler.sendForm(sWriter.toReader(), out);
         } finally {
             try {
                 out.flush();

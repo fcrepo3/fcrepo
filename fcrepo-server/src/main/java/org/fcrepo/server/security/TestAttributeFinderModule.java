@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.attr.AttributeDesignator;
-import com.sun.xacml.attr.StringAttribute;
 
 /**
  * @author Bill Niebel
@@ -67,7 +66,7 @@ class TestAttributeFinderModule
         logger.debug("getAttributeLocally test");
         logger.debug("TestAttributeFinderModule attributeId={}", attributeId);
         Object values = null;
-        logger.debug("designatorType" + designatorType);
+        logger.debug("designatorType{}", designatorType);
         if (designatorType == AttributeDesignator.ENVIRONMENT_TARGET) {
             if (ATTRIBUTE_ID.equals(attributeId)) {
                 values = ATTRIBUTE_VALUE;
@@ -77,10 +76,10 @@ class TestAttributeFinderModule
         } else {
             values = null;
         }
-        if (values instanceof String) {
-            logger.debug("getAttributeLocally string value={}", (String) values);
+        if (values != null) {
+            logger.debug("getAttributeLocally string value={}", values);
         } else {
-            logger.debug("getAttributeLocally object value={}", values);
+            logger.debug("getAttributeLocally object value=null");
         }
         return values;
     }

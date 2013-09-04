@@ -9,10 +9,12 @@ import static org.fcrepo.server.utilities.StreamUtility.enc;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
@@ -480,12 +482,15 @@ public class DefaultSerializer {
             int maxResults,
             FieldSearchResult result,
             Appendable html) throws IOException {
-        HashSet<String> fieldHash = new HashSet<String>();
+        Set<String> fieldHash;
 
         if (wantedFields != null) {
+            fieldHash = new HashSet<String>(wantedFields.length);
             for (String wf : wantedFields) {
                 fieldHash.add(wf);
             }
+        } else {
+            fieldHash = Collections.emptySet();
         }
 
         html.append("<html><head><title>Search Repository</title></head>"

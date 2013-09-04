@@ -121,17 +121,6 @@ public class DatastreamResolverServlet
         }
     }
 
-    private static final boolean contains(String[] array, String item) {
-        boolean contains = false;
-        for (String element : array) {
-            if (element.equals(item)) {
-                contains = true;
-                break;
-            }
-        }
-        return contains;
-    }
-
     public static final String ACTION_LABEL = "Resolve Datastream";
 
     /**

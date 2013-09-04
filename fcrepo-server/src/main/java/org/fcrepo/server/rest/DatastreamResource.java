@@ -312,7 +312,7 @@ public class DatastreamResource
                                         logMessage);
 
             // convert purged into a String[] so we can return it as a JSON array
-            List<String> results = new ArrayList<String>();
+            List<String> results = new ArrayList<String>(purged.length);
             for (Date d : purged) {
                 results.add(DateUtility.convertDateToXSDString(d));
             }

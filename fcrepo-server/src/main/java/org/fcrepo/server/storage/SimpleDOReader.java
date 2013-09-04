@@ -6,8 +6,6 @@ package org.fcrepo.server.storage;
 
 import static org.fcrepo.common.Constants.MODEL;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,6 +55,14 @@ public class SimpleDOReader
 
     private static final Logger logger =
             LoggerFactory.getLogger(SimpleDOReader.class);
+    
+    private static final Datastream[] DATASTREAM_TYPE =
+            new Datastream[0];
+
+    private static final Date[] DATE_TYPE =
+            new Date[0];
+    
+    private static final String[] STRING_TYPE = new String[0];
 
     protected final DigitalObject m_obj;
 
@@ -254,8 +260,9 @@ public class SimpleDOReader
     @Override
     public List<String> getContentModels() throws ServerException {
 
-        List<String> list = new ArrayList<String>();
-        for (RelationshipTuple rel : getRelationships(MODEL.HAS_MODEL,null)) {
+        Set<RelationshipTuple> rels = getRelationships(MODEL.HAS_MODEL,null); 
+        List<String> list = new ArrayList<String>(rels.size());
+        for (RelationshipTuple rel : rels) {
             list.add(rel.object);
         }
         return list;
@@ -287,14 +294,7 @@ public class SimpleDOReader
                 }
             }
         }
-        iter = al.iterator();
-        String[] out = new String[al.size()];
-        int i = 0;
-        while (iter.hasNext()) {
-            out[i] = iter.next();
-            i++;
-        }
-        return out;
+        return al.toArray(STRING_TYPE);
     }
 
     /**
@@ -350,10 +350,11 @@ public class SimpleDOReader
     @Override
     public Date[] getDatastreamVersions(String datastreamID) {
         ArrayList<Date> versionDates = new ArrayList<Date>();
+        
         for (Datastream d : m_obj.datastreams(datastreamID)) {
             versionDates.add(d.DSCreateDT);
         }
-        return versionDates.toArray(new Date[0]);
+        return versionDates.toArray(DATE_TYPE);
     }
 
     /**
@@ -362,21 +363,14 @@ public class SimpleDOReader
     @Override
     public Datastream[] GetDatastreams(Date versDateTime, String state) {
         String[] ids = ListDatastreamIDs(null);
-        ArrayList<Datastream> al = new ArrayList<Datastream>();
+        ArrayList<Datastream> al = new ArrayList<Datastream>(ids.length);
         for (String element : ids) {
             Datastream ds = GetDatastream(element, versDateTime);
             if (ds != null && (state == null || ds.DSState.equals(state))) {
                 al.add(ds);
             }
         }
-        Datastream[] out = new Datastream[al.size()];
-        Iterator<Datastream> iter = al.iterator();
-        int i = 0;
-        while (iter.hasNext()) {
-            out[i] = iter.next();
-            i++;
-        }
-        return out;
+        return al.toArray(DATASTREAM_TYPE);
     }
 
     /**

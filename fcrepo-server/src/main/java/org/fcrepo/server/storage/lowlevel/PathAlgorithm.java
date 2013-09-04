@@ -38,7 +38,7 @@ public abstract class PathAlgorithm {
 
     public static String decode(String encoded) throws LowlevelStorageException {
         try {
-            int i = encoded.indexOf("+");
+            int i = encoded.indexOf('+');
             if (i != -1) {
                 return Server.pidFromFilename(encoded.substring(0, i))
                         .toString()

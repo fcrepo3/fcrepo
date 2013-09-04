@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
+import org.apache.commons.io.IOUtils;
 import org.fcrepo.common.FaultException;
 
 
@@ -106,6 +107,24 @@ public abstract class Base64 {
      */
     public static byte[] decode(String in) {
         return decode(getBytes(in));
+    }
+    
+    /**
+     * Decode an input stream of b64-encoded data to an array of bytes. 
+     * @param in
+     * @return the decoded bytes, or null if there was an error reading the bytes
+     */
+    public static byte[] decode(InputStream in) {
+        try {
+            return IOUtils.toByteArray(decodeToStream(in));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public static InputStream decodeToStream(InputStream in) {
+        return new org.apache.commons.codec.binary.Base64InputStream(in, false);
     }
 
     /**

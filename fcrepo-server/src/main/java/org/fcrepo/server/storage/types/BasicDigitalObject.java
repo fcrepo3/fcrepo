@@ -145,7 +145,10 @@ public class BasicDigitalObject
     }
 
     private static <T> Set<String> copyOfKeysForNonEmptyLists(Map<String, List<T>> map) {
-        Set<String> set = new LinkedHashSet<String>();
+        if (map == null || map.size() == 0) {
+            return Collections.emptySet();
+        }
+        Set<String> set = new LinkedHashSet<String>(map.size());
 
         for (Map.Entry<String, List<T>> e : map.entrySet()) {
             if (!e.getValue().isEmpty()) {
@@ -158,12 +161,11 @@ public class BasicDigitalObject
     public Iterable<Datastream> datastreams(String id) {
 
         if (!m_datastreams.containsKey(id)) {
-            return new ArrayList<Datastream>();
+            return Collections.emptyList();
         }
 
         return Collections
-                .unmodifiableList(new ArrayList<Datastream>(m_datastreams
-                        .get(id)));
+                .unmodifiableList(new ArrayList<Datastream>(m_datastreams.get(id)));
     }
 
     public void removeDatastreamVersion(Datastream ds) {
@@ -240,20 +242,20 @@ public class BasicDigitalObject
     }
 
     public String newDatastreamID(String id) {
-        List<String> versionIDs = new ArrayList<String>();
-        Iterator<Datastream> iter = (m_datastreams.get(id)).iterator();
-        while (iter.hasNext()) {
-            Datastream ds = iter.next();
-            versionIDs.add(ds.DSVersionID);
+        Iterator<String> iter = null;
+        if (m_datastreams.containsKey(id)) {
+            List<String> versionIDs = new ArrayList<String>(m_datastreams.get(id).size());
+            for (Datastream ds: m_datastreams.get(id)) {
+                versionIDs.add(ds.DSVersionID);
+            }
+            iter = versionIDs.iterator();
         }
-        return newID(versionIDs.iterator(), id.concat("."));
+        return newID(iter, id.concat("."));
     }
 
     public String newAuditRecordID() {
-        ArrayList<String> auditIDs = new ArrayList<String>();
-        Iterator<AuditRecord> iter = m_auditRecords.iterator();
-        while (iter.hasNext()) {
-            AuditRecord record = iter.next();
+        ArrayList<String> auditIDs = new ArrayList<String>(m_auditRecords.size());
+        for (AuditRecord record: m_auditRecords) {
             auditIDs.add(record.id);
         }
         return newID(auditIDs.iterator(), "AUDREC");
@@ -314,7 +316,6 @@ public class BasicDigitalObject
     public Set<RelationshipTuple> getRelationships(SubjectNode subject,
                                                    PredicateNode predicate,
                                                    ObjectNode object) {
-        Set<RelationshipTuple> foundRels = new HashSet<RelationshipTuple>();
 
         if (m_rels == null) {
             readRels();
@@ -324,6 +325,7 @@ public class BasicDigitalObject
 
         // Iterate explicit relationships, finding matches and
         // determining whether the object has an explicit basic cmodel.
+        Set<RelationshipTuple> foundRels = new HashSet<RelationshipTuple>(m_rels.size());
 
         for (RelationshipTuple t : m_rels) {
 
@@ -379,7 +381,7 @@ public class BasicDigitalObject
     public List<String> getContentModels() {
         Set<RelationshipTuple> cmTubles = getRelationships(Constants.MODEL.HAS_MODEL,
                                                            null);
-        List<String> cms = new ArrayList<String>();
+        List<String> cms = new ArrayList<String>(cmTubles.size());
         for (RelationshipTuple cmTuble:cmTubles){
             cms.add(cmTuble.object);
         }
@@ -398,15 +400,17 @@ public class BasicDigitalObject
      */
     private String newID(Iterator<String> iter, String start) {
         int highest = 0;
-        while (iter.hasNext()) {
-            String id = iter.next();
-            if (id.startsWith(start) && id.length() > start.length()) {
-                try {
-                    int num = Integer.parseInt(id.substring(start.length()));
-                    if (num > highest) {
-                        highest = num;
+        if (iter != null) {
+            while (iter.hasNext()) {
+                String id = iter.next();
+                if (id.startsWith(start) && id.length() > start.length()) {
+                    try {
+                        int num = Integer.parseInt(id.substring(start.length()));
+                        if (num > highest) {
+                            highest = num;
+                        }
+                    } catch (NumberFormatException ignored) {
                     }
-                } catch (NumberFormatException ignored) {
                 }
             }
         }

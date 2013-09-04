@@ -161,13 +161,13 @@ public class FedoraAPIAImpl
         Context context = ReadOnlyContext.getSoapContext(ctx);
         assertInitialized();
         try {
-            String[] sDefs = m_access.getObjectHistory(context, pid);
-            if (sDefs != null && debug) {
-                for (int i = 0; i < sDefs.length; i++) {
-                    LOG.debug("sDef[{}] = {}", i, sDefs[i]);
+            String[] changeTimestamps = m_access.getObjectHistory(context, pid);
+            if (changeTimestamps != null && debug) {
+                for (int i = 0; i < changeTimestamps.length; i++) {
+                    LOG.debug("changeTimestamps[{}] = {}", i, changeTimestamps[i]);
                 }
             }
-            return sDefs == null ? null : Arrays.asList(new String[0]);
+            return changeTimestamps == null ? null : Arrays.asList(changeTimestamps);
         } catch (Throwable th) {
             LOG.error("Error getting object history", th);
             throw CXFUtility.getFault(th);

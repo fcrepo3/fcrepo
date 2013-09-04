@@ -5,6 +5,7 @@
 package org.fcrepo.server.storage;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public abstract class RDFRelationshipReader {
             throws ServerException {
 
         if (ds == null) {
-            return new HashSet<RelationshipTuple>();
+            return Collections.emptySet();
         }
 
         try {
@@ -37,13 +38,7 @@ public abstract class RDFRelationshipReader {
     public static Set<RelationshipTuple> readRelationships(InputStream dsContent)
             throws TrippiException {
 
-        Set<Triple> triples =
-                TripleIteratorFactory.defaultInstance().allAsSet(dsContent, null, RDFFormat.RDF_XML);
-        Set<RelationshipTuple> tuples =
-                new HashSet<RelationshipTuple>(triples.size());
-        for (Triple triple: triples) {
-            tuples.add(RelationshipTuple.fromTriple(triple));
-        }
-        return tuples;
+        return TripleIteratorFactory.defaultInstance().allAsSet(dsContent, null,
+                        RDFFormat.RDF_XML, RelationshipTuple.TRANSFORMER);
     }
 }

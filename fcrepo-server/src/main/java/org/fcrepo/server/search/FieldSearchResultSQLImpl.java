@@ -221,14 +221,14 @@ public class FieldSearchResultSQLImpl
         return whereClause.toString();
     }
 
-    private String getWhereClause(List conditions) throws QueryParseException {
+    private String getWhereClause(List<Condition> conditions) throws QueryParseException {
         StringBuffer whereClause = new StringBuffer();
         boolean willJoin = false;
         if (conditions.size() > 0) {
             boolean needsEscape = false;
             whereClause.append(" WHERE");
             for (int i = 0; i < conditions.size(); i++) {
-                Condition cond = (Condition) conditions.get(i);
+                Condition cond = conditions.get(i);
                 if (i > 0) {
                     whereClause.append(" AND");
                 }
@@ -372,7 +372,7 @@ public class FieldSearchResultSQLImpl
     protected void step() throws UnrecognizedFieldException,
             ObjectIntegrityException, RepositoryConfigurationException,
             StreamIOException, ServerException {
-        m_objectFields = new ArrayList();
+        m_objectFields = new ArrayList<ObjectFields>();
         int resultCount = 0;
         // Run through resultSet, adding each result to m_objectFields
         // for up to maxResults objects, or until the result set is
@@ -532,7 +532,7 @@ public class FieldSearchResultSQLImpl
         return f;
     }
 
-    public List objectFieldsList() {
+    public List<ObjectFields> objectFieldsList() {
         return m_objectFields;
     }
 
@@ -726,7 +726,10 @@ public class FieldSearchResultSQLImpl
     private static final String dcFixup(String st) {
         String dcFixed;
         if (isDCProp(st)) {
-            dcFixed = "dc" + st.substring(0, 1).toUpperCase() + st.substring(1);
+            StringBuilder sb = new StringBuilder(st.length() + 2);
+            sb.append("dc").append(Character.toUpperCase(st.charAt(0)));
+            sb.append(st, 1, st.length());
+            dcFixed = sb.toString();
         } else {
             dcFixed = st;
         }

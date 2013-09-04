@@ -77,7 +77,7 @@ public class AuthZHttpRequestAttributesFilter implements Filter {
 					.getHeaders(name); retrievedheadervalues.hasMoreElements();) {
 				logger.debug("Retrieved header with name: {}", name);
 				String value = retrievedheadervalues.nextElement();
-				logger.debug("Now adding value: " + value + " to field " + name);
+				logger.debug("Now adding value: {} to field {}", value, name);
 
 				headervalues.add(value);
 			}
