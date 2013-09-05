@@ -110,7 +110,7 @@ public class Rebuild implements Constants, Runnable {
 
     public void run() {
         try {
-            if (m_options != null) {
+            if (m_options != null && m_rebuilder != null) {
                 System.err.println();
                 System.err.println("Rebuilding...");
                 try {
@@ -151,6 +151,7 @@ public class Rebuild implements Constants, Runnable {
                                 " objects failed to rebuild due to errors.");
                     }
                 } finally {
+                    System.out.println("Exiting without rebuilding.");
                     m_rebuilder.finish();
                     if (server != null) {
                         server.shutdown(null);
@@ -160,11 +161,18 @@ public class Rebuild implements Constants, Runnable {
                     System.err.println();
                 }
                 return;
+            } else {
+                if (server != null) {
+                    server.shutdown(null);
+                    server = null;
+                }
             }
         } catch (Exception e) {
             System.err.println("Rebuild failed:");
             System.err.println(e.toString());
             e.printStackTrace(System.err);
+        } finally {
+            
         }
     }
 
