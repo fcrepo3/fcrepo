@@ -89,7 +89,7 @@ public class MultiValueMap {
      * @return first available value
      */
     public String getString(String name) {
-        return attributes.get(name)[0];
+         return (attributes.containsKey(name)) ? attributes.get(name)[0] : null;
     }
 
     public String[] getStringArray(String name) {
