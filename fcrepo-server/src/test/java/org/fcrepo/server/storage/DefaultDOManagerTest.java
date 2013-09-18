@@ -343,13 +343,21 @@ public class DefaultDOManagerTest
               } catch( IOException ex ) {
                   ex.printStackTrace();
               }
-          } catch ( ObjectLockedException | ObjectExistsException ex ) {
-              LOGGER.info( "{} - thread caught expected exception: {}", Thread.currentThread().getName(), ex );
+          } catch ( ObjectLockedException ole ) {
+              LOGGER.info( "{} - thread caught expected exception: {}", Thread.currentThread().getName(), ole );
               expectedFailures.incrementAndGet();
               try {
                   in.close();
               } catch( IOException ioe ) {
-                  ex.printStackTrace();
+                  ole.printStackTrace();
+              }
+          } catch (ObjectExistsException oee ) {
+              LOGGER.info( "{} - thread caught expected exception: {}", Thread.currentThread().getName(), oee );
+              expectedFailures.incrementAndGet();
+              try {
+                  in.close();
+              } catch( IOException ioe ) {
+                  oee.printStackTrace();
               }
           } catch( Exception ex ) {
               LOGGER.error( Thread.currentThread().getName() + " - Exception", ex);

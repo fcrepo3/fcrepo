@@ -110,7 +110,7 @@ public class Rebuild implements Constants, Runnable {
 
     public void run() {
         try {
-            if (m_options != null) {
+            if (m_options != null && m_rebuilder != null) {
                 System.err.println();
                 System.err.println("Rebuilding...");
                 try {
@@ -160,11 +160,19 @@ public class Rebuild implements Constants, Runnable {
                     System.err.println();
                 }
                 return;
+            } else {
+                System.out.println("Exiting without rebuilding.");
+                if (server != null) {
+                    server.shutdown(null);
+                    server = null;
+                }
             }
         } catch (Exception e) {
             System.err.println("Rebuild failed:");
             System.err.println(e.toString());
             e.printStackTrace(System.err);
+        } finally {
+            
         }
     }
 
@@ -276,11 +284,11 @@ public class Rebuild implements Constants, Runnable {
         }
         labels[i] = "Exit";
         int choiceNum = i;
-        System.out.println("Getting rebuilder... " +
-                System.getProperty("rebuilder"));
         if (System.getProperty("rebuilder") == null) {
             choiceNum = getChoice("What do you want to do?", labels);
         } else {
+            System.out.println("Getting rebuilder... " +
+                    System.getProperty("rebuilder"));
             for (int j = 0; j < rebuilders.length; j++) {
                 if (rebuilders[j].equals(System.getProperty("rebuilder"))) {
                     choiceNum = j;
