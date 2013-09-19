@@ -20,6 +20,8 @@ import org.fcrepo.server.errors.authorization.AuthzPermittedException;
  */
 public abstract class RootException
         extends ServletException {
+    
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private final HttpServletRequest request;
 
@@ -105,7 +107,7 @@ public abstract class RootException
             return new InternalError500Exception(request,
                                                  action,
                                                  "bug revealed in throwServletException(ae,...)",
-                                                 new String[0]);
+                                                 EMPTY_STRING_ARRAY);
         }
     }
 

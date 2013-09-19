@@ -424,7 +424,7 @@ public class METSFedoraExtDODeserializer
                 m_dsFormatURI = grab(a, METS.uri, "FORMAT_URI");
                 String altIDs = grab(a, METS.uri, "ALT_IDS");
                 if (altIDs.length() == 0) {
-                    m_dsAltIDs = new String[0];
+                    m_dsAltIDs = EMPTY_STRING_ARRAY;
                 } else {
                     m_dsAltIDs = altIDs.split(" ");
                 }
@@ -449,7 +449,7 @@ public class METSFedoraExtDODeserializer
                 m_dsMimeType = "";
                 m_dsControlGrp = "";
                 m_dsFormatURI = "";
-                m_dsAltIDs = new String[0];
+                m_dsAltIDs = EMPTY_STRING_ARRAY;
                 m_dsState = grab(a, METS.uri, "STATUS");
                 m_dsSize = -1;
                 m_dsChecksum = "";
@@ -504,7 +504,7 @@ public class METSFedoraExtDODeserializer
                 }
                 String altIDs = grab(a, METS.uri, "ALT_IDS");
                 if (altIDs.length() == 0) {
-                    m_dsAltIDs = new String[0];
+                    m_dsAltIDs = EMPTY_STRING_ARRAY;
                 } else {
                     m_dsAltIDs = altIDs.split(" ");
                 }
@@ -1233,7 +1233,7 @@ public class METSFedoraExtDODeserializer
         m_dsCreateDate = null;
         m_dsState = "";
         m_dsFormatURI = "";
-        m_dsAltIDs = new String[0];
+        m_dsAltIDs = EMPTY_STRING_ARRAY;
         m_dsSize = -1;
         m_dsLocationType = "";
         m_dsLocation = "";

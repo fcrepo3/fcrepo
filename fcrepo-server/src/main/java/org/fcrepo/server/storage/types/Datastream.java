@@ -32,6 +32,8 @@ public class Datastream {
 
     private static final Logger logger =
             LoggerFactory.getLogger(Datastream.class);
+    
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     public final static String CHECKSUMTYPE_DISABLED = "DISABLED";
 
@@ -47,7 +49,7 @@ public class Datastream {
 
     public String DatastreamID;
 
-    public String[] DatastreamAltIDs = new String[0];
+    public String[] DatastreamAltIDs = EMPTY_STRING_ARRAY;
 
     public String DSFormatURI;
 

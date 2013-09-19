@@ -408,7 +408,7 @@ public class DefaultManagement
         // empty altIDs are allowed. assume they meant String[0] if they provide
         // it as null.
         if (altIDs == null) {
-            altIDs = new String[0];
+            altIDs = EMPTY_STRING_ARRAY;
         }
 
         // If the datastream ID is not specified directly, see

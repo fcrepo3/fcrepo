@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -161,14 +162,14 @@ public class FieldSearchServlet
                                                request);
 
             String[] fieldsArray = getFieldsArray(request);
-            HashSet<String> fieldHash;
+            Set<String> fieldHash;
             if (fieldsArray != null) {
                 fieldHash = new HashSet<String>(fieldsArray.length);
                 for (String element : fieldsArray) {
                     fieldHash.add(element);
                 }
             } else {
-                fieldHash = new HashSet<String>(0);
+                fieldHash = Collections.emptySet();
             }
             String terms = request.getParameter("terms");
             String query = request.getParameter("query");
@@ -188,7 +189,7 @@ public class FieldSearchServlet
                     throw new BadRequest400Exception(request,
                                                      ACTION_LABEL,
                                                      "",
-                                                     new String[0]);
+                                                     EMPTY_STRING_ARRAY);
                 }
             }
 
@@ -305,7 +306,7 @@ public class FieldSearchServlet
             throw RootException.getServletException(ae,
                                                     request,
                                                     ACTION_LABEL,
-                                                    new String[0]);
+                                                    EMPTY_STRING_ARRAY);
         } catch (ServletException e) {
             throw e;
         } catch (Throwable th) {
@@ -314,7 +315,7 @@ public class FieldSearchServlet
                                                 request,
                                                 actionLabel,
                                                 "",
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
         }
     }
     
@@ -358,7 +359,7 @@ public class FieldSearchServlet
         html.append("</tr>");
     }
     
-    private void printSearchFormToHtml(HashSet<String> fieldHash, String terms, String query, PrintWriter html) {
+    private void printSearchFormToHtml(Set<String> fieldHash, String terms, String query, PrintWriter html) {
         html.append("<form method=\"post\" action=\"search\">"
                 + "<center><table border=0 cellpadding=6 cellspacing=0>\n"
                 + "<tr><td colspan=3 valign=top><i>Fields to display:</i></td><td></td></tr>"
@@ -511,7 +512,7 @@ public class FieldSearchServlet
     }
     
     private void printHiddenFieldsFormToHtml(FieldSearchResult fsr, 
-            HashSet<String> fieldHash, long maxResults, PrintWriter html) {
+            Set<String> fieldHash, long maxResults, PrintWriter html) {
         if (fsr != null && fsr.getToken() != null) {
             if (fsr.getCursor() != -1) {
                 long viewingStart = fsr.getCursor() + 1;

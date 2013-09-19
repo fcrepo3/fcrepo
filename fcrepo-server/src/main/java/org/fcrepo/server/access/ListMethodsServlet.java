@@ -152,7 +152,7 @@ public class ListMethodsServlet
                 throw new BadRequest400Exception(request,
                                                  ACTION_LABEL,
                                                  "",
-                                                 new String[0]);
+                                                 EMPTY_STRING_ARRAY);
             }
             if (URIArray.length == 7) {
                 // Request is a versioned listMethods request
@@ -163,7 +163,7 @@ public class ListMethodsServlet
                     throw new BadRequest400Exception(request,
                                                      ACTION_LABEL,
                                                      "",
-                                                     new String[0]);
+                                                     EMPTY_STRING_ARRAY);
                 }
                 asOfDateTime = versDateTime;
             }
@@ -174,7 +174,7 @@ public class ListMethodsServlet
             throw new BadRequest400Exception(request,
                                              ACTION_LABEL,
                                              "",
-                                             new String[0]);
+                                             EMPTY_STRING_ARRAY);
         }
 
         if (request.getParameter("xml") != null) {
@@ -192,7 +192,7 @@ public class ListMethodsServlet
             throw new NotFound404Exception(request,
                                            ACTION_LABEL,
                                            "",
-                                           new String[0]);
+                                           EMPTY_STRING_ARRAY);
         } catch (DisseminationException e) {
             logger.error("Error Listing Methods: " + requestURI + " (actionLabel="
                     + ACTION_LABEL + ")", e);
@@ -201,20 +201,20 @@ public class ListMethodsServlet
                                            request,
                                            ACTION_LABEL,
                                            "",
-                                           new String[0]);
+                                           EMPTY_STRING_ARRAY);
         } catch (ObjectNotInLowlevelStorageException e) {
             logger.error("Object not found for request: " + requestURI
                     + " (actionLabel=" + ACTION_LABEL + ")", e);
             throw new NotFound404Exception(request,
                                            ACTION_LABEL,
                                            "",
-                                           new String[0]);
+                                           EMPTY_STRING_ARRAY);
         } catch (AuthzException ae) {
             logger.error("Authorization error listing methods", ae);
             throw RootException.getServletException(ae,
                                                     request,
                                                     ACTION_LABEL,
-                                                    new String[0]);
+                                                    EMPTY_STRING_ARRAY);
         } catch (Throwable th) {
             logger.error("Error listing methods", th);
             throw new InternalError500Exception("Error listing methods",
@@ -222,7 +222,7 @@ public class ListMethodsServlet
                                                 request,
                                                 ACTION_LABEL,
                                                 "",
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
         }
     }
 

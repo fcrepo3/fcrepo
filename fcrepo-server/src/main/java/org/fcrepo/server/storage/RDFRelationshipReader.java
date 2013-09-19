@@ -6,7 +6,6 @@ package org.fcrepo.server.storage;
 
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.fcrepo.server.errors.GeneralException;
@@ -17,6 +16,7 @@ import org.jrdf.graph.Triple;
 import org.trippi.RDFFormat;
 import org.trippi.TrippiException;
 import org.trippi.io.TripleIteratorFactory;
+import org.trippi.io.transform.impl.TripleReflector;
 
 
 public abstract class RDFRelationshipReader {
@@ -40,5 +40,11 @@ public abstract class RDFRelationshipReader {
 
         return TripleIteratorFactory.defaultInstance().allAsSet(dsContent, null,
                         RDFFormat.RDF_XML, RelationshipTuple.TRANSFORMER);
+    }
+    
+    public static Set<Triple> readTriples(InputStream dsContent)
+            throws TrippiException {
+        return TripleIteratorFactory.defaultInstance().allAsSet(dsContent, null,
+                RDFFormat.RDF_XML, TripleReflector.instance);
     }
 }

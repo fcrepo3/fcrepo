@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 public class FilterLdap
         extends BaseCaching {
 
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
+    
     public static final String CONTEXT_VERSION_KEY = "java.naming.ldap.version";
 
     public static final String VERSION_KEY = "version";
@@ -105,7 +107,7 @@ public class FilterLdap
             if (!initErrors) {
                 Set temp = new HashSet();
                 if (ATTRIBUTES2RETURN == null) {
-                    ATTRIBUTES2RETURN = new String[0];
+                    ATTRIBUTES2RETURN = EMPTY_STRING_ARRAY;
                 } else {
                     for (String element : ATTRIBUTES2RETURN) {
                         temp.add(element);

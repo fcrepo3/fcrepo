@@ -1675,7 +1675,7 @@ public class FedoraAccessSoapServlet {
 //
 //        private String PID = null;
 //
-//        private String[] objectHistoryArray = new String[0];
+//        private String[] objectHistoryArray = EMPTY_STRING_ARRAY;
 //
 //        /**
 //         * <p>

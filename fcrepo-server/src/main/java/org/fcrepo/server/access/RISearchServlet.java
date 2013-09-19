@@ -56,6 +56,8 @@ extends SpringAccessServlet {
             LoggerFactory.getLogger(RISearchServlet.class);
 
     private static final String ACTION_LABEL = "Resource Index Search";
+    
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private Authorization m_authorization;
 
@@ -214,7 +216,7 @@ extends SpringAccessServlet {
             throw RootException.getServletException(e,
                     request,
                     ACTION_LABEL,
-                    new String[0]);
+                    EMPTY_STRING_ARRAY);
         } catch (Throwable th) {
             logger.error("Unexpected error servicing API-A request", th);
             throw new InternalError500Exception("",
@@ -222,7 +224,7 @@ extends SpringAccessServlet {
                     request,
                     ACTION_LABEL,
                     "",
-                    new String[0]);
+                    EMPTY_STRING_ARRAY);
         }
     }
 

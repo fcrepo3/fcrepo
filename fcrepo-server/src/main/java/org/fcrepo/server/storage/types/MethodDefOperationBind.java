@@ -22,12 +22,12 @@ public class MethodDefOperationBind
 
     public String operationURL = null;
 
-    public String[] dsBindingKeys = new String[0];
+    public String[] dsBindingKeys = EMPTY_STRING_ARRAY;
 
     /**
      * Possible response MIME types.
      */
-    public String[] outputMIMETypes = new String[0];
+    public String[] outputMIMETypes = EMPTY_STRING_ARRAY;
 
     public MethodDefOperationBind() {
     }

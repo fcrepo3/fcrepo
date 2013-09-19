@@ -486,7 +486,7 @@ public class AtomDODeserializer
     private String[] getDSAltIds(Entry entry) {
         List<Category> altIds = entry.getCategories(MODEL.ALT_IDS.uri);
         if (altIds.isEmpty()) {
-            return new String[0];
+            return EMPTY_STRING_ARRAY;
         } else {
             return altIds.get(0).getTerm().split(" ");
             // TODO we could handle size > 1

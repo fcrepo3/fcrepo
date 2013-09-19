@@ -117,7 +117,7 @@ public class GetObjectHistoryServlet
             throw new BadRequest400Exception(request,
                                              ACTION_LABEL,
                                              "",
-                                             new String[0]);
+                                             EMPTY_STRING_ARRAY);
         }
 
         PID = URIArray[5];
@@ -146,7 +146,7 @@ public class GetObjectHistoryServlet
             throw new NotFound404Exception(request,
                                            ACTION_LABEL,
                                            "",
-                                           new String[0]);
+                                           EMPTY_STRING_ARRAY);
         } catch (ObjectNotInLowlevelStorageException e) {
             logger.error("Object not found for request: "
                     + request.getRequestURI() + " (actionLabel=" + ACTION_LABEL
@@ -154,12 +154,12 @@ public class GetObjectHistoryServlet
             throw new NotFound404Exception(request,
                                            ACTION_LABEL,
                                            "",
-                                           new String[0]);
+                                           EMPTY_STRING_ARRAY);
         } catch (AuthzException ae) {
             throw RootException.getServletException(ae,
                                                     request,
                                                     ACTION_LABEL,
-                                                    new String[0]);
+                                                    EMPTY_STRING_ARRAY);
         } catch (Throwable th) {
             logger.error("Unexpected error servicing API-A request", th);
             throw new InternalError500Exception("",
@@ -167,7 +167,7 @@ public class GetObjectHistoryServlet
                                                 request,
                                                 ACTION_LABEL,
                                                 "",
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
         }
     }
 
@@ -178,7 +178,7 @@ public class GetObjectHistoryServlet
             throws ServerException {
 
         OutputStreamWriter out = null;
-        String[] objectHistory = new String[0];
+        String[] objectHistory = EMPTY_STRING_ARRAY;
         PipedWriter pw = null;
         PipedReader pr = null;
 
@@ -266,7 +266,7 @@ public class GetObjectHistoryServlet
 
         private PipedWriter pw = null;
 
-        private String[] objectHistory = new String[0];
+        private String[] objectHistory = EMPTY_STRING_ARRAY;
 
         private String PID = null;
 

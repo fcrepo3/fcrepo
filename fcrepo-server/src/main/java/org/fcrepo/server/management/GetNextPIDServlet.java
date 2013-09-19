@@ -144,7 +144,7 @@ public class GetNextPIDServlet
             throw RootException.getServletException(ae,
                                                     request,
                                                     ACTION_LABEL,
-                                                    new String[0]);
+                                                    EMPTY_STRING_ARRAY);
         } catch (Throwable th) {
             final String msg = "Unexpected error getting next PID";
             logger.error(msg, th);
@@ -153,7 +153,7 @@ public class GetNextPIDServlet
                                                 request,
                                                 ACTION_LABEL,
                                                 "Internal Error",
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
         }
     }
 

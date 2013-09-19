@@ -53,6 +53,8 @@ public class ServerController
         LoggerFactory.getLogger(DefaultManagement.class);
 
     private static final long serialVersionUID = 1L;
+    
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private static String PROTOCOL_FILE = "file:///";
 
@@ -66,7 +68,7 @@ public class ServerController
             throw new BadRequest400Exception(request,
                                              actionLabel,
                                              "no action",
-                                             new String[0]);
+                                             EMPTY_STRING_ARRAY);
         }
 
         if (action.equals("status")) {
@@ -77,7 +79,7 @@ public class ServerController
             modifyDatastreamControlGroupAction(request, response);
         } else {
             throw new BadRequest400Exception(request, actionLabel, "bad action:  "
-                                             + action, new String[0]);
+                                             + action, EMPTY_STRING_ARRAY);
         }
     }
 
@@ -90,7 +92,7 @@ public class ServerController
                 throw new InternalError500Exception(request,
                                                     actionLabel,
                                                     "server not available",
-                                                    new String[0]);
+                                                    EMPTY_STRING_ARRAY);
             }
             try {
                 m_server.status(context);
@@ -98,27 +100,27 @@ public class ServerController
                 throw new Forbidden403Exception(request,
                                                 actionLabel,
                                                 "authorization failed",
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
             } catch (AuthzDeniedException ade) {
                 throw new Forbidden403Exception(request,
                                                 actionLabel,
                                                 "authorization denied",
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
             } catch (AuthzPermittedException ape) {
                 throw new Continue100Exception(request,
                                                actionLabel,
                                                "authorization permitted",
-                                               new String[0]);
+                                               EMPTY_STRING_ARRAY);
             } catch (Throwable t) {
                 throw new InternalError500Exception(request,
                                                     actionLabel,
                                                     "error performing action2",
-                                                    new String[0]);
+                                                    EMPTY_STRING_ARRAY);
             }
             throw new Ok200Exception(request,
                                      actionLabel,
                                      "server running",
-                                     new String[0]);
+                                     EMPTY_STRING_ARRAY);
 
         }
 
@@ -131,7 +133,7 @@ public class ServerController
                 throw new InternalError500Exception(request,
                                                     actionLabel,
                                                     "server not available",
-                                                    new String[0]);
+                                                    EMPTY_STRING_ARRAY);
             }
             Authorization authModule = null;
             authModule =
@@ -140,7 +142,7 @@ public class ServerController
                 throw new InternalError500Exception(request,
                                                     actionLabel,
                                                     "Required Authorization module not available",
-                                                    new String[0]);
+                                                    EMPTY_STRING_ARRAY);
             }
             try {
                 authModule.reloadPolicies(context);
@@ -148,27 +150,27 @@ public class ServerController
                 throw new Forbidden403Exception(request,
                                                 actionLabel,
                                                 "authorization failed",
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
             } catch (AuthzDeniedException ade) {
                 throw new Forbidden403Exception(request,
                                                 actionLabel,
                                                 "authorization denied",
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
             } catch (AuthzPermittedException ape) {
                 throw new Continue100Exception(request,
                                                actionLabel,
                                                "authorization permitted",
-                                               new String[0]);
+                                               EMPTY_STRING_ARRAY);
             } catch (Throwable t) {
                 throw new InternalError500Exception(request,
                                                     actionLabel,
                                                     "error performing action2",
-                                                    new String[0]);
+                                                    EMPTY_STRING_ARRAY);
             }
             throw new Ok200Exception(request,
                                      actionLabel,
                                      "server running",
-                                     new String[0]);
+                                     EMPTY_STRING_ARRAY);
 
         }
 
@@ -207,7 +209,7 @@ public class ServerController
             throw new InternalError500Exception(request,
                                                 actionLabel,
                                                 "server not available",
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
         }
         // FIXME: see FCREPO-765 Admin methods are currently in DefaultManagement and carried through to ManagementModule
         ManagementModule apimDefault = (ManagementModule) m_server.getModule("org.fcrepo.server.management.Management");
@@ -285,13 +287,13 @@ public class ServerController
             throw new NotFound404Exception(request,
                                            actionLabel,
                                            e.getMessage(),
-                                           new String[0]);
+                                           EMPTY_STRING_ARRAY);
         } catch (DatastreamNotFoundException e) {
             logger.error("Datastream not found: " + pid + "/" + dsID + " - " + e.getMessage());
             throw new NotFound404Exception(request,
                                            actionLabel,
                                            e.getMessage(),
-                                           new String[0]);
+                                           EMPTY_STRING_ARRAY);
 
 
         } catch (GeneralException e) {
@@ -299,29 +301,29 @@ public class ServerController
             throw new InternalError500Exception(request,
                                                 actionLabel,
                                                 e.getMessage(),
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
         } catch (AuthzOperationalException aoe) {
             throw new Forbidden403Exception(request,
                                             actionLabel,
                                             "authorization failed",
-                                            new String[0]);
+                                            EMPTY_STRING_ARRAY);
         } catch (AuthzDeniedException ade) {
             throw new Forbidden403Exception(request,
                                             actionLabel,
                                             "authorization denied",
-                                            new String[0]);
+                                            EMPTY_STRING_ARRAY);
         } catch (AuthzPermittedException ape) {
             throw new Continue100Exception(request,
                                            actionLabel,
                                            "authorization permitted",
-                                           new String[0]);
+                                           EMPTY_STRING_ARRAY);
 
         } catch (ServerException e) {
             logger.error(e.getMessage(),e);
             throw new InternalError500Exception(request,
                                                 actionLabel,
                                                 "Unexpected error: " + e.getMessage(),
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
         }
 
     }

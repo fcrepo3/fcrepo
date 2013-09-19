@@ -13,6 +13,8 @@ package org.fcrepo.server.access;
  * @author Sandy Payette
  */
 public class RepositoryInfo {
+    
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     public String repositoryName = null;
 
@@ -26,7 +28,7 @@ public class RepositoryInfo {
 
     public String OAINamespace = null;
 
-    public String[] adminEmailList = new String[0];
+    public String[] adminEmailList = EMPTY_STRING_ARRAY;
 
     public String samplePID = null;
 
@@ -38,5 +40,5 @@ public class RepositoryInfo {
 
     public String sampleOAIURL = null;
 
-    public String[] retainPIDs = new String[0];
+    public String[] retainPIDs = EMPTY_STRING_ARRAY;
 }

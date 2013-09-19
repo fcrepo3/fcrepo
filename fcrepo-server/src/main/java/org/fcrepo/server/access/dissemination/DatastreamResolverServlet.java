@@ -75,6 +75,8 @@ public class DatastreamResolverServlet
             LoggerFactory.getLogger(DatastreamResolverServlet.class);
 
     private static final long serialVersionUID = 1L;
+    
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private DOManager m_manager;
 
@@ -325,7 +327,7 @@ public class DatastreamResolverServlet
                  * request.getUserPrincipal(); if (principal == null) { // no
                  * principal to grok roles from!! } else { try { roles =
                  * ReadOnlyContext.getRoles(principal); } catch (Throwable t) { } }
-                 * if (roles == null) { roles = new String[0]; }
+                 * if (roles == null) { roles = EMPTY_STRING_ARRAY; }
                  */
                 //XXXXXXXXXXXXXXXXXXXXXXxif (contains(roles, targetRole)) {
                 logger.debug("DatastreamResolverServlet: user=={}",
@@ -506,7 +508,7 @@ public class DatastreamResolverServlet
             throw RootException.getServletException(ae,
                                                     request,
                                                     ACTION_LABEL,
-                                                    new String[0]);
+                                                   EMPTY_STRING_ARRAY);
         } catch (Throwable th) {
             logger.error("Error resolving datastream", th);
             String message =

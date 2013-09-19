@@ -47,6 +47,8 @@ public class FedoraAPIMImpl
 
     private static final Logger LOG = LoggerFactory
             .getLogger(FedoraAPIMImpl.class);
+    
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     @Resource
     private WebServiceContext context;
@@ -223,7 +225,7 @@ public class FedoraAPIMImpl
             MessageContext ctx = context.getMessageContext();
             String[] altIDsArray = null;
             if (altIDs != null && altIDs.getItem() != null) {
-                altIDsArray = altIDs.getItem().toArray(new String[0]);
+                altIDsArray = altIDs.getItem().toArray(EMPTY_STRING_ARRAY);
             }
             return m_management.addDatastream(ReadOnlyContext
                                                       .getSoapContext(ctx),
@@ -275,7 +277,7 @@ public class FedoraAPIMImpl
             MessageContext ctx = context.getMessageContext();
             String[] altIDsArray = null;
             if (altIDs != null && altIDs.getItem() != null) {
-                altIDsArray = altIDs.getItem().toArray(new String[0]);
+                altIDsArray = altIDs.getItem().toArray(EMPTY_STRING_ARRAY);
             }
             return DateUtility.convertDateToString(m_management
                     .modifyDatastreamByReference(ReadOnlyContext
@@ -325,7 +327,7 @@ public class FedoraAPIMImpl
             MessageContext ctx = context.getMessageContext();
             String[] altIDsArray = null;
             if (altIDs != null && altIDs.getItem() != null) {
-                altIDsArray = altIDs.getItem().toArray(new String[0]);
+                altIDsArray = altIDs.getItem().toArray(EMPTY_STRING_ARRAY);
             }
             return DateUtility
                     .convertDateToString(m_management.modifyDatastreamByValue(ReadOnlyContext

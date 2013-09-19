@@ -5,15 +5,15 @@
 
 package org.fcrepo.server.storage.types;
 
-import org.fcrepo.common.rdf.SimpleTriple;
-import org.fcrepo.common.rdf.SimpleURIReference;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.jrdf.graph.Triple;
 import org.trippi.TripleIterator;
 import org.trippi.TrippiException;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
 
 
 public class TupleArrayTripleIterator
@@ -25,35 +25,33 @@ public class TupleArrayTripleIterator
         DEFAULT_NS.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
     }
     
-    int size = 0;
-
-    int index = 0;
-
-    ArrayList<RelationshipTuple> m_TupleArray = null;
+    Iterator<RelationshipTuple> m_tuples = null;
 
     Map<String, String> m_map = null;
-
-    public TupleArrayTripleIterator(ArrayList<RelationshipTuple> array,
+    
+    public TupleArrayTripleIterator(Iterator<RelationshipTuple> tuples,
                                     Map<String, String> map) {
-        m_TupleArray = array;
-        size = array.size();
+        m_tuples = tuples;
         m_map = map;
     }
 
-    public TupleArrayTripleIterator(ArrayList<RelationshipTuple> array) {
-        m_TupleArray = array;
-        size = array.size();
-        m_map = DEFAULT_NS;
+    public TupleArrayTripleIterator(List<RelationshipTuple> array,
+                                    Map<String, String> map) {
+        this(array.iterator(), map);
+    }
+
+    public TupleArrayTripleIterator(List<RelationshipTuple> array) {
+        this(array, DEFAULT_NS);
     }
 
     @Override
     public boolean hasNext() throws TrippiException {
-        return index < size;
+        return m_tuples.hasNext();
     }
 
     @Override
     public Triple next() throws TrippiException {
-        RelationshipTuple tuple = m_TupleArray.get(index++);
+        RelationshipTuple tuple = m_tuples.next();
         try {
             return tuple.toTriple(m_map);
         } catch (URISyntaxException e) {
@@ -63,7 +61,6 @@ public class TupleArrayTripleIterator
 
     @Override
     public void close() throws TrippiException {
-        // TODO Auto-generated method stub
-
+        // no-op
     }
 }

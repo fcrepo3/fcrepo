@@ -15,9 +15,6 @@ import java.util.Map;
 public abstract class Pluggable
         extends Parameterized {
 
-    /** an empty array of strings */
-    private final static String[] EMPTY_STRING_ARRAY = new String[] {};
-
     /**
      * Creates a Pluggable with no parameters.
      */

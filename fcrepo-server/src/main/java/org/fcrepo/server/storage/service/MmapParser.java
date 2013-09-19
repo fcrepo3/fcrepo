@@ -179,7 +179,7 @@ class MmapParser
                             Boolean.parseBoolean(attrs.getValue("required"));
                 }
                 methodMapParm.parmDefaultValue = null;
-                methodMapParm.parmDomainValues = new String[0];
+                methodMapParm.parmDomainValues = EMPTY_STRING_ARRAY;
             } else if (namespaceURI.equalsIgnoreCase(METHOD_MAP.uri)
                     && localName.equalsIgnoreCase("DefaultInputParm")) {
                 methodMapParm = new MmapMethodParmDef();
@@ -195,7 +195,7 @@ class MmapParser
                             Boolean.parseBoolean(attrs.getValue("required"));
                 }
                 methodMapParm.parmDefaultValue = attrs.getValue("defaultValue");
-                methodMapParm.parmDomainValues = new String[0];
+                methodMapParm.parmDomainValues = EMPTY_STRING_ARRAY;
             } else if (namespaceURI.equalsIgnoreCase(METHOD_MAP.uri)
                     && localName.equalsIgnoreCase("UserInputParm")) {
                 inUserInputParm = true;
@@ -272,7 +272,7 @@ class MmapParser
                     && namespaceURI.equalsIgnoreCase(METHOD_MAP.uri)
                     && localName.equalsIgnoreCase("ValidParmValues")) {
                 methodMapParm.parmDomainValues =
-                        (String[]) tmp_enum.toArray(new String[0]);
+                        (String[]) tmp_enum.toArray(EMPTY_STRING_ARRAY);
                 tmp_enum = null;
             }
         }

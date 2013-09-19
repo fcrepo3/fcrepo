@@ -33,6 +33,7 @@ public class FedoraAPIAImpl
     private static final Logger LOG = LoggerFactory
             .getLogger(FedoraAPIAImpl.class);
 
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
     @Resource
     private WebServiceContext context;
 
@@ -135,7 +136,7 @@ public class FedoraAPIAImpl
         assertInitialized();
         try {
             String[] resultFieldsArray =
-                    resultFields.getItem().toArray(new String[0]);
+                    resultFields.getItem().toArray(EMPTY_STRING_ARRAY);
 
             org.fcrepo.server.search.FieldSearchResult result =
                     m_access.findObjects(context,

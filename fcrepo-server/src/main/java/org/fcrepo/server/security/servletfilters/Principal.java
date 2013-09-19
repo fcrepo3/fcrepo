@@ -18,7 +18,9 @@ import org.slf4j.LoggerFactory;
 public class Principal
         implements java.security.Principal {
 
-    private final Logger logger = LoggerFactory.getLogger(Principal.class);
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
+    
+    private static final Logger logger = LoggerFactory.getLogger(Principal.class);
 
     private final String name;
 
@@ -50,7 +52,7 @@ public class Principal
     }
 
     public String[] getRoles() {
-        return new String[0];
+        return EMPTY_STRING_ARRAY;
     }
 
 }
