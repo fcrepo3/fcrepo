@@ -37,35 +37,35 @@ public class DCFields
         extends DefaultHandler
         implements Constants {
 
-    private ArrayList<DCField> m_titles = new ArrayList<DCField>();
+    private ArrayList<DCField> m_titles = null;
 
-    private ArrayList<DCField> m_creators = new ArrayList<DCField>();
+    private ArrayList<DCField> m_creators = null;
 
-    private ArrayList<DCField> m_subjects = new ArrayList<DCField>();
+    private ArrayList<DCField> m_subjects = null;
 
-    private ArrayList<DCField> m_descriptions = new ArrayList<DCField>();
+    private ArrayList<DCField> m_descriptions = null;
 
-    private ArrayList<DCField> m_publishers = new ArrayList<DCField>();
+    private ArrayList<DCField> m_publishers = null;
 
-    private ArrayList<DCField> m_contributors = new ArrayList<DCField>();
+    private ArrayList<DCField> m_contributors = null;
 
-    private ArrayList<DCField> m_dates = new ArrayList<DCField>();
+    private ArrayList<DCField> m_dates = null;
 
-    private ArrayList<DCField> m_types = new ArrayList<DCField>();
+    private ArrayList<DCField> m_types = null;
 
-    private ArrayList<DCField> m_formats = new ArrayList<DCField>();
+    private ArrayList<DCField> m_formats = null;
 
-    private ArrayList<DCField> m_identifiers = new ArrayList<DCField>();
+    private ArrayList<DCField> m_identifiers = null;
 
-    private ArrayList<DCField> m_sources = new ArrayList<DCField>();
+    private ArrayList<DCField> m_sources = null;
 
-    private ArrayList<DCField> m_languages = new ArrayList<DCField>();
+    private ArrayList<DCField> m_languages = null;
 
-    private ArrayList<DCField> m_relations = new ArrayList<DCField>();
+    private ArrayList<DCField> m_relations = null;
 
-    private ArrayList<DCField> m_coverages = new ArrayList<DCField>();
+    private ArrayList<DCField> m_coverages = null;
 
-    private ArrayList<DCField> m_rights = new ArrayList<DCField>();
+    private ArrayList<DCField> m_rights = null;
 
     private StringBuffer m_currentContent;
     
@@ -143,21 +143,21 @@ public class DCFields
     public Map<RDFName, List<DCField>> getMap() {
         Map<RDFName, List<DCField>> map = new HashMap<RDFName, List<DCField>>(15);
 
-        map.put(DC.TITLE, m_titles);
-        map.put(DC.CREATOR, m_creators);
-        map.put(DC.SUBJECT, m_subjects);
-        map.put(DC.DESCRIPTION, m_descriptions);
-        map.put(DC.PUBLISHER, m_publishers);
-        map.put(DC.CONTRIBUTOR, m_contributors);
-        map.put(DC.DATE, m_dates);
-        map.put(DC.TYPE, m_types);
-        map.put(DC.FORMAT, m_formats);
-        map.put(DC.IDENTIFIER, m_identifiers);
-        map.put(DC.SOURCE, m_sources);
-        map.put(DC.LANGUAGE, m_languages);
-        map.put(DC.RELATION, m_relations);
-        map.put(DC.COVERAGE, m_coverages);
-        map.put(DC.RIGHTS, m_rights);
+        if (m_titles != null) map.put(DC.TITLE, m_titles);
+        if (m_creators != null) map.put(DC.CREATOR, m_creators);
+        if (m_subjects != null) map.put(DC.SUBJECT, m_subjects);
+        if (m_descriptions != null) map.put(DC.DESCRIPTION, m_descriptions);
+        if (m_publishers != null) map.put(DC.PUBLISHER, m_publishers);
+        if (m_contributors != null) map.put(DC.CONTRIBUTOR, m_contributors);
+        if (m_dates != null) map.put(DC.DATE, m_dates);
+        if (m_types != null) map.put(DC.TYPE, m_types);
+        if (m_formats != null) map.put(DC.FORMAT, m_formats);
+        if (m_identifiers != null) map.put(DC.IDENTIFIER, m_identifiers);
+        if (m_sources != null) map.put(DC.SOURCE, m_sources);
+        if (m_languages != null) map.put(DC.LANGUAGE, m_languages);
+        if (m_relations != null) map.put(DC.RELATION, m_relations);
+        if (m_coverages != null) map.put(DC.COVERAGE, m_coverages);
+        if (m_rights != null) map.put(DC.RIGHTS, m_rights);
 
         return map;
     }
