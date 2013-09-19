@@ -714,6 +714,9 @@ public interface Constants {
      */
     public static final XACMLPolicy1_0Format XACML_POLICY1_0 =
             XACMLPolicy1_0Format.getInstance();
+    
+    /** an empty array of strings */
+    public static final String [] EMPTY_STRING_ARRAY = new String[0];
 
     //---
     // Static helpers

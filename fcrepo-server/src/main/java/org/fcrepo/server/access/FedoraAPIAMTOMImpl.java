@@ -33,6 +33,7 @@ public class FedoraAPIAMTOMImpl
     private static final Logger LOG = LoggerFactory
             .getLogger(FedoraAPIAMTOMImpl.class);
 
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
     @Resource
     private WebServiceContext context;
 
@@ -179,7 +180,7 @@ public class FedoraAPIAMTOMImpl
         try {
             String[] resultFieldsArray = null;
             if (resultFields != null && resultFields.getItem() != null) {
-                resultFieldsArray = resultFields.getItem().toArray(new String[0]);
+                resultFieldsArray = resultFields.getItem().toArray(EMPTY_STRING_ARRAY);
             }
 
             org.fcrepo.server.search.FieldSearchResult result =

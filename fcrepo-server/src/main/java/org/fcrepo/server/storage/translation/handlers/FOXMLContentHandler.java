@@ -20,6 +20,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.common.xml.format.XMLFormat;
@@ -330,7 +331,7 @@ public class FOXMLContentHandler
                                                              "CREATED"));
                 String altIDsString = grab(a, FOXML.uri, "ALT_IDS");
                 if (altIDsString.length() == 0) {
-                    m_dsAltIds = new String[0];
+                    m_dsAltIds = EMPTY_STRING_ARRAY;
                 } else {
                     m_dsAltIds = altIDsString.split(" ");
                 }
@@ -600,7 +601,7 @@ public class FOXMLContentHandler
             m_dsVersId = "";
             m_dsLabel = "";
             m_dsCreateDate = null;
-            m_dsAltIds = new String[0];
+            m_dsAltIds = EMPTY_STRING_ARRAY;
             m_dsFormatURI = "";
             m_dsMimeType = "";
             m_dsSize = -1;
@@ -837,9 +838,7 @@ public class FOXMLContentHandler
         ByteBuffer bytes = Charset.forName(m_characterEncoding).
                 encode(m_dsXMLBuffer.toBuffer());
         ds.xmlContent = new byte[bytes.limit()];
-        System.arraycopy(
-                bytes.array(), bytes.arrayOffset(),
-                ds.xmlContent, 0, bytes.limit());
+        bytes.get(ds.xmlContent);
         if (logger.isDebugEnabled()) {
             StringBuilder rels = new StringBuilder();
             if (m_dsId.equals("WSDL")) {

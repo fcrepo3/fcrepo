@@ -4,10 +4,6 @@
  */
 package org.fcrepo.server.rest;
 
-import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.ws.rs.DELETE;
@@ -27,7 +23,7 @@ import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.storage.types.TupleArrayTripleIterator;
-import org.fcrepo.utilities.ReadableByteArrayOutputStream;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.springframework.stereotype.Component;
 import org.trippi.RDFFormat;
 import org.trippi.TripleIterator;
@@ -83,8 +79,8 @@ public class RelationshipResource extends BaseRestResource {
         }
         try {
             RelationshipTuple[] tuples = m_management.getRelationships(context, subject, predicate);
-            TripleIterator it = new TupleArrayTripleIterator(new ArrayList<RelationshipTuple>(Arrays.asList(tuples)));
-            ReadableByteArrayOutputStream out = new ReadableByteArrayOutputStream(256 * tuples.length);
+            TripleIterator it = new TupleArrayTripleIterator(Arrays.asList(tuples));
+            ReadableCharArrayWriter out = new ReadableCharArrayWriter(256 * tuples.length);
 
             format = format.toLowerCase();
             RDFFormat outputFormat;
@@ -104,8 +100,8 @@ public class RelationshipResource extends BaseRestResource {
             } else {
                 throw new IllegalArgumentException("unknown format: " + format);
             }
-            it.toStream(out, outputFormat);
-            return Response.ok(out.getString(Charset.forName("UTF-8")), mediaType).build();
+            it.toStream(out, outputFormat, true);
+            return Response.ok(out.getString(), mediaType).build();
         } catch (ServerException e) {
             return handleException(e, flash);
         } catch (TrippiException e) {

@@ -53,6 +53,8 @@ import org.fcrepo.server.storage.types.Property;
  * @author Sandy Payette
  */
 public class DynamicAccessImpl {
+    
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private final Access m_access;
 
@@ -101,7 +103,7 @@ public class DynamicAccessImpl {
         while (iter.hasNext()) {
             sdefs.add(iter.next());
         }
-        return (String[]) sdefs.toArray(new String[0]);
+        return (String[]) sdefs.toArray(EMPTY_STRING_ARRAY);
     }
 
     /**

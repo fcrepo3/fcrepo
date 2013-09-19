@@ -8,6 +8,8 @@ package org.fcrepo.client.batch.types;
  * @author Sandy Payette
  */
 public class Datastream {
+    
+    private static final String[] EMPTY_STRING_ARRAY = new String[0]; 
 
     public String dsID;
 
@@ -39,7 +41,7 @@ public class Datastream {
 
     public boolean force = false;
 
-    public String[] altIDs = new String[0];
+    public String[] altIDs = EMPTY_STRING_ARRAY;
 
     public String logMessage;
 

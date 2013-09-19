@@ -39,6 +39,8 @@ import org.fcrepo.utilities.XmlTransformUtility;
  * @version $Id$
  */
 public class ServiceMapper {
+    
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private WSDLParser wsdlHandler;
 
@@ -243,7 +245,7 @@ public class ServiceMapper {
                     }
                 }
                 fedoraMethodDefBindings[i].dsBindingKeys =
-                        (String[]) tmp_dsInputKeys.toArray(new String[0]);
+                        (String[]) tmp_dsInputKeys.toArray(EMPTY_STRING_ARRAY);
 
                 // Set the outputMIMETypes from the operation's output binding, if any
                 HTTPOperationInOut oBind =
@@ -255,7 +257,7 @@ public class ServiceMapper {
                     }
                     fedoraMethodDefBindings[i].outputMIMETypes =
                             (String[]) tmp_outputMIMETypes
-                                    .toArray(new String[0]);
+                                    .toArray(EMPTY_STRING_ARRAY);
                 }
 
             }

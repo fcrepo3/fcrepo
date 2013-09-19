@@ -4,25 +4,20 @@
  */
 package org.fcrepo.server.management;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
-import org.fcrepo.server.Server;
-import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
 import org.slf4j.Logger;
@@ -48,6 +43,8 @@ public class UploadServlet
             LoggerFactory.getLogger(UploadServlet.class);
 
     private static final long serialVersionUID = 1L;
+    
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     /**
      * The servlet entry point. http://host:port/fedora/management/upload
@@ -85,7 +82,7 @@ public class UploadServlet
             throw RootException.getServletException(ae,
                                                     request,
                                                     "Upload",
-                                                    new String[0]);
+                                                    EMPTY_STRING_ARRAY);
         } catch (Exception e) {
             e.printStackTrace();
             sendResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e

@@ -299,7 +299,7 @@ public class SimpleDOWriter
 
             dsxml = new XMLDatastreamProcessor(dsId);
             Datastream newds = dsxml.getDatastream();
-            newds.DatastreamAltIDs = new String[0];
+            newds.DatastreamAltIDs = EMPTY_STRING_ARRAY;
             // formats for internal datastreams
             if (dsId.equals("RELS-EXT")) {
                 newds.DSFormatURI = RELS_EXT1_0.uri;

@@ -8,12 +8,17 @@ package org.fcrepo.server.storage.types;
  * @author Sandy Payette
  */
 public class MethodDef {
+    
+    protected static final String[] EMPTY_STRING_ARRAY = new String[0];
+    
+    protected static final MethodParmDef[] EMPTY_PARMDEF_ARRAY =
+            new MethodParmDef[0];
 
     public String methodName = null;
 
     public String methodLabel = null;
 
-    public MethodParmDef[] methodParms = new MethodParmDef[0];
+    public MethodParmDef[] methodParms = EMPTY_PARMDEF_ARRAY;
 
     public MethodDef() {
     }

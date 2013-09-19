@@ -789,7 +789,7 @@ public class DefaultAccess
         while (st.hasMoreElements()) {
             emails.add(st.nextElement());
         }
-        return emails.toArray(new String[0]);
+        return emails.toArray(EMPTY_STRING_ARRAY);
     }
 
     private String[] getRetainPIDs() {
@@ -802,7 +802,7 @@ public class DefaultAccess
         while (st.hasMoreElements()) {
             retainPIDs.add(st.nextElement());
         }
-        return retainPIDs.toArray(new String[0]);
+        return retainPIDs.toArray(EMPTY_STRING_ARRAY);
     }
 
     private String convertToCSV(String list) {

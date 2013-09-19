@@ -153,7 +153,7 @@ public class ListDatastreamsServlet
                 throw new BadRequest400Exception(request,
                                                  ACTION_LABEL,
                                                  "",
-                                                 new String[0]);
+                                                 EMPTY_STRING_ARRAY);
             }
             if (URIArray.length == 7) {
                 // Request is a versioned listDatastreams request
@@ -164,7 +164,7 @@ public class ListDatastreamsServlet
                     throw new BadRequest400Exception(request,
                                                      ACTION_LABEL,
                                                      "",
-                                                     new String[0]);
+                                                     EMPTY_STRING_ARRAY);
                 }
                 asOfDateTime = versDateTime;
             }
@@ -175,7 +175,7 @@ public class ListDatastreamsServlet
             throw new BadRequest400Exception(request,
                                              ACTION_LABEL,
                                              "",
-                                             new String[0]);
+                                             EMPTY_STRING_ARRAY);
         }
 
         if (request.getParameter("xml") != null) {
@@ -193,20 +193,20 @@ public class ListDatastreamsServlet
             throw new NotFound404Exception(request,
                                            ACTION_LABEL,
                                            "",
-                                           new String[0]);
+                                           EMPTY_STRING_ARRAY);
         } catch (ObjectNotInLowlevelStorageException e) {
             logger.error("Object not found for request: " + requestURI
                     + " (actionLabel=" + ACTION_LABEL + ")", e);
             throw new NotFound404Exception(request,
                                            ACTION_LABEL,
                                            "",
-                                           new String[0]);
+                                           EMPTY_STRING_ARRAY);
         } catch (AuthzException ae) {
             logger.error("Authorization failed while listing datastreams", ae);
             throw RootException.getServletException(ae,
                                                     request,
                                                     ACTION_LABEL,
-                                                    new String[0]);
+                                                    EMPTY_STRING_ARRAY);
         } catch (Throwable th) {
             logger.error("Error listing datastreams", th);
             throw new InternalError500Exception("Error listing datastreams",
@@ -214,7 +214,7 @@ public class ListDatastreamsServlet
                                                 request,
                                                 ACTION_LABEL,
                                                 "",
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
         }
     }
 

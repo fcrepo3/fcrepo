@@ -462,34 +462,34 @@ public class FedoraAccessServlet
             logger.error("Method not found for request: " + requestURI
                     + " (actionLabel=" + actionLabel + ")", e);
             throw new NotFound404Exception("", e, request, actionLabel, e
-                    .getMessage(), new String[0]);
+                    .getMessage(), EMPTY_STRING_ARRAY);
         } catch (DatastreamNotFoundException e) {
             logger.error("Datastream not found for request: " + requestURI
                     + " (actionLabel=" + actionLabel + ")", e);
             throw new NotFound404Exception("", e, request, actionLabel, e
-                    .getMessage(), new String[0]);
+                    .getMessage(), EMPTY_STRING_ARRAY);
         } catch (ObjectNotFoundException e) {
             logger.error("Object not found for request: " + requestURI
                     + " (actionLabel=" + actionLabel + ")", e);
             throw new NotFound404Exception("", e, request, actionLabel, e
-                    .getMessage(), new String[0]);
+                    .getMessage(), EMPTY_STRING_ARRAY);
         } catch (DisseminationException e) {
             logger.error("Dissemination failed: " + requestURI
                     + " (actionLabel=" + actionLabel + ")", e);
             throw new NotFound404Exception("", e, request, actionLabel, e
-                    .getMessage(), new String[0]);
+                    .getMessage(), EMPTY_STRING_ARRAY);
         } catch (ObjectNotInLowlevelStorageException e) {
             logger.error("Object or datastream not found for request: "
                     + requestURI + " (actionLabel=" + actionLabel + ")", e);
             throw new NotFound404Exception("", e, request, actionLabel, e
-                    .getMessage(), new String[0]);
+                    .getMessage(), EMPTY_STRING_ARRAY);
         } catch (AuthzException ae) {
             logger.error("Authorization failed for request: " + requestURI
                     + " (actionLabel=" + actionLabel + ")", ae);
             throw RootException.getServletException(ae,
                                                     request,
                                                     actionLabel,
-                                                    new String[0]);
+                                                    EMPTY_STRING_ARRAY);
         } catch (Throwable th) {
             logger.error("Unexpected error servicing API-A request", th);
             throw new InternalError500Exception("",
@@ -497,7 +497,7 @@ public class FedoraAccessServlet
                                                 request,
                                                 actionLabel,
                                                 "",
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
         }
     }
 

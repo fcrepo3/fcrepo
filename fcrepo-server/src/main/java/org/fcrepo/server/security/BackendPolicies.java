@@ -23,6 +23,8 @@ public class BackendPolicies {
 
     private static final Logger logger =
             LoggerFactory.getLogger(BackendPolicies.class);
+    
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     public static final String FEDORA_INTERNAL_CALL = "fedoraInternalCall-1";
 
@@ -116,7 +118,7 @@ public class BackendPolicies {
             temp.append("\t\t<SslRequired/>\n");
         }
         logger.debug("DEBUGGING IPREGEX0 [" + iplist + "]");
-        String[] ipRegexes = new String[0];
+        String[] ipRegexes = EMPTY_STRING_ARRAY;
         if (iplist != null && !iplist.trim().isEmpty()) {
             ipRegexes = iplist.trim().split("\\s");
         }

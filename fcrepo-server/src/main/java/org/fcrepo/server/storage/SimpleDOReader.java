@@ -62,7 +62,7 @@ public class SimpleDOReader
     private static final Date[] DATE_TYPE =
             new Date[0];
     
-    private static final String[] STRING_TYPE = new String[0];
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     protected final DigitalObject m_obj;
 
@@ -294,7 +294,7 @@ public class SimpleDOReader
                 }
             }
         }
-        return al.toArray(STRING_TYPE);
+        return al.toArray(EMPTY_STRING_ARRAY);
     }
 
     /**
@@ -386,7 +386,7 @@ public class SimpleDOReader
                 modDates.add(DateUtility.convertDateToString(element2));
             }
         }
-        return modDates.toArray(new String[0]);
+        return modDates.toArray(EMPTY_STRING_ARRAY);
     }
 
     /**

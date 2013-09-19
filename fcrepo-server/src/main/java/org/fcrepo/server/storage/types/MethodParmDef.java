@@ -8,6 +8,8 @@ package org.fcrepo.server.storage.types;
  * @author Sandy Payette
  */
 public class MethodParmDef {
+    
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     public static final String PASS_BY_REF = "URL_REF";
 
@@ -25,7 +27,7 @@ public class MethodParmDef {
 
     public String parmDefaultValue = null;
 
-    public String[] parmDomainValues = new String[0];
+    public String[] parmDomainValues = EMPTY_STRING_ARRAY;
 
     public boolean parmRequired = true;
 

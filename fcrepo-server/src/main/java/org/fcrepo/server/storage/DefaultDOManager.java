@@ -94,8 +94,6 @@ implements DOManager {
     private static final Logger logger = LoggerFactory
             .getLogger(DefaultDOManager.class);
     
-    private static final String[] STRING_TYPE = new String[0];
-
     private static final Pattern URL_PROTOCOL = Pattern.compile("^\\w+:\\/.*$");
     
     public static String CMODEL_QUERY =
@@ -1944,9 +1942,9 @@ implements DOManager {
                 do {
                     pidList.add(results.getString("doPID"));
                 } while (results.next()); 
-                return pidList.toArray(STRING_TYPE);
+                return pidList.toArray(EMPTY_STRING_ARRAY);
             } else {
-                return STRING_TYPE;
+                return EMPTY_STRING_ARRAY;
             }
         } catch (SQLException sqle) {
             throw new StorageDeviceException(

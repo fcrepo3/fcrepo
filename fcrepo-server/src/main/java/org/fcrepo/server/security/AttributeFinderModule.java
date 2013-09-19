@@ -38,6 +38,8 @@ public abstract class AttributeFinderModule
 
     private static final Logger logger =
             LoggerFactory.getLogger(AttributeFinderModule.class);
+    
+    protected static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     protected AttributeFinderModule() {
 
@@ -338,35 +340,23 @@ public abstract class AttributeFinderModule
             if (attributeType.equals(STRING_ATTRIBUTE_TYPE_URI)) {
                 att = StringAttribute.getInstance((String) temp);
             } else if (attributeType.equals(DATETIME_ATTRIBUTE_TYPE_URI)) {
-                DateTimeAttribute tempDateTimeAttribute;
                 try {
-                    tempDateTimeAttribute =
-                            DateTimeAttribute.getInstance((String) temp);
-                    att = tempDateTimeAttribute;
+                    att = DateTimeAttribute.getInstance((String) temp);
                 } catch (Throwable t) {
                 }
             } else if (attributeType.equals(DATE_ATTRIBUTE_TYPE_URI)) {
-                DateAttribute tempDateAttribute;
                 try {
-                    tempDateAttribute =
-                            DateAttribute.getInstance((String) temp);
-                    att = tempDateAttribute;
+                    att = DateAttribute.getInstance((String) temp);
                 } catch (Throwable t) {
                 }
             } else if (attributeType.equals(TIME_ATTRIBUTE_TYPE_URI)) {
-                TimeAttribute tempTimeAttribute;
                 try {
-                    tempTimeAttribute =
-                            TimeAttribute.getInstance((String) temp);
-                    att = tempTimeAttribute;
+                    att = TimeAttribute.getInstance((String) temp);
                 } catch (Throwable t) {
                 }
             } else if (attributeType.equals(INTEGER_ATTRIBUTE_TYPE_URI)) {
-                IntegerAttribute tempIntegerAttribute;
                 try {
-                    tempIntegerAttribute =
-                            IntegerAttribute.getInstance((String) temp);
-                    att = tempIntegerAttribute;
+                    att = IntegerAttribute.getInstance((String) temp);
                 } catch (Throwable t) {
                 }
             }
@@ -380,7 +370,7 @@ public abstract class AttributeFinderModule
             // and sizing to the size of the value list
             set = new ArrayList<AttributeValue>(strings.length);
             logger.debug("AttributeFinder:findAttribute will return a String[] {}", iAm());
-            for (int i = 0; i < ((String[]) temp).length; i++) {
+            for (int i = 0; i < strings.length; i++) {
                 if (strings[i] == null) {
                     continue;
                 }

@@ -122,14 +122,14 @@ public class DescribeRepositoryServlet
             throw RootException.getServletException(ae,
                                                     request,
                                                     ACTION_LABEL,
-                                                    new String[0]);
+                                                    EMPTY_STRING_ARRAY);
         } catch (Throwable th) {
             throw new InternalError500Exception("",
                                                 th,
                                                 request,
                                                 ACTION_LABEL,
                                                 "",
-                                                new String[0]);
+                                                EMPTY_STRING_ARRAY);
         }
 
     }
