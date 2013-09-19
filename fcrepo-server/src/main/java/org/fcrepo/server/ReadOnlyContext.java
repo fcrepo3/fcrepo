@@ -41,7 +41,7 @@ public class ReadOnlyContext
         EMPTY.setResourceAttributes(null);
     }
     
-    private static final String[] EMPTY_VALUES = new String[0];
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private final Date now = new Date();
 
@@ -175,9 +175,7 @@ public class ReadOnlyContext
         }
         String[] values = new String[n];
         String[] temp = m_subjectAttributes.getStringArray(name);
-        for (int i = 0; i < temp.length; i++) {
-            values[i] = temp[i];
-        }
+        System.arraycopy(temp, 0, values, 0, temp.length);
         if (extendedHttpServletRequest != null
                 && extendedHttpServletRequest.isUserInRole(name)) {
             values[n - 1] = "";
@@ -364,7 +362,7 @@ public class ReadOnlyContext
                         } else if (value instanceof Set) {
                             @SuppressWarnings("unchecked")
                             Set<String> values = (Set<String>) value;
-                            String temp[] = values.toArray(EMPTY_VALUES);
+                            String temp[] = values.toArray(EMPTY_STRING_ARRAY);
                             if (logger.isDebugEnabled()) {
                                 for (String singleValue: temp) {
                                     logger.debug("IN CONTEXT singleValue is string=={}",

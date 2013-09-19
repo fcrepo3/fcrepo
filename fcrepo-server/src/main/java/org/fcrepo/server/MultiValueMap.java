@@ -17,7 +17,7 @@ public class MultiValueMap<T> {
     private static final Logger logger =
             LoggerFactory.getLogger(MultiValueMap.class);
 
-    private static final String [] EMPTY = new String[0];
+    private static final String [] EMPTY_STRING_ARRAY = new String[0];
 
     private boolean locked = false;
 
@@ -47,7 +47,7 @@ public class MultiValueMap<T> {
                 attributes.put(name, new String[]{value});
             } else temp[0] = value;
         } else {
-            attributes.put(name, EMPTY);
+            attributes.put(name, EMPTY_STRING_ARRAY);
         }
     }
 
@@ -63,7 +63,7 @@ public class MultiValueMap<T> {
         if (value != null) {
             attributes.put(name, value);
         } else {
-            attributes.put(name, new String[0]);
+            attributes.put(name, EMPTY_STRING_ARRAY);
         }
     }
 
