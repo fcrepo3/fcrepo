@@ -82,13 +82,13 @@ class ContextAttributeFinderModule
                 context.getActionAttribute(contextIdType, contextIdId, null);
         Object element = getAttributeFromEvaluationResult(attribute);
         if (element == null) {
-            logger.debug("ContextAttributeFinder:getContextId" + " exit on "
+            logger.debug("ContextAttributeFinder:getContextId exit on "
                     + "can't get contextId on request callback");
             return null;
         }
 
         if (!(element instanceof StringAttribute)) {
-            logger.debug("ContextAttributeFinder:getContextId" + " exit on "
+            logger.debug("ContextAttributeFinder:getContextId exit on "
                     + "couldn't get contextId from xacml request "
                     + "non-string returned");
             return null;
@@ -97,13 +97,13 @@ class ContextAttributeFinderModule
         String contextId = ((StringAttribute) element).getValue();
 
         if (contextId == null) {
-            logger.debug("ContextAttributeFinder:getContextId" + " exit on "
+            logger.debug("ContextAttributeFinder:getContextId exit on "
                     + "null contextId");
             return null;
         }
 
         if (!validContextId(contextId)) {
-            logger.debug("ContextAttributeFinder:getContextId" + " exit on "
+            logger.debug("ContextAttributeFinder:getContextId exit on "
                     + "invalid context-id");
             return null;
         }
@@ -134,43 +134,27 @@ class ContextAttributeFinderModule
         }
         Context context = m_contexts.getContext(contextId);
         logger.debug("got context");
-        Object values = null;
+        String[] values = null;
         logger.debug("designatorType{}", designatorType);
         switch (designatorType) {
             case AttributeDesignator.SUBJECT_TARGET:
                 String attributeName = attributeId.toString();
-                if (0 > context.nSubjectValues(attributeName)) {
+                if (context.nSubjectValues(attributeName) < 1) {
                     values = null;
+                    logger.debug("RETURNING NO VALUES FOR {}", attributeName);
                 } else {
                     if (logger.isDebugEnabled()) {
                     logger.debug("getting n values for {}={}", attributeId,
                             context.nSubjectValues(attributeName));
                     }
-                    switch (context.nSubjectValues(attributeName)) {
-                        case 0:
-                            values = null;
-                            /*
-                             * values = new String[1]; ((String[])values)[0] =
-                             * Authorization.UNDEFINED;
-                             */
-                            break;
-                        case 1:
-                            values = new String[1];
-                            ((String[]) values)[0] =
-                                    context.getSubjectValue(attributeName);
-                            break;
-                        default:
-                            values = context.getSubjectValues(attributeName);
-                    }
+                    values = context.getSubjectValues(attributeName);
                     if (logger.isDebugEnabled()) {
-                        if (values == null) {
-                            logger.debug("RETURNING NO VALUES FOR " + attributeName);
-                        } else {
+                        if (values != null) {
                             StringBuffer sb = new StringBuffer();
-                            sb.append("RETURNING " + ((String[]) values).length
+                            sb.append("RETURNING " + values.length
                                     + " VALUES FOR " + attributeName + " ==");
-                            for (int i = 0; i < ((String[]) values).length; i++) {
-                                sb.append(" " + ((String[]) values)[i]);
+                            for (int i = 0; i < values.length; i++) {
+                                sb.append(" " + values[i]);
                             }
                             logger.debug(sb.toString());
                         }
@@ -178,83 +162,38 @@ class ContextAttributeFinderModule
                 }
                 break;
             case AttributeDesignator.ACTION_TARGET:
-                if (0 > context.nActionValues(attributeId)) {
+                if (context.nActionValues(attributeId) < 1) {
                     values = null;
                 } else {
-                    switch (context.nActionValues(attributeId)) {
-                        case 0:
-                            values = null;
-                            /*
-                             * values = new String[1]; ((String[])values)[0] =
-                             * Authorization.UNDEFINED;
-                             */
-                            break;
-                        case 1:
-                            values = new String[1];
-                            ((String[]) values)[0] =
-                                    context.getActionValue(attributeId);
-                            break;
-                        default:
-                            values = context.getActionValues(attributeId);
-                    }
+                    values = context.getActionValues(attributeId);
                 }
                 break;
             case AttributeDesignator.RESOURCE_TARGET:
-                if (0 > context.nResourceValues(attributeId)) {
+                if (context.nResourceValues(attributeId) < 1) {
                     values = null;
                 } else {
-                    switch (context.nResourceValues(attributeId)) {
-                        case 0:
-                            values = null;
-                            /*
-                             * values = new String[1]; ((String[])values)[0] =
-                             * Authorization.UNDEFINED;
-                             */
-                            break;
-                        case 1:
-                            values = new String[1];
-                            ((String[]) values)[0] =
-                                    context.getResourceValue(attributeId);
-                            break;
-                        default:
-                            values = context.getResourceValues(attributeId);
-                    }
+                    values = context.getResourceValues(attributeId);
                 }
                 break;
             case AttributeDesignator.ENVIRONMENT_TARGET:
-                if (0 > context.nEnvironmentValues(attributeId)) {
+                if (context.nEnvironmentValues(attributeId) < 1) {
                     values = null;
                 } else {
-                    switch (context.nEnvironmentValues(attributeId)) {
-                        case 0:
-                            values = null;
-                            /*
-                             * values = new String[1]; ((String[])values)[0] =
-                             * Authorization.UNDEFINED;
-                             */
-                            break;
-                        case 1:
-                            values = new String[1];
-                            ((String[]) values)[0] =
-                                    context.getEnvironmentValue(attributeId);
-                            break;
-                        default:
-                            values = context.getEnvironmentValues(attributeId);
-                    }
+                    values = context.getEnvironmentValues(attributeId);
                 }
                 break;
             default:
         }
         logger.debug("local context attribute {}", attributeId);
-        if (values instanceof String) {
-            logger.debug("getAttributeLocally string value={}", (String) values);
-        } else if (values instanceof String[]) {
-            logger.debug("getAttributeLocally string values={}", values);
-            for (int i = 0; i < ((String[]) values).length; i++) {
-                logger.debug("another string value={}", ((String[]) values)[i]);
+        if (values != null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getAttributeLocally string values=<Array>");
+                for (int i = 0; i < ((String[]) values).length; i++) {
+                    logger.debug("another string value={}", ((String[]) values)[i]);
+                }
             }
         } else {
-            logger.debug("getAttributeLocally object value={}", values);
+            logger.debug("getAttributeLocally object value=null");
         }
         return values;
     }

@@ -115,13 +115,13 @@ class ResourceAttributeFinderModule
 
         Object element = getAttributeFromEvaluationResult(attribute);
         if (element == null) {
-            logger.debug("getDatastreamId: " + " exit on "
+            logger.debug("getDatastreamId:  exit on "
                     + "can't get resource-id on request callback");
             return null;
         }
 
         if (!(element instanceof StringAttribute)) {
-            logger.debug("getDatastreamId: " + " exit on "
+            logger.debug("getDatastreamId:  exit on "
                     + "couldn't get resource-id from xacml request "
                     + "non-string returned");
             return null;
@@ -130,7 +130,7 @@ class ResourceAttributeFinderModule
         String datastreamId = ((StringAttribute) element).getValue();
 
         if (datastreamId == null) {
-            logger.debug("getDatastreamId: " + " exit on " + "null resource-id");
+            logger.debug("getDatastreamId:  exit on null resource-id");
             return null;
         }
 
@@ -196,7 +196,7 @@ class ResourceAttributeFinderModule
                                     ownerIdSeparator);
                     String ownerId = reader.getOwnerId();
                     if (ownerId == null) {
-                        values = new String[0];
+                        values = EMPTY_STRING_ARRAY;
                     } else {
                         values = reader.getOwnerId().split(ownerIdSeparator);
                     }
@@ -214,7 +214,7 @@ class ResourceAttributeFinderModule
             } else if (Constants.MODEL.HAS_MODEL.attributeId.equals(attributeId)) {
                 try {
                     values = new HashSet<String>(reader.getContentModels())
-                            .toArray(new String[0]);
+                            .toArray(EMPTY_STRING_ARRAY);
                 } catch (ServerException e) {
                     logger.debug("failed getting {}", Constants.MODEL.HAS_MODEL.uri,e);
                     return null;
