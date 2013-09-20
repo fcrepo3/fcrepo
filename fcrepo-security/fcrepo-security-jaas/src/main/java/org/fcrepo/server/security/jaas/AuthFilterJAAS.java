@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -472,13 +473,14 @@ public class AuthFilterJAAS
      * @return a set of strings that represent the users roles.
      */
     private Set<String> getUserRoles(Subject subject) {
-        Set<String> userRoles = new HashSet<String>();
+        Set<String> userRoles = null;
 
         // get roles from specified classes
         Set<Principal> principals = subject.getPrincipals();
         if (roleClassNames != null && roleClassNames.size() > 0) {
             for (Principal p : principals) {
                 if (roleClassNames.contains(p.getClass().getName())) {
+                    if (userRoles == null) userRoles = new HashSet<String>();
                     userRoles.add(p.getName());
                 }
             }
@@ -487,17 +489,17 @@ public class AuthFilterJAAS
         // get roles from specified attributes
         Map<String, Set<String>> attributes =
                 SubjectUtils.getAttributes(subject);
-        if (attributes != null) {
-            for (String key : attributes.keySet()) {
-                if (roleAttributeNames.contains(key)) {
-                    userRoles.addAll(attributes.get(key));
-                }
+        for (String key : attributes.keySet()) {
+            if (roleAttributeNames.contains(key)) {
+                if (userRoles == null) userRoles = new HashSet<String>();
+                userRoles.addAll(attributes.get(key));
             }
         }
 
+        if (userRoles == null) userRoles = Collections.emptySet();
         if (logger.isDebugEnabled()) {
             for (String r : userRoles) {
-                logger.debug("found role: " + r);
+                logger.debug("found role: {}", r);
             }
         }
 
@@ -514,7 +516,7 @@ public class AuthFilterJAAS
      */
     private void addRolesToSubject(Subject subject, Set<String> userRoles) {
         if (userRoles == null) {
-            userRoles = new HashSet<String>();
+            userRoles = Collections.emptySet();
         }
 
         Map<String, Set<String>> attributes =
@@ -522,14 +524,14 @@ public class AuthFilterJAAS
 
         Set<String> roles = attributes.get(ROLE_KEY);
         if (roles == null) {
-            roles = new HashSet<String>();
+            roles = new HashSet<String>(userRoles);
             attributes.put(ROLE_KEY, roles);
+        } else {
+            roles.addAll(userRoles);
         }
-
-        for (String role : userRoles) {
-            roles.add(role);
-            if (logger.isDebugEnabled()) {
-                logger.debug("added role: " + role);
+        if (logger.isDebugEnabled()) {
+            for (String role : userRoles) {
+                logger.debug("added role: {}", role);
             }
         }
     }
@@ -551,18 +553,16 @@ public class AuthFilterJAAS
                                           HttpServletRequest request) {
         Map<String, Set<String>> attributes =
                 SubjectUtils.getAttributes(subject);
-        if (attributes == null) {
-            attributes = new HashMap<String, Set<String>>();
-        }
 
         // get the fedoraRole attribute or create it.
         Set<String> roles = attributes.get(FEDORA_ROLE_KEY);
         if (roles == null) {
-            roles = new HashSet<String>();
+            roles = new HashSet<String>(userRoles);
             attributes.put(FEDORA_ROLE_KEY, roles);
+        } else {
+            roles.addAll(userRoles);
         }
 
-        roles.addAll(userRoles);
 
         request.setAttribute(FEDORA_ATTRIBUTES_KEY, attributes);
     }

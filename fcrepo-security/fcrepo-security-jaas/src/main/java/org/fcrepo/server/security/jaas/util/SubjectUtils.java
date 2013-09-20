@@ -19,6 +19,7 @@
 package org.fcrepo.server.security.jaas.util;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +40,13 @@ public class SubjectUtils {
 
     private static final String VALUE_OBJECT = "java.util.HashSet";
 
+    /**
+     * Get the attribute map of String keys to Set<String> values
+     * This method will not return a null
+     * @param subject
+     * @return
+     */
+    
     @SuppressWarnings("unchecked")
     public static Map<String, Set<String>> getAttributes(Subject subject) {
         Map<String, Set<String>> attributes = null;
@@ -47,61 +55,57 @@ public class SubjectUtils {
             return new HashMap<String, Set<String>>();
         }
 
-        Iterator<?> i = subject.getPublicCredentials().iterator();
-        while (attributes == null && i.hasNext()) {
+        Iterator<HashMap> credentialObjects = subject.getPublicCredentials(HashMap.class).iterator();
+        while (attributes == null && credentialObjects.hasNext()) {
             Map<String, Set<String>> tmp = null;
-            Object o = i.next();
+            HashMap<?,?> credentialObject = credentialObjects.next();
 
             if (logger.isDebugEnabled()) {
                 logger.debug("checking for attributes (class name): "
-                        + o.getClass().getName());
+                        + credentialObject.getClass().getName());
             }
 
-            if (!o.getClass().getName().equals(CLASS_OBJECT)) {
+            Object key = null;
+            Iterator<?> keys = null;
+
+            keys = credentialObject.keySet().iterator();
+            if (!keys.hasNext()) {
                 continue;
             }
 
-            tmp = (Map) o;
-            Object tObject = null;
-            Iterator<?> t = null;
-
-            t = tmp.keySet().iterator();
-            if (!t.hasNext()) {
-                continue;
-            }
-
-            tObject = t.next();
+            key = keys.next();
 
             if (logger.isDebugEnabled()) {
                 logger.debug("checking for attributes (key object name): "
-                        + tObject.getClass().getName());
+                        + key.getClass().getName());
             }
 
-            if (!tObject.getClass().getName().equals(KEY_OBJECT)) {
+            if (!(key instanceof String)) {
                 continue;
             }
 
-            t = tmp.values().iterator();
-            if (!t.hasNext()) {
+            keys = credentialObject.values().iterator();
+            if (!keys.hasNext()) {
                 continue;
             }
 
-            tObject = t.next();
+            key = keys.next();
 
             if (logger.isDebugEnabled()) {
                 logger.debug("checking for attributes (value object name): "
-                        + tObject.getClass().getName());
+                        + key.getClass().getName());
             }
 
-            if (!tObject.getClass().getName().equals(VALUE_OBJECT)) {
+            if (!(key instanceof HashSet)) {
                 continue;
             }
 
-            attributes = (Map) o;
+            attributes = (Map<String, Set<String>>) credentialObject;
         }
 
         if (attributes == null) {
-            return new HashMap<String, Set<String>>();
+            attributes = new HashMap<String, Set<String>>();
+            subject.getPublicCredentials().add(attributes);
         }
 
         return attributes;
