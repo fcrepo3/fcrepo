@@ -60,6 +60,7 @@ import org.fcrepo.server.security.xacml.pep.rest.filters.ResponseHandlingRESTFil
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.fcrepo.server.utilities.CXFUtility;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -67,9 +68,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.tidy.Tidy;
 
-import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
 import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
@@ -113,9 +112,8 @@ public class FindObjects
         super();
 
         try {
-            TransformerFactory xFactory = TransformerFactory.newInstance();
-            xFormer = xFactory.newTransformer();
-        } catch (TransformerConfigurationException tce) {
+            xFormer = XmlTransformUtility.getTransformer();
+        } catch (TransformerException tce) {
             throw new PEPException("Error initialising SearchFilter", tce);
         }
 
