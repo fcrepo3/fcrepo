@@ -839,6 +839,8 @@ public class FOXMLContentHandler
                 encode(m_dsXMLBuffer.toBuffer());
         ds.xmlContent = new byte[bytes.limit()];
         bytes.get(ds.xmlContent);
+        ds.DSSize = ds.xmlContent.length;
+
         if (logger.isDebugEnabled()) {
             StringBuilder rels = new StringBuilder();
             if (m_dsId.equals("WSDL")) {
@@ -850,7 +852,6 @@ public class FOXMLContentHandler
             }
         }
         //LOOK! this sets bytes, not characters.  Do we want to set this?
-        ds.DSSize = ds.xmlContent.length;
 
         logger.debug(
                 "instantiate XML datastream: dsid = {} checksumType = {} checksum = {}",
