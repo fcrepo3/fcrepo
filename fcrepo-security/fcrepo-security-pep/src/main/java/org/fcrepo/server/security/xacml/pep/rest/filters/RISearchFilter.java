@@ -52,6 +52,7 @@ import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.LogUtil;
 import org.fcrepo.server.security.xacml.util.RelationshipResolver;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -105,7 +106,7 @@ public class RISearchFilter
 
         m_transformers = new HashMap<String, Transformer>();
         m_mimeType = new HashMap<String, String>();
-        TransformerFactory xFormerFactory = TransformerFactory.newInstance();
+        TransformerFactory xFormerFactory = XmlTransformUtility.getTransformerFactory();
 
         try {
             Transformer transformer = xFormerFactory.newTransformer();
@@ -113,6 +114,7 @@ public class RISearchFilter
             m_mimeType.put("RDF/XML", "text/xml");
         } catch (TransformerConfigurationException tce) {
             logger.warn("Error loading the rdfxml2nTriples.xsl stylesheet", tce);
+            XmlTransformUtility.returnTransformerFactory(xFormerFactory);
             throw new PEPException("Error loading the rdfxml2nTriples.xsl stylesheet",
                                    tce);
         }
@@ -138,6 +140,8 @@ public class RISearchFilter
         } catch (FileNotFoundException fnfe) {
             logger.warn(fnfe.getMessage());
             throw new PEPException(fnfe.getMessage());
+        } finally {
+            XmlTransformUtility.returnTransformerFactory(xFormerFactory);
         }
     }
 
