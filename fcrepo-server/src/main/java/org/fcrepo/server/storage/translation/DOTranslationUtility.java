@@ -421,10 +421,11 @@ public abstract class DOTranslationUtility
     public static Datastream normalizeDSLocationURLs(String PID,
                                                      Datastream origDS,
                                                      int transContext) {
-        Datastream ds = origDS.copy();
         if (transContext == AS_IS) {
-            return ds;
+            return origDS;
         }
+
+        Datastream ds = origDS.copy();
         if (transContext == DOTranslationUtility.DESERIALIZE_INSTANCE) {
             if (ds.DSControlGrp.equals("E") || ds.DSControlGrp.equals("R")) {
                 // MAKE ABSOLUTE REPO URLs
@@ -751,12 +752,13 @@ public abstract class DOTranslationUtility
                         if (logger.isDebugEnabled())
                             logger.debug("{} : normalising URLs in {}",
                                     obj.getPid(), dsid);
-                        xd.xmlContent =
-                                DOTranslationUtility
-                                        .normalizeInlineXML(new String(xd.xmlContent,
-                                                                       "UTF-8"),
-                                                            transContext)
-                                        .getBytes(characterEncoding);
+                        String origContent = new String(xd.xmlContent, "UTF-8");
+                        String normal = DOTranslationUtility
+                                .normalizeInlineXML(origContent,
+                                        transContext);
+                        if (!normal.equals(origContent) || !"UTF-8".equalsIgnoreCase(characterEncoding)){
+                            xd.xmlContent = normal.getBytes(characterEncoding);
+                        }
                         xd.DSSize = xd.xmlContent.length;
                     }
                 }
