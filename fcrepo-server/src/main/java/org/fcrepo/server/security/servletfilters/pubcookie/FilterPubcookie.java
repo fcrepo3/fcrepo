@@ -4,6 +4,7 @@
  */
 package org.fcrepo.server.security.servletfilters.pubcookie;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -31,7 +32,7 @@ public class FilterPubcookie
     private static final Logger logger =
             LoggerFactory.getLogger(FilterPubcookie.class);
 
-    private static final Map NO_REQUEST_PARAMETERS = new HashMap();
+    private static final Map<?,?> NO_REQUEST_PARAMETERS = Collections.emptyMap();
 
     private static final Cookie[] NO_COOKIES = new Cookie[0];
 
@@ -164,12 +165,12 @@ public class FilterPubcookie
     }
 
     //initial, setup call
-    private final Map getFormFields(Node parent) {
+    private final Map<String, String> getFormFields(Node parent) {
         String method = "getFormFields(Node parent)";
         if (logger.isDebugEnabled()) {
             logger.debug(enter(method));
         }
-        Map formfields = new Hashtable();
+        Map<String, String> formfields = new Hashtable<String, String>();
         getFormFields(parent, formfields);
         if (logger.isDebugEnabled()) {
             logger.debug(exit(method));
@@ -178,7 +179,7 @@ public class FilterPubcookie
     }
 
     //inner, recursive call
-    private final void getFormFields(Node parent, Map formfields) {
+    private final void getFormFields(Node parent, Map<String, String> formfields) {
         String method = "getFormFields(Node parent, Map formfields)";
         if (logger.isDebugEnabled()) {
             logger.debug(enter(method));
@@ -245,13 +246,13 @@ public class FilterPubcookie
             if (logger.isDebugEnabled()) {
                 logger.debug(format(method, "action", action));
             }
-            Map formpageFields = getFormFields(formpageDocument);
-            Iterator iter = null;
+            Map<String, String> formpageFields = getFormFields(formpageDocument);
+            Iterator<String> iter = null;
 
             if (logger.isDebugEnabled()) {
                 iter = formpageFields.keySet().iterator();
                 while (iter.hasNext()) {
-                    String key = (String) iter.next();
+                    String key = iter.next();
                     logger.debug(format(method, null, key, (String) formpageFields
                             .get(key)));
                 }

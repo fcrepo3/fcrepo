@@ -158,26 +158,25 @@ public class DefaultLowlevelStorage
             //storeBase = (String)configuration.get("storeBase");
 
             Object[] parameters = new Object[] {configuration};
-            Class[] parameterTypes = new Class[] {Map.class};
             ClassLoader loader = getClass().getClassLoader();
-            Class cclass;
-            Constructor constructor;
+            Class<?> cclass;
+            Constructor<?> constructor;
             String failureReason = "";
             try {
                 failureReason = FILESYSTEM;
                 cclass = loader.loadClass(filesystem);
-                constructor = cclass.getConstructor(parameterTypes);
+                constructor = cclass.getConstructor(Map.class);
                 fileSystem = (FileSystem) constructor.newInstance(parameters);
 
                 failureReason = PATH_ALGORITHM;
                 cclass = loader.loadClass(pathAlgorithm);
-                constructor = cclass.getConstructor(parameterTypes);
+                constructor = cclass.getConstructor(Map.class);
                 this.pathAlgorithm =
                         (PathAlgorithm) constructor.newInstance(parameters);
 
                 failureReason = PATH_REGISTRY;
                 cclass = loader.loadClass(pathRegistry);
-                constructor = cclass.getConstructor(parameterTypes);
+                constructor = cclass.getConstructor(Map.class);
                 this.pathRegistry =
                         (PathRegistry) constructor.newInstance(parameters);
             } catch (Exception e) {

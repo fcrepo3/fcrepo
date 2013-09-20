@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,9 +25,9 @@ import javax.swing.text.JTextComponent;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
+import org.fcrepo.utilities.ReadableCharArrayWriter;
+import org.fcrepo.utilities.XmlTransformUtility;
+import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
 import org.w3c.dom.Document;
 
 import org.xml.sax.InputSource;
@@ -95,21 +94,12 @@ public class TextContentEditor
         String content;
         if (m_xml) {
             try {
+                ReadableCharArrayWriter buf = new ReadableCharArrayWriter();
+                Document doc = XmlTransformUtility.parseNamespaceAware(data);
                 // use xerces to pretty print the xml to the editor
-                OutputFormat fmt = new OutputFormat("XML", "UTF-8", true);
-                fmt.setOmitXMLDeclaration(true);
-                fmt.setIndent(2);
-                fmt.setLineWidth(120);
-                fmt.setPreserveSpace(false);
-                ByteArrayOutputStream buf = new ByteArrayOutputStream();
-                XMLSerializer ser = new XMLSerializer(buf, fmt);
-                DocumentBuilderFactory factory =
-                        DocumentBuilderFactory.newInstance();
-                factory.setNamespaceAware(true);
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                Document doc = builder.parse(data);
-                ser.serialize(doc);
-                content = new String(buf.toByteArray(), "UTF-8");
+                ProprietaryXmlSerializers.writeMgmtNoDecl(doc, buf);
+                buf.close();
+                content = buf.getString();
             } catch (Exception e) {
                 throw new IOException("Error parsing as XML: " + e.getMessage());
             }
@@ -169,8 +159,7 @@ public class TextContentEditor
                 DocumentBuilderFactory factory =
                         DocumentBuilderFactory.newInstance();
                 DocumentBuilder builder = factory.newDocumentBuilder();
-                Document doc =
-                        builder.parse(new InputSource(new StringReader(m_editor
+                builder.parse(new InputSource(new StringReader(m_editor
                                 .getText())));
             }
             return new ByteArrayInputStream(m_editor.getText()

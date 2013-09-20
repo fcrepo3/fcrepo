@@ -1,27 +1,19 @@
 
 package org.fcrepo.server.security.xacml.util;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.Writer;
-import java.nio.charset.Charset;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
-import org.w3c.dom.Document;
-
-import org.fcrepo.utilities.ReadableByteArrayOutputStream;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 public class DataUtils {
 
@@ -69,19 +61,11 @@ public class DataUtils {
     }
 
     public static String format(Document doc) throws Exception {
-        OutputFormat format = new OutputFormat(doc);
-        format.setEncoding("UTF-8");
-        format.setIndenting(true);
-        format.setIndent(2);
-        format.setOmitXMLDeclaration(true);
 
-        ReadableByteArrayOutputStream out = new ReadableByteArrayOutputStream(8192);
-        Writer output = new BufferedWriter(new OutputStreamWriter(out));
+        ReadableCharArrayWriter out = new ReadableCharArrayWriter(8192);
+        ProprietaryXmlSerializers.writePrettyPrint(doc, out);
+        out.close();
 
-        XMLSerializer serializer = new XMLSerializer(output, format);
-        serializer.serialize(doc);
-        output.close();
-
-        return out.getString(Charset.forName("UTF-8"));
+        return out.getString();
     }
 }

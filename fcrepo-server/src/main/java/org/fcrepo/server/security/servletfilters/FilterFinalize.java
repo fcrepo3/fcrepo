@@ -7,6 +7,7 @@ package org.fcrepo.server.security.servletfilters;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,7 +27,7 @@ public class FilterFinalize
 
     private static final boolean AUTHENTICATION_REQUIRED_DEFAULT = true;
 
-    private boolean AUTHENTICATION_REQUIRED = AUTHENTICATION_REQUIRED_DEFAULT;
+    protected boolean AUTHENTICATION_REQUIRED = AUTHENTICATION_REQUIRED_DEFAULT;
 
     private static final String AUTHENTICATION_REQUIRED_KEY =
             "authentication-required";
@@ -56,7 +57,7 @@ public class FilterFinalize
 
     private static final String[] URLS_DEFAULT = {"/.*"};
 
-    private String[] URLS = URLS_DEFAULT;
+    protected String[] URLS = URLS_DEFAULT.clone();
 
     private static final String URLS_KEY = "authentication-urls";
 
@@ -130,25 +131,21 @@ public class FilterFinalize
                 }
             } else {
                 boolean errorsInMap = false;
-                Map auxSubjectRoles = (Map) testFedoraAuxSubjectAttributes;
-                Iterator auxSubjectRoleKeys =
+                @SuppressWarnings("unchecked")
+                Map<String, Set<?>> auxSubjectRoles =
+                    (Map<String, Set<?>>) testFedoraAuxSubjectAttributes;
+                Iterator<String> auxSubjectRoleKeys =
                         auxSubjectRoles.keySet().iterator();
                 while (auxSubjectRoleKeys.hasNext()) {
-                    Object name = auxSubjectRoleKeys.next();
-                    if (!(name instanceof String)) {
-                        logger.error(format(method, "key not a String " + name));
+                    String name = auxSubjectRoleKeys.next();
+                    Object value = auxSubjectRoles.get(name);
+                    if (!(value instanceof String[])) {
+                        if (logger.isErrorEnabled()) {
+                            logger.error(format(method, "value not a Set"
+                                    + value));
+                        }
                         errorsInMap = true;
                         break;
-                    } else {
-                        Object value = auxSubjectRoles.get(name);
-                        if (!(value instanceof String[])) {
-                            if (logger.isErrorEnabled()) {
-                                logger.error(format(method, "value not a String"
-                                        + value));
-                            }
-                            errorsInMap = true;
-                            break;
-                        }
                     }
                 }
                 if (errorsInMap) {
@@ -169,19 +166,21 @@ public class FilterFinalize
         }
         request.audit();
 
-        Map subjectAttributesMap = new Hashtable();
+        Map<String, Set<?>> subjectAttributesMap = new Hashtable<String, Set<?>>();
         subjectAttributesMap.putAll(request.getAllAttributes());
 
-        for (Iterator it = subjectAttributesMap.keySet().iterator(); it
-                .hasNext();) {
-            String name = (String) it.next();
-            Object value = subjectAttributesMap.get(name);
-            logger.debug("IN FILTER MAP HAS ATTRIBUTE " + name + "==" + value
-                    + " " + value.getClass().getName());
+        if (logger.isDebugEnabled()) {
+            for (Iterator<String> subjectAttributes = subjectAttributesMap.keySet().iterator();
+                    subjectAttributes.hasNext();) {
+                String subjectAttribute = subjectAttributes.next();
+                Object value = subjectAttributesMap.get(subjectAttribute);
+                logger.debug("IN FILTER MAP HAS ATTRIBUTE {}=={} {}",
+                        subjectAttribute, value,
+                        value.getClass().getName());
+            }
+            logger.debug("IN FILTER ROLE eduPersonAffiliation?=={}",
+                    request.isUserInRole("eduPersonAffiliation"));
         }
-        logger.debug("IN FILTER ROLE eduPersonAffiliation?=="
-                + request.isUserInRole("eduPersonAffiliation"));
-
         request.setAttribute(DELIVERY_NAME, subjectAttributesMap);
         return false; // i.e., don't signal to terminate servlet filter chain
     }

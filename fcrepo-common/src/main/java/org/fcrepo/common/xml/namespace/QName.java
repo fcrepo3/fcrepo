@@ -41,9 +41,6 @@ public class QName extends javax.xml.namespace.QName {
     public QName(XMLNamespace namespace, String localName) {
         super(namespace.uri, localName, namespace.prefix);
         
-        if (namespace == null) {
-            throw new IllegalArgumentException("namespace cannot be null");
-        }
         if (localName == null) {
             throw new IllegalArgumentException("localName cannot be null");
         }

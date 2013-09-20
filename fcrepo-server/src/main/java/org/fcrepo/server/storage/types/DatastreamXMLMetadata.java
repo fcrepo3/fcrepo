@@ -5,7 +5,6 @@
 package org.fcrepo.server.storage.types;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,11 +20,9 @@ import org.fcrepo.server.Context;
 import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 /**
  * @author Sandy Payette
@@ -101,16 +98,10 @@ public class DatastreamXMLMetadata
         try {
             ReadableCharArrayWriter out =
                 new ReadableCharArrayWriter(xmlContent.length + (xmlContent.length /4));
-            OutputFormat fmt = new OutputFormat("XML", m_encoding, false);
-            fmt.setIndent(0);
-            fmt.setLineWidth(0);
-            fmt.setPreserveSpace(false);
-            XMLSerializer ser = new XMLSerializer(out, fmt);
-            
             DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
             try {
                 Document doc = builder.parse(new ByteArrayInputStream(xmlContent));
-                ser.serialize(doc);
+                ProprietaryXmlSerializers.writeXmlNoSpace(doc, m_encoding, out);
                 out.close();
             } finally {
                 XmlTransformUtility.returnDocumentBuilder(builder);

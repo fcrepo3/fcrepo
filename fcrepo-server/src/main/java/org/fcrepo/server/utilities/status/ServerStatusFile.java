@@ -160,7 +160,8 @@ public class ServerStatusFile {
             BufferedReader reader =
                     new BufferedReader(new InputStreamReader(in));
 
-            List messages = new ArrayList();
+            List<ServerStatusMessage> messages =
+                    new ArrayList<ServerStatusMessage>();
             ServerStatusMessage message = getNextMessage(reader);
             while (message != null) {
                 if (!sawAfterMessage) {
@@ -173,8 +174,7 @@ public class ServerStatusFile {
                 message = getNextMessage(reader);
             }
 
-            return (ServerStatusMessage[]) messages
-                    .toArray(new ServerStatusMessage[0]);
+            return messages.toArray(STATUS_MSG_ARRAY_TYPE);
 
         } catch (IOException ioe) {
             throw new Exception("Error opening server status file for reading: "
@@ -189,6 +189,9 @@ public class ServerStatusFile {
             }
         }
     }
+    
+    private static final ServerStatusMessage[] STATUS_MSG_ARRAY_TYPE =
+            new ServerStatusMessage[0];
 
     private void serialize(ServerStatusMessage message, PrintWriter writer)
             throws Exception {

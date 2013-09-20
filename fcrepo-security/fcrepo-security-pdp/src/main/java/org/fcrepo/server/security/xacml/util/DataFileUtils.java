@@ -20,13 +20,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.fcrepo.utilities.ReadableByteArrayOutputStream;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 public class DataFileUtils {
 
@@ -110,24 +109,19 @@ public class DataFileUtils {
     }
 
     public static String format(Document doc) {
-        OutputFormat format = new OutputFormat(doc);
-        format.setEncoding("UTF-8");
-        format.setIndenting(true);
-        format.setIndent(2);
-        format.setOmitXMLDeclaration(true);
-
-        ReadableByteArrayOutputStream out = new ReadableByteArrayOutputStream(8192);
-        Writer output = new BufferedWriter(new OutputStreamWriter(out));
-
-        XMLSerializer serializer = new XMLSerializer(output, format);
         try {
-            serializer.serialize(doc);
+            ReadableCharArrayWriter out = new ReadableCharArrayWriter();
+            Writer output = new BufferedWriter(out);
+
+            ProprietaryXmlSerializers.writePrettyPrint(doc, output);
             output.close();
+
+            return out.getString();
         } catch (Exception e) {
             logger.error("Failed to format document.", e);
         }
 
-        return out.getString(Charset.forName("UTF-8"));
+        return null;
     }
 
     public static String format(byte[] document) throws Exception {
@@ -144,33 +138,29 @@ public class DataFileUtils {
     }
 
     public static byte[] fedoraXMLHashFormat(byte[] data) throws Exception {
-        OutputFormat format = new OutputFormat("XML", "UTF-8", false);
-        format.setIndent(0);
-        format.setLineWidth(0);
-        format.setPreserveSpace(false);
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        XMLSerializer serializer = new XMLSerializer(outStream, format);
+        ReadableCharArrayWriter writer = new ReadableCharArrayWriter();
 
         DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
         try {
             Document doc = builder.parse(new ByteArrayInputStream(data));
-            serializer.serialize(doc);
+            ProprietaryXmlSerializers.writeXmlNoSpace(doc, "UTF-8", writer);
+            writer.close();
         } finally {
             XmlTransformUtility.returnDocumentBuilder(builder);
         }
 
-        ByteArrayInputStream in =
-                new ByteArrayInputStream(outStream.toByteArray());
         BufferedReader br =
-                new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                new BufferedReader(writer.toReader());
         String line = null;
-        StringBuffer sb = new StringBuffer();
+        ReadableByteArrayOutputStream outStream = new ReadableByteArrayOutputStream();
+        OutputStreamWriter sb = new OutputStreamWriter(outStream, "UTF-8");
         while ((line = br.readLine()) != null) {
             line = line.trim();
-            sb = sb.append(line);
+            sb.write(line);
         }
+        sb.close();
 
-        return sb.toString().getBytes("UTF-8");
+        return outStream.toByteArray();
     }
 
     public static String getHash(byte[] data) throws NoSuchAlgorithmException {

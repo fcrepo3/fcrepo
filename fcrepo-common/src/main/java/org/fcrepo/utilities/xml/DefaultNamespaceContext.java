@@ -4,12 +4,10 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Default implementation of a {@link NamespaceContext}
@@ -139,31 +137,75 @@ public class DefaultNamespaceContext implements NamespaceContext {
     }
 
     @Override
-    public Iterator getPrefixes(String namespaceURI) {
+    public Iterator<String> getPrefixes(String namespaceURI) {
 
         if (namespaceURI == null) {
             throw new IllegalArgumentException();
         }
 
         if (namespaceURI.equals(XMLConstants.XML_NS_URI)) {
-            return new NonModifiableIterator(
-                    Arrays.asList(XMLConstants.XML_NS_PREFIX).iterator());
+            return new OneResultIterator<String>(XMLConstants.XML_NS_PREFIX);
         }
         if (namespaceURI.equals(XMLConstants.XMLNS_ATTRIBUTE_NS_URI)) {
-            return new NonModifiableIterator(
-                    Arrays.asList(XMLConstants.XMLNS_ATTRIBUTE).iterator());
+            return new OneResultIterator<String>(XMLConstants.XMLNS_ATTRIBUTE);
         }
         if (namespaceURI.equals(defaultNamespaceURI)) {
-            return new NonModifiableIterator(
-                    Arrays.asList(XMLConstants.DEFAULT_NS_PREFIX).iterator());
+            return new OneResultIterator<String>(XMLConstants.DEFAULT_NS_PREFIX);
         }
 
         Collection<String> s = namespace.get(namespaceURI);
         if (s != null && !namespace.isEmpty()) {
-            return new NonModifiableIterator(s.iterator());
+            return new NonModifiableIterator<String>(s.iterator());
         } else {
-            return Collections.emptySet().iterator();
+            return NO_STRINGS;
         }
+    }
+    
+    private static final EmptyIterator<String> NO_STRINGS =
+            new EmptyIterator<String>();
+    
+    static class EmptyIterator<T> implements Iterator<T> {
+
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public T next() {
+            return null;
+        }
+
+        @Override
+        public void remove() {
+            
+        }
+        
+    }
+    
+    static class OneResultIterator<T> implements Iterator<T> {
+        private T result;
+        public OneResultIterator(T oneResult) {
+            result = oneResult;
+        }
+        
+        @Override
+        public boolean hasNext() {
+            return result != null;
+        }
+
+        @Override
+        public T next() {
+            T next = result;
+            result = null;
+            return next;
+        }
+
+        @Override
+        public void remove() {
+            
+        }
+        
     }
 
     /**
@@ -172,13 +214,14 @@ public class DefaultNamespaceContext implements NamespaceContext {
      *
      * @author Hans Lund, State and University Library, Aarhus Denamrk.
      * @version $Id: DefaultNamespaceContext.java,v 1.5 2007/10/04 13:28:21 te Exp $
+     * @param <T>
      * @see javax.xml.namespace.NamespaceContext#getPrefixes(String)
      */
-    static class NonModifiableIterator implements Iterator {
+    static class NonModifiableIterator<T> implements Iterator<T> {
 
-        Iterator wrapped;
+        Iterator<T> wrapped;
 
-        NonModifiableIterator(Iterator iter) {
+        NonModifiableIterator(Iterator<T> iter) {
             wrapped = iter;
         }
 
@@ -202,7 +245,7 @@ public class DefaultNamespaceContext implements NamespaceContext {
          * @throws java.util.NoSuchElementException
          *          iteration has no more elements.
          */
-        public Object next() {
+        public T next() {
             return wrapped.next();
         }
 

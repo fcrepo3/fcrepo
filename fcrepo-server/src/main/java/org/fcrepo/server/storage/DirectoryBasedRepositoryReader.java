@@ -10,7 +10,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.ObjectIntegrityException;
@@ -45,6 +44,9 @@ public class DirectoryBasedRepositoryReader
     private static final Logger logger =
             LoggerFactory.getLogger(DirectoryBasedRepositoryReader.class);
 
+    private static final String[] EMPTY_STRING_ARRAY =
+            new String[0];
+
     private final DOTranslator m_translator;
 
     private final String m_exportFormat;
@@ -53,7 +55,7 @@ public class DirectoryBasedRepositoryReader
 
     private final String m_encoding;
 
-    private final HashMap m_files = new HashMap();
+    private final HashMap<String, File> m_files = new HashMap<String, File>();
 
     /**
      * Initializes the RepositoryReader by looking at all files in the provided
@@ -166,13 +168,7 @@ public class DirectoryBasedRepositoryReader
     }
 
     public String[] listObjectPIDs(Context context) {
-        String[] out = new String[m_files.keySet().size()];
-        Iterator iter = m_files.keySet().iterator();
-        int i = 0;
-        while (iter.hasNext()) {
-            out[i++] = (String) iter.next();
-        }
-        return out;
+        return m_files.keySet().toArray(EMPTY_STRING_ARRAY);
     }
 
 }

@@ -27,7 +27,7 @@ public class RandomDCMetadataFactory
                     "identifier", "source", "language", "relation", "coverage",
                     "rights"};
 
-    private final ArrayList m_wordList = new ArrayList();
+    private final ArrayList<String> m_wordList = new ArrayList<String>();
 
     public RandomDCMetadataFactory(File dictionaryFile)
             throws IOException {
@@ -51,7 +51,7 @@ public class RandomDCMetadataFactory
         return get(repeatMax, wordMax, m_wordList);
     }
 
-    public static String get(int repeatMax, int wordMax, List wordList) {
+    public static String get(int repeatMax, int wordMax, List<String> wordList) {
         StringBuffer out = new StringBuffer();
         out.append("<oai_dc:dc\n" + "    xmlns:oai_dc=\"" + OAI_DC.uri + "\"\n"
                 + "    xmlns:dc=\"" + DC.uri + "\"\n" + "    xmlns:xsi=\""
@@ -68,14 +68,14 @@ public class RandomDCMetadataFactory
         return out.toString();
     }
 
-    private static String getRandomWords(int wordMax, List wordList) {
+    private static String getRandomWords(int wordMax, List<String> wordList) {
         int count = 1 + getRandom(wordMax);
         StringBuffer out = new StringBuffer();
         for (int i = 0; i < count; i++) {
             if (i > 0) {
                 out.append(" ");
             }
-            out.append((String) wordList.get(getRandom(wordList.size())));
+            out.append(wordList.get(getRandom(wordList.size())));
         }
         return out.toString();
     }

@@ -22,7 +22,6 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -75,13 +74,11 @@ import org.fcrepo.server.validation.ecm.EcmValidator;
 import org.fcrepo.utilities.DateUtility;
 import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
 import org.jrdf.graph.URIReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 /**
  * Implements API-M without regard to the transport/messaging protocol.
@@ -1536,18 +1533,15 @@ public class DefaultManagement
     private void getXML(InputStream in, OutputStream outStream, boolean includeXMLDeclaration) throws GeneralException {
         // parse with xerces and re-serialize the fixed xml to a byte array
         try {
-            OutputFormat fmt = new OutputFormat("XML", "UTF-8", true);
-            fmt.setIndent(2);
-            fmt.setLineWidth(120);
-            fmt.setPreserveSpace(false);
-            fmt.setOmitXMLDeclaration(!includeXMLDeclaration);
-            fmt.setOmitDocumentType(true);
             BufferedWriter out = new BufferedWriter(
                     new OutputStreamWriter(outStream, Charset.forName("UTF-8")));
-            XMLSerializer ser = new XMLSerializer(out, fmt);
             Document doc =
                 XmlTransformUtility.parseNamespaceAware(in);
-            ser.serialize(doc);
+            if (includeXMLDeclaration) {
+                ProprietaryXmlSerializers.writeMgmtWithDecl(doc, out);
+            } else {
+                ProprietaryXmlSerializers.writeMgmtNoDecl(doc, out);
+            }
             out.flush();
         } catch (Exception e) {
             String message = e.getMessage();

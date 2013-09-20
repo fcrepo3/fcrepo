@@ -81,7 +81,7 @@ public class FilterSetup
                 if (logger.isDebugEnabled()) {
                     logger.debug(format(method, null, "FILTER_NAME", FILTER_NAME));
                 }
-                Enumeration enumer = filterConfig.getInitParameterNames();
+                Enumeration<?> enumer = filterConfig.getInitParameterNames();
                 while (enumer.hasMoreElements()) {
                     String key = (String) enumer.nextElement();
                     String value = filterConfig.getInitParameter(key);

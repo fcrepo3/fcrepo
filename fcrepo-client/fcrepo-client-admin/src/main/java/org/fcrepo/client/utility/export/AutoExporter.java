@@ -7,7 +7,9 @@ package org.fcrepo.client.utility.export;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
+import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -22,10 +24,8 @@ import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.types.gen.RepositoryInfo;
 import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.utilities.FileUtils;
+import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
 import org.w3c.dom.Document;
-
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 
 /**
@@ -136,18 +136,16 @@ public class AutoExporter
             if (ATOM_ZIP1_1.uri.equals(format)) {
                 FileUtils.copy(new ByteArrayInputStream(bytes), outStream);
             } else {
-                // use xerces to pretty print the xml, assuming it's well formed
-                OutputFormat fmt = new OutputFormat("XML", "UTF-8", true);
-                fmt.setIndent(2);
-                fmt.setLineWidth(120);
-                fmt.setPreserveSpace(false);
-                XMLSerializer ser = new XMLSerializer(outStream, fmt);
                 DocumentBuilderFactory factory =
                         DocumentBuilderFactory.newInstance();
                 factory.setNamespaceAware(true);
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 Document doc = builder.parse(new ByteArrayInputStream(bytes));
-                ser.serialize(doc);
+                OutputStreamWriter writer =
+                        new OutputStreamWriter(outStream, Charset.forName("UTF-8"));
+                // use xerces to pretty print the xml, assuming it's well formed
+                ProprietaryXmlSerializers.writeMgmtNoDecl(doc, writer);
+                writer.close();
             }
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getClass().getName() + " : "
@@ -180,17 +178,15 @@ public class AutoExporter
         byte[] bytes = TypeUtility.convertDataHandlerToBytes(apim.getObjectXML(pid));
         try {
             // use xerces to pretty print the xml, assuming it's well formed
-            OutputFormat fmt = new OutputFormat("XML", "UTF-8", true);
-            fmt.setIndent(2);
-            fmt.setLineWidth(120);
-            fmt.setPreserveSpace(false);
-            XMLSerializer ser = new XMLSerializer(outStream, fmt);
             DocumentBuilderFactory factory =
                     DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(new ByteArrayInputStream(bytes));
-            ser.serialize(doc);
+            OutputStreamWriter writer =
+                    new OutputStreamWriter(outStream, Charset.forName("UTF-8"));
+            ProprietaryXmlSerializers.writeMgmtNoDecl(doc, writer);
+            writer.close();
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getClass().getName() + " : "
                     + e.getMessage());
