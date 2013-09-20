@@ -183,9 +183,9 @@ public class DatastreamResolverServlet
             DatastreamMediation dm = DisseminationService.dsRegistry.get(id);
             if (dm == null) {
                 StringBuffer entries = new StringBuffer();
-                Iterator eIter = DisseminationService.dsRegistry.keySet().iterator();
+                Iterator<String> eIter = DisseminationService.dsRegistry.keySet().iterator();
                 while (eIter.hasNext()) {
-                    entries.append("'" + (String) eIter.next() + "' ");
+                    entries.append("'" + eIter.next() + "' ");
                 }
                 throw new IOException("Cannot find datastream in temp registry by key: "
                         + id + "\n" + "Reg entries: " + entries.toString());
@@ -401,13 +401,15 @@ public class DatastreamResolverServlet
                 // testing to see what's in request header that might be of
                 // interest
                 if (logger.isDebugEnabled()) {
-                    for (Enumeration e = request.getHeaderNames(); e
+                    for (@SuppressWarnings("unchecked")
+                    Enumeration<String> e = request.getHeaderNames(); e
                             .hasMoreElements();) {
-                        String name = (String) e.nextElement();
-                        Enumeration headerValues = request.getHeaders(name);
+                        String name = e.nextElement();
+                        @SuppressWarnings("unchecked")
+                        Enumeration<String> headerValues = request.getHeaders(name);
                         StringBuffer sb = new StringBuffer();
                         while (headerValues.hasMoreElements()) {
-                            sb.append((String) headerValues.nextElement());
+                            sb.append(headerValues.nextElement());
                         }
                         String value = sb.toString();
                         logger

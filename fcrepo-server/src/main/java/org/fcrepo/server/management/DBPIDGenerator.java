@@ -39,7 +39,7 @@ public class DBPIDGenerator
     private static final Logger logger =
             LoggerFactory.getLogger(DBPIDGenerator.class);
 
-    private final HashMap m_highestID;
+    private final HashMap<String, Integer> m_highestID;
 
     private PID m_lastPID;
 
@@ -56,7 +56,7 @@ public class DBPIDGenerator
     public DBPIDGenerator(ConnectionPool cPool, File oldPidGenDir)
             throws IOException {
         m_connectionPool = cPool;
-        m_highestID = new HashMap();
+        m_highestID = new HashMap<String, Integer>();
         // load the values from the database into the m_highestID hash
         // pidGen:  namespace  highestID
         Statement s = null;

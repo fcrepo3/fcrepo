@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:fedora-api="http://www.fedora.info/definitions/1/0/types/"
+             xmlns:fedora-types="http://www.fedora.info/definitions/1/0/types/"
+             targetNamespace="http://www.fedora.info/definitions/1/0/types/"
+             name="Fedora-API-M-WSDL">
+
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema"
+                targetNamespace="http://www.fedora.info/definitions/1/0/types/">
+            <include schemaLocation="fedora-types.xsd"/>
+        </schema>
+    </types>
+
+    <message name="ingestRequest">
+        <part name="parameters" element="fedora-types:ingest"/>
+    </message>
+    <message name="ingestResponse">
+        <part name="parameters" element="fedora-types:ingestResponse"/>
+    </message>
+
+    <message name="modifyObjectRequest">
+        <part name="parameters" element="fedora-types:modifyObject"/>
+    </message>
+    <message name="modifyObjectResponse">
+        <part name="parameters" element="fedora-types:modifyObjectResponse"/>
+    </message>
+
+    <message name="getObjectXMLRequest">
+        <part name="parameters" element="fedora-types:getObjectXML"/>
+    </message>
+    <message name="getObjectXMLResponse">
+        <part name="parameters" element="fedora-types:getObjectXMLResponse"/>
+    </message>
+
+    <message name="exportRequest">
+        <part name="parameters" element="fedora-types:export"/>
+    </message>
+    <message name="exportResponse">
+        <part name="parameters" element="fedora-types:exportResponse"/>
+    </message>
+
+    <message name="purgeObjectRequest">
+        <part name="parameters" element="fedora-types:purgeObject"/>
+    </message>
+    <message name="purgeObjectResponse">
+        <part name="parameters" element="fedora-types:purgeObjectResponse"/>
+    </message>
+
+    <message name="addDatastreamRequest">
+        <part name="parameters" element="fedora-types:addDatastream"/>
+    </message>
+    <message name="addDatastreamResponse">
+        <part name="parameters" element="fedora-types:addDatastreamResponse"/>
+    </message>
+
+    <message name="modifyDatastreamByReferenceRequest">
+        <part name="parameters" element="fedora-types:modifyDatastreamByReference"/>
+    </message>
+    <message name="modifyDatastreamByReferenceResponse">
+        <part name="parameters" element="fedora-types:modifyDatastreamByReferenceResponse"/>
+    </message>
+
+    <message name="modifyDatastreamByValueRequest">
+        <part name="parameters" element="fedora-types:modifyDatastreamByValue"/>
+    </message>
+    <message name="modifyDatastreamByValueResponse">
+        <part name="parameters" element="fedora-types:modifyDatastreamByValueResponse"/>
+    </message>
+
+    <message name="setDatastreamStateRequest">
+        <part name="parameters" element="fedora-types:setDatastreamState"/>
+    </message>
+    <message name="setDatastreamStateResponse">
+        <part name="parameters" element="fedora-types:setDatastreamStateResponse"/>
+    </message>
+
+    <message name="setDatastreamVersionableRequest">
+        <part name="parameters" element="fedora-types:setDatastreamVersionable"/>
+    </message>
+    <message name="setDatastreamVersionableResponse">
+        <part name="parameters" element="fedora-types:setDatastreamVersionableResponse"/>
+    </message>
+
+    <message name="compareDatastreamChecksumRequest">
+        <part name="parameters" element="fedora-types:compareDatastreamChecksum"/>
+    </message>
+    <message name="compareDatastreamChecksumResponse">
+        <part name="parameters" element="fedora-types:compareDatastreamChecksumResponse"/>
+    </message>
+
+    <message name="getDatastreamRequest">
+        <part name="parameters" element="fedora-types:getDatastream"/>
+    </message>
+    <message name="getDatastreamResponse">
+        <part name="parameters" element="fedora-types:getDatastreamResponse"/>
+    </message>
+
+    <message name="getDatastreamsRequest">
+        <part name="parameters" element="fedora-types:getDatastreams"/>
+    </message>
+    <message name="getDatastreamsResponse">
+        <part name="parameters" element="fedora-types:getDatastreamsResponse"/>
+    </message>
+
+    <message name="getDatastreamHistoryRequest">
+        <part name="parameters" element="fedora-types:getDatastreamHistory"/>
+    </message>
+    <message name="getDatastreamHistoryResponse">
+        <part name="parameters" element="fedora-types:getDatastreamHistoryResponse"/>
+    </message>
+
+    <message name="purgeDatastreamRequest">
+        <part name="parameters" element="fedora-types:purgeDatastream"/>
+    </message>
+    <message name="purgeDatastreamResponse">
+        <part name="parameters" element="fedora-types:purgeDatastreamResponse"/>
+    </message>
+
+    <message name="getNextPIDRequest">
+        <part name="parameters" element="fedora-types:getNextPID"/>
+    </message>
+    <message name="getNextPIDResponse">
+        <part name="parameters" element="fedora-types:getNextPIDResponse"/>
+    </message>
+
+    <message name="getRelationshipsRequest">
+        <part name="parameters" element="fedora-types:getRelationships"/>
+    </message>
+    <message name="getRelationshipsResponse">
+        <part name="parameters" element="fedora-types:getRelationshipsResponse"/>
+    </message>
+
+    <message name="addRelationshipRequest">
+        <part name="parameters" element="fedora-types:addRelationship"/>
+    </message>
+    <message name="addRelationshipResponse">
+        <part name="parameters" element="fedora-types:addRelationshipResponse"/>
+    </message>
+
+    <message name="purgeRelationshipRequest">
+        <part name="parameters" element="fedora-types:purgeRelationship"/>
+    </message>
+    <message name="purgeRelationshipResponse">
+        <part name="parameters" element="fedora-types:purgeRelationshipResponse"/>
+    </message>
+
+    <message name="validateRequest">
+        <part name="parameters" element="fedora-types:validate"/>
+    </message>
+    <message name="validateResponse">
+        <part name="parameters" element="fedora-types:validateResponse"/>
+    </message>
+
+
+    <portType name="Fedora-API-M">
+        <operation name="ingest">
+            <input message="fedora-api:ingestRequest"/>
+            <output message="fedora-api:ingestResponse"/>
+        </operation>
+        <operation name="modifyObject">
+            <input message="fedora-api:modifyObjectRequest"/>
+            <output message="fedora-api:modifyObjectResponse"/>
+        </operation>
+        <operation name="getObjectXML">
+            <input message="fedora-api:getObjectXMLRequest"/>
+            <output message="fedora-api:getObjectXMLResponse"/>
+        </operation>
+        <operation name="export">
+            <input message="fedora-api:exportRequest"/>
+            <output message="fedora-api:exportResponse"/>
+        </operation>
+        <operation name="purgeObject">
+            <input message="fedora-api:purgeObjectRequest"/>
+            <output message="fedora-api:purgeObjectResponse"/>
+        </operation>
+        <operation name="addDatastream">
+            <input message="fedora-api:addDatastreamRequest"/>
+            <output message="fedora-api:addDatastreamResponse"/>
+        </operation>
+        <operation name="modifyDatastreamByReference">
+            <input message="fedora-api:modifyDatastreamByReferenceRequest"/>
+            <output message="fedora-api:modifyDatastreamByReferenceResponse"/>
+        </operation>
+        <operation name="modifyDatastreamByValue">
+            <input message="fedora-api:modifyDatastreamByValueRequest"/>
+            <output message="fedora-api:modifyDatastreamByValueResponse"/>
+        </operation>
+        <operation name="setDatastreamState">
+            <input message="fedora-api:setDatastreamStateRequest"/>
+            <output message="fedora-api:setDatastreamStateResponse"/>
+        </operation>
+        <operation name="setDatastreamVersionable">
+            <input message="fedora-api:setDatastreamVersionableRequest"/>
+            <output message="fedora-api:setDatastreamVersionableResponse"/>
+        </operation>
+        <operation name="compareDatastreamChecksum">
+            <input message="fedora-api:compareDatastreamChecksumRequest"/>
+            <output message="fedora-api:compareDatastreamChecksumResponse"/>
+        </operation>
+        <operation name="getDatastream">
+            <input message="fedora-api:getDatastreamRequest"/>
+            <output message="fedora-api:getDatastreamResponse"/>
+        </operation>
+        <operation name="getDatastreams">
+            <input message="fedora-api:getDatastreamsRequest"/>
+            <output message="fedora-api:getDatastreamsResponse"/>
+        </operation>
+        <operation name="getDatastreamHistory">
+            <input message="fedora-api:getDatastreamHistoryRequest"/>
+            <output message="fedora-api:getDatastreamHistoryResponse"/>
+        </operation>
+        <operation name="purgeDatastream">
+            <input message="fedora-api:purgeDatastreamRequest"/>
+            <output message="fedora-api:purgeDatastreamResponse"/>
+        </operation>
+        <operation name="getNextPID">
+            <input message="fedora-api:getNextPIDRequest"/>
+            <output message="fedora-api:getNextPIDResponse"/>
+        </operation>
+        <operation name="getRelationships">
+            <input message="fedora-api:getRelationshipsRequest"/>
+            <output message="fedora-api:getRelationshipsResponse"/>
+        </operation>
+        <operation name="addRelationship">
+            <input message="fedora-api:addRelationshipRequest"/>
+            <output message="fedora-api:addRelationshipResponse"/>
+        </operation>
+        <operation name="purgeRelationship">
+            <input message="fedora-api:purgeRelationshipRequest"/>
+            <output message="fedora-api:purgeRelationshipResponse"/>
+        </operation>
+        <operation name="validate">
+            <input message="fedora-api:validateRequest"/>
+            <output message="fedora-api:validateResponse"/>
+        </operation>
+    </portType>
+
+    <binding name="Fedora-API-M-Binding-SOAPHTTP" type="fedora-api:Fedora-API-M">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="ingest">
+            <soap:operation style="document" soapAction="http://www.fedora.info/definitions/1/0/api/#ingest"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="modifyObject">
+            <soap:operation style="document" soapAction="http://www.fedora.info/definitions/1/0/api/#modifyObject"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="getObjectXML">
+            <soap:operation style="document" soapAction="http://www.fedora.info/definitions/1/0/api/#getObjectXML"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="export">
+            <soap:operation style="document" soapAction="http://www.fedora.info/definitions/1/0/api/#export"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="purgeObject">
+            <soap:operation style="document" soapAction="http://www.fedora.info/definitions/1/0/api/#purgeObject"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="addDatastream">
+            <soap:operation style="document" soapAction="http://www.fedora.info/definitions/1/0/api/#addDatastream"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="modifyDatastreamByReference">
+            <soap:operation style="document"
+                            soapAction="http://www.fedora.info/definitions/1/0/api/#modifyDatastreamByReference"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="modifyDatastreamByValue">
+            <soap:operation style="document"
+                            soapAction="http://www.fedora.info/definitions/1/0/api/#modifyDatastreamByValue"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="setDatastreamState">
+            <soap:operation style="document"
+                            soapAction="http://www.fedora.info/definitions/1/0/api/#setDatastreamState"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="setDatastreamVersionable">
+            <soap:operation style="document"
+                            soapAction="http://www.fedora.info/definitions/1/0/api/#setDatastreamVersionable"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="compareDatastreamChecksum">
+            <soap:operation style="document"
+                            soapAction="http://www.fedora.info/definitions/1/0/api/#compareDatastreamChecksum"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="getDatastream">
+            <soap:operation style="document" soapAction="http://www.fedora.info/definitions/1/0/api/#getDatastream"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="getDatastreams">
+            <soap:operation style="document" soapAction="http://www.fedora.info/definitions/1/0/api/#getDatastreams"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="getDatastreamHistory">
+            <soap:operation style="document"
+                            soapAction="http://www.fedora.info/definitions/1/0/api/#getDatastreamHistory"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="purgeDatastream">
+            <soap:operation style="document" soapAction="http://www.fedora.info/definitions/1/0/api/#purgeDatastream"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="getNextPID">
+            <soap:operation style="document" soapAction="http://www.fedora.info/definitions/1/0/api/#getNextPID"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="getRelationships">
+            <soap:operation style="document" soapAction="http://www.fedora.info/definitions/1/0/api/#getRelationships"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="addRelationship">
+            <soap:operation style="document" soapAction="http://www.fedora.info/definitions/1/0/api/#addRelationship"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="purgeRelationship">
+            <soap:operation style="document"
+                            soapAction="http://www.fedora.info/definitions/1/0/api/#purgeRelationship"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="validate">
+            <soap:operation style="document"
+                            soapAction="http://www.fedora.info/definitions/1/0/api/#validate"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+
+    <service name="Fedora-API-M-Service">
+        <port name="Fedora-API-M-Port-SOAPHTTP" binding="fedora-api:Fedora-API-M-Binding-SOAPHTTP">
+            <soap:address location="http://localhost:8080/fedora/services/management"/>
+        </port>
+        <port name="Fedora-API-M-Port-SOAPHTTPS" binding="fedora-api:Fedora-API-M-Binding-SOAPHTTP">
+            <soap:address location="https://localhost:8443/fedora/services/management"/>
+        </port>
+    </service>
+
+</definitions>

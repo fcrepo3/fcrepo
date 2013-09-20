@@ -15,9 +15,6 @@ import java.util.Set;
 
 import javax.xml.transform.TransformerException;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -41,6 +38,7 @@ import org.fcrepo.server.storage.translation.DOSerializer;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
 
 import static org.fcrepo.common.Constants.FOXML;
 import static org.fcrepo.common.Constants.MODEL;
@@ -201,12 +199,7 @@ public abstract class TestFOXMLDOSerializer
         try {
 
             StringWriter sout = new StringWriter();
-
-            OutputFormat formatter = new OutputFormat();
-            formatter.setEncoding("UTF-8"); // is the default
-
-            XMLSerializer serializer = new XMLSerializer(sout, formatter);
-            serializer.serialize(rdfRels);
+            ProprietaryXmlSerializers.writeXmlToUTF8(rdfRels, sout);
             rels =
                     RDFRelationshipReader
                             .readRelationships(new ByteArrayInputStream(sout

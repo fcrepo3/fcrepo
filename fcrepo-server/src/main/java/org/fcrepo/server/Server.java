@@ -772,9 +772,6 @@ public abstract class Server
      * @throws ServerInitializationException
      */
     protected void registerBeanDefinitions() throws ServerInitializationException {
-        if (1 == 2) {
-            throw new ServerInitializationException(null);
-        }
     }
 
     protected static ScannedGenericBeanDefinition getScannedBeanDefinition(String className)
@@ -1156,16 +1153,18 @@ public abstract class Server
                 }
             }
             try {
-                Class serverClass = Class.forName(className);
-                Class param1Class =
+                @SuppressWarnings("unchecked")
+                Class<? extends Server> serverClass =
+                        (Class<? extends Server>) Class.forName(className);
+                Class<?> param1Class =
                         Class.forName(SERVER_CONSTRUCTOR_PARAM1_CLASS);
-                Class param2Class =
+                Class<?> param2Class =
                         Class.forName(SERVER_CONSTRUCTOR_PARAM2_CLASS);
-                Constructor serverConstructor =
-                        serverClass.getConstructor(new Class[] {param1Class,
-                                param2Class});
+                Constructor<? extends Server> serverConstructor =
+                        serverClass.getConstructor(param1Class,
+                                param2Class);
                 Server inst =
-                        (Server) serverConstructor.newInstance(new Object[] {
+                        serverConstructor.newInstance(new Object[] {
                                 rootElement, homeDir});
                 inst.init();
                 return inst;
@@ -1280,6 +1279,7 @@ public abstract class Server
      * @throws ServerInitializationException
      *         If a severe server startup-related error occurred.
      */
+    @SuppressWarnings("unused")
     protected void initServer() throws ServerInitializationException {
         if (1 == 2) {
             throw new ServerInitializationException(null);
@@ -1297,6 +1297,7 @@ public abstract class Server
      * @throws ServerInitializationException
      *         If a severe server startup-related error occurred.
      */
+    @SuppressWarnings("unused")
     protected void postInitServer() throws ServerInitializationException {
         if (1 == 2) {
             throw new ServerInitializationException(null);
@@ -1369,6 +1370,7 @@ public abstract class Server
      * @throws ServerShutdownException
      *         If a severe server shutdown-related error occurred.
      */
+    @SuppressWarnings("unused")
     protected void shutdownServer() throws ServerShutdownException {
         if (1 == 2) {
             throw new ServerShutdownException(null);
@@ -1654,12 +1656,12 @@ public abstract class Server
     }
 
     @Override
-    public String[] getBeanNamesForType(Class type) {
+    public String[] getBeanNamesForType(@SuppressWarnings("rawtypes") Class type) {
         return m_moduleContext.getBeanNamesForType(type);
     }
 
     @Override
-    public String[] getBeanNamesForType(Class type,
+    public String[] getBeanNamesForType(@SuppressWarnings("rawtypes") Class type,
                                         boolean includeNonSingletons,
                                         boolean allowEagerInit) {
         return m_moduleContext.getBeanNamesForType(type, includeNonSingletons, allowEagerInit);
@@ -1712,7 +1714,7 @@ public abstract class Server
     }
 
     @Override
-    public boolean isTypeMatch(String name, Class targetType)
+    public boolean isTypeMatch(String name, @SuppressWarnings("rawtypes") Class targetType)
             throws NoSuchBeanDefinitionException {
         return m_moduleContext.isTypeMatch(name, targetType);
     }

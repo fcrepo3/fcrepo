@@ -105,7 +105,7 @@ public class FilterLdap
             m = FilterSetup.getFilterNameAbbrev(FILTER_NAME) + " init() ";
             inited = false;
             if (!initErrors) {
-                Set temp = new HashSet();
+                Set<String> temp = new HashSet<String>();
                 if (ATTRIBUTES2RETURN == null) {
                     ATTRIBUTES2RETURN = EMPTY_STRING_ARRAY;
                 } else {
@@ -267,14 +267,14 @@ public class FilterLdap
         return individualUserComparison;
     }
 
-    private Hashtable getEnvironment(String userid, String password) {
+    private Hashtable<String, String> getEnvironment(String userid, String password) {
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " getEnvironment() ";
-        Hashtable env = null;
+        Hashtable<String, String> env = null;
 
         try {
-            env = new Hashtable();
+            env = new Hashtable<String, String>();
             env.put(Context.INITIAL_CONTEXT_FACTORY,
                     "com.sun.jndi.ldap.LdapCtxFactory");
 
@@ -385,17 +385,17 @@ public class FilterLdap
         return searchControls;
     }
 
-    private NamingEnumeration getBasicNamingEnumeration(String userid,
+    private NamingEnumeration<SearchResult> getBasicNamingEnumeration(String userid,
                                                         String password,
                                                         String filter,
                                                         SearchControls searchControls,
-                                                        Hashtable env)
+                                                        Hashtable<String, String> env)
             throws NamingException, Exception {
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " getNamingEnumeration() ";
         logger.debug("{}>", m);
-        NamingEnumeration ne = null;
+        NamingEnumeration<SearchResult> ne = null;
         try {
             DirContext ctx;
             try {
@@ -409,10 +409,7 @@ public class FilterLdap
                 }
                 throw th;
             }
-            if (ctx == null) {
-                logger.error(m + "unexpected null ldap context");
-                throw new NamingException("");
-            }
+
             try {
                 ne = ctx.search(BASE, filter, searchControls);
             } catch (NamingException th) {
@@ -434,11 +431,11 @@ public class FilterLdap
         return ne;
     }
 
-    private NamingEnumeration getNamingEnumeration(String userid,
+    private NamingEnumeration<SearchResult> getNamingEnumeration(String userid,
                                                    String password,
                                                    String filter,
                                                    SearchControls searchControls,
-                                                   Hashtable env)
+                                                   Hashtable<String, String> env)
             throws NamingException, Exception {
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
@@ -469,8 +466,6 @@ public class FilterLdap
                         } else if (SKIP_FILTER.equalsIgnoreCase(PW_NULL)) {
                             logger.info("{}pre ignoring for null passwd", m);
                             throw new Exception(msg + "null password]");
-                        } else {
-                            assert true : "bad value for PW_NULL==" + PW_NULL;
                         }
                     }
                 }
@@ -489,8 +484,6 @@ public class FilterLdap
                         } else if (SKIP_FILTER.equalsIgnoreCase(PW_0)) {
                             logger.info("{}pre ignoring for 0-length passwd", m);
                             throw new Exception(msg + "0-length password]");
-                        } else {
-                            assert true : "bad value for PW_0==" + PW_0;
                         }
                     }
                 }
@@ -499,7 +492,7 @@ public class FilterLdap
             }
         }
 
-        NamingEnumeration ne = null;
+        NamingEnumeration<SearchResult> ne = null;
         try {
             ne =
                     getBasicNamingEnumeration(userid,
@@ -542,9 +535,6 @@ public class FilterLdap
                             } else {
                                 throw new NamingException(msg + "expected some");
                             }
-                        } else {
-                            assert true : "bad value for EMPTY_RESULTS=="
-                                    + EMPTY_RESULTS;
                         }
                     }
                 }
@@ -600,7 +590,7 @@ public class FilterLdap
         return rc;
     }
 
-    private void getAttributes(Attributes attributes, Map map) throws Throwable {
+    private void getAttributes(Attributes attributes, Map<String, Set<Object>> map) throws Throwable {
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " getAttributes() ";
@@ -618,13 +608,13 @@ public class FilterLdap
                     logger.debug("{}values collected and interpreted as groups=={}",
                             m, key);
                 }
-                Set values;
+                Set<Object> values;
                 if (map.containsKey(key)) {
                     logger.debug("{}already a value-set for attribute=={}", m, key);
-                    values = (Set) map.get(key);
+                    values = map.get(key);
                 } else {
                     logger.debug("{}making+storing a value-set for attribute=={}", m, key);
-                    values = new HashSet();
+                    values = new HashSet<Object>();
                     map.put(key, values);
                 }
                 int size = attribute.size();
@@ -640,10 +630,10 @@ public class FilterLdap
         }
     }
 
-    private Boolean processNamingEnumeration(NamingEnumeration ne,
+    private Boolean processNamingEnumeration(NamingEnumeration<SearchResult> ne,
                                              String password,
                                              Boolean authenticated,
-                                             Map map) {
+                                             Map<String, Set<Object>> map) {
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " processNamingEnumeration() ";
@@ -654,9 +644,8 @@ public class FilterLdap
                 logger.debug("{}another element", m);
                 SearchResult s = null;
                 try {
-                    Object o = ne.nextElement();
-                    logger.debug("{}got a {}", m, o.getClass().getName());
-                    s = (SearchResult) o;
+                    s = ne.nextElement();
+                    logger.debug("{}got a {}", m, s.getClass().getName());
                 } catch (Throwable th) {
                     logger.error("{} naming enum contains obj not SearchResult", m);
                     continue;
@@ -724,7 +713,8 @@ public class FilterLdap
                         + " populateCacheElement() ";
         logger.debug("{}>", m);
         Boolean authenticated = null;
-        Map map = new Hashtable();
+        Map<String, Set<Object>> map =
+                new Hashtable<String, Set<Object>>();
         try {
             logger.debug("{}about to call getNamingEnumeration()", m);
 
@@ -732,9 +722,9 @@ public class FilterLdap
 
             SearchControls searchControls = getSearchControls();
 
-            Hashtable env = getEnvironment(cacheElement.getUserid(), password);
+            Hashtable<String,String> env = getEnvironment(cacheElement.getUserid(), password);
 
-            NamingEnumeration ne = null;
+            NamingEnumeration<SearchResult> ne = null;
 
             try {
                 ne =

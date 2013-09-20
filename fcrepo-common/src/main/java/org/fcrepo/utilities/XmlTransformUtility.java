@@ -29,6 +29,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+
 /**
  *
  * @author Edwin Shin
@@ -54,7 +55,7 @@ public class XmlTransformUtility {
     private static final SoftReferenceObjectPool<SAXParser> SAX_PARSERS =
         new SoftReferenceObjectPool<SAXParser>(
             new PoolableSAXParserFactory(true, false));
-    
+        
     /**
      * Convenience method to get a new instance of a TransformerFactory.
      * If the {@link #TransformerFactory} is an instance of
@@ -185,22 +186,23 @@ public class XmlTransformUtility {
 
     public static void parseWithoutValidating(InputSource in, DefaultHandler handler)
             throws SAXException, IOException {
-            SAXParser parser = null;
-            try {
-                parser = (SAXParser) SAX_PARSERS.borrowObject();
-            } catch (Exception e) {
-                throw new RuntimeException("Error initializing SAX parser", e);
-            }
-            
-            try {
-                parser.parse(in, handler);
-            } finally {
-                if (parser != null) {
-                    try {
-                        SAX_PARSERS.returnObject(parser);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+        SAXParser parser = null;
+        try {
+            parser = (SAXParser) SAX_PARSERS.borrowObject();
+        } catch (Exception e) {
+            throw new RuntimeException("Error initializing SAX parser", e);
+        }
+
+        try {
+            parser.parse(in, handler);
+        } finally {
+            if (parser != null) {
+                try {
+                    SAX_PARSERS.returnObject(parser);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-        }}
+        }
+    }
+}

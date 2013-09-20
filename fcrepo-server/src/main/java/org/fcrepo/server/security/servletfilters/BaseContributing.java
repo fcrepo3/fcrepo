@@ -6,8 +6,10 @@
 package org.fcrepo.server.security.servletfilters;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.servlet.FilterConfig;
@@ -25,7 +27,8 @@ public abstract class BaseContributing
     private static final Logger logger =
             LoggerFactory.getLogger(BaseContributing.class);
 
-    public static final HashSet NULL_SET = new HashSet();
+    public static final Set<String> NULL_SET =
+        Collections.emptySet();
 
     public static final Hashtable EMPTY_MAP = new Hashtable();
 
@@ -34,15 +37,15 @@ public abstract class BaseContributing
     //defaults
     private static boolean AUTHENTICATE_DEFAULT = true;
 
-    private static Collection FILTERS_CONTRIBUTING_SPONSORED_ATTRIBUTES_DEFAULT =
+    private static Collection<String> FILTERS_CONTRIBUTING_SPONSORED_ATTRIBUTES_DEFAULT =
             NULL_SET;
 
     protected boolean AUTHENTICATE = AUTHENTICATE_DEFAULT;
 
-    protected Collection FILTERS_CONTRIBUTING_AUTHENTICATED_ATTRIBUTES =
+    protected Collection<String> FILTERS_CONTRIBUTING_AUTHENTICATED_ATTRIBUTES =
             NULL_SET;
 
-    protected Collection FILTERS_CONTRIBUTING_SPONSORED_ATTRIBUTES =
+    protected Collection<String> FILTERS_CONTRIBUTING_SPONSORED_ATTRIBUTES =
             FILTERS_CONTRIBUTING_SPONSORED_ATTRIBUTES_DEFAULT;
 
     public static final String SURROGATE_ROLE_KEY = "surrogate-role";
@@ -109,9 +112,7 @@ public abstract class BaseContributing
                     }
                 } else {
                     FILTERS_CONTRIBUTING_AUTHENTICATED_ATTRIBUTES =
-                            new Vector(1);
-                    FILTERS_CONTRIBUTING_AUTHENTICATED_ATTRIBUTES
-                            .add(FILTER_NAME);
+                            Collections.singletonList(FILTER_NAME);
                 }
             }
         }

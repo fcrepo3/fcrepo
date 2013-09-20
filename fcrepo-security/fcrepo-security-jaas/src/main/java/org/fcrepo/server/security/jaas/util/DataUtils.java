@@ -29,22 +29,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 public class DataUtils {
 
@@ -119,60 +113,34 @@ public class DataUtils {
     }
 
     public static String format(Document doc) throws Exception {
-        OutputFormat format = new OutputFormat(doc);
-        format.setEncoding("UTF-8");
-        format.setIndenting(true);
-        format.setIndent(2);
-        format.setOmitXMLDeclaration(true);
+        ReadableCharArrayWriter out = new ReadableCharArrayWriter();
+        Writer output = new BufferedWriter(out);
 
-        ReadableByteArrayOutputStream out = new ReadableByteArrayOutputStream(8192);
-        Writer output = new BufferedWriter(new OutputStreamWriter(out));
-
-        XMLSerializer serializer = new XMLSerializer(output, format);
-        serializer.serialize(doc);
+        ProprietaryXmlSerializers.writePrettyPrint(doc, output);
         output.close();
 
-        return out.getString(Charset.forName("UTF-8"));
+        return out.getString();
     }
 
     public static String format(byte[] data) throws Exception {
         Document doc =
             XmlTransformUtility.parseNamespaceAware(new ByteArrayInputStream(data));
 
-        OutputFormat format = new OutputFormat(doc);
-        format.setEncoding("UTF-8");
-        format.setIndenting(true);
-        format.setIndent(2);
-        format.setOmitXMLDeclaration(true);
-
-        ReadableCharArrayWriter out = new ReadableCharArrayWriter();
-        Writer output = new BufferedWriter(out);
-
-        XMLSerializer serializer = new XMLSerializer(output, format);
-        serializer.serialize(doc);
-        output.close();
-
-        return out.getString();
+        return format(doc);
     }
 
     public static InputStream fedoraXMLHashFormat(byte[] data) throws Exception {
-        OutputFormat format = new OutputFormat("XML", "UTF-8", false);
-        format.setIndent(0);
-        format.setLineWidth(0);
-        format.setPreserveSpace(false);
-        ReadableByteArrayOutputStream outStream = new ReadableByteArrayOutputStream();
-        XMLSerializer serializer = new XMLSerializer(outStream, format);
+        ReadableCharArrayWriter writer = new ReadableCharArrayWriter();
 
         Document doc =
             XmlTransformUtility.parseNamespaceAware(new ByteArrayInputStream(data));
-        serializer.serialize(doc);
+        ProprietaryXmlSerializers.writeXmlNoSpace(doc, "UTF-8", writer);
+        writer.close();
 
-        ByteArrayInputStream in =
-                outStream.toInputStream();
         BufferedReader br =
-                new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                new BufferedReader(writer.toReader());
         String line = null;
-        outStream = new ReadableByteArrayOutputStream();
+        ReadableByteArrayOutputStream outStream = new ReadableByteArrayOutputStream();
         OutputStreamWriter sb = new OutputStreamWriter(outStream, "UTF-8");
         while ((line = br.readLine()) != null) {
             line = line.trim();

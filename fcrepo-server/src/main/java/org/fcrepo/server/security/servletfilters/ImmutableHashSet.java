@@ -9,14 +9,15 @@ import java.util.HashSet;
 
 /**
  * @author Bill Niebel
+ * @param <T>
  */
-public class ImmutableHashSet
-        extends HashSet {
+public class ImmutableHashSet<T>
+        extends HashSet<T> {
 
     private static final long serialVersionUID = 1L;
 
     @Override
-    public boolean add(Object o) {
+    public boolean add(T o) {
         return false;
     }
 
@@ -35,17 +36,17 @@ public class ImmutableHashSet
     }
 
     @Override
-    public boolean removeAll(Collection c) {
+    public boolean removeAll(Collection<?> c) {
         return false;
     }
 
     @Override
-    public boolean addAll(Collection c) {
+    public boolean addAll(Collection<? extends T> c) {
         return false;
     }
 
     @Override
-    public boolean retainAll(Collection c) {
+    public boolean retainAll(Collection<?> c) {
         return false;
     }
 

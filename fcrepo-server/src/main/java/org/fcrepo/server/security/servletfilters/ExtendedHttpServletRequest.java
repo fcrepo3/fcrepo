@@ -50,14 +50,14 @@ public interface ExtendedHttpServletRequest
     public boolean isAttributeDefined(String key)
             throws AuthzOperationalException;
 
-    public void addAttributes(String authority, Map attributes)
+    public void addAttributes(String authority, Map<String, Set<?>> attributes)
             throws Exception;
 
     public String getUser() throws Exception;
 
     public String getPassword() throws Exception;
 
-    public Map getAllAttributes() throws Exception;
+    public Map<String, Set<?>> getAllAttributes() throws Exception;
 
     public String getAuthority();
 

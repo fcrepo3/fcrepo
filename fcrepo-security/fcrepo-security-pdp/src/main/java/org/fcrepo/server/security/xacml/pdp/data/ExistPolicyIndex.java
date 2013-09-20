@@ -9,11 +9,11 @@ import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -23,6 +23,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader;
 import org.fcrepo.server.security.xacml.util.AttributeBean;
+import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -40,8 +41,6 @@ import org.xmldb.api.modules.CollectionManagementService;
 import org.xmldb.api.modules.XMLResource;
 import org.xmldb.api.modules.XPathQueryService;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.ParsingException;
@@ -302,18 +301,12 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
      * @throws PolicyIndexException
      */
     protected static byte[] nodeToByte(Node node) throws PolicyIndexException {
-        OutputFormat format = new OutputFormat();
-        format.setEncoding("UTF-8");
-        format.setIndenting(true);
-        format.setIndent(2);
-        format.setOmitXMLDeclaration(false);
-
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Writer output = new OutputStreamWriter(out);
+        Writer output = new OutputStreamWriter(out, Charset.forName("UTF-8"));
 
-        XMLSerializer serializer = new XMLSerializer(output, format);
         try {
-            serializer.serialize(node);
+            ProprietaryXmlSerializers.writePrettyPrintWithDecl(node, output);
+            output.close();
         } catch (IOException e) {
             throw new PolicyIndexException("Failed to serialise node " + e.getMessage(), e);
         }
