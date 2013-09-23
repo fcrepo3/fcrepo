@@ -1,0 +1,85 @@
+<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+  xmlns:test="http://foo.org/bar/">
+  <dc:title>Web Service Definition for the Fedora Access Service</dc:title>
+  <dc:creator>Sandy Payette</dc:creator>
+  <dc:subject>Fedora</dc:subject>
+  <dc:subject>documentation</dc:subject>
+  <dc:subject>web service</dc:subject>
+  <dc:subject>Web Services Description Language (WSDL)</dc:subject>
+  <test:c1>
+  <test:c2>
+  <test:c3>
+  <test:c4>
+  <test:c5>
+  <test:c6>
+  <test:c7>
+  <test:c8>
+  <test:c9>
+  <test:c10>
+  <test:c11>
+  <test:c12>
+  <test:c13>
+  <test:c14>
+  <test:c15>
+  <test:c16>
+  <test:c17>
+  <test:c18>
+  <test:c19>
+  <test:c20>
+  <test:c21>
+  <test:c22>
+  <test:c23>
+  <test:c24>
+  <test:c25>
+  <test:c26>
+  <test:c27>
+  <test:c28>
+  <test:c29>
+  <test:c30>
+  <test:c31>
+  <test:c32>
+  <test:c33>
+  <test:c34>
+  <test:c35>
+  <test:c36>
+  <dc:description>This XML source contains a very long description of the something, something important, which will be stored in an inline XML datastream, but parsed first.</dc:description>
+  </test:c36>
+  </test:c35>
+  </test:c34>
+  </test:c33>
+  </test:c32>
+  </test:c31>
+  </test:c30>
+  </test:c29>
+  </test:c28>
+  </test:c27>
+  </test:c26>
+  </test:c25>
+  </test:c24>
+  </test:c23>
+  </test:c22>
+  </test:c21>
+  </test:c20>
+  </test:c19>
+  </test:c18>
+  </test:c17>
+  </test:c16>
+  </test:c15>
+  </test:c14>
+  </test:c13>
+  </test:c12>
+  </test:c11>
+  </test:c10>
+  </test:c9>
+  </test:c8>
+  </test:c7>
+  </test:c6>
+  </test:c5>
+  </test:c4>
+  </test:c3>
+  </test:c2>
+  </test:c1>
+  <dc:identifier>demo:14</dc:identifier>
+  <dc:relation>http://www.fedora.info</dc:relation>
+  <dc:rights>unrestricted</dc:rights>
+</oai_dc:dc>

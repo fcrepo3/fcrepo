@@ -38,7 +38,7 @@ import org.fcrepo.server.storage.translation.DOSerializer;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.RelationshipTuple;
-import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
+import org.fcrepo.utilities.xml.XercesXmlSerializers;
 
 import static org.fcrepo.common.Constants.FOXML;
 import static org.fcrepo.common.Constants.MODEL;
@@ -199,7 +199,7 @@ public abstract class TestFOXMLDOSerializer
         try {
 
             StringWriter sout = new StringWriter();
-            ProprietaryXmlSerializers.writeXmlToUTF8(rdfRels, sout);
+            XercesXmlSerializers.writeXmlToUTF8(rdfRels, sout);
             rels =
                     RDFRelationshipReader
                             .readRelationships(new ByteArrayInputStream(sout

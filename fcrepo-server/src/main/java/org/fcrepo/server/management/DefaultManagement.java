@@ -74,7 +74,7 @@ import org.fcrepo.server.validation.ecm.EcmValidator;
 import org.fcrepo.utilities.DateUtility;
 import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.fcrepo.utilities.XmlTransformUtility;
-import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
+import org.fcrepo.utilities.xml.XercesXmlSerializers;
 import org.jrdf.graph.URIReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1538,9 +1538,9 @@ public class DefaultManagement
             Document doc =
                 XmlTransformUtility.parseNamespaceAware(in);
             if (includeXMLDeclaration) {
-                ProprietaryXmlSerializers.writeMgmtWithDecl(doc, out);
+                XercesXmlSerializers.writeMgmtWithDecl(doc, out);
             } else {
-                ProprietaryXmlSerializers.writeMgmtNoDecl(doc, out);
+                XercesXmlSerializers.writeMgmtNoDecl(doc, out);
             }
             out.flush();
         } catch (Exception e) {

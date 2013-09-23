@@ -7,22 +7,19 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
-import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
+import org.fcrepo.utilities.xml.XercesXmlSerializers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -96,9 +93,8 @@ public class DataFileUtils {
             throws Exception {
         try {
             File file = new File(filename.trim());
-            String data = format(doc);
             PrintWriter writer = new PrintWriter(file, "UTF-8");
-            writer.print(data);
+            format(doc, writer);
             writer.flush();
             writer.close();
         } catch (Exception e) {
@@ -113,7 +109,7 @@ public class DataFileUtils {
             ReadableCharArrayWriter out = new ReadableCharArrayWriter();
             Writer output = new BufferedWriter(out);
 
-            ProprietaryXmlSerializers.writePrettyPrint(doc, output);
+            format(doc, output);
             output.close();
 
             return out.getString();
@@ -122,6 +118,10 @@ public class DataFileUtils {
         }
 
         return null;
+    }
+    
+    private static void format(Document doc, Writer out) throws Exception {
+        XercesXmlSerializers.writePrettyPrint(doc, out);
     }
 
     public static String format(byte[] document) throws Exception {
@@ -143,7 +143,7 @@ public class DataFileUtils {
         DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
         try {
             Document doc = builder.parse(new ByteArrayInputStream(data));
-            ProprietaryXmlSerializers.writeXmlNoSpace(doc, "UTF-8", writer);
+            XercesXmlSerializers.writeXmlNoSpace(doc, "UTF-8", writer);
             writer.close();
         } finally {
             XmlTransformUtility.returnDocumentBuilder(builder);

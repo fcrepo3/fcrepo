@@ -20,7 +20,7 @@ import org.fcrepo.server.Context;
 import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
-import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
+import org.fcrepo.utilities.xml.XercesXmlSerializers;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -101,7 +101,7 @@ public class DatastreamXMLMetadata
             DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
             try {
                 Document doc = builder.parse(new ByteArrayInputStream(xmlContent));
-                ProprietaryXmlSerializers.writeXmlNoSpace(doc, m_encoding, out);
+                XercesXmlSerializers.writeXmlNoSpace(doc, m_encoding, out);
                 out.close();
             } finally {
                 XmlTransformUtility.returnDocumentBuilder(builder);
