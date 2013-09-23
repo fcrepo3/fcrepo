@@ -3,9 +3,6 @@ package org.fcrepo.utilities.xml;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.xml.parsers.DocumentBuilder;
-
-import org.fcrepo.utilities.XmlTransformUtility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -14,7 +11,7 @@ import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 @Deprecated
-public abstract class ProprietaryXmlSerializers {
+public abstract class SunXmlSerializers {
 
     /**
      * Serialize the dom Document with no preserved space between elements,
@@ -29,13 +26,8 @@ public abstract class ProprietaryXmlSerializers {
         throws IOException {
         XMLSerializer ser = new XMLSerializer(out, getXmlNoSpace(encoding));
         
-        DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
-        try {
-            ser.serialize(doc);
-            out.close();
-        } finally {
-            XmlTransformUtility.returnDocumentBuilder(builder);
-        }
+        ser.serialize(doc);
+        out.close();
     }
     
     /**

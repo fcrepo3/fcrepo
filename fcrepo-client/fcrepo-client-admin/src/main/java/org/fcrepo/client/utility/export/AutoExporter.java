@@ -24,7 +24,7 @@ import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.types.gen.RepositoryInfo;
 import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.utilities.FileUtils;
-import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
+import org.fcrepo.utilities.xml.XercesXmlSerializers;
 import org.w3c.dom.Document;
 
 
@@ -144,7 +144,7 @@ public class AutoExporter
                 OutputStreamWriter writer =
                         new OutputStreamWriter(outStream, Charset.forName("UTF-8"));
                 // use xerces to pretty print the xml, assuming it's well formed
-                ProprietaryXmlSerializers.writeMgmtNoDecl(doc, writer);
+                XercesXmlSerializers.writeMgmtNoDecl(doc, writer);
                 writer.close();
             }
         } catch (Exception e) {
@@ -185,7 +185,7 @@ public class AutoExporter
             Document doc = builder.parse(new ByteArrayInputStream(bytes));
             OutputStreamWriter writer =
                     new OutputStreamWriter(outStream, Charset.forName("UTF-8"));
-            ProprietaryXmlSerializers.writeMgmtNoDecl(doc, writer);
+            XercesXmlSerializers.writeMgmtNoDecl(doc, writer);
             writer.close();
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getClass().getName() + " : "

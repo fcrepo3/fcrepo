@@ -4,13 +4,14 @@ package org.fcrepo.server.security.xacml.util;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.PrintWriter;
+import java.io.Writer;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
-import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
+import org.fcrepo.utilities.xml.XercesXmlSerializers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -50,9 +51,8 @@ public class DataUtils {
     public static void saveDocument(String filename, Document doc) {
         try {
             File file = new File(filename.trim());
-            String data = format(doc);
             PrintWriter writer = new PrintWriter(file, "UTF-8");
-            writer.print(data);
+            format(doc, writer);
             writer.flush();
             writer.close();
         } catch (Exception e) {
@@ -63,9 +63,13 @@ public class DataUtils {
     public static String format(Document doc) throws Exception {
 
         ReadableCharArrayWriter out = new ReadableCharArrayWriter(8192);
-        ProprietaryXmlSerializers.writePrettyPrint(doc, out);
+        format(doc, out);
         out.close();
 
         return out.getString();
+    }
+    
+    private static void format(Document doc, Writer out) throws Exception {
+        XercesXmlSerializers.writePrettyPrint(doc, out);
     }
 }

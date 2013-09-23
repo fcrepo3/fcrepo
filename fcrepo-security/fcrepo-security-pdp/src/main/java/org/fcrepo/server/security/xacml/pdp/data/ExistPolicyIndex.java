@@ -23,7 +23,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader;
 import org.fcrepo.server.security.xacml.util.AttributeBean;
-import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
+import org.fcrepo.utilities.xml.SunXmlSerializers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -305,7 +305,7 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
         Writer output = new OutputStreamWriter(out, Charset.forName("UTF-8"));
 
         try {
-            ProprietaryXmlSerializers.writePrettyPrintWithDecl(node, output);
+            SunXmlSerializers.writePrettyPrintWithDecl(node, output);
             output.close();
         } catch (IOException e) {
             throw new PolicyIndexException("Failed to serialise node " + e.getMessage(), e);

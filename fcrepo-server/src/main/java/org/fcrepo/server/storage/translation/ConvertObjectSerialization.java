@@ -26,7 +26,7 @@ import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.utilities.LogConfig;
 import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.fcrepo.utilities.XmlTransformUtility;
-import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
+import org.fcrepo.utilities.xml.XercesXmlSerializers;
 import org.trippi.io.TripleIteratorFactory;
 import org.w3c.dom.Document;
 
@@ -111,7 +111,7 @@ public class ConvertObjectSerialization {
         DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
         try {
             Document doc = builder.parse(source);
-            ProprietaryXmlSerializers.writeConsoleWithDocType(doc, outWriter);
+            XercesXmlSerializers.writeConsoleWithDocType(doc, outWriter);
             outWriter.close();
         } finally {
             XmlTransformUtility.returnDocumentBuilder(builder);

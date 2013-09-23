@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.fcrepo.utilities.XmlTransformUtility;
-import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
+import org.fcrepo.utilities.xml.XercesXmlSerializers;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -120,7 +120,7 @@ public class RuntimeWSDL {
      * Serialize the final WSDL document to the given writer.
      */
     public void serialize(Writer out) throws IOException {
-        ProprietaryXmlSerializers.writeConsoleNoDocType(_wsdlDoc, out);
+        XercesXmlSerializers.writeConsoleNoDocType(_wsdlDoc, out);
     }
 
     /**

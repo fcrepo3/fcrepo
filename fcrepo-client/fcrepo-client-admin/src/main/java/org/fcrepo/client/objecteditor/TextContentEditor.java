@@ -27,7 +27,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
-import org.fcrepo.utilities.xml.ProprietaryXmlSerializers;
+import org.fcrepo.utilities.xml.XercesXmlSerializers;
 import org.w3c.dom.Document;
 
 import org.xml.sax.InputSource;
@@ -97,7 +97,7 @@ public class TextContentEditor
                 ReadableCharArrayWriter buf = new ReadableCharArrayWriter();
                 Document doc = XmlTransformUtility.parseNamespaceAware(data);
                 // use xerces to pretty print the xml to the editor
-                ProprietaryXmlSerializers.writeMgmtNoDecl(doc, buf);
+                XercesXmlSerializers.writeMgmtNoDecl(doc, buf);
                 buf.close();
                 content = buf.getString();
             } catch (Exception e) {
