@@ -67,7 +67,7 @@ public class BasicDigitalObject
 
     private final HashMap<String, List<Disseminator>> m_disseminators;
 
-    private final Map<String, String> m_extProperties;
+    private Map<String, String> m_extProperties;
 
 
 
@@ -75,7 +75,8 @@ public class BasicDigitalObject
         m_auditRecords = new ArrayList<AuditRecord>();
         m_datastreams = new LinkedHashMap<String, List<Datastream>>();
         m_disseminators = new HashMap<String, List<Disseminator>>();
-        m_extProperties = new HashMap<String, String>();
+        // since extProperties are rare, initialize lazily
+        m_extProperties = null;
         m_datastreamProcessor = new RelationshipProcessor();
         setNew(false);
     }
@@ -268,6 +269,9 @@ public class BasicDigitalObject
      *        The extended property name, either a string, or URI as string.
      */
     public void setExtProperty(String propName, String propValue) {
+        if (m_extProperties == null) {
+            m_extProperties = new HashMap<String, String>();
+        }
         m_extProperties.put(propName, propValue);
 
     }
@@ -278,8 +282,10 @@ public class BasicDigitalObject
      * @return The property value.
      */
     public String getExtProperty(String propName) {
+        if (m_extProperties == null) {
+            return null;
+        }
         return m_extProperties.get(propName);
-
     }
 
     /**
@@ -289,8 +295,10 @@ public class BasicDigitalObject
      * @return The property Map.
      */
     public Map<String, String> getExtProperties() {
+        if (m_extProperties == null) {
+            return Collections.emptyMap();
+        }
         return m_extProperties;
-
     }
 
     // assumes m_pid as subject; ie RELS-EXT only
