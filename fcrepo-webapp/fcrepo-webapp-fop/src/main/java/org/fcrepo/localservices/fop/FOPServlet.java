@@ -126,14 +126,6 @@ public class FOPServlet
         }
         return src;
     }
-
-    private void sendPDF(byte[] content, HttpServletResponse response) throws IOException {
-        //Send the result back to the client
-        response.setContentType("application/pdf");
-        response.setContentLength(content.length);
-        response.getOutputStream().write(content);
-        response.getOutputStream().flush();
-    }
     
     /**
      * Renders an XSL-FO file into a PDF file. The PDF is written to a byte
@@ -208,8 +200,9 @@ public class FOPServlet
 
         FOUserAgent foUserAgent = getFOUserAgent();
 
-        //Setup output
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        //Setup output, assume 1 kb to avoid at least some copy-up
+        ReadableByteArrayOutputStream out =
+                new ReadableByteArrayOutputStream(1024);
 
         //Setup FOP
         Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, out);
@@ -221,7 +214,10 @@ public class FOPServlet
         transformer.transform(src, res);
 
         //Return the result
-        sendPDF(out.toByteArray(), response);
+        response.setContentType("application/pdf");
+        response.setContentLength(out.length());
+        out.writeAllTo(response.getOutputStream());
+        response.getOutputStream().flush();
     }
     
     /** @return a new FOUserAgent for FOP */

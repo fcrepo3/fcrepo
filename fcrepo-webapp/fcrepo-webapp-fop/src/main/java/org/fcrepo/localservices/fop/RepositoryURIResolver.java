@@ -26,7 +26,7 @@ public class RepositoryURIResolver
         implements URIResolver {
 
     /** {@inheritDoc} */
-    public Source resolve(String href, String base) throws TransformerException {
+    public StreamSource resolve(String href, String base) throws TransformerException {
 
         return resolveRepositoryURI(href);
 
@@ -41,10 +41,10 @@ public class RepositoryURIResolver
      * @throws TransformerException
      *         if no URL can be constructed from the path
      */
-    protected Source resolveRepositoryURI(String path)
+    protected StreamSource resolveRepositoryURI(String path)
             throws TransformerException {
 
-        Source resolvedSource = null;
+        StreamSource resolvedSource = null;
 
         try {
             if (path != null) {
