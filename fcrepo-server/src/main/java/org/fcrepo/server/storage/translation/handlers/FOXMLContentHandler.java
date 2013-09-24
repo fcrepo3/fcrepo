@@ -174,10 +174,16 @@ public class FOXMLContentHandler
 
     private String m_auditJustification;
 
-    // buffers for reading content
-    private ReadableByteArrayOutputStream m_elementContent; // single element
+    /** buffers for reading content **/
+    // single element of B64-encoded data
+    private ReadableByteArrayOutputStream m_elementContent;
+    
+    // chunks of inline XML metadata
+    private ReadableCharArrayWriter m_dsXMLBuffer; 
 
-    private ReadableCharArrayWriter m_dsXMLBuffer; // chunks of inline XML metadata
+    // the content of individual elements in an audit stream as a String
+    // reused after each element in an audit record (depth is 1)
+    private StringBuilder m_auditBuffer;
     
     /**
      * Creates a deserializer that reads the default FOXML format.
@@ -228,7 +234,7 @@ public class FOXMLContentHandler
     @Override
     public void startPrefixMapping(String prefix, String uri) {
         m_prefixMap.put(prefix, uri);
-        if (m_inXMLMetadata) {
+        if (m_inXMLMetadata && !m_gotAudit) {
             m_localPrefixMap.put(prefix, uri);
             m_prefixList.add(prefix);
         }
@@ -240,7 +246,7 @@ public class FOXMLContentHandler
     @Override
     public void endPrefixMapping(String prefix) {
         m_prefixMap.remove(prefix);
-        if (m_inXMLMetadata) {
+        if (m_inXMLMetadata && !m_gotAudit) {
             m_localPrefixMap.remove(prefix);
         }
     }
@@ -369,7 +375,8 @@ public class FOXMLContentHandler
             // inside a datastreamVersion element, it's either going to be
             // xmlContent (inline xml), contentLocation (a reference) or binaryContent
             else if (localName.equals("xmlContent")) {
-                m_dsXMLBuffer = new ReadableCharArrayWriter();
+                // null out the existing buffer (if any) and lazily initialize
+                m_dsXMLBuffer = null;
                 m_xmlDataLevel = 0;
                 m_inXMLMetadata = true;
             } else if (localName.equals("contentLocation")) {
@@ -434,16 +441,6 @@ public class FOXMLContentHandler
             // INLINE XML...
             //===============
             if (m_inXMLMetadata) {
-                // we are inside an xmlContent element.
-                // just output it, remembering the number of foxml:xmlContent elements we see,
-                appendElementStart(uri, localName, qName, a, m_dsXMLBuffer);
-
-                // FOXML INSIDE FOXML! we have an inline XML datastream
-                // that is itself FOXML.  We do not want to parse this!
-                if (uri.equals(FOXML.uri) && localName.equals("xmlContent")) {
-                    m_xmlDataLevel++;
-                }
-
                 // if AUDIT datastream, initialize new audit record object
                 if (m_gotAudit) {
                     if (localName.equals("record")) {
@@ -452,6 +449,17 @@ public class FOXMLContentHandler
                     } else if (localName.equals("process")) {
                         m_auditProcessType = grab(a, uri, "type");
                     }
+                    if (m_auditBuffer != null) m_auditBuffer.setLength(0);
+                } else {
+                    // FOXML INSIDE FOXML! we have an inline XML datastream
+                    // that is itself FOXML.  We do not want to parse this!
+                    if (uri.equals(FOXML.uri) && localName.equals("xmlContent")) {
+                        m_xmlDataLevel++;
+                    }
+                    // we are inside an xmlContent element.
+                    // just output it, remembering the number of foxml:xmlContent elements we see,
+                    ensureInlineXmlCharBuffer();
+                    appendElementStart(uri, localName, qName, a, m_dsXMLBuffer);
                 }
             } else {
                 // ignore all else
@@ -470,13 +478,20 @@ public class FOXMLContentHandler
             // since this data is encoded straight back to xml,
             // we need to make sure special characters &, <, >, ", and '
             // are re-converted to the xml-acceptable equivalents.
+            ensureInlineXmlCharBuffer();
             StreamUtility.enc(ch, start, length, m_dsXMLBuffer);
-        } else if (m_gotAudit || m_readingBinaryContent){
+        } else if (m_gotAudit){
             // Use a separate buffer to deal with the special case
             // of AUDIT datastreams, which may be inline, but need to
             // retrieve individual element content to deserialize correctly
-            // append element content into a byte buffer; or b64-encoded
-            // binary content
+            // append element content into a byte buffer; we don't call
+            // ensure because these attributes are much smaller than the dsSize
+            if (m_auditBuffer == null) {
+                m_auditBuffer = new StringBuilder();
+            }
+            m_auditBuffer.append(ch, start, length);
+        } else if (m_readingBinaryContent) {
+            // b64-encoded binary content
             if (m_elementContent == null) {
                 m_elementContent = new ReadableByteArrayOutputStream();
             }
@@ -502,23 +517,24 @@ public class FOXMLContentHandler
             if (m_gotAudit) {
                 // Pick up audit records from the current ds version
                 // and instantiate audit records array in digital object.
+                int chars = (m_auditBuffer == null) ? 0 : m_auditBuffer.length();
                 if (localName.equals("action")) {
-                    m_auditAction = (m_elementContent != null) ?
-                            m_elementContent.toString() : "";
+                    m_auditAction = (chars > 0) ?
+                            m_auditBuffer.toString() : "";
                     //} else if (localName.equals("recordID")) {
                     //    m_auditRecordID=m_elementContent.toString();
                 } else if (localName.equals("componentID")) {
-                    m_auditComponentID = (m_elementContent != null) ?
-                            m_elementContent.toString() : "";
+                    m_auditComponentID = (chars > 0) ?
+                            m_auditBuffer.toString() : "";
                 } else if (localName.equals("responsibility")) {
-                    m_auditResponsibility = (m_elementContent != null) ?
-                            m_elementContent.toString() : "";
+                    m_auditResponsibility = (chars > 0) ?
+                            m_auditBuffer.toString() : "";
                 } else if (localName.equals("date")) {
-                    m_auditDate = (m_elementContent != null) ?
-                            m_elementContent.toString() : "";
+                    m_auditDate = (chars > 0) ?
+                            m_auditBuffer.toString() : "";
                 } else if (localName.equals("justification")) {
-                    m_auditJustification = (m_elementContent != null) ?
-                            m_elementContent.toString() : "";
+                    m_auditJustification = (chars > 0) ?
+                            m_auditBuffer.toString() : "";
                 } else if (localName.equals("record")) {
                     //m_auditRec.id=m_auditRecordID;
                     m_auditRec.processType = m_auditProcessType;
@@ -540,6 +556,9 @@ public class FOXMLContentHandler
                 } else if (localName.equals("auditTrail")) {
                     m_gotAudit = false;
                 }
+                // zero out the audit buffer to maintain element specificity
+                if (chars > 0) m_auditBuffer.setLength(0);
+                // specific to element, and needs to  
                 // process end of xmlContent ONLY if it is NOT embedded within inline XML!
             } else if (uri.equals(FOXML.uri) && localName.equals("xmlContent")
                     && m_xmlDataLevel == 0) {
@@ -564,6 +583,7 @@ public class FOXMLContentHandler
                 }
             } else {
                 // finished an element within inline xml metadata
+                ensureInlineXmlCharBuffer();
                 m_dsXMLBuffer.append("</").append(qName).append('>');
                 // make sure we know when to pay attention to FOXML again
                 if (uri.equals(FOXML.uri) && localName.equals("xmlContent")) {
@@ -598,6 +618,9 @@ public class FOXMLContentHandler
         } else if (uri.equals(FOXML.uri)
                 && localName.equals("datastreamVersion")) {
             // reinitialize datastream version-level attributes...
+            if (m_dsVersId.equals("AUDIT.0")) {
+                m_gotAudit = false;
+            }
             m_dsVersId = "";
             m_dsLabel = "";
             m_dsCreateDate = null;
@@ -624,6 +647,18 @@ public class FOXMLContentHandler
     // Instance helpers
     //---
 
+    private void ensureInlineXmlCharBuffer() {
+        if (m_dsXMLBuffer == null) {
+            if (m_dsSize != -1) {
+                // inline byte streams must be read into an array historically, cast
+                // size as an int.
+                m_dsXMLBuffer = new ReadableCharArrayWriter((int)m_dsSize);
+            } else {
+                m_dsXMLBuffer = new ReadableCharArrayWriter();
+            }
+        }
+    }
+    
     private void startDisseminators(String localName, Attributes a) {
         if (localName.equals("disseminator")) {
             m_dissID = grab(a, FOXML.uri, "ID");
@@ -834,7 +869,6 @@ public class FOXMLContentHandler
         ds.DSMDClass = m_dsMDClass; // METS legacy
 
         // now set the xml content stream itself...
-
         ByteBuffer bytes = Charset.forName(m_characterEncoding).
                 encode(m_dsXMLBuffer.toBuffer());
         ds.xmlContent = new byte[bytes.limit()];
