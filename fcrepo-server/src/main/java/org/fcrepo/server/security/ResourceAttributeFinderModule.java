@@ -268,7 +268,8 @@ class ResourceAttributeFinderModule
                 logger.debug("datastreamId={}", datastreamId);
                 Datastream datastream;
                 try {
-                    datastream = reader.GetDatastream(datastreamId, new Date()); //right import (above)?
+                    // get the most recent datastream version
+                    datastream = reader.GetDatastream(datastreamId, null); //right import (above)?
                 } catch (ServerException e) {
                     logger.debug("couldn't get datastream");
                     return null;
