@@ -4,20 +4,15 @@
  */
 package org.fcrepo.server.messaging;
 
-import java.io.File;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.fcrepo.common.Constants;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.proxy.AbstractInvocationHandler;
 import org.fcrepo.server.proxy.ModuleConfiguredInvocationHandler;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
