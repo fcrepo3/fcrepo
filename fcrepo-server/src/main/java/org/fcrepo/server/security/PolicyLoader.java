@@ -42,7 +42,7 @@ public abstract class PolicyLoader {
                                                      pid);
             Datastream ds = reader.GetDatastream("POLICY", null);
             if (ds != null) {
-                logger.debug("Using POLICY for " + pid);
+                logger.debug("Using POLICY for {}", pid);
                 return policyParser.parse(ds.getContentStream(), validate);
             } else {
                 return null;

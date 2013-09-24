@@ -149,7 +149,7 @@ public interface DigitalObject {
     public Iterator<String> datastreamIdIterator();
 
     /**
-     * Gets an interable view that consists of versions of the same datastream
+     * Gets an iterable view that consists of versions of the same datastream
      * that is identified by the requested datastream identifier.
      * <p>
      * Datastreams within any iterators produced here are references to the

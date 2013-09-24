@@ -1122,7 +1122,7 @@ public class DefaultManagement
             buf.append(formatter.format(end));
         }
         buf.append(".  This resulted in the permanent removal of ");
-        buf.append(deletedDates.length + " ");
+        buf.append(deletedDates.length).append(' ');
         buf.append(kindaThing);
         buf.append(" version(s) (");
         for (int i = 0; i < deletedDates.length; i++) {
@@ -1159,7 +1159,7 @@ public class DefaultManagement
                 logMsg.append("pid: ").append(pid);
                 logMsg.append(", datastreamID: ").append(datastreamID);
                 logMsg.append(", asOfDateTime: ").append(asOfDateTime);
-                logMsg.append(")");
+                logMsg.append(')');
                 logger.info(logMsg.toString());
             }
 
