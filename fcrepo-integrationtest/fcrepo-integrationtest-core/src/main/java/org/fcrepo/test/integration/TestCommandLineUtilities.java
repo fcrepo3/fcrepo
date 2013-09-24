@@ -120,7 +120,7 @@ public class TestCommandLineUtilities
                  "test:0005", "test:0006", "test:0007", "test:0008",
                  "test:0009", "test:0010"};
         System.out.println("Purging batch objects");
-        purgeFast(batchObjs);
+        purgeFast(batchObjs, "testBatchBuildAndBatchIngestAndPurge-purge(array)");
         System.out.println("Build and ingest test succeeded");
     }
 
@@ -146,7 +146,7 @@ public class TestCommandLineUtilities
                  "test:0005", "test:0006", "test:0007", "test:0008",
                  "test:0009", "test:0010"};
         System.out.println("Purging batch objects");
-        purgeFast(batchObjs);
+        purgeFast(batchObjs, "testBatchBuildIngestAndPurge-purge(array)");
         System.out.println("Build/ingest test succeeded");
     }
 
@@ -172,7 +172,7 @@ public class TestCommandLineUtilities
                 .indexOf("25 modify directives successfully processed.") == -1);
         assertEquals(String.format("%s; %s", out, err), false, out.indexOf("0 modify directives failed.") == -1);
         System.out.println("Purging batch modify object");
-        purgeFast("test:1002");
+        purgeFast("test:1002", "testBatchModify-purge");
         System.out.println("Batch modify test succeeded");
     }
 
@@ -251,7 +251,7 @@ public class TestCommandLineUtilities
         if (outFile2.exists()) {
             outFile2.delete();
         }
-        purgeFast("test:1001");
+        purgeFast("test:1001", "testExport-purge");
         System.out.println("Export test succeeded");
     }
 
@@ -352,14 +352,14 @@ public class TestCommandLineUtilities
                 getFedoraAppServerContext());
     }
 
-    private static void purgeFast(String pid) throws Exception {
-        getAPIM().purgeObject(pid, "because", false);
+    private static void purgeFast(String pid, String logMsg) throws Exception {
+        getAPIM().purgeObject(pid, "purgeFast-single", false);
     }
 
-    private static void purgeFast(String[] pids) throws Exception {
+    private static void purgeFast(String[] pids, String logMsg) throws Exception {
         FedoraAPIMMTOM apim = getAPIM();
         for (String element : pids) {
-            apim.purgeObject(element, "because", false);
+            apim.purgeObject(element, logMsg, false);
         }
     }
 
@@ -417,7 +417,7 @@ public class TestCommandLineUtilities
                 getPassword(),
                 objectPurgeFile.getAbsoluteFile().toURI().toString(),
                 getProtocol(),
-                "because",
+                "batch-purge",
                 getFedoraAppServerContext());
     }
 
