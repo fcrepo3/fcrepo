@@ -7,12 +7,13 @@ package org.fcrepo.server.security;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.fcrepo.common.policy.XacmlName;
@@ -40,12 +41,27 @@ public abstract class AttributeFinderModule
             LoggerFactory.getLogger(AttributeFinderModule.class);
     
     protected static final String[] EMPTY_STRING_ARRAY = new String[0];
+    
+    protected static final Map<URI, EvaluationResult> EMPTY_RESULTS =
+            new HashMap<URI, EvaluationResult>(3);
+    
+    private static EvaluationResult getEmptyResult(URI attributeType) {
+        EvaluationResult empty = EMPTY_RESULTS.get(attributeType);
+        if (empty == null) {
+            empty = new EvaluationResult(BagAttribute
+                    .createEmptyBag(attributeType));
+            EMPTY_RESULTS.put(attributeType, empty);
+        }
+        return empty;
+    }
 
     protected AttributeFinderModule() {
 
     }
 
     private Boolean instantiatedOk = null;
+    
+    private String iAmCache = null;
 
     public final void setInstantiatedOk(boolean value) {
         logger.debug("setInstantiatedOk() {}", value);
@@ -106,19 +122,13 @@ public abstract class AttributeFinderModule
     }
 
     protected String iAm() {
-        return this.getClass().getName();
+        if (iAmCache == null) {
+            iAmCache = this.getClass().getName();
+        }
+        return iAmCache;
     }
 
-    protected final Object getAttributeFromEvaluationResult(EvaluationResult attribute /*
-     * URI
-     * type,
-     * URI
-     * id,
-     * URI
-     * category,
-     * EvaluationCtx
-     * context
-     */) {
+    protected final Object getAttributeFromEvaluationResult(EvaluationResult attribute) {
         if (attribute.indeterminate()) {
             logger.debug("AttributeFinder:getAttributeFromEvaluationCtx{} exit on couldn't get resource attribute from xacml request indeterminate",
                     iAm());
@@ -146,7 +156,7 @@ public abstract class AttributeFinderModule
             return null;
         }
 
-        Iterator it = bag.iterator();
+        Iterator<?> it = bag.iterator();
         Object element = it.next();
 
         if (element == null) {
@@ -255,6 +265,7 @@ public abstract class AttributeFinderModule
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Set getSupportedDesignatorTypes() {
         if (instantiatedOk != null && instantiatedOk.booleanValue()) {
             logger.debug("getSupportedDesignatorTypes() will return {} set of elements, n={}",
@@ -303,14 +314,12 @@ public abstract class AttributeFinderModule
             if (attributeType == null) {
                 attributeType = STRING_ATTRIBUTE_TYPE_URI;
             }
-            return new EvaluationResult(BagAttribute
-                    .createEmptyBag(attributeType));
+            return getEmptyResult(attributeType);
         }
 
         if (!willService(attributeId)) {
             logger.debug("AttributeFinder:willService() {} returns false", iAm());
-            return new EvaluationResult(BagAttribute
-                    .createEmptyBag(attributeType));
+            return getEmptyResult(attributeType);
         }
 
         if (category != null) {
@@ -329,8 +338,7 @@ public abstract class AttributeFinderModule
         if (temp == null) {
             logger.debug("AttributeFinder:findAttribute{} exit on "
                     + "attribute value not found", iAm());
-            return new EvaluationResult(BagAttribute
-                    .createEmptyBag(attributeType));
+            return getEmptyResult(attributeType);
         }
 
         Collection<AttributeValue> set = null;
@@ -413,8 +421,8 @@ public abstract class AttributeFinderModule
                 }
             }
         }
-        if (set == null) {
-            set = Collections.emptySet();
+        if (set == null || set.size() == 0) {
+            return getEmptyResult(attributeType);
         }
         return new EvaluationResult(new BagAttribute(attributeType, set));
     }
