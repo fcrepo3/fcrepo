@@ -4,16 +4,13 @@
  */
 package org.fcrepo.server.access.defaultdisseminator;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.io.Writer;
 import java.util.Date;
 
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.Context;
-import org.fcrepo.server.Server;
 import org.fcrepo.server.access.ObjectProfile;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.ServerException;
@@ -24,8 +21,8 @@ import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.utilities.DCFields;
 import org.fcrepo.server.utilities.StreamUtility;
-
 import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
 
 
 
@@ -47,14 +44,14 @@ public class ObjectInfoAsXML
     public static String getObjectProfile(String reposBaseURL,
                                    ObjectProfile objProfile,
                                    Date versDateTime) throws ServerException {
-        StringBuilder buffer = new StringBuilder(1024);
+        ReadableCharArrayWriter buffer = new ReadableCharArrayWriter(1024);
         getObjectProfile(reposBaseURL, objProfile, versDateTime, buffer);
-        return buffer.toString();
+        return buffer.getString();
     }
 
     public static void getObjectProfile(String reposBaseURL,
                 ObjectProfile objProfile,
-                Date versDateTime, Appendable out) throws ServerException {
+                Date versDateTime, Writer out) throws ServerException {
         // use REST serializer
         try {
             DefaultSerializer.objectProfileToXML(objProfile, versDateTime, out);
@@ -67,16 +64,16 @@ public class ObjectInfoAsXML
                                String applicationContext,
                                DOReader reader,
                                Date versDateTime) throws ServerException {
-        StringBuilder out = new StringBuilder(512);
+        ReadableCharArrayWriter out = new ReadableCharArrayWriter(512);
         getItemIndex(reposBaseURL, applicationContext, reader, versDateTime, out);
-        return out.toString();
+        return out.getString();
     }
     
     public static void getItemIndex(String reposBaseURL,
                 String applicationContext,
                 DOReader reader,
                 Date versDateTime,
-                Appendable out) throws ServerException {
+                Writer out) throws ServerException {
         try {
             Datastream[] datastreams =
                     reader.GetDatastreams(versDateTime, null);
@@ -130,16 +127,17 @@ public class ObjectInfoAsXML
                                  String PID,
                                  ObjectMethodsDef[] methods,
                                  Date versDateTime) throws ServerException {
-        StringBuilder buffer = new StringBuilder(1024);
+        ReadableCharArrayWriter buffer =
+                new ReadableCharArrayWriter(1024);
         getMethodIndex(reposBaseURL, PID, methods, versDateTime, buffer);
-        return buffer.toString();
+        return buffer.getString();
     }
 
     public static void getMethodIndex(String reposBaseURL,
                 String PID,
                 ObjectMethodsDef[] methods,
                 Date versDateTime,
-                Appendable buffer) throws ServerException {
+                Writer buffer) throws ServerException {
         // use REST serializer
         try {
             DefaultSerializer.objectMethodsToXml(reposBaseURL, methods, PID, null, versDateTime, buffer);
@@ -161,7 +159,7 @@ public class ObjectInfoAsXML
         return dc.getAsXML();
     }
     
-    public static void getOAIDublinCore(Datastream dublinCore, Appendable out)
+    public static void getOAIDublinCore(Datastream dublinCore, Writer out)
             throws ServerException {
         DCFields dc;
         if (dublinCore == null) {

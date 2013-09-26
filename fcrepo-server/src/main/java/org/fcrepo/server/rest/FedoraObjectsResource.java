@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -588,7 +589,7 @@ public class FedoraObjectsResource extends BaseRestResource {
             String label,
             String ownerId,
             String encoding,
-            Appendable xml) throws IOException {
+            Writer xml) throws IOException {
         
         xml.append("<?xml version=\"1.0\" encoding=\"");
         xml.append(encoding);

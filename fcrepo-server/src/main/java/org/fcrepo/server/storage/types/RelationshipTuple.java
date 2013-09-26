@@ -12,12 +12,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.jrdf.graph.GraphElementFactory;
 import org.jrdf.graph.Literal;
 import org.jrdf.graph.ObjectNode;
 import org.jrdf.graph.PredicateNode;
 import org.jrdf.graph.SubjectNode;
 import org.jrdf.graph.Triple;
-import org.trippi.RDFUtil;
 import org.trippi.TrippiException;
 import org.trippi.io.transform.Transformer;
 
@@ -231,7 +231,7 @@ public class RelationshipTuple
 
         @Override
         public RelationshipTuple transform(SubjectNode s, PredicateNode p,
-                ObjectNode o, RDFUtil u) throws TrippiException {
+                ObjectNode o, GraphElementFactory u) throws TrippiException {
             return RelationshipTuple.fromNodes(s, p, o);
         }
         

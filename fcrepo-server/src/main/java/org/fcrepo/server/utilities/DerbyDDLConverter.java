@@ -132,12 +132,12 @@ public class DerbyDDLConverter
         if (cs.getDefaultValue() != null) {
             out.append("DEFAULT ");
             if (!isNumberType(cs)) {
-                out.append("'");
+                out.append('\'');
             }
             out.append(cs.getDefaultValue());
 
             if (!isNumberType(cs)) {
-                out.append("'");
+                out.append('\'');
             }
             out.append(' ');
         }
@@ -149,7 +149,7 @@ public class DerbyDDLConverter
         if (ts.getPrimaryColumnName() != null) {
             out.append("  PRIMARY KEY (");
             out.append(ts.getPrimaryColumnName());
-            out.append(")");
+            out.append(')');
         }
 
     }

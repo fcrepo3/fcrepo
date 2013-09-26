@@ -90,7 +90,7 @@ public class BatchModifyParser
     /**
      * Variables for keeping state during SAX parse.
      */
-    private StringBuffer m_dsXMLBuffer;
+    private StringBuilder m_dsXMLBuffer;
 
     private boolean m_inXMLMetadata;
 
@@ -230,7 +230,7 @@ public class BatchModifyParser
                                     String localName,
                                     String qName,
                                     Attributes a,
-                                    StringBuffer out) {
+                                    StringBuilder out) {
         out.append('<').append(qName);
         for (int i = 0; i < a.getLength(); i++) {
             out.append(' ').append(a.getQName(i)).append("=\"");
@@ -626,7 +626,7 @@ public class BatchModifyParser
         } else if (namespaceURI.equalsIgnoreCase(BATCH_MODIFY.uri)
                 && localName.equalsIgnoreCase("xmlData")) {
             m_inXMLMetadata = true;
-            m_dsXMLBuffer = new StringBuffer();
+            m_dsXMLBuffer = new StringBuilder();
         } else {
             if (m_inXMLMetadata) {
                 appendElementStart(namespaceURI,

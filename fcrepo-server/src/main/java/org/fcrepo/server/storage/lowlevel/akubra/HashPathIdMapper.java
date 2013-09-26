@@ -177,7 +177,7 @@ public class HashPathIdMapper
                 if (i == uri.length() - 1) {
                     out.append("%2E");
                 } else {
-                    out.append(".");
+                    out.append('.');
                 }
             } else {
                 try {

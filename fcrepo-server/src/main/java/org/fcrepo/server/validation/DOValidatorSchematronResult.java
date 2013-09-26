@@ -92,6 +92,13 @@ public class DOValidatorSchematronResult {
         writer.close();
         return writer.getString();
     }
+    
+    private static final char [] XML_PI_CHARS =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>".toCharArray();
+    private static final char [] EQUAL_QUOTE =
+            new char[]{'=','"'};
+    private static final char [] BRACKET_SLASH =
+            new char[]{'<','/'};
 
     private void serializeNode(Node node, Writer out) {
         try {
@@ -102,7 +109,7 @@ public class DOValidatorSchematronResult {
             int type = node.getNodeType();
             switch (type) {
                 case Node.DOCUMENT_NODE:
-                    out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+                    out.write(XML_PI_CHARS);
                     serializeNode(((Document) node).getDocumentElement(), out);
                     break;
 
@@ -115,7 +122,7 @@ public class DOValidatorSchematronResult {
                     for (int i = 0; i < attrs.getLength(); i++) {
                         out.write(' ');
                         out.write(attrs.item(i).getNodeName());
-                        out.write("=\"");
+                        out.write(EQUAL_QUOTE);
                         out.write(attrs.item(i).getNodeValue());
                         out.write('"');
                     }
@@ -139,9 +146,9 @@ public class DOValidatorSchematronResult {
             }
 
             if (type == Node.ELEMENT_NODE) {
-                out.write("</");
+                out.write(BRACKET_SLASH);
                 out.write(node.getNodeName());
-                out.write(">");
+                out.write('>');
             }
             out.flush();
         } catch (Exception e) {

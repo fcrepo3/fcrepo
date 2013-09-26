@@ -42,7 +42,7 @@ public class MsSQLDDLConverter
             }
             csNum++;
             ColumnSpec cs = csi.next();
-            out.append(" ");
+            out.append(' ');
             out.append(cs.getName());
             out.append(' ');
             if (cs.getType().equalsIgnoreCase("varchar")) {

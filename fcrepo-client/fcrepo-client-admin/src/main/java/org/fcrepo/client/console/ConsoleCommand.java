@@ -72,9 +72,9 @@ public class ConsoleCommand {
     public String toString() {
         StringBuffer ret = new StringBuffer();
         ret.append(getUnqualifiedName(m_method.getReturnType()));
-        ret.append(" ");
+        ret.append(' ');
         ret.append(m_method.getName());
-        ret.append("(");
+        ret.append('(');
         Class[] types = m_method.getParameterTypes();
         for (int i = 0; i < types.length; i++) {
             if (i > 0) {
@@ -84,7 +84,7 @@ public class ConsoleCommand {
             ret.append(' ');
             ret.append(m_paramNames[i]);
         }
-        ret.append(")");
+        ret.append(')');
         return ret.toString();
     }
 

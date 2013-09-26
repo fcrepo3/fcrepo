@@ -856,8 +856,7 @@ public class FedoraAccessServlet
             if (pw != null) {
                 try {
                     pw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-                    pw.write("<objectProfile");
-                    pw.write(" pid=\"");
+                    pw.write("<objectProfile pid=\"");
                     StreamUtility.enc(PID, pw);
                     pw.write('"');
                     if (versDateTime != null) {
