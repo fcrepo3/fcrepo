@@ -6,6 +6,7 @@ package org.fcrepo.server.utilities;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import org.fcrepo.common.rdf.RDFName;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.RepositoryConfigurationException;
 import org.fcrepo.server.errors.StreamIOException;
+import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
 
 
@@ -36,6 +38,33 @@ import javax.xml.XMLConstants;
 public class DCFields
         extends DefaultHandler
         implements Constants {
+    
+    private static final char[] TITLE = "title".toCharArray();
+    private static final char[] CREATOR = "creator".toCharArray();
+    private static final char[] SUBJECT = "subject".toCharArray();
+    private static final char[] DESCRIPTION = "description".toCharArray();
+    private static final char[] PUBLISHER = "publisher".toCharArray();
+    private static final char[] CONTRIBUTOR = "contributor".toCharArray();
+    private static final char[] DATE = "date".toCharArray();
+    private static final char[] TYPE = "type".toCharArray();
+    private static final char[] FORMAT = "format".toCharArray();
+    private static final char[] IDENTIFIER = "identifier".toCharArray();
+    private static final char[] SOURCE = "source".toCharArray();
+    private static final char[] LANGUAGE = "language".toCharArray();
+    private static final char[] RELATION = "relation".toCharArray();
+    private static final char[] COVERAGE = "coverage".toCharArray();
+    private static final char[] RIGHTS = "rights".toCharArray();
+    
+    private static final char[] XML_OPEN = xmlOpen();
+    private static final char[] XML_CLOSE = "</oai_dc:dc>\n".toCharArray();
+    private static final char[] DC_OPEN_ELEMENT_PREFIX =
+            "  <dc:".toCharArray();
+    private static final char[] DC_CLOSE_ELEMENT_PREFIX =
+            "</dc:".toCharArray();
+    private static final char[] XML_LANG_START =
+            " xml:lang=\"".toCharArray();
+    private static final char[] BRACKET_NEWLINE =
+            new char[]{'>','\n'};
 
     private ArrayList<DCField> m_titles = null;
 
@@ -245,7 +274,7 @@ public class DCFields
         return getAsXML((String)null);
     }
     
-    public void getAsXML(Appendable out) throws IOException {
+    public void getAsXML(Writer out) throws IOException {
         getAsXML(null, out);
     }
 
@@ -255,16 +284,16 @@ public class DCFields
             * @return
      */
     public String getAsXML(String targetPid) {
-        StringBuilder out = new StringBuilder(512);
+        ReadableCharArrayWriter out = new ReadableCharArrayWriter(512);
         try {
             getAsXML(targetPid, out);
         } catch (IOException wonthappen) {
             throw new RuntimeException(wonthappen);
         }
-        return out.toString();
+        return out.getString();
     }
     
-    public void getAsXML(String targetPid, Appendable out) throws IOException {
+    public void getAsXML(String targetPid, Writer out) throws IOException {
         boolean addPid = (targetPid != null);
         if (addPid) {
         for (DCField dcField : identifiers()) {
@@ -273,47 +302,56 @@ public class DCFields
             }
         }
         }
-        out.append("<" + OAI_DC.prefix + ":dc" + " xmlns:" + OAI_DC.prefix
-                + "=\"" + OAI_DC.uri + "\"" + "\nxmlns:" + DC.prefix + "=\""
-                + DC.uri + "\"\nxmlns:xsi=\"" + XSI.uri
-                + "\"\nxsi:schemaLocation=\"" + OAI_DC.uri + " "
-                + OAI_DC2_0.xsdLocation + "\">\n");
-        appendXML(m_titles, "title", out);
-        appendXML(m_creators, "creator", out);
-        appendXML(m_subjects, "subject", out);
-        appendXML(m_descriptions, "description", out);
-        appendXML(m_publishers, "publisher", out);
-        appendXML(m_contributors, "contributor", out);
-        appendXML(m_dates, "date", out);
-        appendXML(m_types, "type", out);
-        appendXML(m_formats, "format", out);
+        out.write(XML_OPEN);
+        appendXML(m_titles, TITLE, out);
+        appendXML(m_creators, CREATOR, out);
+        appendXML(m_subjects, SUBJECT, out);
+        appendXML(m_descriptions, DESCRIPTION, out);
+        appendXML(m_publishers, PUBLISHER, out);
+        appendXML(m_contributors, CONTRIBUTOR, out);
+        appendXML(m_dates, DATE, out);
+        appendXML(m_types, TYPE, out);
+        appendXML(m_formats, FORMAT, out);
         if (addPid) {
-            appendXML(new DCField(targetPid), "identifier", out);
+            appendXML(new DCField(targetPid), IDENTIFIER, out);
         }
-        appendXML(m_identifiers, "identifier", out);
-        appendXML(m_sources, "source", out);
-        appendXML(m_languages, "language", out);
-        appendXML(m_relations, "relation", out);
-        appendXML(m_coverages, "coverage", out);
-        appendXML(m_rights, "rights", out);
-        out.append("</oai_dc:dc>\n");
+        appendXML(m_identifiers, IDENTIFIER, out);
+        appendXML(m_sources, SOURCE, out);
+        appendXML(m_languages, LANGUAGE, out);
+        appendXML(m_relations, RELATION, out);
+        appendXML(m_coverages, COVERAGE, out);
+        appendXML(m_rights, RIGHTS, out);
+        out.write(XML_CLOSE);
     }
 
-    private void appendXML(List<DCField> values, String name, Appendable out)
+    private void appendXML(List<DCField> values, char[] name, Writer out)
         throws IOException {
         if (values == null || values.size() == 0) return;
         for (DCField value : values) {
             appendXML(value, name, out);
         }
     }
-    private void appendXML(DCField value, String name, Appendable out)
+    
+    private void appendXML(DCField value, char[] name, Writer out)
         throws IOException {
-        out.append("  <dc:").append(name);
+        out.write(DC_OPEN_ELEMENT_PREFIX);
+        out.write(name);
         if (value.getLang() != null) {
-            out.append(" xml:lang=\"").append(value.getLang()).append('"');
+            out.write(XML_LANG_START);
+            out.append(value.getLang()).append('"');
         }
         out.append('>');
         StreamUtility.enc(value.getValue(), out);
-        out.append("</dc:").append(name).append(">\n");
+        out.write(DC_CLOSE_ELEMENT_PREFIX);
+        out.write(name);
+        out.write(BRACKET_NEWLINE);
+    }
+    
+    private static final char[] xmlOpen() {
+        return ("<" + OAI_DC.prefix + ":dc" + " xmlns:" + OAI_DC.prefix
+                + "=\"" + OAI_DC.uri + "\"" + "\nxmlns:" + DC.prefix + "=\""
+                + DC.uri + "\"\nxmlns:xsi=\"" + XSI.uri
+                + "\"\nxsi:schemaLocation=\"" + OAI_DC.uri + " "
+                + OAI_DC2_0.xsdLocation + "\">\n").toCharArray();
     }
 }

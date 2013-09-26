@@ -152,7 +152,7 @@ public class METSFedoraExtDODeserializer
 
     private String m_dsChecksumType;
 
-    private StringBuffer m_dsXMLBuffer;
+    private StringBuilder m_dsXMLBuffer;
 
     // are we reading binary in an FContent element? (base64-encoded)
     private boolean m_readingContent; // indicates reading element content
@@ -431,7 +431,7 @@ public class METSFedoraExtDODeserializer
                 m_dsChecksum = grab(a, METS.uri, "CHECKSUM");
                 m_dsChecksumType = grab(a, METS.uri, "CHECKSUMTYPE");
             } else if (localName.equals("xmlData")) {
-                m_dsXMLBuffer = new StringBuffer();
+                m_dsXMLBuffer = new StringBuilder();
                 m_xmlDataLevel = 0;
                 m_inXMLMetadata = true;
             } else if (localName.equals("fileGrp")) {
@@ -856,7 +856,7 @@ public class METSFedoraExtDODeserializer
                                     String localName,
                                     String qName,
                                     Attributes a,
-                                    StringBuffer out) {
+                                    StringBuilder out) {
         out.append("<" + qName);
         // add the current qName's namespace to m_localPrefixMap
         // and m_prefixList if it's not already in m_localPrefixMap

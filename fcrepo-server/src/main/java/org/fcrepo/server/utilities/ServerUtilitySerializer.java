@@ -40,9 +40,7 @@ public final class ServerUtilitySerializer {
     }
 
     private void indent(int level) throws IOException {
-        char[] indent = new char[level * INDENT];
-        Arrays.fill(indent, ' ');
-        m_writer.write(indent);
+        SpaceCharacters.indent(level * INDENT, m_writer);
     }
 
     private void start() throws IOException {

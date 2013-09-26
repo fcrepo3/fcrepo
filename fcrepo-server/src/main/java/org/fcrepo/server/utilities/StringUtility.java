@@ -81,6 +81,7 @@ public class StringUtility {
      * @return A string split into multiple indented lines whose length is less
      *         than the specified length + indent amount.
      */
+    @Deprecated
     public static String splitAndIndent(String str, int indent, int numChars) {
         final int inputLength = str.length();
         // to prevent resizing, we can predict the size of the indented string
@@ -94,16 +95,14 @@ public class StringUtility {
         int outputLength = inputLength + formatLength;
         
         StringBuilder sb = new StringBuilder(outputLength);
-        char[] ib = new char[indent];
-        Arrays.fill(ib, ' ');
 
         for (int offset = 0; offset < inputLength; offset += numChars) {
-            sb.append(ib);
+            SpaceCharacters.indent(indent, sb);
             sb.append(str, offset, offset + numChars);
             sb.append('\n');
         }
         if (!perfectFit) {
-            sb.append(ib);
+            SpaceCharacters.indent(indent, sb);
             sb.append(str, fullLines * numChars, inputLength);
             sb.append('\n');
         }
@@ -112,22 +111,37 @@ public class StringUtility {
 
     }
     
+    /**
+     * Method that attempts to break a string up into lines no longer than the
+     * specified line length.
+     *
+     * <p>The string is assumed to a large chunk of undifferentiated text such
+     * as base 64 encoded binary data.
+     *
+     * @param str
+     *        The input string to be split into lines.
+     * @param indent
+     *        The number of spaces to insert at the start of each line.
+     * @param numChars
+     *        The maximum length of each line (not counting the indent spaces).
+     * @param writer
+     *        The character stream to print the output to.
+     * @return A string split into multiple indented lines whose length is less
+     *         than the specified length + indent amount.
+     */
     public static void splitAndIndent(String str, int indent,
             int numChars, PrintWriter writer) {
         final int inputLength = str.length();
         boolean perfectFit = (inputLength % numChars == 0);
         int fullLines = (inputLength / numChars);
-        
-        char[] ib = new char[indent];
-        Arrays.fill(ib, ' ');
 
         for (int offset = 0; offset < inputLength; offset += numChars) {
-            writer.print(ib);
+            SpaceCharacters.indent(indent, writer);
             writer.append(str, offset, offset + numChars);
             writer.print('\n');
         }
         if (!perfectFit) {
-            writer.print(ib);
+            SpaceCharacters.indent(indent, writer);
             writer.append(str, fullLines * numChars, inputLength);
             writer.print('\n');
         }

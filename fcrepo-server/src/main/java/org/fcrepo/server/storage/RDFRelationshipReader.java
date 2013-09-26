@@ -16,7 +16,7 @@ import org.jrdf.graph.Triple;
 import org.trippi.RDFFormat;
 import org.trippi.TrippiException;
 import org.trippi.io.TripleIteratorFactory;
-import org.trippi.io.transform.impl.TripleReflector;
+import org.trippi.io.transform.impl.Identity;
 
 
 public abstract class RDFRelationshipReader {
@@ -45,6 +45,6 @@ public abstract class RDFRelationshipReader {
     public static Set<Triple> readTriples(InputStream dsContent)
             throws TrippiException {
         return TripleIteratorFactory.defaultInstance().allAsSet(dsContent, null,
-                RDFFormat.RDF_XML, TripleReflector.instance);
+                RDFFormat.RDF_XML, Identity.instance);
     }
 }

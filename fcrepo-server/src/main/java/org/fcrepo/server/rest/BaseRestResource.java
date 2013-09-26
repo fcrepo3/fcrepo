@@ -9,8 +9,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
@@ -24,12 +22,9 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
-import net.sf.saxon.FeatureKeys;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -185,8 +180,7 @@ public class BaseRestResource {
         } else if (ex instanceof ObjectValidityException){
             LOGGER.warn("Validation exception; unable to fulfill REST API request", ex);
 			if (((ObjectValidityException) ex).getValidation() != null) {
-				DefaultSerializer serializer = new DefaultSerializer("n/a", getContext());
-				String errors = serializer.objectValidationToXml(((ObjectValidityException) ex).getValidation());
+				String errors = DefaultSerializer.objectValidationToXml(((ObjectValidityException) ex).getValidation());
 	            return Response.status(Status.BAD_REQUEST).entity(errors).type(MediaType.TEXT_XML).build();
 			} else {
 	            return Response.status(Status.BAD_REQUEST).entity(ex.getMessage()).type(MediaType.TEXT_PLAIN).build();

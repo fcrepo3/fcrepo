@@ -367,9 +367,8 @@ public class FOXMLDOSerializer
                         writer.print(FOXML.prefix);
                         writer.print(":binaryContent> \n");
                         String encoded = Base64.encodeToString(vds.getContentStream());
-                        writer.print(StringUtility.splitAndIndent(encoded,
-                                                                  14,
-                                                                  80));
+                        StringUtility.splitAndIndent(encoded,
+                                14, 80, writer);
                         writer.print("</");
                         writer.print(FOXML.prefix);
                         writer.print(":binaryContent> \n");
