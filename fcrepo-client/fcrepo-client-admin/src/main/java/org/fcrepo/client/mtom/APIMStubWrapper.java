@@ -1,15 +1,11 @@
 
 package org.fcrepo.client.mtom;
 
-import java.awt.Dimension;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.activation.DataHandler;
 
-import org.fcrepo.client.Administrator;
 import org.fcrepo.client.SwingWorker;
 import org.fcrepo.server.types.gen.ArrayOfString;
 import org.fcrepo.server.types.gen.Datastream;
@@ -27,406 +23,95 @@ public class APIMStubWrapper
     }
 
     @Override
-    public java.lang.String ingest(DataHandler objectXML,
-                                   java.lang.String format,
-                                   java.lang.String logMessage){
-        String METHOD_NAME = "ingest";
-        HashMap PARMS = new HashMap();
-        PARMS.put("objectXML", objectXML);
-        PARMS.put("format", format);
-        PARMS.put("logMessage", logMessage);
+    public String ingest(final DataHandler objectXML,
+                                   final String format,
+                                   final String logMessage){
+        String buf = "Ingest";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<String> worker = new SwingWorker<String>() {
 
             @Override
-            public Object construct() {
+            public String construct() {
                     // call wrapped method
-                    return m_instance.ingest((DataHandler) parms.get("objectXML"),
-                                             (java.lang.String) parms
-                                                     .get("format"),
-                                             (java.lang.String) parms
-                                                     .get("logMessage"));
+                    return m_instance.ingest(objectXML,
+                                             format,
+                                             logMessage);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (java.lang.String) worker.get();
     }
 
     @Override
-    public java.lang.String modifyObject(java.lang.String pid,
-                                         java.lang.String state,
-                                         java.lang.String label,
-                                         java.lang.String ownerId,
-                                         java.lang.String logMessage){
-        String METHOD_NAME = "modifyObject";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("state", state);
-        PARMS.put("label", label);
-        PARMS.put("ownerId", ownerId);
-        PARMS.put("logMessage", logMessage);
+    public String modifyObject(final String pid,
+                               final String state,
+                               final String label,
+                               final String ownerId,
+                               final String logMessage){
+        String buf = "Modify object";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<String> worker = new SwingWorker<String>() {
 
             @Override
-            public Object construct() {
+            public String construct() {
                     // call wrapped method
-                    return m_instance.modifyObject((java.lang.String) parms
-                                                           .get("pid"),
-                                                   (java.lang.String) parms
-                                                           .get("state"),
-                                                   (java.lang.String) parms
-                                                           .get("label"),
-                                                   (java.lang.String) parms
-                                                           .get("ownerId"),
-                                                   (java.lang.String) parms
-                                                           .get("logMessage"));
+                    return m_instance.modifyObject(pid,
+                                                   state,
+                                                   label,
+                                                   ownerId,
+                                                   logMessage);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (java.lang.String) worker.get();
     }
 
     @Override
-    public DataHandler getObjectXML(java.lang.String pid){
-        String METHOD_NAME = "getObjectXML";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
+    public DataHandler getObjectXML(final String pid){
+        String buf = "Get object XML";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<DataHandler> worker = new SwingWorker<DataHandler>() {
 
             @Override
-            public Object construct() {
+            public DataHandler construct() {
                     // call wrapped method
-                    return m_instance.getObjectXML((java.lang.String) parms
-                            .get("pid"));
+                    return m_instance.getObjectXML(pid);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (DataHandler) worker.get();
     }
 
     @Override
-    public DataHandler export(java.lang.String pid,
-                         java.lang.String format,
-                         java.lang.String context){
-        String METHOD_NAME = "export";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("format", format);
-        PARMS.put("context", context);
+    public DataHandler export(final String pid,
+                         final String format,
+                         final String context){
+        String buf = "Export";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<DataHandler> worker = new SwingWorker<DataHandler>() {
 
             @Override
-            public Object construct() {
+            public DataHandler construct() {
                     // call wrapped method
-                    return m_instance.export((java.lang.String) parms
-                                                     .get("pid"),
-                                             (java.lang.String) parms
-                                                     .get("format"),
-                                             (java.lang.String) parms
-                                                     .get("context"));
+                    return m_instance.export(pid,
+                                             format,
+                                             context);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (DataHandler) worker.get();
     }
 
     @Override
-    public java.lang.String purgeObject(java.lang.String pid,
-                                        java.lang.String logMessage,
-                                        boolean force){
-        String METHOD_NAME = "purgeObject";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("logMessage", logMessage);
-        PARMS.put("force", new Boolean(force));
+    public String purgeObject(final String pid,
+                              final String logMessage,
+                              final boolean force){
+        String buf = "Purge object";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<String> worker = new SwingWorker<String>() {
 
             @Override
-            public Object construct() {
+            public String construct() {
                     // call wrapped method
                     return m_instance.purgeObject((java.lang.String) parms
                             .get("pid"), (java.lang.String) parms
@@ -434,1646 +119,366 @@ public class APIMStubWrapper
                             .booleanValue());
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (java.lang.String) worker.get();
     }
 
     @Override
-    public java.lang.String addDatastream(java.lang.String pid,
-                                          java.lang.String dsID,
-                                          ArrayOfString altIDs,
-                                          java.lang.String dsLabel,
-                                          boolean versionable,
-                                          java.lang.String MIMEType,
-                                          java.lang.String formatURI,
-                                          java.lang.String dsLocation,
-                                          java.lang.String controlGroup,
-                                          java.lang.String dsState,
-                                          java.lang.String checksumType,
-                                          java.lang.String checksum,
-                                          java.lang.String logMessage){
-        String METHOD_NAME = "addDatastream";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("dsID", dsID);
-        PARMS.put("altIDs", altIDs);
-        PARMS.put("dsLabel", dsLabel);
-        PARMS.put("versionable", new Boolean(versionable));
-        PARMS.put("MIMEType", MIMEType);
-        PARMS.put("formatURI", formatURI);
-        PARMS.put("dsLocation", dsLocation);
-        PARMS.put("controlGroup", controlGroup);
-        PARMS.put("dsState", dsState);
-        PARMS.put("checksumType", checksumType);
-        PARMS.put("checksum", checksum);
-        PARMS.put("logMessage", logMessage);
+    public String addDatastream(final String pid,
+                                          final String dsID,
+                                          final ArrayOfString altIDs,
+                                          final String dsLabel,
+                                          final boolean versionable,
+                                          final String MIMEType,
+                                          final String formatURI,
+                                          final String dsLocation,
+                                          final String controlGroup,
+                                          final String dsState,
+                                          final String checksumType,
+                                          final String checksum,
+                                          final String logMessage){
+        String buf = "Add datastream";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<String> worker = new SwingWorker<String>() {
 
             @Override
-            public Object construct() {
+            public String construct() {
                     // call wrapped method
                     return m_instance
-                            .addDatastream((java.lang.String) parms.get("pid"),
-                                           (java.lang.String) parms.get("dsID"),
-                                           (ArrayOfString) parms
-                                                   .get("altIDs"),
-                                           (java.lang.String) parms
-                                                   .get("dsLabel"),
-                                           ((Boolean) parms.get("versionable"))
-                                                   .booleanValue(),
-                                           (java.lang.String) parms
-                                                   .get("MIMEType"),
-                                           (java.lang.String) parms
-                                                   .get("formatURI"),
-                                           (java.lang.String) parms
-                                                   .get("dsLocation"),
-                                           (java.lang.String) parms
-                                                   .get("controlGroup"),
-                                           (java.lang.String) parms
-                                                   .get("dsState"),
-                                           (java.lang.String) parms
-                                                   .get("checksumType"),
-                                           (java.lang.String) parms
-                                                   .get("checksum"),
-                                           (java.lang.String) parms
-                                                   .get("logMessage"));
+                            .addDatastream(pid,
+                                           dsID,
+                                           altIDs,
+                                           dsLabel,
+                                           versionable,
+                                           MIMEType,
+                                           formatURI,
+                                           dsLocation,
+                                           controlGroup,
+                                           dsState,
+                                           checksumType,
+                                           checksum,
+                                           logMessage);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (java.lang.String) worker.get();
     }
 
     @Override
-    public java.lang.String modifyDatastreamByReference(java.lang.String pid,
-                                                        java.lang.String dsID,
-                                                        ArrayOfString altIDs,
-                                                        java.lang.String dsLabel,
-                                                        java.lang.String MIMEType,
-                                                        java.lang.String formatURI,
-                                                        java.lang.String dsLocation,
-                                                        java.lang.String checksumType,
-                                                        java.lang.String checksum,
-                                                        java.lang.String logMessage,
-                                                        boolean force){
-        String METHOD_NAME = "modifyDatastreamByReference";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("dsID", dsID);
-        PARMS.put("altIDs", altIDs);
-        PARMS.put("dsLabel", dsLabel);
-        PARMS.put("MIMEType", MIMEType);
-        PARMS.put("formatURI", formatURI);
-        PARMS.put("dsLocation", dsLocation);
-        PARMS.put("checksumType", checksumType);
-        PARMS.put("checksum", checksum);
-        PARMS.put("logMessage", logMessage);
-        PARMS.put("force", new Boolean(force));
+    public String modifyDatastreamByReference(final String pid,
+                                                        final String dsID,
+                                                        final ArrayOfString altIDs,
+                                                        final String dsLabel,
+                                                        final String MIMEType,
+                                                        final String formatURI,
+                                                        final String dsLocation,
+                                                        final String checksumType,
+                                                        final String checksum,
+                                                        final String logMessage,
+                                                        final boolean force){
+        String buf = "Modify datastream by reference";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<String> worker = new SwingWorker<String>() {
 
             @Override
-            public Object construct() {
+            public String construct() {
                     // call wrapped method
                     return m_instance
-                            .modifyDatastreamByReference((java.lang.String) parms
-                                                                 .get("pid"),
-                                                         (java.lang.String) parms
-                                                                 .get("dsID"),
-                                                         (ArrayOfString) parms
-                                                                 .get("altIDs"),
-                                                         (java.lang.String) parms
-                                                                 .get("dsLabel"),
-                                                         (java.lang.String) parms
-                                                                 .get("MIMEType"),
-                                                         (java.lang.String) parms
-                                                                 .get("formatURI"),
-                                                         (java.lang.String) parms
-                                                                 .get("dsLocation"),
-                                                         (java.lang.String) parms
-                                                                 .get("checksumType"),
-                                                         (java.lang.String) parms
-                                                                 .get("checksum"),
-                                                         (java.lang.String) parms
-                                                                 .get("logMessage"),
-                                                         ((Boolean) parms
-                                                                 .get("force"))
-                                                                 .booleanValue());
+                            .modifyDatastreamByReference(pid,
+                                    dsID,
+                                    altIDs,
+                                    dsLabel,
+                                    MIMEType,
+                                    formatURI,
+                                    dsLocation,
+                                    checksumType,
+                                    checksum,
+                                    logMessage,
+                                    force);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (java.lang.String) worker.get();
     }
 
     @Override
-    public java.lang.String modifyDatastreamByValue(java.lang.String pid,
-                                                    java.lang.String dsID,
-                                                    ArrayOfString altIDs,
-                                                    java.lang.String dsLabel,
-                                                    java.lang.String MIMEType,
-                                                    java.lang.String formatURI,
-                                                    DataHandler dsContent,
-                                                    java.lang.String checksumType,
-                                                    java.lang.String checksum,
-                                                    java.lang.String logMessage,
-                                                    boolean force){
-        String METHOD_NAME = "modifyDatastreamByValue";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("dsID", dsID);
-        PARMS.put("altIDs", altIDs);
-        PARMS.put("dsLabel", dsLabel);
-        PARMS.put("MIMEType", MIMEType);
-        PARMS.put("formatURI", formatURI);
-        PARMS.put("dsContent", dsContent);
-        PARMS.put("checksumType", checksumType);
-        PARMS.put("checksum", checksum);
-        PARMS.put("logMessage", logMessage);
-        PARMS.put("force", new Boolean(force));
+    public String modifyDatastreamByValue(final String pid,
+            final String dsID,
+            final ArrayOfString altIDs,
+            final String dsLabel,
+            final String MIMEType,
+            final String formatURI,
+            final DataHandler dsContent,
+            final String checksumType,
+            final String checksum,
+            final String logMessage,
+            final boolean force){
+        String buf = "Modify datastream by value";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<String> worker = new SwingWorker<String>() {
 
             @Override
-            public Object construct() {
+            public String construct() {
                     // call wrapped method
                     return m_instance
-                            .modifyDatastreamByValue((java.lang.String) parms
-                                                             .get("pid"),
-                                                     (java.lang.String) parms
-                                                             .get("dsID"),
-                                                     (ArrayOfString) parms
-                                                             .get("altIDs"),
-                                                     (java.lang.String) parms
-                                                             .get("dsLabel"),
-                                                     (java.lang.String) parms
-                                                             .get("MIMEType"),
-                                                     (java.lang.String) parms
-                                                             .get("formatURI"),
-                                                     (DataHandler) parms
-                                                             .get("dsContent"),
-                                                     (java.lang.String) parms
-                                                             .get("checksumType"),
-                                                     (java.lang.String) parms
-                                                             .get("checksum"),
-                                                     (java.lang.String) parms
-                                                             .get("logMessage"),
-                                                     ((Boolean) parms
-                                                             .get("force"))
-                                                             .booleanValue());
+                            .modifyDatastreamByValue(pid,
+                                    dsID,
+                                    altIDs,
+                                    dsLabel,
+                                    MIMEType,
+                                    formatURI,
+                                    dsContent,
+                                    checksumType,
+                                    checksum,
+                                    logMessage,
+                                    force);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (java.lang.String) worker.get();
     }
 
     @Override
-    public java.lang.String setDatastreamState(java.lang.String pid,
-                                               java.lang.String dsID,
-                                               java.lang.String dsState,
-                                               java.lang.String logMessage){
-        String METHOD_NAME = "setDatastreamState";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("dsID", dsID);
-        PARMS.put("dsState", dsState);
-        PARMS.put("logMessage", logMessage);
+    public String setDatastreamState(final String pid,
+            final String dsID,
+            final String dsState,
+            final String logMessage){
+        String buf = "Set datastream state";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<String> worker = new SwingWorker<String>() {
 
             @Override
-            public Object construct() {
+            public String construct() {
                     return m_instance
-                            .setDatastreamState((java.lang.String) parms
-                                    .get("pid"), (java.lang.String) parms
-                                    .get("dsID"), (java.lang.String) parms
-                                    .get("dsState"), (java.lang.String) parms
-                                    .get("logMessage"));
+                            .setDatastreamState(pid, dsID, dsState, logMessage);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (java.lang.String) worker.get();
     }
 
     @Override
-    public java.lang.String setDatastreamVersionable(java.lang.String pid,
-                                                     java.lang.String dsID,
-                                                     boolean versionable,
-                                                     java.lang.String logMessage){
-        String METHOD_NAME = "setDatastreamVersionable";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("dsID", dsID);
-        PARMS.put("versionable", new Boolean(versionable));
-        PARMS.put("logMessage", logMessage);
+    public String setDatastreamVersionable(final String pid,
+                                                     final String dsID,
+                                                     final boolean versionable,
+                                                     final String logMessage){
+        String buf = "Set datastream versionable";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<String> worker = new SwingWorker<String>() {
 
             @Override
-            public Object construct() {
+            public String construct() {
                     // call wrapped method
                     return m_instance
-                            .setDatastreamVersionable((java.lang.String) parms
-                                                              .get("pid"),
-                                                      (java.lang.String) parms
-                                                              .get("dsID"),
-                                                      ((Boolean) parms
-                                                              .get("versionable"))
-                                                              .booleanValue(),
-                                                      (java.lang.String) parms
-                                                              .get("logMessage"));
+                            .setDatastreamVersionable(pid,
+                                                      dsID,
+                                                      versionable,
+                                                      logMessage);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (java.lang.String) worker.get();
     }
 
     @Override
-    public java.lang.String compareDatastreamChecksum(java.lang.String pid,
-                                                      java.lang.String dsID,
-                                                      java.lang.String versionDate){
-        String METHOD_NAME = "compareDatastreamChecksum";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("dsID", dsID);
-        PARMS.put("versionDate", versionDate);
+    public String compareDatastreamChecksum(final String pid,
+            final String dsID,
+            final String versionDate){
+        String buf = "Compare datastream checksum";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<String> worker = new SwingWorker<String>() {
 
             @Override
-            public Object construct() {
+            public String construct() {
                     // call wrapped method
                     return m_instance
-                            .compareDatastreamChecksum((java.lang.String) parms
-                                    .get("pid"), (java.lang.String) parms
-                                    .get("dsID"), (java.lang.String) parms
-                                    .get("versionDate"));
+                            .compareDatastreamChecksum(pid, dsID, versionDate);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (java.lang.String) worker.get();
     }
 
     @Override
-    public Datastream getDatastream(java.lang.String pid,
-                                                                java.lang.String dsID,
-                                                                java.lang.String asOfDateTime){
-        String METHOD_NAME = "getDatastream";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("dsID", dsID);
-        PARMS.put("asOfDateTime", asOfDateTime);
+    public Datastream getDatastream(final String pid,
+            final String dsID,
+            final String asOfDateTime){
+        String buf = "Get datastream";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<Datastream> worker = new SwingWorker<Datastream>() {
 
             @Override
-            public Object construct() {
+            public Datastream construct() {
                     // call wrapped method
                     return m_instance
-                            .getDatastream((java.lang.String) parms.get("pid"),
-                                           (java.lang.String) parms.get("dsID"),
-                                           (java.lang.String) parms
-                                                   .get("asOfDateTime"));
+                            .getDatastream(pid,
+                                           dsID,
+                                           asOfDateTime);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (Datastream) worker.get();
     }
 
     @Override
-    public List<Datastream> getDatastreams(java.lang.String pid,
-                                                                   java.lang.String asOfDateTime,
-                                                                   java.lang.String dsState){
-        String METHOD_NAME = "getDatastreams";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("asOfDateTime", asOfDateTime);
-        PARMS.put("dsState", dsState);
+    public List<Datastream> getDatastreams(final String pid,
+            final String asOfDateTime,
+            final String dsState){
+        String buf = "Get datastreams";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<List<Datastream>> worker =
+                new SwingWorker<List<Datastream>>() {
 
             @Override
-            public Object construct() {
+            public List<Datastream> construct() {
                     // call wrapped method
-                    return m_instance.getDatastreams((java.lang.String) parms
-                            .get("pid"), (java.lang.String) parms
-                            .get("asOfDateTime"), (java.lang.String) parms
-                            .get("dsState"));
+                    return m_instance.getDatastreams(pid, asOfDateTime, dsState);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (List<Datastream>) worker.get();
+        return SwingWorker.waitForResult(worker, buf);
+
     }
 
     @Override
-    public List<Datastream> getDatastreamHistory(java.lang.String pid,
-                                                                         java.lang.String dsID){
-        String METHOD_NAME = "getDatastreamHistory";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("dsID", dsID);
+    public List<Datastream> getDatastreamHistory(final String pid,
+            final String dsID){
+        String buf = "Get datastream history";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<List<Datastream>> worker =
+                new SwingWorker<List<Datastream>>() {
 
             @Override
-            public Object construct() {
+            public List<Datastream> construct() {
                     // call wrapped method
                     return m_instance
-                            .getDatastreamHistory((java.lang.String) parms
-                                    .get("pid"), (java.lang.String) parms
-                                    .get("dsID"));
+                            .getDatastreamHistory(pid, dsID);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (List<Datastream>) worker.get();
     }
 
     @Override
-    public List<String> purgeDatastream(java.lang.String pid,
-                                              java.lang.String dsID,
-                                              java.lang.String startDT,
-                                              java.lang.String endDT,
-                                              java.lang.String logMessage,
-                                              boolean force){
-        String METHOD_NAME = "purgeDatastream";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("dsID", dsID);
-        PARMS.put("startDT", startDT);
-        PARMS.put("endDT", endDT);
-        PARMS.put("logMessage", logMessage);
-        PARMS.put("force", new Boolean(force));
+    public List<String> purgeDatastream(final String pid,
+            final String dsID,
+            final String startDT,
+            final String endDT,
+            final String logMessage,
+            final boolean force){
+        String buf = "Purge datastream";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<List<String>> worker =
+                new SwingWorker<List<String>>() {
 
             @Override
-            public Object construct() {
+            public List<String> construct() {
                     // call wrapped method
                     return m_instance
-                            .purgeDatastream((java.lang.String) parms
-                                    .get("pid"), (java.lang.String) parms
-                                    .get("dsID"), (java.lang.String) parms
-                                    .get("startDT"), (java.lang.String) parms
-                                    .get("endDT"), (java.lang.String) parms
-                                    .get("logMessage"), ((Boolean) parms
-                                    .get("force")).booleanValue());
+                            .purgeDatastream(pid, dsID, startDT, endDT,
+                                    logMessage, force);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (List<String>) worker.get();
     }
 
     @Override
-    public List<String> getNextPID(BigInteger numPIDs,
-                                         java.lang.String pidNamespace){
-        String METHOD_NAME = "getNextPID";
-        HashMap PARMS = new HashMap();
-        PARMS.put("numPIDs", numPIDs);
-        PARMS.put("pidNamespace", pidNamespace);
+    public List<String> getNextPID(final BigInteger numPIDs,
+                                         final String pidNamespace){
+        String buf = "Get next PID";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<List<String>> worker =
+                new SwingWorker<List<String>>() {
 
             @Override
-            public Object construct() {
+            public List<String> construct() {
                     // call wrapped method
                     return m_instance
-                            .getNextPID((BigInteger) parms
-                                                .get("numPIDs"),
-                                        (java.lang.String) parms
-                                                .get("pidNamespace"));
+                            .getNextPID(numPIDs, pidNamespace);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (List<String>) worker.get();
     }
 
     @Override
-    public List<RelationshipTuple> getRelationships(java.lang.String pid,
-                                                                            java.lang.String relationship){
-        String METHOD_NAME = "getRelationships";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("relationship", relationship);
+    public List<RelationshipTuple> getRelationships(final String pid,
+            final String relationship){
+        String buf = "Get relationships";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<List<RelationshipTuple>> worker =
+                new SwingWorker<List<RelationshipTuple>>() {
 
             @Override
-            public Object construct() {
+            public List<RelationshipTuple> construct() {
                     // call wrapped method
-                    return m_instance.getRelationships((java.lang.String) parms
-                            .get("pid"), (java.lang.String) parms
-                            .get("relationship"));
+                    return m_instance.getRelationships(pid, relationship);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (List<RelationshipTuple>) worker.get();
     }
 
     @Override
-    public boolean addRelationship(java.lang.String pid,
-                                   java.lang.String relationship,
-                                   java.lang.String object,
-                                   boolean isLiteral,
-                                   java.lang.String datatype){
-        String METHOD_NAME = "addRelationship";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("relationship", relationship);
-        PARMS.put("object", object);
-        PARMS.put("isLiteral", new Boolean(isLiteral));
-        PARMS.put("datatype", datatype);
+    public boolean addRelationship(final String pid,
+            final String relationship,
+            final String object,
+            final boolean isLiteral,
+            final String datatype){
+        String buf = "Add relationship";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<Boolean> worker = new SwingWorker<Boolean>() {
 
             @Override
-            public Object construct() {
+            public Boolean construct() {
                     // call wrapped method
-                    return m_instance.addRelationship((java.lang.String) parms
-                            .get("pid"), (java.lang.String) parms
-                            .get("relationship"), (java.lang.String) parms
-                            .get("object"), ((Boolean) parms.get("isLiteral"))
-                            .booleanValue(), (java.lang.String) parms
-                            .get("datatype"));
+                    return m_instance.addRelationship(pid,
+                            relationship, object, isLiteral, datatype);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (Boolean) worker.get();// (Object) worker.get();
     }
 
     @Override
-    public boolean purgeRelationship(java.lang.String pid,
-                                     java.lang.String relationship,
-                                     java.lang.String object,
-                                     boolean isLiteral,
-                                     java.lang.String datatype){
-        String METHOD_NAME = "purgeRelationship";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("relationship", relationship);
-        PARMS.put("object", object);
-        PARMS.put("isLiteral", new Boolean(isLiteral));
-        PARMS.put("datatype", datatype);
+    public boolean purgeRelationship(final String pid,
+            final String relationship,
+            final String object,
+            final boolean isLiteral,
+            final String datatype){
+        String buf = "Purge relationship";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<Boolean> worker = new SwingWorker<Boolean>() {
 
             @Override
-            public Object construct() {
+            public Boolean construct() {
                     // call wrapped method
                     return m_instance
-                            .purgeRelationship((java.lang.String) parms
-                                                       .get("pid"),
-                                               (java.lang.String) parms
-                                                       .get("relationship"),
-                                               (java.lang.String) parms
-                                                       .get("object"),
-                                               ((Boolean) parms
-                                                       .get("isLiteral"))
-                                                       .booleanValue(),
-                                               (java.lang.String) parms
-                                                       .get("datatype"));
+                            .purgeRelationship(pid,
+                                    relationship,
+                                    object,
+                                    isLiteral,
+                                    datatype);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (Boolean) worker.get();// (Object) worker.get();
     }
 
     @Override
-    public Validation validate(java.lang.String pid,
-                                                           java.lang.String asOfDateTime){
-        String METHOD_NAME = "validate";
-        HashMap PARMS = new HashMap();
-        PARMS.put("pid", pid);
-        PARMS.put("asOfDateTime", asOfDateTime);
+    public Validation validate(final String pid,
+            final String asOfDateTime){
+        String buf = "Validate";
         // Run the method in a SwingWorker thread
-        SwingWorker worker = new SwingWorker(PARMS) {
+        SwingWorker<Validation> worker = new SwingWorker<Validation>() {
 
             @Override
-            public Object construct() {
+            public Validation construct() {
                     // call wrapped method
-                    return m_instance.validate((java.lang.String) parms
-                            .get("pid"), (java.lang.String) parms
-                            .get("asOfDateTime"));
+                    return m_instance.validate(pid, asOfDateTime);
             }
         };
-        worker.start();
-        // The following code will run in the (safe)
-        // Swing event dispatcher thread.
-        int ms = 0;
-        Dimension d = Administrator.PROGRESS.getSize();
-        // Devise verbage based on method name
-        ArrayList words = new ArrayList();
-        StringBuffer word = new StringBuffer();
-        boolean lastWasCaps = true;
-        for (int i = 0; i < METHOD_NAME.length(); i++) {
-            char c = METHOD_NAME.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                // char is caps
-                if (!lastWasCaps) {
-                    // new word
-                    words.add(word.toString());
-                    word = new StringBuffer();
-                }
-                word.append(c);
-                lastWasCaps = true;
-            } else {
-                // char is lowercase
-                word.append(c);
-                lastWasCaps = false;
-            }
-        }
-        words.add(word.toString());
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < words.size(); i++) {
-            String lcWord = ((String) words.get(i)).toLowerCase();
-            if (i == 0) {
-                String firstChar = lcWord.substring(0, 1).toUpperCase();
-                char lastChar = lcWord.charAt(lcWord.length() - 1);
-                String middle = lcWord.substring(1, lcWord.length() - 1);
-                buf.append(firstChar);
-                buf.append(middle);
-                buf.append(lastChar);
-                buf.append(" ");
-            } else {
-                buf.append(lcWord + " ");
-            }
-        }
-        Administrator.PROGRESS.setString(buf.toString() + ". . .");
-        while (!worker.done) {
-            try {
-                Administrator.PROGRESS.setValue(ms);
-                Administrator.PROGRESS
-                        .paintImmediately(0,
-                                          0,
-                                          (int) d.getWidth() - 1,
-                                          (int) d.getHeight() - 1);
-                Thread.sleep(100);
-                ms = ms + 100;
-                if (ms >= 2000) ms = 200;
-            } catch (InterruptedException ie) {
-            }
-        }
-        Administrator.PROGRESS.setValue(2000);
-        Administrator.PROGRESS.paintImmediately(0,
-                                                0,
-                                                (int) d.getWidth() - 1,
-                                                (int) d.getHeight() - 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ie) {
-        }
-        Administrator.PROGRESS.setValue(0);
-        Administrator.PROGRESS.setString("");
+        return SwingWorker.waitForResult(worker, buf);
 
-        // Otherwise, get the value from the
-        // worker (returning it if applicable)
-        return (Validation) worker.get();
     }
 }

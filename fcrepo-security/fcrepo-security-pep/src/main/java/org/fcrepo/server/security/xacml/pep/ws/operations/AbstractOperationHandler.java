@@ -49,7 +49,6 @@ import org.fcrepo.server.utilities.CXFUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 
@@ -157,6 +156,7 @@ public abstract class AbstractOperationHandler
      * @return the return object for the message.
      * @throws SoapFault
      */
+    @SuppressWarnings("unchecked")
     protected <T> List<T>  getSOAPResponseObject(SOAPMessageContext context, Class<T> clazz) {
         // return result
 
@@ -165,7 +165,7 @@ public abstract class AbstractOperationHandler
         for (Method m:responseObject.getClass().getDeclaredMethods()){
             if (m.getReturnType() == clazz) {
                 try {
-                    resultList.add((T)m.invoke(responseObject, null));
+                    resultList.add((T)m.invoke(responseObject));
                 } catch (Exception e) {
                     logger.error(e.toString(),e);
                     throw CXFUtility.getFault(e);
@@ -409,8 +409,8 @@ public abstract class AbstractOperationHandler
     }
 
     protected Object callGetter(String mname, Object context) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        Class klass = context.getClass();
-        Method getter = klass.getDeclaredMethod(mname, null);
+        Class<?> klass = context.getClass();
+        Method getter = klass.getDeclaredMethod(mname);
         return getter.invoke(context);
     }
 

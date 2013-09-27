@@ -9,7 +9,7 @@ package org.fcrepo.client.console;
  */
 public abstract class InputPanelFactory {
 
-    public static InputPanel getPanel(Class cl) {
+    public static InputPanel<?> getPanel(Class<?> cl) {
         if (cl.getName().equals("java.lang.String")) {
             return new StringInputPanel();
         }
@@ -29,12 +29,9 @@ public abstract class InputPanelFactory {
             return new NonNegativeIntegerInputPanel();
         }
         if (cl.getName().startsWith("[L")) {
-            try {
-                return new ArrayInputPanel(Class.forName(cl.getName()
-                        .substring(2, cl.getName().length() - 1)));
-            } catch (ClassNotFoundException cnfe) {
-                // will fall through as unrecognized
-            }
+            Class<?> type =
+                    cl.getComponentType();
+            return ArrayInputPanel.getInstance(type);
         }
         System.out.println("Unrecognized type: " + cl.getName());
         return NullInputPanel.getInstance();

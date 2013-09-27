@@ -30,7 +30,7 @@ public class ConsoleCommandInvoker
 
     private final Console m_console;
 
-    private final InputPanel[] m_inputPanels;
+    private final InputPanel<?>[] m_inputPanels;
 
     public ConsoleCommandInvoker(ConsoleCommand command, Console console) {
         m_command = command;
@@ -41,7 +41,7 @@ public class ConsoleCommandInvoker
         jeez.setLayout(new BorderLayout());
         jeez.add(commandNameLabel, BorderLayout.WEST);
         add(jeez);
-        Class types[] = command.getParameterTypes();
+        Class<?> types[] = command.getParameterTypes();
         String names[] = command.getParameterNames();
         m_inputPanels = new InputPanel[types.length];
         for (int i = 0; i < types.length; i++) {

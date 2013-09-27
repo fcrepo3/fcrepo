@@ -9,9 +9,10 @@ import javax.swing.JPanel;
 /**
  * @author Chris Wilper
  */
-public abstract class InputPanel
+@SuppressWarnings("serial")
+public abstract class InputPanel<T>
         extends JPanel {
 
-    public abstract Object getValue();
+    public abstract T getValue();
 
 }

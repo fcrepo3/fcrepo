@@ -25,11 +25,11 @@ public class ConsoleSendButtonListener
 
     private final Administrator m_mainFrame;
 
-    private final ComboBoxModel m_model;
+    private final ComboBoxModel<ConsoleCommand> m_model;
 
     private final Console m_console;
 
-    public ConsoleSendButtonListener(ComboBoxModel model,
+    public ConsoleSendButtonListener(ComboBoxModel<ConsoleCommand> model,
                                      Administrator mainFrame,
                                      Console console) {
         m_model = model;

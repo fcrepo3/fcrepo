@@ -29,7 +29,7 @@ class DatastreamInputSpecDeserializer
     // values gathered and built while parsing
     private String m_label;
 
-    private List m_bindingRules;
+    private List<DatastreamBindingRule> m_bindingRules;
 
     private String m_min;
 
@@ -83,7 +83,7 @@ class DatastreamInputSpecDeserializer
                              String qName,
                              Attributes a) {
         if (localName.equals("DSInputSpec")) {
-            m_bindingRules = new ArrayList();
+            m_bindingRules = new ArrayList<DatastreamBindingRule>();
             for (int i = 0; i < a.getLength(); i++) {
                 String name = a.getLocalName(i);
                 if (name.equals("label")) {

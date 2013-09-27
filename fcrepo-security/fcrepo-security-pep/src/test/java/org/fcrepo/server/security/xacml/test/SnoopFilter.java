@@ -46,15 +46,15 @@ public final class SnoopFilter
         String uri = req.getRequestURI();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Incoming Request, URI: " + uri);
+            logger.debug("Incoming Request, URI: {}", uri);
             logger.debug("Headers: ");
-            Enumeration headerNames = req.getHeaderNames();
+            Enumeration<?> headerNames = req.getHeaderNames();
             while (headerNames.hasMoreElements()) {
                 String headerName = (String) headerNames.nextElement();
-                Enumeration values = req.getHeaders(headerName);
+                Enumeration<?> values = req.getHeaders(headerName);
                 while (values.hasMoreElements()) {
                     String value = (String) values.nextElement();
-                    logger.debug(headerName + ": " + value);
+                    logger.debug("{}: {}", headerName, value);
                 }
             }
             logger.debug("userPrincipal: " + req.getUserPrincipal());

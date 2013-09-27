@@ -12,9 +12,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-
-import java.util.HashMap;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -179,19 +176,16 @@ public class Downloader {
                 File tempFile =
                         File.createTempFile("fedora-client-download-", null);
                 tempFile.deleteOnExit();
-                HashMap PARMS = new HashMap();
-                PARMS.put("in", response.getEntity().getContent());
-                PARMS.put("out", new FileOutputStream(tempFile));
+                final InputStream in = response.getEntity().getContent();
+                final OutputStream out= new FileOutputStream(tempFile);
                 // do the actual download in a safe thread
-                SwingWorker worker = new SwingWorker(PARMS) {
+                SwingWorker<String> worker = new SwingWorker<String>() {
 
                     @Override
-                    public Object construct() {
+                    public String construct() {
                         try {
-                            StreamUtility.pipeStream((InputStream) parms
-                                                             .get("in"),
-                                                     (OutputStream) parms
-                                                             .get("out"),
+                            StreamUtility.pipeStream(in,
+                                                     out,
                                                      8192);
                         } catch (Exception e) {
                             thrownException = e;
@@ -226,8 +220,7 @@ public class Downloader {
                     Thread.sleep(100);
                 } catch (InterruptedException ie) {
                 }
-                ((InputStream) PARMS
-                        .get("in")).close();
+                in.close();
                 return new FileInputStream(tempFile);
             }
             return response.getEntity().getContent();

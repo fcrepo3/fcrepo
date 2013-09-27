@@ -100,6 +100,7 @@ public abstract class Module
      *         If initialization values are invalid or initialization fails for
      *         some other reason.
      */
+    @SuppressWarnings("unused")
     public void initModule() throws ModuleInitializationException {
         if (1 == 2) {
             throw new ModuleInitializationException(null, null);
@@ -114,6 +115,7 @@ public abstract class Module
      *         If initialization values are invalid or initialization fails for
      *         some other reason.
      */
+    @SuppressWarnings("unused")
     public void postInitModule() throws ModuleInitializationException {
         if (1 == 2) {
             throw new ModuleInitializationException(null, null);
@@ -129,6 +131,7 @@ public abstract class Module
      *         process. Therefore, this method should do everything possible to
      *         recover from exceptional situations before throwing an exception.
      */
+    @SuppressWarnings("unused")
     public void shutdownModule() throws ModuleShutdownException {
         logger.info("Shutting down " + getClass().getName());
         if (1 == 2) {

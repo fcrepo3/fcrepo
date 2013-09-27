@@ -29,7 +29,7 @@ import org.fcrepo.server.utilities.StreamUtility;
  * @author Chris Wilper
  */
 public class ByteArrayInputPanel
-        extends InputPanel
+        extends InputPanel<byte[]>
         implements ActionListener {
 
     private static final long serialVersionUID = 1L;
@@ -94,7 +94,7 @@ public class ByteArrayInputPanel
     }
 
     @Override
-    public Object getValue() {
+    public byte[] getValue() {
         if (m_fromTextRadioButton.isSelected()) {
             return m_textField.getText().getBytes();
         } else {

@@ -86,15 +86,13 @@ public class MethodParameterResolverServlet
         String methodName = null;
         String versDateTime = null;
         StringBuffer methodParms = new StringBuffer();
-        Hashtable h_methodParms = new Hashtable();
+        Hashtable<String, String> h_methodParms = new Hashtable<String, String>();
         response.setContentType(HTML_CONTENT_TYPE);
-        PrintWriter out = response.getWriter();
 
         // Get servlet parameters.
-        Enumeration parms = request.getParameterNames();
+        Enumeration<?> parms = request.getParameterNames();
         while (parms.hasMoreElements()) {
-            String name = new String((String) parms.nextElement());
-            String value = new String(request.getParameter(name));
+            String name = (String) parms.nextElement();
             if (name.equals("PID")) {
                 PID = URLDecoder.decode(request.getParameter(name), "UTF-8");
             } else if (name.equals("sDefPID")) {
@@ -139,9 +137,9 @@ public class MethodParameterResolverServlet
                     + "methodName_=" + methodName);
             // Add method parameters.
             int i = 0;
-            for (Enumeration e = h_methodParms.keys(); e.hasMoreElements();) {
+            for (Enumeration<String> e = h_methodParms.keys(); e.hasMoreElements();) {
                 String name =
-                        URLEncoder.encode((String) e.nextElement(), "UTF-8");
+                        URLEncoder.encode(e.nextElement(), "UTF-8");
                 String value =
                         URLEncoder.encode((String) h_methodParms.get(name),
                                           "UTF-8");

@@ -5,6 +5,7 @@
 package org.fcrepo.client.console;
 
 import java.awt.BorderLayout;
+import java.util.Date;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -32,7 +33,7 @@ import org.fcrepo.utilities.DateUtility;
  * @author Ross Wayland
  */
 public class DateTimeInputPanel
-        extends InputPanel {
+        extends InputPanel<Date> {
 
     private static final long serialVersionUID = 1L;
 
@@ -66,7 +67,7 @@ public class DateTimeInputPanel
     }
 
     @Override
-    public Object getValue() {
+    public Date getValue() {
         if (m_nullRadioButton.isSelected()) {
             return null;
         } else {

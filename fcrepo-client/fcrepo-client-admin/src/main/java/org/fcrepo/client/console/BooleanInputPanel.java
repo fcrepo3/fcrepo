@@ -10,7 +10,7 @@ import javax.swing.JCheckBox;
  * @author Chris Wilper
  */
 public class BooleanInputPanel
-        extends InputPanel {
+        extends InputPanel<Boolean> {
 
     private static final long serialVersionUID = 1L;
 
@@ -23,7 +23,7 @@ public class BooleanInputPanel
     }
 
     @Override
-    public Object getValue() {
+    public Boolean getValue() {
         return new Boolean(m_checkBox.isSelected());
     }
 
