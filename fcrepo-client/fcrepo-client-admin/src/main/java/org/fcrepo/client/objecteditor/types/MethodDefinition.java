@@ -19,12 +19,13 @@ public class MethodDefinition {
 
     private final String m_label;
 
-    private final List m_parameterDefinitions;
+    private final List<ParameterDefinition> m_parameterDefinitions;
 
     /**
      * Initialize a MethodDefinition object with all values.
      */
-    public MethodDefinition(String name, String label, List parameterDefinitions) {
+    public MethodDefinition(String name, String label,
+            List<ParameterDefinition> parameterDefinitions) {
         m_name = name;
         m_label = label;
         m_parameterDefinitions = parameterDefinitions;
@@ -50,7 +51,7 @@ public class MethodDefinition {
      * &lt;/Method&gt;
      * </pre>
      */
-    public static List parse(InputStream xml) throws IOException {
+    public static List<MethodDefinition> parse(InputStream xml) throws IOException {
         return new MethodDefinitionsDeserializer(xml).getResult();
     }
 
@@ -72,7 +73,7 @@ public class MethodDefinition {
      * Get the method's list of <code>ParameterDefinition</code>s. If the
      * method takes no parameters, this will be an empty list.
      */
-    public List parameterDefinitions() {
+    public List<ParameterDefinition> parameterDefinitions() {
         return m_parameterDefinitions;
     }
 

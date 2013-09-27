@@ -16,7 +16,7 @@ import javax.swing.JTextField;
  * @author Chris Wilper
  */
 public class StringInputPanel
-        extends InputPanel {
+        extends InputPanel<String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -49,7 +49,7 @@ public class StringInputPanel
     }
 
     @Override
-    public Object getValue() {
+    public String getValue() {
         if (m_nullRadioButton.isSelected()) {
             return null;
         } else {

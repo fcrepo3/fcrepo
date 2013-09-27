@@ -6,22 +6,16 @@
 package org.fcrepo.client.batch;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.Uploader;
 import org.fcrepo.client.batch.types.Datastream;
 import org.fcrepo.client.batch.types.DigitalObject;
@@ -29,13 +23,6 @@ import org.fcrepo.client.utility.ingest.AutoIngestor;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
-import org.fcrepo.server.types.gen.ComparisonOperator;
-import org.fcrepo.server.types.gen.Condition;
-import org.fcrepo.server.types.gen.FieldSearchQuery;
-import org.fcrepo.server.types.gen.FieldSearchResult;
-import org.fcrepo.server.types.gen.FieldSearchResult.ResultList;
-import org.fcrepo.server.types.gen.ObjectFactory;
-import org.fcrepo.server.types.gen.ObjectFields;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.utilities.TypeUtility;
 import org.xml.sax.Attributes;
@@ -1144,51 +1131,9 @@ public class BatchModifyParser
         out.println("  </succeeded>");
     }
 
-    public static Map getServiceLabelMap() throws IOException {
-        try {
-            HashMap<String, String> labelMap = new HashMap<String, String>();
-            FieldSearchQuery query = new FieldSearchQuery();
-            FieldSearchQuery.Conditions conds =
-                    new FieldSearchQuery.Conditions();
-            Condition condition = new Condition();
-            condition = new Condition();
-            condition.setProperty("fType");
-            condition.setOperator(ComparisonOperator.fromValue("eq"));
-            condition.setValue("D");
-            conds.getCondition().add(condition);
-            ObjectFactory factory = new ObjectFactory();
-            query.setConditions(factory.createFieldSearchQueryConditions(conds));
-            String[] fields = new String[] {"pid", "label"};
-
-            if (true) {
-                /* FIXME: find some other way to do this */
-                throw new UnsupportedOperationException("This operation uses obsolete field search semantics");
-            }
-
-            FieldSearchResult result =
-                    APIA.findObjects(TypeUtility.convertStringtoAOS(fields),
-                                     new BigInteger("50"),
-                                     query);
-            while (result != null) {
-                ResultList resultList = result.getResultList();
-                if (result.getResultList() != null) {
-                    for (ObjectFields element : resultList.getObjectFields()) {
-                        labelMap.put(element.getPid().getValue(), element
-                                .getLabel().getValue());
-                    }
-                }
-                if (result.getListSession() != null) {
-                    result =
-                            APIA.resumeFindObjects(result.getListSession()
-                                    .getValue().getToken());
-                } else {
-                    result = null;
-                }
-            }
-            return labelMap;
-        } catch (Exception e) {
-            throw new IOException(e.getMessage());
-        }
+    @Deprecated
+    public static Map<?,?> getServiceLabelMap() throws IOException {
+        throw new IOException("This operation uses obsolete field search semantics");
     }
 
     /**
@@ -1201,122 +1146,9 @@ public class BatchModifyParser
      * @throws IOException
      *         If an error occurs in retrieving the list of labels.
      */
-    public static Map getDeploymentLabelMap(String sDefPID) throws IOException {
-        try {
-            HashMap<String, String> labelMap = new HashMap<String, String>();
-            FieldSearchQuery query = new FieldSearchQuery();
-            Condition[] conditions = new Condition[2];
-            conditions[0] = new Condition();
-            conditions[0].setProperty("fType");
-            conditions[0].setOperator(ComparisonOperator.fromValue("eq"));
-            conditions[0].setValue("M");
-            conditions[1] = new Condition();
-            conditions[1].setProperty("bDef");
-            conditions[1].setOperator(ComparisonOperator.fromValue("has"));
-            conditions[1].setValue(sDefPID);
-            FieldSearchQuery.Conditions conds = new FieldSearchQuery.Conditions();
-            conds.getCondition().addAll(Arrays.asList(conditions));
-            ObjectFactory factory = new ObjectFactory();
-            query.setConditions(factory.createFieldSearchQueryConditions(conds));
-            String[] fields = new String[] {"pid", "label"};
-
-            if (true) {
-                /*
-                 * FIXME: find some other way to do this, if we care. It uses
-                 * fType and bDef in field search, which are no longer
-                 * available.
-                 */
-                throw new UnsupportedOperationException("This operation uses obsolete field search semantics");
-            }
-            FieldSearchResult result =
-                    APIA.findObjects(TypeUtility.convertStringtoAOS(fields),
-                                     new BigInteger("50"),
-                                     query);
-            while (result != null) {
-                ResultList resultList = result.getResultList();
-                if (resultList != null) {
-                    for (ObjectFields element : resultList.getObjectFields()) {
-                        labelMap.put(element.getPid().getValue(), element.getLabel().getValue());
-                    }
-                }
-                if (result.getListSession() != null) {
-                    result =
-                            APIA.resumeFindObjects(result.getListSession().getValue()
-                                    .getToken());
-                } else {
-                    result = null;
-                }
-            }
-            return labelMap;
-        } catch (Exception e) {
-            throw new IOException(e.getMessage());
-        }
-    }
-
-    /**
-     * <p>
-     * Main method for testing only.
-     * </p>
-     *
-     * @param args
-     *        Array of input parms consisting of hostname, port, username,
-     *        password, protocol, directives, log.
-     */
-    public static void main(String[] args) {
-
-        if (args.length == 5 || args.length == 6) {
-            String host = args[0];
-            int port = new Integer(args[1]).intValue();
-            String user = args[2];
-            String pass = args[3];
-            String protocol = args[4];
-
-            String context = Constants.FEDORA_DEFAULT_APP_CONTEXT;
-            if (args.length == 6 && !args[5].isEmpty()) {
-                context = args[5];
-            }
-
-            PrintStream logFile;
-            FedoraAPIMMTOM APIM;
-            FedoraAPIAMTOM APIA;
-
-            try {
-                UPLOADER = new Uploader(host, port, context, user, pass);
-                logFile =
-                        new PrintStream(new FileOutputStream("C:\\zlogfile.txt"));
-                //APIM = org.fcrepo.client.APIMStubFactory.getStub(protocol, host, port, user, pass);
-                //APIA = org.fcrepo.client.APIAStubFactory.getStub(protocol, host, port, user, pass);
-
-                // ******************************************
-                // NEW: use new client utility class
-                String baseURL =
-                        protocol + "://" + host + ":" + port + "/" + context;
-                FedoraClient fc = new FedoraClient(baseURL, user, pass);
-                APIA = fc.getAPIAMTOM();
-                APIM = fc.getAPIMMTOM();
-                fc.shutdown();
-                //*******************************************
-
-                InputStream file =
-                        new FileInputStream("c:\\fedora\\mellon\\dist\\client\\demo\\batch-demo\\modify-batch-directives-valid.xml");
-                BatchModifyParser bmp =
-                        new BatchModifyParser(UPLOADER,
-                                              APIM,
-                                              APIA,
-                                              file,
-                                              logFile);
-                file.close();
-                logFile.close();
-            } catch (Exception e) {
-                System.out.println("ERROR: "
-                        + e.getClass().getName()
-                        + " - "
-                        + (e.getMessage() == null ? "(no detail provided)" : e
-                                .getMessage()));
-            }
-        } else {
-            System.out.println("Enter args for: host port user pass protocol");
-        }
+    @Deprecated
+    public static Map<?,?> getDeploymentLabelMap(String sDefPID) throws IOException {
+        throw new IOException("This operation uses obsolete field search semantics");
     }
 
 }

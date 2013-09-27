@@ -13,7 +13,7 @@ import javax.wsdl.PortType;
  */
 public class ServiceConsoleCommandFactory {
 
-    public static ConsoleCommand[] getConsoleCommands(Class javaInterface,
+    public static ConsoleCommand[] getConsoleCommands(Class<?> javaInterface,
                                                       PortType wsdlInterface) {
         if (!javaInterface.isInterface()) {
             return null;

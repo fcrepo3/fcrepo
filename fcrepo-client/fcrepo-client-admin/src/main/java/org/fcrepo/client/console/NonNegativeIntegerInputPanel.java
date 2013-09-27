@@ -19,7 +19,7 @@ import javax.swing.JTextField;
  * @author Ross Wayland
  */
 public class NonNegativeIntegerInputPanel
-        extends InputPanel {
+        extends InputPanel<BigInteger> {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,7 +52,7 @@ public class NonNegativeIntegerInputPanel
     }
 
     @Override
-    public Object getValue() {
+    public BigInteger getValue() {
         if (m_nullRadioButton.isSelected()) {
             return null;
         } else {

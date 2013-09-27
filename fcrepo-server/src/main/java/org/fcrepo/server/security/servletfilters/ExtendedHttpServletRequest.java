@@ -24,8 +24,8 @@ public interface ExtendedHttpServletRequest
 
     public static final String FAILED = "failed";
 
-    public static final ImmutableHashSet IMMUTABLE_NULL_SET =
-            new ImmutableHashSet();
+    public static final ImmutableHashSet<Object> IMMUTABLE_NULL_SET =
+            new ImmutableHashSet<Object>();
 
     public void audit();
 
@@ -42,7 +42,7 @@ public interface ExtendedHttpServletRequest
 
     public boolean isAuthenticated();
 
-    public Set getAttributeValues(String key) throws AuthzOperationalException;
+    public Set<?> getAttributeValues(String key) throws AuthzOperationalException;
 
     public boolean hasAttributeValues(String key)
             throws AuthzOperationalException;

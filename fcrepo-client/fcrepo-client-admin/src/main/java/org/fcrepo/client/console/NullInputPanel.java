@@ -12,7 +12,7 @@ import javax.swing.JLabel;
  * @author Chris Wilper
  */
 public class NullInputPanel
-        extends InputPanel {
+        extends InputPanel<Object> {
 
     private static final long serialVersionUID = 1L;
 

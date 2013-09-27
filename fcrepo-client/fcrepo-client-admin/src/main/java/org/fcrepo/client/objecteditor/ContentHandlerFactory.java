@@ -14,14 +14,11 @@ import java.util.HashMap;
  */
 public abstract class ContentHandlerFactory {
 
-    private static HashMap s_viewers;
+    private static final HashMap<String, ContentViewer> s_viewers =
+            new HashMap<String, ContentViewer>();
 
-    private static HashMap s_editors;
-
-    static {
-        s_viewers = new HashMap();
-        s_editors = new HashMap();
-    }
+    private static final HashMap<String, ContentViewer> s_editors =
+            new HashMap<String, ContentViewer>();
 
     /**
      * Registers a viewer or editor with the factory. Before the factory is

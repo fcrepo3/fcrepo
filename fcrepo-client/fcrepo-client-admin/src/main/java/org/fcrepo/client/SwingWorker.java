@@ -4,7 +4,8 @@
  */
 package org.fcrepo.client;
 
-import java.util.HashMap;
+import java.awt.Dimension;
+import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
@@ -16,9 +17,9 @@ import javax.swing.SwingUtilities;
  * the API changed slightly in the 3rd version: You must now invoke start() on
  * the SwingWorker after creating it.
  */
-public abstract class SwingWorker {
+public abstract class SwingWorker<T> {
 
-    private Object value; // see getValue(), setValue()
+    private T value; // see getValue(), setValue()
 
     public boolean done; // set to true only upon finish
 
@@ -51,21 +52,21 @@ public abstract class SwingWorker {
      * Get the value produced by the worker thread, or null if it hasn't been
      * constructed yet.
      */
-    protected synchronized Object getValue() {
+    protected synchronized T getValue() {
         return value;
     }
 
     /**
      * Set the value produced by worker thread
      */
-    public synchronized void setValue(Object x) {
+    public synchronized void setValue(T x) {
         value = x;
     }
 
     /**
      * Compute the value to be returned by the <code>get</code> method.
      */
-    public abstract Object construct();
+    public abstract T construct();
 
     /**
      * Called on the event dispatching thread (not on the worker thread) after
@@ -94,7 +95,7 @@ public abstract class SwingWorker {
      * 
      * @return the value created by the <code>construct</code> method
      */
-    public Object get() {
+    public T get() {
         while (true) {
             Thread t = threadVar.get();
             if (t == null) {
@@ -109,14 +110,13 @@ public abstract class SwingWorker {
         }
     }
 
-    public HashMap parms;
+    public Map<?,?> parms;
 
     /**
      * Start a thread that will call the <code>construct</code> method and
      * then exit.
      */
-    public SwingWorker(HashMap parms) {
-        this.parms = parms;
+    public SwingWorker() {
         final Runnable doFinished = new Runnable() {
 
             public void run() {
@@ -140,6 +140,11 @@ public abstract class SwingWorker {
         Thread t = new Thread(doConstruct);
         threadVar = new ThreadVar(t);
     }
+    
+    public SwingWorker(Map<?,?> parms) {
+        this();
+        this.parms = parms;
+    }
 
     /**
      * Start the worker thread.
@@ -149,5 +154,42 @@ public abstract class SwingWorker {
         if (t != null) {
             t.start();
         }
+    }
+
+    public static <T> T waitForResult(SwingWorker<T> worker, String msg) {
+        worker.start();
+        // The following code will run in the (safe)
+        // Swing event dispatcher thread.
+        int ms = 0;
+        Dimension d = Administrator.PROGRESS.getSize();
+        Administrator.PROGRESS.setString(msg + ". . .");
+        while (!worker.done) {
+            try {
+                Administrator.PROGRESS.setValue(ms);
+                Administrator.PROGRESS
+                        .paintImmediately(0,
+                                          0,
+                                          (int) d.getWidth() - 1,
+                                          (int) d.getHeight() - 1);
+                Thread.sleep(100);
+                ms = ms + 100;
+                if (ms >= 2000) ms = 200;
+            } catch (InterruptedException ie) {
+            }
+        }
+        Administrator.PROGRESS.setValue(2000);
+        Administrator.PROGRESS.paintImmediately(0,
+                                                0,
+                                                (int) d.getWidth() - 1,
+                                                (int) d.getHeight() - 1);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ie) {
+        }
+        Administrator.PROGRESS.setValue(0);
+        Administrator.PROGRESS.setString("");
+        // Otherwise, get the value from the
+        // worker (returning it if applicable)
+        return worker.get();
     }
 }

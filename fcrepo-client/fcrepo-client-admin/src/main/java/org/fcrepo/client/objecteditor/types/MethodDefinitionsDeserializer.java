@@ -24,14 +24,14 @@ class MethodDefinitionsDeserializer
         extends DefaultHandler {
 
     /** The deserialized MethodDefinition objects */
-    private final List m_result;
+    private final List<MethodDefinition> m_result;
 
     // values gathered and built while parsing
     private String m_methodName;
 
     private String m_methodLabel;
 
-    private List m_methodParms;
+    private List<ParameterDefinition> m_methodParms;
 
     private String m_parmName;
 
@@ -41,11 +41,11 @@ class MethodDefinitionsDeserializer
 
     private String m_parmDefaultValue;
 
-    private List m_parmValidValues;
+    private List<String> m_parmValidValues;
 
     public MethodDefinitionsDeserializer(InputStream xml)
             throws IOException {
-        m_result = new ArrayList();
+        m_result = new ArrayList<MethodDefinition>();
         try {
             SAXParserFactory spf = SAXParserFactory.newInstance();
             spf.setNamespaceAware(true);
@@ -61,7 +61,7 @@ class MethodDefinitionsDeserializer
         }
     }
 
-    public List getResult() {
+    public List<MethodDefinition> getResult() {
         return m_result;
     }
 
@@ -73,7 +73,7 @@ class MethodDefinitionsDeserializer
         if (localName.equals("Method")) {
             m_methodName = null;
             m_methodLabel = null;
-            m_methodParms = new ArrayList();
+            m_methodParms = new ArrayList<ParameterDefinition>();
             for (int i = 0; i < a.getLength(); i++) {
                 String name = a.getLocalName(i);
                 if (name.equals("operationName")) {
@@ -87,7 +87,7 @@ class MethodDefinitionsDeserializer
             m_parmLabel = null;
             m_parmRequired = null;
             m_parmDefaultValue = null;
-            m_parmValidValues = new ArrayList();
+            m_parmValidValues = new ArrayList<String>();
             for (int i = 0; i < a.getLength(); i++) {
                 String name = a.getLocalName(i);
                 if (name.equals("parmName")) {

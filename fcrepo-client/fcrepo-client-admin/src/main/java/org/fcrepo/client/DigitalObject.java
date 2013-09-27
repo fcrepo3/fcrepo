@@ -12,9 +12,11 @@ import java.util.Iterator;
  */
 public class DigitalObject {
 
-    protected HashMap basisStreams = new HashMap();
+    protected HashMap<?, BasisDataStream> basisStreams =
+            new HashMap<Object, BasisDataStream>();
 
-    protected HashMap inlineStreams = new HashMap();
+    protected HashMap<?, InlineDataStream> inlineStreams =
+            new HashMap<Object, InlineDataStream>();
 
     private boolean m_dirty = true;
 
@@ -36,17 +38,17 @@ public class DigitalObject {
         if (m_dirty) {
             return true;
         }
-        Iterator iter;
-        iter = basisStreams.values().iterator();
-        while (iter.hasNext()) {
-            BasisDataStream basis = (BasisDataStream) iter.next();
+        Iterator<BasisDataStream> b_iter =
+                basisStreams.values().iterator();
+        while (b_iter.hasNext()) {
+            BasisDataStream basis = b_iter.next();
             if (basis.isDirty()) {
                 return true;
             }
         }
-        iter = inlineStreams.values().iterator();
-        while (iter.hasNext()) {
-            InlineDataStream inline = (InlineDataStream) iter.next();
+        Iterator<InlineDataStream> i_iter = inlineStreams.values().iterator();
+        while (i_iter.hasNext()) {
+            InlineDataStream inline = i_iter.next();
             if (inline.isDirty()) {
                 return true;
             }
@@ -60,15 +62,15 @@ public class DigitalObject {
 
     public void setAllClean() {
         m_dirty = false;
-        Iterator iter;
-        iter = basisStreams.values().iterator();
-        while (iter.hasNext()) {
-            BasisDataStream basis = (BasisDataStream) iter.next();
+        Iterator<BasisDataStream> b_iter =
+                basisStreams.values().iterator();
+        while (b_iter.hasNext()) {
+            BasisDataStream basis = b_iter.next();
             basis.setClean();
         }
-        iter = inlineStreams.values().iterator();
-        while (iter.hasNext()) {
-            InlineDataStream inline = (InlineDataStream) iter.next();
+        Iterator<InlineDataStream> i_iter = inlineStreams.values().iterator();
+        while (i_iter.hasNext()) {
+            InlineDataStream inline = i_iter.next();
             inline.setClean();
         }
     }

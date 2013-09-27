@@ -44,8 +44,8 @@ public abstract class OAIProviderServlet
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            HashMap params = new HashMap();
-            Enumeration enm = request.getParameterNames();
+            HashMap<String,String> params = new HashMap<String,String>();
+            Enumeration<?> enm = request.getParameterNames();
             while (enm.hasMoreElements()) {
                 String name = (String) enm.nextElement();
                 params.put(name, request.getParameter(name));
@@ -75,14 +75,6 @@ public abstract class OAIProviderServlet
         }
     }
 
-    private static String getMessage(Throwable t) {
-        String msg = t.getMessage();
-        if (msg == null) {
-            msg = "Unexpected repository error.";
-        }
-        return msg;
-    }
-
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -110,8 +102,8 @@ public abstract class OAIProviderServlet
 
     public abstract OAIResponder getResponder() throws RepositoryException;
 
-    public static HashMap getAsParameterMap(String[] args) {
-        HashMap h = new HashMap();
+    public static HashMap<String,String> getAsParameterMap(String[] args) {
+        HashMap<String,String> h = new HashMap<String,String>();
         for (String arg : args) {
             int pos = arg.indexOf("=");
             if (pos != -1) {

@@ -83,16 +83,12 @@ public class ObjectEditorFrame
 
         // outerPane(tabbedPane)
         ImageIcon objIcon =
-            new ImageIcon(this.getClass().getClassLoader().getSystemClassLoader()
+            new ImageIcon(ClassLoader
                           .getSystemResource("images/client/standard/general/Information16.gif"));
 
         ImageIcon dsIcon =
-            new ImageIcon(this.getClass().getClassLoader().getSystemClassLoader()
+            new ImageIcon(ClassLoader
                           .getSystemResource("images/client/standard/general/Copy16.gif"));
-
-        ImageIcon dissIcon =
-            new ImageIcon(this.getClass().getClassLoader().getSystemClassLoader()
-                          .getSystemResource("images/client/standard/general/Refresh16.gif"));
 
         // tabbedPane(ObjectPane, DatastreamsPane, DisseminatorsPane)
         m_objectPane =
@@ -121,10 +117,7 @@ public class ObjectEditorFrame
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(outerPane, BorderLayout.CENTER);
-        //ImageIcon openIcon =
-        //    new ImageIcon(ClassLoader.
-        //                  getSystemResource("images/client/standard/general/Open16.gif"));
-        //setFrameIcon(openIcon);
+
         pack();
         Dimension dims = getSize();
         if (dims.height < 675) {
@@ -142,9 +135,9 @@ public class ObjectEditorFrame
     }
 
     public Datastream[] getCurrentDatastreamVersions() {
-        Collection vColl = m_datastreamsPane.getCurrentVersionMap().values();
+        Collection<Datastream> vColl = m_datastreamsPane.getCurrentVersionMap().values();
         Datastream[] versions = new Datastream[vColl.size()];
-        Iterator iter = vColl.iterator();
+        Iterator<Datastream> iter = vColl.iterator();
         int i = 0;
         while (iter.hasNext()) {
             versions[i++] = (Datastream) iter.next();

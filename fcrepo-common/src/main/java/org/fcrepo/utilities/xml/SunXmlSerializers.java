@@ -11,6 +11,7 @@ import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 @Deprecated
+@SuppressWarnings("restriction")
 public abstract class SunXmlSerializers {
 
     /**

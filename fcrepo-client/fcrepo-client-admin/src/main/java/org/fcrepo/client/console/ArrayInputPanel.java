@@ -10,26 +10,29 @@ import javax.swing.JLabel;
 
 /**
  * @author Chris Wilper
+ * @param <T>
+ * @param <T>
  */
-public class ArrayInputPanel
-        extends InputPanel {
+public class ArrayInputPanel<T>
+        extends InputPanel<T[]> {
 
     private static final long serialVersionUID = 1L;
 
-    private final ArrayList m_inputPanels;
+    private final ArrayList<T> m_inputPanels;
 
-    public ArrayInputPanel(Class cl) {
-        m_inputPanels = new ArrayList();
+    public ArrayInputPanel() {
+        m_inputPanels = new ArrayList<T>();
         add(new JLabel("Array handler not implemented, will be null."));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Object getValue() {
-        Object[] out = null;
-        if (m_inputPanels.size() > 0) {
-            out = new Object[m_inputPanels.size()];
-        }
-        return out;
+    public T[] getValue() {
+        return (T[]) m_inputPanels.toArray();
+    }
+    
+    public static <E> ArrayInputPanel<E> getInstance(Class<E> type) {
+        return new ArrayInputPanel<E>();
     }
 
 }
