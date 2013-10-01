@@ -20,7 +20,6 @@ import java.util.Set;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.access.ObjectProfile;
-import org.fcrepo.server.management.DefaultManagement;
 import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.search.ObjectFields;
 import org.fcrepo.server.storage.types.Datastream;
@@ -31,13 +30,9 @@ import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.utilities.DateUtility;
 import org.fcrepo.utilities.ReadableCharArrayWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class DefaultSerializer {
-    private static final Logger logger =
-            LoggerFactory.getLogger(DefaultManagement.class);
 
     String fedoraServerHost;
     String fedoraServerPort;

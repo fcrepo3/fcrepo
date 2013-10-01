@@ -373,7 +373,7 @@ public class DatastreamsPane
 
         JTextArea m_controlGroupTextArea;
 
-        JComboBox m_mimeComboBox;
+        JComboBox<String> m_mimeComboBox;
 
         CardLayout m_contentCard;
 
@@ -391,7 +391,7 @@ public class DatastreamsPane
 
         JPanel m_checksumPanel;
 
-        JComboBox m_checksumTypeComboBox;
+        JComboBox<String> m_checksumTypeComboBox;
 
         JTextField m_checksumValue;
 
@@ -430,9 +430,9 @@ public class DatastreamsPane
                         + "relative hyperlinks, or there are licensing or access restrictions that prevent "
                         + "it from being proxied.";
 
-        private final JComboBox m_stateComboBox;
+        private final JComboBox<String> m_stateComboBox;
 
-        private final JComboBox m_versionableComboBox;
+        private final JComboBox<String> m_versionableComboBox;
 
         private String m_initialState;
 
@@ -448,7 +448,7 @@ public class DatastreamsPane
                             new JLabel("Alternate IDs"), new JLabel("Checksum")};
 
             m_stateComboBox =
-                    new JComboBox(new String[] {"Active", "Inactive", "Deleted"});
+                    new JComboBox<String>(new String[] {"Active", "Inactive", "Deleted"});
             m_initialState = "A";
             m_stateComboBox.setBackground(Administrator.ACTIVE_COLOR);
             Administrator.constrainHeight(m_stateComboBox);
@@ -474,7 +474,7 @@ public class DatastreamsPane
             String[] comboBoxStrings2 =
                     {"Updates will create new version",
                             "Updates will replace most recent version"};
-            m_versionableComboBox = new JComboBox(comboBoxStrings2);
+            m_versionableComboBox = new JComboBox<String>(comboBoxStrings2);
             Administrator.constrainHeight(m_versionableComboBox);
             m_versionableComboBox.setSelectedIndex(NEW_VERSION_ON_UPDATE);
 
@@ -484,7 +484,7 @@ public class DatastreamsPane
             m_formatURITextField = new JTextField("");
             m_altIDsTextField = new JTextField("");
 
-            m_mimeComboBox = new JComboBox(dropdownMimeTypes);
+            m_mimeComboBox = new JComboBox<String>(dropdownMimeTypes);
             Administrator.constrainHeight(m_mimeComboBox);
             m_mimeComboBox.setEditable(true);
             JPanel controlGroupPanel = new JPanel();
@@ -527,7 +527,7 @@ public class DatastreamsPane
             m_checksumPanel = new JPanel();
             m_checksumPanel.setLayout(new BorderLayout());
             m_checksumTypeComboBox =
-                    new JComboBox(new String[] {"Default", "DISABLED", "MD5",
+                    new JComboBox<String>(new String[] {"Default", "DISABLED", "MD5",
                             "SHA-1", "SHA-256", "SHA-384", "SHA-512"});
 
             m_checksumValue = null;

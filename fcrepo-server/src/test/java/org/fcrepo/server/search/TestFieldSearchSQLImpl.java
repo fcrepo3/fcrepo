@@ -510,9 +510,6 @@ public class TestFieldSearchSQLImpl {
     private static class SDepMockRepositoryReader extends MockRepositoryReader {
         private int calls;
 
-        public SDepMockRepositoryReader() {
-        }
-
         public void checkExpectations() {
             assertEquals("sDep reader calls", 1, calls);
         }

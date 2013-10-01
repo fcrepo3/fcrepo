@@ -4,9 +4,8 @@
  */
 package org.fcrepo.server.resourceIndex;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -15,32 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.jrdf.graph.ObjectNode;
-import org.jrdf.graph.PredicateNode;
-import org.jrdf.graph.SubjectNode;
-import org.jrdf.graph.Triple;
-import org.jrdf.graph.URIReference;
-
-import org.junit.After;
-import org.junit.Before;
-
-import org.trippi.RDFFormat;
-import org.trippi.RDFUtil;
-import org.trippi.TripleIterator;
-import org.trippi.TriplestoreConnector;
-import org.trippi.TriplestoreReader;
-import org.trippi.TriplestoreWriter;
-import org.trippi.io.SimpleTripleIterator;
-import org.trippi.io.TripleIteratorFactory;
-
 import org.fcrepo.common.Models;
-import org.fcrepo.server.resourceIndex.ModelBasedTripleGenerator;
-import org.fcrepo.server.resourceIndex.ResourceIndex;
-import org.fcrepo.server.resourceIndex.ResourceIndexImpl;
-import org.fcrepo.server.resourceIndex.TripleGenerator;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.MockRepositoryReader;
 import org.fcrepo.server.storage.ServiceDefinitionReader;
@@ -51,11 +25,21 @@ import org.fcrepo.server.storage.SimpleServiceDeploymentReader;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.ObjectBuilder;
-
-
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.jrdf.graph.ObjectNode;
+import org.jrdf.graph.PredicateNode;
+import org.jrdf.graph.SubjectNode;
+import org.jrdf.graph.Triple;
+import org.jrdf.graph.URIReference;
+import org.junit.After;
+import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.trippi.RDFUtil;
+import org.trippi.TripleIterator;
+import org.trippi.TriplestoreConnector;
+import org.trippi.TriplestoreWriter;
+import org.trippi.io.SimpleTripleIterator;
+import org.trippi.io.TripleIteratorFactory;
 
 /**
  * Superclass for <code>ResourceIndex</code> integration tests.
@@ -66,8 +50,6 @@ public abstract class ResourceIndexIntegrationTest {
 
     private static final Logger logger =
             LoggerFactory.getLogger(ResourceIndexIntegrationTest.class.getName());
-
-    private static final String TEST_DIR = "target";
 
     private static final String DB_DRIVER =
             "org.apache.derby.jdbc.EmbeddedDriver";
@@ -162,6 +144,7 @@ public abstract class ResourceIndexIntegrationTest {
         _factory.shutdown();
     }
 
+    @SuppressWarnings("deprecation")
     private void tearDownTriplestore() throws Exception {
 
         // delete all triples from the RI

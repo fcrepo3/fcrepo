@@ -20,7 +20,6 @@ package org.fcrepo.server.security.xacml.pep.ws;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 

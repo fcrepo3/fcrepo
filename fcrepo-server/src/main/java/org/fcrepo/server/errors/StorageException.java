@@ -13,6 +13,11 @@ public abstract class StorageException
         extends ServerException {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Creates a StorageException.
      * 
      * @param message

@@ -14,21 +14,17 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
-import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.GeneralException;
-import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.ObjectNotFoundException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.errors.ServerException;

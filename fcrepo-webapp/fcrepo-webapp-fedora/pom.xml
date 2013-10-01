@@ -94,12 +94,12 @@
               org.xml.sax;resolution:=optional,
               org.xml.sax.helpers;resolution:=optional
             </Import-Package>
-
             <!-- | each module can override these defaults in their osgi.bnd 
               file -->
             <_include>-osgi.bnd</_include>
           </instructions>
         </configuration>
+        
       </plugin>
 
     </plugins>

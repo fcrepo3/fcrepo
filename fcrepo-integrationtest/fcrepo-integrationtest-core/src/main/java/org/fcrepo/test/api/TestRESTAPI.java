@@ -62,7 +62,6 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.apache.velocity.runtime.parser.node.GetExecutor;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
@@ -180,6 +179,7 @@ public class TestRESTAPI
     private static final String earlierDateTime =
             "2001-01-01T00:00:00.000Z";
 
+    @SuppressWarnings("unused")
     private boolean chunked = false;
     
     protected static FedoraClient initClient() throws Exception {
@@ -1979,13 +1979,6 @@ public class TestRESTAPI
         return result;
     }
 
-    private String _getPort(String url) {
-        if (url != null && url.startsWith("https")) {
-            return getServerConfiguration().getParameter("fedoraRedirectPort");
-        }
-        return getServerConfiguration().getParameter("fedoraServerPort");
-    }
-    
     protected static URI getURI(String url) {
         if (url == null || url.length() == 0) {
             throw new IllegalArgumentException("url must be a non-empty value");

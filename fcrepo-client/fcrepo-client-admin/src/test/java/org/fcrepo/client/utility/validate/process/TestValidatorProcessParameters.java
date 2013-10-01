@@ -117,7 +117,7 @@ public class TestValidatorProcessParameters {
             File pidfile = parms.getPidfile();
             assertEquals("pidfile", dummyFile, pidfile);
         } finally {
-            if (dummyFile != null || dummyFile.exists()) {
+            if (dummyFile != null && dummyFile.exists()) {
                 dummyFile.delete();
             }
         }

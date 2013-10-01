@@ -14,5 +14,5 @@ import java.util.Vector;
 public class SimpleType
         extends Type {
 
-    public Vector enumerationOfValues;
+    public Vector<?> enumerationOfValues;
 }

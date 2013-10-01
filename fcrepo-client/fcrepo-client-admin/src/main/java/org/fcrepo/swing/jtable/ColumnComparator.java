@@ -18,7 +18,7 @@ import java.util.Vector;
  * @author Chris Wilper
  */
 public class ColumnComparator
-        implements Comparator<Vector<?>> {
+        implements Comparator<Vector<Object>> {
 
     protected int index;
 
@@ -29,7 +29,8 @@ public class ColumnComparator
         this.ascending = ascending;
     }
 
-    public int compare(Vector<?> one, Vector<?> two) {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public int compare(Vector<Object> one, Vector<Object> two) {
         Object oOne = one.elementAt(index);
         Object oTwo = two.elementAt(index);
         if (oOne instanceof Comparable && oTwo instanceof Comparable) {

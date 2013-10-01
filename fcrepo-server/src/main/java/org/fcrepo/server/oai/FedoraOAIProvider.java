@@ -7,6 +7,7 @@ package org.fcrepo.server.oai;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,17 +21,18 @@ import org.fcrepo.oai.DateGranularitySupport;
 import org.fcrepo.oai.DeletedRecordSupport;
 import org.fcrepo.oai.Header;
 import org.fcrepo.oai.IDDoesNotExistException;
+import org.fcrepo.oai.MetadataFormat;
 import org.fcrepo.oai.NoMetadataFormatsException;
 import org.fcrepo.oai.NoRecordsMatchException;
 import org.fcrepo.oai.NoSetHierarchyException;
 import org.fcrepo.oai.OAIProvider;
 import org.fcrepo.oai.Record;
 import org.fcrepo.oai.RepositoryException;
+import org.fcrepo.oai.SetInfo;
 import org.fcrepo.oai.SimpleHeader;
 import org.fcrepo.oai.SimpleMetadataFormat;
 import org.fcrepo.oai.SimpleRecord;
 import org.fcrepo.oai.SimpleResumptionToken;
-import org.fcrepo.oai.SimpleSetInfo;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.errors.UnknownSessionTokenException;
 import org.fcrepo.server.search.Condition;
@@ -59,11 +61,11 @@ public class FedoraOAIProvider
 
     private final String m_relpath;
 
-    private final Set m_adminEmails;
+    private final Set<String> m_adminEmails;
 
     private final Set<String> m_descriptions;
 
-    private final List<SimpleSetInfo> m_setInfos;
+    private final List<SetInfo> m_setInfos;
 
     private final long m_maxSets;
 
@@ -73,9 +75,7 @@ public class FedoraOAIProvider
 
     private final FieldSearch m_fieldSearch;
 
-    private final Set<SimpleMetadataFormat> m_formats;
-
-    private static Set s_emptySet = new HashSet();
+    private final Set<MetadataFormat> m_formats;
 
     private static String[] s_headerFields =
             new String[] {"pid", "dcmDate"};
@@ -90,8 +90,8 @@ public class FedoraOAIProvider
                              String repositoryDomainName,
                              String localname,
                              String relpath,
-                             Set adminEmails,
-                             Set friendBaseURLs,
+                             Set<String> adminEmails,
+                             Set<String> friendBaseURLs,
                              String namespaceID,
                              long maxSets,
                              long maxRecords,
@@ -129,19 +129,19 @@ public class FedoraOAIProvider
             buf.append("          xsi:schemaLocation=\"" + OAI_FRIENDS.uri
                     + "\n");
             buf.append("          " + OAI_FRIENDS2_0.xsdLocation + "\">\n");
-            Iterator iter = friendBaseURLs.iterator();
+            Iterator<String> iter = friendBaseURLs.iterator();
             while (iter.hasNext()) {
-                buf.append("        <baseURL>" + (String) iter.next()
+                buf.append("        <baseURL>" + iter.next()
                         + "</baseURL>\n");
             }
             buf.append("      </friends>");
             m_descriptions.add(buf.toString());
         }
-        m_formats = new HashSet<SimpleMetadataFormat>();
+        m_formats = new HashSet<MetadataFormat>();
         m_formats.add(new SimpleMetadataFormat("oai_dc",
                                                OAI_DC2_0.xsdLocation,
                                                OAI_DC.uri));
-        m_setInfos = new ArrayList<SimpleSetInfo>();
+        m_setInfos = new ArrayList<SetInfo>();
     }
 
     public String getRepositoryName() {
@@ -168,15 +168,15 @@ public class FedoraOAIProvider
         return DateGranularitySupport.SECONDS;
     }
 
-    public Set getAdminEmails() {
+    public Set<String> getAdminEmails() {
         return m_adminEmails;
     }
 
-    public Set getSupportedCompressionEncodings() {
-        return s_emptySet;
+    public Set<String> getSupportedCompressionEncodings() {
+        return Collections.emptySet();
     }
 
-    public Set getDescriptions() {
+    public Set<String> getDescriptions() {
         return m_descriptions;
     }
 
@@ -187,7 +187,7 @@ public class FedoraOAIProvider
             throw new CannotDisseminateFormatException("Repository does not provide that format in OAI-PMH responses.");
         }
         String pid = getPID(identifier);
-        List l = null;
+        List<ObjectFields> l = null;
         try {
             //FIXME: use maxResults from... config instead of hardcoding 100?
             l =
@@ -205,7 +205,8 @@ public class FedoraOAIProvider
         }
         if (l.size() > 0) {
             ObjectFields f = (ObjectFields) l.get(0);
-            return new SimpleRecord(getHeader(f), getDCXML(f), s_emptySet);
+            Set<String> abouts = Collections.emptySet();
+            return new SimpleRecord(getHeader(f), getDCXML(f), abouts);
         } else {
             // see if it exists
             try {
@@ -229,7 +230,7 @@ public class FedoraOAIProvider
         }
     }
 
-    public List getRecords(Date from,
+    public List<?> getRecords(Date from,
                            Date until,
                            String metadataPrefix,
                            String set) throws CannotDisseminateFormatException,
@@ -238,7 +239,7 @@ public class FedoraOAIProvider
         if (!metadataPrefix.equals("oai_dc")) {
             throw new CannotDisseminateFormatException("Repository does not provide that format in OAI-PMH responses.");
         }
-        List l = null;
+        List<ObjectFields> l = null;
         FieldSearchResult fsr;
         try {
             fsr =
@@ -258,9 +259,10 @@ public class FedoraOAIProvider
             throw new NoRecordsMatchException("No records match the given criteria.");
         }
         ArrayList<Object> ret = new ArrayList<Object>();
+        Set<String> abouts = Collections.emptySet();
         for (int i = 0; i < l.size(); i++) {
             ObjectFields f = (ObjectFields) l.get(i);
-            ret.add(new SimpleRecord(getHeader(f), getDCXML(f), s_emptySet));
+            ret.add(new SimpleRecord(getHeader(f), getDCXML(f), abouts));
         }
         if (fsr.getToken() != null) {
             // add resumptionToken stuff
@@ -282,14 +284,14 @@ public class FedoraOAIProvider
         return dc.getAsXML();
     }
 
-    public List getRecords(String resumptionToken)
+    public List<?> getRecords(String resumptionToken)
             throws CannotDisseminateFormatException, NoRecordsMatchException,
             NoSetHierarchyException, BadResumptionTokenException,
             RepositoryException {
         // this is the exact same as the other getRecords, except for the FieldSearch call,
         // and the fact that we re-throw UnknownSessionTokenException
         // as a BadResumptionTokenException
-        List l = null;
+        List<ObjectFields> l = null;
         FieldSearchResult fsr;
         try {
             fsr = m_fieldSearch.resumeFindObjects(resumptionToken);
@@ -304,9 +306,10 @@ public class FedoraOAIProvider
             throw new NoRecordsMatchException("No records match the given criteria.");
         }
         ArrayList<Object> ret = new ArrayList<Object>();
+        Set<String> abouts = Collections.emptySet();
         for (int i = 0; i < l.size(); i++) {
             ObjectFields f = (ObjectFields) l.get(i);
-            ret.add(new SimpleRecord(getHeader(f), getDCXML(f), s_emptySet));
+            ret.add(new SimpleRecord(getHeader(f), getDCXML(f), abouts));
         }
         if (fsr.getToken() != null) {
             ret.add(new SimpleResumptionToken(fsr.getToken(), fsr
@@ -343,7 +346,7 @@ public class FedoraOAIProvider
         return out.toString();
     }
 
-    public List getHeaders(Date from,
+    public List<?> getHeaders(Date from,
                            Date until,
                            String metadataPrefix,
                            String set) throws CannotDisseminateFormatException,
@@ -352,7 +355,7 @@ public class FedoraOAIProvider
         if (!metadataPrefix.equals("oai_dc")) {
             throw new CannotDisseminateFormatException("Repository does not provide that format in OAI-PMH responses.");
         }
-        List l = null;
+        List<ObjectFields> l = null;
         FieldSearchResult fsr;
         try {
             fsr =
@@ -389,14 +392,14 @@ public class FedoraOAIProvider
         return ret;
     }
 
-    public List getHeaders(String resumptionToken)
+    public List<?> getHeaders(String resumptionToken)
             throws CannotDisseminateFormatException, NoRecordsMatchException,
             NoSetHierarchyException, BadResumptionTokenException,
             RepositoryException {
         // this is the exact same as the other getHeaders, except for the FieldSearch call,
         // and the fact that we re-throw UnknownSessionTokenException
         // as a BadResumptionTokenException
-        List l = null;
+        List<ObjectFields> l = null;
         FieldSearchResult fsr;
         try {
             fsr = m_fieldSearch.resumeFindObjects(resumptionToken);
@@ -427,11 +430,11 @@ public class FedoraOAIProvider
         return ret;
     }
 
-    public List getSets() throws NoSetHierarchyException, RepositoryException {
+    public List<?> getSets() throws NoSetHierarchyException, RepositoryException {
         return m_setInfos;
     }
 
-    public List getSets(String resumptionToken)
+    public List<?> getSets(String resumptionToken)
             throws BadResumptionTokenException, NoSetHierarchyException,
             RepositoryException {
         // no resumptionTokens are currently used on getSets since it's always so small
@@ -449,13 +452,13 @@ public class FedoraOAIProvider
         return id.substring(4 + m_repositoryDomainName.length() + 1);
     }
 
-    public Set getMetadataFormats(String id) throws NoMetadataFormatsException,
+    public Set<MetadataFormat> getMetadataFormats(String id) throws NoMetadataFormatsException,
             IDDoesNotExistException, RepositoryException {
         if (id == null) {
             return m_formats;
         }
         String pid = getPID(id);
-        List l = null;
+        List<ObjectFields> l = null;
         try {
             l =
                     m_fieldSearch

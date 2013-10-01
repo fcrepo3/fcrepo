@@ -21,6 +21,6 @@ public abstract class DORegistry {
 
     public abstract void remove();
 
-    public abstract Iterator ids();
+    public abstract Iterator<?> ids();
 
 }

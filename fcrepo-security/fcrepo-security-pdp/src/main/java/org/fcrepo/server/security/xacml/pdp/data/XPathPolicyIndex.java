@@ -3,7 +3,6 @@ package org.fcrepo.server.security.xacml.pdp.data;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader;
 import org.fcrepo.server.security.xacml.util.AttributeBean;

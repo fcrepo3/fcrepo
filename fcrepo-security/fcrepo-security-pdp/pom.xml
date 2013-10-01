@@ -81,4 +81,21 @@
       <version>1.4.2</version>
     </dependency>
   </dependencies>
+  <build>  
+  <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+        </plugin>
+  </plugins>
+  </build>
 </project>

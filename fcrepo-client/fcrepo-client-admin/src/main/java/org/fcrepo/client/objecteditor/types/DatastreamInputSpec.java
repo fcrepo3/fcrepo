@@ -18,12 +18,12 @@ public class DatastreamInputSpec {
 
     private final String m_label;
 
-    private final List m_bindingRules;
+    private final List<DatastreamBindingRule> m_bindingRules;
 
     /**
      * Initialize a DatastreamInputSpec object with all values.
      */
-    public DatastreamInputSpec(String label, List bindingRules) {
+    public DatastreamInputSpec(String label, List<DatastreamBindingRule> bindingRules) {
         m_label = label;
         m_bindingRules = bindingRules;
     }
@@ -61,7 +61,7 @@ public class DatastreamInputSpec {
     /**
      * Get the spec's list of <code>DatastreamBindingRule</code>s.
      */
-    public List bindingRules() {
+    public List<DatastreamBindingRule> bindingRules() {
         return m_bindingRules;
     }
 

@@ -37,16 +37,16 @@ public class JSortTableTest
     }
 
     protected SortTableModel makeModel() {
-        Vector data = new Vector();
+        Vector<Vector<Integer>> data = new Vector<Vector<Integer>>();
         for (int i = 0; i < 25; i++) {
-            Vector row = new Vector();
+            Vector<Integer> row = new Vector<Integer>();
             for (int j = 0; j < 5; j++) {
                 row.add(new Integer((int) (Math.random() * 256)));
             }
             data.add(row);
         }
 
-        Vector names = new Vector();
+        Vector<String> names = new Vector<String>();
         names.add("One");
         names.add("Two");
         names.add("Three");

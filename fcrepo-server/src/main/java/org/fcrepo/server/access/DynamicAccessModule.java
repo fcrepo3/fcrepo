@@ -69,7 +69,7 @@ public class DynamicAccessModule
     /** Main Access module of the Fedora server. */
     private Access m_access;
 
-    private Hashtable dynamicServiceToDeployment = null;
+    private Hashtable<String, Class<?>> dynamicServiceToDeployment = null;
 
     private File reposHomeDir = null;
 
@@ -88,7 +88,7 @@ public class DynamicAccessModule
      *         If initilization values are invalid or initialization fails for
      *         some other reason.
      */
-    public DynamicAccessModule(Map moduleParameters, Server server, String role)
+    public DynamicAccessModule(Map<String,String> moduleParameters, Server server, String role)
             throws ModuleInitializationException {
         super(moduleParameters, server, role);
     }
@@ -127,7 +127,7 @@ public class DynamicAccessModule
         // associated internal service classes.  For now, we are explicitly
         // loading up the Default service def/dep since this is the only
         // thing supported in the system right now.
-        dynamicServiceToDeployment = new Hashtable();
+        dynamicServiceToDeployment = new Hashtable<String, Class<?>>();
         try {
             dynamicServiceToDeployment.put("fedora-system:3", Class
                     .forName(getParameter("fedora-system:4")));

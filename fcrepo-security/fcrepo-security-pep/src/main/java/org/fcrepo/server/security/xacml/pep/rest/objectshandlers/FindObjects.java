@@ -40,9 +40,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
@@ -502,7 +500,7 @@ public class FindObjects
         }
 
         @Override
-        public Iterator getPrefixes(String uri) {
+        public Iterator<String> getPrefixes(String uri) {
             if("http://www.fedora.info/definitions/1/0/types/".equals(uri)) {
                 return PREFIXES.iterator();
             }

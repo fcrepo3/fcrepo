@@ -38,6 +38,6 @@ public interface Record {
      * xsi:schemaLocation attribute. If getHeader().isAvailable() is false, this
      * may be null.
      */
-    public abstract Set getAbouts();
+    public abstract Set<String> getAbouts();
 
 }

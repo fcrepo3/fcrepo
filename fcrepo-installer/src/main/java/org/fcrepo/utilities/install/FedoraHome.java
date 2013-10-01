@@ -36,6 +36,7 @@ import org.fcrepo.utilities.ExecUtility;
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.Zip;
 
+@SuppressWarnings("deprecation")
 public class FedoraHome {
 
 	private final Distribution _dist;
@@ -517,7 +518,7 @@ InstallOptions.FESL_AUTHN_ENABLED, true);
 		}
 	}
 
-	private void configureFedoraUsers() throws InstallationFailedException {
+    private void configureFedoraUsers() throws InstallationFailedException {
 		FedoraUsers fu = FedoraUsers.getInstance();
 		for (User user : fu.getUsers()) {
 			if (user.getName().equals("fedoraAdmin")) {

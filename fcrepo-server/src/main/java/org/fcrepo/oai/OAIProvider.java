@@ -81,7 +81,7 @@ public interface OAIProvider {
      * @throws RepositoryException
      *         if an error has occurred.
      */
-    public abstract Set getAdminEmails() throws RepositoryException;
+    public abstract Set<String> getAdminEmails() throws RepositoryException;
 
     /**
      * Get the compression encodings supported by the repository. This set may
@@ -91,7 +91,7 @@ public interface OAIProvider {
      * @throws RepositoryException
      *         if an error has occurred.
      */
-    public abstract Set getSupportedCompressionEncodings()
+    public abstract Set<String> getSupportedCompressionEncodings()
             throws RepositoryException;
 
     /**
@@ -105,7 +105,7 @@ public interface OAIProvider {
      * @throws RepositoryException
      *         if an error has occurred.
      */
-    public abstract Set getDescriptions() throws RepositoryException;
+    public abstract Set<String> getDescriptions() throws RepositoryException;
 
     /**
      * Get an individual metadata record from the repository.
@@ -145,7 +145,7 @@ public interface OAIProvider {
      * @throws RepositoryException
      *         if an error has occurred.
      */
-    public abstract List getRecords(Date from,
+    public abstract List<?> getRecords(Date from,
                                     Date until,
                                     String metadataPrefix,
                                     String set)
@@ -167,7 +167,7 @@ public interface OAIProvider {
      * @throws RepositoryException
      *         if an error has occurred.
      */
-    public abstract List getRecords(String resumptionToken)
+    public abstract List<?> getRecords(String resumptionToken)
             throws CannotDisseminateFormatException, NoRecordsMatchException,
             NoSetHierarchyException, BadResumptionTokenException,
             RepositoryException;
@@ -192,7 +192,7 @@ public interface OAIProvider {
      * @throws RepositoryException
      *         if an error has occurred.
      */
-    public abstract List getHeaders(Date from,
+    public abstract List<?> getHeaders(Date from,
                                     Date until,
                                     String metadataPrefix,
                                     String set)
@@ -214,7 +214,7 @@ public interface OAIProvider {
      * @throws RepositoryException
      *         if an error has occurred.
      */
-    public abstract List getHeaders(String resumptionToken)
+    public abstract List<?> getHeaders(String resumptionToken)
             throws CannotDisseminateFormatException, NoRecordsMatchException,
             NoSetHierarchyException, BadResumptionTokenException,
             RepositoryException;
@@ -232,7 +232,7 @@ public interface OAIProvider {
      * @throws RepositoryException
      *         if an error has occurred.
      */
-    public abstract List getSets() throws NoSetHierarchyException,
+    public abstract List<?> getSets() throws NoSetHierarchyException,
             RepositoryException;
 
     /**
@@ -248,7 +248,7 @@ public interface OAIProvider {
      * @throws RepositoryException
      *         if an error has occurred.
      */
-    public abstract List getSets(String resumptionToken)
+    public abstract List<?> getSets(String resumptionToken)
             throws BadResumptionTokenException, NoSetHierarchyException,
             RepositoryException;
 
@@ -264,7 +264,7 @@ public interface OAIProvider {
      * @throws RepositoryException
      *         if an error has occurred.
      */
-    public abstract Set getMetadataFormats(String id)
+    public abstract Set<MetadataFormat> getMetadataFormats(String id)
             throws IDDoesNotExistException, NoMetadataFormatsException,
             RepositoryException;
 

@@ -20,7 +20,6 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.common.xml.format.XMLFormat;
@@ -153,6 +152,7 @@ public class FOXMLContentHandler
 
     private String m_dissState;
 
+    @SuppressWarnings("unused")
     private boolean m_dissVersionable;
 
     private ArrayList<DSBinding> m_dsBindings;

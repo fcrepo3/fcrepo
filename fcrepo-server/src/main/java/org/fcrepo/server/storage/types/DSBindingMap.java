@@ -8,7 +8,6 @@ package org.fcrepo.server.storage.types;
  * @author Sandy Payette
  */
 @Deprecated
-@SuppressWarnings("deprecation")
 public class DSBindingMap {
 
     public String dsBindMapID = null;

@@ -5,7 +5,6 @@
 
 package org.fcrepo.server.utilities;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
-import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;

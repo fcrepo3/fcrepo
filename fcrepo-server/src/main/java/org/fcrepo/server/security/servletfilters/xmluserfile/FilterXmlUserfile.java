@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.servletfilters.BaseCaching;
@@ -88,7 +89,7 @@ public class FilterXmlUserfile
             logger.debug(enter(method));
         }
         Boolean authenticated = null;
-        Map namedAttributes = null;
+        Map<String, Set<?>> namedAttributes = null;
         String errorMessage = null;
         authenticated = Boolean.FALSE;
 

@@ -45,7 +45,7 @@ import javax.swing.table.TableColumnModel;
         this(new DefaultSortTableModel(data, names));
     }
 
-    public JSortTable(Vector data, Vector names) {
+    public JSortTable(Vector<Object> data, Vector<Object> names) {
         this(new DefaultSortTableModel(data, names));
     }
 

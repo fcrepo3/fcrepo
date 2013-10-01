@@ -8,6 +8,11 @@ import java.util.Map;
  */
 class LRUCache<K, V> extends LinkedHashMap<K, V> {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1495573413909538632L;
+    
     private int sizeLimit;
 
     /**

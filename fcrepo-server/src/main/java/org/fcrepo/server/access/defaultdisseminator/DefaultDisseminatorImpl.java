@@ -4,7 +4,6 @@
  */
 package org.fcrepo.server.access.defaultdisseminator;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

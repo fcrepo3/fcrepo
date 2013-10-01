@@ -60,6 +60,7 @@ import com.sun.xacml.finder.PolicyFinder;
  * @author Stephen Bayliss
  * @version $Id$
  */
+@Deprecated
 public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
 
     private static final Logger log =
@@ -300,6 +301,7 @@ public class ExistPolicyIndex extends XPathPolicyIndex implements PolicyIndex {
      * @return
      * @throws PolicyIndexException
      */
+    @Deprecated
     protected static byte[] nodeToByte(Node node) throws PolicyIndexException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Writer output = new OutputStreamWriter(out, Charset.forName("UTF-8"));

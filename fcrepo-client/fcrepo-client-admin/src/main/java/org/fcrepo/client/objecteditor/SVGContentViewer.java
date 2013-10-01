@@ -69,6 +69,7 @@ public class SVGContentViewer
      * Re-initializes the handler given new input data. The old data can be
      * discarded.
      */
+    @SuppressWarnings("deprecation")
     @Override
     public void setContent(InputStream data) throws IOException {
         try {

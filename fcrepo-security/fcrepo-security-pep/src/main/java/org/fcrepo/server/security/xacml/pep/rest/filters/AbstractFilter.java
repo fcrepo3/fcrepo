@@ -19,7 +19,6 @@
 package org.fcrepo.server.security.xacml.pep.rest.filters;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,12 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
-import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.sun.xacml.attr.AnyURIAttribute;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.StringAttribute;
 
@@ -51,8 +45,6 @@ import com.sun.xacml.attr.StringAttribute;
 public abstract class AbstractFilter
 implements RESTFilter {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(AbstractFilter.class);
     private static final String[] EMPTY = new String[0];
     private ContextHandler m_contextHandler;
 

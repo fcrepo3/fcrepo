@@ -11,23 +11,19 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.StreamIOException;
-import org.fcrepo.server.errors.ValidationException;
 import org.fcrepo.server.storage.ContentManagerParams;
 import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationUtility;
-import org.fcrepo.server.validation.ecm.jaxb.DsTypeModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 

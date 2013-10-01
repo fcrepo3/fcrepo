@@ -44,7 +44,7 @@ public class Parameter
         this(name, null, false, null, new HashMap<String,String>());
     }
 
-    private Parameter(String name, String value) {
+    public Parameter(String name, String value) {
         this(name, value, false, null, new HashMap<String,String>());
     }
 

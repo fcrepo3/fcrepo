@@ -52,7 +52,7 @@ public abstract class DataStream {
      */
     public DataStream(File tempDir, String id) {
         m_id = id;
-        File m_dataFile = new File(tempDir, id);
+        m_dataFile = new File(tempDir, id);
         clearData();
     }
 

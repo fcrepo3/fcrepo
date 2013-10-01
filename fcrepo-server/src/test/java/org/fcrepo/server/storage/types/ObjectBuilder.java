@@ -4,6 +4,10 @@
  */
 package org.fcrepo.server.storage.types;
 
+import java.io.ByteArrayInputStream;
+import java.util.Date;
+import java.util.Iterator;
+
 import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.storage.translation.DOTranslationUtility;
@@ -11,11 +15,6 @@ import org.fcrepo.server.storage.translation.FOXML1_1DODeserializer;
 import org.fcrepo.server.storage.translation.FOXML1_1DOSerializer;
 import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.jrdf.graph.URIReference;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.Date;
-import java.util.Iterator;
 
 
 /**
@@ -99,7 +98,7 @@ public abstract class ObjectBuilder {
                                       String id,
                                       Datastream ds) {
         int size = 0;
-        for (Datastream d : obj.datastreams(id)) {
+        for (@SuppressWarnings("unused") Datastream d : obj.datastreams(id)) {
             size++;
         }
         ds.DatastreamID = id;

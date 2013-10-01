@@ -75,11 +75,11 @@ public class DatastreamPane
 
     private final Datastream m_mostRecent;
 
-    protected JComboBox m_stateComboBox;
+    protected JComboBox<String> m_stateComboBox;
 
     static protected String s_stateComboBoxValues[] = {"A", "I", "D"};
 
-    protected JComboBox m_versionableComboBox;
+    protected JComboBox<String> m_versionableComboBox;
 
     private JSlider m_versionSlider;
 
@@ -142,7 +142,7 @@ public class DatastreamPane
         // RIGHT: values
 
         String[] comboBoxStrings = {"Active", "Inactive", "Deleted"};
-        m_stateComboBox = new JComboBox(comboBoxStrings);
+        m_stateComboBox = new JComboBox<String>(comboBoxStrings);
         Administrator.constrainHeight(m_stateComboBox);
         if (mostRecent.getState().equals("A")) {
             m_stateComboBox.setSelectedIndex(0);
@@ -177,7 +177,7 @@ public class DatastreamPane
         String[] comboBoxStrings2 =
                 {"Updates will create new version",
                         "Updates will replace most recent version"};
-        m_versionableComboBox = new JComboBox(comboBoxStrings2);
+        m_versionableComboBox = new JComboBox<String>(comboBoxStrings2);
         Administrator.constrainHeight(m_versionableComboBox);
         m_versionableComboBox
                 .setSelectedIndex(mostRecent.isVersionable() ? NEW_VERSION_ON_UPDATE
@@ -471,7 +471,7 @@ public class DatastreamPane
 
         private JButton m_separateViewButton;
 
-        protected JComboBox m_checksumTypeComboBox;
+        protected JComboBox<String> m_checksumTypeComboBox;
 
         protected JTextField m_checksumTextField;
 
@@ -654,7 +654,7 @@ public class DatastreamPane
             urlTextField.setEditable(false); // so they can copy, but not modify
             // Datastream checksum field
             m_checksumTypeComboBox =
-                    new JComboBox(new String[] {"DISABLED", "MD5", "SHA-1",
+                    new JComboBox<String>(new String[] {"DISABLED", "MD5", "SHA-1",
                             "SHA-256", "SHA-384", "SHA-512"});
             setSelectedChecksumType(m_checksumTypeComboBox,
                                     ds.getChecksumType());
@@ -964,7 +964,7 @@ public class DatastreamPane
             return altIDStr;
         }
 
-        private void setSelectedChecksumType(JComboBox typeComboBox,
+        private void setSelectedChecksumType(JComboBox<String> typeComboBox,
                                              String checksumType) {
             for (int i = 0; i < typeComboBox.getItemCount(); i++) {
                 if (typeComboBox.getItemAt(i).toString().equals(checksumType)) {
@@ -1270,10 +1270,6 @@ public class DatastreamPane
 
         private static final long serialVersionUID = 1L;
 
-        private boolean X;
-
-        private boolean M;
-
         private boolean E;
 
         private boolean R;
@@ -1322,11 +1318,7 @@ public class DatastreamPane
                 }
             }
 
-            if (ds.getControlGroup().toString().equals("X")) {
-                X = true;
-            } else if (ds.getControlGroup().toString().equals("M")) {
-                M = true;
-            } else if (ds.getControlGroup().toString().equals("E")) {
+            if (ds.getControlGroup().toString().equals("E")) {
                 E = true;
             } else if (ds.getControlGroup().toString().equals("R")) {
                 R = true;
@@ -1627,7 +1619,7 @@ public class DatastreamPane
 
         boolean canceled;
 
-        private final JList list;
+        private final JList<?> list;
 
         public PurgeDataStreamDialog(JFrame parent,
                                      String datastreamName,
@@ -1639,7 +1631,7 @@ public class DatastreamPane
                             + datastreamName + " to purge:");
             getContentPane().add(label, BorderLayout.NORTH);
             label.setBorder(new EmptyBorder(10, 10, 0, 10));
-            list = new JList(dateStrings);
+            list = new JList<Object>(dateStrings);
             list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
             JScrollPane scroll = new JScrollPane(list);
             scroll.setBorder(new CompoundBorder(new EmptyBorder(10, 10, 10, 10),
@@ -1670,9 +1662,9 @@ public class DatastreamPane
         public void actionPerformed(ActionEvent e) {
             if (e.getActionCommand() == "Purge") {
                 canceled = false;
-                Object sel[] = list.getSelectedValues();
-                startDate = sel[0];
-                endDate = sel[sel.length - 1];
+                List<?> sel = list.getSelectedValuesList();
+                startDate = sel.get(0);
+                endDate = sel.get(sel.size() - 1);
                 setVisible(false);
             }
             if (e.getActionCommand() == "Cancel") {

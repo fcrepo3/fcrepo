@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -16,12 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.fcrepo.server.utilities.TableCreatingConnection;
-import org.fcrepo.server.utilities.TableSpec;
 import org.fcrepo.utilities.DriverShim;
 import org.fcrepo.utilities.FileUtils;
 

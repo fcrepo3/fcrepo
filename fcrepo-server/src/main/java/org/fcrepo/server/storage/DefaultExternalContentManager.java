@@ -51,6 +51,7 @@ public class DefaultExternalContentManager
     private static final String DEFAULT_MIMETYPE="text/plain";
     private String m_userAgent;
 
+    @SuppressWarnings("unused")
     private String fedoraServerHost;
 
     private String fedoraServerPort;

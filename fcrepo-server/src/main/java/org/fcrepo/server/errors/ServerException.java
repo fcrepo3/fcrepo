@@ -37,6 +37,11 @@ import org.fcrepo.server.Server;
 public abstract class ServerException
         extends Exception {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     /** The bundle in which the message, identified by m_code, resides. */
     private final String m_bundleName;
 

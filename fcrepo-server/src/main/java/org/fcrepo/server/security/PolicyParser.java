@@ -9,29 +9,25 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import com.sun.xacml.AbstractPolicy;
-import com.sun.xacml.ParsingException;
-import com.sun.xacml.Policy;
-import com.sun.xacml.PolicySet;
-
+import org.fcrepo.common.FaultException;
+import org.fcrepo.server.errors.ValidationException;
+import org.fcrepo.utilities.XmlTransformUtility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import org.fcrepo.common.FaultException;
-import org.fcrepo.server.errors.ValidationException;
-import org.fcrepo.utilities.XmlTransformUtility;
+import com.sun.xacml.AbstractPolicy;
+import com.sun.xacml.ParsingException;
+import com.sun.xacml.Policy;
+import com.sun.xacml.PolicySet;
 
 
 

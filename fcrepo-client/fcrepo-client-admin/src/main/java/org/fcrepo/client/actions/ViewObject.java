@@ -27,7 +27,7 @@ public class ViewObject
 
     private static final long serialVersionUID = 1L;
 
-    private Set m_pids;
+    private Set<String> m_pids;
 
     private boolean m_prompt;
 
@@ -38,11 +38,11 @@ public class ViewObject
 
     public ViewObject(String pid) {
         super("Open Object");
-        m_pids = new HashSet();
+        m_pids = new HashSet<String>();
         m_pids.add(pid);
     }
 
-    public ViewObject(Set pids) {
+    public ViewObject(Set<String> pids) {
         super("Open Objects");
         m_pids = pids;
     }
@@ -59,12 +59,12 @@ public class ViewObject
             if (pid == null) {
                 return;
             }
-            m_pids = new HashSet();
+            m_pids = new HashSet<String>();
             m_pids.add(pid);
         }
-        Iterator pidIter = m_pids.iterator();
+        Iterator<String> pidIter = m_pids.iterator();
         while (pidIter.hasNext()) {
-            String pid = (String) pidIter.next();
+            String pid = pidIter.next();
             try {
                 ObjectEditorFrame editor = new ObjectEditorFrame(pid, 0);
                 editor.setVisible(true);

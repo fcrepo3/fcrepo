@@ -6,6 +6,7 @@ package org.fcrepo.server.security.servletfilters;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,7 @@ public class Cache {
         return cacheElementPopulator;
     }
 
+    @SuppressWarnings("deprecation")
     public Cache(String cacheId,
                  String CACHE_KEY_SEPARATOR,
                  String AUTH_SUCCESS_TIMEOUT_UNIT,
@@ -101,11 +103,10 @@ public class Cache {
         cacheAbbrev = FilterSetup.getFilterNameAbbrev(getCacheId());
     }
 
-    private final Map cache = new Hashtable();
+    private final Map<String, CacheElement> cache = new Hashtable<String, CacheElement>();
 
     public final void audit(String userid) {
         String m = getCacheAbbrev() + " audit() ";
-        String key = getKey(userid/* , password, getCacheKeySeparator() */);
         CacheElement cacheElement = getCacheElement(userid);
         if (cacheElement == null) {
             logger.debug(m + "cache element is null for " + userid);
@@ -128,16 +129,10 @@ public class Cache {
      * changes the element's state -- elements are never removed from cache or
      * replaced
      */
-    private final synchronized CacheElement getCacheElement(String userid /*
-                                                                             * ,
-                                                                             * String
-                                                                             * password
-                                                                             */) {
+    private final synchronized CacheElement getCacheElement(String userid) {
         String m = getCacheAbbrev() + " getCacheElement() ";
         CacheElement cacheElement = null;
-        String keytemp = getKey(userid/* ,password,CACHE_KEY_SEPARATOR */);
-        Integer key = new Integer(keytemp.hashCode());
-        logger.debug(m + "keytemp==" + keytemp);
+        String key = getKey(userid);
         logger.debug(m + "key==" + key);
         if (cache.containsKey(key)) {
             logger.debug(m + "cache already has element");
@@ -197,7 +192,7 @@ public class Cache {
         return authenticated;
     }
 
-    public final Map getNamedValues(CacheElementPopulator authenticator,
+    public final Map<String, Set<?>> getNamedValues(CacheElementPopulator authenticator,
                                     String userid,
                                     String password) throws Throwable {
         if (firstCall) {
@@ -214,7 +209,7 @@ public class Cache {
 
         CacheElement cacheElement = getCacheElement(userid /* , password */);
         logger.debug("{}cacheElement=={}", m, cacheElement.getInstanceId());
-        Map namedValues = null;
+        Map<String, Set<?>> namedValues = null;
         try {
             namedValues = cacheElement.getNamedValues(this, password);
         } catch (Throwable t) {

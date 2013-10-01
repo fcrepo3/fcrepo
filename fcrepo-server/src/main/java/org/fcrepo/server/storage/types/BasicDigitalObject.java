@@ -308,7 +308,61 @@ public class BasicDigitalObject
 
     public boolean hasRelationship(SubjectNode subject, PredicateNode predicate, ObjectNode object) {
         /* Brute force */
-        return getRelationships(subject, predicate, object).size() > 0;
+        if (m_rels == null) {
+            readRels();
+        }
+
+        boolean hasRel = false;
+        
+        boolean basicExplicit = false;
+
+        // Iterate explicit relationships, finding matches and
+        // determining whether the object has an explicit basic cmodel.
+
+        for (RelationshipTuple t : m_rels) {
+
+            // Do any hasModel rels point to a basic cmodel?
+            if (Constants.MODEL.HAS_MODEL.uri.equals(t.predicate)
+                    && Models.isBasicModel(t.object)) {
+                basicExplicit = true;
+            }
+
+            // Find matching relationships from those that are explicit
+            if (subject != null) {
+                if (!JRDF.sameSubject(subject, t.subject)) {
+                    continue;
+                }
+            }
+            if (predicate != null) {
+                if (!JRDF.samePredicate(predicate, t.predicate)) {
+                    continue;
+                }
+            }
+            if (object != null) {
+                if (!JRDF.sameObject(object,
+                                     t.object,
+                                     t.isLiteral,
+                                     t.datatype,
+                                     t.language)) {
+                    continue;
+                }
+
+            }
+            hasRel = true;
+        }
+
+        // If necessary, add the current basic cmodel to the set of matches
+        if (!hasRel && !basicExplicit
+                && (subject == null ||
+                JRDF.sameSubject(subject, PID.toURI(m_pid)))
+                && (predicate == null ||
+                JRDF.samePredicate(predicate, Constants.MODEL.HAS_MODEL))
+                && (object == null ||
+                JRDF.sameObject(object, Models.FEDORA_OBJECT_CURRENT))) {
+            return true;
+        }
+
+        return hasRel;
     }
 
     // assume m_pid as subject; ie RELS-EXT only

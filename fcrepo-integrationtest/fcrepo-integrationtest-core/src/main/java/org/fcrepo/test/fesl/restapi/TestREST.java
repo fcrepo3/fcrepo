@@ -80,7 +80,7 @@ public class TestREST extends FedoraServerTestCase implements Constants {
             logger.debug("Setting up...");
             LoadDataset.load("fesl", fedoraUrl, username, password);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             Assert.fail(e.getMessage());
         }
     }

@@ -4,7 +4,6 @@
  */
 package org.fcrepo.server.messaging;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;

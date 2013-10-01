@@ -12,8 +12,6 @@ import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.RepositoryReader;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.validation.DOObjectValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,9 +26,6 @@ public class EcmValidator implements DOObjectValidator {
 
 
     private final OwlValidator relsExtValidator;
-
-    private static final Logger logger =
-            LoggerFactory.getLogger(EcmValidator.class);
 
     private final DatastreamValidator datastreamValidator;
 

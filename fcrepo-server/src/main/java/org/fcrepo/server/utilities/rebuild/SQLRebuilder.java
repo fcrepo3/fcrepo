@@ -141,7 +141,7 @@ public class SQLRebuilder
             m_context =
                     ReadOnlyContext.getContext("utility", "fedoraAdmin", "", /* null, */
                     ReadOnlyContext.DO_OP);
-            String registryClassTemp = m_server.getParameter("registry");
+
             ILowlevelStorage llstore =
                     (ILowlevelStorage) m_server
                             .getModule("org.fcrepo.server.storage.lowlevel.ILowlevelStorage");

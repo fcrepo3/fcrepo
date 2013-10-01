@@ -8,6 +8,7 @@ import java.security.Principal;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.servlet.FilterConfig;
@@ -26,7 +27,7 @@ public abstract class BaseCaching
             LoggerFactory.getLogger(BaseCaching.class);
 
     //use additional indirection level to distinguish multiple uses of the same code for different filter instances
-    private static final Map superCache = new Hashtable();
+    private static final Map<String, Cache> superCache = new Hashtable<String, Cache>();
 
     protected final Cache getCache(String filterName) {
         String method = "getCache()";
@@ -44,6 +45,7 @@ public abstract class BaseCaching
         superCache.put(filterName, cache);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void init(FilterConfig filterConfig) {
         String method = "init()";
@@ -86,6 +88,7 @@ public abstract class BaseCaching
         if (logger.isDebugEnabled()) {
             logger.debug(enter(method));
         }
+        @SuppressWarnings("deprecation")
         Cache cache = new Cache(FILTER_NAME, "", //CACHE_KEY_SEPARATOR
                                 LOOKUP_SUCCESS_TIMEOUT_UNIT,
                                 LOOKUP_SUCCESS_TIMEOUT_DURATION,
@@ -198,7 +201,7 @@ public abstract class BaseCaching
         } else if (AUTHENTICATED_USER_KEY.equals(key)) {
             String[] temp = value.split(",");
             FILTERS_CONTRIBUTING_AUTHENTICATED_ATTRIBUTES =
-                    new Vector(temp.length);
+                    new Vector<String>(temp.length);
             for (String element : temp) {
                 FILTERS_CONTRIBUTING_AUTHENTICATED_ATTRIBUTES.add(element);
             }
@@ -213,7 +216,7 @@ public abstract class BaseCaching
                                   "other filters associated with this filter for surrogates",
                                   value));
             String[] temp = value.split(",");
-            FILTERS_CONTRIBUTING_SPONSORED_ATTRIBUTES = new Vector(temp.length);
+            FILTERS_CONTRIBUTING_SPONSORED_ATTRIBUTES = new Vector<String>(temp.length);
             for (String element : temp) {
                 logger.error(format(method, null, "adding", element));
                 FILTERS_CONTRIBUTING_SPONSORED_ATTRIBUTES.add(element);
@@ -241,6 +244,7 @@ public abstract class BaseCaching
         return authenticate;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void authenticate(ExtendedHttpServletRequest extendedHttpServletRequest)
             throws Exception {
@@ -288,6 +292,7 @@ public abstract class BaseCaching
         }
     }
 
+    @SuppressWarnings("deprecation")
     public void contributeAttributes(ExtendedHttpServletRequest extendedHttpServletRequest,
                                      String userid,
                                      String password) throws Exception {
@@ -308,7 +313,7 @@ public abstract class BaseCaching
             if (logger.isDebugEnabled()) {
                 logger.debug(format(method, "calling cache.getNamedValues()"));
             }
-            Map namedValues = cache.getNamedValues(this, userid, password);
+            Map<String, Set<?>> namedValues = cache.getNamedValues(this, userid, password);
             //extendedHttpServletRequest.addRoles(FILTER_NAME, predicates);
             extendedHttpServletRequest.addAttributes(FILTER_NAME, namedValues);
             if (logger.isDebugEnabled()) {

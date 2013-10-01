@@ -5,28 +5,21 @@
 
 package org.fcrepo.server.storage.translation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import org.fcrepo.server.errors.UnsupportedTranslationException;
-import org.fcrepo.server.storage.translation.DODeserializer;
-import org.fcrepo.server.storage.translation.DOSerializer;
-import org.fcrepo.server.storage.translation.DOTranslator;
-import org.fcrepo.server.storage.translation.DOTranslatorImpl;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.DigitalObject;
-
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Unit tests for DOTranslatorImpl.
@@ -83,16 +76,11 @@ public class TestDOTranslatorImpl {
         assertEquals(FORMAT_2, obj2.getLabel());
     }
 
-    @Test
-    public void testDeserializeUnknownFormat() {
-        DigitalObject obj = null;
-        try {
-            obj = doDeserialize(FORMAT_UNKNOWN);
-            fail("Deserialization should have failed with "
-                    + "UnsupportedTranslationException");
-        } catch (UnsupportedTranslationException e) {
-            // expected
-        }
+    @Test(expected=UnsupportedTranslationException.class)
+    public void testDeserializeUnknownFormat() throws UnsupportedTranslationException {
+        doDeserialize(FORMAT_UNKNOWN);
+        fail("Deserialization should have failed with "
+                + "UnsupportedTranslationException");
     }
 
     @Test
@@ -112,15 +100,11 @@ public class TestDOTranslatorImpl {
         }
     }
 
-    @Test
-    public void testSerializeUnknownFormat() {
-        try {
-            doSerialize(FORMAT_UNKNOWN);
-            fail("Serialization should have failed with "
-                    + "UnsupportedTranslationException");
-        } catch (UnsupportedTranslationException e) {
-            // expected
-        }
+    @Test(expected=UnsupportedTranslationException.class)
+    public void testSerializeUnknownFormat() throws UnsupportedTranslationException {
+        doSerialize(FORMAT_UNKNOWN);
+        fail("Serialization should have failed with "
+                + "UnsupportedTranslationException");
     }
 
     //---
@@ -167,11 +151,7 @@ public class TestDOTranslatorImpl {
     //---
 
     private static InputStream getInputStream(String value) {
-        try {
-            return new ByteArrayInputStream(value.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException wontHappen) {
-            throw new Error(wontHappen);
-        }
+        return new ByteArrayInputStream(value.getBytes(Charset.forName("UTF-8")));
     }
 
     // Supports legacy test runners

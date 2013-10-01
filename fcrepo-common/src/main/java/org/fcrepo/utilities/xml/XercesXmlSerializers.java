@@ -10,6 +10,13 @@ import org.w3c.dom.Node;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 
+/**
+ * This class can only be used with the Xerces 2.9.x line;
+ * the xml serializers it uses will be removed in Xerces 3.x
+ * @author armintor@gmail.com
+ *
+ */
+@SuppressWarnings("deprecation")
 public abstract class XercesXmlSerializers {
 
     /**

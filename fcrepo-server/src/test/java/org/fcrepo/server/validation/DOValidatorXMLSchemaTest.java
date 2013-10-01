@@ -8,19 +8,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
+import junit.framework.JUnit4TestAdapter;
 
+import org.fcrepo.common.FedoraTestConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.common.FedoraTestConstants;
-import org.fcrepo.server.validation.DOValidatorXMLSchema;
-
-import junit.framework.JUnit4TestAdapter;
 
 
 /**

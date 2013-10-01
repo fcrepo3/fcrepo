@@ -10,7 +10,6 @@ import static org.fcrepo.common.Constants.XLINK;
 import static org.fcrepo.common.Models.FEDORA_OBJECT_3_0;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,13 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -41,14 +34,11 @@ import org.fcrepo.server.storage.types.DatastreamReferencedContent;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.utilities.TestBase64;
-import org.fusesource.hawtbuf.ByteArrayInputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 
 
@@ -166,7 +156,7 @@ public abstract class TestMETSFedoraExtDOSerializer
         XPath xp = XPathFactory.newInstance().newXPath();
         xp.setNamespaceContext(new javax.xml.namespace.NamespaceContext() {
 			@Override
-			public Iterator getPrefixes(String namespaceURI) {
+			public Iterator<String> getPrefixes(String namespaceURI) {
 				// TODO Auto-generated method stub
 				return null;
 			}

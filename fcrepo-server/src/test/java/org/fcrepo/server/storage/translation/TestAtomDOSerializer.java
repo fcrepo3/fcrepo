@@ -38,6 +38,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.fcrepo.common.Constants;
@@ -175,8 +176,11 @@ public class TestAtomDOSerializer
         //f.delete();
     }
 
-    // TODO
-    private void validateWithISOSchematron(String candidate)
+    /**
+     * Not yet implemented
+     */
+    @Ignore
+    public void validateWithISOSchematron(String candidate)
             throws TransformerException, IOException {
         StreamSource skeleton = new StreamSource(new File(iso_tron));
         StreamSource schema = new StreamSource(new File(atom_tron));

@@ -15,10 +15,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.utilities.FileUtils;
 import org.slf4j.Logger;

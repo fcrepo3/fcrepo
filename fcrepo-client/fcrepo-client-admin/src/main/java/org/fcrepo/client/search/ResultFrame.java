@@ -319,7 +319,7 @@ public class ResultFrame
                         if (rowNum >= 0) {
                             int[] sRows = m_table.getSelectedRows();
                             boolean clickedOnSelected = false;
-                            HashSet pids = new HashSet();
+                            HashSet<String> pids = new HashSet<String>();
                             for (int element : sRows) {
                                 if (element == rowNum) {
                                     clickedOnSelected = true;
@@ -327,14 +327,14 @@ public class ResultFrame
                                 pids.add(m_rowPids[element]);
                             }
                             if (!clickedOnSelected) {
-                                pids = new HashSet();
+                                pids = new HashSet<String>();
                                 m_table.clearSelection();
                                 m_table.addRowSelectionInterval(rowNum, rowNum);
                                 pids.add(m_rowPids[rowNum]);
                             }
                             if (pids.size() == 1) {
-                                Iterator pidIter = pids.iterator();
-                                new ResultFrame.SingleSelectionPopup((String) pidIter
+                                Iterator<String> pidIter = pids.iterator();
+                                new ResultFrame.SingleSelectionPopup(pidIter
                                         .next()).show(e.getComponent(),
                                                       e.getX(),
                                                       e.getY());
@@ -396,7 +396,7 @@ public class ResultFrame
 
         private static final long serialVersionUID = 1L;
 
-        public MultiSelectionPopup(Set pids) {
+        public MultiSelectionPopup(Set<String> pids) {
             super();
             JMenuItem i0 = new JMenuItem(new ViewObject(pids));
             i0.setMnemonic(KeyEvent.VK_O);

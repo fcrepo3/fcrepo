@@ -30,7 +30,6 @@ import static org.fcrepo.common.Constants.OLD_XLINK;
  *
  * @author Chris Wilper
  */
-@SuppressWarnings("deprecation")
 public class TestMETSFedoraExt1_0DOSerializer
         extends TestMETSFedoraExtDOSerializer {
 

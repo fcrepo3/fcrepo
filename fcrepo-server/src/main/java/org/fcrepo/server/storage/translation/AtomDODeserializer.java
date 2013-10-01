@@ -5,7 +5,6 @@
 package org.fcrepo.server.storage.translation;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,12 +16,9 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
-
 import java.text.ParseException;
-
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -31,11 +27,8 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.xml.stream.XMLStreamException;
-
 import javax.activation.MimeType;
-
-import org.apache.commons.io.IOUtils;
+import javax.xml.stream.XMLStreamException;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.ext.thread.ThreadHelper;
@@ -49,15 +42,11 @@ import org.apache.abdera.model.Person;
 import org.apache.abdera.parser.Parser;
 import org.apache.abdera.util.MimeTypeHelper;
 import org.apache.abdera.xpath.XPath;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.commons.io.IOUtils;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.MalformedPIDException;
 import org.fcrepo.common.PID;
 import org.fcrepo.common.xml.format.XMLFormat;
-
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.errors.ValidationException;
@@ -67,10 +56,11 @@ import org.fcrepo.server.storage.types.DatastreamReferencedContent;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.validation.ValidationUtility;
-
 import org.fcrepo.utilities.DateUtility;
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.NormalizedURI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 

@@ -18,7 +18,7 @@ import org.jrdf.graph.ObjectNode;
 import org.jrdf.graph.PredicateNode;
 import org.jrdf.graph.SubjectNode;
 import org.jrdf.graph.Triple;
-import org.trippi.TrippiException;
+import org.openrdf.rio.RDFHandlerException;
 import org.trippi.io.transform.Transformer;
 
 import org.fcrepo.common.Constants;
@@ -200,9 +200,32 @@ public class RelationshipTuple
         }
     }
     
+    public static RelationshipTuple fromNodes(org.openrdf.model.Resource s, org.openrdf.model.URI p,
+            org.openrdf.model.Value o, GraphElementFactory u) {
+        String subject = s.stringValue();
+        String predicate = p.stringValue();
+        // the rdf streams parsed by Fedora will only contain URIs and Literals, no BNodes
+        if (o instanceof org.openrdf.model.Literal) {
+            return getLiteral(subject, predicate, (org.openrdf.model.Literal)o);
+        } else {
+            return new RelationshipTuple(subject, predicate, o.stringValue(), false, null, null);
+        }
+    }
+    
     private static RelationshipTuple getLiteral(String subject, String predicate, Literal literal) {
         return new RelationshipTuple(subject, predicate, literal.getLexicalForm(), true, literal.getDatatypeURI(), literal.getLanguage());
     }
+
+    private static RelationshipTuple getLiteral(String subject, String predicate, org.openrdf.model.Literal literal) {
+        if (literal.getDatatype() != null) {
+            return new RelationshipTuple(subject, predicate, literal.stringValue(), true,
+                URI.create(literal.getDatatype().stringValue()), null);
+        } else {
+            return new RelationshipTuple(subject, predicate, literal.stringValue(), true,
+                    null, literal.getLanguage());
+        }
+    }
+//org.openrdf.model.Literal
    
     // test for equality, accounting for null values
     private static boolean eq(Object a, Object b) {
@@ -230,9 +253,15 @@ public class RelationshipTuple
         }
 
         @Override
-        public RelationshipTuple transform(SubjectNode s, PredicateNode p,
-                ObjectNode o, GraphElementFactory u) throws TrippiException {
-            return RelationshipTuple.fromNodes(s, p, o);
+        public RelationshipTuple transform(
+                SubjectNode sNode, PredicateNode pNode, ObjectNode oNode) {
+            return RelationshipTuple.fromNodes(sNode, pNode, oNode);
+        }
+
+        @Override
+        public RelationshipTuple transform(org.openrdf.model.Statement s,
+                GraphElementFactory u) throws RDFHandlerException {
+            return RelationshipTuple.fromNodes(s.getSubject(), s.getPredicate(), s.getObject(), u);
         }
         
     }

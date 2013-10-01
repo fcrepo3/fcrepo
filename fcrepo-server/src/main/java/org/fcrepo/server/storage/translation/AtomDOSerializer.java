@@ -9,16 +9,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-
 import java.util.Date;
 import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import org.apache.commons.io.IOUtils;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.ext.thread.ThreadHelper;
@@ -27,19 +22,17 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
 import org.apache.abdera.util.MimeTypeHelper;
-
+import org.apache.commons.io.IOUtils;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
 import org.fcrepo.common.xml.format.XMLFormat;
-
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.utilities.StreamUtility;
-
 import org.fcrepo.utilities.DateUtility;
 import org.fcrepo.utilities.MimeTypeUtils;
 import org.fcrepo.utilities.ReadableCharArrayWriter;

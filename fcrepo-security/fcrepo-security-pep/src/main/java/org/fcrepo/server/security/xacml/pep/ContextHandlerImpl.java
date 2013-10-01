@@ -25,8 +25,6 @@ import java.util.Map;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.RelationshipResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.ctx.RequestCtx;
@@ -38,9 +36,6 @@ import com.sun.xacml.ctx.ResponseCtx;
  */
 public class ContextHandlerImpl
         implements ContextHandler {
-
-    private static final Logger logger =
-            LoggerFactory.getLogger(ContextHandlerImpl.class);
 
     private ContextUtil m_contextUtil = null;
 

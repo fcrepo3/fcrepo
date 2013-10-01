@@ -1,5 +1,4 @@
 package org.fcrepo.common.policy.xacml1;
-import org.fcrepo.common.policy.XacmlName;
 import org.fcrepo.common.policy.XacmlNamespace;
 
 

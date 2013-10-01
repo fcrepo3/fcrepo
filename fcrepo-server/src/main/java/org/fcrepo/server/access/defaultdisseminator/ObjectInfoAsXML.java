@@ -35,6 +35,7 @@ import org.fcrepo.utilities.ReadableCharArrayWriter;
 public class ObjectInfoAsXML
         implements Constants {
 
+    @SuppressWarnings("unused")
     private final Context m_context;
 
     public ObjectInfoAsXML(Context context) {

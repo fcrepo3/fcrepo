@@ -11,12 +11,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.apache.xerces.util.XMLChar;
 import org.fcrepo.common.Constants;
-import org.fcrepo.common.FaultException;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.errors.ValidationException;
 import org.fcrepo.utilities.XmlTransformUtility;

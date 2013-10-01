@@ -5,16 +5,12 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader;
 import org.fcrepo.server.security.xacml.util.AttributeBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -52,9 +48,6 @@ implements PolicyIndex {
 
     protected Map<String, Map<String, String>> indexMap = null;
     protected PolicyReader m_policyReader;
-
-    private static final Logger log =
-        LoggerFactory.getLogger(PolicyIndexBase.class.getName());
 
     protected static final String METADATA_POLICY_NS = "metadata";
 

@@ -43,7 +43,7 @@ public class BasisDataStream
         m_descriptiveStreams.remove(inlineStream);
     }
 
-    public Iterator descriptiveStreams() {
+    public Iterator<InlineDataStream> descriptiveStreams() {
         return m_descriptiveStreams.iterator();
     }
 

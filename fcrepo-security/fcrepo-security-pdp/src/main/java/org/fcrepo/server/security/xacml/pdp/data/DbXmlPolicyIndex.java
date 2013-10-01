@@ -21,7 +21,6 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.fcrepo.server.security.xacml.pdp.finder.policy.PolicyReader;
@@ -535,6 +534,7 @@ public class DbXmlPolicyIndex
         return true;
     }
 
+    @SuppressWarnings("unused")
     private boolean deleteDirectory(String directory) {
 
         boolean result = false;

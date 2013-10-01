@@ -682,10 +682,6 @@ public class Administrator
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
         JMenuItem helpContents = new JMenuItem("Documentation", KeyEvent.VK_D);
-        String portPart = "";
-        if (getPort() != 80) {
-            portPart = ":" + getPort();
-        }
 
         helpContents.addActionListener(new ActionListener() {
 
@@ -895,7 +891,7 @@ public class Administrator
         String user = null;
         String pass = null;
         String context = null;
-        Administrator administrator =
-                new Administrator(protocol, host, port, context, user, pass);
+        // check that the constructor works
+        new Administrator(protocol, host, port, context, user, pass);
     }
 }

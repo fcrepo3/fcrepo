@@ -20,13 +20,13 @@ public class SimpleHeader
 
     private final Date m_datestamp;
 
-    private final Set m_setSpecs;
+    private final Set<String> m_setSpecs;
 
     private final boolean m_isAvailable;
 
     public SimpleHeader(String identifier,
                         Date datestamp,
-                        Set setSpecs,
+                        Set<String> setSpecs,
                         boolean isAvailable) {
         m_identifier = identifier;
         m_datestamp = datestamp;
@@ -42,7 +42,7 @@ public class SimpleHeader
         return m_datestamp;
     }
 
-    public Set getSetSpecs() {
+    public Set<String> getSetSpecs() {
         return m_setSpecs;
     }
 

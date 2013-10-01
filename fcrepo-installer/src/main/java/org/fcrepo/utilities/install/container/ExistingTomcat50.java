@@ -7,7 +7,6 @@ package org.fcrepo.utilities.install.container;
 import org.fcrepo.utilities.install.Distribution;
 import org.fcrepo.utilities.install.InstallOptions;
 import org.fcrepo.utilities.install.InstallationFailedException;
-import org.fcrepo.utilities.install.Installer;
 
 public class ExistingTomcat50
         extends ExistingTomcat55 {

@@ -21,7 +21,6 @@ package org.fcrepo.server.security.xacml.pdp;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -107,18 +106,18 @@ public class HierarchicalLowestChildDenyOverridesPolicyAlg
     @Override
     @SuppressWarnings("unchecked")
     public Result combine(EvaluationCtx context,
-                          List parameters,
-                          List policyElements) {
+                          @SuppressWarnings("rawtypes") List parameters,
+                          @SuppressWarnings("rawtypes") List policyElements) {
         logger.info("Combining using: " + getIdentifier());
 
         boolean atLeastOneError = false;
         boolean atLeastOnePermit = false;
-        Set denyObligations = new HashSet();
+        Set<Set<?>> denyObligations = new HashSet<Set<?>>();
         Status firstIndeterminateStatus = null;
 
         Set<AbstractPolicy> matchedPolicies = new HashSet<AbstractPolicy>();
 
-        Iterator it = policyElements.iterator();
+        Iterator<?> it = policyElements.iterator();
         while (it.hasNext()) {
             AbstractPolicy policy =
                     ((PolicyCombinerElement) it.next()).getPolicy();

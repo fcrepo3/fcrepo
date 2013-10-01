@@ -36,7 +36,7 @@ public class RebuildDOManager
      * @param role
      * @throws ModuleInitializationException
      */
-    public RebuildDOManager(Map moduleParameters, Server server, String role)
+    public RebuildDOManager(Map<String, String> moduleParameters, Server server, String role)
             throws ModuleInitializationException {
         super(moduleParameters, server, role);
     }

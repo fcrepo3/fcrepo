@@ -277,8 +277,6 @@ public abstract class TestXMLDODeserializer
                 (DatastreamXMLMetadata) processed.datastreams("WSDL")
                         .iterator().next();
 
-        Iterator<String> ids = processed.datastreamIdIterator();
-
         String content = new String(ds1proc.xmlContent);
         assertFalse(content.contains("local.fedora.server"));
         assertTrue(content.contains("http"));

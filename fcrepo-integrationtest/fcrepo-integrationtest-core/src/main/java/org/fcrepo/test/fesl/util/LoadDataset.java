@@ -11,8 +11,6 @@ public class LoadDataset {
     private static final Logger logger =
             LoggerFactory.getLogger(LoadDataset.class);
 
-    private static final String PROPERTIES = "fedora";
-
     private static final String RESOURCEBASE =
         System.getProperty("fcrepo-integrationtest-core.classes") != null ? System
                 .getProperty("fcrepo-integrationtest-core.classes")

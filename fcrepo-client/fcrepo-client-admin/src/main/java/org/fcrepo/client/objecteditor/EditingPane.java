@@ -38,6 +38,11 @@ public abstract class EditingPane
         extends JPanel
         implements PotentiallyDirty {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected JButton m_saveButton;
 
     protected JButton m_undoButton;

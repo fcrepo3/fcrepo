@@ -124,7 +124,7 @@ public class AutoBatchBuildIngest
                 System.out.println("\n*** Format of template files is: "
                         + objectFormat + " . Generated objects will be in "
                         + objectFormat + " format.\n");
-                AutoBatchBuildIngest autoBatch =
+                // check that the constructor works
                         new AutoBatchBuildIngest(args[0],
                                                  args[1],
                                                  args[2],

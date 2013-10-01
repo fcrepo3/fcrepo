@@ -79,22 +79,22 @@ public class ConnectPubcookie {
 
     private static final HttpUriRequest setup(HttpClient client,
                                               URL url,
-                                              Map requestParameters,
+                                              Map<?, ?> noRequestParameters,
                                               Cookie[] requestCookies) {
         logger.debug("Entered setup()");
         HttpUriRequest method = null;
-        if (requestParameters == null) {
+        if (noRequestParameters == null) {
             logger.debug("Using GetMethod; requestParameters == null");
             method = new HttpGet(url.toExternalForm());
         } else {
             logger.debug("Using PostMethod; requestParameters specified");
             HttpPost post = new HttpPost(url.toExternalForm()); // "http://localhost:8080/"
 
-            List<NameValuePair> formParams = new ArrayList<NameValuePair>(requestParameters.size());
-            Iterator iterator = requestParameters.keySet().iterator();
-            for (int i = 0; iterator.hasNext(); i++) {
-                String fieldName = (String) iterator.next();
-                String fieldValue = (String) requestParameters.get(fieldName);
+            List<NameValuePair> formParams = new ArrayList<NameValuePair>(noRequestParameters.size());
+            Iterator<?> iterator = noRequestParameters.keySet().iterator();
+            while (iterator.hasNext()) {
+                String fieldName = (String)iterator.next();
+                String fieldValue = (String)noRequestParameters.get(fieldName);
                 NameValuePair stringPart = new BasicNameValuePair(fieldName, fieldValue);
                 formParams.add(stringPart);
                 logger.debug("Adding Post parameter {} = {}", fieldName, fieldValue);
@@ -115,13 +115,13 @@ public class ConnectPubcookie {
     }
 
     public final void connect(String urlString,
-                              Map requestParameters,
+                              Map<?, ?> noRequestParameters,
                               Cookie[] requestCookies,
                               String truststoreLocation,
                               String truststorePassword) {
         if (logger.isDebugEnabled()) {
             logger.debug("Entered .connect() " + " url=="
-                    + urlString + " requestParameters==" + requestParameters
+                    + urlString + " requestParameters==" + noRequestParameters
                     + " requestCookies==" + requestCookies);
         }
         responseCookies2 = null;
@@ -168,7 +168,7 @@ public class ConnectPubcookie {
         logger.debug(".connect() requestCookies=={}", requestCookies.toString());
         BasicCookieStore cookies = new BasicCookieStore();
         HttpUriRequest method =
-                setup(client, url, requestParameters, requestCookies);
+                setup(client, url, noRequestParameters, requestCookies);
         HttpContext context = new BasicHttpContext();
         context.setAttribute(ClientContext.COOKIE_SPEC, new BestMatchSpec());
         context.setAttribute(ClientContext.COOKIE_STORE, cookies);
@@ -196,7 +196,7 @@ public class ConnectPubcookie {
                         method =
                                 setup(client,
                                       redirectURL,
-                                      requestParameters,
+                                      noRequestParameters,
                                       requestCookies);
                     } catch (MalformedURLException mue) {
                         logger.error(".connect() malformed redirect url: " + urlString);

@@ -33,7 +33,6 @@ import org.fcrepo.server.access.dissemination.DisseminationService;
 import org.fcrepo.server.errors.DatastreamNotFoundException;
 import org.fcrepo.server.errors.DisseminationException;
 import org.fcrepo.server.errors.DisseminatorNotFoundException;
-import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.InvalidUserParmException;
 import org.fcrepo.server.errors.MethodNotFoundException;
 import org.fcrepo.server.errors.ModuleInitializationException;

@@ -22,7 +22,7 @@ public class Part {
     public String partBaseTypeLocalName;
 
     // consider...
-    public Vector enumerationOfValues;
+    public Vector<?> enumerationOfValues;
 
     public String defaultValue;
 }

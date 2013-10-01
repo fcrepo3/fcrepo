@@ -5,6 +5,7 @@
 package org.fcrepo.oai.sample;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -15,8 +16,10 @@ import org.fcrepo.oai.BadResumptionTokenException;
 import org.fcrepo.oai.DateGranularitySupport;
 import org.fcrepo.oai.DeletedRecordSupport;
 import org.fcrepo.oai.IDDoesNotExistException;
+import org.fcrepo.oai.MetadataFormat;
 import org.fcrepo.oai.OAIProvider;
 import org.fcrepo.oai.Record;
+import org.fcrepo.oai.SetInfo;
 import org.fcrepo.oai.SimpleHeader;
 import org.fcrepo.oai.SimpleMetadataFormat;
 import org.fcrepo.oai.SimpleRecord;
@@ -129,18 +132,16 @@ public class SampleOAIProvider
         return DateGranularitySupport.SECONDS;
     }
 
-    public Set getAdminEmails() {
-        HashSet<String> s = new HashSet<String>();
-        s.add("nobody@nowhere.com");
-        return s;
+    public Set<String> getAdminEmails() {
+        return Collections.singleton("nobody@nowhere.com");
     }
 
-    public Set getSupportedCompressionEncodings() {
-        return new HashSet();
+    public Set<String> getSupportedCompressionEncodings() {
+        return Collections.emptySet();
     }
 
-    public Set getDescriptions() {
-        return new HashSet();
+    public Set<String> getDescriptions() {
+        return Collections.emptySet();
     }
 
     public Record getRecord(String identifier, String metadataPrefix)
@@ -153,57 +154,52 @@ public class SampleOAIProvider
         }
     }
 
-    public List getRecords(Date from,
+    public List<?> getRecords(Date from,
                            Date until,
                            String metadataPrefix,
                            String set) {
         // throws CannotDisseminateFormatException,
         // NoRecordsMatchException, NoSetHierarchyException;
-        ArrayList<SimpleRecord> a = new ArrayList<SimpleRecord>();
-        a.add(m_rec1);
-        return a;
+        return Collections.singletonList(m_rec1);
     }
 
-    public List getRecords(String resumptionToken)
+    public List<?> getRecords(String resumptionToken)
             throws BadResumptionTokenException {
         throw new BadResumptionTokenException("Sample doesn't support resumptionTokens.");
     }
 
-    public List getHeaders(Date from,
+    public List<?> getHeaders(Date from,
                            Date until,
                            String metadataPrefix,
                            String set) {
-        ArrayList<SimpleHeader> a = new ArrayList<SimpleHeader>();
-        a.add(m_head1);
-        return a;
+        return Collections.singletonList(m_head1);
     }
 
-    public List getHeaders(String resumptionToken)
+    public List<?> getHeaders(String resumptionToken)
             throws BadResumptionTokenException {
         throw new BadResumptionTokenException("Sample doesn't support resumptionTokens.");
     }
 
-    public List getSets() {
-        ArrayList<SimpleSetInfo> a = new ArrayList<SimpleSetInfo>();
-        a.add(new SimpleSetInfo("Computer Science", "cs", new HashSet()));
+    public List<SetInfo> getSets() {
+        ArrayList<SetInfo> a = new ArrayList<SetInfo>();
+        a.add(new SimpleSetInfo("Computer Science", "cs", new HashSet<String>()));
         a
                 .add(new SimpleSetInfo("Cornell University",
                                        "cornell",
-                                       new HashSet()));
+                                       new HashSet<String>()));
         return a;
     }
 
-    public List getSets(String resumptionToken)
+    public List<?> getSets(String resumptionToken)
             throws BadResumptionTokenException {
         throw new BadResumptionTokenException("Sample doesn't support resumptionTokens.");
     }
 
-    public Set getMetadataFormats(String id) {
-        HashSet<SimpleMetadataFormat> s = new HashSet<SimpleMetadataFormat>();
-        s.add(new SimpleMetadataFormat(OAI_DC.prefix,
+    public Set<MetadataFormat> getMetadataFormats(String id) {
+        MetadataFormat mdf = (new SimpleMetadataFormat(OAI_DC.prefix,
                                        OAI_DC2_0.xsdLocation,
                                        OAI_DC.uri));
-        return s;
+        return Collections.singleton(mdf);
     }
 
     public long getMaxSets() {

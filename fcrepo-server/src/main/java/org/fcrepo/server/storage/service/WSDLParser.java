@@ -334,6 +334,7 @@ class WSDLParser
                 wsdlPort = new Port();
                 wsdlPort.portName = attrs.getValue("name");
                 tmp_portBindingName = attrs.getValue("binding");
+                @SuppressWarnings("unused")
                 String nsprefix = null;
                 tmp_portBindingLocalName = null;
                 StringTokenizer st =
@@ -364,6 +365,7 @@ class WSDLParser
             StringTokenizer st =
                     new StringTokenizer(tmp_bindingPortTypeName, ":");
             if (st.hasMoreTokens()) {
+                @SuppressWarnings("unused")
                 String nsprefix = st.nextToken();
                 tmp_bindingPortTypeLocalName = st.nextToken();
             } else {

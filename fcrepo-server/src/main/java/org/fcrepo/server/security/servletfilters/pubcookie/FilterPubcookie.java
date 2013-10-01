@@ -5,20 +5,18 @@
 package org.fcrepo.server.security.servletfilters.pubcookie;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.http.cookie.Cookie;
 import org.fcrepo.server.security.servletfilters.BaseCaching;
 import org.fcrepo.server.security.servletfilters.CacheElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
 /**

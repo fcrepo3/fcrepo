@@ -42,7 +42,7 @@ class MmapParser
     /**
      * URI-to-namespace prefix mapping info from SAX2 startPrefixMapping events.
      */
-    private HashMap nsPrefixMap;
+    private HashMap<String, String> nsPrefixMap;
 
     // Variables for keeping state during SAX parse.
     private boolean inMethod = false;
@@ -58,17 +58,17 @@ class MmapParser
     private MmapMethodParmDef methodMapParm;
 
     //private Hashtable wsdlMsgToMethodTbl;
-    private Hashtable wsdlOperationToMethodDefTbl;
+    private Hashtable<String, MmapMethodDef> wsdlOperationToMethodDefTbl;
 
-    private Hashtable wsdlMsgPartToParmDefTbl;
+    private Hashtable<String, MmapMethodParmDef> wsdlMsgPartToParmDefTbl;
 
     // Working variables...
 
-    private Vector tmp_enum;
+    private Vector<String> tmp_enum;
 
-    private Vector tmp_parms;
+    private Vector<MmapMethodParmDef> tmp_parms;
 
-    private Vector tmp_methods;
+    private Vector<MmapMethodDef> tmp_methods;
 
     /**
      * Constructor to enable another class to initiate the parsing
@@ -112,8 +112,8 @@ class MmapParser
 
     @Override
     public void startDocument() throws SAXException {
-        nsPrefixMap = new HashMap();
-        wsdlOperationToMethodDefTbl = new Hashtable();
+        nsPrefixMap = new HashMap<String, String>();
+        wsdlOperationToMethodDefTbl = new Hashtable<String, MmapMethodDef>();
     }
 
     @Override
@@ -150,7 +150,7 @@ class MmapParser
                 && localName.equalsIgnoreCase("MethodMap")) {
             methodMap = new Mmap();
             methodMap.mmapName = attrs.getValue("name");
-            tmp_methods = new Vector();
+            tmp_methods = new Vector<MmapMethodDef>();
         } else if (namespaceURI.equalsIgnoreCase(METHOD_MAP.uri)
                 && localName.equalsIgnoreCase("Method")) {
             inMethod = true;
@@ -161,8 +161,8 @@ class MmapParser
             methodMapMethod.wsdlMessageName = attrs.getValue("wsdlMsgName");
             methodMapMethod.wsdlOutputMessageName =
                     attrs.getValue("wsdlMsgOutput");
-            tmp_parms = new Vector();
-            wsdlMsgPartToParmDefTbl = new Hashtable();
+            tmp_parms = new Vector<MmapMethodParmDef>();
+            wsdlMsgPartToParmDefTbl = new Hashtable<String, MmapMethodParmDef>();
         } else if (inMethod) {
             if (namespaceURI.equalsIgnoreCase(METHOD_MAP.uri)
                     && localName.equalsIgnoreCase("DatastreamInputParm")) {
@@ -215,7 +215,7 @@ class MmapParser
             } else if (inUserInputParm) {
                 if (namespaceURI.equalsIgnoreCase(METHOD_MAP.uri)
                         && localName.equalsIgnoreCase("ValidParmValues")) {
-                    tmp_enum = new Vector();
+                    tmp_enum = new Vector<String>();
                 } else if (namespaceURI.equalsIgnoreCase(METHOD_MAP.uri)
                         && localName.equalsIgnoreCase("ValidParm")) {
                     tmp_enum.add(attrs.getValue("value"));

@@ -5,12 +5,8 @@
 package org.fcrepo.server.management;
 
 import java.io.IOException;
-
 import java.util.Iterator;
 import java.util.Set;
-
-import org.fcrepo.common.PID;
-import org.fcrepo.server.management.PIDGenerator;
 
 import junit.framework.TestCase;
 
@@ -23,11 +19,11 @@ public abstract class TestPIDGenerator
 
     private PIDGenerator testPIDGenerator;
 
-    private Set namespaces;
+    private Set<String> namespaces;
 
     protected abstract PIDGenerator getTestPIDGenerator();
 
-    protected abstract Set getNamespaces();
+    protected abstract Set<String> getNamespaces();
 
     @Override
     protected void setUp() {
@@ -42,10 +38,10 @@ public abstract class TestPIDGenerator
     }
 
     public void testGeneratePID() {
-        Iterator it = namespaces.iterator();
+        Iterator<String> it = namespaces.iterator();
         try {
             while (it.hasNext()) {
-                testPIDGenerator.generatePID((String) it.next());
+                testPIDGenerator.generatePID(it.next());
             }
         } catch (IOException e) {
             fail(e.getMessage());
@@ -53,9 +49,8 @@ public abstract class TestPIDGenerator
     }
 
     public void testgetLastPID() {
-        PID pid;
         try {
-            pid = testPIDGenerator.getLastPID();
+            testPIDGenerator.getLastPID();
         } catch (UnsupportedOperationException e) {
             // optional
         } catch (IOException e) {

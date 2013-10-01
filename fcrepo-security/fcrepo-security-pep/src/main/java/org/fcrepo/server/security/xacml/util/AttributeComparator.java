@@ -28,16 +28,13 @@ import com.sun.xacml.ctx.Attribute;
  * @author nishen@melcoe.mq.edu.au
  */
 public class AttributeComparator
-        implements Comparator {
+        implements Comparator<Attribute> {
 
     /*
      * (non-Javadoc)
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(Object o1, Object o2) {
-        Attribute a = (Attribute) o1;
-        Attribute b = (Attribute) o2;
-
+    public int compare(Attribute a, Attribute b) {
         int result = a.getId().toString().compareTo(b.getId().toString());
 
         if (result == 0) {

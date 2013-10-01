@@ -18,7 +18,6 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -72,6 +71,7 @@ public class DescribeRepositoryResource
     private static final Logger logger =
             LoggerFactory.getLogger(DescribeRepositoryResource.class);
 
+    @SuppressWarnings("unused")
     private static final long serialVersionUID = 1L;
 
     /** Content type for html. */

@@ -81,6 +81,7 @@ implements PolicyEnforcementPoint {
     /* (non-Javadoc)
      * @see org.fcrepo.server.security.PolicyEnforcementPoint#enforce(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.fcrepo.server.Context)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public final void enforce(String subjectId,
                               String action,
