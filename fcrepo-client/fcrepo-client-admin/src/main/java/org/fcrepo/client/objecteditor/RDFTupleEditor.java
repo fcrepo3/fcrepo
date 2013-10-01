@@ -274,7 +274,7 @@ public class RDFTupleEditor
             try {
                 iter = m_factory.fromStream(data, RDFFormat.RDF_XML);
                 entries = new ArrayList<RelationshipTuple>();
-                for (int i = 0; iter.hasNext(); i++) {
+                while (iter.hasNext()) {
                     Triple triple = iter.next();
                     String object = null;
                     boolean isLiteral = false;
@@ -300,6 +300,7 @@ public class RDFTupleEditor
             }
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public RDFDataModel clone() {
             RDFDataModel clone = new RDFDataModel();
@@ -479,13 +480,13 @@ public class RDFTupleEditor
 
         private JTextField m_subject;
 
-        private final JComboBox m_predicate;
+        private final JComboBox<String> m_predicate;
 
         private JTextField m_objectURI;
 
         private JCheckBox m_isLiteral;
 
-        private JComboBox m_literalType;
+        private JComboBox<String> m_literalType;
 
         private JLabel lab1, lab2, lab3, lab4, lab5;
 
@@ -500,15 +501,16 @@ public class RDFTupleEditor
             JPanel mainPanel = new JPanel();
             mainPanel.setLayout(new SpringLayout());
 
-            mainPanel.add(lab1 = new JLabel("Subject:", SwingConstants.RIGHT));
+            lab1 = new JLabel("Subject:", SwingConstants.RIGHT);
+            mainPanel.add(lab1);
             mainPanel.add(m_subject =
                     new JTextField(tuple != null ? tuple.subject : PID
                             .toURI(pid)));
             m_subject.setBackground(Administrator.BACKGROUND_COLOR);
             m_subject.setEditable(false);
 
-            mainPanel
-                    .add(lab2 = new JLabel("Predicate:", SwingConstants.RIGHT));
+            lab2 = new JLabel("Predicate:", SwingConstants.RIGHT);
+            mainPanel.add(lab2);
             String rels[] =
                     {"",
                      MODEL.HAS_MODEL.toString(),
@@ -516,7 +518,7 @@ public class RDFTupleEditor
                      MODEL.IS_CONTRACTOR_OF.toString(),
                      MODEL.IS_DEPLOYMENT_OF.toString(),
                      Constants.RELS_EXT.IS_MEMBER_OF.toString()};
-            m_predicate = new JComboBox(rels);
+            m_predicate = new JComboBox<String>(rels);
             m_predicate.setEditable(true);
             Administrator.constrainHeight(m_predicate);
             mainPanel.add(m_predicate);
@@ -541,7 +543,7 @@ public class RDFTupleEditor
                     new JLabel("      Type:", SwingConstants.RIGHT));
             String types[] =
                     {"<untyped>", "long", "int", "float", "double", "dateTime"};
-            mainPanel.add(m_literalType = new JComboBox(types));
+            mainPanel.add(m_literalType = new JComboBox<String>(types));
             m_literalType.setEditable(false);
             Administrator.constrainHeight(m_literalType);
 
@@ -596,7 +598,8 @@ public class RDFTupleEditor
             if (arg0.getActionCommand().equals("OK")) {
                 String msg = "predicate";
                 try {
-                    URI uriSub = new URI(m_subject.getText());
+                    // audit the URI syntax
+                    new URI(m_subject.getText());
                     RelationshipTuple
                             .makePredicateResourceFromRel(getPredicate(), m_map);
                     msg = "object";

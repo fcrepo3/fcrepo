@@ -1,16 +1,14 @@
 package org.fcrepo.server.validation.ecm;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.Validation;
 import org.fcrepo.server.validation.ecm.jaxb.DsTypeModel;
 import org.fcrepo.server.validation.ecm.jaxb.Form;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,8 +19,6 @@ import java.util.List;
  */
 public class FormValidator {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(FormValidator.class);
     void checkFormAndMime(DsTypeModel typeModel, Datastream objectDatastream, Validation validation,
                           DOReader contentmodelReader) throws ServerException {
         List<Form> forms = typeModel.getForm();

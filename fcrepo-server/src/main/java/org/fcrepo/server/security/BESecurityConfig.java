@@ -291,10 +291,10 @@ public class BESecurityConfig
      * Add empty sDep and method configurations given by the map if they are
      * not already already defined.
      */
-    public void addEmptyConfigs(Map pidToMethodList) {
-        Iterator pIter = pidToMethodList.keySet().iterator();
+    public void addEmptyConfigs(Map<String, List<String>> pidToMethodList) {
+        Iterator<String> pIter = pidToMethodList.keySet().iterator();
         while (pIter.hasNext()) {
-            String sDepPID = (String) pIter.next();
+            String sDepPID = pIter.next();
             // add the sDep indicated by the key if it doesn't exist
             ServiceDeploymentRoleConfig sDepRoleConfig = m_sDepConfigs.get(sDepPID);
             if (sDepRoleConfig == null) {
@@ -303,7 +303,7 @@ public class BESecurityConfig
                 m_sDepConfigs.put(sDepPID, sDepRoleConfig);
             }
             // add each method indicated by the List which doesn't already exist
-            Iterator mIter = ((List) pidToMethodList.get(sDepPID)).iterator();
+            Iterator<String> mIter = pidToMethodList.get(sDepPID).iterator();
             while (mIter.hasNext()) {
                 String methodName = (String) mIter.next();
                 MethodRoleConfig methodRoleConfig =
@@ -497,15 +497,15 @@ public class BESecurityConfig
                             writer);
 
         // sDep roles
-        Iterator bIter = m_sDepConfigs.keySet().iterator();
+        Iterator<String> bIter = m_sDepConfigs.keySet().iterator();
         while (bIter.hasNext()) {
-            String role = (String) bIter.next();
+            String role = bIter.next();
             ServiceDeploymentRoleConfig bConfig = m_sDepConfigs.get(role);
             write(bConfig, true, skipNonOverrides, writer);
             // per-method roles
-            Iterator mIter = bConfig.getMethodConfigs().keySet().iterator();
+            Iterator<String> mIter = bConfig.getMethodConfigs().keySet().iterator();
             while (mIter.hasNext()) {
-                String methodName = (String) mIter.next();
+                String methodName = mIter.next();
                 MethodRoleConfig mConfig =
                         bConfig.getMethodConfigs().get(methodName);
                 write(mConfig, true, skipNonOverrides, writer);

@@ -6,14 +6,7 @@ package org.fcrepo.server.search;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.Date;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.RepositoryConfigurationException;
@@ -23,6 +16,8 @@ import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.DCFields;
 import org.fcrepo.utilities.DateUtility;
 import org.fcrepo.utilities.XmlTransformUtility;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 
 /**

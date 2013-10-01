@@ -147,7 +147,8 @@ public class AuthZHttpRequestAttributesFilterTest extends TestCase {
 		} catch (ServletException e) {
 			logger.error("Unexpected ServletException", e);
 		}
-		Map<String,String[]>  attributes = (Map<String, String[]>) chain.getRequest().getAttribute(attributesKey);
+		@SuppressWarnings("unchecked")
+        Map<String,String[]>  attributes = (Map<String, String[]>) chain.getRequest().getAttribute(attributesKey);
 		logger.debug("Found attributes: {}", attributes );
 		String ourheader = attributes.get(header1)[0];
 		assertEquals(ourheader,"Some value");
@@ -175,7 +176,8 @@ public class AuthZHttpRequestAttributesFilterTest extends TestCase {
 		} catch (ServletException e) {
 			logger.error("Unexpected ServletException", e);
 		}
-		Map<String,String[]>  attributes = (Map<String, String[]>) chain.getRequest().getAttribute(attributesKey);
+		@SuppressWarnings("unchecked")
+        Map<String,String[]>  attributes = (Map<String, String[]>) chain.getRequest().getAttribute(attributesKey);
 		logger.debug("Found attributes: {}", attributes );
 		String[] ourheader = attributes.get(header2);
 		assertNull(ourheader);

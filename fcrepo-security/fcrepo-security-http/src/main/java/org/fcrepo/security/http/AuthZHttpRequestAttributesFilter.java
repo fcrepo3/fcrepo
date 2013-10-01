@@ -73,7 +73,8 @@ public class AuthZHttpRequestAttributesFilter implements Filter {
 		for (String name : names) {
 			logger.debug("Looking for header with name: {}", name);
 			Set<String> headervalues = new HashSet<String>();
-			for (Enumeration<String> retrievedheadervalues = req
+			for (@SuppressWarnings("unchecked")
+            Enumeration<String> retrievedheadervalues = req
 					.getHeaders(name); retrievedheadervalues.hasMoreElements();) {
 				logger.debug("Retrieved header with name: {}", name);
 				String value = retrievedheadervalues.nextElement();

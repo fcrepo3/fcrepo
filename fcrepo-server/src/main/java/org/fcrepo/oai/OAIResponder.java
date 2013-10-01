@@ -49,7 +49,7 @@ public class OAIResponder
         m_authorization = authorization;
     }
 
-    public void respond(Context context, Map args, OutputStream outStream)
+    public void respond(Context context, Map<String, String> args, OutputStream outStream)
             throws RepositoryException, AuthzException {
         if (m_authorization != null) {
             m_authorization.enforceOAIRespond(context);
@@ -103,10 +103,10 @@ public class OAIResponder
                 Date earliestDatestamp = m_provider.getEarliestDatestamp();
                 DeletedRecordSupport deletedRecord =
                         m_provider.getDeletedRecordSupport();
-                Set adminEmails = m_provider.getAdminEmails();
-                Set compressions =
+                Set<String> adminEmails = m_provider.getAdminEmails();
+                Set<String> compressions =
                         m_provider.getSupportedCompressionEncodings();
-                Set descriptions = m_provider.getDescriptions();
+                Set<String> descriptions = m_provider.getDescriptions();
                 respondToIdentify(args,
                                   baseURL,
                                   repositoryName,
@@ -119,21 +119,21 @@ public class OAIResponder
                                   out);
             } else if (verb.equals("ListIdentifiers")) {
                 String rToken = (String) args.get("resumptionToken");
-                List headers;
+                List<?> headers;
                 if (rToken != null) {
                     if (args.size() > 2) {
                         throw new BadArgumentException("ListIdentifiers request specified resumptionToken with other arguments.");
                     }
                     headers = m_provider.getHeaders(rToken);
                 } else {
-                    Iterator iter = args.keySet().iterator();
+                    Iterator<String> iter = args.keySet().iterator();
                     boolean badParam = false;
                     Date from = null;
                     Date until = null;
                     String metadataPrefix = null;
                     String set = null;
                     while (iter.hasNext()) {
-                        String name = (String) iter.next();
+                        String name = iter.next();
                         if (name.equals("metadataPrefix")) {
                             metadataPrefix = (String) args.get(name);
                         } else if (name.equals("set")) {
@@ -194,14 +194,14 @@ public class OAIResponder
                         .getMetadataFormats(identifier), out);
             } else if (verb.equals("ListRecords")) {
                 String rToken = (String) args.get("resumptionToken");
-                List records;
+                List<?> records;
                 if (rToken != null) {
                     if (args.size() > 2) {
                         throw new BadArgumentException("ListRecords request specified resumptionToken with other arguments.");
                     }
                     records = m_provider.getRecords(rToken);
                 } else {
-                    Iterator iter = args.keySet().iterator();
+                    Iterator<String> iter = args.keySet().iterator();
                     boolean badParam = false;
                     Date from = null;
                     Date until = null;
@@ -256,7 +256,7 @@ public class OAIResponder
                                      out);
             } else if (verb.equals("ListSets")) {
                 String rToken = (String) args.get("resumptionToken");
-                List sets;
+                List<?> sets;
                 if (rToken == null) {
                     if (args.size() > 1) {
                         throw new BadArgumentException("ListSets request specified illegal argument(s).");
@@ -295,7 +295,7 @@ public class OAIResponder
         }
     }
 
-    private void respondToGetRecord(Map args,
+    private void respondToGetRecord(Map<String, String> args,
                                     String baseURL,
                                     Record record,
                                     PrintWriter out) {
@@ -307,15 +307,15 @@ public class OAIResponder
         appendBottom(out);
     }
 
-    private void respondToIdentify(Map args,
+    private void respondToIdentify(Map<String,String> args,
                                    String baseURL,
                                    String repositoryName,
                                    String protocolVersion,
                                    Date earliestDatestamp,
                                    DeletedRecordSupport deletedRecord,
-                                   Set adminEmails,
-                                   Set compressions,
-                                   Set descriptions,
+                                   Set<String> adminEmails,
+                                   Set<String> compressions,
+                                   Set<String> descriptions,
                                    PrintWriter out) {
         appendTop(out);
         appendRequest(args, baseURL, out);
@@ -325,10 +325,10 @@ public class OAIResponder
         out.println("    <baseURL>" + OAIResponder.enc(baseURL) + "</baseURL>");
         out.println("    <protocolVersion>" + protocolVersion
                 + "</protocolVersion>");
-        Iterator iter = adminEmails.iterator();
+        Iterator<String> iter = adminEmails.iterator();
         while (iter.hasNext()) {
             out.println("    <adminEmail>"
-                    + OAIResponder.enc((String) iter.next()) + "</adminEmail>");
+                    + OAIResponder.enc(iter.next()) + "</adminEmail>");
         }
         out.println("    <earliestDatestamp>"
                 + getUTCString(earliestDatestamp,
@@ -356,9 +356,9 @@ public class OAIResponder
     }
 
     // resumptionToken may be null
-    private void respondToListIdentifiers(Map args,
+    private void respondToListIdentifiers(Map<String, String> args,
                                           String baseURL,
-                                          List headers,
+                                          List<?> headers,
                                           ResumptionToken resumptionToken,
                                           PrintWriter out) {
         appendTop(out);
@@ -373,16 +373,16 @@ public class OAIResponder
         appendBottom(out);
     }
 
-    private void respondToListMetadataFormats(Map args,
+    private void respondToListMetadataFormats(Map<String, String> args,
                                               String baseURL,
-                                              Set metadataFormats,
+                                              Set<MetadataFormat> metadataFormats,
                                               PrintWriter out) {
         appendTop(out);
         appendRequest(args, baseURL, out);
         out.println("  <ListMetadataFormats>");
-        Iterator iter = metadataFormats.iterator();
+        Iterator<MetadataFormat> iter = metadataFormats.iterator();
         while (iter.hasNext()) {
-            MetadataFormat f = (MetadataFormat) iter.next();
+            MetadataFormat f = iter.next();
             out.println("    <metadataFormat>");
             out.println("      <metadataPrefix>" + f.getPrefix()
                     + "</metadataPrefix>");
@@ -396,9 +396,9 @@ public class OAIResponder
     }
 
     // resumptionToken may be null
-    private void respondToListRecords(Map args,
+    private void respondToListRecords(Map<String, String> args,
                                       String baseURL,
-                                      List records,
+                                      List<?> records,
                                       ResumptionToken resumptionToken,
                                       PrintWriter out) {
         appendTop(out);
@@ -413,9 +413,9 @@ public class OAIResponder
     }
 
     // resumptionToken may be null
-    private void respondToListSets(Map args,
+    private void respondToListSets(Map<String, String> args,
                                    String baseURL,
-                                   List sets,
+                                   List<?> sets,
                                    ResumptionToken resumptionToken,
                                    PrintWriter out) {
         appendTop(out);
@@ -426,10 +426,10 @@ public class OAIResponder
             out.println("    <set>");
             out.println("      <setSpec>" + s.getSpec() + "</setSpec>");
             out.println("      <setName>" + s.getName() + "</setName>");
-            Iterator iter = s.getDescriptions().iterator();
+            Iterator<String> iter = s.getDescriptions().iterator();
             while (iter.hasNext()) {
                 out.println("      <setDescription>\n");
-                out.println((String) iter.next());
+                out.println(iter.next());
                 out.println("      </setDescription>\n");
             }
             out.println("    </set>");
@@ -442,17 +442,17 @@ public class OAIResponder
     private void appendRecord(String indent, Record record, PrintWriter out) {
         Header header = record.getHeader();
         String metadata = record.getMetadata();
-        Set abouts = record.getAbouts();
+        Set<String> abouts = record.getAbouts();
         out.println(indent + "<record>");
         appendHeader(indent + "  ", header, out);
         if (header.isAvailable()) {
             out.println(indent + "  <metadata>");
             out.println(metadata);
             out.println(indent + "  </metadata>");
-            Iterator iter = abouts.iterator();
+            Iterator<String> iter = abouts.iterator();
             while (iter.hasNext()) {
                 out.println(indent + "  <about>");
-                out.println((String) iter.next());
+                out.println(iter.next());
                 out.println(indent + "  </about>");
             }
         }
@@ -462,7 +462,7 @@ public class OAIResponder
     private void appendHeader(String indent, Header header, PrintWriter out) {
         String identifier = header.getIdentifier();
         Date datestamp = header.getDatestamp();
-        Set setSpecs = header.getSetSpecs();
+        Set<String> setSpecs = header.getSetSpecs();
         boolean isAvailable = header.isAvailable();
         out.print(indent + "<header");
         if (!isAvailable) {
@@ -476,10 +476,10 @@ public class OAIResponder
                 + getUTCString(datestamp,
                                m_granularity == DateGranularitySupport.SECONDS)
                 + "</datestamp>");
-        Iterator iter = setSpecs.iterator();
+        Iterator<String> iter = setSpecs.iterator();
         while (iter.hasNext()) {
             out.println(indent + "  <setSpec>"
-                    + OAIResponder.enc((String) iter.next()) + "</setSpec>");
+                    + OAIResponder.enc(iter.next()) + "</setSpec>");
         }
         out.println(indent + "</header>");
     }
@@ -506,12 +506,12 @@ public class OAIResponder
         }
     }
 
-    private void appendRequest(Map args, String baseURL, PrintWriter out) {
+    private void appendRequest(Map<String, String> args, String baseURL, PrintWriter out) {
         out.print("  <request");
-        Iterator iter = args.keySet().iterator();
+        Iterator<String> iter = args.keySet().iterator();
         while (iter.hasNext()) {
-            String name = (String) iter.next();
-            String value = (String) args.get(name);
+            String name = iter.next();
+            String value = args.get(name);
             out.print(" " + name + "=\"" + OAIResponder.enc(value) + "\"");
         }
         out.println(">" + OAIResponder.enc(baseURL) + "</request>");
@@ -629,25 +629,6 @@ public class OAIResponder
     private static void enc(String in, StringBuilder out) {
         for (int i = 0; i < in.length(); i++) {
             enc(in.charAt(i), out);
-        }
-    }
-
-    /**
-     * Appends an XML-appropriate encoding of the given range of characters to
-     * the given StringBuffer.
-     *
-     * @param in
-     *        The char buffer to read from.
-     * @param start
-     *        The starting index.
-     * @param length
-     *        The number of characters in the range.
-     * @param out
-     *        The StringBuffer to write to.
-     */
-    private static void enc(char[] in, int start, int length, StringBuilder out) {
-        for (int i = start; i < length + start; i++) {
-            enc(in[i], out);
         }
     }
 

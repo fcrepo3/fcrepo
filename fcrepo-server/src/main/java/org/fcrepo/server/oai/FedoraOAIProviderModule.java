@@ -15,6 +15,7 @@ import org.fcrepo.oai.CannotDisseminateFormatException;
 import org.fcrepo.oai.DateGranularitySupport;
 import org.fcrepo.oai.DeletedRecordSupport;
 import org.fcrepo.oai.IDDoesNotExistException;
+import org.fcrepo.oai.MetadataFormat;
 import org.fcrepo.oai.NoMetadataFormatsException;
 import org.fcrepo.oai.NoRecordsMatchException;
 import org.fcrepo.oai.NoSetHierarchyException;
@@ -43,7 +44,7 @@ public class FedoraOAIProviderModule
 
     private FedoraOAIProvider m_wrappedOAIProvider;
 
-    public FedoraOAIProviderModule(Map params, Server server, String role)
+    public FedoraOAIProviderModule(Map<String, String>  params, Server server, String role)
             throws ModuleInitializationException {
         super(params, server, role);
     }
@@ -206,15 +207,15 @@ public class FedoraOAIProviderModule
         return m_wrappedOAIProvider.getDateGranularitySupport();
     }
 
-    public Set getAdminEmails() {
+    public Set<String> getAdminEmails() {
         return m_wrappedOAIProvider.getAdminEmails();
     }
 
-    public Set getSupportedCompressionEncodings() {
+    public Set<String> getSupportedCompressionEncodings() {
         return m_wrappedOAIProvider.getSupportedCompressionEncodings();
     }
 
-    public Set getDescriptions() {
+    public Set<String> getDescriptions() {
         return m_wrappedOAIProvider.getDescriptions();
     }
 
@@ -224,7 +225,7 @@ public class FedoraOAIProviderModule
         return m_wrappedOAIProvider.getRecord(identifier, metadataPrefix);
     }
 
-    public List getRecords(Date from,
+    public List<?> getRecords(Date from,
                            Date until,
                            String metadataPrefix,
                            String set) throws CannotDisseminateFormatException,
@@ -234,14 +235,14 @@ public class FedoraOAIProviderModule
                 .getRecords(from, until, metadataPrefix, set);
     }
 
-    public List getRecords(String resumptionToken)
+    public List<?> getRecords(String resumptionToken)
             throws CannotDisseminateFormatException, NoRecordsMatchException,
             NoSetHierarchyException, BadResumptionTokenException,
             RepositoryException {
         return m_wrappedOAIProvider.getRecords(resumptionToken);
     }
 
-    public List getHeaders(Date from,
+    public List<?> getHeaders(Date from,
                            Date until,
                            String metadataPrefix,
                            String set) throws CannotDisseminateFormatException,
@@ -251,24 +252,24 @@ public class FedoraOAIProviderModule
                 .getHeaders(from, until, metadataPrefix, set);
     }
 
-    public List getHeaders(String resumptionToken)
+    public List<?> getHeaders(String resumptionToken)
             throws CannotDisseminateFormatException, NoRecordsMatchException,
             NoSetHierarchyException, BadResumptionTokenException,
             RepositoryException {
         return m_wrappedOAIProvider.getHeaders(resumptionToken);
     }
 
-    public List getSets() throws NoSetHierarchyException, RepositoryException {
+    public List<?> getSets() throws NoSetHierarchyException, RepositoryException {
         return m_wrappedOAIProvider.getSets();
     }
 
-    public List getSets(String resumptionToken)
+    public List<?> getSets(String resumptionToken)
             throws BadResumptionTokenException, NoSetHierarchyException,
             RepositoryException {
         return m_wrappedOAIProvider.getSets(resumptionToken);
     }
 
-    public Set getMetadataFormats(String id) throws NoMetadataFormatsException,
+    public Set<MetadataFormat> getMetadataFormats(String id) throws NoMetadataFormatsException,
             IDDoesNotExistException, RepositoryException {
         return m_wrappedOAIProvider.getMetadataFormats(id);
     }

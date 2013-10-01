@@ -217,14 +217,14 @@ public class BackendSecurityDeserializer
         }
     }
 
-    private void inheritProperties(Hashtable inheritableProperties) {
+    private void inheritProperties(Hashtable<String,String> inheritableProperties) {
 
         logger.debug("Setting inherited properties...");
-        Iterator it = inheritableProperties.keySet().iterator();
+        Iterator<String> it = inheritableProperties.keySet().iterator();
         while (it.hasNext()) {
-            String key = (String) it.next();
+            String key = it.next();
             if (!beProperties.containsKey(key)) {
-                setProperty(key, (String) inheritableProperties.get(key));
+                setProperty(key, inheritableProperties.get(key));
             }
         }
     }
@@ -265,17 +265,17 @@ public class BackendSecurityDeserializer
         BackendSecuritySpec beSS = bds.deserialize(args[0]);
 
         // Let's see all the stuff...
-        Set allRoleKeys = beSS.listRoleKeys();
-        Iterator iterRoles = allRoleKeys.iterator();
+        Set<String> allRoleKeys = beSS.listRoleKeys();
+        Iterator<String> iterRoles = allRoleKeys.iterator();
         while (iterRoles.hasNext()) {
-            String roleKey = (String) iterRoles.next();
+            String roleKey = iterRoles.next();
             logger.debug("************ ROLEKEY = " + roleKey);
             // let's see all the properties for this role...
-            Hashtable roleProperties = beSS.getSecuritySpec(roleKey);
-            Iterator iterProps = roleProperties.keySet().iterator();
+            Hashtable<String, String> roleProperties = beSS.getSecuritySpec(roleKey);
+            Iterator<String> iterProps = roleProperties.keySet().iterator();
             while (iterProps.hasNext()) {
-                String propKey = (String) iterProps.next();
-                String propValue = (String) roleProperties.get(propKey);
+                String propKey = iterProps.next();
+                String propValue = roleProperties.get(propKey);
                 logger.debug(propKey + "=" + propValue);
             }
         }

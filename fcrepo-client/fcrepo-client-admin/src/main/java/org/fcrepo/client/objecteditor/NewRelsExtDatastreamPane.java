@@ -88,53 +88,49 @@ class NewRelsExtDatastreamPane
     public void saveChanges(String logMessage) throws Exception {
         if (m_currentVersionPane.isDirty()) {
             // defer to the currentVersionPane if anything else changed
-            try {
-                String state =
-                        s_stateComboBoxValues[m_stateComboBox
-                                .getSelectedIndex()];
-                String label =
-                        m_currentVersionPane.m_labelTextField.getText().trim();
-                String mimeType =
-                        m_currentVersionPane.m_MIMETextField.getText().trim();
-                String formatURI =
-                        m_currentVersionPane.m_formatURITextField.getText()
-                                .trim();
-                String[] altIDs =
-                        m_currentVersionPane.m_altIDsTextField.getText().trim()
-                                .split(" ");
-                String checksumType =
-                        m_currentVersionPane.m_checksumTypeComboBox
-                                .getSelectedItem().toString();
-                if (checksumType.equals("Default")) {
-                    checksumType = null;
-                }
-                String location = null;
-                location =
-                        Administrator.UPLOADER
-                                .upload(m_currentVersionPane.m_editor
-                                        .getContent());
-                boolean versionable =
-                        m_versionableComboBox.getSelectedIndex() == NEW_VERSION_ON_UPDATE ? true
-                                : false;
-                String newID =
-                        Administrator.APIM.addDatastream(m_pid,
-                                                         s_dsid,
-                                                         TypeUtility.convertStringtoAOS(altIDs),
-                                                         label,
-                                                         versionable, // DEFAULT_VERSIONABLE
-                                                         mimeType,
-                                                         formatURI,
-                                                         location,
-                                                         "X",
-                                                         state,
-                                                         checksumType,
-                                                         null, // checksum type and checksum
-                                                         logMessage); // DEFAULT_LOGMESSAGE
-
-            } catch (Exception e) {
-                throw e;
+            String state =
+                    s_stateComboBoxValues[m_stateComboBox
+                                          .getSelectedIndex()];
+            String label =
+                    m_currentVersionPane.m_labelTextField.getText().trim();
+            String mimeType =
+                    m_currentVersionPane.m_MIMETextField.getText().trim();
+            String formatURI =
+                    m_currentVersionPane.m_formatURITextField.getText()
+                    .trim();
+            String[] altIDs =
+                    m_currentVersionPane.m_altIDsTextField.getText().trim()
+                    .split(" ");
+            String checksumType =
+                    m_currentVersionPane.m_checksumTypeComboBox
+                    .getSelectedItem().toString();
+            if (checksumType.equals("Default")) {
+                checksumType = null;
             }
-            m_owner.addDatastreamTab(s_dsid, false);
+            String location = null;
+            location =
+                    Administrator.UPLOADER
+                    .upload(m_currentVersionPane.m_editor
+                            .getContent());
+            boolean versionable =
+                    m_versionableComboBox.getSelectedIndex() == NEW_VERSION_ON_UPDATE ? true
+                            : false;
+            String newID =
+                    Administrator.APIM.addDatastream(m_pid,
+                            s_dsid,
+                            TypeUtility.convertStringtoAOS(altIDs),
+                            label,
+                            versionable, // DEFAULT_VERSIONABLE
+                            mimeType,
+                            formatURI,
+                            location,
+                            "X",
+                            state,
+                            checksumType,
+                            null, // checksum type and checksum
+                            logMessage); // DEFAULT_LOGMESSAGE
+
+            m_owner.addDatastreamTab(newID, false);
         }
     }
 }

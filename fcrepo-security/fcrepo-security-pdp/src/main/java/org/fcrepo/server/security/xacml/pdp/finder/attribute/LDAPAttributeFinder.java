@@ -2,7 +2,6 @@
 package org.fcrepo.server.security.xacml.pdp.finder.attribute;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -191,12 +190,12 @@ public class LDAPAttributeFinder
 
         Set<AttributeValue> bagValues = new HashSet<AttributeValue>();
         try {
-            NamingEnumeration ne = ctx.search(base, filter, searchControls);
+            NamingEnumeration<SearchResult> ne = ctx.search(base, filter, searchControls);
 
             while (ne.hasMore()) {
                 SearchResult result = (SearchResult) ne.next();
                 Attributes attrs = result.getAttributes();
-                NamingEnumeration neas = attrs.getAll();
+                NamingEnumeration<? extends Attribute> neas = attrs.getAll();
 
                 while (neas.hasMoreElements()) {
                     Attribute attr = (Attribute) neas.nextElement();
@@ -204,7 +203,7 @@ public class LDAPAttributeFinder
                         continue;
                     }
 
-                    NamingEnumeration nea = attr.getAll();
+                    NamingEnumeration<?> nea = attr.getAll();
                     while (nea.hasMoreElements()) {
                         String value = (String) nea.nextElement();
                         if (logger.isDebugEnabled()) {
@@ -251,7 +250,7 @@ public class LDAPAttributeFinder
                                            type);
         BagAttribute bag = (BagAttribute) result.getAttributeValue();
 
-        Iterator i = bag.iterator();
+        Iterator<?> i = bag.iterator();
         while (i.hasNext()) {
             AttributeValue a = (AttributeValue) i.next();
             logger.info("value: " + a.encode());

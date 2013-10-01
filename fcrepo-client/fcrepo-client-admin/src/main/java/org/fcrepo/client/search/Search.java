@@ -343,7 +343,7 @@ public class Search
                 publisherBox, coverageBox, mDateBox, contributorBox, rightsBox,
                 dcmDateBox, dateBox;
 
-        public SelectFieldsDialog(List fieldList) {
+        public SelectFieldsDialog(List<?> fieldList) {
             super(Administrator.getInstance(), "Select Fields to Display", true);
 
             // mainPanel(northPanel, noteLabel, southPanel)
@@ -565,7 +565,7 @@ public class Search
             }
         }
 
-        public List getSelectedFields() {
+        public List<String> getSelectedFields() {
             return m_selectedFields;
         }
 
@@ -641,9 +641,9 @@ public class Search
 
         private final int m_rowNum;
 
-        private final JComboBox m_fieldBox;
+        private final JComboBox<String> m_fieldBox;
 
-        private final JComboBox m_operatorBox;
+        private final JComboBox<String> m_operatorBox;
 
         private final JTextField m_valueField;
 
@@ -656,8 +656,8 @@ public class Search
 
             // NORTH: northPanel(fieldBox,operatorBox,valueField)
 
-            m_fieldBox = new JComboBox(s_fieldArray);
-            m_operatorBox = new JComboBox(s_operatorArray);
+            m_fieldBox = new JComboBox<String>(s_fieldArray);
+            m_operatorBox = new JComboBox<String>(s_operatorArray);
             m_valueField = new JTextField(10);
             if (rowNum != -1) {
                 // if this is an edit, start with current values
@@ -759,7 +759,7 @@ public class Search
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            List fields = m_fieldSelector.getFieldList();
+            List<?> fields = m_fieldSelector.getFieldList();
             String[] displayFields = new String[fields.size()];
             ObjectFactory factory = new ObjectFactory();
             for (int i = 0; i < fields.size(); i++) {
@@ -794,9 +794,9 @@ public class Search
 
         private final JLabel m_fieldLabel;
 
-        private List m_fieldList;
+        private List<?> m_fieldList;
 
-        public ChangeFieldsButtonListener(JLabel fieldLabel, List fieldList) {
+        public ChangeFieldsButtonListener(JLabel fieldLabel, List<?> fieldList) {
             m_fieldLabel = fieldLabel;
             m_fieldList = fieldList;
         }
@@ -829,7 +829,7 @@ public class Search
             }
         }
 
-        public List getFieldList() {
+        public List<?> getFieldList() {
             return m_fieldList;
         }
     }

@@ -43,6 +43,7 @@ public class GetDissemination
         super();
     }
 
+        @SuppressWarnings("deprecation")
         @Override
         public RequestCtx handleRequest(HttpServletRequest request,
                                         HttpServletResponse response)

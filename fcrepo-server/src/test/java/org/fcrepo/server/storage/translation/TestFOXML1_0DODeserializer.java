@@ -5,18 +5,11 @@
 
 package org.fcrepo.server.storage.translation;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.Iterator;
 
-import org.junit.Test;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.storage.translation.FOXML1_0DODeserializer;
-import org.fcrepo.server.storage.translation.FOXML1_0DOSerializer;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.Datastream;
-import org.fcrepo.server.storage.types.DigitalObject;
+import org.junit.Test;
 
 /**
  * Unit tests for FOXML1_0DODeserializer.

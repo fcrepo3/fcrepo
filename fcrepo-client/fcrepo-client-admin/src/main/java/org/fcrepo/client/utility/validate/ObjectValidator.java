@@ -9,12 +9,10 @@ import java.util.Collection;
 
 import org.fcrepo.client.utility.validate.types.BasicObjectInfo;
 import org.fcrepo.client.utility.validate.types.ContentModelInfo;
-import org.fcrepo.client.utility.validate.types.DatastreamInfo;
-import org.fcrepo.client.utility.validate.types.ObjectInfo;
-import org.fcrepo.client.utility.validate.types.RelationshipInfo;
 import org.fcrepo.client.utility.validate.types.ContentModelInfo.DsTypeModel;
 import org.fcrepo.client.utility.validate.types.ContentModelInfo.Form;
-import org.fcrepo.common.Constants;
+import org.fcrepo.client.utility.validate.types.DatastreamInfo;
+import org.fcrepo.client.utility.validate.types.ObjectInfo;
 
 
 

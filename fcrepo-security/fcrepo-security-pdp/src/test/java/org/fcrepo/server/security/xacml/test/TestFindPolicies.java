@@ -2,7 +2,6 @@
 package org.fcrepo.server.security.xacml.test;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
@@ -13,9 +12,11 @@ import org.slf4j.LoggerFactory;
 
 public class TestFindPolicies {
 
+    @SuppressWarnings("unused")
     private static final Logger logger =
             LoggerFactory.getLogger(TestFindPolicies.class);
 
+    @SuppressWarnings("unused")
     private static PolicyStore dbXmlPolicyDataManager;
 
     public static void main(String[] args) throws Exception {
@@ -37,10 +38,10 @@ public class TestFindPolicies {
                                   null,
                                   value);
 
-        Map<String, byte[]> results = null;
 
         // TODO: move these tests to a PolicyDataQuery test
         /*
+        Map<String, byte[]> results = null;
         results = dbXmlPolicyDataManager.findPolicies(attributes);
         for (String name : results.keySet()) {
             logger.info("Name: " + name);

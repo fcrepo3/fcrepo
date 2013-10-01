@@ -96,21 +96,21 @@ public class BatchTool {
                 batchAdditions.process();
             }
 
-            Vector buildKeys = null;
+            Vector<String> buildKeys = null;
             if (miscProperties.getProperty(DISCRETE) == null
                     || !miscProperties.getProperty(DISCRETE).equals("yes")) {
-                buildKeys = new Vector();
+                buildKeys = new Vector<String>();
             } else {
                 batchXforms.process();
                 buildKeys = batchXforms.getKeys();
             }
 
-            Hashtable ingestMaps = null;
-            Vector ingestKeys = null;
+            Hashtable<String, String> ingestMaps = null;
+            Vector<String> ingestKeys = null;
             if (miscProperties.getProperty(EAT) == null
                     || !miscProperties.getProperty(EAT).equals("yes")) {
-                ingestMaps = new Hashtable();
-                ingestKeys = new Vector();
+                ingestMaps = new Hashtable<String, String>();
+                ingestKeys = new Vector<String>();
             } else {
                 batchIngest.process();
                 ingestMaps = batchIngest.getPidMaps();
@@ -125,11 +125,8 @@ public class BatchTool {
 
             String pidsFormat =
                     miscProperties.getProperty(BatchTool.PIDSFORMAT);
-            String objectFormat =
-                    miscProperties.getProperty(BatchTool.OBJECTFORMAT);
             PrintStream out = new PrintStream(new FileOutputStream(pidsPath)); //= System.err;
 
-            //System.out.println("pidsFormat = [" + pidsFormat + "]");
             if (pidsFormat.equals("xml")) {
                 out.println("<" + XMLREPORTROOT + ">");
             }

@@ -260,29 +260,29 @@ public class ResponseCacheImpl
 
             Set<Attribute> attributes = null;
 
-            Set<Subject> subjects = new TreeSet(new SubjectComparator());
+            Set<Subject> subjects = new TreeSet<Subject>(new SubjectComparator());
             subjects.addAll(reqCtx.getSubjects());
             for (Subject s : subjects) {
-                attributes = new TreeSet(new AttributeComparator());
+                attributes = new TreeSet<Attribute>(new AttributeComparator());
                 attributes.addAll(s.getAttributes());
                 for (Attribute a : attributes) {
                     hashAttribute(a, digest);
                 }
             }
 
-            attributes = new TreeSet(new AttributeComparator());
+            attributes = new TreeSet<Attribute>(new AttributeComparator());
             attributes.addAll(reqCtx.getResource());
             for (Attribute a : attributes) {
                 hashAttribute(a, digest);
             }
 
-            attributes = new TreeSet(new AttributeComparator());
+            attributes = new TreeSet<Attribute>(new AttributeComparator());
             attributes.addAll(reqCtx.getAction());
             for (Attribute a : attributes) {
                 hashAttribute(a, digest);
             }
 
-            attributes = new TreeSet(new AttributeComparator());
+            attributes = new TreeSet<Attribute>(new AttributeComparator());
             attributes.addAll(reqCtx.getEnvironmentAttributes());
             for (Attribute a : attributes) {
                 hashAttribute(a, digest);

@@ -5,10 +5,8 @@
 package org.fcrepo.utilities;
 
 import java.io.File;
-
 import java.net.URL;
 import java.net.URLClassLoader;
-
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -16,10 +14,8 @@ import java.sql.DriverPropertyInfo;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
-
-import java.util.logging.Logger;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * Allows one to load a JDBC driver at runtime. java.sql.DriverManager will

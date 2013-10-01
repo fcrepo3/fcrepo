@@ -21,19 +21,12 @@ package org.fcrepo.server.security.xacml.util;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
-import org.fcrepo.server.security.xacml.pdp.MelcoePDPException;
 import org.fcrepo.server.security.xacml.pdp.data.AbstractPolicyStore;
-import org.fcrepo.server.security.xacml.pdp.data.FedoraPolicyStore;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyStore;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyStoreException;
-import org.fcrepo.server.security.xacml.pdp.data.PolicyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Populates the policy store from XACML files in the policies directory

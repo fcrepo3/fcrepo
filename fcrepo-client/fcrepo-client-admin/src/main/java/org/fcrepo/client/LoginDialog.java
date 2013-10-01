@@ -59,15 +59,15 @@ public class LoginDialog
 
     private static final long serialVersionUID = 1L;
 
-    private final JComboBox m_serverComboBox;
+    private final JComboBox<String> m_serverComboBox;
 
-    private final JComboBox m_protocolComboBox;
+    private final JComboBox<String> m_protocolComboBox;
 
-    private final JComboBox m_usernameComboBox;
+    private final JComboBox<String> m_usernameComboBox;
 
     private final JPasswordField m_passwordField;
 
-    private final JComboBox m_contextComboBox;
+    private final JComboBox<String> m_contextComboBox;
 
     private String m_lastUsername = "fedoraAdmin";
 
@@ -103,13 +103,13 @@ public class LoginDialog
         JLabel passwordLabel = new JLabel("Password");
         JLabel contextLabel = new JLabel("Context");
 
-        m_serverComboBox = new JComboBox();
+        m_serverComboBox = new JComboBox<String>();
         m_serverComboBox.setEditable(true);
-        m_protocolComboBox = new JComboBox();
+        m_protocolComboBox = new JComboBox<String>();
         m_protocolComboBox.setEditable(true);
-        m_contextComboBox = new JComboBox();
+        m_contextComboBox = new JComboBox<String>();
         m_contextComboBox.setEditable(true);
-        m_usernameComboBox = new JComboBox();
+        m_usernameComboBox = new JComboBox<String>();
         m_usernameComboBox.setEditable(true);
         m_passwordField = new JPasswordField();
 

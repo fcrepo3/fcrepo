@@ -35,7 +35,7 @@ public class ViewObjectXML
 
     private static final long serialVersionUID = 1L;
 
-    private Set m_pids;
+    private Set<String> m_pids;
 
     private boolean m_prompt;
 
@@ -48,18 +48,18 @@ public class ViewObjectXML
 
     public ViewObjectXML(String pid) {
         super("View Object XML");
-        m_pids = new HashSet();
+        m_pids = new HashSet<String>();
         m_pids.add(pid);
     }
 
     public ViewObjectXML(String pid, JPanel viewPane) {
         super("View Object XML");
-        m_pids = new HashSet();
+        m_pids = new HashSet<String>();
         m_pids.add(pid);
         m_viewPane = viewPane;
     }
 
-    public ViewObjectXML(Set pids) {
+    public ViewObjectXML(Set<String> pids) {
         super("View Objects XML");
         m_pids = pids;
     }
@@ -70,7 +70,7 @@ public class ViewObjectXML
             if (pid == null) {
                 return;
             }
-            m_pids = new HashSet();
+            m_pids = new HashSet<String>();
             m_pids.add(pid);
         }
         AutoExporter exporter = null;
@@ -84,10 +84,10 @@ public class ViewObjectXML
                                           e);
         }
         if (exporter != null) {
-            Iterator pidIter = m_pids.iterator();
+            Iterator<String> pidIter = m_pids.iterator();
             while (pidIter.hasNext()) {
                 try {
-                    String pid = (String) pidIter.next();
+                    String pid = pidIter.next();
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     exporter.getObjectXML(pid, out);
                     JTextComponent textEditor = new JTextArea();

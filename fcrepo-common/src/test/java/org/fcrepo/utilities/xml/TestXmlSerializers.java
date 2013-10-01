@@ -38,6 +38,7 @@ public class TestXmlSerializers {
     // outside of the document are moved to the end of the
     // serialization. This appears to be fixed in Xerces, but
     // obviously means output will not be equal in these circumstances.
+    @SuppressWarnings("unused")
     private Document metsDoc;
     
     @Before
@@ -53,6 +54,7 @@ public class TestXmlSerializers {
         metsDoc = XmlTransformUtility.parseNamespaceAware(docSrc);
     }
     
+    @SuppressWarnings("deprecation")
     private void testWriteConsoleNoDocType(Document doc) throws Exception {
         StringWriter sout = new StringWriter();
         SunXmlSerializers.writeConsoleNoDocType(doc, sout);
@@ -76,6 +78,7 @@ public class TestXmlSerializers {
         testWriteConsoleNoDocType(deepDoc);
     }
 
+    @SuppressWarnings("deprecation")
     private void testWriteMgmtNoDecl(Document doc) throws Exception {
         StringWriter sout = new StringWriter();
         SunXmlSerializers.writeMgmtNoDecl(doc, sout);
@@ -99,6 +102,7 @@ public class TestXmlSerializers {
         testWriteMgmtNoDecl(deepDoc);
     }
 
+    @SuppressWarnings("deprecation")
     private void testWriteXmlNoSpace(Document doc) throws Exception {
         StringWriter sout = new StringWriter();
         SunXmlSerializers.writeXmlNoSpace(doc, "UTF-8", sout);

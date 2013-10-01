@@ -48,15 +48,12 @@ public class Release2_1Namespace
         }
 
         Release2_1Namespace instance = Release2_1Namespace.getInstance();
-        Vector list = new Vector();
+        Vector<XacmlName> list = new Vector<XacmlName>();
         instance.flatRep(list);
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i) instanceof XacmlName) {
-                if (!((XacmlName) list.get(i)).toString()
-                        .startsWith(Constants.ACTION.CONTEXT_ID.uri)) {
-                    printer.println(list.get(i));
-                }
-
+            if (!list.get(i).toString()
+                    .startsWith(Constants.ACTION.CONTEXT_ID.uri)) {
+                printer.println(list.get(i));
             }
         }
     }

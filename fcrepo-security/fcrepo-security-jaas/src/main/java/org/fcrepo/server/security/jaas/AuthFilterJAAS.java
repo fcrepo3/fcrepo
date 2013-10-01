@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.Principal;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;

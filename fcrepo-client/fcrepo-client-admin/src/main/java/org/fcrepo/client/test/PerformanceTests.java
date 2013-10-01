@@ -7,16 +7,13 @@ package org.fcrepo.client.test;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.InputStream;
 import java.io.PrintStream;
-
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -27,10 +24,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.fcrepo.client.FedoraClient;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.http.PreemptiveAuth;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.utilities.TypeUtility;

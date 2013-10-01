@@ -42,7 +42,7 @@ public class SubjectComparator
     public int compare(Subject a, Subject b) {
         int result = 0;
 
-        Comparator cmp = new AttributeComparator();
+        Comparator<Attribute> cmp = new AttributeComparator();
         Set<Attribute> setA = new TreeSet<Attribute>(cmp);
         setA.addAll(a.getAttributes());
 

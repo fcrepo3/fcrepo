@@ -7,10 +7,8 @@ package org.fcrepo.server.security.servletfilters;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +19,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Bill Niebel
  */
+@SuppressWarnings("deprecation")
 public abstract class BaseContributing
         extends FilterSetup {
 
@@ -30,7 +29,7 @@ public abstract class BaseContributing
     public static final Set<String> NULL_SET =
         Collections.emptySet();
 
-    public static final Hashtable EMPTY_MAP = new Hashtable();
+    public static final Hashtable<?,?> EMPTY_MAP = new Hashtable<Object, Object>();
 
     public static final String[] EMPTY_ARRAY = new String[] {};
 

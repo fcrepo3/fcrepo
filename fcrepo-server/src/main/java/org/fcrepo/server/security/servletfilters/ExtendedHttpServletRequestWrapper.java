@@ -269,23 +269,23 @@ public class ExtendedHttpServletRequestWrapper
         return isAttributeDefined;
     }
 
-    private void putMapIntoMap(Map<String, Map<String, Set<?>>> map,
-            String key, Map<String, Set<?>> value) throws Exception {
+    private void putMapIntoMap(Map<String, Map<String, Set<?>>> sponsoredAttributes2,
+            String key, Map<String, Set<?>> attributes) throws Exception {
         if (wrapperWriteLocked) {
             throw new Exception();
         }
         if (!isAuthenticated()) {
             throw new Exception("can't collect user roles/attributes/groups until after authentication");
         }
-        if (map == null || key == null || value == null) {
-            throw new Exception("null parm, map==" + map + ", key==" + key
-                    + ", value==" + value);
+        if (sponsoredAttributes2 == null || key == null || attributes == null) {
+            throw new Exception("null parm, map==" + sponsoredAttributes2 + ", key==" + key
+                    + ", value==" + attributes);
         }
-        if (map.containsKey(key)) {
+        if (sponsoredAttributes2.containsKey(key)) {
             throw new Exception("map already contains key==" + key);
         }
-        logger.debug("mapping {} => {} in {}", key, value, map);
-        map.put(key, value);
+        logger.debug("mapping {} => {} in {}", key, attributes, sponsoredAttributes2);
+        sponsoredAttributes2.put(key, attributes);
     }
 
     @Override

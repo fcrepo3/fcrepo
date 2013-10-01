@@ -49,9 +49,9 @@ public class ChangeObjectState
                         .showInputDialog("Enter a log message for the state change.");
         if (reason != null) {
             try {
-                Iterator pidIter = m_pids.iterator();
+                Iterator<String> pidIter = m_pids.iterator();
                 while (pidIter.hasNext()) {
-                    String pid = (String) pidIter.next();
+                    String pid = pidIter.next();
                     Administrator.APIM.modifyObject(pid,
                                                     m_newState,
                                                     null,

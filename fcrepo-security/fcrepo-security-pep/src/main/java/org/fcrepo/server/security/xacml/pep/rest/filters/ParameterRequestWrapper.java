@@ -27,9 +27,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.fcrepo.server.security.servletfilters.ExtendedHttpServletRequestWrapper;
 
 /**
@@ -40,9 +37,6 @@ import org.fcrepo.server.security.servletfilters.ExtendedHttpServletRequestWrapp
 
 public class ParameterRequestWrapper
         extends ExtendedHttpServletRequestWrapper {
-
-    private static final Logger logger =
-            LoggerFactory.getLogger(ParameterRequestWrapper.class);
 
     private Map<String, String[]> params = null;
 

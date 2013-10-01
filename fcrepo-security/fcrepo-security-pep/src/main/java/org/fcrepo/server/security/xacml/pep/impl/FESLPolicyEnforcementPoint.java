@@ -42,6 +42,7 @@ implements PolicyEnforcementPoint {
         return n++;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void enforce(String subjectId,
                         String action,

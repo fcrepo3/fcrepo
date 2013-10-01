@@ -4,29 +4,20 @@
  */
 package org.fcrepo.server.resourceIndex;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
-import java.util.TimeZone;
 
+import org.fcrepo.common.Constants;
+import org.fcrepo.server.storage.types.DigitalObject;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.jrdf.graph.Literal;
 import org.jrdf.graph.ObjectNode;
-
 import org.junit.Test;
-
 import org.trippi.TripleIterator;
-
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.storage.types.DigitalObject;
-
-
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Date precision tests.
@@ -36,8 +27,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class ResourceIndexDatePrecisionIntegrationTest
         extends ResourceIndexIntegrationTest {
-
-    private static TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     private final DateTimeFormatter _millisFormat;
 

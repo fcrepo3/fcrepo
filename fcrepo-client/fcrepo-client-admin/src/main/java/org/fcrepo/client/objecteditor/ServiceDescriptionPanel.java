@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -101,7 +102,7 @@ public class ServiceDescriptionPanel
         //
         // Methods
         //
-        java.util.List methodDefs = Util.getMethodDefinitions(sDefPID);
+        List<MethodDefinition> methodDefs = Util.getMethodDefinitions(sDefPID);
         String[] methodSelections = new String[methodDefs.size()];
         for (int i = 0; i < methodDefs.size(); i++) {
             MethodDefinition def = (MethodDefinition) methodDefs.get(i);
@@ -113,7 +114,8 @@ public class ServiceDescriptionPanel
             }
             methodSelections[i] = buf.toString();
         }
-        final JComboBox methodComboBox = new JComboBox(methodSelections);
+        final JComboBox<String> methodComboBox =
+                new JComboBox<String>(methodSelections);
         Administrator.constrainHeight(methodComboBox);
 
         //
@@ -149,11 +151,10 @@ public class ServiceDescriptionPanel
 
         private final CardLayout m_cardLayout;
 
-        public ParameterPanel(java.util.List methodDefs) {
+        public ParameterPanel(List<MethodDefinition> methodDefs) {
             m_cardLayout = new CardLayout();
             setLayout(m_cardLayout);
-            for (int i = 0; i < methodDefs.size(); i++) {
-                MethodDefinition def = (MethodDefinition) methodDefs.get(i);
+            for (MethodDefinition def: methodDefs) {
                 add(makePane(def), def.getName());
             }
         }

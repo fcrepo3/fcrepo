@@ -101,6 +101,7 @@ public class DefaultAuthorization
     private static final Logger logger =
             LoggerFactory.getLogger(DefaultAuthorization.class);
 
+    @SuppressWarnings("unused")
     private static final String REPOSITORY_POLICY_GUITOOL_DIRECTORY_KEY =
             "REPOSITORY-POLICY-GUITOOL-POLICIES-DIRECTORY";
 
@@ -964,6 +965,7 @@ public class DefaultAuthorization
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void enforceGetDissemination(Context context,
                                         String pid,

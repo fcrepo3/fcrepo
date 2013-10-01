@@ -14,6 +14,10 @@ import org.fcrepo.server.errors.ServerException;
 public abstract class AuthzException
         extends ServerException {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     public static final String BRIEF_DESC = "Used for authorization signaling";
 
     public AuthzException(String message) {

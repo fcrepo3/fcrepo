@@ -4,11 +4,8 @@
  */
 package org.fcrepo.server.access;
 
-import java.io.File;
 import java.io.IOException;
-
 import java.net.URLEncoder;
-
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -17,9 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.fcrepo.common.Constants;
-import org.fcrepo.server.Server;
-import org.fcrepo.server.errors.InitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,6 +85,7 @@ public class MethodParameterResolverServlet
         Hashtable<String,String> h_methodParms = new Hashtable<String,String>();
 
         // Get parameters passed from web form.
+        @SuppressWarnings("unchecked")
         Enumeration<String> parms = request.getParameterNames();
         while (parms.hasMoreElements()) {
             String name = parms.nextElement();

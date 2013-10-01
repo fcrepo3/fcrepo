@@ -19,9 +19,9 @@ public class SimpleSetInfo
 
     private final String m_spec;
 
-    private final Set m_descriptions;
+    private final Set<String> m_descriptions;
 
-    public SimpleSetInfo(String name, String spec, Set descriptions) {
+    public SimpleSetInfo(String name, String spec, Set<String> descriptions) {
         m_name = name;
         m_spec = spec;
         m_descriptions = descriptions;
@@ -35,7 +35,7 @@ public class SimpleSetInfo
         return m_spec;
     }
 
-    public Set getDescriptions() {
+    public Set<String> getDescriptions() {
         return m_descriptions;
     }
 

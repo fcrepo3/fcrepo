@@ -1,13 +1,11 @@
 package org.fcrepo.server.validation.ecm;
 
-import org.fcrepo.server.storage.types.RelationshipTuple;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
 import java.util.TimeZone;
+
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Created by IntelliJ IDEA.

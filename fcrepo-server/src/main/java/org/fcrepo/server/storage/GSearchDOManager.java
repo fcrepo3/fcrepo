@@ -84,7 +84,7 @@ public class GSearchDOManager
     /**
      * Delegates construction to the superclass.
      */
-    public GSearchDOManager(Map moduleParameters, Server server, String role)
+    public GSearchDOManager(Map<String, String> moduleParameters, Server server, String role)
             throws ModuleInitializationException {
         super(moduleParameters, server, role);
     }

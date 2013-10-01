@@ -4,19 +4,8 @@
  */
 package org.fcrepo.client;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 /**
  * Launch a dialog for selecting which object type(s) the user is interested in:
@@ -34,14 +23,6 @@ public class FTypeDialog
     private static final long serialVersionUID = 1L;
 
     private String selections;
-
-    private final JCheckBox dButton;
-
-    private final JCheckBox mButton;
-
-    private final JCheckBox cButton;
-
-    private final JCheckBox oButton;
 
     public FTypeDialog() {
         super(JOptionPane.getFrameForComponent(Administrator.getDesktop()),

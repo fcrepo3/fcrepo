@@ -19,9 +19,9 @@ public class SimpleRecord
 
     private final String m_metadata;
 
-    private final Set m_abouts;
+    private final Set<String> m_abouts;
 
-    public SimpleRecord(Header header, String metadata, Set abouts) {
+    public SimpleRecord(Header header, String metadata, Set<String> abouts) {
         m_header = header;
         m_metadata = metadata;
         m_abouts = abouts;
@@ -35,7 +35,7 @@ public class SimpleRecord
         return m_metadata;
     }
 
-    public Set getAbouts() {
+    public Set<String> getAbouts() {
         return m_abouts;
     }
 

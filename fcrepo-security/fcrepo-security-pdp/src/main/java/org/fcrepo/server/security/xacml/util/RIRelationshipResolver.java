@@ -209,7 +209,7 @@ public class RIRelationshipResolver
         } else if (queryLang.equals(SPO)) {
             // triple query
             // check lang supported
-            if (!verifyTripleLanguage(queryLang)) {
+            if (!(spoTriples || verifyTripleLanguage(queryLang))) {
                 logger.warn("RI query language " + queryLang + " is not supported");
                 return res;
             }
@@ -349,12 +349,14 @@ public class RIRelationshipResolver
             if (itqlTuples) {
                 lang = ITQL;
                 query = getTQLQuery(pidUri);
-            } else {
+            } else if (sparqlTuples){
                 lang = SPARQL;
                 query = getSPARQLQuery(pidUri);
+            } else {
+                throw new MelcoeXacmlException("RI supports no expected query languages for parent queries.");
             }
 
-            logger.debug(lang + " query: " + query);
+            logger.debug("{} query: {}", lang, query);
 
             TupleIterator tuples;
             try {
@@ -390,7 +392,7 @@ public class RIRelationshipResolver
             }
 
 
-        } else if (verifyTripleLanguage(SPO)) {
+        } else if (spoTriples || verifyTripleLanguage(SPO)) {
             // gets all relationships for pid, then filters results
             // rather than executing separate queries for each relationship
 

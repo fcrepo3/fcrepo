@@ -124,11 +124,11 @@ class BatchIngest
 
     private Vector<String> keys = null;
 
-    /* package */Hashtable getPidMaps() {
+    Hashtable<String, String> getPidMaps() {
         return pidMaps;
     }
 
-    /* package */Vector getKeys() {
+    Vector<String> getKeys() {
         return keys;
     }
 

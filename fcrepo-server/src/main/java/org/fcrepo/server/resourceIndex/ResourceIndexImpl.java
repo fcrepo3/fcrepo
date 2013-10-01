@@ -120,6 +120,7 @@ public class ResourceIndexImpl
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("deprecation")
     public void export(OutputStream out, RDFFormat format)
             throws ResourceIndexException {
         try {

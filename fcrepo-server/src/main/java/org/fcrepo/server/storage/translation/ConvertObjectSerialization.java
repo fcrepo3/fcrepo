@@ -5,8 +5,6 @@
 package org.fcrepo.server.storage.translation;
 
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -206,7 +204,9 @@ public class ConvertObjectSerialization {
         }
         File destDir = new File(args[1]);
 
+        @SuppressWarnings("unchecked")
         Class<DODeserializer> deserializer = (Class<DODeserializer>) Class.forName(args[2]);
+        @SuppressWarnings("unchecked")
         Class<DOSerializer> serializer = (Class<DOSerializer>) Class.forName(args[3]);
 
         // So DOTranslationUtility works...

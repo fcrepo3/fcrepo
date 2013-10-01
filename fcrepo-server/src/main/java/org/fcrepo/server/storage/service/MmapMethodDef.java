@@ -24,7 +24,7 @@ public class MmapMethodDef
 
     public MmapMethodParmDef[] wsdlMsgParts = new MmapMethodParmDef[0];
 
-    public Hashtable wsdlMsgPartToParmDefTbl;
+    public Hashtable<String, MmapMethodParmDef> wsdlMsgPartToParmDefTbl;
 
     public MmapMethodDef() {
     }

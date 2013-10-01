@@ -179,6 +179,7 @@ public class TestRESTAPI
     private static final String earlierDateTime =
             "2001-01-01T00:00:00.000Z";
 
+    @SuppressWarnings("unused")
     private boolean chunked = false;
     
     protected static FedoraClient initClient() throws Exception {
@@ -1978,13 +1979,6 @@ public class TestRESTAPI
         return result;
     }
 
-    private String _getPort(String url) {
-        if (url != null && url.startsWith("https")) {
-            return getServerConfiguration().getParameter("fedoraRedirectPort");
-        }
-        return getServerConfiguration().getParameter("fedoraServerPort");
-    }
-    
     protected static URI getURI(String url) {
         if (url == null || url.length() == 0) {
             throw new IllegalArgumentException("url must be a non-empty value");

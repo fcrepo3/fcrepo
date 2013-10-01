@@ -4,23 +4,18 @@
  */
 package org.fcrepo.server.access.dissemination;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URI;
-
 import java.sql.Timestamp;
-
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Iterator;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,7 +24,6 @@ import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.SpringServlet;
-import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.authorization.AuthzOperationalException;
 import org.fcrepo.server.errors.servletExceptionExtensions.RootException;
@@ -84,6 +78,7 @@ public class DatastreamResolverServlet
 
     private static final String HTML_CONTENT_TYPE = "text/html";
 
+    @SuppressWarnings("unused")
     private static String fedoraServerHost;
 
     private static String fedoraServerPort;
@@ -144,17 +139,12 @@ public class DatastreamResolverServlet
         String id = null;
         String dsPhysicalLocation = null;
         String dsControlGroupType = null;
-        String user = null;
-        String pass = null;
         MIMETypedStream mimeTypedStream = null;
         DisseminationService ds = null;
         Timestamp keyTimestamp = null;
         Timestamp currentTimestamp = null;
         PrintWriter out = null;
         ServletOutputStream outStream = null;
-        String requestURI =
-                request.getRequestURL().toString() + "?"
-                        + request.getQueryString();
 
         id = request.getParameter("id").replaceAll("T", " ");
         logger.debug("Datastream tempID={}", id);
@@ -192,8 +182,6 @@ public class DatastreamResolverServlet
             }
             dsPhysicalLocation = dm.dsLocation;
             dsControlGroupType = dm.dsControlGroupType;
-            user = dm.callUsername;
-            pass = dm.callPassword;
             if (logger.isDebugEnabled()) {
                 logger.debug("**************************** DatastreamResolverServlet dm.dsLocation: {}", dm.dsLocation);
                 logger.debug("**************************** DatastreamResolverServlet dm.dsControlGroupType: {}", dm.dsControlGroupType);

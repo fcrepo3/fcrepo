@@ -24,7 +24,7 @@ public class PurgeObject
 
     private static final long serialVersionUID = 1L;
 
-    private Set m_pids;
+    private Set<String> m_pids;
 
     private boolean m_prompt;
 
@@ -37,19 +37,19 @@ public class PurgeObject
 
     public PurgeObject(ObjectEditorFrame parent, String pid) {
         super("Purge Object");
-        m_pids = new HashSet();
+        m_pids = new HashSet<String>();
         m_pids.add(pid);
         m_parent = parent;
     }
 
-    public PurgeObject(Set pids) {
+    public PurgeObject(Set<String> pids) {
         super("Purge Objects");
         m_pids = pids;
     }
 
     public PurgeObject(String pid) {
         super("Purge Object");
-        m_pids = new HashSet();
+        m_pids = new HashSet<String>();
         m_pids.add(pid);
     }
 
@@ -60,7 +60,7 @@ public class PurgeObject
             if (pid == null) {
                 return;
             }
-            m_pids = new HashSet();
+            m_pids = new HashSet<String>();
             m_pids.add(pid);
         }
         AutoPurger purger = null;
@@ -76,9 +76,9 @@ public class PurgeObject
                                      e);
         }
         if (purger != null) {
-            Iterator pidIter = m_pids.iterator();
+            Iterator<String> pidIter = m_pids.iterator();
             if (m_pids.size() == 1) {
-                String pid = (String) pidIter.next();
+                String pid = pidIter.next();
                 // just purge one
                 String reason =
                         JOptionPane
@@ -110,7 +110,7 @@ public class PurgeObject
                 if (reason != null) {
                     while (pidIter.hasNext()) {
                         try {
-                            String pid = (String) pidIter.next();
+                            String pid = pidIter.next();
                             purger.purge(pid, reason);
                         } catch (Exception e) {
                             Administrator

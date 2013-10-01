@@ -1016,7 +1016,7 @@
       <plugin>
         <groupId>com.github.github</groupId>
         <artifactId>site-maven-plugin</artifactId>
-        <version>0.7</version>
+        <version>0.8</version>
         <configuration>
           <message>Creating site for ${project.artifactId}, ${project.version}</message>
           <!-- this does the trick to place every module in the correct subfolder -->
@@ -1027,7 +1027,8 @@
           <execution>
             <id>github</id>
             <goals>
-              <goal>site</goal>
+              <goal>ignore</goal>
+              <!-- <goal>site</goal>  -->
             </goals>
             <phase>site-deploy</phase>
           </execution>

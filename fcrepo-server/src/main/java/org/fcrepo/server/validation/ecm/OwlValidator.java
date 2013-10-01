@@ -445,6 +445,7 @@ public class OwlValidator {
         }
 
 
+        @SuppressWarnings("unused")
         public void setProcessInherited(boolean processInherited) {
             this.processInherited = processInherited;
         }

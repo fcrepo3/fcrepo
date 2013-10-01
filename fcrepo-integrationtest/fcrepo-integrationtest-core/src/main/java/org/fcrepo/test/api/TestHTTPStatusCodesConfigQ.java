@@ -4,15 +4,13 @@
  */
 package org.fcrepo.test.api;
 
+import static org.fcrepo.test.api.TestHTTPStatusCodes.RI_SEARCH_PATH;
+import static org.fcrepo.test.api.TestHTTPStatusCodes.checkError;
+import junit.framework.JUnit4TestAdapter;
+
 import org.fcrepo.test.FedoraServerTestCase;
 import org.junit.AfterClass;
 import org.junit.Test;
-
-import junit.framework.JUnit4TestAdapter;
-import junit.framework.TestSuite;
-
-import static org.fcrepo.test.api.TestHTTPStatusCodes.RI_SEARCH_PATH;
-import static org.fcrepo.test.api.TestHTTPStatusCodes.checkError;
 
 
 /**

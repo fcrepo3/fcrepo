@@ -89,7 +89,7 @@ public class AutoBatchIngest
                 context = args[8];
             }
             if (!errors) {
-                AutoBatchIngest autoBatch =
+                // test constructor
                         new AutoBatchIngest(args[0],
                                             args[1],
                                             args[2],

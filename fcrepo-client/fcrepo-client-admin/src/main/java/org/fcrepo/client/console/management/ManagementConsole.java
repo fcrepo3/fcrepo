@@ -115,7 +115,8 @@ public class ManagementConsole
             System.exit(0);
         }
 
-        JComboBox commandComboBox = new JComboBox(commands);
+        JComboBox<ConsoleCommand> commandComboBox =
+                new JComboBox<ConsoleCommand>(commands);
         commandComboBox.setSelectedIndex(0);
         commandPanel.add(commandComboBox);
         JButton sendButton = new JButton(" Send.. ");

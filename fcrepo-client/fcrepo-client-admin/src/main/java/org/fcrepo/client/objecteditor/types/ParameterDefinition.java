@@ -19,7 +19,7 @@ public class ParameterDefinition {
 
     private final String m_defaultValue;
 
-    private final List m_validValues;
+    private final List<String> m_validValues;
 
     /**
      * Initialize a parameter definition with all values. The label,
@@ -29,7 +29,7 @@ public class ParameterDefinition {
                                String label,
                                boolean isRequired,
                                String defaultValue,
-                               List validValues) {
+                               List<String> validValues) {
         m_name = name;
         m_label = label;
         m_isRequired = isRequired;
@@ -53,7 +53,7 @@ public class ParameterDefinition {
         return m_defaultValue;
     }
 
-    public List validValues() {
+    public List<String> validValues() {
         return m_validValues;
     }
 }

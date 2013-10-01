@@ -6,10 +6,8 @@ package org.fcrepo.server.security;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.ReadOnlyContext;

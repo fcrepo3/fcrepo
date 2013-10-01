@@ -47,7 +47,7 @@ public class BasicPIDGenerator
      *         If initilization values are invalid or initialization fails for
      *         some other reason.
      */
-    public BasicPIDGenerator(Map moduleParameters, Server server, String role)
+    public BasicPIDGenerator(Map<String, String> moduleParameters, Server server, String role)
             throws ModuleInitializationException {
         super(moduleParameters, server, role);
     }

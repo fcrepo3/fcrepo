@@ -4,31 +4,23 @@
  */
 package org.fcrepo.test.api;
 
-import static junit.framework.Assert.assertEquals;
-
-import java.net.URI;
-import java.util.concurrent.TimeUnit;
-
-import junit.framework.JUnit4TestAdapter;
-
-import org.apache.http.entity.StringEntity;
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.common.PID;
-
-import org.fcrepo.server.management.FedoraAPIMMTOM;
-
-import org.fcrepo.test.FedoraServerTestCase;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.JUnitCore;
-
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+
+import java.net.URI;
+
+import junit.framework.JUnit4TestAdapter;
+
+import org.apache.http.entity.StringEntity;
+import org.fcrepo.common.PID;
+import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.test.FedoraServerTestCase;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
 
 /**
  * Tests of the REST API based on the config Q settings.

@@ -18,7 +18,6 @@ import org.fcrepo.server.security.PolicyEnforcementPoint;
 
 public class FESLAuthorization implements Authorization {
     private static final Logger logger = LoggerFactory.getLogger(FESLAuthorization.class);
-    private static final URI BLANK = URI.create("");
     
     private PolicyEnforcementPoint m_pep;
     public FESLAuthorization(PolicyEnforcementPoint pep) {

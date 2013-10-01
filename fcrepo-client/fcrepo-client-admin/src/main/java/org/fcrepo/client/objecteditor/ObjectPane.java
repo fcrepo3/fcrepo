@@ -45,7 +45,7 @@ public class ObjectPane
 
     private String m_ownerId;
 
-    private final JComboBox m_stateComboBox;
+    private final JComboBox<String> m_stateComboBox;
 
     private final JTextField m_labelTextField;
 
@@ -99,7 +99,7 @@ public class ObjectPane
 
         // RIGHT: Values
         String[] comboBoxStrings = {"Active", "Inactive", "Deleted"};
-        m_stateComboBox = new JComboBox(comboBoxStrings);
+        m_stateComboBox = new JComboBox<String>(comboBoxStrings);
         Administrator.constrainHeight(m_stateComboBox);
         if (state.equals("A")) {
             m_stateComboBox.setSelectedIndex(0);

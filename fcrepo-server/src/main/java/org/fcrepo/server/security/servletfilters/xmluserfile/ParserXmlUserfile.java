@@ -43,7 +43,7 @@ public class ParserXmlUserfile
 
     private Boolean authenticated = null;
 
-    private Map<String, Set<String>> namedAttributes = null;
+    private Map<String, Set<?>> namedAttributes = null;
 
     private String attributeName = null;
 
@@ -53,7 +53,7 @@ public class ParserXmlUserfile
         return authenticated;
     }
 
-    public final Map<String, Set<String>> getNamedAttributes() {
+    public final Map<String, Set<?>> getNamedAttributes() {
         return namedAttributes;
     }
 
@@ -144,7 +144,7 @@ public class ParserXmlUserfile
         try {
             value = new StringBuffer();
             authenticated = null;
-            namedAttributes = new Hashtable<String, Set<String>>();
+            namedAttributes = new Hashtable<String, Set<?>>();
             foundUser = false;
             XmlTransformUtility.parseWithoutValidating(m_xmlStream, this);
         } catch (FinishedParsingException fpe) {

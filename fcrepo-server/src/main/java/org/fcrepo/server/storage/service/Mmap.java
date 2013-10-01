@@ -15,6 +15,6 @@ public class Mmap {
 
     public MmapMethodDef[] mmapMethods = new MmapMethodDef[0];
 
-    public Hashtable wsdlOperationToMethodDef;
+    public Hashtable<String, MmapMethodDef> wsdlOperationToMethodDef;
 
 }

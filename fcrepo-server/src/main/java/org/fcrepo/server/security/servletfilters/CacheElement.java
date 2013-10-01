@@ -5,7 +5,7 @@
 package org.fcrepo.server.security.servletfilters;
 
 import java.util.Calendar;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +36,8 @@ public class CacheElement {
     private boolean m_valid = false;
     private Calendar m_expiration = null;
     private Boolean m_authenticated = null;
-    private Map m_namedValues = null;
+    // a map of String to Set<String>
+    private Map<String, Set<?>> m_namedValues = null;
     private String m_errorMessage = null;
 
     static {
@@ -77,8 +78,8 @@ public class CacheElement {
      *        For now, callers can avoid a warning by giving it as null.
      */
     public final void populate(Boolean authenticated,
-                               Set predicates,
-                               Map namedValues,
+                               Set<?> predicates,
+                               Map<String, Set<?>> map,
                                String errorMessage) {
         String m = m_cacheabbrev + " populate() ";
         logger.debug(m + ">");
@@ -91,7 +92,7 @@ public class CacheElement {
                 logger.error(m + "errorMessage==" + errorMessage);
                 throw new Exception(errorMessage);
             } else {
-                validate(authenticated, namedValues);
+                validate(authenticated, map);
                 // can't set expiration here -- don't have cache reference
                 // can't set pwd here, don't have it
             }
@@ -181,7 +182,7 @@ public class CacheElement {
         return rc;
     }
 
-    public final synchronized Map getNamedValues(Cache cache, String pwd) {
+    public final synchronized Map<String, Set<?>> getNamedValues(Cache cache, String pwd) {
         // Original Comment:
         // Synchronized so evaluation of cache item state will be sequential,
         // non-interlaced.  This protects against overlapping calls resulting in
@@ -189,7 +190,7 @@ public class CacheElement {
         // TODO: refactor method name so that it doesn't look like "getter"
         String m = m_cacheabbrev + " namedValues ";
         logger.debug(m + ">");
-        Map rc = null;
+        Map<String, Set<?>> rc = null;
         try {
             logger.debug(m + "valid==" + m_valid);
             if (m_valid && !CacheElement.isExpired(m_expiration)) {
@@ -207,16 +208,10 @@ public class CacheElement {
                     logger.debug(m + "couldn't complete population");
                 } else {
                     logger.debug(m + "populate completed");
-                    if (m_namedValues == null) {
-                        duration = cache.getAuthFailureTimeoutDuration();
-                        unit = cache.getAuthFailureTimeoutUnit();
-                        logger.debug(m + "populate failed");
-                    } else {
-                        m_password = pwd;
-                        duration = cache.getAuthSuccessTimeoutDuration();
-                        unit = cache.getAuthSuccessTimeoutUnit();
-                        logger.debug(m + "populate succeeded");
-                    }
+                    m_password = pwd;
+                    duration = cache.getAuthSuccessTimeoutDuration();
+                    unit = cache.getAuthSuccessTimeoutUnit();
+                    logger.debug(m + "populate succeeded");
                 }
                 m_expiration = CacheElement.calcExpiration(duration, unit);
             }
@@ -228,7 +223,7 @@ public class CacheElement {
             audit();
             rc = m_namedValues;
             if (rc == null) {
-                rc = new Hashtable();
+                rc = new HashMap<String, Set<?>>();
             }
             logger.debug(m + "< " + rc);
         }
@@ -323,10 +318,10 @@ public class CacheElement {
         }
     }
 
-    private void validate(Boolean authenticated, Map namedValues) {
+    private void validate(Boolean authenticated, Map<String, Set<?>> map) {
         assertInvalid();
         m_authenticated = authenticated;
-        m_namedValues = namedValues;
+        m_namedValues = map;
         m_errorMessage = null;
         m_valid = true;
     }
@@ -335,10 +330,10 @@ public class CacheElement {
     // Private Class Methods
     ///////////////////////////////////////////////////////////////////////////
 
-    private static final void auditNamedValues(String m, Map namedValues) {
+    private static final void auditNamedValues(String m, Map<String, ?> namedValues) {
         if (logger.isDebugEnabled()) {
             assert namedValues != null;
-            for (Iterator outer = namedValues.keySet().iterator(); outer
+            for (Iterator<String> outer = namedValues.keySet().iterator(); outer
                     .hasNext();) {
                 Object name = outer.next();
                 assert name instanceof String : "not a string, name==" + name;
@@ -349,18 +344,14 @@ public class CacheElement {
                 if (temp instanceof String) {
                     sb.append(temp.toString());
                 } else if (temp instanceof Set) {
-                    Set values = (Set) temp;
+                    @SuppressWarnings("unchecked")
+                    Set<String> values = (Set<String>) temp;
                     sb.append("(" + values.size() + ") {");
                     String punct = "";
-                    for (Iterator it = values.iterator(); it.hasNext();) {
-                        temp = it.next();
-                        if (!(temp instanceof String)) {
-                            logger.error(m + "set member not string, ==" + temp);
-                        } else {
-                            String value = (String) temp;
-                            sb.append(punct + value);
-                            punct = ",";
-                        }
+                    for (Iterator<String> it = values.iterator(); it.hasNext();) {
+                        String value = it.next();
+                        sb.append(punct + value);
+                        punct = ",";
                     }
                     sb.append("}");
                 }

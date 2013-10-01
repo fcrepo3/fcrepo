@@ -4,9 +4,6 @@
  */
 package org.fcrepo.server.storage.translation;
 
-import static org.fcrepo.common.Models.FEDORA_OBJECT_3_0;
-import static org.fcrepo.server.storage.translation.DOTranslationUtility.DESERIALIZE_INSTANCE;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -17,25 +14,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import org.junit.Test;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.FedoraTestConstants;
 import org.fcrepo.common.Models;
-import org.fcrepo.server.storage.translation.AtomDODeserializer;
-import org.fcrepo.server.storage.translation.AtomDOSerializer;
-import org.fcrepo.server.storage.translation.DODeserializer;
-import org.fcrepo.server.storage.translation.DOSerializer;
-import org.fcrepo.server.storage.translation.DOTranslationUtility;
-import org.fcrepo.server.storage.translation.FOXML1_1DOSerializer;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
+import org.junit.Test;
 
 
 /**

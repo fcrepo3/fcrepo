@@ -67,7 +67,7 @@ public class TestPidfileIterator {
             assertEquals("third line", THIRD_PID, iterator.next());
             assertFalse("no fourth line", iterator.hasNext());
         } finally {
-            if (dummyFile != null || dummyFile.exists()) {
+            if (dummyFile != null && dummyFile.exists()) {
                 dummyFile.delete();
             }
         }

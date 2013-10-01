@@ -6,7 +6,6 @@ package org.fcrepo.server.storage.translation;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -19,8 +18,6 @@ import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.errors.UnsupportedTranslationException;
 import org.fcrepo.server.storage.types.DigitalObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -40,9 +37,6 @@ import org.slf4j.LoggerFactory;
 public class DOTranslatorModule
         extends Module
         implements DOTranslator {
-
-    private static final Logger logger =
-            LoggerFactory.getLogger(DOTranslatorModule.class);
 
     /** Prefix for deserializer parameter names. */
     private static final String DESER_PARAM_PREFIX = "deserializer_";

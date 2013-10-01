@@ -7,7 +7,6 @@ package org.fcrepo.utilities;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
-
 import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -16,7 +15,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
@@ -29,11 +27,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import org.fcrepo.utilities.DateUtility;
 
 
 

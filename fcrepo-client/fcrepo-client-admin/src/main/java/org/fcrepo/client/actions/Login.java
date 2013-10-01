@@ -28,7 +28,7 @@ public class Login
 
     public void actionPerformed(ActionEvent ae) {
         try {
-            LoginDialog ld = new LoginDialog();
+            new LoginDialog();
         } catch (Exception e) {
             Administrator.showErrorDialog(Administrator.getDesktop(),
                                           "Login Error",

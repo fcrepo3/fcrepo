@@ -31,7 +31,7 @@ public class ExportObject
 
     private static final long serialVersionUID = 1L;
 
-    private Set m_pids;
+    private Set<String> m_pids;
 
     private boolean m_prompt;
 
@@ -42,11 +42,11 @@ public class ExportObject
 
     public ExportObject(String pid) {
         super("Export...");
-        m_pids = new HashSet();
+        m_pids = new HashSet<String>();
         m_pids.add(pid);
     }
 
-    public ExportObject(Set pids) {
+    public ExportObject(Set<String> pids) {
         super("Export Objects...");
         m_pids = pids;
     }
@@ -68,13 +68,13 @@ public class ExportObject
                 if (pid == null) {
                     return;
                 }
-                m_pids = new HashSet();
+                m_pids = new HashSet<String>();
                 m_pids.add(pid);
             }
-            Iterator pidIter = m_pids.iterator();
+            Iterator<String> pidIter = m_pids.iterator();
             if (m_pids.size() == 1) {
                 // If there's only one pid, get export filename
-                String pid = (String) pidIter.next();
+                String pid = pidIter.next();
                 try {
                     FileDialog dlg =
                             new FileDialog(Administrator.INSTANCE,

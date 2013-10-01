@@ -11,9 +11,9 @@ import java.util.Map.Entry;
 import org.jrdf.graph.Triple;
 
 import org.trippi.Alias;
+import org.trippi.AliasManager;
 import org.trippi.TripleIterator;
 import org.trippi.TrippiException;
-import org.trippi.impl.base.AliasManager;
 
 public class FilteredTripleIterator
         extends TripleIterator {

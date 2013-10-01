@@ -34,12 +34,6 @@ public class SubjectUtils {
     private static final Logger logger =
             LoggerFactory.getLogger(SubjectUtils.class);
 
-    private static final String CLASS_OBJECT = "java.util.HashMap";
-
-    private static final String KEY_OBJECT = "java.lang.String";
-
-    private static final String VALUE_OBJECT = "java.util.HashSet";
-
     /**
      * Get the attribute map of String keys to Set<String> values
      * This method will not return a null
@@ -55,9 +49,9 @@ public class SubjectUtils {
             return new HashMap<String, Set<String>>();
         }
 
+        @SuppressWarnings("rawtypes")
         Iterator<HashMap> credentialObjects = subject.getPublicCredentials(HashMap.class).iterator();
         while (attributes == null && credentialObjects.hasNext()) {
-            Map<String, Set<String>> tmp = null;
             HashMap<?,?> credentialObject = credentialObjects.next();
 
             if (logger.isDebugEnabled()) {

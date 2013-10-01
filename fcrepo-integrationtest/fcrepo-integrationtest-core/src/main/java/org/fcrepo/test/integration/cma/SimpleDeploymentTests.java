@@ -40,6 +40,7 @@ public class SimpleDeploymentTests {
     private static final String SIMPLE_DEPLOYMENT_BASE =
             "cma-examples/simple-deployment";
 
+    @SuppressWarnings("unused")
     private static final String SIMPLE_DEPLOYMENT_PUBLIC_OBJECTS =
             "cma-examples/simple-deployment/public-objects";
 

@@ -126,12 +126,14 @@ public class METSFedoraExtDODeserializer
 
     private String m_dsInfoType;
 
+    @SuppressWarnings("unused")
     private String m_dsOtherInfoType;
 
     private String m_dsLabel;
 
     private int m_dsMDClass;
 
+    @SuppressWarnings("unused")
     private long m_dsSize;
 
     private String m_dsLocation;
@@ -845,7 +847,8 @@ public class METSFedoraExtDODeserializer
                             .convertStringToDate(grab(a, METS.uri, "CREATED"));
             dissem.dissLabel = grab(a, METS.uri, "LABEL");
         } else if (localName.equals("interfaceMD")) {
-            Disseminator dissem = m_dissems.get(m_structId);
+            // no-op?
+            // Disseminator dissem = m_dissems.get(m_structId);
         } else if (localName.equals("serviceBindMD")) {
             Disseminator dissem = m_dissems.get(m_structId);
             dissem.sDepID = grab(a, m_xlink.uri, "href");

@@ -156,15 +156,15 @@ public abstract class AbstractPolicyEnforcementPoint
         return resources;
     }
 
-    protected static final boolean denyBiasedAuthz(Set set) {
+    protected static final boolean denyBiasedAuthz(Set<Result> set) {
         int nPermits = 0; //explicit permit returned
         int nDenies = 0; //explicit deny returned
         int nNotApplicables = 0; //no targets matched
         int nIndeterminates = 0; //for targets matched, no rules matched
         int nWrongs = 0; //none of the above, i.e., unreported failure, should not happen
-        Iterator it = set.iterator();
+        Iterator<Result> it = set.iterator();
         while (it.hasNext()) {
-            Result result = (Result) it.next();
+            Result result = it.next();
             int decision = result.getDecision();
             switch (decision) {
                 case Result.DECISION_PERMIT:

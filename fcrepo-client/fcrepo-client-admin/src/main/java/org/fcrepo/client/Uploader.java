@@ -12,8 +12,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.util.HashMap;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.utilities.StreamUtility;
 
@@ -85,7 +83,7 @@ public class Uploader {
     /**
      * Send a file to the server, getting back the identifier.
      */
-    public String upload(File file) throws IOException {
+    public String upload(final File file) throws IOException {
         if (Administrator.INSTANCE == null) {
             return fc.uploadFile(file);
         } else {
@@ -102,16 +100,11 @@ public class Uploader {
                                                     (int) d.getHeight() - 1);
 
             // then start the thread, passing parms in
-            HashMap<String, Object> PARMS = new HashMap<String, Object>();
-            PARMS.put("fc", fc);
-            PARMS.put("file", file);
-            SwingWorker worker = new SwingWorker(PARMS) {
+            SwingWorker<String> worker = new SwingWorker<String>() {
 
                 @Override
-                public Object construct() {
+                public String construct() {
                     try {
-                        FedoraClient fc = (FedoraClient) parms.get("fc");
-                        File file = (File) parms.get("file");
                         return fc.uploadFile(file);
                     } catch (IOException e) {
                         thrownException = e;

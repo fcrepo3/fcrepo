@@ -29,6 +29,6 @@ public interface SetInfo {
     /**
      * Get the descriptions of the set.
      */
-    public abstract Set getDescriptions();
+    public abstract Set<String> getDescriptions();
 
 }

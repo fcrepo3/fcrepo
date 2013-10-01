@@ -32,7 +32,7 @@ public class FieldSearchSQLModule
 
     private FieldSearchSQLImpl m_wrappedFieldSearch;
 
-    public FieldSearchSQLModule(Map params, Server server, String role)
+    public FieldSearchSQLModule(Map<String, String> params, Server server, String role)
             throws ModuleInitializationException {
         super(params, server, role);
     }

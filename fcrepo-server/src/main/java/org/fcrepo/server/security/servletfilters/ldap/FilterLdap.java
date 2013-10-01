@@ -590,7 +590,8 @@ public class FilterLdap
         return rc;
     }
 
-    private void getAttributes(Attributes attributes, Map<String, Set<Object>> map) throws Throwable {
+    @SuppressWarnings("unchecked")
+    private void getAttributes(Attributes attributes, Map<String, Set<?>> map) throws Throwable {
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " getAttributes() ";
@@ -611,7 +612,7 @@ public class FilterLdap
                 Set<Object> values;
                 if (map.containsKey(key)) {
                     logger.debug("{}already a value-set for attribute=={}", m, key);
-                    values = map.get(key);
+                    values = (Set<Object>) map.get(key);
                 } else {
                     logger.debug("{}making+storing a value-set for attribute=={}", m, key);
                     values = new HashSet<Object>();
@@ -633,7 +634,7 @@ public class FilterLdap
     private Boolean processNamingEnumeration(NamingEnumeration<SearchResult> ne,
                                              String password,
                                              Boolean authenticated,
-                                             Map<String, Set<Object>> map) {
+                                             Map<String, Set<?>> map) {
         String m =
                 FilterSetup.getFilterNameAbbrev(FILTER_NAME)
                         + " processNamingEnumeration() ";
@@ -713,8 +714,8 @@ public class FilterLdap
                         + " populateCacheElement() ";
         logger.debug("{}>", m);
         Boolean authenticated = null;
-        Map<String, Set<Object>> map =
-                new Hashtable<String, Set<Object>>();
+        Map<String, Set<?>> map =
+                new Hashtable<String, Set<?>>();
         try {
             logger.debug("{}about to call getNamingEnumeration()", m);
 

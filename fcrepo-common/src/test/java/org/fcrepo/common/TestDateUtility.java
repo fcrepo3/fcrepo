@@ -7,19 +7,11 @@ package org.fcrepo.common;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.text.DateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 import junit.framework.JUnit4TestAdapter;
 
 import org.fcrepo.utilities.DateUtility;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Test;
 
 /**

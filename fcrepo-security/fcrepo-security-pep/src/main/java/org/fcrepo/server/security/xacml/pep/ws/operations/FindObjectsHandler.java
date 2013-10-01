@@ -18,7 +18,6 @@
 
 package org.fcrepo.server.security.xacml.pep.ws.operations;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import javax.xml.ws.handler.soap.SOAPMessageContext;
@@ -66,9 +65,6 @@ public class FindObjectsHandler
             oMap = getSOAPRequestObjects(context);
             org.fcrepo.server.types.gen.ArrayOfString resultFields =
                 (org.fcrepo.server.types.gen.ArrayOfString) callGetter("getResultFields",oMap);
-            BigInteger maxResults = (BigInteger) callGetter("getMaxResults",oMap);
-            org.fcrepo.server.types.gen.FieldSearchQuery fieldSearchQuery =
-                (org.fcrepo.server.types.gen.FieldSearchQuery) callGetter("getQuery",oMap);
 
             List<String> resultFieldsList =
                     resultFields.getItem();

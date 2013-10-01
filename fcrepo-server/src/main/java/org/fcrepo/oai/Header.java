@@ -33,7 +33,7 @@ public interface Header {
      * Get a (possibly empty) Set of Strings indicating the repository 'set'
      * membership of the item, for the purpose of selective harvesting.
      */
-    public abstract Set getSetSpecs();
+    public abstract Set<String> getSetSpecs();
 
     /**
      * Tells whether the record is currently available. This should only return

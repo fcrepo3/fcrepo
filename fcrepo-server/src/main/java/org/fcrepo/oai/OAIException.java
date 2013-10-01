@@ -12,6 +12,11 @@ package org.fcrepo.oai;
 public abstract class OAIException
         extends Exception {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    
     private final String m_code;
 
     protected OAIException(String code, String message) {

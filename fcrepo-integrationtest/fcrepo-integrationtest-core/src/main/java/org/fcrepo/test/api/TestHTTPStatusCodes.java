@@ -14,7 +14,6 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.concurrent.TimeUnit;
 
 import junit.framework.JUnit4TestAdapter;
 
@@ -23,7 +22,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
-
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.common.http.HttpInputStream;
 import org.fcrepo.test.FedoraServerTestCase;

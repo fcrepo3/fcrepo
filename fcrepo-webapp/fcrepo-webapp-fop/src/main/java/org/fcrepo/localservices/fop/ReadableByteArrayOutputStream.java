@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 
 
 public class ReadableByteArrayOutputStream extends ByteArrayOutputStream {

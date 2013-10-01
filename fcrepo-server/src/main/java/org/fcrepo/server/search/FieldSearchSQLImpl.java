@@ -394,18 +394,4 @@ public class FieldSearchSQLImpl
         return out.toString();
     }
 
-    // same as above, but for case sensitive repeating values
-    private static String getDbValueCaseSensitive(List<String> dcItem) {
-        if (dcItem.size() == 0) {
-            return null;
-        }
-        StringBuffer out = new StringBuffer();
-        for (int i = 0; i < dcItem.size(); i++) {
-            String val = dcItem.get(i);
-            out.append(" ");
-            out.append(val);
-        }
-        out.append(" .");
-        return out.toString();
-    }
 }

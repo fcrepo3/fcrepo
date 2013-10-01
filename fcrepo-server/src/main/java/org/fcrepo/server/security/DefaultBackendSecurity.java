@@ -51,7 +51,7 @@ public class DefaultBackendSecurity
      *         If initialization values are invalid or initialization fails for
      *         some other reason.
      */
-    public DefaultBackendSecurity(Map moduleParameters,
+    public DefaultBackendSecurity(Map<String, String> moduleParameters,
                                   Server server,
                                   String role)
             throws ModuleInitializationException {
@@ -72,7 +72,6 @@ public class DefaultBackendSecurity
     public void postInitModule() throws ModuleInitializationException {
 
         try {
-            Server s_server = getServer();
             logger.debug("DefaultBackendSecurity initialized");
             String fedoraHome = Constants.FEDORA_HOME;
             if (fedoraHome == null) {
@@ -114,8 +113,8 @@ public class DefaultBackendSecurity
             // initialize static BackendSecuritySpec instance
             setBackendSecuritySpec();
             if (logger.isDebugEnabled()) {
-                Set roleList = beSS.listRoleKeys();
-                Iterator iter = roleList.iterator();
+                Set<String> roleList = beSS.listRoleKeys();
+                Iterator<String> iter = roleList.iterator();
                 while (iter.hasNext()) {
                     logger.debug("beSecurity ROLE: " + iter.next());
                 }

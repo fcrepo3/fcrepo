@@ -4,7 +4,6 @@
  */
 package org.fcrepo.server.config;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -73,7 +72,7 @@ public class ServerConfiguration
      * trailing spaces from the property values before applying them.
      */
     public void applyProperties(Properties props) {
-        Iterator iter = props.keySet().iterator();
+        Iterator<?> iter = props.keySet().iterator();
         while (iter.hasNext()) {
             String fullName = (String) iter.next();
             String value = props.getProperty(fullName).trim();
