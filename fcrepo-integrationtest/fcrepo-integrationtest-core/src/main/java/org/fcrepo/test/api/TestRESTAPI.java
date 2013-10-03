@@ -34,7 +34,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,6 +54,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -1705,6 +1708,30 @@ public class TestRESTAPI
     }
 
     @Test
+    public void testDatastreamDisseminationHEAD()
+            throws Exception {
+
+        // filename from RELS-INT, no lookup of extension; no download
+        URI url = getURI("/objects/demo:REST/datastreams/DS2/content");
+        HttpGet get = new HttpGet(url);
+        HttpResponse response = getOrDelete(get, getAuthAccess(), false);
+        EntityUtils.consumeQuietly(response.getEntity());
+        assertEquals(SC_OK, response.getStatusLine().getStatusCode());
+        checkSingleHeader(HttpHeaders.CONTENT_LENGTH, response, Long.toString(47));
+        checkSingleHeader(HttpHeaders.CONTENT_TYPE, response, "image/jpeg");
+        // jpg should be from MIMETYPE mapping
+        CheckCDHeader(response, "inline", TestRESTAPI.DS2LabelFilename+ ".jpg");
+        Header[] expectedHeaders = response.getAllHeaders();
+        // again as HEAD
+        HttpHead head = new HttpHead(url);
+        response = getOrDelete(head, getAuthAccess(), false);
+        EntityUtils.consumeQuietly(response.getEntity());
+        assertEquals(SC_OK, response.getStatusLine().getStatusCode());
+        Header[] actualHeaders = response.getAllHeaders();
+        assertHeadersEquals(expectedHeaders, actualHeaders);
+    }
+
+    @Test
     public void testUpload() throws Exception {
         String uploadUrl = "/upload";
         String url = getBaseURL() + uploadUrl;
@@ -1948,15 +1975,16 @@ public class TestRESTAPI
     private void CheckCDHeader(HttpResponse response,
                                String expectedType,
                                String expectedFilename) {
-        String contentDisposition = "";
-        Header[] headers = response.getAllHeaders();
-        for (Header header : headers) {
-            if (header.getName().equalsIgnoreCase("content-disposition")) {
-                contentDisposition = header.getValue();
-            }
-        }
-        assertEquals(expectedType + "; " + "filename=\"" + expectedFilename
-                + "\"", contentDisposition);
+        String headerName = "Content-Disposition";
+        String expected = 
+                expectedType + "; filename=\"" + expectedFilename + "\"";
+        checkSingleHeader(headerName, response, expected);
+    }
+    
+    private void checkSingleHeader(String headerName, HttpResponse response, String expected) {
+        String actual = (response.containsHeader(headerName)) ?
+                response.getFirstHeader(headerName).getValue() : null;
+                assertEquals(expected, actual);
     }
 
     // helper methods
@@ -2100,8 +2128,8 @@ public class TestRESTAPI
 
         LOGGER.debug(method.getURI().toString());
 
-        if (!(method instanceof HttpGet || method instanceof HttpDelete)) {
-            throw new IllegalArgumentException("method must be one of GET or DELETE.");
+        if (!(method instanceof HttpGet || method instanceof HttpDelete || method instanceof HttpHead)) {
+            throw new IllegalArgumentException("method must be one of GET, HEAD or DELETE.");
         }
         HttpResponse response = client.execute(method);
 
@@ -2177,6 +2205,43 @@ public class TestRESTAPI
         assertTrue("Testing if relationship present: " + exists + " [ " + s
                            + ", " + p + ", " + o + " ] \n " + sb.toString(),
                    exists == found);
+    }
+    
+    private static void assertHeadersEquals(Header[] expectedHeaders, 
+            Header[] actualHeaders) {
+        Map<String, String> expected = mapHeaders(expectedHeaders);
+        Map<String, String> actual = mapHeaders(actualHeaders);
+        expected.remove(HttpHeaders.DATE);
+        actual.remove(HttpHeaders.DATE);
+        assertEquals("Response header names were different", join(expected.keySet()), join(actual.keySet()));
+        for(Map.Entry<String, String> entry: expected.entrySet()) {
+            assertEquals(entry.getValue(), actual.get(entry.getKey()));
+        }
+    }
+    
+    private static String join(Set<String> strings) {
+        TreeSet<String> sorted = new TreeSet<String>(strings);
+        StringBuilder out = new StringBuilder();
+        for (String string: sorted) {
+            out.append(string).append(", ");
+        }
+        int len = out.length();
+        out.deleteCharAt(len - 2);
+        out.deleteCharAt(len - 1);
+        return out.toString();
+    }
+    
+    private static Map<String, String> mapHeaders(Header[] headers) {
+        Map<String, String> result = new HashMap<String, String>(headers.length);
+        for (Header header:headers) {
+            String key = header.getName();
+            if (result.containsKey(key)) {
+                result.put(key, result.get(key) + ", " + header.getValue());
+            } else {
+                result.put(key, header.getValue());
+            }
+        }
+        return result;
     }
 
     // Supports legacy test runners

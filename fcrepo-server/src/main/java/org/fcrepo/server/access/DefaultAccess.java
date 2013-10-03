@@ -24,6 +24,9 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.ws.rs.core.HttpHeaders;
+
+import org.apache.commons.httpclient.util.DateUtil;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.server.Context;
@@ -1132,14 +1135,29 @@ public class DefaultAccess
             params.setContext(context);
             mimeTypedStream = m_externalContentManager.getExternalContent(params);
         } else if (ds.DSControlGrp.equalsIgnoreCase("M")) {
-            DatastreamManagedContent dmc =
-                    (DatastreamManagedContent) ds;
-
-            mimeTypedStream = new MIMETypedStream(ds.DSMIME, dmc.getContentStream(context), null,ds.DSSize);
+            boolean head = "HEAD".equals(context.getEnvironmentValue(Constants.HTTP_REQUEST.METHOD.attributeId));
+            if (!head) {
+                mimeTypedStream = new MIMETypedStream(ds.DSMIME, ds.getContentStream(context),
+                        getDatastreamHeaders(PID, ds), ds.DSSize);
+            } else {
+                if (ds.DSSize <= 0) {
+                    ds.DSSize = ((DatastreamManagedContent)ds).getContentSize(context);
+                }
+                mimeTypedStream = new MIMETypedStream(ds.DSMIME, null,
+                        getDatastreamHeaders(PID, ds), ds.DSSize);
+            }
         } else if (ds.DSControlGrp.equalsIgnoreCase("X")) {
-            DatastreamXMLMetadata dxm =
-                    (DatastreamXMLMetadata) ds;
-            mimeTypedStream = new MIMETypedStream(ds.DSMIME, dxm.getContentStream(context), null, ds.DSSize);
+            boolean head = "HEAD".equals(context.getEnvironmentValue(Constants.HTTP_REQUEST.METHOD.attributeId));
+            if (ds.DSSize <= 0) {
+                ds.DSSize = ((DatastreamXMLMetadata)ds).xmlContent.length;
+            }
+            if (!head) {
+                mimeTypedStream = new MIMETypedStream(ds.DSMIME, ds.getContentStream(context),
+                        getDatastreamHeaders(PID, ds), ds.DSSize);
+            } else {
+                mimeTypedStream = new MIMETypedStream(ds.DSMIME, null,
+                        getDatastreamHeaders(PID, ds), ds.DSSize);
+            }
         } else if (ds.DSControlGrp.equalsIgnoreCase("R")) {
             DatastreamReferencedContent drc =
                     (DatastreamReferencedContent) ds;
@@ -1161,11 +1179,28 @@ public class DefaultAccess
                             null);
         }
         if (logger.isDebugEnabled()) {
-            long stopTime = new Date().getTime();
+            long stopTime = System.currentTimeMillis();
             long interval = stopTime - startTime;
             logger.debug("Roundtrip getDatastreamDissemination: {} milliseconds.", interval);
         }
         return mimeTypedStream;
     }
-
+    
+    /**
+     * Content-Length is determined elsewhere
+     * Content-Type is determined elsewhere
+     * Last-Modified
+     * ETag
+     * @param ds
+     * @return
+     */
+    private static Property[] getDatastreamHeaders(String pid, Datastream ds) {
+        Property[] result = new Property[2];
+        StringBuilder etag = new StringBuilder(64);
+        etag.append(pid).append('+').append(ds.DatastreamID).append('+').append(ds.DSVersionID)
+        .append('+').append(Long.toString(ds.DSCreateDT.getTime()));
+        result[0] = new Property(HttpHeaders.ETAG, etag.toString());
+        result[1] = new Property(HttpHeaders.LAST_MODIFIED, DateUtil.formatDate(ds.DSCreateDT));
+        return result;
+    }
 }

@@ -20,6 +20,7 @@ import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.storage.ContentManagerParams;
 import org.fcrepo.server.storage.ExternalContentManager;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
+import org.fcrepo.server.storage.lowlevel.ISizable;
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.slf4j.Logger;
@@ -48,6 +49,8 @@ public class DatastreamManagedContent
     public static final String UPLOADED_SCHEME = "uploaded://";
 
     private static ILowlevelStorage s_llstore;
+    
+    private static boolean s_llsizable = false;
 
     private static Server m_server;
 
@@ -67,12 +70,13 @@ public class DatastreamManagedContent
         return ds;
     }
 
-    private ILowlevelStorage getLLStore() throws Exception {
+    private static ILowlevelStorage getLLStore() throws Exception {
         if (s_llstore == null) {
             try {
                 s_llstore =
                         (ILowlevelStorage) getServer()
                                 .getModule("org.fcrepo.server.storage.lowlevel.ILowlevelStorage");
+                s_llsizable = s_llstore instanceof ISizable;
             } catch (InitializationException ie) {
                 throw new Exception("Unable to get LLStore Module: "
                         + ie.getMessage(), ie);
@@ -96,7 +100,7 @@ public class DatastreamManagedContent
         return m_tempUploadDir;
     }
 
-    private Server getServer() throws Exception {
+    private static Server getServer() throws Exception {
         if (m_server == null) {
             try {
                 m_server = Server.getInstance(new File(Constants.FEDORA_HOME),
@@ -185,6 +189,78 @@ public class DatastreamManagedContent
         throw new StreamIOException("[DatastreamManagedContent] could not resolve dsLocation " + DSLocation + " dsLocationType " + DSLocationType);
     }
 
+    /**
+     * Return the size of the data if possible
+     * (IE, it is a file or LLStore implements ISizable)
+     * @param ctx
+     * @return
+     * @throws StreamIOException
+     */
+    public long getContentSize(Context ctx) throws StreamIOException {
+        try {
+            // For new or modified datastreams, the new bytestream hasn't yet been
+            // committed. However, we need to access it in order to compute
+            // the datastream checksum
+            if (DSLocation.startsWith(UPLOADED_SCHEME)) {
+                // TODO: refactor to use proper temp file management - FCREPO-718
+                // for now, just get the file directly (see also DefaultManagement.getTempStream(...))
+                String internalId = DSLocation.substring(UPLOADED_SCHEME.length());
+                File uploadedFile = new File(getTempUploadDir(), internalId);
+                // check it has not been automatically purged (see DefaultManagement.purgeUploadedFiles())
+                if (uploadedFile.exists()) {
+                    return uploadedFile.length();
+                } else {
+                    throw new StreamIOException("Uploaded file " + DSLocation + " no longer exists.");
+                }
+
+            } else if (DSLocation.startsWith(TEMP_SCHEME)) {
+                // TODO: refactor to use proper temp file management - FCREPO-718
+                String fileName = DSLocation.substring(TEMP_SCHEME.length());
+                File tempFile = new File(fileName);
+                // check it has not been removed elsewhere (should not happen)
+                if (tempFile.exists()) {
+                    return tempFile.length();
+                } else {
+                    throw new StreamIOException("Temp file " + DSLocation + " no longer exists.");
+                }
+            } else if (Datastream.DS_LOCATION_TYPE_INTERNAL.equals(DSLocationType)) {
+                ILowlevelStorage llstore = getLLStore();
+                if (s_llsizable) {
+                    return ((ISizable)llstore).getDatastreamSize(DSLocation);
+                } else {
+                    return 0;
+                }
+            } else if (Datastream.DS_LOCATION_TYPE_URL.equals(DSLocationType)) {
+                // Managed content can have URL dsLocation on ingest
+                ValidationUtility.validateURL(DSLocation, this.DSControlGrp);
+                // If validation has succeeded, assume an external resource.
+                // Fetch it, store it locally, update DSLocation
+                if (ctx == null) {
+                    ctx = ReadOnlyContext.getContext(null, null, "", false);
+                    // changed from below, which sets noOp to true, seems to cause an AuthZ permitted exception
+                    // in PolicyEnforcementPoint.enforce(...)
+                    // ctx = ReadOnlyContext.EMPTY;
+                }
+               ContentManagerParams params = new ContentManagerParams(DSLocation);
+                params.setContext(ctx);
+                MIMETypedStream stream = getExternalContentManager()
+                        .getExternalContent(params);
+
+                // TODO: refactor temp file management - see FCREPO-718; for now create temp file and write to it
+                // note - don't use temp upload directory, use (container's) temp dir (upload dir is for uploads)
+                File tempFile = File.createTempFile("managedcontentupdate", null);
+                OutputStream os = new FileOutputStream(tempFile);
+                StreamUtility.pipeStream(stream.getStream(), os, 32768);
+                DSLocation = TEMP_SCHEME + tempFile.getAbsolutePath();
+                return tempFile.length();
+            }
+        } catch (Throwable th) {
+            throw new StreamIOException("[DatastreamManagedContent] returned "
+                    + " the error: \"" + th.getClass().getName()
+                    + "\". Reason: " + th.getMessage(), th);
+        }
+        throw new StreamIOException("[DatastreamManagedContent] could not resolve dsLocation " + DSLocation + " dsLocationType " + DSLocationType);
+    }
     /**
      * Set the contents of this managed datastream by storing as a temp file.  If the previous content
      * was stored in a temp file, clean up this file.

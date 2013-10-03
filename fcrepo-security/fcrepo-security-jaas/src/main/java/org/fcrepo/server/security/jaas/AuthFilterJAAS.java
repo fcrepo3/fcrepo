@@ -258,7 +258,7 @@ public class AuthFilterJAAS
         // test path for API-A methods, maybe regex to make it explicit)
         boolean doChallenge = true;
         if (!authnAPIA) {
-            if (req.getMethod().equals("GET")) {
+            if (req.getMethod().equals("GET") || req.getMethod().equals("HEAD")) {
                 String requestPath = req.getPathInfo();
                 if (requestPath == null) requestPath = ""; // null is returned eg for /fedora/objects? - API-A, so we still want to do the below...
                 String fullPath = req.getRequestURI();
