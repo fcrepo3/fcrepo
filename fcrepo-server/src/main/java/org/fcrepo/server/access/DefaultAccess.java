@@ -1126,27 +1126,23 @@ public class DefaultAccess
 
         if (ds.DSControlGrp.equalsIgnoreCase("E")) {
             DatastreamReferencedContent drc =
-                    (DatastreamReferencedContent) reader
-                            .GetDatastream(dsID, asOfDateTime);
+                    (DatastreamReferencedContent) ds;
             ContentManagerParams params = new ContentManagerParams(drc.DSLocation,
                                                                    drc.DSMIME, null, null);
             params.setContext(context);
             mimeTypedStream = m_externalContentManager.getExternalContent(params);
         } else if (ds.DSControlGrp.equalsIgnoreCase("M")) {
             DatastreamManagedContent dmc =
-                    (DatastreamManagedContent) reader
-                            .GetDatastream(dsID, asOfDateTime);
+                    (DatastreamManagedContent) ds;
 
             mimeTypedStream = new MIMETypedStream(ds.DSMIME, dmc.getContentStream(context), null,ds.DSSize);
         } else if (ds.DSControlGrp.equalsIgnoreCase("X")) {
             DatastreamXMLMetadata dxm =
-                    (DatastreamXMLMetadata) reader.GetDatastream(dsID,
-                                                                 asOfDateTime);
+                    (DatastreamXMLMetadata) ds;
             mimeTypedStream = new MIMETypedStream(ds.DSMIME, dxm.getContentStream(context), null, ds.DSSize);
         } else if (ds.DSControlGrp.equalsIgnoreCase("R")) {
             DatastreamReferencedContent drc =
-                    (DatastreamReferencedContent) reader
-                            .GetDatastream(dsID, asOfDateTime);
+                    (DatastreamReferencedContent) ds;
             // The dsControlGroupType of Redirect("R") is a special control type
             // used primarily for streaming media. Datastreams of this type are
             // not mediated (proxied by Fedora) and their physical dsLocation is
