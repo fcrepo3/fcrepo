@@ -5,6 +5,7 @@
 package org.fcrepo.server.rest;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
@@ -40,6 +41,7 @@ import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.errors.ObjectValidityException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.management.Management;
+import org.fcrepo.server.storage.DOManager;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.utilities.XmlTransformUtility;
@@ -95,7 +97,8 @@ public class BaseRestResource {
             this.m_management = (Management) m_server.getModule("org.fcrepo.server.management.Management");
             this.m_access = (Access) m_server.getModule("org.fcrepo.server.access.Access");
             this.m_hostname = m_server.getParameter("fedoraServerHost");
-            m_datastreamFilenameHelper = new DatastreamFilenameHelper(m_server, m_management, m_access );
+            m_datastreamFilenameHelper = new DatastreamFilenameHelper(m_server,
+                    (DOManager) m_server.getModule("org.fcrepo.server.storage.DOManager"));
             m_mapper = new ObjectMapper();
         } catch (Exception ex) {
             throw new RestException("Unable to locate Fedora server instance", ex);
@@ -144,20 +147,23 @@ public class BaseRestResource {
                 for (Property header : result.header) {
                     if (header.name != null
                             && !(header.name.equalsIgnoreCase("transfer-encoding"))
-                            && !(header.name.equalsIgnoreCase("content-length"))
-                            && !(header.name.equalsIgnoreCase("content-type"))) {
+                            && !(header.name.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH))
+                            && !(header.name.equalsIgnoreCase(HttpHeaders.CONTENT_TYPE))) {
                         builder.header(header.name, header.value);
                     }
                 }
             }
             if (result.getSize() != -1L){
-                builder.header("content-length",result.getSize());
+                builder.header(HttpHeaders.CONTENT_LENGTH,result.getSize());
             }
 
             if (!result.MIMEType.isEmpty()){
                 builder.type(result.MIMEType);
             }
-            builder.entity(result.getStream());
+            InputStream content = result.getStream();
+            if (content != null) {
+                builder.entity(result.getStream());
+            }
             return builder.build();
         }
     }

@@ -144,24 +144,25 @@ public class TestRESTAPI
                     + "rest"
                     : "src/test/resources/rest";
 
-    private static String DS1RelsFilename =
+    private static final String DS1RelsFilename =
             "Datastream 1 filename from rels.extension";
 
-    private static String DS2LabelFilename = "Datastream 2 filename from label";
+    private static final String DS2LabelFilename = "Datastream 2 filename from label";
 
-    private static String DS3LabelFilename = "Datastream 3 filename from label";
+    private static final String DS3LabelFilename = "Datastream 3 filename from label";
 
-    private static String DodgyChars = "\\/*?&lt;&gt;:|";
+    private static final String DodgyChars = "\\/*?&lt;&gt;:|";
 
-    private static String DS4LabelFilenameOriginal =
+    private static final  String DS4LabelFilenameOriginal =
             "Datastream 4 filename " + DodgyChars + "from label";
 
     // this one in foxml
-    private static String DS4LabelFilename = "Datastream 4 filename from label"; // this should be the cleaned version
+    // this should be the cleaned version
+    private static final String DS4LabelFilename = "Datastream 4 filename from label";
 
-    private static String DS5ID = "DS5";
+    private static final String DS5ID = "DS5";
 
-    private static String DS6ID = "DS6.xml";
+    private static final String DS6ID = "DS6.xml";
 
     // note: since we are explicitly formatting the date as "Z" (literal), need to ensure the formatter operates in GMT/UTC
     static SimpleDateFormat df;
@@ -1711,16 +1712,18 @@ public class TestRESTAPI
     public void testDatastreamDisseminationHEAD()
             throws Exception {
 
+        // test an inline (type X) datastream with no recorded size
+        // info:fedora/demo:REST/DS1 is a type 'X'
         // filename from RELS-INT, no lookup of extension; no download
-        URI url = getURI("/objects/demo:REST/datastreams/DS2/content");
+        URI url = getURI("/objects/demo:REST/datastreams/DS1/content");
         HttpGet get = new HttpGet(url);
         HttpResponse response = getOrDelete(get, getAuthAccess(), false);
         EntityUtils.consumeQuietly(response.getEntity());
         assertEquals(SC_OK, response.getStatusLine().getStatusCode());
         checkSingleHeader(HttpHeaders.CONTENT_LENGTH, response, Long.toString(47));
-        checkSingleHeader(HttpHeaders.CONTENT_TYPE, response, "image/jpeg");
+        checkSingleHeader(HttpHeaders.CONTENT_TYPE, response, "text/xml");
         // jpg should be from MIMETYPE mapping
-        CheckCDHeader(response, "inline", TestRESTAPI.DS2LabelFilename+ ".jpg");
+        CheckCDHeader(response, "inline", TestRESTAPI.DS1RelsFilename);
         Header[] expectedHeaders = response.getAllHeaders();
         // again as HEAD
         HttpHead head = new HttpHead(url);
@@ -1729,6 +1732,28 @@ public class TestRESTAPI
         assertEquals(SC_OK, response.getStatusLine().getStatusCode());
         Header[] actualHeaders = response.getAllHeaders();
         assertHeadersEquals(expectedHeaders, actualHeaders);
+        // test a managed (type M) datastream 
+        // info:fedora/demo:REST/DS2 is a type 'M'
+        url = getURI("/objects/demo:REST/datastreams/DS2/content");
+        get = new HttpGet(url);
+        response = getOrDelete(get, getAuthAccess(), false);
+        EntityUtils.consumeQuietly(response.getEntity());
+        assertEquals(SC_OK, response.getStatusLine().getStatusCode());
+        checkSingleHeader(HttpHeaders.CONTENT_LENGTH, response, Long.toString(47));
+        checkSingleHeader(HttpHeaders.CONTENT_TYPE, response, "image/jpeg");
+        // jpg should be from MIMETYPE mapping
+        CheckCDHeader(response, "inline", TestRESTAPI.DS2LabelFilename+ ".jpg");
+        expectedHeaders = response.getAllHeaders();
+        // again as HEAD
+        head = new HttpHead(url);
+        response = getOrDelete(head, getAuthAccess(), false);
+        EntityUtils.consumeQuietly(response.getEntity());
+        assertEquals(SC_OK, response.getStatusLine().getStatusCode());
+        actualHeaders = response.getAllHeaders();
+        assertHeadersEquals(expectedHeaders, actualHeaders);
+        // test an external (type E) datastream with file
+        // test an external (type E) datastream with url
+        // info:fedora/demo:REST/EXTDS is a type 'E' pointing back to DS1
     }
 
     @Test
@@ -2226,8 +2251,8 @@ public class TestRESTAPI
             out.append(string).append(", ");
         }
         int len = out.length();
-        out.deleteCharAt(len - 2);
         out.deleteCharAt(len - 1);
+        out.deleteCharAt(len - 2);
         return out.toString();
     }
     
