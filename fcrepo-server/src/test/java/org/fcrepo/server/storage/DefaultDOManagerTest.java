@@ -234,11 +234,22 @@ public class DefaultDOManagerTest
     }
 
     @Test (expected=ObjectExistsException.class)
-    public void testGetIngestWriterThrowsIfObjectAlreadyExists() throws Exception
+    public void testGetIngestWriterThrowsIfPidAlreadyRegistered() throws Exception
     {
         InputStream in = new ByteArrayInputStream("".getBytes(ENCODING));
 
         when(pidExists.next()).thenReturn(true);
+
+        testObj.getIngestWriter(Server.USE_DEFINITIVE_STORE, mockContext, in, FORMAT, ENCODING, DUMMY_PID);
+    }
+
+    @Test (expected=ObjectExistsException.class)
+    public void testGetIngestWriterThrowsIfObjectAlreadyExists() throws Exception
+    {
+        InputStream in = new ByteArrayInputStream("".getBytes(ENCODING));
+
+        when(pidExists.next()).thenReturn(false);
+        when(mockLowLevelStorage.objectExists(DUMMY_PID)).thenReturn(true);
 
         testObj.getIngestWriter(Server.USE_DEFINITIVE_STORE, mockContext, in, FORMAT, ENCODING, DUMMY_PID);
     }

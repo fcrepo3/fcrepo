@@ -25,9 +25,9 @@ import org.fcrepo.server.storage.ConnectionPoolManager;
  */
 public class DefaultLowlevelStorageModule
         extends Module
-        implements ILowlevelStorage, IListable, ISizable {
+        implements ILowlevelStorage, IListable, ISizable, ICheckable {
 
-    private ILowlevelStorage m_llstore;
+    private DefaultLowlevelStorage m_llstore;
 
     public DefaultLowlevelStorageModule(Map<String, String> moduleParameters,
                                         Server server,
@@ -175,17 +175,24 @@ public class DefaultLowlevelStorageModule
     // IListable methods
 
     public Iterator<String> listObjects() {
-        return ((IListable) m_llstore).listObjects();
+        return m_llstore.listObjects();
     }
 
     public Iterator<String> listDatastreams() {
-        return ((IListable) m_llstore).listDatastreams();
+        return m_llstore.listDatastreams();
     }
 
     // ISizable methods
 
     @Override
     public long getDatastreamSize(String dsKey) throws LowlevelStorageException {
-        return ((ISizable) m_llstore).getDatastreamSize(dsKey);
+        return m_llstore.getDatastreamSize(dsKey);
     }
-}
+    
+    // ICheckable methods
+    @Override
+    public boolean objectExists(String objectKey) {
+        return m_llstore.objectExists(objectKey);
+    }
+
+ }

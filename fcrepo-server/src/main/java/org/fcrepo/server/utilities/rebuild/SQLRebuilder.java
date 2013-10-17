@@ -348,6 +348,8 @@ public class SQLRebuilder
         try {
             registerObject(obj);
         } catch (StorageDeviceException e) {
+            // continue past individual errors
+            logger.error(e.getMessage());
         }
 
         try {
@@ -396,7 +398,7 @@ public class SQLRebuilder
             }
         } catch (SQLException sqle) {
             throw new StorageDeviceException("Unexpected error from SQL database while registering object: "
-                    + sqle.getMessage());
+                    + sqle.getMessage(), sqle);
         } finally {
             try {
                 if (s1 != null) {
@@ -404,7 +406,7 @@ public class SQLRebuilder
                 }
             } catch (Exception sqle) {
                 throw new StorageDeviceException("Unexpected error from SQL database while registering object: "
-                        + sqle.getMessage());
+                        + sqle.getMessage(), sqle);
             } finally {
                 s1 = null;
             }

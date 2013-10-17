@@ -40,6 +40,12 @@ public class DBPathRegistry
             LoggerFactory.getLogger(DBPathRegistry.class);
 
     private ConnectionPool connectionPool = null;
+    
+    private final String selectAllQuery;
+    
+    private final String selectByIdQuery;
+    
+    private final String deleteByIdQuery;
 
     private final boolean backslashIsEscape;
 
@@ -50,6 +56,54 @@ public class DBPathRegistry
                 Boolean
                         .valueOf((String) configuration
                                 .get("backslashIsEscape")).booleanValue();
+        selectAllQuery = "SELECT token FROM " + this.registryName;
+        selectByIdQuery = "SELECT path FROM " + this.registryName + " WHERE token=?";
+        deleteByIdQuery = "DELETE FROM " + this.registryName + " WHERE "
+        + this.registryName + ".token=?";
+
+    }
+    
+    /**
+     * Checks to see whether a pid exists in the registry.
+     * Makes no audits of the number of registrations or
+     * the paths registered.
+     */
+    @Override
+    public boolean exists(String pid)
+    throws LowlevelStorageException {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        try {
+            connection = connectionPool.getReadOnlyConnection();
+            statement = connection.prepareStatement(selectByIdQuery);
+            statement.setString(1,pid);
+            rs =
+                    statement.executeQuery();
+            return rs.next();
+        } catch (SQLException e1) {
+            throw new LowlevelStorageException(true, "sql failure (get)", e1);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (statement != null) {
+                    statement.close();
+                }
+                if (connection != null) {
+                    connectionPool.free(connection);
+                }
+            } catch (Exception e2) { // purposely general to include uninstantiated statement, connection
+                throw new LowlevelStorageException(true,
+                                                   "sql failure closing statement, connection, pool (get)",
+                                                   e2);
+            } finally {
+                rs = null;
+                statement = null;
+                connection = null;
+            }
+        }
     }
 
     @Override
@@ -62,8 +116,7 @@ public class DBPathRegistry
         try {
             int paths = 0;
             connection = connectionPool.getReadOnlyConnection();
-            String query = "SELECT path FROM " + getRegistryName() + " WHERE token=?";
-            statement = connection.prepareStatement(query);
+            statement = connection.prepareStatement(selectByIdQuery);
             statement.setString(1,pid);
             rs =
                     statement.executeQuery();
@@ -102,6 +155,7 @@ public class DBPathRegistry
             } finally {
                 rs = null;
                 statement = null;
+                connection = null;
             }
         }
         return path;
@@ -123,39 +177,6 @@ public class DBPathRegistry
         }
     }
 
-    @Deprecated
-    public void executeSql(String sql)
-            throws ObjectNotInLowlevelStorageException,
-            LowlevelStorageInconsistencyException, LowlevelStorageException {
-        Connection connection = null;
-        Statement statement = null;
-        try {
-            connection = connectionPool.getReadWriteConnection();
-            statement = connection.createStatement();
-            if (statement.execute(sql)) {
-                throw new LowlevelStorageException(true,
-                                                   "sql returned query results for a nonquery");
-            }
-            ensureSingleUpdate(statement);
-        } catch (SQLException e1) {
-            throw new LowlevelStorageException(true, "sql failurex (exec)", e1);
-        } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-                if (connection != null) {
-                    connectionPool.free(connection);
-                }
-            } catch (Exception e2) { // purposely general to include uninstantiated statement, connection
-                throw new LowlevelStorageException(true,
-                                                   "sql failure closing statement, connection, pool (exec)",
-                                                   e2);
-            } finally {
-                statement = null;
-            }
-        }
-    }
     private void executeUpdate(String sql, String pid)
         throws ObjectNotInLowlevelStorageException,
         LowlevelStorageInconsistencyException, LowlevelStorageException {
@@ -188,6 +209,7 @@ public class DBPathRegistry
     					e2);
     		} finally {
     			statement = null;
+                connection = null;
     		}
     	}
     }
@@ -222,6 +244,7 @@ public class DBPathRegistry
         } finally {
             if (conn != null) {
                 connectionPool.free(conn);
+                conn = null;
             }
         }
     }
@@ -230,9 +253,7 @@ public class DBPathRegistry
     public void remove(String pid) throws ObjectNotInLowlevelStorageException,
             LowlevelStorageInconsistencyException, LowlevelStorageException {
         try {
-            String query = "DELETE FROM " + getRegistryName() + " WHERE "
-            + getRegistryName() + ".token=?";
-            executeUpdate(query, pid);
+            executeUpdate(deleteByIdQuery, pid);
 
         } catch (ObjectNotInLowlevelStorageException e1) {
             throw new ObjectNotInLowlevelStorageException("[" + pid
@@ -273,7 +294,7 @@ public class DBPathRegistry
     }
 
     @Override
-    protected Enumeration<String> keys() throws LowlevelStorageException,
+    public Enumeration<String> keys() throws LowlevelStorageException,
             LowlevelStorageInconsistencyException {
         File tempFile = null;
         PrintWriter writer = null;
@@ -286,8 +307,7 @@ public class DBPathRegistry
                     new FileOutputStream(tempFile)));
             connection = connectionPool.getReadOnlyConnection();
             statement = connection.createStatement();
-            rs = statement.executeQuery("SELECT token FROM "
-                    + getRegistryName());
+            rs = statement.executeQuery(selectAllQuery);
             while (rs.next()) {
                 String key = rs.getString(1);
                 if (null == key || 0 == key.length()) {
@@ -320,6 +340,7 @@ public class DBPathRegistry
                 }
                 rs = null;
                 statement = null;
+                connection = null;
             }
         }
     }

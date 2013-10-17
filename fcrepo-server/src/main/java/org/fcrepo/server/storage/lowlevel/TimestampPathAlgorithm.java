@@ -21,7 +21,8 @@ class TimestampPathAlgorithm
 
     private final String storeBase;
 
-    private static final String[] PADDING = {"", "0", "00", "000"};
+    private static final String[] PADDED =
+        {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09"};
 
     private static final String SEP = File.separator;
 
@@ -38,23 +39,23 @@ class TimestampPathAlgorithm
     public String format(String pid) throws LowlevelStorageException {
         GregorianCalendar calendar = new GregorianCalendar();
         String year = Integer.toString(calendar.get(Calendar.YEAR));
-        String month = leftPadded(1 + calendar.get(Calendar.MONTH), 2);
-        String dayOfMonth = leftPadded(calendar.get(Calendar.DAY_OF_MONTH), 2);
-        String hourOfDay = leftPadded(calendar.get(Calendar.HOUR_OF_DAY), 2);
-        String minute = leftPadded(calendar.get(Calendar.MINUTE), 2);
-        //String second = leftPadded(calendar.get(Calendar.SECOND),2);
+        String month = leftPaddedUnder100(1 + calendar.get(Calendar.MONTH));
+        String dayOfMonth = leftPaddedUnder100(calendar.get(Calendar.DAY_OF_MONTH));
+        String hourOfDay = leftPaddedUnder100(calendar.get(Calendar.HOUR_OF_DAY));
+        String minute = leftPaddedUnder100(calendar.get(Calendar.MINUTE));
         return storeBase + SEP + year + SEP + month + dayOfMonth + SEP
-                + hourOfDay + SEP + minute /* + sep + second */+ SEP + pid;
+                + hourOfDay + SEP + minute + SEP + pid;
     }
 
-    private final String leftPadded(int i, int n)
+    private final String leftPaddedUnder100(int i)
             throws LowlevelStorageException {
-        if (n > 3 || n < 0 || i < 0 || i > 999) {
+        if (i < 0 || i > 99) {
             throw new LowlevelStorageException(true, getClass().getName()
                     + ": faulty date padding");
         }
-        int m = i > 99 ? 3 : i > 9 ? 2 : 1;
-        int p = n - m;
-        return PADDING[p] + Integer.toString(i);
+        if (i < 10) {
+            return PADDED[i];
+        }
+        return Integer.toString(i);
     }
 }

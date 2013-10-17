@@ -5,6 +5,7 @@
 package org.fcrepo.server.storage.lowlevel.akubra;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -62,6 +63,7 @@ public class AkubraLowlevelStorageTest {
     @Test (expected=ObjectAlreadyInLowlevelStorageException.class)
     public void testAddExistingObject() throws LowlevelStorageException {
         instance.addObject(OBJ_KEY, toStream(OBJ_CONTENT));
+        assertTrue(instance.objectExists(OBJ_KEY));
         instance.addObject(OBJ_KEY, toStream(OBJ_CONTENT));
     }
 

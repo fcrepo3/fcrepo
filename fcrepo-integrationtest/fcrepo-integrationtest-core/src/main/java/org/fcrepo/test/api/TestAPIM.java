@@ -8,14 +8,17 @@ package org.fcrepo.test.api;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
 import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
 import static org.custommonkey.xmlunit.XMLAssert.assertXpathExists;
 import static org.custommonkey.xmlunit.XMLAssert.assertXpathNotExists;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,10 +29,12 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.activation.DataHandler;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import junit.framework.JUnit4TestAdapter;
 
+import org.apache.commons.io.FileUtils;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -2719,6 +2724,55 @@ public class TestAPIM
                 }
             }
             assertTrue(validation.isValid());
+        }
+    }
+
+    @Test
+    public void testCorruptIndex() throws Exception {
+        // test object
+        File dir = new File(FEDORA_HOME,
+                "client/demo/foxml/local-server-demos");
+
+        String resfile = "image-collection-demo/dataObjects/demo_SmileyBeerGlass.xml";
+
+        File resourceFile = new File(dir, resfile);
+        String resource = FileUtils.readFileToString(resourceFile, "UTF-8");
+        // build source of a new object, different content, same byte counts
+        resource = resource.replaceAll("Smiley", "Frowny");
+
+        // decide whether this is an akubra or legacy config
+        File data = new File(Constants.FEDORA_HOME, "data");
+        File akubraStore = new File(data, "objectStore");
+        boolean akubra = akubraStore.exists();
+        // quit if it's a legacy config (no access to backing db)
+        if (!akubra) {
+            System.out.println("testCorruptIndex not executing because akubra " +
+                               "objectStore dir doesn't exist at " +
+                               akubraStore.getAbsolutePath());
+            return;
+        }
+        String pid = "info:fedora/demo:FrownyBeerGlass";
+        // the MD5 hash of "info:fedora/demo:FrownyBeerGlass" is
+        // "80e1d61a2e4182752725f02b772795ff"
+        // write the orphan foxml to the appropriate data subdirectory
+        // the default akubra path algorithm is just the first two chars
+        File dataSubdir = new File(akubraStore, "80");
+        // pid.gsub(':','%3A').gsub('/','%2F').gsub('_', '%5F')
+        String fileName = pid.replaceAll("\\:", "%3A")
+                             .replaceAll("\\/", "%2F")
+                             .replaceAll("_", "%5F");
+        FileUtils.write(new File(dataSubdir, fileName), resource);
+        // check that we cannot ingest an object with that pid
+        try {
+            DataHandler objectXML = TypeUtility
+                    .convertBytesToDataHandler(resource.getBytes(Charset.forName("UTF-8")));
+            apim.ingest(objectXML, FOXML1_1.uri,
+                    "ingest should fail because object exists in objectStore");
+            fail("Should not have been able to overlay object at demo:FrownyBeerGlass");
+        } catch (javax.xml.ws.soap.SOAPFaultException af) {
+            System.out.println(af.getMessage());
+            assertTrue(af.getMessage(), af.getMessage()
+                    .contains("already exists in the registry; the object can't be re-created"));
         }
     }
 
