@@ -28,6 +28,7 @@ import org.fcrepo.server.config.DatastoreConfiguration;
 import org.fcrepo.server.config.Parameter;
 import org.fcrepo.server.errors.InconsistentTableSpecException;
 import org.fcrepo.server.storage.ConnectionPool;
+import org.fcrepo.server.utilities.rebuild.SQLRebuilder;
 
 
 /**
@@ -42,6 +43,13 @@ class SQLUtilityImpl
 
     private static final Logger logger =
             LoggerFactory.getLogger(SQLUtilityImpl.class);
+    
+    public static final String GET_MOST_RECENT_REBUILD =
+            "SELECT rebuildDate FROM fcrepoRebuildStatus ORDER BY rebuildDate DESC";
+    
+    public static final String GET_REBUILD_STATUS =
+            "SELECT complete FROM fcrepoRebuildStatus WHERE rebuildDate=?";
+        
 
     @Override
     protected ConnectionPool i_getConnectionPool(DatastoreConfiguration cpDC)
@@ -445,6 +453,52 @@ class SQLUtilityImpl
             throw new SQLException("Unique column does not exist in given "
                     + "column array");
         }
+    }
+
+    @Override
+    protected long i_getMostRecentRebuild(Connection conn) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(GET_MOST_RECENT_REBUILD);
+        ResultSet rs = null;
+        long mostRecent = -1;
+        try {
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                mostRecent = rs.getLong(1);
+            }
+        } finally {
+            if (rs != null) rs.close();
+            stmt.close();
+        }
+        return mostRecent;
+    }
+
+    @Override
+    protected boolean i_getRebuildStatus(Connection conn, long rebuildDate)
+            throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(GET_REBUILD_STATUS);
+        ResultSet rs = null;
+        boolean status = false;
+        try {
+            stmt.setLong(1, rebuildDate);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                status = rs.getBoolean(1);
+            }
+            
+        } finally {
+            if (rs != null) rs.close();
+            stmt.close();
+        }
+        return status;
+    }
+
+    @Override
+    protected void i_recordSuccessfulRebuild(Connection conn, long rebuildDate)
+            throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(SQLRebuilder.CREATE_REBUILD_STATUS);
+        stmt.setBoolean(1, true);
+        stmt.setLong(2, rebuildDate);
+        stmt.execute();
     }
 
 }

@@ -2761,7 +2761,8 @@ public class TestAPIM
         String fileName = pid.replaceAll("\\:", "%3A")
                              .replaceAll("\\/", "%2F")
                              .replaceAll("_", "%5F");
-        FileUtils.write(new File(dataSubdir, fileName), resource);
+        File frownyObject = new File(dataSubdir, fileName);
+        FileUtils.write(frownyObject, resource);
         // check that we cannot ingest an object with that pid
         try {
             DataHandler objectXML = TypeUtility
@@ -2773,6 +2774,9 @@ public class TestAPIM
             System.out.println(af.getMessage());
             assertTrue(af.getMessage(), af.getMessage()
                     .contains("already exists in the registry; the object can't be re-created"));
+        } finally {
+            // clean up
+            frownyObject.delete();
         }
     }
 

@@ -404,6 +404,26 @@ public class TestFieldSearchSQLImpl {
             fail("Unexpected call to MockSqlUtility.i_addRow");
             return false;
         }
+
+        @Override
+        protected long i_getMostRecentRebuild(Connection conn)
+                throws SQLException {
+            fail("Unexpected call to MockSqlUtility.i_getMostRecentRebuild");
+            return 0;
+        }
+
+        @Override
+        protected boolean i_getRebuildStatus(Connection conn, long rebuildDate)
+                throws SQLException {
+            fail("Unexpected call to MockSqlUtility.i_getRebuildStatus");
+            return false;
+        }
+
+        @Override
+        protected void i_recordSuccessfulRebuild(Connection conn,
+                long rebuildDate) throws SQLException {
+            fail("Unexpected call to MockSqlUtility.i_recordSuccessfulRebuild");            
+        }
     }
 
     public static class UnusedMockSqlUtility extends MockSqlUtility {

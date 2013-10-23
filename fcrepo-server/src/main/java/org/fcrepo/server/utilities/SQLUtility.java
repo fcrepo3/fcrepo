@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -146,6 +147,53 @@ public abstract class SQLUtility {
             throws IOException, InconsistentTableSpecException, SQLException {
         instance.i_createNonExistingTables(cPool, dbSpec);
     }
+    
+    public static long getMostRecentRebuild(Connection conn)
+            throws SQLException {
+        return instance.i_getMostRecentRebuild(conn);
+    }
+    
+    public static boolean getRebuildStatus(Connection conn, long rebuildDate)
+            throws SQLException {
+        return instance.i_getRebuildStatus(conn, rebuildDate);
+    }
+    
+    public static void recordSuccessfulRebuild(Connection conn, long rebuildDate)
+            throws SQLException {
+        instance.i_recordSuccessfulRebuild(conn, rebuildDate);
+    }
+
+    /**
+     * Gets a connection to the database specified in connection pool module's
+     * "defaultPoolName" config value. This allows us to the connect to the
+     * database without the server running.
+     */
+    public static Connection getDefaultConnection(ServerConfiguration serverConfig) {
+        ModuleConfiguration poolConfig =
+                serverConfig
+                        .getModuleConfiguration("org.fcrepo.server.storage.ConnectionPoolManager");
+        String datastoreID =
+                poolConfig.getParameter("defaultPoolName",Parameter.class).getValue();
+        DatastoreConfiguration dbConfig =
+                serverConfig.getDatastoreConfiguration(datastoreID);
+        return getConnection(dbConfig.getParameter("jdbcDriverClass",Parameter.class)
+                                     .getValue(),
+                             dbConfig.getParameter("jdbcURL",Parameter.class).getValue(),
+                             dbConfig.getParameter("dbUsername",Parameter.class).getValue(),
+                             dbConfig.getParameter("dbPassword",Parameter.class).getValue());
+    }
+
+    private static Connection getConnection(String driverClass,
+                                            String url,
+                                            String username,
+                                            String password) {
+        try {
+            Class.forName(driverClass);
+            return DriverManager.getConnection(url, username, password);
+        } catch (Exception e) {
+            throw new RuntimeException("Error getting database connection", e);
+        }
+    }
 
     /*
      * ------------------------------------------------------------------------
@@ -193,5 +241,14 @@ public abstract class SQLUtility {
             throws SQLException;
 
     protected abstract String i_getLongString(ResultSet rs, int pos)
+            throws SQLException;
+    
+    protected abstract long i_getMostRecentRebuild(Connection conn)
+            throws SQLException;
+
+    protected abstract boolean i_getRebuildStatus(Connection conn, long rebuildDate)
+            throws SQLException;
+    
+    protected abstract void i_recordSuccessfulRebuild(Connection conn, long rebuildDate)
             throws SQLException;
 }

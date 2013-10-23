@@ -14,8 +14,7 @@
         <comment>For each namespace the DBPIDGenerator keeps track of, 
         the highestID is the highest known id ever used from that namespace.
         The PID generation algorithm simply increments this value to get
-        the next id within the namespace.
-        </comment>
+        the next id within the namespace.</comment>
         <column name="namespace" type="varchar(255)" notNull="true" binary="true"/>
         <column name="highestID" type="int(11)" notNull="true"/>
     </table>
@@ -23,8 +22,7 @@
 		<comment>This is used internally to keep track of objects in the definitive
              store.  When an object is ingested or newly created, a PID
              has been assigned, and the object is written to the definitive
-             store, an entry is created here.
-            </comment>
+             store, an entry is created here.</comment>
 		<column name="doPID" type="varchar(64)" notNull="true" binary="true">
 			<comment>The PID of the object</comment>
 		</column>
@@ -32,7 +30,7 @@
 			<comment>The system version of the object.  This starts at zero on
                initial creation or import, and is subsequently incremented by
                one each time a change is committed to the definitive store.
-      </comment>
+            </comment>
 		</column>
 		<column name="ownerId" type="varchar(64)" notNull="false">
 			<comment>The userId of the user who owns the object.</comment>
@@ -139,6 +137,15 @@
 		</column>
 		<column name="dcDate" type="bigint" notNull="true">
 			<comment>A dc:date that was successfully parsed as a date.</comment>
+		</column>
+	</table>
+	<table name="fcrepoRebuildStatus">
+	    <comment>A table of one row that is dropped and rebuilt on every rebuild attempt.</comment>
+		<column name="rebuildDate" type="bigint" notNull="true" index="rebuildDate" unique="true">
+			<comment>The date of the last SQL rebuild attempt.</comment>
+		</column>
+		<column name="complete" type="boolean" notNull="true">
+			<comment>The status of the last SQL rebuild attempt.</comment>
 		</column>
 	</table>
 </database>
