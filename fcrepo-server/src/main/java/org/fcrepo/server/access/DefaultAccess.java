@@ -5,7 +5,6 @@
 package org.fcrepo.server.access;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
@@ -65,6 +64,7 @@ import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.fcrepo.server.utilities.NullInputStream;
 import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,12 +84,7 @@ public class DefaultAccess
 
     private static final MethodParmDef[] METHOD_PARM_DEF_TYPE =
             new MethodParmDef[0];
-    
-    // CXF needs a non-null entity to preserve content-type and content-length
-    // as per 2.7.7
-    private static final NullInputStream NULL_INPUT =
-            new NullInputStream();
-    
+        
     /** Current DOManager of the Fedora server. */
     private DOManager m_manager;
 
@@ -1145,24 +1140,22 @@ public class DefaultAccess
             if (ds.DSSize <= 0) {
                 ds.DSSize = ((DatastreamManagedContent)ds).getContentSize(context);
             }
-            boolean head = "HEAD".equals(context.getEnvironmentValue(Constants.HTTP_REQUEST.METHOD.attributeId));
-            if (!head) {
+            if (!isHEADRequest(context)) {
                 mimeTypedStream = new MIMETypedStream(ds.DSMIME, ds.getContentStream(context),
                         getDatastreamHeaders(PID, ds), ds.DSSize);
             } else {
-                mimeTypedStream = new MIMETypedStream(ds.DSMIME, NULL_INPUT,
+                mimeTypedStream = new MIMETypedStream(ds.DSMIME, NullInputStream.NULL_STREAM,
                         getDatastreamHeaders(PID, ds), ds.DSSize);
             }
         } else if (ds.DSControlGrp.equalsIgnoreCase("X")) {
             if (ds.DSSize <= 0) {
                 ds.DSSize = ((DatastreamXMLMetadata)ds).xmlContent.length;
             }
-            boolean head = "HEAD".equalsIgnoreCase(context.getEnvironmentValue(Constants.HTTP_REQUEST.METHOD.attributeId));
-            if (!head) {
+            if (!isHEADRequest(context)) {
                 mimeTypedStream = new MIMETypedStream(ds.DSMIME, ds.getContentStream(context),
                         getDatastreamHeaders(PID, ds), ds.DSSize);
             } else {
-                mimeTypedStream = new MIMETypedStream(ds.DSMIME, NULL_INPUT,
+                mimeTypedStream = new MIMETypedStream(ds.DSMIME, NullInputStream.NULL_STREAM,
                         getDatastreamHeaders(PID, ds), ds.DSSize);
             }
         } else if (ds.DSControlGrp.equalsIgnoreCase("R")) {
@@ -1203,20 +1196,23 @@ public class DefaultAccess
      */
     private static Property[] getDatastreamHeaders(String pid, Datastream ds) {
         Property[] result = new Property[2];
-        StringBuilder etag = new StringBuilder(64);
-        etag.append(pid).append('+').append(ds.DatastreamID).append('+').append(ds.DSVersionID)
-        .append('+').append(Long.toString(ds.DSCreateDT.getTime()));
-        result[0] = new Property(HttpHeaders.ETAG, etag.toString());
+        result[0] = new Property(HttpHeaders.ETAG, Datastream.defaultETag(pid, ds));
         result[1] = new Property(HttpHeaders.LAST_MODIFIED, DateUtil.formatDate(ds.DSCreateDT));
         return result;
     }
     
-    private static class NullInputStream extends InputStream {
-
-        @Override
-        public int read() throws IOException {
-            return -1;
+    /**
+     * determine whether the context is a HEAD http request
+     */
+    private static boolean isHEADRequest(Context context) {
+        if (context != null) {
+            String method =
+                    context.getEnvironmentValue(
+                            Constants.HTTP_REQUEST.METHOD.attributeId);
+            return "HEAD".equalsIgnoreCase(method);
+                    
         }
-        
+        return false;
     }
+
 }

@@ -327,6 +327,13 @@ public class Datastream {
         target.DSChecksumType = DSChecksumType;
         target.DSChecksum = DSChecksum;
     }
+    
+    public static String defaultETag(String pid, Datastream ds) {
+        StringBuilder etag = new StringBuilder(64);
+        etag.append(pid).append('+').append(ds.DatastreamID).append('+').append(ds.DSVersionID)
+        .append('+').append(Long.toString(ds.DSCreateDT.getTime()));
+        return etag.toString();
+    }
 
     private static final MultiValueMap<URI> beginEnvironmentMap(String messageProtocol) {
         MultiValueMap<URI> environmentMap = new MultiValueMap<URI>();

@@ -5,19 +5,28 @@
 package org.fcrepo.server.storage;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.ws.rs.core.HttpHeaders;
 
+import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.http.Header;
+import org.fcrepo.common.Constants;
 import org.fcrepo.common.http.HttpInputStream;
 import org.fcrepo.common.http.WebClient;
 import org.fcrepo.common.http.WebClientConfiguration;
+import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
+import org.fcrepo.server.utilities.MD5Utility;
+import org.fcrepo.server.utilities.NullInputStream;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.HttpServiceNotFoundException;
 import org.fcrepo.server.errors.ModuleInitializationException;
@@ -49,6 +58,10 @@ public class DefaultExternalContentManager
             LoggerFactory.getLogger(DefaultExternalContentManager.class);
 
     private static final String DEFAULT_MIMETYPE="text/plain";
+    
+    private static final MimetypesFileTypeMap MIME_MAP =
+            new MimetypesFileTypeMap();
+
     private String m_userAgent;
 
     @SuppressWarnings("unused")
@@ -163,11 +176,15 @@ public class DefaultExternalContentManager
      * Get a MIMETypedStream for the given URL. If user or password are
      * <code>null</code>, basic authentication will not be attempted.
      */
-    private MIMETypedStream get(String url, String user, String pass, String knownMimeType)
+    private MIMETypedStream getFromWeb(String url, String user, String pass,
+            String knownMimeType, boolean headOnly)
             throws GeneralException {
         logger.debug("DefaultExternalContentManager.get({})", url);
+        HttpInputStream response = null;
         try {
-            HttpInputStream response = m_http.get(url, true, user, pass);
+            response = headOnly ? 
+                    m_http.get(url, true, user, pass) :
+                    m_http.head(url, true, user, pass);
             String mimeType =
                     response.getResponseHeaderValue("Content-Type",
                                                     knownMimeType);
@@ -177,7 +194,17 @@ public class DefaultExternalContentManager
             if (mimeType == null || mimeType.isEmpty()) {
                 mimeType = DEFAULT_MIMETYPE;
             }
-            return new MIMETypedStream(mimeType, response, headerArray, length);
+            if (headOnly) {
+                try {
+                    response.close();
+                } catch (IOException ioe) {
+                    logger.warn("problem closing HEAD response: {}", ioe.getMessage());
+                }
+                return new MIMETypedStream(mimeType, NullInputStream.NULL_STREAM,
+                        headerArray, length);
+            } else {
+                return new MIMETypedStream(mimeType, response, headerArray, length);
+            }
         } catch (Exception e) {
             throw new GeneralException("Error getting " + url, e);
         }
@@ -197,24 +224,6 @@ public class DefaultExternalContentManager
         }
         return props;
     }
-
-   /* *//**
-     * Creates a property array out of the MIME type and the length of the
-     * provided file.
-     *
-     * @param file
-     *            the file containing the content.
-     * @return an array of properties containing content-length and
-     *         content-type.
-     *//*
-    private static Property[] getPropertyArray(File file, String mimeType) {
-         Property[] props = new Property[2];
-         Property clen = new Property("Content-Length",Long.toString(file.length()));
-         Property ctype = new Property("Content-Type", mimeType);
-         props[0] = clen;
-         props[1] = ctype;
-         return props;
-    }*/
 
     /**
      * Get a MIMETypedStream for the given URL. If user or password are
@@ -241,7 +250,8 @@ public class DefaultExternalContentManager
                 throw new GeneralException(
                 "Missing required Authorization module");
             }
-            authModule.enforceRetrieveFile(params.getContext(), cURI.toString());
+            String cUriString = cURI.toString();
+            authModule.enforceRetrieveFile(params.getContext(), cUriString);
             // end security check
             String mimeType = params.getMimeType();
 
@@ -249,7 +259,12 @@ public class DefaultExternalContentManager
             if (mimeType == null || mimeType.equalsIgnoreCase("")){
                 mimeType = determineMimeType(cFile);
             }
-            return new MIMETypedStream(mimeType,fileUrl.openStream(),null,cFile.length());
+            InputStream content = isHEADRequest(params) ?
+                    NullInputStream.NULL_STREAM :
+                    fileUrl.openStream();
+            return new MIMETypedStream(mimeType, content,
+                    getFileDatastreamHeaders(cUriString, cFile.lastModified()),
+                    cFile.length());
         }
         catch(AuthzException ae){
             logger.error(ae.getMessage(),ae);
@@ -321,7 +336,8 @@ public class DefaultExternalContentManager
             }
 
         }
-        return get(url, username, password, params.getMimeType());
+        return getFromWeb(url, username, password, params.getMimeType(),
+                isHEADRequest(params));
     }
 
 /**
@@ -331,12 +347,48 @@ public class DefaultExternalContentManager
      * @return the detected mime type
      */
     private String determineMimeType(File file){
-        String mimeType = new MimetypesFileTypeMap().getContentType(file);
+        String mimeType = MIME_MAP.getContentType(file);
         // if mimeType detection failed, fall back to the default
         if (mimeType == null || mimeType.equalsIgnoreCase("")){
             mimeType = DEFAULT_MIMETYPE;
         }
         return mimeType;
     }
+    
+    /**
+     * determine whether the context is a HEAD http request
+     */
+    private static boolean isHEADRequest(ContentManagerParams params) {
+        Context context = params.getContext();
+        if (context != null) {
+            String method =
+                    context.getEnvironmentValue(
+                            Constants.HTTP_REQUEST.METHOD.attributeId);
+            return "HEAD".equalsIgnoreCase(method);
+                    
+        }
+        return false;
+    }
+    
+    /**
+     * Content-Length is determined elsewhere
+     * Content-Type is determined elsewhere
+     * Last-Modified
+     * ETag
+     * @param Context context: the request context
+     * @param File file: the resolved file-system resource
+     * @return
+     */
+    private static Property[] getFileDatastreamHeaders(String canonicalPath, long lastModified) {
+        Property[] result = new Property[2];
+        String eTag =
+            MD5Utility.getBase16Hash(canonicalPath)
+            .concat(Long.toString(lastModified));
+        result[0] = new Property(HttpHeaders.ETAG, eTag);
+        result[1] = new Property(HttpHeaders.LAST_MODIFIED,
+                DateUtil.formatDate(new Date(lastModified)));
+        return result;
+    }
+
 }
 

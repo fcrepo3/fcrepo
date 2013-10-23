@@ -16,6 +16,8 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
@@ -160,6 +162,20 @@ public class WebClient {
         return get(url, failIfNotOK, creds);
     }
 
+    public HttpInputStream head(String url, boolean failIfNotOK)
+            throws IOException {
+        return head(url, failIfNotOK, null);
+    }
+
+    public HttpInputStream head(String url,
+            boolean failIfNotOK,
+            String user,
+            String pass) throws IOException {
+        UsernamePasswordCredentials creds = null;
+        if (user != null && !user.isEmpty() && pass != null && !pass.isEmpty())
+            creds = new UsernamePasswordCredentials(user, pass);
+        return head(url, failIfNotOK, creds);
+    }
     /**
      * Get an HTTP resource with the response as an InputStream, given a URL. If
      * FOLLOW_REDIRECTS is true, up to MAX_REDIRECTS redirects will be followed.
@@ -182,12 +198,25 @@ public class WebClient {
                                boolean failIfNotOK,
                                UsernamePasswordCredentials creds)
             throws IOException {
+        return execute(new HttpGet(), url, failIfNotOK, creds);
+    }
+    
+    public HttpInputStream head(String url,
+                     boolean failIfNotOK,
+                     UsernamePasswordCredentials creds)
+            throws IOException {
+        return execute(new HttpHead(), url, failIfNotOK, creds);
+    }
 
+    private HttpInputStream execute(HttpUriRequest request,
+                                    String url,
+                                    boolean failIfNotOK,
+                                    UsernamePasswordCredentials creds)
+            throws IOException {
         HttpClient client;
-        HttpGet getMethod = new HttpGet(url);
 
         if (wconfig.getUserAgent() != null) {
-            getMethod.setHeader(HttpHeaders.USER_AGENT, wconfig.getUserAgent());
+            request.setHeader(HttpHeaders.USER_AGENT, wconfig.getUserAgent());
         }
         if (creds != null && creds.getUserName() != null
                 && creds.getUserName().length() > 0) {
@@ -196,7 +225,7 @@ public class WebClient {
             client = getHttpClient(url);
         }
 
-        HttpInputStream in = new HttpInputStream(client, getMethod);
+        HttpInputStream in = new HttpInputStream(client, request);
         int status = in.getStatusCode();
         if (failIfNotOK) {
             if (status != 200) {
@@ -210,12 +239,11 @@ public class WebClient {
                         }
                         url = in.getResponseHeader(HttpHeaders.LOCATION).getValue();
                         in.close();
-                        getMethod = new HttpGet(url);
                         if (wconfig.getUserAgent() != null) {
-                            getMethod
+                            request
                                     .setHeader(HttpHeaders.USER_AGENT, wconfig.getUserAgent());
                         }
-                        in = new HttpInputStream(client, getMethod);
+                        in = new HttpInputStream(client, request);
                         status = in.getStatusCode();
                         count++;
                     }
