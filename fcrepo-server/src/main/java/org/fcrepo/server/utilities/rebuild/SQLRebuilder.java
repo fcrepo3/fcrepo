@@ -53,6 +53,7 @@ import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.RelationshipTuple;
+import org.fcrepo.server.utilities.SQLUtility;
 import org.fcrepo.server.utilities.TableSpec;
 
 /**
@@ -64,6 +65,15 @@ public class SQLRebuilder
     private static final Logger logger =
             LoggerFactory.getLogger(Rebuilder.class);
 
+    public static final String CREATE_REBUILD_STATUS =
+            "INSERT INTO fcrepoRebuildStatus (complete, rebuildDate) VALUES (?, ?)";
+
+    public static final String UPDATE_REBUILD_STATUS =
+            "UPDATE fcrepoRebuildStatus SET complete=? WHERE rebuildDate=?";
+
+    public static final String DBSPEC_LOCATION =
+            "org/fcrepo/server/storage/resources/DefaultDOManager.dbspec";
+
     private ServerConfiguration m_serverConfig;
 
     private Server m_server;
@@ -71,6 +81,8 @@ public class SQLRebuilder
     private ConnectionPool m_connectionPool;
 
     private Context m_context;
+    
+    private long m_now = -1;
 
     /**
      * Get a short phrase describing what the user can do with this rebuilder.
@@ -126,7 +138,6 @@ public class SQLRebuilder
         // (in particular the hash map held by PIDGenerator)
         // don't get out of sync with the database.
         blankExistingTables();
-
         try {
             m_server = Rebuild.getServer();
             // now get the connectionpool
@@ -138,10 +149,15 @@ public class SQLRebuilder
                                                         "ConnectionPoolManager");
             }
             m_connectionPool = cpm.getPool();
+            ensureFedoraTables();
+            // set m_now, which is both when we are starting this job and the flag
+            // that it was started
+            m_now = System.currentTimeMillis();
+            startStatus(m_now);
             m_context =
                     ReadOnlyContext.getContext("utility", "fedoraAdmin", "", /* null, */
                     ReadOnlyContext.DO_OP);
-            String registryClassTemp = m_server.getParameter("registry");
+
             ILowlevelStorage llstore =
                     (ILowlevelStorage) m_server
                             .getModule("org.fcrepo.server.storage.lowlevel.ILowlevelStorage");
@@ -156,6 +172,41 @@ public class SQLRebuilder
         } catch (InitializationException ie) {
             logger.error("Error initializing", ie);
             throw ie;
+        }
+    }
+    
+    private final void startStatus(long time)
+            throws SQLException {
+        executeStatusSql(CREATE_REBUILD_STATUS, false, time);
+    }
+    
+    private final void finishStatus(long time)
+            throws SQLException {
+        executeStatusSql(UPDATE_REBUILD_STATUS, true, time);
+    }
+
+    private final void executeStatusSql(String sql, boolean complete, long time)
+            throws SQLException {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        try {
+            conn = m_connectionPool.getReadWriteConnection();
+            stmt = conn.prepareStatement(sql);
+            // we've written our 2 sql statements to use the same indices
+            // first is the boolean status
+            stmt.setBoolean(1, complete);
+            // next is the long date
+            stmt.setLong(2, time);
+            stmt.execute();
+        } finally {
+            if (stmt != null) {
+                stmt.close();
+                stmt = null;
+            }
+            if (conn != null) {
+                m_connectionPool.free(conn);
+                conn = null;
+            }
         }
     }
 
@@ -197,12 +248,11 @@ public class SQLRebuilder
         Connection connection = null;
         Statement s = null;
         try {
-            connection = getDefaultConnection();
+            connection = SQLUtility.getDefaultConnection(m_serverConfig);
             List<String> existingTables = getExistingTables(connection);
             List<String> fedoraTables = getFedoraTables();
             s = connection.createStatement();
-            for (int i = 0; i < existingTables.size(); i++) {
-                String origTableName = existingTables.get(i);
+            for (String origTableName: existingTables) {
                 String tableName = origTableName.toUpperCase();
                 if (fedoraTables.contains(tableName)
                         && !tableName.startsWith("RI")) {
@@ -230,6 +280,19 @@ public class SQLRebuilder
         }
     }
 
+    public void ensureFedoraTables() {
+        try {
+            InputStream specIn =
+                    getClass().getClassLoader()
+                            .getResourceAsStream(DBSPEC_LOCATION);
+            SQLUtility.createNonExistingTables(m_connectionPool, specIn);
+
+        } catch (Exception e) {
+            throw new RuntimeException("DB error while ensuring Fedora tables: "
+                                       + e.getMessage(),
+                                       e);
+        }
+    }
     /**
      * Get the names of all Fedora tables listed in the server's dbSpec file.
      * Names will be returned in ALL CAPS so that case-insensitive comparisons
@@ -237,15 +300,12 @@ public class SQLRebuilder
      */
     private List<String> getFedoraTables() {
         try {
-            String dbSpecLocation =
-                    "org/fcrepo/server/storage/resources/DefaultDOManager.dbspec";
             InputStream in =
                     getClass().getClassLoader()
-                            .getResourceAsStream(dbSpecLocation);
+                            .getResourceAsStream(DBSPEC_LOCATION);
             List<TableSpec> specs = TableSpec.getTableSpecs(in);
             ArrayList<String> names = new ArrayList<String>();
-            for (int i = 0; i < specs.size(); i++) {
-                TableSpec spec = specs.get(i);
+            for (TableSpec spec: specs) {
                 names.add(spec.getName().toUpperCase());
             }
             return names;
@@ -319,18 +379,6 @@ public class SQLRebuilder
             }
         }
 
-        // GET DIGITAL OBJECT WRITER:
-        // get an object writer configured with the DEFAULT export format
-        // barmintor: this appears to be unused code, commenting out with intent to delete
-        //logger.debug("INGEST: Instantiating a SimpleDOWriter...");
-        //try {
-        //    DOWriter w =
-        //            manager.getWriter(Server.USE_DEFINITIVE_STORE,
-        //                              m_context,
-        //                              obj.getPid());
-        //} catch (ServerException se) {
-        //}
-
         // PID GENERATION:
         // have the system generate a PID if one was not provided
         logger.debug("INGEST: Stream contained PID with retainable namespace-id... will use PID from stream.");
@@ -348,6 +396,8 @@ public class SQLRebuilder
         try {
             registerObject(obj);
         } catch (StorageDeviceException e) {
+            // continue past individual errors
+            logger.error(e.getMessage());
         }
 
         try {
@@ -396,7 +446,7 @@ public class SQLRebuilder
             }
         } catch (SQLException sqle) {
             throw new StorageDeviceException("Unexpected error from SQL database while registering object: "
-                    + sqle.getMessage());
+                    + sqle.getMessage(), sqle);
         } finally {
             try {
                 if (s1 != null) {
@@ -404,7 +454,7 @@ public class SQLRebuilder
                 }
             } catch (Exception sqle) {
                 throw new StorageDeviceException("Unexpected error from SQL database while registering object: "
-                        + sqle.getMessage());
+                        + sqle.getMessage(), sqle);
             } finally {
                 s1 = null;
             }
@@ -459,43 +509,14 @@ public class SQLRebuilder
     }
 
     /**
-     * Free up any system resources associated with rebuilding.
+     * Update the status table to indicate that we finished normally.
      */
     @Override
-    public void finish() {
-        // nothing to do
-    }
-
-    /**
-     * Gets a connection to the database specified in connection pool module's
-     * "defaultPoolName" config value. This allows us to the connect to the
-     * database without the server running.
-     */
-    private Connection getDefaultConnection() {
-        ModuleConfiguration poolConfig =
-                m_serverConfig
-                        .getModuleConfiguration("org.fcrepo.server.storage.ConnectionPoolManager");
-        String datastoreID =
-                poolConfig.getParameter("defaultPoolName",Parameter.class).getValue();
-        DatastoreConfiguration dbConfig =
-                m_serverConfig.getDatastoreConfiguration(datastoreID);
-        return getConnection(dbConfig.getParameter("jdbcDriverClass",Parameter.class)
-                                     .getValue(),
-                             dbConfig.getParameter("jdbcURL",Parameter.class).getValue(),
-                             dbConfig.getParameter("dbUsername",Parameter.class).getValue(),
-                             dbConfig.getParameter("dbPassword",Parameter.class).getValue());
-    }
-
-    private static Connection getConnection(String driverClass,
-                                            String url,
-                                            String username,
-                                            String password) {
-        try {
-            Class.forName(driverClass);
-            return DriverManager.getConnection(url, username, password);
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting database connection", e);
+    public void finish() throws Exception {
+        if (m_now == -1) {
+            throw new RuntimeException("Called finish() without calling start()");
         }
+        finishStatus(m_now);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.fcrepo.common.PID;
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.ObjectAlreadyInLowlevelStorageException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
+import org.fcrepo.server.storage.lowlevel.ICheckable;
 import org.fcrepo.server.storage.lowlevel.IListable;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
 import org.fcrepo.server.storage.lowlevel.ISizable;
@@ -46,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * @author Chris Wilper
  */
 public class AkubraLowlevelStorage
-        implements ILowlevelStorage, IListable, ISizable {
+        implements ILowlevelStorage, IListable, ISizable, ICheckable {
 
     private static final Logger logger =
             LoggerFactory.getLogger(AkubraLowlevelStorage.class);
@@ -201,7 +202,15 @@ public class AkubraLowlevelStorage
     public long getDatastreamSize(String dsKey) throws LowlevelStorageException {
         return getSize(datastreamStore, dsKey);
     }
-
+    
+    //
+    // ICheckable methods
+    //
+    @Override
+    public boolean objectExists(String objectKey) {
+        return exists(objectStore, objectKey, null);
+    }
+    
     //
     // Private implementation methods
     //
@@ -442,7 +451,8 @@ public class AkubraLowlevelStorage
     }
 
 
-    private static BlobStoreConnection getConnection(BlobStore store, Map<String, String> hints) {
+    private static BlobStoreConnection getConnection(BlobStore store,
+            Map<String, String> hints) {
         try {
             return store.openConnection(null, hints);
         } catch (IOException e) {
@@ -496,6 +506,14 @@ public class AkubraLowlevelStorage
             logger.error(e.toString(),e);
             throw new FaultException("System error opening output stream", e);
         }
+    }
+    
+    private static boolean exists(BlobStore blobStore, String key,
+            Map<String, String> hints) {
+        URI blobId = getBlobId(key);
+        BlobStoreConnection conn =
+                getConnection(blobStore, hints);
+        return exists(getBlob(conn, blobId, hints));
     }
 
     private static boolean exists(Blob blob) {

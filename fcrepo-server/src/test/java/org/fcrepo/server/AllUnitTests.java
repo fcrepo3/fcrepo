@@ -10,6 +10,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses( {
+        BasicServerTest.class,
         org.fcrepo.server.config.AllUnitTests.class,
         org.fcrepo.server.journal.AllUnitTests.class,
         org.fcrepo.server.messaging.AllUnitTests.class,
@@ -18,6 +19,7 @@ import org.junit.runners.Suite;
         org.fcrepo.server.security.AllUnitTests.class,
         org.fcrepo.server.storage.AllUnitTests.class,
         org.fcrepo.server.utilities.AllUnitTests.class,
+        org.fcrepo.server.utilities.rebuild.AllUnitTests.class,
         org.fcrepo.server.validation.AllUnitTests.class})
 public class AllUnitTests {
 

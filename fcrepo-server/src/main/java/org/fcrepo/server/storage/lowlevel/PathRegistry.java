@@ -43,6 +43,8 @@ public abstract class PathRegistry {
         registryName = (String) configuration.get("registryName");
         storeBases = (String[]) configuration.get("storeBases");
     }
+    
+    public abstract boolean exists(String pid) throws LowlevelStorageException;
 
     public abstract String get(String pid) throws LowlevelStorageException;
 
@@ -184,6 +186,6 @@ public abstract class PathRegistry {
         traverseFiles(files, operation, stopOnError, report);
     }
 
-    protected abstract Enumeration<String> keys() throws LowlevelStorageException,
+    public abstract Enumeration<String> keys() throws LowlevelStorageException,
             LowlevelStorageInconsistencyException;
 }

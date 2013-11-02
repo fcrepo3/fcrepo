@@ -9,7 +9,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses( {org.fcrepo.server.storage.translation.AllUnitTests.class,
+@Suite.SuiteClasses( {org.fcrepo.server.storage.DefaultDOManagerTest.class,
+                      org.fcrepo.server.storage.translation.AllUnitTests.class,
                       org.fcrepo.server.storage.lowlevel.akubra.AllUnitTests.class})
 public class AllUnitTests {
 

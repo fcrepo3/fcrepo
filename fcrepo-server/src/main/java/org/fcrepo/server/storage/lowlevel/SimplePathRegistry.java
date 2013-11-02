@@ -30,6 +30,16 @@ class SimplePathRegistry
         super(configuration);
         rebuild();
     }
+    
+    @Override
+    public boolean exists(String pid) throws LowlevelStorageException {
+        try {
+            return hashtable.containsKey(pid);
+        } catch (Exception e) {
+            throw new LowlevelStorageException(true, "SimplePathRegistry.exists("
+                    + pid + ")", e);
+        }
+    }
 
     @Override
     public String get(String pid) throws LowlevelStorageException {
@@ -97,7 +107,7 @@ class SimplePathRegistry
     }
 
     @Override
-    protected Enumeration<String> keys() throws LowlevelStorageException {
+    public Enumeration<String> keys() throws LowlevelStorageException {
         return hashtable.keys();
     }
 }

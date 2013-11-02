@@ -55,6 +55,7 @@ import org.fcrepo.server.resourceIndex.ResourceIndex;
 import org.fcrepo.server.search.FieldSearch;
 import org.fcrepo.server.search.FieldSearchQuery;
 import org.fcrepo.server.search.FieldSearchResult;
+import org.fcrepo.server.storage.lowlevel.ICheckable;
 import org.fcrepo.server.storage.lowlevel.ILowlevelStorage;
 import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.translation.DOTranslator;
@@ -75,7 +76,6 @@ import org.fcrepo.server.validation.DOValidator;
 import org.fcrepo.server.validation.ValidationUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.tidy.Out;
 
 /**
  * Manages the reading and writing of digital objects by instantiating an
@@ -85,7 +85,8 @@ import org.w3c.tidy.Out;
  * @author Chris Wilper
  * @version $Id$
  */
-public class DefaultDOManager extends Module implements DOManager {
+public class DefaultDOManager extends Module
+implements DOManager {
 
     private static final Logger logger = LoggerFactory
             .getLogger(DefaultDOManager.class);
@@ -109,6 +110,13 @@ public class DefaultDOManager extends Module implements DOManager {
 
     public static String PID_VERSION_UPDATE =
             "UPDATE doRegistry SET systemVersion=? WHERE doPID=?";
+    
+    private static String INSERT_MODEL_DEPLOYMENT =
+            "INSERT INTO modelDeploymentMap (cModel, sDef, sDep) VALUES (?, ?, ?)";
+
+    private static String DELETE_MODEL_DEPLOYMENT =
+            "DELETE FROM modelDeploymentMap "
+                    + "WHERE cModel = ? AND sDef =? AND sDep = ?";
 
     private String m_pidNamespace;
 
@@ -123,8 +131,10 @@ public class DefaultDOManager extends Module implements DOManager {
     protected PIDGenerator m_pidGenerator;
 
     protected DOTranslator m_translator;
-
+    
     protected ILowlevelStorage m_permanentStore;
+    
+    protected boolean m_checkableStore;
 
     protected FedoraStorageHintProvider m_hintProvider;
 
@@ -413,6 +423,7 @@ public class DefaultDOManager extends Module implements DOManager {
             throw new ModuleInitializationException(
                     "LowlevelStorage not loaded", getRole());
         }
+        m_checkableStore = (m_permanentStore instanceof ICheckable);
         // get ref to DOReaderCache module
         m_readerCache = (DOReaderCache) getServer().getBean("org.fcrepo.server.readerCache");
         
@@ -429,7 +440,7 @@ public class DefaultDOManager extends Module implements DOManager {
         /* Load the service deployment cache from the registry */
         initializeCModelDeploymentCache();
     }
-
+    
     @Override
     public String lookupDeploymentForCModel(String cModelPid, String sDefPid) {
 
@@ -538,9 +549,7 @@ public class DefaultDOManager extends Module implements DOManager {
     private void addDeployment(ServiceContext context, DigitalObject sDep,
             Connection c) throws SQLException {
 
-        String query =
-                "INSERT INTO modelDeploymentMap (cModel, sDef, sDep) VALUES (?, ?, ?)";
-        PreparedStatement s = c.prepareStatement(query);
+        PreparedStatement s = c.prepareStatement(INSERT_MODEL_DEPLOYMENT);
 
         try {
             s.setString(1, context.cModel);
@@ -568,10 +577,7 @@ public class DefaultDOManager extends Module implements DOManager {
 
     private void removeDeployment(ServiceContext context, DigitalObject sDep,
             Connection c) throws SQLException {
-        String query =
-                "DELETE FROM modelDeploymentMap "
-                        + "WHERE cModel = ? AND sDef =? AND sDep = ?";
-        PreparedStatement s = c.prepareStatement(query);
+        PreparedStatement s = c.prepareStatement(DELETE_MODEL_DEPLOYMENT);
         s.setString(1, context.cModel);
         s.setString(2, context.sDef);
         s.setString(3, sDep.getPid());
@@ -684,7 +690,7 @@ public class DefaultDOManager extends Module implements DOManager {
     public DOTranslator getTranslator() {
         return m_translator;
     }
-
+    
     /**
      * Gets a reader on an an existing digital object.
      */
@@ -1140,8 +1146,7 @@ public class DefaultDOManager extends Module implements DOManager {
                                     mimeTypedStream =
                                             new MIMETypedStream(
                                                     null,
-                                                    m_permanentStore
-                                                            .retrieveDatastream(dmc.DSLocation
+                                                    m_permanentStore.retrieveDatastream(dmc.DSLocation
                                                                     .substring(7)),
                                                     null, dmc.DSSize);
                                 } else if (dmc.DSLocation
@@ -1208,8 +1213,7 @@ public class DefaultDOManager extends Module implements DOManager {
                                                         dsHints);
                                     } catch (ObjectAlreadyInLowlevelStorageException oailse) {
                                         dmc.DSSize =
-                                                m_permanentStore
-                                                        .replaceDatastream(
+                                                m_permanentStore.replaceDatastream(
                                                                 internalId,
                                                                 mimeTypedStream
                                                                         .getStream(),
@@ -1367,7 +1371,7 @@ public class DefaultDOManager extends Module implements DOManager {
                  * update systemVersion in doRegistry (add one), and update
                  * deployment maps if necessary.
                  */
-                logger.debug("Updating registry for " + pid);
+                logger.debug("Updating registry for {}", pid);
                 Connection conn = null;
                 PreparedStatement s = null;
                 ResultSet results = null;
@@ -1419,7 +1423,7 @@ public class DefaultDOManager extends Module implements DOManager {
 
                 // REPLICATE:
                 // add to replication jobs table and do replication to db
-                logger.info("Updating dissemination index for " + pid);
+                logger.info("Updating dissemination index for {}", pid);
                 String whichIndex = "FieldSearch";
 
                 try {
@@ -1476,8 +1480,8 @@ public class DefaultDOManager extends Module implements DOManager {
     private void removeObject(DigitalObject obj, boolean failSafe)
             throws ServerException {
 
-        String pid = obj.getPid();
-        logger.info("Committing removal of " + pid);
+        final String pid = obj.getPid();
+        logger.info("Committing removal of {}", pid);
 
         // RESOURCE INDEX:
         // remove digital object from the resourceIndex
@@ -1485,10 +1489,10 @@ public class DefaultDOManager extends Module implements DOManager {
         // relationships might be in managed datastreams)
         if (m_resourceIndex.getIndexLevel() != ResourceIndex.INDEX_LEVEL_OFF) {
             try {
-                logger.info("Deleting " + pid + " from ResourceIndex");
+                logger.info("Deleting {} from ResourceIndex", pid);
                 m_resourceIndex.deleteObject(new SimpleDOReader(null, null,
                         null, null, null, obj));
-                logger.debug("Finished deleting " + pid + " from ResourceIndex");
+                logger.debug("Finished deleting {} from ResourceIndex", pid);
             } catch (ServerException se) {
                 if (failSafe) {
                     logger.warn("Object " + pid +
@@ -1517,10 +1521,10 @@ public class DefaultDOManager extends Module implements DOManager {
                 // iterate over all versions of this dsID
                 for (Datastream dmc : obj.datastreams(dsID)) {
                     String id =
-                            obj.getPid() + "+" + dmc.DatastreamID + "+" +
+                            pid + "+" + dmc.DatastreamID + "+" +
                                     dmc.DSVersionID;
-                    logger.info("Deleting managed datastream: " + id + " for " +
-                            pid);
+                    logger.info("Deleting managed datastream: {} for {}",
+                            id, pid);
                     try {
                         m_permanentStore.removeDatastream(id);
                     } catch (LowlevelStorageException llse) {
@@ -1545,7 +1549,7 @@ public class DefaultDOManager extends Module implements DOManager {
         // STORAGE:
         // remove digital object from persistent storage
         try {
-            m_permanentStore.removeObject(obj.getPid());
+            m_permanentStore.removeObject(pid);
         } catch (ObjectNotInLowlevelStorageException onilse) {
             if (failSafe) {
                 logger.warn("Object " + pid +
@@ -1561,7 +1565,7 @@ public class DefaultDOManager extends Module implements DOManager {
         // now that the object xml is removed, make sure future requests
         // for the object will not use a stale copy
         if (m_readerCache != null) {
-            m_readerCache.remove(obj.getPid());
+            m_readerCache.remove(pid);
         }
 
         // REGISTRY:
@@ -1663,6 +1667,24 @@ public class DefaultDOManager extends Module implements DOManager {
      */
     @Override
     public boolean objectExists(String pid) throws StorageDeviceException {
+        boolean registered = objectExistsInRegistry(pid);
+        boolean exists = false;
+        if (!registered && m_checkableStore) {
+            try {
+                exists = ((ICheckable)m_permanentStore).objectExists(pid);
+            } catch (LowlevelStorageException e) {
+                throw new StorageDeviceException(e.getMessage(), e);
+            }
+        }
+        if (exists && !registered) {
+            logger.warn("{} was not in the registry, but appears to be in store." +
+                        " Registry db may be in inconsistent state.", pid);
+        }
+        return registered || exists;
+    }
+    
+    protected boolean objectExistsInRegistry(String pid)
+        throws StorageDeviceException {
         logger.debug("Checking if " + pid + " already exists");
         Connection conn = null;
         PreparedStatement s = null;
@@ -2134,11 +2156,9 @@ public class DefaultDOManager extends Module implements DOManager {
                 }
 
                 if (count > 1) {
-                    logger.info("More than one service deployment specified for sDef " +
-                            cxt.sDef +
-                            " in model " +
-                            cxt.cModel +
-                            ".  Using the one with the EARLIEST modification date.");
+                    logger.info("More than one service deployment specified for sDef {}" +
+                            " in model {}.  Using the one with the EARLIEST modification date.",
+                            cxt.sDef, cxt.cModel);
                 }
                 return sDep;
             } else {

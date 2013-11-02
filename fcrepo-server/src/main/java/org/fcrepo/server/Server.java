@@ -913,7 +913,7 @@ public abstract class Server
      *        The role of the <code>Module</code> to get.
      * @return The <code>Module</code>, <code>null</code> if not found.
      */
-    public final Module getModule(String role) {
+    public Module getModule(String role) {
         if(m_moduleContext.containsBean(role)){
             try{
                 return m_moduleContext.getBean(role,Module.class);
