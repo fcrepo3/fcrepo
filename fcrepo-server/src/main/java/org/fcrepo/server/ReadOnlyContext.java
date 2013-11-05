@@ -5,7 +5,9 @@
 package org.fcrepo.server;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -57,6 +59,8 @@ public class ReadOnlyContext
     private MultiValueMap<URI> m_actionAttributes;
 
     private MultiValueMap<URI> m_resourceAttributes;
+    
+    private MultiValueMap<String> m_requestHeaders;
 
     private final String password;
 
@@ -105,6 +109,7 @@ public class ReadOnlyContext
         if (request instanceof ExtendedHttpServletRequest) {
             extendedHttpServletRequest = (ExtendedHttpServletRequest) request;
         }
+        m_requestHeaders = getHeaders(request);
     }
 
     public void setEnvironmentValues(MultiValueMap<URI> environmentAttributes) {
@@ -194,9 +199,10 @@ public class ReadOnlyContext
 
     @Override
     public void setActionAttributes(MultiValueMap<URI> actionAttributes) {
-        m_actionAttributes = actionAttributes;
-        if (m_actionAttributes == null) {
+        if (actionAttributes == null) {
             m_actionAttributes = new MultiValueMap<URI>();
+        } else {
+            m_actionAttributes = actionAttributes;            
         }
         m_actionAttributes.lock();
     }
@@ -228,9 +234,10 @@ public class ReadOnlyContext
 
     @Override
     public void setResourceAttributes(MultiValueMap<URI> resourceAttributes) {
-        m_resourceAttributes = resourceAttributes;
-        if (m_resourceAttributes == null) {
+        if (resourceAttributes == null) {
             m_resourceAttributes = new MultiValueMap<URI>();
+        } else {
+            m_resourceAttributes = resourceAttributes;
         }
         m_resourceAttributes.lock();
     }
@@ -544,7 +551,7 @@ public class ReadOnlyContext
                 && testFedoraAuxSubjectAttributes instanceof Map) {
             auxSubjectRoles = (Map<String, ?>) testFedoraAuxSubjectAttributes;
         }
-        return getContext(request, environmentMap, subjectId, password, /* overrideRoles, */
+        return getContext(request, environmentMap, subjectId, password,
         auxSubjectRoles, noOp);
     }
 
@@ -557,5 +564,43 @@ public class ReadOnlyContext
     public boolean getNoOp() {
         return noOp;
     }
+    
+    @Override
+    public MultiValueMap<String> getHeaders() {
+        return m_requestHeaders;
+    }
 
+    @Override
+    public String getHeaderValue(String name) {
+        return m_requestHeaders.getString(name);
+    }
+
+    @Override
+    public String[] getHeaderValues(String name) {
+        return m_requestHeaders.getStringArray(name);
+    }
+
+    private static MultiValueMap<String> getHeaders(HttpServletRequest request) {
+        MultiValueMap<String> result = new MultiValueMap<String>();
+        if (request == null) return result;
+        @SuppressWarnings("unchecked")
+        Enumeration<String> names = request.getHeaderNames();
+        while(names.hasMoreElements()) {
+            String name = names.nextElement();
+            @SuppressWarnings("unchecked")
+            Enumeration<String> values = request.getHeaders(name);
+            while(values.hasMoreElements()) {
+                String next = values.nextElement();
+                if (result.length(name) > 0) {
+                    String[] prev = result.getStringArray(name);
+                    String[]temp = Arrays.copyOf(prev, prev.length + 1);
+                    temp[temp.length - 1] = next;
+                    result.set(name, temp);
+                } else {
+                    result.set(name, next);
+                }
+            }
+        }
+        return result;
+    }
 }

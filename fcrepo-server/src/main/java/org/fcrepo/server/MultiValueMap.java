@@ -164,10 +164,13 @@ public class MultiValueMap<T> {
         return attributes.hashCode() + (locked ? 1 : 0);
     }
 
-    protected static final String here;
-    static {
-        here = "MultiValueMap";
+    public static <S> MultiValueMap<S> empty(Class<S> klazz) {
+        MultiValueMap<S> result = new MultiValueMap<S>();
+        result.lock();
+        return result;
     }
+
+    protected static final String here = "MultiValueMap";
 
     private void audit(T key, Object value)
             throws IllegalArgumentException, IllegalStateException {

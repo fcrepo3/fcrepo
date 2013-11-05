@@ -49,6 +49,12 @@ public interface Context {
     public String getResourceValue(URI name);
 
     public String[] getResourceValues(URI name);
+    
+    public MultiValueMap<String> getHeaders();
+    
+    public String getHeaderValue(String name);
+    
+    public String[] getHeaderValues(String name);
 
     public void setActionAttributes(MultiValueMap<URI> actionAttributes);
 
@@ -64,7 +70,5 @@ public interface Context {
 
     public static final String FEDORA_AUX_SUBJECT_ATTRIBUTES =
             "FEDORA_AUX_SUBJECT_ATTRIBUTES";
-
-    //public boolean useCachedObject();
 
 }

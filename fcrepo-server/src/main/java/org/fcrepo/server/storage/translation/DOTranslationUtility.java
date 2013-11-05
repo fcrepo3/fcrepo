@@ -9,6 +9,7 @@ import static org.fcrepo.common.Models.FEDORA_OBJECT_3_0;
 import static org.fcrepo.common.Models.SERVICE_DEFINITION_3_0;
 import static org.fcrepo.common.Models.SERVICE_DEPLOYMENT_3_0;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -225,7 +226,11 @@ public abstract class DOTranslationUtility
             XMLInputFactory.newInstance();
 
     // initialize static class with stuff that's used by all DO Serializerers
-    static {
+    public static void init(Server server) {
+        init(server.getHomeDir());
+    }
+    
+    public static void init(File serverHome) {
         // get host port from system properties (for testing without server instance)
         String fedoraServerHost = System.getProperty("fedora.hostname");
         String fedoraServerPort = System.getProperty("fedora.port");
@@ -249,7 +254,7 @@ public abstract class DOTranslationUtility
                 || fedoraAppServerContext == null) {
             // if fedoraServerHost or fedoraServerPort system properties
             // are not defined, read them from server configuration
-            ServerConfiguration config = Server.getConfig();
+            ServerConfiguration config = Server.getConfig(serverHome);
             fedoraServerHost =
                     config.getParameter("fedoraServerHost",Parameter.class).getValue();
             fedoraServerPort =

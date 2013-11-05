@@ -17,7 +17,6 @@ import org.junit.runners.Suite;
         org.fcrepo.test.api.TestRelationships.class,
         org.fcrepo.test.api.TestRISearch.class,
         org.fcrepo.server.messaging.AtomAPIMMessageTest.class,
-        org.fcrepo.server.storage.translation.DOTranslationUtilityTest.class,
         org.fcrepo.test.api.TestRESTAPI.class,
         org.fcrepo.test.api.TestAdminAPI.class})
 public class AllSystemTestsConfigC {
@@ -39,7 +38,6 @@ public class AllSystemTestsConfigC {
         suite.addTest(org.fcrepo.test.api.TestRISearch.suite());
         suite.addTest(org.fcrepo.test.api.TestRESTAPI.suite());
         suite.addTest(org.fcrepo.server.messaging.AtomAPIMMessageTest.suite());
-        suite.addTest(org.fcrepo.server.storage.translation.DOTranslationUtilityTest.suite());
         suite.addTest(org.fcrepo.test.api.TestAdminAPI.suite());
 
         return suite;

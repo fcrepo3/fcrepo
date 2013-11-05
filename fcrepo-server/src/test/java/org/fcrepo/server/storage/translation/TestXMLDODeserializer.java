@@ -63,15 +63,6 @@ public abstract class TestXMLDODeserializer
     TestXMLDODeserializer(DODeserializer deserializer, DOSerializer serializer) {
         m_deserializer = deserializer;
         m_serializer = serializer;
-        if (System.getProperty("fedora.hostname") == null) {
-            System.setProperty("fedora.hostname","localhost");
-        }
-        if (System.getProperty("fedora.port") == null) {
-            System.setProperty("fedora.port","1024");
-        }
-        if (System.getProperty("fedora.appServerContext") == null) {
-            System.setProperty("fedora.appServerContext","fedora");
-        }
     }
 
     //---

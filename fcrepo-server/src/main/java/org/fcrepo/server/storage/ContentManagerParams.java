@@ -26,6 +26,7 @@ public class ContentManagerParams {
     private String protocol;
     private boolean bypassBackend = false;
     private Context context;
+    private String fedoraUri = null;
     
     
     public ContentManagerParams(){
@@ -90,6 +91,14 @@ public class ContentManagerParams {
 
     public Context getContext() {
         return context;
+    }
+    
+    public void setFedoraUri(String fedoraUri) {
+        this.fedoraUri = fedoraUri;
+    }
+    
+    public String getFedoraUri() {
+        return this.fedoraUri;
     }
 }
 

@@ -17,6 +17,7 @@ import org.fcrepo.server.MultiValueMap;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.StreamIOException;
+import org.fcrepo.server.utilities.MD5Utility;
 import org.fcrepo.server.utilities.StringUtility;
 import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
@@ -329,10 +330,11 @@ public class Datastream {
     }
     
     public static String defaultETag(String pid, Datastream ds) {
-        StringBuilder etag = new StringBuilder(64);
-        etag.append(pid).append('+').append(ds.DatastreamID).append('+').append(ds.DSVersionID)
-        .append('+').append(Long.toString(ds.DSCreateDT.getTime()));
-        return etag.toString();
+        if (ds.DSChecksum != null) {
+            return ds.DSChecksum;
+        }
+        return MD5Utility.getBase16Hash(
+            pid,ds.DatastreamID,ds.DSVersionID,Long.toString(ds.DSCreateDT.getTime()));
     }
 
     private static final MultiValueMap<URI> beginEnvironmentMap(String messageProtocol) {

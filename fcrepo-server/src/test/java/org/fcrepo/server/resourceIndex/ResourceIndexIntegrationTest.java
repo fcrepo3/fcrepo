@@ -7,6 +7,7 @@ package org.fcrepo.server.resourceIndex;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +23,7 @@ import org.fcrepo.server.storage.ServiceDeploymentReader;
 import org.fcrepo.server.storage.SimpleDOReader;
 import org.fcrepo.server.storage.SimpleServiceDefinitionReader;
 import org.fcrepo.server.storage.SimpleServiceDeploymentReader;
+import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.ObjectBuilder;
@@ -132,6 +134,20 @@ public abstract class ResourceIndexIntegrationTest {
     @Before
     public void setupTest() throws Exception {
         _factory = new TripleIteratorFactory();
+    }
+    
+    @Before
+    public void setUpTranslationUtility() {
+        if (System.getProperty("fedora.hostname") == null) {
+            System.setProperty("fedora.hostname","localhost");
+        }
+        if (System.getProperty("fedora.port") == null) {
+            System.setProperty("fedora.port","1024");
+        }
+        if (System.getProperty("fedora.appServerContext") == null) {
+            System.setProperty("fedora.appServerContext","fedora");
+        }
+        DOTranslationUtility.init((File)null);
     }
 
     // Test tearDown

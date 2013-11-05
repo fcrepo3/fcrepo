@@ -135,7 +135,7 @@ public class DefaultExternalContentManager
                                                             + "The message was \""
                                                             + th.getMessage()
                                                             + "\".",
-                                                    getRole());
+                                                    getRole(), th);
         }
     }
 
@@ -189,9 +189,9 @@ public class DefaultExternalContentManager
                 response = m_http.get(url, true, user, pass);
             }
             String mimeType =
-                    response.getResponseHeaderValue("Content-Type",
+                    response.getResponseHeaderValue(HttpHeaders.CONTENT_TYPE,
                                                     knownMimeType);
-            long length = Long.parseLong(response.getResponseHeaderValue("Content-Length","-1"));
+            long length = Long.parseLong(response.getResponseHeaderValue(HttpHeaders.CONTENT_LENGTH,"-1"));
             Property[] headerArray =
                     toPropertyArray(response.getResponseHeaders());
             if (mimeType == null || mimeType.isEmpty()) {
@@ -368,7 +368,6 @@ public class DefaultExternalContentManager
                     context.getEnvironmentValue(
                             Constants.HTTP_REQUEST.METHOD.attributeId);
             return "HEAD".equalsIgnoreCase(method);
-                    
         }
         return false;
     }
@@ -378,15 +377,14 @@ public class DefaultExternalContentManager
      * Content-Type is determined elsewhere
      * Last-Modified
      * ETag
-     * @param Context context: the request context
-     * @param File file: the resolved file-system resource
+     * @param String canonicalPath: the canonical path to a file system resource
+     * @param long lastModified: the date of last modification
      * @return
      */
     private static Property[] getFileDatastreamHeaders(String canonicalPath, long lastModified) {
         Property[] result = new Property[2];
         String eTag =
-            MD5Utility.getBase16Hash(canonicalPath)
-            .concat(Long.toString(lastModified));
+            MD5Utility.getBase16Hash(canonicalPath.concat(Long.toString(lastModified)));
         result[0] = new Property(HttpHeaders.ETAG, eTag);
         result[1] = new Property(HttpHeaders.LAST_MODIFIED,
                 DateUtil.formatDate(new Date(lastModified)));

@@ -18,7 +18,8 @@ import org.junit.runners.Suite;
         TestMETSFedoraExt1_1DOSerializer.class,
         TestMETSFedoraExt1_1DODeserializer.class,
         TestAtomDOSerializer.class,
-        TestAtomDODeserializer.class})
+        TestAtomDODeserializer.class,
+        TestDOTranslationUtility.class})
 
 public class AllUnitTests {
 
@@ -44,6 +45,8 @@ public class AllUnitTests {
 
 //        suite.addTest(TestAtomDOSerializer.suite());
 //        suite.addTest(TestAtomDODeserializer.suite());
+
+        suite.addTest(TestDOTranslationUtility.suite());
 
         return suite;
     }

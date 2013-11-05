@@ -57,7 +57,7 @@ public class BasicServer
 
     @Override
     public void initServer() throws ServerInitializationException {
-
+        super.initServer();
         String fedoraServerHost = null;
         String fedoraServerPort = null;
 

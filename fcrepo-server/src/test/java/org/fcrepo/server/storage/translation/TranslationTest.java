@@ -6,20 +6,16 @@
 package org.fcrepo.server.storage.translation;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
-
 import java.util.Date;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.custommonkey.xmlunit.XMLTestCase;
-
 import org.jrdf.graph.URIReference;
-
 import org.junit.Before;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
@@ -51,10 +47,20 @@ public abstract class TranslationTest
     @Override
     @Before
     public void setUp() {
-        // HACK: make DOTranslationUtility happy
-        System.setProperty("fedoraServerHost", "localhost");
-        System.setProperty("fedoraServerPort", "8080");
-        System.setProperty("fedoraAppServerContext", Constants.FEDORA_DEFAULT_APP_CONTEXT);
+        // HACK: make DOTranslationUtility happy; does this still do anything?
+        //System.setProperty("fedoraServerHost", "localhost");
+        //System.setProperty("fedoraServerPort", "8080");
+        //System.setProperty("fedoraAppServerContext", Constants.FEDORA_DEFAULT_APP_CONTEXT);
+        if (System.getProperty("fedora.hostname") == null) {
+            System.setProperty("fedora.hostname","localhost");
+        }
+        if (System.getProperty("fedora.port") == null) {
+            System.setProperty("fedora.port","1024");
+        }
+        if (System.getProperty("fedora.appServerContext") == null) {
+            System.setProperty("fedora.appServerContext","fedora");
+        }
+        DOTranslationUtility.init((File)null);
     }
 
     //---

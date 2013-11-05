@@ -24,4 +24,11 @@ public abstract class MD5Utility {
         return MD5.asHex(new MD5(in).Final());
     }
 
+    public static String getBase16Hash(String ... in){
+        MD5 md5 = new MD5();
+        for (String i: in){
+            md5.Update(i);
+        }
+        return MD5.asHex(md5.Final());
+    }
 }

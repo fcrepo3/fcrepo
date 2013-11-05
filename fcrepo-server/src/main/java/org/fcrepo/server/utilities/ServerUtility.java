@@ -219,7 +219,11 @@ public class ServerUtility {
      * Initializes the web client http connection settings.
      */
     private static void initWebClientConfig(WebClientConfiguration wconf) {
-
+        if (CONFIG == null) {
+            logger.warn("Web client config was null; cannot configure web client for {}", ServerUtility.class);
+            logger.info("FEDORA_HOME is used to configure web client; was set to {}", Constants.FEDORA_HOME);
+            return;
+        }
         if (CONFIG.getParameter("httpClientTimeoutSecs") != null)
             wconf.setTimeoutSecs(Integer.parseInt(CONFIG.getParameter("httpClientTimeoutSecs")));
 

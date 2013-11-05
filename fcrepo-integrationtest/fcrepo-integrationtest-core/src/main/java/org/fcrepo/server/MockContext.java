@@ -193,4 +193,22 @@ public class MockContext
         return null;
     }
 
+    @Override
+    public MultiValueMap<String> getHeaders() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getHeaderValue(String name) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String[] getHeaderValues(String name) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

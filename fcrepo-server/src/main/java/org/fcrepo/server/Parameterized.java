@@ -88,7 +88,7 @@ public abstract class Parameterized implements Constants {
      *        to FEDORA_HOME.
      * @return The value, null if undefined.
      */
-    public final String getParameter(String name, boolean asAbsolutePath) {
+    public String getParameter(String name, boolean asAbsolutePath) {
         if (!m_parameters.containsKey(name)) return null;
 
         String paramValue = m_parameters.get(name).getValue();
@@ -108,11 +108,11 @@ public abstract class Parameterized implements Constants {
      *        The parameter name.
      * @return String The value, null if undefined.
      */
-    public final String getParameter(String name) {
+    public String getParameter(String name) {
         return getParameter(name, false);
     }
 
-    public final Parameter getParameter(String name,Class<Parameter> type) {
+    public Parameter getParameter(String name,Class<Parameter> type) {
         return m_parameters.get(name);
     }
 

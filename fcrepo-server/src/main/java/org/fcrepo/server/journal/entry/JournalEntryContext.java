@@ -285,4 +285,19 @@ public class JournalEntryContext
                 ^ environmentAttributes.hashCode() ^ password.hashCode()
                 ^ now.hashCode() + (noOp ? 0 : 1);
     }
+
+    @Override
+    public MultiValueMap<String> getHeaders() {
+        return null;
+    }
+
+    @Override
+    public String getHeaderValue(String name) {
+        return null;
+    }
+
+    @Override
+    public String[] getHeaderValues(String name) {
+        return null;
+    }
 }

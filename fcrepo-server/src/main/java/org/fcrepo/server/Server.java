@@ -46,6 +46,7 @@ import org.fcrepo.server.errors.ServerShutdownException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.resourceIndex.ModelBasedTripleGenerator;
 import org.fcrepo.server.security.Authorization;
+import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.utilities.status.ServerState;
 import org.fcrepo.server.utilities.status.ServerStatusFile;
 import org.fcrepo.utilities.DateUtility;
@@ -594,9 +595,6 @@ public abstract class Server
 
             for (DatastoreConfiguration ds:dsConfigs) {
                 String id = ds.getId();
-//                m_datastoreConfigs
-//                        .put(id, new DatastoreConfig((HashMap) datastoreParams
-//                                .get(id)));
                 logger.info("Loading fcfg datastore definitions for " + id);
                 registerBeanDefinition(id, createDatastoreConfigurationBeanDefinition(id));
             }
@@ -1270,17 +1268,13 @@ public abstract class Server
      * Performs any server start-up tasks particular to this type of Server.
      * <p>
      * </p>
-     * This is guaranteed to be run before any modules are loaded. The default
-     * implementation does nothing.
+     * This is guaranteed to be run before any modules are loaded.
      *
      * @throws ServerInitializationException
      *         If a severe server startup-related error occurred.
      */
-    @SuppressWarnings("unused")
     protected void initServer() throws ServerInitializationException {
-        if (1 == 2) {
-            throw new ServerInitializationException(null);
-        }
+        DOTranslationUtility.init(m_serverDir);
     }
 
     /**
@@ -1540,15 +1534,25 @@ public abstract class Server
     }
 
     /**
-     * Gets the server configuration.
+     * Gets the server configuration for the system-default FEDORA_HOME.
      *
      * @return the server configuration.
      */
     public static ServerConfiguration getConfig() {
+        return getConfig(new File(Constants.FEDORA_HOME,
+                             "server"));
+    }
+    
+    /**
+     * Gets the server configuration under a given $FEDORA_HOME/server/ directory.
+     * @param the server directory
+     * @return the server configuration.
+     */
+    public static ServerConfiguration getConfig(File serverHome) {
         try {
             InputStream fcfg = new FileInputStream(
-                    new File(Constants.FEDORA_HOME,
-                             "server/config/fedora.fcfg"));
+                    new File(serverHome,
+                             "config/fedora.fcfg"));
             ServerConfigurationParser parser =
                 new ServerConfigurationParser(fcfg);
             return parser.parse();

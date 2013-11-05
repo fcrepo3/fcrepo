@@ -4,20 +4,18 @@
  */
 package org.fcrepo.server.storage.translation;
 
-import static junit.framework.Assert.assertEquals;
-
 import java.io.ByteArrayInputStream;
-
 import java.util.List;
 
 import org.junit.After;
 import org.junit.Test;
-
 import org.fcrepo.server.storage.types.AuditRecord;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
-import org.fcrepo.test.FedoraTestCase;
 import org.fcrepo.utilities.DateUtility;
+
+
+
 
 
 
@@ -30,11 +28,24 @@ import static org.fcrepo.server.storage.translation.DOTranslationUtility.SERIALI
 
 /**
  * @author Edwin Shin
- * @version $Id: DOTranslationUtilityTest.java 6996 2008-04-18 18:46:06Z
+ * @version $Id: TestDOTranslationUtility.java 6996 2008-04-18 18:46:06Z
  *          pangloss $
  */
-public class DOTranslationUtilityTest extends FedoraTestCase {
-
+public class TestDOTranslationUtility extends TranslationTest {
+    
+    private String getFedoraAppServerContext() {
+        return System.getProperty("fedora.appServerContext");
+    }
+    
+    public String getBaseURL() {
+        if (System.getProperty("fedora.baseURL") != null) {
+            return System.getProperty("fedora.baseURL");
+        } else {
+            return "http://" + System.getProperty("fedora.hostname") + ":" + System.getProperty("fedora.port") + "/"
+                    + getFedoraAppServerContext();
+        }
+    }
+    
     /**
      * @throws java.lang.Exception
      */
@@ -48,6 +59,7 @@ public class DOTranslationUtilityTest extends FedoraTestCase {
      */
     @Test
     public void testNormalizeDSLocationURLs() {
+        DOTranslationUtility.init((java.io.File)null);
         String baseURL = getBaseURL();
         Datastream ds, ds2;
         String pid = "demo:foo";
@@ -279,7 +291,7 @@ public class DOTranslationUtilityTest extends FedoraTestCase {
 
     // Supports legacy test runners
     public static junit.framework.Test suite() {
-        return new junit.framework.JUnit4TestAdapter(DOTranslationUtilityTest.class);
+        return new junit.framework.JUnit4TestAdapter(TestDOTranslationUtility.class);
     }
 
     class ContextControlPair {
