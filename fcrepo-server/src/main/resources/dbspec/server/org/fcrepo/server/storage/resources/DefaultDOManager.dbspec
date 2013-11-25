@@ -141,7 +141,7 @@
 	</table>
 	<table name="fcrepoRebuildStatus">
 	    <comment>A table of one row that is dropped and rebuilt on every rebuild attempt.</comment>
-		<column name="rebuildDate" type="bigint" notNull="true" index="rebuildDate" unique="true">
+		<column name="rebuildDate" type="bigint" notNull="true" unique="true">
 			<comment>The date of the last SQL rebuild attempt.</comment>
 		</column>
 		<column name="complete" type="boolean" notNull="true">
