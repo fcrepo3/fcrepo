@@ -16,7 +16,7 @@ import org.fcrepo.server.errors.LowlevelStorageException;
 /**
  * @author Bill Niebel
  */
-class TimestampPathAlgorithm
+public class TimestampPathAlgorithm
         extends PathAlgorithm {
 
     private final String storeBase;
