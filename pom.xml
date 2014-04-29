@@ -321,7 +321,7 @@
       <dependency>
         <groupId>org.fcrepo</groupId>
         <artifactId>mulgara-core</artifactId>
-        <version>2.1.12</version>
+        <version>2.1.13</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -736,17 +736,6 @@
       </snapshots>
     </repository>
 
-    <repository>
-      <id>aduna</id>
-      <name>Aduna Releases Maven Repository</name>
-      <url>http://repo.aduna-software.org/maven2/releases/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
   </repositories>
 
   <scm>
