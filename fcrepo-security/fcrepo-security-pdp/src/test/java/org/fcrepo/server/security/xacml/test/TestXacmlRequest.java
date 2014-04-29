@@ -72,6 +72,7 @@ public class TestXacmlRequest {
             while (scanner.hasNextLine()) {
                 request.append(scanner.nextLine());
             }
+            scanner.close();
 
             testRequest(request.toString());
         } else {

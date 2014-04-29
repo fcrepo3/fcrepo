@@ -143,6 +143,7 @@ public class GenerateSamplePolicies {
                 strings.add(item);
             }
         }
+        scanner.close();
 
         System.out.println("Loaded " + strings.size() + " values.");
 
@@ -177,6 +178,7 @@ public class GenerateSamplePolicies {
                 }
             }
         }
+        scanner.close();
 
         System.out.println("Loaded action values.");
 

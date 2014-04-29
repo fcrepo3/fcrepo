@@ -60,6 +60,7 @@ public class PolicyUtils {
                 out.write(bytes, 0, count);
                 count = fis.read(bytes);
             }
+            fis.close();
         } catch (IOException e) {
             throw new MelcoePDPException("Error reading file: "
                     + f.getName(), e);

@@ -55,7 +55,8 @@ public class PolicyIndexUtils implements Constants {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(base + "/test-objects/xacml/test-policy-" + policy + ".xml"),"UTF-8"));
         String ln;
         while ((ln = br.readLine()) != null)
-            sb.append(ln + "\n");
+            sb.append(ln).append('\n');
+        br.close();
         return sb.toString();
 
 

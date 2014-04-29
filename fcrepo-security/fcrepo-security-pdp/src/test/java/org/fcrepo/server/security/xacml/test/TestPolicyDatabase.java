@@ -112,6 +112,7 @@ public class TestPolicyDatabase {
                     out.write(bytes, 0, count);
                     count = fis.read(bytes);
                 }
+                fis.close();
             } catch (IOException e) {
                 logger.error("Error reading file: " + f.getName(), e);
             }

@@ -40,9 +40,10 @@ public abstract class Base64 {
      * @param encoded bytes, or null if there's an error reading the stream
      */
     public static byte[] encode(InputStream in) {
+        Base64OutputStream out = null;
         try {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            Base64OutputStream out = new Base64OutputStream(bytes);
+            out = new Base64OutputStream(bytes);
             byte[] buf = new byte[4096];
             int len;
             while ((len = in.read(buf)) > 0) {
@@ -55,6 +56,7 @@ public abstract class Base64 {
         } finally {
             try {
                 in.close();
+                if (out != null) out.close();
             } catch (IOException e) {
                 throw new FaultException(e);
             }

@@ -235,6 +235,7 @@ public class WebClient {
                     while (300 <= status && status <= 399
                             && count <= wconfig.getMaxRedirects()) {
                         if (in.getResponseHeader(HttpHeaders.LOCATION) == null) {
+                            in.close();
                             throw new IOException("Redirect HTTP response provided no location header.");
                         }
                         url = in.getResponseHeader(HttpHeaders.LOCATION).getValue();

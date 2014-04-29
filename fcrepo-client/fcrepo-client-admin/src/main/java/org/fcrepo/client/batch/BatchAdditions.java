@@ -90,6 +90,7 @@ class BatchAdditions
                 String temp = new String(buffer, 0, bytesRead);
                 sbuffer.append(temp);
             }
+            fileInputStream.close();
             contents = new String(sbuffer);
         } catch (Exception e) {
             System.err.println("exception in content read " + e.getMessage());

@@ -311,6 +311,8 @@ public class DBPathRegistry
             while (rs.next()) {
                 String key = rs.getString(1);
                 if (null == key || 0 == key.length()) {
+                    connectionPool.free(connection);
+                    connection = null;
                     throw new LowlevelStorageInconsistencyException(
                         "Null token found in " + getRegistryName());
                 }

@@ -217,6 +217,7 @@ public class TestPolicyIndex extends FedoraServerTestCase implements Constants {
                     data.append(inp + sep);
                 }
             }
+            br.close();
 
             // overwrite existing with new version
             @SuppressWarnings("deprecation")

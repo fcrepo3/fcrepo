@@ -80,7 +80,6 @@ public class RelationshipResource extends BaseRestResource {
         try {
             RelationshipTuple[] tuples = m_management.getRelationships(context, subject, predicate);
             TripleIterator it = new TupleArrayTripleIterator(Arrays.asList(tuples));
-            ReadableCharArrayWriter out = new ReadableCharArrayWriter(256 * tuples.length);
 
             format = format.toLowerCase();
             RDFFormat outputFormat;
@@ -100,6 +99,8 @@ public class RelationshipResource extends BaseRestResource {
             } else {
                 throw new IllegalArgumentException("unknown format: " + format);
             }
+
+            ReadableCharArrayWriter out = new ReadableCharArrayWriter(256 * tuples.length);
             it.toStream(out, outputFormat, true);
             return Response.ok(out.getString(), mediaType).build();
         } catch (ServerException e) {

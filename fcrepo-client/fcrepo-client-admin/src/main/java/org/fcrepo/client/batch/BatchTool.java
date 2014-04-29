@@ -169,6 +169,7 @@ public class BatchTool {
                     }
                     //System.out.println("no exceptions");
                 } catch (Exception e) {
+                    out.close();
                     System.out.println(e.getMessage());
                     //System.out.println("exception = [" + e.getMessage() + "]");
                     Thread.dumpStack();

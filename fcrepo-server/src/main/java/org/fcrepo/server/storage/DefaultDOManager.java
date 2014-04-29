@@ -1391,6 +1391,7 @@ implements DOManager {
                     }
                     int systemVersion = results.getInt("systemVersion");
                     systemVersion++;
+                    s.close();
                     s = conn.prepareStatement(PID_VERSION_UPDATE);
                     s.setInt(1, systemVersion);
                     s.setString(2, obj.getPid());

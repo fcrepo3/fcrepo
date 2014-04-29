@@ -56,17 +56,19 @@ public class TestRmiTransportWriter {
     }
 
     @Test
-    public void testConstructorOpensConnection() throws JournalException {
-        new RmiTransportWriter(receiver, repositoryHash, "theFilename");
+    public void testConstructorOpensConnection() throws JournalException, IOException {
+        RmiTransportWriter rtw = new RmiTransportWriter(receiver, repositoryHash, "theFilename");
+        rtw.close();
         assertCorrectNumberOfCalls(receiver, 1, 0, 0);
         assertEquals(repositoryHash, receiver.getRepositoryHash());
         assertEquals("theFilename", receiver.getFilename());
     }
 
     @Test(expected = JournalException.class)
-    public void testConstructorGetsException() throws JournalException {
+    public void testConstructorGetsException() throws JournalException, IOException {
         receiver.setOpenFileThrowsException(true);
-        new RmiTransportWriter(receiver, repositoryHash, "theFilename");
+        RmiTransportWriter rtw = new RmiTransportWriter(receiver, repositoryHash, "theFilename");
+        rtw.close();
     }
 
     @Test
@@ -90,10 +92,14 @@ public class TestRmiTransportWriter {
 
         String text3 = "What's going on?";
         writer.write(text3, 3, 8);
-        assertCorrectNumberOfCalls(receiver, 1, 3, 0);
-        assertEquals("unexpected text 3", text3.substring(3, 11), receiver
-                .getText());
-        assertCorrectItemHash(receiver, 2);
+        try {
+            assertCorrectNumberOfCalls(receiver, 1, 3, 0);
+            assertEquals("unexpected text 3", text3.substring(3, 11), receiver
+                    .getText());
+            assertCorrectItemHash(receiver, 2);
+        } finally {
+            writer.close();
+        }
     }
 
     @Test(expected = IOException.class)
@@ -102,7 +108,11 @@ public class TestRmiTransportWriter {
 
         RmiTransportWriter writer =
                 new RmiTransportWriter(receiver, repositoryHash, "theFilename");
-        writer.write("Throw an exception");
+        try {
+            writer.write("Throw an exception");
+        } finally {
+            writer.close();
+        }
     }
 
     @Test
@@ -145,6 +155,7 @@ public class TestRmiTransportWriter {
         assertCorrectNumberOfCalls(receiver, 1, 0, 0);
 
         buffered.flush();
+        buffered.close();
         assertCorrectNumberOfCalls(receiver, 1, 1, 0);
         assertEquals("unexpected text", text1 + text2 + text3, receiver
                 .getText());

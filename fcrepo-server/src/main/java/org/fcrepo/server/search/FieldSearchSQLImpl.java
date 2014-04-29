@@ -281,6 +281,7 @@ public class FieldSearchSQLImpl
             st = conn.prepareStatement("DELETE FROM doFields WHERE pid=?");
             st.setString(1, pid);
             st.executeUpdate();
+            st.close();
             st = conn.prepareStatement("DELETE FROM dcDates WHERE pid=?");
             st.setString(1, pid);
             st.executeUpdate();

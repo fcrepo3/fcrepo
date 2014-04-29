@@ -133,10 +133,12 @@ public class Installer {
             throws InstallationFailedException {
         try {
             File war = new File(installDir, filename);
-            if (!FileUtils.copy(_dist.get(filename), new FileOutputStream(war))) {
+            FileOutputStream out = new FileOutputStream(war);
+            if (!FileUtils.copy(_dist.get(filename), out)) {
                 throw new InstallationFailedException("Copy to "
                         + war.getAbsolutePath() + " failed.");
             }
+            out.close();
             container.deploy(war);
         } catch (IOException e) {
             throw new InstallationFailedException(e.getMessage(), e);

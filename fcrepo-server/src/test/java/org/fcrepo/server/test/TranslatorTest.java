@@ -38,7 +38,6 @@ public class TranslatorTest {
             if (Constants.FEDORA_HOME == null) {
                 throw new IOException("FEDORA_HOME is not set. Try using -Dfedora.home=path/to/fedorahome");
             }
-            in = new FileInputStream(new File(args[0]));
             Server server;
             server = Server.getInstance(new File(Constants.FEDORA_HOME));
             DOTranslator trans =
@@ -49,11 +48,13 @@ public class TranslatorTest {
             }
             DigitalObject obj = new BasicDigitalObject();
             System.out.println("Deserializing...");
+            in = new FileInputStream(new File(args[0]));
             trans.deserialize(in,
                               obj,
                               args[1],
                               args[2],
                               DOTranslationUtility.DESERIALIZE_INSTANCE);
+            in.close();
             System.out.println("Done.");
             ByteArrayOutputStream outStream = new ByteArrayOutputStream();
             System.out.println("Re-serializing...");

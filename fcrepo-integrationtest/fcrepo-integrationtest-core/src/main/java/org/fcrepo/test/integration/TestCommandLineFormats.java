@@ -15,8 +15,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.StringReader;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -26,11 +26,9 @@ import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.Parser;
-
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -42,15 +40,11 @@ import junit.framework.JUnit4TestAdapter;
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.utility.export.Export;
 import org.fcrepo.client.utility.ingest.Ingest;
-
 import org.fcrepo.common.PID;
-
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.test.FedoraTestCase;
 import org.fcrepo.test.api.TestAPIM;
-
 import org.fcrepo.utilities.FileUtils;
 
 
@@ -312,6 +306,7 @@ public class TestCommandLineFormats
             FileInputStream fileReader = new FileInputStream(foxml10);
             byte[] objectXML = new byte[fileReader.available()];
             fileReader.read(objectXML);
+            fileReader.close();
             String xmlIn = new String(objectXML, "UTF-8");
             assertXpathExists("foxml:digitalObject[@PID='demo:998']", xmlIn);
             assertXpathExists(
@@ -344,10 +339,7 @@ public class TestCommandLineFormats
 
             Export.main(parameters);
             File foxml11 = new File(temp.getParent() + "/demo_998.xml");
-            FileInputStream fileReader = new FileInputStream(foxml11);
-            byte[] objectXML = new byte[fileReader.available()];
-            fileReader.read(objectXML);
-            String xmlIn = new String(objectXML, "UTF-8");
+            String xmlIn = fileAsUTFString(foxml11);
             assertXpathExists("foxml:digitalObject[@PID='demo:998']", xmlIn);
             assertXpathExists(
                     "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']",
@@ -382,10 +374,7 @@ public class TestCommandLineFormats
             assertTrue(
             		"Expected export file " + foxml11.getAbsolutePath() +
             		" does not exist!", foxml11.exists());
-            FileInputStream fileReader = new FileInputStream(foxml11);
-            byte[] objectXML = new byte[fileReader.available()];
-            fileReader.read(objectXML);
-            String xmlIn = new String(objectXML, "UTF-8");
+            String xmlIn = fileAsUTFString(foxml11);
             assertXpathExists("foxml:digitalObject[@PID='demo:998']", xmlIn);
             assertXpathExists(
                     "//foxml:objectProperties/foxml:property[@NAME='info:fedora/fedora-system:def/model#state' and @VALUE='Active']",
@@ -417,10 +406,7 @@ public class TestCommandLineFormats
 
             Export.main(parameters);
             File mets = new File(temp.getParent() + "/demo_998.xml");
-            FileInputStream fileReader = new FileInputStream(mets);
-            byte[] objectXML = new byte[fileReader.available()];
-            fileReader.read(objectXML);
-            String xmlIn = new String(objectXML, "UTF-8");
+            String xmlIn = fileAsUTFString(mets);
             assertXpathExists("METS:mets[@OBJID='demo:998']", xmlIn);
             assertXpathExists("METS:mets[@LABEL='Data Object (Coliseum) for Local Simple Image Demo']", xmlIn);
             assertXpathExists("METS:mets[@EXT_VERSION='1.1']", xmlIn);
@@ -446,10 +432,7 @@ public class TestCommandLineFormats
 
             Export.main(parameters);
             File mets = new File(temp.getParent() + "/demo_998.xml");
-            FileInputStream fileReader = new FileInputStream(mets);
-            byte[] objectXML = new byte[fileReader.available()];
-            fileReader.read(objectXML);
-            String xmlIn = new String(objectXML, "UTF-8");
+            String xmlIn = fileAsUTFString(mets);
             assertXpathExists("METS:mets[@OBJID='demo:998']", xmlIn);
             assertXpathExists("METS:mets[@LABEL='Data Object (Coliseum) for Local Simple Image Demo']", xmlIn);
             assertXpathNotExists("METS:mets[@EXT_VERSION='1.1']", xmlIn);
@@ -475,10 +458,7 @@ public class TestCommandLineFormats
 
             Export.main(parameters);
             File atom = new File(temp.getParent() + "/demo_998.xml");
-            FileInputStream fileReader = new FileInputStream(atom);
-            byte[] objectXML = new byte[fileReader.available()];
-            fileReader.read(objectXML);
-            String xmlIn = new String(objectXML, "UTF-8");
+            String xmlIn = fileAsUTFString(atom);
             // FIXME: Determine how to perform xpath tests with default namespace
             assertTrue(xmlIn.indexOf("<id>info:fedora/demo:998</id>") > -1);
             assertTrue(
@@ -533,6 +513,14 @@ public class TestCommandLineFormats
         } finally {
             apim.purgeObject("demo:998", "Purge test object", false);
         }
+    }
+    
+    private static String fileAsUTFString(File input) throws IOException {
+        FileInputStream fileReader = new FileInputStream(input);
+        byte[] objectXML = new byte[fileReader.available()];
+        fileReader.read(objectXML);
+        fileReader.close();
+        return new String(objectXML, "UTF-8");
     }
 
     public static junit.framework.Test suite() {

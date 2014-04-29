@@ -10,17 +10,12 @@ import java.util.Map;
 import org.fcrepo.common.FaultException;
 import org.fcrepo.server.errors.LowlevelStorageException;
 import org.fcrepo.server.errors.ObjectAlreadyInLowlevelStorageException;
-import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.storage.lowlevel.DefaultLowlevelStorage;
 import org.fcrepo.server.storage.lowlevel.FileSystem;
 import org.fcrepo.server.storage.lowlevel.PathAlgorithm;
 import org.fcrepo.server.storage.lowlevel.PathRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Store {
-    private static final Logger logger =
-            LoggerFactory.getLogger(Store.class);
 
     private final PathAlgorithm pathAlgorithm;
 

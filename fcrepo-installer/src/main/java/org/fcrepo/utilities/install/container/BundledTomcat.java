@@ -86,14 +86,16 @@ public class BundledTomcat
             // nothing to do
             return;
         }
+
         try {
             InputStream is = getDist().get(Distribution.KEYSTORE);
             File keystore = getIncludedKeystore();
-
-            if (!FileUtils.copy(is, new FileOutputStream(keystore))) {
+            FileOutputStream out = new FileOutputStream(keystore);
+            if (!FileUtils.copy(is, out)) {
                 throw new InstallationFailedException("Copy to " +
                         keystore.getAbsolutePath() + " failed.");
             }
+            out.close();
 
         } catch (IOException e) {
             throw new InstallationFailedException(e.getMessage(), e);

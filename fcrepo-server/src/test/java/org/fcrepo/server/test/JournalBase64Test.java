@@ -254,5 +254,7 @@ public class JournalBase64Test
                         + sourceByte + ", target=" + targetByte);
             }
         }
+        sourceStream.close();
+        targetStream.close();
     }
 }

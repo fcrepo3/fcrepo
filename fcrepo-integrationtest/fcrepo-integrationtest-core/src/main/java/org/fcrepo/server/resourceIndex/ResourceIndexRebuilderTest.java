@@ -141,6 +141,8 @@ public class ResourceIndexRebuilderTest {
             return socket.isConnected();
         } catch (ConnectException e) {
             return false;
+        } finally {
+            socket.close();
         }
     }
 

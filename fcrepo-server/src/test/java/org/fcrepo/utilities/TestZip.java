@@ -55,7 +55,12 @@ public class TestZip {
     @Test
     public void testZip() throws Exception {
         Zip.zip(ZIP_FILE, SRC_DIR.listFiles());
-        assertEquals(5, new ZipFile(ZIP_FILE).size());
+        ZipFile zf = new ZipFile(ZIP_FILE);
+        try {
+            assertEquals(5, zf.size());
+        } finally {
+            zf.close();
+        }
     }
 
     @Test

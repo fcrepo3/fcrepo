@@ -134,6 +134,7 @@ public class DataUtils {
         while ((len = fis.read(buf)) >= 0) {
             data.write(buf, 0, len);
         }
+        fis.close();
 
         return data.toByteArray();
     }

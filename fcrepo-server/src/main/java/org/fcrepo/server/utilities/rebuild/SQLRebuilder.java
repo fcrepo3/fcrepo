@@ -10,7 +10,6 @@ import java.io.InputStream;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,9 +32,6 @@ import org.fcrepo.common.Models;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
-import org.fcrepo.server.config.DatastoreConfiguration;
-import org.fcrepo.server.config.ModuleConfiguration;
-import org.fcrepo.server.config.Parameter;
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.errors.InitializationException;
 import org.fcrepo.server.errors.LowlevelStorageException;
@@ -477,6 +473,7 @@ public class SQLRebuilder
             int systemVersion = results.getInt("systemVersion");
             systemVersion++;
             query = "UPDATE doRegistry SET systemVersion=? WHERE doPID=?";
+            s2.close();
             s2 = conn.prepareStatement(query);
             s2.setInt(1, systemVersion);
             s2.setString(2,pid);

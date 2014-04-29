@@ -80,10 +80,12 @@ public class ExistingTomcat
                         .println("WARNING: The installer-provided keystore will not be installed, it will be copied to: \n\t"
                                 + keystore.getAbsolutePath());
             }
-            if (!FileUtils.copy(is, new FileOutputStream(keystore))) {
+            FileOutputStream out = new FileOutputStream(keystore);
+            if (!FileUtils.copy(is, out)) {
                 throw new InstallationFailedException("Copy to "
                         + keystore.getAbsolutePath() + " failed.");
             }
+            out.close();
         } catch (IOException e) {
             throw new InstallationFailedException(e.getMessage(), e);
         }
