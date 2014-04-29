@@ -88,9 +88,6 @@ public class DerbyDDLConverterIntegrationTest {
 
     private final String DC_DATES_INDEX =
             "CREATE INDEX dcDates_pid ON dcDates (pid)";
-    
-    private final String REBUILD_DATE_INDEX =
-            "CREATE INDEX fcrepoRebuildStatus_rebuildDate ON fcrepoRebuildStatus (rebuildDate)";
 
     @Before
     public void setUp() throws Exception {
@@ -107,7 +104,6 @@ public class DerbyDDLConverterIntegrationTest {
         expectedStmts.add(REBUILD_STATUS_TABLE_SPEC);
         expectedStmts.add(DO_FIELDS_INDEX);
         expectedStmts.add(DC_DATES_INDEX);
-        expectedStmts.add(REBUILD_DATE_INDEX);
     }
 
     @After
