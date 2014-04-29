@@ -198,14 +198,14 @@ public class WebClient {
                                boolean failIfNotOK,
                                UsernamePasswordCredentials creds)
             throws IOException {
-        return execute(new HttpGet(), url, failIfNotOK, creds);
+        return execute(new HttpGet(url), url, failIfNotOK, creds);
     }
     
     public HttpInputStream head(String url,
                      boolean failIfNotOK,
                      UsernamePasswordCredentials creds)
             throws IOException {
-        return execute(new HttpHead(), url, failIfNotOK, creds);
+        return execute(new HttpHead(url), url, failIfNotOK, creds);
     }
 
     private HttpInputStream execute(HttpUriRequest request,

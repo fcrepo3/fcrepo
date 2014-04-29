@@ -180,11 +180,14 @@ public class DefaultExternalContentManager
             String knownMimeType, boolean headOnly)
             throws GeneralException {
         logger.debug("DefaultExternalContentManager.get({})", url);
+        if (url == null) throw new GeneralException("null url");
         HttpInputStream response = null;
         try {
-            response = headOnly ? 
-                    m_http.get(url, true, user, pass) :
-                    m_http.head(url, true, user, pass);
+            if (headOnly) {
+                response = m_http.head(url, true, user, pass);
+            } else {
+                response = m_http.get(url, true, user, pass);
+            }
             String mimeType =
                     response.getResponseHeaderValue("Content-Type",
                                                     knownMimeType);
