@@ -262,20 +262,17 @@ public abstract class DateUtility {
 				throw new ParseException("Argument cannot be null.", 0);
 			}
 			
-            int last = dateString.length() - 1;
-			if (dateString.length() == 0) {
+            final int last = dateString.length() - 1;
+			if (last == -1) {
 				throw new ParseException("Argument cannot be empty.", 0);
 			} else if (dateString.charAt(last) == '.') {
 				throw new ParseException(
 						"dateString ends with invalid character.",
-						dateString.length() - 1);
+						last);
 			}
 			// SimpleDateFormat formatter = new SimpleDateFormat();
 			// formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-			int length = dateString.length();
-			if (dateString.charAt(0) == '-') {
-				length--;
-			}
+			final int length = (dateString.charAt(0) != '-') ? last + 1 : last;
 			DateTimeFormatter formatter = FORMATTER_MILLISECONDS_T_Z;
 			if (dateString.charAt(last) == 'Z') {
 				if (length == 11) {
@@ -331,8 +328,7 @@ public abstract class DateUtility {
 					// the timezone
 					// see
 					// http://joda-time.sourceforge.net/apidocs/org/joda/time/format/DateTimeFormat.html
-					dateString = dateString.substring(0,
-							dateString.length() - 4);
+					dateString = dateString.substring(0, last - 3);
 					formatter = FORMATTER_TIMEZONE;
 				}
 			}
