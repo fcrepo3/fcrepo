@@ -225,7 +225,6 @@ public class RelationshipTuple
                     null, literal.getLanguage());
         }
     }
-//org.openrdf.model.Literal
    
     // test for equality, accounting for null values
     private static boolean eq(Object a, Object b) {

@@ -120,6 +120,7 @@
     <cxf.version>2.7.7</cxf.version>
     <derby.version>10.9.1.0</derby.version>
     <jersey.version>1.8</jersey.version>
+    <sesame.version>2.7.11</sesame.version>
     <slf4j.version>1.7.2</slf4j.version>
     <spring.version>3.0.7.RELEASE</spring.version>
     <trippi.version>1.5.9</trippi.version>
@@ -350,11 +351,46 @@
         </exclusions>
       </dependency>
 
-      <dependency>
-        <groupId>org.fcrepo</groupId>
-        <artifactId>openrdf-sesame-onejar</artifactId>
-        <version>2.2.1</version>
-      </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-model</artifactId>
+      <version>${sesame.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-api</artifactId>
+      <version>${sesame.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-datatypes</artifactId>
+      <version>${sesame.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-languages</artifactId>
+      <version>${sesame.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-ntriples</artifactId>
+      <version>${sesame.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-n3</artifactId>
+      <version>${sesame.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-rdfxml</artifactId>
+      <version>${sesame.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-turtle</artifactId>
+      <version>${sesame.version}</version>
+    </dependency>
 
       <dependency>
         <groupId>jotm</groupId>

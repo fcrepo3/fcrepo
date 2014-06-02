@@ -161,8 +161,12 @@
       <artifactId>mulgara-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>openrdf-sesame-onejar</artifactId>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.fcrepo</groupId>

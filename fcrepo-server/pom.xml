@@ -709,6 +709,12 @@
     <dependency>
       <groupId>org.trippi</groupId>
       <artifactId>trippi-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.fcrepo</groupId>
+          <artifactId>openrdf-sesame-onejar</artifactId>      
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -761,10 +767,37 @@
     </dependency>
 
     <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>openrdf-sesame-onejar</artifactId>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-model</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-datatypes</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-languages</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-ntriples</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-n3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-rdfxml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-turtle</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>Tidy</artifactId>

@@ -2236,6 +2236,8 @@ public class TestRESTAPI
             Header[] actualHeaders) {
         Map<String, String> expected = mapHeaders(expectedHeaders);
         Map<String, String> actual = mapHeaders(actualHeaders);
+        expected.remove("Set-Cookie");
+        actual.remove("Set-Cookie");
         expected.remove(HttpHeaders.DATE);
         actual.remove(HttpHeaders.DATE);
         assertEquals("Response header names were different", join(expected.keySet()), join(actual.keySet()));
