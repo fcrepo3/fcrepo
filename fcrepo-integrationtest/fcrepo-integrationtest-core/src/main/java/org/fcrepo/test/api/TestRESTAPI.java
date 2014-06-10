@@ -15,6 +15,7 @@ import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_MOVED_TEMPORARILY;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_NOT_MODIFIED;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
@@ -33,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -1709,6 +1711,57 @@ public class TestRESTAPI
     }
 
     @Test
+    public void testDatastreamDisseminationConditionalGet()
+            throws Exception {
+
+        // test an inline (type X) datastream with no recorded size
+        // info:fedora/demo:REST/DS1 is a type 'X'
+        // filename from RELS-INT, no lookup of extension; no download
+        URI url = getURI("/objects/demo:REST/datastreams/DS1/content");
+        HttpGet get = new HttpGet(url);
+        HttpResponse response = getOrDelete(get, getAuthAccess(), false);
+        EntityUtils.consumeQuietly(response.getEntity());
+        assertEquals(SC_OK, response.getStatusLine().getStatusCode());
+        checkSingleHeader(HttpHeaders.CONTENT_LENGTH, response, Long.toString(47));
+        checkSingleHeader(HttpHeaders.CONTENT_TYPE, response, "text/xml");
+        // jpg should be from MIMETYPE mapping
+        CheckCDHeader(response, "inline", TestRESTAPI.DS1RelsFilename);
+        String etag = response.getFirstHeader(HttpHeaders.ETAG).getValue();
+        String lastModified = response.getFirstHeader(HttpHeaders.LAST_MODIFIED).getValue();
+        assertNotNull(etag);
+        assertNotNull(lastModified);
+        // again as conditional GET with matched etag
+        get = new HttpGet(url);
+        get.addHeader(HttpHeaders.IF_NONE_MATCH, etag);
+        response = getOrDelete(get, getAuthAccess(), false);
+        EntityUtils.consumeQuietly(response.getEntity());
+        assertEquals(SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+        // again as conditional GET with unmatched etag
+        get = new HttpGet(url);
+        get.addHeader(HttpHeaders.IF_NONE_MATCH, etag + "0");
+        response = getOrDelete(get, getAuthAccess(), false);
+        EntityUtils.consumeQuietly(response.getEntity());
+        assertEquals(SC_OK, response.getStatusLine().getStatusCode());
+        // again with If-Modified-Since
+        get = new HttpGet(url);
+        get.addHeader(HttpHeaders.IF_MODIFIED_SINCE, lastModified);
+        response = getOrDelete(get, getAuthAccess(), false);
+        EntityUtils.consumeQuietly(response.getEntity());
+        assertEquals(SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+        // and with If-Modified-Since indicating stale cache
+        SimpleDateFormat dateFormat =
+            new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        Date checkDate = dateFormat.parse(lastModified);
+        checkDate = new Date(checkDate.getTime() - 1000);
+        get = new HttpGet(url);
+        get.addHeader(HttpHeaders.IF_MODIFIED_SINCE, dateFormat.format(checkDate));
+        response = getOrDelete(get, getAuthAccess(), false);
+        EntityUtils.consumeQuietly(response.getEntity());
+        assertEquals(SC_OK, response.getStatusLine().getStatusCode());
+    }
+
+    @Test
     public void testDatastreamDisseminationHEAD()
             throws Exception {
 
@@ -1725,6 +1778,10 @@ public class TestRESTAPI
         // jpg should be from MIMETYPE mapping
         CheckCDHeader(response, "inline", TestRESTAPI.DS1RelsFilename);
         Header[] expectedHeaders = response.getAllHeaders();
+        String etag = response.getFirstHeader(HttpHeaders.ETAG).getValue();
+        String lastModified = response.getFirstHeader(HttpHeaders.LAST_MODIFIED).getValue();
+        assertNotNull(etag);
+        assertNotNull(lastModified);
         // again as HEAD
         HttpHead head = new HttpHead(url);
         response = getOrDelete(head, getAuthAccess(), false);

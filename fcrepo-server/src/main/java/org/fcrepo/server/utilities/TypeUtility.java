@@ -280,7 +280,7 @@ public abstract class TypeUtility {
         if (mimeTypedStream != null) {
             org.fcrepo.server.types.gen.MIMETypedStream genMIMETypedStream =
                     new org.fcrepo.server.types.gen.MIMETypedStream();
-            genMIMETypedStream.setMIMEType(mimeTypedStream.MIMEType);
+            genMIMETypedStream.setMIMEType(mimeTypedStream.getMIMEType());
             org.fcrepo.server.storage.types.Property[] header =
                     mimeTypedStream.header;
             org.fcrepo.server.types.gen.MIMETypedStream.Header head =
@@ -313,7 +313,7 @@ public abstract class TypeUtility {
         if (mimeTypedStream != null) {
             org.fcrepo.server.types.mtom.gen.MIMETypedStream genMIMETypedStream =
                     new org.fcrepo.server.types.mtom.gen.MIMETypedStream();
-            genMIMETypedStream.setMIMEType(mimeTypedStream.MIMEType);
+            genMIMETypedStream.setMIMEType(mimeTypedStream.getMIMEType());
             org.fcrepo.server.storage.types.Property[] header =
                     mimeTypedStream.header;
             org.fcrepo.server.types.mtom.gen.MIMETypedStream.Header head =
@@ -326,7 +326,7 @@ public abstract class TypeUtility {
             }
             genMIMETypedStream.setHeader(head);
 
-            InputStreamDataSource ds = new InputStreamDataSource(mimeTypedStream.getStream(), mimeTypedStream.MIMEType);
+            InputStreamDataSource ds = new InputStreamDataSource(mimeTypedStream.getStream(), mimeTypedStream.getMIMEType());
             genMIMETypedStream
                     .setStream(new DataHandler(ds));
             return genMIMETypedStream;

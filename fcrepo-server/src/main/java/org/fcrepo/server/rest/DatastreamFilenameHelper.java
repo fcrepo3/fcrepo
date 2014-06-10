@@ -186,13 +186,13 @@ public class DatastreamFilenameHelper {
         // is downloading requested?
         if (download != null && download.equals("true")) {
             // generate an "attachment" content disposition header with the filename
-            filename = getFilename(context, pid, dsID, asOfDateTime, stream.MIMEType);
+            filename = getFilename(context, pid, dsID, asOfDateTime, stream.getMIMEType());
             headerValue= attachmentHeader(filename);
         } else {
             // is the content disposition header enabled in the case of not downloading?
             if (m_datastreamContentDispositionInlineEnabled.equals("true")) {
                 // it is... generate the header with "inline"
-                filename = getFilename(context, pid, dsID, asOfDateTime, stream.MIMEType);
+                filename = getFilename(context, pid, dsID, asOfDateTime, stream.getMIMEType());
                 headerValue= inlineHeader(filename);
             }
         }

@@ -87,7 +87,7 @@ public class ReadOnlyContext
                             MultiValueMap<String> subjectAttributes,
                             String password,
                             boolean noOp) {
-        //super(parameters);
+
         setEnvironmentValues(environmentAttributes);
         m_subjectAttributes = subjectAttributes;
         if (m_subjectAttributes == null) {
@@ -289,26 +289,10 @@ public class ReadOnlyContext
         return environmentMap;
     }
 
-    //will need fixup for noOp
-//    public static Context getSoapContext() {
-//        HttpServletRequest req =
-//                (HttpServletRequest) MessageContext.getCurrentContext()
-//                        .getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
-//        return ReadOnlyContext.getContext(Constants.HTTP_REQUEST.SOAP.uri, req);
-//    }
-
     public static Context getSoapContext(javax.xml.ws.handler.MessageContext ctx) {
     	HttpServletRequest req = (HttpServletRequest) ctx.get(AbstractHTTPDestination.HTTP_REQUEST);
         return ReadOnlyContext.getContext(Constants.HTTP_REQUEST.SOAP.uri, req);
     }
-
-    /*
-     * i don't see any references. needed? let's see . . . public static final
-     * ReadOnlyContext getContext(Context existingContext, String subjectId,
-     * String password, String[] roles) { return
-     * getContext(existingContext.getEnvironmentAttributes(), subjectId,
-     * password, roles, existingContext.getNoOp()); }
-     */
 
     private static final ReadOnlyContext getContext(HttpServletRequest request,
                                                     MultiValueMap<URI> environmentMap,
@@ -395,14 +379,6 @@ public class ReadOnlyContext
                                    password == null ? "" : password,
                                    noOp);
     }
-
-    /*
-     * new; can we do without? private static final ReadOnlyContext
-     * getContext(MultiValueMap environmentMap, String subjectId, String
-     * password, String[] roles, Map auxSubjectRoles, boolean noOp) { return
-     * getContext(null, environmentMap, subjectId, password, roles,
-     * auxSubjectRoles, noOp); }
-     */
 
     // needed only for rebuild
     public static final ReadOnlyContext getContext(String messageProtocol,
@@ -517,7 +493,7 @@ public class ReadOnlyContext
         String password = null;
 
         try {
-            if(request instanceof ExtendedHttpServletRequest){
+            if (request instanceof ExtendedHttpServletRequest){
                 password = ((ExtendedHttpServletRequest) request).getPassword();
             }
         } catch (Throwable th) {
@@ -534,8 +510,7 @@ public class ReadOnlyContext
 
         boolean noOp = true; //safest approach
         try {
-            noOp =
-                    Boolean.parseBoolean(request.getParameter(NOOP_PARAMETER_NAME));
+            noOp = Boolean.parseBoolean(request.getParameter(NOOP_PARAMETER_NAME));
             logger.debug("NOOP_PARAMETER_NAME={}", NOOP_PARAMETER_NAME);
             logger.debug("request.getParameter(NOOP_PARAMETER_NAME)={}",
                     request.getParameter(NOOP_PARAMETER_NAME));
@@ -572,12 +547,12 @@ public class ReadOnlyContext
 
     @Override
     public String getHeaderValue(String name) {
-        return m_requestHeaders.getString(name);
+        return m_requestHeaders.getString(name.toLowerCase());
     }
 
     @Override
     public String[] getHeaderValues(String name) {
-        return m_requestHeaders.getStringArray(name);
+        return m_requestHeaders.getStringArray(name.toLowerCase());
     }
 
     private static MultiValueMap<String> getHeaders(HttpServletRequest request) {
@@ -585,8 +560,8 @@ public class ReadOnlyContext
         if (request == null) return result;
         @SuppressWarnings("unchecked")
         Enumeration<String> names = request.getHeaderNames();
-        while(names.hasMoreElements()) {
-            String name = names.nextElement();
+        while(names != null && names.hasMoreElements()) {
+            String name = names.nextElement().toLowerCase();
             @SuppressWarnings("unchecked")
             Enumeration<String> values = request.getHeaders(name);
             while(values.hasMoreElements()) {

@@ -28,6 +28,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
@@ -137,35 +138,40 @@ public class BaseRestResource {
     }
 
     protected Response buildResponse(MIMETypedStream result) throws Exception {
-        if (result.MIMEType.equalsIgnoreCase("application/fedora-redirect")) {
-            URI location = URI.create(IOUtils.toString(result.getStream()));
-            return Response.temporaryRedirect(location).build();
-        } else {
-            ResponseBuilder builder = Response.ok();
+        ResponseBuilder builder = null;
+        switch (result.getHttpStatus()) {
+            case HttpStatus.SC_MOVED_TEMPORARILY:
+                URI location = URI.create(IOUtils.toString(result.getStream()));
+                return Response.temporaryRedirect(location).build();
+            case HttpStatus.SC_NOT_MODIFIED:
+                builder = Response.notModified();
+                break;
+            default:
+                builder = Response.ok();
+                if (result.getSize() != -1L){
+                    builder.header(HttpHeaders.CONTENT_LENGTH,result.getSize());
+                }
 
-            if (result.header != null) {
-                for (Property header : result.header) {
-                    if (header.name != null
-                            && !(header.name.equalsIgnoreCase("transfer-encoding"))
-                            && !(header.name.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH))
-                            && !(header.name.equalsIgnoreCase(HttpHeaders.CONTENT_TYPE))) {
-                        builder.header(header.name, header.value);
-                    }
+                if (!result.getMIMEType().isEmpty()){
+                    builder.type(result.getMIMEType());
+                }
+                InputStream content = result.getStream();
+                if (content != null) {
+                    builder.entity(result.getStream());
+                }
+        }
+
+        if (result.header != null) {
+            for (Property header : result.header) {
+                if (header.name != null
+                        && !(header.name.equalsIgnoreCase("transfer-encoding"))
+                        && !(header.name.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH))
+                        && !(header.name.equalsIgnoreCase(HttpHeaders.CONTENT_TYPE))) {
+                    builder.header(header.name, header.value);
                 }
             }
-            if (result.getSize() != -1L){
-                builder.header(HttpHeaders.CONTENT_LENGTH,result.getSize());
-            }
-
-            if (!result.MIMEType.isEmpty()){
-                builder.type(result.MIMEType);
-            }
-            InputStream content = result.getStream();
-            if (content != null) {
-                builder.entity(result.getStream());
-            }
-            return builder.build();
         }
+        return builder.build();
     }
 
     private Response handleException(Exception ex) {

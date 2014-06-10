@@ -196,6 +196,7 @@ public class DatastreamManagedContent
      * @return
      * @throws StreamIOException
      */
+    @Override
     public long getContentSize(Context ctx) throws StreamIOException {
         try {
             // For new or modified datastreams, the new bytestream hasn't yet been
@@ -301,4 +302,8 @@ public class DatastreamManagedContent
         }
     }
 
+    @Override
+    public boolean isRepositoryManaged() {
+        return true;
+    }
 }

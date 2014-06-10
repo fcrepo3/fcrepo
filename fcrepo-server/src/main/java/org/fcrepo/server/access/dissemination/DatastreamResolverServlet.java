@@ -400,9 +400,8 @@ public class DatastreamResolverServlet
                             sb.append(headerValues.nextElement());
                         }
                         String value = sb.toString();
-                        logger
-                                .debug("DATASTREAMRESOLVERSERVLET REQUEST HEADER CONTAINED: "
-                                        + name + " : " + value);
+                        logger.debug("DATASTREAMRESOLVERSERVLET REQUEST HEADER CONTAINED: {} : {}",
+                            name, value);
                     }
                 }
 
@@ -419,7 +418,7 @@ public class DatastreamResolverServlet
                 // ReadOnlyContext.getContext(Constants.HTTP_REQUEST.REST.uri,
                 // request));
                 outStream = response.getOutputStream();
-                response.setContentType(mimeTypedStream.MIMEType);
+                response.setContentType(mimeTypedStream.getMIMEType());
                 Property[] headerArray = mimeTypedStream.header;
                 if (headerArray != null) {
                     for (int i = 0; i < headerArray.length; i++) {

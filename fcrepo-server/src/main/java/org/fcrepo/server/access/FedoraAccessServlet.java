@@ -5,11 +5,9 @@
 
 package org.fcrepo.server.access;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PipedReader;
 import java.io.PipedWriter;
@@ -23,11 +21,13 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.HttpHeaders;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.http.HttpStatus;
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
@@ -615,32 +615,22 @@ public class FedoraAccessServlet
 
             // Dissemination was successful;
             // Return MIMETypedStream back to browser client
-            if (dissemination.MIMEType
-                    .equalsIgnoreCase("application/fedora-redirect")) {
-                // A MIME type of application/fedora-redirect signals that
-                // the MIMETypedStream returned from the dissemination is
-                // a special Fedora-specific MIME type. In this case, the
-                // Fedora server will not proxy the datastream, but
-                // instead perform a simple redirect to the URL contained
-                // within the body of the MIMETypedStream. This special
-                // MIME type is used primarily for streaming media where
-                // it is more efficient to stream the data directly
-                // between the streaming server and the browser client
-                // rather than proxy it through the Fedora server.
-
-                BufferedReader br =
-                        new BufferedReader(new InputStreamReader(dissemination
-                                .getStream()));
-                StringBuffer sb = new StringBuffer();
-                String line = null;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
+            if (dissemination.getHttpStatus() == HttpStatus.SC_MOVED_TEMPORARILY) {
+                String location = "";
+                for (Property prop: dissemination.header) {
+                    if (prop.name.equalsIgnoreCase(HttpHeaders.LOCATION)) {
+                        location = prop.value;
+                        break;
+                    }
                 }
 
-                response.sendRedirect(sb.toString());
+                response.sendRedirect(location);
             } else {
-
-                response.setContentType(dissemination.MIMEType);
+                int status = dissemination.getHttpStatus();
+                response.setStatus(status);
+                if (status == HttpStatus.SC_OK) {
+                    response.setContentType(dissemination.getMIMEType());
+                }
                 Property[] headerArray = dissemination.header;
                 if (headerArray != null) {
                     for (int i = 0; i < headerArray.length; i++) {
@@ -742,31 +732,18 @@ public class FedoraAccessServlet
 
             // Dissemination was successful;
             // Return MIMETypedStream back to browser client
-            if (dissemination.MIMEType
-                    .equalsIgnoreCase("application/fedora-redirect")) {
-                // A MIME type of application/fedora-redirect signals that
-                // the MIMETypedStream returned from the dissemination is
-                // a special Fedora-specific MIME type. In this case, the
-                // Fedora server will not proxy the datastream, but
-                // instead perform a simple redirect to the URL contained
-                // within the body of the MIMETypedStream. This special
-                // MIME type is used primarily for streaming media where
-                // it is more efficient to stream the data directly between
-                // the streaming server and the browser client rather than
-                // proxy it through the Fedora server.
-
-                BufferedReader br =
-                        new BufferedReader(new InputStreamReader(dissemination
-                                .getStream()));
-                StringBuffer sb = new StringBuffer();
-                String line = null;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
+            if (dissemination.getHttpStatus() == HttpStatus.SC_MOVED_TEMPORARILY) {
+                String location = "";
+                for (Property prop: dissemination.header) {
+                    if (prop.name.equalsIgnoreCase(HttpHeaders.LOCATION)) {
+                        location = prop.value;
+                        break;
+                    }
                 }
 
-                response.sendRedirect(sb.toString());
+                response.sendRedirect(location);
             } else {
-                response.setContentType(dissemination.MIMEType);
+                response.setContentType(dissemination.getMIMEType());
                 Property[] headerArray = dissemination.header;
                 if (headerArray != null) {
                     for (int i = 0; i < headerArray.length; i++) {

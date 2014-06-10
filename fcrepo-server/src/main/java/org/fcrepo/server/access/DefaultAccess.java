@@ -4,14 +4,11 @@
  */
 package org.fcrepo.server.access;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -51,9 +48,7 @@ import org.fcrepo.server.storage.ServiceDefinitionReader;
 import org.fcrepo.server.storage.ServiceDeploymentReader;
 import org.fcrepo.server.storage.types.Datastream;
 import org.fcrepo.server.storage.types.DatastreamDef;
-import org.fcrepo.server.storage.types.DatastreamManagedContent;
 import org.fcrepo.server.storage.types.DatastreamReferencedContent;
-import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DeploymentDSBindRule;
 import org.fcrepo.server.storage.types.DeploymentDSBindSpec;
 import org.fcrepo.server.storage.types.DisseminationBindingInfo;
@@ -65,6 +60,7 @@ import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.fcrepo.server.utilities.NullInputStream;
+import org.fcrepo.server.utilities.ServerUtility;
 import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +80,7 @@ public class DefaultAccess
 
     private static final MethodParmDef[] METHOD_PARM_DEF_TYPE =
             new MethodParmDef[0];
-        
+
     /** Current DOManager of the Fedora server. */
     private DOManager m_manager;
 
@@ -507,7 +503,7 @@ public class DefaultAccess
         DeploymentDSBindSpec dsBindSpec =
                 bmReader.getServiceDSInputSpec(versDateTime);
         DeploymentDSBindRule[] dsBindRules =
-                dsBindSpec.dsBindRules == null ? new DeploymentDSBindRule[0]
+                dsBindSpec.dsBindRules == null ? DeploymentDSBindRule.ARRAY_TYPE
                                                : dsBindSpec.dsBindRules;
 
         // Results will be returned in this list, one item per *existing*
@@ -546,7 +542,7 @@ public class DefaultAccess
                 bindingInfoList.add(bindingInfo);
             }
         }
-        return bindingInfoList.toArray(new DisseminationBindingInfo[0]);
+        return bindingInfoList.toArray(DisseminationBindingInfo.ARRAY_TYPE);
     }
 
     @Override
@@ -1129,35 +1125,30 @@ public class DefaultAccess
             throw new DatastreamNotFoundException(message);
         }
 
-        if (ds.DSControlGrp.equalsIgnoreCase("E")) {
+        if (ds.isRepositoryManaged()) {
+            if (ds.DSSize <= 0) {
+                ds.DSSize = ds.getContentSize(context);
+            }
+            if (!isHEADRequest(context)) {
+                Property[] dsHeaders = getDatastreamHeaders(PID, ds);
+                if (ServerUtility.isStaleCache(context, dsHeaders)) {
+                    //TODO deal with Range header
+                    mimeTypedStream = new MIMETypedStream(ds.DSMIME, ds.getContentStream(context),
+                      dsHeaders, ds.DSSize);
+                } else {
+                    mimeTypedStream = MIMETypedStream.getNotModified(dsHeaders);
+                }
+            } else {
+                mimeTypedStream = new MIMETypedStream(ds.DSMIME, NullInputStream.NULL_STREAM,
+                        getDatastreamHeaders(PID, ds), ds.DSSize);
+            }
+        } else if (ds.DSControlGrp.equalsIgnoreCase("E")) {
             DatastreamReferencedContent drc =
                     (DatastreamReferencedContent) ds;
             ContentManagerParams params = new ContentManagerParams(drc.DSLocation,
                                                                    drc.DSMIME, null, null);
             params.setContext(context);
             mimeTypedStream = m_externalContentManager.getExternalContent(params);
-        } else if (ds.DSControlGrp.equalsIgnoreCase("M")) {
-            if (ds.DSSize <= 0) {
-                ds.DSSize = ((DatastreamManagedContent)ds).getContentSize(context);
-            }
-            if (!isHEADRequest(context)) {
-                mimeTypedStream = new MIMETypedStream(ds.DSMIME, ds.getContentStream(context),
-                        getDatastreamHeaders(PID, ds), ds.DSSize);
-            } else {
-                mimeTypedStream = new MIMETypedStream(ds.DSMIME, NullInputStream.NULL_STREAM,
-                        getDatastreamHeaders(PID, ds), ds.DSSize);
-            }
-        } else if (ds.DSControlGrp.equalsIgnoreCase("X")) {
-            if (ds.DSSize <= 0) {
-                ds.DSSize = ((DatastreamXMLMetadata)ds).xmlContent.length;
-            }
-            if (!isHEADRequest(context)) {
-                mimeTypedStream = new MIMETypedStream(ds.DSMIME, ds.getContentStream(context),
-                        getDatastreamHeaders(PID, ds), ds.DSSize);
-            } else {
-                mimeTypedStream = new MIMETypedStream(ds.DSMIME, NullInputStream.NULL_STREAM,
-                        getDatastreamHeaders(PID, ds), ds.DSSize);
-            }
         } else if (ds.DSControlGrp.equalsIgnoreCase("R")) {
             DatastreamReferencedContent drc =
                     (DatastreamReferencedContent) ds;
@@ -1170,13 +1161,7 @@ public class DefaultAccess
             // special fedora-specific MIME type to identify the stream as
             // a MIMETypedStream whose contents contain a URL to which the client
             // should be redirected.
-            InputStream inStream =
-                    new ByteArrayInputStream(drc.DSLocation
-                            .getBytes(Charset.forName("UTF-8")));
-            mimeTypedStream =
-                    new MIMETypedStream("application/fedora-redirect",
-                            inStream,
-                            null);
+            mimeTypedStream = MIMETypedStream.getRedirect(drc.DSLocation);
         }
         if (logger.isDebugEnabled()) {
             long stopTime = System.currentTimeMillis();

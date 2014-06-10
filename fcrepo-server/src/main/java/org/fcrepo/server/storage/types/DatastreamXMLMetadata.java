@@ -17,6 +17,7 @@ import java.nio.charset.Charset;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.fcrepo.server.Context;
+import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
@@ -137,5 +138,15 @@ public class DatastreamXMLMetadata
         byte[] firstLineBytes = firstLine.getBytes(m_encoding);
         return new SequenceInputStream(new ByteArrayInputStream(firstLineBytes),
                 new ByteArrayInputStream(xmlContent));
+    }
+
+    @Override
+    public long getContentSize(Context ctx) throws StreamIOException {
+        return xmlContent.length;
+    }
+
+    @Override
+    public boolean isRepositoryManaged() {
+        return true;
     }
 }

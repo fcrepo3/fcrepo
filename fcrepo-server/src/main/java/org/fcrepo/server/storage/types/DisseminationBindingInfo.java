@@ -13,7 +13,10 @@ import java.util.Date;
  * @author Ross Wayland
  */
 public class DisseminationBindingInfo {
-    
+
+    public static final DisseminationBindingInfo[] ARRAY_TYPE =
+        new DisseminationBindingInfo[0];
+
     public String DSBindKey = null;
 
     public MethodParmDef[] methodParms = null;

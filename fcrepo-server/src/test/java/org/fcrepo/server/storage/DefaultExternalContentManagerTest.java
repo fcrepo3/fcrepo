@@ -122,9 +122,9 @@ public class DefaultExternalContentManagerTest {
     @Test
     public void testDefaultToGetMethod() throws HttpServiceNotFoundException, GeneralException, IOException {
         mockResponseFor(null);
-        when(mockClient.get(TEST_URL, true, null, null))
+        when(mockClient.get(TEST_URL, true, null, null, null, null, null))
         .thenReturn(mockResponse);
         testObj.getExternalContent(mockParams);
-        verify(mockClient).get(TEST_URL, true, null, null);
+        verify(mockClient).get(TEST_URL, true, null, null, null, null, null);
     }
 }

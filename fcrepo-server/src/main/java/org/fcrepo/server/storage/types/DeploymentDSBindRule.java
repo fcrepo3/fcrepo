@@ -12,6 +12,9 @@ package org.fcrepo.server.storage.types;
  */
 public class DeploymentDSBindRule {
 
+    public static final DeploymentDSBindRule[] ARRAY_TYPE =
+        new DeploymentDSBindRule[0];
+
     public String bindingKeyName;
 
     public int minNumBindings;

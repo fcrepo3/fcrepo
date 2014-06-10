@@ -12,6 +12,7 @@ import java.net.URL;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
@@ -156,11 +157,21 @@ public class WebClient {
                                boolean failIfNotOK,
                                String user,
                                String pass) throws IOException {
+        return get(url, failIfNotOK, user, pass, null, null, null);
+    }
+
+    public HttpInputStream get(String url,
+            boolean failIfNotOK,
+            String user,
+            String pass,
+            String ifNoneMatch,
+            String ifModifiedSince,
+            String range) throws IOException {
         UsernamePasswordCredentials creds = null;
         if (user != null && !user.isEmpty() && pass != null && !pass.isEmpty())
             creds = new UsernamePasswordCredentials(user, pass);
-        return get(url, failIfNotOK, creds);
-    }
+        return get(url, failIfNotOK, creds, ifNoneMatch, ifModifiedSince, range);
+}
 
     public HttpInputStream head(String url, boolean failIfNotOK)
             throws IOException {
@@ -198,26 +209,37 @@ public class WebClient {
                                boolean failIfNotOK,
                                UsernamePasswordCredentials creds)
             throws IOException {
-        return execute(new HttpGet(url), url, failIfNotOK, creds);
+        return execute(new HttpGet(url), url, failIfNotOK, creds, null, null, null);
     }
-    
+
+    public HttpInputStream get(String url,
+                               boolean failIfNotOK,
+                               UsernamePasswordCredentials creds,
+                               String ifNoneMatch,
+                               String ifModifiedSince,
+                               String range)
+            throws IOException {
+        return execute(new HttpGet(url), url, failIfNotOK, creds, ifNoneMatch, ifModifiedSince, range);
+    }
+
     public HttpInputStream head(String url,
                      boolean failIfNotOK,
                      UsernamePasswordCredentials creds)
             throws IOException {
-        return execute(new HttpHead(url), url, failIfNotOK, creds);
+        return execute(new HttpHead(url), url, failIfNotOK, creds, null, null, null);
     }
 
     private HttpInputStream execute(HttpUriRequest request,
                                     String url,
                                     boolean failIfNotOK,
-                                    UsernamePasswordCredentials creds)
+                                    UsernamePasswordCredentials creds,
+                                    String ifNoneMatch,
+                                    String ifModifiedSince,
+                                    String range)
             throws IOException {
         HttpClient client;
 
-        if (wconfig.getUserAgent() != null) {
-            request.setHeader(HttpHeaders.USER_AGENT, wconfig.getUserAgent());
-        }
+        setHeaders(request, wconfig.getUserAgent(), ifNoneMatch, ifModifiedSince, range);
         if (creds != null && creds.getUserName() != null
                 && creds.getUserName().length() > 0) {
             client = getHttpClient(url, creds);
@@ -228,7 +250,7 @@ public class WebClient {
         HttpInputStream in = new HttpInputStream(client, request);
         int status = in.getStatusCode();
         if (failIfNotOK) {
-            if (status != 200) {
+            if (status != HttpStatus.SC_OK && status != HttpStatus.SC_NOT_MODIFIED) {
                 //if (followRedirects && in.getStatusCode() == 302){
                 if (wconfig.getFollowRedirects() && 300 <= status && status <= 399) {
                     int count = 1;
@@ -240,10 +262,7 @@ public class WebClient {
                         }
                         url = in.getResponseHeader(HttpHeaders.LOCATION).getValue();
                         in.close();
-                        if (wconfig.getUserAgent() != null) {
-                            request
-                                    .setHeader(HttpHeaders.USER_AGENT, wconfig.getUserAgent());
-                        }
+                        setHeaders(request, wconfig.getUserAgent(), ifNoneMatch, ifModifiedSince, range);
                         in = new HttpInputStream(client, request);
                         status = in.getStatusCode();
                         count++;
@@ -309,4 +328,23 @@ public class WebClient {
         }
     }
 
+    private static void setHeaders(
+            HttpUriRequest request,
+            String ua,
+            String ifNoneMatch,
+            String ifModifiedSince,
+            String range) {
+        if (ifNoneMatch != null) {
+            request.setHeader(HttpHeaders.IF_NONE_MATCH, ifNoneMatch);
+        }
+        if (ifModifiedSince != null) {
+            request.setHeader(HttpHeaders.IF_MODIFIED_SINCE, ifModifiedSince);
+        }
+        if (range != null) {
+            request.setHeader(HttpHeaders.RANGE, range);
+        }
+        if (ua != null) {
+            request.setHeader(HttpHeaders.USER_AGENT, ua);
+        }
+    }
 }

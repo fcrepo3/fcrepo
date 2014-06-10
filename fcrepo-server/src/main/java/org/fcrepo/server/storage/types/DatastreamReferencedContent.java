@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.InputStream;
 
 import org.fcrepo.common.Constants;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.InitializationException;
@@ -117,4 +116,9 @@ public class DatastreamReferencedContent
         }
         return length;
     }    
+
+    @Override
+    public boolean isRepositoryManaged() {
+        return false;
+    }
 }

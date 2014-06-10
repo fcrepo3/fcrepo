@@ -117,7 +117,7 @@ public class TestAPIA
 
         // test for type R datastream
         ds = apia.getDatastreamDissemination("demo:31", "DS3", null);
-        assertEquals(ds.getMIMEType(), "application/fedora-redirect");
+        assertEquals(ds.getMIMEType(), org.fcrepo.server.storage.types.MIMETypedStream.MIME_INTERNAL_REDIRECT);
 
         // test for type M datastream
         ds = apia.getDatastreamDissemination("demo:5", "THUMBRES_IMG", null);

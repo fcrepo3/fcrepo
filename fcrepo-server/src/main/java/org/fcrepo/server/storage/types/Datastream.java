@@ -152,6 +152,16 @@ public class Datastream {
         return getContentStream(context);
     }
 
+    /**
+     * Calculate and return the size of the data if possible
+     * @param ctx
+     * @return
+     * @throws StreamIOException
+     */
+    public long getContentSize(Context ctx) throws StreamIOException {
+        return DSSize;
+    }
+
     public static String getDefaultChecksumType() {
         return defaultChecksumType;
     }
@@ -328,9 +338,17 @@ public class Datastream {
         target.DSChecksumType = DSChecksumType;
         target.DSChecksum = DSChecksum;
     }
-    
+
+    /**
+     * true if the datastream is managed content or inline XML
+     * @return
+     */
+    public boolean isRepositoryManaged() {
+        return "M".equalsIgnoreCase(DSControlGrp) || "X".equalsIgnoreCase(DSControlGrp);
+    }
+
     public static String defaultETag(String pid, Datastream ds) {
-        if (ds.DSChecksum != null) {
+        if (ds.DSChecksum != null && !CHECKSUM_NONE.equals(ds.DSChecksum)) {
             return ds.DSChecksum;
         }
         return MD5Utility.getBase16Hash(

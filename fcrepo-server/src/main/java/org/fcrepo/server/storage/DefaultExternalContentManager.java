@@ -18,6 +18,7 @@ import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.http.Header;
+import org.apache.http.HttpStatus;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.http.HttpInputStream;
 import org.fcrepo.common.http.WebClient;
@@ -177,7 +178,7 @@ public class DefaultExternalContentManager
      * <code>null</code>, basic authentication will not be attempted.
      */
     private MIMETypedStream getFromWeb(String url, String user, String pass,
-            String knownMimeType, boolean headOnly)
+            String knownMimeType, boolean headOnly, Context context)
             throws GeneralException {
         logger.debug("DefaultExternalContentManager.get({})", url);
         if (url == null) throw new GeneralException("null url");
@@ -186,7 +187,11 @@ public class DefaultExternalContentManager
             if (headOnly) {
                 response = m_http.head(url, true, user, pass);
             } else {
-                response = m_http.get(url, true, user, pass);
+                response = m_http.get(
+                        url, true, user, pass,
+                        context.getHeaderValue(HttpHeaders.IF_NONE_MATCH),
+                        context.getHeaderValue(HttpHeaders.IF_MODIFIED_SINCE),
+                        context.getHeaderValue("Range"));
             }
             String mimeType =
                     response.getResponseHeaderValue(HttpHeaders.CONTENT_TYPE,
@@ -206,7 +211,18 @@ public class DefaultExternalContentManager
                 return new MIMETypedStream(mimeType, NullInputStream.NULL_STREAM,
                         headerArray, length);
             } else {
-                return new MIMETypedStream(mimeType, response, headerArray, length);
+                if (response.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
+                    response.close();
+                    Header[] respHeaders = response.getResponseHeaders();
+                    Property[] properties = new Property[respHeaders.length];
+                    for (int i = 0; i < respHeaders.length; i++){
+                        properties[i] =
+                            new Property(respHeaders[i].getName(), respHeaders[i].getValue());
+                    }
+                    return MIMETypedStream.getNotModified(properties);
+                } else {
+                    return new MIMETypedStream(mimeType, response, headerArray, length);
+                }
             }
         } catch (Exception e) {
             throw new GeneralException("Error getting " + url, e);
@@ -262,12 +278,28 @@ public class DefaultExternalContentManager
             if (mimeType == null || mimeType.equalsIgnoreCase("")){
                 mimeType = determineMimeType(cFile);
             }
-            InputStream content = isHEADRequest(params) ?
-                    NullInputStream.NULL_STREAM :
-                    fileUrl.openStream();
-            return new MIMETypedStream(mimeType, content,
-                    getFileDatastreamHeaders(cUriString, cFile.lastModified()),
-                    cFile.length());
+            Property [] headers = getFileDatastreamHeaders(cUriString, cFile.lastModified());
+            if (isHEADRequest(params)) {
+                return new MIMETypedStream(mimeType, NullInputStream.NULL_STREAM,
+                        headers,
+                        cFile.length());
+            } else if (ServerUtility.isStaleCache(params.getContext(), headers)) {
+                String rangeHdr = null;
+                InputStream content = null;
+                long cLen = -1L;
+                if ((rangeHdr = params.getContext().getHeaderValue("Range")) != null) {
+                    // parse the range
+                    // verify the range
+                    // limit the content stream and length header
+                    throw new UnsupportedOperationException("tried to limit type E range with header Range:\"" + rangeHdr + "\"");
+                } else {
+                    content = fileUrl.openStream();
+                    cLen = cFile.length();
+                }
+                return new MIMETypedStream(mimeType, content, headers, cLen);
+            } else {
+                return MIMETypedStream.getNotModified(headers);
+            }
         }
         catch(AuthzException ae){
             logger.error(ae.getMessage(),ae);
@@ -340,7 +372,7 @@ public class DefaultExternalContentManager
 
         }
         return getFromWeb(url, username, password, params.getMimeType(),
-                isHEADRequest(params));
+                isHEADRequest(params), params.getContext());
     }
 
 /**

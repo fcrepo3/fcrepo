@@ -4,11 +4,8 @@
  */
 package org.fcrepo.server.access.dissemination;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Enumeration;
@@ -630,35 +627,24 @@ public class DisseminationService {
 
 				if (isRedirect) {
 					// The dsControlGroupType of Redirect("R") is a special
-					// control type
-					// used primarily for streaming media. Datastreams of this
-					// type are
-					// not mediated (proxied by Fedora) and their physical
-					// dsLocation is
-					// simply redirected back to the client. Therefore, the
-					// contents
+					// control type used primarily for streaming media.
+					// Datastreams of this type are not mediated (proxied by
+					// Fedora) and their physical dsLocation is simply
+					// redirected back to the client. Therefore, the contents
 					// of the MIMETypedStream returned for dissemination
-					// requests will
-					// contain the raw URL of the dsLocation and will be
-					// assigned a
-					// special fedora-specific MIME type to identify the stream
-					// as
-					// a MIMETypedStream whose contents contain a URL to which
-					// the client
-					// should be redirected.
+					// requests will contain the raw URL of the dsLocation and
+					// will be assigned a special fedora-specific MIME type to
+					// identify the stream as a MIMETypedStream whose contents
+					// contain a URL to which the client should be redirected.
 
-					InputStream is = null;
-					is = new ByteArrayInputStream(dissURL.getBytes(Charset.forName("UTF-8")));
-					logger.debug("Finished assembling dissemination");
-					dissemination = new MIMETypedStream(
-							"application/fedora-redirect", is, null);
+                    dissemination = MIMETypedStream.getRedirect(dissURL);
+					logger.debug("Finished assembling dissemination for redirect, URL={}",
+                            dissURL);
 				} else {
 					// For all non-redirected disseminations, Fedora captures
 					// and returns
 					// the MIMETypedStream resulting from the dissemination
 					// request.
-					logger.debug("Finished assembling dissemination, URL={}",
-							dissURL);
 
 					// See if backend service reference is to fedora server
 					// itself or an external location.
@@ -667,7 +653,7 @@ public class DisseminationService {
 					// simply a callback to the fedora server. If the reference
 					// is remote, then use
 					// the role of backend service deployment PID. If the
-					// referenc is to the fedora server,
+					// reference is to the fedora server,
 					// use the special role of "fedoraInternalCall-1" to denote
 					// that the callback will come from the
 					// fedora server itself.
@@ -723,6 +709,8 @@ public class DisseminationService {
 					params.setBypassBackend(true);
 					params.setContext(context);
 					dissemination = m_ecm.getExternalContent(params);
+                    logger.debug("Finished assembling dissemination, URL={}",
+                            dissURL);
 				}
 
 			} else if (protocolType.equalsIgnoreCase("soap")) {
