@@ -14,10 +14,10 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import javax.activation.MimetypesFileTypeMap;
-import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.http.HttpInputStream;
@@ -27,7 +27,6 @@ import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.utilities.MD5Utility;
-import org.fcrepo.server.utilities.NullInputStream;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.HttpServiceNotFoundException;
 import org.fcrepo.server.errors.ModuleInitializationException;
@@ -40,6 +39,7 @@ import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.server.utilities.ServerUtility;
+import org.fcrepo.utilities.io.NullInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -284,19 +284,16 @@ public class DefaultExternalContentManager
                         headers,
                         cFile.length());
             } else if (ServerUtility.isStaleCache(params.getContext(), headers)) {
-                String rangeHdr = null;
-                InputStream content = null;
-                long cLen = -1L;
-                if ((rangeHdr = params.getContext().getHeaderValue("Range")) != null) {
-                    // parse the range
-                    // verify the range
-                    // limit the content stream and length header
-                    throw new UnsupportedOperationException("tried to limit type E range with header Range:\"" + rangeHdr + "\"");
+                String rangeHdr =
+                    params.getContext().getHeaderValue(HttpHeaders.RANGE);
+                InputStream content = fileUrl.openStream();
+                long cLen = cFile.length();
+                MIMETypedStream result = new MIMETypedStream(mimeType, content, headers, cLen);
+                if (rangeHdr != null) {
+                    result.setRange(rangeHdr);;
                 } else {
-                    content = fileUrl.openStream();
-                    cLen = cFile.length();
                 }
-                return new MIMETypedStream(mimeType, content, headers, cLen);
+                return result;
             } else {
                 return MIMETypedStream.getNotModified(headers);
             }
@@ -414,11 +411,12 @@ public class DefaultExternalContentManager
      * @return
      */
     private static Property[] getFileDatastreamHeaders(String canonicalPath, long lastModified) {
-        Property[] result = new Property[2];
+        Property[] result = new Property[3];
         String eTag =
             MD5Utility.getBase16Hash(canonicalPath.concat(Long.toString(lastModified)));
-        result[0] = new Property(HttpHeaders.ETAG, eTag);
-        result[1] = new Property(HttpHeaders.LAST_MODIFIED,
+        result[0] = new Property(HttpHeaders.ACCEPT_RANGES,"bytes");
+        result[1] = new Property(HttpHeaders.ETAG, eTag);
+        result[2] = new Property(HttpHeaders.LAST_MODIFIED,
                 DateUtil.formatDate(new Date(lastModified)));
         return result;
     }

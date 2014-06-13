@@ -615,7 +615,7 @@ public class FedoraAccessServlet
 
             // Dissemination was successful;
             // Return MIMETypedStream back to browser client
-            if (dissemination.getHttpStatus() == HttpStatus.SC_MOVED_TEMPORARILY) {
+            if (dissemination.getStatusCode() == HttpStatus.SC_MOVED_TEMPORARILY) {
                 String location = "";
                 for (Property prop: dissemination.header) {
                     if (prop.name.equalsIgnoreCase(HttpHeaders.LOCATION)) {
@@ -626,7 +626,7 @@ public class FedoraAccessServlet
 
                 response.sendRedirect(location);
             } else {
-                int status = dissemination.getHttpStatus();
+                int status = dissemination.getStatusCode();
                 response.setStatus(status);
                 if (status == HttpStatus.SC_OK) {
                     response.setContentType(dissemination.getMIMEType());
@@ -732,7 +732,7 @@ public class FedoraAccessServlet
 
             // Dissemination was successful;
             // Return MIMETypedStream back to browser client
-            if (dissemination.getHttpStatus() == HttpStatus.SC_MOVED_TEMPORARILY) {
+            if (dissemination.getStatusCode() == HttpStatus.SC_MOVED_TEMPORARILY) {
                 String location = "";
                 for (Property prop: dissemination.header) {
                     if (prop.name.equalsIgnoreCase(HttpHeaders.LOCATION)) {

@@ -82,6 +82,7 @@ import org.fcrepo.server.types.gen.FieldSearchQuery;
 import org.fcrepo.server.types.gen.FieldSearchResult;
 import org.fcrepo.server.types.gen.ObjectFields;
 import org.fcrepo.server.types.mtom.gen.MIMETypedStream;
+import org.fcrepo.server.utilities.MD5Utility;
 import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.jrdf.graph.Triple;
@@ -1759,6 +1760,39 @@ public class TestRESTAPI
         response = getOrDelete(get, getAuthAccess(), false);
         EntityUtils.consumeQuietly(response.getEntity());
         assertEquals(SC_OK, response.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    public void testDatastreamDisseminationGetContentRange()
+            throws Exception {
+
+        // test an inline (type X) datastream with no recorded size
+        // info:fedora/demo:REST/DS1 is a type 'X'
+        // filename from RELS-INT, no lookup of extension; no download
+        URI url = getURI("/objects/demo:REST/datastreams/DS1/content");
+        HttpGet get = new HttpGet(url);
+        HttpResponse response = getOrDelete(get, getAuthAccess(), false);
+        String controlChecksum =
+                MD5Utility.getBase16Hash(EntityUtils.toString(response.getEntity()));
+        assertEquals(SC_OK, response.getStatusLine().getStatusCode());
+        checkSingleHeader(HttpHeaders.CONTENT_LENGTH, response, Long.toString(47));
+        checkSingleHeader(HttpHeaders.CONTENT_TYPE, response, "text/xml");
+        get = new HttpGet(url);
+        get.addHeader("Range", "bytes=0-24");
+        response = getOrDelete(get, getAuthAccess(), false);
+        String part1 = EntityUtils.toString(response.getEntity());
+        assertEquals(206, response.getStatusLine().getStatusCode());
+        checkSingleHeader(HttpHeaders.CONTENT_LENGTH, response, Long.toString(25));
+        checkSingleHeader(HttpHeaders.CONTENT_RANGE, response, "bytes 0-24/47");
+        get = new HttpGet(url);
+        get.addHeader("Range", "bytes=25");
+        response = getOrDelete(get, getAuthAccess(), false);
+        String part2 = EntityUtils.toString(response.getEntity());
+        assertEquals(206, response.getStatusLine().getStatusCode());
+        checkSingleHeader(HttpHeaders.CONTENT_LENGTH, response, Long.toString(22));
+        checkSingleHeader(HttpHeaders.CONTENT_RANGE, response, "bytes 25-46/47");
+        String compositeChecksum = MD5Utility.getBase16Hash(part1, part2);
+        assertEquals(controlChecksum, compositeChecksum);
     }
 
     @Test

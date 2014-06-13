@@ -21,9 +21,8 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.core.HttpHeaders;
-
 import org.apache.commons.httpclient.util.DateUtil;
+import org.apache.http.HttpHeaders;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.server.Context;
@@ -59,9 +58,9 @@ import org.fcrepo.server.storage.types.MethodParmDef;
 import org.fcrepo.server.storage.types.ObjectMethodsDef;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.server.storage.types.RelationshipTuple;
-import org.fcrepo.server.utilities.NullInputStream;
 import org.fcrepo.server.utilities.ServerUtility;
 import org.fcrepo.utilities.DateUtility;
+import org.fcrepo.utilities.io.NullInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1132,9 +1131,11 @@ public class DefaultAccess
             if (!isHEADRequest(context)) {
                 Property[] dsHeaders = getDatastreamHeaders(PID, ds);
                 if (ServerUtility.isStaleCache(context, dsHeaders)) {
-                    //TODO deal with Range header
+                    String rangeHdr = context.getHeaderValue(HttpHeaders.RANGE);
                     mimeTypedStream = new MIMETypedStream(ds.DSMIME, ds.getContentStream(context),
-                      dsHeaders, ds.DSSize);
+                            dsHeaders, ds.DSSize);
+                    // delimit Content-Range if necessary
+                    if (rangeHdr != null) mimeTypedStream.setRange(rangeHdr);
                 } else {
                     mimeTypedStream = MIMETypedStream.getNotModified(dsHeaders);
                 }
@@ -1180,9 +1181,10 @@ public class DefaultAccess
      * @return
      */
     private static Property[] getDatastreamHeaders(String pid, Datastream ds) {
-        Property[] result = new Property[2];
-        result[0] = new Property(HttpHeaders.ETAG, Datastream.defaultETag(pid, ds));
-        result[1] = new Property(HttpHeaders.LAST_MODIFIED, DateUtil.formatDate(ds.DSCreateDT));
+        Property[] result = new Property[3];
+        result[0] = new Property(HttpHeaders.ACCEPT_RANGES,"bytes");
+        result[1] = new Property(HttpHeaders.ETAG, Datastream.defaultETag(pid, ds));
+        result[2] = new Property(HttpHeaders.LAST_MODIFIED, DateUtil.formatDate(ds.DSCreateDT));
         return result;
     }
     

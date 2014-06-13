@@ -3,21 +3,20 @@
  * available online at http://fedora-commons.org/license/).
  */
 
-package org.fcrepo.common;
+package org.fcrepo.utilities.xml;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses( {org.fcrepo.common.TestPID.class, org.fcrepo.common.TestDateUtility.class} )
+@Suite.SuiteClasses( {org.fcrepo.utilities.xml.TestXmlSerializers.class} )
 public class AllUnitTests {
 
     // Supports legacy tests runners
     public static junit.framework.Test suite() throws Exception {
         junit.framework.TestSuite suite =
                 new junit.framework.TestSuite(AllUnitTests.class.getName());
-        suite.addTest(org.fcrepo.common.TestPID.suite());
-        suite.addTest(org.fcrepo.common.TestDateUtility.suite());
+        suite.addTest(org.fcrepo.utilities.xml.TestXmlSerializers.suite());
         return suite;
     }
 }

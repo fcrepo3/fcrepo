@@ -9,10 +9,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import javax.ws.rs.core.HttpHeaders;
-
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
-import org.fcrepo.server.utilities.NullInputStream;
+import org.fcrepo.server.errors.RangeNotSatisfiableException;
+import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.errors.StreamIOException;
+import org.fcrepo.utilities.io.ByteRangeInputStream;
+import org.fcrepo.utilities.io.NullInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,19 +144,50 @@ public class MIMETypedStream {
         return m_size;
     }
 
+    public void setRange(String rangeRequest) throws ServerException {
+        if(rangeRequest != null && !rangeRequest.isEmpty() && !m_gotStream){
+            try{
+                ByteRangeInputStream range =
+                        new ByteRangeInputStream(m_stream, m_size, rangeRequest);
+                setStream(range);
+                m_size = range.length;
+                m_httpStatus = HttpStatus.SC_PARTIAL_CONTENT;
+                setContentRange(range.contentRange);
+            } catch (IOException e) {
+                throw new StreamIOException(e.getMessage(),e);
+            } catch (IndexOutOfBoundsException e) {
+                throw new RangeNotSatisfiableException(e.getMessage());
+            }
+        }
+    }
     /**
      * Typically 200, but control group R datastream content responses will use
      * 302, and conditional GET of datastream contents may return a 304
      * @return
      */
-    public int getHttpStatus() {
+    public int getStatusCode() {
         return m_httpStatus;
     }
 
-    public void setStatus(int status) {
+    public void setStatusCode(int status) {
         m_httpStatus = status;
     }
-    
+    private void setContentRange(String val) {
+        boolean found = false;
+        for(Property prop: this.header){
+            if (prop.name.equalsIgnoreCase(HttpHeaders.CONTENT_RANGE)) {
+                prop.value = val;
+                found = true;
+            }
+        }
+        if (!found){
+            Property[] newHeader = new Property[this.header.length + 1];
+            System.arraycopy(this.header, 0, newHeader,0,this.header.length);
+            newHeader[newHeader.length - 1] = new Property(HttpHeaders.CONTENT_RANGE, val);
+            this.header = newHeader;
+        }
+    }
+
     public static MIMETypedStream getRedirect(Property[] header) {
         return new MIMETypedStream(
                 MIME_INTERNAL_REDIRECT, NullInputStream.NULL_STREAM, header,
@@ -171,4 +205,5 @@ public class MIMETypedStream {
                 MIME_INTERNAL_NOT_MODIFIED, NullInputStream.NULL_STREAM, header,
                 NO_CONTENT_LENGTH, HttpStatus.SC_NOT_MODIFIED);
     }
+    
 }

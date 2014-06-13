@@ -40,6 +40,7 @@ import org.fcrepo.server.errors.DatastreamNotFoundException;
 import org.fcrepo.server.errors.ObjectLockedException;
 import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.errors.ObjectValidityException;
+import org.fcrepo.server.errors.RangeNotSatisfiableException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.management.Management;
 import org.fcrepo.server.storage.DOManager;
@@ -139,7 +140,7 @@ public class BaseRestResource {
 
     protected Response buildResponse(MIMETypedStream result) throws Exception {
         ResponseBuilder builder = null;
-        switch (result.getHttpStatus()) {
+        switch (result.getStatusCode()) {
             case HttpStatus.SC_MOVED_TEMPORARILY:
                 URI location = URI.create(IOUtils.toString(result.getStream()));
                 return Response.temporaryRedirect(location).build();
@@ -147,7 +148,7 @@ public class BaseRestResource {
                 builder = Response.notModified();
                 break;
             default:
-                builder = Response.ok();
+                builder = Response.status(result.getStatusCode());
                 if (result.getSize() != -1L){
                     builder.header(HttpHeaders.CONTENT_LENGTH,result.getSize());
                 }
@@ -198,6 +199,9 @@ public class BaseRestResource {
 	            return Response.status(Status.BAD_REQUEST).entity(ex.getMessage()).type(MediaType.TEXT_PLAIN).build();
 			}
 
+        } else if (ex instanceof RangeNotSatisfiableException) {
+            LOGGER.warn("Bad range request" + ex.getMessage() + "; unable to fulfill REST API request", ex);
+            return Response.status(RangeNotSatisfiableException.STATUS_CODE).entity(ex.getMessage()).type(MediaType.TEXT_PLAIN).build();
         } else {
             LOGGER.error("Unexpected error fulfilling REST API request", ex);
             throw new WebApplicationException(ex);

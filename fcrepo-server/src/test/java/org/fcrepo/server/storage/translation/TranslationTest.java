@@ -14,7 +14,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.jrdf.graph.URIReference;
 import org.junit.Before;
-import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.StreamIOException;

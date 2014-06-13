@@ -8,6 +8,8 @@ import java.io.StringWriter;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 
+import junit.framework.JUnit4TestAdapter;
+
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.junit.Before;
 import org.junit.Test;
@@ -131,6 +133,10 @@ public class TestXmlSerializers {
         Transformer t = XmlTransformUtility.getTransformer();
         t.setOutputProperty(OutputKeys.INDENT, "yes");
         t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+    }
+
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestXmlSerializers.class);
     }
 
 }
