@@ -8,7 +8,7 @@ package org.fcrepo.server.errors;
  * @author Bill Niebel
  */
 public class ObjectNotInLowlevelStorageException
-        extends LowlevelStorageException {
+        extends LowlevelStorageException implements ResourceNotFoundError {
 
     private static final long serialVersionUID = 1L;
 

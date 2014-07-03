@@ -98,6 +98,9 @@ public class TestByteRangeInputStream {
         assertEquals("bad length of " + test.length + " for " + input, 7, test.length);
         assertEquals("bytes 3-9/10", test.contentRange);
         bytes.reset();
+        test = new ByteRangeInputStream(bytes, 10, "bytes=0-8");
+        assertEquals("123456789", IOUtils.toString(test));
+        bytes.reset();
         InputStream bytes2 = new ByteArrayInputStream(data.getBytes(Charset.forName("UTF-8")));
         test = new ByteRangeInputStream(bytes, 10, "bytes=0-2");
         ByteRangeInputStream test2 = new ByteRangeInputStream(bytes2, 10, "bytes=-7");

@@ -11,7 +11,7 @@ package org.fcrepo.server.errors;
  * @version $Id$
  */
 public class DatastreamLockedException
-        extends StorageException {
+        extends StorageException implements ResourceLockedError {
 
     private static final long serialVersionUID = 1L;
 

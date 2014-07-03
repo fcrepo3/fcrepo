@@ -8,9 +8,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
-import javax.ws.rs.core.HttpHeaders;
-
 import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.http.HttpInputStream;
 import org.fcrepo.common.http.WebClient;
@@ -47,7 +46,6 @@ public class DefaultExternalContentManagerTest {
     private static final String TEST_URL =
             "http://foo.com/bar";
     
-    private static final String FILE = "file";
     private static final String HTTP = "http";
     
     @Mock
@@ -126,5 +124,40 @@ public class DefaultExternalContentManagerTest {
         .thenReturn(mockResponse);
         testObj.getExternalContent(mockParams);
         verify(mockClient).get(TEST_URL, true, null, null, null, null, null);
+    }
+
+    @Test
+    public void testConditionalGetETagMethod() throws HttpServiceNotFoundException, GeneralException, IOException {
+        mockResponseFor("GET");
+        when(mockClient.get(TEST_URL, true, null, null, "LOL", null, null))
+        .thenReturn(mockResponse);
+        when(mockContext.getHeaderValue(HttpHeaders.IF_NONE_MATCH)).thenReturn("LOL");
+        testObj.getExternalContent(mockParams);
+        verify(mockClient).get(TEST_URL, true, null, null, "LOL", null, null);
+    }
+
+    @Test
+    public void testConditionalGetDateMethod() throws HttpServiceNotFoundException, GeneralException, IOException {
+        mockResponseFor("GET");
+        when(mockClient.get(TEST_URL, true, null, null, null, "LOL", null))
+        .thenReturn(mockResponse);
+        when(mockContext.getHeaderValue(HttpHeaders.IF_MODIFIED_SINCE)).thenReturn("LOL");
+        testObj.getExternalContent(mockParams);
+        verify(mockClient).get(TEST_URL, true, null, null, null, "LOL", null);
+    }
+
+    @Test
+    public void testConditionalGetRangeMethod() throws HttpServiceNotFoundException, GeneralException, IOException {
+        mockResponseFor("GET");
+        when(mockClient.get(TEST_URL, true, null, null, null, null, "LOL"))
+        .thenReturn(mockResponse);
+        when(mockContext.getHeaderValue(HttpHeaders.RANGE)).thenReturn("LOL");
+        testObj.getExternalContent(mockParams);
+        verify(mockClient).get(TEST_URL, true, null, null, null, null, "LOL");
+    }
+
+    // Supports legacy test runners
+    public static junit.framework.Test suite() {
+        return new junit.framework.JUnit4TestAdapter(DefaultDOManagerTest.class);
     }
 }

@@ -13,7 +13,6 @@ import java.net.URI;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -28,6 +27,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.fcrepo.common.Constants;
@@ -35,12 +35,10 @@ import org.fcrepo.server.Context;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.access.Access;
-import org.fcrepo.server.errors.DatastreamLockedException;
-import org.fcrepo.server.errors.DatastreamNotFoundException;
-import org.fcrepo.server.errors.ObjectLockedException;
-import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.errors.ObjectValidityException;
 import org.fcrepo.server.errors.RangeNotSatisfiableException;
+import org.fcrepo.server.errors.ResourceLockedError;
+import org.fcrepo.server.errors.ResourceNotFoundError;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.management.Management;
 import org.fcrepo.server.storage.DOManager;
@@ -91,7 +89,7 @@ public class BaseRestResource {
     protected UriInfo m_uriInfo;
 
     @javax.ws.rs.core.Context
-    protected HttpHeaders m_headers;
+    protected javax.ws.rs.core.HttpHeaders m_headers;
 
     public BaseRestResource(Server server) {
         try {
@@ -165,7 +163,7 @@ public class BaseRestResource {
         if (result.header != null) {
             for (Property header : result.header) {
                 if (header.name != null
-                        && !(header.name.equalsIgnoreCase("transfer-encoding"))
+                        && !(header.name.equalsIgnoreCase(HttpHeaders.TRANSFER_ENCODING))
                         && !(header.name.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH))
                         && !(header.name.equalsIgnoreCase(HttpHeaders.CONTENT_TYPE))) {
                     builder.header(header.name, header.value);
@@ -176,8 +174,7 @@ public class BaseRestResource {
     }
 
     private Response handleException(Exception ex) {
-        if (ex instanceof ObjectNotInLowlevelStorageException ||
-            ex instanceof DatastreamNotFoundException) {
+        if (ex instanceof ResourceNotFoundError) {
             LOGGER.warn("Resource not found: " + ex.getMessage() + "; unable to fulfill REST API request", ex);
             return Response.status(Status.NOT_FOUND).entity(ex.getMessage()).type("text/plain").build();
         } else if (ex instanceof AuthzException) {
@@ -186,8 +183,7 @@ public class BaseRestResource {
         } else if (ex instanceof IllegalArgumentException) {
             LOGGER.warn("Bad request; unable to fulfill REST API request", ex);
             return Response.status(Status.BAD_REQUEST).entity(ex.getMessage()).type("text/plain").build();
-        } else if (ex instanceof ObjectLockedException ||
-                   ex instanceof DatastreamLockedException) {
+        } else if (ex instanceof ResourceLockedError) {
             LOGGER.warn("Lock exception; unable to fulfill REST API request", ex);
             return Response.status(Status.CONFLICT).entity(ex.getMessage()).type(MediaType.TEXT_PLAIN).build();
         } else if (ex instanceof ObjectValidityException){
@@ -200,7 +196,7 @@ public class BaseRestResource {
 			}
 
         } else if (ex instanceof RangeNotSatisfiableException) {
-            LOGGER.warn("Bad range request" + ex.getMessage() + "; unable to fulfill REST API request", ex);
+            LOGGER.warn("Bad range request: " + ex.getMessage() + "; unable to fulfill REST API request", ex);
             return Response.status(RangeNotSatisfiableException.STATUS_CODE).entity(ex.getMessage()).type(MediaType.TEXT_PLAIN).build();
         } else {
             LOGGER.error("Unexpected error fulfilling REST API request", ex);

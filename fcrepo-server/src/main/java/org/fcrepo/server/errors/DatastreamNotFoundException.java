@@ -10,7 +10,7 @@ package org.fcrepo.server.errors;
  * @author Chris Wilper
  */
 public class DatastreamNotFoundException
-        extends StorageException {
+        extends StorageException implements ResourceNotFoundError {
 
     private static final long serialVersionUID = 1L;
 

@@ -385,4 +385,8 @@ public class DefaultDOManagerTest
     	}
     }
 
+    // Supports legacy test runners
+    public static junit.framework.Test suite() {
+        return new junit.framework.JUnit4TestAdapter(DefaultDOManagerTest.class);
+    }
 }

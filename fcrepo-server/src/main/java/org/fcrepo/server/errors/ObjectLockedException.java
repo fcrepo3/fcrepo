@@ -10,7 +10,7 @@ package org.fcrepo.server.errors;
  * @author Chris Wilper
  */
 public class ObjectLockedException
-        extends StorageException {
+        extends StorageException implements ResourceLockedError {
 
     private static final long serialVersionUID = 1L;
 
