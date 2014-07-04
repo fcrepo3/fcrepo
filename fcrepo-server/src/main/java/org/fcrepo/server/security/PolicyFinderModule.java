@@ -9,12 +9,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.transform.Transformer;
+import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -35,6 +36,7 @@ import com.sun.xacml.PolicySet;
 import com.sun.xacml.attr.AttributeValue;
 import com.sun.xacml.attr.BagAttribute;
 import com.sun.xacml.attr.StringAttribute;
+import com.sun.xacml.combine.OrderedDenyOverridesPolicyAlg;
 import com.sun.xacml.combine.PolicyCombiningAlgorithm;
 import com.sun.xacml.cond.EvaluationResult;
 import com.sun.xacml.ctx.Status;
@@ -94,8 +96,11 @@ public class PolicyFinderModule
     private static final URI STRING_ATTRIBUTE = URI.create(StringAttribute.identifier);
     
     private static final URI EMPTY_URI = URI.create("");
+
+    @SuppressWarnings("unchecked")
+    private static final PolicySet EMPTY_SET = toPolicySet(Collections.EMPTY_LIST, new OrderedDenyOverridesPolicyAlg());
     
-    private final String m_combiningAlgorithm;
+    private final PolicyCombiningAlgorithm m_combiningAlgorithm;
 
     private final String m_serverHome;
 
@@ -112,6 +117,8 @@ public class PolicyFinderModule
     private final PolicyLoader m_policyLoader;
 
     private final List<AbstractPolicy> m_repositoryPolicies;
+
+    private PolicySet m_repositoryPolicySet = EMPTY_SET;
 
     public PolicyFinderModule(Server server,
                               PolicyLoader policyLoader,
@@ -133,11 +140,16 @@ public class PolicyFinderModule
             m_repositoryPolicyDirectoryPath = "";
         }
 
-        if (moduleParameters.containsKey(COMBINING_ALGORITHM_KEY)) {
+        String combAlgClass = (moduleParameters.containsKey(COMBINING_ALGORITHM_KEY)) ?
+            moduleParameters.get(COMBINING_ALGORITHM_KEY)
+            : DEFAULT_XACML_COMBINING_ALGORITHM;
+                    
+        try {
             m_combiningAlgorithm =
-                    moduleParameters.get(COMBINING_ALGORITHM_KEY);
-        } else {
-            m_combiningAlgorithm = DEFAULT_XACML_COMBINING_ALGORITHM;
+                    (PolicyCombiningAlgorithm) Class
+                            .forName(combAlgClass).newInstance();
+        } catch (Exception e) {
+            throw new GeneralException(e.getMessage(), e);
         }
 
         if (moduleParameters.containsKey(VALIDATE_REPOSITORY_POLICIES_KEY)) {
@@ -205,6 +217,7 @@ public class PolicyFinderModule
                                  m_validateRepositoryPolicies,
                                  new File(m_repositoryPolicyDirectoryPath)));
             m_repositoryPolicies.addAll(repositoryPolicies.values());
+            m_repositoryPolicySet = toPolicySet(m_repositoryPolicies, m_combiningAlgorithm);
         } catch (Throwable t) {
             logger.error("Error loading repository policies: " + t.toString(), t);
         }
@@ -220,20 +233,23 @@ public class PolicyFinderModule
         TransformerFactory tfactory = XmlTransformUtility.getTransformerFactory();
         try {
             Iterator<String> iterator = tempfiles.keySet().iterator();
+            Templates template = null;
             while (iterator.hasNext()) {
-                File f =
-                        new File(m_serverHome + File.separator
-                                 + BACKEND_POLICIES_XSL_LOCATION); // <<stylesheet
-                // location
-                StreamSource ss = new StreamSource(f);
-                Transformer transformer = tfactory.newTransformer(ss); // xformPath
+                if (template == null) {
+                    File f =
+                            new File(m_serverHome + File.separator
+                                    + BACKEND_POLICIES_XSL_LOCATION); // <<stylesheet
+                    // location
+                    StreamSource ss = new StreamSource(f);
+                    template = tfactory.newTemplates(ss); // xformPath
+                }
                 String key = iterator.next();
                 File infile = new File(tempfiles.get(key));
                 FileInputStream fis = new FileInputStream(infile);
                 FileOutputStream fos =
                         new FileOutputStream(m_repositoryBackendPolicyDirectoryPath
                                              + File.separator + key);
-                transformer.transform(new StreamSource(fis),
+                template.newTransformer().transform(new StreamSource(fis),
                                       new StreamResult(fos));
             }
         } finally {
@@ -275,8 +291,8 @@ public class PolicyFinderModule
     @Override
     public PolicyFinderResult findPolicy(EvaluationCtx context) {
         PolicyFinderResult policyFinderResult = null;
+        PolicySet policySet = m_repositoryPolicySet;
         try {
-            List<AbstractPolicy> policies = new ArrayList<AbstractPolicy>(m_repositoryPolicies);
             String pid = getPid(context);
             if (pid != null && !pid.isEmpty()) {
                 AbstractPolicy objectPolicyFromObject = 
@@ -284,20 +300,11 @@ public class PolicyFinderModule
                                                          pid,
                                                          m_validateObjectPoliciesFromDatastream);
                 if (objectPolicyFromObject != null) {
+                    List<AbstractPolicy> policies = new ArrayList<AbstractPolicy>(m_repositoryPolicies);
                     policies.add(objectPolicyFromObject);
+                    policySet = toPolicySet(policies, m_combiningAlgorithm);
                 }
             }
-            PolicyCombiningAlgorithm policyCombiningAlgorithm =
-                    (PolicyCombiningAlgorithm) Class
-                            .forName(m_combiningAlgorithm).newInstance();
-            PolicySet policySet =
-                    new PolicySet(EMPTY_URI,
-                                  policyCombiningAlgorithm,
-                                  null /*
-                                   * no general target beyond those of
-                                   * multiplexed individual policies
-                                   */,
-                                  policies);
             policyFinderResult = new PolicyFinderResult(policySet);
         } catch (Exception e) {
             logger.warn("PolicyFinderModule seriously failed to evaluate a policy ", e);
@@ -355,4 +362,13 @@ public class PolicyFinderModule
         }
     }
 
+    private static PolicySet toPolicySet(List<AbstractPolicy> policies, PolicyCombiningAlgorithm alg) {
+        return new PolicySet(EMPTY_URI,
+                              alg,
+                              null /*
+                               * no general target beyond those of
+                               * multiplexed individual policies
+                               */,
+                              policies);
+    }
 }
