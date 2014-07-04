@@ -59,9 +59,9 @@ implements PolicyEnforcementPoint {
         super(pdpConfig);
 
         m_registry = registry;
-        Map<String,String> moduleParameters = authzConfiguration.getParameters();
-        if (moduleParameters.containsKey(ENFORCE_MODE_CONFIG_KEY)) {
-            m_enforceMode = moduleParameters.get(ENFORCE_MODE_CONFIG_KEY);
+        String enforceMode = authzConfiguration.getParameter(ENFORCE_MODE_CONFIG_KEY);
+        if (enforceMode != null) {
+            m_enforceMode = enforceMode;
             if (ENFORCE_MODE_ENFORCE_POLICIES.equals(m_enforceMode)) {
             } else if (ENFORCE_MODE_PERMIT_ALL_REQUESTS.equals(m_enforceMode)) {
             } else if (ENFORCE_MODE_DENY_ALL_REQUESTS.equals(m_enforceMode)) {

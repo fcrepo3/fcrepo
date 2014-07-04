@@ -5,7 +5,7 @@
 package org.fcrepo.server.config;
 
 import java.io.File;
-
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,11 +41,11 @@ public class Parameter
     }
 
     public Parameter(String name) {
-        this(name, null, false, null, new HashMap<String,String>());
+        this(name, null, false, null, Collections.<String, String> emptyMap());
     }
 
     public Parameter(String name, String value) {
-        this(name, value, false, null, new HashMap<String,String>());
+        this(name, value, false, null, Collections.<String, String> emptyMap());
     }
 
     public String getName() {

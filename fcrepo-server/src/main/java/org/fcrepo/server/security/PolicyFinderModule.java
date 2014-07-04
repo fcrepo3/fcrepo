@@ -127,22 +127,17 @@ public class PolicyFinderModule
         m_serverHome = server.getHomeDir().getAbsolutePath();
 
         m_policyLoader = policyLoader;
-        
-        Map<String,String> moduleParameters = authorizationConfig.getParameters();
 
         m_repositoryBackendPolicyDirectoryPath = m_serverHome + File.separator
                 + BACKEND_POLICIES_ACTIVE_DIRECTORY;
 
-        if (moduleParameters.containsKey(REPOSITORY_POLICIES_DIRECTORY_KEY)) {
-            m_repositoryPolicyDirectoryPath =
-                    authorizationConfig.getParameter(REPOSITORY_POLICIES_DIRECTORY_KEY, true);
-        } else {
-            m_repositoryPolicyDirectoryPath = "";
-        }
+        String repositoryPolicyDirectoryPath =
+                authorizationConfig.getParameter(REPOSITORY_POLICIES_DIRECTORY_KEY, true);
+        if (repositoryPolicyDirectoryPath == null) repositoryPolicyDirectoryPath = "";
+        m_repositoryPolicyDirectoryPath = repositoryPolicyDirectoryPath;
 
-        String combAlgClass = (moduleParameters.containsKey(COMBINING_ALGORITHM_KEY)) ?
-            moduleParameters.get(COMBINING_ALGORITHM_KEY)
-            : DEFAULT_XACML_COMBINING_ALGORITHM;
+        String combAlgClass = authorizationConfig.getParameter(COMBINING_ALGORITHM_KEY);
+        if (combAlgClass == null) combAlgClass = DEFAULT_XACML_COMBINING_ALGORITHM;
                     
         try {
             m_combiningAlgorithm =
@@ -152,31 +147,25 @@ public class PolicyFinderModule
             throw new GeneralException(e.getMessage(), e);
         }
 
-        if (moduleParameters.containsKey(VALIDATE_REPOSITORY_POLICIES_KEY)) {
-            m_validateRepositoryPolicies =
-                    Boolean.parseBoolean(moduleParameters
-                            .get(VALIDATE_REPOSITORY_POLICIES_KEY));
-        } else {
-            m_validateRepositoryPolicies = false;
+        String validatePolicies = authorizationConfig.getParameter(VALIDATE_REPOSITORY_POLICIES_KEY);
+        try {
+            m_validateRepositoryPolicies = (validatePolicies != null) ? Boolean.parseBoolean(validatePolicies) : false;
+        } catch (Exception e) {
+            throw new GeneralException("bad init parm boolean value for "
+                                                    + VALIDATE_REPOSITORY_POLICIES_KEY, e);
         }
-        if (moduleParameters
-                .containsKey(VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY)) {
-            try {
-                m_validateObjectPoliciesFromDatastream =
-                        Boolean.parseBoolean(moduleParameters
-                                .get(VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY));
-            } catch (Exception e) {
-                throw new GeneralException("bad init parm boolean value for "
-                                                        + VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY,
-                                                        e);
-            }
-        } else {
-            m_validateObjectPoliciesFromDatastream = false;
+
+        validatePolicies = authorizationConfig.getParameter(VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY);
+        try {
+            m_validateObjectPoliciesFromDatastream = (validatePolicies != null) ? Boolean.parseBoolean(validatePolicies) : false;
+        } catch (Exception e) {
+            throw new GeneralException("bad init parm boolean value for "
+                                                    + VALIDATE_OBJECT_POLICIES_FROM_DATASTREAM_KEY, e);
         }
 
         // Initialize the policy parser given the POLICY_SCHEMA_PATH_KEY
-        if (moduleParameters.containsKey(POLICY_SCHEMA_PATH_KEY)) {
-            String schemaPath = moduleParameters.get(POLICY_SCHEMA_PATH_KEY);
+        String schemaPath = authorizationConfig.getParameter(POLICY_SCHEMA_PATH_KEY);
+        if (schemaPath != null) {
             File schema;
             if (schemaPath.startsWith(File.separator)){ // absolute
                 schema = new File(schemaPath);

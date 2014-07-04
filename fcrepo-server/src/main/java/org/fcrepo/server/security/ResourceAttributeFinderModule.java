@@ -91,9 +91,9 @@ class ResourceAttributeFinderModule
     }
 
     public void setLegacyConfiguration(ModuleConfiguration authorizationConfiguration) {
-        Map<String,String> moduleParameters = authorizationConfiguration.getParameters();
-        if (moduleParameters.containsKey(OWNER_ID_SEPARATOR_CONFIG_KEY)) {
-            setOwnerIdSeparator(moduleParameters.get(OWNER_ID_SEPARATOR_CONFIG_KEY));
+        String ownerIdSep = authorizationConfiguration.getParameter(OWNER_ID_SEPARATOR_CONFIG_KEY);
+        if (ownerIdSep != null) {
+            setOwnerIdSeparator(ownerIdSep);
         }
     }
 

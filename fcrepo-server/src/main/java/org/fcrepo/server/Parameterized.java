@@ -60,7 +60,18 @@ public abstract class Parameterized implements Constants {
      *        The map from which to derive the name-value pairs.
      */
     protected final void setParameters(Map<String, String> parameters) {
-        setParameters(Parameterized.getParameterList(parameters));
+        if (parameters == null) {
+            m_parameters.clear();
+        }
+        else {
+            m_parameters.clear();
+            Parameter p;
+            for (String key:parameters.keySet()) {
+                p = new Parameter(key);
+                p.setValue(parameters.get(key));
+                m_parameters.put(key, p);
+            }
+        }
     }
 
     protected final void setParameters(List<Parameter> parameters) {
