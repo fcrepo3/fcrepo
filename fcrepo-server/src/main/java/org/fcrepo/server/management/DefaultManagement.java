@@ -516,13 +516,13 @@ public class DefaultManagement
             if (dsID == null || dsID.length() == 0) {
                 ds.DatastreamID = w.newDatastreamID();
             } else {
-                if (dsID.indexOf(" ") != -1) {
+                if (dsID.indexOf(' ') != -1) {
                     throw new GeneralException("Datastream ids cannot contain spaces.");
                 }
-                if (dsID.indexOf("+") != -1) {
+                if (dsID.indexOf('+') != -1) {
                     throw new GeneralException("Datastream ids cannot contain plusses.");
                 }
-                if (dsID.indexOf(":") != -1) {
+                if (dsID.indexOf(':') != -1) {
                     throw new GeneralException("Datastream ids cannot contain colons.");
                 }
                 if (w.GetDatastream(dsID, null) != null) {

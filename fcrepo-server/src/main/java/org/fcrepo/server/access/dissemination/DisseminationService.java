@@ -908,7 +908,7 @@ public class DisseminationService {
 		}
 
 		// Replace the blank between date and time with the character "T".
-		return tempID.replaceAll(" ", "T");
+		return tempID.replace(' ', 'T');
 	}
 
 	/**

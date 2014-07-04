@@ -146,7 +146,7 @@ public class DatastreamResolverServlet
         PrintWriter out = null;
         ServletOutputStream outStream = null;
 
-        id = request.getParameter("id").replaceAll("T", " ");
+        id = request.getParameter("id").replace('T', ' ');
         logger.debug("Datastream tempID={}", id);
 
         logger.debug("DRS doGet()");
@@ -166,7 +166,7 @@ public class DatastreamResolverServlet
                                    message);
                 return;
             }
-            id = id.replaceAll("T", " ").replaceAll("/", "").trim();
+            id = id.replace('T', ' ').replaceAll("/", "").trim();
 
             // Get in-memory hashtable of mappings from Fedora server.
             ds = new DisseminationService(m_server);

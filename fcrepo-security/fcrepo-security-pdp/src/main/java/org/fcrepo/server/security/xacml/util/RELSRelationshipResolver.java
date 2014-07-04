@@ -189,7 +189,7 @@ public class RELSRelationshipResolver extends RelationshipResolverBase
                         }
                         } catch (MalformedPIDException e) {
                             // target of relationship isn't a PID
-                            logger.warn("Triple " + pid + " " + rel + " " + parent + " does not have a digital object as its target");
+                            logger.warn("Triple {} {} {} does not have a digital object as its target", pid, rel, parent);
 
                         }
                     }
