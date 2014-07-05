@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses( { TestPolicyParser.class })
+@Suite.SuiteClasses( { TestPolicyParser.class, org.fcrepo.server.security.impl.AllUnitTests.class })
 public class AllUnitTests {
 
     // Supports legacy tests runners
@@ -17,7 +17,7 @@ public class AllUnitTests {
         junit.framework.TestSuite suite =
                 new junit.framework.TestSuite(AllUnitTests.class.getName());
         suite.addTest(TestPolicyParser.suite());
-
+        suite.addTest(org.fcrepo.server.security.impl.AllUnitTests.suite());
         return suite;
     }
 }

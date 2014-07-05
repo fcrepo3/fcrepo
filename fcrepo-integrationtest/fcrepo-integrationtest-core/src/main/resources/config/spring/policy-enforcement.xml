@@ -10,8 +10,6 @@
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util-2.5.xsd">
         
-        <bean id="org.fcrepo.server.security.ContextRegistry"
-              class="org.fcrepo.server.security.impl.HashtableContextRegistry" />
               
   <util:set id="policyFinderModules">
     <bean id="LegacyPolicyFinderModule"
@@ -26,11 +24,6 @@
     </bean>
   </util:set>
 
-  <bean id="org.fcrepo.server.security.ContextAttributeFinderModule"
-        class="org.fcrepo.server.security.ContextAttributeFinderModule"
-        autowire-candidate="true">
-    <constructor-arg><ref bean="org.fcrepo.server.security.ContextRegistry" /></constructor-arg>
-  </bean>
   <bean id="org.fcrepo.server.security.ResourceAttributeFinderModule"
         class="org.fcrepo.server.security.ResourceAttributeFinderModule"
         factory-method="getInstance" autowire-candidate="true">
@@ -48,7 +41,6 @@
   </bean>
 
   <util:list id="attributeFinderModules">
-    <ref bean="org.fcrepo.server.security.ContextAttributeFinderModule" />
     <ref bean="org.fcrepo.server.security.ResourceAttributeFinderModule" />
     <ref bean="org.fcrepo.server.security.TestAttributeFinderModule" />
         <!-- Uncomment the bean below to enable the use of relationship index triples in XACML policies -->
@@ -94,7 +86,6 @@
               init-method="init"
               autowire-candidate="true">
               <constructor-arg><ref bean="LegacyPDPConfig" /></constructor-arg>
-              <constructor-arg><ref bean="org.fcrepo.server.security.ContextRegistry" /></constructor-arg>
               <constructor-arg><ref bean="org.fcrepo.server.security.AuthorizationConfiguration" /></constructor-arg>
         </bean>
 </beans>

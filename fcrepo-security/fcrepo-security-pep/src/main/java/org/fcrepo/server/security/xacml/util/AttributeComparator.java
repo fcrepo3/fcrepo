@@ -20,7 +20,7 @@ package org.fcrepo.server.security.xacml.util;
 
 import java.util.Comparator;
 
-import com.sun.xacml.ctx.Attribute;
+import org.fcrepo.server.security.Attribute;
 
 /**
  * Class to compare two Attributes.

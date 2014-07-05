@@ -11,10 +11,10 @@ import org.fcrepo.server.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeDesignator;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.cond.EvaluationResult;
+import org.jboss.security.xacml.sunxacml.EvaluationCtx;
+import org.jboss.security.xacml.sunxacml.attr.AttributeDesignator;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.cond.EvaluationResult;
 
 /**
  * @author Bill Niebel
@@ -67,6 +67,7 @@ class ContextAttributeFinderModule
         denyAttribute(Constants.SUBJECT.LOGIN_ID.attributeId);
         denyAttribute(Constants.ACTION.ID.attributeId);
         denyAttribute(Constants.ACTION.API.attributeId);
+        denyAttribute(Constants.OBJECT.PID.attributeId);
 
         setInstantiatedOk(true);
     }
@@ -75,36 +76,30 @@ class ContextAttributeFinderModule
         final URI contextIdType = STRING_ATTRIBUTE_TYPE_URI;
         final URI contextIdId = Constants.ACTION.CONTEXT_ID.attributeId;
 
-        logger.debug("ContextAttributeFinder:findAttribute"
-                + " about to call getAttributeFromEvaluationCtx");
+        logger.debug("ContextAttributeFinder:findAttribute about to call getAttributeFromEvaluationCtx");
 
         EvaluationResult attribute =
                 context.getActionAttribute(contextIdType, contextIdId, null);
         Object element = getAttributeFromEvaluationResult(attribute);
         if (element == null) {
-            logger.debug("ContextAttributeFinder:getContextId exit on "
-                    + "can't get contextId on request callback");
+            logger.debug("ContextAttributeFinder:getContextId exit on can't get contextId on request callback");
             return null;
         }
 
         if (!(element instanceof StringAttribute)) {
-            logger.debug("ContextAttributeFinder:getContextId exit on "
-                    + "couldn't get contextId from xacml request "
-                    + "non-string returned");
+            logger.debug("ContextAttributeFinder:getContextId exit on couldn't get contextId from xacml request non-string returned");
             return null;
         }
 
         String contextId = ((StringAttribute) element).getValue();
 
         if (contextId == null) {
-            logger.debug("ContextAttributeFinder:getContextId exit on "
-                    + "null contextId");
+            logger.debug("ContextAttributeFinder:getContextId exit on null contextId");
             return null;
         }
 
         if (!validContextId(contextId)) {
-            logger.debug("ContextAttributeFinder:getContextId exit on "
-                    + "invalid context-id");
+            logger.debug("ContextAttributeFinder:getContextId exit on invalid context-id");
             return null;
         }
 

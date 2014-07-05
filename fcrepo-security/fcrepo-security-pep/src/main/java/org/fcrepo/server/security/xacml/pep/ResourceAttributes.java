@@ -6,9 +6,9 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sun.xacml.attr.AnyURIAttribute;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.attr.AnyURIAttribute;
+import org.jboss.security.xacml.sunxacml.attr.AttributeValue;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,13 +39,13 @@ public abstract class ResourceAttributes {
             resAttr.put(Constants.OBJECT.PID.getURI(),
                         new StringAttribute(pid));
             try{
-                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.attributeId,
                             new AnyURIAttribute(new URI(pid)));
             } catch (URISyntaxException e) {
                 logger.warn("pid {} is not a valid uri; write policies against the StringAttribute {} instead.",
                             pid,
                             Constants.OBJECT.PID.uri);
-                resAttr.put(Constants.XACML1_RESOURCE.ID.getURI(),
+                resAttr.put(Constants.XACML1_RESOURCE.ID.attributeId,
                             new StringAttribute(pid));
             }
         }

@@ -229,6 +229,10 @@ public class FedoraHome {
 					"org.fcrepo.server.security.xacml.pdp.decorator.PolicyIndexInvocationHandler");
 		}
 
+		// If messaging is enabled, remove the do-nothing decorator and proxy chain
+        if (!_opts.getBooleanValue(InstallOptions.MESSAGING_ENABLED, false)) {
+            props.remove("module.org.fcrepo.server.management.Management:decorator1");
+        }
 		try {
 			FileInputStream fis = new FileInputStream(fcfgBase);
 			ServerConfiguration config = new ServerConfigurationParser(fis)

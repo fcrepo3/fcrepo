@@ -10,8 +10,11 @@
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util-2.5.xsd">
         
+    <!-- Uncomment the bean below to enable 3.7 registered context lookups -->
+    <!--
         <bean id="org.fcrepo.server.security.ContextRegistry"
               class="org.fcrepo.server.security.impl.HashtableContextRegistry" />
+    -->
               
   <util:set id="policyFinderModules">
     <bean id="LegacyPolicyFinderModule"
@@ -26,11 +29,14 @@
     </bean>
   </util:set>
 
+    <!-- Uncomment the bean below to enable 3.7 registered context lookups -->
+    <!--
   <bean id="org.fcrepo.server.security.ContextAttributeFinderModule"
         class="org.fcrepo.server.security.ContextAttributeFinderModule"
         autowire-candidate="true">
     <constructor-arg><ref bean="org.fcrepo.server.security.ContextRegistry" /></constructor-arg>
   </bean>
+    -->
   <bean id="org.fcrepo.server.security.ResourceAttributeFinderModule"
         class="org.fcrepo.server.security.ResourceAttributeFinderModule"
         factory-method="getInstance" autowire-candidate="true">
@@ -50,12 +56,15 @@
         /TESTONLY -->
 
   <util:list id="attributeFinderModules">
-    <ref bean="org.fcrepo.server.security.ContextAttributeFinderModule" />
     <ref bean="org.fcrepo.server.security.ResourceAttributeFinderModule" />
-        <!-- Uncomment the bean below to enable the use of relationship index triples in XACML policies -->
-        <!--
-                      <ref bean="org.fcrepo.server.security.xacml.pdp.finder.attribute.RITriplesAttributeFinder" />
-        -->       
+    <!-- Uncomment the bean below to enable 3.7 registered context lookups -->
+    <!--
+    <ref bean="org.fcrepo.server.security.ContextAttributeFinderModule" />
+      -->
+    <!-- Uncomment the bean below to enable the use of relationship index triples in XACML policies -->
+    <!--
+                  <ref bean="org.fcrepo.server.security.xacml.pdp.finder.attribute.RITriplesAttributeFinder" />
+    -->       
         <!-- TESTONLY
     <ref bean="org.fcrepo.server.security.TestAttributeFinderModule" />
         /TESTONLY -->       
@@ -98,7 +107,17 @@
               init-method="init"
               autowire-candidate="true">
               <constructor-arg><ref bean="LegacyPDPConfig" /></constructor-arg>
+              <constructor-arg><ref bean="org.fcrepo.server.security.AuthorizationConfiguration" /></constructor-arg>
+        </bean>
+    <!-- Use the bean below to enable 3.7 registered context lookups -->
+    <!--
+        <bean id="org.fcrepo.server.security.PolicyEnforcementPoint"
+              class="org.fcrepo.server.security.impl.ContextRegisteringPolicyEnforcementPoint"
+              init-method="init"
+              autowire-candidate="true">
+              <constructor-arg><ref bean="LegacyPDPConfig" /></constructor-arg>
               <constructor-arg><ref bean="org.fcrepo.server.security.ContextRegistry" /></constructor-arg>
               <constructor-arg><ref bean="org.fcrepo.server.security.AuthorizationConfiguration" /></constructor-arg>
         </bean>
+    -->
 </beans>

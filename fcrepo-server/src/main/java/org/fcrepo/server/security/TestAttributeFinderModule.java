@@ -11,8 +11,8 @@ import org.fcrepo.common.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeDesignator;
+import org.jboss.security.xacml.sunxacml.EvaluationCtx;
+import org.jboss.security.xacml.sunxacml.attr.AttributeDesignator;
 
 /**
  * @author Bill Niebel

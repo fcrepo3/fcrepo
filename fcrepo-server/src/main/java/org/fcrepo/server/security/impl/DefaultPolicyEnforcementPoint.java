@@ -4,20 +4,15 @@
  */
 package org.fcrepo.server.security.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
-import com.sun.xacml.PDPConfig;
-import com.sun.xacml.ctx.Attribute;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Subject;
-
+import org.jboss.security.xacml.sunxacml.PDPConfig;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
+import org.jboss.security.xacml.sunxacml.ctx.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.config.ModuleConfiguration;
 import org.fcrepo.server.errors.ModuleInitializationException;
@@ -25,8 +20,9 @@ import org.fcrepo.server.errors.authorization.AuthzDeniedException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.errors.authorization.AuthzOperationalException;
 import org.fcrepo.server.errors.authorization.AuthzPermittedException;
-import org.fcrepo.server.security.ContextRegistry;
+import org.fcrepo.server.security.Attribute;
 import org.fcrepo.server.security.PolicyEnforcementPoint;
+import org.fcrepo.server.security.RequestCtx;
 
 /**
  * @author Bill Niebel
@@ -37,6 +33,8 @@ implements PolicyEnforcementPoint {
 
     private static final Logger logger =
             LoggerFactory.getLogger(DefaultPolicyEnforcementPoint.class);
+
+    private static final List<Attribute> EMPTY_ENV = Collections.emptyList();
 
     private static final String ROLE = org.fcrepo.server.security.PolicyEnforcementPoint.class.getName();
 
@@ -49,16 +47,13 @@ implements PolicyEnforcementPoint {
 
     static final String ENFORCE_MODE_DENY_ALL_REQUESTS = "deny-all-requests";
 
-    private final ContextRegistry m_registry;
-
     private String m_enforceMode = ENFORCE_MODE_ENFORCE_POLICIES;
 
-    public DefaultPolicyEnforcementPoint(PDPConfig pdpConfig, ContextRegistry registry, ModuleConfiguration authzConfiguration)
+    public DefaultPolicyEnforcementPoint(PDPConfig pdpConfig, ModuleConfiguration authzConfiguration)
             throws ModuleInitializationException {
 
         super(pdpConfig);
 
-        m_registry = registry;
         String enforceMode = authzConfiguration.getParameter(ENFORCE_MODE_CONFIG_KEY);
         if (enforceMode != null) {
             m_enforceMode = enforceMode;
@@ -71,12 +66,6 @@ implements PolicyEnforcementPoint {
         }
     }
 
-
-    private int n = 0;
-
-    private synchronized int next() {
-        return n++;
-    }
 
     /* (non-Javadoc)
      * @see org.fcrepo.server.security.PolicyEnforcementPoint#enforce(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.fcrepo.server.Context)
@@ -108,30 +97,28 @@ implements PolicyEnforcementPoint {
                 ResponseCtx response = null;
                 String contextIndex = null;
                 try {
-                    contextIndex = Integer.toString(next());
-                    logger.debug("context index set={}", contextIndex);
-                    Set<Subject> subjects = wrapSubjects(subjectId);
-                    Set<Attribute> actions = wrapActions(action, api, contextIndex);
-                    Set<Attribute> resources = wrapResources(pid, namespace);
+                    List<Subject> subjects = wrapSubjects(subjectId);
+                    List<Attribute> actions = wrapActions(action, api, contextIndex);
+                    List<Attribute> resources = wrapResources(pid, namespace);
 
                     RequestCtx request =
-                            new RequestCtx(subjects,
+                            new BasicRequestCtx(subjects,
                                            resources,
                                            actions,
-                                           Collections.EMPTY_SET);
-                    Iterator<Attribute> tempit = actions.iterator();
-                    while (tempit.hasNext()) {
-                        Attribute tempobj = tempit.next();
-                        logger.debug("request action has {}={}", tempobj.getId(), tempobj.getValue().toString());
+                                           EMPTY_ENV);
+                    if (debug) {
+                        for (Attribute tempobj: actions) {
+                            logger.debug("request action has {}={}", tempobj.getId(), tempobj.getValue());
+                        }
                     }
-                    m_registry.registerContext(contextIndex, context);
                     long st = debug ? System.currentTimeMillis() : 0;
                     try {
-                        response = m_pdp.evaluate(request);
+                        // we use a localized EvaluationCtx so that resource-id is correctly located
+                        response = m_pdp.evaluate(new BasicEvaluationCtx(request, m_pdpConfig.getAttributeFinder(), context));
                     } finally {
                         if (debug) {
                           long dur = System.currentTimeMillis() - st;
-                          logger.debug("Policy evaluation took {}ms.", dur);
+                          logger.debug("Policy evaluation took {} ms.", dur);
                         }
                     }
 
@@ -139,12 +126,14 @@ implements PolicyEnforcementPoint {
                 } catch (Throwable t) {
                     logger.error("Error evaluating policy", t);
                     throw new AuthzOperationalException("");
-                } finally {
-                    m_registry.unregisterContext(contextIndex);
                 }
                 logger.debug("in pep, before denyBiasedAuthz() called");
                 if (!denyBiasedAuthz(response.getResults())) {
-                    response.encode(System.out);
+                    if (debug) {
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        response.encode(bos);                        
+                        logger.debug(bos.toString());                        
+                    }
                     throw new AuthzDeniedException("");
                 }
             }
@@ -154,7 +143,7 @@ implements PolicyEnforcementPoint {
         } finally {
             if (debug) {
                 long dur = System.currentTimeMillis() - enforceStartTime;
-                logger.debug("Policy enforcement took {}ms.", dur);
+                logger.debug("Policy enforcement took {} ms.", dur);
             }
         }
     }

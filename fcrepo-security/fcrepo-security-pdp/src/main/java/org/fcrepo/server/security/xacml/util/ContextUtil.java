@@ -22,29 +22,31 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.Attribute;
+import org.fcrepo.server.security.RequestCtx;
+import org.fcrepo.server.security.impl.BasicAttribute;
+import org.fcrepo.server.security.impl.BasicRequestCtx;
+import org.fcrepo.server.security.impl.SingletonAttribute;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.xacml.Indenter;
-import com.sun.xacml.ParsingException;
-import com.sun.xacml.attr.AnyURIAttribute;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.ctx.Attribute;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
-import com.sun.xacml.ctx.Subject;
+import org.jboss.security.xacml.sunxacml.Indenter;
+import org.jboss.security.xacml.sunxacml.ParsingException;
+import org.jboss.security.xacml.sunxacml.attr.AnyURIAttribute;
+import org.jboss.security.xacml.sunxacml.attr.AttributeValue;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
+import org.jboss.security.xacml.sunxacml.ctx.Result;
+import org.jboss.security.xacml.sunxacml.ctx.Subject;
 
 
 /**
@@ -61,9 +63,6 @@ public class ContextUtil {
 
     private static final Logger logger =
             LoggerFactory.getLogger(ContextUtil.class);
-
-    private static final URI XACML_RESOURCE_ID =
-            Constants.XACML1_RESOURCE.ID.getURI();
 
     private final Map<URI, URI> actionMap =
             new ConcurrentHashMap<URI, URI>();
@@ -101,27 +100,25 @@ public class ContextUtil {
      *
      * @return a Set of Subject instances for inclusion in a Request
      */
-    public Set<Subject> setupSubjects(List<Map<URI, List<AttributeValue>>> subjs) {
-        Set<Subject> subjects = new HashSet<Subject>();
+    public List<Subject> setupSubjects(List<Map<URI, List<AttributeValue>>> subjs) {
 
         if (subjs == null || subjs.size() == 0) {
-            subjects.add(new Subject(new HashSet<Attribute>()));
-            return subjects;
+            return Collections.singletonList(new Subject(new ArrayList<Attribute>()));
         }
 
+        List<Subject> subjects = new ArrayList<Subject>(subjs.size());
         // Go through each of the subjects
         for (Map<URI, List<AttributeValue>> s : subjs) {
-            Set<Attribute> attributes = new HashSet<Attribute>();
+            List<Attribute> attributes = new ArrayList<Attribute>();
 
             // Extract and create the attributes for this subject and add them
             // to the set
             for (URI uri : s.keySet()) {
                 List<AttributeValue> attributeValues = s.get(uri);
-                for (AttributeValue attributeValue : attributeValues) {
-                    attributes.add(new Attribute(uri,
-                                                 null,
-                                                 null,
-                                                 attributeValue));
+                if (attributeValues != null && attributeValues.size() > 0) {
+                    attributes.add(
+                        new BasicAttribute(uri, attributeValues.get(0).getType(),
+                            null, null, attributeValues));
                 }
             }
 
@@ -137,24 +134,24 @@ public class ContextUtil {
      *
      * @return a Set of Attributes for inclusion in a Request
      */
-    public Set<Attribute> setupResources(Map<URI, AttributeValue> res, RelationshipResolver relationshipResolver)
+    public List<Attribute> setupResources(Map<URI, AttributeValue> res, RelationshipResolver relationshipResolver)
             throws MelcoeXacmlException {
-        Set<Attribute> attributes = new HashSet<Attribute>();
 
         if (res == null || res.size() == 0) {
-            return attributes;
+            return new ArrayList<Attribute>();
         }
 
+        List<Attribute> attributes = new ArrayList<Attribute>(res.size());
         try {
             String pid = null;
-            AttributeValue pidAttr = res.get(XACML_RESOURCE_ID);
+            AttributeValue pidAttr = res.get(Constants.XACML1_RESOURCE.ID.attributeId);
             if (pidAttr != null) {
                 pid = pidAttr.encode();
                 pid = relationshipResolver.buildRESTParentHierarchy(pid);
 
                 String dsid = null;
                 AttributeValue dsidAttr =
-                        res.get(Constants.DATASTREAM.ID.getURI());
+                        res.get(Constants.DATASTREAM.ID.attributeId);
                 if (dsidAttr != null) {
                     dsid = dsidAttr.encode();
                     if (!dsid.isEmpty()) {
@@ -162,7 +159,7 @@ public class ContextUtil {
                     }
                 }
 
-                res.put(XACML_RESOURCE_ID, new AnyURIAttribute(new URI(pid)));
+                res.put(Constants.XACML1_RESOURCE.ID.attributeId, new AnyURIAttribute(new URI(pid)));
             }
         } catch (Exception e) {
             logger.error("Error finding parents.", e);
@@ -170,7 +167,7 @@ public class ContextUtil {
         }
 
         for (URI uri : res.keySet()) {
-            attributes.add(new Attribute(uri, null, null, res.get(uri)));
+            attributes.add(new SingletonAttribute(uri, null, null, res.get(uri)));
         }
 
         return attributes;
@@ -181,13 +178,13 @@ public class ContextUtil {
      *
      * @return a Set of Attributes for inclusion in a Request
      */
-    public Set<Attribute> setupAction(Map<URI, AttributeValue> a) {
-        Set<Attribute> actions = new HashSet<Attribute>();
+    public List<Attribute> setupAction(Map<URI, AttributeValue> a) {
 
         if (a == null || a.size() == 0) {
-            return actions;
+            return Collections.emptyList();
         }
 
+        List<Attribute> actions = new ArrayList<Attribute>(a.size());
         Map<URI, AttributeValue> newActions =
                 new HashMap<URI, AttributeValue>();
         for (URI uri : a.keySet()) {
@@ -211,7 +208,7 @@ public class ContextUtil {
         }
 
         for (URI uri : newActions.keySet()) {
-            actions.add(new Attribute(uri, null, null, newActions.get(uri)));
+            actions.add(new SingletonAttribute(uri, null, null, newActions.get(uri)));
         }
 
         return actions;
@@ -222,15 +219,15 @@ public class ContextUtil {
      *
      * @return a Set of Attributes for inclusion in a Request
      */
-    public Set<Attribute> setupEnvironment(Map<URI, AttributeValue> e) {
-        Set<Attribute> environment = new HashSet<Attribute>();
+    public List<Attribute> setupEnvironment(Map<URI, AttributeValue> e) {
 
         if (e == null || e.size() == 0) {
-            return environment;
+            return Collections.emptyList();
         }
 
+        List<Attribute> environment = new ArrayList<Attribute>(e.size());
         for (URI uri : e.keySet()) {
-            environment.add(new Attribute(uri, null, null, e.get(uri)));
+            environment.add(new SingletonAttribute(uri, null, null, e.get(uri)));
         }
 
         return environment;
@@ -256,9 +253,7 @@ public class ContextUtil {
                                    Map<URI, AttributeValue> environment,
                                    RelationshipResolver relationshipResolver)
             throws MelcoeXacmlException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Building request!");
-        }
+        logger.debug("Building request!");
 
         RequestCtx request = null;
 
@@ -267,7 +262,7 @@ public class ContextUtil {
         // if that Set is empty
         try {
             request =
-                    new RequestCtx(setupSubjects(subjects),
+                    new BasicRequestCtx(setupSubjects(subjects),
                                    setupResources(resources, relationshipResolver),
                                    setupAction(actions),
                                    setupEnvironment(environment));
@@ -291,12 +286,8 @@ public class ContextUtil {
             throws MelcoeXacmlException {
         ResponseCtx resCtx = null;
         try {
-            // sunxacml 1.2 bug. ResponseCtx.getInstance looks for
-            // ResourceId and creates ResourceID
-            String newResponse =
-                    response.replaceAll("ResourceID", "ResourceId");
             ByteArrayInputStream is =
-                    new ByteArrayInputStream(newResponse.getBytes());
+                    new ByteArrayInputStream(response.getBytes());
             resCtx = ResponseCtx.getInstance(is);
         } catch (ParsingException pe) {
             throw new MelcoeXacmlException("Error parsing response.", pe);
@@ -318,7 +309,7 @@ public class ContextUtil {
         try {
             ByteArrayInputStream is =
                     new ByteArrayInputStream(request.getBytes());
-            reqCtx = RequestCtx.getInstance(is);
+            reqCtx = BasicRequestCtx.getInstance(is);
         } catch (ParsingException pe) {
             throw new MelcoeXacmlException("Error parsing response.", pe);
         }

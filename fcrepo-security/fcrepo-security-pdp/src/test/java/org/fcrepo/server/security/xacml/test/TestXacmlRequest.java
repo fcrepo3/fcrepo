@@ -28,16 +28,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.fcrepo.server.security.RequestCtx;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.RIRelationshipResolver;
 import org.fcrepo.server.security.xacml.util.RelationshipResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.attr.AnyURIAttribute;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.ctx.RequestCtx;
+import org.jboss.security.xacml.sunxacml.attr.AnyURIAttribute;
+import org.jboss.security.xacml.sunxacml.attr.AttributeValue;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
 
 /**
  * @author nishen@melcoe.mq.edu.au

@@ -18,16 +18,18 @@
 
 package org.fcrepo.server.security.xacml.pep;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.URL;
-
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.fcrepo.server.security.RequestCtx;
 import org.fcrepo.server.security.xacml.pdp.client.MelcoePDP;
 import org.fcrepo.server.security.xacml.pdp.client.MelcoePDPPortType;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
 
 /**
  * This is the Web Services based client for the MelcoePDP. It uses the classes
@@ -88,6 +90,18 @@ public class WebServicesPDPClient
         return response;
     }
 
+    public ResponseCtx evaluate(RequestCtx request) throws PEPException {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            request.encode(bos);
+            String response = this.client.evaluate(bos.toString());
+            ByteArrayInputStream bis = new ByteArrayInputStream(response.getBytes());
+            return ResponseCtx.getInstance(bis);
+        } catch (Exception e) {
+            logger.error("Error evaluating request.", e);
+            throw new PEPException("Error evaluating request", e);
+        }
+    }
     /*
      * (non-Javadoc)
      * @see

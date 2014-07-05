@@ -14,16 +14,16 @@ import org.fcrepo.server.security.xacml.util.AttributeBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.sun.xacml.AbstractPolicy;
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.ParsingException;
-import com.sun.xacml.Policy;
-import com.sun.xacml.PolicySet;
-import com.sun.xacml.attr.AttributeDesignator;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.BagAttribute;
-import com.sun.xacml.cond.EvaluationResult;
-import com.sun.xacml.finder.PolicyFinder;
+import org.jboss.security.xacml.sunxacml.AbstractPolicy;
+import org.jboss.security.xacml.sunxacml.EvaluationCtx;
+import org.jboss.security.xacml.sunxacml.ParsingException;
+import org.jboss.security.xacml.sunxacml.Policy;
+import org.jboss.security.xacml.sunxacml.PolicySet;
+import org.jboss.security.xacml.sunxacml.attr.AttributeDesignator;
+import org.jboss.security.xacml.sunxacml.attr.AttributeValue;
+import org.jboss.security.xacml.sunxacml.attr.BagAttribute;
+import org.jboss.security.xacml.sunxacml.cond.EvaluationResult;
+import org.jboss.security.xacml.sunxacml.finder.PolicyFinder;
 
 
 /**

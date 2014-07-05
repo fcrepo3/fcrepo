@@ -35,7 +35,7 @@
 
 package org.fcrepo.server.security.xacml.pdp.finder.policy;
 
-import com.sun.xacml.ctx.Status;
+import org.jboss.security.xacml.sunxacml.ctx.Status;
 
 /**
  * This is an exception thrown by the support code when there's an error trying

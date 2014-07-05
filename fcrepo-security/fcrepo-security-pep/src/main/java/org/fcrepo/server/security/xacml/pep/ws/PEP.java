@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.fcrepo.server.security.RequestCtx;
 import org.fcrepo.server.security.xacml.pep.AuthzDeniedException;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -36,9 +37,8 @@ import org.fcrepo.server.utilities.CXFUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
+import org.jboss.security.xacml.sunxacml.ctx.Result;
 
 /**
  * This class is an JAX-WS handler. It is used as a handler on both the request

@@ -110,9 +110,7 @@ public class RelationshipResolverImpl
      * lang.String)
      */
     public Set<String> getParents(String pid) throws MelcoeXacmlException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Obtaining parents for: " + pid);
-        }
+        logger.debug("Obtaining parents for: {}", pid);
 
         Set<String> parentPIDs = new HashSet<String>();
         if (pid.equalsIgnoreCase(Constants.FEDORA_REPOSITORY_PID.uri)) {
@@ -120,9 +118,7 @@ public class RelationshipResolverImpl
         }
 
         query: for (String relationship : relationships) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("relationship query: " + pid + ", " + relationship);
-            }
+            logger.debug("relationship query: {}, {}", pid, relationship);
 
             Map<String, Set<String>> mapping;
             try {
@@ -133,10 +129,8 @@ public class RelationshipResolverImpl
                 // another object, Y which does not exist. Therefore, we don't
                 // want to continue querying for Y's parents.
                 if (t != null && t instanceof ObjectNotInLowlevelStorageException) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Parent, " + pid + ", not found.");
-                        }
-                        break query;
+                    logger.debug("Parent, {}, not found.", pid);
+                    break query;
                 } else {
                 // Unexpected error, so we throw back the original
                 throw e;
@@ -149,9 +143,7 @@ public class RelationshipResolverImpl
                     PID parentPID = PID.getInstance(parent);
                     // we want the parents in demo:123 form, not info:fedora/demo:123
                     parentPIDs.add(parentPID.toString());
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("added parent " + parentPID.toString());
-                    }
+                    logger.debug("added parent {}", parentPID.toString());
                 }
             }
         }

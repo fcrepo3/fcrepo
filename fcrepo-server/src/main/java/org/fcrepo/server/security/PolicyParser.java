@@ -24,10 +24,10 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import com.sun.xacml.AbstractPolicy;
-import com.sun.xacml.ParsingException;
-import com.sun.xacml.Policy;
-import com.sun.xacml.PolicySet;
+import org.jboss.security.xacml.sunxacml.AbstractPolicy;
+import org.jboss.security.xacml.sunxacml.ParsingException;
+import org.jboss.security.xacml.sunxacml.Policy;
+import org.jboss.security.xacml.sunxacml.PolicySet;
 
 
 

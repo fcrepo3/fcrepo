@@ -23,13 +23,9 @@
     </bean>
   </util:set>
   <util:list id="attributeFinderModules">
-    <bean id="CurrentEnvModule" class="com.sun.xacml.finder.impl.CurrentEnvModule"/>
-    <bean id="SelectorModule" class="com.sun.xacml.finder.impl.SelectorModule"/>
+    <bean id="CurrentEnvModule" class="org.jboss.security.xacml.sunxacml.finder.impl.CurrentEnvModule"/>
+    <bean id="SelectorModule" class="org.jboss.security.xacml.sunxacml.finder.impl.SelectorModule"/>
     <ref bean="FedoraRIAttributeFinder" />
-    <bean id="org.fcrepo.server.security.ContextAttributeFinderModule"
-        class="org.fcrepo.server.security.ContextAttributeFinderModule">
-      <constructor-arg><ref bean="org.fcrepo.server.security.ContextRegistry" /></constructor-arg>
-    </bean>
   </util:list>
   <util:list id="resourceFinderModules">
   </util:list>

@@ -4,8 +4,8 @@
  */
 package org.fcrepo.common.policy;
 
-import com.sun.xacml.attr.DateTimeAttribute;
-import com.sun.xacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.attr.DateTimeAttribute;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
 
 /**
  * The Fedora Disseminator XACML namespace.

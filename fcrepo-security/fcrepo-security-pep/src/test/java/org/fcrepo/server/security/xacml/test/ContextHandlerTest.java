@@ -18,6 +18,8 @@
 
 package org.fcrepo.server.security.xacml.test;
 
+import static org.mockito.Mockito.when;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -26,28 +28,46 @@ import java.util.List;
 import java.util.Map;
 
 import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.pep.ContextHandler;
+import org.fcrepo.server.security.RequestCtx;
 import org.fcrepo.server.security.xacml.pep.ContextHandlerImpl;
+import org.fcrepo.server.security.xacml.pep.EvaluationEngine;
+import org.fcrepo.server.security.xacml.util.ContextUtil;
+import org.fcrepo.server.security.xacml.util.RelationshipResolver;
 import org.fcrepo.server.utilities.CXFUtility;
-
-import com.sun.xacml.attr.AnyURIAttribute;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.ctx.RequestCtx;
+import org.jboss.security.xacml.sunxacml.attr.AnyURIAttribute;
+import org.jboss.security.xacml.sunxacml.attr.AttributeValue;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 
 /**
  * @author nishen@melcoe.mq.edu.au
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ContextHandlerTest {
 
-    private static ContextHandler ctx = null;
+    private ContextHandlerImpl test;
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) throws Exception {
-        ctx = new ContextHandlerImpl();
+    private ContextUtil fixtureUtil;
+    @Mock
+    private RelationshipResolver mockResolver;
+    @Mock
+    private EvaluationEngine mockEval;
+    @Before
+    public void setUp() throws Exception{
+        fixtureUtil = new ContextUtil();
+        test = new ContextHandlerImpl();
+        test.setContextUtil(fixtureUtil);
+        test.setRelationshipResolver(mockResolver);
+        test.setEvaluationEngine(mockEval);
+        when(mockResolver.buildRESTParentHierarchy("FedoraRepository")).thenReturn("/FedoraRepository");
+    }
+    @Test
+    public void testRoundTrip() throws Exception {
         RequestCtx req;
 
         long a, b;
@@ -59,17 +79,18 @@ public class ContextHandlerTest {
         a = System.nanoTime();
 
         req =
-                ctx.buildRequest(getSubjects("nishen"),
+                test.buildRequest(getSubjects("nishen"),
                                  getActions(),
                                  getResources().get(0),
                                  getEnvironment());
-        response = ctx.evaluate(request);
+        
+        response = test.evaluate(request);
 
         b = System.nanoTime();
         req.encode(System.out);
 
         System.out.println(response);
-        System.out.println("Time taken: " + (b - a));
+        System.out.println("Time taken: " + (b - a) + " nanos");
     }
 
     private static List<Map<URI, AttributeValue>> getResources()

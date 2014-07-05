@@ -178,6 +178,7 @@ public class ReadOnlyContext
                 && extendedHttpServletRequest.isUserInRole(name)) {
             n++;
         }
+        if (n == 0) return null;
         String[] values = new String[n];
         String[] temp = m_subjectAttributes.getStringArray(name);
         System.arraycopy(temp, 0, values, 0, temp.length);

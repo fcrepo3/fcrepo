@@ -23,12 +23,12 @@ import org.slf4j.LoggerFactory;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.policy.xacml1.XACML1SubjectCategoryNamespace;
 
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeFactory;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.BagAttribute;
-import com.sun.xacml.attr.StandardAttributeFactory;
-import com.sun.xacml.cond.EvaluationResult;
+import org.jboss.security.xacml.sunxacml.EvaluationCtx;
+import org.jboss.security.xacml.sunxacml.attr.AttributeFactory;
+import org.jboss.security.xacml.sunxacml.attr.AttributeValue;
+import org.jboss.security.xacml.sunxacml.attr.BagAttribute;
+import org.jboss.security.xacml.sunxacml.attr.StandardAttributeFactory;
+import org.jboss.security.xacml.sunxacml.cond.EvaluationResult;
 
 public class LDAPAttributeFinder
         extends DesignatorAttributeFinderModule {

@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -23,7 +22,6 @@ import org.fcrepo.server.Module;
 import org.fcrepo.server.ReadOnlyContext;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.DatastreamNotFoundException;
-import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.security.Authorization;
@@ -65,7 +63,6 @@ public class DefaultAccessTest {
 
     private DefaultAccess test;
 
-    @SuppressWarnings("unchecked")
     @Before
     public void setUp() throws ServerException {
         when(mockServer.getBean("org.fcrepo.server.security.Authorization", Authorization.class)).thenReturn(mockAuthz);

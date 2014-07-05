@@ -20,7 +20,7 @@ package org.fcrepo.server.security.xacml.pep.ws.operations;
 
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import com.sun.xacml.ctx.RequestCtx;
+import org.fcrepo.server.security.RequestCtx;
 
 public interface OperationHandler {
 

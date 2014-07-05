@@ -289,8 +289,8 @@ public class AuthFilterJAAS
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("incoming filter: " + this.getClass().getName());
-            logger.debug("session-id: " + req.getSession().getId());
+            logger.debug("incoming filter: {}", this.getClass().getName());
+            logger.debug("session-id: {}", req.getSession().getId());
         }
 
         Subject subject = authenticate(req);
@@ -455,9 +455,9 @@ public class AuthFilterJAAS
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("found userPrincipal ["
-                    + userPrincipal.getClass().getName() + "]: "
-                    + userPrincipal.getName());
+            logger.debug("found userPrincipal [{}]: {}",
+                         userPrincipal.getClass().getName(),
+                         userPrincipal.getName());
         }
 
         return userPrincipal;

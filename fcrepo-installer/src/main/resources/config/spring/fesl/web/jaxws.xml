@@ -49,7 +49,6 @@
 		<entry key="listDatastreams">
 		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.ListDatastreamsHandler">
 		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
-            <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
 		  </bean>
 		</entry>
 		<entry key="listMethods">
@@ -70,13 +69,11 @@
 		<entry key="findObjects">
 		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.FindObjectsHandler">
 		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
-	        <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
 		  </bean>
 		</entry>
 		<entry key="resumeFindObjects">
 		  <bean class="org.fcrepo.server.security.xacml.pep.ws.operations.ResumeFindObjectsHandler">
 		    <constructor-arg ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
-	        <property name="contextUtil" ref="org.fcrepo.server.security.xacml.util.ContextUtil" />
 		  </bean>
 		</entry>
 		<entry key="getObjectHistory">

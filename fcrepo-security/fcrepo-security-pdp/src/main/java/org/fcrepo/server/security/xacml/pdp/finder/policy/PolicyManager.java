@@ -30,17 +30,17 @@ import org.fcrepo.server.security.xacml.pdp.data.PolicyIndexException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.AbstractPolicy;
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.MatchResult;
-import com.sun.xacml.PolicyMetaData;
-import com.sun.xacml.PolicySet;
-import com.sun.xacml.Target;
-import com.sun.xacml.TargetMatch;
-import com.sun.xacml.TargetSection;
-import com.sun.xacml.combine.PolicyCombiningAlgorithm;
-import com.sun.xacml.ctx.Status;
-import com.sun.xacml.finder.PolicyFinder;
+import org.jboss.security.xacml.sunxacml.AbstractPolicy;
+import org.jboss.security.xacml.sunxacml.EvaluationCtx;
+import org.jboss.security.xacml.sunxacml.MatchResult;
+import org.jboss.security.xacml.sunxacml.PolicyMetaData;
+import org.jboss.security.xacml.sunxacml.PolicySet;
+import org.jboss.security.xacml.sunxacml.Target;
+import org.jboss.security.xacml.sunxacml.TargetMatch;
+import org.jboss.security.xacml.sunxacml.TargetSection;
+import org.jboss.security.xacml.sunxacml.combine.PolicyCombiningAlgorithm;
+import org.jboss.security.xacml.sunxacml.ctx.Status;
+import org.jboss.security.xacml.sunxacml.finder.PolicyFinder;
 
 /**
  * This class interacts with the policy cache on behalf of the PolicyFinder

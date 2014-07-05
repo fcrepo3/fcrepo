@@ -152,7 +152,7 @@
         <include>commons-pool:commons-pool:jar:*</include>
         <include>dom4j:dom4j:jar:*</include>
         <include>org.fcrepo:mulgara-core:jar:*</include>
-        <include>org.fcrepo:sunxacml:jar:*</include>
+        <include>org.jboss.security:jboss-sunxacml:jar:*</include>
         <include>org.openrdf.sesame:sesame*</include>
         <include>jaxen:jaxen:jar:*</include>
         <include>org.slf4j:slf4j-api:jar:*</include>

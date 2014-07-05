@@ -20,6 +20,9 @@ package org.fcrepo.server.security.xacml.pep;
 
 import java.util.List;
 
+import org.fcrepo.server.security.RequestCtx;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
+
 /**
  * @author nishen@melcoe.mq.edu.au
  */
@@ -35,9 +38,10 @@ public interface PDPClient {
      */
     public String evaluate(String request) throws PEPException;
 
+    public ResponseCtx evaluate(RequestCtx request) throws PEPException;
     /**
      * Sends a String array of XACML requests for evaluation to the PDP. A
-     * single resposne with the results of all requests is returned.
+     * single response with the results of all requests is returned.
      *
      * @param request
      *        a String array of XACML requests

@@ -12,12 +12,12 @@ import org.fcrepo.server.security.xacml.util.RelationshipResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeFactory;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.BagAttribute;
-import com.sun.xacml.attr.StandardAttributeFactory;
-import com.sun.xacml.cond.EvaluationResult;
+import org.jboss.security.xacml.sunxacml.EvaluationCtx;
+import org.jboss.security.xacml.sunxacml.attr.AttributeFactory;
+import org.jboss.security.xacml.sunxacml.attr.AttributeValue;
+import org.jboss.security.xacml.sunxacml.attr.BagAttribute;
+import org.jboss.security.xacml.sunxacml.attr.StandardAttributeFactory;
+import org.jboss.security.xacml.sunxacml.cond.EvaluationResult;
 
 public class FedoraRIAttributeFinder
         extends DesignatorAttributeFinderModule {

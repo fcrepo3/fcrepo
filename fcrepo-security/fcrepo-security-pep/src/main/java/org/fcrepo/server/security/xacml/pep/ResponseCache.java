@@ -1,6 +1,8 @@
 
 package org.fcrepo.server.security.xacml.pep;
 
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
+
 /**
  * @author nishen@melcoe.mq.edu.au
  */
@@ -12,9 +14,9 @@ public interface ResponseCache {
      * @param request
      *        the request to hash and add.
      * @param response
-     *        the resposne to add
+     *        the response to add
      */
-    public void addCacheItem(String request, String response);
+    public void addCacheItem(String request, ResponseCtx response);
     
     public void setTTL(long ttl);
 
@@ -23,7 +25,7 @@ public interface ResponseCache {
      *        the request to hash and retrieve
      * @return the response corresponding to the request hash
      */
-    public String getCacheItem(String request);
+    public ResponseCtx getCacheItem(String request);
 
     /**
      * Invalidates the cache.

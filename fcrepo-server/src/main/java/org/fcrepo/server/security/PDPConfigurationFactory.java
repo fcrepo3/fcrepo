@@ -9,49 +9,49 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.xacml.PDPConfig;
-import com.sun.xacml.attr.AttributeFactory;
-import com.sun.xacml.attr.AttributeProxy;
+import org.jboss.security.xacml.sunxacml.PDPConfig;
+import org.jboss.security.xacml.sunxacml.attr.AttributeFactory;
+import org.jboss.security.xacml.sunxacml.attr.AttributeProxy;
  
-import com.sun.xacml.attr.BaseAttributeFactory;
+import org.jboss.security.xacml.sunxacml.attr.BaseAttributeFactory;
  
-import com.sun.xacml.attr.StandardAttributeFactory;
+import org.jboss.security.xacml.sunxacml.attr.StandardAttributeFactory;
  
-import com.sun.xacml.combine.BaseCombiningAlgFactory;
+import org.jboss.security.xacml.sunxacml.combine.BaseCombiningAlgFactory;
  
-import com.sun.xacml.combine.CombiningAlgFactory;
+import org.jboss.security.xacml.sunxacml.combine.CombiningAlgFactory;
  
-import com.sun.xacml.combine.CombiningAlgorithm;
+import org.jboss.security.xacml.sunxacml.combine.CombiningAlgorithm;
  
-import com.sun.xacml.combine.StandardCombiningAlgFactory;
+import org.jboss.security.xacml.sunxacml.combine.StandardCombiningAlgFactory;
  
-import com.sun.xacml.cond.BaseFunctionFactory;
+import org.jboss.security.xacml.sunxacml.cond.BaseFunctionFactory;
  
-import com.sun.xacml.cond.BasicFunctionFactoryProxy;
+import org.jboss.security.xacml.sunxacml.cond.BasicFunctionFactoryProxy;
  
-import com.sun.xacml.cond.Function;
+import org.jboss.security.xacml.sunxacml.cond.Function;
  
-import com.sun.xacml.cond.FunctionFactory;
+import org.jboss.security.xacml.sunxacml.cond.FunctionFactory;
  
-import com.sun.xacml.cond.FunctionFactoryProxy;
+import org.jboss.security.xacml.sunxacml.cond.FunctionFactoryProxy;
  
-import com.sun.xacml.cond.FunctionProxy;
+import org.jboss.security.xacml.sunxacml.cond.FunctionProxy;
  
-import com.sun.xacml.cond.StandardFunctionFactory;
+import org.jboss.security.xacml.sunxacml.cond.StandardFunctionFactory;
  
-import com.sun.xacml.cond.cluster.FunctionCluster;
+import org.jboss.security.xacml.sunxacml.cond.cluster.FunctionCluster;
  
-import com.sun.xacml.finder.AttributeFinder;
+import org.jboss.security.xacml.sunxacml.finder.AttributeFinder;
  
-import com.sun.xacml.finder.AttributeFinderModule;
+import org.jboss.security.xacml.sunxacml.finder.AttributeFinderModule;
  
-import com.sun.xacml.finder.PolicyFinder;
+import org.jboss.security.xacml.sunxacml.finder.PolicyFinder;
  
-import com.sun.xacml.finder.PolicyFinderModule;
+import org.jboss.security.xacml.sunxacml.finder.PolicyFinderModule;
  
-import com.sun.xacml.finder.ResourceFinder;
+import org.jboss.security.xacml.sunxacml.finder.ResourceFinder;
  
-import com.sun.xacml.finder.ResourceFinderModule;
+import org.jboss.security.xacml.sunxacml.finder.ResourceFinderModule;
  
 public class PDPConfigurationFactory {
  

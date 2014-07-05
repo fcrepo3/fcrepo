@@ -14,7 +14,7 @@ import org.fcrepo.server.storage.RepositoryReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.AbstractPolicy;
+import org.jboss.security.xacml.sunxacml.AbstractPolicy;
 
 
 public class SimplePolicyLoader extends PolicyLoader {

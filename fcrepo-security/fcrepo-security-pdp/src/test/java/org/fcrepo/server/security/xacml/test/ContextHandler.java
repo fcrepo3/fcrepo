@@ -19,13 +19,13 @@
 package org.fcrepo.server.security.xacml.test;
 
 
+import org.fcrepo.server.security.RequestCtx;
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
 
 /**
  * Borrowed <b>heavily</b> from sunxacml samples SampleRequestBuilder.java

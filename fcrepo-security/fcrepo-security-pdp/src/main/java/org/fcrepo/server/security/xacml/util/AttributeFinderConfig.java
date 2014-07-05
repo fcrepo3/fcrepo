@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.fcrepo.server.security.xacml.pdp.finder.AttributeFinderException;
 
-import com.sun.xacml.attr.AttributeDesignator;
+import org.jboss.security.xacml.sunxacml.attr.AttributeDesignator;
 
 
 

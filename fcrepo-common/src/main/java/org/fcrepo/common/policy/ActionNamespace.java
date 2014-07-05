@@ -4,7 +4,7 @@
  */
 package org.fcrepo.common.policy;
 
-import com.sun.xacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
 
 /**
  * The Fedora Action XACML namespace.

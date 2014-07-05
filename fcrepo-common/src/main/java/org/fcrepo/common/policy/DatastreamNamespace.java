@@ -4,11 +4,11 @@
  */
 package org.fcrepo.common.policy;
 
-import com.sun.xacml.attr.AnyURIAttribute;
-import com.sun.xacml.attr.BooleanAttribute;
-import com.sun.xacml.attr.DateTimeAttribute;
-import com.sun.xacml.attr.IntegerAttribute;
-import com.sun.xacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.attr.AnyURIAttribute;
+import org.jboss.security.xacml.sunxacml.attr.BooleanAttribute;
+import org.jboss.security.xacml.sunxacml.attr.DateTimeAttribute;
+import org.jboss.security.xacml.sunxacml.attr.IntegerAttribute;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
 
 /**
  * The Fedora Datastream XACML namespace.

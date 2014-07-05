@@ -385,7 +385,7 @@
         <include>org.fcrepo:jai_core:jar:*</include>
         <include>org.fcrepo:mulgara-core:jar:*</include>
         <include>org.fcrepo:saxon:jar:*</include>
-        <include>org.fcrepo:sunxacml:jar:*</include>
+        <include>org.jboss.security:jboss-sunxacml:jar:*</include>
         <include>org.openrdf.sesame:sesame*</include>
         <include>org.trippi:trippi-core:jar:*</include>
         <include>org.slf4j:slf4j-api:jar:*</include>

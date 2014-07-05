@@ -159,7 +159,7 @@ We are now discussing an alternate policy-writing approach, which focuses each P
 but which has it returning Permit or Deny according to several rules.  This is, in fact, the 
 general case. 
 
-Assuming that the configured combining algorithm is com.sun.xacml.combine.OrderedDenyOverridesPolicyAlg
+Assuming that the configured combining algorithm is org.jboss.security.xacml.sunxacml.combine.OrderedDenyOverridesPolicyAlg
 and that the single-effect approach to writing policies is used, for a request to succeed authz, 
 	1. at least one positive policy must match the request
 	2. no negative policy can match the request

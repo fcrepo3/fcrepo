@@ -35,10 +35,10 @@ import com.sleepycat.dbxml.XmlQueryContext;
 import com.sleepycat.dbxml.XmlQueryExpression;
 import com.sleepycat.dbxml.XmlResults;
 import com.sleepycat.dbxml.XmlValue;
-import com.sun.xacml.AbstractPolicy;
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.ParsingException;
-import com.sun.xacml.finder.PolicyFinder;
+import org.jboss.security.xacml.sunxacml.AbstractPolicy;
+import org.jboss.security.xacml.sunxacml.EvaluationCtx;
+import org.jboss.security.xacml.sunxacml.ParsingException;
+import org.jboss.security.xacml.sunxacml.finder.PolicyFinder;
 
 /**
  * Encapsulates indexed access to policies stored in DbXml.
@@ -99,7 +99,7 @@ public class DbXmlPolicyIndex
 
     /*
      * (non-Javadoc)
-     * @seemelcoe.xacml.pdp.data.PolicyDataManager#getPolicies(com.sun.xacml.
+     * @seemelcoe.xacml.pdp.data.PolicyDataManager#getPolicies(org.jboss.security.xacml.sunxacml.
      * EvaluationCtx)
      */
     @Override

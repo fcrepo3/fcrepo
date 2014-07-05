@@ -29,22 +29,20 @@ import java.util.Set;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.fcrepo.common.Constants;
-import org.fcrepo.server.security.xacml.MelcoeXacmlException;
+import org.fcrepo.server.security.RequestCtx;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
-import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.types.gen.FieldSearchResult;
 import org.fcrepo.server.types.gen.ObjectFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
-import com.sun.xacml.ctx.Status;
+import org.jboss.security.xacml.sunxacml.attr.AttributeValue;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
+import org.jboss.security.xacml.sunxacml.ctx.Result;
+import org.jboss.security.xacml.sunxacml.ctx.Status;
 
 
 /**
@@ -59,8 +57,6 @@ public class FieldSearchResultHandler
     private static final Logger logger =
             LoggerFactory.getLogger(FieldSearchResultHandler.class);
 
-    private ContextUtil m_contextUtil = null;
-
     /**
      * Default constructor.
      *
@@ -69,10 +65,6 @@ public class FieldSearchResultHandler
     public FieldSearchResultHandler(ContextHandler contextHandler)
             throws PEPException {
         super(contextHandler);
-    }
-
-    public void setContextUtil(ContextUtil contextUtil) {
-        m_contextUtil = contextUtil;
     }
 
     /**
@@ -92,15 +84,12 @@ public class FieldSearchResultHandler
             return result;
         }
         List<ObjectFields> objs = result.getResultList().getObjectFields();
-        List<String> requests = new ArrayList<String>();
+        RequestCtx[] requests = new RequestCtx[objs.size()];
+        int ix = 0;
         Map<String, ObjectFields> objects = new HashMap<String, ObjectFields>();
 
-
-
         for (ObjectFields o : objs) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Checking: " + o.getPid());
-            }
+            logger.debug("Checking: {}", o.getPid());
 
             Map<URI, AttributeValue> actions =
                     new HashMap<URI, AttributeValue>();
@@ -128,7 +117,7 @@ public class FieldSearchResultHandler
                                                   resAttr,
                                                   getEnvironment(context));
 
-                    requests.add(m_contextUtil.makeRequestCtx(req));
+                    requests[ix++] = req;
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                     throw new OperationHandlerException(e.getMessage(), e);
@@ -136,15 +125,8 @@ public class FieldSearchResultHandler
             }
         }
 
-        String response =
-                getContextHandler().evaluateBatch(requests
-                        .toArray(new String[requests.size()]));
-        ResponseCtx resCtx;
-        try {
-            resCtx = m_contextUtil.makeResponseCtx(response);
-        } catch (MelcoeXacmlException e) {
-            throw new PEPException(e);
-        }
+        ResponseCtx resCtx =
+                getContextHandler().evaluateBatch(requests);
 
         @SuppressWarnings("unchecked")
         Set<Result> results = resCtx.getResults();

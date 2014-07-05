@@ -18,8 +18,8 @@
 
 package org.fcrepo.server.security.xacml.pep;
 
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
+import org.fcrepo.server.security.RequestCtx;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -56,6 +56,8 @@ public interface EvaluationEngine {
      * @throws PEPException
      */
     public String evaluate(String[] requests) throws PEPException;
+
+    public ResponseCtx evaluate(RequestCtx[] requests) throws PEPException;
 
     /**
      * @return the client

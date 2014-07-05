@@ -22,13 +22,12 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+import org.fcrepo.server.security.RequestCtx;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.RelationshipResolver;
-
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
+import org.jboss.security.xacml.sunxacml.attr.AttributeValue;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -91,7 +90,7 @@ public class ContextHandlerImpl
     /*
      * (non-Javadoc)
      * @see
-     * org.fcrepo.server.security.xacml.pep.ContextHandler#evaluate(com.sun.xacml.ctx.RequestCtx)
+     * org.fcrepo.server.security.xacml.pep.ContextHandler#evaluate(org.jboss.security.xacml.sunxacml.ctx.RequestCtx)
      */
     @Override
     public ResponseCtx evaluate(RequestCtx reqCtx) throws PEPException {
@@ -116,4 +115,8 @@ public class ContextHandlerImpl
         return m_evaluationEngine.evaluate(requests);
     }
 
+    @Override
+    public ResponseCtx evaluateBatch(RequestCtx[] requests) throws PEPException {
+        return m_evaluationEngine.evaluate(requests);
+    }
 }

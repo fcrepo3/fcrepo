@@ -161,7 +161,7 @@
 		<param name="REPOSITORY-POLICY-GUITOOL-POLICIES-DIRECTORY" value="data/fedora-xacml-policies/repository-policies-generated-by-policyguitool" isFilePath="true">
 			<comment>This parameter is for future use.</comment>
 		</param>
-		<param name="XACML-COMBINING-ALGORITHM" value="com.sun.xacml.combine.OrderedDenyOverridesPolicyAlg"/>
+		<param name="XACML-COMBINING-ALGORITHM" value="org.jboss.security.xacml.sunxacml.combine.OrderedDenyOverridesPolicyAlg"/>
 		<param name="ENFORCE-MODE" value="enforce-policies"/>
 		<param name="POLICY-SCHEMA-PATH" value="xsd/cs-xacml-schema-policy-01.xsd"/>
 		<param name="VALIDATE-REPOSITORY-POLICIES" value="true"/>

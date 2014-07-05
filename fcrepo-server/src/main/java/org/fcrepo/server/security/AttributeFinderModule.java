@@ -20,22 +20,22 @@ import org.fcrepo.common.policy.XacmlName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.BagAttribute;
-import com.sun.xacml.attr.DateAttribute;
-import com.sun.xacml.attr.DateTimeAttribute;
-import com.sun.xacml.attr.IntegerAttribute;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.attr.TimeAttribute;
-import com.sun.xacml.cond.EvaluationResult;
-import com.sun.xacml.ctx.Status;
+import org.jboss.security.xacml.sunxacml.EvaluationCtx;
+import org.jboss.security.xacml.sunxacml.attr.AttributeValue;
+import org.jboss.security.xacml.sunxacml.attr.BagAttribute;
+import org.jboss.security.xacml.sunxacml.attr.DateAttribute;
+import org.jboss.security.xacml.sunxacml.attr.DateTimeAttribute;
+import org.jboss.security.xacml.sunxacml.attr.IntegerAttribute;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.attr.TimeAttribute;
+import org.jboss.security.xacml.sunxacml.cond.EvaluationResult;
+import org.jboss.security.xacml.sunxacml.ctx.Status;
 
 /**
  * @author Bill Niebel
  */
 public abstract class AttributeFinderModule
-        extends com.sun.xacml.finder.AttributeFinderModule {
+        extends org.jboss.security.xacml.sunxacml.finder.AttributeFinderModule {
 
     private static final Logger logger =
             LoggerFactory.getLogger(AttributeFinderModule.class);
@@ -66,15 +66,15 @@ public abstract class AttributeFinderModule
     public final void setInstantiatedOk(boolean value) {
         logger.debug("setInstantiatedOk() {}", value);
         if (instantiatedOk == null) {
-            instantiatedOk = new Boolean(value);
+            instantiatedOk = Boolean.valueOf(value);
         }
     }
 
     @Override
     public boolean isDesignatorSupported() {
         logger.debug("isDesignatorSupported() will return {} {}",
-                iAm(), (instantiatedOk != null && instantiatedOk.booleanValue()));
-        return instantiatedOk != null && instantiatedOk.booleanValue();
+                iAm(), (instantiatedOk == Boolean.TRUE));
+        return instantiatedOk == Boolean.TRUE;
     }
 
     private final boolean parmsOk(URI attributeType,

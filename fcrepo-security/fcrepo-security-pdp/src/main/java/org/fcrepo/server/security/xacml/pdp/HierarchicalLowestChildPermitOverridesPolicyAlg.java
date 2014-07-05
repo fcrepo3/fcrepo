@@ -39,15 +39,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sun.xacml.AbstractPolicy;
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.Indenter;
-import com.sun.xacml.MatchResult;
-import com.sun.xacml.TargetMatchGroup;
-import com.sun.xacml.combine.PolicyCombinerElement;
-import com.sun.xacml.combine.PolicyCombiningAlgorithm;
-import com.sun.xacml.ctx.Result;
-import com.sun.xacml.ctx.Status;
+import org.jboss.security.xacml.sunxacml.AbstractPolicy;
+import org.jboss.security.xacml.sunxacml.EvaluationCtx;
+import org.jboss.security.xacml.sunxacml.Indenter;
+import org.jboss.security.xacml.sunxacml.MatchResult;
+import org.jboss.security.xacml.sunxacml.TargetMatchGroup;
+import org.jboss.security.xacml.sunxacml.combine.PolicyCombinerElement;
+import org.jboss.security.xacml.sunxacml.combine.PolicyCombiningAlgorithm;
+import org.jboss.security.xacml.sunxacml.ctx.Result;
+import org.jboss.security.xacml.sunxacml.ctx.Status;
 
 public class HierarchicalLowestChildPermitOverridesPolicyAlg
         extends PolicyCombiningAlgorithm {

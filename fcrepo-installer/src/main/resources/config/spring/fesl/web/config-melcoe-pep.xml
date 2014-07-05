@@ -81,7 +81,6 @@
               class="org.fcrepo.server.security.xacml.pep.impl.FESLPolicyEnforcementPoint"
               autowire-candidate="true" init-method="init">
               <constructor-arg><ref bean="MelcoePDPConfig" /></constructor-arg>
-              <constructor-arg><ref bean="org.fcrepo.server.security.ContextRegistry" /></constructor-arg>
         </bean>
         <bean id="org.fcrepo.server.security.Authorization"
               class="org.fcrepo.server.security.xacml.pep.impl.FESLAuthorization"

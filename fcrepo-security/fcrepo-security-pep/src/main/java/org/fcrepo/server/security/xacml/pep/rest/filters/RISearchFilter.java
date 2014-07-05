@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +45,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.Attribute;
+import org.fcrepo.server.security.RequestCtx;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.pep.PEPException;
 import org.fcrepo.server.security.xacml.pep.ResourceAttributes;
@@ -59,14 +60,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.tidy.Tidy;
-
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.ctx.Attribute;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
-import com.sun.xacml.ctx.Status;
+import org.jboss.security.xacml.sunxacml.attr.AttributeValue;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
+import org.jboss.security.xacml.sunxacml.ctx.Result;
+import org.jboss.security.xacml.sunxacml.ctx.Status;
 
 
 /**
@@ -324,11 +322,10 @@ public class RISearchFilter
                                      HttpServletRequest request,
                                      DataResponseWrapper response)
             throws ServletException {
-        Set<String> requests = new HashSet<String>();
+        RequestCtx[] requests = new RequestCtx[pids.size()];
+        int ix = 0;
         for (String pidDN : pids) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Checking: " + pidDN);
-            }
+            logger.debug("Checking: {}", pidDN);
 
             Map<URI, AttributeValue> actions =
                     new HashMap<URI, AttributeValue>();
@@ -381,34 +378,20 @@ public class RISearchFilter
                     resultPid.add(pidDN);
                 }
 
-                String r = m_contextUtil.makeRequestCtx(req);
-                if (logger.isDebugEnabled()) {
-                    logger.debug(r);
-                }
-
-                requests.add(r);
+                requests[ix++] = req;
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 throw new ServletException(e.getMessage(), e);
             }
         }
 
-        String res = null;
         ResponseCtx resCtx = null;
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Number of requests: " + requests.size());
-            }
+            logger.debug("Number of requests: {}", requests.length);
 
-            res =
-                    getContextHandler().evaluateBatch(requests
-                            .toArray(new String[requests.size()]));
+            resCtx =
+                    getContextHandler().evaluateBatch(requests);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Response: " + res);
-            }
-
-            resCtx = m_contextUtil.makeResponseCtx(res);
         } catch (MelcoeXacmlException pe) {
             throw new ServletException("Error evaluating pids: "
                     + pe.getMessage(), pe);
@@ -421,8 +404,7 @@ public class RISearchFilter
     }
 
     private String getXacmlResourceId(RequestCtx req) {
-        @SuppressWarnings("unchecked")
-        Set<Attribute> attributes = req.getResource();
+        List<Attribute> attributes = req.getResourceAsList();
 
         for (Attribute attr : attributes) {
             if (logger.isDebugEnabled()) {

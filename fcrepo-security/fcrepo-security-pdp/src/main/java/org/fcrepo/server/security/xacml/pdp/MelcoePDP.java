@@ -21,6 +21,8 @@ package org.fcrepo.server.security.xacml.pdp;
 import java.io.File;
 
 import org.fcrepo.common.Constants;
+import org.fcrepo.server.security.RequestCtx;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
 
 
 /**
@@ -43,6 +45,7 @@ public interface MelcoePDP {
      */
     public String evaluate(String request) throws EvaluationException;
 
+    public ResponseCtx evaluate(RequestCtx request) throws EvaluationException;
     /**
      * A convenience function designed for reducing the number of WS calls made.
      * This function takes an array of requests and evaluates them and returns a
@@ -54,4 +57,6 @@ public interface MelcoePDP {
      * @throws EvaluationException
      */
     public String evaluateBatch(String[] requests) throws EvaluationException;
+
+    public ResponseCtx evaluateBatch(RequestCtx[] requests) throws EvaluationException;
 }

@@ -184,9 +184,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>sunxacml</artifactId>
-      <classifier>melcoe</classifier>
+      <groupId>org.jboss.security</groupId>
+      <artifactId>jboss-sunxacml</artifactId>
     </dependency>
 
     <dependency>

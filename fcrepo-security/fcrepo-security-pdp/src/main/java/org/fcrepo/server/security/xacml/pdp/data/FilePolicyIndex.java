@@ -30,10 +30,10 @@ import org.fcrepo.server.security.xacml.util.DataFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.AbstractPolicy;
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.ParsingException;
-import com.sun.xacml.finder.PolicyFinder;
+import org.jboss.security.xacml.sunxacml.AbstractPolicy;
+import org.jboss.security.xacml.sunxacml.EvaluationCtx;
+import org.jboss.security.xacml.sunxacml.ParsingException;
+import org.jboss.security.xacml.sunxacml.finder.PolicyFinder;
 
 /**
  * Implements PolicyIndex for a filesystem policy index, cached in memory
@@ -93,7 +93,7 @@ implements PolicyIndex {
 
     /*
      * (non-Javadoc)
-     * @seemelcoe.xacml.pdp.data.Index#getPolicies(com.sun.xacml.
+     * @seemelcoe.xacml.pdp.data.Index#getPolicies(org.jboss.security.xacml.sunxacml.
      * EvaluationCtx)
      */
     @Override

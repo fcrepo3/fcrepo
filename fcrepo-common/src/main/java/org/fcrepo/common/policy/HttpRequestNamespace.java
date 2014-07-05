@@ -4,8 +4,8 @@
  */
 package org.fcrepo.common.policy;
 
-import com.sun.xacml.attr.IntegerAttribute;
-import com.sun.xacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.attr.IntegerAttribute;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
 
 /**
  * The Fedora HTTP Request XACML namespace.

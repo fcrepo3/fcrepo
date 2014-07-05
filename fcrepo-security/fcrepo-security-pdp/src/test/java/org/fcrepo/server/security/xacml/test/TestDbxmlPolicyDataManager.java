@@ -5,7 +5,7 @@ import org.fcrepo.server.security.xacml.pdp.data.DbXmlPolicyIndex;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyIndex;
 import org.fcrepo.server.security.xacml.pdp.data.PolicyIndexException;
 
-import com.sun.xacml.AbstractPolicy;
+import org.jboss.security.xacml.sunxacml.AbstractPolicy;
 
 public class TestDbxmlPolicyDataManager {
 

@@ -760,11 +760,10 @@
       </exclusions>
     </dependency>
 
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>sunxacml</artifactId>
-      <classifier>melcoe</classifier>
-    </dependency>
+	<dependency>
+	  <groupId>org.jboss.security</groupId>
+	  <artifactId>jboss-sunxacml</artifactId>
+	</dependency>
 
     <dependency>
       <groupId>org.openrdf.sesame</groupId>

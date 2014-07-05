@@ -15,8 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.transform.Templates;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -30,18 +29,18 @@ import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.AbstractPolicy;
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.PolicySet;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.BagAttribute;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.combine.OrderedDenyOverridesPolicyAlg;
-import com.sun.xacml.combine.PolicyCombiningAlgorithm;
-import com.sun.xacml.cond.EvaluationResult;
-import com.sun.xacml.ctx.Status;
-import com.sun.xacml.finder.PolicyFinder;
-import com.sun.xacml.finder.PolicyFinderResult;
+import org.jboss.security.xacml.sunxacml.AbstractPolicy;
+import org.jboss.security.xacml.sunxacml.EvaluationCtx;
+import org.jboss.security.xacml.sunxacml.PolicySet;
+import org.jboss.security.xacml.sunxacml.attr.AttributeValue;
+import org.jboss.security.xacml.sunxacml.attr.BagAttribute;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.combine.OrderedDenyOverridesPolicyAlg;
+import org.jboss.security.xacml.sunxacml.combine.PolicyCombiningAlgorithm;
+import org.jboss.security.xacml.sunxacml.cond.EvaluationResult;
+import org.jboss.security.xacml.sunxacml.ctx.Status;
+import org.jboss.security.xacml.sunxacml.finder.PolicyFinder;
+import org.jboss.security.xacml.sunxacml.finder.PolicyFinderResult;
 
 /**
  * XACML PolicyFinder for Fedora.
@@ -50,7 +49,7 @@ import com.sun.xacml.finder.PolicyFinderResult;
  * when available.
  */
 public class PolicyFinderModule
-        extends com.sun.xacml.finder.PolicyFinderModule {
+        extends org.jboss.security.xacml.sunxacml.finder.PolicyFinderModule {
 
     private static final Logger logger =
             LoggerFactory.getLogger(PolicyFinderModule.class);
@@ -63,7 +62,7 @@ public class PolicyFinderModule
 
     private static final String DEFAULT = "default";
 
-    private static final String DEFAULT_XACML_COMBINING_ALGORITHM = "com.sun.xacml.combine.OrderedDenyOverridesPolicyAlg";
+    private static final String DEFAULT_XACML_COMBINING_ALGORITHM = "org.jboss.security.xacml.sunxacml.combine.OrderedDenyOverridesPolicyAlg";
 
     private static final String XACML_DIST_BASE = "fedora-internal-use";
 
@@ -219,18 +218,19 @@ public class PolicyFinderModule
                 new BackendPolicies(m_serverHome + File.separator
                                     + BE_SECURITY_XML_LOCATION);
         Hashtable<String, String> tempfiles = backendPolicies.generateBackendPolicies();
-        TransformerFactory tfactory = XmlTransformUtility.getTransformerFactory();
         try {
             Iterator<String> iterator = tempfiles.keySet().iterator();
-            Templates template = null;
+            Transformer transformer = null;
             while (iterator.hasNext()) {
-                if (template == null) {
+                if (transformer == null) {
                     File f =
                             new File(m_serverHome + File.separator
                                     + BACKEND_POLICIES_XSL_LOCATION); // <<stylesheet
                     // location
                     StreamSource ss = new StreamSource(f);
-                    template = tfactory.newTemplates(ss); // xformPath
+                    transformer = XmlTransformUtility.getTransformer(ss); // xformPath
+                } else {
+                    transformer.reset();
                 }
                 String key = iterator.next();
                 File infile = new File(tempfiles.get(key));
@@ -238,12 +238,10 @@ public class PolicyFinderModule
                 FileOutputStream fos =
                         new FileOutputStream(m_repositoryBackendPolicyDirectoryPath
                                              + File.separator + key);
-                template.newTransformer().transform(new StreamSource(fis),
+                transformer.transform(new StreamSource(fis),
                                       new StreamResult(fos));
             }
         } finally {
-            // return the transformerFactory
-            XmlTransformUtility.returnTransformerFactory(tfactory);
             // we're done with temp files now, so delete them
             Iterator<String> iter = tempfiles.keySet().iterator();
             while (iter.hasNext()) {
@@ -308,27 +306,24 @@ public class PolicyFinderModule
     public static String getPid(EvaluationCtx context) {
         EvaluationResult attribute
                 = context.getResourceAttribute(STRING_ATTRIBUTE,
-                        Constants.OBJECT.PID.getURI(),
+                        Constants.OBJECT.PID.attributeId,
                                                null);
-        Object element = getAttributeFromEvaluationResult(attribute);
+        BagAttribute element = getAttributeFromEvaluationResult(attribute);
         if (element == null) {
-            logger.debug("PolicyFinderModule:getPid exit on "
-                    + "can't get pid on request callback");
+            logger.debug("PolicyFinderModule:getPid exit on can't get pid on request callback");
             return null;
         }
 
-        if (!(element instanceof StringAttribute)) {
-            logger.debug("PolicyFinderModule:getPid exit on "
-                    + "couldn't get pid from xacml request "
-                    + "non-string returned");
+        if (!(element.getType().equals(STRING_ATTRIBUTE))) {
+            logger.debug("PolicyFinderModule:getPid exit on couldn't get pid from xacml request non-string returned");
             return null;
         }
 
-        return ((StringAttribute) element).getValue();
+        return (element.size() == 1) ? (String) element.getValue() : null;
     }
 
     // copy of code in AttributeFinderModule; consider refactoring
-    private static final Object getAttributeFromEvaluationResult(EvaluationResult attribute) {
+    private static final BagAttribute getAttributeFromEvaluationResult(EvaluationResult attribute) {
         if (attribute.indeterminate()) {
             return null;
         }
@@ -343,12 +338,7 @@ public class PolicyFinderModule
             return null;
         }
 
-        BagAttribute bag = (BagAttribute) attributeValue;
-        if (1 != bag.size()) {
-            return null;
-        } else {
-            return bag.iterator().next();
-        }
+        return (BagAttribute) attributeValue;
     }
 
     private static PolicySet toPolicySet(List<AbstractPolicy> policies, PolicyCombiningAlgorithm alg) {

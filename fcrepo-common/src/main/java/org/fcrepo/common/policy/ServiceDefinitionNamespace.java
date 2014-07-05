@@ -4,8 +4,8 @@
  */
 package org.fcrepo.common.policy;
 
-import com.sun.xacml.attr.AnyURIAttribute;
-import com.sun.xacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.attr.AnyURIAttribute;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
 
 /**
  * The Fedora Service Definition XACML namespace.

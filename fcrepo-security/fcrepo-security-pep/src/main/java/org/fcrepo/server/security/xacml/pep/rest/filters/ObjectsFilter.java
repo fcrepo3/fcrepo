@@ -21,7 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.sun.xacml.ctx.RequestCtx;
+import org.fcrepo.server.security.RequestCtx;
 
 /**
  * Handles the get operations.

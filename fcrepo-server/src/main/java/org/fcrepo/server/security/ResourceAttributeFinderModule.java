@@ -7,7 +7,6 @@ package org.fcrepo.server.security;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
-import java.util.Map;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.ReadOnlyContext;
@@ -21,10 +20,10 @@ import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeDesignator;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.cond.EvaluationResult;
+import org.jboss.security.xacml.sunxacml.EvaluationCtx;
+import org.jboss.security.xacml.sunxacml.attr.AttributeDesignator;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.cond.EvaluationResult;
 
 /**
  * @author Bill Niebel
@@ -104,17 +103,15 @@ class ResourceAttributeFinderModule
     }
 
     private final String getDatastreamId(EvaluationCtx context) {
-        URI datastreamIdUri = Constants.DATASTREAM.ID.attributeId;
 
         EvaluationResult attribute =
                 context.getResourceAttribute(STRING_ATTRIBUTE_TYPE_URI,
-                                             datastreamIdUri,
+                        Constants.DATASTREAM.ID.attributeId,
                                              null);
 
         Object element = getAttributeFromEvaluationResult(attribute);
         if (element == null) {
-            logger.debug("getDatastreamId:  exit on "
-                    + "can't get resource-id on request callback");
+            logger.debug("getDatastreamId:  exit on can't get resource-id on request callback");
             return null;
         }
 

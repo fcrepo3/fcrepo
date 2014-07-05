@@ -32,6 +32,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.fcrepo.server.security.RequestCtx;
 import org.fcrepo.server.security.xacml.pep.AuthzDeniedException;
 import org.fcrepo.server.security.xacml.pep.ContextHandler;
 import org.fcrepo.server.security.xacml.pep.PEPException;
@@ -43,10 +44,8 @@ import org.fcrepo.server.security.xacml.pep.rest.filters.RESTFilter;
 import org.fcrepo.server.security.xacml.pep.rest.filters.ResponseHandlingRESTFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
+import org.jboss.security.xacml.sunxacml.ctx.Result;
 
 
 /**

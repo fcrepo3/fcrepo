@@ -23,8 +23,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.sun.xacml.ctx.Attribute;
-import com.sun.xacml.ctx.Subject;
+import org.fcrepo.server.security.Attribute;
+import org.jboss.security.xacml.sunxacml.ctx.Subject;
 
 /**
  * Class to compare two Subjects.
@@ -33,7 +33,8 @@ import com.sun.xacml.ctx.Subject;
  */
 public class SubjectComparator
         implements Comparator<Subject> {
-
+    private static final AttributeComparator ATTRIBUTE_COMPARATOR =
+            new AttributeComparator();
     /*
      * (non-Javadoc)
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
@@ -42,19 +43,18 @@ public class SubjectComparator
     public int compare(Subject a, Subject b) {
         int result = 0;
 
-        Comparator<Attribute> cmp = new AttributeComparator();
-        Set<Attribute> setA = new TreeSet<Attribute>(cmp);
-        setA.addAll(a.getAttributes());
+        Set<Attribute> setA = new TreeSet<Attribute>(ATTRIBUTE_COMPARATOR);
+        setA.addAll(a.getAttributesAsList());
 
-        Set<Attribute> setB = new TreeSet<Attribute>(cmp);
-        setB.addAll(b.getAttributes());
+        Set<Attribute> setB = new TreeSet<Attribute>(ATTRIBUTE_COMPARATOR);
+        setB.addAll(b.getAttributesAsList());
 
         Iterator<Attribute> iterA = setA.iterator();
         Iterator<Attribute> iterB = setB.iterator();
         while (iterA.hasNext() && iterB.hasNext()) {
             Attribute attrA = iterA.next();
             Attribute attrB = iterB.next();
-            result = cmp.compare(attrA, attrB);
+            result = ATTRIBUTE_COMPARATOR.compare(attrA, attrB);
 
             if (result != 0) {
                 return result;

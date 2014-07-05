@@ -127,6 +127,7 @@
     <powermock.version>1.5.1</powermock.version>
     <httpcomponents.version>4.2.5</httpcomponents.version>
     <httpcore.version>4.2.4</httpcore.version>
+    <xacml.version>2.0.9.Final</xacml.version>
   </properties>
 
   <dependencyManagement>
@@ -496,10 +497,9 @@
         <version>1.0.2</version>
       </dependency>
       <dependency>
-        <groupId>org.fcrepo</groupId>
-        <artifactId>sunxacml</artifactId>
-        <version>1.2</version>
-        <classifier>melcoe</classifier>
+        <groupId>org.jboss.security</groupId>
+        <artifactId>jboss-sunxacml</artifactId>
+        <version>${xacml.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>

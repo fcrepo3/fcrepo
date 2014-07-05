@@ -10,8 +10,8 @@ import java.net.URISyntaxException;
 import org.jrdf.graph.TypedNodeVisitor;
 import org.jrdf.graph.URIReference;
 
-import com.sun.xacml.attr.AnyURIAttribute;
-import com.sun.xacml.attr.StringAttribute;
+import org.jboss.security.xacml.sunxacml.attr.AnyURIAttribute;
+import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
 
 /**
  * A URIReference from a known namespace.

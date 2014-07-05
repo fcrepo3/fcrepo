@@ -22,9 +22,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
+import org.fcrepo.server.security.RequestCtx;
+import org.jboss.security.xacml.sunxacml.attr.AttributeValue;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
 
 /**
  * This interface represents the bridge between the PEP and the PDP. It is
@@ -84,5 +84,7 @@ public interface ContextHandler {
      * @throws PEPException
      */
     public String evaluateBatch(String[] requests) throws PEPException;
+
+    public ResponseCtx evaluateBatch(RequestCtx[] requests) throws PEPException;
 
 }

@@ -20,7 +20,9 @@ package org.fcrepo.server.security.xacml.pep;
 
 import java.util.List;
 
+import org.fcrepo.server.security.RequestCtx;
 import org.fcrepo.server.security.xacml.pdp.MelcoePDP;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,8 @@ public class DirectPDPClient
 
     private static final Logger logger =
             LoggerFactory.getLogger(DirectPDPClient.class);
+
+    private static final String[] STRING_TYPE = new String[0];
 
     private MelcoePDP client = null;
 
@@ -71,6 +75,15 @@ public class DirectPDPClient
         return response;
     }
 
+    @Override
+    public ResponseCtx evaluate(RequestCtx request) throws PEPException {
+        try {
+            return this.client.evaluate(request);
+        } catch (Exception e) {
+            logger.error("Error evaluating request.", e);
+            throw new PEPException("Error evaluating request", e);
+        }
+    }
     /*
      * (non-Javadoc)
      * @see org.fcrepo.server.security.xacml.pep.PEPClient#evaluateBatch(java.lang.String[])
@@ -81,13 +94,12 @@ public class DirectPDPClient
             throw new NullPointerException("evaluateBatch(request=null)");
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("Resolving request batch (" + request.size()
-                    + " requests)");
+            logger.debug("Resolving request batch ({} requests)", request.size());
         }
 
         String response = null;
         try {
-            response = this.client.evaluateBatch(request.toArray(new String[]{}));
+            response = this.client.evaluateBatch(request.toArray(STRING_TYPE));
         } catch (Exception e) {
             logger.error("Error evaluating request.", e);
             throw new PEPException("Error evaluating request", e);

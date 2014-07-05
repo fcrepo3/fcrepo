@@ -20,22 +20,21 @@ package org.fcrepo.server.security.xacml.pep;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
+import org.fcrepo.server.security.Attribute;
+import org.fcrepo.server.security.RequestCtx;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
 import org.fcrepo.server.security.xacml.util.AttributeComparator;
 import org.fcrepo.server.security.xacml.util.ContextUtil;
 import org.fcrepo.server.security.xacml.util.SubjectComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.xacml.ctx.Attribute;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.Subject;
+import org.jboss.security.xacml.sunxacml.ctx.ResponseCtx;
+import org.jboss.security.xacml.sunxacml.ctx.Subject;
 
 /**
  * @author nishen@melcoe.mq.edu.au
@@ -52,11 +51,19 @@ public class ResponseCacheImpl
 
     private static final long DEFAULT_TTL = 10 * 60 * 1000; // 10 minutes
 
+    private static final Attribute[] ATTRIBUTE_TYPE = new Attribute[0];
+
+    private static final AttributeComparator ATTRIBUTE_COMPARATOR = new AttributeComparator();
+
+    private static final Subject[] SUBJECT_TYPE = new Subject[0];
+
+    private static final SubjectComparator SUBJECT_COMPARATOR = new SubjectComparator();
+
     private final int CACHE_SIZE;
 
     private long TTL;
 
-    private Map<String, String> requestCache = null;
+    private Map<String, ResponseCtx> requestCache = null;
 
     private Map<String, Long> requestCacheTimeTracker = null;
 
@@ -110,7 +117,7 @@ public class ResponseCacheImpl
         }
 
         // Note - HashMap, ArrayList are not thread-safe
-        requestCache = new HashMap<String, String>(CACHE_SIZE);
+        requestCache = new HashMap<String, ResponseCtx>(CACHE_SIZE);
         requestCacheTimeTracker = new HashMap<String, Long>(CACHE_SIZE);
         requestCacheUsageTracker = new ArrayList<String>(CACHE_SIZE);
 
@@ -132,7 +139,7 @@ public class ResponseCacheImpl
      * java.lang.String)
      */
     @Override
-    public void addCacheItem(String request, String response) {
+    public void addCacheItem(String request, ResponseCtx response) {
         String hash = null;
 
         try {
@@ -171,9 +178,9 @@ public class ResponseCacheImpl
      * @see org.fcrepo.server.security.xacml.pep.ResponseCache#getCacheItem(java.lang.String)
      */
     @Override
-    public String getCacheItem(String request) {
+    public ResponseCtx getCacheItem(String request) {
         String hash = null;
-        String response = null;
+        ResponseCtx response = null;
 
         try {
             hash = makeHash(request);
@@ -230,7 +237,7 @@ public class ResponseCacheImpl
     public void invalidate() {
         // thread-safety on cache operations
         synchronized (requestCache) {
-            requestCache = new HashMap<String, String>(CACHE_SIZE);
+            requestCache = new HashMap<String, ResponseCtx>(CACHE_SIZE);
             requestCacheTimeTracker = new HashMap<String, Long>(CACHE_SIZE);
             requestCacheUsageTracker = new ArrayList<String>(CACHE_SIZE);
         }
@@ -244,7 +251,6 @@ public class ResponseCacheImpl
      * @return the hash
      * @throws CacheException
      */
-    @SuppressWarnings("unchecked")
     private String makeHash(String request) throws CacheException {
         RequestCtx reqCtx = null;
         try {
@@ -258,35 +264,13 @@ public class ResponseCacheImpl
         synchronized(digest) {
             digest.reset();
 
-            Set<Attribute> attributes = null;
+            hashSubjectList(reqCtx.getSubjectsAsList(), digest);
 
-            Set<Subject> subjects = new TreeSet<Subject>(new SubjectComparator());
-            subjects.addAll(reqCtx.getSubjects());
-            for (Subject s : subjects) {
-                attributes = new TreeSet<Attribute>(new AttributeComparator());
-                attributes.addAll(s.getAttributes());
-                for (Attribute a : attributes) {
-                    hashAttribute(a, digest);
-                }
-            }
+            hashAttributeList(reqCtx.getResourceAsList(), digest);
 
-            attributes = new TreeSet<Attribute>(new AttributeComparator());
-            attributes.addAll(reqCtx.getResource());
-            for (Attribute a : attributes) {
-                hashAttribute(a, digest);
-            }
+            hashAttributeList(reqCtx.getActionAsList(), digest);
 
-            attributes = new TreeSet<Attribute>(new AttributeComparator());
-            attributes.addAll(reqCtx.getAction());
-            for (Attribute a : attributes) {
-                hashAttribute(a, digest);
-            }
-
-            attributes = new TreeSet<Attribute>(new AttributeComparator());
-            attributes.addAll(reqCtx.getEnvironmentAttributes());
-            for (Attribute a : attributes) {
-                hashAttribute(a, digest);
-            }
+            hashAttributeList(reqCtx.getEnvironmentAttributesAsList(), digest);
 
             hash = digest.digest();
         }
@@ -294,6 +278,22 @@ public class ResponseCacheImpl
         return byte2hex(hash);
     }
 
+    @SuppressWarnings("unchecked")
+    private static void hashSubjectList(List<Subject> subjList, MessageDigest digest) {
+        Subject[] subjs = subjList.toArray(SUBJECT_TYPE);
+        Arrays.sort(subjs, SUBJECT_COMPARATOR);
+        for (Subject s:subjs) {
+            hashAttributeList(s.getAttributesAsList(), digest);
+        }
+    }
+
+    private static void hashAttributeList(List<Attribute> attList, MessageDigest digest) {
+        Attribute[] atts = attList.toArray(ATTRIBUTE_TYPE);
+        Arrays.sort(atts, ATTRIBUTE_COMPARATOR);
+        for (Attribute a:atts) {
+            hashAttribute(a, digest);
+        }
+    }
     /**
      * Utility function to add an attribute to the hash digest.
      *

@@ -52,7 +52,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import com.sun.xacml.ParsingException;
+import org.jboss.security.xacml.sunxacml.ParsingException;
 
 /**
  * This class is provided as a utility for reading policies from common, simple
@@ -60,7 +60,7 @@ import com.sun.xacml.ParsingException;
  * s. It can optionally schema validate the policies.
  * <p>
  * Note: some of this functionality was previously provided in
- * <code>com.sun.xacml.finder.impl.FilePolicyModule</code>, but as of the 2.0
+ * <code>org.jboss.security.xacml.sunxacml.finder.impl.FilePolicyModule</code>, but as of the 2.0
  * release, that class has been removed. This new <code>PolicyReader</code>
  * class provides much better functionality for loading policies.
  *
