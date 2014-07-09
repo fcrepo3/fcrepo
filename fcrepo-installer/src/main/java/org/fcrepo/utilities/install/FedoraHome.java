@@ -21,10 +21,13 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.fcrepo.server.config.ModuleConfiguration;
+import org.fcrepo.server.config.Parameter;
 import org.fcrepo.server.config.ServerConfiguration;
 import org.fcrepo.server.config.ServerConfigurationParser;
 import org.fcrepo.server.resourceIndex.ResourceIndex;
@@ -229,15 +232,30 @@ public class FedoraHome {
 					"org.fcrepo.server.security.xacml.pdp.decorator.PolicyIndexInvocationHandler");
 		}
 
-		// If messaging is enabled, remove the do-nothing decorator and proxy chain
-        if (!_opts.getBooleanValue(InstallOptions.MESSAGING_ENABLED, false)) {
-            props.remove("module.org.fcrepo.server.management.Management:decorator1");
-        }
 		try {
 			FileInputStream fis = new FileInputStream(fcfgBase);
 			ServerConfiguration config = new ServerConfigurationParser(fis)
 					.parse();
-			config.applyProperties(props);
+            config.applyProperties(props);
+            // If messaging is enabled, remove the do-nothing decorator and proxy chain
+            if (!_opts.getBooleanValue(InstallOptions.MESSAGING_ENABLED, false)) {
+                ModuleConfiguration mConfig = config
+                        .getModuleConfiguration("org.fcrepo.server.management.Management");
+                Collection<Parameter> parms = mConfig.getParameters(Parameter.class);
+                Parameter delete = null;
+                for (Parameter p:parms) {
+                    if ("org.fcrepo.server.messaging.NotificationInvocationHandler".equals(p.getValue())) {
+                        delete = p;
+                    }
+                }
+                if (delete != null) {
+                    config.getModuleConfigurations().remove(mConfig);
+                    parms.remove(delete);
+                    ArrayList<Parameter> newParms = new ArrayList<Parameter>(parms);
+                    mConfig = new ModuleConfiguration(newParms,mConfig.getRole(),mConfig.getClassName(), mConfig.getComment());
+                    config.getModuleConfigurations().add(mConfig);
+                }
+            }
 
 			// If using akubra-fs, set the class of the module and clear params.
 			if (usingAkubra()) {
