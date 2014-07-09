@@ -7,7 +7,6 @@ package org.fcrepo.server.access;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -32,6 +31,7 @@ import org.fcrepo.server.search.FieldSearchResult;
 import org.fcrepo.server.search.ObjectFields;
 import org.fcrepo.server.utilities.DCField;
 import org.fcrepo.server.utilities.StreamUtility;
+import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -226,8 +226,6 @@ public class FieldSearchServlet
                 }
             }
             if (!xml) {
-                SimpleDateFormat formatter =
-                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                 response.setContentType("text/html; charset=UTF-8");
                 PrintWriter out = response.getWriter();
                 out
@@ -246,7 +244,7 @@ public class FieldSearchServlet
                 List<ObjectFields> searchResults = fsr.objectFieldsList();
                 for (int i = 0; i < searchResults.size(); i++) {
                     ObjectFields f = searchResults.get(i);
-                    printObjectFieldsToHtml(f, fieldsArray, formatter, out);
+                    printObjectFieldsToHtml(f, fieldsArray, out);
                 }
                     out.append("</table>");
                     printHiddenFieldsFormToHtml(fsr, fieldHash, maxResults, out);
@@ -264,8 +262,6 @@ public class FieldSearchServlet
                 out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
                 out.println("<result xmlns=\"" + TYPES.uri + "\">");
                 if (fsr != null) {
-                    SimpleDateFormat formatter =
-                            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                     out.println("  <listSession>");
                     if (fsr.getToken() != null) {
                         out.print("    <token>");
@@ -284,7 +280,7 @@ public class FieldSearchServlet
                     }
                     if (fsr.getExpirationDate() != null) {
                         out.print("    <expirationDate>");
-                        out.print(formatter.format(fsr.getExpirationDate()));
+                        out.print(DateUtility.formatMillisTZ(fsr.getExpirationDate()));
                         out.println("</expirationDate>");
                     }
                     out.println("  </listSession>");
@@ -292,7 +288,7 @@ public class FieldSearchServlet
                     List<ObjectFields> searchResults = fsr.objectFieldsList();
                     for (int i = 0; i < searchResults.size(); i++) {
                         ObjectFields f = searchResults.get(i);
-                        printObjectFieldsToXml(f, formatter, out);
+                        printObjectFieldsToXml(f, out);
                     }
                     out.println("</resultList>");
                 } else {
@@ -320,15 +316,15 @@ public class FieldSearchServlet
     }
     
     private void printObjectFieldsToXml(
-            ObjectFields objFields, SimpleDateFormat formatter, PrintWriter xmlBuf) {
+            ObjectFields objFields, PrintWriter xmlBuf) {
         xmlBuf.append("  <objectFields>\n");
         appendXML("pid", objFields.getPid(), xmlBuf);
         appendXML("label", objFields.getLabel(), xmlBuf);
         appendXML("state", objFields.getState(), xmlBuf);
         appendXML("ownerId", objFields.getOwnerId(), xmlBuf);
-        appendXML("cDate", objFields.getCDate(), formatter, xmlBuf);
-        appendXML("mDate", objFields.getMDate(), formatter, xmlBuf);
-        appendXML("dcmDate", objFields.getDCMDate(), formatter, xmlBuf);
+        appendXML("cDate", objFields.getCDate(), xmlBuf);
+        appendXML("mDate", objFields.getMDate(), xmlBuf);
+        appendXML("dcmDate", objFields.getDCMDate(), xmlBuf);
         appendXML("title", objFields.titles(), xmlBuf);
         appendXML("creator", objFields.creators(), xmlBuf);
         appendXML("subject", objFields.subjects(), xmlBuf);
@@ -443,8 +439,7 @@ public class FieldSearchServlet
                 + "</form><hr size=1>");
     }
     
-    private void printObjectFieldsToHtml(ObjectFields f, String[] fieldsArray,
-            SimpleDateFormat formatter, PrintWriter html) {
+    private void printObjectFieldsToHtml(ObjectFields f, String[] fieldsArray, PrintWriter html) {
         html.append("<tr>");
         for (String l : fieldsArray) {
             html.append("<td valign=\"top\">");
@@ -465,13 +460,12 @@ public class FieldSearchServlet
                     html.append(f.getOwnerId());
                 }
             } else if (l.equalsIgnoreCase("cDate")) {
-                html.append(formatter.format(f.getCDate()));
+                html.append(DateUtility.formatMillisTZ(f.getCDate()));
             } else if (l.equalsIgnoreCase("mDate")) {
-                html.append(formatter.format(f.getMDate()));
+                html.append(DateUtility.formatMillisTZ(f.getMDate()));
             } else if (l.equalsIgnoreCase("dcmDate")) {
                 if (f.getDCMDate() != null) {
-                    html.append(formatter
-                            .format(f.getDCMDate()));
+                    html.append(DateUtility.formatMillisTZ(f.getDCMDate()));
                 }
             } else if (l.equalsIgnoreCase("title")) {
                 getList(f.titles(), html);
@@ -646,10 +640,9 @@ public class FieldSearchServlet
 
     private void appendXML(String name,
                            Date dt,
-                           SimpleDateFormat formatter,
                            PrintWriter out) {
         if (dt != null) {
-            appendXML(name, formatter.format(dt), out);
+            appendXML(name, DateUtility.formatMillisTZ(dt), out);
         }
     }
 

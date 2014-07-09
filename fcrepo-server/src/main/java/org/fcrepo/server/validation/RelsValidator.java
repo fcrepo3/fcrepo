@@ -15,6 +15,7 @@ import org.apache.xerces.util.XMLChar;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.errors.ValidationException;
+import org.fcrepo.utilities.DateUtility;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -522,42 +523,8 @@ public class RelsValidator
      * dateTime value. Passing this test will ensure successful indexing later.
      */
     private static boolean isValidDateTime(String lex) {
-        SimpleDateFormat format = new SimpleDateFormat();
-
-        format.setTimeZone(TimeZone.getTimeZone("UTC"));
-        int length = lex.length();
-        if (lex.startsWith("-")) {
-            length--;
-        }
-        if (lex.endsWith("Z")) {
-            if (length == 20) {
-                format.applyPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            } else if (length == 22) {
-                format.applyPattern("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
-            } else if (length == 23) {
-                format.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SS'Z'");
-            } else if (length == 24) {
-                format.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-            } else {
-                logger.warn("Not a valid dateTime: " + lex);
-                return false;
-            }
-        } else {
-            if (length == 19) {
-                format.applyPattern("yyyy-MM-dd'T'HH:mm:ss");
-            } else if (length == 21) {
-                format.applyPattern("yyyy-MM-dd'T'HH:mm:ss.S");
-            } else if (length == 22) {
-                format.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SS");
-            } else if (length == 23) {
-                format.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-            } else {
-                logger.warn("Not a valid dateTime: " + lex);
-                return false;
-            }
-        }
         try {
-            format.parse(lex);
+            DateUtility.parseDateStrict(lex);
             if (logger.isTraceEnabled()) {
                 logger.trace("Validated dateTime: " + lex);
             }

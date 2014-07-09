@@ -283,16 +283,23 @@ public abstract class DateUtility {
 					formatter = FORMATTER_SECONDS_T_Z;
 				} else if (length > 21 && length < 24) {
 					// right-pad the milliseconds with 0s up to three places
-					StringBuilder sb = new StringBuilder(dateString.subSequence(
-							0, last));
-					int dotIndex = sb.lastIndexOf(".");
-					int endIndex = sb.length() - 1;
+					int endIndex = last - 1;
+                    int dotIndex = dateString.lastIndexOf('.');
 					int padding = 3 - (endIndex - dotIndex);
-					for (int i = 0; i < padding; i++) {
-						sb.append('0');
-					}
-					sb.append('Z');
-					dateString = sb.toString();
+					if (padding > 0) {
+                        StringBuilder sb = new StringBuilder(24);
+                        sb.append(dateString.subSequence(0, last));
+                        switch(padding){
+                            case 3:
+                                sb.append('0');
+                            case 2:
+                                sb.append('0');
+                            case 1:
+                                sb.append('0');
+                        }
+    					sb.append('Z');
+    					dateString = sb.toString();
+				    }
 					// formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 					formatter = FORMATTER_MILLISECONDS_T_Z;
 				} else if (length == 24) {
@@ -308,14 +315,22 @@ public abstract class DateUtility {
 					formatter = FORMATTER_SECONDS_T;
 				} else if (length > 20 && length < 23) {
 					// right-pad millis with 0s
-					StringBuilder sb = new StringBuilder(dateString);
-					int dotIndex = sb.lastIndexOf(".");
-					int endIndex = sb.length() - 1;
-					int padding = 3 - (endIndex - dotIndex);
-					for (int i = 0; i < padding; i++) {
-						sb.append('0');
-					}
-					dateString = sb.toString();
+					int endIndex = dateString.length() - 1;
+                    int dotIndex = dateString.lastIndexOf('.');
+                    int padding = 3 - (endIndex - dotIndex);
+                    if (padding > 0) {
+                        StringBuilder sb = new StringBuilder(23);
+                        sb.append(dateString);
+                        switch(padding){
+                            case 3:
+                                sb.append('0');
+                            case 2:
+                                sb.append('0');
+                            case 1:
+                                sb.append('0');
+                        }
+                        dateString = sb.toString();
+                    }
 					// formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 					formatter = FORMATTER_MILLISECONDS_T;
 				} else if (length == 23) {
@@ -338,5 +353,9 @@ public abstract class DateUtility {
 		} catch (IllegalArgumentException e) {
 			throw new ParseException(e.getLocalizedMessage(), 0);
 		}
+	}
+	
+	public static String formatMillisTZ(Date date) {
+	    return FORMATTER_MILLISECONDS_T_Z.print(date.getTime());
 	}
 }

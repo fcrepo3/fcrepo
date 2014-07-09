@@ -7,6 +7,7 @@ package org.fcrepo.common;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.text.ParseException;
 import java.util.Date;
 
 import junit.framework.JUnit4TestAdapter;
@@ -166,6 +167,18 @@ public class TestDateUtility {
 		// therefore the date should be 1233 not 1234
 		assertEquals("-1233-01-01T00:00:00.2Z",
 				DateUtility.convertDateToXSDString(nDate));
+	}
+
+	@Test
+	public void testRoundTripMillis() throws ParseException {
+        String expected = "1970-01-01T00:00:00.200Z";
+        Date parsed = DateUtility.parseDateStrict(expected);
+        String actual = DateUtility.formatMillisTZ(parsed);
+        assertEquals(expected, actual);
+        expected = "-1234-01-01T00:00:00.200Z";
+        parsed = DateUtility.parseDateStrict(expected);
+        actual = DateUtility.formatMillisTZ(parsed);
+        assertEquals(expected, actual);
 	}
 
 	public static junit.framework.Test suite() {

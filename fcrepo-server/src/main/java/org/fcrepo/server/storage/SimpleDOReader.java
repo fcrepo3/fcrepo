@@ -7,7 +7,6 @@ package org.fcrepo.server.storage;
 import static org.fcrepo.common.Constants.MODEL;
 
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -75,9 +74,6 @@ public class SimpleDOReader
     private final String m_exportFormat;
 
     private String m_storageFormat;
-
-    private final SimpleDateFormat m_formatter =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     public SimpleDOReader(Context context,
                           RepositoryReader repoReader,
@@ -437,7 +433,7 @@ public class SimpleDOReader
 
     protected String getWhenString(Date versDateTime) {
         if (versDateTime != null) {
-            return m_formatter.format(versDateTime);
+            return DateUtility.formatMillisTZ(versDateTime);
         } else {
             return "the current time";
         }
