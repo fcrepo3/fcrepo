@@ -4,8 +4,8 @@
  */
 package org.fcrepo.soapclient;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Enumeration;
@@ -16,6 +16,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This servlet accepts the result of a posted web form containing information
@@ -33,30 +36,27 @@ public class MethodParameterResolverServlet
 
     private static final long serialVersionUID = 1L;
 
+    private static final Logger logger = LoggerFactory.getLogger(MethodParameterResolverServlet.class);
     /** A string constant for the html MIME type */
     static final private String HTML_CONTENT_TYPE = "text/html";
 
     /** Servlet mapping for this servlet */
     private static String SERVLET_PATH = null;
 
-    /** Properties file for soap client */
+    /** Properties file for soap client
+        Overrides hould be stored in WEB-INF/classes/ */
     private static final String soapClientPropertiesFile =
-            "WEB-INF/soapclient.properties";
+            "/soapclient.properties";
 
     @Override
     public void init() throws ServletException {
         try {
-            System.out
-                    .println("Realpath Properties File: "
-                            + getServletContext()
-                                    .getRealPath(soapClientPropertiesFile));
-            FileInputStream fis =
-                    new FileInputStream(getServletContext()
-                            .getRealPath(soapClientPropertiesFile));
+            URL soapProperties = getServletContext().getResource(soapClientPropertiesFile);
+            logger.info("Properties File: {}", soapProperties.toString());
             Properties p = new Properties();
-            p.load(fis);
+            p.load(soapProperties.openStream());
             SERVLET_PATH = p.getProperty("soapClientServletPath");
-            System.out.println("soapClientServletPath: " + SERVLET_PATH);
+            logger.info("soapClientServletPath: {}", SERVLET_PATH);
 
         } catch (Throwable th) {
             String message =

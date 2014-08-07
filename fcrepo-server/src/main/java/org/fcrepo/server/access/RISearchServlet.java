@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -78,9 +80,9 @@ extends SpringAccessServlet {
                   .getBean("org.fcrepo.server.security.Authorization", Authorization.class);
 
         try {
-            String indexStylesheetPath = getPath(getIndexStylesheetLocation());
-            String formStylesheetPath = getPath(getFormStylesheetLocation());
-            String errorStylesheetPath = getPath(getErrorStylesheetLocation());
+            URL indexStylesheetPath = getResource(getIndexStylesheetLocation());
+            URL formStylesheetPath = getResource(getFormStylesheetLocation());
+            URL errorStylesheetPath = getResource(getErrorStylesheetLocation());
             m_styler = new Styler(indexStylesheetPath,
                     formStylesheetPath,
                     errorStylesheetPath);
@@ -90,16 +92,8 @@ extends SpringAccessServlet {
 
     }
 
-    private String getPath(String loc) {
-        if (loc == null) return null;
-        if (loc.startsWith("/")) {
-            String foo = getServletContext().getRealPath("/foo");
-            File dir = new File(foo).getParentFile().getParentFile();
-            File file = new File(dir, loc);
-            return file.toString();
-        } else {
-            return getServletContext().getRealPath(loc);
-        }
+    private URL getResource(String loc) throws MalformedURLException {
+        return (loc != null) ? getServletContext().getResource(loc) : null;
     }
 
     public TrippiServer getTrippiServer() throws ServletException {

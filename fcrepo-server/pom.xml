@@ -39,7 +39,16 @@
         <filtering>true</filtering>
       </resource>
       <resource>
-        <directory>src/main/resources/properties</directory>
+        <directory>src/main/resources/properties/soapclient</directory>
+        <targetPath>META-INF/resources</targetPath>
+      </resource>
+      <resource>
+        <directory>src/main/resources/properties/resources</directory>
+        <targetPath>resources</targetPath>
+      </resource>
+      <resource>
+        <directory>src/main/resources/properties/batch-demo</directory>
+        <targetPath>batch-demo</targetPath>
       </resource>
       <resource>
         <directory>src/main/resources/dbspec/server</directory>

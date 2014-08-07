@@ -14,6 +14,7 @@ import java.util.Map;
 
 import junit.framework.JUnit4TestAdapter;
 
+import org.apache.http.HttpHeaders;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -190,6 +191,14 @@ public class TestAPIALite
                                                   ACCESS.prefix, ACCESS.prefix, ACCESS.prefix), result);
     }
 
+    @Test
+    public void testAccessParmResolver() throws Exception {
+        String location = "/getAccessParmResolver?PID=fedora-system:ContentModel-3.0&sDefPID=fedora-system:3&methodName=viewObjectProfile";
+        HttpInputStream result = s_client.get(getBaseURL() + location, false, false);
+        assertEquals(302, result.getStatusCode());
+        String expected = getBaseURL() + "/get/fedora-system:ContentModel-3.0/fedora-system:3/viewObjectProfile/";
+        assertEquals(expected, result.getResponseHeader(HttpHeaders.LOCATION).getValue());
+    }
     public static junit.framework.Test suite() {
         return new JUnit4TestAdapter(TestAPIALite.class);
     }
