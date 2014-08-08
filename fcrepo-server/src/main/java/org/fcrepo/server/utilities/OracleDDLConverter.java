@@ -46,6 +46,9 @@ public class OracleDDLConverter
                         out.append("NUMBER(20,0)");
                     } else if (cs.getType().toLowerCase().equals("text")) {
                         out.append("CLOB");
+                    } else if(cs.getType().toLowerCase().equals("boolean")) {
+                        // map the non existing boolean type for oracle dbs
+                        out.append("NUMBER(1)");
                     } else {
                         out.append(cs.getType());
                     }
