@@ -332,17 +332,30 @@ class SQLUtilityImpl
         ResultSet r = null;
         // Get a list of tables that don't exist, if any
         try {
-            r = dbMeta.getTables(null, null, "%", null);
-            HashSet<String> existingTableSet = new HashSet<String>();
-            while (r.next()) {
-                existingTableSet.add(r.getString("TABLE_NAME").toLowerCase());
-            }
-            r.close();
-            r = null;
-            while (tSpecIter.hasNext()) {
-                TableSpec spec = tSpecIter.next();
-                if (!existingTableSet.contains(spec.getName().toLowerCase())) {
-                    nonExisting.add(spec);
+            final String dbType = dbMeta.getDatabaseProductName();
+            if (dbType.equals("Oracle"))  {
+                // added since it takes ages on a fresh ORACLE XE to fetch all the tables
+                while (tSpecIter.hasNext()) {
+                    final TableSpec spec = tSpecIter.next();
+                    r = dbMeta.getTables(null, null, spec.getName().toUpperCase(), null);
+                    if (!r.next()) {
+                        nonExisting.add(spec);
+                    }
+                    r.close();
+                }
+            } else {
+                r = dbMeta.getTables(null, null, "%", null);
+                HashSet<String> existingTableSet = new HashSet<String>();
+                while (r.next()) {
+                    existingTableSet.add(r.getString("TABLE_NAME").toLowerCase());
+                }
+                r.close();
+                r = null;
+                while (tSpecIter.hasNext()) {
+                    TableSpec spec = tSpecIter.next();
+                    if (!existingTableSet.contains(spec.getName().toLowerCase())) {
+                        nonExisting.add(spec);
+                    }
                 }
             }
         } catch (SQLException sqle) {

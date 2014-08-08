@@ -56,7 +56,7 @@ public class Database {
         try {
             Connection conn = getConnection();
             DatabaseMetaData dmd = conn.getMetaData();
-            ResultSet rs = dmd.getTables(null, null, "%", null);
+            ResultSet rs = dmd.getTables(null, null, "do%", null);
             while (rs.next()) {
                 if (rs.getString("TABLE_NAME").equals("do")) {
                     Statement stmt = conn.createStatement();
@@ -123,11 +123,11 @@ public class Database {
      */
     protected void test() throws Exception {
         Connection conn = getConnection();
-
-        DatabaseMetaData dmd = conn.getMetaData();
-        dmd.getTables(null, null, "%", null);
+        if (!conn.isValid(10)) {
+            throw new Exception("Unable to connect to database");
+        }
         System.out.println("Successfully connected to "
-                + dmd.getDatabaseProductName());
+                + conn.getMetaData().getDatabaseProductName());
     }
 
     /**
@@ -141,7 +141,7 @@ public class Database {
         DatabaseMetaData dmd = conn.getMetaData();
 
         // check if we need to update old table
-        ResultSet rs = dmd.getTables(null, null, "%", null);
+        ResultSet rs = dmd.getTables(null, null, "do%", null);
         while (rs.next()) {
             if (rs.getString("TABLE_NAME").equals("do")) {
                 rs.close();
