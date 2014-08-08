@@ -24,6 +24,7 @@
         <map>
           <entry key="/describe" value-ref="DescribeFilter" />
 		  <entry key="/get" value-ref="GetFilter" />
+	      <entry key="/getAccessParmResolver" value-ref="GetAccessParmResolverFilter" />
 		  <entry key="/getObjectHistory" value-ref="GetObjectHistoryFilter" />
 		  <entry key="/listDatastreams" value-ref="ListDatastreamsFilter" />
 		  <entry key="/listMethods" value-ref="ListMethodsFilter" />
@@ -89,6 +90,9 @@
 	-->
 
 	<bean id="DescribeFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.DescribeFilter">
+      <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
+	</bean>
+    <bean id="GetAccessParmResolverFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetAccessParmResolverFilter">
       <property name="contextHandler" ref="org.fcrepo.server.security.xacml.pep.ContextHandler" />
 	</bean>
     <bean id="GetFilter" class="org.fcrepo.server.security.xacml.pep.rest.filters.GetFilter">
