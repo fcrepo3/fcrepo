@@ -706,7 +706,7 @@
     <repository>
       <id>duraspace-releases</id>
       <name>DuraSpace Releases Maven Repository</name>
-      <url>https://m2.duraspace.org/content/repositories/releases</url>
+      <url>http://m2.duraspace.org/content/repositories/releases</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -718,7 +718,7 @@
     <repository>
       <id>duraspace-thirdparty</id>
       <name>Duraspace Thirdparty Maven Repository</name>
-      <url>https://m2.duraspace.org/content/repositories/thirdparty</url>
+      <url>http://m2.duraspace.org/content/repositories/thirdparty</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -730,7 +730,7 @@
     <repository>
       <id>duraspace-snapshots</id>
       <name>DuraSpace Snapshots Maven Repository</name>
-      <url>https://m2.duraspace.org/content/repositories/snapshots</url>
+      <url>http://m2.duraspace.org/content/repositories/snapshots</url>
       <releases>
         <enabled>false</enabled>
       </releases>
