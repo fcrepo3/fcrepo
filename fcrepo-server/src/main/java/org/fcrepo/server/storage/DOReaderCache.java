@@ -114,9 +114,11 @@ public class DOReaderCache extends TimerTask {
 	    DOReader result = null;
 	    mapLock.lock();
 		if (cacheMap.containsKey(pid)) {
-			TimestampedCacheEntry<DOReader> e = cacheMap.get(pid);
+			TimestampedCacheEntry<DOReader> e = cacheMap.remove(pid);
 			LOG.debug("cache hit for {}", pid);
 			result = e.value();
+			// put the cache hit at the end of the FIFO list
+			cacheMap.put(pid, e.refresh());
 		} else {
 		    LOG.debug("cache miss for {}", pid);
 		}
