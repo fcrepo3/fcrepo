@@ -145,9 +145,13 @@ public class RelationshipTuple
             Iterator<String> iter = keys.iterator();
             while (iter.hasNext()) {
                 String key = iter.next();
-                if (predicate.startsWith(key) && predicate.charAt(key.length()) == ':') {
+                if (predicate.startsWith(key)) {
+                    int keyLen = key.length();
+                    if (predicate.length() != keyLen
+                            && predicate.charAt(keyLen) == ':') {
                     predicate =
-                            map.get(key).concat(predicate.substring(key.length() + 1));
+                            map.get(key).concat(predicate.substring(keyLen + 1));
+                    }
                 }
             }
         }
