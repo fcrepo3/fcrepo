@@ -3,8 +3,8 @@
   <target name="tomcat-start">
     <echo>Starting Fedora</echo>
     <parallel>
-      <java jar="${mvn.tomcat.home}/bin/bootstrap.jar" 
-      	    fork="yes" dir="${mvn.tomcat.home}" spawn="true">
+      <java classname="org.apache.catalina.startup.Bootstrap" fork="yes" dir="${mvn.tomcat.home}" spawn="true">
+      	<classpath path="${mvn.tomcat.home}/bin/bootstrap.jar:${mvn.tomcat.home}/bin/tomcat-juli.jar" />
         <jvmarg value="-Djava.io.tmpdir=${mvn.tomcat.home}/temp" />
       	<!-- disable FeSL PEP caching or cached results will cause test failures -->
       	<jvmarg value="-Dfedora.fesl.pep_nocache=true"/>
@@ -28,10 +28,11 @@
 
   <target name="tomcat-stop">
     <parallel>
-    <java jar="${mvn.tomcat.home}/bin/bootstrap.jar" fork="yes" dir="${mvn.tomcat.home}" spawn="true">
-      <jvmarg value="-Djava.io.tmpdir=${mvn.tomcat.home}/temp" />
-      <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
-      <arg line="stop" />
+      <java classname="org.apache.catalina.startup.Bootstrap" fork="yes" dir="${mvn.tomcat.home}" spawn="true">
+        <classpath path="${mvn.tomcat.home}/bin/bootstrap.jar:${mvn.tomcat.home}/bin/tomcat-juli.jar" />
+        <jvmarg value="-Djava.io.tmpdir=${mvn.tomcat.home}/temp" />
+        <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
+        <arg line="stop" />
     </java>
     <sequential>
       <waitfor maxwait="60" maxwaitunit="second" checkevery="2" timeoutproperty="timeout">

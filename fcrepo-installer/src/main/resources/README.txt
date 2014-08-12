@@ -17,8 +17,8 @@ Updating the Bundled Tomcat
 ---------------------------
 Download and deploy the distribution as a third-party artifact:
 mvn deploy:deploy-file -Durl=https://m2.duraspace.org/content/repositories/thirdparty \
--DrepositoryId=duraspace-thirdparty -Dfile=apache-tomcat-X.Y.Z.zip \
--DgroupId=org.fcrepo -DartifactId=apache-tomcat -Dversion=X.Y.Z -Dpackaging=zip
+-DrepositoryId=duraspace-thirdparty -Dfile=tomcat-X.Y.Z.zip \
+-DgroupId=org.apache.tomcat -DartifactId=tomcat -Dversion=X.Y.Z -Dpackaging=zip
 
 Update resources/server/org/fcrepo/utilities/install/OptionDefinition.properties
 Update fcrepo-server/src/main/resources/properties/resources/install.properties

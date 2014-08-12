@@ -201,7 +201,7 @@
     <dependencySet>
       <useProjectArtifact>false</useProjectArtifact>
       <includes>
-        <include>org.fcrepo:apache-tomcat:zip:*</include>
+        <include>org.apache.tomcat:tomcat:zip:*</include>
       </includes>
       <outputDirectory>/resources</outputDirectory>
     </dependencySet>
