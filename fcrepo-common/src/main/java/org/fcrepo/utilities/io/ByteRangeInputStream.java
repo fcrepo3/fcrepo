@@ -63,6 +63,9 @@ public class ByteRangeInputStream extends InputStream {
             throw new IndexOutOfBoundsException("Bad range spec start position: " + rangeHeader);
         }
         this.length = Math.min(length, limit);
+        if (length < 0) {
+            throw new IndexOutOfBoundsException("Bad range spec end position: " + rangeHeader);
+        }
         this.offset = offset;
         this.src = src;
         long skipped = 0;

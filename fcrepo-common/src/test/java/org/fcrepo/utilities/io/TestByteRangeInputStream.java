@@ -87,6 +87,12 @@ public class TestByteRangeInputStream {
         ByteRangeInputStream test = new ByteRangeInputStream(NullInputStream.NULL_STREAM, 10, "bytes=10");
 	}
 	
+    @Test(expected=IndexOutOfBoundsException.class)
+    public void testBadRangeHeaderOrder() throws IOException {
+        @SuppressWarnings({"unused", "resource"})
+        ByteRangeInputStream test = new ByteRangeInputStream(NullInputStream.NULL_STREAM, 10, "bytes=6-2");
+    }
+    
 	@SuppressWarnings("resource")
     @Test
 	public void testSkippedBytes() throws IndexOutOfBoundsException, IOException {
