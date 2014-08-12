@@ -465,7 +465,7 @@ public class FindObjects
         static ArrayList<String> EMPTY = new ArrayList<String>(0);
         @Override
         public String getNamespaceURI(String prefix) {
-            if ("types".equals(prefix) || prefix.isEmpty()) {
+            if ("types".equals(prefix) || (prefix != null && prefix.isEmpty())) {
                return "http://www.fedora.info/definitions/1/0/types/";
             }
             if ("xsi".equals(prefix)){

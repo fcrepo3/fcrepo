@@ -210,7 +210,7 @@ public class HierarchicalLowestChildPermitOverridesPolicyAlg
 
             int current;
 
-            if (resourceId.isEmpty()) {
+            if (resourceId == null || resourceId.isEmpty()) {
                 current = 0;
             } else {
                 current = getLength(resourceId);
