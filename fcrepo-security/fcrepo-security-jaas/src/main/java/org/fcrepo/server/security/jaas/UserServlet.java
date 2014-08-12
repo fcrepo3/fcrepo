@@ -103,9 +103,14 @@ public class UserServlet
             userId = principal.getName();
         }
 
-        DocumentBuilder documentBuilder = XmlTransformUtility.borrowDocumentBuilder();
+        DocumentBuilder documentBuilder = null;
+        try {
+            documentBuilder = XmlTransformUtility.borrowDocumentBuilder();
+        } catch (Exception e) {
+            throw new ServletException(e.getMessage(), e);
+        }
         Document doc = documentBuilder.newDocument();
-        XmlTransformUtility.returnDocumentBuilder(documentBuilder);
+        if (documentBuilder != null) XmlTransformUtility.returnDocumentBuilder(documentBuilder);
         doc.setXmlVersion("1.0");
 
         Element root = doc.createElement("user");

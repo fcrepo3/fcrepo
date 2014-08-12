@@ -93,8 +93,8 @@ public class ListDatastreams
 
         try {
             xFormer = XmlTransformUtility.getTransformer();
-        } catch (TransformerException tce) {
-            throw new PEPException("Error initialising SearchFilter", tce);
+        } catch (Exception e) {
+            throw new PEPException("Error initialising SearchFilter", e);
         }
 
         tidy = new Tidy();

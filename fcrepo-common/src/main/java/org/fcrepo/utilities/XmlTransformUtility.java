@@ -65,14 +65,10 @@ public class XmlTransformUtility {
      * processor.
      *
      * @return a new instance of TransformerFactory
+     * @throws Exception 
      */
-    public static TransformerFactory getTransformerFactory() {
-        try {
-            return (TransformerFactory) TRANSFORM_FACTORIES.borrowObject();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    public static TransformerFactory borrowTransformerFactory() throws Exception {
+        return (TransformerFactory) TRANSFORM_FACTORIES.borrowObject();
     }
     
     public static void returnTransformerFactory(TransformerFactory factory) {
@@ -83,10 +79,10 @@ public class XmlTransformUtility {
         }
     }
     
-    public static Transformer getTransformer() throws TransformerException {
+    public static Transformer getTransformer() throws Exception {
         return getTransformer(null);
     }
-    public static Transformer getTransformer(Source src) throws TransformerException {
+    public static Transformer getTransformer(Source src) throws Exception {
         TransformerFactory factory = null;
         Transformer result = null;
         try {
@@ -94,10 +90,6 @@ public class XmlTransformUtility {
             result = (src == null) ? factory.newTransformer()
                     : factory.newTransformer(src);
             
-        } catch (TransformerException e) {
-            throw e;
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
             if (factory != null) {
                 try {
@@ -120,12 +112,15 @@ public class XmlTransformUtility {
         TimestampedCacheEntry<Templates> entry = TEMPLATES_CACHE.get(key);
         // check to see if it is null or has changed
         if (entry == null || entry.timestamp() < src.lastModified()) {
-            TransformerFactory factory = getTransformerFactory();
+            TransformerFactory factory = null;
             try {
+                factory = borrowTransformerFactory();
                 Templates template = factory.newTemplates(new StreamSource(src));
                 entry = new TimestampedCacheEntry<Templates>(src.lastModified(), template);
+            } catch (Exception e) {
+                throw new TransformerException(e.getMessage(), e);
             } finally {
-                returnTransformerFactory(factory);
+                if (factory != null) returnTransformerFactory(factory);
             }
             TEMPLATES_CACHE.put(key, entry);
         }
@@ -134,23 +129,21 @@ public class XmlTransformUtility {
     
     public static Templates getTemplates(StreamSource source)
         throws TransformerException {
-        TransformerFactory tf = getTransformerFactory();
+        TransformerFactory tf = null;
         Templates result = null;
         try {
+            tf = borrowTransformerFactory();
             result = tf.newTemplates(source);
+        } catch (Exception e) {
+            throw new TransformerException(e.getMessage(), e);
         } finally {
-            returnTransformerFactory(tf);
+            if (tf != null) returnTransformerFactory(tf);
         }
         return result;
     }
     
-    public static DocumentBuilder borrowDocumentBuilder() {
-        try {
-            return (DocumentBuilder) DOCUMENT_BUILDERS.borrowObject();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    public static DocumentBuilder borrowDocumentBuilder() throws Exception {
+        return (DocumentBuilder) DOCUMENT_BUILDERS.borrowObject();
     }
     
     public static void returnDocumentBuilder(DocumentBuilder object) {

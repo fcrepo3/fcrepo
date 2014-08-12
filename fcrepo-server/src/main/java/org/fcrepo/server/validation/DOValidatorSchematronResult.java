@@ -9,10 +9,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Properties;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -43,8 +40,7 @@ public class DOValidatorSchematronResult {
         rootElement = (Element) result.getNode().getFirstChild();
     }
 
-    public String getXMLResult() throws TransformerException,
-            TransformerConfigurationException, ParserConfigurationException {
+    public String getXMLResult() throws Exception {
         Writer w = new StringWriter();
         PrintWriter out = new PrintWriter(w);
 

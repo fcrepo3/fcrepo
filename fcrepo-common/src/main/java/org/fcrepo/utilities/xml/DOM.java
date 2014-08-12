@@ -150,7 +150,7 @@ public class DOM {
      * @return the dom as an XML String.
      * @throws TransformerException if the dom could not be converted.
      */
-    public static String domToString(Node dom) throws TransformerException {
+    public static String domToString(Node dom) throws Exception {
         return domToString(dom, false);
     }
 
@@ -164,7 +164,7 @@ public class DOM {
      */
     // TODO: Consider optimizing this with ThreadLocal Transformers
     public static String domToString(Node dom, boolean withXmlDeclaration)
-            throws TransformerException {
+            throws Exception {
         Transformer t = XmlTransformUtility.getTransformer();
         t.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         if (withXmlDeclaration) {

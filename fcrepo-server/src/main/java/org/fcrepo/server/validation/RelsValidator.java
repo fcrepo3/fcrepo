@@ -8,8 +8,6 @@ package org.fcrepo.server.validation;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
 
 import org.apache.xerces.util.XMLChar;
 import org.fcrepo.common.Constants;

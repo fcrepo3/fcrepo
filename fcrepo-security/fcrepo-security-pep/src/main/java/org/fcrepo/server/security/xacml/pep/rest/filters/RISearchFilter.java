@@ -103,17 +103,18 @@ public class RISearchFilter
 
         m_transformers = new HashMap<String, Transformer>();
         m_mimeType = new HashMap<String, String>();
-        TransformerFactory xFormerFactory = XmlTransformUtility.getTransformerFactory();
+        TransformerFactory xFormerFactory = null;
 
         try {
+            xFormerFactory = XmlTransformUtility.borrowTransformerFactory();
             Transformer transformer = xFormerFactory.newTransformer();
             m_transformers.put("RDF/XML", transformer);
             m_mimeType.put("RDF/XML", "text/xml");
-        } catch (TransformerConfigurationException tce) {
-            logger.warn("Error loading the rdfxml2nTriples.xsl stylesheet", tce);
-            XmlTransformUtility.returnTransformerFactory(xFormerFactory);
+        } catch (Exception e) {
+            logger.warn("Error loading the rdfxml2nTriples.xsl stylesheet", e);
+            if (xFormerFactory != null) XmlTransformUtility.returnTransformerFactory(xFormerFactory);
             throw new PEPException("Error loading the rdfxml2nTriples.xsl stylesheet",
-                                   tce);
+                                   e);
         }
 
         try {

@@ -205,7 +205,7 @@ public class DOValidatorSchematron {
             ptransformer.setParameter("phase", phase);
             ptransformer.transform(rulesSource, new StreamResult(out));
             out.close();
-        } catch (TransformerException e) {
+        } catch (Exception e) {
             logger.error("Schematron validation failed", e);
             throw new ObjectValidityException(e.getMessage());
         }

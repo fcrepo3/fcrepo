@@ -4,7 +4,6 @@
  */
 package org.fcrepo.utilities;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.Date;
@@ -13,8 +12,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
@@ -28,7 +25,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 
 
@@ -77,7 +73,7 @@ public class Foxml11Document {
         X, M, E, R;
     }
 
-    public Foxml11Document(String pid) {
+    public Foxml11Document(String pid) throws Exception {
 
         DocumentBuilder builder = null;
         try {
@@ -93,7 +89,6 @@ public class Foxml11Document {
                                        "info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd");
             rootElement.setAttribute("VERSION", "1.1");
             rootElement.setAttribute("PID", pid);
-
         } finally {
             if (builder != null) {
                 XmlTransformUtility.returnDocumentBuilder(builder);
@@ -173,10 +168,7 @@ public class Foxml11Document {
             Element content = doc.createElementNS(FOXML_NS, "foxml:xmlContent");
             dsv.appendChild(content);
             content.appendChild(importedContent);
-        } catch (SAXException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
@@ -226,19 +218,10 @@ public class Foxml11Document {
         }
     }
 
-    public void serialize(OutputStream out) {
-        final Transformer idTransform;
-        try {
-            idTransform = XmlTransformUtility.getTransformer();
-            Source input = new DOMSource(doc);
-            Result output = new StreamResult(out);
-            idTransform.transform(input, output);
-        } catch (TransformerConfigurationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (TransformerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public void serialize(OutputStream out) throws Exception {
+        final Transformer idTransform = XmlTransformUtility.getTransformer();
+        Source input = new DOMSource(doc);
+        Result output = new StreamResult(out);
+        idTransform.transform(input, output);
     }
 }

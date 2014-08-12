@@ -94,7 +94,7 @@ class BatchXforms
     }
 
     final void process() throws TransformerConfigurationException, Exception {
-        TransformerFactory tfactory = XmlTransformUtility.getTransformerFactory();
+        TransformerFactory tfactory = XmlTransformUtility.borrowTransformerFactory();
         keys = new Vector<String>();
         if (good2go) {
             File file4catch = null;

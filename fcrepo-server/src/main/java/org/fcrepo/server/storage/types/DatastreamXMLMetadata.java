@@ -6,7 +6,6 @@ package org.fcrepo.server.storage.types;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -22,15 +21,16 @@ import org.fcrepo.utilities.ReadableByteArrayOutputStream;
 import org.fcrepo.utilities.ReadableCharArrayWriter;
 import org.fcrepo.utilities.XmlTransformUtility;
 import org.fcrepo.utilities.xml.XercesXmlSerializers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**
  * @author Sandy Payette
  */
 public class DatastreamXMLMetadata
         extends Datastream {
-
+    private static final Logger logger = LoggerFactory.getLogger(DatastreamXMLMetadata.class);
     // techMD (technical metadata),
     // sourceMD (analog/digital source metadata),
     // rightsMD (intellectual property rights metadata),
@@ -99,13 +99,14 @@ public class DatastreamXMLMetadata
         try {
             ReadableCharArrayWriter out =
                 new ReadableCharArrayWriter(xmlContent.length + (xmlContent.length /4));
-            DocumentBuilder builder = XmlTransformUtility.borrowDocumentBuilder();
+            DocumentBuilder builder = null;
             try {
+                builder = XmlTransformUtility.borrowDocumentBuilder();
                 Document doc = builder.parse(new ByteArrayInputStream(xmlContent));
                 XercesXmlSerializers.writeXmlNoSpace(doc, m_encoding, out);
                 out.close();
             } finally {
-                XmlTransformUtility.returnDocumentBuilder(builder);
+                if (builder != null) XmlTransformUtility.returnDocumentBuilder(builder);
             }
 
             br =
@@ -121,11 +122,8 @@ public class DatastreamXMLMetadata
             }
             outStream.close();
             return bytes.toInputStream();
-        } catch (UnsupportedEncodingException e) {
-            return getContentStream();
-        } catch (IOException e) {
-            return getContentStream();
-        } catch (SAXException e) {
+        } catch (Exception e) {
+            logger.warn(e.getMessage(),e);
             return getContentStream();
         }
     }
