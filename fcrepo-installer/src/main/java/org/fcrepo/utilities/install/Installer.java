@@ -4,6 +4,7 @@
  */
 package org.fcrepo.utilities.install;
 
+import org.apache.commons.io.IOUtils;
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.LogConfig;
 import org.fcrepo.utilities.Zip;
@@ -12,6 +13,7 @@ import org.fcrepo.utilities.install.container.ContainerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -103,32 +105,49 @@ public class Installer {
         try {
             File outputFile = new File(installDir, fedoraWarName + ".war");
             String driver = _opts.getValue(InstallOptions.DATABASE_DRIVER);
-            if (driver.equals(InstallOptions.INCLUDED)) {
-                FileUtils.copy(_dist.get(Distribution.FEDORA_WAR),
-                        new FileOutputStream(outputFile));
-            } else {
-                addLibrary(_dist.get(Distribution.FEDORA_WAR),
-                        driver, outputFile);
+            File stagingDir = stage(_dist.get(Distribution.FEDORA_WAR));
+            if (!driver.equals(InstallOptions.INCLUDED)) {
+                addLibrary(stagingDir, driver, outputFile);
             }
+            addContext(stagingDir);
+            repackage(stagingDir, outputFile);
             return outputFile;
         } catch (IOException e) {
             throw new InstallationFailedException(e.getMessage(), e);
 		}
     }
-    
-    private void addLibrary(InputStream inputStream, String libraryPath,
-            File outputFile) throws IOException {
-        // unzip, add file, re-zip, and remove staging dir
+
+    private File stage(InputStream inputStream) throws IOException {
         File stagingDir = new File(installDir, "fedorawar");
         stagingDir.mkdirs();
         Zip.unzip(inputStream, stagingDir);
+        return stagingDir;
+    }
+    private File repackage(File stagingDir, File outputFile) throws IOException {
+        Zip.zip(outputFile, stagingDir.listFiles());
+        FileUtils.delete(stagingDir);
+        return outputFile;
+    }
+    private void addLibrary(File stagingDir, String libraryPath,
+            File outputFile) throws IOException {
+        // unzip, add file, re-zip, and remove staging dir
         File sourceFile = new File(libraryPath);
         File destFile = new File(stagingDir, "WEB-INF/lib/" + sourceFile.getName());
         FileUtils.copy(sourceFile, destFile);
-        Zip.zip(outputFile, stagingDir.listFiles());
-        FileUtils.delete(stagingDir);
     }
-
+    private void addContext(File stagingDir) throws IOException {
+        File metaInf = new File(stagingDir, "META-INF");
+        metaInf.mkdirs();
+        File contextFile = new File(metaInf, "context.xml");
+        String content =
+                IOUtils.toString(this.getClass()
+                        .getResourceAsStream("/resources/context.xml"))
+                        .replace("_FEDORA_HOME_",
+                                 _opts.getValue(InstallOptions.FEDORA_HOME));
+        FileWriter writer = new FileWriter(contextFile);
+        IOUtils.write(content, writer);
+        writer.close();
+    }
     private void deployLocalService(Container container, String filename)
             throws InstallationFailedException {
         try {
