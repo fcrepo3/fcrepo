@@ -14,10 +14,13 @@
 
   <build>
 
-    <!-- This 'resource' directory should be migrated to default location -->
     <resources>
       <resource>
-        <directory>../resources/server</directory>
+        <directory>${project.build.directory}/maven-shared-archive-resources/server</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>${project.build.directory}/maven-shared-archive-resources/webapp-context</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
@@ -99,6 +102,23 @@
                 </manifest>
               </archive>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>process-remote-resources</id>
+            <goals>
+              <goal>process</goal>
+            </goals>
+	        <configuration>
+	          <resourceBundles>
+	            <resourceBundle>org.fcrepo:fcrepo-shared-resources:${project.version}</resourceBundle>
+	          </resourceBundles>
+	        </configuration>
           </execution>
         </executions>
       </plugin>

@@ -93,6 +93,7 @@
   </developers>
 
   <modules>
+    <module>fcrepo-shared-resources</module>
     <module>fcrepo-common</module>
     <module>fcrepo-server</module>
     <module>fcrepo-client</module>
@@ -929,6 +930,20 @@
                   </pluginExecutionFilter>
                   <action>
                     <execute />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-remote-resources-plugin</artifactId>
+                    <versionRange>[1.5,)</versionRange>
+                    <goals>
+                      <goal>bundle</goal>
+                      <goal>process</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>

@@ -111,5 +111,9 @@ public class BundledTomcat
 	protected void setCommonLib() {
 		commonLib = new File(getTomcatHome(), "lib" + File.separator);
 	}
-    
+
+	@Override
+    protected void installFedoraContext() {
+        // no-op in Tomcat 7.x
+    }
 }

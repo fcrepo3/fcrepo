@@ -32,10 +32,9 @@
 
   <build>
 
-    <!-- This 'resource' directory should be migrated to default location -->
     <resources>
       <resource>
-        <directory>../resources/server</directory>
+        <directory>${project.build.directory}/maven-shared-archive-resources/server</directory>
         <filtering>true</filtering>
       </resource>
       <resource>
@@ -145,7 +144,23 @@
         </executions>
       </plugin>
 
-
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>process-remote-resources</id>
+            <goals>
+              <goal>process</goal>
+            </goals>
+	        <configuration>
+	          <resourceBundles>
+	            <resourceBundle>org.fcrepo:fcrepo-shared-resources:${project.version}</resourceBundle>
+	          </resourceBundles>
+	        </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <!-- ** This plugin needs to be removed when ANT is gone. The unit/integration
         test regex's should be defined at root/pom.xml ** -->
       <plugin>
@@ -741,6 +756,12 @@
       <groupId>jotm</groupId>
       <artifactId>jotm_iiop_stubs</artifactId>
       <version>2.0.10</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-shared-resources</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>

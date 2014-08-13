@@ -18,8 +18,5 @@ public class ExistingTomcat50
     @Override
     public void install() throws InstallationFailedException {
         super.install();
-        /* REMOVE
-        Installer.installJDBCDriver(getDist(), getOptions(), getCommonLib());
-        */
     }
 }

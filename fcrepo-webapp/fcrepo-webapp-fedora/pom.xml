@@ -12,6 +12,19 @@
   <packaging>war</packaging>
   <name>Fedora Webapp</name>
 
+  <profiles>
+    <profile>
+      <id>fedora.home-is-defined</id>
+      <activation>
+        <property>
+          <name>fedora.home</name>
+        </property>
+      </activation>
+      <properties>
+        <fedora.home>${fedora.home}</fedora.home>
+      </properties>
+    </profile>
+  </profiles>
   <build>
     <plugins>
       <plugin>
@@ -21,15 +34,6 @@
           <webResources>
             <resource>
               <directory>${basedir}/src/main/resources</directory>
-            </resource>
-            <resource>
-              <!-- this is terrible. brittle. FIXME -->
-              <directory>${project.basedir}/../../fcrepo-security/fcrepo-security-pep/src/main/resources</directory>
-              <targetPath>WEB-INF/classes</targetPath>
-              <includes>
-                <include>config-melcoe-pep.xml</include>
-                <include>config-melcoe-pep-mapping.xml</include>
-              </includes>
             </resource>
           </webResources>
           <archive>
@@ -111,6 +115,7 @@
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
     </dependency>
+
 
     <dependency>
       <groupId>org.fcrepo</groupId>

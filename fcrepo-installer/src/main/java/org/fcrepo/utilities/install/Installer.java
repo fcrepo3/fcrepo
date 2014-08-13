@@ -141,7 +141,7 @@ public class Installer {
         File contextFile = new File(metaInf, "context.xml");
         String content =
                 IOUtils.toString(this.getClass()
-                        .getResourceAsStream("/resources/context.xml"))
+                        .getResourceAsStream("/webapp-context/context.xml"))
                         .replace("_FEDORA_HOME_",
                                  _opts.getValue(InstallOptions.FEDORA_HOME));
         FileWriter writer = new FileWriter(contextFile);

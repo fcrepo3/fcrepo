@@ -75,7 +75,7 @@ public abstract class Tomcat
         try {
             String content =
                     IOUtils.toString(this.getClass()
-                            .getResourceAsStream("/resources/context.xml"))
+                            .getResourceAsStream("/webapp-context/context.xml"))
                             .replace("_FEDORA_HOME_",
                                      getOptions().getValue(InstallOptions.FEDORA_HOME));
 

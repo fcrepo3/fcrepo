@@ -1,3 +1,4 @@
+  <filter-mappings>
   <!-- authn required optionally.  installer choice to secure api-a with authn should add these filter-mappings to web.xml -->		
   <filter-mapping> 
     <filter-name>EnforceAuthnFilter</filter-name>  
@@ -48,3 +49,4 @@
     <url-pattern>/services/access</url-pattern>
   </filter-mapping>
   <!-- ^^^^^ authn required optionally.  installer choice to secure api-a with authn should add these filter-mappings to web.xml ^^^^^ -->
+  </filter-mappings>
