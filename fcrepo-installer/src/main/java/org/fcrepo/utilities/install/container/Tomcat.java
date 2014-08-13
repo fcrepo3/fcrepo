@@ -76,7 +76,7 @@ public abstract class Tomcat
             String content =
                     IOUtils.toString(this.getClass()
                             .getResourceAsStream("/webapp-context/context.xml"))
-                            .replace("_FEDORA_HOME_",
+                            .replace("${fedora.home}",
                                      getOptions().getValue(InstallOptions.FEDORA_HOME));
 
             String name =

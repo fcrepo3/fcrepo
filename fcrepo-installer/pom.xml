@@ -21,7 +21,7 @@
       </resource>
       <resource>
         <directory>${project.build.directory}/maven-shared-archive-resources/webapp-context</directory>
-        <filtering>true</filtering>
+        <filtering>false</filtering>
       </resource>
     </resources>
 

@@ -142,7 +142,7 @@ public class Installer {
         String content =
                 IOUtils.toString(this.getClass()
                         .getResourceAsStream("/webapp-context/context.xml"))
-                        .replace("_FEDORA_HOME_",
+                        .replace("${fedora.home}",
                                  _opts.getValue(InstallOptions.FEDORA_HOME));
         FileWriter writer = new FileWriter(contextFile);
         IOUtils.write(content, writer);

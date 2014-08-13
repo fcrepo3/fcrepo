@@ -14,7 +14,7 @@
 
   <profiles>
     <profile>
-      <id>fedora.home-is-defined</id>
+      <id>fedora-home-is-defined</id>
       <activation>
         <property>
           <name>fedora.home</name>
@@ -23,6 +23,53 @@
       <properties>
         <fedora.home>${fedora.home}</fedora.home>
       </properties>
+      <build>
+      <plugins>
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-remote-resources-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>process-remote-resources</id>
+	            <goals>
+	              <goal>process</goal>
+	            </goals>
+		        <configuration>
+		          <resourceBundles>
+		            <resourceBundle>org.fcrepo:fcrepo-shared-resources:${project.version}</resourceBundle>
+		          </resourceBundles>
+                  <outputDirectory>${project.build.directory}/shared</outputDirectory>
+                  <attachToMain>false</attachToMain>
+		        </configuration>
+	          </execution>
+	          </executions>
+	      </plugin>
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-resources-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>copy-context</id>
+	            <phase>validate</phase>
+	            <goals>
+	              <goal>copy-resources</goal>
+	            </goals>
+	            <configuration>
+			        <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/META-INF</outputDirectory>
+				    <resources>
+				      <resource>
+				        <directory>${project.build.directory}/shared/webapp-context</directory>
+				        <filtering>true</filtering>
+				        <includes>
+				        </includes>
+				      </resource>
+				    </resources>
+	            </configuration>
+	          </execution>
+	        </executions>
+	      </plugin>
+      </plugins>
+      </build>
     </profile>
   </profiles>
   <build>
@@ -37,7 +84,7 @@
             </resource>
           </webResources>
           <archive>
-            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+            <manifestFile>${project.build.directory}/${project.artifactId}-${project.version}/META-INF/MANIFEST.MF</manifestFile>
             <manifest>
               <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
             </manifest>
@@ -62,6 +109,7 @@
           </execution>
         </executions>
         <configuration>
+          <manifestLocation>${project.build.directory}/${project.artifactId}-${project.version}/META-INF/</manifestLocation>
           <supportedProjectTypes>
             <supportedProjectType>jar</supportedProjectType>
             <supportedProjectType>bundle</supportedProjectType>
@@ -104,6 +152,12 @@
           </instructions>
         </configuration>
         
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+        <executions>
+        </executions>
       </plugin>
 
     </plugins>

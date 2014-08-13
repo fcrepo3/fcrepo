@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
-  <Parameter name="fedora.home" value="_FEDORA_HOME_" />
+  <Parameter name="fedora.home" value="${fedora.home}" />
 </Context>
