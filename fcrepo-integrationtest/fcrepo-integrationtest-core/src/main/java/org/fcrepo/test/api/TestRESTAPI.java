@@ -1063,6 +1063,30 @@ public class TestRESTAPI
         verifyDELETEStatusOnly(url, SC_UNAUTHORIZED, false);
         verifyDELETEStatusOnly(url, SC_OK, true);
 
+        // Create new empty object with a state of 'I' (inactive) specified
+        url = getURI(String.format("/objects/new?state=I"));
+        verifyPOSTStatusOnly(url, SC_UNAUTHORIZED, entity, false);
+        post = new HttpPost(url);
+        response = putOrPost(post, entity, true);
+
+        EntityUtils.consumeQuietly(response.getEntity());
+        assertEquals(SC_CREATED, response.getStatusLine().getStatusCode());
+        emptyObjectPid =
+                extractPid(response.getFirstHeader(HttpHeaders.LOCATION).getValue());
+        
+        url = getURI(String.format("/objects/%s?format=xml", emptyObjectPid));
+        HttpGet get = new HttpGet(url);
+        // always authenticate since type I should be hidden
+        response = getOrDelete(get, true, true);
+        int status = response.getStatusLine().getStatusCode();
+        String responseXML = readString(response);
+        assertEquals(SC_OK, status);
+        assertTrue(responseXML.contains("<objState>I</objState>"));
+
+        // Delete empty "test" object
+        verifyDELETEStatusOnly(url, SC_UNAUTHORIZED, false);
+        verifyDELETEStatusOnly(url, SC_OK, true);
+
         // Delete the demo:REST object (ingested as part of setup)
         url = getURI(String.format("/objects/%s", DEMO_REST_PID.toString()));
         verifyDELETEStatusOnly(url, SC_UNAUTHORIZED, false);

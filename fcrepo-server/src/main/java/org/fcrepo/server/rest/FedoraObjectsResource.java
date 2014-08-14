@@ -514,7 +514,8 @@ public class FedoraObjectsResource extends BaseRestResource {
                         new ReadableByteArrayOutputStream(1024);
                 PrintWriter xml = new PrintWriter(
                             new OutputStreamWriter(bytes, Charset.forName(encoding)));
-                getFOXMLTemplate(pid, label, ownerID, encoding, xml);
+                char stateChar = state.trim().toUpperCase().charAt(0);
+                getFOXMLTemplate(pid, label, ownerID, stateChar, encoding, xml);
                 xml.close();
                 is = bytes.toInputStream();
             } else {
@@ -588,6 +589,7 @@ public class FedoraObjectsResource extends BaseRestResource {
             String pid,
             String label,
             String ownerId,
+            char state,
             String encoding,
             Writer xml) throws IOException {
         
@@ -608,7 +610,9 @@ public class FedoraObjectsResource extends BaseRestResource {
         }
 
         xml.append(">\n  <foxml:objectProperties>\n"
-                + "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"A\"/>\n"
+                + "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#state\" VALUE=\"");
+        xml.append(state);
+        xml.append("\"/>\n"
                 + "    <foxml:property NAME=\"info:fedora/fedora-system:def/model#label\" VALUE=\"");
         StreamUtility.enc(label, xml);
         xml.append("\"/>\n"
