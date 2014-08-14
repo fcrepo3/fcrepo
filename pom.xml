@@ -105,6 +105,7 @@
 
   <properties>
     <github.global.server>github</github.global.server>
+    <project.copyrightYear>2014</project.copyrightYear>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <unitTests>**/*Test.class</unitTests>
@@ -796,9 +797,9 @@
   </repositories>
 
   <scm>
-    <connection>scm:git:git://github.com/fcrepo/fcrepo.git</connection>
-    <developerConnection>scm:git:git@github.com:fcrepo/fcrepo.git</developerConnection>
-    <url>https://github.com/fcrepo/fcrepo</url>
+    <connection>scm:git:git://github.com/fcrepo3/fcrepo.git</connection>
+    <developerConnection>scm:git:git@github.com:fcrepo3/fcrepo.git</developerConnection>
+    <url>https://github.com/fcrepo3/fcrepo</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -1008,11 +1009,12 @@
         </plugin>
         <plugin>
           <artifactId>maven-release-plugin</artifactId>
-          <version>2.4</version>
+          <version>2.4.1</version>
           <configuration>
             <!-- see http://jira.codehaus.org/browse/MRELEASE-424 -->
             <mavenExecutorId>forked-path</mavenExecutorId>
             <tagNameFormat>v@{project.version}</tagNameFormat>
+            <preparationGoals>clean verify install</preparationGoals>
           </configuration>
           <dependencies>
             <dependency>
@@ -1033,8 +1035,9 @@
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.2</version>
+          <version>3.3</version>
           <configuration>
+            <topSiteURL>http://fcrepo3.github.com/${project.name}/</topSiteURL>
             <skipDeploy>true</skipDeploy>
           </configuration>
           <dependencies>
@@ -1075,19 +1078,25 @@
       <plugin>
         <groupId>com.github.github</groupId>
         <artifactId>site-maven-plugin</artifactId>
-        <version>0.8</version>
+        <version>0.9</version>
         <configuration>
           <message>Creating site for ${project.artifactId}, ${project.version}</message>
           <!-- this does the trick to place every module in the correct subfolder -->
           <path>${project.distributionManagement.site.url}</path>
           <merge>true</merge>
+          <excludes>
+            <!-- Excluding test-related javadocs in order to keep the site 
+              deployment smaller than 30M.
+              see: https://github.com/github/maven-plugins/issues/54 -->
+            <exclude>xref-test/**</exclude>
+            <exclude>testapidocs/**</exclude>
+          </excludes>
         </configuration>
         <executions>
           <execution>
             <id>github</id>
             <goals>
-              <goal>ignore</goal>
-              <!-- <goal>site</goal>  -->
+              <goal>site</goal>
             </goals>
             <phase>site-deploy</phase>
           </execution>
@@ -1236,7 +1245,7 @@
     <site>
       <id>gh-pages</id>
       <name>Deployment through GitHub's site deployment plugin</name>
-      <url>site/${project.version}</url>
+      <url>site/${project.version}/</url>
     </site>
   </distributionManagement>
 
