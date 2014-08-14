@@ -44,7 +44,7 @@
         <include>org.apache.derby:derby:jar:*</include>
         <include>org.fcrepo:mulgara-core:jar:*</include>
         <include>mysql:mysql-connector-java:jar:*</include>
-        <include>postgresql:postgresql:jar:*</include>
+        <include>org.postgresql:postgresql:jar:*</include>
       </includes>
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>/resources</outputDirectory>
