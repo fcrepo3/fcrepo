@@ -958,6 +958,8 @@
 		     http://jdbc.postgresql.org/download.html
 		     and make sure it's accessible to your servlet container.
 		     If you're running Tomcat, putting it in common/lib/ will work.
+		  5) For Postgres 9.1+, set "backslashIsEscape" to "false"; for earlier
+		     versions of Postgres, set to "true".
 		</comment>
 		<param name="connectorClassName" value="org.trippi.impl.mpt.MPTConnector"/>
 		<param name="ddlGenerator" value="org.nsdl.mptstore.impl.postgres.PostgresDDLGenerator"/>
@@ -967,7 +969,7 @@
 		<param name="password" value="fedoraAdmin"/>
 		<param name="poolInitialSize" value="3"/>
 		<param name="poolMaxSize" value="10"/>
-		<param name="backslashIsEscape" value="true"/>
+		<param name="backslashIsEscape" value="false"/>
 		<param name="fetchSize" value="1000"/>
 		<param name="autoFlushDormantSeconds" value="5"/>
 		<param name="autoFlushBufferSize" value="1000"/>
