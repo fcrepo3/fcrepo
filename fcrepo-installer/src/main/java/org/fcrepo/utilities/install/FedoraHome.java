@@ -149,18 +149,18 @@ public class FedoraHome {
 
 		String database = _opts.getValue(InstallOptions.DATABASE);
 		String dbPoolName = "";
-		String backslashIsEscape = "true";
+		String backslashIsEscape = "false";
 		if (database.equals(InstallOptions.DERBY)
 				|| database.equals(InstallOptions.INCLUDED)) {
 			dbPoolName = "localDerbyPool";
-			backslashIsEscape = "false";
 		} else if (database.equals(InstallOptions.MYSQL)) {
 			dbPoolName = "localMySQLPool";
+			backslashIsEscape = "true";
 		} else if (database.equals(InstallOptions.ORACLE)) {
 			dbPoolName = "localOraclePool";
-			backslashIsEscape = "false";
 		} else if (database.equals(InstallOptions.POSTGRESQL)) {
 			dbPoolName = "localPostgreSQLPool";
+			System.out.println("\tConfiguring for PostgreSQL 9.1 defaults; see documentation for Postgres < 9.1");
 		} else {
 			throw new InstallationFailedException(
 					"unable to configure for unknown database: " + database);
