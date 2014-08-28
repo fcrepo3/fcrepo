@@ -27,6 +27,7 @@ import org.fcrepo.test.fesl.util.PolicyUtils;
 import org.fcrepo.test.fesl.util.RemoveDataset;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,7 +45,9 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
     private static FedoraClient s_client;
 
     private HttpUtils httpUtils = null;
-
+    
+    private static String ri_impl;
+    
     //private FedoraAPIM apim = null;
     private PolicyUtils policyUtils = null;
 
@@ -57,6 +60,7 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
     @BeforeClass
     public static void bootStrap() throws Exception {
         s_client = getFedoraClient();
+        ri_impl = getRIImplementation();
     }
     
     @AfterClass
@@ -264,11 +268,17 @@ public class TestPolicies extends FedoraServerTestCase implements Constants {
 
     @Test
     public void testRIAttributesTQL() throws Exception {
+        /* skip if MPTTriplestore implementation */
+        Assume.assumeTrue(! "localPostgresMPTTriplestore".equals(ri_impl));
+        
         doAttributesTest("test-policy-state-itql.xml", "test-policy-subject-itql.xml");
     }
 
     @Test
     public void testRIAttributesSPARQL() throws Exception {
+        /* skip if MPTTriplestore implementation */
+        Assume.assumeTrue(! "localPostgresMPTTriplestore".equals(ri_impl));
+        
         doAttributesTest("test-policy-state-sparql.xml", "test-policy-subject-sparql.xml");
     }
 

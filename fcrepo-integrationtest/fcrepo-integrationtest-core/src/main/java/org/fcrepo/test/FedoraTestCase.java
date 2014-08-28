@@ -157,4 +157,10 @@ public abstract class FedoraTestCase
             throws Exception {
         return new FedoraClient(baseURL, username, password);
     }
+    
+    public static String getRIImplementation() throws Exception {
+        return getServerConfiguration().
+                getModuleConfiguration("org.fcrepo.server.resourceIndex.ResourceIndex").
+                  getParameter("datastore");
+    }
 }

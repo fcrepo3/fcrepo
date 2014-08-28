@@ -25,6 +25,7 @@ import org.fcrepo.server.resourceIndex.UvaStdImgTripleGenerator_1;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.fcrepo.test.ManagedContentTranslator;
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
@@ -46,12 +47,14 @@ extends FedoraServerTestCase {
             "demo:SmileyPens_M",
             "demo:SmileyGreetingCard" };
 
+    private static String ri_impl;
     
     @BeforeClass
     public static void bootStrap() throws Exception {
         s_client = getFedoraClient();
         ingestSimpleImageDemoObjects(s_client);
         ingestImageCollectionDemoObjects(s_client);
+        ri_impl = getRIImplementation();
         // clone some demo objects to managed-content equivalents for reserved datastreams (RELS-*, DC)
         ManagedContentTranslator.createManagedClone(s_client.getAPIMMTOM(), "demo:SmileyPens", "demo:SmileyPens_M");
         ManagedContentTranslator.createManagedClone(s_client.getAPIMMTOM(), "demo:SmileyBeerGlass", "demo:SmileyBeerGlass_M");
@@ -83,6 +86,9 @@ extends FedoraServerTestCase {
      */
     @Test
     public void testRISearchSparqlW3cResult() throws Exception{
+        /* skip if MPTTriplestore implementation */
+        Assume.assumeTrue(! "localPostgresMPTTriplestore".equals(ri_impl));
+        
     	String query="select $object $modified from <#ri> where  " +
     			"$object <fedora-model:hasModel> " +
     			"<info:fedora/fedora-system:ServiceDefinition-3.0> and " +
@@ -154,6 +160,10 @@ extends FedoraServerTestCase {
     public void testLanguageAttributes() throws Exception {
         // skos: <http://www.w3.org/2004/02/skos/core#>
         // skos:prefLabel \"Immagine del Colosseo a Roma\"
+        
+        /* skip if MPTTriplestore implementation */
+        Assume.assumeTrue(! "localPostgresMPTTriplestore".equals(ri_impl));
+        
         String query = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" +
                        "SELECT ?x FROM <#ri>\n" +
                        "WHERE { ?x skos:prefLabel \"Immagine del Colosseo a Roma\"@it }";
