@@ -113,10 +113,10 @@ public class APIMStubWrapper
             @Override
             public String construct() {
                     // call wrapped method
-                    return m_instance.purgeObject((java.lang.String) parms
-                            .get("pid"), (java.lang.String) parms
-                            .get("logMessage"), ((Boolean) parms.get("force"))
-                            .booleanValue());
+                    return m_instance
+			    .purgeObject(pid,
+                                         logMessage,
+			                 force);
             }
         };
         return SwingWorker.waitForResult(worker, buf);
