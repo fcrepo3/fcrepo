@@ -356,6 +356,7 @@
         <include>batik:*</include>
         <include>commons-codec:commons-codec:jar:*</include>
         <include>commons-discovery:commons-discovery:jar:*</include>
+        <include>commons-io:commons-io:jar:*</include>
         <include>commons-pool:commons-pool:jar:*</include>
         <include>org.apache.httpcomponents:httpcore:jar:*</include>
         <include>org.apache.httpcomponents:httpcore-nio:jar:*</include>
