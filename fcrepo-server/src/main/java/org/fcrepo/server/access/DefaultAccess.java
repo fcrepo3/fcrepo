@@ -1128,21 +1128,21 @@ public class DefaultAccess
             if (ds.DSSize <= 0) {
                 ds.DSSize = ds.getContentSize(context);
             }
-            if (!isHEADRequest(context)) {
-                Property[] dsHeaders = getDatastreamHeaders(PID, ds);
-                if (ServerUtility.isStaleCache(context, dsHeaders)) {
-                    String rangeHdr = context.getHeaderValue(HttpHeaders.RANGE);
-                    mimeTypedStream = new MIMETypedStream(ds.DSMIME, ds.getContentStream(context),
-                            dsHeaders, ds.DSSize);
-                    // delimit Content-Range if necessary
-                    if (rangeHdr != null) mimeTypedStream.setRange(rangeHdr);
+            Property[] dsHeaders = getDatastreamHeaders(PID, ds);
+            if (ServerUtility.isStaleCache(context, dsHeaders)) {
+                if (isHEADRequest(context)) {
+                    mimeTypedStream = new MIMETypedStream(ds.DSMIME, NullInputStream.NULL_STREAM,
+                            getDatastreamHeaders(PID, ds), ds.DSSize);
                 } else {
-                    mimeTypedStream = MIMETypedStream.getNotModified(dsHeaders);
+                    mimeTypedStream = new MIMETypedStream(ds.DSMIME, ds.getContentStream(context),
+                            dsHeaders, ds.DSSize);                    
                 }
             } else {
-                mimeTypedStream = new MIMETypedStream(ds.DSMIME, NullInputStream.NULL_STREAM,
-                        getDatastreamHeaders(PID, ds), ds.DSSize);
+                mimeTypedStream = MIMETypedStream.getNotModified(dsHeaders);
             }
+            String rangeHdr = context.getHeaderValue(HttpHeaders.RANGE);
+            // delimit Content-Range if necessary
+            if (rangeHdr != null) mimeTypedStream.setRange(rangeHdr);
         } else if (ds.DSControlGrp.equalsIgnoreCase("E")) {
             DatastreamReferencedContent drc =
                     (DatastreamReferencedContent) ds;

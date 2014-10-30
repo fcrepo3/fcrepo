@@ -1847,6 +1847,10 @@ public class TestRESTAPI
         assertEquals(SC_OK, response.getStatusLine().getStatusCode());
         Header[] actualHeaders = response.getAllHeaders();
         assertHeadersEquals(expectedHeaders, actualHeaders);
+        head.addHeader(HttpHeaders.IF_NONE_MATCH, etag);
+        response = getOrDelete(head, getAuthAccess(), false);
+        assertEquals(SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+        assertNull(response.getEntity());
         // test a managed (type M) datastream 
         // info:fedora/demo:REST/DS2 is a type 'M'
         url = getURI("/objects/demo:REST/datastreams/DS2/content");
