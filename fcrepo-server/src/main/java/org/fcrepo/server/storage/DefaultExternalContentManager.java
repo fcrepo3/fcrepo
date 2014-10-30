@@ -185,7 +185,10 @@ public class DefaultExternalContentManager
         HttpInputStream response = null;
         try {
             if (headOnly) {
-                response = m_http.head(url, true, user, pass);
+                response = m_http.head(url, true, user, pass,
+                        context.getHeaderValue(HttpHeaders.IF_NONE_MATCH),
+                        context.getHeaderValue(HttpHeaders.IF_MODIFIED_SINCE),
+                        context.getHeaderValue("Range"));
             } else {
                 response = m_http.get(
                         url, true, user, pass,

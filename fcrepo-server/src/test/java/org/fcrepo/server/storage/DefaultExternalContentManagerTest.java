@@ -111,10 +111,10 @@ public class DefaultExternalContentManagerTest {
     @Test
     public void testPassthroughHeadMethod() throws HttpServiceNotFoundException, GeneralException, IOException {
         mockResponseFor("HEAD");
-        when(mockClient.head(TEST_URL, true, null, null))
+        when(mockClient.head(TEST_URL, true, null, null, null, null, null))
         .thenReturn(mockResponse);
         testObj.getExternalContent(mockParams);
-        verify(mockClient).head(TEST_URL, true, null, null);
+        verify(mockClient).head(TEST_URL, true, null, null, null, null, null);
     }
 
     @Test
@@ -154,6 +154,16 @@ public class DefaultExternalContentManagerTest {
         when(mockContext.getHeaderValue(HttpHeaders.RANGE)).thenReturn("LOL");
         testObj.getExternalContent(mockParams);
         verify(mockClient).get(TEST_URL, true, null, null, null, null, "LOL");
+    }
+
+    @Test
+    public void testConditionalHeadETagMethod() throws HttpServiceNotFoundException, GeneralException, IOException {
+        mockResponseFor("HEAD");
+        when(mockClient.head(TEST_URL, true, null, null, "LOL", null, null))
+        .thenReturn(mockResponse);
+        when(mockContext.getHeaderValue(HttpHeaders.IF_NONE_MATCH)).thenReturn("LOL");
+        testObj.getExternalContent(mockParams);
+        verify(mockClient).head(TEST_URL, true, null, null, "LOL", null, null);
     }
 
     // Supports legacy test runners
