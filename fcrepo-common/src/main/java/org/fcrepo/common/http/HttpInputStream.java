@@ -4,7 +4,6 @@
  */
 package org.fcrepo.common.http;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -12,6 +11,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.fcrepo.utilities.io.NullInputStream;
 
 /**
  * An InputStream from an HttpMethod. When this InputStream is close()d, the
@@ -19,8 +19,6 @@ import org.apache.http.client.methods.HttpUriRequest;
  */
 public class HttpInputStream
         extends InputStream {
-
-    private final HttpClient m_client;
 
     private final HttpUriRequest m_method;
     
@@ -30,15 +28,14 @@ public class HttpInputStream
 
     private InputStream m_in;
 
-    public HttpInputStream(HttpClient client, HttpUriRequest method)
+    public HttpInputStream(final HttpClient client, final HttpUriRequest method)
             throws IOException {
-        m_client = client;
         m_method = method;
         try {
-            m_response = m_client.execute(m_method);
+            m_response = client.execute(m_method);
             m_code = m_response.getStatusLine().getStatusCode();
             if (m_response.getEntity() == null) {
-                m_in = new ByteArrayInputStream(new byte[0]);
+                m_in = NullInputStream.NULL_STREAM;
             } else {
                 m_in = m_response.getEntity().getContent();
             }
