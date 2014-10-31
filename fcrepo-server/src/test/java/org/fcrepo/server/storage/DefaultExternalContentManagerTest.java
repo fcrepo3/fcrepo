@@ -1,5 +1,6 @@
 package org.fcrepo.server.storage;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -20,6 +21,7 @@ import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.HttpServiceNotFoundException;
 import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.storage.translation.DOTranslationUtility;
+import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.utilities.ServerUtility;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -96,12 +98,17 @@ public class DefaultExternalContentManagerTest {
     }
     
     private void mockResponseFor(String httpMethod) {
+        mockResponseFor(httpMethod, 200);
+    }
+
+    private void mockResponseFor(String httpMethod, int status) {
         when(mockParams.getUrl()).thenReturn(TEST_URL);
         when(mockParams.getProtocol()).thenReturn(HTTP);
         when(mockContext.getEnvironmentValue(Constants.HTTP_REQUEST.METHOD.attributeId)).thenReturn(httpMethod);
         String cLen = Long.toString(System.currentTimeMillis());
         when(mockResponse.getResponseHeaderValue(HttpHeaders.CONTENT_LENGTH, "-1")).thenReturn(cLen);
         when(mockResponse.getResponseHeaders()).thenReturn(new Header[0]);
+        when(mockResponse.getStatusCode()).thenReturn(status);
         mockStatic(DOTranslationUtility.class);
         when(DOTranslationUtility.makeAbsoluteURLs(TEST_URL)).thenReturn(TEST_URL);
         mockStatic(ServerUtility.class);
@@ -158,12 +165,13 @@ public class DefaultExternalContentManagerTest {
 
     @Test
     public void testConditionalHeadETagMethod() throws HttpServiceNotFoundException, GeneralException, IOException {
-        mockResponseFor("HEAD");
+        mockResponseFor("HEAD",304);
         when(mockClient.head(TEST_URL, true, null, null, "LOL", null, null))
         .thenReturn(mockResponse);
         when(mockContext.getHeaderValue(HttpHeaders.IF_NONE_MATCH)).thenReturn("LOL");
-        testObj.getExternalContent(mockParams);
+        MIMETypedStream out = testObj.getExternalContent(mockParams);
         verify(mockClient).head(TEST_URL, true, null, null, "LOL", null, null);
+        assertEquals(304, out.getStatusCode());
     }
 
     // Supports legacy test runners

@@ -204,24 +204,25 @@ public class DefaultExternalContentManager
             if (mimeType == null || mimeType.isEmpty()) {
                 mimeType = DEFAULT_MIMETYPE;
             }
-            if (headOnly) {
-                try {
-                    response.close();
-                } catch (IOException ioe) {
-                    logger.warn("problem closing HEAD response: {}", ioe.getMessage());
+            if (response.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
+                response.close();
+                Header[] respHeaders = response.getResponseHeaders();
+                Property[] properties = new Property[respHeaders.length];
+                for (int i = 0; i < respHeaders.length; i++){
+                    properties[i] =
+                        new Property(respHeaders[i].getName(), respHeaders[i].getValue());
                 }
-                return new MIMETypedStream(mimeType, NullInputStream.NULL_STREAM,
-                        headerArray, length);
+                return MIMETypedStream.getNotModified(properties);
             } else {
-                if (response.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
-                    response.close();
-                    Header[] respHeaders = response.getResponseHeaders();
-                    Property[] properties = new Property[respHeaders.length];
-                    for (int i = 0; i < respHeaders.length; i++){
-                        properties[i] =
-                            new Property(respHeaders[i].getName(), respHeaders[i].getValue());
+                if (headOnly) {
+                    try {
+                        response.close();
+                    } catch (IOException ioe) {
+                        logger.warn("problem closing HEAD response: {}", ioe.getMessage());
                     }
-                    return MIMETypedStream.getNotModified(properties);
+                    
+                    return new MIMETypedStream(mimeType, NullInputStream.NULL_STREAM,
+                            headerArray, length);
                 } else {
                     return new MIMETypedStream(mimeType, response, headerArray, length);
                 }

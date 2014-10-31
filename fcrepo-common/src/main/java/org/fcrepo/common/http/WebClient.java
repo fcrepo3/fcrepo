@@ -195,7 +195,7 @@ public class WebClient {
         UsernamePasswordCredentials creds = null;
         if (user != null && !user.isEmpty() && pass != null && !pass.isEmpty())
             creds = new UsernamePasswordCredentials(user, pass);
-        return execute(new HttpHead(url), url, failIfNotOK, creds, ifNoneMatch, ifModifiedSince, range);
+        return head(url, failIfNotOK, creds, ifNoneMatch, ifModifiedSince, range);
      }
 
     public HttpInputStream head(String url,
@@ -229,7 +229,7 @@ public class WebClient {
                                boolean failIfNotOK,
                                UsernamePasswordCredentials creds)
             throws IOException {
-        return execute(new HttpGet(url), url, failIfNotOK, creds, null, null, null);
+        return get(url, failIfNotOK, creds, null, null, null);
     }
 
     public HttpInputStream get(String url,
