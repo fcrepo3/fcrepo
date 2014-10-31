@@ -6,7 +6,6 @@ package org.fcrepo.server.storage;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.Date;
@@ -180,7 +179,7 @@ public class DefaultExternalContentManager
     private MIMETypedStream getFromWeb(String url, String user, String pass,
             String knownMimeType, boolean headOnly, Context context)
             throws GeneralException {
-        logger.debug("DefaultExternalContentManager.get({})", url);
+        logger.debug("DefaultExternalContentManager.getFromWeb({})", url);
         if (url == null) throw new GeneralException("null url");
         HttpInputStream response = null;
         try {
@@ -282,21 +281,22 @@ public class DefaultExternalContentManager
                 mimeType = determineMimeType(cFile);
             }
             Property [] headers = getFileDatastreamHeaders(cUriString, cFile.lastModified());
-            if (isHEADRequest(params)) {
-                return new MIMETypedStream(mimeType, NullInputStream.NULL_STREAM,
-                        headers,
-                        cFile.length());
-            } else if (ServerUtility.isStaleCache(params.getContext(), headers)) {
+            if (ServerUtility.isStaleCache(params.getContext(), headers)) {
+                MIMETypedStream result;
+                if (isHEADRequest(params)) {
+                    result = new MIMETypedStream(mimeType, NullInputStream.NULL_STREAM,
+                            headers, cFile.length());
+                } else {
+                    result = new MIMETypedStream(mimeType, fileUrl.openStream(),
+                            headers, cFile.length());
+                }
                 String rangeHdr =
-                    params.getContext().getHeaderValue(HttpHeaders.RANGE);
-                InputStream content = fileUrl.openStream();
-                long cLen = cFile.length();
-                MIMETypedStream result = new MIMETypedStream(mimeType, content, headers, cLen);
+                        params.getContext().getHeaderValue(HttpHeaders.RANGE);
                 if (rangeHdr != null) {
                     result.setRange(rangeHdr);;
-                } else {
                 }
                 return result;
+                
             } else {
                 return MIMETypedStream.getNotModified(headers);
             }
