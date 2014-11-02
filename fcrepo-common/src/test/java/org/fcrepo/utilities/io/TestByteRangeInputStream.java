@@ -27,7 +27,7 @@ public class TestByteRangeInputStream {
 	@Test
 	public void testGoodRangeHeaders() throws IOException {
 		// these are semantically equivalent for a 10 byte stream
-		String [] inputs = new String[]{"bytes=0-9","bytes=0","bytes=-10", "bytes=-12"};
+		String [] inputs = new String[]{"bytes=0-9","bytes=0","bytes=-10", "bytes=-12", "bytes=0-"};
 		for (String input: inputs) {
 		    ByteRangeInputStream test = new ByteRangeInputStream(NullInputStream.NULL_STREAM, 10, input);
 		    try {
@@ -38,7 +38,7 @@ public class TestByteRangeInputStream {
 		        test.close();
 		    }
 		}
-		inputs = new String[]{"bytes=1-9","bytes=1","bytes=-9","bytes=1-12"};
+		inputs = new String[]{"bytes=1-9","bytes=1","bytes=-9","bytes=1-12","bytes=1-"};
         for (String input: inputs) {
             ByteRangeInputStream test = new ByteRangeInputStream(NullInputStream.NULL_STREAM, 10, input);
             try {
@@ -49,7 +49,7 @@ public class TestByteRangeInputStream {
                 test.close();
             }
         }
-        inputs = new String[]{"bytes= 1-9 ","bytes= 1","bytes= - 9","bytes = 1-12"};
+        inputs = new String[]{"bytes= 1-9 ","bytes= 1","bytes= - 9","bytes = 1-12","bytes= 1 - "};
         for (String input: inputs) {
             ByteRangeInputStream test = new ByteRangeInputStream(NullInputStream.NULL_STREAM, 10, input);
             try {
