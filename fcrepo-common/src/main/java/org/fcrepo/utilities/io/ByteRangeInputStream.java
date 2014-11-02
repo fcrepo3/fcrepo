@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  */
 public class ByteRangeInputStream extends InputStream {
 
-    private static final Pattern RANGE_HEADER = Pattern.compile("^bytes\\s*=\\s*(\\d*)\\s*(-\\s*(\\d+))?\\s*$");
+    private static final Pattern RANGE_HEADER = Pattern.compile("^bytes\\s*=\\s*(\\d*)\\s*(-\\s*(\\d*))?\\s*$");
 
     public final long offset;
 
@@ -47,17 +47,21 @@ public class ByteRangeInputStream extends InputStream {
         if (g1 == null && g3 == null) {
             throw new IOException("Bad range spec values: " + rangeHeader);
         }
-        long offset = (g1 != null && !g1.isEmpty()) ? Long.parseLong(g1) : (0L - Long.parseLong(g3));
+
+        long endByte;
+        if (g3 == null || g3.isEmpty()) {
+            endByte = limit;
+        } else {
+            endByte = Long.parseLong(g3);
+        }
+
+        long offset = (g1 != null && !g1.isEmpty()) ? Long.parseLong(g1) : (0L - endByte);
         long length = 0;
         if (offset < 0) {
             length = Math.min(limit, Math.abs(offset));
             offset = limit - length;
         } else {
-            if (g3 != null) {
-                length = Math.min(limit - offset, Long.parseLong(g3) + 1 - offset);
-            } else {
-                length = limit - offset;
-            }
+            length = Math.min(limit - offset, endByte + 1 - offset);
         }
         if (offset >= limit || offset < 0) {
             throw new IndexOutOfBoundsException("Bad range spec start position: " + rangeHeader);

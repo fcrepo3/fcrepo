@@ -29,6 +29,7 @@ import org.fcrepo.server.utilities.MD5Utility;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.HttpServiceNotFoundException;
 import org.fcrepo.server.errors.ModuleInitializationException;
+import org.fcrepo.server.errors.RangeNotSatisfiableException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.security.Authorization;
 import org.fcrepo.server.security.BackendPolicies;
@@ -150,7 +151,7 @@ public class DefaultExternalContentManager
      */
     @Override
     public MIMETypedStream getExternalContent(ContentManagerParams params)
-            throws GeneralException, HttpServiceNotFoundException{
+            throws GeneralException, HttpServiceNotFoundException, RangeNotSatisfiableException {
         logger.debug("in getExternalContent(), url={}", params.getUrl());
         try {
             if(params.getProtocol().equals("file")){
@@ -160,6 +161,9 @@ public class DefaultExternalContentManager
                 return getFromWeb(params);
             }
             throw new GeneralException("protocol for retrieval of external content not supported. URL: " + params.getUrl());
+        }
+        catch (RangeNotSatisfiableException re) {
+        	throw re;
         } catch (Exception ex) {
             // catch anything but generalexception
             ex.printStackTrace();
@@ -178,7 +182,7 @@ public class DefaultExternalContentManager
      */
     private MIMETypedStream getFromWeb(String url, String user, String pass,
             String knownMimeType, boolean headOnly, Context context)
-            throws GeneralException {
+            throws GeneralException, RangeNotSatisfiableException {
         logger.debug("DefaultExternalContentManager.getFromWeb({})", url);
         if (url == null) throw new GeneralException("null url");
         HttpInputStream response = null;
@@ -213,6 +217,14 @@ public class DefaultExternalContentManager
                         new Property(respHeaders[i].getName(), respHeaders[i].getValue());
                 }
                 return MIMETypedStream.getNotModified(properties);
+            } else if (response.getStatusCode() == HttpStatus.SC_PARTIAL_CONTENT) {
+            	MIMETypedStream pc_response = new MIMETypedStream(mimeType, response,
+                        headerArray, length);
+            	pc_response.setStatusCode(HttpStatus.SC_PARTIAL_CONTENT);
+            	return pc_response;
+            } else if (response.getStatusCode() == HttpStatus.SC_REQUESTED_RANGE_NOT_SATISFIABLE) {
+            	response.close();
+            	throw new RangeNotSatisfiableException("External URL datastream request returned 416 Range Not Satisfiable");
             } else {
                 if (headOnly) {
                     try {
@@ -227,6 +239,9 @@ public class DefaultExternalContentManager
                     return new MIMETypedStream(mimeType, response, headerArray, length);
                 }
             }
+        } catch (RangeNotSatisfiableException re){
+        	logger.error(re.getMessage(), re);
+        	throw re;                    
         } catch (Exception e) {
             throw new GeneralException("Error getting " + url, e);
         }
@@ -255,9 +270,10 @@ public class DefaultExternalContentManager
      * @return
      * @throws HttpServiceNotFoundException
      * @throws GeneralException
+     * @throws RangeNotSatisfiableException
      */
     private MIMETypedStream getFromFilesystem(ContentManagerParams params)
-            throws HttpServiceNotFoundException,GeneralException {
+            throws HttpServiceNotFoundException,RangeNotSatisfiableException,GeneralException {
         logger.debug("in getFromFilesystem(), url={}", params.getUrl());
 
         try {
@@ -306,6 +322,10 @@ public class DefaultExternalContentManager
             logger.error(ae.getMessage(),ae);
             throw new HttpServiceNotFoundException("Policy blocked datastream resolution",ae);
         }
+        catch (RangeNotSatisfiableException re){
+        	logger.error(re.getMessage(), re);
+        	throw re;
+        }
         catch (GeneralException me) {
             logger.error(me.getMessage(),me);
             throw me;
@@ -328,9 +348,10 @@ public class DefaultExternalContentManager
      * @return A MIMETypedStream
      * @throws ModuleInitializationException
      * @throws GeneralException
+     * @throws RangeNotSatisfiableException
      */
     private MIMETypedStream getFromWeb(ContentManagerParams params)
-            throws ModuleInitializationException, GeneralException {
+            throws ModuleInitializationException, GeneralException, RangeNotSatisfiableException {
            String username = params.getUsername();
         String password = params.getPassword();
         boolean backendSSL = false;
