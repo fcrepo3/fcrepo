@@ -29,6 +29,7 @@ import org.fcrepo.server.utilities.MD5Utility;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.HttpServiceNotFoundException;
 import org.fcrepo.server.errors.ModuleInitializationException;
+import org.fcrepo.server.errors.RangeNotSatisfiableException;
 import org.fcrepo.server.errors.authorization.AuthzException;
 import org.fcrepo.server.security.Authorization;
 import org.fcrepo.server.security.BackendPolicies;
@@ -150,7 +151,7 @@ public class DefaultExternalContentManager
      */
     @Override
     public MIMETypedStream getExternalContent(ContentManagerParams params)
-            throws GeneralException, HttpServiceNotFoundException{
+            throws GeneralException, HttpServiceNotFoundException, RangeNotSatisfiableException {
         logger.debug("in getExternalContent(), url={}", params.getUrl());
         try {
             if(params.getProtocol().equals("file")){
@@ -160,6 +161,9 @@ public class DefaultExternalContentManager
                 return getFromWeb(params);
             }
             throw new GeneralException("protocol for retrieval of external content not supported. URL: " + params.getUrl());
+        }
+        catch (RangeNotSatisfiableException re) {
+        	throw re;
         } catch (Exception ex) {
             // catch anything but generalexception
             ex.printStackTrace();
@@ -257,7 +261,7 @@ public class DefaultExternalContentManager
      * @throws GeneralException
      */
     private MIMETypedStream getFromFilesystem(ContentManagerParams params)
-            throws HttpServiceNotFoundException,GeneralException {
+            throws HttpServiceNotFoundException,RangeNotSatisfiableException,GeneralException {
         logger.debug("in getFromFilesystem(), url={}", params.getUrl());
 
         try {
@@ -305,6 +309,10 @@ public class DefaultExternalContentManager
         catch(AuthzException ae){
             logger.error(ae.getMessage(),ae);
             throw new HttpServiceNotFoundException("Policy blocked datastream resolution",ae);
+        }
+        catch (RangeNotSatisfiableException re){
+        	logger.error(re.getMessage(), re);
+        	throw re;
         }
         catch (GeneralException me) {
             logger.error(me.getMessage(),me);

@@ -20,6 +20,7 @@ import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.errors.HttpServiceNotFoundException;
 import org.fcrepo.server.errors.ModuleInitializationException;
+import org.fcrepo.server.errors.RangeNotSatisfiableException;
 import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.utilities.ServerUtility;
@@ -116,7 +117,7 @@ public class DefaultExternalContentManagerTest {
     }
     
     @Test
-    public void testPassthroughHeadMethod() throws HttpServiceNotFoundException, GeneralException, IOException {
+    public void testPassthroughHeadMethod() throws HttpServiceNotFoundException, GeneralException, IOException, RangeNotSatisfiableException {
         mockResponseFor("HEAD");
         when(mockClient.head(TEST_URL, true, null, null, null, null, null))
         .thenReturn(mockResponse);
@@ -125,7 +126,7 @@ public class DefaultExternalContentManagerTest {
     }
 
     @Test
-    public void testDefaultToGetMethod() throws HttpServiceNotFoundException, GeneralException, IOException {
+    public void testDefaultToGetMethod() throws HttpServiceNotFoundException, GeneralException, IOException, RangeNotSatisfiableException {
         mockResponseFor(null);
         when(mockClient.get(TEST_URL, true, null, null, null, null, null))
         .thenReturn(mockResponse);
@@ -134,7 +135,7 @@ public class DefaultExternalContentManagerTest {
     }
 
     @Test
-    public void testConditionalGetETagMethod() throws HttpServiceNotFoundException, GeneralException, IOException {
+    public void testConditionalGetETagMethod() throws HttpServiceNotFoundException, GeneralException, IOException, RangeNotSatisfiableException {
         mockResponseFor("GET");
         when(mockClient.get(TEST_URL, true, null, null, "LOL", null, null))
         .thenReturn(mockResponse);
@@ -144,7 +145,7 @@ public class DefaultExternalContentManagerTest {
     }
 
     @Test
-    public void testConditionalGetDateMethod() throws HttpServiceNotFoundException, GeneralException, IOException {
+    public void testConditionalGetDateMethod() throws HttpServiceNotFoundException, GeneralException, IOException, RangeNotSatisfiableException {
         mockResponseFor("GET");
         when(mockClient.get(TEST_URL, true, null, null, null, "LOL", null))
         .thenReturn(mockResponse);
@@ -154,7 +155,7 @@ public class DefaultExternalContentManagerTest {
     }
 
     @Test
-    public void testConditionalGetRangeMethod() throws HttpServiceNotFoundException, GeneralException, IOException {
+    public void testConditionalGetRangeMethod() throws HttpServiceNotFoundException, GeneralException, IOException, RangeNotSatisfiableException {
         mockResponseFor("GET");
         when(mockClient.get(TEST_URL, true, null, null, null, null, "LOL"))
         .thenReturn(mockResponse);
@@ -164,7 +165,7 @@ public class DefaultExternalContentManagerTest {
     }
 
     @Test
-    public void testConditionalHeadETagMethod() throws HttpServiceNotFoundException, GeneralException, IOException {
+    public void testConditionalHeadETagMethod() throws HttpServiceNotFoundException, GeneralException, IOException, RangeNotSatisfiableException {
         mockResponseFor("HEAD",304);
         when(mockClient.head(TEST_URL, true, null, null, "LOL", null, null))
         .thenReturn(mockResponse);
