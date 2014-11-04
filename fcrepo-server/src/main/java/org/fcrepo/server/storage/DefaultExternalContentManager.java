@@ -182,7 +182,7 @@ public class DefaultExternalContentManager
      */
     private MIMETypedStream getFromWeb(String url, String user, String pass,
             String knownMimeType, boolean headOnly, Context context)
-            throws GeneralException {
+            throws GeneralException, RangeNotSatisfiableException {
         logger.debug("DefaultExternalContentManager.getFromWeb({})", url);
         if (url == null) throw new GeneralException("null url");
         HttpInputStream response = null;
@@ -217,6 +217,14 @@ public class DefaultExternalContentManager
                         new Property(respHeaders[i].getName(), respHeaders[i].getValue());
                 }
                 return MIMETypedStream.getNotModified(properties);
+            } else if (response.getStatusCode() == HttpStatus.SC_PARTIAL_CONTENT) {
+            	MIMETypedStream pc_response = new MIMETypedStream(mimeType, response,
+                        headerArray, length);
+            	pc_response.setStatusCode(HttpStatus.SC_PARTIAL_CONTENT);
+            	return pc_response;
+            } else if (response.getStatusCode() == HttpStatus.SC_REQUESTED_RANGE_NOT_SATISFIABLE) {
+            	response.close();
+            	throw new RangeNotSatisfiableException("External URL datastream request returned 416 Range Not Satisfiable");
             } else {
                 if (headOnly) {
                     try {
@@ -231,6 +239,9 @@ public class DefaultExternalContentManager
                     return new MIMETypedStream(mimeType, response, headerArray, length);
                 }
             }
+        } catch (RangeNotSatisfiableException re){
+        	logger.error(re.getMessage(), re);
+        	throw re;                    
         } catch (Exception e) {
             throw new GeneralException("Error getting " + url, e);
         }
@@ -259,6 +270,7 @@ public class DefaultExternalContentManager
      * @return
      * @throws HttpServiceNotFoundException
      * @throws GeneralException
+     * @throws RangeNotSatisfiableException
      */
     private MIMETypedStream getFromFilesystem(ContentManagerParams params)
             throws HttpServiceNotFoundException,RangeNotSatisfiableException,GeneralException {
@@ -336,9 +348,10 @@ public class DefaultExternalContentManager
      * @return A MIMETypedStream
      * @throws ModuleInitializationException
      * @throws GeneralException
+     * @throws RangeNotSatisfiableException
      */
     private MIMETypedStream getFromWeb(ContentManagerParams params)
-            throws ModuleInitializationException, GeneralException {
+            throws ModuleInitializationException, GeneralException, RangeNotSatisfiableException {
            String username = params.getUsername();
         String password = params.getPassword();
         boolean backendSSL = false;

@@ -270,7 +270,10 @@ public class WebClient {
         HttpInputStream in = new HttpInputStream(client, request);
         int status = in.getStatusCode();
         if (failIfNotOK) {
-            if (status != HttpStatus.SC_OK && status != HttpStatus.SC_NOT_MODIFIED) {
+            if (status != HttpStatus.SC_OK && 
+                status != HttpStatus.SC_NOT_MODIFIED &&
+                status != HttpStatus.SC_PARTIAL_CONTENT &&
+                status != HttpStatus.SC_REQUESTED_RANGE_NOT_SATISFIABLE) {
                 //if (followRedirects && in.getStatusCode() == 302){
                 if (wconfig.getFollowRedirects() && 300 <= status && status <= 399) {
                     int count = 1;
