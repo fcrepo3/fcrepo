@@ -63,6 +63,14 @@ public class TestAPIM
         extends FedoraServerTestCase
         implements Constants {
 
+    private static final String PENS_PID = "demo:SmileyPens";
+
+    private static final String MANAGED_PENS_PID = PENS_PID + "_M";
+
+    private static final String GLASS_PID = "demo:SmileyBeerGlass";
+
+    private static final String MANAGED_GLASS_PID = GLASS_PID + "_M";
+
     private static final String DEMO_14 = "demo:14";
 
     private static FedoraClient s_client;
@@ -842,7 +850,7 @@ public class TestAPIM
             e.printStackTrace();
         }
     }
-    
+
     @BeforeClass
     public static void bootStrap() throws Exception {
         s_client = getFedoraClient();
@@ -854,13 +862,19 @@ public class TestAPIM
         ingestDocumentTransformDemoObjects(s_client);
         // demo:26
         ingestFormattingObjectsDemoObjects(s_client);
-        // clone some demo objects to managed-content equivalents for reserved datastreams (RELS-*, DC)
-        ManagedContentTranslator.createManagedClone(s_client.getAPIMMTOM(), "demo:SmileyPens", "demo:SmileyPens_M");
-        ManagedContentTranslator.createManagedClone(s_client.getAPIMMTOM(), "demo:SmileyBeerGlass", "demo:SmileyBeerGlass_M");
+        Map<String, String> nsMap = new HashMap<String, String>();
+        nsMap.put("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
+        nsMap.put("dc", "http://purl.org/dc/elements/1.1/");
+        nsMap.put("foxml", "info:fedora/fedora-system:def/foxml#");
+        nsMap.put("audit", "info:fedora/fedora-system:def/audit#");
+        nsMap.put("METS", "http://www.loc.gov/METS/");
+        NamespaceContext ctx = new SimpleNamespaceContext(nsMap);
+        XMLUnit.setXpathNamespaceContext(ctx);
     }
     
     @AfterClass
     public static void cleanUp() throws Exception {
+        XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
         purgeDemoObjects(s_client);
         s_client.shutdown();
     }
@@ -871,19 +885,15 @@ public class TestAPIM
     public void setUp() throws Exception {
         apim = s_client.getAPIMMTOM();
         apia = s_client.getAPIAMTOM();
-        Map<String, String> nsMap = new HashMap<String, String>();
-        nsMap.put("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
-        nsMap.put("dc", "http://purl.org/dc/elements/1.1/");
-        nsMap.put("foxml", "info:fedora/fedora-system:def/foxml#");
-        nsMap.put("audit", "info:fedora/fedora-system:def/audit#");
-        nsMap.put("METS", "http://www.loc.gov/METS/");
-        NamespaceContext ctx = new SimpleNamespaceContext(nsMap);
-        XMLUnit.setXpathNamespaceContext(ctx);
+        // clone some demo objects to managed-content equivalents for reserved datastreams (RELS-*, DC)
+        ManagedContentTranslator.createManagedClone(apim, PENS_PID, MANAGED_PENS_PID);
+        ManagedContentTranslator.createManagedClone(apim, GLASS_PID, MANAGED_GLASS_PID);
     }
 
     @After
     public void tearDown() {
-        XMLUnit.setXpathNamespaceContext(SimpleNamespaceContext.EMPTY_CONTEXT);
+        apim.purgeObject(MANAGED_GLASS_PID, "Test cleanup", true);
+        apim.purgeObject(MANAGED_PENS_PID, "Test cleanup", true);
     }
 
     @Test
@@ -1422,16 +1432,15 @@ public class TestAPIM
         // same for RELS-EXT and RELS-INT as managed content datastreams using demo:SmileyBeerGlass_M (managed content version of SmileyBeerGlass)
         // object has pre-existing RELS-EXTso purge first
         // FIXME: can't do this for DC as (default) content model checks make sure that datastreams used by disseminators can't be removed
-        String mcPID = "demo:SmileyBeerGlass_M";
-        int expected = apim.getDatastreamHistory(mcPID, "RELS-EXT").size();
-        assertTrue("There were no extant versions of " + mcPID + "/RELS-EXT to purge!", expected > 0);
+        int expected = apim.getDatastreamHistory(MANAGED_GLASS_PID, "RELS-EXT").size();
+        assertTrue("There were no extant versions of " + MANAGED_GLASS_PID + "/RELS-EXT to purge!", expected > 0);
         String[] purgedDatastreams =
-                apim.purgeDatastream(mcPID,
+                apim.purgeDatastream(MANAGED_GLASS_PID,
                                      "RELS-EXT",
                                      null,
                                      null,
                                      "Purge managed content datastream RELS-EXT"
-                                             + mcPID,
+                                             + MANAGED_GLASS_PID,
                                      false).toArray(new String[0]);
         assertEquals("Check purged managed datastream RELS-EXT",
                    expected, purgedDatastreams.length);
@@ -1439,7 +1448,7 @@ public class TestAPIM
             altIds[0] = "Datastream 2 Alternate ID";
             try {
                 datastreamId =
-                    apim.addDatastream(mcPID,
+                    apim.addDatastream(MANAGED_GLASS_PID,
                                        reservedDSID,
                                        TypeUtility.convertStringtoAOS(altIds),
                                        "A New RELS Datastream",
@@ -1463,28 +1472,27 @@ public class TestAPIM
         // strictly speaking adding managed RELS-EXT etc should be covered by other add managed tests,
         // but there's sufficient reserved-datastream-specific code to warrant this
         // FIXME: also do for DC, can't do unless DC is purged, content model checks currently prevent this (DC used in default content model)
-        mcPID = "demo:SmileyPens_M";
-        expected = apim.getDatastreamHistory(mcPID, "RELS-EXT").size();
-        assertTrue("There were no extant versions of " + mcPID + "/RELS-EXT to purge!", expected > 0);
+        expected = apim.getDatastreamHistory(MANAGED_PENS_PID, "RELS-EXT").size();
+        assertTrue("There were no extant versions of " + MANAGED_PENS_PID + "/RELS-EXT to purge!", expected > 0);
         purgedDatastreams =
-                apim.purgeDatastream(mcPID,
+                apim.purgeDatastream(MANAGED_PENS_PID,
                                      "RELS-EXT",
                                      null,
                                      null,
                                      "Purge managed content datastream RELS-EXT"
-                                             + mcPID,
+                                             + MANAGED_PENS_PID,
                                      false).toArray(new String[0]);
         assertEquals("Check purged managed datastream RELS-EXT",
                 expected, purgedDatastreams.length);
-        expected = apim.getDatastreamHistory(mcPID, "RELS-INT").size();
-        assertTrue("There were no extant versions of " + mcPID + "/RELS-INT to purge!", expected > 0);
+        expected = apim.getDatastreamHistory(MANAGED_PENS_PID, "RELS-INT").size();
+        assertTrue("There were no extant versions of " + MANAGED_PENS_PID + "/RELS-INT to purge!", expected > 0);
         purgedDatastreams =
-                apim.purgeDatastream(mcPID,
+                apim.purgeDatastream(MANAGED_PENS_PID,
                                      "RELS-INT",
                                      null,
                                      null,
                                      "Purge managed content datastream RELS-INT"
-                                             + mcPID,
+                                             + MANAGED_PENS_PID,
                                      false).toArray(new String[0]);
         assertEquals("Check purged managed datastream RELS-INT",
             expected, purgedDatastreams.length);
@@ -1492,7 +1500,7 @@ public class TestAPIM
         for (String reservedDSID : new String[] {"RELS-EXT", "RELS-INT"}) {
             altIds[0] = "Datastream 2 Alternate ID";
             datastreamId =
-                    apim.addDatastream(mcPID,
+                    apim.addDatastream(MANAGED_PENS_PID,
                                        reservedDSID,
                                        TypeUtility.convertStringtoAOS(altIds),
                                        "A New RELS Datastream",
@@ -1500,8 +1508,8 @@ public class TestAPIM
                                        "application/rdf+xml",
                                        "info:fedora/fedora-system:FedoraRELSExt-1.0",
                                        getDemoBaseURL()
-                                               + "/image-collection-demo/SmileyPens_M-"
-                                               + reservedDSID + ".xml",
+                                               + "/image-collection-demo/" + MANAGED_PENS_PID.split("[:]")[1]
+                                               + "-" + reservedDSID + ".xml",
                                        "M",
                                        "A",
                                        null,
@@ -1511,11 +1519,11 @@ public class TestAPIM
             // check added datastreams
             objectXML =
                     TypeUtility.convertDataHandlerToBytes(apim
-                            .getObjectXML(mcPID));
+                            .getObjectXML(MANAGED_PENS_PID));
             assertTrue(objectXML.length > 0);
             xmlIn = new String(objectXML, "UTF-8");
             doc = XMLUnit.buildControlDocument(xmlIn);
-            assertXpathExists("foxml:digitalObject[@PID='" + mcPID + "']",
+            assertXpathExists("foxml:digitalObject[@PID='" + MANAGED_PENS_PID + "']",
                               doc);
             assertXpathExists("//foxml:datastream[@ID='" + reservedDSID
                     + "' and @CONTROL_GROUP='M' and @STATE='A']", doc);
@@ -1590,14 +1598,13 @@ public class TestAPIM
 
         // test modifyDatastreamByReference RELS-EXT, RELS-INT triggers validation for managed content datastreams
         // add RELS-EXT from some other object as that will be invalid for this object
-        // using demo:SmileyBeerGlass_M (managed content version of SmileyBeerGlass)
+        // using demo:SmileyPens_M (managed content version of SmileyPens)
         // TODO: DC also
-        String mcPID = "demo:SmileyPens_M";
         for (String reservedDSID : new String[] {"RELS-EXT", "RELS-INT"}) {
             altIds[0] = "Datastream 2 Alternate ID";
             try {
                 datastreamId =
-                    apim.modifyDatastreamByReference(mcPID,
+                    apim.modifyDatastreamByReference(MANAGED_PENS_PID,
                                                      reservedDSID,
                                                      TypeUtility
                                                              .convertStringtoAOS(altIds),
@@ -1622,7 +1629,6 @@ public class TestAPIM
         // strictly speaking adding managed RELS-EXT etc should be covered by other add managed tests,
         // but there's sufficient reserved-datastream-specific code to warrant this
         // TODO: do for DC also
-        mcPID = "demo:SmileyPens_M";
 
         for (String reservedDSID : new String[] {"RELS-EXT", "RELS-INT"}) {
             altIds[0] = "Datastream 2 Alternate ID";
@@ -1635,7 +1641,7 @@ public class TestAPIM
             }
 
             datastreamId =
-                    apim.modifyDatastreamByReference(mcPID,
+                    apim.modifyDatastreamByReference(MANAGED_PENS_PID,
                                                      reservedDSID,
                                                      TypeUtility
                                                              .convertStringtoAOS(altIds),
@@ -1643,9 +1649,8 @@ public class TestAPIM
                                                      "application/rdf+xml",
                                                      uri,
                                                      getDemoBaseURL()
-                                                             + "/image-collection-demo/SmileyPens_M-"
-                                                             + reservedDSID
-                                                             + ".xml",
+                                                     + "/image-collection-demo/" + MANAGED_PENS_PID.split("[:]")[1]
+                                                     + "-" + reservedDSID + ".xml",
                                                      null,
                                                      null,
                                                      "modify reserved datastream by reference with valid content",
@@ -1654,11 +1659,11 @@ public class TestAPIM
             // check  datastreams
             objectXML =
                     TypeUtility.convertDataHandlerToBytes(apim
-                            .getObjectXML(mcPID));
+                            .getObjectXML(MANAGED_PENS_PID));
             assertTrue(objectXML.length > 0);
             xmlIn = new String(objectXML, "UTF-8");
             doc = XMLUnit.buildControlDocument(xmlIn);
-            assertXpathExists("foxml:digitalObject[@PID='" + mcPID + "']",
+            assertXpathExists("foxml:digitalObject[@PID='" + MANAGED_PENS_PID + "']",
                               doc);
             assertXpathExists("//foxml:datastream[@ID='" + reservedDSID
                     + "' and @CONTROL_GROUP='M' and @STATE='A']", doc);
@@ -1806,7 +1811,6 @@ public class TestAPIM
         // test modifyDatastreamByValue RELS-EXT, RELS-INT triggers validation for type "M"
         // using demo:SmileyPens_M (managed content version of demo:SmileyPens)
         // TODO: do for DC also
-        String mcPID = "demo:SmileyPens_M";
         for (String reservedDSID : new String[] {"RELS-EXT", "RELS-INT"}) {
             altIds[0] = "Datastream 2 Alternate ID";
 
@@ -1819,7 +1823,7 @@ public class TestAPIM
 
             try {
                 datastreamId =
-                    apim.modifyDatastreamByValue(mcPID,
+                    apim.modifyDatastreamByValue(MANAGED_PENS_PID,
                                                  reservedDSID,
                                                  TypeUtility
                                                          .convertStringtoAOS(altIds),
@@ -1845,19 +1849,18 @@ public class TestAPIM
         // strictly speaking adding managed RELS-EXT etc should be covered by other add managed tests,
         // but there's sufficient reserved-datastream-specific code to warrant this
         // TODO: DC also?
-        mcPID = "demo:SmileyPens_M";
 
-        // some minimal rels valid content for demo:SmileyPens
+        // some minimal rels valid content for demo:SmileyPens_M
         String[] relsContent =
                 new String[] {
                         "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" "
                                 + "xmlns:rel=\"http://www.example.org/test#\">"
-                                + "<rdf:Description rdf:about=\"info:fedora/demo:SmileyPens_M\">"
+                                + "<rdf:Description rdf:about=\"info:fedora/" + MANAGED_PENS_PID + "\">"
                                 + "<rel:dummy>stuff</rel:dummy>"
                                 + "</rdf:Description>" + "</rdf:RDF>",
                         "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" "
                                 + "xmlns:rel=\"http://www.example.org/test#\">"
-                                + "<rdf:Description rdf:about=\"info:fedora/demo:SmileyPens_M/DC\">"
+                                + "<rdf:Description rdf:about=\"info:fedora/" + MANAGED_PENS_PID + "/DC\">"
                                 + "<rel:dummy>stuff</rel:dummy>"
                                 + "</rdf:Description>" + "</rdf:RDF>"};
 
@@ -1874,7 +1877,7 @@ public class TestAPIM
             }
 
             datastreamId =
-                    apim.modifyDatastreamByValue(mcPID,
+                    apim.modifyDatastreamByValue(MANAGED_PENS_PID,
                                                  reservedDSID,
                                                  TypeUtility
                                                          .convertStringtoAOS(altIds),
@@ -1892,12 +1895,12 @@ public class TestAPIM
             // check  datastreams
             objectXML =
                     TypeUtility.convertDataHandlerToBytes(apim
-                            .getObjectXML(mcPID));
+                            .getObjectXML(MANAGED_PENS_PID));
             assertTrue(objectXML.length > 0);
             xmlIn = new String(objectXML, "UTF-8");
             doc = XMLUnit.buildControlDocument(xmlIn);
-            //System.out.println("***** Testcase: TestAPIM.testModifyDatastreamByValue " + mcPID + "\n"+xmlIn);
-            assertXpathExists("foxml:digitalObject[@PID='" + mcPID + "']",
+            //System.out.println("***** Testcase: TestAPIM.testModifyDatastreamByValue " + MANAGED_PENS_PID + "\n"+xmlIn);
+            assertXpathExists("foxml:digitalObject[@PID='" + MANAGED_PENS_PID + "']",
                               doc);
             assertXpathExists("//foxml:datastream[@ID='" + reservedDSID
                     + "' and @CONTROL_GROUP='M' and @STATE='A']", doc);
