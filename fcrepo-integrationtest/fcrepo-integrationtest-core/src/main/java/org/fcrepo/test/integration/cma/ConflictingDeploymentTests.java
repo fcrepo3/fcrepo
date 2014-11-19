@@ -14,11 +14,11 @@ import junit.framework.Assert;
 
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.utility.AutoPurger;
-
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.fcrepo.test.FedoraServerTestCase;
 
 import static org.fcrepo.test.integration.cma.Util.ingestTestObjects;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -92,6 +92,11 @@ public class ConflictingDeploymentTests {
 
     @Before
     public void setUp() throws Exception {
+        int ingested = 0;
+        ingested = ingestTestObjects(s_client, DEPLOYMENT_1_BASE);
+        assertTrue("No objects were ingested from " + Util.resourcePath(DEPLOYMENT_1_BASE), ingested > 0);
+        ingested = ingestTestObjects(s_client, DEPLOYMENT_2_BASE);
+        assertTrue("No objects were ingested from " + Util.resourcePath(DEPLOYMENT_2_BASE), ingested > 0);
     }
 
     @After
@@ -107,9 +112,6 @@ public class ConflictingDeploymentTests {
      */
     @Test
     public void testDeployFirstIngested12() throws Exception {
-
-        ingestTestObjects(s_client, DEPLOYMENT_1_BASE);
-        ingestTestObjects(s_client, DEPLOYMENT_2_BASE);
 
         String content = getDisseminatedContent();
 
@@ -127,15 +129,12 @@ public class ConflictingDeploymentTests {
     @Test
     public void testDeployFirstIngested21() throws Exception {
 
-        ingestTestObjects(s_client, DEPLOYMENT_2_BASE);
-        ingestTestObjects(s_client, DEPLOYMENT_1_BASE);
-
         String content = getDisseminatedContent();
 
         Assert.assertFalse("Wrong deployment used!", content
-                .contains("CONTENT_1"));
-        Assert.assertTrue("Did not disseminate expected content", content
                 .contains("CONTENT_2"));
+        Assert.assertTrue("Did not disseminate expected content", content
+                .contains("CONTENT_1"));
 
     }
 
@@ -145,8 +144,6 @@ public class ConflictingDeploymentTests {
      */
     @Test
     public void testModifyOldestSdep() throws Exception {
-        ingestTestObjects(s_client, DEPLOYMENT_1_BASE);
-        ingestTestObjects(s_client, DEPLOYMENT_2_BASE);
 
         modify(SDEP_1_PID);
 
@@ -164,8 +161,6 @@ public class ConflictingDeploymentTests {
      */
     @Test
     public void testModifyNewestSdep() throws Exception {
-        ingestTestObjects(s_client, DEPLOYMENT_1_BASE);
-        ingestTestObjects(s_client, DEPLOYMENT_2_BASE);
 
         modify(SDEP_2_PID);
 
@@ -183,16 +178,15 @@ public class ConflictingDeploymentTests {
      */
     @Test
     public void testPurgeReplace() throws Exception {
-        ingestTestObjects(s_client, DEPLOYMENT_1_BASE);
-        ingestTestObjects(s_client, DEPLOYMENT_2_BASE);
 
         s_client.getAPIMMTOM()
                 .purgeObject(SDEP_1_PID, "removing first sDep", false);
-
-        try {
+        try{
             Assert.assertTrue("Did not disseminate expected content: ",
                     getDisseminatedContent().contains("CONTENT_2"));
         } finally {
+            // this object is re-ingested here solely because the cleanup/purge
+            // can't handle the potentially missing item
             ingestTestObjects(s_client, DEPLOYMENT_1_BASE);
         }
     }

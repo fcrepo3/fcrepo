@@ -8,15 +8,14 @@ import static junit.framework.Assert.fail;
 
 import java.io.IOException;
 
+import junit.framework.JUnit4TestAdapter;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.fcrepo.client.FedoraClient;
-
 import org.fcrepo.server.utilities.StreamUtility;
 import org.fcrepo.server.utilities.TypeUtility;
-
 import org.fcrepo.test.FedoraTestCase;
 import org.fcrepo.test.api.RISearchUtil;
 
@@ -48,6 +47,10 @@ public class TestMisplacedNamespace
             "test-objects/foxml/TestMisplacedNamespace/DemoSuccess.xml";
 
     private static final String PID = "demo:failObject";
+
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestMisplacedNamespace.class);
+    }
 
     @Before
     public void setUp() throws Exception {

@@ -9,6 +9,8 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses( {org.fcrepo.test.AllCommonSystemTests.class,
+        org.fcrepo.test.integration.TestMisplacedNamespace.class,
+        org.fcrepo.test.integration.cma.SimpleDeploymentTests.class,
         org.fcrepo.test.api.TestAuthentication.class,
         org.fcrepo.test.api.TestHTTPStatusCodesConfigB.class,
         org.fcrepo.test.api.TestXACMLPolicies.class,
@@ -16,6 +18,7 @@ import org.junit.runners.Suite;
         org.fcrepo.test.api.TestRISearch.class,
         org.fcrepo.test.api.TestManagementNotifications.class,
         org.fcrepo.test.api.TestRESTAPI.class,
+        org.fcrepo.test.api.TestRESTAPIURLDecoding.class,
         org.fcrepo.test.api.TestAdminAPI.class})
 public class AllSystemTestsConfigB {
 
@@ -27,6 +30,8 @@ public class AllSystemTestsConfigB {
                         .getName());
 
         suite.addTest(org.fcrepo.test.AllCommonSystemTests.suite());
+        suite.addTest(org.fcrepo.test.integration.TestMisplacedNamespace.suite());
+        suite.addTest(org.fcrepo.test.integration.cma.SimpleDeploymentTests.suite());
         suite.addTest(org.fcrepo.test.api.TestAuthentication.suite());
         suite.addTest(org.fcrepo.test.api.TestHTTPStatusCodesConfigB.suite());
         suite.addTest(org.fcrepo.test.api.TestXACMLPolicies.suite());
@@ -34,6 +39,7 @@ public class AllSystemTestsConfigB {
         suite.addTest(org.fcrepo.test.api.TestRISearch.suite());
         suite.addTest(org.fcrepo.test.api.TestManagementNotifications.suite());
         suite.addTest(org.fcrepo.test.api.TestRESTAPI.suite());
+        suite.addTest(org.fcrepo.test.api.TestRESTAPIURLDecoding.suite());
         suite.addTest(org.fcrepo.test.api.TestAdminAPI.suite());
 
 

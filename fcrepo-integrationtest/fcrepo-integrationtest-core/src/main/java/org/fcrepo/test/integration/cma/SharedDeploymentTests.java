@@ -16,6 +16,7 @@ import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.types.gen.ObjectMethodsDef;
 import org.fcrepo.test.FedoraServerTestCase;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -82,6 +83,8 @@ public class SharedDeploymentTests {
 
     private static FedoraClient s_client;
 
+    private static int s_items_ingested = 0;
+
     public static junit.framework.Test suite() {
         return new junit.framework.JUnit4TestAdapter(SharedDeploymentTests.class);
     }
@@ -93,13 +96,18 @@ public class SharedDeploymentTests {
                 new FedoraClient(FedoraServerTestCase.getBaseURL(),
                                  FedoraServerTestCase.getUsername(),
                                  FedoraServerTestCase.getPassword());
-        Util.ingestTestObjects(s_client, SHARED_DEPLOYMENT_BASE);
+        s_items_ingested = Util.ingestTestObjects(s_client, SHARED_DEPLOYMENT_BASE);
     }
 
     @AfterClass
     public static void cleanUp() throws Exception {
         s_client.shutdown();
         FedoraServerTestCase.purgeDemoObjects(s_client);
+    }
+
+    @Before
+    public void setUp() {
+        assertTrue("Nothing was ingested from " + Util.resourcePath(SHARED_DEPLOYMENT_BASE), s_items_ingested > 0);
     }
 
     @Test

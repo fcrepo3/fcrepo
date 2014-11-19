@@ -9,14 +9,16 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses( {org.fcrepo.test.AllCommonSystemTests.class,
+        org.fcrepo.test.integration.TestMisplacedNamespace.class,
+        org.fcrepo.test.integration.cma.SimpleDeploymentTests.class,
         org.fcrepo.test.api.TestAuthentication.class,
         org.fcrepo.test.api.TestHTTPStatusCodesConfigC.class,
         org.fcrepo.test.fesl.policy.TestPolicies.class,
+        org.fcrepo.test.fesl.policy.TestHierarchy.class,
         org.fcrepo.test.fesl.policyindex.TestPolicyIndex.class,
         org.fcrepo.test.fesl.restapi.TestREST.class,
         org.fcrepo.test.api.TestRelationships.class,
         org.fcrepo.test.api.TestRISearch.class,
-        org.fcrepo.server.messaging.AtomAPIMMessageTest.class,
         org.fcrepo.test.api.TestRESTAPI.class,
         org.fcrepo.test.api.TestAdminAPI.class})
 public class AllSystemTestsConfigC {
@@ -29,15 +31,17 @@ public class AllSystemTestsConfigC {
                         .getName());
 
         suite.addTest(org.fcrepo.test.AllCommonSystemTests.suite());
+        suite.addTest(org.fcrepo.test.integration.TestMisplacedNamespace.suite());
+        suite.addTest(org.fcrepo.test.integration.cma.SimpleDeploymentTests.suite());
         suite.addTest(org.fcrepo.test.api.TestAuthentication.suite());
         suite.addTest(org.fcrepo.test.api.TestHTTPStatusCodesConfigC.suite());
         suite.addTest(org.fcrepo.test.fesl.policy.TestPolicies.suite());
+        suite.addTest(org.fcrepo.test.fesl.policy.TestHierarchy.suite());
         suite.addTest(org.fcrepo.test.fesl.policyindex.TestPolicyIndex.suite());
         suite.addTest(org.fcrepo.test.fesl.restapi.TestREST.suite());
         suite.addTest(org.fcrepo.test.api.TestRelationships.suite());
         suite.addTest(org.fcrepo.test.api.TestRISearch.suite());
         suite.addTest(org.fcrepo.test.api.TestRESTAPI.suite());
-        suite.addTest(org.fcrepo.server.messaging.AtomAPIMMessageTest.suite());
         suite.addTest(org.fcrepo.test.api.TestAdminAPI.suite());
 
         return suite;

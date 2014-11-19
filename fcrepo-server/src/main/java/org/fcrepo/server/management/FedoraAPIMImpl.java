@@ -338,7 +338,7 @@ public class FedoraAPIMImpl
                                                                               dsLabel,
                                                                               mimeType,
                                                                               formatURI,
-                                                                              new ByteArrayInputStream(dsContent),
+                                                                              dsContent != null ? new ByteArrayInputStream(dsContent) : null,
                                                                               checksumType,
                                                                               checksum,
                                                                               logMessage,

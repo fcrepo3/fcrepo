@@ -1,0 +1,40 @@
+﻿# this is a values file for TemplatedResourceIterator
+#
+# format: java properties file, with:
+# template.attribute.sets.count=<number of attribute sets to iterate over>
+# template.attribute.set.<n>.attributename=value : 
+#   $attributename$ in the template file is substituted for value
+#   when doing the <n>th set iteration
+#
+# nb: sets zero-indexed, from 0 to $attribute.sets.count$ - 1
+#
+# nb: escape backslahes to \\
+#
+###################################################################
+#
+# attribute values are all simple strings requiring no escaping
+# ingesting based on using these should always succeed - check the server is still behaving after the injection test
+
+# label2 is not used in the ingest, but is used in eg update operations
+
+template.attribute.sets.count=2
+
+# set 0
+template.attribute.set.0.pid=demo:0_p
+template.attribute.set.0.cmodel_pid=demo:0cmodel_p
+template.attribute.set.0.sdef_pid=demo:0sdef_p
+template.attribute.set.0.sdep_pid=demo:0sdep_p
+template.attribute.set.0.label=some label
+template.attribute.set.0.label2=\\'); drop table doRegistry;--
+
+# set 1
+template.attribute.set.1.pid=demo:1_p
+template.attribute.set.1.cmodel_pid=demo:1cmodel_p
+template.attribute.set.1.sdef_pid=demo:1sdef_p
+template.attribute.set.1.sdep_pid=demo:1sdep_p
+template.attribute.set.1.label=and another label
+template.attribute.set.1.label2=\\'); DROP TABLE doRegistry;--
+
+
+
+

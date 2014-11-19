@@ -1,0 +1,49 @@
+﻿# this is a values file for TemplatedResourceIterator
+#
+# format: java properties file, with:
+# template.attribute.sets.count=<number of attribute sets to iterate over>
+# template.attribute.set.<n>.attributename=value : 
+#   $attributename$ in the template file is substituted for value
+#   when doing the <n>th set iteration
+#
+# nb: sets zero-indexed, from 0 to $attribute.sets.count$ - 1
+#
+# nb: escape backslahes to \\
+#
+###################################################################
+#
+# testing SQL injection in FOXML and in object and datastream properties
+
+template.attribute.sets.count=4
+
+# set 0
+template.attribute.set.0.pid=demo:0
+template.attribute.set.0.cmodel_pid=demo:0cmodel
+template.attribute.set.0.sdef_pid=demo:0sdef
+template.attribute.set.0.sdep_pid=demo:0sdep
+template.attribute.set.0.label=\\'); drop table doRegistry;--
+
+# set 1
+template.attribute.set.1.pid=demo:1
+template.attribute.set.1.cmodel_pid=demo:1cmodel
+template.attribute.set.1.sdef_pid=demo:1sdef
+template.attribute.set.1.sdep_pid=demo:1sdep
+template.attribute.set.1.label=\\'); DROP TABLE doRegistry;--
+
+# set 2
+template.attribute.set.2.pid=demo:2
+template.attribute.set.2.cmodel_pid=demo:2cmodel
+template.attribute.set.2.sdef_pid=demo:2sdef
+template.attribute.set.2.sdep_pid=demo:2sdep
+template.attribute.set.2.label=\\'); drop table doRegistry; drop table doRegistry;--
+
+# set 3
+template.attribute.set.3.pid=demo:3
+template.attribute.set.3.cmodel_pid=demo:3cmodel
+template.attribute.set.3.sdef_pid=demo:3sdef
+template.attribute.set.3.sdep_pid=demo:3sdep
+template.attribute.set.3.label=\\'); DROP TABLE doRegistry; DROP TABLE doRegistry;--
+
+
+
+

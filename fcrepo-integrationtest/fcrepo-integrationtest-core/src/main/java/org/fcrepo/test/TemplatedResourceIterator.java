@@ -45,7 +45,7 @@ public class TemplatedResourceIterator implements Iterator<String> {
     // number of sets to iterate
     private final int m_setCount;
     // index of next set to return with next()
-    private int m_nextSet = 0;
+    private int m_nextSet = -1;
 
     // for validation of consistent attribute counts across sets
     int m_lastAttributeCount = -1;
@@ -73,13 +73,13 @@ public class TemplatedResourceIterator implements Iterator<String> {
 
     @Override
     public boolean hasNext() {
-        return (m_nextSet < m_setCount);
+        return (m_nextSet + 1 < m_setCount);
     }
 
     @Override
     public String next() {
 
-        if (m_nextSet >= m_setCount)
+        if (m_nextSet++ >= m_setCount)
             throw new NoSuchElementException();
 
         // all properties in the current set start with...
@@ -117,7 +117,6 @@ public class TemplatedResourceIterator implements Iterator<String> {
         }
         m_lastAttributeCount = attributeCount;
 
-        m_nextSet++;
         return tpl.toString();
     }
 
@@ -129,8 +128,7 @@ public class TemplatedResourceIterator implements Iterator<String> {
 
     @Override
     public void remove() {
-        throw new RuntimeException("Method remove() is not supported");
-
+        throw new UnsupportedOperationException("Method remove() is not supported");
     }
 
     // TODO: make generic, allow different forms of escaping?

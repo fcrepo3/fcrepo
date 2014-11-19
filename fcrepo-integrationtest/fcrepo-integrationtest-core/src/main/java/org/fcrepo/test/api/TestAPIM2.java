@@ -5,10 +5,14 @@
 package org.fcrepo.test.api;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.xml.ws.soap.SOAPFaultException;
 
 import junit.framework.JUnit4TestAdapter;
 
@@ -23,6 +27,7 @@ import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.types.gen.ComparisonOperator;
 import org.fcrepo.server.types.gen.Condition;
 import org.fcrepo.server.types.gen.FieldSearchQuery;
+import org.fcrepo.server.types.gen.FieldSearchResult;
 import org.fcrepo.server.types.gen.ObjectFactory;
 import org.fcrepo.server.utilities.TypeUtility;
 import org.fcrepo.test.FedoraServerTestCase;
@@ -155,6 +160,7 @@ public class TestAPIM2
         String termsTemplate = "$value$";
         TemplatedResourceIterator tri = new TemplatedResourceIterator(termsTemplate, "src/test/resources/APIM2/searchvalues");
         while (tri.hasNext()) {
+            String terms = tri.next();
             FieldSearchQuery query;
             // using conditions
             FieldSearchQuery.Conditions conds = new FieldSearchQuery.Conditions();
@@ -166,14 +172,21 @@ public class TestAPIM2
             query = new FieldSearchQuery();
             ObjectFactory factory = new ObjectFactory();
             query.setConditions(factory.createFieldSearchQueryConditions(conds));
-            apia.findObjects(TypeUtility.convertStringtoAOS(resultFields), maxResults, query);
+            try {
+                apia.findObjects(TypeUtility.convertStringtoAOS(resultFields), maxResults, query);
+                fail("Query should not have succeeded with SQL");
+            } catch (SOAPFaultException e) {
+                // expected
+                String expected = "Query cannot contain the ' character.";
+                assertTrue(
+                        "\"" + e.getCause().getMessage() + "\" did not contain expected message \"" + expected + "\"",
+                        e.getCause().getMessage().contains(expected));
+            }
 
-
-            String terms = tri.next();
             query = new FieldSearchQuery();
             query.setTerms(factory.createFieldSearchQueryTerms(terms));
-            apia.findObjects(TypeUtility.convertStringtoAOS(resultFields), maxResults, query);
-
+            FieldSearchResult result = apia.findObjects(TypeUtility.convertStringtoAOS(resultFields), maxResults, query);
+            assertEquals(0,result.getResultList().getObjectFields().size());
         }
 
         purgeDemoObjects(s_client);
@@ -203,8 +216,8 @@ public class TestAPIM2
         String resource = FileUtils.readFileToString(resourceFile, "UTF-8");
         TemplatedResourceIterator tri = new TemplatedResourceIterator(resource, "src/test/resources/APIM2/valuesplain");
         while (tri.hasNext()) {
-            String label2 = tri.getAttributeValue("label2");
             byte[] foxml = tri.next().getBytes("UTF-8");
+            String label2 = tri.getAttributeValue("label2");
             String pid = apim.ingest(foxml, FOXML1_1.uri,"ingesting new foxml object");
 
             // update object label with new value
@@ -241,8 +254,8 @@ public class TestAPIM2
         String resource = FileUtils.readFileToString(resourceFile, "UTF-8");
         TemplatedResourceIterator tri = new TemplatedResourceIterator(resource, "src/test/resources/APIM2/valuesplain");
         while (tri.hasNext()) {
-            String label2 = tri.getAttributeValue("label2");
             byte[] foxml = tri.next().getBytes("UTF-8");
+            String label2 = tri.getAttributeValue("label2");
             String pid = apim.ingest(foxml, FOXML1_1.uri,"ingesting new foxml object");
 
             // modify datastream label

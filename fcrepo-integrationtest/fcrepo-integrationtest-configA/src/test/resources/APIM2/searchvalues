@@ -1,0 +1,26 @@
+# this is a values file for TemplatedResourceIterator
+#
+# format: java properties file, with:
+# template.attribute.sets.count=<number of attribute sets to iterate over>
+# template.attribute.set.<n>.attributename=value : 
+#   $attributename$ in the template file is substituted for value
+#   when doing the <n>th set iteration
+#
+# nb: sets zero-indexed, from 0 to $attribute.sets.count$ - 1
+#
+# nb: escape backslahes to \\
+#
+###################################################################
+#
+# testing FieldSearch
+#
+# values are inserted into query terms/conditions to try and provoke an SQL injectino
+
+template.attribute.sets.count=2
+
+# set 0
+template.attribute.set.0.value=demo:*\\'); drop table doRegistry;--
+
+# set 1
+template.attribute.set.1.value=demo:*\\'); DROP TABLE doRegistry;--
+

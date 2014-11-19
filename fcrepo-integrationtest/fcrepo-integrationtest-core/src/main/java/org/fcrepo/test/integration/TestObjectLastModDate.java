@@ -6,6 +6,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import junit.framework.JUnit4TestAdapter;
+
 import org.apache.commons.io.IOUtils;
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.server.utilities.TypeUtility;
@@ -31,6 +33,10 @@ public class TestObjectLastModDate
                     .getProperty("fcrepo-integrationtest-core.classes")
                     + "test-objects/foxml/cli-utils"
                     : "src/test/resources/test-objects/foxml/cli-utils";
+
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestObjectLastModDate.class);
+    }
 
     @Before
     public void setUp() throws Exception {

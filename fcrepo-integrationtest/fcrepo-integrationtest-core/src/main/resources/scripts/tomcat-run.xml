@@ -1,8 +1,25 @@
 <project name="tomcat-run">
-
+  <target name="wait-until-port">
+    <sequential>
+      <waitfor maxwait="60" maxwaitunit="second" checkevery="2" timeoutproperty="timeout">
+        <socket server="127.0.0.1" port="${mvn.fedora.port}"/>
+      </waitfor>
+      <fail if="timeout">Fedora did not start in time</fail>
+    </sequential>
+  </target>
+  <target name="wait-on-port">
+    <sequential>
+      <waitfor maxwait="60" maxwaitunit="second" checkevery="2" timeoutproperty="timeout">
+        <not>
+          <socket server="127.0.0.1" port="${mvn.fedora.port}"/>
+        </not>
+      </waitfor>
+      <fail if="timeout">Fedora did not stop in time</fail>
+    </sequential>
+  </target>
   <target name="tomcat-start">
     <echo>Starting Fedora</echo>
-    <parallel>
+    <sequential>
       <java classname="org.apache.catalina.startup.Bootstrap" fork="yes" dir="${mvn.tomcat.home}" spawn="true">
       	<classpath path="${mvn.tomcat.home}/bin/bootstrap.jar:${mvn.tomcat.home}/bin/tomcat-juli.jar" />
         <jvmarg value="-Djava.io.tmpdir=${mvn.tomcat.home}/temp" />
@@ -16,32 +33,20 @@
         <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
         <arg line="start" />
       </java>
-      <sequential>
-        <waitfor maxwait="60" maxwaitunit="second" checkevery="2" timeoutproperty="timeout">
-          <socket server="127.0.0.1" port="${mvn.fedora.port}"/>
-        </waitfor>
-        <fail if="timeout">Fedora did not start in time</fail>
-        <echo>Fedora started</echo>
-      </sequential>
-    </parallel>
+      <antcall target="wait-until-port" />
+    </sequential>
   </target>
 
   <target name="tomcat-stop">
-    <parallel>
+    <sequential>
       <java classname="org.apache.catalina.startup.Bootstrap" fork="yes" dir="${mvn.tomcat.home}" spawn="true">
         <classpath path="${mvn.tomcat.home}/bin/bootstrap.jar:${mvn.tomcat.home}/bin/tomcat-juli.jar" />
         <jvmarg value="-Djava.io.tmpdir=${mvn.tomcat.home}/temp" />
         <env key="FEDORA_HOME" value="${mvn.fedora.home}" />
         <arg line="stop" />
-    </java>
-    <sequential>
-      <waitfor maxwait="60" maxwaitunit="second" checkevery="2" timeoutproperty="timeout">
-        <not>
-          <socket server="127.0.0.1" port="${mvn.fedora.port}"/>
-        </not>
-      </waitfor>
+      </java>
+      <antcall target="wait-on-port" />
     </sequential>
-    </parallel>
   </target>
 
 </project>

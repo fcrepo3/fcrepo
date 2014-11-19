@@ -63,7 +63,7 @@
       <foxml:xmlContent>
         <fbs:DSInputSpec
           label="Datastream Input Specification for Mechanism for getting contents in Conflicting Deployment Demo" xmlns:fbs="http://fedora.comm.nsdlib.org/service/bindspec">
-          <fbs:DSInput DSMax="1" DSMin="1" DSOrdinality="false" wsdlMsgPartName="CONTENT_INPUT">
+          <fbs:DSInput DSMax="1" DSMin="1" DSOrdinality="false" wsdlMsgPartName="CONTENT_1">
             <fbs:DSInputLabel>Content input Binding</fbs:DSInputLabel>
             <fbs:DSMIME>text/xml</fbs:DSMIME>
             <fbs:DSInputInstruction/>
@@ -97,7 +97,7 @@
           </wsdl:types>
           <wsdl:message name="contentRequest">
             <wsdl:part name="pid" type="this:pidType"/>
-            <wsdl:part name="CONTENT_INPUT" type="this:contentInputType"/>
+            <wsdl:part name="CONTENT_1" type="this:contentInputType"/>
           </wsdl:message>
           <wsdl:message name="dissemResponse">
             <wsdl:part name="dissem" type="xsd:base64Binary"/>

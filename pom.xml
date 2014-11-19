@@ -1014,7 +1014,7 @@
             <!-- see http://jira.codehaus.org/browse/MRELEASE-424 -->
             <mavenExecutorId>forked-path</mavenExecutorId>
             <tagNameFormat>v@{project.version}</tagNameFormat>
-            <preparationGoals>clean verify install</preparationGoals>
+            <preparationGoals>clean install</preparationGoals>
           </configuration>
           <dependencies>
             <dependency>

@@ -1,0 +1,22 @@
+# this is a values file for TemplatedResourceIterator
+#
+# format: java properties file, with:
+# template.attribute.sets.count=<number of attribute sets to iterate over>
+# template.attribute.set.<n>.attributename=value : 
+#   $attributename$ in the template file is substituted for value
+#   when doing the <n>th set iteration
+#
+# nb: sets zero-indexed, from 0 to $attribute.sets.count$ - 1
+#
+# nb: escape backslahes to \\
+#
+###################################################################
+#
+# testing REST field search
+#
+
+template.attribute.sets.count=1
+
+# set 0
+# SQL injection vuln (FCREPO-798) - drops doRegistry
+template.attribute.set.0.value=pid=true&title=true&terms=&query=pid%09LIKE%09NULL%3B%09DROP%09TABLE%09doregistry%3BSELECT%09*%09from%09doFields%09where%09pid~demo*&maxResults=20

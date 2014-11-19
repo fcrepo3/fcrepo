@@ -9,13 +9,17 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses( {org.fcrepo.test.api.TestAPIA.class,
-        org.fcrepo.test.api.TestAPIALite.class, org.fcrepo.test.api.TestAPIM.class,
+        org.fcrepo.test.api.TestAPIALite.class,
+        org.fcrepo.test.api.TestAPIM.class,
         org.fcrepo.test.api.TestAPIMLite.class,
+        org.fcrepo.test.api.TestHTTPStatusCodes.class,
+        org.fcrepo.test.api.TestExternalDatastreams.class,
+        org.fcrepo.test.api.TestManagedDatastreams.class,
         org.fcrepo.test.integration.cma.ConflictingDeploymentTests.class,
         org.fcrepo.test.integration.cma.ContentModelDSInputTest.class,
         org.fcrepo.test.integration.cma.SharedDeploymentTests.class,
-        org.fcrepo.test.integration.cma.SimpleDeploymentTests.class,
         org.fcrepo.test.integration.TestOAIService.class,
+        org.fcrepo.test.integration.TestObjectLastModDate.class,
         org.fcrepo.test.integration.TestCommandLineUtilities.class,
         org.fcrepo.test.integration.TestCommandLineFormats.class})
 public class AllCommonSystemTests {
@@ -31,18 +35,17 @@ public class AllCommonSystemTests {
         suite.addTest(org.fcrepo.test.api.TestAPIALite.suite());
         suite.addTest(org.fcrepo.test.api.TestAPIM.suite());
         suite.addTest(org.fcrepo.test.api.TestAPIMLite.suite());
+        suite.addTest(org.fcrepo.test.api.TestHTTPStatusCodes.suite());
+        suite.addTest(org.fcrepo.test.api.TestExternalDatastreams.suite());
         suite.addTest(org.fcrepo.test.api.TestManagedDatastreams.suite());
         suite.addTest(org.fcrepo.test.integration.cma.ConflictingDeploymentTests
                 .suite());
         suite.addTest(org.fcrepo.test.integration.cma.ContentModelDSInputTest
                 .suite());
-        suite
-                .addTest(org.fcrepo.test.integration.cma.SharedDeploymentTests
-                        .suite());
-        suite
-                .addTest(org.fcrepo.test.integration.cma.SimpleDeploymentTests
-                        .suite());
+        suite.addTest(org.fcrepo.test.integration.cma.SharedDeploymentTests
+                .suite());
         suite.addTest(org.fcrepo.test.integration.TestOAIService.suite());
+        suite.addTest(org.fcrepo.test.integration.TestObjectLastModDate.suite());
         suite.addTest(org.fcrepo.test.integration.TestCommandLineUtilities.suite());
         suite.addTest(org.fcrepo.test.integration.TestCommandLineFormats.suite());
 

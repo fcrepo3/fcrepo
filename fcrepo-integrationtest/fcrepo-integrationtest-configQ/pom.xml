@@ -106,76 +106,6 @@
         <mvn.fedora.appServerContext>${fedora.appServerContext}</mvn.fedora.appServerContext>
         <mvn.tomcat.home>${tomcat.home}</mvn.tomcat.home>
       </properties>
-
-      <build>
-
-        <plugins>
-          
-          <!-- Copy and filter config properties -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>filter-test-configs</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${project.build.directory}/config</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes/config</directory>
-                      <includes>
-                        <include>*.properties</include>
-                      </includes>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-
-          <!-- Execute installer and run/stop tomcat -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>start-fedora</id>
-                <phase>pre-integration-test</phase>
-                <configuration>
-                  <target unless="${integration.test.skip}">
-                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml" target="install" inheritrefs="true" />
-                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml" target="clearSQL" inheritrefs="true" />
-                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml" target="tomcat-start" inheritrefs="true" />
-                  </target>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-
-              <execution>
-                <id>stop-fedora</id>
-                <phase>post-integration-test</phase>
-                <configuration>
-                  <target unless="${integration.test.skip}">
-                    <echo>Stopping Fedora</echo>
-                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml" target="tomcat-stop" inheritrefs="true" />
-                  </target>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-        </plugins>
-      </build>
     </profile>
 
     <profile>
@@ -196,7 +126,7 @@
 
     <resources>
       <resource>
-        <directory>src/test/resources/confg</directory>
+        <directory>src/test/resources/config</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
@@ -278,6 +208,69 @@
           </execution>
         </executions>
       </plugin>
+          <!-- Copy and filter config properties -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>filter-test-configs</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/config</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${project.build.directory}/ext/fcrepo-integrationtest-core/test-classes/config</directory>
+                      <includes>
+                        <include>*.properties</include>
+                      </includes>
+                      <filtering>true</filtering>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Execute installer and run/stop tomcat -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>start-fedora</id>
+                <phase>pre-integration-test</phase>
+                <configuration>
+                  <target unless="${integration.test.skip}">
+                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml" target="install" inheritrefs="true" />
+                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml" target="clearSQL" inheritrefs="true" />
+                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/installer-run.xml" target="configureFedora" inheritrefs="true" />
+                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml" target="tomcat-start" inheritrefs="true" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+
+              <execution>
+                <id>stop-fedora</id>
+                <phase>post-integration-test</phase>
+                <configuration>
+                  <target unless="${integration.test.skip}">
+                    <echo>Stopping Fedora</echo>
+                    <ant antfile="target/ext/fcrepo-integrationtest-core/scripts/tomcat-run.xml" target="tomcat-stop" inheritrefs="true" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -297,32 +290,9 @@
 
               <includes>
 
-                <include>**/AtomAPIMMessageTest.class</include>
-                <include>**/NotificationInvocationHandlerTest.class</include>
-
-                <!--
-                  Has bug in source-code
-                  <include>**/SimpleDeploymentTests.class</include>
-                -->
-
-                <include>**/DOTranslationUtilityTest.class</include>
-                <include>**/TestIngest.class</include>
-                <include>**/TestAPIA.class</include>
-                <include>**/TestAPIAConfigA.class</include>
-                <include>**/TestAPIALite.class</include>
-                <include>**/TestAPIALiteConfigA.class</include>
-                <include>**/TestAPIM.class</include>
-                <include>**/TestAPIMLite.class</include>
-                <include>**/TestHTTPStatusCodesConfigQ.class</include>
-                <include>**/TestManagedDatastreams.class</include>
-                <include>**/TestManyDisseminations.class</include>
-                <include>**/TestCommandLineFormats.class</include>
-                <include>**/TestOAIService.class</include>
-                <include>**/TestServerConfiguration.class</include>
-                <include>**/ConflictingDeploymentTests.class</include>
-                <include>**/SharedDeploymentTests.class</include>
-                <include>**/TestCommandLineUtilities.class</include>
-                <include>**/ContentModelDSInputTest.class</include>
+                <include>**/org/fcrepo/test/AllSystemTestsConfigQ.class</include>
+                <include>**/org/fcrepo/server/messaging/AllUnitTests.class</include>
+                <include>**/org/fcrepo/client/utility/ingest/TestIngest.class</include>
 
               </includes>
 

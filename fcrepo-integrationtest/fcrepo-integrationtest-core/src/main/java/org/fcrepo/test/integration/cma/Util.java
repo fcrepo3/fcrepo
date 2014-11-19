@@ -45,22 +45,27 @@ public abstract class Util {
 
     }
 
-    public static void ingestTestObjects(FedoraClient client, String path) throws Exception {
-        File dir = null;
-
+    public static String resourcePath(String path) {
         String specificPath = File.separator + path;
-
-        System.out.println("Ingesting test objects in FOXML format from "
-                + specificPath);
-
         String base = "src/test/resources/";
 
         if (System.getProperty("fcrepo-integrationtest-core.classes") != null) {
             base = System.getProperty("fcrepo-integrationtest-core.classes");
         }
 
-        dir = new File(base + "test-objects/foxml" + specificPath);
+        return base + "test-objects/foxml" + specificPath;
+    }
+    public static int ingestTestObjects(FedoraClient client, String path) throws Exception {
+        File dir = null;
 
+        String specificPath = resourcePath(path);
+
+        System.out.println("Ingesting test objects in FOXML format from "
+                + specificPath);
+
+        dir = new File(specificPath);
+
+        IngestCounter counter = new IngestCounter();
         Ingest.multiFromDirectory(dir,
                 FOXML1_1.uri,
                 client.getAPIAMTOM(),
@@ -68,6 +73,7 @@ public abstract class Util {
                 null,
                 new PrintStream(File.createTempFile("demo",
                         null)),
-                        new IngestCounter());
+                        counter);
+        return counter.successes;
     }
 }
