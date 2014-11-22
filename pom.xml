@@ -1080,10 +1080,13 @@
         <artifactId>site-maven-plugin</artifactId>
         <version>0.9</version>
         <configuration>
+          <repositoryName>fcrepo</repositoryName>
+          <repositoryOwner>fcrepo3</repositoryOwner>
           <message>Creating site for ${project.artifactId}, ${project.version}</message>
           <!-- this does the trick to place every module in the correct subfolder -->
           <path>${project.distributionManagement.site.url}</path>
           <merge>true</merge>
+          <dryRun>true</dryRun>
           <excludes>
             <!-- Excluding test-related javadocs in order to keep the site 
               deployment smaller than 30M.
@@ -1238,6 +1241,14 @@
           </reportsDirectories>
         </configuration>
       </plugin>
+      <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-project-info-reports-plugin</artifactId>
+		<version>2.7</version>
+		<configuration>
+		  <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+		</configuration>
+	  </plugin>
     </plugins>
   </reporting>
 
