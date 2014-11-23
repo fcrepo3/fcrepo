@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.fcrepo</groupId>
     <artifactId>fcrepo</artifactId>
-    <version>3.8.0</version>
+    <version>3.8.1-SNAPSHOT</version>
   </parent>
   <groupId>org.fcrepo</groupId>
   <artifactId>fcrepo-shared-resources</artifactId>
