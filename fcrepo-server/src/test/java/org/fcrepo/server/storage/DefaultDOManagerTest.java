@@ -391,7 +391,7 @@ public class DefaultDOManagerTest
     @Test
     public void testMultithreadedGetWriterBlocksReadsForSameObject() throws Throwable {
         final AtomicInteger retrievals = new AtomicInteger();
-      
+
         when(mockLowLevelStorage.retrieveObject(DUMMY_PID)).thenAnswer(
             new Answer<ByteArrayInputStream>() {
                 @Override
@@ -422,15 +422,22 @@ public class DefaultDOManagerTest
 
         t1t.start();
         t2t.start();
+        
+        // Both threads will try to get a writer on the same PID, but one should have
+        // to wait. Since GetWriterRunnable does not release its writer, interrupt the
+        // threads after a short period of time.
 
         try {
             t1t.join(100);
             t2t.join(100);
-        } catch (InterruptedException e) {
-        }
+        } catch (InterruptedException e) {}
 
         int successes = t1.successes.get() + t2.successes.get();
         int unexpectedFailures = t1.unexpectedFailures.get() + t2.unexpectedFailures.get();
+
+        // Exactly one thread should have succeeded in getting a writer and exactly
+        // one object retrieval should have occurred. The other thread should have been
+        // waiting its turn.
 
         assertEquals(1, retrievals.get());
         assertEquals(1, successes);
@@ -447,13 +454,14 @@ public class DefaultDOManagerTest
           }
 
           public void run() {
-            try {
-                DOWriter writer = manager.getWriter(false, mockContext, DUMMY_PID);
-                successes.incrementAndGet();
-            } catch (Exception ex) {
-                LOGGER.error(Thread.currentThread().getName() + " - Exception", ex);
-                unexpectedFailures.incrementAndGet();
-            }
+              try {
+                  // Get a writer and keep it forever
+                  DOWriter writer = manager.getWriter(false, mockContext, DUMMY_PID);
+                  successes.incrementAndGet();
+              } catch (Exception ex) {
+                  LOGGER.error(Thread.currentThread().getName() + " - Exception", ex);
+                  unexpectedFailures.incrementAndGet();
+              }
         }
     }
 
