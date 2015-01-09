@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,7 +42,9 @@ import org.fcrepo.server.resourceIndex.ResourceIndexModule;
 import org.fcrepo.server.search.FieldSearch;
 import org.fcrepo.server.storage.lowlevel.DefaultLowlevelStorageModule;
 import org.fcrepo.server.storage.translation.DOTranslatorModule;
+import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.types.XMLDatastreamProcessor;
+import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.utilities.SQLUtility;
 import org.fcrepo.server.validation.DOObjectValidatorModule;
 import org.fcrepo.server.validation.DOValidatorModule;
@@ -383,6 +386,75 @@ public class DefaultDOManagerTest
               }
           }
     	}
+    }
+    
+    @Test
+    public void testMultithreadedGetWriterBlocksReadsForSameObject() throws Throwable {
+        final AtomicInteger retrievals = new AtomicInteger();
+      
+        when(mockLowLevelStorage.retrieveObject(DUMMY_PID)).thenAnswer(
+            new Answer<ByteArrayInputStream>() {
+                @Override
+                public ByteArrayInputStream answer(InvocationOnMock invocation) throws Throwable {
+                    retrievals.incrementAndGet();
+                    return new ByteArrayInputStream("".getBytes(ENCODING));
+                }
+            }
+        );
+
+        doAnswer(
+            new Answer<Void>() {
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    BasicDigitalObject obj = (BasicDigitalObject) invocation.getArguments()[1];
+                    obj.setPid(DUMMY_PID);
+                    return null;
+                }
+            }
+        ).when(mockTranslatorModule).deserialize(
+            any(InputStream.class), any(BasicDigitalObject.class), eq(FORMAT), eq(ENCODING),
+                eq(DOTranslationUtility.DESERIALIZE_INSTANCE));
+
+        GetWriterRunnable t1 = new GetWriterRunnable(testObj);
+        GetWriterRunnable t2 = new GetWriterRunnable(testObj);
+        Thread t1t = new Thread(t1);
+        Thread t2t = new Thread(t2);
+
+        t1t.start();
+        t2t.start();
+
+        try {
+            t1t.join(100);
+            t2t.join(100);
+        } catch (InterruptedException e) {
+        }
+
+        int successes = t1.successes.get() + t2.successes.get();
+        int unexpectedFailures = t1.unexpectedFailures.get() + t2.unexpectedFailures.get();
+
+        assertEquals(1, retrievals.get());
+        assertEquals(1, successes);
+        assertEquals(0, unexpectedFailures);
+    }
+    
+    class GetWriterRunnable implements Runnable {
+          DefaultDOManager manager;
+          AtomicInteger successes = new AtomicInteger();
+          AtomicInteger unexpectedFailures = new AtomicInteger();
+
+          GetWriterRunnable(DefaultDOManager manager) {
+              this.manager = manager;
+          }
+
+          public void run() {
+            try {
+                DOWriter writer = manager.getWriter(false, mockContext, DUMMY_PID);
+                successes.incrementAndGet();
+            } catch (Exception ex) {
+                LOGGER.error(Thread.currentThread().getName() + " - Exception", ex);
+                unexpectedFailures.incrementAndGet();
+            }
+        }
     }
 
     // Supports legacy test runners
