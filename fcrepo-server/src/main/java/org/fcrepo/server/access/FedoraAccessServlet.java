@@ -146,9 +146,6 @@ public class FedoraAccessServlet
     /** Content type for xml. */
     private static final String CONTENT_TYPE_XML = "text/xml; charset=UTF-8";
 
-    /** Portion of initial request URL from protocol up to query string */
-    private String requestURI = null;
-
     /** 4K Buffer */
     private final static int BUF = 4096;
 
@@ -182,7 +179,9 @@ public class FedoraAccessServlet
         boolean isGetDatastreamDisseminationRequest = false;
         boolean xml = false;
 
-        requestURI = request.getQueryString() != null ?
+        // Portion of initial request URL from protocol up to query string
+        // Moved to a local variable to be thread-safe
+        String requestURI = request.getQueryString() != null ?
                 request.getRequestURL().toString() + "?" + request.getQueryString()
                 : request.getRequestURL().toString();
         logger.info("Got request: {}", requestURI);
