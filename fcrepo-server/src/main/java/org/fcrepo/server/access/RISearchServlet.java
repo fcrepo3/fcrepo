@@ -410,15 +410,15 @@ extends SpringAccessServlet {
     }
 
     private String getIndexStylesheetLocation() {
-        return "ri/index.xsl";
+        return "/WEB-INF/classes/ri/index.xsl";
     }
 
     private String getFormStylesheetLocation() {
-        return "ri/form.xsl";
+        return "/WEB-INF/classes/ri/form.xsl";
     }
 
     private String getErrorStylesheetLocation() {
-        return "ri/error.xsl";
+        return "/WEB-INF/classes/ri/error.xsl";
     }
 
     private String getContext(String origContext) {
