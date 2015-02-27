@@ -83,6 +83,9 @@ public class AtomDOSerializer
     /** The format this serializer writes. */
     private final XMLFormat m_format;
 
+    /** The translation utility is use */
+    private DOTranslationUtility m_translator;
+
     private PID m_pid;
 
     protected Feed m_feed;
@@ -94,12 +97,16 @@ public class AtomDOSerializer
     }
 
     public AtomDOSerializer(XMLFormat format) {
+        this(format, null);
+    }
+    public AtomDOSerializer(XMLFormat format, DOTranslationUtility translator) {
         if (format.equals(ATOM1_1) || format.equals(ATOM_ZIP1_1)) {
             m_format = format;
         } else {
             throw new IllegalArgumentException("Not an ATOM format: "
                     + format.uri);
         }
+        m_translator = (translator == null) ? DOTranslationUtility.defaultInstance() : translator;
     }
 
     /**
@@ -351,7 +358,7 @@ public class AtomDOSerializer
                 && (ds.DatastreamID.equals("SERVICE-PROFILE") || ds.DatastreamID
                         .equals("WSDL"))) {
             content =
-                    DOTranslationUtility
+                    m_translator
                             .normalizeInlineXML(new String(ds.xmlContent,
                                                            m_encoding),
                                                 m_transContext).getBytes(m_encoding);
@@ -382,7 +389,7 @@ public class AtomDOSerializer
             throws StreamIOException {
         entry.setSummary(vds.DSVersionID);
         String dsLocation =
-                StreamUtility.enc(DOTranslationUtility
+                StreamUtility.enc(m_translator
                         .normalizeDSLocationURLs(m_obj.getPid(),
                                                  vds,
                                                  m_transContext).DSLocation);
@@ -425,7 +432,7 @@ public class AtomDOSerializer
                 }
             } else {
                 dsLocation =
-                    StreamUtility.enc(DOTranslationUtility
+                    StreamUtility.enc(m_translator
                             .normalizeDSLocationURLs(m_obj.getPid(),
                                                      vds,
                                                      m_transContext).DSLocation);

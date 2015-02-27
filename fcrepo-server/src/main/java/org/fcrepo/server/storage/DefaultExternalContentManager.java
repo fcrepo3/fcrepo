@@ -35,7 +35,6 @@ import org.fcrepo.server.security.Authorization;
 import org.fcrepo.server.security.BackendPolicies;
 import org.fcrepo.server.security.BackendSecurity;
 import org.fcrepo.server.security.BackendSecuritySpec;
-import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.fcrepo.server.storage.types.Property;
 import org.fcrepo.server.utilities.ServerUtility;
@@ -357,7 +356,7 @@ public class DefaultExternalContentManager
         boolean backendSSL = false;
         String url = params.getUrl();
         // in case host is 'local.fedora.server', and has not been normalized (e.g. on validating datastream add)
-        url = DOTranslationUtility.makeAbsoluteURLs(url);
+        url = params.getTranslator().makeAbsoluteURLs(url);
         if (ServerUtility.isURLFedoraServer(url) && !params.isBypassBackend()) {
             BackendSecuritySpec m_beSS;
             BackendSecurity m_beSecurity =

@@ -1183,7 +1183,7 @@ implements DOManager {
                                 } else {
                                     ContentManagerParams params =
                                             new ContentManagerParams(
-                                                    DOTranslationUtility
+                                                    DOTranslationUtility.defaultInstance()
                                                             .makeAbsoluteURLs(dmc.DSLocation
                                                                     .toString()),
                                                     dmc.DSMIME, null, null);

@@ -17,7 +17,10 @@ public class METSFedoraExt1_0DODeserializer
      * Constructs an instance.
      */
     public METSFedoraExt1_0DODeserializer() {
-        super(METS_EXT1_0);
+        this(null);
+    }
+    public METSFedoraExt1_0DODeserializer(DOTranslationUtility translator) {
+        super(METS_EXT1_0, translator);
     }
     
 }

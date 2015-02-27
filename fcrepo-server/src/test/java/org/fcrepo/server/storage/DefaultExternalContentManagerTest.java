@@ -68,7 +68,10 @@ public class DefaultExternalContentManagerTest {
     
     @Mock
     private HttpInputStream mockResponse;
-    
+
+    @Mock
+    private DOTranslationUtility mockTranslator;
+
     @BeforeClass
     public static void bootstrap() throws NoSuchFieldException, SecurityException {
         webClientField = DefaultExternalContentManager.class.getDeclaredField("m_http");
@@ -110,8 +113,8 @@ public class DefaultExternalContentManagerTest {
         when(mockResponse.getResponseHeaderValue(HttpHeaders.CONTENT_LENGTH, "-1")).thenReturn(cLen);
         when(mockResponse.getResponseHeaders()).thenReturn(new Header[0]);
         when(mockResponse.getStatusCode()).thenReturn(status);
-        mockStatic(DOTranslationUtility.class);
-        when(DOTranslationUtility.makeAbsoluteURLs(TEST_URL)).thenReturn(TEST_URL);
+        when(mockTranslator.makeAbsoluteURLs(TEST_URL)).thenReturn(TEST_URL);
+        when(mockParams.getTranslator()).thenReturn(mockTranslator);
         mockStatic(ServerUtility.class);
         when(ServerUtility.isURLFedoraServer(TEST_URL)).thenReturn(false);
     }

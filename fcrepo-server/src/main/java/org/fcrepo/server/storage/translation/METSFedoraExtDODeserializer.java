@@ -11,9 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-
 import java.text.ParseException;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,7 +22,6 @@ import java.util.List;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.xml.format.XMLFormat;
 import org.fcrepo.common.xml.namespace.XMLNamespace;
@@ -74,6 +71,9 @@ public class METSFedoraExtDODeserializer
 
     /** The format this deserializer reads. */
     private final XMLFormat m_format;
+
+    /** The translation utility is use */
+    private DOTranslationUtility m_translator;
 
     /** The xlink namespace this deserializer understands; depends on format. */
     private final XMLNamespace m_xlink;
@@ -227,6 +227,18 @@ public class METSFedoraExtDODeserializer
      *         if format is not a known Fedora METS Extension format.
      */
     public METSFedoraExtDODeserializer(XMLFormat format) {
+        this(format, null);
+    }
+
+    /**
+     * Creates a deserializer that reads the given Fedora METS Extension format.
+     *
+     * @param format
+     *        the version-specific Fedora METS Extension format.
+     * @throws IllegalArgumentException
+     *         if format is not a known Fedora METS Extension format.
+     */
+    public METSFedoraExtDODeserializer(XMLFormat format, DOTranslationUtility translator) {
         if (format.equals(METS_EXT1_0)) {
             m_xlink = OLD_XLINK;
         } else if (format.equals(METS_EXT1_1)) {
@@ -236,6 +248,7 @@ public class METSFedoraExtDODeserializer
                     + format.uri);
         }
         m_format = format;
+        m_translator = (translator == null) ? DOTranslationUtility.defaultInstance() : translator;
     }
 
     //---
@@ -286,7 +299,7 @@ public class METSFedoraExtDODeserializer
         // datastream, if one does not already exist.
         createRelsInt();
 
-        DOTranslationUtility.normalizeDatastreams(m_obj,
+        m_translator.normalizeDatastreams(m_obj,
                                                   m_transContext,
                                                   m_characterEncoding);
 
@@ -935,7 +948,7 @@ public class METSFedoraExtDODeserializer
 
         // Normalize the dsLocation for the deserialization context
         ds.DSLocation =
-                (DOTranslationUtility.normalizeDSLocationURLs(m_obj.getPid(),
+                (m_translator.normalizeDSLocationURLs(m_obj.getPid(),
                                                               ds,
                                                               m_transContext)).DSLocation;
 

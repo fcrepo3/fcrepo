@@ -31,7 +31,7 @@ public class TestFOXML1_1DOSerializer
 
     public TestFOXML1_1DOSerializer() {
         // superclass sets protected field m_serializer as given below
-        super(new FOXML1_1DOSerializer());
+        super(new FOXML1_1DOSerializer(translationUtility()));
     }
 
     //---

@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.fcrepo.server.Context;
+import org.fcrepo.server.storage.translation.DOTranslationUtility;
 
 
 /**
@@ -27,7 +28,7 @@ public class ContentManagerParams {
     private boolean bypassBackend = false;
     private Context context;
     private String fedoraUri = null;
-    
+    private DOTranslationUtility translator = null;
     
     public ContentManagerParams(){
     }
@@ -99,6 +100,12 @@ public class ContentManagerParams {
     
     public String getFedoraUri() {
         return this.fedoraUri;
+    }
+    public DOTranslationUtility getTranslator() {
+        return (this.translator == null) ? DOTranslationUtility.defaultInstance() : this.translator;
+    }
+    public void setTranslator(DOTranslationUtility translator) {
+        this.translator = translator;
     }
 }
 

@@ -17,6 +17,9 @@ public class FOXML1_0DOSerializer
      * Constructs an instance.
      */
     public FOXML1_0DOSerializer() {
-        super(FOXML1_0);
+        this(null);
+    }
+    public FOXML1_0DOSerializer(DOTranslationUtility translator) {
+        super(FOXML1_0, translator);
     }
 }

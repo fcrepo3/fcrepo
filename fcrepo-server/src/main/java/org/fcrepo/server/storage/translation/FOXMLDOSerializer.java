@@ -59,6 +59,9 @@ public class FOXMLDOSerializer
     /** The format this serializer writes. */
     private final XMLFormat m_format;
 
+    /** The translation utility is use */
+    private DOTranslationUtility m_translator;
+
     /** The current translation context. */
     private int m_transContext;
 
@@ -67,6 +70,7 @@ public class FOXMLDOSerializer
      */
     public FOXMLDOSerializer() {
         m_format = DEFAULT_FORMAT;
+        m_translator = DOTranslationUtility.defaultInstance();
     }
 
     /**
@@ -78,14 +82,18 @@ public class FOXMLDOSerializer
      *         if format is not a known FOXML format.
      */
     public FOXMLDOSerializer(XMLFormat format) {
+        this(format, null);
+    }
+
+    public FOXMLDOSerializer(XMLFormat format, DOTranslationUtility translator) {
         if (format.equals(FOXML1_0) || format.equals(FOXML1_1)) {
             m_format = format;
         } else {
             throw new IllegalArgumentException("Not a FOXML format: "
                     + format.uri);
         }
+        m_translator = (translator == null) ? DOTranslationUtility.defaultInstance() : translator;
     }
-
     //---
     // DOSerializer implementation
     //---
@@ -354,7 +362,7 @@ public class FOXMLDOSerializer
                     writer.print(":contentLocation TYPE=\"");
                     writer.print(Datastream.DS_LOCATION_TYPE_URL);
                     writer.print("\" REF=\"");
-                    String urls = DOTranslationUtility.normalizeDSLocationURLs(
+                    String urls = m_translator.normalizeDSLocationURLs(
                             obj.getPid(),
                             vds,
                             m_transContext).DSLocation;
@@ -378,7 +386,7 @@ public class FOXMLDOSerializer
                         writer.print(":contentLocation TYPE=\"");
                         writer.print(Datastream.DS_LOCATION_TYPE_INTERNAL);
                         writer.print("\" REF=\"");
-                        String urls = DOTranslationUtility.normalizeDSLocationURLs(
+                        String urls = m_translator.normalizeDSLocationURLs(
                                 obj.getPid(),
                                 vds,
                                 m_transContext).DSLocation;
@@ -465,7 +473,7 @@ public class FOXMLDOSerializer
             // FIXME! We need a more efficient way than to search
             // the whole block of inline XML. We really only want to
             // look at service URLs in the XML.
-            writer.print(DOTranslationUtility
+            writer.print(m_translator
                     .normalizeInlineXML(new String(ds.xmlContent, "UTF-8")
                             .trim(), m_transContext));
         } else {

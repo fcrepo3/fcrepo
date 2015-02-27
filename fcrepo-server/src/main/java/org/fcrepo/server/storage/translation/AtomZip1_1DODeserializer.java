@@ -15,6 +15,9 @@ public class AtomZip1_1DODeserializer
         extends AtomDODeserializer {
 
     public AtomZip1_1DODeserializer() {
-        super(ATOM_ZIP1_1);
+        this(null);
+    }
+    public AtomZip1_1DODeserializer(DOTranslationUtility translator) {
+        super(ATOM_ZIP1_1, translator);
     }
 }

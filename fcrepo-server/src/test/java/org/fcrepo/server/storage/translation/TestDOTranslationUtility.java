@@ -6,8 +6,10 @@ package org.fcrepo.server.storage.translation;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.Properties;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.fcrepo.server.storage.types.AuditRecord;
 import org.fcrepo.server.storage.types.Datastream;
@@ -19,11 +21,15 @@ import org.fcrepo.utilities.DateUtility;
 
 
 
+
+
+
 import static org.fcrepo.server.storage.translation.DOTranslationUtility.DESERIALIZE_INSTANCE;
 import static org.fcrepo.server.storage.translation.DOTranslationUtility.SERIALIZE_EXPORT_ARCHIVE;
 import static org.fcrepo.server.storage.translation.DOTranslationUtility.SERIALIZE_EXPORT_MIGRATE;
 import static org.fcrepo.server.storage.translation.DOTranslationUtility.SERIALIZE_EXPORT_PUBLIC;
 import static org.fcrepo.server.storage.translation.DOTranslationUtility.SERIALIZE_STORAGE_INTERNAL;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -31,21 +37,29 @@ import static org.fcrepo.server.storage.translation.DOTranslationUtility.SERIALI
  * @version $Id: TestDOTranslationUtility.java 6996 2008-04-18 18:46:06Z
  *          pangloss $
  */
-public class TestDOTranslationUtility extends TranslationTest {
+public class TestDOTranslationUtility {
+    private String appContext = null;
+    private String baseURL = null;
+    private DOTranslationUtility subject;
     
-    private String getFedoraAppServerContext() {
-        return System.getProperty("fedora.appServerContext");
-    }
-    
-    public String getBaseURL() {
-        if (System.getProperty("fedora.baseURL") != null) {
-            return System.getProperty("fedora.baseURL");
-        } else {
-            return "http://" + System.getProperty("fedora.hostname") + ":" + System.getProperty("fedora.port") + "/"
-                    + getFedoraAppServerContext();
+    @Before
+    public void setUp() {
+        Properties transProps = new Properties(System.getProperties());
+        if (transProps.getProperty("fedora.hostname") == null) {
+            transProps.setProperty("fedora.hostname","localhost");
         }
+        if (transProps.getProperty("fedora.port") == null) {
+            transProps.setProperty("fedora.port","1024");
+        }
+        if (transProps.getProperty("fedora.appServerContext") == null) {
+            transProps.setProperty("fedora.appServerContext","fedora");
+        }
+        appContext = transProps.getProperty("fedora.appServerContext","fedora");
+        subject = new DOTranslationUtility.Impl(transProps,true);
+        String propertyUrl = "http://" + transProps.getProperty("fedora.hostname") + ":" + transProps.getProperty("fedora.port") + "/"
+                + appContext;
+        baseURL = System.getProperty("fedora.baseURL", propertyUrl);
     }
-    
     /**
      * @throws java.lang.Exception
      */
@@ -59,8 +73,6 @@ public class TestDOTranslationUtility extends TranslationTest {
      */
     @Test
     public void testNormalizeDSLocationURLs() {
-        DOTranslationUtility.init((java.io.File)null);
-        String baseURL = getBaseURL();
         Datastream ds, ds2;
         String pid = "demo:foo";
 
@@ -92,13 +104,13 @@ public class TestDOTranslationUtility extends TranslationTest {
             ds.DSLocation =
                     "http://localhost:8080/fedora-demo/simple-image-demo/coliseum-veryhigh.jpg";
             ds2 =
-                    DOTranslationUtility.normalizeDSLocationURLs(pid, ds, pair
+                    subject.normalizeDSLocationURLs(pid, ds, pair
                             .getContext());
             assertEquals(ds.DSLocation, ds2.DSLocation);
 
             ds.DSLocation = baseURL + "/get/demo:foo/DS1";
             ds2 =
-                    DOTranslationUtility.normalizeDSLocationURLs(pid, ds, pair
+                    subject.normalizeDSLocationURLs(pid, ds, pair
                             .getContext());
             assertEquals(ds.DSLocation, ds2.DSLocation);
         }
@@ -113,9 +125,9 @@ public class TestDOTranslationUtility extends TranslationTest {
                                     baseURL,
                                     pid,
                                     ds.DatastreamID);
-            System.setProperty("fedoraAppServerContext", getFedoraAppServerContext());
+            System.setProperty("fedora.appServerContext", appContext);
             ds2 =
-                    DOTranslationUtility.normalizeDSLocationURLs(pid, ds, pair
+                    subject.normalizeDSLocationURLs(pid, ds, pair
                             .getContext());
             assertEquals(ds.DSLocation, ds2.DSLocation);
         }
@@ -132,18 +144,18 @@ public class TestDOTranslationUtility extends TranslationTest {
                                     ds.DatastreamID);
             String localURL =
                     String
-                            .format("http://local.fedora.server/" + getFedoraAppServerContext() + "/get/%s/%s",
+                            .format("http://local.fedora.server/" + appContext + "/get/%s/%s",
                                     pid,
                                     ds.DatastreamID);
             ds.DSLocation = url;
             ds2 =
-                    DOTranslationUtility.normalizeDSLocationURLs(pid, ds, pair
+                    subject.normalizeDSLocationURLs(pid, ds, pair
                             .getContext());
             assertEquals(localURL, ds2.DSLocation);
 
             ds.DSLocation = url;
             ds2 =
-                    DOTranslationUtility.normalizeDSLocationURLs(pid, ds, pair
+                    subject.normalizeDSLocationURLs(pid, ds, pair
                             .getContext());
             assertEquals(localURL, ds2.DSLocation);
         }
@@ -157,8 +169,7 @@ public class TestDOTranslationUtility extends TranslationTest {
     public void testNormalizeInlineXML() {
         String xml = "<foo/>";
         String result =
-                DOTranslationUtility
-                        .normalizeInlineXML(xml,
+                subject.normalizeInlineXML(xml,
                                             DOTranslationUtility.SERIALIZE_EXPORT_PUBLIC);
         assertEquals(xml, result);
     }
@@ -216,78 +227,6 @@ public class TestDOTranslationUtility extends TranslationTest {
         assertEquals("fedoraAdmin", records.get(1).responsibility);
 
     }
-
-    //    /**
-    //     * Test method for {@link org.fcrepo.server.storage.translation.DOTranslationUtility#setDatastreamDefaults(org.fcrepo.server.storage.types.Datastream)}.
-    //     */
-    //    @Test
-    //    public void testSetDatastreamDefaults() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    /**
-    //     * Test method for {@link org.fcrepo.server.storage.translation.DOTranslationUtility#appendXMLStream(java.io.InputStream, java.lang.StringBuffer, java.lang.String)}.
-    //     */
-    //    @Test
-    //    public void testAppendXMLStream() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    /**
-    //     * Test method for {@link org.fcrepo.server.storage.translation.DOTranslationUtility#setDisseminatorDefaults(org.fcrepo.server.storage.types.Disseminator)}.
-    //     */
-    //    @Test
-    //    public void testSetDisseminatorDefaults() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    /**
-    //     * Test method for {@link org.fcrepo.server.storage.translation.DOTranslationUtility#oneString(java.lang.String[])}.
-    //     */
-    //    @Test
-    //    public void testOneString() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    /**
-    //     * Test method for {@link org.fcrepo.server.storage.translation.DOTranslationUtility#writeToStream(java.lang.StringBuffer, java.io.OutputStream, java.lang.String, boolean)}.
-    //     */
-    //    @Test
-    //    public void testWriteToStream() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    /**
-    //     * Test method for {@link org.fcrepo.server.storage.translation.DOTranslationUtility#getStateAttribute(org.fcrepo.server.storage.types.DigitalObject)}.
-    //     */
-    //    @Test
-    //    public void testGetStateAttribute() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    /**
-    //     * Test method for {@link org.fcrepo.server.storage.translation.DOTranslationUtility#getTypeAttribute(org.fcrepo.server.storage.types.DigitalObject, org.fcrepo.common.xml.format.XMLFormat)}.
-    //     */
-    //    @Test
-    //    public void testGetTypeAttribute() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    /**
-    //     * Test method for {@link org.fcrepo.server.storage.translation.DOTranslationUtility#validateAudit(org.fcrepo.server.storage.types.AuditRecord)}.
-    //     */
-    //    @Test
-    //    public void testValidateAudit() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    /**
-    //     * Test method for {@link org.fcrepo.server.storage.translation.DOTranslationUtility#getAuditTrail(org.fcrepo.server.storage.types.DigitalObject)}.
-    //     */
-    //    @Test
-    //    public void testGetAuditTrail() {
-    //        fail("Not yet implemented");
-    //    }
 
     // Supports legacy test runners
     public static junit.framework.Test suite() {

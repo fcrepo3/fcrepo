@@ -15,6 +15,9 @@ public class Atom1_1DOSerializer
         extends AtomDOSerializer {
 
     public Atom1_1DOSerializer() {
-        super(ATOM1_1);
+        this(null);
+    }
+    public Atom1_1DOSerializer(DOTranslationUtility translator) {
+        super(ATOM1_1, translator);
     }
 }
