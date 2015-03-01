@@ -11,6 +11,7 @@ import static org.custommonkey.xmlunit.XMLAssert.assertXpathExists;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import junit.framework.JUnit4TestAdapter;
 
@@ -199,6 +200,22 @@ public class TestAPIALite
         String expected = getBaseURL() + "/get/fedora-system:ContentModel-3.0/fedora-system:3/viewObjectProfile/";
         assertEquals(expected, result.getResponseHeader(HttpHeaders.LOCATION).getValue());
     }
+    @Test
+    public void testConcurrentRequests() throws Exception {
+        GetCallable[] callables = {
+                new GetCallable(s_client,"/get/demo:29/demo:27/convertImage?convertTo=gif"),
+                new GetCallable(s_client,"/get/demo:SmileyBeerGlass/MEDIUM_SIZE"),
+                new GetCallable(s_client,"/get/demo:5?xml=true")
+        };
+        runConcurrent(callables);
+        assertEquals("image/gif",callables[0].lastType);
+        assertEquals(356909,callables[0].lastLength);
+        assertEquals(callables[1].lastType,"image/jpeg");
+        assertEquals(17109,callables[1].lastLength);
+        assertEquals(callables[2].lastType,"text/xml;charset=UTF-8");
+        assertEquals(callables[2].lastLength,924);
+    }
+
     public static junit.framework.Test suite() {
         return new JUnit4TestAdapter(TestAPIALite.class);
     }

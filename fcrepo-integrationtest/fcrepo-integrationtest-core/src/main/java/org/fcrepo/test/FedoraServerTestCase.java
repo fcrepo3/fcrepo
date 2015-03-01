@@ -7,28 +7,28 @@ package org.fcrepo.test;
 import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.custommonkey.xmlunit.XMLUnit;
-
 import org.w3c.dom.Document;
-
 import org.xml.sax.InputSource;
-
 import org.fcrepo.client.FedoraClient;
 import org.fcrepo.client.search.SearchResultParser;
 import org.fcrepo.client.utility.AutoPurger;
 import org.fcrepo.client.utility.ingest.Ingest;
 import org.fcrepo.client.utility.ingest.IngestCounter;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.http.HttpInputStream;
-
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
 import org.junit.runner.JUnitCore;
 
+import static org.junit.Assert.assertTrue;
 
 /**
  * Base class for JUnit tests that assume a running Fedora instance.
@@ -248,6 +248,37 @@ public abstract class FedoraServerTestCase
     public static void purgeDemoObjects(FedoraAPIMMTOM apim) throws Exception {
         for (String pid : getDemoObjects()) {
             AutoPurger.purge(apim, pid, null);
+        }
+    }
+
+    protected void runConcurrent(Callable<?>[] callables) throws Exception {
+
+        final int numThreads = callables.length;
+        final ExecutorService threadPool = Executors.newFixedThreadPool(numThreads);
+        try {
+          final CountDownLatch allExecutorThreadsReady = new CountDownLatch(numThreads);
+          final CountDownLatch afterInitBlocker = new CountDownLatch(1);
+          final CountDownLatch allDone = new CountDownLatch(numThreads);
+          for (final Callable<?> submittedTestCallable : callables) {
+            threadPool.submit(new Callable<Object>() {
+              public Object call() throws Exception {
+                allExecutorThreadsReady.countDown();
+                try {
+                  afterInitBlocker.await();
+                  return submittedTestCallable.call();
+                } finally {
+                  allDone.countDown();
+                }
+              }
+            });
+          }
+          // wait until all threads are ready
+          assertTrue("Timeout initializing threads! Perform long lasting initializations before passing runnables to assertConcurrent", allExecutorThreadsReady.await(callables.length * 10, TimeUnit.MILLISECONDS));
+          // start all test runners
+          afterInitBlocker.countDown();
+          assertTrue("Thread timeout! More than 5 seconds", allDone.await(5, TimeUnit.SECONDS));
+        } finally {
+          threadPool.shutdownNow();
         }
     }
 
