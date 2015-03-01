@@ -52,7 +52,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Deserializes objects in the constructor-provided version of FOXML.
- *
+ * This class is not thread-safe or re-usable.
  * @author Sandy Payette
  * @author Chris Wilper
  */
@@ -183,34 +183,28 @@ public class FOXMLContentHandler
     private ReadableCharArrayWriter m_dsXMLBuffer; // chunks of inline XML metadata
     
     /**
-     * Creates a deserializer that reads the default FOXML format.
-     */
-    public FOXMLContentHandler(DigitalObject obj,
-            String encoding,
-            int transContext) {
-        this(obj, DEFAULT_FORMAT, encoding, transContext);
-    }
-
-    /**
-     * Creates a deserializer that reads the given FOXML format.
+     * Creates a content handler that reads the given FOXML format.
      *
      * @param format
      *        the version-specific FOXML format.
+     * @param translator
+     *        the translation utility for URLs
+     * @param transContext
+     *        the translation context
+     * @param encoding
+     *        the character encoding to use
+     * @param obj
+     *        the DigitalObject receiver
      * @throws IllegalArgumentException
      *         if format is not a known FOXML format.
      */
-    public FOXMLContentHandler(DigitalObject obj,
+    public FOXMLContentHandler(
             XMLFormat format,
-            String encoding,
-            int transContext) {
-        this(obj, format, encoding, null, transContext);
-    }
-
-    public FOXMLContentHandler(DigitalObject obj,
-            XMLFormat format,
-            String encoding,
             DOTranslationUtility translator,
-            int transContext) {
+            int transContext,
+            String encoding,
+            DigitalObject obj
+            ) {
         if (format.equals(FOXML1_0) || format.equals(FOXML1_1)) {
             m_format = format;
         } else {

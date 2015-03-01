@@ -13,18 +13,14 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-
 import java.lang.reflect.Field;
-
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.jrdf.graph.URIReference;
-
 import org.junit.Test;
-
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.storage.translation.DODeserializer;

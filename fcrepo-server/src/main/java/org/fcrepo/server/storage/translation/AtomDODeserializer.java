@@ -39,7 +39,6 @@ import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Person;
-import org.apache.abdera.parser.Parser;
 import org.apache.abdera.util.MimeTypeHelper;
 import org.apache.abdera.xpath.XPath;
 import org.apache.commons.io.IOUtils;
@@ -81,32 +80,15 @@ public class AtomDODeserializer
     private static final Logger logger =
             LoggerFactory.getLogger(AtomDODeserializer.class);
 
-    /** The object to deserialize to. */
-    private DigitalObject m_obj;
-
-    private String m_encoding;
-
-    /** The current translation context. */
-    private int m_transContext;
-
     /** The format this deserializer reads. */
     private final XMLFormat m_format;
 
     /** The translation utility is use */
     private DOTranslationUtility m_translator;
 
-    private final Abdera abdera = Abdera.getInstance();
+    private static final Abdera abdera = Abdera.getInstance();
 
-    private Feed m_feed;
-
-    private XPath m_xpath;
-
-    private ZipInputStream m_zin;
-
-    /**
-     * Temporary directory for the unpacked contents of an Atom Zip archive.
-     */
-    private File m_tempDir;
+    private XPath m_xpath = abdera.getXPath();
 
     public AtomDODeserializer() {
         this(DEFAULT_FORMAT);
@@ -134,17 +116,18 @@ public class AtomDODeserializer
                             String encoding,
                             int transContext) throws ObjectIntegrityException,
             StreamIOException, UnsupportedEncodingException {
+        File tempDir = null;
         if (m_format.equals(ATOM_ZIP1_1)) {
             try {
-                m_tempDir = FileUtils.createTempDir("atomzip", null);
-                m_zin = new ZipInputStream(new BufferedInputStream(in));
+                tempDir = FileUtils.createTempDir("atomzip", null);
+                ZipInputStream zin = new ZipInputStream(new BufferedInputStream(in));
                 ZipEntry entry;
                 // reusable this byte buffer
                 byte[] buf = new byte[4096];
-                while ((entry = m_zin.getNextEntry()) != null) {
-                    FileUtils.copy(m_zin, new FileOutputStream(new File(m_tempDir, entry.getName())), buf);
+                while ((entry = zin.getNextEntry()) != null) {
+                    FileUtils.copy(zin, new FileOutputStream(new File(tempDir, entry.getName())), buf);
                 }
-                in = new FileInputStream(new File(m_tempDir, "atommanifest.xml"));
+                in = new FileInputStream(new File(tempDir, "atommanifest.xml"));
             } catch (FileNotFoundException e) {
                 throw new StreamIOException(e.getMessage(), e);
             } catch (IOException e) {
@@ -152,28 +135,21 @@ public class AtomDODeserializer
             }
         }
 
-        Parser parser = abdera.getParser();
-        Document<Feed> feedDoc = parser.parse(in);
-        m_feed = feedDoc.getRoot();
-        m_xpath = abdera.getXPath();
+        Document<Feed> feedDoc = abdera.getParser().parse(in);
+        Feed feed = feedDoc.getRoot();
 
-        m_obj = obj;
-        m_encoding = encoding;
-        m_transContext = transContext;
-        addObjectProperties();
-        addDatastreams();
+        addObjectProperties(feed, obj);
+        addDatastreams(feed, obj, encoding, transContext, tempDir);
 
-        m_translator.normalizeDatastreams(m_obj,
-                                                  m_transContext,
-                                                  m_encoding);
-        FileUtils.delete(m_tempDir);
+        m_translator.normalizeDatastreams(obj, transContext, encoding);
+        FileUtils.delete(tempDir);
     }
 
     /**
      * {@inheritDoc}
      */
     public DODeserializer getInstance() {
-        return new AtomDODeserializer(m_format);
+        return this;
     }
 
     /**
@@ -181,93 +157,102 @@ public class AtomDODeserializer
      *
      * @throws ObjectIntegrityException
      */
-    private void addObjectProperties() throws ObjectIntegrityException {
+    private void addObjectProperties(Feed feed, DigitalObject obj)
+            throws ObjectIntegrityException {
         PID pid;
         try {
-            pid = new PID(m_feed.getId().toString());
+            pid = new PID(feed.getId().toString());
         } catch (MalformedPIDException e) {
             throw new ObjectIntegrityException(e.getMessage(), e);
         }
 
-        String label = m_feed.getTitle();
+        String label = feed.getTitle();
         String state =
                 m_xpath.valueOf("/a:feed/a:category[@scheme='"
-                        + MODEL.STATE.uri + "']/@term", m_feed);
+                        + MODEL.STATE.uri + "']/@term", feed);
         String createDate =
                 m_xpath.valueOf("/a:feed/a:category[@scheme='"
-                        + MODEL.CREATED_DATE.uri + "']/@term", m_feed);
+                        + MODEL.CREATED_DATE.uri + "']/@term", feed);
 
-        m_obj.setPid(pid.toString());
+        obj.setPid(pid.toString());
 
         try {
-            m_obj.setState(DOTranslationUtility.readStateAttribute(state));
+            obj.setState(DOTranslationUtility.readStateAttribute(state));
         } catch (ParseException e) {
             throw new ObjectIntegrityException("Could not read object state", e);
         }
 
-        m_obj.setLabel(label);
-        m_obj.setOwnerId(getOwnerId());
-        m_obj.setCreateDate(DateUtility.convertStringToDate(createDate));
-        m_obj.setLastModDate(m_feed.getUpdated());
+        obj.setLabel(label);
+        obj.setOwnerId(getOwnerId(feed));
+        obj.setCreateDate(DateUtility.convertStringToDate(createDate));
+        obj.setLastModDate(feed.getUpdated());
 
-        setExtProps();
+        setExtProps(obj, feed);
     }
 
-    private void addDatastreams() throws UnsupportedEncodingException,
-            StreamIOException, ObjectIntegrityException {
-        m_feed.sortEntries(new UpdatedIdComparator(true));
-        List<Entry> entries = m_feed.getEntries();
+    private void addDatastreams(Feed feed, DigitalObject obj,
+            String encoding, int transContext, File tempDir)
+            throws UnsupportedEncodingException, StreamIOException, ObjectIntegrityException {
+        feed.sortEntries(new UpdatedIdComparator(true));
+        List<Entry> entries = feed.getEntries();
         for (Entry entry : entries) {
             if (ThreadHelper.getInReplyTo(entry) != null) {
-                addDatastreamVersion(entry);
+                addDatastreamVersion(feed, entry, obj, encoding, transContext, tempDir);
             }
         }
     }
 
-    private void addDatastreamVersion(Entry entry)
+    private void addDatastreamVersion(Feed feed, Entry entry, DigitalObject obj,
+            String encoding, int transContext, File tempDir)
             throws UnsupportedEncodingException, StreamIOException,
             ObjectIntegrityException {
         IRI ref = ThreadHelper.getInReplyTo(entry).getRef();
-        Entry parent = m_feed.getEntry(ref.toString());
+        Entry parent = feed.getEntry(ref.toString());
 
         Datastream ds;
-        String controlGroup = getDSControlGroup(parent);
+        String controlGroup = getDSControlGroup(obj, parent);
         if (controlGroup.equals("X")) {
-            ds = addInlineDatastreamVersion(entry);
+            ds = addInlineDatastreamVersion(feed, entry, obj, encoding, tempDir);
         } else if (controlGroup.equals("M")) {
-            ds = addManagedDatastreamVersion(entry);
+            ds = addManagedDatastreamVersion(obj, entry, feed, encoding, transContext, tempDir);
         } else {
-            ds = addExternalReferencedDatastreamVersion(entry);
+            try {
+                ds = addExternalReferencedDatastreamVersion(obj, entry, feed, transContext);
+            } catch (IOException e) {
+                throw new StreamIOException(e.getMessage(), e);
+            }
         }
-        m_obj.addDatastreamVersion(ds, true);
+        obj.addDatastreamVersion(ds, true);
     }
 
-    private Datastream addInlineDatastreamVersion(Entry entry)
+    private Datastream addInlineDatastreamVersion(Feed feed, Entry entry, DigitalObject obj, String encoding, File tempDir)
             throws ObjectIntegrityException, StreamIOException {
         DatastreamXMLMetadata ds = new DatastreamXMLMetadata();
-        setDSCommonProperties(ds, entry);
+        setDSCommonProperties(ds, obj, entry, feed);
         String dsId = ds.DatastreamID;
         String dsvId = ds.DSVersionID;
-        ds.DSLocation = m_obj.getPid() + "+" + dsId + "+" + dsvId;
+        ds.DSLocation = obj.getPid() + "+" + dsId + "+" + dsvId;
 
         if (ds.DSVersionID.equals("AUDIT.0")) {
-            addAuditDatastream(entry);
+            addAuditDatastream(obj, entry, encoding, tempDir);
         } else {
             try {
                 if (m_format.equals(ATOM_ZIP1_1)) {
-                    File entryContent = getContentSrcAsFile(entry.getContentSrc());
+                    File entryContent = getContentSrcAsFile(entry.getContentSrc(), tempDir);
                     ByteBuffer byteBuffer = ByteBuffer.allocate((int)entryContent.length());
                     FileUtils.copy(new FileInputStream(entryContent),
                             byteBuffer);
                     ds.xmlContent = byteBuffer.array();
 
                 } else {
-                    ds.xmlContent = entry.getContent().getBytes(m_encoding);
+                    ds.xmlContent = entry.getContent().getBytes(encoding);
                 }
             } catch (UnsupportedEncodingException e) {
                 throw new StreamIOException(e.getMessage(), e);
             } catch (FileNotFoundException e) {
                 throw new ObjectIntegrityException(e.getMessage(), e);
+            } catch (IOException e) {
+                throw new StreamIOException(e.getMessage(), e);
             }
         }
 
@@ -284,26 +269,28 @@ public class AtomDODeserializer
         return ds;
     }
 
-    private Datastream addExternalReferencedDatastreamVersion(Entry entry)
-            throws ObjectIntegrityException {
+    private Datastream addExternalReferencedDatastreamVersion(DigitalObject obj, Entry entry,
+            Feed feed, int transContext)
+            throws ObjectIntegrityException, IOException {
         Datastream ds = new DatastreamReferencedContent();
-        setDSCommonProperties(ds, entry);
+        setDSCommonProperties(ds, obj, entry, feed);
         ds.DSLocation = entry.getContentSrc().toString();
         // Normalize the dsLocation for the deserialization context
         ds.DSLocation =
-                (m_translator.normalizeDSLocationURLs(m_obj.getPid(),
+                (m_translator.normalizeDSLocationURLs(obj.getPid(),
                                                               ds,
-                                                              m_transContext)).DSLocation;
+                                                              transContext)).DSLocation;
         ds.DSLocationType = Datastream.DS_LOCATION_TYPE_URL;
         ds.DSMIME = entry.getContentMimeType().toString();
 
         return ds;
     }
 
-    private Datastream addManagedDatastreamVersion(Entry entry)
+    private Datastream addManagedDatastreamVersion(DigitalObject obj, Entry entry, Feed feed,
+            String encoding, int transContext, File tempDir)
             throws StreamIOException, ObjectIntegrityException {
         Datastream ds = new DatastreamManagedContent();
-        setDSCommonProperties(ds, entry);
+        setDSCommonProperties(ds, obj, entry, feed);
         ds.DSLocationType = Datastream.DS_LOCATION_TYPE_INTERNAL;
 
         ds.DSMIME = getDSMimeType(entry);
@@ -320,23 +307,27 @@ public class AtomDODeserializer
             // once the repository has sucked in the content for storage.
 
         	// AtomZIP files can have a simple filename (nb, not file: )for the content location, so don't validate that
-            if (m_obj.isNew() && !m_format.equals(ATOM_ZIP1_1)) {
+            if (obj.isNew() && !m_format.equals(ATOM_ZIP1_1)) {
                 ValidationUtility
                         .validateURL(contentLocation.toString(),ds.DSControlGrp);
             }
 
             if (m_format.equals(ATOM_ZIP1_1)) {
                 if (!contentLocation.isAbsolute() && !contentLocation.isPathAbsolute()) {
-                    File f = getContentSrcAsFile(contentLocation);
-                    contentLocation = new IRI(DatastreamManagedContent.TEMP_SCHEME +
+                    try {
+                        File f = getContentSrcAsFile(contentLocation, tempDir);
+                        contentLocation = new IRI(DatastreamManagedContent.TEMP_SCHEME +
                                               f.getAbsolutePath());
+                    } catch (IOException e) {
+                        throw new StreamIOException(e.getMessage(), e);
+                    }
                 }
             }
 
             ds.DSLocation = contentLocation.toString();
             ds.DSLocation =
-                    (m_translator.normalizeDSLocationURLs(m_obj
-                            .getPid(), ds, m_transContext)).DSLocation;
+                    (m_translator.normalizeDSLocationURLs(obj
+                            .getPid(), ds, transContext)).DSLocation;
             return ds;
         }
 
@@ -347,7 +338,7 @@ public class AtomDODeserializer
                     || MimeTypeHelper.isXml(ds.DSMIME)) {
                 IOUtils.copy(new StringReader(entry.getContent()),
                              out,
-                             m_encoding);
+                             encoding);
             } else {
                 IOUtils.copy(entry.getContentStream(), out);
             }
@@ -359,17 +350,17 @@ public class AtomDODeserializer
         return ds;
     }
 
-    private void addAuditDatastream(Entry entry)
+    private void addAuditDatastream(DigitalObject obj, Entry entry, String encoding, File tempDir)
             throws ObjectIntegrityException, StreamIOException {
         try {
             Reader auditTrail;
             if (m_format.equals(ATOM_ZIP1_1)) {
-                File f = getContentSrcAsFile(entry.getContentSrc());
-                auditTrail = new InputStreamReader(new FileInputStream(f), m_encoding);
+                File f = getContentSrcAsFile(entry.getContentSrc(), tempDir);
+                auditTrail = new InputStreamReader(new FileInputStream(f), encoding);
             } else {
                 auditTrail = new StringReader(entry.getContent());
             }
-            m_obj.getAuditRecords().addAll(DOTranslationUtility
+            obj.getAuditRecords().addAll(DOTranslationUtility
                     .getAuditRecords(auditTrail));
             auditTrail.close();
         } catch (XMLStreamException e) {
@@ -379,8 +370,8 @@ public class AtomDODeserializer
         }
     }
 
-    private String getOwnerId() {
-        Person owner = m_feed.getAuthor();
+    private String getOwnerId(Feed feed) {
+        Person owner = feed.getAuthor();
         if (owner == null) {
             return "";
         } else {
@@ -394,7 +385,7 @@ public class AtomDODeserializer
      * @param id
      * @return
      */
-    private String getDatastreamId(Entry entry) {
+    private String getDatastreamId(DigitalObject obj, Entry entry) {
         String entryId = entry.getId().toString();
         // matches info:fedora/pid/dsid/timestamp
         Pattern pattern =
@@ -404,26 +395,26 @@ public class AtomDODeserializer
         if (matcher.find()) {
             return matcher.group(1);
         } else {
-            return m_obj.newDatastreamID();
+            return obj.newDatastreamID();
         }
     }
 
-    private String getDatastreamVersionId(Entry entry) {
-        String dsId = getDatastreamId(entry);
+    private String getDatastreamVersionId(DigitalObject obj, Entry entry) {
+        String dsId = getDatastreamId(obj, entry);
         String dsvId = entry.getTitle();
         // e.g. Match DS1.0 but not DS1
         if (dsvId.matches("^" + dsId + ".*\\.[\\w]")) {
             return dsvId;
         } else {
-            if (!m_obj.datastreams(dsId).iterator().hasNext()) {
+            if (!obj.datastreams(dsId).iterator().hasNext()) {
                 return dsId + ".0";
             } else {
-                return m_obj.newDatastreamID(dsId);
+                return obj.newDatastreamID(dsId);
             }
         }
     }
 
-    private String getDSControlGroup(Entry entry)
+    private String getDSControlGroup(DigitalObject obj, Entry entry)
             throws ObjectIntegrityException {
         List<Category> controlGroups =
                 entry.getCategories(MODEL.CONTROL_GROUP.uri);
@@ -447,7 +438,7 @@ public class AtomDODeserializer
 
             else {
                 throw new ObjectIntegrityException("No control group provided by "
-                        + m_obj.getPid());
+                        + obj.getPid());
             }
         } else {
             return controlGroups.get(0).getTerm();
@@ -469,8 +460,8 @@ public class AtomDODeserializer
      * @param entry
      * @return
      */
-    private boolean getDSVersionable(Entry entry) {
-        if (getDatastreamId(entry).equals("AUDIT")) {
+    private boolean getDSVersionable(DigitalObject obj, Entry entry) {
+        if (getDatastreamId(obj, entry).equals("AUDIT")) {
             return false;
         }
         List<Category> versionable = entry.getCategories(MODEL.VERSIONABLE.uri);
@@ -551,27 +542,27 @@ public class AtomDODeserializer
         }
     }
 
-    private void setDSCommonProperties(Datastream dsVersion, Entry entry)
+    private void setDSCommonProperties(Datastream dsVersion, DigitalObject obj, Entry entry, Feed feed)
             throws ObjectIntegrityException {
         IRI ref = ThreadHelper.getInReplyTo(entry).getRef();
-        Entry parent = m_feed.getEntry(ref.toString());
-        dsVersion.DatastreamID = getDatastreamId(parent);
-        dsVersion.DSControlGrp = getDSControlGroup(parent);
+        Entry parent = feed.getEntry(ref.toString());
+        dsVersion.DatastreamID = getDatastreamId(obj, parent);
+        dsVersion.DSControlGrp = getDSControlGroup(obj, parent);
         dsVersion.DSState = getDSState(parent);
-        dsVersion.DSVersionable = getDSVersionable(parent);
-        setDatastreamVersionProperties(dsVersion, entry);
+        dsVersion.DSVersionable = getDSVersionable(obj, parent);
+        setDatastreamVersionProperties(dsVersion, obj, entry);
     }
 
-    private void setDatastreamVersionProperties(Datastream ds, Entry entry)
+    private void setDatastreamVersionProperties(Datastream ds, DigitalObject obj, Entry entry)
             throws ValidationException {
         ds.DatastreamAltIDs = getDSAltIds(entry);
         ds.DSCreateDT = entry.getUpdated();
         ds.DSFormatURI = getDSFormatURI(entry);
         ds.DSLabel = getDSLabel(entry);
-        ds.DSVersionID = getDatastreamVersionId(entry);
+        ds.DSVersionID = getDatastreamVersionId(obj, entry);
         ds.DSChecksumType = getDSChecksumType(entry);
         String checksum = getDSChecksum(entry);
-        if (m_obj.isNew()) {
+        if (obj.isNew()) {
             if (logger.isDebugEnabled()) {
                 logger.debug("New Object: checking supplied checksum");
             }
@@ -592,11 +583,11 @@ public class AtomDODeserializer
         }
     }
 
-    private void setExtProps() {
+    private void setExtProps(DigitalObject obj, Feed feed) {
         List<Category> epCategories =
-                m_feed.getCategories(MODEL.EXT_PROPERTY.uri);
+                feed.getCategories(MODEL.EXT_PROPERTY.uri);
         for (Category epCategory : epCategories) {
-            m_obj.setExtProperty(epCategory.getTerm(), epCategory.getLabel());
+            obj.setExtProperty(epCategory.getTerm(), epCategory.getLabel());
         }
     }
 
@@ -607,19 +598,23 @@ public class AtomDODeserializer
      * @return the contentSrc as a File relative to m_tempDir.
      * @throws ObjectIntegrityException
      */
-    protected File getContentSrcAsFile(IRI contentSrc) throws ObjectIntegrityException {
+    protected File getContentSrcAsFile(IRI contentSrc, File tempDir) throws ObjectIntegrityException, IOException {
         if (contentSrc.isAbsolute() || contentSrc.isPathAbsolute()) {
             throw new ObjectIntegrityException("contentSrc must not be absolute");
         }
         try {
             // Normalize the IRI to resolve percent-encoding and
             // backtracking (e.g. "../")
-            NormalizedURI nUri = new NormalizedURI(m_tempDir.toURI().toString() + contentSrc.toString());
+            NormalizedURI nUri = new NormalizedURI(tempDir.toURI().toString() + contentSrc.toString());
             nUri.normalize();
 
             File f = new File(nUri.toURI());
-            if (f.getParentFile().equals(m_tempDir)) {
-                return f;
+            if (f.getParentFile().equals(tempDir)) {
+                File temp = File.createTempFile("binary-datastream", null);
+                FileUtils.move(f, temp);
+                temp.deleteOnExit();
+                return temp;
+                //return f;
             } else {
                 throw new ObjectIntegrityException(contentSrc.toString()
                                                    + " is not a valid path.");

@@ -15,8 +15,8 @@ import org.fcrepo.server.storage.types.DigitalObject;
 /**
  * Reads a Fedora object in some format.
  * <p>
- * Implementations of this interface <strong>MUST</strong> implement a public,
- * no-arg constructor.
+ * Implementations of this interface <strong>MUST</strong> implement a public
+ * constructor with a DOTranslationUtility argument.
  * </p>
  * 
  * @author Chris Wilper
@@ -24,7 +24,9 @@ import org.fcrepo.server.storage.types.DigitalObject;
 public interface DODeserializer {
 
     /**
-     * Creates a new deserializer that the same format as this one.
+     * Get a new deserializer with the same format as this one, safe
+     * for use in the current thread. Thread-safe implementations may
+     * return the same object. 
      */
     public DODeserializer getInstance();
 

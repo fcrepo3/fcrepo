@@ -14,10 +14,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.concurrent.Callable;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.fcrepo.common.Constants;
 import org.fcrepo.common.FedoraTestConstants;
 import org.fcrepo.common.Models;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
@@ -35,13 +35,18 @@ public class TestAtomDODeserializer
         extends TestXMLDODeserializer
         implements FedoraTestConstants {
 
+    private final AtomDOSerializer m_zip_serializer;
+    private final AtomDODeserializer m_zip_deserializer;
     public TestAtomDODeserializer() {
-        super(new AtomDODeserializer(), new AtomDOSerializer());
+        this(new AtomDODeserializer(AtomDODeserializer.DEFAULT_FORMAT, translationUtility()),
+                new AtomDOSerializer(AtomDODeserializer.DEFAULT_FORMAT, translationUtility()));
     }
 
     public TestAtomDODeserializer(DODeserializer deserializer,
                                   DOSerializer serializer) {
         super(deserializer, serializer);
+        m_zip_serializer = new AtomDOSerializer(AtomDODeserializer.ATOM_ZIP1_1, translationUtility());
+        m_zip_deserializer = new AtomDODeserializer(AtomDODeserializer.ATOM_ZIP1_1, translationUtility());
     }
 
     @Test
@@ -59,19 +64,17 @@ public class TestAtomDODeserializer
         original.addDatastreamVersion(ds1, true);
 
         // serialize the object as Atom
-        DOSerializer serA = new AtomDOSerializer();
         File f = File.createTempFile("test", null);
         OutputStream out = new FileOutputStream(f);
-        serA.serialize(original,
+        m_serializer.serialize(original,
                        out,
                        "utf-8",
                        DOTranslationUtility.SERIALIZE_EXPORT_ARCHIVE);
 
         // deserialize the object
         DigitalObject candidate = new BasicDigitalObject();
-        DODeserializer deserA = new AtomDODeserializer();
         InputStream in = new FileInputStream(f);
-        deserA.deserialize(in,
+        m_deserializer.deserialize(in,
                            candidate,
                            "utf-8",
                            DOTranslationUtility.DESERIALIZE_INSTANCE);
@@ -95,22 +98,59 @@ public class TestAtomDODeserializer
                        DOTranslationUtility.SERIALIZE_EXPORT_ARCHIVE);
     }
 
-    public void testDeserializeFromDemoObjects() throws Exception {
+    @Test
+    public void testConcurrentDeserialization() throws Exception {
+        File [] files = getDemoZipExports();
+        Callable<?>[] callables = {
+                new DeserializerCallable(m_zip_deserializer, new FileInputStream(files[0])),
+                new DeserializerCallable(m_zip_deserializer, new FileInputStream(files[1])),
+                new DeserializerCallable(m_zip_deserializer, new ByteArrayInputStream(get_demo1001_zip()))
+            };
+       runConcurrent(callables); 
+    }
+
+    private DigitalObject[] getDemoObjects() throws Exception {
         String[] demoSources =
                 {"atom/local-server-demos/simple-image-demo/sdep_demo_2.xml",
                  "atom/local-server-demos/formatting-objects-demo/obj_demo_26.xml"};
+        DigitalObject[] objects = new DigitalObject[demoSources.length];
+        int i = 0;
         for (String source : demoSources) {
             File sourceFile = new File(DEMO_DIR_PREFIX + source);
             InputStream in = new FileInputStream(sourceFile);
             DigitalObject candidate = new BasicDigitalObject();
-            DODeserializer deserA = new AtomDODeserializer();
-            deserA.deserialize(in,
+            m_deserializer.deserialize(in,
                                candidate,
                                "utf-8",
                                DOTranslationUtility.DESERIALIZE_INSTANCE);
+            assertNotNull(candidate);
+            objects[i++] = candidate;
         }
+        return objects;
     }
-    
+
+    private File[] getDemoZipExports() throws Exception {
+        DigitalObject[] demoObjects = getDemoObjects();
+        File [] exports = new File[demoObjects.length];
+        int i = 0;
+        for (DigitalObject object : demoObjects) {
+            File f = File.createTempFile("test", null);
+            OutputStream out = new FileOutputStream(f);
+            try {
+                m_zip_serializer.serialize(object,
+                           out,
+                           "utf-8",
+                           DOTranslationUtility.SERIALIZE_EXPORT_ARCHIVE);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (e.getCause() != null) e.getCause().printStackTrace();
+                throw e;
+            }
+            exports[i++] = f;
+        }
+        return exports;
+    }
+
     private byte[] get_demo1001_manifest() {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -225,8 +265,7 @@ public class TestAtomDODeserializer
 
         InputStream in = new ByteArrayInputStream(demo1001ATOMZip);
         DigitalObject obj = new BasicDigitalObject();
-        DODeserializer dser = new AtomDODeserializer(Constants.ATOM_ZIP1_1);
-        dser.deserialize(in, obj, "UTF-8", DOTranslationUtility.DESERIALIZE_INSTANCE);
+        m_zip_deserializer.deserialize(in, obj, "UTF-8", DOTranslationUtility.DESERIALIZE_INSTANCE);
         assertEquals("demo:1001", obj.getPid());
         assertEquals(true, Datastream.autoChecksum);
 
@@ -249,8 +288,7 @@ public class TestAtomDODeserializer
 
         InputStream in = new ByteArrayInputStream(demo1001ATOMZip);
         DigitalObject obj = new BasicDigitalObject();
-        DODeserializer dser = new AtomDODeserializer(Constants.ATOM_ZIP1_1);
-        dser.deserialize(in, obj, "UTF-8", DOTranslationUtility.DESERIALIZE_INSTANCE);
+        m_zip_deserializer.deserialize(in, obj, "UTF-8", DOTranslationUtility.DESERIALIZE_INSTANCE);
         assertEquals("demo:1001", obj.getPid());
         assertEquals(false, Datastream.autoChecksum);
 
@@ -263,6 +301,7 @@ public class TestAtomDODeserializer
             assertEquals(Datastream.CHECKSUM_NONE, version.getChecksum());
         }
     }
+
     // Supports legacy test runners
     public static junit.framework.Test suite() {
         return new junit.framework.JUnit4TestAdapter(TestAtomDODeserializer.class);

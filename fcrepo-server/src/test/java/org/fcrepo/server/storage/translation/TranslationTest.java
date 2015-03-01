@@ -9,6 +9,11 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.custommonkey.xmlunit.XMLTestCase;
@@ -134,6 +139,37 @@ public abstract class TranslationTest
         }
         diss.dsBindMap.dsBindings = dsBindings;
         return diss;
+    }
+
+    protected void runConcurrent(Callable<?>[] callables) throws Exception {
+        
+        final int numThreads = callables.length;
+        final ExecutorService threadPool = Executors.newFixedThreadPool(numThreads);
+        try {
+          final CountDownLatch allExecutorThreadsReady = new CountDownLatch(numThreads);
+          final CountDownLatch afterInitBlocker = new CountDownLatch(1);
+          final CountDownLatch allDone = new CountDownLatch(numThreads);
+          for (final Callable<?> submittedTestCallable : callables) {
+            threadPool.submit(new Callable<Object>() {
+              public Object call() throws Exception {
+                allExecutorThreadsReady.countDown();
+                try {
+                  afterInitBlocker.await();
+                  return submittedTestCallable.call();
+                } finally {
+                  allDone.countDown();
+                }
+              }
+            });
+          }
+          // wait until all threads are ready
+          assertTrue("Timeout initializing threads! Perform long lasting initializations before passing runnables to assertConcurrent", allExecutorThreadsReady.await(callables.length * 10, TimeUnit.MILLISECONDS));
+          // start all test runners
+          afterInitBlocker.countDown();
+          assertTrue("Thread timeout! More than 5 seconds", allDone.await(5, TimeUnit.SECONDS));
+        } finally {
+          threadPool.shutdownNow();
+        }
     }
 
 }

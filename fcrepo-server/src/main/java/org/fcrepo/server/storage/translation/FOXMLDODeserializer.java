@@ -112,7 +112,7 @@ public class FOXMLDODeserializer
 
         // make resettable and pool these handlers?
         FOXMLContentHandler handler =
-                new FOXMLContentHandler(obj, m_format, encoding, transContext);
+                new FOXMLContentHandler(m_format, m_translator, transContext, encoding, obj);
         try {
             XmlTransformUtility.parseWithoutValidating(in, handler);
         } catch (IOException ioe) {

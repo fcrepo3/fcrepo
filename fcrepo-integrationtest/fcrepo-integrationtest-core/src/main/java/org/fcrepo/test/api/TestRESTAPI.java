@@ -25,7 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -1356,33 +1355,30 @@ public class TestRESTAPI
     @Test
     public void testAtomZipRoundTrip() throws Exception {
         String format = "info:fedora/fedora-system:ATOMZip-1.1";
-        String pid = "demo:TEST_ATOM_ZIP_RT";
-        URI obj = getURI("/objects/" + pid);
+        String testPid= "demo:TEST_ATOM_ZIP_RT";
+        URI obj = getURI("/objects/" + testPid);
         verifyPOSTStatusOnly(obj, SC_CREATED, getStringEntity("", TEXT_XML), true);
         String xmlData = "<foo>bar</foo>";
         AbstractHttpEntity entity = getStringEntity(xmlData, TEXT_XML);
-        String dsPath = "/objects/" + DEMO_REST_PID + "/datastreams/FOO";
+        String dsPath = "/objects/" + testPid + "/datastreams/FOO";
         URI url = getURI(dsPath + "?controlGroup=M&dsLabel=foo.xml");
         verifyPOSTStatusOnly(url, SC_CREATED, entity, true);
         url = getURI(
             String.format("/objects/%s/export?context=archive&format=%s",
-                pid,format));
+                    testPid, format));
         byte[] src = verifyGETStatusBytes(
                     url, SC_OK, true, true);
         verifyDELETEStatusOnly(obj, SC_OK, true);
-        FileWriter fw = new FileWriter("/tmp/demo.demo:TEST_ATOM_ZIP_RT.zip", false);
-        for (byte b: src) fw.write(b);
-        fw.close();
-        url = getURI(String.format("/objects/%s?format=%s",pid,format));
+        url = getURI(String.format("/objects/%s?format=%s",testPid, format));
         entity = getBytesEntity(src, "application/zip");
         HttpPost post = new HttpPost(url);
         HttpResponse response = putOrPost(post, entity, true);
 
-        String responseBody = readString(response);
+        readString(response);
         assertEquals(SC_CREATED, response.getStatusLine().getStatusCode());
-        
-        assertFalse(DEMO_REST_PID.toString() + " round tripped with same PID",
-                DEMO_REST_PID.toString().equals(responseBody));
+        url = getURI(dsPath + "/content");
+        String contents = verifyGETStatusString(url, 200, true, false);
+        assertEquals(xmlData,contents);
     }
     @Test
     public void testAddDatastream() throws Exception {
