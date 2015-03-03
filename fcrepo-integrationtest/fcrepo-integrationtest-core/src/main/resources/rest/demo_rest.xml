@@ -9,7 +9,7 @@
   <foxml:objectProperties>
     <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="A"/>
   </foxml:objectProperties>
-  <foxml:datastream ID="DC" CONTROL_GROUP="X" STATE="A">
+  <foxml:datastream ID="DC" CONTROL_GROUP="M" STATE="A" VERSIONABLE="false">
     <foxml:datastreamVersion FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0" MIMETYPE="text/xml" LABEL="Dublin Core Record for this object">
       <foxml:xmlContent>
         <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
@@ -24,7 +24,7 @@
       </foxml:xmlContent>
     </foxml:datastreamVersion>
   </foxml:datastream>
-  <foxml:datastream ID="RELS-EXT" CONTROL_GROUP="X" STATE="A">
+  <foxml:datastream ID="RELS-EXT" CONTROL_GROUP="M" STATE="A" VERSIONABLE="false">
     <foxml:datastreamVersion FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT.0" MIMETYPE="application/rdf+xml" LABEL="RDF Statements about this object" CREATED="$DATETIME$">
       <foxml:xmlContent>
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
