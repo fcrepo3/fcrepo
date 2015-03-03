@@ -6,7 +6,7 @@ package org.fcrepo.server.resourceIndex;
 
 import java.io.IOException;
 import java.io.OutputStream;
-
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -22,7 +22,6 @@ import org.jrdf.graph.PredicateNode;
 import org.jrdf.graph.SubjectNode;
 import org.jrdf.graph.Triple;
 import org.jrdf.graph.URIReference;
-
 import org.trippi.FlushErrorHandler;
 import org.trippi.RDFFormat;
 import org.trippi.TripleIterator;
@@ -31,7 +30,6 @@ import org.trippi.TriplestoreConnector;
 import org.trippi.TriplestoreWriter;
 import org.trippi.TrippiException;
 import org.trippi.TupleIterator;
-
 import org.fcrepo.server.errors.ResourceIndexException;
 import org.fcrepo.server.storage.DOReader;
 
@@ -91,6 +89,13 @@ public class ResourceIndexImpl
     /**
      * {@inheritDoc}
      */
+    public boolean getSync() {
+        return _syncUpdates;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void addObject(DOReader reader) throws ResourceIndexException {
         if (_indexLevel > INDEX_LEVEL_OFF) {
             updateTriples(_generator.getTriplesForObject(reader), false);
@@ -117,6 +122,17 @@ public class ResourceIndexImpl
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public List<Triple> exportObject(DOReader object) throws ResourceIndexException {
+        Set<Triple> triples = _generator.getTriplesForObject(object);
+        ArrayList<Triple> list = new ArrayList<Triple>(triples.size());
+        for (Triple triple:triples) {
+            list.add(getLocalizedTriple(triple));
+        }
+        return list;
+    }
     /**
      * {@inheritDoc}
      */

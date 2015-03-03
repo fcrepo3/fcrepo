@@ -5,12 +5,13 @@
 package org.fcrepo.server.resourceIndex;
 
 import java.io.OutputStream;
+import java.util.List;
 
 import org.trippi.RDFFormat;
 import org.trippi.TriplestoreWriter;
-
 import org.fcrepo.server.errors.ResourceIndexException;
 import org.fcrepo.server.storage.DOReader;
+import org.jrdf.graph.Triple;
 
 
 /**
@@ -45,6 +46,12 @@ public interface ResourceIndex
     int getIndexLevel();
 
     /**
+     * Gets the default state of buffer synchronization. When this is
+     * true, all operations are flushed on completion.
+     * @return
+     */
+    boolean getSync();
+    /**
      * Adds the appripriate triples implied by the given object to the
      * ResourceIndex.
      * 
@@ -77,6 +84,18 @@ public interface ResourceIndex
      *         If the triples can't be removed for any reason.
      */
     void deleteObject(DOReader oldReader) throws ResourceIndexException;
+
+    /**
+     * Export the triples indexed from a given object.
+     * Adding an object is the equivalent of inserting these triples.
+     * Deleting an object is the equivalent of deleting these triples.
+     * Modifying an object is the equivalent of processing the difference
+     * between the export before and after a change.
+     * @param object
+     * @return
+     * @throws ResourceIndexException
+     */
+    List<Triple> exportObject(DOReader object) throws ResourceIndexException;
 
     /**
      * Exports all triples in the RI.

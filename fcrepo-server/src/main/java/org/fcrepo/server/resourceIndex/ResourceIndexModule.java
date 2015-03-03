@@ -6,7 +6,6 @@ package org.fcrepo.server.resourceIndex;
 
 import java.io.IOException;
 import java.io.OutputStream;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.jrdf.graph.ObjectNode;
 import org.jrdf.graph.PredicateNode;
 import org.jrdf.graph.SubjectNode;
 import org.jrdf.graph.Triple;
-
 import org.trippi.FlushErrorHandler;
 import org.trippi.RDFFormat;
 import org.trippi.TripleIterator;
@@ -24,7 +22,6 @@ import org.trippi.TripleUpdate;
 import org.trippi.TriplestoreConnector;
 import org.trippi.TrippiException;
 import org.trippi.TupleIterator;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Parameterized;
@@ -257,6 +254,13 @@ public class ResourceIndexModule
     /**
      * {@inheritDoc}
      */
+    public boolean getSync() {
+        return _ri.getSync();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void addObject(DOReader reader) throws ResourceIndexException {
         _ri.addObject(reader);
     }
@@ -274,6 +278,13 @@ public class ResourceIndexModule
      */
     public void deleteObject(DOReader oldReader) throws ResourceIndexException {
         _ri.deleteObject(oldReader);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<Triple> exportObject(DOReader object) throws ResourceIndexException {
+        return _ri.exportObject(object);
     }
 
     /**
