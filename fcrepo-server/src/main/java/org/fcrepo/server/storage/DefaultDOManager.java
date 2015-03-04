@@ -784,14 +784,22 @@ implements DOManager {
         } else {
             BasicDigitalObject obj = new BasicDigitalObject();
             getWriteLock(pid);
-            m_translator.deserialize(m_permanentStore.retrieveObject(pid), obj,
-                    m_defaultStorageFormat, m_storageCharacterEncoding,
-                    DOTranslationUtility.DESERIALIZE_INSTANCE);
-            DOWriter w =
-                    new SimpleDOWriter(context, this, m_translator,
-                            m_defaultStorageFormat, m_storageCharacterEncoding,
-                            obj);
-            return w;
+            boolean clean = false;
+            try {
+                m_translator.deserialize(m_permanentStore.retrieveObject(pid), obj,
+                        m_defaultStorageFormat, m_storageCharacterEncoding,
+                        DOTranslationUtility.DESERIALIZE_INSTANCE);
+                DOWriter w =
+                        new SimpleDOWriter(context, this, m_translator,
+                                m_defaultStorageFormat, m_storageCharacterEncoding,
+                                obj);
+                clean = true;
+                return w;
+            } finally {
+                if (!clean) {
+                    releaseWriteLock(pid);
+                }
+            }
         }
     }
 
