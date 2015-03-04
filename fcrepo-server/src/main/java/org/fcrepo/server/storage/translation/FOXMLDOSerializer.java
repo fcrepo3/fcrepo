@@ -6,11 +6,13 @@
 package org.fcrepo.server.storage.translation;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +28,6 @@ import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.server.storage.types.Disseminator;
 import org.fcrepo.server.utilities.StreamUtility;
-import org.fcrepo.server.utilities.StringUtility;
 import org.fcrepo.utilities.Base64;
 import org.fcrepo.utilities.DateUtility;
 import org.slf4j.Logger;
@@ -367,15 +368,7 @@ public class FOXMLDOSerializer
                     // if M insert ds content location as an internal identifier
                 } else if (vds.DSControlGrp.equalsIgnoreCase("M")) {
                     if (transContext == DOTranslationUtility.SERIALIZE_EXPORT_ARCHIVE) {
-                        writer.print('<');
-                        writer.print(FOXML.prefix);
-                        writer.print(":binaryContent> \n");
-                        String encoded = Base64.encodeToString(vds.getContentStream());
-                        StringUtility.splitAndIndent(encoded,
-                                14, 80, writer);
-                        writer.print("</");
-                        writer.print(FOXML.prefix);
-                        writer.print(":binaryContent> \n");
+                        serializeDatastreamContent(vds, writer);
                     } else {
                         writer.print('<');
                         writer.print(FOXML.prefix);
@@ -404,6 +397,29 @@ public class FOXMLDOSerializer
             writer.print(FOXML.prefix);
             writer.print(":datastream>\n");
         }
+    }
+
+    protected void serializeDatastreamContent(Datastream dsc, PrintWriter writer)
+            throws StreamIOException {
+        writer.print("<");
+        writer.print(FOXML.prefix);
+        writer.print(":binaryContent> \n");
+        Reader encoded = new InputStreamReader(Base64.encodeToStream(dsc.getContentStream()));
+        char [] buffer = new char[80];
+        int len = 0;
+
+        try{
+            while ((len = encoded.read(buffer)) > -1){
+                writer.write(DOSerializer.DS_INDENT);
+                writer.write(buffer,0,len);
+                writer.write('\n');
+            }
+        } catch (IOException ioe) {
+           throw new StreamIOException(ioe.getMessage()); 
+        }
+        writer.print("</");
+        writer.print(FOXML.prefix);
+        writer.print(":binaryContent> \n");
     }
 
     private void appendAudit(DigitalObject obj,

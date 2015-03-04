@@ -55,8 +55,6 @@ public class METSFedoraExtDOSerializer
     private static final Logger logger =
             LoggerFactory.getLogger(METSFedoraExtDOSerializer.class);
 
-    private static final char [] DS_INDENT = "              ".toCharArray();
-    
     /** The format this serializer writes. */
     private final XMLFormat m_format;
 
@@ -630,7 +628,7 @@ public class METSFedoraExtDOSerializer
         
         try{
             while ((len = encoded.read(buffer)) > -1){
-                writer.write(DS_INDENT);
+                writer.write(DOSerializer.DS_INDENT);
                 writer.write(buffer,0,len);
                 writer.write('\n');
             }
