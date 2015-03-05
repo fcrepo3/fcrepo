@@ -31,6 +31,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.fcrepo.common.Constants;
 import org.fcrepo.server.Context;
@@ -260,7 +261,7 @@ public class FedoraObjectsResource extends BaseRestResource {
 
         try {
             Context context = getContext();
-            InputStream is = m_management.export(context, pid, format, exportContext, encoding);
+            StreamingOutput is = m_management.stream(context, pid, format, exportContext, encoding);
             MediaType mediaType = TEXT_XML;
             if (format.equals(ATOMZIP1_1)) {
                 mediaType = MediaType.valueOf(ZIP);

@@ -14,6 +14,8 @@ import org.fcrepo.server.storage.types.Validation;
 import java.io.InputStream;
 import java.util.Date;
 
+import javax.ws.rs.core.StreamingOutput;
+
 
 /**
  * The management subsystem interface.
@@ -43,6 +45,12 @@ public interface Management {
             throws ServerException;
 
     public InputStream export(@PName("context") Context context,
+            @PName("pid") String pid,
+            @PName("format") String format,
+            @PName("exportContext") String exportContext,
+            @PName("encoding") String encoding) throws ServerException;
+
+    public StreamingOutput stream(@PName("context") Context context,
                               @PName("pid") String pid,
                               @PName("format") String format,
                               @PName("exportContext") String exportContext,

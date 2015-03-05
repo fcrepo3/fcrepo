@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.Map;
 
+import javax.ws.rs.core.StreamingOutput;
+
 
 /**
  * This is the worker class to use in Journaling mode (normal mode).
@@ -458,6 +460,17 @@ public class JournalCreator
                               String exportContext,
                               String encoding) throws ServerException {
         return delegate.export(context, pid, format, exportContext, encoding);
+    }
+
+    /**
+     * Let the delegate do it.
+     */
+    public StreamingOutput stream(Context context,
+                              String pid,
+                              String format,
+                              String exportContext,
+                              String encoding) throws ServerException {
+        return delegate.stream(context, pid, format, exportContext, encoding);
     }
 
     /**

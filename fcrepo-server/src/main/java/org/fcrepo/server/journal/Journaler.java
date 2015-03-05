@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.ws.rs.core.StreamingOutput;
+
 /**
  * A Management module that decorates a ManagementDelegate module with code that
  * either creates a Journal or consumes a Journal, depending on the startup
@@ -195,6 +197,17 @@ public class Journaler
                               String exportContext,
                               String encoding) throws ServerException {
         return worker.export(context, pid, format, exportContext, encoding);
+    }
+
+    /**
+     * Delegate to the JournalWorker.
+     */
+    public StreamingOutput stream(Context context,
+                              String pid,
+                              String format,
+                              String exportContext,
+                              String encoding) throws ServerException {
+        return worker.stream(context, pid, format, exportContext, encoding);
     }
 
     /**

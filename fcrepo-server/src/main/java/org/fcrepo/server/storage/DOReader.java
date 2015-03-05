@@ -5,15 +5,15 @@
 package org.fcrepo.server.storage;
 
 import java.io.InputStream;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.core.StreamingOutput;
+
 import org.jrdf.graph.ObjectNode;
 import org.jrdf.graph.PredicateNode;
 import org.jrdf.graph.SubjectNode;
-
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.types.AuditRecord;
 import org.fcrepo.server.storage.types.Datastream;
@@ -108,6 +108,8 @@ public interface DOReader {
     public InputStream Export(String format, String exportContext)
             throws ServerException;
 
+    public StreamingOutput Stream(String format, String exportContext)
+            throws ServerException;
     /**
      * @deprecated in Fedora 3.0, use Export() instead
      */

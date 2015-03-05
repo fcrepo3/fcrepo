@@ -5,15 +5,14 @@
 package org.fcrepo.server.security.xacml.pdp.decorator;
 
 import java.io.InputStream;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import java.util.Date;
+
+import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.management.Management;
@@ -177,6 +176,16 @@ public class ManagementMethodInvocation
 
     @Override
     public InputStream export(Context context,
+                              String pid,
+                              String format,
+                              String exportContext,
+                              String encoding) throws ServerException {
+        action = Action.NA;
+        return null;
+    }
+
+    @Override
+    public StreamingOutput stream(Context context,
                               String pid,
                               String format,
                               String exportContext,
