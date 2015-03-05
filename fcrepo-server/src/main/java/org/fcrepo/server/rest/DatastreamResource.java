@@ -167,7 +167,7 @@ public class DatastreamResource
             }
 
             ReadableCharArrayWriter out = new ReadableCharArrayWriter(512);
-            getSerializer(context)
+            DefaultSerializer
                 .datastreamProfileToXML(
                     pid,
                     dsID,
@@ -622,7 +622,7 @@ public class DatastreamResource
             Datastream dsProfile =
                     m_management.getDatastream(context, pid, dsID, null);
             ReadableCharArrayWriter out = new ReadableCharArrayWriter(512);
-            getSerializer(context).datastreamProfileToXML(
+            DefaultSerializer.datastreamProfileToXML(
                     pid,
                     dsID,
                     dsProfile,

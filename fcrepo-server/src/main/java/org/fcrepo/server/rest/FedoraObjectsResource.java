@@ -296,7 +296,6 @@ public class FedoraObjectsResource extends BaseRestResource {
         try {
             Context context = getContext();
             String[] objectHistory = m_access.getObjectHistory(context, pid);
-            getSerializer(context);
             ReadableCharArrayWriter xml = new ReadableCharArrayWriter(1024);
             DefaultSerializer.objectHistoryToXml(objectHistory, pid, xml);
             xml.close();
