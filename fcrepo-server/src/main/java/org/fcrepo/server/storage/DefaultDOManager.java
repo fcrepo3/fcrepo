@@ -703,7 +703,7 @@ implements DOManager {
     }
     
     /**
-     * Gets a reader on an an existing digital object.
+     * Gets a reader on an existing digital object.
      */
     @Override
     public DOReader getReader(boolean cachedObjectRequired, Context context,
@@ -743,7 +743,7 @@ implements DOManager {
     }
 
     /**
-     * Gets a reader on an an existing service deployment object.
+     * Gets a reader on an existing service deployment object.
      */
     @Override
     public ServiceDeploymentReader getServiceDeploymentReader(
@@ -758,7 +758,7 @@ implements DOManager {
     }
 
     /**
-     * Gets a reader on an an existing service definition object.
+     * Gets a reader on an existing service definition object.
      */
     @Override
     public ServiceDefinitionReader getServiceDefinitionReader(
@@ -773,7 +773,7 @@ implements DOManager {
     }
 
     /**
-     * Gets a writer on an an existing object.
+     * Gets a writer on an existing object.
      */
     @Override
     public DOWriter getWriter(boolean cachedObjectRequired, Context context,
@@ -783,15 +783,23 @@ implements DOManager {
                     "A DOWriter is unavailable in a cached context.");
         } else {
             BasicDigitalObject obj = new BasicDigitalObject();
-            m_translator.deserialize(m_permanentStore.retrieveObject(pid), obj,
-                    m_defaultStorageFormat, m_storageCharacterEncoding,
-                    DOTranslationUtility.DESERIALIZE_INSTANCE);
-            DOWriter w =
-                    new SimpleDOWriter(context, this, m_translator,
-                            m_defaultStorageFormat, m_storageCharacterEncoding,
-                            obj);
-            getWriteLock(obj.getPid());
-            return w;
+            getWriteLock(pid);
+            boolean clean = false;
+            try {
+                m_translator.deserialize(m_permanentStore.retrieveObject(pid), obj,
+                        m_defaultStorageFormat, m_storageCharacterEncoding,
+                        DOTranslationUtility.DESERIALIZE_INSTANCE);
+                DOWriter w =
+                        new SimpleDOWriter(context, this, m_translator,
+                                m_defaultStorageFormat, m_storageCharacterEncoding,
+                                obj);
+                clean = true;
+                return w;
+            } finally {
+                if (!clean) {
+                    releaseWriteLock(pid);
+                }
+            }
         }
     }
 
