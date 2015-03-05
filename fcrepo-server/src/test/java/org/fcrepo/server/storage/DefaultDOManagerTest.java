@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,13 +36,17 @@ import org.fcrepo.server.Context;
 import org.fcrepo.server.Server;
 import org.fcrepo.server.errors.ObjectExistsException;
 import org.fcrepo.server.errors.ObjectLockedException;
+import org.fcrepo.server.errors.ServerException;
+import org.fcrepo.server.errors.GeneralException;
 import org.fcrepo.server.management.BasicPIDGenerator;
 import org.fcrepo.server.management.ManagementModule;
 import org.fcrepo.server.resourceIndex.ResourceIndexModule;
 import org.fcrepo.server.search.FieldSearch;
 import org.fcrepo.server.storage.lowlevel.DefaultLowlevelStorageModule;
 import org.fcrepo.server.storage.translation.DOTranslatorModule;
+import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.types.XMLDatastreamProcessor;
+import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.utilities.SQLUtility;
 import org.fcrepo.server.validation.DOObjectValidatorModule;
 import org.fcrepo.server.validation.DOValidatorModule;
@@ -383,6 +388,142 @@ public class DefaultDOManagerTest
               }
           }
     	}
+    }
+    
+    @Test
+    public void testMultithreadedGetWriterBlocksReadsForSameObject() throws Throwable {
+        final AtomicInteger retrievals = new AtomicInteger();
+
+        when(mockLowLevelStorage.retrieveObject(DUMMY_PID)).thenAnswer(
+            new Answer<ByteArrayInputStream>() {
+                @Override
+                public ByteArrayInputStream answer(InvocationOnMock invocation) throws Throwable {
+                    retrievals.incrementAndGet();
+                    return new ByteArrayInputStream("".getBytes(ENCODING));
+                }
+            }
+        );
+
+        doAnswer(
+            new Answer<Void>() {
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    BasicDigitalObject obj = (BasicDigitalObject) invocation.getArguments()[1];
+                    obj.setPid(DUMMY_PID);
+                    return null;
+                }
+            }
+        ).when(mockTranslatorModule).deserialize(
+            any(InputStream.class), any(BasicDigitalObject.class), eq(FORMAT), eq(ENCODING),
+                eq(DOTranslationUtility.DESERIALIZE_INSTANCE));
+
+        GetWriterRunnable t1 = new GetWriterRunnable(testObj);
+        GetWriterRunnable t2 = new GetWriterRunnable(testObj);
+        Thread t1t = new Thread(t1);
+        Thread t2t = new Thread(t2);
+
+        t1t.start();
+        t2t.start();
+        
+        // Both threads will try to get a writer on the same PID, but one should have
+        // to wait. Since GetWriterRunnable does not release its writer, interrupt the
+        // threads after a short period of time.
+
+        try {
+            t1t.join(100);
+            t2t.join(100);
+        } catch (InterruptedException e) {}
+
+        int successes = t1.successes.get() + t2.successes.get();
+        int unexpectedFailures = t1.unexpectedFailures.get() + t2.unexpectedFailures.get();
+
+        // Exactly one thread should have succeeded in getting a writer and exactly
+        // one object retrieval should have occurred. The other thread should have been
+        // waiting its turn.
+
+        assertEquals(1, retrievals.get());
+        assertEquals(1, successes);
+        assertEquals(0, unexpectedFailures);
+    }
+    
+    @Test
+    public void testGetWriterUnlocksForException() throws Throwable {
+        
+        doAnswer(
+            new Answer<Void>() {
+                private boolean thrown = false;
+                
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    // Throw an exception on the first try, succeed on the second.
+                    if (thrown == false) {
+                        thrown = true;
+                        throw new GeneralException("Expected server exception");
+                    } else {
+                        BasicDigitalObject obj = (BasicDigitalObject) invocation.getArguments()[1];
+                        obj.setPid(DUMMY_PID);
+                    }
+                    
+                    return null;
+                }
+            }
+        ).when(mockTranslatorModule).deserialize(
+            any(InputStream.class), any(BasicDigitalObject.class), eq(FORMAT), eq(ENCODING),
+                eq(DOTranslationUtility.DESERIALIZE_INSTANCE));
+        
+        // Our first try should result in an exception, which should unlock the object.
+        
+        GetWriterRunnable r1 = new GetWriterRunnable(testObj);
+        Thread t1 = new Thread(r1);
+        
+        t1.start();
+        try {
+            t1.join(100);
+        } catch (InterruptedException e) {}
+        
+        assertEquals(0, r1.successes.get());
+        assertEquals(1, r1.expectedFailures.get());
+        assertEquals(0, r1.unexpectedFailures.get());
+        
+        // Our second try should succeed, because the object should have been unlocked.
+
+        GetWriterRunnable r2 = new GetWriterRunnable(testObj);
+        Thread t2 = new Thread(r2);
+        
+        t2.start();
+        try {
+            t2.join(100);
+        } catch (InterruptedException e) {}
+        
+        assertEquals(1, r2.successes.get());
+        assertEquals(0, r2.expectedFailures.get());
+        assertEquals(0, r2.unexpectedFailures.get());
+        
+    }
+    
+    class GetWriterRunnable implements Runnable {
+          DefaultDOManager manager;
+          AtomicInteger successes = new AtomicInteger();
+          AtomicInteger expectedFailures = new AtomicInteger();
+          AtomicInteger unexpectedFailures = new AtomicInteger();
+
+          GetWriterRunnable(DefaultDOManager manager) {
+              this.manager = manager;
+          }
+
+          public void run() {
+              try {
+                  // Get a writer and keep it forever
+                  DOWriter writer = manager.getWriter(false, mockContext, DUMMY_PID);
+                  successes.incrementAndGet();
+              } catch (ServerException ex) {
+                  LOGGER.info( "{} - thread caught expected exception: {}", Thread.currentThread().getName(), ex );
+                  expectedFailures.incrementAndGet();
+              } catch (Exception ex) {
+                  LOGGER.error(Thread.currentThread().getName() + " - Exception", ex);
+                  unexpectedFailures.incrementAndGet();
+              }
+        }
     }
 
     // Supports legacy test runners
