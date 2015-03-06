@@ -21,7 +21,7 @@
       </directory>
       <outputDirectory>/resources</outputDirectory>
       <includes>
-        <include>DefaultDOManager.dbspec</include>
+        <include>*.dbspec</include>
       </includes>
     </fileSet>
 

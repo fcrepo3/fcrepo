@@ -4,6 +4,7 @@
  */
 package org.fcrepo.server.search;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.RepositoryConfigurationException;
 import org.fcrepo.server.errors.ServerException;
@@ -92,11 +94,13 @@ public class FieldSearchSQLImpl
      *        what the user might request
      * @param maxSecondsPerSession
      *        maximum number of seconds per session.
+     * @throws ModuleInitializationException 
      */
     public FieldSearchSQLImpl(ConnectionPool cPool,
                               RepositoryReader repoReader,
                               int maxResults,
-                              int maxSecondsPerSession) {
+                              int maxSecondsPerSession,
+                              SQLUtility sqlUtility) throws ModuleInitializationException {
         this(cPool, repoReader, maxResults, maxSecondsPerSession, true);
     }
 
@@ -118,19 +122,40 @@ public class FieldSearchSQLImpl
      *        whether DC field values should be examined and updated in the
      *        database. If false, queries will behave as if no values had been
      *        specified for the DC fields.
+     * @throws ModuleInitializationException 
      */
     public FieldSearchSQLImpl(ConnectionPool cPool,
                               RepositoryReader repoReader,
                               int maxResults,
                               int maxSecondsPerSession,
-                              boolean indexDCFields) {
+                              boolean indexDCFields) throws ModuleInitializationException {
         logger.debug("Entering constructor");
         m_cPool = cPool;
         m_repoReader = repoReader;
         m_maxResults = maxResults;
         m_maxSecondsPerSession = maxSecondsPerSession;
         m_indexDCFields = indexDCFields;
+        try {
+            String dbSpec =
+                    "org/fcrepo/server/storage/resources/FieldSearchSQLImpl.dbspec";
+            InputStream specIn =
+                    this.getClass().getClassLoader()
+                            .getResourceAsStream(dbSpec);
+            if (specIn == null) {
+                throw new IOException("Cannot find required resource: " +
+                        dbSpec);
+            }
+            SQLUtility.createNonExistingTables(m_cPool, specIn);
+        } catch (Exception e) {
+            throw new ModuleInitializationException(
+                "Error while attempting to check for and create non-existing table(s): " +
+                    e.getClass().getName() + ": " + e.getMessage(), getRole(), e);
+        }
         logger.debug("Exiting constructor");
+    }
+
+    public String getRole() {
+        return FieldSearch.class.getName();    
     }
 
     public void update(DOReader reader) throws ServerException {

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+	<table name="pidGen">
+        <comment>For each namespace the DBPIDGenerator keeps track of, 
+        the highestID is the highest known id ever used from that namespace.
+        The PID generation algorithm simply increments this value to get
+        the next id within the namespace.</comment>
+        <column name="namespace" type="varchar(255)" notNull="true" binary="true"/>
+        <column name="highestID" type="int(11)" notNull="true"/>
+    </table>
+</database>

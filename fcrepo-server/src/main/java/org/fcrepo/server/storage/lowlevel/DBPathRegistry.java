@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -51,7 +52,7 @@ public class DBPathRegistry
 
     private final boolean backslashIsEscape;
 
-    public DBPathRegistry(Map<String, ?> configuration) {
+    public DBPathRegistry(Map<String, ?> configuration) throws LowlevelStorageException {
         super(configuration);
         connectionPool = (ConnectionPool) configuration.get("connectionPool");
         backslashIsEscape =
@@ -62,6 +63,23 @@ public class DBPathRegistry
         selectByIdQuery = "SELECT path FROM " + this.registryName + " WHERE token=?";
         deleteByIdQuery = "DELETE FROM " + this.registryName + " WHERE "
         + this.registryName + ".token=?";
+        try {
+            String dbSpec =
+                    "org/fcrepo/server/storage/resources/DBPathRegistry.dbspec";
+            InputStream specIn =
+                    this.getClass().getClassLoader()
+                            .getResourceAsStream(dbSpec);
+            if (specIn == null) {
+                throw new IOException("Cannot find required resource: " +
+                        dbSpec);
+            }
+            SQLUtility.createNonExistingTables(connectionPool, specIn);
+        } catch (Exception e) {
+            throw new LowlevelStorageException(
+                true,
+                "Error while attempting to check for and create non-existing table(s): " +
+                    e.getClass().getName() + ": " + e.getMessage(), e);
+        }
 
     }
     

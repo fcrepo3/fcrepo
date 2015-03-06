@@ -14,10 +14,7 @@ import java.io.InputStream;
  */
 public class MockTableSpec {
 
-    public static InputStream getTableSpecStream() throws IOException {
-        String dbSpec =
-                "org/fcrepo/server/storage/resources/DefaultDOManager.dbspec";
-
+    public static InputStream getTableSpecStream(String dbSpec) throws IOException {
         InputStream specIn =
                 MockTableSpec.class.getClassLoader()
                         .getResourceAsStream(dbSpec);

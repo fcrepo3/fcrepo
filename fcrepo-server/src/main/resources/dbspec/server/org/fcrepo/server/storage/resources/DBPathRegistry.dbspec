@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+	<table name="objectPaths" primaryKey="tokenDbID">
+		<column name="tokenDbID" type="int(11)" notNull="true" autoIncrement="true"/>
+		<column name="token" type="varchar(64)" notNull="true" default="" unique="true"/>
+		<column name="path" type="varchar(255)" notNull="true" default=""/>
+	</table>
+	<table name="datastreamPaths" primaryKey="tokenDbID">
+		<column name="tokenDbID" type="int(11)" notNull="true" autoIncrement="true"/>
+		<column name="token" type="varchar(199)" notNull="true" default="" unique="true"/>
+		<column name="path" type="varchar(255)" notNull="true" default=""/>
+	</table>
+</database>
