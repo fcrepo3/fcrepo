@@ -68,7 +68,7 @@ public abstract class TestMETSFedoraExtDOSerializer
 
     @Before
     @Override
-    public void setUp() {
+    public void setUp() throws Exception {
         super.setUp();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put(METS.prefix, METS.uri);

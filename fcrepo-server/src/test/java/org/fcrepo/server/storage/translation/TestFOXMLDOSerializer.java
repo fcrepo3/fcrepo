@@ -7,7 +7,6 @@ package org.fcrepo.server.storage.translation;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,19 +18,15 @@ import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.exceptions.XpathException;
-
 import org.jrdf.graph.Literal;
 import org.jrdf.graph.ObjectNode;
 import org.jrdf.graph.PredicateNode;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
 import org.fcrepo.common.rdf.RDFName;
 import org.fcrepo.server.storage.RDFRelationshipReader;
 import org.fcrepo.server.storage.translation.DOSerializer;
@@ -79,7 +74,7 @@ public abstract class TestFOXMLDOSerializer
 
     @Before
     @Override
-    public void setUp() {
+    public void setUp() throws Exception {
         super.setUp();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put(FOXML.prefix, FOXML.uri);

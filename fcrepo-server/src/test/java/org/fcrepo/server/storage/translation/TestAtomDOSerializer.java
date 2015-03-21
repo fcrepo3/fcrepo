@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,16 +28,13 @@ import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.Parser;
-
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
@@ -52,6 +48,7 @@ import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
 import org.fcrepo.server.storage.types.DigitalObject;
 import org.fcrepo.utilities.FileUtils;
 import org.fcrepo.utilities.XmlTransformUtility;
+
 
 
 
@@ -82,7 +79,7 @@ public class TestAtomDOSerializer
      */
     @Before
     @Override
-    public void setUp() {
+    public void setUp() throws Exception {
         super.setUp();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put("fedora", "http://www.example.org");

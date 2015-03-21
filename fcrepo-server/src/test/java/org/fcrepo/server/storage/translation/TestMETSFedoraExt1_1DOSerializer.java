@@ -14,13 +14,10 @@ import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.exceptions.XpathException;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.w3c.dom.Document;
-
 import org.fcrepo.common.Models;
 import org.fcrepo.server.storage.translation.METSFedoraExt1_1DOSerializer;
 import org.fcrepo.server.storage.types.DigitalObject;
@@ -41,7 +38,7 @@ public class TestMETSFedoraExt1_1DOSerializer
 
     public TestMETSFedoraExt1_1DOSerializer() {
         // superclass sets protected field m_serializer as given below
-        super(new METSFedoraExt1_1DOSerializer());
+        super(new METSFedoraExt1_1DOSerializer(translationUtility()));
     }
 
     //---
@@ -50,7 +47,7 @@ public class TestMETSFedoraExt1_1DOSerializer
 
     @Before
     @Override
-    public void setUp() {
+    public void setUp() throws Exception {
         super.setUp();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put(METS.prefix, METS.uri);

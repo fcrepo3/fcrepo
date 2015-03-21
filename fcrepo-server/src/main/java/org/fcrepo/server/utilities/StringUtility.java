@@ -34,7 +34,7 @@ public class StringUtility {
      * @param delim
      *        The character delimiter separating each token in the input string;
      *        if null, defaults to the space character.
-     * @return A string split into multiple lines whose lenght is less than the
+     * @return A string split into multiple lines whose length is less than the
      *         specified length. Actual length is approximate depending on line
      *         length, token size, and how many complete tokens will fit into
      *         the specified line length.
@@ -97,12 +97,7 @@ public class StringUtility {
 
         for (int offset = 0; offset < inputLength; offset += numChars) {
             SpaceCharacters.indent(indent, sb);
-            sb.append(str, offset, offset + numChars);
-            sb.append('\n');
-        }
-        if (!perfectFit) {
-            SpaceCharacters.indent(indent, sb);
-            sb.append(str, fullLines * numChars, inputLength);
+            sb.append(str, offset, Math.min(offset + numChars,inputLength));
             sb.append('\n');
         }
 
@@ -131,17 +126,10 @@ public class StringUtility {
     public static void splitAndIndent(String str, int indent,
             int numChars, PrintWriter writer) {
         final int inputLength = str.length();
-        boolean perfectFit = (inputLength % numChars == 0);
-        int fullLines = (inputLength / numChars);
 
         for (int offset = 0; offset < inputLength; offset += numChars) {
             SpaceCharacters.indent(indent, writer);
-            writer.append(str, offset, offset + numChars);
-            writer.print('\n');
-        }
-        if (!perfectFit) {
-            SpaceCharacters.indent(indent, writer);
-            writer.append(str, fullLines * numChars, inputLength);
+            writer.append(str, offset, Math.min(offset + numChars,inputLength));
             writer.print('\n');
         }
 

@@ -21,8 +21,8 @@ public class TestMETSFedoraExt1_0DODeserializer
     public TestMETSFedoraExt1_0DODeserializer() {
         // superclass sets protected fields
         // m_deserializer and m_serializer as given below
-        super(new METSFedoraExt1_0DODeserializer(),
-              new METSFedoraExt1_0DOSerializer());
+        super(new METSFedoraExt1_0DODeserializer(translationUtility()),
+              new METSFedoraExt1_0DOSerializer(translationUtility()));
     }
 
     //---

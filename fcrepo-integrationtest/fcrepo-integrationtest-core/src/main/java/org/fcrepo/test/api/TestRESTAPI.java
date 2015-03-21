@@ -33,9 +33,11 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -77,6 +79,9 @@ import org.fcrepo.common.Models;
 import org.fcrepo.common.PID;
 import org.fcrepo.server.access.FedoraAPIAMTOM;
 import org.fcrepo.server.management.FedoraAPIMMTOM;
+import org.fcrepo.server.storage.translation.DOTranslationUtility;
+import org.fcrepo.server.storage.translation.FOXML1_1DODeserializer;
+import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.types.gen.Datastream;
 import org.fcrepo.server.types.gen.FieldSearchQuery;
 import org.fcrepo.server.types.gen.FieldSearchResult;
@@ -1298,6 +1303,28 @@ public class TestRESTAPI
                 url, SC_UNAUTHORIZED, false, false);
         verifyGETStatusString(
                 url, SC_OK, true, true);
+        url =
+                getURI(
+                    String.format("/objects/%s/export?context=archive", DEMO_REST_PID
+                            .toString()));
+            verifyGETStatusString(
+                    url, SC_UNAUTHORIZED, false, false);
+        String src = verifyGETStatusString(
+                    url, SC_OK, true, true);
+        BasicDigitalObject recv = new BasicDigitalObject();
+        ByteArrayInputStream bytes = new ByteArrayInputStream(src.getBytes("UTF-8"));
+        DOTranslationUtility trans =
+                new DOTranslationUtility.Impl(testingTranslationProperties(),true);
+        FOXML1_1DODeserializer deser = new FOXML1_1DODeserializer(trans);
+        deser.deserialize(bytes, recv, "UTF-8", DOTranslationUtility.DESERIALIZE_INSTANCE);
+        Iterator<String> dsids = recv.datastreamIdIterator();
+        while(dsids.hasNext()) {
+            String dsid = dsids.next();
+            for (org.fcrepo.server.storage.types.Datastream ds :recv.datastreams(dsid)) {
+                assertTrue(DEMO_REST_PID + "/" + dsid + " did not validate",
+                        ds.compareChecksum());
+            }
+        }
     }
 
     @Test
@@ -2350,7 +2377,20 @@ public class TestRESTAPI
                            + ", " + p + ", " + o + " ] \n " + sb.toString(),
                    exists == found);
     }
-    
+
+    private Properties testingTranslationProperties() {
+        Properties transProps = new Properties(System.getProperties());
+        if (transProps.getProperty("fedora.hostname") == null) {
+            transProps.setProperty("fedora.hostname","localhost");
+        }
+        if (transProps.getProperty("fedora.port") == null) {
+            transProps.setProperty("fedora.port","1024");
+        }
+        if (transProps.getProperty("fedora.appServerContext") == null) {
+            transProps.setProperty("fedora.appServerContext","fedora");
+        }
+        return transProps;
+    }
     private static void assertHeadersEquals(Header[] expectedHeaders, 
             Header[] actualHeaders) {
         Map<String, String> expected = mapHeaders(expectedHeaders);

@@ -12,7 +12,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-
 import java.util.Date;
 import java.util.Iterator;
 
@@ -61,6 +60,9 @@ public class METSFedoraExtDOSerializer
     /** The format this serializer writes. */
     private final XMLFormat m_format;
 
+    /** The translation utility is use */
+    private DOTranslationUtility m_translator;
+
     /** The current translation context. */
     private int m_transContext;
 
@@ -70,6 +72,7 @@ public class METSFedoraExtDOSerializer
      */
     public METSFedoraExtDOSerializer() {
         m_format = DEFAULT_FORMAT;
+        m_translator = DOTranslationUtility.defaultInstance();
     }
 
     /**
@@ -81,12 +84,25 @@ public class METSFedoraExtDOSerializer
      *         if format is not a known METS Fedora extension format.
      */
     public METSFedoraExtDOSerializer(XMLFormat format) {
+        this(format, null);
+    }
+ 
+    /**
+     * Creates a serializer that writes the given METS Fedora Extension format.
+     *
+     * @param format
+     *        the version-specific METS Fedora Extension format.
+     * @throws IllegalArgumentException
+     *         if format is not a known METS Fedora extension format.
+     */
+    public METSFedoraExtDOSerializer(XMLFormat format, DOTranslationUtility translator) {
         if (format.equals(METS_EXT1_0) || format.equals(METS_EXT1_1)) {
             m_format = format;
         } else {
             throw new IllegalArgumentException("Not a METS Fedora Extension "
                     + "format: " + format.uri);
         }
+        m_translator = (translator == null) ? DOTranslationUtility.defaultInstance() : translator;
     }
 
     //---
@@ -378,7 +394,7 @@ public class METSFedoraExtDOSerializer
             if (obj.hasContentModel(SERVICE_DEPLOYMENT_3_0)
                     && ds.DatastreamID.equals("SERVICE-PROFILE")
                     || ds.DatastreamID.equals("WSDL")) {
-                writer.print(DOTranslationUtility
+                writer.print(m_translator
                         .normalizeInlineXML(new String(ds.xmlContent, "UTF-8")
                                 .trim(), m_transContext));
             } else {
@@ -577,7 +593,7 @@ public class METSFedoraExtDOSerializer
                         writer.print(XLINK.prefix);
                         writer.print(":href=\"");
                         StreamUtility.enc(
-                                DOTranslationUtility.normalizeDSLocationURLs(
+                                m_translator.normalizeDSLocationURLs(
                                         obj.getPid(),
                                         dsc,
                                         m_transContext).DSLocation, writer);

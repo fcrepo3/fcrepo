@@ -73,6 +73,9 @@ public class FOXMLContentHandler
     /** The format this deserializer reads. */
     private final XMLFormat m_format;
 
+    /** The translation utility is use */
+    private DOTranslationUtility m_translator;
+
     /** The current translation context. */
     private int m_transContext;
 
@@ -200,6 +203,14 @@ public class FOXMLContentHandler
             XMLFormat format,
             String encoding,
             int transContext) {
+        this(obj, format, encoding, null, transContext);
+    }
+
+    public FOXMLContentHandler(DigitalObject obj,
+            XMLFormat format,
+            String encoding,
+            DOTranslationUtility translator,
+            int transContext) {
         if (format.equals(FOXML1_0) || format.equals(FOXML1_1)) {
             m_format = format;
         } else {
@@ -210,6 +221,7 @@ public class FOXMLContentHandler
         m_obj.setLabel("");
         m_obj.setOwnerId("");
         m_characterEncoding = encoding;
+        m_translator = (translator == null) ? DOTranslationUtility.defaultInstance() : translator;
         m_transContext = transContext;
         initialize();
     }
@@ -810,7 +822,7 @@ public class FOXMLContentHandler
 
         // Normalize the dsLocation for the deserialization context
         ds.DSLocation =
-                (DOTranslationUtility.normalizeDSLocationURLs(m_obj.getPid(),
+                (m_translator.normalizeDSLocationURLs(m_obj.getPid(),
                                                               ds,
                                                               m_transContext)).DSLocation;
 

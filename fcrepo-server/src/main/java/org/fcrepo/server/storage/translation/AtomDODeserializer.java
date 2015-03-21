@@ -92,6 +92,9 @@ public class AtomDODeserializer
     /** The format this deserializer reads. */
     private final XMLFormat m_format;
 
+    /** The translation utility is use */
+    private DOTranslationUtility m_translator;
+
     private final Abdera abdera = Abdera.getInstance();
 
     private Feed m_feed;
@@ -110,12 +113,17 @@ public class AtomDODeserializer
     }
 
     public AtomDODeserializer(XMLFormat format) {
+        this(format, null);
+    }
+
+    public AtomDODeserializer(XMLFormat format, DOTranslationUtility translator) {
         if (format.equals(ATOM1_1) || format.equals(ATOM_ZIP1_1)) {
             m_format = format;
         } else {
             throw new IllegalArgumentException("Not an Atom format: "
                     + format.uri);
         }
+        m_translator = (translator == null) ? DOTranslationUtility.defaultInstance() : translator;
     }
 
     /**
@@ -155,7 +163,7 @@ public class AtomDODeserializer
         addObjectProperties();
         addDatastreams();
 
-        DOTranslationUtility.normalizeDatastreams(m_obj,
+        m_translator.normalizeDatastreams(m_obj,
                                                   m_transContext,
                                                   m_encoding);
         FileUtils.delete(m_tempDir);
@@ -283,7 +291,7 @@ public class AtomDODeserializer
         ds.DSLocation = entry.getContentSrc().toString();
         // Normalize the dsLocation for the deserialization context
         ds.DSLocation =
-                (DOTranslationUtility.normalizeDSLocationURLs(m_obj.getPid(),
+                (m_translator.normalizeDSLocationURLs(m_obj.getPid(),
                                                               ds,
                                                               m_transContext)).DSLocation;
         ds.DSLocationType = Datastream.DS_LOCATION_TYPE_URL;
@@ -327,7 +335,7 @@ public class AtomDODeserializer
 
             ds.DSLocation = contentLocation.toString();
             ds.DSLocation =
-                    (DOTranslationUtility.normalizeDSLocationURLs(m_obj
+                    (m_translator.normalizeDSLocationURLs(m_obj
                             .getPid(), ds, m_transContext)).DSLocation;
             return ds;
         }

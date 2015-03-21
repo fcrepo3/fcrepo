@@ -41,14 +41,17 @@ public class FOXMLDODeserializer
     private static final Logger logger =
             LoggerFactory.getLogger(FOXMLDODeserializer.class);
 
-    /** The format this deserializer reads. */
+    /** The format this serializer reads. */
     private final XMLFormat m_format;
+
+    /** The translation utility is use */
+    private DOTranslationUtility m_translator;
 
     /**
      * Creates a deserializer that reads the default FOXML format.
      */
     public FOXMLDODeserializer() {
-        this(DEFAULT_FORMAT);
+        this(DEFAULT_FORMAT, null);
     }
 
     /**
@@ -60,12 +63,27 @@ public class FOXMLDODeserializer
      *         if format is not a known FOXML format.
      */
     public FOXMLDODeserializer(XMLFormat format) {
+        this(format, null);
+    }
+
+    /**
+     * Creates a deserializer that reads the given FOXML format.
+     *
+     * @param format
+     *        the version-specific FOXML format.
+     * @param translator
+     *        the digital object translation impl
+     * @throws IllegalArgumentException
+     *         if format is not a known FOXML format.
+     */
+    public FOXMLDODeserializer(XMLFormat format, DOTranslationUtility translator) {
         if (format.equals(FOXML1_0) || format.equals(FOXML1_1)) {
             m_format = format;
         } else {
             throw new IllegalArgumentException("Not a FOXML format: "
                     + format.uri);
         }
+        m_translator = (translator == null) ? DOTranslationUtility.defaultInstance() : translator;
 
     }
 
@@ -111,7 +129,7 @@ public class FOXMLDODeserializer
                     + " The digitalObject root element was not detected.");
         }
 
-        DOTranslationUtility.normalizeDatastreams(obj, transContext, encoding);
+        m_translator.normalizeDatastreams(obj, transContext, encoding);
     }
 
 }
