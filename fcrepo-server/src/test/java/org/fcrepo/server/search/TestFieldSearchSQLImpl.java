@@ -5,54 +5,46 @@
 
 package org.fcrepo.server.search;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
+import static org.mockito.AdditionalMatchers.aryEq;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import junit.framework.JUnit4TestAdapter;
 
-import org.fcrepo.mock.sql.MockConnection;
-import org.fcrepo.mock.sql.MockDriver;
-import org.fcrepo.mock.sql.MockPreparedStatement;
-import org.fcrepo.mock.sql.MockStatement;
-import org.fcrepo.server.Context;
-import org.fcrepo.server.config.DatastoreConfiguration;
-import org.fcrepo.server.errors.InconsistentTableSpecException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.ConnectionPool;
 import org.fcrepo.server.storage.MockDOReader;
 import org.fcrepo.server.storage.MockRepositoryReader;
-import org.fcrepo.server.storage.MockServiceDeploymentReader;
-import org.fcrepo.server.storage.ServiceDeploymentReader;
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.DatastreamXMLMetadata;
-import org.fcrepo.server.storage.types.DeploymentDSBindSpec;
 import org.fcrepo.server.utilities.SQLUtility;
-import org.fcrepo.server.utilities.TableCreatingConnection;
-import org.fcrepo.server.utilities.TableSpec;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"org.slf4j.*", "org.apache.xerces.*", "javax.xml.*",
+    "org.xml.sax.*", "javax.management.*"})
+@PrepareForTest({SQLUtility.class})
 public class TestFieldSearchSQLImpl {
     private static final String[] SHORT_FIELDS = FieldSearchSQLImpl.DB_COLUMN_NAMES_NODC;
 
@@ -96,115 +88,74 @@ public class TestFieldSearchSQLImpl {
                     12345), new Date(67890), new Date(10000),
             DC_PAYLOAD_WITH_DATES);
 
-    private static SQLUtility saveSqlUtility;
-
-    @BeforeClass
-    public static void saveSqlUtilityImpl() {
-        saveSqlUtility = getSqlUtilityInstance();
-    }
-
-    @AfterClass
-    public static void restoreSqlUtilityImpl() {
-        setSqlUtilityInstance(saveSqlUtility);
-    }
-
+    @Mock
     private MockRepositoryReader mockRepositoryReader;
 
+    @Mock
     private ConnectionPool connectionPool;
 
-    private MyMockDriver mockDriver;
+    @Mock
+    private Connection mockConnection;
 
-    private int expectedDateInserts;
-
-    private int expectedDateDeletes;
-
-    @Before
-    public void registerMockDriver() {
-        try {
-            mockDriver = new MyMockDriver();
-            DriverManager.registerDriver(mockDriver);
-        } catch (SQLException e) {
-            fail("Failed to register mock JDBC driver: " + e);
-        }
-    }
-
-    @After
-    public void deregisterMockDriver() {
-        try {
-            mockDriver.resetLog();
-            DriverManager.deregisterDriver(mockDriver);
-        } catch (SQLException e) {
-            fail("Failed to deregister mock JDBC driver: " + e);
-        }
-    }
+    @Mock
+    private PreparedStatement mockStmt;
 
     @Before
-    public void createConnectionPool() throws SQLException {
-        // Create a connection pool that uses the Mock Driver and some other
-        // plausible values.
-        this.connectionPool = new ConnectionPool(MockDriver.class.getName(),
-                "mock://bogus.url", "bogusUsername", "bogusPassword", 5, 5, 5,
-                0, 0, 2, 300, null, false, false, false, (byte) 0);
-    }
-
-    @Before
-    public void clearExpectedValues() {
-        this.expectedDateInserts = 0;
-        this.expectedDateDeletes = 0;
+    public void setUp() throws Exception {
+        mockStatic(SQLUtility.class);
+        when(connectionPool.getReadWriteConnection()).thenReturn(mockConnection);
+        when(mockConnection.prepareStatement(any(String.class))).thenReturn(mockStmt);
+        //PowerMockito.doNothing().when(SQLUtility.class, "createNonExistingTables",any(ConnectionPool.class), any(InputStream.class));
     }
 
     @Test
-    public void noDC() throws ServerException {
-        setSqlUtilityInstance(new UpdatingMockSqlUtility(SHORT_FIELDS,
-                OBJECT_WITH_NO_DC.getShortFieldValueList()));
-        this.mockRepositoryReader = new UnusedMockRepositoryReader();
-
+    public void noDC() throws ServerException, SQLException {
         updateRecord(OBJECT_WITH_NO_DC, false);
-        checkExpectations();
+        verify(mockConnection,times(0)).prepareStatement("DELETE FROM dcDates WHERE pid=?");
+        verify(mockConnection, times(0)).prepareStatement("INSERT INTO dcDates (pid, dcDate) values (?, ?)");
+        verifyStatic(times(1));
+        SQLUtility.replaceInto(
+                any(Connection.class), eq("doFields"), aryEq(SHORT_FIELDS), aryEq(OBJECT_WITH_NO_DC.getShortFieldValueList().toArray(new String[]{})), eq("pid"), any(boolean[].class));
     }
 
     @Test
-    public void dcNoDatesShortFields() throws ServerException {
-        setSqlUtilityInstance(new UpdatingMockSqlUtility(SHORT_FIELDS,
-                OBJECT_WITH_DC.getShortFieldValueList()));
-        this.mockRepositoryReader = new UnusedMockRepositoryReader();
-
+    public void dcNoDatesShortFields() throws ServerException, SQLException {
         updateRecord(OBJECT_WITH_DC, false);
-        checkExpectations();
+        verify(mockConnection,times(0)).prepareStatement("DELETE FROM dcDates WHERE pid=?");
+        verify(mockConnection, times(0)).prepareStatement("INSERT INTO dcDates (pid, dcDate) values (?, ?)");
+        verifyStatic(times(1));
+        SQLUtility.replaceInto(
+                any(Connection.class), eq("doFields"), aryEq(SHORT_FIELDS), aryEq(OBJECT_WITH_DC.getShortFieldValueList().toArray(new String[]{})), eq("pid"), any(boolean[].class));
     }
 
     @Test
-    public void dcNoDatesLongFields() throws ServerException {
-        setSqlUtilityInstance(new UpdatingMockSqlUtility(LONG_FIELDS,
-                OBJECT_WITH_DC.getLongFieldValueList()));
-        this.expectedDateDeletes = 1;
-        this.expectedDateInserts = 0;
-        this.mockRepositoryReader = new UnusedMockRepositoryReader();
-
+    public void dcNoDatesLongFields() throws ServerException, SQLException {
         updateRecord(OBJECT_WITH_DC, true);
-        checkExpectations();
+        verify(mockConnection,times(1)).prepareStatement("DELETE FROM dcDates WHERE pid=?");
+        verify(mockConnection, times(0)).prepareStatement("INSERT INTO dcDates (pid, dcDate) values (?, ?)");
+        verifyStatic(times(1));
+        SQLUtility.replaceInto(
+                any(Connection.class), eq("doFields"), aryEq(LONG_FIELDS), aryEq(OBJECT_WITH_DC.getLongFieldValueList().toArray(new String[]{})), eq("pid"), any(boolean[].class));
     }
 
     @Test
-    public void dcDatesShortFields() throws ServerException {
-        setSqlUtilityInstance(new UpdatingMockSqlUtility(SHORT_FIELDS,
-                OBJECT_WITH_DC_AND_DATES.getShortFieldValueList()));
-        this.mockRepositoryReader = new UnusedMockRepositoryReader();
-
+    public void dcDatesShortFields() throws ServerException, SQLException {
         updateRecord(OBJECT_WITH_DC_AND_DATES, false);
-        checkExpectations();
+        verify(mockConnection,times(0)).prepareStatement("DELETE FROM dcDates WHERE pid=?");
+        verify(mockConnection, times(0)).prepareStatement("INSERT INTO dcDates (pid, dcDate) values (?, ?)");
+        verifyStatic(times(1));
+        SQLUtility.replaceInto(
+                any(Connection.class), eq("doFields"), aryEq(SHORT_FIELDS), aryEq(OBJECT_WITH_DC.getShortFieldValueList().toArray(new String[]{})), eq("pid"), any(boolean[].class));
     }
 
     @Test
-    public void dcDatesLongFields() throws ServerException {
-        setSqlUtilityInstance(new UpdatingMockSqlUtility(LONG_FIELDS,
-                OBJECT_WITH_DC_AND_DATES.getLongFieldValueList()));
-        this.expectedDateDeletes = 1;
-        this.expectedDateInserts = 1;
-        this.mockRepositoryReader = new UnusedMockRepositoryReader();
-
+    public void dcDatesLongFields() throws ServerException, SQLException {
         updateRecord(OBJECT_WITH_DC_AND_DATES, true);
-        checkExpectations();
+        verify(mockConnection,times(1)).prepareStatement("DELETE FROM dcDates WHERE pid=?");
+        verify(mockConnection, times(1)).prepareStatement("INSERT INTO dcDates (pid, dcDate) values (?, ?)");
+        verifyStatic(times(1));
+        SQLUtility.replaceInto(
+                any(Connection.class), eq("doFields"), aryEq(LONG_FIELDS), aryEq(OBJECT_WITH_DC_AND_DATES.getLongFieldValueList().toArray(new String[]{})), eq("pid"), any(boolean[].class));
     }
 
     private void updateRecord(ObjectData objectData, boolean longFields)
@@ -239,347 +190,7 @@ public class TestFieldSearchSQLImpl {
         fssi.update(new MockDOReader(theObject));
     }
 
-    private void checkExpectations() {
-        ((MockSqlUtility) getSqlUtilityInstance()).checkExpectations();
 
-        if (mockDriver instanceof MyMockDriver) {
-            ((MyMockDriver) mockDriver).checkExpectations(
-                    expectedDateDeletes, expectedDateInserts);
-        }
-
-        if (mockRepositoryReader instanceof SDepMockRepositoryReader) {
-            ((SDepMockRepositoryReader) mockRepositoryReader)
-                    .checkExpectations();
-        }
-    }
-
-    private void assertEqualArrays(String label, Object[] expected,
-            Object[] actual) {
-        if (!Arrays.equals(expected, actual)) {
-            fail(label + ", expected: " + Arrays.deepToString(expected)
-                    + ", actual: " + Arrays.deepToString(actual));
-
-        }
-    }
-
-    private void assertEqualValues(String[] columns, Object[] expected,
-            Object[] actual) {
-        if (Arrays.equals(expected, actual)) {
-            return;
-        }
-
-        String noValue = "_NO_VALUE_";
-        String message = "";
-        List<String> badColumns = new ArrayList<String>();
-        for (int i = 0; i < columns.length; i++) {
-            Object expectedValue = (i < expected.length) ? expected[i]
-                    : noValue;
-            Object actualValue = (i < actual.length) ? actual[i] : noValue;
-            if (!equivalent(expectedValue, actualValue)) {
-                badColumns.add(columns[i]);
-            }
-            String expectedString = (expectedValue == noValue) ? noValue
-                    : (expectedValue == null) ? "null" : (expected[i]
-                            .getClass().getName()
-                            + "[" + expected[i] + "]");
-            String actualString = (actualValue == noValue) ? noValue
-                    : (actualValue == null) ? "null" : (actual[i].getClass()
-                            .getName()
-                            + "[" + actual[i] + "]");
-            message += String.format("column '%s', expected=%s, actual=%s\n",
-                    columns[i], expectedString, actualString);
-        }
-        if (!badColumns.isEmpty()) {
-            message = "bad columns: " + badColumns + "\n" + message;
-        }
-
-        fail(message);
-    }
-
-    private boolean equivalent(Object o1, Object o2) {
-        return (o1 == null) ? (o2 == null) : (o1.equals(o2));
-    }
-
-    /**
-     * Reach into the {@link SQLUtility} class and get the instance that is
-     * handling the JDBC-based methods.
-     */
-    private static SQLUtility getSqlUtilityInstance() {
-        try {
-            Field instanceField = SQLUtility.class.getDeclaredField("instance");
-            instanceField.setAccessible(true);
-            return (SQLUtility) instanceField.get(null);
-        } catch (SecurityException e) {
-            fail("Failed to set SqlUtility instance: " + e);
-        } catch (NoSuchFieldException e) {
-            fail("Failed to set SqlUtility instance: " + e);
-        } catch (IllegalArgumentException e) {
-            fail("Failed to set SqlUtility instance: " + e);
-        } catch (IllegalAccessException e) {
-            fail("Failed to set SqlUtility instance: " + e);
-        }
-        return null;
-    }
-
-    /**
-     * Reach into the {@link SQLUtility} class and set an instance to handle the
-     * JDBC-based methods.
-     */
-    private static void setSqlUtilityInstance(SQLUtility instance) {
-        try {
-            Field instanceField = SQLUtility.class.getDeclaredField("instance");
-            instanceField.setAccessible(true);
-            instanceField.set(null, instance);
-        } catch (SecurityException e) {
-            fail("Failed to set SqlUtility instance: " + e);
-        } catch (NoSuchFieldException e) {
-            fail("Failed to set SqlUtility instance: " + e);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            fail("Failed to set SqlUtility instance: " + e);
-        } catch (IllegalAccessException e) {
-            fail("Failed to set SqlUtility instance: " + e);
-        }
-    }
-
-    /**
-     * Base class for Mock {@link SQLUtility} implementations. Every method
-     * causes the test to fail, unless overridden by the subclass.
-     */
-    public abstract static class MockSqlUtility extends SQLUtility {
-        public abstract void checkExpectations();
-
-        @Override
-        protected void i_addRow(Connection conn, String table,
-                String[] columns, String[] values, boolean[] numeric)
-                throws SQLException {
-            fail("Unexpected call to MockSqlUtility.i_addRow");
-        }
-
-        @Override
-        protected void i_createNonExistingTables(ConnectionPool pool,
-                InputStream dbSpec) throws IOException,
-                InconsistentTableSpecException, SQLException {
-            fail("Unexpected call to MockSqlUtility.i_createNonExistingTables");
-        }
-
-        @Override
-        protected void i_createTables(TableCreatingConnection tcConn,
-                List<TableSpec> specs) throws SQLException {
-            fail("Unexpected call to MockSqlUtility.i_addRow");
-        }
-
-        @Override
-        protected ConnectionPool i_getConnectionPool(DatastoreConfiguration cpDC)
-                throws SQLException {
-            fail("Unexpected call to MockSqlUtility.i_addRow");
-            return null;
-        }
-
-        @Override
-        protected String i_getLongString(ResultSet rs, int pos)
-                throws SQLException {
-            fail("Unexpected call to MockSqlUtility.i_addRow");
-            return null;
-        }
-
-        @Override
-        protected List<TableSpec> i_getNonExistingTables(Connection conn,
-                List<TableSpec> specs) throws SQLException {
-            fail("Unexpected call to MockSqlUtility.i_addRow");
-            return null;
-        }
-
-        @Override
-        protected void i_replaceInto(Connection conn, String table,
-                String[] columns, String[] values, String uniqueColumn,
-                boolean[] numeric) throws SQLException {
-            fail("Unexpected call to MockSqlUtility.i_addRow");
-        }
-
-        @Override
-        protected boolean i_updateRow(Connection conn, String table,
-                String[] columns, String[] values, String uniqueColumn,
-                boolean[] numeric) throws SQLException {
-            fail("Unexpected call to MockSqlUtility.i_addRow");
-            return false;
-        }
-
-        @Override
-        protected long i_getMostRecentRebuild(Connection conn)
-                throws SQLException {
-            fail("Unexpected call to MockSqlUtility.i_getMostRecentRebuild");
-            return 0;
-        }
-
-        @Override
-        protected boolean i_getRebuildStatus(Connection conn, long rebuildDate)
-                throws SQLException {
-            fail("Unexpected call to MockSqlUtility.i_getRebuildStatus");
-            return false;
-        }
-
-        @Override
-        protected void i_recordSuccessfulRebuild(Connection conn,
-                long rebuildDate) throws SQLException {
-            fail("Unexpected call to MockSqlUtility.i_recordSuccessfulRebuild");            
-        }
-    }
-
-    public static class UnusedMockSqlUtility extends MockSqlUtility {
-        @Override
-        public void checkExpectations() {
-            // Nothing to check.
-        }
-
-    }
-
-    private class UpdatingMockSqlUtility extends MockSqlUtility {
-        private final String[] expectedColumns;
-
-        private final String[] expectedValues;
-
-        private String[] actualColumns;
-
-        private String[] actualValues;
-
-        /**
-         * Write down some of what we expect to have happen.
-         *
-         * @param expectedColumns
-         * @param expectedValues
-         */
-        public UpdatingMockSqlUtility(String[] expectedColumns,
-                List<String> expectedValues) {
-            this.expectedColumns = expectedColumns;
-            this.expectedValues = expectedValues
-                    .toArray(new String[expectedValues.size()]);
-        }
-
-        /**
-         * If we get a replace call, store the columns and values for testing
-         * later. (If we get more then one call, only the last will be
-         * retained.)
-         */
-        @Override
-        protected void i_replaceInto(Connection conn, String table,
-                String[] columns, String[] values, String uniqueColumn,
-                boolean[] numeric) throws SQLException {
-            this.actualColumns = columns;
-            this.actualValues = values;
-        }
-
-        @Override
-        public void checkExpectations() {
-            assertEqualArrays("column names", expectedColumns, actualColumns);
-            assertEqualValues(expectedColumns, expectedValues, actualValues);
-        }
-    }
-
-    private static class UpdatingMockConnection extends MockConnection {
-        private MyMockDriver driver;
-
-        UpdatingMockConnection(MyMockDriver driver) {
-            this.driver = driver;
-        }
-        @Override
-        public Statement createStatement() throws SQLException {
-            return new MockStatement() {
-                @Override
-                public int executeUpdate(String sql) throws SQLException {
-                    if (sql.trim().toLowerCase().startsWith("insert")) {
-                        driver.logInsert();
-                    }
-                    if (sql.trim().toLowerCase().startsWith("delete")) {
-                        driver.logDelete();
-                    }
-                    return 1;
-                }
-            };
-        }
-
-        @Override
-        public PreparedStatement prepareStatement(final String sql) throws SQLException {
-        	return new MockPreparedStatement(sql) {
-                @Override
-                public int executeUpdate() throws SQLException {
-                    if (sql.trim().toLowerCase().startsWith("insert")) {
-                        driver.logInsert();
-                    }
-                    if (sql.trim().toLowerCase().startsWith("delete")) {
-                        driver.logDelete();
-                    }
-                    return 1;
-                }
-        	};
-        }
-
-    }
-
-    private static class UnusedMockRepositoryReader extends
-            MockRepositoryReader {
-        @Override
-        public synchronized ServiceDeploymentReader getServiceDeploymentReader(
-                boolean cachedObjectRequired, Context context, String pid)
-                throws ServerException {
-            fail("Unexpected call to UnusedMockRepositoryReader.getServiceDeploymentReader");
-            return null;
-        }
-    }
-
-    private static class SDepMockRepositoryReader extends MockRepositoryReader {
-        private int calls;
-
-        public void checkExpectations() {
-            assertEquals("sDep reader calls", 1, calls);
-        }
-
-        @Override
-        public synchronized ServiceDeploymentReader getServiceDeploymentReader(
-                boolean cachedObjectRequired, Context context, String pid)
-                throws ServerException {
-            calls++;
-            return new MockServiceDeploymentReader(null) {
-                @Override
-                public DeploymentDSBindSpec getServiceDSInputSpec(Date versDateTime)
-                        throws ServerException {
-                    DeploymentDSBindSpec spec = new DeploymentDSBindSpec();
-                    return spec;
-                }
-            };
-        }
-    }
-
-    private class MyMockDriver extends MockDriver {
-        private int deleteCalls = 0;
-
-        private int insertCalls = 0;
-        
-        public void logInsert() {
-            insertCalls++;
-        }
-        
-        public void logDelete() {
-            deleteCalls++;
-        }
-        
-        public void resetLog() {
-            deleteCalls = 0;
-            insertCalls = 0;
-        }
-
-        @Override
-        public Connection connect(String url, Properties info)
-                throws SQLException {
-            return new UpdatingMockConnection(this);
-        }
-
-        public void checkExpectations(int expectedDeletes, int expectedInserts) {
-            assertEquals("delete calls", expectedDeletes, deleteCalls);
-            assertEquals("insert calls", expectedInserts, insertCalls);
-        }
-    }
-    
     private static class ObjectData {
         private final String pid;
 

@@ -65,7 +65,7 @@ import org.slf4j.LoggerFactory;
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"org.slf4j.*", "org.apache.xerces.*", "javax.xml.*",
     "org.xml.sax.*", "javax.management.*"})
-@PrepareForTest({Server.class})
+@PrepareForTest({Server.class, SQLUtility.class})
 public class DefaultDOManagerTest
 {
     private static final Logger LOGGER =
@@ -120,9 +120,6 @@ public class DefaultDOManagerTest
 
     @Mock
     private DefaultLowlevelStorageModule mockLowLevelStorage;
-
-    @Mock
-    private SQLUtility mockSqlUtility;
     
     private DOReaderCache mockReaderCache = new DOReaderCache();
 
@@ -203,7 +200,7 @@ public class DefaultDOManagerTest
         
         when(mockPool.getReadOnlyConnection()).thenReturn(mockROConnection);
 
-        setStaticMember(SQLUtility.class, "instance", mockSqlUtility);
+        mockStatic(SQLUtility.class);
         when(mockServer.getModule("org.fcrepo.server.storage.DOManager")).thenReturn(instance);
 
         PreparedStatement mockStmt = mock(PreparedStatement.class);
@@ -514,7 +511,7 @@ public class DefaultDOManagerTest
           public void run() {
               try {
                   // Get a writer and keep it forever
-                  DOWriter writer = manager.getWriter(false, mockContext, DUMMY_PID);
+                  manager.getWriter(false, mockContext, DUMMY_PID);
                   successes.incrementAndGet();
               } catch (ServerException ex) {
                   LOGGER.info( "{} - thread caught expected exception: {}", Thread.currentThread().getName(), ex );

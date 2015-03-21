@@ -11,7 +11,6 @@ import static org.custommonkey.xmlunit.XMLAssert.assertXpathExists;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import junit.framework.JUnit4TestAdapter;
 

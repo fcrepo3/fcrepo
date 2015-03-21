@@ -401,24 +401,9 @@ implements DOManager {
             throw new ModuleInitializationException("Couldn't get required "
                     + "connection pool; wasn't found", getRole());
         }
-        try {
-            String dbSpec =
-                    "org/fcrepo/server/storage/resources/DefaultDOManager.dbspec";
-            InputStream specIn =
-                    this.getClass().getClassLoader()
-                            .getResourceAsStream(dbSpec);
-            if (specIn == null) {
-                throw new IOException("Cannot find required " + "resource: " +
-                        dbSpec);
-            }
-            SQLUtility.createNonExistingTables(m_connectionPool, specIn);
-        } catch (Exception e) {
-            throw new ModuleInitializationException(
-                    "Error while attempting to " +
-                            "check for and create non-existing table(s): " +
-                            e.getClass().getName() + ": " + e.getMessage(),
-                    getRole(), e);
-        }
+        ensureTableSpec("org/fcrepo/server/storage/resources/DefaultDOManager.dbspec");
+        // the cModel cache relies on the lastMod date from doFields table
+        ensureTableSpec("org/fcrepo/server/storage/resources/FieldSearchSQLImpl.dbspec");
 
         // get ref to lowlevelstorage module
         m_permanentStore =
@@ -454,6 +439,25 @@ implements DOManager {
                 cModelPid, sDefPid));
     }
 
+    private void ensureTableSpec(String dbSpec) throws ModuleInitializationException {
+        try {
+            InputStream specIn =
+                    this.getClass().getClassLoader()
+                            .getResourceAsStream(dbSpec);
+            if (specIn == null) {
+                throw new IOException("Cannot find required " + "resource: " +
+                        dbSpec);
+            }
+            SQLUtility.createNonExistingTables(m_connectionPool, specIn);
+        } catch (Exception e) {
+            throw new ModuleInitializationException(
+                    "Error while attempting to " +
+                            "check for and create non-existing table(s): " +
+                            e.getClass().getName() + ": " + e.getMessage(),
+                    getRole(), e);
+        }
+    }
+
     private void initializeCModelDeploymentCache() {
         // Initialize Map containing links from Content Models to the Service
         // Deployments.
@@ -481,7 +485,7 @@ implements DOManager {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error loading cModel deployment cach",
+            throw new RuntimeException("Error loading cModel deployment cache",
                     e);
         } finally {
             try {

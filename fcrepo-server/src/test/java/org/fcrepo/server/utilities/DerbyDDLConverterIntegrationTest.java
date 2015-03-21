@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -114,8 +115,16 @@ public class DerbyDDLConverterIntegrationTest {
 
     @Test
     public void testGetDDL() throws InconsistentTableSpecException, IOException {
-        List<TableSpec> tableSpecs =
-                TableSpec.getTableSpecs(MockTableSpec.getTableSpecStream());
+        List<TableSpec> tableSpecs = new ArrayList<>();
+        String[] dbSpecs = {
+            "org/fcrepo/server/storage/resources/DBPathRegistry.dbspec",
+            "org/fcrepo/server/storage/resources/DBPIDGenerator.dbspec",
+            "org/fcrepo/server/storage/resources/DefaultDOManager.dbspec",
+            "org/fcrepo/server/storage/resources/FieldSearchSQLImpl.dbspec"
+        };
+        for (String dbSpec:dbSpecs){
+            tableSpecs.addAll(TableSpec.getTableSpecs(MockTableSpec.getTableSpecStream(dbSpec)));
+        }
         verifyInputTableSpec(tableSpecs);
 
         for (TableSpec spec : tableSpecs) {

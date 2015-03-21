@@ -8,22 +8,20 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import java.util.Arrays;
 import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.fcrepo.common.MalformedPIDException;
 import org.fcrepo.common.PID;
-
+import org.fcrepo.server.errors.ModuleInitializationException;
 import org.fcrepo.server.storage.ConnectionPool;
 import org.fcrepo.server.utilities.SQLUtility;
 
@@ -52,11 +50,28 @@ public class DBPIDGenerator
      * generated PID as reported by the log files in that directory. This is to
      * support automatic upgrade of this functionality from versions of Fedora
      * prior to 1.2.
+     * @throws ModuleInitializationException 
+     * @throws  
      */
     public DBPIDGenerator(ConnectionPool cPool, File oldPidGenDir)
-            throws IOException {
+            throws IOException, ModuleInitializationException {
         m_connectionPool = cPool;
-        m_highestID = new HashMap<String, Integer>();
+        try {
+            String dbSpec =
+                    "org/fcrepo/server/storage/resources/DBPIDGenerator.dbspec";
+            InputStream specIn =
+                    this.getClass().getClassLoader()
+                            .getResourceAsStream(dbSpec);
+            if (specIn == null) {
+                throw new IOException("Cannot find required resource: " +
+                        dbSpec);
+            }
+            SQLUtility.createNonExistingTables(m_connectionPool, specIn);
+        } catch (Exception e) {
+            throw new ModuleInitializationException(
+                "Error while attempting to check for and create non-existing table(s): " +
+                    e.getClass().getName() + ": " + e.getMessage(), getRole(), e);
+        }
         // load the values from the database into the m_highestID hash
         // pidGen:  namespace  highestID
         Statement s = null;
@@ -67,13 +82,15 @@ public class DBPIDGenerator
             String query = "SELECT namespace, highestID FROM pidGen";
             s = conn.createStatement();
             results = s.executeQuery(query);
+            m_highestID = new HashMap<String, Integer>();
             while (results.next()) {
                 m_highestID.put(results.getString("namespace"),
                                 new Integer(results.getInt("highestID")));
             }
-        } catch (SQLException sqle) {
-            logger.warn("Unable to read pidGen table; assuming it "
-                    + "will be created shortly");
+        } catch (SQLException e) {
+            throw new ModuleInitializationException(
+                    "Error while attempting to load highest existing pids and namespaces: " +
+                        e.getClass().getName() + ": " + e.getMessage(), getRole(), e);
         } finally {
             try {
                 if (results != null) {
@@ -94,6 +111,10 @@ public class DBPIDGenerator
             }
         }
         upgradeIfNeeded(oldPidGenDir);
+    }
+
+    public String getRole() {
+        return PIDGenerator.class.getName();
     }
 
     /**
