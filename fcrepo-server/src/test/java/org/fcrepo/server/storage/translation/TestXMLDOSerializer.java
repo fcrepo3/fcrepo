@@ -10,16 +10,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.Callable;
 
 import org.custommonkey.xmlunit.XMLUnit;
-
 import org.junit.Test;
-
 import org.w3c.dom.Document;
-
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.storage.translation.DOSerializer;
@@ -106,6 +103,10 @@ public abstract class TestXMLDOSerializer
                    new String(unicodeContent).equals(serializedContent));
     }
 
+    @Test
+    public void testConcurrentSerialization() throws Exception {
+        runConcurrent(getCallables());
+    }
     //---
     // Instance helpers
     //---
@@ -168,4 +169,17 @@ public abstract class TestXMLDOSerializer
         }
     }
 
+    protected Callable<?>[] getCallables() {
+        DigitalObject[] objects = {
+        createTestObject(FEDORA_OBJECT_3_0),
+        createTestObject(SERVICE_DEPLOYMENT_3_0),
+        createTestObject(SERVICE_DEPLOYMENT_3_0)
+        };
+        Callable<?>[] callables = new Callable<?>[objects.length];
+        int i = 0;
+        for (DigitalObject obj: objects) {
+            callables[i++] = new SerializerCallable(m_serializer, obj);
+        }
+        return callables;
+    }
 }

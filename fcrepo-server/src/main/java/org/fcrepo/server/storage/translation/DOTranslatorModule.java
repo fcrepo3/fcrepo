@@ -47,12 +47,14 @@ public class DOTranslatorModule
     /** The DOTranslator this module uses. */
     private DOTranslator m_wrappedTranslator;
 
+    private DOTranslationUtility m_translation;
     /**
      * Creates an instance using the standard <code>Module</code> constructor.
      */
     public DOTranslatorModule(Map<String, String> params, Server server, String role)
             throws ModuleInitializationException {
         super(params, server, role);
+        m_translation = DOTranslationUtility.get(server);
     }
 
     //---
@@ -76,7 +78,8 @@ public class DOTranslatorModule
                     DOSerializer ser =
                             (DOSerializer) Class
                                     .forName(getParameter(paramName))
-                                    .newInstance();
+                                    .getConstructor(DOTranslationUtility.class)
+                                    .newInstance(m_translation);
                     serMap.put(serName, ser);
                 } catch (Exception e) {
                     throw new ModuleInitializationException("Can't instantiate serializer class for format "

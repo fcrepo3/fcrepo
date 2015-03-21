@@ -311,11 +311,19 @@ public abstract class DOTranslationUtility
     }
     // initialize static class with stuff that's used by all DO Serializerers
     public static void init(Server server) {
-        init(server.getHomeDir());
+        defaultInstance(get(server));
+    }
+
+    public static DOTranslationUtility get(Server server) {
+        return get(server.getHomeDir());
     }
 
     public static void init(File serverHome) {
-        defaultInstance(new Impl(Server.getConfig(serverHome)));
+        defaultInstance(get(serverHome));
+    }
+
+    public static DOTranslationUtility get(File serverHome) {
+        return new Impl(Server.getConfig(serverHome));
     }
 
     /**
@@ -328,9 +336,12 @@ public abstract class DOTranslationUtility
      * @param properties
      */
     public static void init(Properties properties) {
-        defaultInstance(new Impl(properties, true));
+        defaultInstance(get(properties));
     }
 
+    public static DOTranslationUtility get(Properties properties) {
+        return new Impl(properties, true);
+    }
     /**
      * Make URLs that are relative to the local Fedora repository ABSOLUTE URLs.
      * First, see if any URLs are expressed in relative URL syntax (beginning

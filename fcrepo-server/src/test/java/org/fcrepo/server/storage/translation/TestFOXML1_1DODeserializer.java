@@ -8,6 +8,7 @@ package org.fcrepo.server.storage.translation;
 import static org.fcrepo.common.Models.CONTENT_MODEL_3_0;
 
 import java.util.Iterator;
+import java.util.concurrent.Callable;
 
 import org.fcrepo.server.storage.types.BasicDigitalObject;
 import org.fcrepo.server.storage.types.Datastream;
@@ -68,6 +69,16 @@ public class TestFOXML1_1DODeserializer
             }
         }
     }
+    @Test
+    public void testConcurrentDeserialization() throws Exception {
+        Callable<?>[] callables = {
+                new DeserializerCallable(m_deserializer, this.getClass().getClassLoader().getResourceAsStream("ecm/dataobject1.xml")),
+                new DeserializerCallable(m_deserializer, this.getClass().getClassLoader().getResourceAsStream("ecm/dataobject2.xml")),
+                new DeserializerCallable(m_deserializer, this.getClass().getClassLoader().getResourceAsStream("ecm/dataobject3.xml"))
+            };
+       runConcurrent(callables); 
+    }
+
     // Supports legacy test runners
     public static junit.framework.Test suite() {
         return new junit.framework.JUnit4TestAdapter(TestFOXML1_1DODeserializer.class);

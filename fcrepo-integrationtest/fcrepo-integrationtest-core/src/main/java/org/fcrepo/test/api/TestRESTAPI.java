@@ -62,6 +62,8 @@ import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.AbstractContentBody;
@@ -377,11 +379,24 @@ public class TestRESTAPI
         }
         return entity;
     }
+    protected static ByteArrayEntity getBytesEntity(
+            byte[] content, String contentType) {
+            if (content == null) {
+                return null;
+            }
+            
+            ByteArrayEntity entity =
+                new ByteArrayEntity(content);
+            if (contentType != null) {
+                entity.setContentType(contentType);
+            }
+            return entity;
+        }
     
     protected void verifyPOSTStatusOnly(URI url, int expected,
-        StringEntity content, boolean authenticate) throws Exception {
+        AbstractHttpEntity entity, boolean authenticate) throws Exception {
         HttpPost post = new HttpPost(url);
-        HttpResponse response = putOrPost(post, content, authenticate);
+        HttpResponse response = putOrPost(post, entity, authenticate);
         int status = response.getStatusLine().getStatusCode();
         if (status == SC_MOVED_TEMPORARILY) {
             String original = url.toString();
@@ -389,7 +404,7 @@ public class TestRESTAPI
             if (!original.equals(url.toString())) {
                 EntityUtils.consumeQuietly(response.getEntity());
                 post = new HttpPost(url);
-                response = putOrPost(post, content, true);
+                response = putOrPost(post, entity, true);
                 status = response.getStatusLine().getStatusCode();
             }
         }
@@ -398,7 +413,7 @@ public class TestRESTAPI
     }
 
     protected void verifyPOSTStatusOnly(URI url, int expected,
-            StringEntity content, boolean authenticate, boolean validate) throws Exception {
+            AbstractHttpEntity content, boolean authenticate, boolean validate) throws Exception {
             HttpPost post = new HttpPost(url);
             HttpResponse response = putOrPost(post, content, authenticate);
             int status = response.getStatusLine().getStatusCode();
@@ -421,7 +436,7 @@ public class TestRESTAPI
         }
 
     protected void verifyPUTStatusOnly(URI url, int expected,
-            StringEntity content, boolean authenticate) throws Exception {
+            AbstractHttpEntity content, boolean authenticate) throws Exception {
             HttpPut put = new HttpPut(url);
             HttpResponse response = putOrPost(put, content, authenticate);
             int status = response.getStatusLine().getStatusCode();
@@ -1337,6 +1352,34 @@ public class TestRESTAPI
         verifyDELETEStatusOnly(url, SC_OK, true);
     }
 
+    @Test
+    public void testAtomZipRoundTrip() throws Exception {
+        String format = "info:fedora/fedora-system:ATOMZip-1.1";
+        String testPid= "demo:TEST_ATOM_ZIP_RT";
+        URI obj = getURI("/objects/" + testPid);
+        verifyPOSTStatusOnly(obj, SC_CREATED, getStringEntity("", TEXT_XML), true);
+        String xmlData = "<foo>bar</foo>";
+        AbstractHttpEntity entity = getStringEntity(xmlData, TEXT_XML);
+        String dsPath = "/objects/" + testPid + "/datastreams/FOO";
+        URI url = getURI(dsPath + "?controlGroup=M&dsLabel=foo.xml");
+        verifyPOSTStatusOnly(url, SC_CREATED, entity, true);
+        url = getURI(
+            String.format("/objects/%s/export?context=archive&format=%s",
+                    testPid, format));
+        byte[] src = verifyGETStatusBytes(
+                    url, SC_OK, true, true);
+        verifyDELETEStatusOnly(obj, SC_OK, true);
+        url = getURI(String.format("/objects/%s?format=%s",testPid, format));
+        entity = getBytesEntity(src, "application/zip");
+        HttpPost post = new HttpPost(url);
+        HttpResponse response = putOrPost(post, entity, true);
+
+        readString(response);
+        assertEquals(SC_CREATED, response.getStatusLine().getStatusCode());
+        url = getURI(dsPath + "/content");
+        String contents = verifyGETStatusString(url, 200, true, false);
+        assertEquals(xmlData,contents);
+    }
     @Test
     public void testAddDatastream() throws Exception {
         // inline (X) datastream
