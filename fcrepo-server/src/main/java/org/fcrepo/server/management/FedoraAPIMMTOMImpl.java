@@ -17,6 +17,7 @@ import java.util.List;
 import javax.activation.DataHandler;
 import javax.annotation.Resource;
 import javax.mail.util.ByteArrayDataSource;
+import javax.ws.rs.core.StreamingOutput;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
@@ -159,14 +160,14 @@ public class FedoraAPIMMTOMImpl
         try {
             MessageContext ctx =
                     FedoraAPIMMTOMImpl.this.context.getMessageContext();
-            InputStream in =
-                    m_management.export(ReadOnlyContext.getSoapContext(ctx),
+            StreamingOutput so =
+                    m_management.stream(ReadOnlyContext.getSoapContext(ctx),
                                         pid,
                                         format,
                                         context,
                                         "UTF-8");
             ByteArrayOutputStream out = new ByteArrayOutputStream(2048);
-            pipeStream(in, out);
+            so.write(out);
             return new DataHandler(new ByteArrayDataSource(out.toByteArray(),
                                                            "text/xml"));
         } catch (Throwable th) {

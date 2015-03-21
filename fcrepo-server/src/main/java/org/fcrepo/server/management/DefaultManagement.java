@@ -31,6 +31,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.ws.rs.core.StreamingOutput;
+
 import org.apache.commons.betwixt.XMLUtils;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.PID;
@@ -323,9 +325,43 @@ public class DefaultManagement
                     m_manager.getReader(Server.USE_DEFINITIVE_STORE,
                                         context,
                                         pid);
-            InputStream instream = reader.Export(format, exportContext);
+            return reader.Export(format, exportContext);
+        } finally {
+            // Logger completion
+            if (logger.isInfoEnabled()) {
+                StringBuilder logMsg = new StringBuilder("Completed export(");
+                logMsg.append("pid: ").append(pid);
+                logMsg.append(", format: ").append(format);
+                logMsg.append(", exportContext: ").append(exportContext);
+                logMsg.append(", encoding: ").append(encoding);
+                logMsg.append(")");
+                logger.info(logMsg.toString());
+            }
 
-            return instream;
+            logger.debug("Exiting export");
+        }
+    }
+
+    @Override
+    public StreamingOutput stream(Context context,
+                              String pid,
+                              String format,
+                              String exportContext,
+                              String encoding) throws ServerException {
+        try {
+            logger.debug("Entered export");
+
+            m_authz.enforceExport(context,
+                                  pid,
+                                  format,
+                                  exportContext,
+                                  encoding);
+
+            DOReader reader =
+                    m_manager.getReader(Server.USE_DEFINITIVE_STORE,
+                                        context,
+                                        pid);
+            return reader.Stream(format, exportContext);
         } finally {
             // Logger completion
             if (logger.isInfoEnabled()) {

@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.ws.rs.core.StreamingOutput;
+
 import org.fcrepo.common.Models;
 import org.fcrepo.server.Context;
 import org.fcrepo.server.errors.DisseminationException;
@@ -23,6 +25,7 @@ import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.errors.StorageException;
 import org.fcrepo.server.errors.StreamIOException;
 import org.fcrepo.server.errors.UnsupportedTranslationException;
+import org.fcrepo.server.storage.tasks.StreamingExport;
 import org.fcrepo.server.storage.translation.DOTranslationUtility;
 import org.fcrepo.server.storage.translation.DOTranslator;
 import org.fcrepo.server.storage.types.AuditRecord;
@@ -177,6 +180,20 @@ public class SimpleDOReader
     public InputStream Export(String format, String exportContext)
             throws ObjectIntegrityException, StreamIOException,
                    UnsupportedTranslationException, ServerException {
+        // allocate the ByteArrayOutputStream with a 4k initial capacity to constrain copying up
+        ReadableByteArrayOutputStream bytes = new ReadableByteArrayOutputStream(4096);
+        try {
+            Stream(format, exportContext).write(bytes);
+        } catch (Exception e) {
+            throw new StreamIOException(e.getMessage(),e);
+        }
+        return bytes.toInputStream();
+    }
+
+    @Override
+    public StreamingOutput Stream(String format, String exportContext)
+            throws ObjectIntegrityException, StreamIOException,
+                   UnsupportedTranslationException, ServerException {
         int transContext;
         // first, set the translation context...
         logger.debug("Export context: {}", exportContext);
@@ -196,23 +213,15 @@ public class SimpleDOReader
                                                       + exportContext + " is not valid.");
         }
 
-        // allocate the ByteArrayOutputStream with a 4k initial capacity to constrain copying up
-        ReadableByteArrayOutputStream bytes = new ReadableByteArrayOutputStream(4096);
         // now serialize for export in the proper XML format...
         if (format == null || format.isEmpty()
             || format.equalsIgnoreCase("default")) {
             logger.debug("Export in default format: {}", m_exportFormat);
-            m_translator.serialize(m_obj,
-                                   bytes,
-                                   m_exportFormat,
-                                   "UTF-8",
-                                   transContext);
+            format = m_exportFormat;            
         } else {
             logger.debug("Export in format: {}", format);
-            m_translator.serialize(m_obj, bytes, format, "UTF-8", transContext);
         }
-
-        return bytes.toInputStream();
+        return new StreamingExport(m_translator, m_obj, format, "UTF-8", transContext);
     }
 
     /**

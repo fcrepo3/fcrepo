@@ -6,7 +6,6 @@
 package org.fcrepo.server.storage;
 
 import java.io.InputStream;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,10 +13,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.core.StreamingOutput;
+
 import org.jrdf.graph.ObjectNode;
 import org.jrdf.graph.PredicateNode;
 import org.jrdf.graph.SubjectNode;
-
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.storage.DOReader;
 import org.fcrepo.server.storage.types.AuditRecord;
@@ -157,6 +157,11 @@ public class MockDOReader
     }
 
     public InputStream Export(String format, String exportContext)
+            throws ServerException {
+        throw new RuntimeException("MockDOReader.Export not implemented");
+    }
+
+    public StreamingOutput Stream(String format, String exportContext)
             throws ServerException {
         throw new RuntimeException("MockDOReader.Export not implemented");
     }

@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.ws.rs.core.StreamingOutput;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
@@ -159,14 +160,13 @@ public class FedoraAPIMImpl
         try {
             MessageContext ctx =
                     FedoraAPIMImpl.this.context.getMessageContext();
-            InputStream in =
-                    m_management.export(ReadOnlyContext.getSoapContext(ctx),
+            StreamingOutput so = m_management.stream(ReadOnlyContext.getSoapContext(ctx),
                                         pid,
                                         format,
                                         context,
                                         "UTF-8");
             ByteArrayOutputStream out = new ByteArrayOutputStream(2048);
-            pipeStream(in, out);
+            so.write(out);
             return out.toByteArray();
         } catch (Throwable th) {
             LOG.error("Error exporting object", th);

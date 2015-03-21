@@ -151,7 +151,7 @@ public class DefaultSerializer {
         buffer.append("</objState></objectProfile>");
     }
 
-    private void datastreamFieldSerialization(Datastream dsProfile, String prefix,
+    private static void datastreamFieldSerialization(Datastream dsProfile, String prefix,
             boolean validateChecksum, Writer buffer)
             throws IOException {
         appendXML(null, prefix, "dsLabel", dsProfile.DSLabel, buffer, true);
@@ -181,7 +181,7 @@ public class DefaultSerializer {
         }
     }
 
-    String datastreamProfileToXML(String pid, String dsID, Datastream dsProfile, Date versDateTime,
+    static String datastreamProfileToXML(String pid, String dsID, Datastream dsProfile, Date versDateTime,
                                   boolean validateChecksum) {
         ReadableCharArrayWriter buffer =
                 new ReadableCharArrayWriter(512);
@@ -191,7 +191,7 @@ public class DefaultSerializer {
         return buffer.getString();
     }
 
-    String datastreamProfileToXML(String pid, String dsID, Datastream dsProfile, Date versDateTime,
+    static String datastreamProfileToXML(String pid, String dsID, Datastream dsProfile, Date versDateTime,
             boolean validateChecksum, Writer buffer) throws IOException {
         buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + "<datastreamProfile  xmlns=\"")

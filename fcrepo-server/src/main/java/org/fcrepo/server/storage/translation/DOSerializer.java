@@ -23,6 +23,8 @@ import org.fcrepo.server.storage.types.DigitalObject;
  */
 public interface DOSerializer {
 
+    static final char [] DS_INDENT = "              ".toCharArray();
+
     /**
      * Get a new serializer with the same format as this one, safe
      * for use in the current thread. Thread-safe implementations may

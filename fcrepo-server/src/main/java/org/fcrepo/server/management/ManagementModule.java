@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.StreamingOutput;
+
 import org.fcrepo.server.Context;
 import org.fcrepo.server.Module;
 import org.fcrepo.server.Server;
@@ -286,6 +288,18 @@ public class ManagementModule
                               String exportContext,
                               String encoding) throws ServerException {
         return mgmt.export(context, pid, format, exportContext, encoding);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StreamingOutput stream(Context context,
+                              String pid,
+                              String format,
+                              String exportContext,
+                              String encoding) throws ServerException {
+        return mgmt.stream(context, pid, format, exportContext, encoding);
     }
 
     /**
