@@ -1560,6 +1560,17 @@ public class TestRESTAPI
         assertXMLEqual(xmlData,
                        new String(TypeUtility.convertDataHandlerToBytes(ds1
                                .getStream()), "UTF-8"));
+        MIMETypedStream dc =
+                apia.getDatastreamDissemination(DEMO_REST_PID.toString(), "DC", null);
+        String dc_src = new String(TypeUtility.convertDataHandlerToBytes(dc
+                .getStream()), "UTF-8");
+        dc_src.replace("Staples", "Clips");
+        url = getURI(
+                String.format(
+                    "/objects/%s/datastreams/DC",
+                    DEMO_REST_PID.toString()));
+        verifyPUTStatusOnly(url, SC_OK, getStringEntity(dc_src, TEXT_XML), true);
+
     }
 
     @Test
