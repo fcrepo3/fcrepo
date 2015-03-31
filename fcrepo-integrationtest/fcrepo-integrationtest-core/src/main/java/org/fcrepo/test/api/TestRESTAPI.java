@@ -37,6 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -1359,11 +1360,36 @@ public class TestRESTAPI
         URI obj = getURI("/objects/" + testPid);
         verifyPOSTStatusOnly(obj, SC_CREATED, getStringEntity("", TEXT_XML), true);
         String xmlData = "<foo>bar</foo>";
-        AbstractHttpEntity entity = getStringEntity(xmlData, TEXT_XML);
-        String dsPath = "/objects/" + testPid + "/datastreams/FOO";
-        URI url = getURI(dsPath + "?controlGroup=M&dsLabel=foo.xml");
-        verifyPOSTStatusOnly(url, SC_CREATED, entity, true);
-        url = getURI(
+        String md5 = MD5Utility.getBase16Hash(xmlData);
+        AbstractHttpEntity entity;
+        HashMap<String,String> dsIds = new HashMap<String,String>(2);
+        dsIds.put("FOO", "M");
+        dsIds.put("FOX", "X");
+        for (Entry<String,String>dsEntry:dsIds.entrySet()){
+            String dsid = dsEntry.getKey();
+            String dsPath = "/objects/" + testPid + "/datastreams/" + dsid;
+            HashMap<String, String> dsParms = new HashMap<String, String>();
+            dsParms.put("controlGroup", dsEntry.getValue());
+            dsParms.put("dsLabel", dsid.toLowerCase()+".xml");
+            dsParms.put("checksumType", "MD5");
+            // if inline, the server will munge it
+            if (!"X".equals(dsEntry.getValue())) dsParms.put("checksum", md5);
+            StringBuffer buf = new StringBuffer();
+            for(Entry<String,String>entry:dsParms.entrySet()) {
+                if (buf.length() > 0) {
+                    buf.append('&');
+                } else {
+                    buf.append('?');
+                }
+                buf.append(entry.getKey()).append('=').append(entry.getValue());
+            }
+    
+            URI url = getURI(dsPath + buf.toString());
+            entity = getStringEntity(xmlData, TEXT_XML);
+            verifyPOSTStatusOnly(url, SC_CREATED, entity, true);
+        }
+
+        URI url = getURI(
             String.format("/objects/%s/export?context=archive&format=%s",
                     testPid, format));
         byte[] src = verifyGETStatusBytes(
@@ -1376,9 +1402,16 @@ public class TestRESTAPI
 
         readString(response);
         assertEquals(SC_CREATED, response.getStatusLine().getStatusCode());
-        url = getURI(dsPath + "/content");
-        String contents = verifyGETStatusString(url, 200, true, false);
-        assertEquals(xmlData,contents);
+        
+        for (Entry<String,String>dsEntry:dsIds.entrySet()){
+            String dsid = dsEntry.getKey();
+            String dsPath = "/objects/" + testPid + "/datastreams/" + dsid;
+            url = getURI(dsPath + "/content");
+            String contents = verifyGETStatusString(url, 200, true, false);
+            // clean up the formatting whitespace for inline content
+            if ("X".equals(dsEntry.getValue())) contents = contents.trim();
+            assertEquals(xmlData,contents);
+        }
     }
     @Test
     public void testAddDatastream() throws Exception {
