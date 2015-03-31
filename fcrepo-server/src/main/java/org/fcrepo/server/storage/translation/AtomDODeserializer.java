@@ -266,6 +266,7 @@ public class AtomDODeserializer
         } else {
             ds.DSMIME = mimeType.toString();
         }
+        setDatastreamVersionChecksumProperties(ds, obj, entry);
         return ds;
     }
 
@@ -328,6 +329,7 @@ public class AtomDODeserializer
             ds.DSLocation =
                     (m_translator.normalizeDSLocationURLs(obj
                             .getPid(), ds, transContext)).DSLocation;
+            setDatastreamVersionChecksumProperties(ds, obj, entry);
             return ds;
         }
 
@@ -560,6 +562,9 @@ public class AtomDODeserializer
         ds.DSFormatURI = getDSFormatURI(entry);
         ds.DSLabel = getDSLabel(entry);
         ds.DSVersionID = getDatastreamVersionId(obj, entry);
+    }
+    private void setDatastreamVersionChecksumProperties(Datastream ds, DigitalObject obj, Entry entry)
+            throws ValidationException {
         ds.DSChecksumType = getDSChecksumType(entry);
         String checksum = getDSChecksum(entry);
         if (obj.isNew()) {
