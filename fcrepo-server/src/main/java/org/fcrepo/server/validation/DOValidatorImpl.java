@@ -423,20 +423,20 @@ public class DOValidatorImpl
 
             FileOutputStream fos = new FileOutputStream(objectAsFile);
             FileUtils.copy(objectAsStream, fos);
+            return objectAsFile;
         } catch (IOException e) {
             if (objectAsFile != null && objectAsFile.exists()) {
                 objectAsFile.delete();
             }
             throw e;
         }
-        return objectAsFile;
     }
 
     // Distinguish temporary object files from real object files
     // that were passed in for validation.  This is a bit ugly as it stands,
     // but it should only blow away files in the temp directory.
     private void cleanUp(File f) {
-        if (f.getParentFile() != null) {
+        if (f != null && f.getParentFile() != null) {
             if (m_absoluteTempPath.equalsIgnoreCase(f
                     .getParentFile().getAbsolutePath())) {
                 f.delete();
