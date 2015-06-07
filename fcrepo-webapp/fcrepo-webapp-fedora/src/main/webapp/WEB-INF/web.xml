@@ -230,14 +230,6 @@
     <servlet-name>CXFSchemaServlet</servlet-name>
     <url-pattern>/schema/*</url-pattern>
   </servlet-mapping>
-  <filter>
-    <filter-name>RestApiFlashFilter</filter-name>
-    <filter-class>org.fcrepo.server.security.servletfilters.FilterRestApiFlash</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>RestApiFlashFilter</filter-name>
-    <servlet-name>RestServlet</servlet-name>
-  </filter-mapping>
 
   <!-- Spring security -->
   <filter>
