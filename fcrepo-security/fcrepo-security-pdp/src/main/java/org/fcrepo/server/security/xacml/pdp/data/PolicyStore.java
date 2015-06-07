@@ -52,7 +52,7 @@ public interface PolicyStore {
      * @param name
      *        the name to assign the policy
      * @return the name of the policy
-     * @throws {@link PolicyStoreException}
+     * @throws PolicyStoreException
      */
     String addPolicy(File f, String name)
             throws PolicyStoreException;
@@ -65,7 +65,7 @@ public interface PolicyStore {
      * @param f
      *        the policy as a {@link File}
      * @return the name of the added policy
-     * @throws {@link PolicyStoreException}
+     * @throws PolicyStoreException
      */
     String addPolicy(File f) throws PolicyStoreException;
 
@@ -77,7 +77,7 @@ public interface PolicyStore {
      *        the policy as a {@link String}
      * @param name
      * @return the name of the added policy
-     * @throws {@link PolicyStoreException}
+     * @throws PolicyStoreException
      */
     String addPolicy(String document, String name)
             throws PolicyStoreException;
@@ -90,7 +90,7 @@ public interface PolicyStore {
      * @param document
      *        the policy as a {@link String}
      * @return the name of the added policy
-     * @throws {@link PolicyStoreException}
+     * @throws PolicyStoreException
      */
     String addPolicy(String document) throws PolicyStoreException;
 

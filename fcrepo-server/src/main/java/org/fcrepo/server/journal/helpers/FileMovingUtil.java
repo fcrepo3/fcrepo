@@ -13,7 +13,7 @@ import java.io.IOException;
 
 /**
  * Provides a workaround to the fact that
- * {@link java.io.File.renameTo(java.io.File)} doesn't work across NFS file
+ * {@link java.io.File#renameTo(java.io.File)} doesn't work across NFS file
  * systems.
  * <p>
  * This code is taken from a workaround provided on the Sun Developer Network
@@ -21,11 +21,11 @@ import java.io.IOException;
  * mailto:morgan.sziraki@cartesian.co.uk
  * </p>
  * <p>
- * The code is modified to protect against a situation where
+ * The code is modified to protect against a situation where:</p>
  * <ul>
  * <li>We need to copy the file across NFS mounted filesystems</li>
  * <li>Another process is waiting for the file to be renamed</li>
- * </ul>
+ * </ul><p>
  * If we do a simple copy, we leave open the possibility that the second process
  * will see the new file created before we have a chance to copy the contents.
  * </p>

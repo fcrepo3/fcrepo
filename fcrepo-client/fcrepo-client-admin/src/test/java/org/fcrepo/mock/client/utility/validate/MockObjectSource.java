@@ -123,9 +123,6 @@ public class MockObjectSource
     // Un-implemented methods
     // ----------------------------------------------------------------------
 
-    /**
-     * {@inheritDoc}
-     */
     public Iterator<String> findObjectPids(FieldSearchQuery query)
             throws ObjectSourceException {
         // KLUGE Auto-generated method stub

@@ -120,8 +120,8 @@ public class DefaultManagement
     /**
      * @param purgeDelayInMillis milliseconds to delay before removing
      *                           old uploaded files
-     * @author Frederic Buffet & Tommy Bourdin (Atos Worldline)
-     * @date August 1, 2008
+     * @author Frederic Buffet &amp; Tommy Bourdin (Atos Worldline)
+     * @since August 1, 2008
      */
     public DefaultManagement(Authorization authz,
                              DOManager doMgr,
@@ -1978,7 +1978,6 @@ public class DefaultManagement
      * @param pid
      * @param dsID
      * @param controlGroup - new Control Group for datastream
-     * @param ignoreAlreadyDone - if true don't return an error if datastream already has desired control group
      * @param addXMLHeader - add an XML header declaring UTF-8 character encoding to datastream content
      * @param reformat - reformat the XML (in the same format as used for inline XML)
      * @param setMIMETypeCharset - add charset declaration (UTF-8) to the MIMEType, and add text/xml MIMEType if no MIMEType is set

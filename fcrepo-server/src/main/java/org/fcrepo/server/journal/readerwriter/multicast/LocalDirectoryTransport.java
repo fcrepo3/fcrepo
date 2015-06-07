@@ -24,15 +24,12 @@ import org.fcrepo.server.journal.helpers.ParameterHelper;
 
 /**
  * <p>
- * LocalDirectoryTransport.java
- * </p>
- * <p>
  * Writes Journal files to a local disk directory. It requires these parameters:
+ * </p>
  * <ul>
  * <li>directoryPath - full path to the directory where the Journals will be
  * stored.</li>
  * </ul>
- * </p>
  *
  * @author jblake
  * @version $Id: LocalDirectoryTransport.java,v 1.1 2007/03/06 15:02:58 jblake

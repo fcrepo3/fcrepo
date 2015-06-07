@@ -29,6 +29,7 @@ public class RestHelper {
      * @param args
      * @return the first argument that is not null.
      */
+    @SafeVarargs
     static <T> T firstNotNull(T... args) {
         for (T arg : args) {
             if (arg != null) {

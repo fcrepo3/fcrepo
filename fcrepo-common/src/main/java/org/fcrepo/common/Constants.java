@@ -738,7 +738,7 @@ public interface Constants {
          * Once successfully determined, the value is guaranteed not to change
          * during the life of the application.
          *
-         * @returns the value, or <code>null</code> if undefined in any way.
+         * @return String value, or <code>null</code> if undefined in any way.
          */
         public static final String getValue() {
             if (value == null) {

@@ -597,10 +597,11 @@ public class AtomDODeserializer
     }
 
     /**
-     * Returns the an Entry's contentSrc as a File relative to {@link #m_tempDir}.
+     * Returns the an Entry's contentSrc as a File relative to the tempDir param.
      *
      * @param contentSrc
-     * @return the contentSrc as a File relative to m_tempDir.
+     * @param tempDir
+     * @return the contentSrc as a File relative to tempDir.
      * @throws ObjectIntegrityException
      */
     protected File getContentSrcAsFile(IRI contentSrc, File tempDir) throws ObjectIntegrityException, IOException {

@@ -97,7 +97,7 @@ public class BasicAttribute extends AbstractAttribute {
     * Creates a new <code>BasicAttribute</code>
     *
     * @deprecated As of version 1.1, replaced by
-    *        {@link #Attribute(URI,String,DateTimeAttribute,AttributeValue)}.
+    *        {see org.fcrepo.server.security.impl.AbstractAttribute(URI,String,DateTimeAttribute,AttributeValue)}.
     *             This constructor has some ambiguity in that it allows a
     *             specified datatype and a value that already has some
     *             associated datatype. The new constructor clarifies this

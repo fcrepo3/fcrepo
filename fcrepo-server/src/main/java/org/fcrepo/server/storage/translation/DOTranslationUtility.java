@@ -66,10 +66,10 @@ import org.slf4j.LoggerFactory;
  * usage 1=Serialize java object to XML appropriate for "public" export
  * (absolute URLs) 2=Serialize java object to XML appropriate for move/migrate
  * to another repository 3=Serialize java object to XML appropriate for internal
- * storage</b> </p> The public "normalize*" methods in this class should be
+ * storage<p> The public "normalize*" methods in this class should be
  * called to make the right decisions about what conversions should occur for
  * what contexts. Other utility methods set default values for datastreams and
- * disseminators.
+ * disseminators.</p>
  *
  * @author Sandy Payette
  * @version $Id$
@@ -360,7 +360,7 @@ public abstract class DOTranslationUtility
      * "http://myrepo.com:8080/fedora/get/demo:1/sdef:1/getFoo?in="
      * http://myrepo.com:8080/fedora/get/demo:2/DC"
      *
-     * @param m_xmlContent
+     * @param input
      * @return String with all relative repository URLs and Fedora local URLs
      *         converted to absolute URL syntax.
      */

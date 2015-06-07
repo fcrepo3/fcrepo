@@ -44,11 +44,11 @@ import org.junit.runner.JUnitCore;
 
 /**
  * Tests involving XACML policies, for API-A and API-M.
- * <p/>
+ * <p>
  * Note: Although these tests can run when API-A AuthN is off, for the best
  * coverage, make sure the server is configured to authenticate for API-A
  * access.
- *
+ * </p>
  * @author Edwin Shin
  */
 public class TestXACMLPolicies

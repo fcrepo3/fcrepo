@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Base class for Fedora server modules.
- * </p>
  * <p>
  * A <code>Module</code> is a singleton object of a Fedora <code>Server</code>
  * instance with a simple lifecycle, supported by the <code>initModule()</code>

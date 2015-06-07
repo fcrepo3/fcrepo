@@ -30,7 +30,7 @@ import org.junit.Test;
  * model. Furthermore, individual methods/operations/endpoints are defined
  * within each individual service object. In order to invoke a specific method,
  * the identites of the object, the sDef, and the method need to be specified.
- * In that light, this suite tests the following:
+ * In that light, this suite tests the following:</p>
  * <ul>
  * <li>The system will enumerate (via iewItemIndex, listMethods, etc) ONLY those
  * services/methods/endpoints that are specified by the graph containing the
@@ -45,7 +45,6 @@ import org.junit.Test;
  * may make use of multiple SDeps to provide full deployment coverage of all its
  * methods.</li>
  * </ul>
- * </p>
  *
  * @author birkland
  */

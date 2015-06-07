@@ -6,7 +6,6 @@ package org.fcrepo.server.errors;
 
 /**
  * Signifies that an error occurred during the server's initialization.
- * </p>
  * 
  * @author Chris Wilper
  */

@@ -74,8 +74,10 @@ public class PID {
     }
 
     /**
-     * Alternate constructor that throws an unchecked exception if it's not
+     * Factory method that throws an unchecked exception if it's not
      * well-formed.
+     * @param pidString the String value of the PID
+     * @return PID
      */
     public static PID getInstance(String pidString) {
         try {
@@ -88,6 +90,9 @@ public class PID {
     /**
      * Construct a PID given a filename of the form produced by toFilename(),
      * throwing a MalformedPIDException if it's not well-formed.
+     * @param filenameString default translation of PID to filename
+     * @return PID the PID producing the input filename
+     * @throws MalformedPIDException
      */
     public static PID fromFilename(String filenameString)
             throws MalformedPIDException {
@@ -101,6 +106,9 @@ public class PID {
     /**
      * Return the normalized form of the given pid string, or throw a
      * MalformedPIDException.
+     * @param pidString
+     * @return String normalized version of the pid
+     * @throws MalformedPIDException
      */
     public static String normalize(String pidString)
             throws MalformedPIDException {
@@ -218,6 +226,7 @@ public class PID {
     /**
      * Return the URI form of this PID. This is just the PID, prepended with
      * "info:fedora/".
+     * @return String pid as uri value
      */
     public String toURI() {
         return Constants.FEDORA.uri.concat(m_normalized);

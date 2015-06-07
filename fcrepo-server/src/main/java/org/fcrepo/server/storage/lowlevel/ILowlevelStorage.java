@@ -35,7 +35,7 @@ public interface ILowlevelStorage {
      *
      * @param objectKey the pid of the object.
      * @param content the serialized object.
-     * @param objectStorageHints a map of hints for object storage
+     * @param objectHints a map of hints for object storage
      * @throws LowlevelStorageException if the object does not already exist
      *         or cannot be replaced for any other reason.
      */
@@ -108,7 +108,7 @@ public interface ILowlevelStorage {
      * @param content the content.
      * @throws LowlevelStorageException if the datastream version already
      *         exists or cannot be added for any other reason.
-     * @returns size - the size of the added object in bytes
+     * @return size - the size of the added object in bytes
      */
     public long addDatastream(String dsKey, InputStream content, Map<String, String> dsStorageHints)
             throws LowlevelStorageException;
@@ -121,7 +121,7 @@ public interface ILowlevelStorage {
      * @param content the content.
      * @throws LowlevelStorageException if the datastream version does not
      *         already exist or cannot be replaced for any other reason.
-     * @returns size - the size of the added object in bytes
+     * @return size - the size of the added object in bytes
      */
     public long replaceDatastream(String dsKey, InputStream content, Map<String, String> dsHints)
             throws LowlevelStorageException;

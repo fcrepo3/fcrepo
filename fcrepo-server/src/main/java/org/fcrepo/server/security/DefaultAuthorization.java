@@ -25,21 +25,20 @@ import org.slf4j.LoggerFactory;
 /**
  * The Authorization module, protecting access to Fedora's API-A and API-M
  * endpoints.
- * <p/>
+ * <p>
  * The following attributes are available for use in authorization policies
  * during any enforce call.
  * </p>
  * <p>
- * subject attributes
+ * subject attributes</p>
  * <ul>
  * <li>urn:fedora:names:fedora:2.1:subject:loginId (available only if user
  * has authenticated)</li>
  * <li>urn:fedora:names:fedora:2.1:subject:<i>x</i> (available if
  * authenticated user has attribute <i>x</i>)</li>
  * </ul>
- * </p>
  * <p>
- * environment attributes derived from HTTP request
+ * environment attributes derived from HTTP request</p>
  * <ul>
  * <li>urn:fedora:names:fedora:2.1:environment:httpRequest:security
  * <ul>
@@ -62,9 +61,8 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * </li>
  * </ul>
- * </p>
  * <p>
- * environment attributes directly from HTTP request
+ * environment attributes directly from HTTP request</p>
  * <ul>
  * <li>urn:fedora:names:fedora:2.1:environment:httpRequest:authType</li>
  * <li>urn:fedora:names:fedora:2.1:environment:httpRequest:clientFqdn</li>
@@ -80,15 +78,13 @@ import org.slf4j.LoggerFactory;
  * <li>urn:fedora:names:fedora:2.1:environment:httpRequest:sessionEncoding</li>
  * <li>urn:fedora:names:fedora:2.1:environment:httpRequest:sessionStatus</li>
  * </ul>
- * </p>
  * <p>
- * other environment attributes
+ * other environment attributes</p>
  * <ul>
  * <li>urn:fedora:names:fedora:2.1:currentDateTime</li>
  * <li>urn:fedora:names:fedora:2.1:currentDate</li>
  * <li>urn:fedora:names:fedora:2.1:currentTime</li>
  * </ul>
- * </p>
  *
  * @see <a
  *      href="http://java.sun.com/products/servlet/2.2/javadoc/javax/servlet/http/HttpServletRequest.html">HttpServletRequest
@@ -176,24 +172,23 @@ public class DefaultAuthorization
      * during a call to this method.
      * </p>
      * <p>
-     * action attributes
+     * action attributes</p>
      * <ul>
      * <li>urn:fedora:names:fedora:2.1:action:id ==
      * urn:fedora:names:fedora:2.1:action:id-addDatastream</li>
      * <li>urn:fedora:names:fedora:2.1:action:api ==
      * urn:fedora:names:fedora:2.1:action:api-m</li>
      * </ul>
-     * </p>
+     * 
      * <p>
-     * resource attributes of object to which datastream would be added
+     * resource attributes of object to which datastream would be added</p>
      * <ul>
      * <li>urn:fedora:names:fedora:2.1:resource:object:pid</li>
      * <li>urn:fedora:names:fedora:2.1:resource:object:namespace (if pid is
      * "x:y", namespace is "x")</li>
      * </ul>
-     * </p>
      * <p>
-     * resource attributes of datastream which would be added
+     * resource attributes of datastream which would be added</p>
      * <ul>
      * <li>urn:fedora:names:fedora:2.1:resource:datastream:mimeType</li>
      * <li>urn:fedora:names:fedora:2.1:resource:datastream:formatUri</li>
@@ -205,7 +200,6 @@ public class DefaultAuthorization
      * <li>urn:fedora:names:fedora:2.1:resource:datastream:checksumType</li>
      * <li>urn:fedora:names:fedora:2.1:resource:datastream:checksum</li>
      * </ul>
-     * </p>
      */
     @Override
     public final void enforceAddDatastream(Context context,

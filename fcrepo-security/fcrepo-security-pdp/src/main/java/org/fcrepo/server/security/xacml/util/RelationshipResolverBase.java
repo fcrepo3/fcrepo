@@ -8,7 +8,6 @@ import java.util.Map;
 import org.fcrepo.common.Constants;
 import org.fcrepo.common.MalformedPIDException;
 import org.fcrepo.common.PID;
-import org.fcrepo.server.security.xacml.pdp.MelcoePDPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,11 +35,10 @@ public abstract class RelationshipResolverBase
 
     /**
      * Constructor that takes a map of parent-child predicates (relationships).
-     * {@link ContextHandlerImpl} builds the map from the relationship-resolver
+     * org.fcrepo.server.security.xacml.pep.ContextHandlerImpl builds the map from the relationship-resolver
      * section of config-melcoe-pep.xml (in WEB-INF/classes).
      *
      * @param options
-     * @throws MelcoePDPException
      */
     public RelationshipResolverBase(Map<String, String> options) {
         parentRelationships = new ArrayList<String>();

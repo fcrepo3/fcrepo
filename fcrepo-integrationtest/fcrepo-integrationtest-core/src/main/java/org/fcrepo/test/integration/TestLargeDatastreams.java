@@ -40,13 +40,13 @@ import org.fcrepo.test.FedoraTestCase;
 
 
 /**
- * Performs ingest and export tests using large datastreams.
+ * <p>Performs ingest and export tests using large datastreams.
  * This test creates and moves very large files and as such
  * takes significant time to run.
- * <p/>
+ * </p><p>
  * Non-SSL transports *MUST* be available for all APIs in order
  * for this test to run properly.
- *
+ * </p>
  * @author Bill Branan
  */
 public class TestLargeDatastreams

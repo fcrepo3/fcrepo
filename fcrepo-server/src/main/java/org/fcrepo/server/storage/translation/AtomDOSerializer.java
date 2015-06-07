@@ -47,12 +47,12 @@ import org.fcrepo.utilities.ReadableCharArrayWriter;
  * represented via the Atom Threading Extensions.
  * For convenience, a datastream entry references its latest datastream
  * version entry with an atom:link element. For example, a DC datastream
- * entry with a reference to its most recent version: <br/>
- * <code>&lt;link href="info:fedora/demo:foo/DC/2008-04-01T12:30:15.123" rel="alternate"/&gt</code></p>
+ * entry with a reference to its most recent version: <br>
+ * <code>&lt;link href="info:fedora/demo:foo/DC/2008-04-01T12:30:15.123" rel="alternate"/&gt;</code></p>
  *
  * <p>Each datastream version refers to its parent datastream via a
  * thr:in-reply-to element. For example, the entry for a DC datastream
- * version would include:<br/>
+ * version would include:<br>
  * <code>&lt;thr:in-reply-to ref="info:fedora/demo:foo/DC"/&gt;</code></p>
  *
  * @see <a href="http://atomenabled.org/developers/syndication/atom-format-spec.php">The Atom Syndication Format</a>

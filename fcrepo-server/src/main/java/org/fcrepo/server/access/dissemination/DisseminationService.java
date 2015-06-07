@@ -759,7 +759,6 @@ public class DisseminationService {
 	 * The format of the tempID is derived from <code>java.sql.Timestamp</code>
 	 * with an arbitrary counter appended to the end to insure uniqueness. The
 	 * syntax is of the form:
-	 * <ul>
 	 * <p>
 	 * YYYY-MM-DD HH:mm:ss.mmm:dddddd where
 	 * </p>
@@ -772,7 +771,6 @@ public class DisseminationService {
 	 * <li>ss - seconds (0-59)</li>
 	 * <li>mmm - milliseconds (0-999)</li>
 	 * <li>dddddd - incremental counter (0-999999)</li>
-	 * </ul>
 	 * </ul>
 	 * 
 	 * @param dsLocation

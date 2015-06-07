@@ -40,7 +40,7 @@ import org.fcrepo.utilities.Foxml11Document.State;
 
 /**
  * Test of the ResourceIndexRebuilder. Requires that Fedora already be installed.
- * Note that this is a long-running test because of the ingest & purge cycle.
+ * Note that this is a long-running test because of the ingest &amp; purge cycle.
  *
  * @author Edwin Shin
  * @version $Id: ResourceIndexRebuilderTest.java 7508 2008-07-15 04:00:43Z pangloss $

@@ -7,8 +7,8 @@ package org.fcrepo.common.policy;
 import org.jboss.security.xacml.sunxacml.attr.StringAttribute;
 
 /**
- * The Fedora Action XACML namespace.
- * <p/>
+ * <p>The Fedora Action XACML namespace.
+ * </p>
  * <pre>
  * Namespace URI    : urn:fedora:names:fedora:2.1:action
  * </pre>

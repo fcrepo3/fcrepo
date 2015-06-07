@@ -431,7 +431,7 @@ public class DefaultExternalContentManager
      * Last-Modified
      * ETag
      * @param String canonicalPath: the canonical path to a file system resource
-     * @param long lastModified: the date of last modification
+     * @param lastModified lastModified: the date of last modification
      * @return
      */
     private static Property[] getFileDatastreamHeaders(String canonicalPath, long lastModified) {

@@ -37,7 +37,7 @@ import static org.fcrepo.server.journal.readerwriter.multicast.Transport.State.S
 
 /**
  * SYNCHRONIZATION NOTE: All public methods are synchronized against
- * {@link JournalWriter.SYNCHRONIZER}, as is the {@link #closeFile() closeFile}
+ * {@link JournalWriter#SYNCHRONIZER}, as is the {@link #closeFile() closeFile}
  * method. This means that an asynchronous call by the timer task will not
  * interrupt a synchronous operation already in progress, or vice versa.
  *

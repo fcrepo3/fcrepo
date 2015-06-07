@@ -24,8 +24,8 @@ public class DefaultNamespaceContext implements NamespaceContext {
 
 
     /**
-     * Constructs a NamespaceContext with no default namespace.
-     * <p/>
+     * <p>Constructs a NamespaceContext with no default namespace.
+     * </p>
      * Beware that the default namespace can only be set during
      * construction.
      */
@@ -35,7 +35,6 @@ public class DefaultNamespaceContext implements NamespaceContext {
 
     /**
      * Constructs a NamespaceContext with a default namespace.
-     * <p/>
      *
      * @param defaultNamespaceURI , the default namespace for this context.
      */
@@ -72,11 +71,11 @@ public class DefaultNamespaceContext implements NamespaceContext {
     }
 
     /**
-     * Set or add a namespace to the context and associated it with a prefix.
-     * <p/>
+     * <p>Set or add a namespace to the context and associated it with a prefix.
+     * </p><p>
      * A given prefix can only be associated with one namespace in the context.
      * A namespace can have multiple prefixes.
-     * <p/>
+     * </p>
      * The prefixes: {@code xml}, and {@code xmlns} are reserved and
      * predefined in any context.
      *
@@ -111,7 +110,7 @@ public class DefaultNamespaceContext implements NamespaceContext {
 
 
         if (!this.prefixes.containsKey(prefix)) {
-            return XMLConstants.NULL_NS_URI;
+            return "";
         }
 
         return this.prefixes.get(prefix);
@@ -210,7 +209,7 @@ public class DefaultNamespaceContext implements NamespaceContext {
 
     /**
      * This Iterator wraps any Iterator and makes the remove() method
-     * unsupported.<br>
+     * unsupported.<br></br>
      *
      * @author Hans Lund, State and University Library, Aarhus Denamrk.
      * @version $Id: DefaultNamespaceContext.java,v 1.5 2007/10/04 13:28:21 te Exp $

@@ -780,7 +780,6 @@ public abstract class Server
      * Generates Spring Bean definitions for Fedora Modules.
      * Server param should be unnecessary if autowired.
      * @param className
-     * @param server
      * @param params
      * @param role
      * @return
@@ -838,9 +837,8 @@ public abstract class Server
 
     /**
      *
-     * @param DatastoreConfiguration tsDC : the datastore configuration intended for the triplestore connector
+     * @param tsDC DatastoreConfiguration : the datastore configuration intended for the triplestore connector
      * @return GenericBeanDefinition for the TriplestoreConnector
-     * @throws ClassNotFoundException
      * @throws IOException
      */
     protected static GenericBeanDefinition getTriplestoreConnectorBeanDefinition(DatastoreConfiguration tsDC)
@@ -1545,7 +1543,7 @@ public abstract class Server
     
     /**
      * Gets the server configuration under a given $FEDORA_HOME/server/ directory.
-     * @param the server directory
+     * @param serverHome the server directory
      * @return the server configuration.
      */
     public static ServerConfiguration getConfig(File serverHome) {

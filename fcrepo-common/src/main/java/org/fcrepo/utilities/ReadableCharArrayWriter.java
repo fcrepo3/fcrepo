@@ -11,16 +11,10 @@ public class ReadableCharArrayWriter extends CharArrayWriter {
     
     private boolean closed = false;
     
-    /**
-     * {@inheritDoc}
-     */
     public ReadableCharArrayWriter() {
         super();
     }
     
-    /**
-     * {@inheritDoc}
-     */
     public ReadableCharArrayWriter(int size) {
         super(size);
     }

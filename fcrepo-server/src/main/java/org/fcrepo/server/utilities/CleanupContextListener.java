@@ -52,7 +52,7 @@ public class CleanupContextListener implements ServletContextListener {
     /**
      * Clean up resources used by the application when stopped
      *
-     * @seejavax.servlet.ServletContextListener#contextDestroyed(javax.servlet
+     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet
      * .ServletContextEvent)
      */
     @Override

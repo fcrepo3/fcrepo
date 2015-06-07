@@ -21,14 +21,14 @@ public class Designator {
     /**
      * Gets an attribute by name
      * @param attributeName
-     * @return
+     * @return Attribute
      */
     public Attribute get(String attributeName) {
         return attributes.get(attributeName);
     }
     /**
      * Get all attribute names for this designator (XACML target)
-     * @return
+     * @return Set&lt;String&gt;
      */
     public Set<String> getAttributeNames() {
         return attributes.keySet();
@@ -37,7 +37,7 @@ public class Designator {
      * Add/update an attribute for this target.  Note that the attribute will have
      * no configuration (empty configuration is created).  Returns the attribued added/updated
      * @param attributeName
-     * @return
+     * @return Attribute
      */
     public Attribute put(String attributeName) {
         Attribute attr = attributes.get(attributeName);

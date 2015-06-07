@@ -23,7 +23,7 @@ public class Attribute {
     /**
      * Get named config item for this attribute
      * @param optionName
-     * @return
+     * @return String option value
      */
     public String get(String optionName) {
         return options.get(optionName);
@@ -32,7 +32,7 @@ public class Attribute {
      * Add or update a config item for this attribute
      * @param optionName
      * @param optionValue
-     * @return
+     * @return String option value
      */
     public String put(String optionName, String optionValue) {
         options.put(optionName, optionValue);

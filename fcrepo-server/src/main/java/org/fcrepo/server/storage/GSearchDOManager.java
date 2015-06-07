@@ -39,18 +39,18 @@ import org.fcrepo.server.storage.types.DigitalObject;
  * </p>
  * <p>
  * Required:
+ * </p>
  * <ul>
  * <li> &lt;param name="gSearchRESTURL"
  * value="http://localhost:8080/fedoragsearch/rest"/&gt;</li>
  * </ul>
- * </p>
  * <p>
  * Optional (only needed if basic auth is required for GSearch REST access):
+ * </p>
  * <ul>
  * <li> &lt;param name="gSearchUsername" value="exampleUsername"/&gt;</li>
  * <li> &lt;param name="gSearchPassword" value="examplePassword"/&gt;</li>
  * </ul>
- * </p>
  *
  * @author Chris Wilper
  */

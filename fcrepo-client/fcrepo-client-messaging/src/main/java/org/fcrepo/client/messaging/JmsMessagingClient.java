@@ -69,7 +69,7 @@ public class JmsMessagingClient implements MessagingClient, MessageListener {
     /**
      * Creates a messaging client
      *
-     * <h4>Client ID</h4>
+     * <h1>Client ID</h1>
      * <p>
      * The clientId provides applications with the opportunity to create
      * multiple messaging clients and track them based on this identifier.
@@ -77,20 +77,22 @@ public class JmsMessagingClient implements MessagingClient, MessageListener {
      * connection for durable subscriptions.
      * </p>
      *
-     * <h4>Message Listener</h4>
+     * <h1>Message Listener</h1>
      * <p>
      * A listener, the onMessage() method of which will be called when a
      * message arrives from the messaging provider. See the documentation
      * for javax.jms.MessageListener for more information.
      * </p>
      *
-     * <h4>Connection Properties</h4>
+     * <h1>Connection Properties</h1>
      *
      * <p>All of the following properties must be included:</p>
-     * <table border="1">
-     *   <th>Property</th>
-     *   <th>Description</th>
-     *   <th>Example Value</th>
+     * <table border="1" summary="JMS Connection Properties">
+     *   <tr>
+     *     <th>Property</th>
+     *     <th>Description</th>
+     *     <th>Example Value</th>
+     *   </tr>
      *   <tr>
      *     <td>java.naming.factory.initial (javax.naming.Context.INITIAL_CONTEXT_FACTORY)</td>
      *     <td>The JNDI initial context factory which will allow lookup of the other attributes</td>
@@ -108,10 +110,12 @@ public class JmsMessagingClient implements MessagingClient, MessageListener {
      *   </tr>
      * </table>
      * <p>One or more of the following properties must be specified:</p>
-     * <table border="1">
-     *   <th>Property Name</th>
-     *   <th>Description</th>
-     *   <th>Example Value</th>
+     * <table border="1" summary="JMS Subscription Properties">
+     *   <tr>
+     *     <th>Property Name</th>
+     *     <th>Description</th>
+     *     <th>Example Value</th>
+     *   </tr>
      *   <tr>
      *     <td>topic.X (where X = name of subscription topic, example - topic.fedoraManagement)</td>
      *     <td>A topic over which notification messages will be provided</td>
@@ -124,7 +128,7 @@ public class JmsMessagingClient implements MessagingClient, MessageListener {
      *   </tr>
      * </table>
      *
-     * <h4>Durable</h4>
+     * <h1>Durable</h1>
      * <p>
      * Specifies whether the topics included in the connection properties should
      * have durable consumers. If set to true, all topics listeners will be
@@ -140,7 +144,7 @@ public class JmsMessagingClient implements MessagingClient, MessageListener {
      * A single MessageListener can be registered as the listener for both clients.
      * </p>
      *
-     * <h4>Message Selector</h4>
+     * <h1>Message Selector</h1>
      * <p>
      * A JMS message selector allows a client to specify, by header field references
      * and property references, the messages it is interested in. Only messages

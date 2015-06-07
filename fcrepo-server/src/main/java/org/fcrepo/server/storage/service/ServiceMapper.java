@@ -26,7 +26,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * found in service objects. The intent of this class is to initiate parsing of
  * these datastreams so that information about a service can be
  * instantiated in Fedora.
- * </p>
  * 
  * @author Sandy Payette
  * @version $Id$

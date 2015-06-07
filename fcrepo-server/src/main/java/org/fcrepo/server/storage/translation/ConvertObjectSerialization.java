@@ -122,7 +122,7 @@ public class ConvertObjectSerialization {
      *
      * @param source
      * @param destination
-     * @return
+     * @return boolean
      */
     public boolean convert(File source, File destination) {
         boolean result = true;

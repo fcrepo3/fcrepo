@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Required;
 
 
 /**
- * Wraps a Spring-configured {@link AkubraLowlevelStore} instance as a
+ * Wraps a Spring-configured {@link AkubraLowlevelStorage} instance as a
  * {@link Module}.
  * <p>
  * To use this module, edit <code>$FEDORA_HOME/config/akubra-llstore.xml</code>
@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Required;
  * <p>
  * <pre>
  * &lt;module role="org.fcrepo.server.storage.lowlevel.ILowlevelStorage"
- *   class="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorageModule"/>
+ *   class="org.fcrepo.server.storage.lowlevel.akubra.AkubraLowlevelStorageModule"/&gt;
  * </pre>
  *
  * @author Chris Wilper

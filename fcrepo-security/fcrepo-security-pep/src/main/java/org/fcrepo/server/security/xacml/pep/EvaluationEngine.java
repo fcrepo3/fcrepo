@@ -29,7 +29,7 @@ public interface EvaluationEngine {
     /**
      * Evaluates an XACML request and returns an XACML response.
      * 
-     * @param request
+     * @param reqCtx
      *        an XACML request as a RequestCtx object
      * @return and XACML response as a ResponseCtx object
      * @throws PEPException

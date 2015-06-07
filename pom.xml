@@ -1327,6 +1327,11 @@
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
               <maxmemory>128m</maxmemory>
+              <dependencySourceIncludes>
+                <!-- include ONLY duraspace project dependencies -->
+                <dependencySourceInclude>org.fcrepo:*</dependencySourceInclude>
+                <dependencySourceInclude>org.trippi:*</dependencySourceInclude>
+              </dependencySourceIncludes>
             </configuration>
             <executions>
               <execution>

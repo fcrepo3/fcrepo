@@ -80,8 +80,7 @@ public class DatastreamFilenameHelper {
      * in the access modules upstream.
      *
      * @param fedoraServer
-     * @param management
-     * @param access
+     * @param manager
      */
     public DatastreamFilenameHelper(Server fedoraServer, DOManager manager) {
         m_datastreamContentDispositionInlineEnabled = fedoraServer.getParameter("datastreamContentDispositionInlineEnabled");

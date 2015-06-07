@@ -1018,14 +1018,14 @@ implements DOManager {
                 // of it in the digital object registry
                 registerObject(obj);
                 return w;
-            } catch (IOException e) {
+            } catch (IOException ioe) {
 
                 if (w != null) {
                     releaseWriteLock(obj.getPid());
                 }
 
                 throw new GeneralException("Error reading/writing temporary "
-                        + "ingest file", e);
+                        + "ingest file", ioe);
             } catch (Exception e) {
 
                 if (w != null) {

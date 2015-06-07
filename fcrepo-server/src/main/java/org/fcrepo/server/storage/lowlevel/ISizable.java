@@ -14,7 +14,7 @@ public interface ISizable {
     /**
      * Return the size of a datastream in bytes
      * @param dsKey
-     * @return
+     * @return long size of datastream contents
      * @throws LowlevelStorageException
      */
     public long getDatastreamSize(String dsKey) throws LowlevelStorageException;

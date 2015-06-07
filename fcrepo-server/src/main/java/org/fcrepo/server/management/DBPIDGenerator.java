@@ -50,8 +50,8 @@ public class DBPIDGenerator
      * generated PID as reported by the log files in that directory. This is to
      * support automatic upgrade of this functionality from versions of Fedora
      * prior to 1.2.
-     * @throws ModuleInitializationException 
-     * @throws  
+     * @throws IOException
+     * @throws ModuleInitializationException
      */
     public DBPIDGenerator(ConnectionPool cPool, File oldPidGenDir)
             throws IOException, ModuleInitializationException {

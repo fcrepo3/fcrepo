@@ -48,7 +48,7 @@ public interface ResourceIndex
     /**
      * Gets the default state of buffer synchronization. When this is
      * true, all operations are flushed on completion.
-     * @return
+     * @return boolean
      */
     boolean getSync();
     /**
@@ -92,7 +92,7 @@ public interface ResourceIndex
      * Modifying an object is the equivalent of processing the difference
      * between the export before and after a change.
      * @param object
-     * @return
+     * @return List&lt;Triple&gt;
      * @throws ResourceIndexException
      */
     List<Triple> exportObject(DOReader object) throws ResourceIndexException;

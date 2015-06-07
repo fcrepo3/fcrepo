@@ -108,7 +108,7 @@ public abstract class FedoraServerTestCase
      * hierarchy
      * </p>
      *
-     * @param path format-independent path to a directory within the demo object
+     * @param paths format-independent path to a directory within the demo object
      *             hierarchy.
      * @throws Exception
      */

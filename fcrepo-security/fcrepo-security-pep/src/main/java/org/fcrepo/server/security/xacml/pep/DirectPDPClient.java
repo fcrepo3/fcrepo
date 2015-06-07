@@ -45,8 +45,8 @@ public class DirectPDPClient
     /**
      * Initialises the DirectPDPClient class.
      *
-     * @param options
-     *        a Map of options for this class
+     * @param pdp
+     *        the PDP for which this is a client
      * @throws PEPException
      */
     public DirectPDPClient(MelcoePDP pdp)

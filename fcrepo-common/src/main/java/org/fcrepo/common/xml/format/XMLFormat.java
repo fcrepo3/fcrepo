@@ -28,9 +28,9 @@ public class XMLFormat {
      * 
      * @param uri
      *        the URI of the format.
-     * @param xmlNamespace
+     * @param namespace
      *        the primary XML namespace.
-     * @param xsdSchemaLocation
+     * @param xsdLocation
      *        the public location of the XSD schema.
      * @throws IllegalArgumentException
      *         if any parameter is null.

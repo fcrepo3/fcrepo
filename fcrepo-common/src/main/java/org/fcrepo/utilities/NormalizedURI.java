@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  *
  * @author Edwin Shin
  * @since 3.0
- * @see RFC3986
+ * @see <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC3986</a>
  * @version $Id$
  */
 public class NormalizedURI {
@@ -98,7 +98,7 @@ public class NormalizedURI {
 
     /**
      * Case Normalization
-     * @see RFC3986 6.2.2.1
+     * @see "RFC3986 6.2.2.1"
      *
      */
     public void normalizeCase() {
@@ -138,7 +138,7 @@ public class NormalizedURI {
 
     /**
      * Percent-Encoding Normalization
-     * @see RFC3986 6.2.2.2
+     * @see "RFC3986 6.2.2.2"
      *
      */
     public void normalizePercentEncoding() {
@@ -154,7 +154,7 @@ public class NormalizedURI {
 
     /**
      * Path Segment Normalization
-     * @see RFC3986 6.2.2.3
+     * @see "RFC3986 6.2.2.3"
      *
      */
     public void normalizePathSegment() {
@@ -163,7 +163,7 @@ public class NormalizedURI {
 
     /**
      * Scheme-Based Normalization
-     * @see RFC3986 6.2.3
+     * @see "RFC3986 6.2.3"
      *
      */
     public void normalizeByScheme() {
@@ -206,7 +206,7 @@ public class NormalizedURI {
 
     /**
      * Protocol-Based Normalization
-     * @see RFC3986 6.2.4
+     * @see "RFC3986 6.2.4"
      *
      */
     public void normalizeByProtocol() {

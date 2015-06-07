@@ -46,14 +46,13 @@ import org.slf4j.LoggerFactory;
  * (API-A-LITE) interface using a java servlet front end. The syntax defined by
  * API-A-LITE has for getting a description of the repository has the following
  * binding:
- * <ol>
- * <li>getObjectHistory URL syntax:
+ * <p>getObjectHistory URL syntax:
  * protocol://hostname:port/fedora/getObjectHistory/pid[?xml=BOOLEAN] This
  * syntax requests information about the repository. The xml parameter
  * determines the type of output returned. If the parameter is omitted or has a
  * value of "false", a MIME-typed stream consisting of an html table is returned
  * providing a browser-savvy means of viewing the object profile. If the value
- * specified is "true", then a MIME-typed stream consisting of XML is returned.</li>
+ * specified is "true", then a MIME-typed stream consisting of XML is returned.</p>
  * <ul>
  * <li>protocol - either http or https.</li>
  * <li>hostname - required hostname of the Fedora server.</li>

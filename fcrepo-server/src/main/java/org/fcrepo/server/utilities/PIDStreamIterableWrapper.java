@@ -18,12 +18,13 @@ import java.util.NoSuchElementException;
  * Allows a stream containing a list of pids to be iterated in a for (String pid : wrapper) statement.
  *
  * Stream must contain either:
+ * <ul>
  * <li>Raw list of PIDs, separated by newlines (blank lines are skipped)</li>
  * <li>XML containing &lt;pid&gt; elements.  Structure of XML is not interpreted,
  * only single lines containing this element are read.  Only one PID per line.
  * Empty pid elements (&lt;pid/&gt;) will be skipped.
  * This is compatible with basic search output</li>
- *
+ * </ul>
  * @author Stephen Bayliss
  * @version $Id$
  */

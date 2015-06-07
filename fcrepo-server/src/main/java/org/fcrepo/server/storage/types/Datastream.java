@@ -155,7 +155,7 @@ public class Datastream {
     /**
      * Calculate and return the size of the data if possible
      * @param ctx
-     * @return
+     * @return long content size
      * @throws StreamIOException
      */
     public long getContentSize(Context ctx) throws StreamIOException {
@@ -341,7 +341,7 @@ public class Datastream {
 
     /**
      * true if the datastream is managed content or inline XML
-     * @return
+     * @return boolean
      */
     public boolean isRepositoryManaged() {
         return "M".equalsIgnoreCase(DSControlGrp) || "X".equalsIgnoreCase(DSControlGrp);

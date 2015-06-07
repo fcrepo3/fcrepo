@@ -98,7 +98,7 @@ public class HierarchicalLowestChildPermitOverridesPolicyAlg
      *        the context from the request
      * @param parameters
      *        a (possibly empty) non-null <code>List</code> of
-     *        <code>CombinerParameter<code>s
+     *        <code>CombinerParameter</code>s
      * @param policyElements
      *        the policies to combine
      * @return the result of running the combining algorithm

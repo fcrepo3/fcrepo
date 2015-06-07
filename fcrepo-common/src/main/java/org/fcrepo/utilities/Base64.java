@@ -37,7 +37,7 @@ public abstract class Base64 {
      * successful or not.
      *
      * @param in stream to encode
-     * @param encoded bytes, or null if there's an error reading the stream
+     * @return encoded bytes, or null if there's an error reading the stream
      */
     public static byte[] encode(InputStream in) {
         Base64OutputStream out = null;
@@ -84,7 +84,7 @@ public abstract class Base64 {
      * successful or not.
      *
      * @param in stream to encode
-     * @param encoded string, or null if there's an error reading the stream
+     * return encoded string, or null if there's an error reading the stream
      */
     public static String encodeToString(InputStream in) {
         return getString(encode(in));

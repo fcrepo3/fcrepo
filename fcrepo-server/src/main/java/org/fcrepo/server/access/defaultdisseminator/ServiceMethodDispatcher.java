@@ -32,7 +32,7 @@ public class ServiceMethodDispatcher {
      *        the method to invoke on the target object
      * @param userParms
      *        parameters to the method to invoke on target object
-     * @return
+     * @return Object product of the method
      * @throws ServerException
      */
     public Object invokeMethod(Object service_object,

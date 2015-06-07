@@ -43,7 +43,7 @@ public class Condition {
     }
 
     /**
-     * Gets a List of Conditions from a string like: a=x b~'that\'s' c>='z'
+     * Gets a List of Conditions from a string like: a=x b~'that\'s' c&gt;='z'
      * 
      * @param query
      *        The query string.

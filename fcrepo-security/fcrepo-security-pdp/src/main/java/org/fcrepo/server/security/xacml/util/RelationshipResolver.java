@@ -30,23 +30,11 @@ public interface RelationshipResolver {
      *
      * @param subject
      * @param relationship
-     * @param object
-     * @return
+     * @return Map&lt;String, Set&lt;String&gt;&gt; relationships
      * @throws MelcoeXacmlException
      */
     public Map<String, Set<String>> getRelationships(String subject,
                                                       String relationship) throws MelcoeXacmlException;
-
-    /**
-     * Obtains a list of parents for the given pid.
-     *
-     * @param pid
-     *        object id whose parents we wish to find
-     * @return a Set containing the parents of the pid
-     * @throws PEPException
-     */
-    // FIXME: not used?
-    //public Set<String> getParents(String pid) throws MelcoeXacmlException;
 
     /**
      * Generates a REST based representation of an object and its parents. For
@@ -56,7 +44,7 @@ public interface RelationshipResolver {
      * @param pid
      *        the pid whose parents we need to find
      * @return the REST representation of the pid and its parents
-     * @throws PEPException
+     * @throws MelcoeXacmlException
      */
     public String buildRESTParentHierarchy(String pid)
             throws MelcoeXacmlException;
@@ -71,7 +59,7 @@ public interface RelationshipResolver {
      * @param query The query to run
      * @param queryLang Language of the query - itql, sparql, spo
      * @param variable - the output variable to return (for spo, specify "s", "p" or "o")
-     * @return
+     * @return Set&lt;String&gt; attributes
      * @throws MelcoeXacmlException
      */
     public Set<String> getAttributesFromQuery(String query, String queryLang, String variable) throws MelcoeXacmlException;

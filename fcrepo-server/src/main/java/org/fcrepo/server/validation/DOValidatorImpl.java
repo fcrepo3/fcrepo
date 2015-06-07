@@ -125,7 +125,7 @@ public class DOValidatorImpl
      *        extension)
      * @param schematronPreprocessorPath
      *        Location of the Schematron pre-processing stylesheet configured
-     *        with Fedora.</i>
+     *        with Fedora.
      * @param ruleSchemaMap
      *        Location of rule schemas (Schematron), configured with Fedora (see
      *        Fedora.fcfg). Current options are <i>schematron/foxmlRules1-0.xml</i>
