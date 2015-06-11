@@ -43,7 +43,7 @@ public class UploadResource extends BaseRestResource {
     /**
      * Uploads a file encoded in a multipart/form message.
      *
-     * @param multiPart
+     * @param multipart
      *            the multiPart object containing the file to be uploaded
      * @return a URI with the (custom) uploaded:// scheme and a unique
      *         identifier to be used future ingests. Returns 202 if request succeeds

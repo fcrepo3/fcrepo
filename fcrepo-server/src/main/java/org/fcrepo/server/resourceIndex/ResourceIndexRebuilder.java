@@ -88,7 +88,6 @@ public class ResourceIndexRebuilder
     /**
      * Initialize the rebuilder, given the server configuration.
      *
-     * @returns a map of option names to plaintext descriptions.
      */
     public void setServerConfiguration(ServerConfiguration serverConfig){
         // not needed

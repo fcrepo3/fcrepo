@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An OAIProvider that acts as a server module and wraps FedoraOAIProvider.
+ * <p>An OAIProvider that acts as a server module and wraps FedoraOAIProvider.
  * </p>
  *
  * @author Chris Wilper

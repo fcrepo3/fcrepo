@@ -19,7 +19,7 @@ import org.fcrepo.server.storage.types.MethodParmDef;
 
 
 /**
- * A partial implementation of {@link BMechReader} for use in unit tests. Add
+ * A partial implementation of {@link ServiceDeploymentReader} for use in unit tests. Add
  * more mocking to this class as needed, or override methods in sub-classes.
  *
  * @author Jim Blake

@@ -35,10 +35,10 @@ public class SubjectUtils {
             LoggerFactory.getLogger(SubjectUtils.class);
 
     /**
-     * Get the attribute map of String keys to Set<String> values
+     * Get the attribute map of String keys to Set&lt;String&gt; values
      * This method will not return a null
      * @param subject
-     * @return
+     * @return Map&lt;String, Set&lt;String&gt;&gt;
      */
     
     @SuppressWarnings("unchecked")

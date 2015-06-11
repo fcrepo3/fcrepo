@@ -12,10 +12,10 @@ import javax.swing.JOptionPane;
  * sSefs, sDeps, data objects (any combination).
  * 
  * <p>Result will come back as string consisting of combination of "D", "M", 
- * and "O" characters, respectively, if selected.
+ * and "O" characters, respectively, if selected.</p>
  * 
  * @author Chris Wilper
- * @deprecated.  May replace/refactor with something that selects content models
+ * @deprecated  May replace/refactor with something that selects content models
  */
 public class FTypeDialog
         extends JDialog {

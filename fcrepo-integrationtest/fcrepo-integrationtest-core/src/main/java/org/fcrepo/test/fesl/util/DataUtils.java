@@ -47,7 +47,7 @@ public class DataUtils {
     /**
      * Creates an XML document object from a file.
      *
-     * @param file
+     * @param filename
      *        the filename of the file to load.
      * @return the XML document object.
      * @throws Exception
@@ -82,8 +82,8 @@ public class DataUtils {
     /**
      * Creates an XML document object from a byte array.
      *
-     * @param file
-     *        the file to load.
+     * @param data
+     *        the bytes to load.
      * @return the XML document object.
      * @throws Exception
      */
@@ -115,8 +115,8 @@ public class DataUtils {
     /**
      * Loads a file into a byte array.
      *
-     * @param File
-     *        to load.
+     * @param file
+     *        File to load.
      * @return byte array containing the data file.
      * @throws Exception
      */

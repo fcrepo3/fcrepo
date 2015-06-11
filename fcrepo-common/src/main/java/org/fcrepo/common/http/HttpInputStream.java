@@ -96,7 +96,7 @@ public class HttpInputStream
      * if the fighter is not present
      * @param name the header name
      * @param defaultVal the default value
-     * @return
+     * @return String
      */
     public String getResponseHeaderValue(String name, String defaultVal) {
         if (m_response.containsHeader(name)) {

@@ -38,7 +38,7 @@ public class TypeUtility {
 
     /**
      * Convert a local {@link FieldSearchQuery} into a WSDL-style
-     * {@link org.fcrepo.server.types.mtom.gen.FieldSearchQuery FieldSearchQuery}.
+     * {@link org.fcrepo.server.types.gen.FieldSearchQuery FieldSearchQuery}.
      */
     public static org.fcrepo.server.types.gen.FieldSearchQuery convertFieldSearchQueryToGenFieldSearchQuery(FieldSearchQuery fsq) {
         List<org.fcrepo.server.types.gen.Condition> genConditions =
@@ -56,7 +56,7 @@ public class TypeUtility {
 
     /**
      * Convert a {@link List} of local {@link Condition}s into an array of
-     * WSDL-style {@link org.fcrepo.server.types.mtom.gen.Condition Condition}s.
+     * WSDL-style {@link org.fcrepo.server.types.gen.Condition Condition}s.
      */
     public static List<org.fcrepo.server.types.gen.Condition> convertConditionsListToGenConditionsArray(List<Condition> conditions) {
         List<org.fcrepo.server.types.gen.Condition> genConditions =
@@ -71,7 +71,7 @@ public class TypeUtility {
 
     /**
      * Convert a local {@link Condition} into a WSDL-style
-     * {@link org.fcrepo.server.types.mtom.gen.Condition Condition}.
+     * {@link org.fcrepo.server.types.gen.Condition Condition}.
      */
     public static org.fcrepo.server.types.gen.Condition convertConditionToGenCondition(Condition condition) {
         String opAbbr = condition.getOperator().getAbbreviation();
@@ -92,7 +92,7 @@ public class TypeUtility {
 
     /**
      * Convert a WSDL-style
-     * {@link org.fcrepo.server.types.mtom.gen.FieldSearchResult FieldSearchResult} to a
+     * {@link org.fcrepo.server.types.gen.FieldSearchResult FieldSearchResult} to a
      * local {@link FieldSearchResult}.
      */
     public static FieldSearchResult convertGenFieldSearchResultToFieldSearchResult(org.fcrepo.server.types.gen.FieldSearchResult fsr) {
@@ -124,7 +124,7 @@ public class TypeUtility {
 
     /**
      * Convert an array of WSDL-style
-     * {@link org.fcrepo.server.types.mtom.gen.ObjectFields ObjectFields} objects to a
+     * {@link org.fcrepo.server.types.gen.ObjectFields ObjectFields} objects to a
      * {@link List} of local {@link ObjectFields} objects.
      */
     public static List<ObjectFields> convertGenObjectFieldsArrayToObjectFieldsList(org.fcrepo.server.types.gen.ObjectFields[] objectFields) {
@@ -137,7 +137,7 @@ public class TypeUtility {
 
     /**
      * Convert a WSDL-style
-     * {@link org.fcrepo.server.types.mtom.gen.ObjectFields ObjectFields} object to a
+     * {@link org.fcrepo.server.types.gen.ObjectFields ObjectFields} object to a
      * local {@link ObjectFields} object.
      */
     public static ObjectFields convertGenObjectFieldsToObjectFields(org.fcrepo.server.types.gen.ObjectFields source) {

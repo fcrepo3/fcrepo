@@ -23,7 +23,6 @@ import org.fcrepo.server.errors.ObjectNotInLowlevelStorageException;
 import org.fcrepo.server.errors.ServerException;
 import org.fcrepo.server.management.Management;
 import org.fcrepo.server.security.xacml.MelcoeXacmlException;
-import org.fcrepo.server.security.xacml.pdp.MelcoePDPException;
 import org.fcrepo.server.storage.types.RelationshipTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,11 +61,10 @@ public class RelationshipResolverImpl
 
     /**
      * Constructor that takes a map of parent-child predicates (relationships).
-     * {@link ContextHandlerImpl} builds the map from the relationship-resolver
+     * org.fcrepo.server.security.xacml.pep.ContextHandlerImpl builds the map from the relationship-resolver
      * section of config-melcoe-pep.xml (in WEB-INF/classes).
      *
      * @param options
-     * @throws MelcoePDPException
      */
     public RelationshipResolverImpl(Map<String, String> options) {
         relationships = new ArrayList<String>();

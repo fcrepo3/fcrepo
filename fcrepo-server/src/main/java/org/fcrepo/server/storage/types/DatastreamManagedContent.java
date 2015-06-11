@@ -193,7 +193,7 @@ public class DatastreamManagedContent
      * Return the size of the data if possible
      * (IE, it is a file or LLStore implements ISizable)
      * @param ctx
-     * @return
+     * @return long content size
      * @throws StreamIOException
      */
     @Override

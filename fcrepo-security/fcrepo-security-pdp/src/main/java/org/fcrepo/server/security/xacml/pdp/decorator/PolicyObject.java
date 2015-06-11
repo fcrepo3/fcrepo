@@ -85,7 +85,7 @@ public class PolicyObject {
     /**
      * determines if this object represents an active FeSL policy
      *
-     * @return
+     * @return boolean
      * @throws ServerException
      */
     public boolean isPolicyActive() throws ServerException {
@@ -95,7 +95,7 @@ public class PolicyObject {
 
     /**
      * determines if this digital object is active
-     * @return
+     * @return boolean
      * @throws ServerException
      */
     public boolean isObjectActive() throws ServerException {
@@ -108,7 +108,7 @@ public class PolicyObject {
 
     /**
      * determines if the policy datastream in this object is active
-     * @return
+     * @return boolean
      * @throws ServerException
      */
     public boolean isDatastreamActive() throws ServerException {
@@ -120,7 +120,7 @@ public class PolicyObject {
 
     /**
      * determines if this object contains a policy datastream
-     * @return
+     * @return boolean
      * @throws ServerException
      */
     public boolean hasPolicyDatastream() throws ServerException {
@@ -149,7 +149,7 @@ public class PolicyObject {
 
     /**
      * get the policy datastream content
-     * @return
+     * @return InputStream
      * @throws ServerException
      */
     public InputStream getDsContent() throws ServerException {

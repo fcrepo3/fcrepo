@@ -78,7 +78,7 @@ import org.fcrepo.utilities.ReadableByteArrayOutputStream;
  * projects and then had gobs of javadoc warnings on this file.</li>
  * </ul>
  * <li>v2.2.1 - Fixed bug using URL_SAFE and ORDERED encodings. Fixed bug when
- * using very small files (~< 40 bytes).</li>
+ * using very small files (~&lt; 40 bytes).</li>
  * <li>v2.2 - Added some helper methods for encoding/decoding directly from one
  * file to the next. Also added a main() method to support command line
  * encoding/decoding from one file to the next. Also added these Base64
@@ -1701,7 +1701,7 @@ public class Base64 {
          * <pre>
          *   ENCODE or DECODE: Encode or Decode as data is read.
          *   DO_BREAK_LINES: break lines at 76 characters
-         *     (only meaningful when encoding)</i>
+         *     <i>(only meaningful when encoding)</i>
          * </pre>
          * <p>
          * Example: <code>new Base64.InputStream( in, Base64.DECODE )</code>
@@ -1922,7 +1922,7 @@ public class Base64 {
          * <pre>
          *   ENCODE or DECODE: Encode or Decode as data is read.
          *   DO_BREAK_LINES: don't break lines at 76 characters
-         *     (only meaningful when encoding)</i>
+         *     <i>(only meaningful when encoding)</i>
          * </pre>
          * <p>
          * Example: <code>new Base64.OutputStream( out, Base64.ENCODE )</code>

@@ -26,7 +26,7 @@ public class TimestampedCacheEntry<T> {
 	/**
 	 * Calculate the age since the object was created (or claimed creation)
 	 * and the Current system time
-	 * @return
+     * @return long time since documented creation
 	 */
 	public long age() {
 	    return System.currentTimeMillis() - this.timeStamp;
@@ -36,7 +36,7 @@ public class TimestampedCacheEntry<T> {
 	 * Calculate the age since the object was created (or claimed creation)
 	 * and the passed time as a long. Useful for loop processing of entries.
 	 * @param time
-	 * @return
+	 * @return long time since documented creation
 	 */
     public long ageAt(long time) {
         return time - this.timeStamp;

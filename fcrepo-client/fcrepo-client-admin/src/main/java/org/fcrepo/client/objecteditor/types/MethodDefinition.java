@@ -44,7 +44,7 @@ public class MethodDefinition {
      *                       label="PARAMETER_LABEL"(0-1)
      *                    required="IS_REQUIRED"
      *                defaultValue="DEFAULT_VALUE"&gt;
-     *         &lt;ValidParmValues>(0-1)
+     *         &lt;ValidParmValues&gt;(0-1)
      *             &lt;ValidParm value="VALID_VALUE_1"/&gt;(0-)
      *         &lt;/ValidParmValues&gt;
      *     &lt;/UserInputParm&gt;(0-) 

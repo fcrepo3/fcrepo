@@ -42,10 +42,9 @@ public class OwlValidator {
 
     /**
      * This is one complex method.
-     * <p/>
+     * <br>
      * 1. retrieve the list of content models from the object.
      * 2. retrieve the ontology datastreams from each of these content models
-     * 3.
      *
      * @param context
      * @param asOfDateTime

@@ -39,15 +39,15 @@ public interface ContextHandler {
      * Creates a new Request.
      *
      * @param subjects
-     *        a list of Map<URI, AttributeValue> containing the attributes for a
+     *        a list of Map&lt;URI, AttributeValue&gt; containing the attributes for a
      *        set of subjects.
      * @param actions
      *        the URI of the requested Action.
      * @param resources
-     *        a Map<URI, AttributeValue> containing the attributes for a
+     *        a Map&lt;URI, AttributeValue&gt; containing the attributes for a
      *        resource.
      * @param environment
-     *        Map<URI, AttributeValue> containing the attributes for the
+     *        Map&lt;URI, AttributeValue&gt; containing the attributes for the
      *        environment.
      * @return a request context for a PDP to handle.
      * @throws PEPException

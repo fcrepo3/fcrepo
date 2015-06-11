@@ -214,7 +214,7 @@ public abstract class AbstractOperationHandler
      *
      * @param context
      *        the message context
-     * @param param
+     * @param newResponse
      *        the object to set as the return object
      * @throws SoapFault
      */

@@ -99,7 +99,7 @@ public class PolicyParser {
      *
      * @param policyStream
      *          the serialized XACML policy
-     * @param validate
+     * @param schemaValidate
      *          whether to schema validate
      * @return the parsed policy.
      * @throws ValidationException

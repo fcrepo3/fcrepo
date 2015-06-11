@@ -7,22 +7,22 @@ import java.util.List;
 
 /**
  * <p>Java class for anonymous complex type.
- * <p/>
+ * </p>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p/>
+ * </p>
  * <pre>
- * &lt;complexType>
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{info:fedora/fedora-system:def/dsCompositeModel#}form" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{info:fedora/fedora-system:def/dsCompositeModel#}extension" maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="ID" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
- *       &lt;attribute name="optional" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{info:fedora/fedora-system:def/dsCompositeModel#}form" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{info:fedora/fedora-system:def/dsCompositeModel#}extension" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="ID" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" /&gt;
+ *       &lt;attribute name="optional" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -45,21 +45,17 @@ public class DsTypeModel {
 
     /**
      * Gets the value of the form property.
-     * <p/>
-     * <p/>
+     * <br>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the form property.
-     * <p/>
-     * <p/>
+     * <br>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getForm().add(newItem);
      * </pre>
-     * <p/>
-     * <p/>
-     * <p/>
+     * <br>
      * Objects of the following type(s) are allowed in the list
      * {@link Form }
      */
@@ -72,21 +68,17 @@ public class DsTypeModel {
 
     /**
      * Gets the value of the extension property.
-     * <p/>
-     * <p/>
+     * <br>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the extension property.
-     * <p/>
-     * <p/>
+     * <br>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getExtension().add(newItem);
      * </pre>
-     * <p/>
-     * <p/>
-     * <p/>
+     * <br>
      * Objects of the following type(s) are allowed in the list
      * {@link Extension }
      */

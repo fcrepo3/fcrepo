@@ -35,7 +35,7 @@ public interface Access {
      * 
      * @param context
      *        The context of this request.
-     * @param PID
+     * @param pid
      *        The persistent identifier of the digital object.
      * @param sDefPID
      *        The persistent identifier of the Service Definition object.
@@ -63,7 +63,7 @@ public interface Access {
      * 
      * @param context
      *        The context of this request.
-     * @param PID
+     * @param pid
      *        The persistent identifier of the digital object
      * @param asOfDateTime
      *        The versioning datetime stamp
@@ -144,7 +144,7 @@ public interface Access {
      * 
      * @param context
      *        The context of this request.
-     * @param PID
+     * @param pid
      *        The persistent identifier of the digitla object.
      * @return An Array containing the list of timestamps indicating when
      *         changes were made to the object.

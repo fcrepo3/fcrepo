@@ -281,7 +281,7 @@ public class DCFields
     /**
      * Ensure the dc:identifiers include the pid of the target object
             * @param targetPid
-            * @return
+            * @return String xml
      */
     public String getAsXML(String targetPid) {
         ReadableCharArrayWriter out = new ReadableCharArrayWriter(512);

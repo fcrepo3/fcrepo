@@ -52,8 +52,6 @@ public class MimeTypeUtils {
      * Default MIME type, when a MIME type cannot be determined from a file's
      * extension.
      *
-     * @see #MIMETypeForFile
-     * @see #MIMETypeForFileName
      */
     public static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 
@@ -160,8 +158,6 @@ public class MimeTypeUtils {
      *
      * @param path
      *        path to the file
-     * @param map
-     *        map to load
      */
     private static void loadMIMETypesFile(String path) {
         try {

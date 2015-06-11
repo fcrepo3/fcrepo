@@ -24,9 +24,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * Helpers for doing DOM parsing and manipulations.
- * <p/>
- * Ported from the State and University Library  project sbutils.
+ * <p>Helpers for doing DOM parsing and manipulations.
+ * </p><p>
+ * Ported from the State and University Library  project sbutils.</p>
  */
 public class DOM {
 
@@ -158,7 +158,7 @@ public class DOM {
      * Convert the given DOM to an UTF-8 XML String.
      *
      * @param dom                the Document to convert.
-     * @param withXmlDeclaration if trye, an XML-declaration is prepended.
+     * @param withXmlDeclaration if true, an XML-declaration is prepended.
      * @return the dom as an XML String.
      * @throws TransformerException if the dom could not be converted.
      */
@@ -182,19 +182,19 @@ public class DOM {
     }
 
     /**
-     * Create a new {@link XPathSelector} instance with a given namespace
+     * <p>Create a new {@link XPathSelector} instance with a given namespace
      * mapping. The arguments are parsed as
      * {@code prefix1, uri1, prefix2, uri2, ...}.
-     * <p/>
+     * </p><p>
      * If you want to apply XPath expressions without namespaces use the static
      * {@code select*} methods directly on the {@code DOM} class.
-     * <p/>
+     * </p><p>
      * Note that if you want to apply XPath selections on a DOM constructed from
      * either {@link DOM#streamToDOM(InputStream, boolean)} or
      * {@link DOM#stringToDOM(String, boolean)} you must pass
      * {@code namespaceAware=true} as the boolean argument. Namespaced
      * selections will fail on a DOM constructed without namespaces.
-     *
+     * </p>
      * @param nsContext prefix, uri pairs
      * @return a newly allocated {@link XPathSelector}
      * @throws IllegalArgumentException if an uneven number of arguments are
@@ -287,12 +287,12 @@ public class DOM {
     }
 
     /**
-     * Extract the given value from the node as a String or if the value cannot
+     * <p>Extract the given value from the node as a String or if the value cannot
      * be extracted, {@code defaultValue} is returned.
-     * <p/>
+     * </p><p>
      * Example: To get the value of the attribute "foo" in the node, specify
      * "@foo" as the path.
-     * <p/>
+     * </p>
      * Note: This method does not handle namespaces explicitely.
      *
      * @param node         the node with the wanted attribute
@@ -306,12 +306,12 @@ public class DOM {
     }
 
     /**
-     * Extract the given value from the node as a String or if the value cannot
+     * <p>Extract the given value from the node as a String or if the value cannot
      * be extracted, the empty string is returned
-     * <p/>
+     * </p><p>
      * Example: To get the value of the attribute "foo" in the node, specify
      * "@foo" as the path.
-     * <p/>
+     * </p>
      * Note: This method does not handle namespaces explicitely.
      *
      * @param node  the node with the wanted attribute
@@ -324,11 +324,11 @@ public class DOM {
     }
 
     /**
-     * Select the {@link NodeList} with the given XPath.
+     * <p>Select the {@link NodeList} with the given XPath.
      * </p><p>
      * Note: This is a convenience method that logs exceptions instead of
      * throwing them.
-     *
+     * </p>
      * @param node  the root document.
      * @param xpath the xpath for the Node list.
      * @return the NodeList requested or an empty NodeList if unattainable
@@ -338,11 +338,11 @@ public class DOM {
     }
 
     /**
-     * Select the Node with the given XPath.
+     * <p>Select the Node with the given XPath.
      * </p><p>
      * Note: This is a convenience method that logs exceptions instead of
      * throwing them.
-     *
+     * </p>
      * @param dom   the root document.
      * @param xpath the xpath for the node.
      * @return the Node or null if unattainable.

@@ -22,10 +22,8 @@ public interface ExternalContentManager {
      * result as a MIMETypedStream. Used as a wrapper with a default MIME type 
      * of "text/plain"
      * 
-     * @param url
-     *        The URL of the external content.
-     * @param context
-     *           The context map.       
+     * @param params
+     *           The context params.       
      * @return A MIME-typed stream.
      * @throws ServerException
      *         If the URL connection could not be established.

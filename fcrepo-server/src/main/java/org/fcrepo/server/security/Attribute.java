@@ -42,7 +42,7 @@ public interface Attribute {
 
     /**
      * Return all the values
-     * @return
+     * @return List&lt;AttributeValue&gt;
      */
     public List<AttributeValue> getValues();
 

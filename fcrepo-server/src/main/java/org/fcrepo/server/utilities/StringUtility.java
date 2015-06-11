@@ -120,8 +120,6 @@ public class StringUtility {
      *        The maximum length of each line (not counting the indent spaces).
      * @param writer
      *        The character stream to print the output to.
-     * @return A string split into multiple indented lines whose length is less
-     *         than the specified length + indent amount.
      */
     public static void splitAndIndent(String str, int indent,
             int numChars, PrintWriter writer) {

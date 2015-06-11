@@ -394,9 +394,6 @@ public class SimpleDOReader
         return modDates.toArray(EMPTY_STRING_ARRAY);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     private MethodDef[] listMethods(String sDefPID,
                                     ServiceDefinitionReader sDefReader,
                                     Date versDateTime)

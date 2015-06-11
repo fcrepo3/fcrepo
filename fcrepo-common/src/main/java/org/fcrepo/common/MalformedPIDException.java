@@ -5,7 +5,7 @@
 package org.fcrepo.common;
 
 /**
- * Thrown when a PID is not well-formed. <p/>
+ * <p>Thrown when a PID is not well-formed.</p>
  * 
  * @author Chris Wilper
  */
@@ -16,6 +16,7 @@ public class MalformedPIDException
 
     /**
      * Construct a MalformedPIDException with the given reason.
+     * @param why String
      */
     public MalformedPIDException(String why) {
         super(why);

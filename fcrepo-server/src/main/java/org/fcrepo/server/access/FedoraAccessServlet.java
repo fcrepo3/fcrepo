@@ -56,8 +56,8 @@ import org.slf4j.LoggerFactory;
  * GetDatastreamDissemination of the Fedora Access LITE (API-A-LITE) interface
  * using a java servlet front end. The syntax defined by API-A-LITE defines
  * three bindings for these methods:
- * <ol>
- * <li>GetDissemination URL syntax:
+ * 
+ * GetDissemination URL syntax:
  * <p>
  * protocol://hostname:port/fedora/get/PID/sDefPID/methodName[/dateTime][?
  * parmArray]
@@ -67,7 +67,6 @@ import org.slf4j.LoggerFactory;
  * specified method of the associated service definition object. The result is
  * returned as a MIME-typed stream.
  * </p>
- * </li>
  * <ul>
  * <li>protocol - either http or https.</li>
  * <li>hostname - required hostname of the Fedora server.</li>
@@ -81,9 +80,10 @@ import org.slf4j.LoggerFactory;
  * <li>dateTime - optional dateTime value indicating dissemination of a version
  * of the digital object at the specified point in time.
  * <li>parmArray - optional array of method parameters consisting of name/value
- * pairs in the form parm1=value1&parm2=value2...</li>
+ * pairs in the form parm1=value1&amp;parm2=value2...</li>
  * </ul>
- * <li>GetObjectProfile URL syntax:
+ * 
+  * GetObjectProfile URL syntax:
  * <p>
  * protocol://hostname:port/fedora/get/PID[/dateTime][?xml=BOOLEAN]
  * </p>
@@ -95,7 +95,6 @@ import org.slf4j.LoggerFactory;
  * profile. If the value specified is "true", then a MIME-typed stream
  * consisting of XML is returned.
  * </p>
- * </li>
  * <ul>
  * <li>protocol - either http or https</li>
  * <li>hostname - required hostname of the Fedora server.</li>
@@ -109,13 +108,14 @@ import org.slf4j.LoggerFactory;
  * value of "true" indicates a return type of text/xml; the absence of the xml
  * parameter or a value of "false" indicates format is to be text/html.</li>
  * </ul>
- * <li>GetDatastreamDissemination URL syntax:
+ * 
+ * GetDatastreamDissemination URL syntax:
  * <p>
  * protocol://hostname:port/fedora/get/PID/DSID[/dateTime]
- * </p>
+ * </p><p>
  * This syntax requests a datastream dissemination for the specified digital
  * object. It is used to return the contents of a datastream.
- * <p></li>
+ * </p>
  * <ul>
  * <li>protocol - either http or https.</li>
  * <li>hostname - required hostname of the Fedora server.</li>
@@ -127,7 +127,6 @@ import org.slf4j.LoggerFactory;
  * <li>dateTime - optional dateTime value indicating dissemination of a version
  * of the digital object at the specified point in time.
  * </ul>
- * </ol>
  *
  * @author Ross Wayland
  */

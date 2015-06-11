@@ -91,6 +91,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *        others from the <code>fedora-model</code> and <code>fedora-view</code>
  *        namespaces are inferred from values expressed elsewhere in the
  *        digital object, and we do not want duplication.
+ * </pre>
  * </li>
  * </ul>
  *

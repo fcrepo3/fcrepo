@@ -9,7 +9,7 @@ import java.io.PrintStream;
 
 /**
  * A PrintStream that sends its output to Administrator.WATCH_AREA, the
- * JTextArea of the Tools->Advanced->STDOUT/STDERR window. This is used for
+ * JTextArea of the Tools-&gt;Advanced-&gt;STDOUT/STDERR window. This is used for
  * redirecting System.out/err output to the UI.
  * 
  * @author Chris Wilper

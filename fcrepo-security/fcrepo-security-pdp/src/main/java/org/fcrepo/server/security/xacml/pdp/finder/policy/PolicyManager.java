@@ -19,7 +19,6 @@
 package org.fcrepo.server.security.xacml.pdp.finder.policy;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -81,10 +80,12 @@ public class PolicyManager {
      * from the Policy Index , match them against the evaluation context and
      * return a policy or policy set that conforms to the evaluation context.
      *
-     * @param polFinder
+     * @param policyIndex
+     *        the policy index
+     * @param combiningAlg
+     *        the policy combining algorithm
+     * @param policyFinder
      *        the policy finder
-     * @throws URISyntaxException
-     * @throws {@link PolicyStoreException}
      */
     public PolicyManager(PolicyIndex policyIndex, PolicyCombiningAlgorithm combiningAlg,
                          PolicyFinder policyFinder) {
@@ -116,7 +117,7 @@ public class PolicyManager {
      *        the Evaluation Context
      * @return the Policy/PolicySet that applies to this EvaluationCtx
      * @throws TopLevelPolicyException
-     * @throws {@link PolicyStoreException}
+     * @throws PolicyIndexException
      */
     public AbstractPolicy getPolicy(EvaluationCtx eval)
             throws TopLevelPolicyException, PolicyIndexException {

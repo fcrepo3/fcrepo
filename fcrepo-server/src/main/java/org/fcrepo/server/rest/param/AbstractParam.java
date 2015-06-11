@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response.Status;
  * @author Coda Hale
  * @author Edwin Shin
  * @version $Id$
- * @see http://codahale.com/what-makes-jersey-interesting-parameter-classes/
+ * @see "http://codahale.com/what-makes-jersey-interesting-parameter-classes/"
  */
 public abstract class AbstractParam<V> {
 

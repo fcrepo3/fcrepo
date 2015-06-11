@@ -48,9 +48,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Implements listDatastreams method of Fedora Access LITE (API-A-LITE)
  * interface using a java servlet front end.
- * <ol>
- * <li>ListDatastreams URL syntax:
- * <p>
+ * <p>ListDatastreams URL syntax:
  * protocol://hostname:port/fedora/listDatastreams/PID[/dateTime][?xml=BOOLEAN]
  * </p>
  * <p>
@@ -61,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * profile. If the value specified is "true", then a MIME-typed stream
  * consisting of XML is returned.
  * </p>
- * </li>
+ * 
  * <ul>
  * <li>protocol - either http or https.</li>
  * <li>hostname - required hostname of the Fedora server.</li>
@@ -76,7 +74,6 @@ import org.slf4j.LoggerFactory;
  * value of "true" indicates a return type of text/xml; the absence of the xml
  * parameter or a value of "false" indicates format is to be text/html.</li>
  * </ul>
- * </ol>
  *
  * @author Ross Wayland
  * @version $Id: ListDatastreamsServlet.java 7781 2008-10-15 20:03:30Z pangloss

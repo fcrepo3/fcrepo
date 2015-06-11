@@ -147,7 +147,7 @@ public class SimpleDOWriter
     /**
      * Removes the entire digital object.
      *
-     * @throws ServerException
+     * @throws ObjectIntegrityException
      *         If any type of error occurred fulfilling the request.
      */
     public void remove() throws ObjectIntegrityException {

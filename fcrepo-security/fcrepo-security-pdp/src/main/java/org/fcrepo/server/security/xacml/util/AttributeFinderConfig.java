@@ -30,7 +30,7 @@ public class AttributeFinderConfig {
     /**
      * Get a Designator based on the Sun XACML designator ID
      * @param designator
-     * @return
+     * @return Designator
      */
     public Designator get(int designator) {
         return designators.get(Integer.valueOf(designator));
@@ -38,14 +38,14 @@ public class AttributeFinderConfig {
     /**
      * Get a Designator based on the XACML target name (in lower case)
      * @param designatorName
-     * @return
+     * @return Designator
      */
     public Designator get(String designatorName) {
         return designators.get(getTarget(designatorName));
     }
     /**
      * Gets the designator IDs that have been configured
-     * @return
+     * @return Set&lt;Integer&gt; designator IDs
      */
     public Set<Integer> getDesignatorIds() {
         return designators.keySet();
@@ -56,7 +56,7 @@ public class AttributeFinderConfig {
      * Returns the added/updated designator
      *
      * @param designatorName
-     * @return
+     * @return Designator
      * @throws AttributeFinderException
      */
     public Designator put(String designatorName) throws AttributeFinderException {

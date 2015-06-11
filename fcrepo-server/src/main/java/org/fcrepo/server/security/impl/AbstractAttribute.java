@@ -72,7 +72,6 @@ public abstract class AbstractAttribute implements Attribute {
     * @param issuer the attribute's issuer or null if there is none
     * @param issueInstant the moment when the attribute was issued, or null
     *                     if it's unspecified
-    * @param value the actual value associated with the attribute meta-data
     */
    public AbstractAttribute(URI id, String issuer, DateTimeAttribute issueInstant) 
    {

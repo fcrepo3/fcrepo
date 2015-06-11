@@ -65,7 +65,7 @@ public interface PolicyIndex {
      * @param name
      *        the name of the policy to return
      * @return the policy as an array of bytes
-     * @throws PolicyStoreException
+     * @throws PolicyIndexException
      */
     AbstractPolicy getPolicy(String name, PolicyFinder policyFinder) throws PolicyIndexException;
 
@@ -78,7 +78,7 @@ public interface PolicyIndex {
      *        the policy as a {@link String}
      *
      * @return the name of the added policy
-     * @throws {@link PolicyStoreException}
+     * @throws PolicyIndexException
      */
     String addPolicy(String name, String document)
             throws PolicyIndexException;
@@ -89,7 +89,7 @@ public interface PolicyIndex {
      * @param name
      *        the name of the policy
      * @return true if policy was deleted
-     * @throws PolicyStoreException
+     * @throws PolicyIndexException
      */
     boolean deletePolicy(String name) throws PolicyIndexException;
 
@@ -103,7 +103,7 @@ public interface PolicyIndex {
      * @param newDocument
      *        the new policy as a {@link String}
      * @return true if policy was updated
-     * @throws PolicyStoreException
+     * @throws PolicyIndexException
      */
     boolean updatePolicy(String name, String newDocument)
             throws PolicyIndexException;
@@ -111,16 +111,16 @@ public interface PolicyIndex {
     /**
      * Check if the policy identified by policyName exists.
      *
-     * @param policy
+     * @param policyName the PolicyId value
      * @return true iff the policy store contains a policy with the same
      *         PolicyId
-     * @throws PolicyStoreException
+     * @throws PolicyIndexException
      */
     boolean contains(String policyName) throws PolicyIndexException;
 
     /**
      * Clear the policy index completely
-     * @return
+     * @return boolean
      * @throws PolicyIndexException
      */
     boolean clear() throws PolicyIndexException;

@@ -6,7 +6,6 @@ package org.fcrepo.server.storage.translation;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 
 import org.fcrepo.server.errors.ObjectIntegrityException;
 import org.fcrepo.server.errors.ServerException;
@@ -42,7 +41,7 @@ public interface DOTranslator {
      *         if there is an error reading from the stream.
      * @throws ServerException
      *         if the translator is unable to deserialize for any other reason.
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedTranslationException
      *         if the encoding is not supported by the JVM.
      * @see DOTranslationUtility#DESERIALIZE_INSTANCE
      */
@@ -71,7 +70,7 @@ public interface DOTranslator {
      *         if there is an error writing to the stream.
      * @throws ServerException
      *         if the translator is unable to serialize for any other reason.
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedTranslationException
      *         if the encoding is not supported by the JVM.
      * @see DOTranslationUtility#SERIALIZE_EXPORT_ARCHIVE
      * @see DOTranslationUtility#SERIALIZE_EXPORT_PUBLIC

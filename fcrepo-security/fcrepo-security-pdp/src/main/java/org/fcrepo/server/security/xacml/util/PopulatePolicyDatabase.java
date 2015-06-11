@@ -52,7 +52,7 @@ public class PopulatePolicyDatabase {
     }
 
     /**
-     * @deprecated Use {@link AbstractPolicyStore#addDocuments(PolicyStore)} instead
+     * @deprecated Use {@link AbstractPolicyStore#addDocuments(AbstractPolicyStore)} instead
      */
     @Deprecated
     public static synchronized void addDocuments(PolicyStore policyStore)

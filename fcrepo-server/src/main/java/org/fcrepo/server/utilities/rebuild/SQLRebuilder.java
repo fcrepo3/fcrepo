@@ -100,7 +100,6 @@ public class SQLRebuilder
     /**
      * Initialize the rebuilder, given the server configuration.
      *
-     * @returns a map of option names to plaintext descriptions.
      */
     @Override
     public void setServerConfiguration(ServerConfiguration serverConfig) {

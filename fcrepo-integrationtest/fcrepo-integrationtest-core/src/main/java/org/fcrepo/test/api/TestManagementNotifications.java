@@ -513,7 +513,6 @@ public class TestManagementNotifications
 
     /**
      * Handles messages sent as notifications.
-     * <p/>
      * {@inheritDoc}
      */
     @Override

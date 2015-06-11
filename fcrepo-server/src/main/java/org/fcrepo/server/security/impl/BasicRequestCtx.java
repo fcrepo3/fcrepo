@@ -42,7 +42,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -210,7 +209,6 @@ public class BasicRequestCtx implements RequestCtx
      *
      * @return a new <code>RequestCtx</code> constructed by parsing
      *
-     * @throws URISyntaxException if there is a badly formed URI
      * @throws ParsingException if the DOM node is invalid
      */
     public static RequestCtx getInstance(Node root) throws ParsingException {
@@ -311,7 +309,7 @@ public class BasicRequestCtx implements RequestCtx
      *
      * @return a new <code>RequestCtx</code>
      *
-     * @throws ParserException if there is an error parsing the input
+     * @throws ParsingException if there is an error parsing the input
      */
     public static RequestCtx getInstance(InputStream input)
         throws ParsingException

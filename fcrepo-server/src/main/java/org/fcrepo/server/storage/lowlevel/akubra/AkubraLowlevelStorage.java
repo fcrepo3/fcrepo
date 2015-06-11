@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * Akubra-backed implementation of ILowlevelStorage.
  * <p>
  * This implementation uses two Akubra <code>BlobStore</code>s; one for
- * objects and another for datastreams.
+ * objects and another for datastreams.</p>
  *
  * @author Chris Wilper
  */
@@ -63,18 +63,18 @@ public class AkubraLowlevelStorage
     /**
      * Creates an instance using the given blob stores.
      * <p>
-     * The blob stores <b>MUST</b>:
+     * The blob stores <b>MUST</b>:</p>
      * <ul>
      *   <li> be <i>non-transactional</i></li>
      *   <li> be able to accept <code>info:fedora/</code> URIs as blob ids.
      * </ul>
      * <p>
-     * The blob stores <b>MAY</b>:
+     * The blob stores <b>MAY</b>:</p>
      * <ul>
      *   <li> support atomic overwrites natively. If not,
      *        <code>forceSafe..Overwrites</code> MUST be given as
      *        <code>true</code> and the blob store MUST support
-     *        {@link org.akubraproject.core.Blob#renameTo}
+     *        {@link org.akubraproject.Blob#moveTo}
      *   </li>
      * </ul>
      *

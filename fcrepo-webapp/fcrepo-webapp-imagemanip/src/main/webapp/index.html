@@ -22,22 +22,22 @@
         Optional parameters that can be used to manipulate the image:
         <ul>
             <li><b>Resize:</b>&nbsp;&nbsp;&nbsp;
-                <b>op=resize&newWidth=&lt;width-in-pixels&gt;</b><br/>
+                <b>op=resize&amp;newWidth=&lt;width-in-pixels&gt;</b><br/>
                 This resizes an image to a specified width in pixels, automatically scaling the height in proportion to
                 the width.
             </li>
             <li><b>Zoom:</b>&nbsp;&nbsp;&nbsp;
-                <b>op=zoom&zoomAmt=&lt;zoom-value&gt;</b><br/>
+                <b>op=zoom&amp;zoomAmt=&lt;zoom-value&gt;</b><br/>
                 This zooms an image, depending on the zoom-value. 0 &lt; zoom-value &lt; 1 : zoom out, zoom-value=1 :
                 original, 1 &lt; zoom-value : zoom in
             </li>
             <li><b>Adjust Brightness:</b>&nbsp;&nbsp;&nbsp;
-                <b>op=brightness&brightAmt=&lt;bright-value&gt;</b><br/>
+                <b>op=brightness&amp;brightAmt=&lt;bright-value&gt;</b><br/>
                 This adjusts the brightness of an image, depending on the bright-value. 0 &lt;= bright-value &lt; 1 :
                 darkens, bright-value=1 : original, 1 &lt; bright-value : lightens
             </li>
             <li><b>Watermark:</b>&nbsp;&nbsp;&nbsp;
-                <b>op=watermark&wmText=&lt;watermark-text&gt;</b><br/>
+                <b>op=watermark&amp;wmText=&lt;watermark-text&gt;</b><br/>
                 Watermarks an image, with the supplied text.
             </li>
             <li><b>Grayscale:</b>&nbsp;&nbsp;&nbsp;
@@ -45,8 +45,8 @@
                 Converts an image to grayscale.
             </li>
             <li><b>Crop:</b>&nbsp;&nbsp;&nbsp;
-                <b>op=crop&cropX=&lt;crop-x&gt;&cropY=&lt;crop-y&gt;&<font
-                        color="#FF0000">cropWidth=&lt;crop-width&gt;</font>&<font color="#FF0000">cropHeight=&lt;crop-height&gt;</font></b><br/>
+                <b>op=crop&amp;cropX=&lt;crop-x&gt;&amp;cropY=&lt;crop-y&gt;&amp;<font
+                        color="#FF0000">cropWidth=&lt;crop-width&gt;</font>&amp;<font color="#FF0000">cropHeight=&lt;crop-height&gt;</font></b><br/>
                 Crops an image, starting from (crop-x,crop-y) coordinate, and crops to the optional
                 (crop-width,crop-height) coordinate if supplied, or just to the lower-right corner of the image. All
                 values are measured in pixels.
@@ -61,11 +61,11 @@
 <p><font color="#000000">Examples:</font></p>
 
 <p><font color="#000000"><a
-        href="/imagemanip/ImageManipulation?url=http://www.explore.cornell.edu/tour_landmarks/img/frosty_tower02.jpg&op=zoom&zoomAmt=2.5">/imagemanip/ImageManipulation?url=http://www.explore.cornell.edu/tour_landmarks/img/frosty_tower02.jpg&op=zoom&zoomAmt=2.5</a></font>
+        href="/imagemanip/ImageManipulation?url=http://www.explore.cornell.edu/tour_landmarks/img/frosty_tower02.jpg&op=zoom&zoomAmt=2.5">/imagemanip/ImageManipulation?url=http://www.explore.cornell.edu/tour_landmarks/img/frosty_tower02.jpg&amp;op=zoom&amp;zoomAmt=2.5</a></font>
 </p>
 
 <p><font color="#000000"><a
-        href="/imagemanip/ImageManipulation?url=http://www.explore.cornell.edu/tour_landmarks/img/frosty_tower02.jpg&op=convert&convertTo=gif">/imagemanip/ImageManipulation?url=http://www.explore.cornell.edu/tour_landmarks/img/frosty_tower02.jpg&op=convert&convertTo=gif</a></font>
+        href="/imagemanip/ImageManipulation?url=http://www.explore.cornell.edu/tour_landmarks/img/frosty_tower02.jpg&op=convert&convertTo=gif">/imagemanip/ImageManipulation?url=http://www.explore.cornell.edu/tour_landmarks/img/frosty_tower02.jpg&amp;op=convert&amp;convertTo=gif</a></font>
 </p>
 
 <p>&nbsp;</p>

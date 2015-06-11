@@ -69,7 +69,7 @@ public class TopLevelPolicyException
     /**
      * Constructs a new <code>TopLevelPolicyException</code> with a message, but
      * no cause. The message is saved for later retrieval by the
-     * {@link java.lang#Throwable.getMessage() Throwable.getMessage()} method.
+     * {@link java.lang.Throwable#getMessage() Throwable.getMessage()} method.
      * 
      * @param status
      *        the <code>Status</code> associated with this error
@@ -85,7 +85,7 @@ public class TopLevelPolicyException
     /**
      * Constructs a new <code>TopLevelPolicyException</code> with a cause, but
      * no message. The cause is saved for later retrieval by the
-     * {@link java.lang#Throwable.getCause() Throwable.getCause()} method.
+     * {@link java.lang.Throwable#getCause() Throwable.getCause()} method.
      * 
      * @param status
      *        the <code>Status</code> associated with this error
@@ -101,8 +101,8 @@ public class TopLevelPolicyException
     /**
      * Constructs a new <code>TopLevelPolicyException</code> with a message and
      * a cause. The message and cause are saved for later retrieval by the
-     * {@link java.lang#Throwable.getMessage() Throwable.getMessage()} and
-     * {@link java.lang#Throwable.getCause() Throwable.getCause()} methods.
+     * {@link java.lang.Throwable#getMessage() Throwable.getMessage()} and
+     * {@link java.lang.Throwable#getCause() Throwable.getCause()} methods.
      * 
      * @param status
      *        the <code>Status</code> associated with this error

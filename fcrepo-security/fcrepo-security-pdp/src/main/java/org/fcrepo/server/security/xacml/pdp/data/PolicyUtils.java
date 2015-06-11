@@ -44,8 +44,8 @@ public class PolicyUtils {
      * Read file and return contents as a string
      *
      * @param f File to read
-     * @return
-     * @throws PolicyStoreException
+     * @return string contents of file
+     * @throws MelcoePDPException
      */
     public String fileToString(File f)
         throws MelcoePDPException {

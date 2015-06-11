@@ -58,9 +58,9 @@ public class XmlTransformUtility {
         
     /**
      * Convenience method to get a new instance of a TransformerFactory.
-     * If the {@link #TransformerFactory} is an instance of
+     * If the {@link TransformerFactory} is an instance of
      * net.sf.saxon.TransformerFactoryImpl, the attribute
-     * {@link #FeatureKeys.VERSION_WARNING} will be set to false in order to
+     * {@link net.sf.saxon.FeatureKeys#VERSION_WARNING} will be set to false in order to
      * suppress the warning about using an XSLT1 stylesheet with an XSLT2
      * processor.
      *
@@ -105,7 +105,7 @@ public class XmlTransformUtility {
     /**
      * Try to cache parsed Templates, but check for changes on disk
      * @param src
-     * @return
+     * @return Templates
      */
     public static Templates getTemplates(File src) throws TransformerException {
         String key = src.getAbsolutePath();

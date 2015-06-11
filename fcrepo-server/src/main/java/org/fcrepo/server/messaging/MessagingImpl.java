@@ -48,7 +48,7 @@ public class MessagingImpl implements Messaging {
      * </ul>
      *
      * @param fedoraBaseUrl e.g. http://localhost:8080/fedora
-     * @param mdMap a <code>Map</code> of {@link Messaging#MessageType} to
+     * @param mdMap a <code>Map</code> of {@link Messaging.MessageType} to
      * Destinations.
      * @param jndiProps the JNDI configuration properties.
      * @throws MessagingException
@@ -84,9 +84,9 @@ public class MessagingImpl implements Messaging {
 
     /**
      * Send a message to each of the destinations configured for each
-     * {@link Messaging#MessageType}. Currently, only
+     * {@link Messaging.MessageType}. Currently, only
      * {@link FedoraMethod}s that represent
-     * {@link org.fcrepo.server.Management} methods are supported.
+     * {@link org.fcrepo.server.management.Management} methods are supported.
      * {@inheritDoc}
      */
     public void send(FedoraMethod method) throws MessagingException {

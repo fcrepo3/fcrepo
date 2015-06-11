@@ -76,7 +76,7 @@ public class HashPathIdMapper
     /**
      * Creates an instance that will use the given pattern.
      *
-     * @param pathPattern the pattern to use, possibly <code>null</code> or "".
+     * @param pattern the pattern to use, possibly <code>null</code> or "".
      * @throws IllegalArgumentException if the pattern is invalid.
      */
     public HashPathIdMapper(String pattern) {

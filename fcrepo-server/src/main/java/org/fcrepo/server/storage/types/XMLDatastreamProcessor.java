@@ -158,7 +158,7 @@ public class XMLDatastreamProcessor {
 
     /**
      * Get the XML content of the datastream wrapped by this class
-     * @return
+     * @return byte[] contents
      */
     public byte [] getXMLContent() {
         return getXMLContent(null);
@@ -186,7 +186,7 @@ public class XMLDatastreamProcessor {
 
     /**
      * Get the datastream wrapped by this class
-     * @return
+     * @return Datastream
      */
     public Datastream getDatastream() {
         return m_ds;
@@ -229,7 +229,7 @@ public class XMLDatastreamProcessor {
     }
     /**
      * Get the DSMDClass of the datastream wrapped by this class
-     * @return
+     * @return int
      */
     public int getDSMDClass() {
         if (m_dsType == DS_TYPE.INLINE_XML)

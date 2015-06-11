@@ -137,9 +137,9 @@ public class FedoraObjectsResource extends BaseRestResource {
      * (API-M-LITE) interface using a java servlet front end. The syntax defined
      * by API-M-LITE for getting a list of the next available PIDs has the
      * following binding:
-     * <ol>
+     * <ul>
      * <li>getNextPID URL syntax:
-     * protocol://hostname:port/fedora/objects/nextPID[?numPIDs=NUMPIDS&namespace=NAMESPACE&format=html,xml]
+     * protocol://hostname:port/fedora/objects/nextPID[?numPIDs=NUMPIDS&amp;namespace=NAMESPACE&amp;format=html,xml]
      * This syntax requests a list of next available PIDS. The parameter numPIDs
      * determines the number of requested PIDS to generate. If omitted, numPIDs
      * defaults to 1. The namespace parameter determines the namespace to be
@@ -150,6 +150,7 @@ public class FedoraObjectsResource extends BaseRestResource {
      * stream consisting of an html table is returned providing a browser-savvy
      * means of viewing the object profile. If the value specified is "true",
      * then a MIME-typed stream consisting of XML is returned.</li>
+     * </ul>
      */
     @Path("/nextPID")
     @POST
@@ -238,7 +239,7 @@ public class FedoraObjectsResource extends BaseRestResource {
      * ("info:fedora/fedora-system:FOXML-1.1" or
      * "info:fedora/fedora-system:METSFedoraExt-1.1"), and encoded appropriately
      * for the specified export context ("public", "migrate", or "archive").
-     * <p/>
+     * <br>
      * GET /objects/{pid}/export ? format context encoding
      */
     @Path(VALID_PID_PART + "/export")
@@ -278,7 +279,7 @@ public class FedoraObjectsResource extends BaseRestResource {
      * disseminator was created or modified in the object. These timestamps can
      * be used to request a timestamped dissemination request to view the object
      * as it appeared at a specific point in time.
-     * <p/>
+     * <br>
      * GET /objects/{pid}/versions ? format
      */
     @Path(VALID_PID_PART + "/versions")
@@ -318,7 +319,7 @@ public class FedoraObjectsResource extends BaseRestResource {
      * Gets a profile of the object which includes key metadata fields and URLs
      * for the object Dissemination Index and the object Item Index. Can be
      * thought of as a default view of the object.
-     * <p/>
+     * <br>
      * GET /objects/{pid}/objectXML
      */
     @Path(VALID_PID_PART + "/objectXML")
@@ -345,7 +346,7 @@ public class FedoraObjectsResource extends BaseRestResource {
      * Gets a profile of the object which includes key metadata fields and URLs
      * for the object Dissemination Index and the object Item Index. Can be
      * thought of as a default view of the object.
-     * <p/>
+     * <br>
      * GET /objects/{pid} ? format asOfDateTime
      */
     @GET
@@ -388,7 +389,7 @@ public class FedoraObjectsResource extends BaseRestResource {
 
     /**
      * Permanently removes an object from the repository.
-     * <p/>
+     * <br>
      * DELETE /objects/{pid} ? logMessage
      */
     @DELETE
@@ -444,7 +445,7 @@ public class FedoraObjectsResource extends BaseRestResource {
     /**
      * Create/Update a new digital object. If no xml given in the body, will
      * create an empty object.
-     * <p/>
+     * <br>
      * POST /objects/{pid} ? label logMessage format encoding namespace ownerId state
      */
     @POST
@@ -550,7 +551,7 @@ public class FedoraObjectsResource extends BaseRestResource {
      *                         HTTP 409 Conflict if lastModifiedDate is earlier than the object's
      *                         lastModifiedDate.
      * @return The timestamp for this modification (as an XSD dateTime string)
-     * @see org.fcrepo.server.management.Management#modifyObject(org.fcrepo.server.Context, String, String, String, String, String)
+     * @see org.fcrepo.server.management.Management#modifyObject(org.fcrepo.server.Context, String, String, String, String, String, Date)
      */
     @PUT
     @Path(VALID_PID_PART)

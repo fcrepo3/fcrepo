@@ -50,8 +50,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Implements listMethods method of Fedora Access LITE (API-A-LITE) interface
  * using a java servlet front end.
- * <ol>
- * <li>ListMethods URL syntax:
+ * ListMethods URL syntax:
  * <p>
  * protocol://hostname:port/fedora/listMethods/PID[/dateTime][?xml=BOOLEAN]
  * </p>
@@ -63,7 +62,6 @@ import org.slf4j.LoggerFactory;
  * profile. If the value specified is "true", then a MIME-typed stream
  * consisting of XML is returned.
  * </p>
- * </li>
  * <ul>
  * <li>protocol - either http or https.</li>
  * <li>hostname - required hostname of the Fedora server.</li>
@@ -78,7 +76,6 @@ import org.slf4j.LoggerFactory;
  * value of "true" indicates a return type of text/xml; the absence of the xml
  * parameter or a value of "false" indicates format is to be text/html.</li>
  * </ul>
- * </ol>
  *
  * @author Ross Wayland
  * @version $Id$

@@ -163,7 +163,7 @@ public class MIMETypedStream {
     /**
      * Typically 200, but control group R datastream content responses will use
      * 302, and conditional GET of datastream contents may return a 304
-     * @return
+     * @return int status code to use for the response
      */
     public int getStatusCode() {
         return m_httpStatus;

@@ -114,8 +114,7 @@ public abstract class XPathPolicyIndex
     /**
      * Creates an XPath query from the attributes
      * @param attributeMap attributes from request
-     * @param r number of resource-id values
-     * @return
+     * @return String
      */
     protected static String getXpath(Map<String, Collection<AttributeBean>> attributeMap) {
         StringBuilder sb = new StringBuilder();

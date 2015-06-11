@@ -11,7 +11,6 @@ import javax.swing.JLabel;
 /**
  * @author Chris Wilper
  * @param <T>
- * @param <T>
  */
 public class ArrayInputPanel<T>
         extends InputPanel<T[]> {

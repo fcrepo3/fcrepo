@@ -15,12 +15,12 @@ import org.fcrepo.server.storage.DOReader;
  * <p>Key object metadata and dublin core fields are searchable from via
  * implementations of this interface.
  * 
- * <p>Key fields include:<dir> <i>pid, label, state, ownerId, cDate,
- * mDate, dcmDate</i></dir>
+ * <p>Key fields include: <i>pid, label, state, ownerId, cDate,
+ * mDate, dcmDate</i></p>
  * 
- * <p>Dublin core fields include:<dir> <i>title, creator, subject, description,
+ * <p>Dublin core fields include: <i>title, creator, subject, description,
  * publisher, contributor, date, format, identifier, source, language,
- * relation, coverage, rights</i></dir>
+ * relation, coverage, rights</i></p>
  * 
  * @author Chris Wilper
  */

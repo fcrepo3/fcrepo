@@ -38,14 +38,13 @@ import org.springframework.stereotype.Component;
  * (API-A-LITE) interface using a java servlet front end. The syntax defined by
  * API-A-LITE has for getting a description of the repository has the following
  * binding:
- * <ol>
- * <li>describeRepository URL syntax:
+ * <p>describeRepository URL syntax:
  * protocol://hostname:port/fedora/describe[?xml=BOOLEAN] This syntax requests
  * information about the repository. The xml parameter determines the type of
  * output returned. If the parameter is omitted or has a value of "false", a
  * MIME-typed stream consisting of an html table is returned providing a
  * browser-savvy means of viewing the object profile. If the value specified is
- * "true", then a MIME-typed stream consisting of XML is returned.</li>
+ * "true", then a MIME-typed stream consisting of XML is returned.</p>
  * <ul>
  * <li>protocol - either http or https.</li>
  * <li>hostname - required hostname of the Fedora server.</li>
@@ -90,10 +89,8 @@ public class DescribeRepositoryResource
      * parameters and then execute the specified request.
      * </p>
      *
-     * @param request
-     *        The servlet request.
-     * @param response
-     *        servlet The servlet response.
+     * @param xml
+     *        whether the request is for xml or html.
      * @throws ServletException
      *         If an error occurs that effects the servlet's basic operation.
      * @throws IOException
@@ -173,8 +170,6 @@ public class DescribeRepositoryResource
          *
          * @param repositoryInfo
          *        A repository info data structure.
-         * @param pw
-         *        A PipedWriter to which the serialization info is written.
          */
         public ReposInfoSerializer(Context context,
                                    RepositoryInfo repositoryInfo) {

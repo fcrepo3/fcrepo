@@ -12,12 +12,12 @@
  * This package contains the basic Validator framework, with core classes and interfaces.
  * </p>
  * <p>
- * <code>org.fcrepo.client.utility.validate.process</code> contains a client-side {@link ValidatorProcess}
+ * <code>org.fcrepo.client.utility.validate.process</code> contains a client-side {@link org.fcrepo.client.utility.validate.process.ValidatorProcess}
  * that parses the command line arguments, queries Fedora for the requested objects, validates them.
- * It also has a simple implementation of {@link ValidatorResult}.
+ * It also has a simple implementation of {@link org.fcrepo.client.utility.validate.ValidationResult}.
  * </p>
  * <p>
- * <code>org.fcrepo.client.utility.validate.remote</code> contains an implementation of {@link ObjectSource}
+ * <code>org.fcrepo.client.utility.validate.remote</code> contains an implementation of {@link org.fcrepo.client.utility.validate.ObjectSource}
  * that can be used to access a remote instance of Fedora, with helper classes.
  * </p>
  * <p>

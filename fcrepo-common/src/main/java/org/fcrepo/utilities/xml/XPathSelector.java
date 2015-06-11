@@ -4,9 +4,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Interface for doing efficient XPath selections. To obtain an implementation
+ * <p>Interface for doing efficient XPath selections. To obtain an implementation
  * of this interface use {@link DOM#createXPathSelector(String[])}.
- * <p/>
+ * </p>
  * Note that your DOM must be constructed with namespaces explicitly enabled
  * for a namespace aware selector to work properly. You do this either via
  * the {@link DOM#streamToDOM(java.io.InputStream , boolean)} or
@@ -85,12 +85,12 @@ public interface XPathSelector {
     public Boolean selectBoolean(Node node, String xpath);
 
     /**
-     * Extract the given value from the node as a String or if the value cannot
+     * <p>Extract the given value from the node as a String or if the value cannot
      * be extracted, {@code defaultValue} is returned.
-     * <p/>
+     * </p><p>
      * Example: To get the value of the attribute "foo" in the node, specify
      * "@foo" as the path.
-     * <p/>
+     * </p>
      * Note: This method does not handle namespaces explicitely.
      *
      * @param node         the node with the wanted attribute
@@ -102,12 +102,12 @@ public interface XPathSelector {
     public String selectString(Node node, String xpath, String defaultValue);
 
     /**
-     * Extract the given value from the node as a String or if the value cannot
+     * <p>Extract the given value from the node as a String or if the value cannot
      * be extracted, the empty string is returned
-     * <p/>
+     * </p><p>
      * Example: To get the value of the attribute "foo" in the node, specify
      * "@foo" as the path.
-     * <p/>
+     *</p>
      * Note: This method does not handle namespaces explicitely.
      *
      * @param node  the node with the wanted attribute
@@ -118,11 +118,11 @@ public interface XPathSelector {
     public String selectString(Node node, String xpath);
 
     /**
-     * Select the Node list with the given XPath.
+     * <p>Select the Node list with the given XPath.
      * </p><p>
      * Note: This is a convenience method that logs exceptions instead of
      * throwing them.
-     *
+     * </p>
      * @param node  the root document.
      * @param xpath the xpath for the Node list.
      * @return the NodeList requested or an empty NodeList if unattainable
@@ -130,11 +130,11 @@ public interface XPathSelector {
     public NodeList selectNodeList(Node node, String xpath);
 
     /**
-     * Select the Node with the given XPath.
+     * <p>Select the Node with the given XPath.
      * </p><p>
      * Note: This is a convenience method that logs exceptions instead of
      * throwing them.
-     *
+     * </p>
      * @param dom   the root document.
      * @param xpath the xpath for the node.
      * @return the Node or null if unattainable.

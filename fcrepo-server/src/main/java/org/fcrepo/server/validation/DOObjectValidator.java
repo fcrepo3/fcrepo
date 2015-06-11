@@ -25,8 +25,8 @@ public interface DOObjectValidator {
 	 * @param context
 	 * @param reader
 	 *            - DOReader wrapping the object
-	 * @throws ServerException. Throw
-	 *             an ObjectValidityException if something invalid is found
+	 * @throws ServerException
+	 *             Throws an ObjectValidityException if something invalid is found
 	 *             (with a useful message indicating what failed) and other
 	 *             types of ServerException if the validation process itself
 	 *             failed

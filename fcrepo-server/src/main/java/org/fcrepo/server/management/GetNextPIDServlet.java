@@ -38,9 +38,8 @@ import org.slf4j.LoggerFactory;
  * (API-M-LITE) interface using a java servlet front end. The syntax defined by
  * API-M-LITE for getting a list of the next available PIDs has the following
  * binding:
- * <ol>
- * <li>getNextPID URL syntax:
- * protocol://hostname:port/fedora/management/getNextPID[?numPIDs=NUMPIDS&namespace=NAMESPACE&xml=BOOLEAN]
+ * <p>getNextPID URL syntax:
+ * protocol://hostname:port/fedora/management/getNextPID[?numPIDs=NUMPIDS&amp;namespace=NAMESPACE&amp;xml=BOOLEAN]
  * This syntax requests a list of next available PIDS. The parameter numPIDs
  * determines the number of requested PIDS to generate. If omitted, numPIDs
  * defaults to 1. The namespace parameter determines the namespace to be used in
@@ -50,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * or has a value of "false", a MIME-typed stream consisting of an html table is
  * returned providing a browser-savvy means of viewing the object profile. If
  * the value specified is "true", then a MIME-typed stream consisting of XML is
- * returned.</li>
+ * returned.</p>
  * <ul>
  * <li>protocol - either http or https.</li>
  * <li>hostname - required hostname of the Fedora server.</li>

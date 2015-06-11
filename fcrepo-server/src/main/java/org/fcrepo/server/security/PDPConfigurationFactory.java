@@ -77,7 +77,7 @@ public class PDPConfigurationFactory {
     /**
      *
      * @param algorithms accepts a Set of CombiningAlgorithm impls
-     * @return
+     * @return CombiningAlgFactory
      */
  
     public CombiningAlgFactory useAlgorithms(Set<CombiningAlgorithm> algorithms) {

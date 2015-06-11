@@ -29,7 +29,7 @@ public class FileUtils {
      * @param destination
      * @return <code>true</code> if the operation was successful;
      *         <code>false</code> otherwise (which includes a null input).
-     * @see http://java.sun.com/docs/books/performance/1st_edition/html/JPIOPerformance.fm.html#22980
+     * @see "http://java.sun.com/docs/books/performance/1st_edition/html/JPIOPerformance.fm.html#22980"
      */
     public static boolean copy(InputStream source, OutputStream destination) {
         return copy(source, destination, new byte[4096]);
@@ -53,7 +53,7 @@ public class FileUtils {
      * This method should only be used when the ByteBuffer is known to be able to accomodate the input!
      * @param source
      * @param destination
-     * @return
+     * @return success of the operation
      */
     public static boolean copy(InputStream source, ByteBuffer destination) {
         try {
@@ -111,7 +111,7 @@ public class FileUtils {
      *
      * @param prefix
      * @param directory
-     * @return
+     * @return java.io.File temporary directory
      * @throws IOException
      */
     public static File createTempDir(String prefix, File directory) throws IOException {
@@ -218,7 +218,7 @@ public class FileUtils {
      *
      * @param f
      *        the Properties file to parse.
-     * @return a Map<String, String> representing the given Properties file.
+     * @return a Map&lt;String, String&gt; representing the given Properties file.
      * @throws IOException
      * @see java.util.Properties
      * @see java.util.Map

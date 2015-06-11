@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * </p>
  * <p>
  * Note that the writing of an entry is necessarily a three step process,
- * consisting of
+ * consisting of:</p>
  * <ol>
  * <li>calling {@link #prepareToWriteJournalEntry()},</li>
  * <li>invoking the management method,</li>
@@ -61,7 +61,6 @@ import org.slf4j.LoggerFactory;
  * {@link CreatorJournalEntry}, and these values must be written to the
  * journal.</li>
  * </ul>
- * </p>
  *
  * @author Jim Blake
  */
@@ -125,7 +124,7 @@ public abstract class JournalWriter
 
     /**
      * Concrete sub-classes should insure that a message transport is ready, and
-     * call {@link #writeDocumentHeader(XMLEventWriter) if needed. This method
+     * call {@link #writeDocumentHeader(XMLEventWriter)} if needed. This method
      * is called separately from {@link #writeJournalEntry(CreatorJournalEntry)},
      * so we can obtain the repository hash before the Management method is
      * invoked.
@@ -134,7 +133,7 @@ public abstract class JournalWriter
 
     /**
      * Concrete sub-classes should provide an XMLEventWriter, and call
-     * {@link #writeJournalEntry(XMLEventWriter)}, after which, they should
+     * {@link #writeJournalEntry(CreatorJournalEntry, XMLEventWriter)}, after which, they should
      * probably flush the XMLEventWriter. This method is called after the
      * Management method is invoked, since the Management method may modify the
      * context object in the journal entry.

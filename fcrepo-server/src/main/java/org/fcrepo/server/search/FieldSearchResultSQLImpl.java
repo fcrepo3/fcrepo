@@ -90,12 +90,12 @@ public class FieldSearchResultSQLImpl
 
     /**
      * Construct a FieldSearchResultSQLImpl object.
-     * <p />
+     * <p>
      * Upon construction, a connection is obtained from the connectionPool, and
      * the query is executed. (The connection will be returned to the pool only
      * after the last result has been obtained from the ResultSet, the session
      * is expired, or some non-recoverable error has occurred)
-     * <p />
+     * </p>
      * Once the ResultSet is obtained, one result is requested of it (and
      * remembered for use in step()); then the call returns.
      *

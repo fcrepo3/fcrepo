@@ -48,7 +48,7 @@ public class ParamDomain
      *        the parameter whose domain is being described.
      * @param isRequired
      *        whether specifying a value is required.
-     * @param values
+     * @param domainValues
      *        the domain values.
      */
     public ParamDomain(String parameterName,

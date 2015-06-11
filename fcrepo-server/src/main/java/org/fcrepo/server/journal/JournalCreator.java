@@ -26,13 +26,13 @@ import javax.ws.rs.core.StreamingOutput;
 
 
 /**
- * This is the worker class to use in Journaling mode (normal mode).
- * <p/>
+ * <p>This is the worker class to use in Journaling mode (normal mode).
+ * </p><p>
  * Each time a "writing" Management method is called, create a
  * CreatorJournalEntry and ask it to invoke the method on the
  * ManagementDelegate. If a "read-only" Management method is called, just pass
  * it along to the ManagementDelegate.
- *
+ * </p>
  * @author Jim Blake
  */
 public class JournalCreator

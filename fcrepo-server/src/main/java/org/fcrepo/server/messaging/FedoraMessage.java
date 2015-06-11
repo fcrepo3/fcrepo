@@ -25,7 +25,7 @@ public interface FedoraMessage {
 
     /**
      * An identifier for the serialization format of the message.
-     * @return
+     * @return String
      */
     public String getFormat();
 }

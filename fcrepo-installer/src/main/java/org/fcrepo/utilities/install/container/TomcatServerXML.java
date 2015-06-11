@@ -65,7 +65,7 @@ public class TomcatServerXML
     /**
      * Sets the http port and Fedora default http connector options.
      * 
-     * @see http://tomcat.apache.org/tomcat-6.0-doc/config/http.html
+     * @see "http://tomcat.apache.org/tomcat-6.0-doc/config/http.html"
      * @throws InstallationFailedException
      */
     public void setHTTPPort() throws InstallationFailedException {

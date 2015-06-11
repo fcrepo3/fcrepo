@@ -100,9 +100,6 @@ public class PolicyReader
      * Creates a <code>PolicyReader</code> that does not schema-validate
      * policies.
      *
-     * @param finder
-     *        a <code>PolicyFinder</code> that is used by policy sets, which may
-     *        be null only if no references are used
      */
     public PolicyReader() {
         this(null);

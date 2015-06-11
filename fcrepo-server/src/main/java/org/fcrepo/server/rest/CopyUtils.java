@@ -51,12 +51,12 @@ public class CopyUtils {
     }
 
     /**
-     * Copy chars from a &ltcode&gtReader</code> to a &ltcode&gtWriter</code&gt.
+     * Copy chars from a <code>Reader</code> to a <code>Writer</code>.
      *
      * @param input
-     *            the &ltcode&gtReader</code> to read from
+     *            the <code>Reader</code> to read from
      * @param output
-     *            the &ltcode&gtWriter</code> to write to
+     *            the <code>Writer</code> to write to
      * @return the number of characters copied
      * @throws IOException
      *             In case of an I/O problem

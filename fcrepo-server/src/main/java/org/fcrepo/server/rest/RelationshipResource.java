@@ -112,9 +112,9 @@ public class RelationshipResource extends BaseRestResource {
 
     /**
      * Add a relationship.
-     * <p/>
+     * <br>
      * POST /objects/{pid}/relationships/new ? subject predicate object isLiteral datatype
-     * <p/>
+     * <br>
      * Successful Response:
      * Status: 200 OK
      */
@@ -151,9 +151,9 @@ public class RelationshipResource extends BaseRestResource {
 
     /**
      * Delete a relationship.
-     * <p/>
+     * <br>
      * DELETE /objects/{pid}/relationships ? subject predicate object isLiteral datatype
-     * <p/>
+     * <br>
      * Successful Response:
      * Status: 200 OK
      */

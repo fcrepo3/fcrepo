@@ -176,7 +176,7 @@ public class TestDOTranslationUtility {
 
     /**
      * Test method for
-     * {@link org.fcrepo.server.storage.translation.DOTranslationUtility#getAuditRecords(org.fcrepo.server.storage.types.Datastream)}.
+     * {@link org.fcrepo.server.storage.translation.DOTranslationUtility#getAuditRecords(java.io.InputStream)}.
      */
     @Test
     public void testGetAuditRecords() throws Exception {

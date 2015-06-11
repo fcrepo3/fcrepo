@@ -70,24 +70,24 @@ public class ResourceIndexModule
      * Perform post-initialization of this module. ResourceIndexModule takes the
      * following parameters:
      * <ul>
-     * <li> level (required, integer between 0 and 1)<br/> The level of
+     * <li> level (required, integer between 0 and 1)<br> The level of
      * indexing that should be performed. Values correspond to
      * <code>INDEX_LEVEL_OFF</code>, and <code>INDEX_LEVEL_ON</code>.
      * </li>
-     * <li> datastore (required)<br/> The name of the datastore element that
-     * contains the Trippi Connector configuration.
+     * <li> datastore (required)<br> The name of the datastore element that
+     * contains the Trippi Connector configuration.</li>
      * <li> connectionPool (optional, default is ConnectionPoolManager's
-     * default)<br/> Which connection pool to use for updating the database of
-     * method information. </li>
-     * <li> syncUpdates (optional, default is false)<br/> Whether to flush the
+     * default)<br> Which connection pool to use for updating the database of
+     * method information.</li>
+     * <li> syncUpdates (optional, default is false)<br> Whether to flush the
      * triple buffer before returning from object modification operations.
      * Specifying this as true will ensure that RI queries always reflect the
-     * latest triples. </li>
-     * <li> alias:xyz (optional, uri)<br/> Any parameter starting with "alias:"
+     * latest triples.</li>
+     * <li> alias:xyz (optional, uri)<br> Any parameter starting with "alias:"
      * will be put into Trippi's alias map, and can be used for queries. For
      * example, alias:xyz with a value of urn:example:long:uri:x:y:z: will make
      * it possible to use "xyz:a" to mean "urn:example:long:uri:x:y:z:a" in
-     * queries. </li>
+     * queries.</li>
      * </ul>
      */
     @Override

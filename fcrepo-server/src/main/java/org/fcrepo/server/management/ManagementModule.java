@@ -549,7 +549,7 @@ public class ManagementModule
     }
 
     /**
-     * {@inheritDoce}
+     * {@inheritDoc}
      */
     @Override
     public Date setDatastreamVersionable(Context context,
@@ -643,7 +643,6 @@ public class ManagementModule
      * @param pid
      * @param dsID
      * @param controlGroup - new Control Group for datastream
-     * @param ignoreAlreadyDone - if true don't return an error if datastream already has desired control group
      * @param addXMLHeader - add an XML header declaring UTF-8 character encoding to datastream content
      * @param reformat - reformat the XML (in the same format as used for inline XML)
      * @param setMIMETypeCharset - add charset declaration (UTF-8) to the MIMEType, and add text/xml MIMEType if no MIMEType is set

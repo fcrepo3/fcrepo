@@ -246,7 +246,7 @@ public class JMSManager {
      * @param messageSelector
      *        selection criteria for filtering messages
      * @return the Message received for the given Destination
-     * @throws Exception
+     * @throws MessagingException
      */
     public Message listen(String destName, String messageSelector) throws MessagingException {
         if(logger.isDebugEnabled()) {
@@ -279,7 +279,7 @@ public class JMSManager {
      * @param messageSelector
      *        selection criteria for filtering messages
      * @return the Message received for the given Destination
-     * @throws Exception
+     * @throws MessagingException
      */
     public Message listen(Destination dest, String messageSelector) throws MessagingException {
         if(logger.isDebugEnabled()) {
@@ -319,7 +319,7 @@ public class JMSManager {
      * @param timeout
      *        time in milliseconds before timing out
      * @return the Message received for the given Destination
-     * @throws Exception
+     * @throws MessagingException
      */
     public Message listen(String destName, String messageSelector, int timeout)
             throws MessagingException {
@@ -404,7 +404,7 @@ public class JMSManager {
     }
 
     /**
-     * @see JMSManager#listenDurable(Topic, MessageListener, String)
+     * @see JMSManager#listenDurable(Topic, String, MessageListener, String)
      */
     public String listenDurable(String topicName,
                                 MessageListener callback,
@@ -421,7 +421,7 @@ public class JMSManager {
      * method is the same as calling
      * <code>listenDurable(topic, "", callback, null)</code>
      *
-     * @see JMSManager#listenDurable(Topic, MessageListener, String)
+     * @see JMSManager#listenDurable(Topic, String, MessageListener, String)
      */
     public String listenDurable(Topic topic, MessageListener callback)
             throws MessagingException {
@@ -720,7 +720,7 @@ public class JMSManager {
     /**
      * @param destName
      * @return the Session object for the specified destination name.
-     * @throws Exception
+     * @throws MessagingException
      */
     public Session getSession(String destName) throws MessagingException {
         JMSDestination jmsDest = getJMSDestination(destName);
@@ -733,7 +733,7 @@ public class JMSManager {
      * @param destName
      * @return the Destination object for the specified destination
      *         name or null if the destination does not exist
-     * @throws Exception
+     * @throws MessagingException
      */
     public Destination getDestination(String destName)
             throws MessagingException {
@@ -762,7 +762,7 @@ public class JMSManager {
     /**
      * @param destName
      * @return the MessageProducer object for the specified destination name
-     * @throws Exception
+     * @throws MessagingException
      */
     public MessageProducer getProducer(String destName)
             throws MessagingException {
@@ -773,7 +773,7 @@ public class JMSManager {
     /**
      * @param destName
      * @return the MessageConsumer object for the specified destination name
-     * @throws Exception
+     * @throws MessagingException
      */
     public MessageConsumer getConsumer(String destName)
             throws MessagingException {

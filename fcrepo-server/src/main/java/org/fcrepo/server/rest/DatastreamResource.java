@@ -43,12 +43,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * A rest controller to handle CRUD operations for the Fedora datastream API
+ * <p>A rest controller to handle CRUD operations for the Fedora datastream API
  * (API-M) Request syntax:
- * <p/>
+ * </p><p>
  * GET,PUT,POST,DELETE
  * prototol://hostname:port/fedora/objects/PID/datastreams/DSID/versions ?
- * [dateTime][parmArray]
+ * [dateTime][parmArray]</p>
  * <ul>
  * <li>protocol - either http or https.</li>
  * <li>hostname - required hostname of the Fedora server.</li>
@@ -60,8 +60,8 @@ import org.springframework.stereotype.Component;
  * <li>dateTime - optional dateTime value indicating dissemination of a version
  * of the digital object at the specified point in time.
  * <li>parmArray - optional array of method parameters consisting of name/value
- * pairs in the form parm1=value1&parm2=value2...</li>
- *
+ * pairs in the form parm1=value1&amp;parm2=value2...</li>
+ * </ul>
  * @author cuong.tran@yourmediashelf.com
  * @version $Id$
  */
@@ -76,11 +76,11 @@ public class DatastreamResource
         super(server);
     }
     /**
-     * Inquires upon all object Datastreams to obtain datastreams contained by a
+     * <p>Inquires upon all object Datastreams to obtain datastreams contained by a
      * digital object. This returns a set of datastream locations that represent
      * all possible datastreams available in the object.
-     * <p/>
-     * GET /objects/{pid}/datastreams ? asOfDateTime format
+     * </p><p>
+     * GET /objects/{pid}/datastreams ? asOfDateTime format</p>
      *
      * @param pid
      * @param dateTime
@@ -133,10 +133,10 @@ public class DatastreamResource
     }
 
     /**
-     * Invoke API-M.getDatastream(context, pid, dsID, asOfDateTime)
-     * <p/>
-     * GET /objects/{pid}/datastreams/{dsID} ? asOfDateTime &
-     * validateChecksum=true|false
+     * <p>Invoke API-M.getDatastream(context, pid, dsID, asOfDateTime)
+     * </p><p>
+     * GET /objects/{pid}/datastreams/{dsID} ? asOfDateTime &amp;
+     * validateChecksum=true|false</p>
      */
     @Path("/{dsID}")
     @GET
@@ -249,9 +249,9 @@ public class DatastreamResource
     }
 
     /**
-     * Invoke API-A.getDatastreamDissemination(context, pid, dsID, asOfDateTime)
-     * <p/>
-     * GET /objects/{pid}/datastreams/{dsID}/content ? asOfDateTime
+     * <p>Invoke API-A.getDatastreamDissemination(context, pid, dsID, asOfDateTime)
+     * </p><p>
+     * GET /objects/{pid}/datastreams/{dsID}/content ? asOfDateTime</p>
      */
     @Path("/{dsID}/content")
     @GET
@@ -286,9 +286,9 @@ public class DatastreamResource
     }
 
     /**
-     * Invoke API-M.purgeDatastream
-     * <p/>
-     * DELETE /objects/{pid}/datastreams/{dsID} ? startDT endDT logMessage
+     * <p>Invoke API-M.purgeDatastream
+     * </p><p>
+     * DELETE /objects/{pid}/datastreams/{dsID} ? startDT endDT logMessage</p>
      */
     @Path("/{dsID}")
     @DELETE
@@ -323,13 +323,13 @@ public class DatastreamResource
     }
 
     /**
-     * Modify an existing datastream.
-     * <p/>
+     * <p>Modify an existing datastream.
+     * </p><p>
      * PUT /objects/{pid}/datastreams/{dsID} ? dsLocation altIDs dsLabel
      * versionable dsState formatURI checksumType checksum logMessage
-     * <p/>
+     * </p><p>
      * Successful Response: Status: 200 OK Content-Type: text/xml Body: XML
-     * datastream profile
+     * datastream profile</p>
      */
     @Path("/{dsID}")
     @PUT
@@ -369,13 +369,14 @@ public class DatastreamResource
     }
 
     /**
-     * Add or modify a datastream.
-     * <p/>
+     * <p>Add or modify a datastream.
+     * </p><p>
      * POST /objects/{pid}/datastreams/{dsID} ? controlGroup dsLocation altIDs
      * dsLabel versionable dsState formatURI checksumType checksum logMessage
-     * <p/>
+     * </p><p>
      * Successful Response: Status: 201 Created Location: Datastream profile URL
      * Content-Type: text/xml Body: XML datastream profile
+     * </p>
      */
     @Path("/{dsID}")
     @POST

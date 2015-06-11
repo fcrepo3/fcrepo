@@ -140,7 +140,7 @@ public class ScalabilityTests
     /**
      * Runs the ingest over the set number of batches
      * or runs continuously if the number of batches
-     * is <= 0.
+     * is &lt;= 0.
      */
     public void runIngestTest() throws Exception {
         if(numBatches > 0) {

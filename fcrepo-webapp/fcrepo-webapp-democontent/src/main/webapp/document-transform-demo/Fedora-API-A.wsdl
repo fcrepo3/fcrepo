@@ -273,16 +273,15 @@
 		<operation name="getDissemination">
 			<http:operation location="getDissemination"/>
 			<input>
-				<http:urlEncoded>
-					<documentation>Inside the 'parameters' input message, 
-				          mechanism-specific parameters may be given.  When given as an HTTP 
-				          GET API-A request to Fedora, the mechanism-specific parameters are to 
-				          be further encoded in the HTTP GET request in the value of the 
-				          'parameters' message.  When demarshaling the request, the Fedora 
-				          server will un-URL-encode the the value of 'parameters', and pass the 
-				          provided value(s) to the underlying service.
-					</documentation>
-				</http:urlEncoded>
+				<documentation>Inside the 'parameters' input message, 
+			          mechanism-specific parameters may be given.  When given as an HTTP 
+			          GET API-A request to Fedora, the mechanism-specific parameters are to 
+			          be further encoded in the HTTP GET request in the value of the 
+			          'parameters' message.  When demarshaling the request, the Fedora 
+			          server will un-URL-encode the the value of 'parameters', and pass the 
+			          provided value(s) to the underlying service.
+				</documentation>
+				<http:urlEncoded/>
 			</input>
 			<output>
 				<mime:content type="*/*"/>

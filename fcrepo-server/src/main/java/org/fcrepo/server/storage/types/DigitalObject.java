@@ -79,8 +79,8 @@ public interface DigitalObject {
     /**
      * Sets the owner of the object.
      *
-     * @param user
-     *        The userid.
+     * @param owner
+     *        The userid of the owner.
      */
     public void setOwnerId(String owner);
 

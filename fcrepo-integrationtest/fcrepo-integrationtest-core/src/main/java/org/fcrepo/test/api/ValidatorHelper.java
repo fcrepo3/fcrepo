@@ -35,7 +35,7 @@ public class ValidatorHelper {
      * Get all local filenames that correspond to declared schemas. Validation
      * does not work with a "union of all schemata" schema. This was an attempt
      * create the most minimal set of schema by traversing schemaLocation and
-     * <include> within the xsd files. Ultimately, this was a dead end, because
+     * &lt;include&gt; within the xsd files. Ultimately, this was a dead end, because
      * of a bug in Xerces: https://issues.apache.org/jira/browse/XERCESJ-1130
      * schemaLocation typically points to some http resource. For offline tests,
      * we want to use the local copy of that resource (since we know we have

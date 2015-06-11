@@ -413,7 +413,7 @@ public class DbXmlPolicyIndex
      * @param policyName
      * @return true iff the policy store contains a policy identified as
      *         policyName
-     * @throws PolicyStoreException
+     * @throws PolicyIndexException
      */
     @Override
     public boolean contains(String policyName)
